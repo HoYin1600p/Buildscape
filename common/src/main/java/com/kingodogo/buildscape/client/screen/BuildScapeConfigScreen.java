@@ -107,6 +107,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public static int COLOR_BORDER_GRADIENT_END = currentTheme.colorBorderGradientEnd;
     public static int COLOR_BORDER_SHADOW = currentTheme.colorBorderShadow;
 
+    public static int COLOR_CHASSIS_BAND = currentTheme.colorChassisBand;
+    public static int COLOR_BEVEL_SHADOW = currentTheme.colorBevelShadow;
+    public static int COLOR_BEVEL_HIGHLIGHT = currentTheme.colorBevelHighlight;
+
     // Text & Accents
     public static int COLOR_TEXT_WHITE = currentTheme.colorTextWhite;
     public static int COLOR_TEXT_SILVER = currentTheme.colorTextSilver;
@@ -127,8 +131,17 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public static int COLOR_TOGGLE_OFF_TEXT = currentTheme.colorToggleOffText;
 
     public static int COLOR_BTN_BG = currentTheme.colorBtnBg;
+    public static int COLOR_BTN_BG_HOVER = currentTheme.colorBtnBgHover;
+    public static int COLOR_BTN_BG_ACTIVE = currentTheme.colorBtnBgActive;
     public static int COLOR_BTN_BORDER = currentTheme.colorBtnBorder;
     public static int COLOR_BTN_BORDER_HOVER = currentTheme.colorBtnBorderHover;
+
+    public static int COLOR_SLOT_BG = currentTheme.colorSlotBg;
+    public static int COLOR_SLOT_BG_HOVER = currentTheme.colorSlotBgHover;
+    public static int COLOR_SLOT_BORDER = currentTheme.colorSlotBorder;
+
+    public static int COLOR_ACCENT = currentTheme.colorAccent;
+    public static int COLOR_ACCENT_GLOW = currentTheme.colorAccentGlow;
 
     public static void applyTheme(ConfigThemes.Theme theme) {
         currentTheme = theme;
@@ -142,6 +155,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         COLOR_BORDER_GRADIENT_START = theme.colorBorderGradientStart;
         COLOR_BORDER_GRADIENT_END = theme.colorBorderGradientEnd;
         COLOR_BORDER_SHADOW = theme.colorBorderShadow;
+
+        COLOR_CHASSIS_BAND = theme.colorChassisBand;
+        COLOR_BEVEL_SHADOW = theme.colorBevelShadow;
+        COLOR_BEVEL_HIGHLIGHT = theme.colorBevelHighlight;
 
         COLOR_TEXT_WHITE = theme.colorTextWhite;
         COLOR_TEXT_SILVER = theme.colorTextSilver;
@@ -161,8 +178,17 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         COLOR_TOGGLE_OFF_TEXT = theme.colorToggleOffText;
 
         COLOR_BTN_BG = theme.colorBtnBg;
+        COLOR_BTN_BG_HOVER = theme.colorBtnBgHover;
+        COLOR_BTN_BG_ACTIVE = theme.colorBtnBgActive;
         COLOR_BTN_BORDER = theme.colorBtnBorder;
         COLOR_BTN_BORDER_HOVER = theme.colorBtnBorderHover;
+
+        COLOR_SLOT_BG = theme.colorSlotBg;
+        COLOR_SLOT_BG_HOVER = theme.colorSlotBgHover;
+        COLOR_SLOT_BORDER = theme.colorSlotBorder;
+
+        COLOR_ACCENT = theme.colorAccent;
+        COLOR_ACCENT_GLOW = theme.colorAccentGlow;
     }
 
     // --- Sidenav Specification ---
@@ -2081,20 +2107,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
         // 4. Outer Chassis Band (offset 2 to 4)
-        int band = applyAlpha(0xFF22222A, alpha);
+        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
         drawBorder(poseStackOrGraphics, x + 2, y + 2, w - 4, h - 4, band);
         drawBorder(poseStackOrGraphics, x + 3, y + 3, w - 6, h - 6, band);
 
         // 5. Stepped Bevel Ridge & Groove at offset 5
-        int bevelShadow = applyAlpha(0xFF0E0E12, alpha);
-        int bevelHighlight = applyAlpha(0xFF383848, alpha);
+        int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + 5, x + w - 5, y + 6, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + 5, x + 6, y + h - 5, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + h - 6, x + w - 5, y + h - 5, bevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 6, y + 5, x + w - 5, y + h - 5, bevelHighlight);
 
         // 6. Secondary soft metallic transition at offset 8
-        int softGroove = applyAlpha(0xFF16161C, alpha);
+        int softGroove = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         drawBorder(poseStackOrGraphics, x + 8, y + 8, w - 16, h - 16, softGroove);
     }
 
@@ -2119,19 +2145,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
         // 4. Outer Chassis Band (offset 2 to 4)
-        int band = applyAlpha(0xFF22222A, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + w - 2, y + 3, band);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + h - 3, x + w - 2, y + h - 2, band);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 3, y + 2, x + w - 2, y + h - 2, band);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + 3, y + h - 2, band);
+        int sideBand = applyAlpha(COLOR_CHASSIS_BAND, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + w - 2, y + 3, sideBand);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + h - 3, x + w - 2, y + h - 2, sideBand);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 3, y + 2, x + w - 2, y + h - 2, sideBand);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + 3, y + h - 2, sideBand);
 
         // 5. Stepped Bevel Ridge & Groove at offset 4
-        int bevelShadow = applyAlpha(0xFF0E0E12, alpha);
-        int bevelHighlight = applyAlpha(0xFF383848, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + w - 4, y + 5, bevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + h - 5, x + w - 4, y + h - 4, bevelHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 5, y + 4, x + w - 4, y + h - 4, bevelHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + 5, y + h - 4, bevelShadow);
+        int sideBevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int sideBevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + w - 4, y + 5, sideBevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + h - 5, x + w - 4, y + h - 4, sideBevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 5, y + 4, x + w - 4, y + h - 4, sideBevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + 5, y + h - 4, sideBevelShadow);
     }
 
     private void renderDockingBridges(Object poseStackOrGraphics, int frameRight, int sidePanelX, int sidePanelY, int sidePanelH, float alpha) {
@@ -2611,8 +2637,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private void drawGroove(Object poseStackOrGraphics, int x, int y, int w, boolean horizontal, float alpha) {
-        int dark = applyAlpha(COLOR_FRAME_BLACK, alpha);
-        int light = applyAlpha(0xFF26262E, alpha);
+        int dark = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int light = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         if (horizontal) {
             Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, dark);
             Services.PLATFORM.fill(poseStackOrGraphics, x, y + 1, x + w, y + 2, light);

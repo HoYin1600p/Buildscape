@@ -1081,6 +1081,18 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isAshenKingPillar()) {
             return new AshenKingPillarBlock(props) {
                 @Override
+                public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
+                        LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (state.getValue(WATERLOGGED)) {
+                        level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                    }
+                    Direction facing = state.getValue(FACING);
+                    if (direction == facing.getClockWise() || direction == facing.getCounterClockWise()) {
+                        return state.setValue(PART, com.kingodogo.buildscape.block.PillarPart.SINGLE);
+                    }
+                    return state;
+                }
+                @Override
                 public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, hand, hit);
                 }

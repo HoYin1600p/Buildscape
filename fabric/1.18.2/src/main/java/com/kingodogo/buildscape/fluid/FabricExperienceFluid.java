@@ -21,7 +21,7 @@ public abstract class FabricExperienceFluid extends WaterFluid {
     @Override public boolean isSame(Fluid fluid) { return fluid == STILL || fluid == FLOWING; }
     @Override public Item getBucket() { return Services.PLATFORM.getItem(new CommonId("buildscape", "experience_bucket")); }
     @Override public BlockState createLegacyBlock(FluidState state) {
-        return Services.PLATFORM.getBlock(new CommonId("buildscape", "experience_block")).defaultBlockState()
+        return Services.PLATFORM.getBlock(new CommonId("buildscape", "experience_liquid")).defaultBlockState()
                 .setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
     }
     @Override protected boolean canConvertToSource() { return false; }

@@ -237,6 +237,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         prevTabIndex = selectedTabIndex;
         selectedTabIndex = newIndex;
         scrollOffset = 0.0;
+        targetScrollOffset = 0.0;
+        isDraggingScrollbar = false;
         selectedPillarDetailId = null;
         if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
             closeSidePanel();
@@ -264,7 +266,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Scroll & Viewport State ---
     private double scrollOffset = 0.0;
+    private double targetScrollOffset = 0.0;
     private double maxScroll = 0.0;
+    private boolean isDraggingScrollbar = false;
+    private double scrollDragStartY = 0.0;
+    private double scrollDragStartOffset = 0.0;
+    private int currentScrollbarTrackX = 0;
+    private int currentScrollbarTrackY = 0;
+    private int currentScrollbarTrackW = 6;
+    private int currentScrollbarTrackH = 0;
+    private int currentScrollbarThumbH = 18;
 
     // --- Particle Settings Options Arrays ---
     private static final String[] GLOBAL_PARTICLE_PATTERNS = {
@@ -862,9 +873,17 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 Services.PLATFORM.openScreen(parent);
                 return 0.0f;
             } else {
-                closeProgress = 1.0f - easeInSine(elapsed);
+                closeProgress = 1.0f - easeOutCubic(elapsed);
             }
         }
+
+        // Smooth scrolling dampening
+        if (Math.abs(targetScrollOffset - scrollOffset) > 0.05) {
+            scrollOffset += (targetScrollOffset - scrollOffset) * 0.35;
+        } else {
+            scrollOffset = targetScrollOffset;
+        }
+        scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
 
         return isClosing ? closeProgress : openProgress;
     }

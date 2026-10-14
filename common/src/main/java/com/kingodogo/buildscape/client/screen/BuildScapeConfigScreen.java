@@ -248,8 +248,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         int tabH = 26;
         int tabGap = 3;
-        int panelH = Math.min(height - 16, 308);
-        int panelY = (height - panelH) / 2;
+        int effH = getEffectiveHeight();
+        int panelH = Math.min(effH - 16, 308);
+        int panelY = (effH - panelH) / 2;
         int headerH = 24;
         int navY = panelY + 7 + headerH + 5;
         int startY = navY + 4;
@@ -710,8 +711,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int tabH = 26;
         int tabGap = 3;
-        int panelH = Math.min(height - 16, 308);
-        int panelY = (height - panelH) / 2;
+        int effH = getEffectiveHeight();
+        int panelH = Math.min(effH - 16, 308);
+        int panelY = (effH - panelH) / 2;
         int headerH = 24;
         int navY = panelY + 7 + headerH + 5;
         int startY = navY + 4;
@@ -720,6 +722,43 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (activeTab != null) {
             activeTab.init();
         }
+    }
+
+    // --- Adaptive GUI Scaling Engine ---
+    public float getGuiUiScale() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getWindow() == null) return 1.0f;
+        double guiScale = mc.getWindow().getGuiScale();
+
+        // If the logical screen is large enough to fit both the main panel and side panel, keep 1:1
+        float minRequiredW = 820.0f;
+        float minRequiredH = 340.0f;
+        if (width >= minRequiredW && height >= minRequiredH) {
+            return 1.0f;
+        }
+
+        // Viewport too cramped (e.g. GUI Scale 3/4 on 1080p, or small windowed displays)
+        float scale = 1.0f;
+        if (guiScale > 2.0) {
+            scale = (float) (2.0 / guiScale);
+        }
+        float effW = width / scale;
+        float effH = height / scale;
+        if (effW < minRequiredW || effH < minRequiredH) {
+            float fitScale = Math.min(width / minRequiredW, height / minRequiredH);
+            scale = Math.min(scale, fitScale);
+        }
+        return Math.max(0.25f, Math.min(1.0f, scale));
+    }
+
+    public int getEffectiveWidth() {
+        float s = getGuiUiScale();
+        return Math.abs(s - 1.0f) > 0.001f ? (int) Math.ceil(width / s) : width;
+    }
+
+    public int getEffectiveHeight() {
+        float s = getGuiUiScale();
+        return Math.abs(s - 1.0f) > 0.001f ? (int) Math.ceil(height / s) : height;
     }
 
     // --- Compatibility Methods for Legacy Widgets & Tabs ---
@@ -784,7 +823,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     public int getContentX() {
-        return (int) (width * 0.15);
+        return (int) (getEffectiveWidth() * 0.15);
     }
 
     public int getContentY() {
@@ -792,7 +831,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     public int getContentWidth() {
-        return (int) (width * 0.42);
+        return (int) (getEffectiveWidth() * 0.42);
     }
 
     public int getRightPanelX() {
@@ -800,11 +839,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     public int getRightPanelWidth() {
-        return (int) (width * 0.42);
+        return (int) (getEffectiveWidth() * 0.42);
     }
 
     public int getContentHeight() {
-        return height - 40;
+        return getEffectiveHeight() - 40;
     }
 
     public int getVerticalPanelGap() {
@@ -926,14 +965,26 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         Font font = Minecraft.getInstance().font;
 
-        // 1. Full-screen dimmed backdrop
+        // 1. Full-screen dimmed backdrop (draw before pose scaling to cover physical window)
         Services.PLATFORM.fill(poseStackOrGraphics, 0, 0, width, height, applyAlpha(COLOR_OVERLAY, alpha));
 
+        float uiScale = getGuiUiScale();
+        boolean scaled = Math.abs(uiScale - 1.0f) > 0.001f;
+        if (scaled) {
+            Services.PLATFORM.pushGuiPose(poseStackOrGraphics);
+            Services.PLATFORM.scaleGuiPose(poseStackOrGraphics, uiScale, uiScale);
+        }
+
+        int effW = getEffectiveWidth();
+        int effH = getEffectiveHeight();
+        int effMouseX = scaled ? (int) Math.round(mouseX / uiScale) : mouseX;
+        int effMouseY = scaled ? (int) Math.round(mouseY / uiScale) : mouseY;
+
         // 2. Geometry: 1 Big Unified Panel centered on screen
-        int panelW = Math.min(width - 20, 560);
-        int panelH = Math.min(height - 16, 308);
-        int panelX = (width - panelW) / 2;
-        int panelY = (height - panelH) / 2;
+        int panelW = Math.min(effW - 20, 560);
+        int panelH = Math.min(effH - 16, 308);
+        int panelX = (effW - panelW) / 2;
+        int panelY = (effH - panelH) / 2;
 
         int offsetY = Math.round((1.0f - alpha) * 8.0f);
         panelY += offsetY;
@@ -949,7 +1000,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         updateSidePanelAnimation();
         if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
             int frameRight = frameX + frameW;
-            int availRight = width - frameRight - 4;
+            int availRight = effW - frameRight - 4;
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
@@ -957,14 +1008,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
             int sidePanelX = dockX - slideOffset;
 
-            renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, mouseX, mouseY, alpha);
+            renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, effMouseX, effMouseY, alpha);
         }
 
         // 3. Render 1 Big Frame with expanded chassis gap and metallic gradient
         drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, alpha);
-
-        // 3b. Top Center Crest Badge (Image 2 beveled frame for Buildscape logo)
-        drawTopCrestBadge(poseStackOrGraphics, font, frameX, frameY, frameW, alpha);
 
         // 4. Header Bar (kept exactly as placed rn, with top-left metallic gradient artifact)
         int headerH = 24;
@@ -981,11 +1029,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int tagW = font.width(versionTag);
         drawText(poseStackOrGraphics, font, versionTag, headerX + headerW - tagW - 28, headerY + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
+        // 4b. Top Center Crest Badge (Beveled Frame with Buildscape Logo, sitting proud over frame & header)
+        drawTopCrestBadge(poseStackOrGraphics, font, frameX, frameY, frameW, alpha);
+
         // Close Button [ ✕ ] with top-left metallic highlight
         int closeBtnSize = 14;
         int closeBtnX = headerX + headerW - closeBtnSize - 5;
         int closeBtnY = headerY + 5;
-        boolean hoverClose = mouseX >= closeBtnX && mouseX <= closeBtnX + closeBtnSize && mouseY >= closeBtnY && mouseY <= closeBtnY + closeBtnSize;
+        boolean hoverClose = effMouseX >= closeBtnX && effMouseX <= closeBtnX + closeBtnSize && effMouseY >= closeBtnY && effMouseY <= closeBtnY + closeBtnSize;
         drawBeveledButton(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, hoverClose ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverClose, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, "✕", closeBtnX + closeBtnSize / 2, closeBtnY + 3, applyAlpha(hoverClose ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
@@ -1002,20 +1053,24 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int contentH = navH;
 
         // Render Left Navigation Strip
-        renderSidenav(poseStackOrGraphics, font, navX, navY, navW, navH, mouseX, mouseY, alpha);
+        renderSidenav(poseStackOrGraphics, font, navX, navY, navW, navH, effMouseX, effMouseY, alpha);
 
         // Render Right Main Configuration Content Area
-        renderContentArea(poseStackOrGraphics, font, contentX, contentY, contentW, contentH, mouseX, mouseY, alpha);
+        renderContentArea(poseStackOrGraphics, font, contentX, contentY, contentW, contentH, effMouseX, effMouseY, alpha);
 
         // 7. Fallback Color Picker Modal if explicitly toggled
         if (showColorModal) {
-            renderColorPickerModal(poseStackOrGraphics, font, mouseX, mouseY, alpha);
+            renderColorPickerModal(poseStackOrGraphics, font, effMouseX, effMouseY, alpha);
         }
 
         // Render legacy activeTab if any
         if (activeTab != null) {
-            activeTab.render(poseStackOrGraphics, mouseX, mouseY, partialTick);
-            activeTab.renderTooltips(poseStackOrGraphics, mouseX, mouseY, partialTick);
+            activeTab.render(poseStackOrGraphics, effMouseX, effMouseY, partialTick);
+            activeTab.renderTooltips(poseStackOrGraphics, effMouseX, effMouseY, partialTick);
+        }
+
+        if (scaled) {
+            Services.PLATFORM.popGuiPose(poseStackOrGraphics);
         }
     }
 
@@ -1964,12 +2019,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Draggable Color Picker Modal (2D Saturation x Brightness + Hue Spectrum Slider) ---
     private void renderColorPickerModal(Object poseStackOrGraphics, Font font, int mouseX, int mouseY, float alpha) {
-        Services.PLATFORM.fill(poseStackOrGraphics, 0, 0, width, height, applyAlpha(0xA0000000, alpha));
+        int effW = getEffectiveWidth();
+        int effH = getEffectiveHeight();
+        Services.PLATFORM.fill(poseStackOrGraphics, 0, 0, effW, effH, applyAlpha(0xA0000000, alpha));
 
         int modalW = 340;
         int modalH = 196;
-        int modalX = (width - modalW) / 2;
-        int modalY = (height - modalH) / 2;
+        int modalX = (effW - modalW) / 2;
+        int modalY = (effH - modalH) / 2;
 
         drawVaultHuntersFrame(poseStackOrGraphics, modalX, modalY, modalW, modalH, COLOR_PANEL_BG, alpha);
 
@@ -2998,14 +3055,23 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isClosing) return true;
 
+        float uiScale = getGuiUiScale();
+        if (Math.abs(uiScale - 1.0f) > 0.001f) {
+            mouseX /= uiScale;
+            mouseY /= uiScale;
+        }
+
         if (showColorModal) {
             return handleColorModalClick(mouseX, mouseY);
         }
 
-        int panelW = Math.min(width - 20, 560);
-        int panelH = Math.min(height - 16, 308);
-        int panelX = (width - panelW) / 2;
-        int panelY = (height - panelH) / 2;
+        int effW = getEffectiveWidth();
+        int effH = getEffectiveHeight();
+
+        int panelW = Math.min(effW - 20, 560);
+        int panelH = Math.min(effH - 16, 308);
+        int panelX = (effW - panelW) / 2;
+        int panelY = (effH - panelH) / 2;
 
         int bevelExpansion = 5;
         int frameX = panelX - bevelExpansion;
@@ -3016,7 +3082,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // 0. Right Side Panel Clicks (when visible)
         if (sidePanelProgress > 0.05f && sidePanelType != SidePanelType.NONE && !isSidePanelClosing) {
             int frameRight = frameX + frameW;
-            int availRight = width - frameRight - 4;
+            int availRight = effW - frameRight - 4;
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
@@ -3972,10 +4038,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private boolean handleColorModalClick(double mouseX, double mouseY) {
+        int effW = getEffectiveWidth();
+        int effH = getEffectiveHeight();
         int modalW = 340;
         int modalH = 196;
-        int modalX = (width - modalW) / 2;
-        int modalY = (height - modalH) / 2;
+        int modalX = (effW - modalW) / 2;
+        int modalY = (effH - modalH) / 2;
 
         int closeSize = 14;
         int closeX = modalX + modalW - closeSize - 10;
@@ -4438,6 +4506,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        float uiScale = getGuiUiScale();
+        if (Math.abs(uiScale - 1.0f) > 0.001f) {
+            mouseX /= uiScale;
+            mouseY /= uiScale;
+        }
         isDraggingScrollbar = false;
         draggingGradient = false;
         draggingHue = false;
@@ -4449,6 +4522,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        float uiScale = getGuiUiScale();
+        if (Math.abs(uiScale - 1.0f) > 0.001f) {
+            mouseX /= uiScale;
+            mouseY /= uiScale;
+            dragX /= uiScale;
+            dragY /= uiScale;
+        }
+
         if (isDraggingScrollbar && maxScroll > 0) {
             int trackH = currentScrollbarTrackH;
             int thumbH = currentScrollbarThumbH;
@@ -4462,18 +4543,21 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return true;
         }
 
+        int effW = getEffectiveWidth();
+        int effH = getEffectiveHeight();
+
         if (sidePanelType == SidePanelType.COLOR_PICKER && sidePanelProgress > 0.05f) {
-            int panelW = Math.min(width - 20, 560);
-            int panelH = Math.min(height - 16, 308);
-            int panelX = (width - panelW) / 2;
-            int panelY = (height - panelH) / 2;
+            int panelW = Math.min(effW - 20, 560);
+            int panelH = Math.min(effH - 16, 308);
+            int panelX = (effW - panelW) / 2;
+            int panelY = (effH - panelH) / 2;
             int bevelExpansion = 5;
             int frameX = panelX - bevelExpansion;
             int frameY = panelY - bevelExpansion;
             int frameW = panelW + bevelExpansion * 2;
             int frameH = panelH + bevelExpansion * 2;
             int frameRight = frameX + frameW;
-            int availRight = width - frameRight - 6;
+            int availRight = effW - frameRight - 6;
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
@@ -4510,8 +4594,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (showColorModal) {
             int modalW = 340;
             int modalH = 196;
-            int modalX = (width - modalW) / 2;
-            int modalY = (height - modalH) / 2;
+            int modalX = (effW - modalW) / 2;
+            int modalY = (effH - modalH) / 2;
             int headH = 24;
 
             int gradBoxX = modalX + 16;
@@ -4544,22 +4628,36 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         if (showColorModal) return true;
 
+        float uiScale = getGuiUiScale();
+        if (Math.abs(uiScale - 1.0f) > 0.001f) {
+            mouseX /= uiScale;
+            mouseY /= uiScale;
+        }
+
+        int effW = getEffectiveWidth();
+        int effH = getEffectiveHeight();
+
         if (sidePanelProgress > 0.05f && sidePanelType != SidePanelType.NONE) {
-            int panelW = Math.min(width - 20, 560);
-            int panelH = Math.min(height - 16, 308);
-            int panelX = (width - panelW) / 2;
-            int panelY = (height - panelH) / 2;
+            int panelW = Math.min(effW - 20, 560);
+            int panelH = Math.min(effH - 16, 308);
+            int panelX = (effW - panelW) / 2;
+            int panelY = (effH - panelH) / 2;
             int bevelExpansion = 5;
             int frameX = panelX - bevelExpansion;
             int frameY = panelY - bevelExpansion;
             int frameW = panelW + bevelExpansion * 2;
             int frameH = panelH + bevelExpansion * 2;
+            int frameRight = frameX + frameW;
+            int availRight = effW - frameRight - 4;
+            int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
-            int frameRight = frameX + frameW;
-            int dockX = frameRight + 7;
+            int dockX = frameRight - 2;
+            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
+            int sidePanelX = dockX - slideOffset;
 
-            if (mouseX >= dockX && mouseX <= width && mouseY >= sidePanelY && mouseY <= sidePanelY + sidePanelH) {
+            int interactiveLeft = Math.max(frameRight, sidePanelX);
+            if (mouseX >= interactiveLeft && mouseX <= sidePanelX + sidePanelTargetW && mouseY >= sidePanelY && mouseY <= sidePanelY + sidePanelH) {
                 if (sidePanelMaxScroll > 0) {
                     sidePanelScrollOffset = Math.max(0, Math.min(sidePanelMaxScroll, sidePanelScrollOffset - (int) (delta * 16.0)));
                     return true;

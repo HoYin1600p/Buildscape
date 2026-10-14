@@ -25,6 +25,7 @@ public class BuildscapeClientConfig {
     public static final String KEY_CAKE_STACKING = "isCakeStack";
     public static final String KEY_WATER_BOTTLE_STACKING = "isWaterbottleStack";
     public static final String KEY_UI_THEME = "UITheme";
+    public static final String KEY_UI_BACKGROUND = "UIBackground";
 
     private static final LinkedHashMap<String, String> DEFAULTS = new LinkedHashMap<>();
     private static volatile BuildscapeClientConfig INSTANCE;
@@ -39,6 +40,7 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_CAKE_STACKING, "true");
         DEFAULTS.put(KEY_WATER_BOTTLE_STACKING, "true");
         DEFAULTS.put(KEY_UI_THEME, "dark");
+        DEFAULTS.put(KEY_UI_BACKGROUND, "none");
     }
 
     private final Map<String, String> values;
@@ -204,6 +206,15 @@ public class BuildscapeClientConfig {
 
     public void setUiTheme(String theme) {
         values.put(KEY_UI_THEME, theme != null ? theme : "dark");
+        save();
+    }
+
+    public String getUiBackground() {
+        return values.getOrDefault(KEY_UI_BACKGROUND, "none");
+    }
+
+    public void setUiBackground(String background) {
+        values.put(KEY_UI_BACKGROUND, background != null ? background : "none");
         save();
     }
 }

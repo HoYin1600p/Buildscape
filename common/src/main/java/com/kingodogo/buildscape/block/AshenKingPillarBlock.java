@@ -203,7 +203,7 @@ public class AshenKingPillarBlock extends PillarBlock {
 
         if (player.isShiftKeyDown()) {
             ItemStack displayedItem = pillarBE.getDisplayedItem();
-            boolean isSpawnEgg = !displayedItem.isEmpty() && displayedItem.getItem() instanceof SpawnEggItem;
+            boolean isSpawnEgg = !displayedItem.isEmpty() && Services.PLATFORM.isSpawnEgg(displayedItem);
 
             if (isSpawnEgg) {
                 pillarBE.rotateFacing();

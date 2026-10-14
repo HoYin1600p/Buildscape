@@ -179,6 +179,71 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return entity instanceof net.minecraft.world.entity.monster.EnderMan;
     }
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.canBeReplaced(); }
+    @Override public Boolean writeSolvedToShulker(net.minecraft.world.item.ItemStack shulker, List<net.minecraft.world.item.ItemStack> solved) {
+        NonNullList<net.minecraft.world.item.ItemStack> shulkerItems = NonNullList.withSize(27, net.minecraft.world.item.ItemStack.EMPTY);
+        net.minecraft.world.item.component.ItemContainerContents contents = shulker.get(DataComponents.CONTAINER);
+        if (contents != null) contents.copyInto(shulkerItems);
+
+        List<String> savedFilters = getTagStringList(getCustomData(shulker, true), "GhostFilters");
+        List<String> filters = new ArrayList<>(27);
+        boolean removedGhost = false;
+        for (int i = 0; i < 27; i++) {
+            filters.add(i < savedFilters.size() ? savedFilters.get(i) : "");
+            net.minecraft.world.item.ItemStack item = shulkerItems.get(i);
+            if (!item.isEmpty() && item.has(DataComponents.CUSTOM_DATA) && item.get(DataComponents.CUSTOM_DATA).copyTag().getBoolean("ghost")) {
+                CommonId id = getItemId(item.getItem());
+                if (filters.get(i).isEmpty() && id != null) filters.set(i, id.toString());
+                shulkerItems.set(i, net.minecraft.world.item.ItemStack.EMPTY);
+                removedGhost = true;
+            }
+        }
+
+        int targetRow = -1;
+        for (int row = 0; row < 3; row++) {
+            boolean rowCanFit = true;
+            boolean rowHasAnyConflict = false;
+            for (int col = 0; col < 9; col++) {
+                int slot = row * 9 + col;
+                boolean slotOccupied = !shulkerItems.get(slot).isEmpty() || !filters.get(slot).isEmpty();
+                if (slotOccupied) rowHasAnyConflict = true;
+                if (!solved.get(col).isEmpty() && slotOccupied) {
+                    rowCanFit = false;
+                    break;
+                }
+            }
+            if (rowCanFit) {
+                if (!rowHasAnyConflict || targetRow < 0) {
+                    targetRow = row;
+                    if (!rowHasAnyConflict) break;
+                }
+            }
+        }
+        if (targetRow < 0) return false;
+
+        boolean wroteAnyFilter = false;
+        for (int i = 0; i < 9; i++) {
+            net.minecraft.world.item.ItemStack solvedStack = solved.get(i);
+            if (!solvedStack.isEmpty()) {
+                CommonId itemId = getItemId(solvedStack.getItem());
+                if (itemId != null) {
+                    filters.set(targetRow * 9 + i, itemId.toString());
+                    wroteAnyFilter = true;
+                }
+            }
+        }
+        if (!wroteAnyFilter) return false;
+
+        boolean hasFilterX = false;
+        for (String filter : filters) if (!filter.isEmpty()) hasFilterX = true;
+        final boolean hasFilter = hasFilterX;
+        if (removedGhost) shulker.set(DataComponents.CONTAINER, net.minecraft.world.item.component.ItemContainerContents.fromItems(shulkerItems));
+        updateCustomData(shulker, root -> {
+            if (hasFilter) putTagStringList(root, "GhostFilters", filters);
+            else root.remove("GhostFilters");
+        });
+        return true;
+    }
+    @Override public boolean isSolidMaterial(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) { return state.isSolid(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block == net.minecraft.world.level.block.Blocks.GLASS || block instanceof net.minecraft.world.level.block.StainedGlassBlock || block instanceof net.minecraft.world.level.block.TintedGlassBlock; }
     @Override
     public net.minecraft.world.level.block.RenderShape getEntityBlockRenderShape() { return net.minecraft.world.level.block.RenderShape.ENTITYBLOCK_ANIMATED; }
@@ -245,6 +310,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     @SuppressWarnings("unchecked")
     public boolean getGameRuleBoolean(net.minecraft.world.level.Level level, Object ruleKey, boolean fallback) {
+        // A client level keeps its own default rules; the server's values arrive in the sync packet and are the fallback.
+        if (level != null && level.isClientSide()) return fallback;
         if (level != null && ruleKey instanceof net.minecraft.world.level.GameRules.Key<?> key) {
             return level.getGameRules().getBoolean((net.minecraft.world.level.GameRules.Key<net.minecraft.world.level.GameRules.BooleanValue>) key);
         }
@@ -1027,7 +1094,26 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public int getDyeColorValue(DyeColor color) {
-        return color != null ? color.getTextureDiffuseColor() : 0xFFFFFF;
+        if (color == null) return 0xFFFFFF;
+        // The reference's glow light dye palette (not the vanilla colors).
+        return switch (color) {
+            case WHITE -> 0xE8FEFD;
+            case ORANGE -> 0xFF5C00;
+            case MAGENTA -> 0xFF00FF;
+            case LIGHT_BLUE -> 0x3CDFFF;
+            case YELLOW -> 0xFFFF00;
+            case LIME -> 0xBFFE00;
+            case PINK -> 0xF686B7;
+            case GRAY -> 0x232526;
+            case LIGHT_GRAY -> 0xB1B8C5;
+            case CYAN -> 0x00FFFF;
+            case PURPLE -> 0xAB87FF;
+            case BLUE -> 0x1919EA;
+            case BROWN -> 0x411900;
+            case GREEN -> 0x39FF14;
+            case RED -> 0xFF0000;
+            case BLACK -> 0x07010C;
+        };
     }
 
     @Override

@@ -27,6 +27,7 @@
     "IronBarsBlockMixin",
     "ItemCombinerMenuAccessor",
     "ItemDefaultsV121xMixin",
+    "FireworkStarItemV121xMixin",
     "ItemV121xMixin",
     "LavaFluidMixin",
     "LeavesBlockV121xMixin",
@@ -47,6 +48,8 @@
   ],
   "client": [
     "AbstractContainerScreenMixin",
+    "BeaconBlockEntityRendererMixin",
+    "BeaconRendererInvoker",
     "FireworkStarterMixin",
     "GlassJarRenderShapeMixin",
     "PauseScreenMixin",

@@ -435,6 +435,36 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public Item createHomemakerSpawnEggItem(Item.Properties properties, boolean festive) {
+        EntityType<? extends net.minecraft.world.entity.Mob> type =
+                (EntityType<? extends net.minecraft.world.entity.Mob>) (festive
+                        ? getFestiveWanderingHomemakerEntityType() : getWanderingHomemakerEntityType());
+        return new SpawnEggItem(type, festive ? 0x990000 : 0x5c3c24, festive ? 0x009900 : 0xe4b484, properties) {
+            @Override public int getColor(int tintIndex) { return -1; }
+
+            @Override
+            public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+                super.appendHoverText(stack, level, tooltip, flag);
+                tooltip.add(new TranslatableComponent("tooltip.buildscape." + (festive
+                        ? "festive_wandering_homemaker_spawn_egg" : "wandering_homemaker_spawn_egg") + ".spawn_info"));
+                if (level != null) {
+                    long remaining = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime
+                            - System.currentTimeMillis();
+                    if (remaining > 0) {
+                        long seconds = remaining / 1000;
+                        tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active",
+                                seconds / 60, seconds % 60).withStyle(net.minecraft.ChatFormatting.RED));
+                    } else {
+                        tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                                .withStyle(net.minecraft.ChatFormatting.GREEN));
+                    }
+                }
+            }
+        };
+    }
+
+    @Override
     public Entity createBoatEntity(Level level, double x, double y, double z) {
         return new PoplarBoatEntityImpl(level, x, y, z);
     }
@@ -1090,7 +1120,26 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public int getDyeColorValue(DyeColor color) {
-        return color != null ? color.getFireworkColor() : 0xFFFFFF;
+        if (color == null) return 0xFFFFFF;
+        // The reference's glow light dye palette (not the vanilla firework colors).
+        return switch (color) {
+            case WHITE -> 0xE8FEFD;
+            case ORANGE -> 0xFF5C00;
+            case MAGENTA -> 0xFF00FF;
+            case LIGHT_BLUE -> 0x3CDFFF;
+            case YELLOW -> 0xFFFF00;
+            case LIME -> 0xBFFE00;
+            case PINK -> 0xF686B7;
+            case GRAY -> 0x232526;
+            case LIGHT_GRAY -> 0xB1B8C5;
+            case CYAN -> 0x00FFFF;
+            case PURPLE -> 0xAB87FF;
+            case BLUE -> 0x1919EA;
+            case BROWN -> 0x411900;
+            case GREEN -> 0x39FF14;
+            case RED -> 0xFF0000;
+            case BLACK -> 0x07010C;
+        };
     }
 
     @Override
@@ -1462,7 +1511,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public boolean isSameItemSameComponents(ItemStack a, ItemStack b) {
-        return ItemStack.matches(a, b);
+        // The name and every caller mean the same item and tags regardless of count (ItemStack.matches also compares counts).
+        return ItemStack.isSameItemSameTags(a, b);
     }
 
     @Override

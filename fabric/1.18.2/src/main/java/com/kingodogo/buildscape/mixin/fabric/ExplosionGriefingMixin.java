@@ -15,6 +15,9 @@ public abstract class ExplosionGriefingMixin {
             "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"), require = 0)
     private boolean buildscape$griefing(GameRules rules, GameRules.Key<GameRules.BooleanValue> key) {
         Entity entity = (Entity)(Object)this;
+        // The shared check recognises fireballs by class name, which is an intermediary name at runtime on Fabric.
+        if (key == GameRules.RULE_MOBGRIEFING && entity instanceof LargeFireball
+                && com.kingodogo.buildscape.world.ModGameRules.isGhastGriefingDisabled()) return false;
         if (key == GameRules.RULE_MOBGRIEFING && com.kingodogo.buildscape.event.ModCommonEvents.isMobGriefingDisabled(entity, entity.level)) return false;
         return rules.getBoolean(key);
     }

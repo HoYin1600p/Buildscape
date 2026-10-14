@@ -10,11 +10,13 @@
     "fabric.ItemUseFinishMixin",
     "fabric.AdvancementCompletionMixin",
     "fabric.AnvilUpdateMixin",
+    "fabric.BeaconBlockEntityColorMixin",
     "fabric.EndermanGriefingMixin",
     "fabric.FireballGriefingMixin",
     "fabric.ExplosionGriefingMixin",
     "fabric.SneakBypassUseMixin",
-    "fabric.StrawBedSpawnMixin"
+    "fabric.StrawBedSpawnMixin",
+    "fabric.LivingEntityLadderMixin"
   ],
   "client": [
     "client.KeyboardInputMixin",

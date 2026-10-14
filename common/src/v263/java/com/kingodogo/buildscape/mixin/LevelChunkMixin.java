@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.block.HollowLogBlock;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
+import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
 import net.minecraft.core.BlockPos;
@@ -34,10 +35,10 @@ public abstract class LevelChunkMixin {
         entity.preRemoveSideEffects(pos, state);
     }
 
-    // Main's onRemove ran for every replacement, including the setblock command. 26.2 only calls
+    // Main's onRemove ran for every replacement, including the setblock command. 26.3 only calls
     // preRemoveSideEffects/affectNeighborsAfterRemoval when side effects are allowed (the command passes
-    // flag 256), and removes the block entity before affectNeighborsAfterRemoval, so hollow logs and pipes
-    // run their removal here while the covers, decoration and fluid data are still readable.
+    // flag 256), and removes the block entity before affectNeighborsAfterRemoval, so hollow logs, pipes
+    // and pillars run their removal here while their block entity data is still readable.
     @Inject(method = "setBlockState", at = @At(value = "INVOKE", ordinal = 0,
             target = "Lnet/minecraft/world/level/chunk/LevelChunk;removeBlockEntity(Lnet/minecraft/core/BlockPos;)V"))
     private void buildscape$hollowRemoved(BlockPos pos, BlockState newState, int flags, CallbackInfoReturnable<BlockState> cir) {
@@ -54,6 +55,8 @@ public abstract class LevelChunkMixin {
             log.onBlockRemoved(chunk.getLevel(), pos, oldState);
         } else if (oldState.getBlock() instanceof HollowPipeBlock pipe) {
             pipe.onBlockRemoved(chunk.getLevel(), pos, oldState);
+        } else if (!oldState.is(newState.getBlock()) && oldState.getBlock() instanceof PillarBlock pillar) {
+            pillar.onBlockRemoved(chunk.getLevel(), pos, oldState);
         }
     }
 }

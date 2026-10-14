@@ -543,8 +543,10 @@ def convert(source, output, jar, manifest=None):
                 raise ValueError("Missing retained door template: " + str(base))
             for suffix, parent in models.items():
                 generated[base.with_name(rel.stem + "_" + suffix + ".json")] = dict(copy.deepcopy(door_bottom), parent=parent)
-        for name in ("end_city_treasure", "woodland_mansion"):
-            rel = Path("data/minecraft/loot_table/chests") / (name + ".json")
+        for rel_str in ("data/minecraft/loot_table/chests/end_city_treasure.json",
+                        "data/minecraft/loot_table/chests/woodland_mansion.json",
+                        "data/minecraft/loot_table/gameplay/sniffer_digging.json"):
+            rel = Path(rel_str)
             if rel in generated:
                 bonuses = [pool for pool in generated[rel]["pools"] if "buildscape:" in json.dumps(pool)]
                 generated[rel] = json.loads(vanilla.read(rel.as_posix()))

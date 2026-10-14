@@ -288,6 +288,14 @@ public interface IPlatformAdapter {
     float getHoeMiningSpeed(net.minecraft.world.item.ItemStack stack);
     boolean hasSilkTouch(net.minecraft.world.item.ItemStack stack);
     boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state);
+    /** Writes the solved colour row into a shulker's ghost filters; null when this version has no exact implementation. */
+    default Boolean writeSolvedToShulker(net.minecraft.world.item.ItemStack shulker, java.util.List<net.minecraft.world.item.ItemStack> solved) {
+        return null;
+    }
+    /** Main's "solid material" test; 1.18.2 uses Material.isSolid, other versions fall back to a full collision cube. */
+    default boolean isSolidMaterial(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+        return state.isCollisionShapeFullBlock(level, pos);
+    }
     boolean isGlassBlock(net.minecraft.world.level.block.Block block);
 
     void awardAdvancement(net.minecraft.server.level.ServerPlayer player, CommonId advancementId, String criterion);

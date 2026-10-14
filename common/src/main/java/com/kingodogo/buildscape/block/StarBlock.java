@@ -81,9 +81,13 @@ public abstract class StarBlock extends BushBlock implements SinksOnFarmland, Si
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction clickedFace = context.getClickedFace();
-        BlockPos placePos = context.getClickedPos();
+        BlockPos clickedPos = context.getClickedPos();
+        BlockPos placePos = clickedPos.relative(clickedFace);
         Level level = context.getLevel();
 
+        if (!level.getBlockState(placePos).canBeReplaced(context)) {
+            return null;
+        }
         FluidState fluidState = level.getFluidState(placePos);
         Direction verticalDirection;
 
@@ -117,7 +121,7 @@ public abstract class StarBlock extends BushBlock implements SinksOnFarmland, Si
                 .setValue(LIT, false)
                 .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER)
                 .setValue(VERTICAL_DIRECTION, verticalDirection)
-                .setValue(ON_FARMLAND, verticalDirection == Direction.UP && shouldSink(level, placePos));
+                .setValue(ON_FARMLAND, verticalDirection == Direction.UP && shouldSink(level, clickedPos));
     }
 
     public BlockState onUpdateShape(BlockState state, Direction direction, BlockState neighborState, LevelReader level, BlockPos pos, BlockPos neighborPos) {

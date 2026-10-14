@@ -169,6 +169,80 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return properties.tab(CreativeTabs118x.tabFor(id));
     }
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.getMaterial().isReplaceable(); }
+    @Override public Boolean writeSolvedToShulker(net.minecraft.world.item.ItemStack shulker, List<net.minecraft.world.item.ItemStack> solved) {
+        NonNullList<net.minecraft.world.item.ItemStack> shulkerItems = NonNullList.withSize(27, net.minecraft.world.item.ItemStack.EMPTY);
+        net.minecraft.nbt.CompoundTag blockEntityTag = shulker.getTagElement("BlockEntityTag");
+        if (blockEntityTag != null && blockEntityTag.contains("Items", 9)) {
+            ContainerHelper.loadAllItems(blockEntityTag, shulkerItems);
+        }
+
+        net.minecraft.nbt.CompoundTag beTag = shulker.getOrCreateTagElement("BlockEntityTag");
+        net.minecraft.nbt.ListTag savedFilters = beTag.getList("GhostFilters", 8);
+        List<String> filters = new ArrayList<>(27);
+        for (int i = 0; i < 27; i++) {
+            filters.add(i < savedFilters.size() ? savedFilters.getString(i) : "");
+            net.minecraft.world.item.ItemStack item = shulkerItems.get(i);
+            if (!item.isEmpty() && item.hasTag() && item.getTag().getBoolean("ghost")) {
+                net.minecraft.resources.ResourceLocation id = net.minecraft.core.Registry.ITEM.getKey(item.getItem());
+                if (filters.get(i).isEmpty() && id != null) filters.set(i, id.toString());
+                shulkerItems.set(i, net.minecraft.world.item.ItemStack.EMPTY);
+            }
+        }
+
+        int targetRow = -1;
+        for (int row = 0; row < 3; row++) {
+            boolean rowCanFit = true;
+            boolean rowHasAnyConflict = false;
+            for (int col = 0; col < 9; col++) {
+                int slot = row * 9 + col;
+                net.minecraft.world.item.ItemStack solvedStack = solved.get(col);
+                boolean slotOccupied = !shulkerItems.get(slot).isEmpty() || !filters.get(slot).isEmpty();
+                if (slotOccupied) rowHasAnyConflict = true;
+                if (!solvedStack.isEmpty() && slotOccupied) {
+                    rowCanFit = false;
+                    break;
+                }
+            }
+            if (rowCanFit) {
+                if (!rowHasAnyConflict || targetRow < 0) {
+                    targetRow = row;
+                    if (!rowHasAnyConflict) break;
+                }
+            }
+        }
+
+        if (targetRow < 0) return false;
+
+        boolean wroteAnyFilter = false;
+        for (int i = 0; i < 9; i++) {
+            int slot = targetRow * 9 + i;
+            net.minecraft.world.item.ItemStack solvedStack = solved.get(i);
+            if (!solvedStack.isEmpty()) {
+                net.minecraft.resources.ResourceLocation itemId = net.minecraft.core.Registry.ITEM.getKey(solvedStack.getItem());
+                if (itemId != null) {
+                    filters.set(slot, itemId.toString());
+                    wroteAnyFilter = true;
+                }
+            }
+        }
+
+        if (!wroteAnyFilter) return false;
+
+        boolean hasFilter = false;
+        net.minecraft.nbt.ListTag newGhostFiltersList = new net.minecraft.nbt.ListTag();
+        for (String filter : filters) {
+            if (!filter.isEmpty()) hasFilter = true;
+            newGhostFiltersList.add(net.minecraft.nbt.StringTag.valueOf(filter));
+        }
+        ContainerHelper.saveAllItems(beTag, shulkerItems);
+        if (hasFilter) {
+            beTag.put("GhostFilters", newGhostFiltersList);
+        } else {
+            beTag.remove("GhostFilters");
+        }
+        return true;
+    }
+    @Override public boolean isSolidMaterial(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) { return state.getMaterial().isSolid(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block instanceof net.minecraft.world.level.block.AbstractGlassBlock; }
     @Override
     public net.minecraft.world.level.block.RenderShape getEntityBlockRenderShape() { return net.minecraft.world.level.block.RenderShape.ENTITYBLOCK_ANIMATED; }

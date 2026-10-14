@@ -1096,7 +1096,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         // 3. Render 1 Big Frame with expanded chassis gap & metallic gradient
-        drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, alpha);
+        drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, true, alpha);
 
         // 4. Header Bar (kept exactly as placed rn, with top-left metallic gradient artifact)
         int headerH = 24;
@@ -2213,10 +2213,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Vault Hunters Border & Bevel Engine (Expanded Chassis Gap & Metallic Gradient) ---
     private void drawVaultHuntersFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
+        drawVaultHuntersFrame(poseStackOrGraphics, x, y, w, h, bgRgb, false, alpha);
+    }
+
+    private void drawVaultHuntersFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, boolean hasCrestNotch, float alpha) {
         // 1. Outer Chassis Body Fill (Solid metallic chassis backing)
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
+        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
+        int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
         int crestW = 152;
         int crestX = x + (w - crestW) / 2;
@@ -2224,38 +2232,59 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int uLeft = crestX - padX;
         int uRight = crestX + crestW + padX;
 
-        // 2. Outermost 1px Black Border (Top left and right, connecting into U-bevel)
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, uLeft + 1, y + 1, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, uRight, y, x + w, y + 1, black);
+        // 2. Outermost 1px Black Border
+        if (hasCrestNotch) {
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y, uLeft + 1, y + 1, black);
+            Services.PLATFORM.fill(poseStackOrGraphics, uRight, y, x + w, y + 1, black);
+        } else {
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
+        }
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
 
         // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
-        drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, uLeft - x - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        drawHorizontalGradientLine(poseStackOrGraphics, uRight + 1, y + 1, (x + w - 1) - (uRight + 1), COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+        if (hasCrestNotch) {
+            // Left top horizontal: from x + 1 to uLeft + 1
+            int leftSegW = (uLeft + 1) - (x + 1) + 1;
+            float tLeftEnd = (float) (uLeft - x) / (float) Math.max(1, w - 3);
+            int cCornerLeft = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, tLeftEnd);
+            drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, leftSegW, COLOR_BORDER_GRADIENT_START, cCornerLeft, alpha);
 
-        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+            // Right top horizontal: from uRight - 1 to x + w - 2
+            int rightSegW = (x + w - 2) - (uRight - 1) + 1;
+            float tRightStart = (float) (uRight - 2 - x) / (float) Math.max(1, w - 3);
+            int cCornerRight = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, tRightStart);
+            drawHorizontalGradientLine(poseStackOrGraphics, uRight - 1, y + 1, rightSegW, cCornerRight, COLOR_BORDER_GRADIENT_END, alpha);
+        } else {
+            drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        }
+
+        drawVerticalGradientLine(poseStackOrGraphics, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
         // 4. Outer Chassis Band (offset 2 to 3)
-        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
         for (int o = 2; o <= 3; o++) {
-            Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, uLeft, y + o + 1, band);
-            Services.PLATFORM.fill(poseStackOrGraphics, uRight, y + o, x + w - o, y + o + 1, band);
+            if (hasCrestNotch) {
+                Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, uLeft + o + 1, y + o + 1, band);
+                Services.PLATFORM.fill(poseStackOrGraphics, uRight - o, y + o, x + w - o, y + o + 1, band);
+            } else {
+                Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, x + w - o, y + o + 1, band);
+            }
             Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + h - o - 1, x + w - o, y + h - o, band);
             Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, x + o + 1, y + h - o, band);
             Services.PLATFORM.fill(poseStackOrGraphics, x + w - o - 1, y + o, x + w - o, y + h - o, band);
         }
 
         // 5. Stepped Bevel Ridge & Groove at offset 5
-        int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-        int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         int o5 = 5;
-        Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, uLeft, y + o5 + 1, bevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, uRight, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
+        if (hasCrestNotch) {
+            Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, uLeft + o5 + 1, y + o5 + 1, bevelShadow);
+            Services.PLATFORM.fill(poseStackOrGraphics, uRight - o5, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
+        } else {
+            Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
+        }
         Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, x + o5 + 1, y + h - o5, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + h - o5 - 1, x + w - o5, y + h - o5, bevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - o5 - 1, y + o5, x + w - o5, y + h - o5, bevelHighlight);
@@ -2843,6 +2872,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
         int bShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int bHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
@@ -2854,31 +2884,42 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int uBottom = crestY + crestH + padBottom;
 
         // 1. Recessed backing and dark interior fill under the crest on the main panel
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft, frameY, uRight, uBottom, applyAlpha(COLOR_CHASSIS_BODY, alpha));
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 1, frameY, uRight - 1, uBottom - 1, applyAlpha(COLOR_INNER_DARK, alpha));
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft, frameY, uRight + 1, uBottom + 1, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 6, frameY, uRight - 5, uBottom - 5, applyAlpha(COLOR_INNER_DARK, alpha));
 
-        // 2. 1px Black Border along the U (Left down, Bottom across, Right up)
+        // 2. Layer 0: 1px Black Border along the U (Left down, Bottom across, Right up)
         Services.PLATFORM.fill(poseStackOrGraphics, uLeft, frameY, uLeft + 1, uBottom + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, uLeft, uBottom, uRight + 1, uBottom + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, uRight, frameY, uRight + 1, uBottom + 1, black);
 
-        // 3. 1px Metallic Gradient & Shadow along the U (EXACT SAME AS MAIN PANEL BORDER GRADIENT)
-        drawVerticalGradientLine(poseStackOrGraphics, uLeft + 1, frameY, uBottom - frameY, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
-        drawHorizontalGradientLine(poseStackOrGraphics, uLeft + 1, uBottom - 1, uRight - uLeft - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, uRight - 1, frameY, uRight, uBottom - 1, shadow);
+        // 3. Layer 1: 1px Metallic Gradient & Shadow along the U (EXACT SAME CONTINUOUS GRADIENT AS MAIN PANEL)
+        float tLeft = (float) (uLeft - frameX) / (float) Math.max(1, frameW - 3);
+        float tRight = (float) (uRight - 2 - frameX) / (float) Math.max(1, frameW - 3);
+        int cCornerLeft = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, tLeft);
+        int cCornerRight = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, tRight);
 
-        // 4. Outer Chassis Band (offset 2 to 3) along the U
-        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
+        // U-Left vertical: turns 90° down from top corner (uLeft + 1, frameY + 1) down to (uLeft + 1, uBottom - 1)
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 1, frameY + 1, uLeft + 2, uBottom, applyAlpha(cCornerLeft, alpha));
+
+        // U-Bottom horizontal shelf: turns 90° across from (uLeft + 1, uBottom - 1) to (uRight - 1, uBottom - 1)
+        int shelfW = (uRight - 1) - (uLeft + 1) + 1;
+        drawHorizontalGradientLine(poseStackOrGraphics, uLeft + 1, uBottom - 1, shelfW, cCornerLeft, cCornerRight, alpha);
+
+        // U-Right vertical: turns 90° up from (uRight - 1, uBottom - 1) up to (uRight - 1, frameY + 1)
+        Services.PLATFORM.fill(poseStackOrGraphics, uRight - 1, frameY + 1, uRight, uBottom, applyAlpha(cCornerRight, alpha));
+
+        // 4. Layer 2 & 3: Outer Chassis Band (offset 2 to 3) along the U
         for (int o = 2; o <= 3; o++) {
-            Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o, frameY, uLeft + o + 1, uBottom - o, band);
+            Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o, frameY + o, uLeft + o + 1, uBottom - o + 1, band);
             Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o, uBottom - o, uRight - o + 1, uBottom - o + 1, band);
-            Services.PLATFORM.fill(poseStackOrGraphics, uRight - o, frameY, uRight - o + 1, uBottom - o, band);
+            Services.PLATFORM.fill(poseStackOrGraphics, uRight - o, frameY + o, uRight - o + 1, uBottom - o + 1, band);
         }
 
-        // 5. Stepped Bevel Ridge & Groove along the U
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 4, frameY, uLeft + 5, uBottom - 4, bShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 4, uBottom - 5, uRight - 4, uBottom - 4, bHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, uRight - 5, frameY, uRight - 4, uBottom - 4, bHighlight);
+        // 5. Layer 5: Stepped Bevel Ridge & Groove along the U
+        int o5 = 5;
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o5, frameY + o5, uLeft + o5 + 1, uBottom - o5 + 1, bShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o5, uBottom - o5, uRight - o5 + 1, uBottom - o5 + 1, bHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, uRight - o5, frameY + o5, uRight - o5 + 1, uBottom - o5 + 1, bHighlight);
 
         // B. Top Center Crest Badge (Buildscape Logo Holder) - Clean, standalone, NO surrounding bevel in the air!
         // 1. Solid Outer Chassis Body

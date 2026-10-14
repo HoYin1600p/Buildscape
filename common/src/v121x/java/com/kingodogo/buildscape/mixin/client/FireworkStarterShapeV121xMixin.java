@@ -1,11 +1,13 @@
 package com.kingodogo.buildscape.mixin.client;
 
+import com.kingodogo.buildscape.adapter.v121x.client.FireworkStarterAccess;
 import com.kingodogo.buildscape.mixinsupport.FireworkContext;
 import com.kingodogo.buildscape.mixinsupport.FireworkSparkAccess;
 import com.kingodogo.buildscape.mixinsupport.MixinFactory;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.particle.FireworkParticles;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,7 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /** 1.21.1's particle helpers share the firework bridge's IntList color representation. */
 @Mixin(FireworkParticles.Starter.class)
-public abstract class FireworkStarterShapeV121xMixin implements FireworkSparkAccess {
+public abstract class FireworkStarterShapeV121xMixin implements FireworkSparkAccess, FireworkStarterAccess {
+    @Shadow private int life;
+
+    @Override public int buildscape$life() { return life; }
+
     @Inject(method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDLnet/minecraft/client/particle/ParticleEngine;Ljava/util/List;)V",
             at = @At("RETURN"))
     private void buildscape$rememberRocket(CallbackInfo ci) {

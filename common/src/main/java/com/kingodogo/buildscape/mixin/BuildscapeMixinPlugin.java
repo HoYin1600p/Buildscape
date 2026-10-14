@@ -21,12 +21,7 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
             "com.kingodogo.buildscape.mixin.BuildscapeBlockStateCacheMixin",
             "com.kingodogo.buildscape.mixin.BuildscapeForgeRegistryMixin",
             "com.kingodogo.buildscape.mixin.BuildscapeModelBakeryMixin",
-            "com.kingodogo.buildscape.mixin.CreativeModeTabMixin",
-            "com.kingodogo.buildscape.mixin.RenderBuffersMixin",
-            "com.kingodogo.buildscape.mixin.ScreenMixin",
-            "com.kingodogo.buildscape.mixin.AdvancementWidgetMixin",
-            "com.kingodogo.buildscape.mixin.GeneralStatisticsListMixin",
-            "com.kingodogo.buildscape.mixin.GeneralStatisticsListEntryMixin"
+            "com.kingodogo.buildscape.mixin.RenderBuffersMixin"
     );
 
     private boolean standaloneLaunchFasterPresent;

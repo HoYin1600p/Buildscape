@@ -2581,6 +2581,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override public void renderLineBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderLineBox(poseStack, bufferSource, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, a); }
 
+    @Override public void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) { com.kingodogo.buildscape.adapter.v26x.client.ClientWorldHooks.renderFillBox(poseStack, bufferSource, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, a); }
+
     @Override public boolean isScreenOpen() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isScreenOpen(); }
 
     @Override public net.minecraft.world.phys.Vec3 getCameraPosition(net.minecraft.client.Camera camera) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getCameraPosition(camera); }

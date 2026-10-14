@@ -205,18 +205,24 @@ public class MixinFactory implements IMixinFactory {
     public void arrangeCreativeTabs(CreativeModeTab tab, NonNullList<ItemStack> items) {
         var key = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(tab);
         if (key == null || !key.getNamespace().equals("minecraft")
-                || !(key.getPath().equals("building_blocks") || key.getPath().equals("functional_blocks"))) return;
+                || !(key.getPath().equals("building_blocks") || key.getPath().equals("colored_blocks")
+                || key.getPath().equals("functional_blocks"))) return;
         java.util.Map<net.minecraft.resources.Identifier, ItemStack> byId = new java.util.HashMap<>();
         for (ItemStack stack : items) byId.put(BuiltInRegistries.ITEM.getKey(stack.getItem()), stack);
+        // On 1.18.2 the vertical slabs of vanilla materials live in the vanilla tabs; here only the
+        // Buildscape tab holds them, so they are added to the vanilla tab that holds their anchor.
+        for (Item item : BuiltInRegistries.ITEM) {
+            var id = BuiltInRegistries.ITEM.getKey(item);
+            if (!id.getNamespace().equals("buildscape") || !id.getPath().endsWith("_vertical_slab") || byId.containsKey(id)) continue;
+            if (vanillaAnchor(byId, id) != null) byId.put(id, new ItemStack(item));
+        }
         java.util.Map<ItemStack, ItemStack> insertAfter = new java.util.IdentityHashMap<>();
         Set<ItemStack> moved = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
-        for (ItemStack stack : items) {
-            var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        for (java.util.Map.Entry<net.minecraft.resources.Identifier, ItemStack> entry : byId.entrySet()) {
+            var id = entry.getKey();
             if (!id.getNamespace().equals("buildscape") || !id.getPath().endsWith("_vertical_slab")) continue;
-            String base = id.getPath().substring(0, id.getPath().length() - "_vertical_slab".length());
-            ItemStack anchor = byId.get(net.minecraft.resources.Identifier.withDefaultNamespace(base + "_slab"));
-            if (anchor == null) anchor = byId.get(net.minecraft.resources.Identifier.withDefaultNamespace(base));
-            if (anchor != null) { insertAfter.put(anchor, stack); moved.add(stack); }
+            ItemStack anchor = vanillaAnchor(byId, id);
+            if (anchor != null) { insertAfter.put(anchor, entry.getValue()); moved.add(entry.getValue()); }
         }
         NonNullList<ItemStack> ordered = NonNullList.create();
         for (ItemStack stack : items) {
@@ -227,6 +233,12 @@ public class MixinFactory implements IMixinFactory {
         }
         items.clear();
         items.addAll(ordered);
+    }
+
+    private static ItemStack vanillaAnchor(java.util.Map<net.minecraft.resources.Identifier, ItemStack> byId, net.minecraft.resources.Identifier id) {
+        String base = id.getPath().substring(0, id.getPath().length() - "_vertical_slab".length());
+        ItemStack anchor = byId.get(net.minecraft.resources.Identifier.withDefaultNamespace(base + "_slab"));
+        return anchor != null ? anchor : byId.get(net.minecraft.resources.Identifier.withDefaultNamespace(base));
     }
 
     @Override public void renderFilterPlaceholder(AbstractContainerMenu menu, Slot slot, Object graphics) {

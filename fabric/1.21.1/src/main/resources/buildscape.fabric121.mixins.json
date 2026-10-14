@@ -5,9 +5,11 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "RegistryStateAccessor",
+    "LivingEntityLadderMixin",
     "EntityDataMixin",
     "BlockEntityDataMixin",
     "RecipeManagerMixin",
+    "BeaconBlockEntityColorMixin",
     "AdvancementCompletionMixin",
     "AnvilUpdateMixin",
     "BlockPlacementMixin",

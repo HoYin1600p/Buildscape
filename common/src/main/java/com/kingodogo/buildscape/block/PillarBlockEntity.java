@@ -507,21 +507,29 @@ public class PillarBlockEntity extends DataBlockEntity {
     private static final int SYNC_INTERVAL = 100;
     private int syncTickCounter = 0;
 
-    @Override
-    public void setLevel(Level level) {
-        super.setLevel(level);
-        if (level != null && !level.isClientSide()) {
-            PillarIdManager manager = PillarIdManager.get(level);
-            try {
-                manager.load();
-                manager.registerPillar(this);
-            } catch (Exception e) {
-                // Main ignores a failed manager load here; the periodic sync retries later.
-            }
+    // Main registers in onLoad, once the chunk is loaded. setLevel runs while the chunk is still being built (chunk post-load),
+    // and registering from there reads blocks through the level, which waits on that same chunk and deadlocks the server thread.
+    // onLoad exists only on Forge/NeoForge, so the first server tick (chunk is full by then) does the same registration on every loader.
+    private boolean registeredWithManager = false;
+
+    private void registerWithManager() {
+        registeredWithManager = true;
+        if (level == null || level.isClientSide()) {
+            return;
+        }
+        PillarIdManager manager = PillarIdManager.get(level);
+        try {
+            manager.load();
+            manager.registerPillar(this);
+        } catch (Exception e) {
+            // Main ignores a failed manager load here; the periodic sync retries later.
         }
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, PillarBlockEntity be) {
+        if (!be.registeredWithManager) {
+            be.registerWithManager();
+        }
         be.syncTickCounter++;
         if (be.syncTickCounter >= SYNC_INTERVAL) {
             be.syncTickCounter = 0;

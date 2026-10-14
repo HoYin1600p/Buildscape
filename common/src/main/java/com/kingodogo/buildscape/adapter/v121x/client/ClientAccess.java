@@ -237,6 +237,14 @@ public final class ClientAccess {
         });
     }
 
+    public static boolean isGui3dModel(Object model) {
+        return model instanceof net.minecraft.client.resources.model.BakedModel bm && bm.isGui3d();
+    }
+
+    public static Object getItemModel(ItemStack stack, Level level, int seed) {
+        return net.minecraft.client.Minecraft.getInstance().getItemRenderer().getModel(stack, level, null, seed);
+    }
+
     public static void renderItemFixed(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, Object model) {
         if (bufferSource instanceof net.minecraft.client.renderer.MultiBufferSource mbs && model instanceof net.minecraft.client.resources.model.BakedModel bm) {
             net.minecraft.client.Minecraft.getInstance().getItemRenderer().render(
@@ -285,6 +293,24 @@ public final class ClientAccess {
         if (bufferSource instanceof net.minecraft.client.renderer.MultiBufferSource mbs) {
             com.mojang.blaze3d.vertex.VertexConsumer consumer = mbs.getBuffer(net.minecraft.client.renderer.RenderType.lines());
             net.minecraft.client.renderer.LevelRenderer.renderLineBox(poseStack, consumer, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, a);
+        }
+    }
+
+    public static void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
+        if (!(bufferSource instanceof net.minecraft.client.renderer.MultiBufferSource mbs)) return;
+        com.mojang.blaze3d.vertex.VertexConsumer c = mbs.getBuffer(net.minecraft.client.renderer.RenderType.lightning());
+        org.joml.Matrix4f m = poseStack.last().pose();
+        float x0 = (float) minX, y0 = (float) minY, z0 = (float) minZ, x1 = (float) maxX, y1 = (float) maxY, z1 = (float) maxZ;
+        float[][] quads = {
+                {x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1},
+                {x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0},
+                {x0, y0, z0, x0, y1, z0, x1, y1, z0, x1, y0, z0},
+                {x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1},
+                {x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0},
+                {x1, y0, z0, x1, y1, z0, x1, y1, z1, x1, y0, z1}
+        };
+        for (float[] q : quads) {
+            for (int i = 0; i < 12; i += 3) c.addVertex(m, q[i], q[i + 1], q[i + 2]).setColor(r, g, b, a);
         }
     }
 

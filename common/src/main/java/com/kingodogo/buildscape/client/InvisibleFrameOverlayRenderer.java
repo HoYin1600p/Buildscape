@@ -40,8 +40,11 @@ public class InvisibleFrameOverlayRenderer {
         }
 
         AABB searchBox = player.getBoundingBox().inflate(SEARCH_RANGE);
-        List<ItemFrame> vanillaFrames = mc.level.getEntitiesOfClass(
-                ItemFrame.class, searchBox, Entity::isInvisible
+        // Vanilla frames and BuildScape's coloured frames (which are not ItemFrame subclasses on every version).
+        List<Entity> vanillaFrames = mc.level.getEntitiesOfClass(
+                Entity.class, searchBox,
+                e -> e.isInvisible() && (e instanceof ItemFrame
+                        || e instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity)
         );
 
         if (vanillaFrames.isEmpty()) {
@@ -58,7 +61,19 @@ public class InvisibleFrameOverlayRenderer {
         float g = 200.0f / 255.0f;
         float b = 1.0f;
 
-        for (ItemFrame frame : vanillaFrames) {
+        float fillAlpha = 0.1f + pulse * 0.2f;
+
+        for (Entity frame : vanillaFrames) {
+            AABB bb = frame.getBoundingBox().inflate(0.002);
+            Services.PLATFORM.renderFillBox(
+                    poseStack, bufferSource,
+                    bb.minX - cameraPos.x, bb.minY - cameraPos.y, bb.minZ - cameraPos.z,
+                    bb.maxX - cameraPos.x, bb.maxY - cameraPos.y, bb.maxZ - cameraPos.z,
+                    r, g, b, fillAlpha
+            );
+        }
+
+        for (Entity frame : vanillaFrames) {
             AABB bb = frame.getBoundingBox().inflate(0.002);
             Services.PLATFORM.renderLineBox(
                     poseStack, bufferSource,

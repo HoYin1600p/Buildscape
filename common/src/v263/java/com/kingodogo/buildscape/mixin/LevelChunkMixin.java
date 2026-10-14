@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.mixin;
 import com.kingodogo.buildscape.block.HollowLogBlock;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.block.PillarBlock;
+import com.kingodogo.buildscape.block.TrappedDecoratedPotBlockEntity;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
 import net.minecraft.core.BlockPos;
@@ -31,6 +32,11 @@ public abstract class LevelChunkMixin {
                         pos.getZ() + 0.5D, new ItemStack(frame.getItem()));
                 SignFrameAttachment.setFrame(sign, SignFrameType.NONE);
             }
+        }
+        // Main's onRemove released a spawn egg from a trapped pot as its mob; the generic container drop would drop the egg item.
+        if (entity instanceof TrappedDecoratedPotBlockEntity pot && entity.getLevel() != null && !pot.isEmpty()) {
+            pot.dropContents(entity.getLevel(), pos);
+            pot.setStoredItem(ItemStack.EMPTY, false);
         }
         entity.preRemoveSideEffects(pos, state);
     }

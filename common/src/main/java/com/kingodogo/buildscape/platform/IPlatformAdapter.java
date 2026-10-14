@@ -390,6 +390,9 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.Item createInfinitePhoenixFireworkStarItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createColoredItemFrameItem(net.minecraft.world.item.Item.Properties properties, String colorVariant);
     net.minecraft.world.item.Item createExperienceBucketItem(net.minecraft.world.item.Item.Properties properties);
+    default net.minecraft.world.item.Item createHomemakerSpawnEggItem(net.minecraft.world.item.Item.Properties properties, boolean festive) {
+        return new net.minecraft.world.item.Item(properties);
+    }
     net.minecraft.world.item.Item createPoplarBoatItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.ItemStack removeItem(java.util.List<net.minecraft.world.item.ItemStack> items, int slot, int amount);
     net.minecraft.world.item.ItemStack takeItem(java.util.List<net.minecraft.world.item.ItemStack> items, int slot);

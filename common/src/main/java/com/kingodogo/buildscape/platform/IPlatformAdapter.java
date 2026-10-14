@@ -518,6 +518,10 @@ public interface IPlatformAdapter {
     default void renderEntity(net.minecraft.world.entity.Entity entity, double x, double y, double z, float yaw, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight) {
     }
 
+    /** Translucent filled box in camera-relative coordinates; versions without an implementation draw nothing. */
+    default void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
+    }
+
     default com.mojang.blaze3d.vertex.VertexConsumer getTranslucentBuffer(Object bufferSource) {
         return null;
     }

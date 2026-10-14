@@ -18,5 +18,9 @@ public abstract class ItemModelResolverMixin {
     private void buildscape$rememberStack(ItemStackRenderState state, ItemStack stack, ItemDisplayContext context,
             Level level, ItemOwner owner, int seed, CallbackInfo ci) {
         FestiveSubmission.remember(state, stack);
+        // The GUI caches item renders by model identity; keep festive and ordinary stacks of one model apart.
+        if (com.kingodogo.buildscape.util.FestiveGlintHelper.hasFestiveGlint(stack)) {
+            state.appendModelIdentityElement("buildscape:festive_glint");
+        }
     }
 }

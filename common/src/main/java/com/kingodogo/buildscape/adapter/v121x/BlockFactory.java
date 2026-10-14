@@ -464,7 +464,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isTrapdoor()) {
             return new TrapDoorBlock(BlockSetType.OAK, props) {};
         } else if (def.isButton()) {
-            return new ButtonBlock(BlockSetType.OAK, 30, props) {
+            boolean stoneButton = def.getBlockType().equals("ModButtonBlock");
+            return new ButtonBlock(stoneButton ? BlockSetType.STONE : BlockSetType.OAK, stoneButton ? 20 : 30, props) {
                 @Override public SoundType getSoundType(BlockState state) { return referenceControlSound(def); }
             };
         } else if (def.isPressurePlate()) {
@@ -854,7 +855,9 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    if (fromPos.equals(pos.above()) || fromPos.equals(pos.below())) {
+                        onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    }
                 }
                 @Override
                 protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -894,9 +897,23 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
                 @Override
-                public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-                    onPlayerDestroy(level, pos, state, player);
-                    return super.playerWillDestroy(level, pos, state, player);
+                protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+                    if (!state.is(newState.getBlock())) {
+                        onBlockRemoved(level, pos, state);
+                    }
+                    super.onRemove(state, level, pos, newState, isMoving);
+                }
+                @Override
+                protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (!level.isClientSide() && level instanceof Level lvl) {
+                        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onNeighborChanged(lvl, pos, state, neighborPos);
+                    }
+                    return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+                }
+                @Override
+                protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+                    super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
                 }
             };
         } else if (def.isHollowPipe()) {
@@ -910,9 +927,42 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
                 @Override
-                public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-                    onPlayerDestroy(level, pos, state, player);
-                    return super.playerWillDestroy(level, pos, state, player);
+                protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+                    if (!state.is(newState.getBlock())) {
+                        onBlockRemoved(level, pos, state);
+                    }
+                    super.onRemove(state, level, pos, newState, isMoving);
+                }
+                @Override
+                protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (state.getValue(WATERLOGGED)) {
+                        level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                    }
+                    if (state.getValue(LAVA_LOGGED)) {
+                        level.scheduleTick(pos, Fluids.LAVA, Fluids.LAVA.getTickDelay(level));
+                    }
+                    if (state.getValue(WATER_LEVEL) > 0) {
+                        level.scheduleTick(pos, this, Fluids.WATER.getTickDelay(level));
+                    }
+                    BlockState updated = super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+                    if (state.getValue(WATER_LEVEL) > 0 && updated.getValue(WATER_LEVEL) == 0) {
+                        updated = updated.setValue(WATER_LEVEL, state.getValue(WATER_LEVEL));
+                    }
+                    updated = updateConnections(level, pos, updated);
+                    if (!level.isClientSide() && level instanceof Level lvl) {
+                        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onNeighborChanged(lvl, pos, updated, neighborPos);
+                    }
+                    return updated;
+                }
+                @Override
+                protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+                    super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                }
+                @Override
+                protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+                    super.tick(state, level, pos, random);
+                    onBlockTick(level, pos, state);
                 }
                 @Override
                 protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
@@ -1551,6 +1601,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1596,6 +1647,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1773,6 +1825,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
                 @Override
@@ -1786,7 +1839,7 @@ public class BlockFactory implements IBlockFactory {
             return new SnowyBushBlock(props, snowBricks) {
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1807,7 +1860,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1841,6 +1894,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (direction == Direction.DOWN) return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                     if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
@@ -2054,6 +2108,11 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isPointedIcicle()) {
             return new PointedIcicleBlock(props) {
+                @Override
+                protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+                    onIcicleRemove(state, level, pos, newState, isMoving);
+                    super.onRemove(state, level, pos, newState, isMoving);
+                }
                 @Override
                 protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
                     onIcicleTick(state, level, pos);

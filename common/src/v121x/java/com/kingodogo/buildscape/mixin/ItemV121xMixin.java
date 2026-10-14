@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.platform.Services;
+import net.minecraft.core.component.DataComponents;
 import com.kingodogo.buildscape.util.FestiveGlintHelper;
 import com.kingodogo.buildscape.world.ModGameRules;
 import net.minecraft.world.item.ItemStack;
@@ -14,17 +15,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ItemStack.class)
 public class ItemV121xMixin {
 
-    @Dynamic("Forge 1.18.2 cake stacking; other VersionClusters retain their existing stack limits")
+    @Dynamic("1.21.1 component stack limits with cake and water-potion gamerules")
     @Inject(method = "getMaxStackSize()I", at = @At("HEAD"),
-            cancellable = true, require = 0, remap = false)
-    private void buildscape$legacyCakeMaxStackSize(CallbackInfoReturnable<Integer> cir) {
-        if (!Services.isVersionCluster("v118x")) return;
+            cancellable = true)
+    private void buildscape$ruleMaxStackSize(CallbackInfoReturnable<Integer> cir) {
         ItemStack self = (ItemStack) (Object) this;
         if (self.is(Items.POTION)) {
             cir.setReturnValue(Services.PLATFORM.isWaterPotion(self)
-                    && ModGameRules.isWaterBottleStackingEnabled() ? 16 : 1);
+                    && ModGameRules.isWaterBottleStackingEnabled()
+                    ? Math.min(self.getOrDefault(DataComponents.MAX_STACK_SIZE, 16), 16) : 1);
         } else if (self.is(Items.CAKE)) {
-            cir.setReturnValue(ModGameRules.isCakeStackingEnabled() ? 64 : 1);
+            cir.setReturnValue(ModGameRules.isCakeStackingEnabled()
+                    ? Math.min(self.getOrDefault(DataComponents.MAX_STACK_SIZE, 64), 64) : 1);
         }
     }
 

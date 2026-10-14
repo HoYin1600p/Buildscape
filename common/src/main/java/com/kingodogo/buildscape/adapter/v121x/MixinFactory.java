@@ -230,7 +230,13 @@ public class MixinFactory implements IMixinFactory {
     public ItemStack applyFireworkShotYaw(ItemStack stack, float yaw) {
         ItemStack copy = stack.copy();
         net.minecraft.world.item.component.CustomData.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA, copy, tag -> {
-            tag.putFloat("ShotYaw", yaw);
+            net.minecraft.nbt.CompoundTag fireworks = tag.getCompound("Fireworks");
+            fireworks.putFloat("ShotYaw", yaw);
+            net.minecraft.nbt.ListTag explosions = fireworks.getList("Explosions", net.minecraft.nbt.Tag.TAG_COMPOUND);
+            for (int i = 0; i < explosions.size(); i++) {
+                explosions.getCompound(i).putFloat("ShotYaw", yaw);
+            }
+            tag.put("Fireworks", fireworks);
         });
         return copy;
     }
@@ -238,6 +244,9 @@ public class MixinFactory implements IMixinFactory {
     @Override
     public void preserveGhostFilters(ItemStack stack, net.minecraft.nbt.ListTag filterList) {
         net.minecraft.world.item.component.CustomData.update(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, stack, tag -> {
+            if (!tag.contains("id", net.minecraft.nbt.Tag.TAG_STRING)) {
+                tag.putString("id", "minecraft:shulker_box");
+            }
             tag.put("GhostFilters", filterList.copy());
         });
     }

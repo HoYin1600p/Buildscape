@@ -501,9 +501,26 @@ public final class WorldGenFactory {
             int xzSpread,
             int ySpread
     ) {
-        return new ConfiguredFeature<>(
+        ConfiguredFeature<?, ?> simpleBlockFeature = new ConfiguredFeature<>(
                 Feature.SIMPLE_BLOCK,
                 new SimpleBlockConfiguration(stateProvider)
+        );
+        // 26.x has no random_patch feature: vanilla scatters with count + random_offset placement.
+        net.minecraft.world.level.levelgen.placement.PlacedFeature placedFeature =
+                new net.minecraft.world.level.levelgen.placement.PlacedFeature(
+                        net.minecraft.core.Holder.direct(simpleBlockFeature),
+                        List.of(
+                                net.minecraft.world.level.levelgen.placement.CountPlacement.of(tries),
+                                net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement.of(
+                                        net.minecraft.util.valueproviders.TrapezoidInt.of(-xzSpread, xzSpread, 0),
+                                        net.minecraft.util.valueproviders.TrapezoidInt.of(-ySpread, ySpread, 0)),
+                                net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
+                                        net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(Blocks.AIR)))
+                );
+        return new ConfiguredFeature<>(
+                Feature.SIMPLE_RANDOM_SELECTOR,
+                new net.minecraft.world.level.levelgen.feature.configurations.CompositeFeatureConfiguration(
+                        net.minecraft.core.HolderSet.direct(net.minecraft.core.Holder.direct(placedFeature)))
         );
     }
 }

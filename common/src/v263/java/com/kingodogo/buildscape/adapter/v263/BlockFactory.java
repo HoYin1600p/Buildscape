@@ -317,7 +317,15 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isWeatheringPressurePlate()) {
             return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, BlockSetType.OAK, props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+                    WeatheringBlockLogic.randomTick(state, level, pos);
+                    // Reference oxidation schedules the powered replacement's release tick; the shared handler does not.
+                    BlockState replaced = level.getBlockState(pos);
+                    if (replaced.getBlock() != state.getBlock() && replaced.getBlock() instanceof net.minecraft.world.level.block.WeightedPressurePlateBlock
+                            && replaced.getValue(net.minecraft.world.level.block.WeightedPressurePlateBlock.POWER) > 0) {
+                        level.scheduleTick(pos, replaced.getBlock(), 10);
+                    }
+                }
             };
         } else if (def.isWeatheringSlab()) {
             return new net.minecraft.world.level.block.SlabBlock(props.randomTicks()) {
@@ -507,6 +515,9 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isTrapdoor()) {
             return new TrapDoorBlock(BlockSetType.OAK, props) {};
         } else if (def.isButton()) {
+            if (def.getBlockType().equals("ModButtonBlock")) {
+                return new ButtonBlock(BlockSetType.STONE, 20, props) {};
+            }
             return new ButtonBlock(BlockSetType.OAK, 30, props) {};
         } else if (def.isWeightedPressurePlate()) {
             // 1.18.2 ModPressurePlateBlock: a weighted plate (max weight 150) with the 'power' property.
@@ -886,6 +897,10 @@ public class BlockFactory implements IBlockFactory {
                     if (state.getValue(PillarBlock.WATERLOGGED)) {
                         tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
                     }
+                    // Reconcile only placed pillars after a vertical neighbor change.
+                    if ((direction == Direction.UP || direction == Direction.DOWN) && level instanceof Level realLevel && !realLevel.isClientSide() && level.getBlockState(pos).is(state.getBlock())) {
+                        reconcileStackDisplays(realLevel, pos);
+                    }
                     return onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
                 }
                 @Override
@@ -898,11 +913,11 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean isMoving) {
-                    onNeighborUpdate(level, pos, state, neighborBlock, null, isMoving);
+                    // The changed position is unavailable here; vertical reconciliation runs in updateShape.
                 }
                 @Override
                 protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean isMoving) {
-                    onBlockRemoved(level, pos, state);
+                    // LevelChunkMixin runs cleanup before the old block entity is detached.
                     super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
                 }
                 @Override
@@ -944,11 +959,6 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
                 @Override
-                public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-                    onPlayerDestroy(level, pos, state, player);
-                    return super.playerWillDestroy(level, pos, state, player);
-                }
-                @Override
                 public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
                     return canPlaceLiquid(level, pos, state, fluid);
                 }
@@ -968,9 +978,37 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
                 @Override
-                public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-                    onPlayerDestroy(level, pos, state, player);
-                    return super.playerWillDestroy(level, pos, state, player);
+                protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
+                    if (state.getValue(WATERLOGGED)) {
+                        tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                    }
+                    if (state.getValue(LAVA_LOGGED)) {
+                        tickAccess.scheduleTick(pos, Fluids.LAVA, Fluids.LAVA.getTickDelay(level));
+                    }
+                    if (state.getValue(WATER_LEVEL) > 0) {
+                        tickAccess.scheduleTick(pos, this, Fluids.WATER.getTickDelay(level));
+                    }
+                    BlockState updated = super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
+                    if (state.getValue(WATER_LEVEL) > 0 && updated.getValue(WATER_LEVEL) == 0) {
+                        updated = updated.setValue(WATER_LEVEL, state.getValue(WATER_LEVEL));
+                    }
+                    updated = updateConnections(level, pos, updated);
+                    if (!level.isClientSide() && level instanceof Level lvl) {
+                        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onNeighborChanged(lvl, pos, updated, adjacentPos);
+                    }
+                    return updated;
+                }
+                @Override
+                protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
+                    // 26.x passes an orientation instead of the changed position, so check every side (main passes the real fromPos).
+                    for (Direction side : Direction.values()) {
+                        onNeighborUpdate(level, pos, state, block, pos.relative(side), isMoving);
+                    }
+                }
+                @Override
+                protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+                    super.tick(state, level, pos, random);
+                    onBlockTick(level, pos, state);
                 }
                 @Override
                 public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
@@ -1325,6 +1363,9 @@ public class BlockFactory implements IBlockFactory {
                     if (state.getValue(WATERLOGGED)) {
                         tickAccess.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
                     }
+                    if (direction.getOpposite() == state.getValue(FACING) && !state.canSurvive(level, pos)) {
+                        return Blocks.AIR.defaultBlockState();
+                    }
                     return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
                 @Override
@@ -1471,6 +1512,18 @@ public class BlockFactory implements IBlockFactory {
                     onEntityInside(level, pos, state, entity);
                 }
                 @Override
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
+                    return false;
+                }
+                @Override
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
+                    return false;
+                }
+                @Override
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
+                    // Frost roses reject bone meal; no growth action is available.
+                }
+                @Override
                 public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
                     onAnimateTick(state, level, pos, random::nextDouble, random::nextInt);
                 }
@@ -1591,6 +1644,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
 
@@ -1632,6 +1686,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
 
@@ -1789,6 +1844,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
             }
@@ -1798,7 +1854,7 @@ public class BlockFactory implements IBlockFactory {
             return new SnowyBushBlock(props, snowBricks) {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1816,7 +1872,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1847,8 +1903,10 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
-                    return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
+                    if (direction == Direction.DOWN) {
+                        return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
+                    }
+                    return super.updateShape(state, level, tickAccess, pos, direction, neighborPos, neighborState, random);
                 }
                 @Override
                 public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {

@@ -21,8 +21,23 @@ public final class FabricGameplayEvents {
         LoaderWandererTrades.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, context, selection) ->
                 com.kingodogo.buildscape.command.BuildscapeCommands.register(dispatcher));
-        UseBlockCallback.EVENT.register((player, level, hand, hit) -> player.isSpectator() ? InteractionResult.PASS
-                : ModCommonEvents.onRightClickBlock(player, level, hand, hit.getBlockPos(), hit.getDirection()));
+        UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+            if (player.isSpectator()) return InteractionResult.PASS;
+            // Forge asks the item whether sneaking still uses the block (the wrench on pipes); vanilla and Fabric skip the block when sneaking with an item.
+            var held = player.getItemInHand(hand);
+            if (player.isSecondaryUseActive() && held.getItem() instanceof com.kingodogo.buildscape.item.WrenchItem wrench
+                    && wrench.doesSneakBypassUse(held, level, hit.getBlockPos(), player)) {
+                var state = level.getBlockState(hit.getBlockPos());
+                var used = state.useItemOn(held, level, player, hand, hit);
+                if (used.consumesAction()) return used.result();
+                if (used == net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                        && hand == net.minecraft.world.InteractionHand.MAIN_HAND) {
+                    var plain = state.useWithoutItem(level, player, hit);
+                    if (plain.consumesAction()) return plain;
+                }
+            }
+            return ModCommonEvents.onRightClickBlock(player, level, hand, hit.getBlockPos(), hit.getDirection());
+        });
         UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
             if (player.isSpectator()) return InteractionResult.PASS;
             var golden = GoldenDandelionHandler.onEntityInteract(player, level, hand, entity);

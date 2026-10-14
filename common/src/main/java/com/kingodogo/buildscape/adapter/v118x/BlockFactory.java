@@ -1607,7 +1607,7 @@ public class BlockFactory implements IBlockFactory {
                     if (state.getValue(WATERLOGGED)) {
                         level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
                     }
-                    return GlowLightsBlock.updateGlowLightShape(state, direction, neighborState, level, neighborPos);
+                    return MulticolorGlowLightsBlock.updateMulticolorShape(state, direction, neighborState, level, neighborPos);
                 }
                 @Override
                 public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
@@ -2194,6 +2194,17 @@ public class BlockFactory implements IBlockFactory {
             return new WallpaperFlatBlock(props) {};
         } else if (def.isPointedIcicle()) {
             return new PointedIcicleBlock(props) {
+                @Override
+                public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+                    InteractionResult result = onInteract(state, level, pos, player, hand,
+                            player.getItemInHand(hand).getItem() instanceof net.minecraft.world.item.PickaxeItem);
+                    return result != InteractionResult.PASS ? result : super.use(state, level, pos, player, hand, hit);
+                }
+                @Override
+                public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+                    onIcicleRemove(state, level, pos, newState, isMoving);
+                    super.onRemove(state, level, pos, newState, isMoving);
+                }
                 @Override
                 public void tick(BlockState state, ServerLevel level, BlockPos pos, java.util.Random random) {
                     onIcicleTick(state, level, pos);

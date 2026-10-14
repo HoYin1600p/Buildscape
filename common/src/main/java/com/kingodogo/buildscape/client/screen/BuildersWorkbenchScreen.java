@@ -490,8 +490,13 @@ public class BuildersWorkbenchScreen {
         int categoryBit = 1 << filter;
         int strictBit = categoryBit << ColorGradientSolver.STRICT_SHIFT;
         if (shiftDown) {
-            filterMask ^= strictBit;
-            if ((filterMask & strictBit) != 0) filterMask |= categoryBit;
+            if ((filterMask & categoryBit) == 0) {
+                filterMask |= categoryBit | strictBit;
+            } else if ((filterMask & strictBit) == 0) {
+                filterMask |= strictBit;
+            } else {
+                filterMask &= ~(categoryBit | strictBit);
+            }
         } else {
             filterMask ^= categoryBit;
             if ((filterMask & categoryBit) == 0) filterMask &= ~strictBit;
@@ -501,7 +506,17 @@ public class BuildersWorkbenchScreen {
     }
 
     private void toggleModifier(int modifier) {
-        filterMask ^= modifier == 0 ? ColorGradientSolver.FILTER_SINGLE_TEXTURE : ColorGradientSolver.FILTER_MATCH_SHAPE;
+        if (modifier == 0) {
+            filterMask ^= ColorGradientSolver.FILTER_SINGLE_TEXTURE;
+        } else if ((filterMask & ColorGradientSolver.FILTER_MATCH_SHAPE) == 0) {
+            int categoryState = ColorGradientSolver.FILTER_ALL
+                    | ColorGradientSolver.FILTER_ALL << ColorGradientSolver.STRICT_SHIFT;
+            filterMask = filterMask & ~categoryState
+                    | ColorGradientSolver.FILTER_MATCH_SHAPE
+                    | ColorGradientSolver.FILTER_NON_FULL;
+        } else {
+            filterMask &= ~ColorGradientSolver.FILTER_MATCH_SHAPE;
+        }
         resetAllResultOffsets();
         solveNow();
     }

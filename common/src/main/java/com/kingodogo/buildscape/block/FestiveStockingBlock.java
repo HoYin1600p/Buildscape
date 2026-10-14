@@ -196,6 +196,22 @@ public class FestiveStockingBlock extends Block implements EntityBlock, SimpleWa
             return InteractionResult.PASS;
         }
 
+        if (player.isShiftKeyDown() && !be.isEmpty()) {
+            if (!level.isClientSide()) {
+                ItemStack stored = be.getStoredItem().copy();
+                be.setStoredItem(ItemStack.EMPTY, true);
+                if (!player.getInventory().add(stored)) {
+                    net.minecraft.world.entity.item.ItemEntity itemEntity = new net.minecraft.world.entity.item.ItemEntity(
+                            level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stored);
+                    itemEntity.setDefaultPickUpDelay();
+                    level.addFreshEntity(itemEntity);
+                }
+                Services.PLATFORM.playItemFrameRemove(level, pos);
+                level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+            }
+            return Services.PLATFORM.sidedSuccess(level.isClientSide());
+        }
+
         if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem blockItem && blockItem.getBlock() instanceof FestiveStockingBlock) {
             return InteractionResult.PASS;
         }

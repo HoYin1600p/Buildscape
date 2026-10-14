@@ -451,7 +451,7 @@ public final class ClientMixinHooks {
             float yaw = Math.hypot(xd, zd) > 0.05
                     ? (float) Math.toDegrees(Math.atan2(xd, zd))
                     : Minecraft.getInstance().player == null ? 0 : Minecraft.getInstance().player.getYRot();
-            yaw = root.getFloatOr("ShotYaw", yaw);
+            yaw = fireworks.get().getFloatOr("ShotYaw", yaw);
             FIREWORK_METADATA.put(starter, new FireworkMetadata(explosions.copy(), yaw));
             var particle = (net.minecraft.client.particle.Particle) starter;
             particle.setBoundingBox(particle.getBoundingBox().inflate(120.0D));

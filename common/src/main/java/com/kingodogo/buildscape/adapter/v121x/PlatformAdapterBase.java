@@ -1182,6 +1182,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public void awardStat(ServerPlayer player, CommonId statId) {
         if (player == null || statId == null) return;
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(statId.getNamespace(), statId.getPath());
+        // The custom-stat registry resolves keys by identity: an equal copy of the registered value has no key and
+        // Stat construction fails with an NPE, so award with the registered instance (as main does).
+        ResourceLocation registered = BuiltInRegistries.CUSTOM_STAT.getOptional(ResourceLocation.withDefaultNamespace(statId.getPath()))
+                .filter(id::equals).orElse(null);
+        if (registered != null) id = registered;
         net.minecraft.stats.Stat<ResourceLocation> stat = net.minecraft.stats.Stats.CUSTOM.get(id);
         if (stat != null) {
             player.awardStat(stat);
@@ -3657,8 +3662,9 @@ public static class PoplarBoatEntityImpl extends Boat implements PoplarBoatEntit
             this.setVariant(Boat.Type.OAK);
         }
 
+        @SuppressWarnings("unchecked")
         public PoplarBoatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityType.BOAT, level);
+            this((EntityType<? extends Boat>) Services.PLATFORM.getPoplarBoatEntityType(), level);
             this.setPos(x, y, z);
             this.xo = x;
             this.yo = y;
@@ -3680,7 +3686,7 @@ public static class PoplarBoatEntityImpl extends Boat implements PoplarBoatEntit
         }
 
         public SeatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityType.MARKER, level);
+            this(Services.PLATFORM.getSeatEntityType(), level);
             this.setPos(x, y, z);
         }
 

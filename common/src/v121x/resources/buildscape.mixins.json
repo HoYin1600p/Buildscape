@@ -50,6 +50,7 @@
     "FireworkStarterMixin",
     "GlassJarRenderShapeMixin",
     "PauseScreenMixin",
+    "SignRendererMixin",
     "client.AdvancementsScreenMixin",
     "client.ClientTooltipComponentMixin",
     "client.FireworkRocketContextMixin",

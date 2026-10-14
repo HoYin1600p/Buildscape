@@ -2628,10 +2628,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override public net.minecraft.client.gui.screens.Screen wrapScreen(net.minecraft.network.chat.Component title, net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.IScreenDelegate delegate) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.wrapScreen(title, parent, delegate); }
 
-    @Override public net.minecraft.client.gui.screens.Screen createGuiEditorScreen(net.minecraft.client.gui.screens.Screen parent, String tabName, com.kingodogo.buildscape.client.screen.AbstractConfigTab sourceTab) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createGuiEditorScreen(parent, tabName, sourceTab); }
-
-    @Override public net.minecraft.client.gui.screens.Screen createInventoryItemSelectorScreen(net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab configTab) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createInventoryItemSelectorScreen(parent, configTab); }
-
     @Override public void renderGuiItem(Object poseStackOrGraphics, net.minecraft.world.item.ItemStack stack, int x, int y) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderGuiItem(poseStackOrGraphics, stack, x, y); }
 
     @Override public void renderGuiItemDecorations(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.world.item.ItemStack stack, int x, int y) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderGuiItemDecorations(poseStackOrGraphics, font, stack, x, y); }

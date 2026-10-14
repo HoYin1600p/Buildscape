@@ -585,6 +585,22 @@ public class PillarIdManager {
         removePillars(Collections.singleton(pillarId));
     }
 
+    public void removePillarData(String pillarId) {
+        removePillar(pillarId);
+    }
+
+    public void saveAllPillars() {
+        saveImmediate();
+    }
+
+    public void updatePillarData(PillarData data) {
+        if (data != null && data.id != null) {
+            pillarData.put(data.id, data);
+            data.modifiedTime = System.currentTimeMillis();
+            saveImmediate();
+        }
+    }
+
     public boolean removePillars(Collection<String> pillarIds) {
         if (pillarIds == null || pillarIds.isEmpty()) {
             return false;

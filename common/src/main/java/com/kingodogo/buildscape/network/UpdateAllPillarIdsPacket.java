@@ -27,6 +27,10 @@ public class UpdateAllPillarIdsPacket implements CommonPacket {
         this.pillarDataList = new ArrayList<>(pillarDataList);
     }
 
+    public UpdateAllPillarIdsPacket(java.util.Collection<PillarIdManager.PillarData> pillarDataCollection) {
+        this.pillarDataList = new ArrayList<>(pillarDataCollection);
+    }
+
     public UpdateAllPillarIdsPacket(FriendlyByteBuf buf) {
         int count = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_PILLARS, "pillar");
         this.pillarDataList = new ArrayList<>(count);

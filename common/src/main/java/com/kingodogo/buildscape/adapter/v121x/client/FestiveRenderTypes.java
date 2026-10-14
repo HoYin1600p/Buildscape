@@ -1,12 +1,13 @@
 package com.kingodogo.buildscape.adapter.v121x.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
-/** Festive copies of the vanilla 1.21.1 enchantment glint render types (same states, festive texture). */
+/** Festive glint with the reference shader's source-alpha blending and full colour strength. */
 public final class FestiveRenderTypes extends RenderType {
 
     public static final ResourceLocation FESTIVE_GLINT_LOCATION =
@@ -20,7 +21,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(GLINT_TRANSPARENCY)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTexturingState(GLINT_TEXTURING)
                     .createCompositeState(false));
 
@@ -32,7 +33,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(GLINT_TRANSPARENCY)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTexturingState(GLINT_TEXTURING)
                     .setOutputState(ITEM_ENTITY_TARGET)
                     .createCompositeState(false));
@@ -45,7 +46,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(GLINT_TRANSPARENCY)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setOutputState(ITEM_ENTITY_TARGET)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
                     .createCompositeState(false));
@@ -58,7 +59,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(GLINT_TRANSPARENCY)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
                     .createCompositeState(false));
 
@@ -70,7 +71,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(GLINT_TRANSPARENCY)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                     .createCompositeState(false));
@@ -80,9 +81,19 @@ public final class FestiveRenderTypes extends RenderType {
     private static RenderType createFestive(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize,
                                             boolean affectsCrumbling, boolean sortOnUpload, RenderType.CompositeState state) {
         var states = ((com.kingodogo.buildscape.mixin.RenderCompositeStateV121xAccessor) (Object) state).buildscape$getStates();
+        float[] previousGlintAlpha = new float[1];
         return new FestiveRenderTypes(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload,
-                () -> states.forEach(RenderStateShard::setupRenderState),
-                () -> states.forEach(RenderStateShard::clearRenderState));
+                () -> {
+                    states.forEach(RenderStateShard::setupRenderState);
+                    // Main predates GlintAlpha. Do this at draw time, after stack tracking has ended,
+                    // and restore the user's setting before any ordinary enchantment glint draws.
+                    previousGlintAlpha[0] = RenderSystem.getShaderGlintAlpha();
+                    RenderSystem.setShaderGlintAlpha(1.0F);
+                },
+                () -> {
+                    RenderSystem.setShaderGlintAlpha(previousGlintAlpha[0]);
+                    states.forEach(RenderStateShard::clearRenderState);
+                });
     }
 
     private FestiveRenderTypes(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize,

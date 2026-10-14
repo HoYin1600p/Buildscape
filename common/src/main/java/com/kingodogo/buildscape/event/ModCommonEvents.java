@@ -360,7 +360,10 @@ public final class ModCommonEvents {
         pillarSaveTickCounter = 0;
         pillarBackupTickCounter = 0;
         try {
-            PillarIdManager.get().saveImmediate();
+            PillarIdManager manager = PillarIdManager.get();
+            if (manager != null && manager.hasLoaded()) {
+                manager.savePeriodic(true);
+            }
         } catch (Exception exception) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to save pillar data during server shutdown", exception);
         }

@@ -76,11 +76,21 @@ public class UpdateAllPillarIdsPacket implements CommonPacket {
             PillarIdManager.PillarData existing = manager.getPillarData(incoming.id);
             if (existing != null) {
                 existing.pattern = incoming.pattern;
-                existing.patternSpeed = incoming.patternSpeed;
-                existing.patternSpread = incoming.patternSpread;
-                existing.patternIntensity = incoming.patternIntensity;
-                existing.usePattern = incoming.usePattern;
-                existing.maxParticleColor = incoming.maxParticleColor;
+                Double speed = incoming.patternSpeed != null ? incoming.patternSpeed : incoming.pattern_speed;
+                existing.patternSpeed = speed;
+                existing.pattern_speed = speed;
+                Double spread = incoming.patternSpread != null ? incoming.patternSpread : incoming.pattern_spread;
+                existing.patternSpread = spread;
+                existing.pattern_spread = spread;
+                Double intensity = incoming.patternIntensity != null ? incoming.patternIntensity : incoming.pattern_intensity;
+                existing.patternIntensity = intensity;
+                existing.pattern_intensity = intensity;
+                Boolean usePat = incoming.usePattern != null ? incoming.usePattern : incoming.use_pattern;
+                existing.usePattern = usePat;
+                existing.use_pattern = usePat;
+                Integer maxCol = incoming.maxParticleColor != null ? incoming.maxParticleColor : incoming.max_particle_color;
+                existing.maxParticleColor = maxCol;
+                existing.max_particle_color = maxCol;
                 if (incoming.dyeColors != null) {
                     existing.dyeColors = new ArrayList<>(incoming.dyeColors);
                 }
@@ -92,6 +102,7 @@ public class UpdateAllPillarIdsPacket implements CommonPacket {
         if (changed) {
             manager.saveImmediate();
             manager.syncAllLoadedPillars(com.kingodogo.buildscape.platform.Services.PLATFORM.getServer(serverPlayer));
+            SyncPillarIdsPacket.sendToAll(manager.getAllPillarDataForSync());
         }
     }
 }

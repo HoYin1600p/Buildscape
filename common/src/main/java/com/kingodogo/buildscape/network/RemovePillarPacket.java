@@ -58,6 +58,7 @@ public class RemovePillarPacket implements CommonPacket {
         boolean changed = manager.removePillars(pillarIds);
         if (changed) {
             manager.syncAllLoadedPillars(com.kingodogo.buildscape.platform.Services.PLATFORM.getServer(serverPlayer));
+            SyncPillarIdsPacket.sendToAll(manager.getAllPillarDataForSync());
         }
     }
 }

@@ -56,9 +56,34 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public int width;
     public int height;
 
-    // --- Animation Timings & States ---
-    private static final int OPEN_DURATION_MS = 220;
-    private static final int CLOSE_DURATION_MS = 160;
+    // --- Local Client Preferences & Dynamic Animation Scaling ---
+    private static int animSpeedIndex = 0;
+    private static final String[] ANIM_SPEEDS = {"Smooth", "Snappy", "Instant"};
+
+    public static float getAnimSpeedMultiplier() {
+        return switch (animSpeedIndex) {
+            case 1 -> 0.60f; // Snappy
+            case 2 -> 0.001f; // Instant
+            default -> 1.0f; // Smooth
+        };
+    }
+
+    public static int getOpenAnimMs() { return Math.max(1, (int) (300 * getAnimSpeedMultiplier())); }
+    public static int getCloseAnimMs() { return Math.max(1, (int) (220 * getAnimSpeedMultiplier())); }
+    public static int getNavAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
+    public static int getNavIndicatorAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
+    public static int getTabTransitionAnimMs() { return Math.max(1, (int) (240 * getAnimSpeedMultiplier())); }
+    public static int getSidePanelAnimMs() { return Math.max(1, (int) (280 * getAnimSpeedMultiplier())); }
+
+    public static float easeOutSine(float t) {
+        float clamped = Math.min(1.0f, Math.max(0.0f, t));
+        return (float) Math.sin(clamped * (Math.PI / 2.0));
+    }
+
+    public static float easeInSine(float t) {
+        float clamped = Math.min(1.0f, Math.max(0.0f, t));
+        return 1.0f - (float) Math.cos(clamped * (Math.PI / 2.0));
+    }
 
     private long openStartTime;
     private long closeStartTime = -1;
@@ -323,7 +348,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         sidePanelType = type;
         isSidePanelOpening = true;
         isSidePanelClosing = false;
-        sidePanelAnimStartTime = System.currentTimeMillis() - (long) (sidePanelProgress * SIDE_PANEL_ANIM_MS);
+        int duration = getSidePanelAnimMs();
+        sidePanelAnimStartTime = System.currentTimeMillis() - (long) (sidePanelProgress * duration);
     }
 
     public void closeSidePanel() {
@@ -332,23 +358,23 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         isSidePanelClosing = true;
         isSidePanelOpening = false;
-        sidePanelAnimStartTime = System.currentTimeMillis() - (long) ((1.0f - sidePanelProgress) * SIDE_PANEL_ANIM_MS);
+        int duration = getSidePanelAnimMs();
+        sidePanelAnimStartTime = System.currentTimeMillis() - (long) ((1.0f - sidePanelProgress) * duration);
     }
 
     private void updateSidePanelAnimation() {
         if (!isSidePanelOpening && !isSidePanelClosing) return;
         long elapsed = System.currentTimeMillis() - sidePanelAnimStartTime;
+        int duration = getSidePanelAnimMs();
+        float t = Math.min(1.0f, (float) elapsed / duration);
         if (isSidePanelOpening) {
-            float t = Math.min(1.0f, (float) elapsed / SIDE_PANEL_ANIM_MS);
-            float inv = 1.0f - t;
-            sidePanelProgress = 1.0f - inv * inv * inv * inv;
+            sidePanelProgress = easeOutSine(t);
             if (t >= 1.0f) {
                 sidePanelProgress = 1.0f;
                 isSidePanelOpening = false;
             }
         } else if (isSidePanelClosing) {
-            float t = Math.min(1.0f, (float) elapsed / SIDE_PANEL_ANIM_MS);
-            sidePanelProgress = 1.0f - (t * t * t * t);
+            sidePanelProgress = 1.0f - easeInSine(t);
             if (t >= 1.0f) {
                 sidePanelProgress = 0.0f;
                 isSidePanelClosing = false;
@@ -360,8 +386,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     // --- Local Client Preferences ---
     private boolean autoSnappingEnabled = true;
     private boolean strictBoundsCheck = true;
-    private int animSpeedIndex = 0;
-    private static final String[] ANIM_SPEEDS = {"Smooth", "Snappy", "Instant"};
 
     // Legacy tab & widget support
     private AbstractConfigTab activeTab;
@@ -787,38 +811,30 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         long now = System.currentTimeMillis();
 
         if (isOpening) {
-            float elapsed = (now - openStartTime) / (float) OPEN_DURATION_MS;
+            int duration = getOpenAnimMs();
+            float elapsed = (now - openStartTime) / (float) duration;
             if (elapsed >= 1.0f) {
                 openProgress = 1.0f;
                 isOpening = false;
             } else {
-                openProgress = easeOutCubic(elapsed);
+                openProgress = easeOutSine(elapsed);
             }
         }
 
         if (isClosing) {
-            float elapsed = (now - closeStartTime) / (float) CLOSE_DURATION_MS;
+            int duration = getCloseAnimMs();
+            float elapsed = (now - closeStartTime) / (float) duration;
             if (elapsed >= 1.0f) {
                 closeProgress = 0.0f;
                 isClosing = false;
                 Services.PLATFORM.openScreen(parent);
                 return 0.0f;
             } else {
-                closeProgress = 1.0f - easeInCubic(elapsed);
+                closeProgress = 1.0f - easeInSine(elapsed);
             }
         }
 
         return isClosing ? closeProgress : openProgress;
-    }
-
-    private static float easeOutCubic(float t) {
-        float inv = 1.0f - Math.min(1.0f, Math.max(0.0f, t));
-        return 1.0f - inv * inv * inv;
-    }
-
-    private static float easeInCubic(float t) {
-        float val = Math.min(1.0f, Math.max(0.0f, t));
-        return val * val * val;
     }
 
     public void startClosing() {
@@ -856,15 +872,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public void render(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
         float alpha = updateAnimations();
         if (alpha <= 0.001f) return;
-
-        // Auto-refresh pillar IDs periodically if on the pillars tab
-        if (selectedTabIndex < navItems.size() && "pillars".equals(navItems.get(selectedTabIndex).id)) {
-            long now = System.currentTimeMillis();
-            if (now - lastPillarRefreshCheck >= 1500L) {
-                lastPillarRefreshCheck = now;
-                syncPillars();
-            }
-        }
 
         Font font = Minecraft.getInstance().font;
 
@@ -980,9 +987,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Calculate animated gliding indicator Y
         long now = System.currentTimeMillis();
         long indElapsed = now - navIndicatorStartTime;
-        if (indElapsed < NAV_INDICATOR_ANIM_MS) {
-            float t = (float) indElapsed / NAV_INDICATOR_ANIM_MS;
-            float ease = 1.0f - (float) Math.pow(1.0f - t, 3);
+        int indDuration = getNavIndicatorAnimMs();
+        if (indElapsed < indDuration) {
+            float t = (float) indElapsed / indDuration;
+            float ease = easeOutSine(t);
             currentIndicatorY = prevNavIndicatorY + (targetNavIndicatorY - prevNavIndicatorY) * ease;
         } else {
             currentIndicatorY = targetNavIndicatorY;
@@ -1077,9 +1085,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         float transProgress = 1.0f;
         if (isTabTransitioning) {
             long transElapsed = now - tabTransitionStartTime;
-            if (transElapsed < TAB_TRANSITION_ANIM_MS) {
-                float t = (float) transElapsed / TAB_TRANSITION_ANIM_MS;
-                transProgress = 1.0f - (float) Math.pow(1.0f - t, 3);
+            int transDuration = getTabTransitionAnimMs();
+            if (transElapsed < transDuration) {
+                float t = (float) transElapsed / transDuration;
+                transProgress = easeOutSine(t);
             } else {
                 isTabTransitioning = false;
             }
@@ -1976,13 +1985,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int gradBoxW = 110;
         int gradBoxH = 88;
 
-        for (int x = 0; x < gradBoxW; x += 2) {
+        for (int x = 0; x < gradBoxW; x += 3) {
             float sat = x / (float) gradBoxW;
             int topRgb = hsbToRgb(pickerHue, sat, 1.0f);
-            for (int y = 0; y < gradBoxH; y += 2) {
+            int gw = Math.min(3, gradBoxW - x);
+            for (int y = 0; y < gradBoxH; y += 3) {
                 float bri = 1.0f - (y / (float) gradBoxH);
                 int pixelCol = scaleBrightness(topRgb, bri);
-                Services.PLATFORM.fill(poseStackOrGraphics, gradBoxX + x, gradBoxY + y, gradBoxX + x + 2, gradBoxY + y + 2, applyAlpha(pixelCol, alpha));
+                int gh = Math.min(3, gradBoxH - y);
+                Services.PLATFORM.fill(poseStackOrGraphics, gradBoxX + x, gradBoxY + y, gradBoxX + x + gw, gradBoxY + y + gh, applyAlpha(pixelCol, alpha));
             }
         }
         drawBorder(poseStackOrGraphics, gradBoxX - 1, gradBoxY - 1, gradBoxW + 2, gradBoxH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
@@ -1999,10 +2010,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int hueW = 16;
         int hueH = gradBoxH;
 
-        for (int y = 0; y < hueH; y += 2) {
+        for (int y = 0; y < hueH; y += 3) {
             float h = (y / (float) hueH) * 360.0f;
             int col = hsbToRgb(h, 1.0f, 1.0f);
-            Services.PLATFORM.fill(poseStackOrGraphics, hueX, hueY + y, hueX + hueW, hueY + y + 2, applyAlpha(col, alpha));
+            int hh = Math.min(3, hueH - y);
+            Services.PLATFORM.fill(poseStackOrGraphics, hueX, hueY + y, hueX + hueW, hueY + y + hh, applyAlpha(col, alpha));
         }
         drawBorder(poseStackOrGraphics, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
@@ -2062,16 +2074,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
 
         // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
-        for (int i = 1; i < w - 1; i++) {
-            float t = (float) (i - 1) / Math.max(1, w - 2);
-            int col = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y + 1, x + i + 1, y + 2, applyAlpha(col, alpha));
-        }
-        for (int j = 1; j < h - 1; j++) {
-            float t = (float) (j - 1) / Math.max(1, h - 2);
-            int col = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + j, x + 2, y + j + 1, applyAlpha(col, alpha));
-        }
+        drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        drawVerticalGradientLine(poseStackOrGraphics, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
@@ -2108,11 +2112,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
 
         // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Shadow (Bottom & Right)
-        for (int i = 1; i < w - 1; i++) {
-            float t = (float) (i - 1) / Math.max(1, w - 2);
-            int col = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y + 1, x + i + 1, y + 2, applyAlpha(col, alpha));
-        }
+        drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + 2, y + h - 1, applyAlpha(COLOR_BORDER_GRADIENT_START, alpha));
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
@@ -2314,13 +2314,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int hueY = gradY;
         int hueH = gradH;
 
-        for (int gx = 0; gx < gradW; gx += 2) {
+        for (int gx = 0; gx < gradW; gx += 3) {
             float sat = gx / (float) gradW;
             int topRgb = hsbToRgb(pickerHue, sat, 1.0f);
-            for (int gy = 0; gy < gradH; gy += 2) {
+            int gw = Math.min(3, gradW - gx);
+            for (int gy = 0; gy < gradH; gy += 3) {
                 float bri = 1.0f - (gy / (float) gradH);
                 int pixelCol = scaleBrightness(topRgb, bri);
-                Services.PLATFORM.fill(poseStackOrGraphics, gradX + gx, gradY + gy, gradX + gx + 2, gradY + gy + 2, applyAlpha(pixelCol, alpha));
+                int gh = Math.min(3, gradH - gy);
+                Services.PLATFORM.fill(poseStackOrGraphics, gradX + gx, gradY + gy, gradX + gx + gw, gradY + gy + gh, applyAlpha(pixelCol, alpha));
             }
         }
         drawBorder(poseStackOrGraphics, gradX - 1, gradY - 1, gradW + 2, gradH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
@@ -2332,10 +2334,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawBorder(poseStackOrGraphics, crossX - 2, crossY - 2, 4, 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         // Hue Slider
-        for (int hy = 0; hy < hueH; hy += 2) {
+        for (int hy = 0; hy < hueH; hy += 3) {
             float hVal = (hy / (float) hueH) * 360.0f;
             int col = hsbToRgb(hVal, 1.0f, 1.0f);
-            Services.PLATFORM.fill(poseStackOrGraphics, hueX, hueY + hy, hueX + hueW, hueY + hy + 2, applyAlpha(col, alpha));
+            int hh = Math.min(3, hueH - hy);
+            Services.PLATFORM.fill(poseStackOrGraphics, hueX, hueY + hy, hueX + hueW, hueY + hy + hh, applyAlpha(col, alpha));
         }
         drawBorder(poseStackOrGraphics, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 

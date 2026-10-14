@@ -417,6 +417,28 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     @Override
+    public Item createHomemakerSpawnEggItem(Item.Properties properties, boolean festive) {
+        EntityType<?> type = festive ? getFestiveWanderingHomemakerEntityType() : getWanderingHomemakerEntityType();
+        return new net.minecraft.world.item.SpawnEggItem(properties.spawnEgg(type)) {
+            @Override
+            public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+                super.appendHoverText(stack, context, display, tooltip, flag);
+                tooltip.accept(Component.translatable("tooltip.buildscape." + (festive
+                        ? "festive_wandering_homemaker_spawn_egg" : "wandering_homemaker_spawn_egg") + ".spawn_info"));
+                long remaining = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime - System.currentTimeMillis();
+                if (remaining > 0) {
+                    long seconds = remaining / 1000;
+                    tooltip.accept(Component.translatable("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active",
+                            seconds / 60, seconds % 60).withStyle(net.minecraft.ChatFormatting.RED));
+                } else {
+                    tooltip.accept(Component.translatable("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                            .withStyle(net.minecraft.ChatFormatting.GREEN));
+                }
+            }
+        };
+    }
+
+    @Override
     public EntityType<?> getWanderingHomemakerEntityType() {
         if (wanderingHomemakerType == null) {
             wanderingHomemakerType = EntityType.Builder.<WanderingHomemakerEntityImpl>of(WanderingHomemakerEntityImpl::new, MobCategory.CREATURE)

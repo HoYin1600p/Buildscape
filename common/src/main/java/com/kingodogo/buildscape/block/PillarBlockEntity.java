@@ -28,7 +28,7 @@ import net.minecraft.world.phys.AABB;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-public class PillarBlockEntity extends DataBlockEntity implements Container {
+public class PillarBlockEntity extends DataBlockEntity {
 
     public static final int MAX_DYE_COLORS = 5;
 
@@ -504,6 +504,132 @@ public class PillarBlockEntity extends DataBlockEntity implements Container {
         }
     }
 
+    private static final int SYNC_INTERVAL = 100;
+    private int syncTickCounter = 0;
+
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+        if (level != null && !level.isClientSide()) {
+            PillarIdManager manager = PillarIdManager.get(level);
+            try {
+                manager.load();
+                manager.registerPillar(this);
+            } catch (Exception e) {
+                // Main ignores a failed manager load here; the periodic sync retries later.
+            }
+        }
+    }
+
+    public static void serverTick(Level level, BlockPos pos, BlockState state, PillarBlockEntity be) {
+        be.syncTickCounter++;
+        if (be.syncTickCounter >= SYNC_INTERVAL) {
+            be.syncTickCounter = 0;
+            be.syncBothFromManager();
+        }
+    }
+
+    private void syncBothFromManager() {
+        if (level == null || level.isClientSide()) {
+            return;
+        }
+        if (level.getServer() == null || !level.getServer().isRunning()
+                || !com.kingodogo.buildscape.BuildscapeCommon.isServerFullyInitialized()) {
+            return;
+        }
+        if (level.getServer().getPlayerList().getPlayerCount() == 0) {
+            return;
+        }
+        if (!level.hasChunkAt(worldPosition)) {
+            return;
+        }
+
+        PillarIdManager manager = PillarIdManager.get(level);
+        if (!manager.hasLoaded()) {
+            return;
+        }
+
+        String expectedPrefix = PillarIdManager.getVariantPrefix(level, worldPosition);
+        String idToSync = (this.pillarId != null && !this.pillarId.isEmpty()) ? this.pillarId : getStackPillarId();
+        if (idToSync == null || idToSync.isEmpty()) {
+            return;
+        }
+        if (!idToSync.startsWith(expectedPrefix)) {
+            return;
+        }
+
+        PillarIdManager.PillarData data = manager.getPillarData(idToSync);
+        boolean changed = false;
+
+        if (data != null && data.hasColors()) {
+            List<String> managerColors = data.getColors();
+            boolean colorsDiffer = this.particleColors == null || this.particleColors.isEmpty()
+                    || !idToSync.equals(this.pillarId) || managerColors.size() != this.particleColors.size();
+            if (!colorsDiffer) {
+                for (int i = 0; i < managerColors.size(); i++) {
+                    String mc = managerColors.get(i);
+                    if (mc == null || !mc.equals(this.particleColors.get(i))) {
+                        colorsDiffer = true;
+                        break;
+                    }
+                }
+            }
+            if (colorsDiffer) {
+                this.pillarId = idToSync;
+                this.particleColors = new ArrayList<>(managerColors);
+                this.colorsInitialized = true;
+                this.particleColorCounter = 0;
+                this.lastParticleTick = 0;
+                this.colorsVersion++;
+                changed = true;
+            }
+        }
+
+        if (data != null) {
+            String managerPattern = data.pattern;
+            if (managerPattern != null && !managerPattern.isEmpty()) {
+                boolean validPattern = java.util.Arrays.asList(PATTERNS).contains(managerPattern);
+                if (validPattern && !managerPattern.equals(this.particlePattern)) {
+                    this.particlePattern = managerPattern;
+                    changed = true;
+                }
+            } else if (this.particlePattern != null) {
+                this.particlePattern = null;
+                changed = true;
+            }
+
+            if (data.pattern_speed != null && !data.pattern_speed.equals(this.patternSpeed)) {
+                this.patternSpeed = data.pattern_speed;
+                changed = true;
+            } else if (data.pattern_speed == null && this.patternSpeed != null) {
+                this.patternSpeed = null;
+                changed = true;
+            }
+
+            if (data.pattern_spread != null && !data.pattern_spread.equals(this.patternSpread)) {
+                this.patternSpread = data.pattern_spread;
+                changed = true;
+            } else if (data.pattern_spread == null && this.patternSpread != null) {
+                this.patternSpread = null;
+                changed = true;
+            }
+
+            if (data.pattern_intensity != null
+                    && (this.patternIntensity != null && !this.patternIntensity.equals(data.pattern_intensity))) {
+                this.patternIntensity = data.pattern_intensity;
+                changed = true;
+            } else if (data.pattern_intensity == null && this.patternIntensity != null) {
+                this.patternIntensity = null;
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            this.setChanged();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
     public void syncFromData(PillarIdManager.PillarData data) {
         if (data == null) {
             return;
@@ -571,7 +697,23 @@ public class PillarBlockEntity extends DataBlockEntity implements Container {
         this.particlePattern = pattern;
         this.setChanged();
         if (level != null && !level.isClientSide()) {
+            propagatePatternToStack(pattern);
+            updatePatternInConfig(pattern);
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    private void updatePatternInConfig(String pattern) {
+        if (level == null || level.isClientSide()) {
+            return;
+        }
+        PillarIdManager manager = PillarIdManager.get(level);
+        PillarIdManager.PillarData data = manager.getOrCreatePillarData(level, findStackBottom());
+        if (data != null) {
+            manager.syncPatternSettingsFromNBT(this, data);
+            data.pattern = pattern;
+            data.modifiedTime = System.currentTimeMillis();
+            manager.saveImmediate();
         }
     }
 
@@ -797,71 +939,6 @@ public class PillarBlockEntity extends DataBlockEntity implements Container {
         setChanged();
     }
 
-    @Override
-    public int getContainerSize() {
-        return 1;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return displayedItem.isEmpty();
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == 0 ? displayedItem : ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeItem(int slot, int amount) {
-        if (slot == 0 && !displayedItem.isEmpty()) {
-            ItemStack split = displayedItem.split(amount);
-            if (displayedItem.isEmpty()) {
-                displayedItem = ItemStack.EMPTY;
-            }
-            setChanged();
-            if (level != null && !level.isClientSide()) {
-                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-            }
-            return split;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        if (slot == 0) {
-            ItemStack res = displayedItem;
-            displayedItem = ItemStack.EMPTY;
-            return res;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot == 0) {
-            displayedItem = stack;
-            setChanged();
-            if (level != null && !level.isClientSide()) {
-                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-            }
-        }
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        if (this.level == null || this.level.getBlockEntity(this.worldPosition) != this) {
-            return false;
-        }
-        return player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) <= 64.0D;
-    }
-
-    @Override
-    public void clearContent() {
-        displayedItem = ItemStack.EMPTY;
-        setChanged();
-    }
 
     public AABB getRenderBoundingBox() {
         if (!hasDisplayItem()) {

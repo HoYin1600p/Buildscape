@@ -277,14 +277,22 @@ public final class ClientPlatformHooks {
     public static void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, float u, float v, int width, int height, int sheetW, int sheetH) {
         if (texture != null && poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
             net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath());
-            extractor.blit(id, x, y, width, height, u / sheetW, v / sheetH, (u + width) / sheetW, (v + height) / sheetH);
+            float u0 = u / (float) sheetW;
+            float u1 = (u + width) / (float) sheetW;
+            float v0 = v / (float) sheetH;
+            float v1 = (v + height) / (float) sheetH;
+            extractor.blit(id, x, y, x + width, y + height, u0, u1, v0, v1);
         }
     }
 
     public static void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH) {
         if (texture != null && poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
             net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath());
-            extractor.blit(id, x, y, width, height, u / sheetW, v / sheetH, (u + uWidth) / sheetW, (v + vHeight) / sheetH);
+            float u0 = u / (float) sheetW;
+            float u1 = (u + uWidth) / (float) sheetW;
+            float v0 = v / (float) sheetH;
+            float v1 = (v + vHeight) / (float) sheetH;
+            extractor.blit(id, x, y, x + width, y + height, u0, u1, v0, v1);
         }
     }
 
@@ -814,14 +822,6 @@ public final class ClientPlatformHooks {
 
     public static net.minecraft.client.gui.screens.Screen wrapScreen(net.minecraft.network.chat.Component title, net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.IScreenDelegate delegate) {
         return com.kingodogo.buildscape.adapter.v263.GuiProvider.wrapScreen(title, parent, delegate);
-    }
-
-    public static net.minecraft.client.gui.screens.Screen createGuiEditorScreen(net.minecraft.client.gui.screens.Screen parent, String tabName, com.kingodogo.buildscape.client.screen.AbstractConfigTab sourceTab) {
-        return com.kingodogo.buildscape.adapter.v263.GuiProvider.createGuiEditorScreen(parent, tabName, sourceTab);
-    }
-
-    public static net.minecraft.client.gui.screens.Screen createInventoryItemSelectorScreen(net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab configTab) {
-        return com.kingodogo.buildscape.adapter.v263.GuiProvider.createInventoryItemSelectorScreen(parent, configTab);
     }
 
     public static void renderGuiItem(Object poseStackOrGraphics, net.minecraft.world.item.ItemStack stack, int x, int y) {

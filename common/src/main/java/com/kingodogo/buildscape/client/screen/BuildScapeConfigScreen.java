@@ -1547,7 +1547,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, emTopLeft);
                         Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, emBottomRight);
                         Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, emBottomRight);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 4, slotY + 1, slotX + slotSize - 1, slotY + 4, applyAlpha(0xFF4ADE80, alpha));
                     } else if (hover) {
                         int hTopLeft = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
                         int hBottomRight = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
@@ -3206,14 +3205,30 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (y < clipY || y + h > clipY + clipH) return;
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
 
-        int btnW = 82;
-        int btnH = 14;
-        int btnX = x + w - btnW - 8;
-        int btnY = y + (h - btnH) / 2;
+        int cycleW = 96;
+        int cycleH = 15;
+        int cycleX = x + w - cycleW - 8;
+        int cycleY = y + (h - cycleH) / 2;
+        int arrowW = 15;
 
-        boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
-        drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBtn, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "‹ " + currentVal + " ›", btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        // 1. Left Arrow Button [ ‹ ]
+        boolean hoverPrev = mouseX >= cycleX && mouseX <= cycleX + arrowW && mouseY >= cycleY && mouseY <= cycleY + cycleH;
+        drawBeveledButton(poseStackOrGraphics, cycleX, cycleY, arrowW, cycleH, hoverPrev ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPrev, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "‹", cycleX + arrowW / 2, cycleY + 3, applyAlpha(hoverPrev ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+
+        // 2. Middle Value Container
+        int valX = cycleX + arrowW + 1;
+        int valW = cycleW - (arrowW * 2) - 2;
+        boolean hoverVal = mouseX >= valX && mouseX <= valX + valW && mouseY >= cycleY && mouseY <= cycleY + cycleH;
+        Services.PLATFORM.fill(poseStackOrGraphics, valX, cycleY, valX + valW, cycleY + cycleH, applyAlpha(hoverVal ? COLOR_BTN_BG_HOVER : COLOR_SLOT_BG, alpha));
+        drawBorder(poseStackOrGraphics, valX, cycleY, valW, cycleH, applyAlpha(hoverVal ? COLOR_ROW_BORDER_HOVER : COLOR_SLOT_BORDER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, currentVal, valX + valW / 2, cycleY + 3, applyAlpha(hoverVal ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+
+        // 3. Right Arrow Button [ › ]
+        int rightX = cycleX + cycleW - arrowW;
+        boolean hoverNext = mouseX >= rightX && mouseX <= rightX + arrowW && mouseY >= cycleY && mouseY <= cycleY + cycleH;
+        drawBeveledButton(poseStackOrGraphics, rightX, cycleY, arrowW, cycleH, hoverNext ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNext, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "›", rightX + arrowW / 2, cycleY + 3, applyAlpha(hoverNext ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     private void renderConfigRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String valText, int mouseX, int mouseY, float alpha) {
@@ -3709,7 +3724,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 curY += h + gap;
 
                 // 2. Pattern Cycle
-                if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                int patStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
+                if (patStep != 0) {
                     int pIndex = 0;
                     for (int i = 0; i < GLOBAL_PARTICLE_PATTERNS.length; i++) {
                         if (GLOBAL_PARTICLE_PATTERNS[i].equalsIgnoreCase(cfg.pattern)) {
@@ -3717,7 +3733,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                             break;
                         }
                     }
-                    cfg.pattern = GLOBAL_PARTICLE_PATTERNS[(pIndex + 1) % GLOBAL_PARTICLE_PATTERNS.length];
+                    cfg.pattern = GLOBAL_PARTICLE_PATTERNS[(pIndex + patStep + GLOBAL_PARTICLE_PATTERNS.length) % GLOBAL_PARTICLE_PATTERNS.length];
                     cfg.saveProperties();
                     return true;
                 }
@@ -3929,23 +3945,30 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             case "system" -> {
                 // Row 0: UI Theme Cycle
-                if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                    ConfigThemes.Theme next = ConfigThemes.cycleNextTheme();
+                int themeStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
+                if (themeStep != 0) {
+                    ConfigThemes.Theme next = (themeStep < 0) ? ConfigThemes.cyclePrevTheme() : ConfigThemes.cycleNextTheme();
                     applyTheme(next);
                     return true;
                 }
                 curY += h + gap;
 
                 // Row 1: UI Background Cycle
-                if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                    ConfigBackgrounds.cycleNextBackground();
+                int bgStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
+                if (bgStep != 0) {
+                    if (bgStep < 0) {
+                        ConfigBackgrounds.cyclePrevBackground();
+                    } else {
+                        ConfigBackgrounds.cycleNextBackground();
+                    }
                     return true;
                 }
                 curY += h + gap;
 
                 // Row 2: Screen Animation Cycle
-                if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                    animSpeedIndex = (animSpeedIndex + 1) % ANIM_SPEEDS.length;
+                int animStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
+                if (animStep != 0) {
+                    animSpeedIndex = (animSpeedIndex + animStep + ANIM_SPEEDS.length) % ANIM_SPEEDS.length;
                     return true;
                 }
                 curY += h + gap;
@@ -4199,7 +4222,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         rY += rowH + rowGap;
 
         // Row 2: Trajectory Pattern Cycle
-        if (checkCycleClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH)) {
+        int pillarPatStep = checkCycleClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
+        if (pillarPatStep != 0) {
             String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
             int idx = 0;
             for (int i = 0; i < PARTICLE_PATTERNS.length; i++) {
@@ -4208,7 +4232,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     break;
                 }
             }
-            data.pattern = PARTICLE_PATTERNS[(idx + 1) % PARTICLE_PATTERNS.length];
+            data.pattern = PARTICLE_PATTERNS[(idx + pillarPatStep + PARTICLE_PATTERNS.length) % PARTICLE_PATTERNS.length];
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -4832,13 +4856,32 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
     }
 
-    private boolean checkCycleClick(double mouseX, double mouseY, int x, int y, int w, int h, int clipY, int clipH) {
-        if (y < clipY || y + h > clipY + clipH) return false;
-        int btnW = 82;
-        int btnH = 14;
-        int btnX = x + w - btnW - 8;
-        int btnY = y + (h - btnH) / 2;
-        return mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
+    private int checkCycleClick(double mouseX, double mouseY, int x, int y, int w, int h, int clipY, int clipH) {
+        if (y < clipY || y + h > clipY + clipH) return 0;
+        int cycleW = 96;
+        int cycleH = 15;
+        int cycleX = x + w - cycleW - 8;
+        int cycleY = y + (h - cycleH) / 2;
+        int arrowW = 15;
+
+        if (mouseY >= cycleY && mouseY <= cycleY + cycleH) {
+            // Left arrow button: go back
+            if (mouseX >= cycleX && mouseX <= cycleX + arrowW) {
+                return -1;
+            }
+            // Right arrow button: go forward
+            int rightX = cycleX + cycleW - arrowW;
+            if (mouseX >= rightX && mouseX <= rightX + arrowW) {
+                return 1;
+            }
+            // Value container: left half goes back, right half goes forward
+            int valX = cycleX + arrowW;
+            int valW = cycleW - (arrowW * 2);
+            if (mouseX >= valX && mouseX <= valX + valW) {
+                return (mouseX < valX + valW / 2.0) ? -1 : 1;
+            }
+        }
+        return 0;
     }
 
     private int checkCounterClick(double mouseX, double mouseY, int x, int y, int w, int h, int clipY, int clipH) {

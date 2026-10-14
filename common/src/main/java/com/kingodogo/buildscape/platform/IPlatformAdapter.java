@@ -368,6 +368,7 @@ public interface IPlatformAdapter {
     boolean isSameItemSameComponents(net.minecraft.world.item.ItemStack a, net.minecraft.world.item.ItemStack b);
     void applyNauseaEffect(net.minecraft.world.entity.LivingEntity entity, int durationTicks, int amplifier);
     void hurtFreezeDamage(net.minecraft.world.entity.LivingEntity entity, float amount);
+    void hurtGenericDamage(net.minecraft.world.entity.LivingEntity entity, float amount);
     int getSelectedSlot(net.minecraft.world.entity.player.Inventory inventory);
     <T extends net.minecraft.world.level.block.entity.BlockEntity> net.minecraft.world.level.block.entity.BlockEntityType<T> createBlockEntityType(BlockEntityFactory<T> factory, java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> isValid);
     boolean isOnGround(net.minecraft.world.entity.Entity entity);

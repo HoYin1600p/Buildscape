@@ -288,6 +288,16 @@ public class MixinFactory implements IMixinFactory {
     }
 
     @Override
+    public void handleFireworkStarterTick(Object starter) {
+        com.kingodogo.buildscape.adapter.v121x.client.FireworkHooks.handleFireworkStarterTick(starter);
+    }
+
+    @Override
+    public boolean renderCustomFireworkExplosion(Object starter, Object colors, Object fades, boolean trail, boolean flicker) {
+        return com.kingodogo.buildscape.adapter.v121x.client.FireworkHooks.renderCustomFireworkExplosion(starter, colors, fades, trail, flicker);
+    }
+
+    @Override
     public ItemStack applyFireworkShotYaw(ItemStack stack, float yaw) {
         ItemStack copy = stack.copy();
         net.minecraft.world.item.component.CustomData.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA, copy, tag -> {

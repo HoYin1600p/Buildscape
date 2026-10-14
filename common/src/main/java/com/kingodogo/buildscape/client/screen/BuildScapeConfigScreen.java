@@ -746,6 +746,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Adaptive GUI Scaling Engine ---
     public float getGuiUiScale() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getWindow() == null) return 1.0f;
+        double guiScale = mc.getWindow().getGuiScale();
+        if (guiScale >= 2.5) {
+            return (float) (2.0 / guiScale);
+        }
+        if (width < 820 && width > 0) {
+            return Math.max(0.5f, (float) width / 820.0f);
+        }
         return 1.0f;
     }
 
@@ -1009,16 +1018,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int panelW = Math.min(effW - 20, 560);
         int panelH = Math.min(effH - 16, 308);
 
-        int sidePanelTargetW = Math.max(170, Math.min(210, effW > 850 ? 210 : 190));
+        int sidePanelTargetW = 188;
 
-        // When effW < 800 (Scale 3/small screens), smoothly glide main frame left as side panel opens
-        int shift = 0;
-        if (effW < 800 && sidePanelProgress > 0.001f) {
-            int maxShift = Math.max(0, (effW - panelW) / 2 - 8);
-            shift = (int) (sidePanelProgress * Math.min(30, maxShift));
-        }
-
-        int panelX = (effW - panelW) / 2 - shift;
+        int panelX = (effW - panelW) / 2;
         int panelY = (effH - panelH) / 2;
 
         int bevelExpansion = 5;
@@ -1031,16 +1033,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int sidePanelH = Math.min(264, frameH - 44);
         int sidePanelY = frameY + (frameH - sidePanelH) / 2;
 
-        int maxDockX = effW - sidePanelTargetW - 6;
-        boolean isOverlay = (frameRight - 2 > maxDockX);
-        int dockX = isOverlay ? maxDockX : (frameRight - 2);
-
-        int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
-        int sidePanelX = dockX + (isOverlay ? slideOffset : -slideOffset);
+        int dockX = frameRight - 2;
+        int slideOffset = (int) Math.round((1.0f - sidePanelProgress) * sidePanelTargetW);
+        int sidePanelX = dockX - slideOffset;
 
         return new SidePanelLayout(panelX, panelY, panelW, panelH,
                 frameX, frameY, frameW, frameH, frameRight,
-                sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, isOverlay);
+                sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, false);
     }
 
     // --- Main Rendering ---
@@ -1078,13 +1077,25 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int frameY = layout.frameY + offsetY;
         int frameW = layout.frameW;
         int frameH = layout.frameH;
+        int frameRight = layout.frameRight;
 
         int sidePanelX = layout.sidePanelX;
         int sidePanelY = layout.sidePanelY + offsetY;
         int sidePanelW = layout.sidePanelW;
         int sidePanelH = layout.sidePanelH;
 
-        // 3. Render 1 Big Frame with expanded chassis gap, metallic gradient & logo cradle U-notch
+        // 2b. Connected Sliding Right Side Panel (Rendered behind main chassis so it smoothly slides out like a creative tab)
+        if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
+            int visibleStartX = Math.max(sidePanelX, frameRight - 2);
+            int visibleW = (sidePanelX + sidePanelW) - visibleStartX;
+            if (visibleW > 0) {
+                enableGuiScissor(poseStackOrGraphics, visibleStartX, sidePanelY, visibleW, sidePanelH);
+                renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelW, sidePanelH, effMouseX, effMouseY, alpha);
+                disableGuiScissor(poseStackOrGraphics);
+            }
+        }
+
+        // 3. Render 1 Big Frame with expanded chassis gap & metallic gradient
         drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, alpha);
 
         // 4. Header Bar (kept exactly as placed rn, with top-left metallic gradient artifact)
@@ -1130,14 +1141,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Render Right Main Configuration Content Area
         renderContentArea(poseStackOrGraphics, font, contentX, contentY, contentW, contentH, effMouseX, effMouseY, alpha);
-
-        // 6. Connected Sliding Right Side Panel (Rendered after content so it is never hidden behind main chassis)
-        if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
-            if (layout.isOverlay) {
-                Services.PLATFORM.fill(poseStackOrGraphics, sidePanelX - 6, sidePanelY, sidePanelX, sidePanelY + sidePanelH, applyAlpha(0x000000, alpha * 0.45f));
-            }
-            renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelW, sidePanelH, effMouseX, effMouseY, alpha);
-        }
 
         // 7. Fallback Color Picker Modal if explicitly toggled
         if (showColorModal) {
@@ -2208,58 +2211,31 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawCenteredText(poseStackOrGraphics, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(applyTextCol, alpha));
     }
 
-    // --- Vault Hunters Border & Bevel Engine (Expanded Chassis Gap & Metallic Gradient with Logo Cradle) ---
+    // --- Vault Hunters Border & Bevel Engine (Expanded Chassis Gap & Metallic Gradient) ---
     private void drawVaultHuntersFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
-        int crestW = 152;
-        int crestH = 46;
-        int crestX = x + (w - crestW) / 2;
-        int crestY = y - 18;
-
-        int cradlePad = 4;
-        int cLeft = crestX - cradlePad;
-        int cRight = crestX + crestW + cradlePad;
-        int cBottom = crestY + crestH + cradlePad;
-
         // 1. Outer Chassis Body Fill (Solid metallic chassis backing)
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
-        // Extend backing up into the cradle
-        Services.PLATFORM.fill(poseStackOrGraphics, cLeft, crestY, cRight + 1, y, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
 
-        // 2. Outermost 1px Black Border (Top border has U-notch cradling logo holder)
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, cLeft, y + 1, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, cLeft, y, cLeft + 1, cBottom, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, cLeft, cBottom, cRight + 1, cBottom + 1, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, cRight, y, cRight + 1, cBottom, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, cRight + 1, y, x + w, y + 1, black);
-
-        // Frame bottom, left, right black borders
+        // 2. Outermost 1px Black Border
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
 
         // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
-        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
-        drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, cLeft - x - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        drawHorizontalGradientLine(poseStackOrGraphics, cRight + 1, y + 1, (x + w - 1) - (cRight + 1), COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, cLeft + 1, y + 1, cBottom - y - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, cLeft + 1, cBottom - 1, cRight, cBottom, shadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, cRight - 1, y + 1, cRight, cBottom - 1, shadow);
-
+        drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         drawVerticalGradientLine(poseStackOrGraphics, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+
+        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
         // 4. Outer Chassis Band (offset 2 to 3)
         int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
         for (int o = 2; o <= 3; o++) {
-            Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, cLeft + o, y + o + 1, band);
-            Services.PLATFORM.fill(poseStackOrGraphics, cRight - o + 1, y + o, x + w - o, y + o + 1, band);
-            Services.PLATFORM.fill(poseStackOrGraphics, cLeft + o, y + o, cLeft + o + 1, cBottom - o, band);
-            Services.PLATFORM.fill(poseStackOrGraphics, cLeft + o, cBottom - o, cRight - o + 1, cBottom - o + 1, band);
-            Services.PLATFORM.fill(poseStackOrGraphics, cRight - o, y + o, cRight - o + 1, cBottom - o, band);
-
+            Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, x + w - o, y + o + 1, band);
             Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + h - o - 1, x + w - o, y + h - o, band);
             Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, x + o + 1, y + h - o, band);
             Services.PLATFORM.fill(poseStackOrGraphics, x + w - o - 1, y + o, x + w - o, y + h - o, band);
@@ -2269,12 +2245,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         int o5 = 5;
-        Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, cLeft + o5, y + o5 + 1, bevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, cRight - o5 + 1, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, cLeft + o5, y + o5, cLeft + o5 + 1, cBottom - o5, bevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, cLeft + o5, cBottom - o5, cRight - o5 + 1, cBottom - o5 + 1, bevelHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, cRight - o5, y + o5, cRight - o5 + 1, cBottom - o5, bevelHighlight);
-
+        Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, x + o5 + 1, y + h - o5, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + h - o5 - 1, x + w - o5, y + h - o5, bevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - o5 - 1, y + o5, x + w - o5, y + h - o5, bevelHighlight);
@@ -2779,13 +2750,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private void enableGuiScissor(Object poseStackOrGraphics, int guiX, int guiY, int guiW, int guiH) {
         Minecraft mc = Minecraft.getInstance();
         double scale = mc.getWindow().getGuiScale();
-        float uiScale = getGuiUiScale();
-        double totalScale = scale * uiScale;
         int winH = mc.getWindow().getHeight();
-        int sx = (int) Math.round(guiX * totalScale);
-        int sy = (int) Math.round(winH - (guiY + guiH) * totalScale);
-        int sw = (int) Math.round(guiW * totalScale);
-        int sh = (int) Math.round(guiH * totalScale);
+        int sx = (int) Math.round(guiX * scale);
+        int sy = (int) Math.round(winH - (guiY + guiH) * scale);
+        int sw = (int) Math.round(guiW * scale);
+        int sh = (int) Math.round(guiH * scale);
         if (sw > 0 && sh > 0) {
             Services.PLATFORM.enableScissor(poseStackOrGraphics, sx, sy, sw, sh);
         }
@@ -2853,18 +2822,40 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Top Center Crest Badge (Buildscape Logo Beveled Frame) ---
+    // --- Top Center Crest Badge (Buildscape Logo Beveled Frame with Inner Bevel Cutout Socket) ---
     private static final CommonId LOGO_TEXTURE = CommonId.of("buildscape", "textures/gui/logo.png");
 
     private void drawTopCrestBadge(Object poseStackOrGraphics, Font font, int frameX, int frameY, int frameW, float alpha) {
         int crestW = 152;
         int crestH = 46;
         int crestX = frameX + (frameW - crestW) / 2;
-        int crestY = frameY - 18;
+        int crestY = frameY - 24;
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        int bShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int bHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
+        // A. Seamless Cutout Placement Socket with Inner Bevels
+        int sockPad = 3;
+        int sockX = crestX - sockPad;
+        int sockY = crestY - sockPad;
+        int sockW = crestW + sockPad * 2;
+        int sockH = crestH + sockPad * 2;
+
+        // Solid chassis backing behind the socket
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX, sockY, sockX + sockW, sockY + sockH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        // Cutout socket recessed fill
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + 1, sockX + sockW - 1, sockY + sockH - 1, applyAlpha(COLOR_INNER_DARK, alpha));
+        // 1px black border around socket
+        drawBorder(poseStackOrGraphics, sockX, sockY, sockW, sockH, black);
+        // Inner bevels (top & left shadow, bottom & right highlight)
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + 1, sockX + sockW - 1, sockY + 2, bShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + 1, sockX + 2, sockY + sockH - 1, bShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + sockH - 2, sockX + sockW - 1, sockY + sockH - 1, bHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX + sockW - 2, sockY + 1, sockX + sockW - 1, sockY + sockH - 1, bHighlight);
+
+        // B. Logo Holder Badge
         // 1. Solid Outer Chassis Body
         Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + crestW, crestY + crestH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
@@ -2887,8 +2878,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + plateW, plateY + plateH, applyAlpha(COLOR_INNER_DARK, alpha));
 
         // Inner plate 1px subtle bevel
-        int bShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-        int bHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + plateW, plateY + 1, bShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + 1, plateY + plateH, bShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY + plateH - 1, plateX + plateW, plateY + plateH, bHighlight);
@@ -2897,7 +2886,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // 6. Proportional Buildscape Logo Texture (Crisp 256x143 native scaling)
         int maxLogoW = plateW - 6;
         int maxLogoH = plateH - 4;
-        int logoH = Math.min(38, maxLogoH);
+        int logoH = Math.min(36, maxLogoH);
         int logoW = (int) Math.round(logoH * (256.0 / 143.0));
         if (logoW > maxLogoW) {
             logoW = maxLogoW;
@@ -3220,7 +3209,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // 0. Right Side Panel Clicks (when visible)
         if (sidePanelProgress > 0.05f && sidePanelType != SidePanelType.NONE && !isSidePanelClosing) {
-            if (mouseX >= layout.sidePanelX && mouseX <= layout.sidePanelX + layout.sidePanelW
+            int activeLeft = Math.max(layout.sidePanelX, layout.frameRight - 2);
+            if (mouseX >= activeLeft && mouseX <= layout.sidePanelX + layout.sidePanelW
                     && mouseY >= layout.sidePanelY && mouseY <= layout.sidePanelY + layout.sidePanelH) {
                 if (handleSidePanelClick(mouseX, mouseY, button, layout.sidePanelX, layout.sidePanelY, layout.sidePanelW, layout.sidePanelH)) {
                     return true;
@@ -4749,7 +4739,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         if (sidePanelProgress > 0.05f && sidePanelType != SidePanelType.NONE) {
             SidePanelLayout layout = calculateLayout();
-            if (mouseX >= layout.sidePanelX && mouseX <= layout.sidePanelX + layout.sidePanelW
+            int activeLeft = Math.max(layout.sidePanelX, layout.frameRight - 2);
+            if (mouseX >= activeLeft && mouseX <= layout.sidePanelX + layout.sidePanelW
                     && mouseY >= layout.sidePanelY && mouseY <= layout.sidePanelY + layout.sidePanelH) {
                 if (sidePanelMaxScroll > 0) {
                     sidePanelScrollOffset = Math.max(0, Math.min(sidePanelMaxScroll, sidePanelScrollOffset - (int) (delta * 16.0)));

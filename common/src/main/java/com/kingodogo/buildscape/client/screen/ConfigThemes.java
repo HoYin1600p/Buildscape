@@ -544,8 +544,8 @@ public class ConfigThemes {
             0x60F59E0B  // accentGlow
     );
 
-    public static final Theme CRIMSON = new Theme(
-            "crimson", "Crimson",
+    public static final Theme RED = new Theme(
+            "red", "Red",
             0xD8140406, // overlay
             0xFF1C0E12, // panelBg
             0xFF2A141A, // chassisBody
@@ -583,8 +583,8 @@ public class ConfigThemes {
             0x60E11D48  // accentGlow
     );
 
-    public static final Theme COBALT = new Theme(
-            "cobalt", "Cobalt",
+    public static final Theme BLUE = new Theme(
+            "blue", "Blue",
             0xD8040C1A, // overlay
             0xFF0E1626, // panelBg
             0xFF142036, // chassisBody
@@ -622,8 +622,8 @@ public class ConfigThemes {
             0x603B82F6  // accentGlow
     );
 
-    public static final Theme EMERALD = new Theme(
-            "emerald", "Emerald",
+    public static final Theme GREEN = new Theme(
+            "green", "Green",
             0xD804160A, // overlay
             0xFF0D1E12, // panelBg
             0xFF142B1B, // chassisBody
@@ -661,8 +661,8 @@ public class ConfigThemes {
             0x6022C55E  // accentGlow
     );
 
-    public static final Theme AMETHYST = new Theme(
-            "amethyst", "Amethyst",
+    public static final Theme PURPLE = new Theme(
+            "purple", "Purple",
             0xD810061A, // overlay
             0xFF180E24, // panelBg
             0xFF221434, // chassisBody
@@ -700,8 +700,8 @@ public class ConfigThemes {
             0x60A855F7  // accentGlow
     );
 
-    public static final Theme AMBER = new Theme(
-            "amber", "Amber",
+    public static final Theme ORANGE = new Theme(
+            "orange", "Orange",
             0xD81A0C02, // overlay
             0xFF22130A, // panelBg
             0xFF301B0E, // chassisBody
@@ -739,8 +739,8 @@ public class ConfigThemes {
             0x60F97316  // accentGlow
     );
 
-    public static final Theme PRISMARINE = new Theme(
-            "prismarine", "Prismarine",
+    public static final Theme CYAN = new Theme(
+            "cyan", "Cyan",
             0xD8041618, // overlay
             0xFF0C1D20, // panelBg
             0xFF122B30, // chassisBody
@@ -778,63 +778,72 @@ public class ConfigThemes {
             0x6014B8A6  // accentGlow
     );
 
-    public static final Theme OBSIDIAN = new Theme(
-            "obsidian", "Obsidian",
-            0xE0050308, // overlay
-            0xFF0B0910, // panelBg
-            0xFF120E1A, // chassisBody
-            0xFF07050B, // innerDark
-            0xFF100C17, // headerBg
+    public static final Theme BLACK = new Theme(
+            "black", "Black",
+            0xE8050507, // overlay
+            0xFF0C0C0E, // panelBg
+            0xFF141418, // chassisBody
+            0xFF08080A, // innerDark
+            0xFF101014, // headerBg
             0xFF000000, // frameBlack
-            0xFFA855F7, // borderGradientStart
-            0xFF38BDF8, // borderGradientEnd
-            0xFF050308, // borderShadow
-            0xFF191324, // chassisBand
-            0xFF08060D, // bevelShadow
-            0xFF7C3AED, // bevelHighlight
-            0xFFF8FAFC, // textWhite
-            0xFFE2E8F0, // textSilver
-            0xFFA855F7, // textMuted
-            0xFF0D0A13, // rowBg
-            0xFF171222, // rowBgHover
-            0xFF2B1D3E, // rowBorder
-            0xFFA855F7, // rowBorderHover
-            0xFF240E3E, // toggleOnBg
-            0xFFA855F7, // toggleOnBorder
-            0xFFD8B4FE, // toggleOnText
-            0xFF0E0B14, // toggleOffBg
-            0xFF20172E, // toggleOffBorder
-            0xFF6F588B, // toggleOffText
-            0xFF140F1F, // btnBg
-            0xFF1F1730, // btnBgHover
-            0xFF2A1E40, // btnBgActive
-            0xFF372654, // btnBorder
-            0xFFA855F7, // btnBorderHover
-            0xFF07050B, // slotBg
-            0xFF130E1D, // slotBgHover
-            0xFF20172E, // slotBorder
-            0xFF8B5CF6, // accent
-            0x60A855F7  // accentGlow
+            0xFF71717A, // borderGradientStart
+            0xFF27272A, // borderGradientEnd
+            0xFF050507, // borderShadow
+            0xFF18181D, // chassisBand
+            0xFF08080A, // bevelShadow
+            0xFF3F3F46, // bevelHighlight
+            0xFFF4F4F5, // textWhite
+            0xFFD4D4D8, // textSilver
+            0xFFA1A1AA, // textMuted
+            0xFF0E0E12, // rowBg
+            0xFF17171D, // rowBgHover
+            0xFF27272A, // rowBorder
+            0xFF71717A, // rowBorderHover
+            0xFF18181B, // toggleOnBg
+            0xFF22C55E, // toggleOnBorder
+            0xFF4ADE80, // toggleOnText
+            0xFF121215, // toggleOffBg
+            0xFF27272A, // toggleOffBorder
+            0xFF71717A, // toggleOffText
+            0xFF16161A, // btnBg
+            0xFF1F1F26, // btnBgHover
+            0xFF272730, // btnBgActive
+            0xFF33333D, // btnBorder
+            0xFF71717A, // btnBorderHover
+            0xFF08080A, // slotBg
+            0xFF131317, // slotBgHover
+            0xFF202026, // slotBorder
+            0xFFE4E4E7, // accent
+            0x60E4E4E7  // accentGlow
     );
+
+    // Backward compatibility aliases for legacy theme IDs
+    public static final Theme CRIMSON = RED;
+    public static final Theme COBALT = BLUE;
+    public static final Theme EMERALD = GREEN;
+    public static final Theme AMETHYST = PURPLE;
+    public static final Theme AMBER = ORANGE;
+    public static final Theme PRISMARINE = CYAN;
+    public static final Theme OBSIDIAN = BLACK;
 
     private static final List<Theme> THEMES = Arrays.asList(
             DARK,
             LIGHT,
-            CRIMSON,
-            COBALT,
-            EMERALD,
-            AMETHYST,
-            AMBER,
-            PRISMARINE,
-            OBSIDIAN,
-            GOLD,
+            BLACK,
             GRAY,
             LIGHT_GRAY,
             SILVER,
-            LIGHT_BLUE,
+            GOLD,
+            RED,
             LIGHT_RED,
+            ORANGE,
             LIGHT_ORANGE,
+            GREEN,
             LIGHT_GREEN,
+            CYAN,
+            BLUE,
+            LIGHT_BLUE,
+            PURPLE,
             LIGHT_PURPLE
     );
     private static int activeThemeIndex = 0;
@@ -877,10 +886,25 @@ public class ConfigThemes {
         }
     }
 
+    private static String normalizeId(String id) {
+        if (id == null) return "dark";
+        return switch (id.toLowerCase(java.util.Locale.ROOT)) {
+            case "crimson" -> "red";
+            case "cobalt" -> "blue";
+            case "emerald" -> "green";
+            case "amethyst" -> "purple";
+            case "amber" -> "orange";
+            case "prismarine" -> "cyan";
+            case "obsidian" -> "black";
+            default -> id;
+        };
+    }
+
     public static void setThemeById(String id) {
         if (id == null) return;
+        String normalized = normalizeId(id);
         for (int i = 0; i < THEMES.size(); i++) {
-            if (THEMES.get(i).id.equalsIgnoreCase(id)) {
+            if (THEMES.get(i).id.equalsIgnoreCase(normalized) || THEMES.get(i).id.equalsIgnoreCase(id)) {
                 activeThemeIndex = i;
                 return;
             }
@@ -888,8 +912,10 @@ public class ConfigThemes {
     }
 
     public static Theme getById(String id) {
+        if (id == null) return DARK;
+        String normalized = normalizeId(id);
         for (Theme t : THEMES) {
-            if (t.id.equalsIgnoreCase(id)) return t;
+            if (t.id.equalsIgnoreCase(normalized) || t.id.equalsIgnoreCase(id)) return t;
         }
         return DARK;
     }

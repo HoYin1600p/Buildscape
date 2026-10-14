@@ -50,4 +50,16 @@ public class MulticolorGlowLightsBlock extends GlowLightsBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return null;
     }
+
+    @Override
+    public net.minecraft.world.InteractionResult onInteract(net.minecraft.world.level.Level level, BlockPos pos,
+            BlockState state, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        if (level.isClientSide()) return net.minecraft.world.InteractionResult.SUCCESS;
+        if (!player.getItemInHand(hand).isEmpty()) return net.minecraft.world.InteractionResult.PASS;
+        boolean lit = !state.getValue(LIT);
+        level.setBlock(pos, state.setValue(LIT, lit), 3);
+        Services.PLATFORM.playStoneButtonClick(level, pos, lit);
+        return net.minecraft.world.InteractionResult.SUCCESS;
+    }
 }

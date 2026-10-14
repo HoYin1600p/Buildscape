@@ -1990,6 +1990,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
             renderSidePanelPillarDetail(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+            if (sidePanelMaxScroll > 0) {
+                int trackH = sContentH - 8;
+                int trackY = sContentY + 4;
+                int trackX = sContentX + sContentW - 3;
+                int thumbH = Math.max(12, (int) ((sContentH / (float) (sContentH + sidePanelMaxScroll)) * trackH));
+                int thumbY = trackY + (int) ((sidePanelScrollOffset / (float) sidePanelMaxScroll) * (trackH - thumbH));
+                Services.PLATFORM.fill(poseStackOrGraphics, trackX, trackY, trackX + 2, trackY + trackH, applyAlpha(0xFF141418, alpha));
+                Services.PLATFORM.fill(poseStackOrGraphics, trackX, thumbY, trackX + 2, thumbY + thumbH, applyAlpha(0xFF4E4E60, alpha));
+            }
         } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
             renderSidePanelColorPicker(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
         }
@@ -2006,7 +2015,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         PillarParticleConfig globalCfg = PillarParticleConfig.get();
-        enableGuiScissor(poseStackOrGraphics, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
+        int panelW = Math.min(width - 20, 560);
+        int panelX = (width - panelW) / 2;
+        int dockX = panelX - 5 + panelW + 10 - 4;
+        int scissorLeft = Math.max(dockX, x + 2);
+        int scissorW = Math.max(1, (x + w - 2) - scissorLeft);
+        enableGuiScissor(poseStackOrGraphics, scissorLeft, y + 2, scissorW, Math.max(1, h - 4));
 
         int curY = y + 4 - sidePanelScrollOffset;
         int rowH = 22;
@@ -2067,6 +2081,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         curY += btnH + rowGap;
 
         disableGuiScissor(poseStackOrGraphics);
+        if (sidePanelProgress < 0.999f) {
+            enableGuiScissor(poseStackOrGraphics, dockX, 0, Math.max(1, width - dockX), height);
+        }
 
         int totalH = (curY + sidePanelScrollOffset) - (y + 4);
         sidePanelMaxScroll = Math.max(0, totalH - (h - 8));
@@ -2620,6 +2637,30 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int panelX = (width - panelW) / 2;
         int panelY = (height - panelH) / 2;
 
+        int bevelExpansion = 5;
+        int frameX = panelX - bevelExpansion;
+        int frameY = panelY - bevelExpansion;
+        int frameW = panelW + bevelExpansion * 2;
+        int frameH = panelH + bevelExpansion * 2;
+
+        // 0. Right Side Panel Clicks (when visible)
+        if (sidePanelProgress > 0.05f && sidePanelType != SidePanelType.NONE) {
+            int frameRight = frameX + frameW;
+            int availRight = width - frameRight - 6;
+            int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
+            int sidePanelH = frameH;
+            int sidePanelY = frameY;
+            int dockX = frameRight - 4;
+            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
+            int sidePanelX = dockX - slideOffset;
+
+            if (mouseX >= dockX && mouseX <= sidePanelX + sidePanelTargetW && mouseY >= sidePanelY && mouseY <= sidePanelY + sidePanelH) {
+                if (handleSidePanelClick(mouseX, mouseY, button, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH)) {
+                    return true;
+                }
+            }
+        }
+
         int headerH = 24;
         int headerX = panelX + 7;
         int headerY = panelY + 7;
@@ -2661,6 +2702,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     selectedTabIndex = i;
                     scrollOffset = 0.0;
                     selectedPillarDetailId = null;
+                    if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
+                        closeSidePanel();
+                    }
                     if ("pillars".equals(navItems.get(i).id)) {
                         syncPillars();
                     }
@@ -3061,7 +3105,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                 pickerSat = hsb[1];
                                 pickerBri = hsb[2];
                             } catch (Exception ignored) {}
-                            showColorModal = true;
+                            returnSidePanelType = SidePanelType.NONE;
+                            openSidePanel(SidePanelType.COLOR_PICKER);
                             return true;
                         }
                     }
@@ -3169,11 +3214,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private boolean handlePillarsClick(double mouseX, double mouseY, int button, int contentX, int contentY, int contentW, int contentH, int catHeaderH) {
-        if (selectedPillarDetailId != null) {
-            return handlePillarDetailClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH);
-        } else {
-            return handlePillarTableClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH);
-        }
+        return handlePillarTableClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH);
     }
 
     private boolean handlePillarTableClick(double mouseX, double mouseY, int button, int x, int y, int w, int h, int catHeaderH) {
@@ -3303,7 +3344,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 if (mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH) {
                     selectedPillarDetailId = data.id;
-                    scrollOffset = 0.0;
+                    openSidePanel(SidePanelType.PILLAR_DETAIL);
                     return true;
                 }
 
@@ -3311,6 +3352,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     PillarIdManager.getClient().removePillarData(data.id);
                     PacketFactory.sendToServer(new RemovePillarPacket(data.id));
                     selectedPillarIds.remove(data.id);
+                    if (Objects.equals(selectedPillarDetailId, data.id) && sidePanelType == SidePanelType.PILLAR_DETAIL) {
+                        closeSidePanel();
+                    }
                     return true;
                 }
 
@@ -3341,7 +3385,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 if (mouseX >= idX && mouseX <= idX + idColW) {
                     selectedPillarDetailId = data.id;
-                    scrollOffset = 0.0;
+                    openSidePanel(SidePanelType.PILLAR_DETAIL);
                     return true;
                 }
 
@@ -4014,6 +4058,48 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (sidePanelType == SidePanelType.COLOR_PICKER && sidePanelProgress > 0.05f) {
+            int panelW = Math.min(width - 20, 560);
+            int panelH = Math.min(height - 16, 308);
+            int panelX = (width - panelW) / 2;
+            int panelY = (height - panelH) / 2;
+            int bevelExpansion = 5;
+            int frameX = panelX - bevelExpansion;
+            int frameY = panelY - bevelExpansion;
+            int frameW = panelW + bevelExpansion * 2;
+            int frameRight = frameX + frameW;
+            int availRight = width - frameRight - 6;
+            int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
+            int dockX = frameRight - 4;
+            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
+            int sidePanelX = dockX - slideOffset;
+
+            int sHeadY = frameY + 7;
+            int sContentX = sidePanelX + 6;
+            int sContentY = sHeadY + 22 + 4;
+            int sContentW = sidePanelTargetW - 12;
+
+            int pad = 6;
+            int hueW = 14;
+            int gradW = sContentW - pad * 3 - hueW;
+            int gradH = 82;
+            int gradX = sContentX + pad;
+            int gradY = sContentY + pad;
+            int hueX = gradX + gradW + pad;
+            int hueY = gradY;
+            int hueH = gradH;
+
+            if (draggingGradient) {
+                pickerSat = Math.max(0.0f, Math.min(1.0f, (float) (mouseX - gradX) / gradW));
+                pickerBri = Math.max(0.0f, Math.min(1.0f, 1.0f - ((float) (mouseY - gradY) / gradH)));
+                return true;
+            }
+            if (draggingHue) {
+                pickerHue = Math.max(0.0f, Math.min(360.0f, ((float) (mouseY - hueY) / hueH) * 360.0f));
+                return true;
+            }
+        }
+
         if (showColorModal) {
             int modalW = 340;
             int modalH = 196;
@@ -4051,6 +4137,27 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         if (showColorModal) return true;
 
+        if (sidePanelProgress > 0.05f && sidePanelType != SidePanelType.NONE) {
+            int panelW = Math.min(width - 20, 560);
+            int panelH = Math.min(height - 16, 308);
+            int panelX = (width - panelW) / 2;
+            int panelY = (height - panelH) / 2;
+            int bevelExpansion = 5;
+            int frameX = panelX - bevelExpansion;
+            int frameY = panelY - bevelExpansion;
+            int frameW = panelW + bevelExpansion * 2;
+            int frameH = panelH + bevelExpansion * 2;
+            int frameRight = frameX + frameW;
+            int dockX = frameRight - 4;
+
+            if (mouseX >= dockX && mouseX <= width && mouseY >= frameY && mouseY <= frameY + frameH) {
+                if (sidePanelMaxScroll > 0) {
+                    sidePanelScrollOffset = Math.max(0, Math.min(sidePanelMaxScroll, sidePanelScrollOffset - (int) (delta * 16.0)));
+                    return true;
+                }
+            }
+        }
+
         if (maxScroll > 0) {
             scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset - delta * 20.0));
             return true;
@@ -4076,6 +4183,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return true;
         }
         if (keyCode == 256) { // ESC key
+            if (sidePanelProgress > 0.05f && sidePanelType != SidePanelType.NONE) {
+                if (returnSidePanelType == SidePanelType.PILLAR_DETAIL && sidePanelType == SidePanelType.COLOR_PICKER) {
+                    openSidePanel(SidePanelType.PILLAR_DETAIL);
+                } else {
+                    closeSidePanel();
+                }
+                return true;
+            }
             if (selectedPillarDetailId != null) {
                 selectedPillarDetailId = null;
                 return true;

@@ -415,7 +415,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public Entity createWanderingHomemakerEntity(Level level, boolean festive) {
-        return festive ? new FestiveWanderingHomemakerEntityImpl(level) : new WanderingHomemakerEntityImpl(level);
+        return (festive ? getFestiveWanderingHomemakerEntityType() : getWanderingHomemakerEntityType()).create(level);
     }
 
     @Override
@@ -1833,6 +1833,30 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public Item createColoredItemFrameItem(Item.Properties properties, String colorVariant) {
         return new com.kingodogo.buildscape.item.ColoredItemFrameItem(properties, colorVariant) {
             @Override
+            public InteractionResult useOn(net.minecraft.world.item.context.UseOnContext context) {
+                BlockPos placePos = context.getClickedPos().relative(context.getClickedFace());
+                Direction face = context.getClickedFace();
+                Player player = context.getPlayer();
+                ItemStack stack = context.getItemInHand();
+                Level level = context.getLevel();
+                if (player != null && (player.level.isOutsideBuildHeight(placePos)
+                        || !player.mayUseItemAt(placePos, face, stack))) {
+                    return InteractionResult.FAIL;
+                }
+                ColoredItemFrameEntityImpl frame = (ColoredItemFrameEntityImpl)
+                        createColoredItemFrameEntity(level, placePos, face, colorVariant);
+                CompoundTag tag = stack.getTag();
+                if (tag != null) EntityType.updateCustomEntityTag(level, player, frame, tag);
+                if (!frame.survives()) return InteractionResult.CONSUME;
+                if (!level.isClientSide) {
+                    frame.playPlacementSound();
+                    level.gameEvent(player, net.minecraft.world.level.gameevent.GameEvent.ENTITY_PLACE, placePos);
+                    level.addFreshEntity(frame);
+                }
+                stack.shrink(1);
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+            @Override
             public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
                 appendColoredItemFrameTooltip(stack, tooltip::add);
                 super.appendHoverText(stack, level, tooltip, flag);
@@ -3090,8 +3114,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             this.setDirection(direction);
         }
 
+        @SuppressWarnings("unchecked")
         public ColoredItemFrameEntityImpl(Level level, BlockPos pos, Direction direction, String color) {
-            super(EntityType.ITEM_FRAME, level, pos);
+            super((EntityType<? extends HangingEntity>) Services.PLATFORM.getColoredItemFrameEntityType(), level, pos);
             this.setDirection(direction);
             this.setColorVariant(color);
             if ("invisible".equals(color)) {

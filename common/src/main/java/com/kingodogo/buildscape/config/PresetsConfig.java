@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +22,8 @@ import java.util.Set;
 public class PresetsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String PRESETS_FILE_NAME = "pillar-presets.json";
-    private static PresetsConfig INSTANCE;
+    private static final Map<String, Boolean> MOD_LOADED_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+    private static volatile PresetsConfig INSTANCE;
 
     private File getConfigDir() {
         String configPath = ConfigPaths.dir("buildscape", "pillar").toString();
@@ -36,7 +38,16 @@ public class PresetsConfig {
     private static final String UNNAMED_PRESET_KEY = "_unnamed";
     public static final int MAX_PRESETS = 5;
 
-    public void load() {
+    private List<Preset> cachedPresetList = null;
+    private List<String> cachedKeyList = null;
+
+    private synchronized void invalidateCache() {
+        cachedPresetList = null;
+        cachedKeyList = null;
+    }
+
+    public synchronized void load() {
+        invalidateCache();
         File file = getPresetsFile();
         if (!file.exists()) {
             initializeDefaults();
@@ -45,25 +56,23 @@ public class PresetsConfig {
         }
 
         try (FileReader reader = new FileReader(file)) {
-            Type type = new TypeToken<Map<String, Object>>() {
-            }.getType();
-            Map<String, Object> loaded = GSON.fromJson(reader, type);
-            if (loaded != null) {
+            com.google.gson.JsonElement root = com.google.gson.JsonParser.parseReader(reader);
+            if (root != null && root.isJsonObject()) {
+                com.google.gson.JsonObject obj = root.getAsJsonObject();
                 presets = new HashMap<>();
-                for (Map.Entry<String, Object> entry : loaded.entrySet()) {
-                    if (entry.getKey().equals("_lastApplied")) {
-                        if (entry.getValue() instanceof String) {
-                            lastAppliedPreset = (String) entry.getValue();
+                for (Map.Entry<String, com.google.gson.JsonElement> entry : obj.entrySet()) {
+                    if ("_lastApplied".equals(entry.getKey())) {
+                        if (entry.getValue() != null && entry.getValue().isJsonPrimitive()) {
+                            lastAppliedPreset = entry.getValue().getAsString();
                         }
-                    } else if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
+                    } else if (!UNNAMED_PRESET_KEY.equals(entry.getKey())) {
                         try {
-                            Preset preset = GSON.fromJson(GSON.toJson(entry.getValue()), Preset.class);
+                            Preset preset = GSON.fromJson(entry.getValue(), Preset.class);
                             if (preset != null) {
                                 presets.put(entry.getKey(), preset);
                             }
                         } catch (Exception e) {
-                            BuildscapeCommon.LOGGER.warn("Skipping malformed preset entry", e);
-                            // The reference skips malformed preset entries while loading valid ones.
+                            BuildscapeCommon.LOGGER.warn("Skipping malformed preset entry: " + entry.getKey(), e);
                         }
                     }
                 }
@@ -99,6 +108,7 @@ public class PresetsConfig {
         if (lastAppliedPreset == null || lastAppliedPreset.isEmpty()) {
             lastAppliedPreset = "default";
         }
+        invalidateCache();
     }
 
     private File getPresetsFile() {
@@ -106,11 +116,18 @@ public class PresetsConfig {
     }
 
     public static PresetsConfig get() {
-        if (INSTANCE == null) {
-            INSTANCE = new PresetsConfig();
-            INSTANCE.load();
+        PresetsConfig config = INSTANCE;
+        if (config == null) {
+            synchronized (PresetsConfig.class) {
+                config = INSTANCE;
+                if (config == null) {
+                    config = new PresetsConfig();
+                    config.load();
+                    INSTANCE = config;
+                }
+            }
         }
-        return INSTANCE;
+        return config;
     }
 
     public void save() {
@@ -159,7 +176,8 @@ public class PresetsConfig {
         } else {
             modId = itemString.split(":")[0];
         }
-        return modId.equals("minecraft") || Services.PLATFORM.isModLoaded(modId);
+        if ("minecraft".equals(modId) || "buildscape".equals(modId)) return true;
+        return MOD_LOADED_CACHE.computeIfAbsent(modId, Services.PLATFORM::isModLoaded);
     }
 
     private Set<String> getDefaultItems() {
@@ -282,14 +300,19 @@ public class PresetsConfig {
         return defaultItems;
     }
 
-    public List<Preset> getPresets() {
+    private synchronized void rebuildCache() {
         List<Preset> presetList = new ArrayList<>();
+        List<String> keyList = new ArrayList<>();
+
         if (presets.containsKey("default")) {
+            keyList.add("default");
             presetList.add(presets.get("default"));
         }
         if (presets.containsKey(UNNAMED_PRESET_KEY)) {
+            keyList.add(UNNAMED_PRESET_KEY);
             presetList.add(presets.get(UNNAMED_PRESET_KEY));
         }
+
         List<String> sortedKeys = new ArrayList<>(presets.keySet());
         sortedKeys.remove("default");
         sortedKeys.remove(UNNAMED_PRESET_KEY);
@@ -298,37 +321,31 @@ public class PresetsConfig {
         int customCount = 0;
         for (String key : sortedKeys) {
             if (customCount < MAX_PRESETS - 1) {
+                keyList.add(key);
                 presetList.add(presets.get(key));
                 customCount++;
             }
         }
-        return presetList;
+
+        this.cachedPresetList = Collections.unmodifiableList(presetList);
+        this.cachedKeyList = Collections.unmodifiableList(keyList);
     }
 
-    public List<String> getPresetKeys() {
-        List<String> keys = new ArrayList<>();
-        if (presets.containsKey("default")) {
-            keys.add("default");
+    public synchronized List<Preset> getPresets() {
+        if (cachedPresetList == null) {
+            rebuildCache();
         }
-        if (presets.containsKey(UNNAMED_PRESET_KEY)) {
-            keys.add(UNNAMED_PRESET_KEY);
-        }
-        List<String> sortedKeys = new ArrayList<>(presets.keySet());
-        sortedKeys.remove("default");
-        sortedKeys.remove(UNNAMED_PRESET_KEY);
-        sortedKeys.sort(String::compareTo);
-
-        int customCount = 0;
-        for (String key : sortedKeys) {
-            if (customCount < MAX_PRESETS - 1) {
-                keys.add(key);
-                customCount++;
-            }
-        }
-        return keys;
+        return cachedPresetList;
     }
 
-    public boolean savePreset(String key, String name, Set<String> items) {
+    public synchronized List<String> getPresetKeys() {
+        if (cachedKeyList == null) {
+            rebuildCache();
+        }
+        return cachedKeyList;
+    }
+
+    public synchronized boolean savePreset(String key, String name, Set<String> items) {
         if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
             return false;
         }
@@ -345,6 +362,7 @@ public class PresetsConfig {
         }
 
         presets.put(key, new Preset(name, items));
+        invalidateCache();
         save();
         return true;
     }
@@ -368,11 +386,12 @@ public class PresetsConfig {
         }
     }
 
-    public boolean deletePreset(String key) {
+    public synchronized boolean deletePreset(String key) {
         if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
             return false;
         }
         if (presets.remove(key) != null) {
+            invalidateCache();
             save();
             return true;
         }
@@ -397,8 +416,9 @@ public class PresetsConfig {
         return lastAppliedPreset;
     }
 
-    public void saveUnnamedPreset(Set<String> items) {
+    public synchronized void saveUnnamedPreset(Set<String> items) {
         presets.put(UNNAMED_PRESET_KEY, new Preset("", items));
+        invalidateCache();
     }
 
     public Preset getUnnamedPreset() {
@@ -409,8 +429,9 @@ public class PresetsConfig {
         return presets.containsKey(UNNAMED_PRESET_KEY);
     }
 
-    public void clearUnnamedPreset() {
+    public synchronized void clearUnnamedPreset() {
         presets.remove(UNNAMED_PRESET_KEY);
+        invalidateCache();
     }
 
     public void autoApplyOnLoad() {

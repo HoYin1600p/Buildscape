@@ -26,6 +26,9 @@ public class BuildscapeClientConfig {
     public static final String KEY_WATER_BOTTLE_STACKING = "isWaterbottleStack";
     public static final String KEY_UI_THEME = "UITheme";
     public static final String KEY_UI_BACKGROUND = "UIBackground";
+    public static final String KEY_SIDE_PANEL_EXPANDED = "SidePanelExpanded";
+    public static final String KEY_ANIMATION_SPEED = "AnimationSpeed";
+    public static final String KEY_LAST_ACTIVE_TAB = "LastActiveTab";
 
     private static final LinkedHashMap<String, String> DEFAULTS = new LinkedHashMap<>();
     private static volatile BuildscapeClientConfig INSTANCE;
@@ -41,6 +44,9 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_WATER_BOTTLE_STACKING, "true");
         DEFAULTS.put(KEY_UI_THEME, "dark");
         DEFAULTS.put(KEY_UI_BACKGROUND, "none");
+        DEFAULTS.put(KEY_SIDE_PANEL_EXPANDED, "false");
+        DEFAULTS.put(KEY_ANIMATION_SPEED, "0");
+        DEFAULTS.put(KEY_LAST_ACTIVE_TAB, "0");
     }
 
     private final Map<String, String> values;
@@ -215,6 +221,33 @@ public class BuildscapeClientConfig {
 
     public void setUiBackground(String background) {
         values.put(KEY_UI_BACKGROUND, background != null ? background : "none");
+        save();
+    }
+
+    public boolean isSidePanelExpanded() {
+        return getBoolean(KEY_SIDE_PANEL_EXPANDED);
+    }
+
+    public void setSidePanelExpanded(boolean expanded) {
+        values.put(KEY_SIDE_PANEL_EXPANDED, String.valueOf(expanded));
+        save();
+    }
+
+    public int getAnimationSpeedIndex() {
+        return getInt(KEY_ANIMATION_SPEED, 0);
+    }
+
+    public void setAnimationSpeedIndex(int index) {
+        values.put(KEY_ANIMATION_SPEED, String.valueOf(index));
+        save();
+    }
+
+    public int getLastActiveTab() {
+        return getInt(KEY_LAST_ACTIVE_TAB, 0);
+    }
+
+    public void setLastActiveTab(int tab) {
+        values.put(KEY_LAST_ACTIVE_TAB, String.valueOf(tab));
         save();
     }
 }

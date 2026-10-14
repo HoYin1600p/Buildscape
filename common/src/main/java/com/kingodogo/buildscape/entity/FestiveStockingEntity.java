@@ -19,5 +19,5 @@ public interface FestiveStockingEntity {
     void setColorVariant(String color);
     ItemStack getItem();
     void setItem(ItemStack stack);
-    Direction getDirection();
+    Direction getFrameDirection();
 }

@@ -2669,6 +2669,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         }
 
         @Override
+        public Direction getFrameDirection() {
+            return this.getDirection();
+        }
+
+        @Override
         public String getColorVariant() {
             return this.getEntityData().get(DATA_COLOR);
         }
@@ -2934,6 +2939,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
             if (direction != null) {
                 this.setDirection(direction);
             }
+        }
+
+        @Override
+        public Direction getFrameDirection() {
+            return this.getDirection();
         }
 
         @Override

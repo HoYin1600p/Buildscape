@@ -22,13 +22,37 @@ public final class ClientWorldHooks {
 
     public record Outline(VoxelShape shape, int color, Matrix4f transform) {}
 
+    public record Fill(float[] box, float r, float g, float b, float a, Matrix4f transform) {}
+
     /** Stores semantic boxes, never their line vertices or live world inputs. */
     public static final class OutlineState {
         private final java.util.List<Outline> outlines = new java.util.ArrayList<>();
+        private final java.util.List<Fill> fills = new java.util.ArrayList<>();
 
         public java.util.List<Outline> outlines() { return java.util.List.copyOf(outlines); }
 
         public void submit(PoseStack pose, SubmitNodeCollector collector) {
+            for (Fill fill : fills) {
+                pose.pushPose();
+                try {
+                    pose.mulPose(fill.transform());
+                    collector.submitCustomGeometry(pose, RenderTypes.lightning(), (transform, consumer) -> {
+                        Matrix4f m = transform.pose();
+                        float[] v = fill.box();
+                        float[][] quads = {
+                                {v[0], v[1], v[2], v[3], v[1], v[2], v[3], v[1], v[5], v[0], v[1], v[5]},
+                                {v[0], v[4], v[2], v[0], v[4], v[5], v[3], v[4], v[5], v[3], v[4], v[2]},
+                                {v[0], v[1], v[2], v[0], v[4], v[2], v[3], v[4], v[2], v[3], v[1], v[2]},
+                                {v[0], v[1], v[5], v[3], v[1], v[5], v[3], v[4], v[5], v[0], v[4], v[5]},
+                                {v[0], v[1], v[2], v[0], v[1], v[5], v[0], v[4], v[5], v[0], v[4], v[2]},
+                                {v[3], v[1], v[2], v[3], v[4], v[2], v[3], v[4], v[5], v[3], v[1], v[5]}
+                        };
+                        for (float[] q : quads)
+                            for (int i = 0; i < 12; i += 3)
+                                consumer.addVertex(m, q[i], q[i + 1], q[i + 2]).setColor(fill.r(), fill.g(), fill.b(), fill.a());
+                    });
+                } finally { pose.popPose(); }
+            }
             for (Outline outline : outlines) {
                 pose.pushPose();
                 try {
@@ -81,6 +105,14 @@ public final class ClientWorldHooks {
             renderLineBox(pose, buffer, bottom.getX() - cameraPos.x, bottom.getY() - cameraPos.y, bottom.getZ() - cameraPos.z,
                     top.getX() + 1 - cameraPos.x, top.getY() + 1 - cameraPos.y, top.getZ() + 1 - cameraPos.z,
                     alpha, (1 - mark.getGradientProgress()) * alpha, 0, 1);
+        }
+    }
+
+    public static void renderFillBox(PoseStack pose, Object buffer, double minX, double minY, double minZ,
+            double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
+        if (buffer instanceof OutlineState outlines) {
+            outlines.fills.add(new Fill(new float[]{(float) minX, (float) minY, (float) minZ, (float) maxX, (float) maxY, (float) maxZ},
+                    r, g, b, a, new Matrix4f(pose.last().pose())));
         }
     }
 

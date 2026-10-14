@@ -926,6 +926,21 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int frameW = panelW + bevelExpansion * 2;
         int frameH = panelH + bevelExpansion * 2;
 
+        // 2b. Connected Sliding Right Side Panel (Rendered behind main chassis, docked flush with zero gap like creative tab)
+        updateSidePanelAnimation();
+        if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
+            int frameRight = frameX + frameW;
+            int availRight = width - frameRight - 4;
+            int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
+            int sidePanelH = Math.min(264, frameH - 44);
+            int sidePanelY = frameY + (frameH - sidePanelH) / 2;
+            int dockX = frameRight - 2;
+            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
+            int sidePanelX = dockX - slideOffset;
+
+            renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, mouseX, mouseY, alpha);
+        }
+
         // 3. Render 1 Big Frame with expanded chassis gap and metallic gradient
         drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, alpha);
 
@@ -969,24 +984,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Render Right Main Configuration Content Area
         renderContentArea(poseStackOrGraphics, font, contentX, contentY, contentW, contentH, mouseX, mouseY, alpha);
-
-        // 6. Connected Sliding Right Side Panel (Modifiers / Color Picker / Pillar Details)
-        updateSidePanelAnimation();
-        if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
-            int frameRight = frameX + frameW;
-            int dockGap = 7;
-            int availRight = width - frameRight - dockGap - 4;
-            int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
-            int sidePanelH = Math.min(264, frameH - 44);
-            int sidePanelY = frameY + (frameH - sidePanelH) / 2;
-            int dockX = frameRight + dockGap;
-            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + dockGap + 10));
-            int sidePanelX = dockX - slideOffset;
-
-            enableGuiScissor(poseStackOrGraphics, frameRight, 0, Math.max(1, width - frameRight), height);
-            renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, mouseX, mouseY, alpha);
-            disableGuiScissor(poseStackOrGraphics);
-        }
 
         // 7. Fallback Color Picker Modal if explicitly toggled
         if (showColorModal) {
@@ -2131,38 +2128,35 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Connected Right Side Panel Frame ---
     private void drawConnectedSidePanelFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
-        // 1. Outer Chassis Body Fill
+        // 1. Outer Chassis Body Fill (Solid metallic chassis backing)
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
 
-        // 2. Outermost 1px Black Border (all 4 sides)
+        // 2. Outermost 1px Black Border (Top, Right, Bottom - seamless connection on left under main frame)
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black); // Tucked under main frame edge
 
-        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Shadow (Bottom & Right)
-        drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top) & Shadow (Bottom & Right)
+        drawHorizontalGradientLine(poseStackOrGraphics, x, y + 1, w - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
         // 4. Outer Chassis Band (offset 2 to 4)
         int sideBand = applyAlpha(COLOR_CHASSIS_BAND, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + w - 2, y + 3, sideBand);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + h - 3, x + w - 2, y + h - 2, sideBand);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + 2, x + w - 2, y + 3, sideBand);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 3, x + w - 2, y + h - 2, sideBand);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 3, y + 2, x + w - 2, y + h - 2, sideBand);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + 3, y + h - 2, sideBand);
 
         // 5. Stepped Bevel Ridge & Groove at offset 4
         int sideBevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int sideBevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + w - 4, y + 5, sideBevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + h - 5, x + w - 4, y + h - 4, sideBevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + 4, x + w - 4, y + 5, sideBevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 5, x + w - 4, y + h - 4, sideBevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 5, y + 4, x + w - 4, y + h - 4, sideBevelHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + 5, y + h - 4, sideBevelShadow);
     }
 
     private void renderSidePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
@@ -2926,16 +2920,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // 0. Right Side Panel Clicks (when visible)
         if (sidePanelProgress > 0.05f && sidePanelType != SidePanelType.NONE && !isSidePanelClosing) {
             int frameRight = frameX + frameW;
-            int dockGap = 7;
-            int availRight = width - frameRight - dockGap - 4;
+            int availRight = width - frameRight - 4;
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
-            int dockX = frameRight + dockGap;
-            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + dockGap + 10));
+            int dockX = frameRight - 2;
+            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
             int sidePanelX = dockX - slideOffset;
 
-            if (mouseX >= sidePanelX && mouseX <= sidePanelX + sidePanelTargetW && mouseY >= sidePanelY && mouseY <= sidePanelY + sidePanelH) {
+            int interactiveLeft = Math.max(frameRight, sidePanelX);
+            if (mouseX >= interactiveLeft && mouseX <= sidePanelX + sidePanelTargetW && mouseY >= sidePanelY && mouseY <= sidePanelY + sidePanelH) {
                 if (handleSidePanelClick(mouseX, mouseY, button, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH)) {
                     return true;
                 }

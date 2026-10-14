@@ -168,7 +168,7 @@ public class OrnamentBlock extends Block implements SimpleWaterloggedBlock, ICom
         com.kingodogo.buildscape.util.CommonId supportId = com.kingodogo.buildscape.platform.Services.PLATFORM.getBlockId(support.getBlock());
         boolean leafHedge = supportId != null && supportId.getPath().endsWith("_hedge");
         if (support.is(this) || support.getBlock() instanceof FenceBlock || leafHedge) return true;
-        if (!support.isAir() && !support.is(Blocks.BARRIER) && support.isCollisionShapeFullBlock(level, pos)) return true;
+        if (!support.isAir() && !support.is(Blocks.BARRIER) && com.kingodogo.buildscape.platform.Services.PLATFORM.isSolidMaterial(level, pos, support)) return true;
         return support.isFaceSturdy(level, pos, direction);
     }
 

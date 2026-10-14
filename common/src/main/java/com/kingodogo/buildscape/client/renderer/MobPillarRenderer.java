@@ -41,7 +41,7 @@ public class MobPillarRenderer {
     }
 
     public static void renderMob(
-            SpawnEggItem spawnEgg,
+            net.minecraft.world.item.Item spawnEgg,
             ItemStack spawnEggStack,
             BlockPos pos,
             Level level,

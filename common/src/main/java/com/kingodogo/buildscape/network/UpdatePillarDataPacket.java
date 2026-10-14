@@ -54,6 +54,19 @@ public class UpdatePillarDataPacket implements CommonPacket {
         this.dyeColors = dyeColors != null ? new ArrayList<>(dyeColors) : new ArrayList<>();
     }
 
+    public UpdatePillarDataPacket(PillarIdManager.PillarData data) {
+        this(
+                data != null ? data.id : null,
+                data != null ? data.pattern : null,
+                data != null ? data.use_pattern : null,
+                data != null ? data.pattern_speed : null,
+                data != null ? data.pattern_spread : null,
+                data != null ? data.pattern_intensity : null,
+                data != null ? data.max_particle_color : null,
+                data != null ? data.dyeColors : null
+        );
+    }
+
     public UpdatePillarDataPacket(FriendlyByteBuf buf) {
         this.pillarId = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
 
@@ -156,28 +169,33 @@ public class UpdatePillarDataPacket implements CommonPacket {
             changed = true;
         }
 
-        if (patternSpeed != null && !patternSpeed.equals(data.patternSpeed)) {
+        if (patternSpeed != null && !patternSpeed.equals(data.pattern_speed)) {
             data.patternSpeed = patternSpeed;
+            data.pattern_speed = patternSpeed;
             changed = true;
         }
 
-        if (patternSpread != null && !patternSpread.equals(data.patternSpread)) {
+        if (patternSpread != null && !patternSpread.equals(data.pattern_spread)) {
             data.patternSpread = patternSpread;
+            data.pattern_spread = patternSpread;
             changed = true;
         }
 
-        if (patternIntensity != null && !patternIntensity.equals(data.patternIntensity)) {
+        if (patternIntensity != null && !patternIntensity.equals(data.pattern_intensity)) {
             data.patternIntensity = patternIntensity;
+            data.pattern_intensity = patternIntensity;
             changed = true;
         }
 
-        if (usePattern != null && !usePattern.equals(data.usePattern)) {
+        if (usePattern != null && !usePattern.equals(data.use_pattern)) {
             data.usePattern = usePattern;
+            data.use_pattern = usePattern;
             changed = true;
         }
 
-        if (maxParticleColor != null && !maxParticleColor.equals(data.maxParticleColor)) {
+        if (maxParticleColor != null && !maxParticleColor.equals(data.max_particle_color)) {
             data.maxParticleColor = maxParticleColor;
+            data.max_particle_color = maxParticleColor;
             changed = true;
         }
 
@@ -190,6 +208,7 @@ public class UpdatePillarDataPacket implements CommonPacket {
             data.modifiedTime = System.currentTimeMillis();
             manager.saveImmediate();
             updateBlockEntity(com.kingodogo.buildscape.platform.Services.PLATFORM.getServer(serverPlayer), data);
+            SyncPillarIdsPacket.sendToAll(manager.getAllPillarDataForSync());
         }
     }
 

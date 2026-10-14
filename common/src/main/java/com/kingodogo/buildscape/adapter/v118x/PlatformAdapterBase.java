@@ -4255,16 +4255,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public net.minecraft.client.gui.screens.Screen createGuiEditorScreen(net.minecraft.client.gui.screens.Screen parent, String tabName, com.kingodogo.buildscape.client.screen.AbstractConfigTab sourceTab) {
-        return com.kingodogo.buildscape.adapter.v118x.GuiProvider.createGuiEditorScreen(parent, tabName, sourceTab);
-    }
-
-    @Override
-    public net.minecraft.client.gui.screens.Screen createInventoryItemSelectorScreen(net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab configTab) {
-        return com.kingodogo.buildscape.adapter.v118x.GuiProvider.createInventoryItemSelectorScreen(parent, configTab);
-    }
-
-    @Override
     public void renderGuiItem(Object poseStackOrGraphics, net.minecraft.world.item.ItemStack stack, int x, int y) {
         com.kingodogo.buildscape.adapter.v118x.GuiProvider.renderGuiItem(poseStackOrGraphics, stack, x, y);
     }

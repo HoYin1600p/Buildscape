@@ -181,6 +181,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 public class BlockFactory implements IBlockFactory {
+    private static final java.util.Set<String> CONSTRUCTING_BASES = new java.util.HashSet<>();
 
     @Override
     public Block createBlock(BlockDefinition def) {
@@ -2196,6 +2197,8 @@ public class BlockFactory implements IBlockFactory {
         return 0xFFFFFF;
     }
     private Block getBaseBlock(BlockDefinition def) {
+        Block reference = ReferenceBlockBases.find(def.getId(), this::registeredReferenceBlock);
+        if (reference != null) return reference;
         String parentId = def.getParentBlockId();
         if (parentId != null) {
             String cleanId = parentId.toLowerCase().replace("blocks.", "").replace("modblocks.", "").replace(".get(", "");
@@ -2210,6 +2213,29 @@ public class BlockFactory implements IBlockFactory {
             }
         }
         return Blocks.OAK_PLANKS;
+    }
+
+    private Block registeredReferenceBlock(String id) {
+        for (var entry : Services.REGISTRY.getRegisteredBlocks()) {
+            if (!entry.getPath().equals(id)) continue;
+            Object value = entry.get();
+            if (value instanceof Block block) return block;
+            if (value instanceof BlockDefinition definition) {
+                if (definition.getBlock() == null) {
+                    if (!CONSTRUCTING_BASES.add(id)) throw new IllegalStateException("Circular block dependency: " + id);
+                    try {
+                        Services.PLATFORM.wrapRegistryAction(() -> definition.setBlock(createBlock(definition)));
+                    } finally {
+                        CONSTRUCTING_BASES.remove(id);
+                    }
+                }
+                return definition.getBlock();
+            }
+        }
+        // Bases replaced by vanilla in this cluster are no longer in the shared catalog.
+        Block block = resolveBlockSupplier(id).get();
+        if (block == null) throw new IllegalStateException("Missing block dependency: " + id);
+        return block;
     }
 
     private Supplier<Block> resolveBlockSupplier(String id) {

@@ -1647,6 +1647,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1893,6 +1894,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (direction == Direction.DOWN) return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                     if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
@@ -2106,6 +2108,11 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isPointedIcicle()) {
             return new PointedIcicleBlock(props) {
+                @Override
+                protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+                    onIcicleRemove(state, level, pos, newState, isMoving);
+                    super.onRemove(state, level, pos, newState, isMoving);
+                }
                 @Override
                 protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
                     onIcicleTick(state, level, pos);

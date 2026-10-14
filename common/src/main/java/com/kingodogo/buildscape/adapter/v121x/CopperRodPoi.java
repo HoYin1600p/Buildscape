@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.adapter.v121x;
 import com.google.common.collect.ImmutableSet;
 import com.kingodogo.buildscape.mixin.PoiTypeAccessor;
 import com.kingodogo.buildscape.mixin.PoiTypesAccessor;
+import com.kingodogo.buildscape.platform.Services;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -43,6 +44,11 @@ public final class CopperRodPoi {
                 states.add(state);
             }
         }
-        accessor.setMatchingStates(ImmutableSet.copyOf(states));
+        // PoiType is a record: changing matchingStates changes its hash code. Forge
+        // uses the registered value as an ownership-map key, so mutation loses the
+        // owner during save snapshots. The state lookup alone supplies rod POIs.
+        if (!"Forge 1.21.1".equals(Services.PLATFORM.getPlatformName())) {
+            accessor.setMatchingStates(ImmutableSet.copyOf(states));
+        }
     }
 }

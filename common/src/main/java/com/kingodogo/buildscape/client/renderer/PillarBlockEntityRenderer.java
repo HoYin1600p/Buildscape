@@ -166,7 +166,7 @@ public class PillarBlockEntityRenderer {
                 poseStack.pushPose();
                 try {
                     MobPillarRenderer.renderMob(
-                            (SpawnEggItem) displayedItem.getItem(),
+                            displayedItem.getItem(),
                             displayedItem,
                             pos,
                             blockEntity.getLevel(),
@@ -236,7 +236,7 @@ public class PillarBlockEntityRenderer {
 
     private DisplayInfo createDisplayInfo(ItemStack displayedItem, long startTime) {
         boolean renderAsItem = hasItemNameTag(displayedItem);
-        boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem && !renderAsItem;
+        boolean isSpawnEgg = Services.PLATFORM.isSpawnEgg(displayedItem) && !renderAsItem;
         boolean fixed = !isSpawnEgg && isFixed(displayedItem);
         MobState mobState = null;
         if (isSpawnEgg) {
@@ -258,7 +258,7 @@ public class PillarBlockEntityRenderer {
 
     private boolean hasUpsideDownName(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
-        if (!(stack.getItem() instanceof SpawnEggItem)) return false;
+        if (!(Services.PLATFORM.isSpawnEgg(stack))) return false;
         if (!Services.PLATFORM.hasCustomHoverName(stack)) return false;
         String name = net.minecraft.ChatFormatting.stripFormatting(stack.getHoverName().getString().trim().toLowerCase(java.util.Locale.ROOT));
         return name.contains("grum") || name.contains("dinnerbone");

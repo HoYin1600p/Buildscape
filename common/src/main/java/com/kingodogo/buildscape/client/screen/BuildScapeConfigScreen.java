@@ -1322,6 +1322,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     // --- Content Area Rendering ---
     private void renderContentArea(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+        ConfigBackgrounds.drawCurrentBackground(poseStackOrGraphics, x + 1, y + 1, w - 2, h - 2, alpha, currentTheme);
 
         if (selectedTabIndex < 0 || selectedTabIndex >= navItems.size()) return;
         NavItem current = navItems.get(selectedTabIndex);
@@ -2119,6 +2120,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int curY = startY;
 
         renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", currentTheme.displayName, mouseX, mouseY, alpha);
+        curY += h + gap;
+
+        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "UI Background", "Decorative backdrop pattern applied over the theme", ConfigBackgrounds.getCurrentBackground().displayName, mouseX, mouseY, alpha);
         curY += h + gap;
 
         renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ANIM_SPEEDS[animSpeedIndex], mouseX, mouseY, alpha);
@@ -3932,7 +3936,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
                 curY += h + gap;
 
-                // Row 1: Screen Animation Cycle
+                // Row 1: UI Background Cycle
+                if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    ConfigBackgrounds.cycleNextBackground();
+                    return true;
+                }
+                curY += h + gap;
+
+                // Row 2: Screen Animation Cycle
                 if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
                     animSpeedIndex = (animSpeedIndex + 1) % ANIM_SPEEDS.length;
                     return true;

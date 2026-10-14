@@ -425,7 +425,9 @@ public class PillarBlock extends Block implements EntityBlock, SimpleWaterlogged
                     ? (lvl, pos, st, be) -> PillarBlockEntity.clientTick(lvl, pos, st, (PillarBlockEntity) be)
                     : null;
         }
-        return null;
+        return type == ModBlockEntities.PILLAR_TYPE
+                ? (lvl, pos, st, be) -> PillarBlockEntity.serverTick(lvl, pos, st, (PillarBlockEntity) be)
+                : null;
     }
 
     @Override

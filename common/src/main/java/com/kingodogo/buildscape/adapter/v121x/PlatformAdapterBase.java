@@ -2677,6 +2677,11 @@ public static class ColoredItemFrameEntityImpl extends HangingEntity implements 
         }
 
         @Override
+        public Direction getFrameDirection() {
+            return this.getDirection();
+        }
+
+        @Override
         public String getColorVariant() {
             return this.getEntityData().get(DATA_COLOR);
         }
@@ -3174,6 +3179,11 @@ public static class ColoredItemFrameEntityImpl extends HangingEntity implements 
                     this.recalculateBoundingBox();
                 }
             }
+        }
+
+        @Override
+        public Direction getFrameDirection() {
+            return this.getDirection();
         }
 
         @Override

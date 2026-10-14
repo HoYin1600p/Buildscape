@@ -963,6 +963,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // 3. Render 1 Big Frame with expanded chassis gap and metallic gradient
         drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, alpha);
 
+        // 3b. Top Center Crest Badge (Image 2 beveled frame for Buildscape logo)
+        drawTopCrestBadge(poseStackOrGraphics, font, frameX, frameY, frameW, alpha);
+
         // 4. Header Bar (kept exactly as placed rn, with top-left metallic gradient artifact)
         int headerH = 24;
         int headerX = panelX + 7;
@@ -1131,15 +1134,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int transDuration = getTabTransitionAnimMs();
             if (transElapsed < transDuration) {
                 float t = (float) transElapsed / transDuration;
-                transProgress = easeOutSine(t);
+                transProgress = easeOutCubic(t);
             } else {
                 isTabTransitioning = false;
             }
         }
 
         int slideDir = (selectedTabIndex >= prevTabIndex) ? 1 : -1;
-        int slideOffsetY = (int) Math.round((1.0f - transProgress) * 6 * slideDir);
-        float tabAlpha = alpha * Math.min(1.0f, 0.2f + 0.8f * transProgress);
+        int slideOffsetY = (int) Math.round((1.0f - transProgress) * 3 * slideDir);
+        float tabAlpha = alpha * Math.min(1.0f, 0.65f + 0.35f * transProgress);
 
         int catHeaderH = 22;
         drawText(poseStackOrGraphics, font, current.icon + "  " + current.title.toUpperCase(), x + 8, y + 6, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
@@ -1157,7 +1160,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int rowH = 26;
             int rowGap = 3;
 
-            int scrollbarW = 4;
+            int scrollbarW = 6;
             int scrollbarTrackX = x + w - scrollbarW - 5;
             int rowW = (scrollbarTrackX - 6) - (x + 6);
             int rowX = x + 6;
@@ -1176,15 +1179,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             disableGuiScissor(poseStackOrGraphics);
 
-            // Custom Scrollbar in dedicated right gutter
-            if (maxScroll > 0) {
-                int trackH = viewH;
-                int thumbH = Math.max(16, (int) ((viewH / (float) totalContentHeight) * trackH));
-                int thumbY = clipY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
-
-                Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, clipY, scrollbarTrackX + scrollbarW, clipY + trackH, applyAlpha(COLOR_SLOT_BG, tabAlpha));
-                drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, COLOR_BTN_BG_ACTIVE, false, false, tabAlpha);
-            }
+            renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, clipY, scrollbarW, viewH, scrollOffset, maxScroll, mouseX, mouseY, tabAlpha);
         }
     }
 
@@ -1329,7 +1324,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int viewportY = curY;
         int viewportH = (y + h - 6) - viewportY;
 
-        int scrollbarW = 4;
+        int scrollbarW = 6;
         int scrollbarTrackX = x + w - scrollbarW - 5;
         int availGridW = (scrollbarTrackX - 6) - (x + 6);
 
@@ -1415,15 +1410,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             disableGuiScissor(poseStackOrGraphics);
 
-            // Scrollbar (Only for viewport gutter)
-            if (maxScroll > 0) {
-                int trackH = viewportH;
-                int thumbH = Math.max(16, (int) ((viewportH / (float) totalContentHeight) * trackH));
-                int thumbY = viewportY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
-
-                Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarTrackX + scrollbarW, viewportY + trackH, applyAlpha(COLOR_SLOT_BG, alpha));
-                drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, COLOR_BTN_BG_ACTIVE, false, false, alpha);
-            }
+            renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
 
             if (hoveredStack != null) {
                 List<Component> tooltip = new ArrayList<>();
@@ -1494,15 +1481,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             disableGuiScissor(poseStackOrGraphics);
 
-            // Scrollbar (Only for viewport gutter)
-            if (maxScroll > 0) {
-                int trackH = viewportH;
-                int thumbH = Math.max(16, (int) ((viewportH / (float) totalContentHeight) * trackH));
-                int thumbY = viewportY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
-
-                Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarTrackX + scrollbarW, viewportY + trackH, applyAlpha(COLOR_SLOT_BG, alpha));
-                drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, COLOR_BTN_BG_ACTIVE, false, false, alpha);
-            }
+            renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
         }
     }
 
@@ -1621,7 +1600,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // --- 2. Fixed Table Column Headers ---
         int headH = 16;
-        int scrollbarW = 4;
+        int scrollbarW = 6;
         int scrollbarTrackX = x + w - scrollbarW - 5;
         int availW = (scrollbarTrackX - 6) - (x + 6);
         int colX = x + 6;
@@ -1814,15 +1793,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         disableGuiScissor(poseStackOrGraphics);
 
-        // Scrollbar
-        if (maxScroll > 0) {
-            int trackH = viewportH;
-            int thumbH = Math.max(16, (int) ((viewportH / (float) totalContentHeight) * trackH));
-            int thumbY = viewportY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
-
-            Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarTrackX + scrollbarW, viewportY + trackH, applyAlpha(COLOR_SLOT_BG, alpha));
-            drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, COLOR_BTN_BG_ACTIVE, false, false, alpha);
-        }
+        renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
     }
 
     // --- Tab 2 (Detail): Per-Pillar Customization View ---
@@ -1871,7 +1842,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int rowH = 26;
         int rowGap = 3;
 
-        int scrollbarW = 4;
+        int scrollbarW = 6;
         int scrollbarTrackX = x + w - scrollbarW - 5;
         int rowW = (scrollbarTrackX - 6) - (x + 6);
         int rowX = x + 6;
@@ -1925,15 +1896,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         disableGuiScissor(poseStackOrGraphics);
 
-        // Scrollbar
-        if (maxScroll > 0) {
-            int trackH = viewportH;
-            int thumbH = Math.max(16, (int) ((viewportH / (float) totalContentHeight) * trackH));
-            int thumbY = viewportY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
-
-            Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarTrackX + scrollbarW, viewportY + trackH, applyAlpha(COLOR_SLOT_BG, alpha));
-            drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, COLOR_BTN_BG_ACTIVE, false, false, alpha);
-        }
+        renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
     }
 
     // --- Tab 3: World Settings Rows (Normalized Professional Descriptions) ---
@@ -2704,6 +2667,120 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.drawShadow(poseStackOrGraphics, font, text, x, y, color);
     }
 
+    // --- Top Center Crest Badge (Buildscape Logo Beveled Frame) ---
+    private void drawTopCrestBadge(Object poseStackOrGraphics, Font font, int frameX, int frameY, int frameW, float alpha) {
+        int crestW = 124;
+        int crestH = 18;
+        int crestX = frameX + (frameW - crestW) / 2;
+        int crestY = frameY - 12;
+
+        int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
+
+        // 1. Solid Outer Chassis Body
+        Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + crestW, crestY + crestH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+
+        // 2. 1px Black Border Outline
+        Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + crestW, crestY + 1, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY + crestH - 1, crestX + crestW, crestY + crestH, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + 1, crestY + crestH, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, crestX + crestW - 1, crestY, crestX + crestW, crestY + crestH, black);
+
+        // 3. Top & Left Metallic Gradient Highlights
+        drawHorizontalGradientLine(poseStackOrGraphics, crestX + 1, crestY + 1, crestW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        drawVerticalGradientLine(poseStackOrGraphics, crestX + 1, crestY + 1, crestH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+
+        // 4. Bottom & Right Shadow
+        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, crestX + 1, crestY + crestH - 2, crestX + crestW - 1, crestY + crestH - 2, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, crestX + crestW - 2, crestY + 1, crestX + crestW - 1, crestY + crestH - 1, shadow);
+
+        // 5. Inner Recessed Plate
+        int plateX = crestX + 3;
+        int plateY = crestY + 3;
+        int plateW = crestW - 6;
+        int plateH = crestH - 6;
+        Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + plateW, plateY + plateH, applyAlpha(COLOR_INNER_DARK, alpha));
+
+        // Inner plate 1px subtle bevel
+        int bShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int bHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + plateW, plateY + 1, bShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + 1, plateY + plateH, bShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY + plateH - 1, plateX + plateW, plateY + plateH, bHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, plateX + plateW - 1, plateY, plateX + plateW, plateY + plateH, bHighlight);
+
+        // 6. Logo / Emblem
+        int textCol = applyAlpha(COLOR_ACCENT, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "✦ BUILDCAPE ✦", crestX + crestW / 2, plateY + (plateH - 8) / 2, textCol);
+    }
+
+    // --- Unified Custom Scrollbar (6px width, clean metallic bevels, no gradient banding) ---
+    private void renderCustomScrollbar(Object poseStackOrGraphics, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha) {
+        if (maxSc <= 0) return;
+
+        currentScrollbarTrackX = trackX;
+        currentScrollbarTrackY = trackY;
+        currentScrollbarTrackW = trackW;
+        currentScrollbarTrackH = trackH;
+
+        int thumbH = Math.max(18, (int) ((trackH / (float) (trackH + maxSc)) * trackH));
+        currentScrollbarThumbH = thumbH;
+        int thumbY = trackY + (int) ((scroll / maxSc) * (trackH - thumbH));
+
+        // Track: clean recessed slot
+        Services.PLATFORM.fill(poseStackOrGraphics, trackX, trackY, trackX + trackW, trackY + trackH, applyAlpha(COLOR_SLOT_BG, alpha * 0.75f));
+        drawBorder(poseStackOrGraphics, trackX, trackY, trackW, trackH, applyAlpha(COLOR_FRAME_BLACK, alpha * 0.40f));
+
+        // Thumb: clean metallic button with bevels (no weird gradient banding)
+        boolean hoverThumb = mouseX >= trackX && mouseX <= trackX + trackW && mouseY >= thumbY && mouseY <= thumbY + thumbH;
+        int thumbColor = isDraggingScrollbar ? COLOR_ACCENT : (hoverThumb ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE);
+
+        // Thumb fill
+        Services.PLATFORM.fill(poseStackOrGraphics, trackX + 1, thumbY + 1, trackX + trackW - 1, thumbY + thumbH - 1, applyAlpha(thumbColor, alpha));
+
+        // Thumb 1px border & bevel
+        int highlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
+        int shadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, trackX, thumbY, trackX + trackW, thumbY + 1, highlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, trackX, thumbY + 1, trackX + 1, thumbY + thumbH - 1, highlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, trackX, thumbY + thumbH - 1, trackX + trackW, thumbY + thumbH, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, trackX + trackW - 1, thumbY + 1, trackX + trackW, thumbY + thumbH - 1, shadow);
+    }
+
+    // --- Auto-Minimize & In-World Locate Helper ---
+    private void locatePillarInWorld(PillarIdManager.PillarData data) {
+        if (data == null) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && mc.level != null) {
+            String curDim = Services.PLATFORM.getDimensionId(mc.level).toString();
+            if (data.dimension != null && data.dimension.equals(curDim)) {
+                BlockPos pillarPos = new BlockPos(data.x, data.y, data.z);
+                PillarMarkerManager.get().markPillar(data.id, pillarPos, data.dimension);
+
+                double targetX = pillarPos.getX() + 0.5;
+                double targetY = pillarPos.getY() + 0.5;
+                double targetZ = pillarPos.getZ() + 0.5;
+                double eyeY = mc.player.getY() + mc.player.getEyeHeight();
+
+                double dx = targetX - mc.player.getX();
+                double dy = targetY - eyeY;
+                double dz = targetZ - mc.player.getZ();
+                double distXZ = Math.sqrt(dx * dx + dz * dz);
+
+                float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0f;
+                float pitch = (float) (-(Math.atan2(dy, distXZ) * 180.0 / Math.PI));
+
+                mc.player.setYRot(yaw);
+                mc.player.setXRot(pitch);
+
+                if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
+                    closeSidePanel();
+                }
+                startClosing();
+            }
+        }
+    }
+
     // --- Config Row Render Helpers ---
     private void renderRowCardBase(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, int mouseX, int mouseY, float alpha) {
         if (y + h < clipY || y > clipY + clipH) return;
@@ -3008,6 +3085,25 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int catHeaderH = 22;
         int viewY = contentY + catHeaderH + 4;
         int viewH = contentH - catHeaderH - 8;
+
+        // 3. Scrollbar Interaction (Drag & Page Jump)
+        if (maxScroll > 0 && currentScrollbarTrackW > 0) {
+            int pad = 3;
+            if (mouseX >= currentScrollbarTrackX - pad && mouseX <= currentScrollbarTrackX + currentScrollbarTrackW + pad &&
+                    mouseY >= currentScrollbarTrackY && mouseY <= currentScrollbarTrackY + currentScrollbarTrackH) {
+                int thumbY = currentScrollbarTrackY + (int) ((scrollOffset / maxScroll) * (currentScrollbarTrackH - currentScrollbarThumbH));
+                if (mouseY >= thumbY && mouseY <= thumbY + currentScrollbarThumbH) {
+                    isDraggingScrollbar = true;
+                    scrollDragStartY = mouseY;
+                    scrollDragStartOffset = scrollOffset;
+                } else if (mouseY < thumbY) {
+                    targetScrollOffset = Math.max(0, targetScrollOffset - currentScrollbarTrackH * 0.75);
+                } else {
+                    targetScrollOffset = Math.min(maxScroll, targetScrollOffset + currentScrollbarTrackH * 0.75);
+                }
+                return true;
+            }
+        }
 
         if (mouseX >= contentX && mouseX <= contentX + contentW && mouseY >= contentY && mouseY <= contentY + contentH) {
             if (handleContentClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH)) {
@@ -3682,21 +3778,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 lastPillarRowClickTime = now;
 
                 if (isDouble) {
-                    Minecraft mc = Minecraft.getInstance();
-                    if (mc.player != null && mc.level != null) {
-                        String curDim = Services.PLATFORM.getDimensionId(mc.level).toString();
-                        if (data.dimension != null && data.dimension.equals(curDim)) {
-                            BlockPos pillarPos = new BlockPos(data.x, data.y, data.z);
-                            PillarMarkerManager.get().markPillar(data.id, pillarPos, data.dimension);
-                            double dx = pillarPos.getX() - mc.player.getX();
-                            double dz = pillarPos.getZ() - mc.player.getZ();
-                            float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0f;
-                            mc.player.setYRot(yaw);
-                            mc.player.setXRot(0.0f);
-                            this.onClose();
-                            return true;
-                        }
-                    }
+                    locatePillarInWorld(data);
+                    return true;
                 }
 
                 if (mouseX >= idX && mouseX <= idX + idColW) {
@@ -4195,21 +4278,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Row 8: Locate in World
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.player != null && mc.level != null) {
-                String curDim = Services.PLATFORM.getDimensionId(mc.level).toString();
-                if (data.dimension != null && data.dimension.equals(curDim)) {
-                    BlockPos pillarPos = new BlockPos(data.x, data.y, data.z);
-                    PillarMarkerManager.get().markPillar(data.id, pillarPos, data.dimension);
-                    double dx = pillarPos.getX() - mc.player.getX();
-                    double dz = pillarPos.getZ() - mc.player.getZ();
-                    float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0f;
-                    mc.player.setYRot(yaw);
-                    mc.player.setXRot(0.0f);
-                    this.onClose();
-                    return true;
-                }
-            }
+            locatePillarInWorld(data);
             return true;
         }
 
@@ -4369,6 +4438,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        isDraggingScrollbar = false;
         draggingGradient = false;
         draggingHue = false;
         if (activeTab != null && activeTab.mouseReleased(mouseX, mouseY, button)) {
@@ -4379,6 +4449,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (isDraggingScrollbar && maxScroll > 0) {
+            int trackH = currentScrollbarTrackH;
+            int thumbH = currentScrollbarThumbH;
+            int usableTrack = trackH - thumbH;
+            if (usableTrack > 0) {
+                double deltaThumb = mouseY - scrollDragStartY;
+                double newOffset = scrollDragStartOffset + (deltaThumb / (double) usableTrack) * maxScroll;
+                targetScrollOffset = Math.max(0, Math.min(maxScroll, newOffset));
+                scrollOffset = targetScrollOffset;
+            }
+            return true;
+        }
+
         if (sidePanelType == SidePanelType.COLOR_PICKER && sidePanelProgress > 0.05f) {
             int panelW = Math.min(width - 20, 560);
             int panelH = Math.min(height - 16, 308);
@@ -4485,7 +4568,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         if (maxScroll > 0) {
-            scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset - delta * 20.0));
+            targetScrollOffset = Math.max(0, Math.min(maxScroll, targetScrollOffset - delta * 24.0));
             return true;
         }
         if (activeTab != null && activeTab.mouseScrolled(mouseX, mouseY, delta)) {

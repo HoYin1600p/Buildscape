@@ -24,6 +24,9 @@ import java.util.function.Consumer;
 public class PillarParticleConfig {
 
     public static final int CONFIG_PERMISSION_LEVEL = 4;
+    public static final String[] DEFAULT_COLORS = {
+            "#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF", "#9B51E0"
+    };
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String PROPERTIES_FILE_NAME = "pillar-properties.json";

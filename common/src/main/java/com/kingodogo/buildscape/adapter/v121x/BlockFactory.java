@@ -258,7 +258,15 @@ public class BlockFactory implements IBlockFactory {
             return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, BlockSetType.OAK, props.randomTicks()) {
                 @Override public SoundType getSoundType(BlockState state) { return SoundType.COPPER; }
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+                    WeatheringBlockLogic.randomTick(state, level, pos);
+                    // Reference oxidation schedules the powered replacement's release tick; the shared handler does not.
+                    BlockState replaced = level.getBlockState(pos);
+                    if (replaced.getBlock() != state.getBlock() && replaced.getBlock() instanceof net.minecraft.world.level.block.WeightedPressurePlateBlock
+                            && replaced.getValue(net.minecraft.world.level.block.WeightedPressurePlateBlock.POWER) > 0) {
+                        level.scheduleTick(pos, replaced.getBlock(), 10);
+                    }
+                }
             };
         } else if (def.isWeatheringSlab()) {
             return new net.minecraft.world.level.block.SlabBlock(props.randomTicks()) {

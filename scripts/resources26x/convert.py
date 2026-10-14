@@ -269,10 +269,11 @@ def convert(root, jar):
                     model = copy.deepcopy(template)
                     model["parent"] = parent
                     changed += write(base.with_name(p.stem + "_" + suffix + ".json"), model)
-        # Copy the current vanilla chest loot baseline, preserving only the
+        # Copy the current vanilla loot baseline, preserving only the
         # Buildscape-specific bonus pools. Thus new vanilla loot is not hidden.
-        for name in ("end_city_treasure", "woodland_mansion"):
-            rel = "data/minecraft/loot_table/chests/" + name + ".json"
+        for rel in ("data/minecraft/loot_table/chests/end_city_treasure.json",
+                    "data/minecraft/loot_table/chests/woodland_mansion.json",
+                    "data/minecraft/loot_table/gameplay/sniffer_digging.json"):
             p = root / rel
             if p.exists():
                 d = load(p)

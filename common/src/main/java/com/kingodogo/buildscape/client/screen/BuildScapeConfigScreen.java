@@ -31,19 +31,8 @@ import net.minecraft.world.level.Level;
 import java.util.*;
 import java.util.function.Consumer;
 
-/**
- * Unified Single-Panel Buildscape Configuration Screen.
- * Design Invariants:
- * - 1 Big Unified Panel with beveled chassis gap between the outer 1px metallic gradient and inner black borders.
- * - Items Tab with authentic inventory slot matrix and full registered Minecraft Tags Panel.
- * - Draggable 2D Color Picker (Saturation x Brightness + Hue spectrum slider).
- * - Pillar IDs Tab with placed pillar listing and full per-pillar customization.
- * - Spill-proof scrollable viewport (no rows spill past bottom frame).
- * - Normalized professional naming and descriptions.
- * - Direct real-time binding to real Buildscape configs & network packets.
- * - Solid opaque charcoal & slate palette (no 75% transparency).
- * - Cubic easing open/close animations.
- */
+
+// Unified Single-Panel Buildscape Configuration Screen.
 public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private final Screen parent;
@@ -212,55 +201,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // Sidenav indicator glide animation
-    private float prevNavIndicatorY = 0.0f;
-    private float targetNavIndicatorY = 0.0f;
-    private float currentIndicatorY = 0.0f;
-    private long navIndicatorStartTime = 0L;
-    private static final int NAV_INDICATOR_ANIM_MS = 220;
-
-    // Content area tab switch transition
-    private int prevTabIndex = 0;
-    private long tabTransitionStartTime = 0L;
-    private boolean isTabTransitioning = false;
-    private static final int TAB_TRANSITION_ANIM_MS = 180;
-
-    // System tab states (for Auto Update check & check now)
-    private boolean autoUpdateCheck = true;
-    private String updateStatusText = "Check Now";
-    private long lastUpdateCheckTime = 0L;
-
-    public void selectTab(int newIndex) {
-        if (newIndex < 0 || newIndex >= navItems.size() || selectedTabIndex == newIndex) {
-            return;
-        }
-        prevTabIndex = selectedTabIndex;
-        selectedTabIndex = newIndex;
-        scrollOffset = 0.0;
-        targetScrollOffset = 0.0;
-        isDraggingScrollbar = false;
-        selectedPillarDetailId = null;
-        if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
-            closeSidePanel();
-        }
-        if ("pillars".equals(navItems.get(newIndex).id)) {
-            syncPillars();
-        }
-        int tabH = 26;
-        int tabGap = 3;
-        int effH = getEffectiveHeight();
-        int panelH = Math.min(effH - 16, 308);
-        int panelY = (effH - panelH) / 2;
-        int headerH = 24;
-        int navY = panelY + 7 + headerH + 5;
-        int startY = navY + 4;
-        prevNavIndicatorY = currentIndicatorY > 0.01f ? currentIndicatorY : (startY + prevTabIndex * (tabH + tabGap));
-        targetNavIndicatorY = startY + newIndex * (tabH + tabGap);
-        navIndicatorStartTime = System.currentTimeMillis();
-        tabTransitionStartTime = System.currentTimeMillis();
-        isTabTransitioning = true;
-    }
-
     private final List<NavItem> navItems = new ArrayList<>();
     private int selectedTabIndex = 0;
     private boolean navExpanded = true;
@@ -334,6 +274,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Per-Pillar Customization Detail View ---
     private String selectedPillarDetailId = null;
+    private String closingPillarDetailId = null;
+    private String prevPillarDetailId = null;
+    private long pillarSwitchStartTime = 0L;
+    private boolean isPillarSwitching = false;
 
     // --- Connected Right Side Panel (Sliding Modifier Drawer) ---
     public enum SidePanelType {
@@ -348,7 +292,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private boolean isSidePanelOpening = false;
     private boolean isSidePanelClosing = false;
     private long sidePanelAnimStartTime = 0L;
-    private static final int SIDE_PANEL_ANIM_MS = 260;
     private int sidePanelScrollOffset = 0;
     private int sidePanelMaxScroll = 0;
 
@@ -356,20 +299,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private float navAnimProgress = 1.0f; // 1.0 = expanded, 0.0 = collapsed
     private boolean isNavAnimating = false;
     private long navAnimStartTime = 0L;
-    private static final int NAV_ANIM_MS = 200;
 
     public void toggleNavExpansion() {
         navExpanded = !navExpanded;
         isNavAnimating = true;
-        navAnimStartTime = System.currentTimeMillis() - (long) ((navExpanded ? navAnimProgress : (1.0f - navAnimProgress)) * NAV_ANIM_MS);
+        int duration = getNavAnimMs();
+        navAnimStartTime = System.currentTimeMillis() - (long) ((navExpanded ? navAnimProgress : (1.0f - navAnimProgress)) * duration);
     }
 
     private void updateNavAnimation() {
         if (!isNavAnimating) return;
         long elapsed = System.currentTimeMillis() - navAnimStartTime;
-        float t = Math.min(1.0f, (float) elapsed / NAV_ANIM_MS);
-        float inv = 1.0f - t;
-        float eased = 1.0f - inv * inv * inv;
+        int duration = getNavAnimMs();
+        float t = Math.min(1.0f, (float) elapsed / duration);
+        float eased = easeOutSine(t);
         if (navExpanded) {
             navAnimProgress = eased;
             if (t >= 1.0f) {
@@ -385,6 +328,59 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
+    // Sidenav indicator glide animation
+    private float prevNavIndicatorY = 0.0f;
+    private float targetNavIndicatorY = 0.0f;
+    private float currentIndicatorY = 0.0f;
+    private long navIndicatorStartTime = 0L;
+
+    // Content area tab switch transition
+    private int prevTabIndex = 0;
+    private long tabTransitionStartTime = 0L;
+    private boolean isTabTransitioning = false;
+
+    // System tab states (for Auto Update check & check now)
+    private boolean autoUpdateCheck = true;
+    private String updateStatusText = "Check Now";
+    private long lastUpdateCheckTime = 0L;
+
+    public void selectTab(int newIndex) {
+        if (newIndex < 0 || newIndex >= navItems.size() || selectedTabIndex == newIndex) {
+            return;
+        }
+        prevTabIndex = selectedTabIndex;
+        selectedTabIndex = newIndex;
+        scrollOffset = 0.0;
+        targetScrollOffset = 0.0;
+        isDraggingScrollbar = false;
+
+        // Smoothly retract side panel while preserving its displayed content during slide-out
+        if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
+            closingPillarDetailId = selectedPillarDetailId;
+            closeSidePanel();
+        } else {
+            selectedPillarDetailId = null;
+            closingPillarDetailId = null;
+        }
+
+        if ("pillars".equals(navItems.get(newIndex).id)) {
+            syncPillars();
+        }
+        int tabH = 26;
+        int tabGap = 3;
+        int effH = getEffectiveHeight();
+        int panelH = Math.min(effH - 16, 308);
+        int panelY = (effH - panelH) / 2;
+        int headerH = 24;
+        int navY = panelY + 7 + headerH + 5;
+        int startY = navY + 4;
+        prevNavIndicatorY = currentIndicatorY > 0.01f ? currentIndicatorY : (startY + prevTabIndex * (tabH + tabGap));
+        targetNavIndicatorY = startY + newIndex * (tabH + tabGap);
+        navIndicatorStartTime = System.currentTimeMillis();
+        tabTransitionStartTime = System.currentTimeMillis();
+        isTabTransitioning = true;
+    }
+
     public void openSidePanel(SidePanelType type) {
         if (sidePanelType == type && (isSidePanelOpening || sidePanelProgress >= 1.0f)) {
             return;
@@ -394,6 +390,28 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         isSidePanelClosing = false;
         int duration = getSidePanelAnimMs();
         sidePanelAnimStartTime = System.currentTimeMillis() - (long) (sidePanelProgress * duration);
+    }
+
+    public void openPillarDetailInSidePanel(String pillarId) {
+        if (pillarId == null) return;
+        if (Objects.equals(selectedPillarDetailId, pillarId) && sidePanelType == SidePanelType.PILLAR_DETAIL && sidePanelProgress >= 0.99f && !isSidePanelClosing) {
+            return;
+        }
+
+        boolean wasAlreadyOpen = (sidePanelType == SidePanelType.PILLAR_DETAIL && sidePanelProgress > 0.05f && !isSidePanelClosing);
+        if (wasAlreadyOpen && !Objects.equals(selectedPillarDetailId, pillarId)) {
+            prevPillarDetailId = selectedPillarDetailId;
+            pillarSwitchStartTime = System.currentTimeMillis();
+            isPillarSwitching = true;
+        } else {
+            prevPillarDetailId = null;
+            pillarSwitchStartTime = System.currentTimeMillis();
+            isPillarSwitching = true;
+        }
+
+        selectedPillarDetailId = pillarId;
+        closingPillarDetailId = null;
+        openSidePanel(SidePanelType.PILLAR_DETAIL);
     }
 
     public void closeSidePanel() {
@@ -412,17 +430,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int duration = getSidePanelAnimMs();
         float t = Math.min(1.0f, (float) elapsed / duration);
         if (isSidePanelOpening) {
-            sidePanelProgress = easeOutSine(t);
+            sidePanelProgress = easeOutCubic(t);
             if (t >= 1.0f) {
                 sidePanelProgress = 1.0f;
                 isSidePanelOpening = false;
             }
         } else if (isSidePanelClosing) {
-            sidePanelProgress = 1.0f - easeInSine(t);
+            sidePanelProgress = 1.0f - easeOutCubic(t);
             if (t >= 1.0f) {
                 sidePanelProgress = 0.0f;
                 isSidePanelClosing = false;
                 sidePanelType = SidePanelType.NONE;
+                closingPillarDetailId = null;
+                selectedPillarDetailId = null;
             }
         }
     }
@@ -2559,109 +2579,104 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(borderCol, alpha));
         }
     }
+    private void drawHorizontalGradientLine(Object poseStackOrGraphics, int x, int y, int w, int startCol, int endCol, float alpha) {
+        if (w <= 0) return;
+        for (int i = 0; i < w; i++) {
+            float t = (float) i / Math.max(1, w - 1);
+            int col = lerpColor(startCol, endCol, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + 1, y + 1, applyAlpha(col, alpha));
+        }
+    }
+
+    private void drawVerticalGradientLine(Object poseStackOrGraphics, int x, int y, int h, int startCol, int endCol, float alpha) {
+        if (h <= 0) return;
+        for (int j = 0; j < h; j++) {
+            float t = (float) j / Math.max(1, h - 1);
+            int col = lerpColor(startCol, endCol, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + 1, y + j + 1, applyAlpha(col, alpha));
+        }
+    }
+
     private void drawBeveledComponent(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
         // 1. Interior Fill
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bgRgb, alpha));
 
         // 2. Bottom & Right dark recessed shadow
-        int dark = applyAlpha(0xFF08080C, alpha);
+        int dark = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
 
-        // 3. Top Edge: Metallic White Gradient Artifact (Bright white on left fading to slate on right)
-        for (int i = 0; i < w - 1; i++) {
-            float t = (float) i / Math.max(1, w - 2);
-            int col = lerpColor(0xFFFFFFFF, 0xFF585868, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + 1, y + 1, applyAlpha(col, alpha));
-        }
-
-        // 4. Left Edge: Metallic White Gradient Artifact (Bright white at top fading to slate at bottom)
-        for (int j = 0; j < h - 1; j++) {
-            float t = (float) j / Math.max(1, h - 2);
-            int col = lerpColor(0xFFFFFFFF, 0xFF444452, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + 1, y + j + 1, applyAlpha(col, alpha));
-        }
+        // 3. Top & Left Metallic Gradient Highlights
+        drawHorizontalGradientLine(poseStackOrGraphics, x, y, w - 1, COLOR_BEVEL_HIGHLIGHT, COLOR_BORDER_SHADOW, alpha);
+        drawVerticalGradientLine(poseStackOrGraphics, x, y, h - 1, COLOR_BEVEL_HIGHLIGHT, COLOR_BORDER_SHADOW, alpha);
     }
 
     // Top & Left Metallic Gradient Button Frame
     private void drawBeveledButton(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, boolean hover, boolean active, float alpha) {
-        int bg = active ? (hover ? 0xFF282836 : 0xFF22222E) : (hover ? 0xFF202028 : bgRgb);
+        int bg = bgRgb;
+        if (active) {
+            bg = hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE;
+        } else if (hover) {
+            bg = COLOR_BTN_BG_HOVER;
+        }
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
 
-        int dark = applyAlpha(0xFF08080C, alpha);
+        int dark = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
 
-        int startCol = active ? 0xFFFFFFFF : (hover ? 0xFFEEEEF6 : 0xFF9696A8);
-        int endCol = active ? 0xFF707085 : (hover ? 0xFF585868 : 0xFF383844);
+        int startCol = active ? COLOR_BEVEL_HIGHLIGHT : (hover ? COLOR_BORDER_GRADIENT_START : COLOR_BTN_BORDER);
+        int endCol = active ? COLOR_BORDER_SHADOW : (hover ? COLOR_BORDER_GRADIENT_END : COLOR_BEVEL_SHADOW);
 
-        for (int i = 0; i < w - 1; i++) {
-            float t = (float) i / Math.max(1, w - 2);
-            int col = lerpColor(startCol, endCol, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + 1, y + 1, applyAlpha(col, alpha));
-        }
-        for (int j = 0; j < h - 1; j++) {
-            float t = (float) j / Math.max(1, h - 2);
-            int col = lerpColor(startCol, endCol, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + 1, y + j + 1, applyAlpha(col, alpha));
-        }
-    }
-
-    // Top & Left Metallic Crimson Red Button (for OFF states / Cancel)
-    private void drawBeveledRedButton(Object poseStackOrGraphics, int x, int y, int w, int h, boolean hover, float alpha) {
-        int bg = hover ? 0xFF4A1A1A : COLOR_TOGGLE_OFF_BG;
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
-
-        int dark = applyAlpha(0xFF200808, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
-
-        int startCol = hover ? 0xFFFFD2D2 : 0xFFFCA5A5;
-        int endCol = hover ? 0xFFF87171 : 0xFFEF4444;
-        for (int i = 0; i < w - 1; i++) {
-            float t = (float) i / Math.max(1, w - 2);
-            int col = lerpColor(startCol, endCol, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + 1, y + 1, applyAlpha(col, alpha));
-        }
-        for (int j = 0; j < h - 1; j++) {
-            float t = (float) j / Math.max(1, h - 2);
-            int col = lerpColor(startCol, endCol, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + 1, y + j + 1, applyAlpha(col, alpha));
-        }
+        drawHorizontalGradientLine(poseStackOrGraphics, x, y, w - 1, startCol, endCol, alpha);
+        drawVerticalGradientLine(poseStackOrGraphics, x, y, h - 1, startCol, endCol, alpha);
     }
 
     // Top & Left Metallic Green Button (for Apply / ON states)
     private void drawBeveledGreenButton(Object poseStackOrGraphics, int x, int y, int w, int h, boolean hover, float alpha) {
-        int bg = hover ? 0xFF1E4828 : COLOR_TOGGLE_ON_BG;
+        boolean light = currentTheme != null && currentTheme.isLight();
+        int bg = hover ? (light ? 0xFFBBF7D0 : 0xFF1E4828) : COLOR_TOGGLE_ON_BG;
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
 
-        int dark = applyAlpha(0xFF0A2412, alpha);
+        int dark = applyAlpha(light ? 0xFF86EFAC : 0xFF0A2412, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
 
-        int startCol = hover ? 0xFFCEFFE0 : 0xFF86EFAC;
-        int endCol = hover ? 0xFF4ADE80 : 0xFF22C55E;
-        for (int i = 0; i < w - 1; i++) {
-            float t = (float) i / Math.max(1, w - 2);
-            int col = lerpColor(startCol, endCol, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + 1, y + 1, applyAlpha(col, alpha));
-        }
-        for (int j = 0; j < h - 1; j++) {
-            float t = (float) j / Math.max(1, h - 2);
-            int col = lerpColor(startCol, endCol, t);
-            Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + 1, y + j + 1, applyAlpha(col, alpha));
-        }
+        int startCol = hover ? (light ? 0xFF4ADE80 : 0xFFCEFFE0) : (light ? 0xFF86EFAC : 0xFF86EFAC);
+        int endCol = hover ? (light ? 0xFF22C55E : 0xFF4ADE80) : (light ? 0xFF22C55E : 0xFF22C55E);
+
+        drawHorizontalGradientLine(poseStackOrGraphics, x, y, w - 1, startCol, endCol, alpha);
+        drawVerticalGradientLine(poseStackOrGraphics, x, y, h - 1, startCol, endCol, alpha);
+    }
+
+    // Top & Left Metallic Crimson Red Button (for OFF states / Cancel)
+    private void drawBeveledRedButton(Object poseStackOrGraphics, int x, int y, int w, int h, boolean hover, float alpha) {
+        boolean light = currentTheme != null && currentTheme.isLight();
+        int bg = hover ? (light ? 0xFFE2E8F0 : 0xFF4A1A1A) : COLOR_TOGGLE_OFF_BG;
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
+
+        int dark = applyAlpha(light ? COLOR_BEVEL_SHADOW : 0xFF200808, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
+
+        int startCol = hover ? (light ? 0xFFCBD5E1 : 0xFFFFD2D2) : (light ? COLOR_BTN_BORDER : 0xFFFCA5A5);
+        int endCol = hover ? (light ? 0xFF94A3B8 : 0xFFF87171) : (light ? COLOR_BEVEL_SHADOW : 0xFFEF4444);
+
+        drawHorizontalGradientLine(poseStackOrGraphics, x, y, w - 1, startCol, endCol, alpha);
+        drawVerticalGradientLine(poseStackOrGraphics, x, y, h - 1, startCol, endCol, alpha);
     }
 
     // Viewport Scissor Helpers
     private void enableGuiScissor(Object poseStackOrGraphics, int guiX, int guiY, int guiW, int guiH) {
         Minecraft mc = Minecraft.getInstance();
         double scale = mc.getWindow().getGuiScale();
+        float uiScale = getGuiUiScale();
+        double totalScale = scale * uiScale;
         int winH = mc.getWindow().getHeight();
-        int sx = (int) Math.round(guiX * scale);
-        int sy = (int) Math.round(winH - (guiY + guiH) * scale);
-        int sw = (int) Math.round(guiW * scale);
-        int sh = (int) Math.round(guiH * scale);
+        int sx = (int) Math.round(guiX * totalScale);
+        int sy = (int) Math.round(winH - (guiY + guiH) * totalScale);
+        int sw = (int) Math.round(guiW * totalScale);
+        int sh = (int) Math.round(guiH * totalScale);
         if (sw > 0 && sh > 0) {
             Services.PLATFORM.enableScissor(poseStackOrGraphics, sx, sy, sw, sh);
         }
@@ -2711,33 +2726,72 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private void drawText(Object poseStackOrGraphics, Font font, String text, int x, int y, int color) {
-        Services.PLATFORM.drawShadow(poseStackOrGraphics, font, text, x, y, color);
+        if (currentTheme != null && currentTheme.isLight()) {
+            Services.PLATFORM.draw(poseStackOrGraphics, font, text, x, y, color);
+        } else {
+            Services.PLATFORM.drawShadow(poseStackOrGraphics, font, text, x, y, color);
+        }
+    }
+
+    private void drawCenteredText(Object poseStackOrGraphics, Font font, String text, int centerX, int y, int color) {
+        if (text == null) return;
+        int textW = font.width(text);
+        int startX = centerX - textW / 2;
+        if (currentTheme != null && currentTheme.isLight()) {
+            Services.PLATFORM.draw(poseStackOrGraphics, font, text, startX, y, color);
+        } else {
+            Services.PLATFORM.drawShadow(poseStackOrGraphics, font, text, startX, y, color);
+        }
     }
 
     // --- Top Center Crest Badge (Buildscape Logo Beveled Frame) ---
+    private static final CommonId LOGO_TEXTURE = CommonId.of("buildscape", "textures/gui/logo.png");
+
     private void drawTopCrestBadge(Object poseStackOrGraphics, Font font, int frameX, int frameY, int frameW, float alpha) {
-        int crestW = 124;
-        int crestH = 18;
+        int crestW = 148;
+        int crestH = 46;
         int crestX = frameX + (frameW - crestW) / 2;
-        int crestY = frameY - 12;
+        int crestY = frameY - 18; // Moved up by 6 pixels
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
+        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
 
+        // --- Step A: Base Panel Cutout Socket (Extra beveled border carved out of base panel) ---
+        int pad = 3;
+        int sockX = crestX - pad;
+        int sockY = crestY - pad;
+        int sockW = crestW + pad * 2;
+        int sockH = crestH + pad * 2;
+
+        // 1. Socket background filling the cutout section
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX, sockY, sockX + sockW, sockY + sockH, applyAlpha(COLOR_PANEL_BG, alpha));
+
+        // 2. 1px Black Border outline around cutout socket
+        drawBorder(poseStackOrGraphics, sockX, sockY, sockW, sockH, black);
+
+        // 3. Socket metallic highlight on top & left
+        drawHorizontalGradientLine(poseStackOrGraphics, sockX + 1, sockY + 1, sockW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        drawVerticalGradientLine(poseStackOrGraphics, sockX + 1, sockY + 1, sockH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+
+        // 4. Socket shadow on bottom & right
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + sockH - 2, sockX + sockW - 1, sockY + sockH - 2, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX + sockW - 2, sockY + 1, sockX + sockW - 1, sockY + sockH - 1, shadow);
+
+        // 5. Recessed dark groove between socket and logo holder
+        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 2, sockY + 2, sockX + sockW - 2, sockY + sockH - 2, applyAlpha(COLOR_INNER_DARK, alpha * 0.75f));
+
+        // --- Step B: Logo Holder Badge (Nested inside the beveled socket) ---
         // 1. Solid Outer Chassis Body
         Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + crestW, crestY + crestH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         // 2. 1px Black Border Outline
-        Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + crestW, crestY + 1, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY + crestH - 1, crestX + crestW, crestY + crestH, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + 1, crestY + crestH, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, crestX + crestW - 1, crestY, crestX + crestW, crestY + crestH, black);
+        drawBorder(poseStackOrGraphics, crestX, crestY, crestW, crestH, black);
 
         // 3. Top & Left Metallic Gradient Highlights
         drawHorizontalGradientLine(poseStackOrGraphics, crestX + 1, crestY + 1, crestW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         drawVerticalGradientLine(poseStackOrGraphics, crestX + 1, crestY + 1, crestH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
 
         // 4. Bottom & Right Shadow
-        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, crestX + 1, crestY + crestH - 2, crestX + crestW - 1, crestY + crestH - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, crestX + crestW - 2, crestY + 1, crestX + crestW - 1, crestY + crestH - 1, shadow);
 
@@ -2756,9 +2810,24 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY + plateH - 1, plateX + plateW, plateY + plateH, bHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, plateX + plateW - 1, plateY, plateX + plateW, plateY + plateH, bHighlight);
 
-        // 6. Logo / Emblem
-        int textCol = applyAlpha(COLOR_ACCENT, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "✦ BUILDCAPE ✦", crestX + crestW / 2, plateY + (plateH - 8) / 2, textCol);
+        // 6. Proportional Buildscape Logo Texture
+        int maxLogoW = plateW - 10;
+        int maxLogoH = plateH - 6;
+        int logoH = Math.min(36, maxLogoH);
+        int logoW = (int) Math.round(logoH * (1024.0 / 572.0));
+        if (logoW > maxLogoW) {
+            logoW = maxLogoW;
+            logoH = (int) Math.round(logoW * (572.0 / 1024.0));
+        }
+        int logoX = plateX + (plateW - logoW) / 2;
+        int logoY = plateY + (plateH - logoH) / 2;
+
+        try {
+            Services.PLATFORM.blit(poseStackOrGraphics, LOGO_TEXTURE, logoX, logoY, logoW, logoH, 0.0f, 0.0f, 1024, 572, 1024, 572);
+        } catch (Exception e) {
+            int textCol = applyAlpha(COLOR_ACCENT, alpha);
+            drawCenteredText(poseStackOrGraphics, font, "✦ BUILDSCAPE ✦", crestX + crestW / 2, plateY + (plateH - 8) / 2, textCol);
+        }
     }
 
     // --- Unified Custom Scrollbar (6px width, clean metallic bevels, no gradient banding) ---

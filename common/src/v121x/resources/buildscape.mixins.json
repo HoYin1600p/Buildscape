@@ -58,6 +58,7 @@
     "GuiGraphicsTooltipMixin",
     "PauseScreenMixin",
     "ScreenMixin",
+    "SignRendererMixin",
     "ThrownTridentRendererMixin",
     "client.AdvancementsScreenMixin",
     "client.ClientTooltipComponentMixin",

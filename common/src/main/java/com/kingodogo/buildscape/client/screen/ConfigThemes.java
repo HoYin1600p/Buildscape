@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.screen;
 
+import com.kingodogo.buildscape.config.BuildscapeClientConfig;
 import java.util.Arrays;
 import java.util.List;
 
@@ -195,6 +196,13 @@ public class ConfigThemes {
     private static final List<Theme> THEMES = Arrays.asList(DARK, LIGHT);
     private static int activeThemeIndex = 0;
 
+    static {
+        try {
+            String saved = BuildscapeClientConfig.get().getUiTheme();
+            setThemeById(saved);
+        } catch (Exception ignored) {}
+    }
+
     public static List<Theme> getAllThemes() {
         return THEMES;
     }
@@ -218,6 +226,16 @@ public class ConfigThemes {
     public static void setThemeIndex(int index) {
         if (index >= 0 && index < THEMES.size()) {
             activeThemeIndex = index;
+        }
+    }
+
+    public static void setThemeById(String id) {
+        if (id == null) return;
+        for (int i = 0; i < THEMES.size(); i++) {
+            if (THEMES.get(i).id.equalsIgnoreCase(id)) {
+                activeThemeIndex = i;
+                return;
+            }
         }
     }
 

@@ -28,7 +28,7 @@ import net.minecraft.world.phys.AABB;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-public class PillarBlockEntity extends DataBlockEntity implements Container {
+public class PillarBlockEntity extends DataBlockEntity {
 
     public static final int MAX_DYE_COLORS = 5;
 
@@ -797,71 +797,6 @@ public class PillarBlockEntity extends DataBlockEntity implements Container {
         setChanged();
     }
 
-    @Override
-    public int getContainerSize() {
-        return 1;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return displayedItem.isEmpty();
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return slot == 0 ? displayedItem : ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeItem(int slot, int amount) {
-        if (slot == 0 && !displayedItem.isEmpty()) {
-            ItemStack split = displayedItem.split(amount);
-            if (displayedItem.isEmpty()) {
-                displayedItem = ItemStack.EMPTY;
-            }
-            setChanged();
-            if (level != null && !level.isClientSide()) {
-                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-            }
-            return split;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        if (slot == 0) {
-            ItemStack res = displayedItem;
-            displayedItem = ItemStack.EMPTY;
-            return res;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot == 0) {
-            displayedItem = stack;
-            setChanged();
-            if (level != null && !level.isClientSide()) {
-                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-            }
-        }
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        if (this.level == null || this.level.getBlockEntity(this.worldPosition) != this) {
-            return false;
-        }
-        return player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) <= 64.0D;
-    }
-
-    @Override
-    public void clearContent() {
-        displayedItem = ItemStack.EMPTY;
-        setChanged();
-    }
 
     public AABB getRenderBoundingBox() {
         if (!hasDisplayItem()) {

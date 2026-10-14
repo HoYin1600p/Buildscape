@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.config.BuildscapeClientConfig;
 import com.kingodogo.buildscape.platform.Services;
+import com.kingodogo.buildscape.util.CommonId;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,12 +45,58 @@ public class ConfigBackgrounds {
             { 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
-    // Registered Backgrounds
+    // Wallpaper Texture Identifiers (Loaded from assets/buildscape/textures/gui/backgrounds/)
+    public static final CommonId TEX_ANCIENT_TEMPLE = CommonId.of("buildscape", "textures/gui/backgrounds/ancient_temple.png");
+    public static final CommonId TEX_CHERRY_GROVE = CommonId.of("buildscape", "textures/gui/backgrounds/cherry_grove.png");
+    public static final CommonId TEX_DEEP_DARK = CommonId.of("buildscape", "textures/gui/backgrounds/deep_dark.png");
+    public static final CommonId TEX_END_HIGHLANDS = CommonId.of("buildscape", "textures/gui/backgrounds/end_highlands.png");
+    public static final CommonId TEX_LAVA_PALACE = CommonId.of("buildscape", "textures/gui/backgrounds/lava_palace.png");
+    public static final CommonId TEX_MESSA_CITY = CommonId.of("buildscape", "textures/gui/backgrounds/messa_city.png");
+    public static final CommonId TEX_SCHEMATIC = CommonId.of("buildscape", "textures/gui/backgrounds/schematic.png");
+
+    // 1. None
     public static final Background NONE = new Background(
             "none", "None",
             (poseStackOrGraphics, x, y, width, height, alpha, theme) -> {}
     );
 
+    // 2. Wallpaper Artworks (Imported from E:\Minecraft\Buildscape-com\imports)
+    public static final Background ANCIENT_TEMPLE = new Background(
+            "ancient_temple", "Ancient Temple",
+            (ps, x, y, w, h, a, t) -> drawImageBackground(ps, TEX_ANCIENT_TEMPLE, x, y, w, h, a, t)
+    );
+
+    public static final Background CHERRY_GROVE = new Background(
+            "cherry_grove", "Cherry Grove",
+            (ps, x, y, w, h, a, t) -> drawImageBackground(ps, TEX_CHERRY_GROVE, x, y, w, h, a, t)
+    );
+
+    public static final Background DEEP_DARK = new Background(
+            "deep_dark", "Deep Dark",
+            (ps, x, y, w, h, a, t) -> drawImageBackground(ps, TEX_DEEP_DARK, x, y, w, h, a, t)
+    );
+
+    public static final Background END_HIGHLANDS = new Background(
+            "end_highlands", "End Highlands",
+            (ps, x, y, w, h, a, t) -> drawImageBackground(ps, TEX_END_HIGHLANDS, x, y, w, h, a, t)
+    );
+
+    public static final Background LAVA_PALACE = new Background(
+            "lava_palace", "Lava Palace",
+            (ps, x, y, w, h, a, t) -> drawImageBackground(ps, TEX_LAVA_PALACE, x, y, w, h, a, t)
+    );
+
+    public static final Background MESSA_CITY = new Background(
+            "messa_city", "Mesa City",
+            (ps, x, y, w, h, a, t) -> drawImageBackground(ps, TEX_MESSA_CITY, x, y, w, h, a, t)
+    );
+
+    public static final Background SCHEMATIC = new Background(
+            "schematic", "Schematic",
+            (ps, x, y, w, h, a, t) -> drawImageBackground(ps, TEX_SCHEMATIC, x, y, w, h, a, t)
+    );
+
+    // 3. Creeper Backdrops
     public static final Background GREEN_CREEPER = new Background(
             "green_creeper", "Green Creeper",
             ConfigBackgrounds::drawGreenCreeperBackground
@@ -72,6 +119,13 @@ public class ConfigBackgrounds {
 
     private static final List<Background> BACKGROUNDS = Arrays.asList(
             NONE,
+            ANCIENT_TEMPLE,
+            CHERRY_GROVE,
+            DEEP_DARK,
+            END_HIGHLANDS,
+            LAVA_PALACE,
+            MESSA_CITY,
+            SCHEMATIC,
             GREEN_CREEPER,
             GOLDEN_CREEPER,
             DIAMOND_CREEPER,
@@ -150,6 +204,22 @@ public class ConfigBackgrounds {
 
     public static void drawCurrentBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         getCurrentBackground().draw(poseStackOrGraphics, x, y, width, height, alpha, theme);
+    }
+
+    // =========================================================================
+    // Wallpaper Image Renderer
+    // =========================================================================
+    public static void drawImageBackground(Object poseStackOrGraphics, CommonId texture, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        if (width <= 0 || height <= 0 || alpha <= 0.001f || texture == null) return;
+
+        // 1. Draw texture stretched across the inner container basin
+        Services.PLATFORM.blit(poseStackOrGraphics, texture, x, y, width, height, 0.0f, 0.0f, width, height, width, height);
+
+        // 2. Atmospheric shading overlay to preserve optimal contrast for text & controls
+        boolean light = theme != null && theme.isLight();
+        int washCol = light ? 0xFFFFFFFF : 0xFF08080C;
+        float washAlpha = light ? 0.32f : 0.42f;
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + width, y + height, applyAlpha(washCol, alpha * washAlpha));
     }
 
     // =========================================================================

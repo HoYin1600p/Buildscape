@@ -14,7 +14,8 @@
     "fabric.FireballGriefingMixin",
     "fabric.ExplosionGriefingMixin",
     "fabric.SneakBypassUseMixin",
-    "fabric.StrawBedSpawnMixin"
+    "fabric.StrawBedSpawnMixin",
+    "fabric.LivingEntityLadderMixin"
   ],
   "client": [
     "client.KeyboardInputMixin",

@@ -23,8 +23,11 @@ public final class FabricGameplayEvents {
                 com.kingodogo.buildscape.command.BuildscapeCommands.register(dispatcher));
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> player.isSpectator() ? InteractionResult.PASS
                 : ModCommonEvents.onRightClickBlock(player, level, hand, hit.getBlockPos(), hit.getDirection()));
-        UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> player.isSpectator() ? InteractionResult.PASS
-                : ModCommonEvents.onEntityInteract(player, level, hand, entity));
+        UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+            if (player.isSpectator()) return InteractionResult.PASS;
+            var golden = GoldenDandelionHandler.onEntityInteract(player, level, hand, entity);
+            return golden != InteractionResult.PASS ? golden : ModCommonEvents.onEntityInteract(player, level, hand, entity);
+        });
         AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> player.isSpectator() ? InteractionResult.PASS
                 : ModCommonEvents.onLeftClickBlock(player, level, pos));
         UseItemCallback.EVENT.register((player, level, hand) -> {

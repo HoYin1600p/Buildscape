@@ -1,0 +1,32 @@
+{
+  "values": [
+    "buildscape:ashpen_black_planks",
+    "buildscape:ashpen_blue_planks",
+    "buildscape:ashpen_brown_planks",
+    "buildscape:ashpen_cyan_planks",
+    "buildscape:ashpen_gray_planks",
+    "buildscape:ashpen_green_planks",
+    "buildscape:ashpen_light_blue_planks",
+    "buildscape:ashpen_light_gray_planks",
+    "buildscape:ashpen_lime_planks",
+    "buildscape:ashpen_log",
+    "buildscape:ashpen_magenta_planks",
+    "buildscape:ashpen_orange_planks",
+    "buildscape:ashpen_pink_planks",
+    "buildscape:ashpen_purple_planks",
+    "buildscape:ashpen_red_planks",
+    "buildscape:ashpen_white_planks",
+    "buildscape:ashpen_wood",
+    "buildscape:ashpen_yellow_planks",
+    "buildscape:bamboo_wood",
+    "buildscape:creaking_heart",
+    "buildscape:poplar_log",
+    "buildscape:poplar_planks",
+    "buildscape:poplar_wood",
+    "buildscape:stripped_ashpen_log",
+    "buildscape:stripped_ashpen_wood",
+    "buildscape:stripped_bamboo_wood",
+    "buildscape:stripped_poplar_log",
+    "buildscape:stripped_poplar_wood"
+  ]
+}

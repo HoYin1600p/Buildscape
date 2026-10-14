@@ -39,6 +39,25 @@ public final class FabricClientAccess {
             public <T extends net.minecraft.world.level.block.entity.BlockEntity> void registerBlockEntity(
                     net.minecraft.world.level.block.entity.BlockEntityType<T> type,
                     net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<T> provider) {
+                if (type == com.kingodogo.buildscape.block.ModBlockEntities.PILLAR_TYPE) {
+                    // Fabric has no render-bounding-box culling hook: let pillars with a display render off screen
+                    // so the expanded display bounds are not cut off at the screen edge.
+                    net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry.register(type, context -> {
+                        net.minecraft.client.renderer.blockentity.BlockEntityRenderer<T> delegate = provider.create(context);
+                        return new net.minecraft.client.renderer.blockentity.BlockEntityRenderer<T>() {
+                            public void render(T be, float partialTick, com.mojang.blaze3d.vertex.PoseStack poseStack,
+                                    net.minecraft.client.renderer.MultiBufferSource buffer, int light, int overlay) {
+                                delegate.render(be, partialTick, poseStack, buffer, light, overlay);
+                            }
+                            public boolean shouldRenderOffScreen(T be) { return true; }
+                            public boolean shouldRender(T be, net.minecraft.world.phys.Vec3 camera) {
+                                return be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar
+                                        && pillar.hasDisplayItem() && delegate.shouldRender(be, camera);
+                            }
+                        };
+                    });
+                    return;
+                }
                 net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry.register(type, provider);
             }
             public <T extends net.minecraft.world.entity.Entity> void registerEntity(net.minecraft.world.entity.EntityType<T> type,

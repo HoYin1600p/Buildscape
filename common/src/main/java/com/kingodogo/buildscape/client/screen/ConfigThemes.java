@@ -107,6 +107,14 @@ public class ConfigThemes {
             this.colorAccent = colorAccent;
             this.colorAccentGlow = colorAccentGlow;
         }
+
+        public boolean isLight() {
+            return "light".equalsIgnoreCase(this.id);
+        }
+
+        public boolean isDark() {
+            return "dark".equalsIgnoreCase(this.id);
+        }
     }
 
     public static final Theme DARK = new Theme(
@@ -150,40 +158,40 @@ public class ConfigThemes {
 
     public static final Theme LIGHT = new Theme(
             "light", "Light",
-            0x60000000, // overlay
-            0xFFECEEF4, // panelBg
-            0xFFD8DCE6, // chassisBody
-            0xFFFFFFFF, // innerDark
-            0xFFE0E4EC, // headerBg
-            0xFF5A6072, // frameBlack
-            0xFFFFFFFF, // borderGradientStart
-            0xFFB4BAC8, // borderGradientEnd
-            0xFF9AA0B0, // borderShadow
-            0xFFCCD1DC, // chassisBand
-            0xFFB4B9C6, // bevelShadow
+            0x70000000, // overlay
+            0xFFF0F2F6, // panelBg
+            0xFFE2E5EC, // chassisBody
+            0xFFE8ECF2, // innerDark (recessed container basin)
+            0xFFDDE2EB, // headerBg (distinct clean header bar)
+            0xFF181C24, // frameBlack (crisp dark outer perimeter line)
+            0xFFFFFFFF, // borderGradientStart (bright specular top-left highlight)
+            0xFFC8CFDC, // borderGradientEnd (smooth bevel blend)
+            0xFFA6AFBE, // borderShadow (soft bottom bevel shadow)
+            0xFFD2D8E3, // chassisBand
+            0xFFB2BAC8, // bevelShadow
             0xFFFFFFFF, // bevelHighlight
-            0xFF1A1D24, // textWhite (crisp deep dark graphite text)
-            0xFF4A5160, // textSilver (readable secondary text)
-            0xFF747C8E, // textMuted (soft helper text)
-            0xFFF4F6FA, // rowBg
-            0xFFEAEFF8, // rowBgHover
-            0xFFD0D5E0, // rowBorder
-            0xFFA0A8B8, // rowBorderHover
+            0xFF0F172A, // textWhite (crisp deep dark graphite text - primary headings & values)
+            0xFF334155, // textSilver (readable secondary text - coordinates & labels)
+            0xFF64748B, // textMuted (soft helper text - descriptions & inactive badges)
+            0xFFFFFFFF, // rowBg (pure white elevated card)
+            0xFFF6F8FC, // rowBgHover (elevated hover)
+            0xFFCDD3DE, // rowBorder (clean 1px card border)
+            0xFF0284C7, // rowBorderHover (crisp accent hover highlight)
             0xFFDCFCE7, // toggleOnBg
             0xFF22C55E, // toggleOnBorder
             0xFF15803D, // toggleOnText
-            0xFFF0F2F6, // toggleOffBg
-            0xFFB8BFCF, // toggleOffBorder
-            0xFF6A7282, // toggleOffText
-            0xFFE6E9F0, // btnBg
-            0xFFF4F6FA, // btnBgHover
-            0xFFD6DBE6, // btnBgActive
-            0xFFB8BFCF, // btnBorder
-            0xFF808898, // btnBorderHover
-            0xFFF0F2F6, // slotBg
-            0xFFFFFFFF, // slotBgHover
-            0xFFD0D5E0, // slotBorder
-            0xFF0284C7, // accent
+            0xFFF1F3F7, // toggleOffBg
+            0xFFBAC1CF, // toggleOffBorder
+            0xFF64748B, // toggleOffText
+            0xFFFFFFFF, // btnBg (clean white elevated button)
+            0xFFF0F4FA, // btnBgHover
+            0xFFE2E7F2, // btnBgActive
+            0xFFBFC6D4, // btnBorder
+            0xFF0284C7, // btnBorderHover
+            0xFFE0E5EE, // slotBg
+            0xFFEEF2F8, // slotBgHover
+            0xFFBDC5D3, // slotBorder
+            0xFF0284C7, // accent (vibrant azure blue)
             0x400284C7  // accentGlow
     );
 

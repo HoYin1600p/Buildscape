@@ -1061,16 +1061,33 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int frameH = panelH + bevelExpansion * 2;
         int frameRight = frameX + frameW;
 
-        int sidePanelH = Math.min(264, frameH - 44);
-        int sidePanelY = frameY + (frameH - sidePanelH) / 2;
+        int sidePanelH;
+        int sidePanelY;
+        int sidePanelX;
+        int sidePanelW;
 
-        int dockX = frameRight - 2;
-        int slideOffset = (int) Math.round((1.0f - sidePanelProgress) * sidePanelTargetW);
-        int sidePanelX = dockX - slideOffset;
+        if (sidePanelType == SidePanelType.PRESETS) {
+            int tabW = 20;
+            int tabH = 28;
+            int targetW = sidePanelTargetW;
+            int targetH = Math.min(264, frameH - 44);
+            sidePanelY = frameY + 36;
+            sidePanelX = frameRight - 2;
+            sidePanelW = (int) Math.round(tabW + (targetW - tabW) * sidePanelProgress);
+            sidePanelH = (int) Math.round(tabH + (targetH - tabH) * sidePanelProgress);
+        } else {
+            sidePanelH = Math.min(264, frameH - 44);
+            sidePanelY = frameY + (frameH - sidePanelH) / 2;
+
+            int dockX = frameRight - 2;
+            int slideOffset = (int) Math.round((1.0f - sidePanelProgress) * sidePanelTargetW);
+            sidePanelX = dockX - slideOffset;
+            sidePanelW = sidePanelTargetW;
+        }
 
         return new SidePanelLayout(panelX, panelY, panelW, panelH,
                 frameX, frameY, frameW, frameH, frameRight,
-                sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, false);
+                sidePanelX, sidePanelY, sidePanelW, sidePanelH, false);
     }
 
     // --- Main Rendering ---
@@ -2345,77 +2362,81 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private void renderSidePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         if (sidePanelType == SidePanelType.NONE) return;
 
-        // 1. Chassis Frame
+        // 1. Chassis Frame (animates smoothly in 2 directions for Presets, or slides for others)
         drawConnectedSidePanelFrame(poseStackOrGraphics, x, y, w, h, COLOR_PANEL_BG, alpha);
 
-        // 2. Header
-        int sHeadX = x + 6;
-        int sHeadY = y + 7;
-        int sHeadW = w - 12;
-        int sHeadH = 22;
-        drawBeveledComponent(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, COLOR_HEADER_BG, alpha);
+        if (w >= 60 && h >= 40) {
+            // 2. Header
+            int sHeadX = x + 6;
+            int sHeadY = y + 7;
+            int sHeadW = w - 12;
+            int sHeadH = 22;
+            drawBeveledComponent(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, COLOR_HEADER_BG, alpha);
 
-        String titleText = "Modifiers";
-        if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
-            String activeId = selectedPillarDetailId != null ? selectedPillarDetailId : closingPillarDetailId;
-            PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(activeId);
-            if (data != null && data.id != null) {
-                titleText = "Pillar: " + font.plainSubstrByWidth(data.id, sHeadW - 32);
-            } else {
-                titleText = "Pillar Modifiers";
+            String titleText = "Modifiers";
+            if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
+                String activeId = selectedPillarDetailId != null ? selectedPillarDetailId : closingPillarDetailId;
+                PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(activeId);
+                if (data != null && data.id != null) {
+                    titleText = "Pillar: " + font.plainSubstrByWidth(data.id, sHeadW - 32);
+                } else {
+                    titleText = "Pillar Modifiers";
+                }
+            } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
+                titleText = isEditingPillarColor ? "Pillar Color" : "Particle Color";
+            } else if (sidePanelType == SidePanelType.PRESETS) {
+                titleText = "Presets";
             }
-        } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
-            titleText = isEditingPillarColor ? "Pillar Color" : "Particle Color";
-        } else if (sidePanelType == SidePanelType.PRESETS) {
-            titleText = "Presets";
-        }
 
-        long now = System.currentTimeMillis();
-        float switchProgress = 1.0f;
-        if (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching) {
-            long switchElapsed = now - pillarSwitchStartTime;
-            int switchDur = Math.max(1, (int) (220 * getAnimSpeedMultiplier()));
-            if (switchElapsed < switchDur) {
-                switchProgress = easeOutCubic((float) switchElapsed / switchDur);
-            } else {
-                isPillarSwitching = false;
+            long now = System.currentTimeMillis();
+            float switchProgress = 1.0f;
+            if (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching) {
+                long switchElapsed = now - pillarSwitchStartTime;
+                int switchDur = Math.max(1, (int) (220 * getAnimSpeedMultiplier()));
+                if (switchElapsed < switchDur) {
+                    switchProgress = easeOutCubic((float) switchElapsed / switchDur);
+                } else {
+                    isPillarSwitching = false;
+                }
             }
-        }
 
-        int titleOffsetX = (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching)
-                ? (int) Math.round((1.0f - switchProgress) * 8) : 0;
-        float titleAlpha = (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching)
-                ? alpha * (0.25f + 0.75f * switchProgress) : alpha;
+            int titleOffsetX = (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching)
+                    ? (int) Math.round((1.0f - switchProgress) * 8) : 0;
+            float titleAlpha = (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching)
+                    ? alpha * (0.25f + 0.75f * switchProgress) : alpha;
 
-        drawText(poseStackOrGraphics, font, titleText, sHeadX + 6 + titleOffsetX, sHeadY + 7, applyAlpha(COLOR_TEXT_WHITE, titleAlpha));
+            drawText(poseStackOrGraphics, font, titleText, sHeadX + 6 + titleOffsetX, sHeadY + 7, applyAlpha(COLOR_TEXT_WHITE, titleAlpha));
 
-        if (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching) {
-            float glowAlpha = (1.0f - switchProgress) * 0.45f * alpha;
-            drawBorder(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, applyAlpha(COLOR_ACCENT, glowAlpha));
-        }
+            if (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching) {
+                float glowAlpha = (1.0f - switchProgress) * 0.45f * alpha;
+                drawBorder(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, applyAlpha(COLOR_ACCENT, glowAlpha));
+            }
 
-        // Close Button [ ✕ ]
-        int closeSize = 14;
-        int closeX = sHeadX + sHeadW - closeSize - 4;
-        int closeY = sHeadY + 4;
-        boolean hoverClose = mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize;
-        int closeBg = hoverClose ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
-        drawBeveledButton(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, closeBg, hoverClose, false, alpha);
-        int closeCol = hoverClose ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
-        drawCenteredText(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
+            // Close Button [ ✕ ]
+            int closeSize = 14;
+            int closeX = sHeadX + sHeadW - closeSize - 4;
+            int closeY = sHeadY + 4;
+            boolean hoverClose = mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize;
+            int closeBg = hoverClose ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
+            drawBeveledButton(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, closeBg, hoverClose, false, alpha);
+            int closeCol = hoverClose ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
+            drawCenteredText(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
 
-        // 3. Content Area
-        int sContentX = x + 6;
-        int sContentY = sHeadY + sHeadH + 4;
-        int sContentW = sHeadW;
-        int sContentH = (y + h - 7) - sContentY;
+            // 3. Content Area
+            int sContentX = x + 6;
+            int sContentY = sHeadY + sHeadH + 4;
+            int sContentW = sHeadW;
+            int sContentH = (y + h - 7) - sContentY;
 
-        if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
-            renderSidePanelPillarDetail(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
-        } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
-            renderSidePanelColorPicker(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
-        } else if (sidePanelType == SidePanelType.PRESETS) {
-            renderSidePanelPresets(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+            if (sContentH > 20) {
+                if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
+                    renderSidePanelPillarDetail(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+                } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
+                    renderSidePanelColorPicker(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+                } else if (sidePanelType == SidePanelType.PRESETS) {
+                    renderSidePanelPresets(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+                }
+            }
         }
     }
 
@@ -2487,8 +2508,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private void drawPresetsSideTab(Object poseStackOrGraphics, Font font, int frameRight, int tabY, int mouseX, int mouseY, float alpha) {
-        int tabW = 60;
-        int tabH = 22;
+        int tabW = 20;
+        int tabH = 28;
         int tabX = frameRight - 2;
 
         boolean hover = mouseX >= tabX && mouseX <= tabX + tabW + 6 && mouseY >= tabY && mouseY <= tabY + tabH;
@@ -2497,33 +2518,61 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
-        int highlight = applyAlpha(COLOR_BORDER_GRADIENT_START, alpha);
-        int btnBg = applyAlpha(hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, alpha);
+        int sideBand = applyAlpha(COLOR_CHASSIS_BAND, alpha);
+        int sideBevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int sideBevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
+        int btnBg = applyAlpha(hover ? COLOR_BTN_BG_HOVER : COLOR_PANEL_BG, alpha);
 
-        // Solid chassis backing
+        // 1. Solid chassis body backing
         Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + currentW, tabY + tabH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
-        // 1px Black Border (Top, Right, Bottom - seamlessly attached on left to frame)
+        // 2. Outermost 1px Black Border (Top, Right, Bottom - seamlessly attached on left to frame)
         Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + currentW, tabY + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 1, tabX + currentW, tabY + tabH, black);
         Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 1, tabY, tabX + currentW, tabY + tabH, black);
 
-        // Top highlight
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 1, tabX + currentW - 1, tabY + 2, highlight);
-
-        // Right & Bottom shadow
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 2, tabY + 1, tabX + currentW - 1, tabY + tabH - 1, shadow);
+        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top) & Shadow (Bottom & Right)
+        drawHorizontalGradientLine(poseStackOrGraphics, tabX, tabY + 1, currentW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 2, tabX + currentW - 1, tabY + tabH - 1, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 2, tabY + 1, tabX + currentW - 1, tabY + tabH - 1, shadow);
 
-        // Inner button fill
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 2, tabX + currentW - 2, tabY + tabH - 2, btnBg);
+        // 4. Outer Chassis Band (offset 2)
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 2, tabX + currentW - 2, tabY + 3, sideBand);
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 3, tabX + currentW - 2, tabY + tabH - 2, sideBand);
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 3, tabY + 2, tabX + currentW - 2, tabY + tabH - 2, sideBand);
 
-        // Label: "▤ Presets"
-        int textCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
-        drawCenteredText(poseStackOrGraphics, font, "▤ Presets", tabX + (currentW / 2), tabY + 5, applyAlpha(textCol, alpha));
+        // 5. Stepped Bevel Ridge (offset 3)
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 3, tabX + currentW - 3, tabY + 4, sideBevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 4, tabX + currentW - 3, tabY + tabH - 3, sideBevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 4, tabY + 3, tabX + currentW - 3, tabY + tabH - 3, sideBevelHighlight);
+
+        // 6. Inner button fill
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 4, tabX + currentW - 4, tabY + tabH - 4, btnBg);
+
+        // 7. Presets Equalizer/Sliders Icon
+        int cx = tabX + (currentW - 2) / 2;
+        int cy = tabY + tabH / 2;
+        int trkCol = applyAlpha(hover ? (currentTheme.isLight() ? 0xFF64748B : 0xFF94A3B8) : (currentTheme.isLight() ? 0xFF94A3B8 : COLOR_CHASSIS_BAND), alpha);
+        int knobCol = applyAlpha(hover ? COLOR_ACCENT : (currentTheme.isLight() ? 0xFF334155 : COLOR_TEXT_WHITE), alpha);
+        int knobHighlight = applyAlpha(hover ? 0xFFFFFFFF : (currentTheme.isLight() ? 0xFFFFFFFF : 0xFFCCCCCC), alpha);
+
+        // Slider 1 (Top: knob at left)
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 5, cy - 6, cx + 5, cy - 5, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 3, cy - 8, cx - 1, cy - 3, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 2, cy - 7, cx - 1, cy - 4, knobHighlight);
+
+        // Slider 2 (Middle: knob at right)
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 5, cy, cx + 5, cy + 1, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx + 1, cy - 2, cx + 3, cy + 3, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx + 2, cy - 1, cx + 3, cy + 2, knobHighlight);
+
+        // Slider 3 (Bottom: knob at center)
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 5, cy + 6, cx + 5, cy + 7, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 2, cy + 4, cx, cy + 9, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 1, cy + 5, cx, cy + 8, knobHighlight);
 
         if (hover) {
-            deferredTooltip = Collections.singletonList(ComponentHelper.literal("Presets (Click to Expand)"));
+            deferredTooltip = Collections.singletonList(ComponentHelper.literal("Presets (Click to Open)"));
             deferredTooltipX = rawMouseX + 12;
             deferredTooltipY = rawMouseY;
         }
@@ -3368,9 +3417,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (selectedTabIndex == 0 && sidePanelProgress < 0.05f) {
             int tabX = layout.frameRight - 2;
             int tabY = frameY + 36;
-            int tabW = 66;
-            int tabH = 22;
-            if (mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH) {
+            int tabW = 20;
+            int tabH = 28;
+            if (mouseX >= tabX && mouseX <= tabX + tabW + 6 && mouseY >= tabY && mouseY <= tabY + tabH) {
                 openSidePanel(SidePanelType.PRESETS);
                 return true;
             }

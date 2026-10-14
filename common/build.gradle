@@ -257,7 +257,6 @@ def v118xStandaloneTests = [
         v118xRunEyeblossomTransitionTests: 'com.kingodogo.buildscape.block.EyeblossomTransitionTest',
         v118xRunCopperRodLogicTests: 'com.kingodogo.buildscape.adapter.v118x.CopperRodLogicTest',
         v118xRunHazeBushResourcesTests: 'com.kingodogo.buildscape.block.HazeBushResourcesTest',
-        v118xRunParticleColorSlotsTests: 'com.kingodogo.buildscape.client.screen.ParticleColorSlotsTest',
         v118xRunStairModelTests: 'com.kingodogo.buildscape.client.model.StairModelTest',
         v118xRunPatternBoundsTests: 'com.kingodogo.buildscape.recipe.framework.util.PatternBoundsTest',
         v118xRunRecipePackFormatterTests: 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatterTest',

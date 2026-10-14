@@ -7,6 +7,7 @@ import com.kingodogo.buildscape.adapter.v118x.client.BuildscapeRenderLayers;
 import com.kingodogo.buildscape.adapter.v118x.client.DryFoliageColor;
 import com.kingodogo.buildscape.adapter.v118x.client.FoliageColors;
 import com.kingodogo.buildscape.adapter.v118x.client.HazeBushParticleHandler;
+import com.kingodogo.buildscape.adapter.v118x.client.MixinClientHooks;
 import com.kingodogo.buildscape.adapter.v118x.client.ShulkerTooltipComponent;
 import com.kingodogo.buildscape.client.ClientEvents;
 import com.kingodogo.buildscape.client.CopperChestClientEvents;
@@ -145,7 +146,9 @@ public final class BuildscapeFabricClient implements ClientModInitializer {
                 ? new ShulkerTooltipComponent(shulker) : null);
         ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, models) ->
                 models.accept(new ResourceLocation(BuildscapeCommon.MOD_ID, "block/stringlight_frame")));
-        ClientSpriteRegistryCallback.event(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS)
+        MixinClientHooks.EXTRA_MODEL_LOOKUP = net.fabricmc.fabric.api.client.model.BakedModelManagerHelper::getModel;
+        // The copper chest sprites belong to the chest atlas, not the block atlas.
+        ClientSpriteRegistryCallback.event(net.minecraft.client.renderer.Sheets.CHEST_SHEET)
                 .register((atlas, registry) -> CopperChestClientEvents.onTextureStitch(atlas.location(), registry::register));
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
                 new SimpleSynchronousResourceReloadListener() {
@@ -190,7 +193,8 @@ public final class BuildscapeFabricClient implements ClientModInitializer {
             Minecraft mc = Minecraft.getInstance();
             if (mc.level == null || mc.player == null) return;
             var buffers = mc.renderBuffers().bufferSource();
-            ClientEvents.renderLevel(context.matrixStack(), context.camera(), buffers);
+            // LAST runs with the camera already applied to the GL view matrix, so draw from an identity stack.
+            ClientEvents.renderLevel(new com.mojang.blaze3d.vertex.PoseStack(), context.camera(), buffers);
             buffers.endBatch();
         });
     }

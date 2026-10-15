@@ -28,6 +28,7 @@
                    "LeavesBlockMixin",
                    "LevelV118xMixin",
                    "LivingEntityMixin",
+                   "HollowLogPlayerPoseMixin",
                    "StonecutterMenuLegacyAccessor",
                    "StonecutterMenuMixin",
                    "VineBlockMixin",

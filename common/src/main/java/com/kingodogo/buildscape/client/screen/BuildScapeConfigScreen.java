@@ -42,6 +42,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     record ConfigLink(String title, String description, String url) {}
 
     record PresetSideTabGeometry(int x, int y, int width, int height, int centerX, int centerY) {}
+    record PresetPanelGeometry(int x, int y, int width) {}
+    record SidePanelContentGeometry(int headerX, int headerY, int headerWidth,
+                                    int contentX, int contentY, int contentWidth, int contentHeight) {}
 
     record ItemToolbarGeometry(int filterWidth, int searchWidth, int namespaceWidth, int gap, int totalWidth) {}
 
@@ -50,6 +53,44 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int height = 30;
         int x = frameRight - 2;
         return new PresetSideTabGeometry(x, tabY, width, height, x + width / 2, tabY + height / 2);
+    }
+
+    static PresetPanelGeometry calculatePresetPanelGeometry(int contentX, int contentY, int contentWidth,
+                                                             int contentHeight, int groupHeight, int maximumWidth) {
+        int width = Math.min(Math.max(1, maximumWidth), Math.max(1, contentWidth - 16));
+        int x = contentX + (contentWidth - width) / 2;
+        int y = contentY + Math.max(8, (contentHeight - groupHeight) / 2);
+        return new PresetPanelGeometry(x, y, width);
+    }
+
+    static int cyclePresetIndex(int currentIndex, int direction, int presetCount) {
+        return presetCount <= 0 ? 0 : Math.floorMod(currentIndex + Integer.signum(direction), presetCount);
+    }
+
+    static SidePanelContentGeometry calculateSidePanelContentGeometry(int panelX, int panelY, int panelWidth, int panelHeight) {
+        int inset = 8;
+        int headerY = panelY + 9;
+        int headerHeight = 22;
+        int contentY = headerY + headerHeight + 4;
+        return new SidePanelContentGeometry(panelX + inset, headerY, panelWidth - inset * 2,
+                panelX + inset, contentY, panelWidth - inset * 2, panelY + panelHeight - inset - contentY);
+    }
+
+    static float interpolatePresetDeleteReveal(long now, long startedAt, float from, float to, int durationMs) {
+        float progress = durationMs <= 0 ? 1.0F : Math.min(1.0F, Math.max(0.0F, (now - startedAt) / (float) durationMs));
+        return from + (to - from) * progress;
+    }
+
+    static String applyPresetNamePaste(String currentValue, boolean selected, String clipboardValue) {
+        String current = currentValue == null ? "" : currentValue;
+        String pasted = clipboardValue == null ? "" : clipboardValue.replaceAll("[\\p{Cntrl}\\s]+", " ").trim();
+        String combined = selected ? pasted : current + pasted;
+        return combined.substring(0, Math.min(32, combined.length()));
+    }
+
+    static String applyPresetNameBackspace(String currentValue, boolean selected) {
+        String current = currentValue == null ? "" : currentValue;
+        return selected || current.isEmpty() ? "" : current.substring(0, current.length() - 1);
     }
 
     static ItemToolbarGeometry calculateItemToolbarGeometry(int availableWidth) {
@@ -384,6 +425,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private long itemContentTransitionStartTime = 0L;
     private boolean itemContentTransitioning = false;
     private boolean presetNameFocused = false;
+    private boolean presetNameSelected = false;
+    private float presetDeleteReveal = 0.0F;
+    private float presetDeleteRevealFrom = 0.0F;
+    private float presetDeleteRevealTarget = 0.0F;
+    private long presetDeleteRevealStartedAt = 0L;
     private String presetNameInput = "";
     private String pendingDestructiveAction = null;
     private long pendingDestructiveActionUntil = 0L;
@@ -2926,9 +2972,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawConnectedSidePanelFrame(poseStackOrGraphics, x, y, w, h, COLOR_PANEL_BG, alpha);
 
         if (w >= 60 && h >= 40) {
-            int sHeadX = x + 10;
-            int sHeadY = y + 11;
-            int sHeadW = w - 21;
+            SidePanelContentGeometry geometry = calculateSidePanelContentGeometry(x, y, w, h);
+            int sHeadX = geometry.headerX();
+            int sHeadY = geometry.headerY();
+            int sHeadW = geometry.headerWidth();
             int sHeadH = 22;
             drawBeveledComponent(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, COLOR_HEADER_BG, alpha);
 
@@ -2980,10 +3027,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int closeCol = hoverClose ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
             drawCenteredText(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
 
-            int sContentX = sHeadX;
-            int sContentY = sHeadY + sHeadH + 4;
-            int sContentW = sHeadW;
-            int sContentH = (y + h - 11) - sContentY;
+            int sContentX = geometry.contentX();
+            int sContentY = geometry.contentY();
+            int sContentW = geometry.contentWidth();
+            int sContentH = geometry.contentHeight();
 
             if (sContentH > 20) {
                 if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
@@ -2995,6 +3042,22 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
             }
         }
+    }
+
+    private float updatePresetDeleteReveal(boolean showDelete) {
+        float target = showDelete ? 1.0F : 0.0F;
+        long now = System.currentTimeMillis();
+        int duration = Math.max(1, (int) (180 * getAnimSpeedMultiplier()));
+        presetDeleteReveal = interpolatePresetDeleteReveal(now, presetDeleteRevealStartedAt,
+                presetDeleteRevealFrom, presetDeleteRevealTarget, duration);
+        if (Math.abs(target - presetDeleteRevealTarget) > 0.001F) {
+            presetDeleteRevealFrom = presetDeleteReveal;
+            presetDeleteRevealTarget = target;
+            presetDeleteRevealStartedAt = now;
+        }
+        presetDeleteReveal = interpolatePresetDeleteReveal(now, presetDeleteRevealStartedAt,
+                presetDeleteRevealFrom, presetDeleteRevealTarget, duration);
+        return presetDeleteReveal;
     }
 
     private void renderSidePanelPresets(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
@@ -3010,62 +3073,75 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         String currentKey = (keys.isEmpty() || selectedPresetIndex >= keys.size()) ? "default" : keys.get(selectedPresetIndex);
         String currentPresetName = currentPreset != null ? currentPreset.name : "Default";
         boolean isDefault = "default".equalsIgnoreCase(currentKey);
-
-        int pad = 8;
-        int curY = y + pad;
-        int rowW = w - pad * 2;
-        int rowX = x + pad;
-
-        int selH = 37;
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, selH, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, "SELECTED PRESET", rowX + 6, curY + 5, applyAlpha(COLOR_TEXT_MUTED, alpha));
-
-        int cycleBtnH = 16;
-        int cycleBtnY = curY + 17;
-        int cycleBtnW = rowW - 12;
-        int cycleBtnX = rowX + 6;
-        boolean hoverCycle = mouseX >= cycleBtnX && mouseX <= cycleBtnX + cycleBtnW && mouseY >= cycleBtnY && mouseY <= cycleBtnY + cycleBtnH;
-        drawBeveledButton(poseStackOrGraphics, cycleBtnX, cycleBtnY, cycleBtnW, cycleBtnH, hoverCycle ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverCycle, false, alpha);
-        String cycleLabel = "‹ " + currentPresetName + " (" + (currentPreset != null ? currentPreset.items.size() : 0) + ") ›";
-        drawCenteredText(poseStackOrGraphics, font, cycleLabel, cycleBtnX + cycleBtnW / 2, cycleBtnY + 4, applyAlpha(hoverCycle ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        curY += selH + 4;
-
+        float deleteReveal = updatePresetDeleteReveal(!isDefault);
+        int groupH = 218;
+        PresetPanelGeometry geometry = calculatePresetPanelGeometry(x, y, w, h, groupH, 284);
+        int rowX = geometry.x();
+        int rowW = geometry.width();
+        int curY = geometry.y();
+        int cardPad = 6;
         int btnH = 18;
-        boolean hoverApply = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
-        drawBeveledGreenButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverApply, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "✓ Apply Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
-        curY += btnH + 9;
 
-        drawText(poseStackOrGraphics, font, "MANAGE SELECTED", rowX + 2, curY, applyAlpha(COLOR_TEXT_MUTED, alpha));
-        curY += 12;
+        int selectedCardH = 64;
+        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, selectedCardH, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStackOrGraphics, font, "Selected Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        int selectorY = curY + 18;
+        int selectorX = rowX + cardPad;
+        int selectorW = rowW - cardPad * 2;
+        int arrowW = 20;
+        boolean hoverPrev = mouseX >= selectorX && mouseX <= selectorX + arrowW && mouseY >= selectorY && mouseY <= selectorY + btnH;
+        boolean hoverNext = mouseX >= selectorX + selectorW - arrowW && mouseX <= selectorX + selectorW && mouseY >= selectorY && mouseY <= selectorY + btnH;
+        drawBeveledButton(poseStackOrGraphics, selectorX, selectorY, arrowW, btnH, hoverPrev ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPrev, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "‹", selectorX + arrowW / 2, selectorY + 5, applyAlpha(hoverPrev ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        int valueX = selectorX + arrowW;
+        int valueW = selectorW - arrowW * 2;
+        drawBeveledButton(poseStackOrGraphics, valueX, selectorY, valueW, btnH, COLOR_SLOT_BG, false, false, alpha);
+        String valueText = currentPresetName + " (" + (currentPreset != null ? currentPreset.items.size() : 0) + ")";
+        drawCenteredText(poseStackOrGraphics, font, trimTextToWidth(font, valueText, valueW - 8, false), valueX + valueW / 2, selectorY + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        int nextX = selectorX + selectorW - arrowW;
+        drawBeveledButton(poseStackOrGraphics, nextX, selectorY, arrowW, btnH, hoverNext ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNext, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "›", nextX + arrowW / 2, selectorY + 5, applyAlpha(hoverNext ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        int applyY = selectorY + btnH + 5;
+        boolean hoverApply = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= applyY && mouseY <= applyY + btnH;
+        drawBeveledGreenButton(poseStackOrGraphics, selectorX, applyY, selectorW, btnH, hoverApply, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "✓ Apply Preset", selectorX + selectorW / 2, applyY + 5, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
+        int sectionGap = Math.round(8.0F - 4.0F * deleteReveal);
+        int resetGap = Math.round(18.0F - 12.0F * deleteReveal);
+        curY += selectedCardH + sectionGap;
 
-        boolean hoverSave = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverSave ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverSave, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "▣ Save Changes", rowX + rowW / 2, curY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        curY += btnH + 4;
-
-        if (!isDefault) {
-            boolean hoverDelete = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
-            drawBeveledRedButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverDelete, alpha);
-            drawCenteredText(poseStackOrGraphics, font, "✕ Delete Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverDelete ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT, alpha));
-            curY += btnH + 4;
+        int manageCardH = Math.round(41.0F + 20.0F * deleteReveal);
+        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, manageCardH, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStackOrGraphics, font, "Manage Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        int manageY = curY + 19;
+        boolean hoverSave = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= manageY && mouseY <= manageY + btnH;
+        drawBeveledButton(poseStackOrGraphics, selectorX, manageY, selectorW, btnH, hoverSave ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverSave, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "▣ Save Changes", selectorX + selectorW / 2, manageY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        int visibleDeleteH = Math.round(btnH * deleteReveal);
+        if (visibleDeleteH > 0) {
+            int deleteY = manageY + btnH + 4;
+            boolean hoverDelete = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= deleteY && mouseY <= deleteY + btnH;
+            drawBeveledRedButton(poseStackOrGraphics, selectorX, deleteY, selectorW, visibleDeleteH, hoverDelete, alpha * deleteReveal);
+            if (deleteReveal > 0.45F) {
+                drawCenteredText(poseStackOrGraphics, font, "✕ Delete Preset", selectorX + selectorW / 2, deleteY + 5,
+                        applyAlpha(hoverDelete ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT, alpha * deleteReveal));
+            }
         }
+        curY += manageCardH + sectionGap;
 
-        curY += 5;
-        drawText(poseStackOrGraphics, font, "CREATE NEW PRESET", rowX + 2, curY, applyAlpha(COLOR_TEXT_MUTED, alpha));
-        curY += 12;
-
-        boolean hoverName = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, COLOR_SLOT_BG, hoverName, presetNameFocused, alpha);
-        String nameText = presetNameInput.isEmpty() ? "Preset name..." : presetNameInput + (presetNameFocused ? "_" : "");
-        drawText(poseStackOrGraphics, font, trimTextToWidth(font, nameText, rowW - 10, !presetNameInput.isEmpty()),
-                rowX + 5, curY + 5, applyAlpha(presetNameInput.isEmpty() ? COLOR_TEXT_MUTED : COLOR_TEXT_WHITE, alpha));
-        curY += btnH + 4;
-
-        boolean hoverNew = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverNew ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNew, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "+ Create Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        curY += btnH + 12;
+        int createCardH = 61;
+        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, createCardH, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStackOrGraphics, font, "New Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        int nameY = curY + 19;
+        boolean hoverName = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= nameY && mouseY <= nameY + btnH;
+        drawBeveledButton(poseStackOrGraphics, selectorX, nameY, selectorW, btnH, COLOR_SLOT_BG, hoverName, presetNameFocused, alpha);
+        String nameText = presetNameInput.isEmpty() ? "Preset name..." : presetNameInput + (presetNameFocused && !presetNameSelected ? "_" : "");
+        drawText(poseStackOrGraphics, font, trimTextToWidth(font, nameText, selectorW - 10, !presetNameInput.isEmpty()), selectorX + 5, nameY + 5,
+                applyAlpha(presetNameSelected ? COLOR_ACCENT : presetNameInput.isEmpty() ? COLOR_TEXT_MUTED : COLOR_TEXT_WHITE, alpha));
+        int createY = nameY + btnH + 4;
+        boolean hoverNew = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= createY && mouseY <= createY + btnH;
+        drawBeveledButton(poseStackOrGraphics, selectorX, createY, selectorW, btnH, hoverNew ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNew, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "+ Create Preset", selectorX + selectorW / 2, createY + 5, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        curY += createCardH + resetGap;
 
         boolean hoverReset = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverReset ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverReset, false, alpha);
@@ -5218,9 +5294,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private boolean handleSidePanelClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {
-        int sHeadX = x + 10;
-        int sHeadY = y + 11;
-        int sHeadW = w - 21;
+        SidePanelContentGeometry geometry = calculateSidePanelContentGeometry(x, y, w, h);
+        int sHeadX = geometry.headerX();
+        int sHeadY = geometry.headerY();
+        int sHeadW = geometry.headerWidth();
         int sHeadH = 22;
 
         int closeSize = 14;
@@ -5236,10 +5313,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return true;
         }
 
-        int sContentX = sHeadX;
-        int sContentY = sHeadY + sHeadH + 4;
-        int sContentW = sHeadW;
-        int sContentH = (y + h - 11) - sContentY;
+        int sContentX = geometry.contentX();
+        int sContentY = geometry.contentY();
+        int sContentW = geometry.contentWidth();
+        int sContentH = geometry.contentHeight();
 
         if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
             return handleSidePanelPillarClick(mouseX, mouseY, button, sContentX, sContentY, sContentW, sContentH);
@@ -5261,29 +5338,39 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         String currentKey = (keys.isEmpty() || selectedPresetIndex >= keys.size()) ? "default" : keys.get(selectedPresetIndex);
         boolean isDefault = "default".equalsIgnoreCase(currentKey);
+        float deleteReveal = updatePresetDeleteReveal(!isDefault);
+        int groupH = 218;
+        PresetPanelGeometry geometry = calculatePresetPanelGeometry(x, y, w, h, groupH, 284);
+        int rowX = geometry.x();
+        int rowW = geometry.width();
+        int curY = geometry.y();
+        int cardPad = 6;
+        int btnH = 18;
+        int selectorX = rowX + cardPad;
+        int selectorW = rowW - cardPad * 2;
+        int arrowW = 20;
+        int selectorY = curY + 18;
 
-        int pad = 8;
-        int curY = y + pad;
-        int rowW = w - pad * 2;
-        int rowX = x + pad;
-
-        int selH = 37;
-        int cycleBtnH = 16;
-        int cycleBtnY = curY + 17;
-        int cycleBtnW = rowW - 12;
-        int cycleBtnX = rowX + 6;
-        if (mouseX >= cycleBtnX && mouseX <= cycleBtnX + cycleBtnW && mouseY >= cycleBtnY && mouseY <= cycleBtnY + cycleBtnH) {
-            if (!presets.isEmpty()) {
-                selectedPresetIndex = (selectedPresetIndex + 1) % presets.size();
+        if (mouseY >= selectorY && mouseY <= selectorY + btnH && !presets.isEmpty()) {
+            if (mouseX >= selectorX && mouseX <= selectorX + arrowW) {
+                selectedPresetIndex = cyclePresetIndex(selectedPresetIndex, -1, presets.size());
                 presetNameInput = "";
                 presetNameFocused = false;
+                presetNameSelected = false;
+                return true;
             }
-            return true;
+            int nextX = selectorX + selectorW - arrowW;
+            if (mouseX >= nextX && mouseX <= nextX + arrowW) {
+                selectedPresetIndex = cyclePresetIndex(selectedPresetIndex, 1, presets.size());
+                presetNameInput = "";
+                presetNameFocused = false;
+                presetNameSelected = false;
+                return true;
+            }
         }
-        curY += selH + 4;
 
-        int btnH = 18;
-        if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+        int applyY = selectorY + btnH + 5;
+        if (mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= applyY && mouseY <= applyY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             if (!keys.isEmpty() && selectedPresetIndex < keys.size()) {
                 presetsCfg.applyPreset(keys.get(selectedPresetIndex));
@@ -5293,10 +5380,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             return true;
         }
-        curY += btnH + 9;
 
-        curY += 12;
-        if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+        int sectionGap = Math.round(8.0F - 4.0F * deleteReveal);
+        int resetGap = Math.round(18.0F - 12.0F * deleteReveal);
+        curY += 64 + sectionGap;
+        int manageY = curY + 19;
+        if (mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= manageY && mouseY <= manageY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             if (!presets.isEmpty() && selectedPresetIndex < keys.size()) {
                 String key = keys.get(selectedPresetIndex);
@@ -5308,10 +5397,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             return true;
         }
-        curY += btnH + 4;
 
-        if (!isDefault) {
-            if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+        if (!isDefault && deleteReveal > 0.75F) {
+            int deleteY = manageY + btnH + 4;
+            if (mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= deleteY && mouseY <= deleteY + btnH) {
                 if (!requireConfigModificationAccess()) return true;
                 presetsCfg.deletePreset(currentKey);
                 selectedPresetIndex = 0;
@@ -5321,30 +5410,30 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 itemsListDirty = true;
                 return true;
             }
-            curY += btnH + 4;
         }
 
-        curY += 5 + 12;
-        if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+        int manageCardH = Math.round(41.0F + 20.0F * deleteReveal);
+        curY += manageCardH + sectionGap;
+        int nameY = curY + 19;
+        if (mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= nameY && mouseY <= nameY + btnH) {
             presetNameFocused = true;
+            if (button == 1) {
+                presetNameInput = "";
+                presetNameSelected = false;
+            } else {
+                presetNameSelected = true;
+            }
             return true;
         }
-        curY += btnH + 4;
 
-        if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+        int createY = nameY + btnH + 4;
+        if (mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= createY && mouseY <= createY + btnH) {
             if (!requireConfigModificationAccess()) return true;
-            PillarParticleConfig cfg = PillarParticleConfig.get();
-            String newKey = presetsCfg.generatePresetKey();
-            presetsCfg.savePreset(newKey, normalizePresetName(presetNameInput), new HashSet<>(cfg.items));
-            selectedPresetIndex = presetsCfg.getPresets().size() - 1;
-            presetNameInput = "";
-            presetNameFocused = false;
-            rebuildActiveItemsCache();
-            itemsListDirty = true;
+            createPresetFromInput();
             return true;
         }
-        curY += btnH + 12;
 
+        curY += 61 + resetGap;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             presetsCfg.applyPreset("default");
@@ -5356,6 +5445,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         return false;
+    }
+
+    private void createPresetFromInput() {
+        PresetsConfig presetsCfg = PresetsConfig.get();
+        PillarParticleConfig cfg = PillarParticleConfig.get();
+        String newKey = presetsCfg.generatePresetKey();
+        presetsCfg.savePreset(newKey, normalizePresetName(presetNameInput), new HashSet<>(cfg.items));
+        selectedPresetIndex = presetsCfg.getPresets().size() - 1;
+        presetNameInput = "";
+        presetNameFocused = false;
+        presetNameSelected = false;
+        rebuildActiveItemsCache();
+        itemsListDirty = true;
     }
 
     private boolean handleSidePanelPillarClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {
@@ -5744,10 +5846,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         if (sidePanelType == SidePanelType.COLOR_PICKER && sidePanelProgress > 0.05f) {
             SidePanelLayout layout = calculateLayout();
-            int sHeadY = layout.sidePanelY + 11;
-            int sContentX = layout.sidePanelX + 10;
-            int sContentY = sHeadY + 22 + 4;
-            int sContentW = layout.sidePanelW - 21;
+            SidePanelContentGeometry geometry = calculateSidePanelContentGeometry(
+                    layout.sidePanelX, layout.sidePanelY, layout.sidePanelW, layout.sidePanelH);
+            int sContentX = geometry.contentX();
+            int sContentY = geometry.contentY();
+            int sContentW = geometry.contentWidth();
 
             int pad = 6;
             int hueW = 14;
@@ -5877,12 +5980,28 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
         }
         if (presetNameFocused) {
-            if (keyCode == 259 && !presetNameInput.isEmpty()) {
-                presetNameInput = presetNameInput.substring(0, presetNameInput.length() - 1);
+            if ((modifiers & 2) != 0 && keyCode == 65) {
+                presetNameSelected = true;
                 return true;
             }
-            if (keyCode == 256 || keyCode == 257) {
+            if ((modifiers & 2) != 0 && keyCode == 86) {
+                presetNameInput = applyPresetNamePaste(presetNameInput, presetNameSelected, Services.PLATFORM.getClipboardText());
+                presetNameSelected = false;
+                return true;
+            }
+            if (keyCode == 259) {
+                presetNameInput = applyPresetNameBackspace(presetNameInput, presetNameSelected);
+                presetNameSelected = false;
+                return true;
+            }
+            if (keyCode == 257) {
+                if (!requireConfigModificationAccess()) return true;
+                createPresetFromInput();
+                return true;
+            }
+            if (keyCode == 256) {
                 presetNameFocused = false;
+                presetNameSelected = false;
                 return true;
             }
         }
@@ -5922,6 +6041,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             focusedSearchField = 0;
             searchTextSelected = false;
             presetNameFocused = false;
+            presetNameSelected = false;
             return true;
         }
         if (showColorModal) {
@@ -5968,8 +6088,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             return true;
         }
-        if (presetNameFocused && !Character.isISOControl(codePoint) && presetNameInput.length() < 32) {
-            presetNameInput += codePoint;
+        if (presetNameFocused && !Character.isISOControl(codePoint)) {
+            String next = presetNameSelected ? "" : presetNameInput;
+            if (next.length() < 32) {
+                presetNameInput = next + codePoint;
+                presetNameSelected = false;
+            }
             return true;
         }
         if (focusedSearchField != 0 && !Character.isISOControl(codePoint)) {

@@ -3,11 +3,6 @@ package com.kingodogo.buildscape.client.screen;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * High-performance UI Tab Cache Manager.
- * Lazily caches tab view models, scroll viewports, and heavy query lists so tabs only load
- * when accessed and can be switched instantaneously without dropping frames or re-allocating.
- */
 public class TabCacheManager {
 
     public static class TabViewState {
@@ -58,6 +53,15 @@ public class TabCacheManager {
         TabViewState state = tabs.get(tabId);
         if (state != null) {
             state.isDirty = true;
+        }
+    }
+
+    public void invalidate(String tabId) {
+        TabViewState state = tabs.get(tabId);
+        if (state != null) {
+            state.isLoaded = false;
+            state.isDirty = true;
+            state.clearData();
         }
     }
 

@@ -187,6 +187,11 @@ public final class GuiProvider {
             public boolean isPauseScreen() {
                 return delegate.isPauseScreen();
             }
+
+            @Override
+            public net.minecraft.network.chat.Component getNarrationMessage() {
+                return delegate.getNarrationMessage();
+            }
         };
         delegate.setWrapperScreen(screen);
         return screen;

@@ -228,6 +228,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public CommonId registerExternalTexture(String name, java.io.InputStream stream) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientAccess.registerExternalTexture(name, stream);
+    }
+
+    @Override
     public net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) {
         net.minecraft.client.renderer.texture.DynamicTexture texture = new net.minecraft.client.renderer.texture.DynamicTexture(width, height, clear);
         texture.setFilter(false, false);

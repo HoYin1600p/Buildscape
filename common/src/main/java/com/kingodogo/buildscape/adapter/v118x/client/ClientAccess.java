@@ -27,4 +27,15 @@ public final class ClientAccess {
         ResourceLocation id = Minecraft.getInstance().getTextureManager().register(name, texture);
         return CommonId.of(id.getNamespace(), id.getPath());
     }
+
+    public static CommonId registerExternalTexture(String name, java.io.InputStream stream) {
+        try {
+            com.mojang.blaze3d.platform.NativeImage image = com.mojang.blaze3d.platform.NativeImage.read(stream);
+            DynamicTexture texture = new DynamicTexture(image);
+            texture.upload();
+            return registerDynamicTexture(name, texture);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }

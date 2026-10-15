@@ -3,6 +3,8 @@ package com.kingodogo.buildscape.client.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
+import com.kingodogo.buildscape.util.ComponentHelper;
 
 import java.util.function.Consumer;
 public interface IScreenDelegate {
@@ -50,5 +52,9 @@ public interface IScreenDelegate {
 
     default Object getWrapperScreen() {
         return null;
+    }
+
+    default Component getNarrationMessage() {
+        return ComponentHelper.empty();
     }
 }

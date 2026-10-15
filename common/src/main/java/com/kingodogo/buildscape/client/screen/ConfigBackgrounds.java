@@ -48,22 +48,13 @@ public class ConfigBackgrounds {
             { 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
-    // Wallpaper Texture Identifiers (Loaded from assets/buildscape/textures/gui/backgrounds/)
-    public static final CommonId TEX_ANCIENT_TEMPLE = CommonId.of("buildscape", "textures/gui/backgrounds/ancient_temple.png");
-    public static final CommonId TEX_CHERRY_GROVE = CommonId.of("buildscape", "textures/gui/backgrounds/cherry_grove.png");
-    public static final CommonId TEX_DEEP_DARK = CommonId.of("buildscape", "textures/gui/backgrounds/deep_dark.png");
-    public static final CommonId TEX_END_HIGHLANDS = CommonId.of("buildscape", "textures/gui/backgrounds/end_highlands.png");
-    public static final CommonId TEX_LAVA_PALACE = CommonId.of("buildscape", "textures/gui/backgrounds/lava_palace.png");
-    public static final CommonId TEX_MESSA_CITY = CommonId.of("buildscape", "textures/gui/backgrounds/messa_city.png");
-    public static final CommonId TEX_SCHEMATIC = CommonId.of("buildscape", "textures/gui/backgrounds/schematic.png");
-
-    // 1. None
+    // The empty background remains available when no decorative preset is wanted.
     public static final Background NONE = new Background(
             "none", "None",
             (poseStackOrGraphics, x, y, width, height, alpha, theme) -> {}
     );
 
-    // 2. Creeper Backdrops
+    // Creeper backgrounds are the only decorative presets bundled with the mod.
     public static final Background GREEN_CREEPER = new Background(
             "green_creeper", "Green Creeper",
             ConfigBackgrounds::drawGreenCreeperBackground
@@ -92,34 +83,26 @@ public class ConfigBackgrounds {
             CRIMSON_CREEPER
     ));
 
+    static List<String> getBuiltInBackgroundIds() {
+        return List.of(NONE.id, GREEN_CREEPER.id, GOLDEN_CREEPER.id, DIAMOND_CREEPER.id, CRIMSON_CREEPER.id);
+    }
+
     private static final Set<String> REGISTERED_BACKGROUND_IDS = new java.util.HashSet<>();
     private static long lastScanTimestamp = 0L;
     private static final long SCAN_INTERVAL_MS = 2000L;
 
-    /**
-     * Converts a filename or raw identifier into a clean, human-readable title.
-     * e.g. "ice_dragon.png" -> "Ice Dragon"
-     *      "cherry_grove.png" -> "Cherry Grove"
-     *      "lava-palace.png" -> "Lava Palace"
-     *      "iceDragon.png" -> "Ice Dragon"
-     */
     public static String formatDisplayName(String filenameOrId) {
         if (filenameOrId == null || filenameOrId.isBlank()) return "Custom";
         String s = filenameOrId.trim();
 
-        // 1. Strip file extension if present (.png, .jpg, etc.)
         int dot = s.lastIndexOf('.');
         if (dot > 0) {
             s = s.substring(0, dot);
         }
 
-        // 2. Separate camelCase if present (e.g. iceDragon -> ice Dragon)
         s = s.replaceAll("([a-z0-9])([A-Z])", "$1 $2");
-
-        // 3. Replace underscores, hyphens, dots with spaces
         s = s.replace('_', ' ').replace('-', ' ').replace('.', ' ');
 
-        // 4. Split tokens, capitalize first letter of each word and lowercase the rest
         String[] tokens = s.trim().split("\\s+");
         StringBuilder sb = new StringBuilder();
         for (String token : tokens) {
@@ -133,10 +116,6 @@ public class ConfigBackgrounds {
         return sb.length() > 0 ? sb.toString() : "Custom";
     }
 
-    /**
-     * Normalizes a filename or raw identifier into a clean, lowercased ResourceLocation-safe id.
-     * e.g. "ice_dragon.png" -> "ice_dragon"
-     */
     public static String sanitizeId(String filenameOrId) {
         if (filenameOrId == null || filenameOrId.isBlank()) return "custom";
         String s = filenameOrId.trim();
@@ -152,10 +131,6 @@ public class ConfigBackgrounds {
         return s.isEmpty() ? "custom" : s;
     }
 
-    /**
-     * Resolves the primary background directory: <gameDir>/config/buildscape/backgrounds/
-     * and automatically creates it if missing so users can immediately drop PNG files in.
-     */
     public static Path getCustomBackgroundsDir() {
         try {
             Path configDir = Services.PLATFORM.getConfigDir();
@@ -169,11 +144,13 @@ public class ConfigBackgrounds {
         }
     }
 
-    /**
-     * Automatically scans background folders for PNG images and dynamically registers them
-     * into the selector without requiring code changes.
-     */
     public static synchronized void refreshCustomBackgrounds() {
+        long now = System.currentTimeMillis();
+        if (now - lastScanTimestamp < SCAN_INTERVAL_MS) {
+            return;
+        }
+        lastScanTimestamp = now;
+
         List<Path> candidateDirs = new java.util.ArrayList<>();
         try {
             Path primary = getCustomBackgroundsDir();
@@ -209,7 +186,6 @@ public class ConfigBackgrounds {
         String id = sanitizeId(fileName);
         if (id.isEmpty()) return;
 
-        // Skip if already registered
         if (REGISTERED_BACKGROUND_IDS.contains(id)) return;
 
         String displayName = formatDisplayName(fileName);
@@ -221,10 +197,6 @@ public class ConfigBackgrounds {
         } catch (Exception ignored) {}
     }
 
-    /**
-     * Registers an image-based wallpaper background into the selector.
-     * Keeps the system fully open for custom image assets.
-     */
     public static Background registerImageBackground(String id, String displayName, CommonId textureId) {
         String key = id.toLowerCase(Locale.ROOT);
         REGISTERED_BACKGROUND_IDS.add(key);
@@ -253,7 +225,6 @@ public class ConfigBackgrounds {
     public static List<Background> getAllBackgrounds() {
         long now = System.currentTimeMillis();
         if (now - lastScanTimestamp > SCAN_INTERVAL_MS) {
-            lastScanTimestamp = now;
             refreshCustomBackgrounds();
         }
         return BACKGROUNDS;
@@ -323,27 +294,21 @@ public class ConfigBackgrounds {
         getCurrentBackground().draw(poseStackOrGraphics, x, y, width, height, alpha, theme);
     }
 
-    // =========================================================================
-    // Wallpaper Image Renderer
-    // =========================================================================
+    // External images are shaded to preserve control and text contrast.
     public static void drawImageBackground(Object poseStackOrGraphics, CommonId texture, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f || texture == null) return;
 
-        // 1. Draw texture stretched across the inner container basin
+        // Stretch the image across the inner content basin.
         Services.PLATFORM.blit(poseStackOrGraphics, texture, x, y, width, height, 0.0f, 0.0f, width, height, width, height);
 
-        // 2. Atmospheric shading overlay to preserve optimal contrast for text & controls
+        // Apply a theme-aware wash so controls remain readable.
         boolean light = theme != null && theme.isLight();
         int washCol = light ? 0xFFFFFFFF : 0xFF08080C;
         float washAlpha = light ? 0.32f : 0.42f;
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + width, y + height, applyAlpha(washCol, alpha * washAlpha));
     }
 
-    // =========================================================================
-    // Creeper Background Renderers (Zero artifacts, authentic gradients)
-    // =========================================================================
-
-    // 1. GREEN CREEPER: Iconic Green Creeper Face & Emerald Gradient Wash
+    // Render the green Creeper preset.
     public static void drawGreenCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
@@ -388,7 +353,7 @@ public class ConfigBackgrounds {
         drawBorder(poseStackOrGraphics, faceX - 1, faceY - 1, faceSize + 2, faceSize + 2, applyAlpha(headBorder, alpha * (light ? 0.20f : 0.28f)));
     }
 
-    // 2. GOLDEN CREEPER: Shimmering Gold Creeper Face & Warm Amber Wash
+    // Render the golden Creeper preset.
     public static void drawGoldenCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
@@ -433,7 +398,7 @@ public class ConfigBackgrounds {
         drawBorder(poseStackOrGraphics, faceX - 1, faceY - 1, faceSize + 2, faceSize + 2, applyAlpha(goldBorder, alpha * (light ? 0.25f : 0.32f)));
     }
 
-    // 3. DIAMOND CREEPER: Oceanic Cyan Creeper Face & Sapphire Wash
+    // Render the diamond Creeper preset.
     public static void drawDiamondCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
@@ -478,7 +443,7 @@ public class ConfigBackgrounds {
         drawBorder(poseStackOrGraphics, faceX - 1, faceY - 1, faceSize + 2, faceSize + 2, applyAlpha(diamondBorder, alpha * (light ? 0.25f : 0.32f)));
     }
 
-    // 4. CRIMSON CREEPER: Rich Ruby Creeper Face & Nether Crimson Wash
+    // Render the crimson Creeper preset.
     public static void drawCrimsonCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
@@ -523,9 +488,7 @@ public class ConfigBackgrounds {
         drawBorder(poseStackOrGraphics, faceX - 1, faceY - 1, faceSize + 2, faceSize + 2, applyAlpha(crimsonBorder, alpha * (light ? 0.25f : 0.32f)));
     }
 
-    // =========================================================================
-    // Drawing Helpers
-    // =========================================================================
+    // Shared background drawing helpers.
 
     public static int applyAlpha(int argb, float alpha) {
         int a = (int) (((argb >> 24) & 0xFF) * Math.max(0.0f, Math.min(1.0f, alpha)));

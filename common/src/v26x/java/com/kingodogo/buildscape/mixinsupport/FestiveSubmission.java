@@ -1,9 +1,6 @@
 package com.kingodogo.buildscape.mixinsupport;
 
 import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -17,7 +14,6 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /** Carries stack identity through deferred extraction, submission and glint preparation. */
@@ -62,7 +58,9 @@ public final class FestiveSubmission {
     }
 
     // The private render-type factory has no public counterpart in 26.2. Copy the verified
-    // setup so decal transforms, output targets and sampler behavior stay intact.
+    // setup so blending, decal transforms, output targets and sampler behavior stay intact.
+    // As in 26.3, replace only the texture: source-alpha blending makes opaque glint
+    // texels cover the compass instead of adding a shimmer over its visible face.
     private static RenderType copyGlint(RenderType original) {
         try {
             RenderSetup setup = (RenderSetup) field(original, "state");
@@ -81,7 +79,7 @@ public final class FestiveSubmission {
                     net.minecraft.client.renderer.rendertype.TextureTransform.class,
                     RenderSetup.OutlineProperty.class, boolean.class, boolean.class);
             setupConstructor.setAccessible(true);
-            Object replacement = setupConstructor.newInstance(new FestivePipeline((RenderPipeline) field(setup, "pipeline")), replacements,
+            Object replacement = setupConstructor.newInstance(field(setup, "pipeline"), replacements,
                     field(setup, "useLightmap"), field(setup, "useOverlay"), field(setup, "layeringTransform"),
                     field(setup, "outputTarget"), field(setup, "textureTransform"), field(setup, "outlineProperty"),
                     field(setup, "affectsCrumbling"), field(setup, "sortOnUpload"));
@@ -97,29 +95,6 @@ public final class FestiveSubmission {
         Field field = instance.getClass().getDeclaredField(name);
         field.setAccessible(true);
         return field.get(instance);
-    }
-
-    // Main's shader JSON overrides glint's additive SRC_COLOR blend with source-alpha blending,
-    // and predates GlintAlpha. Keep those two properties local to the festive pipeline.
-    private static final class FestivePipeline extends RenderPipeline {
-        private FestivePipeline(RenderPipeline original) {
-            super(Identifier.fromNamespaceAndPath("buildscape", "festive/" + original.getLocation().getPath()),
-                    original.getVertexShader(), Identifier.fromNamespaceAndPath("buildscape", "core/festive_glint"),
-                    original.getShaderDefines(), original.getBindGroupLayouts(), festiveTargets(original),
-                    original.getDepthStencilState(), original.getPolygonMode(), original.isCull(),
-                    original.getVertexFormatBindings(), original.getPrimitiveTopology(), original.getSortKey());
-        }
-
-        private static ColorTargetState[] festiveTargets(RenderPipeline original) {
-            ColorTargetState[] targets = original.getColorTargetStates().clone();
-            for (int i = 0; i < targets.length; i++) {
-                ColorTargetState target = targets[i];
-                if (target != null) {
-                    targets[i] = new ColorTargetState(Optional.of(BlendFunction.TRANSLUCENT), target.format(), target.writeMask());
-                }
-            }
-            return targets;
-        }
     }
 
     private static final class IdentityReference extends WeakReference<Object> {

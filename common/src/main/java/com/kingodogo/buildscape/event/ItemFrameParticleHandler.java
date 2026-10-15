@@ -94,7 +94,9 @@ public final class ItemFrameParticleHandler {
         if (level == null || level.isClientSide()) return;
 
         if (entity instanceof ItemFrame || entity instanceof ColoredItemFrameEntity) {
-            if (entity.isRemoved()) {
+            Entity.RemovalReason removalReason = entity.getRemovalReason();
+            boolean destroysEntity = removalReason != null && removalReason.shouldDestroy();
+            if (shouldRemoveFrameRegistration(entity.isRemoved(), destroysEntity)) {
                 CompoundTag data = Services.PLATFORM.getEntityData(entity);
                 String frameId = Services.PLATFORM.getTagString(data, FRAME_ID_KEY, null);
                 if (frameId != null && !frameId.isEmpty()) {
@@ -103,6 +105,10 @@ public final class ItemFrameParticleHandler {
                 }
             }
         }
+    }
+
+    static boolean shouldRemoveFrameRegistration(boolean removed, boolean destroysEntity) {
+        return removed && destroysEntity;
     }
 
     public static InteractionResult onEntityInteract(Player player, Level level, InteractionHand hand, Entity target) {
@@ -737,9 +743,17 @@ public final class ItemFrameParticleHandler {
         }
 
         CompoundTag data = Services.PLATFORM.getEntityData(itemFrame);
-        if (data != null && data.contains(FRAME_ID_KEY)) {
-            String id = Services.PLATFORM.getTagString(data, FRAME_ID_KEY, null);
-            if (id != null && !id.isEmpty()) return id;
+        String persistedId = data != null
+                ? Services.PLATFORM.getTagString(data, FRAME_ID_KEY, null)
+                : null;
+        String positionId = findRegisteredFrameId(level, itemFrame.blockPosition(), itemFrame.getDirection());
+        String existingId = selectExistingFrameId(persistedId, positionId);
+        if (existingId != null) {
+            if (data != null && (persistedId == null || persistedId.isEmpty())) {
+                data.putString(FRAME_ID_KEY, existingId);
+            }
+            CLIENT_FRAME_ID_CACHE.put(itemFrame.getId(), existingId);
+            return existingId;
         }
 
         String frameId = generateFrameId(PillarIdManager.get(level));
@@ -748,6 +762,28 @@ public final class ItemFrameParticleHandler {
         }
         CLIENT_FRAME_ID_CACHE.put(itemFrame.getId(), frameId);
         return frameId;
+    }
+
+    static String selectExistingFrameId(String persistedId, String positionId) {
+        if (persistedId != null && !persistedId.isEmpty()) {
+            return persistedId;
+        }
+        return positionId != null && positionId.startsWith(FRAME_PREFIX) ? positionId : null;
+    }
+
+    private static String findRegisteredFrameId(Level level, BlockPos pos, Direction direction) {
+        if (level == null) {
+            return null;
+        }
+        PillarIdManager manager = PillarIdManager.get(level);
+        String dimension = PillarIdManager.getDimensionKey(level);
+        String exactKey = manager.positionKey(dimension, pos, direction);
+        String exactId = manager.getIdForPosition(exactKey);
+        if (exactId != null) {
+            return exactId;
+        }
+        String positionKey = manager.positionKey(dimension, pos, null);
+        return manager.getIdForPosition(positionKey);
     }
 
     public static String getParticlePatternColored(ColoredItemFrameEntity frame) {

@@ -601,6 +601,39 @@ public class PillarIdManager {
         }
     }
 
+    public boolean resetPillarOverrides(String pillarId) {
+        PillarData data = pillarId == null ? null : pillarData.get(pillarId);
+        if (data == null) {
+            return false;
+        }
+        clearPillarOverrides(data);
+        data.modifiedTime = System.currentTimeMillis();
+        saveImmediate();
+        return true;
+    }
+
+    public static void clearPillarOverrides(PillarData data) {
+        if (data == null) {
+            return;
+        }
+        if (data.dyeColors == null) {
+            data.dyeColors = new ArrayList<>();
+        } else {
+            data.dyeColors.clear();
+        }
+        data.use_pattern = null;
+        data.usePattern = null;
+        data.pattern = null;
+        data.pattern_speed = null;
+        data.patternSpeed = null;
+        data.pattern_spread = null;
+        data.patternSpread = null;
+        data.pattern_intensity = null;
+        data.patternIntensity = null;
+        data.max_particle_color = null;
+        data.maxParticleColor = null;
+    }
+
     public boolean removePillars(Collection<String> pillarIds) {
         if (pillarIds == null || pillarIds.isEmpty()) {
             return false;
@@ -719,12 +752,6 @@ public class PillarIdManager {
         try {
             MinecraftServer server = getCurrentServer();
             if (server == null) {
-                pillarData.clear();
-                lastLoadedTime = 0L;
-                lastFileSize = 0L;
-                fileWasDeleted = false;
-                hasLoaded = false;
-                loadInProgress = false;
                 return;
             }
 
@@ -1011,6 +1038,12 @@ public class PillarIdManager {
 
                 updateCachedWorldDir();
                 refreshSyncSnapshot();
+                if (server != null && server.isRunning()) {
+                    try {
+                        List<PillarData> syncList = getAllPillarDataForSync();
+                        com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(syncList);
+                    } catch (Throwable ignored) {}
+                }
 
 
         } catch (Exception e) {
@@ -2237,6 +2270,10 @@ public class PillarIdManager {
         registerItemFrame(frame, false);
     }
 
+    static String resolveItemFrameType(CommonId entityTypeId) {
+        return entityTypeId != null ? entityTypeId.toString() : "minecraft:item_frame";
+    }
+
     public void registerItemFrame(net.minecraft.world.entity.decoration.ItemFrame frame, boolean immediate) {
         if (frame == null) {
             return;
@@ -2260,6 +2297,7 @@ public class PillarIdManager {
         BlockPos pos = frame.blockPosition();
         net.minecraft.core.Direction facing = frame.getDirection();
         String posKey = positionKey(dimension, pos, facing);
+        String frameType = resolveItemFrameType(Services.PLATFORM.getEntityTypeId(frame.getType()));
 
         PillarData existing = pillarData.get(id);
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
@@ -2271,7 +2309,7 @@ public class PillarIdManager {
             data.pattern = pattern;
             data.dyeColors = colors;
 
-            data.pillarType = "minecraft:item_frame";
+            data.pillarType = frameType;
             data.facing = facing != null ? facing.getSerializedName() : null;
 
             if (!frame.getItem().isEmpty()) {
@@ -2287,8 +2325,8 @@ public class PillarIdManager {
             positionIndex.put(posKey, id);
             boolean changed = false;
 
-            if (existing.pillarType == null || !existing.pillarType.equals("minecraft:item_frame")) {
-                existing.pillarType = "minecraft:item_frame";
+            if (!Objects.equals(existing.pillarType, frameType)) {
+                existing.pillarType = frameType;
                 changed = true;
             }
             if (!Objects.equals(existing.facing, facing != null ? facing.getSerializedName() : null)) {

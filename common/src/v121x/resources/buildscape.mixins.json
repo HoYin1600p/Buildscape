@@ -61,7 +61,7 @@
     "ElytraLayerV121xMixin",
     "HumanoidArmorLayerV121xMixin",
     "ItemRendererV121xMixin",
-    "RenderTypeArmorGlintV121xMixin",
+    "GlintBufferSourceV121xMixin",
     "RenderCompositeStateV121xAccessor",
     "RenderBuffersV121xMixin",
     "GeneralStatisticsListEntryMixin",

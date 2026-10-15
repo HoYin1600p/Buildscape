@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
-/** Festive glint with the reference shader's source-alpha blending and full colour strength. */
+/** Festive glint with the reference's additive blending and full colour strength. */
 public final class FestiveRenderTypes extends RenderType {
 
     public static final ResourceLocation FESTIVE_GLINT_LOCATION =
@@ -21,7 +21,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(GLINT_TEXTURING)
                     .createCompositeState(false));
 
@@ -33,7 +33,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(GLINT_TEXTURING)
                     .setOutputState(ITEM_ENTITY_TARGET)
                     .createCompositeState(false));
@@ -46,7 +46,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTransparencyState(GLINT_TRANSPARENCY)
                     .setOutputState(ITEM_ENTITY_TARGET)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
                     .createCompositeState(false));
@@ -59,7 +59,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
                     .createCompositeState(false));
 
@@ -71,7 +71,7 @@ public final class FestiveRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(EQUAL_DEPTH_TEST)
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                     .createCompositeState(false));

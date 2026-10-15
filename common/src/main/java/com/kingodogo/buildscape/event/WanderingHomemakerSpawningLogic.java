@@ -25,6 +25,7 @@ public final class WanderingHomemakerSpawningLogic {
 
     private enum BlockCategory {
         DECORATED_POT,
+        BIG_CANDLE,
         PILLAR,
         STAR,
         CUSHION,
@@ -33,6 +34,7 @@ public final class WanderingHomemakerSpawningLogic {
 
     private static BlockCategory getCategory(Block block) {
         if (block instanceof DecoratedPotBlock || block instanceof TrappedDecoratedPotBlock || isVanillaPotReplacement(block)) return BlockCategory.DECORATED_POT;
+        if (block instanceof BigCandleBlock) return BlockCategory.BIG_CANDLE;
         if (block instanceof PillarBlock || block instanceof AshenKingPillarBlock) return BlockCategory.PILLAR;
         if (block instanceof StarBlock) return BlockCategory.STAR;
         if (block instanceof CushionBlock) return BlockCategory.CUSHION;
@@ -147,7 +149,7 @@ public final class WanderingHomemakerSpawningLogic {
 
             long cooldownEnd = currentTime + 1800000L;
             data.putLong("WanderingHomemakerCooldownRealTime", cooldownEnd);
-            if ((Services.isVersionCluster("v121x") || Services.isVersionCluster("v26x")) && player instanceof ServerPlayer serverPlayer) {
+            if (player instanceof ServerPlayer serverPlayer) {
                 com.kingodogo.buildscape.network.PacketFactory.sendToPlayer(serverPlayer,
                         new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldownEnd));
             }

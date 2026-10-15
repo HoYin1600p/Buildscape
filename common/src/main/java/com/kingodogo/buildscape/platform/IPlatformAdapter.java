@@ -161,6 +161,7 @@ public interface IPlatformAdapter {
     void swingPlayerHand(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand);
     void resetSwingAnimation(net.minecraft.world.entity.LivingEntity entity);
     boolean isEnderman(Entity entity);
+    boolean isLargeFireball(Entity entity);
 
     Iterable<Item> getAllItems();
     net.minecraft.resources.ResourceKey<net.minecraft.core.Registry<Item>> getItemRegistryKey();

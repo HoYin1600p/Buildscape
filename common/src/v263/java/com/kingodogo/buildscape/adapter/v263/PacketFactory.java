@@ -32,6 +32,9 @@ public class PacketFactory implements IPacketFactory {
     ) {}
 
     public static void setServer(MinecraftServer server) {
+        if (server == null && currentServer != null) {
+            com.kingodogo.buildscape.event.ModCommonEvents.onServerStopped();
+        }
         currentServer = server;
     }
 

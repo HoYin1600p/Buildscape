@@ -173,9 +173,7 @@ public class MobPillarRenderer {
                 }
                 livingEntity.setSprinting(false);
                 livingEntity.setShiftKeyDown(false);
-                livingEntity.swingTime = 0;
-                livingEntity.attackAnim = 0.0f;
-                livingEntity.oAttackAnim = 0.0f;
+                Services.PLATFORM.resetSwingAnimation(livingEntity);
                 livingEntity.setDeltaMovement(0, 0, 0);
                 livingEntity.setSpeed(0.0f);
             }

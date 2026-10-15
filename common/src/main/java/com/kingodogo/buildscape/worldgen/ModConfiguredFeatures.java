@@ -785,7 +785,7 @@ public class ModConfiguredFeatures {
     private static ConfiguredFeature<?, ?> createMonetConfiguration(
             com.kingodogo.buildscape.block.BlockDefinition monetBlock
     ) {
-        return Services.PLATFORM.createPatchFeature(
+        return (ConfiguredFeature<?, ?>) Services.PLATFORM.createPatchFeature(
                 BlockStateProvider.simple(monetBlock.defaultBlockState()),
                 64, 7, 3
         );
@@ -818,7 +818,7 @@ public class ModConfiguredFeatures {
         }
 
         BlockStateProvider stateProvider = Services.PLATFORM.createRandomStateProvider(states);
-        return Services.PLATFORM.createPatchFeature(stateProvider, 32, 7, 3);
+        return (ConfiguredFeature<?, ?>) Services.PLATFORM.createPatchFeature(stateProvider, 32, 7, 3);
     }
 
     private static com.kingodogo.buildscape.block.BlockDefinition vanillaBlock(String id) {
@@ -873,7 +873,7 @@ public class ModConfiguredFeatures {
         }
 
         BlockStateProvider stateProvider = Services.PLATFORM.createRandomStateProvider(states);
-        return Services.PLATFORM.createPatchFeature(stateProvider, 192, 7, 3);
+        return (ConfiguredFeature<?, ?>) Services.PLATFORM.createPatchFeature(stateProvider, 192, 7, 3);
     }
 
     private static ConfiguredFeature<?, ?> createCloverConfigurationWithRandomStates(
@@ -904,7 +904,7 @@ public class ModConfiguredFeatures {
         }
 
         BlockStateProvider stateProvider = Services.PLATFORM.createRandomStateProvider(states);
-        return Services.PLATFORM.createPatchFeature(stateProvider, 64, 7, 3);
+        return (ConfiguredFeature<?, ?>) Services.PLATFORM.createPatchFeature(stateProvider, 64, 7, 3);
     }
 
     private static ConfiguredFeature<?, ?> createFlowerPatchConfiguration(
@@ -927,7 +927,7 @@ public class ModConfiguredFeatures {
             }
         }
         BlockStateProvider stateProvider = Services.PLATFORM.createRandomStateProvider(states);
-        return Services.PLATFORM.createPatchFeature(stateProvider, 64, 7, 3);
+        return (ConfiguredFeature<?, ?>) Services.PLATFORM.createPatchFeature(stateProvider, 64, 7, 3);
     }
 
     private static ConfiguredFeature<?, ?> createPetalConfiguration(
@@ -945,7 +945,7 @@ public class ModConfiguredFeatures {
                 .setValue(FLOWER_AMOUNT, flowerAmount)
                 .setValue(FACING_PROP, facing);
 
-        return Services.PLATFORM.createPatchFeature(BlockStateProvider.simple(state), 64, 7, 3);
+        return (ConfiguredFeature<?, ?>) Services.PLATFORM.createPatchFeature(BlockStateProvider.simple(state), 64, 7, 3);
     }
 
     private static ConfiguredFeature<?, ?> createCloverConfiguration(
@@ -962,7 +962,7 @@ public class ModConfiguredFeatures {
                 .setValue(FLOWER_AMOUNT, flowerAmount)
                 .setValue(FACING_PROP, facing);
 
-        return Services.PLATFORM.createPatchFeature(BlockStateProvider.simple(state), 64, 7, 3);
+        return (ConfiguredFeature<?, ?>) Services.PLATFORM.createPatchFeature(BlockStateProvider.simple(state), 64, 7, 3);
     }
 
     private static SimpleBlockConfiguration createColoredSporeBlossomConfiguration() {
@@ -999,7 +999,7 @@ public class ModConfiguredFeatures {
     private static ConfiguredFeature<?, ?> createMangrovePropagulePatchConfiguration(
             int count
     ) {
-        return Services.PLATFORM.createPatchFeature(
+        return (ConfiguredFeature<?, ?>) Services.PLATFORM.createPatchFeature(
                 BlockStateProvider.simple(
                         vanillaBlock("minecraft:mangrove_propagule").defaultBlockState()
                 ),
@@ -1023,7 +1023,7 @@ public class ModConfiguredFeatures {
     }
 
     private static TreeConfiguration createPoplarTreeConfiguration() {
-        return Services.PLATFORM.createTreeConfiguration(
+        return (TreeConfiguration) Services.PLATFORM.createTreeConfiguration(
                 BlockStateProvider.simple(
                         ModBlocks.POPLAR_LOG.get().defaultBlockState()
                 ),
@@ -1052,7 +1052,7 @@ public class ModConfiguredFeatures {
     }
 
     private static TreeConfiguration createPaleOakTreeConfiguration() {
-        return Services.PLATFORM.createTreeConfiguration(
+        return (TreeConfiguration) Services.PLATFORM.createTreeConfiguration(
                 BlockStateProvider.simple(vanillaBlock("minecraft:pale_oak_log").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(5, 2, 1),
                 BlockStateProvider.simple(vanillaBlock("minecraft:pale_oak_leaves").defaultBlockState()),
@@ -1068,7 +1068,7 @@ public class ModConfiguredFeatures {
     }
 
     private static TreeConfiguration createCherryTreeConfiguration() {
-        return Services.PLATFORM.createTreeConfiguration(
+        return (TreeConfiguration) Services.PLATFORM.createTreeConfiguration(
                 BlockStateProvider.simple(vanillaBlock("minecraft:cherry_log").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(4, 2, 0),
                 BlockStateProvider.simple(vanillaBlock("minecraft:cherry_leaves").defaultBlockState()),

@@ -86,7 +86,23 @@ def target_config(repo, config, target_id, registry_path):
         raise SyncError("Target branch is not activated: " + target_id)
     for key in ("reference_snapshot", "mapping_file", "java_root", "resource_root", "state_file"):
         relative(target[key])
-    return target, branch_config
+    # Work on a copy: branch_config is written back to the registry on apply.
+    return dict(target, foreign_clusters=foreign_clusters(branch_config, target)), branch_config
+
+
+def clusters_of(target):
+    return [c for c in target.get("version_clusters", [target.get("version_cluster", "")]) if c]
+
+
+def foreign_clusters(config, target):
+    """VersionClusters registered by other targets; ledger paths in them never belong to this one."""
+    registered = {c for t in config["targets"] for c in clusters_of(t)}
+    return sorted(registered - set(clusters_of(target)))
+
+
+def cluster_tag(path):
+    match = re.search(r"/(?:src|adapter)/(v\w+)/", path)
+    return match[1] if match else ""
 
 
 def source_revision(repo, config, source_repo=None, fetch=False):
@@ -145,15 +161,38 @@ def metadata(path):
             or path.startswith("gradle/"))
 
 
+# mc26.2 predates the registry key; every other target must declare removal_policy explicitly.
+LEGACY_REMOVAL_POLICIES = {"mc26.2": {"file": "sync/removals26x.json", "inherits": "mc26.2"}}
+
+
+def inherited_policy(policy, spec, target):
+    """Apply an approved removal policy to a later target without adding or dropping a removal.
+
+    Only the target-specific resource root is rewritten: the policy names paths under the root of the
+    target it was approved for ("inherited_resource_root"), and the same files live under this
+    target's own resource_root. Every other path and every removed id stay exactly as approved.
+    """
+    owner = spec["inherits"]
+    if owner == target["id"]:
+        return policy
+    old_root = relative(spec["inherited_resource_root"]).rstrip("/") + "/"
+    new_root = target["resource_root"].rstrip("/") + "/"
+    paths = [new_root + p[len(old_root):] if p.startswith(old_root) else p
+             for p in policy.get("excluded_target_paths", [])]
+    return dict(policy, excluded_target_paths=paths, inherited_from=owner)
+
+
 def removal_policy(repo, target):
-    if target["id"] != "mc26.2":
+    spec = target.get("removal_policy") or LEGACY_REMOVAL_POLICIES.get(target["id"])
+    if not spec:
         return {}
-    policy = json_blob(repo, target["branch"], "sync/removals26x.json")
-    if policy.get("schema_version") != 1 or policy.get("target") != target["id"]:
-        raise SyncError("Invalid mc26.2 removal policy")
+    owner = spec["inherits"]
+    policy = json_blob(repo, target["branch"], relative(spec["file"]))
+    if policy.get("schema_version") != 1 or policy.get("target") != owner:
+        raise SyncError(f"Invalid {owner} removal policy")
     for path in policy.get("excluded_target_paths", []):
         relative(path)
-    return policy
+    return inherited_policy(policy, spec, target)
 
 
 def retired_path(path, target, policy, source=None):
@@ -191,6 +230,8 @@ def mapped_java(repo, target, old, row, source):
     prefix = source["subtree"] + "/main/java/"
     roots = java_roots(target)
     resolved = []
+    # The shared ledger also names other clusters' adapters; a target never ports into those.
+    paths = [p for p in paths if cluster_tag(p) not in target.get("foreign_clusters", ())]
     for path in paths:
         # Older ledger rows can still name a file before its cluster-root move.
         if blob(repo, target["branch"], path, True) is None:

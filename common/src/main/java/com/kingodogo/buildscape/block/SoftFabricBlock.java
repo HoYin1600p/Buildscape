@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.BlockGetter;
@@ -66,10 +65,10 @@ public class SoftFabricBlock extends Block {
         ItemStack tool = player.getMainHandItem();
         float speedMultiplier = 1.0F;
 
-        if (tool.getItem() instanceof ShearsItem || tool.getItem() instanceof HoeItem) {
+        if (tool.getItem() instanceof ShearsItem || Services.PLATFORM.isHoeItem(tool)) {
             if (tool.getItem() instanceof ShearsItem) {
                 speedMultiplier = 5.0F;
-            } else if (tool.getItem() instanceof HoeItem) {
+            } else if (Services.PLATFORM.isHoeItem(tool)) {
                 speedMultiplier = Services.PLATFORM.getHoeMiningSpeed(tool);
             } else {
                 speedMultiplier = 2.0F;

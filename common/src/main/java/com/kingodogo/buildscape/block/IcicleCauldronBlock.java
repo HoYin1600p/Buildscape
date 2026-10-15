@@ -105,7 +105,7 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock, I
                 if (heldItem.isEmpty()) {
                     player.setItemInHand(hand, extracted);
                 } else if (!player.getInventory().add(extracted)) {
-                    player.drop(extracted, false);
+                    Services.PLATFORM.dropPlayerItem(player, extracted, false);
                 }
                 Services.PLATFORM.playItemPickup(level, pos, 0.2f, 1.0f);
             }

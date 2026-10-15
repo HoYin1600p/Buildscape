@@ -39,7 +39,7 @@ public class SignFrameInteractionHandler {
                 if (!player.getAbilities().instabuild && currentFrame.getItem() != null) {
                     ItemStack returnStack = new ItemStack(currentFrame.getItem());
                     if (!player.getInventory().add(returnStack)) {
-                        player.drop(returnStack, false);
+                        Services.PLATFORM.dropPlayerItem(player, returnStack, false);
                     }
                 }
 
@@ -47,7 +47,7 @@ public class SignFrameInteractionHandler {
                 level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
 
-            player.swing(hand);
+            Services.PLATFORM.swingPlayerHand(player, hand);
             return Services.PLATFORM.sidedSuccess(level.isClientSide());
         }
 
@@ -63,7 +63,7 @@ public class SignFrameInteractionHandler {
                     level.playSound(null, pos, SoundEvents.ITEM_FRAME_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
 
-                player.swing(hand);
+                Services.PLATFORM.swingPlayerHand(player, hand);
                 return Services.PLATFORM.sidedSuccess(level.isClientSide());
             } else {
                 return InteractionResult.FAIL;

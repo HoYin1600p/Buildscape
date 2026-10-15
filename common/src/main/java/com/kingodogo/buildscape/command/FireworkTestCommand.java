@@ -61,7 +61,7 @@ public class FireworkTestCommand {
             Services.PLATFORM.setItemCustomName(stack, Services.PLATFORM.literal("§6Buildscape §e" + capitalize(shapeName) + " Firework Rocket"));
 
             if (!player.getInventory().add(stack)) {
-                player.drop(stack, false);
+                Services.PLATFORM.dropPlayerItem(player, stack, false);
             }
 
             Services.PLATFORM.sendCommandSuccess(source, "§aGave 1x §6" + capitalize(shapeName) + " Firework Rocket§a to " + player.getScoreboardName(), true);

@@ -1,0 +1,32 @@
+{
+  "pools": [
+    {
+      "entries": [
+        {
+          "modifier": {
+            "type": "minecraft:set_count",
+            "condition": {
+              "type": "minecraft:match_block",
+              "blocks": "buildscape:poplar_slab",
+              "state": {
+                "type": "double"
+              }
+            },
+            "count": {
+              "min": 1,
+              "type": "minecraft:uniform",
+              "max": 2
+            }
+          },
+          "name": "buildscape:poplar_slab",
+          "type": "minecraft:item"
+        }
+      ],
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      }
+    }
+  ],
+  "type": "minecraft:block"
+}

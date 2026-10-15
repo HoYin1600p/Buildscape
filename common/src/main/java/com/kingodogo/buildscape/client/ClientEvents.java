@@ -134,10 +134,14 @@ public class ClientEvents {
                 Minecraft.getInstance().execute(ClientEvents::resetAllPillarParticles);
             }
         });
+        com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.warmupAsync();
     }
 
     public static void onClientTick() {
         Minecraft mc = Minecraft.getInstance();
+        if (mc.level != null && !com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.isItemsCached()) {
+            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.warmupAsync();
+        }
         if (mc.level == null || mc.player == null) {
             while (ModKeyBinds.CINEMATIC_ZOOM.consumeClick()) { }
             return;

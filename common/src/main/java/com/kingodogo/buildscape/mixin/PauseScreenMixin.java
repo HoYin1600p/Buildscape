@@ -14,6 +14,9 @@ public abstract class PauseScreenMixin {
     @Inject(method = "init", at = @At("TAIL"))
     public void addBuildScapeConfigButton(CallbackInfo ci) {
         PauseScreen screen = (PauseScreen) (Object) this;
+        try {
+            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.warmupAsync();
+        } catch (Throwable ignored) {}
         MixinFactory.addPauseScreenButton(screen, screen.width, screen.height, screen.children());
     }
 }

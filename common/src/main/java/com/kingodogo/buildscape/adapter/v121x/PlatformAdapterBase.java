@@ -185,6 +185,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public String getClipboardText() {
+        return net.minecraft.client.Minecraft.getInstance().keyboardHandler.getClipboard();
+    }
+
+    @Override
     public boolean widgetMouseClicked(net.minecraft.client.gui.components.AbstractWidget widget, double mouseX, double mouseY, int button) {
         return ClientAccess.widgetMouseClicked(widget, mouseX, mouseY, button);
     }

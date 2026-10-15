@@ -42,6 +42,7 @@ public final class ForgeGameplayEvents {
         bus.addListener(ForgeGameplayEvents::rightClickBlock);
         bus.addListener(ForgeGameplayEvents::rightClickItem);
         bus.addListener(ForgeGameplayEvents::entityInteract);
+        bus.addListener(ForgeGameplayEvents::entityInteractSpecific);
         bus.addListener((PlayerInteractEvent.LeftClickBlock event) -> {
             InteractionResult result = ModCommonEvents.onLeftClickBlock(event.getPlayer(), event.getWorld(), event.getPos());
             if (result != InteractionResult.PASS) {
@@ -178,6 +179,14 @@ public final class ForgeGameplayEvents {
     }
 
     private static void entityInteract(PlayerInteractEvent.EntityInteract event) {
+        InteractionResult result = ModCommonEvents.onEntityInteract(event.getPlayer(), event.getWorld(), event.getHand(), event.getTarget());
+        if (result != InteractionResult.PASS) {
+            event.setCancellationResult(result);
+            event.setCanceled(true);
+        }
+    }
+
+    private static void entityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
         InteractionResult result = ModCommonEvents.onEntityInteract(event.getPlayer(), event.getWorld(), event.getHand(), event.getTarget());
         if (result != InteractionResult.PASS) {
             event.setCancellationResult(result);

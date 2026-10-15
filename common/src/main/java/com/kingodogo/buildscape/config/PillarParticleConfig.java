@@ -7,6 +7,7 @@ import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
 
 import java.io.File;
 import java.io.FileReader;
@@ -24,6 +25,45 @@ import java.util.function.Consumer;
 public class PillarParticleConfig {
 
     public static final int CONFIG_PERMISSION_LEVEL = 4;
+
+    public enum EditPermissionMode {
+        STRICT,
+        STANDARD,
+        OPEN
+    }
+
+    public enum EditScope {
+        LIMITED,
+        GENERAL,
+        POLICY
+    }
+
+    public static EditPermissionMode parseEditPermissionMode(String value) {
+        if (value == null) return EditPermissionMode.STRICT;
+        try {
+            return EditPermissionMode.valueOf(value.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return EditPermissionMode.STRICT;
+        }
+    }
+
+    public static boolean canEdit(EditPermissionMode mode, int permissionLevel, EditScope scope) {
+        if (scope == EditScope.POLICY) return permissionLevel >= CONFIG_PERMISSION_LEVEL;
+        EditPermissionMode resolvedMode = mode != null ? mode : EditPermissionMode.STRICT;
+        return switch (resolvedMode) {
+            case STRICT -> permissionLevel >= CONFIG_PERMISSION_LEVEL;
+            case STANDARD -> scope == EditScope.LIMITED
+                    ? permissionLevel >= 2
+                    : permissionLevel >= CONFIG_PERMISSION_LEVEL;
+            case OPEN -> true;
+        };
+    }
+
+    public static boolean canPlayerEdit(Player player, EditPermissionMode mode, EditScope scope) {
+        int permissionLevel = Services.PLATFORM.hasPermission(player, CONFIG_PERMISSION_LEVEL) ? CONFIG_PERMISSION_LEVEL
+                : Services.PLATFORM.hasPermission(player, 2) ? 2 : 0;
+        return canEdit(mode, permissionLevel, scope);
+    }
     public static final String[] DEFAULT_COLORS = {
             "#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF", "#9B51E0"
     };
@@ -34,6 +74,15 @@ public class PillarParticleConfig {
 
     private static PillarParticleConfig INSTANCE;
     private static volatile PillarParticleConfig SNAPSHOT = null;
+    private static volatile int CLIENT_PERMISSION_LEVEL = -1;
+
+    public static int getClientPermissionLevel() {
+        return CLIENT_PERMISSION_LEVEL;
+    }
+
+    public static void setClientPermissionLevel(int permissionLevel) {
+        CLIENT_PERMISSION_LEVEL = Math.max(-1, Math.min(CONFIG_PERMISSION_LEVEL, permissionLevel));
+    }
 
     public static void clearServerConfig() {
         SNAPSHOT = null;
@@ -66,6 +115,7 @@ public class PillarParticleConfig {
     public int max_particle_color = 3;
 
     public Set<String> items = new HashSet<>();
+    public EditPermissionMode edit_permission_mode = EditPermissionMode.STRICT;
 
     public PillarParticleConfig() {
         this.particle_color.add("#FFB81C");
@@ -201,7 +251,8 @@ public class PillarParticleConfig {
                 writer.write("  // Hexadecimal particle color palette (up to 7 colors)\n");
                 writer.write("  \"particle_color\": [\"#FFB81C\", \"#FFFFFF\", \"#FFFF00\", \"#E8FEFD\", \"#FF5C00\", \"#3CDFFF\", \"#9B51E0\"],\n");
                 writer.write("  \n");
-                writer.write("  \"max_particle_color\": 3\n");
+                writer.write("  \"max_particle_color\": 3,\n");
+                writer.write("  \"edit_permission_mode\": \"STRICT\"\n");
                 writer.write("}\n");
             }
         } catch (Exception ignored) {
@@ -432,6 +483,8 @@ public class PillarParticleConfig {
                     this.pattern_speed = loaded.pattern_speed > 0 ? loaded.pattern_speed : this.pattern_speed;
                     this.pattern_spread = loaded.pattern_spread > 0 ? loaded.pattern_spread : this.pattern_spread;
                     this.pattern_intensity = loaded.pattern_intensity > 0 ? loaded.pattern_intensity : this.pattern_intensity;
+                    Object permissionMode = jsonMap.get("edit_permission_mode");
+                    this.edit_permission_mode = parseEditPermissionMode(permissionMode instanceof String value ? value : null);
 
                     List<String> rawColors = null;
                     if (loaded.particle_color != null && !loaded.particle_color.isEmpty()) {
@@ -618,7 +671,8 @@ public class PillarParticleConfig {
                 writer.write("  \"pattern_spread\": " + pattern_spread + ",\n");
                 writer.write("  \"pattern_intensity\": " + pattern_intensity + ",\n");
                 writer.write("  \"particle_color\": " + GSON.toJson(particle_color) + ",\n");
-                writer.write("  \"max_particle_color\": " + max_particle_color + "\n");
+                writer.write("  \"max_particle_color\": " + max_particle_color + ",\n");
+                writer.write("  \"edit_permission_mode\": \"" + edit_permission_mode.name() + "\"\n");
                 writer.write("}\n");
             }
             lastLoadedProperties = file.lastModified();

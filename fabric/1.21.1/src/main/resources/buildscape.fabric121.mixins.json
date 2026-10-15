@@ -13,10 +13,12 @@
     "AdvancementCompletionMixin",
     "AnvilUpdateMixin",
     "BlockPlacementMixin",
+    "DoublePlantPlacementMixin",
     "CraftingMixin",
     "CraftingResultPreparationMixin",
     "ItemUseFinishMixin",
     "PlayerDimensionMixin",
+    "PlayerSpawnMixin",
     "EndermanGriefingMixin",
     "EndermanLeaveBlockGriefingMixin",
     "ExplosionGriefingMixin"

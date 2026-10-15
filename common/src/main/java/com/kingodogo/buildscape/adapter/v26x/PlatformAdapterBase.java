@@ -3311,7 +3311,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
             offers.clear();
 
             java.util.Random rand = new java.util.Random(this.getRandom().nextLong());
-            List<MerchantOffer> list = WanderingHomemakerTrades.getFestiveTrades(rand);
+            List<MerchantOffer> list = WanderingHomemakerTrades.getFestiveTrades(rand, false);
             Collections.shuffle(list, rand);
             for (int j = 0; j < Math.min(6, list.size()); j++) {
                 offers.add(list.get(j));

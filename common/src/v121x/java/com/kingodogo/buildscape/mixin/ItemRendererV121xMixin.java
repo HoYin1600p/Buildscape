@@ -59,8 +59,8 @@ public abstract class ItemRendererV121xMixin {
     private static void buildscape$festiveCompassFoilBuffer(MultiBufferSource bufferSource, RenderType renderType, PoseStack.Pose pose, CallbackInfoReturnable<VertexConsumer> cir) {
         if (FestiveStackBufferSource.isFestive(bufferSource)) {
             cir.setReturnValue(VertexMultiConsumer.create(
-                    // Main's festive texture uses the original unit-scale decal projection.
-                    new SheetedDecalTextureGenerator(bufferSource.getBuffer(FestiveRenderTypes.festiveGlint()), pose, 1.0F),
+                    // Keep this version's compass projection; only replace the foil texture.
+                    new SheetedDecalTextureGenerator(bufferSource.getBuffer(FestiveRenderTypes.festiveGlint()), pose, ItemRenderer.COMPASS_FOIL_TEXTURE_SCALE),
                     bufferSource.getBuffer(renderType)));
         }
     }

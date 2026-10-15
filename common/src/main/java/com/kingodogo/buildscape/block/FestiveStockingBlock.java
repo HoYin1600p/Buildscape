@@ -244,6 +244,9 @@ public class FestiveStockingBlock extends Block implements EntityBlock, SimpleWa
             return InteractionResult.SUCCESS;
         }
 
-        return InteractionResult.PASS;
+        if (!level.isClientSide()) {
+            level.playSound(null, pos, ModSounds.DECORATED_POT_INSERT_FAIL.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
+        }
+        return Services.PLATFORM.sidedSuccess(level.isClientSide());
     }
 }

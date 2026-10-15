@@ -90,6 +90,7 @@ public interface IPlatformAdapter {
     int getClientParticleSetting();
     boolean hasShiftDown();
     boolean hasControlDown();
+    String getClipboardText();
     boolean widgetMouseClicked(net.minecraft.client.gui.components.AbstractWidget widget, double mouseX, double mouseY, int button);
     boolean widgetKeyPressed(net.minecraft.client.gui.components.AbstractWidget widget, int keyCode, int scanCode, int modifiers);
     boolean widgetCharTyped(net.minecraft.client.gui.components.AbstractWidget widget, char codePoint, int modifiers);

@@ -107,6 +107,10 @@ public final class ClientPlatformHooks {
         return net.minecraft.client.Minecraft.getInstance().hasControlDown();
     }
 
+    public static String getClipboardText() {
+        return net.minecraft.client.Minecraft.getInstance().keyboardHandler.getClipboard();
+    }
+
     private static net.minecraft.client.input.MouseButtonEvent mouseEvent(double mouseX, double mouseY, int button) {
         return new net.minecraft.client.input.MouseButtonEvent(mouseX, mouseY,
                 new net.minecraft.client.input.MouseButtonInfo(button, 0));

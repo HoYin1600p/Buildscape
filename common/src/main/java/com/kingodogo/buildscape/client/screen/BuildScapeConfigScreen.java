@@ -9,6 +9,7 @@ import com.kingodogo.buildscape.network.PacketFactory;
 import com.kingodogo.buildscape.network.RemovePillarPacket;
 import com.kingodogo.buildscape.network.RequestPillarIdsPacket;
 import com.kingodogo.buildscape.network.UpdateAllPillarIdsPacket;
+import com.kingodogo.buildscape.network.UpdateConfigPacket;
 import com.kingodogo.buildscape.network.UpdateGameRulePacket;
 import com.kingodogo.buildscape.network.UpdatePillarDataPacket;
 import com.kingodogo.buildscape.platform.Services;
@@ -29,12 +30,127 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
+import java.net.URI;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 
 // Unified Single-Panel Buildscape Configuration Screen.
 public class BuildScapeConfigScreen implements IScreenDelegate {
+
+    record ConfigLink(String title, String description, String url) {}
+
+    record PresetSideTabGeometry(int x, int y, int width, int height, int centerX, int centerY) {}
+
+    record ItemToolbarGeometry(int filterWidth, int searchWidth, int namespaceWidth, int gap, int totalWidth) {}
+
+    static PresetSideTabGeometry calculatePresetSideTabGeometry(int frameRight, int tabY, boolean hovered) {
+        int width = hovered ? 32 : 30;
+        int height = 30;
+        int x = frameRight - 2;
+        return new PresetSideTabGeometry(x, tabY, width, height, x + width / 2, tabY + height / 2);
+    }
+
+    static ItemToolbarGeometry calculateItemToolbarGeometry(int availableWidth) {
+        int gap = 3;
+        int safeWidth = Math.max(120, availableWidth);
+        int filterWidth = safeWidth >= 255 ? Math.max(60, Math.min(92, safeWidth / 8))
+                : Math.max(24, (safeWidth - 51) / 4);
+        int namespaceWidth = safeWidth >= 255 ? Math.max(62, Math.min(128, safeWidth / 6)) : Math.max(30, filterWidth);
+        int searchWidth = Math.max(1, safeWidth - filterWidth * 3 - namespaceWidth - gap * 4);
+        return new ItemToolbarGeometry(filterWidth, searchWidth, namespaceWidth, gap,
+                filterWidth * 3 + searchWidth + namespaceWidth + gap * 4);
+    }
+
+    static List<String> getCompactFilterLabels() {
+        return List.of("All", "Inventory", "Active");
+    }
+
+    static String getNamespaceSelectorLabel(int selectedIndex, List<String> namespaces) {
+        return selectedIndex >= 0 && selectedIndex < namespaces.size() ? namespaces.get(selectedIndex) : "All";
+    }
+
+    static int getSystemSettingRowCount() {
+        return 4;
+    }
+
+    static int calculateCycleDescriptionWidth(int rowWidth, int controlWidth) {
+        return Math.max(1, rowWidth - controlWidth - 20);
+    }
+
+    static int getItemToolbarControlHeight() {
+        return 15;
+    }
+
+    static int getSystemSettingRowHeight() {
+        return 36;
+    }
+
+    static int calculateSystemContentHeight(int gap) {
+        return getSystemSettingRowCount() * (getSystemSettingRowHeight() + gap) - gap;
+    }
+
+    static String applySearchCharacter(String value, boolean selectAll, char character) {
+        return selectAll ? String.valueOf(character) : value + character;
+    }
+
+    static String applySearchBackspace(String value, boolean selectAll) {
+        if (selectAll) return "";
+        return value.isEmpty() ? value : value.substring(0, value.length() - 1);
+    }
+
+    static float calculateItemContentTransitionAlpha(long now, long startedAt, int duration) {
+        if (duration <= 0) return 1.0F;
+        float progress = Math.min(1.0F, Math.max(0.0F, (now - startedAt) / (float) duration));
+        return 0.45F + 0.55F * easeOutCubic(progress);
+    }
+
+    static boolean shouldCacheTagDiscovery(Collection<String> tags) {
+        return tags != null && !tags.isEmpty();
+    }
+
+    static List<String> mergeDiscoveredTags(Collection<String> registryTags, Collection<String> holderTags) {
+        Set<String> merged = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        if (registryTags != null) {
+            for (String tag : registryTags) {
+                if (tag != null && !tag.isBlank()) merged.add(tag.startsWith("#") ? tag : "#" + tag);
+            }
+        }
+        if (holderTags != null) {
+            for (String tag : holderTags) {
+                if (tag != null && !tag.isBlank()) merged.add(tag.startsWith("#") ? tag : "#" + tag);
+            }
+        }
+        return new ArrayList<>(merged);
+    }
+
+    static int resolveClientPermissionLevel(int syncedLevel, boolean localLevelTwo, boolean localLevelFour) {
+        if (syncedLevel >= 0) return Math.min(PillarParticleConfig.CONFIG_PERMISSION_LEVEL, syncedLevel);
+        return localLevelFour ? PillarParticleConfig.CONFIG_PERMISSION_LEVEL : localLevelTwo ? 2 : 0;
+    }
+
+    static float readOnlyFeedbackAlpha(long now, long startedAt) {
+        if (startedAt < 0L) return 0.0F;
+        long elapsed = Math.max(0L, now - startedAt);
+        return elapsed >= 600L ? 0.0F : 1.0F - elapsed / 600.0F;
+    }
+
+    static List<String> getWorldSettingSections() {
+        return List.of("Player Settings", "World Rules");
+    }
+
+    private static final List<ConfigLink> CONFIG_LINKS = Collections.unmodifiableList(Arrays.asList(
+            new ConfigLink("Buildscape Website", "News, documentation, and project information", "https://buildscape.online/"),
+            new ConfigLink("Report a Bug", "Report issues with Buildscape", "https://buildscape.online/report"),
+            new ConfigLink("Ko-fi", "Support continued Buildscape development", "https://ko-fi.com/itzmedga"),
+            new ConfigLink("CurseForge", "View releases on CurseForge", "https://www.curseforge.com/minecraft/mc-mods/buildscape"),
+            new ConfigLink("Modrinth", "View releases on Modrinth", "https://modrinth.com/project/9qweL5rw")
+    ));
+
+    static List<ConfigLink> getConfigLinks() {
+        return CONFIG_LINKS;
+    }
 
     private final Screen parent;
     private final Component title;
@@ -46,7 +162,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public int width;
     public int height;
 
-    // --- Local Client Preferences & Dynamic Animation Scaling ---
+    // Local client preferences and animation scaling.
     private static int animSpeedIndex = 0;
     private static final String[] ANIM_SPEEDS = {"Smooth", "Snappy", "Instant"};
 
@@ -88,7 +204,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private float openProgress = 0.0f;
     private float closeProgress = 1.0f;
 
-    // --- Active Theme Palette ---
+    // Active theme palette.
     public static ConfigThemes.Theme currentTheme = ConfigThemes.getCurrentTheme();
 
     public static int COLOR_OVERLAY = currentTheme.colorOverlay;
@@ -191,7 +307,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         COLOR_ACCENT_GLOW = theme.colorAccentGlow;
     }
 
-    // --- Sidenav Specification ---
+    // Side navigation state.
     public static class NavItem {
         public final String id;
         public final String icon;
@@ -210,7 +326,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private int selectedTabIndex = 0;
     private boolean navExpanded = true;
 
-    // --- Scroll & Viewport State ---
+    // Scroll and viewport state.
     private double scrollOffset = 0.0;
     private double targetScrollOffset = 0.0;
     private double maxScroll = 0.0;
@@ -223,7 +339,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private int currentScrollbarTrackH = 0;
     private int currentScrollbarThumbH = 18;
 
-    // --- Particle Settings Options Arrays ---
+    // Particle setting options.
     private static final String[] GLOBAL_PARTICLE_PATTERNS = {
             "none", "ring", "beam", "spiral", "fountain", "pulse", "burst", "snowflake"
     };
@@ -231,16 +347,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             "none", "default", "beam", "spiral", "fountain", "pulse", "ring", "burst", "snowflake"
     };
 
-    // --- Pillar IDs State ---
+    // Pillar selection state.
     private final Set<String> selectedPillarIds = new HashSet<>();
     private long lastPillarRefreshCheck = 0L;
     private long lastPillarRowClickTime = 0L;
     private String lastPillarRowClickId = null;
 
-    // --- High-Performance Tab View & Viewport Caching ---
+    // Cached tab view state.
     private final TabCacheManager tabCache = new TabCacheManager();
 
-    // --- Session-Wide Static Item & Tag Registry Caches (eliminates constructor/init freeze) ---
+    // Session-wide registry caches prevent first-open discovery work.
     private static final List<Item> STATIC_AVAILABLE_ITEMS = new ArrayList<>();
     private static final List<String> STATIC_AVAILABLE_MOD_NAMESPACES = new ArrayList<>();
     private static volatile boolean itemsCached = false;
@@ -248,24 +364,37 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private static final List<String> STATIC_ALL_REGISTERED_TAGS = new ArrayList<>();
     private static final Map<String, Integer> STATIC_TAG_ITEM_COUNTS = new HashMap<>();
     private static volatile boolean tagsCached = false;
-    private static volatile boolean tagsLoading = false;
 
     // Cooldown on disk synchronization for pillar markers
     private static long lastPillarsSyncTime = 0L;
     private static final long PILLARS_SYNC_COOLDOWN_MS = 5000L;
 
-    // --- Presets & Items State ---
+    // Preset, item, and tag state.
     private int selectedPresetIndex = 0;
     private int itemsSubTab = 0; // 0 = Display Items, 1 = Display Tags
-    private int itemFilterMode = 0; // 0=All Items, 1=Inventory, 2=Mod Toggles, 3=Active
-    private int tagFilterMode = 0; // 0=All Tags, 1=Inventory, 2=Mod Toggles, 3=Active
+    private int itemFilterMode = 0; // 0=All Items, 1=Inventory, 2=Active
+    private int tagFilterMode = 0; // 0=All Tags, 1=Inventory, 2=Active
     private int currentTagModIndex = 0;
+    private int itemSearchNamespaceIndex = -1;
+    private int tagSearchNamespaceIndex = -1;
+    private int focusedSearchField = 0;
+    private boolean searchTextSelected = false;
+    private int lastSearchClickField = 0;
+    private long lastSearchClickTime = 0L;
+    private long itemContentTransitionStartTime = 0L;
+    private boolean itemContentTransitioning = false;
+    private boolean presetNameFocused = false;
+    private String presetNameInput = "";
+    private String pendingDestructiveAction = null;
+    private long pendingDestructiveActionUntil = 0L;
+    private String itemSearchFilter = "";
     private String tagSearchFilter = "";
     private final String[] TAG_CATEGORY_CHIPS = {"All", "keys", "gems", "ores", "vault", "swords", "gear"};
     private int activeTagChipIndex = 0;
 
     private final List<Item> availableItems = new ArrayList<>();
     private final List<String> availableModNamespaces = new ArrayList<>();
+    private final List<String> availableTagNamespaces = new ArrayList<>();
     private int currentModIndex = 0;
     private final List<Item> cachedInventoryItems = new ArrayList<>();
     private final Set<Item> cachedActiveItems = new HashSet<>();
@@ -287,8 +416,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private int deferredTooltipY = 0;
     private int rawMouseX = 0;
     private int rawMouseY = 0;
+    private long readOnlyDeniedAt = -1L;
+    private int readOnlyDeniedX = 0;
+    private int readOnlyDeniedY = 0;
 
-    // --- Draggable Color Picker Modal State ---
+    // Color picker state.
     private boolean showColorModal = false;
     private boolean isEditingPillarColor = false;
     private String editingPillarId = null;
@@ -305,14 +437,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             0xFF3CDFFF, 0xFFE8FEFD, 0xFF8E8E93, 0xFF1C1C1E
     };
 
-    // --- Per-Pillar Customization Detail View ---
+    // Per-pillar detail state.
     private String selectedPillarDetailId = null;
     private String closingPillarDetailId = null;
     private String prevPillarDetailId = null;
     private long pillarSwitchStartTime = 0L;
     private boolean isPillarSwitching = false;
 
-    // --- Connected Right Side Panel (Sliding Modifier Drawer) ---
+    // Sliding side-panel state.
     public enum SidePanelType {
         NONE,
         PILLAR_DETAIL,
@@ -421,11 +553,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             openSidePanel(SidePanelType.PRESETS);
         }
 
+        SidePanelLayout layout = calculateLayout();
         int tabH = 26;
         int tabGap = 3;
-        int effH = getEffectiveHeight();
-        int panelH = Math.min(effH - 16, 308);
-        int panelY = (effH - panelH) / 2;
+        int panelY = layout.panelY;
         int headerH = 24;
         int navY = panelY + 7 + headerH + 5;
         int startY = navY + 4;
@@ -522,7 +653,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Local Client Preferences ---
+    // Local client preferences.
     private boolean autoSnappingEnabled = true;
     private boolean strictBoundsCheck = true;
 
@@ -530,12 +661,218 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private AbstractConfigTab activeTab;
     private final List<GuiEventListener> widgets = new ArrayList<>();
     private final List<GuiEventListener> tabWidgets = new ArrayList<>();
+    private static volatile BuildScapeConfigScreen currentInstance;
+    private static final ConfigWarmupState CONFIG_WARMUP_STATE = new ConfigWarmupState();
+
+    static final class ConfigWarmupState {
+        private final AtomicBoolean running = new AtomicBoolean();
+        private volatile boolean complete;
+
+        boolean tryBegin() {
+            return !complete && running.compareAndSet(false, true);
+        }
+
+        void finish(boolean succeeded) {
+            if (succeeded) {
+                complete = true;
+            }
+            running.set(false);
+        }
+
+        boolean isComplete() {
+            return complete;
+        }
+    }
+
+    public static void onPillarsSynced() {
+        BuildScapeConfigScreen screen = currentInstance;
+        if (screen != null) {
+            screen.tabCache.invalidate("pillars");
+        }
+    }
+
+    public static boolean isItemsCached() {
+        return CONFIG_WARMUP_STATE.isComplete();
+    }
+
+    public static void warmupAsync() {
+        if (!CONFIG_WARMUP_STATE.tryBegin()) return;
+        Minecraft mc = Minecraft.getInstance();
+        mc.execute(() -> {
+            boolean succeeded = false;
+            try {
+                populateStaticItemCache();
+                BuildscapeClientConfig.get();
+                PresetsConfig.get();
+                ConfigThemes.getAllThemes();
+                ConfigBackgrounds.refreshCustomBackgrounds();
+                succeeded = true;
+            } catch (Throwable error) {
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to warm up the config screen", error);
+            } finally {
+                CONFIG_WARMUP_STATE.finish(succeeded);
+            }
+        });
+    }
+
+    static boolean matchesConfigSearch(String id, String displayName, String query) {
+        String normalizedQuery = normalizeSearchText(query);
+        if (normalizedQuery.isEmpty()) {
+            return true;
+        }
+        String normalizedId = normalizeSearchText(id);
+        String normalizedName = normalizeSearchText(displayName);
+        return normalizedId.contains(normalizedQuery) || normalizedName.contains(normalizedQuery);
+    }
+
+    private static String normalizeSearchText(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT)
+                .replace('_', ' ').replace('-', ' ').replaceAll("\\s+", " ");
+    }
+
+    static List<Double> resetSearchScrollOffsets(double scrollOffset, double targetScrollOffset) {
+        return List.of(0.0D, 0.0D);
+    }
+
+    private void resetSearchViewport() {
+        List<Double> offsets = resetSearchScrollOffsets(scrollOffset, targetScrollOffset);
+        scrollOffset = offsets.get(0);
+        targetScrollOffset = offsets.get(1);
+    }
+
+    private void startItemContentTransition() {
+        itemContentTransitionStartTime = System.currentTimeMillis();
+        itemContentTransitioning = true;
+    }
+
+    private void clearActiveSearch() {
+        if (focusedSearchField == 1) {
+            itemSearchFilter = "";
+            itemsListDirty = true;
+        } else if (focusedSearchField == 2) {
+            tagSearchFilter = "";
+            tagsListDirty = true;
+        }
+        searchTextSelected = false;
+        resetSearchViewport();
+        startItemContentTransition();
+    }
+
+    static List<String> discoverNamespaces(Collection<String> identifiers) {
+        Set<String> namespaces = new TreeSet<>();
+        if (identifiers == null) {
+            return new ArrayList<>();
+        }
+        for (String identifier : identifiers) {
+            if (identifier == null) {
+                continue;
+            }
+            String normalizedIdentifier = identifier.startsWith("#") ? identifier.substring(1) : identifier;
+            int separator = normalizedIdentifier.indexOf(':');
+            if (separator > 0 && separator < normalizedIdentifier.length() - 1) {
+                namespaces.add(normalizedIdentifier.substring(0, separator).toLowerCase(Locale.ROOT));
+            }
+        }
+        return new ArrayList<>(namespaces);
+    }
+
+    static List<Integer> calculateSearchControlWidths(int availableWidth, int preferredNamespaceWidth, int gap) {
+        int safeGap = Math.max(0, Math.min(gap, Math.max(0, availableWidth - 2)));
+        int namespaceWidth = Math.max(1, Math.min(preferredNamespaceWidth, Math.max(1, (availableWidth - safeGap) / 2)));
+        int searchWidth = Math.max(1, availableWidth - safeGap - namespaceWidth);
+        return Arrays.asList(searchWidth, namespaceWidth, safeGap);
+    }
+
+    static double adjustConfigValue(double value, int direction, double fineStep, boolean accelerated,
+                                    double minimum, double maximum, int decimalPlaces) {
+        double step = fineStep * (accelerated ? 10.0D : 1.0D);
+        double scale = Math.pow(10.0D, Math.max(0, decimalPlaces));
+        double adjusted = Math.round((value + Integer.signum(direction) * step) * scale) / scale;
+        return Math.max(minimum, Math.min(maximum, adjusted));
+    }
+
+    static void resetParticleProperties(PillarParticleConfig config) {
+        config.particle_speed = 0.02D;
+        config.particle_spread = 0.1D;
+        config.particle_lifetime = 20;
+        config.particle_density = 2;
+        config.use_pattern = true;
+        config.pattern = "ring";
+        config.pattern_speed = 0.05D;
+        config.pattern_spread = 0.05D;
+        config.pattern_intensity = 1.0D;
+    }
+
+    static void resetParticleColors(PillarParticleConfig config) {
+        config.particle_color.clear();
+        config.particle_color.addAll(Arrays.asList(PillarParticleConfig.DEFAULT_COLORS));
+        config.max_particle_color = 3;
+    }
+
+    private static synchronized void populateStaticItemCache() {
+        if (itemsCached) return;
+        List<Item> items = new ArrayList<>();
+        for (Item item : Services.PLATFORM.getAllItems()) {
+            if (item != null && item != Items.AIR) {
+                items.add(item);
+            }
+        }
+        if (items.isEmpty()) {
+            for (int rawId = 1; rawId < 2500; rawId++) {
+                Item item = Services.PLATFORM.getItemByRawId(rawId);
+                if (item != null && item != Items.AIR) {
+                    items.add(item);
+                }
+            }
+        }
+        Set<String> modSet = new LinkedHashSet<>();
+        modSet.add("minecraft");
+        modSet.add("buildscape");
+        for (Item item : items) {
+            CommonId cid = Services.PLATFORM.getItemId(item);
+            if (cid != null && cid.getNamespace() != null && !cid.getNamespace().isEmpty()) {
+                modSet.add(cid.getNamespace());
+            }
+        }
+        synchronized (STATIC_AVAILABLE_ITEMS) {
+            STATIC_AVAILABLE_ITEMS.clear();
+            STATIC_AVAILABLE_ITEMS.addAll(items);
+            STATIC_AVAILABLE_MOD_NAMESPACES.clear();
+            STATIC_AVAILABLE_MOD_NAMESPACES.addAll(modSet);
+            itemsCached = true;
+        }
+    }
+
+    private static synchronized void populateStaticTagCache() {
+        if (tagsCached) return;
+        Map<String, Integer> counts = new HashMap<>();
+        List<String> holderTags = new ArrayList<>();
+        synchronized (STATIC_AVAILABLE_ITEMS) {
+            for (Item item : STATIC_AVAILABLE_ITEMS) {
+                try {
+                    item.builtInRegistryHolder().tags().forEach(tagKey -> {
+                        String id = "#" + tagKey.location();
+                        holderTags.add(id);
+                        counts.put(id, counts.getOrDefault(id, 0) + 1);
+                    });
+                } catch (Exception ignored) {}
+            }
+        }
+        List<String> tags = mergeDiscoveredTags(Services.PLATFORM.getAllItemTagIds(), holderTags);
+        synchronized (STATIC_ALL_REGISTERED_TAGS) {
+            STATIC_ALL_REGISTERED_TAGS.clear();
+            STATIC_ALL_REGISTERED_TAGS.addAll(tags);
+            STATIC_TAG_ITEM_COUNTS.clear();
+            STATIC_TAG_ITEM_COUNTS.putAll(counts);
+            tagsCached = shouldCacheTagDiscovery(tags);
+        }
+    }
 
     public BuildScapeConfigScreen(Screen parent) {
         this.parent = parent;
         this.title = ComponentHelper.translatable("buildscape.config.title");
 
-        this.openStartTime = System.currentTimeMillis();
+        this.openStartTime = 0L;
         try {
             BuildscapeClientConfig cfg = BuildscapeClientConfig.get();
             String savedTheme = cfg.getUiTheme();
@@ -543,7 +880,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             ConfigBackgrounds.setBackgroundById(cfg.getUiBackground());
             animSpeedIndex = Math.max(0, Math.min(ANIM_SPEEDS.length - 1, cfg.getAnimationSpeedIndex()));
             int savedTab = cfg.getLastActiveTab();
-            if (savedTab >= 0 && savedTab < 5) {
+            if (savedTab >= 0 && savedTab < 6) {
                 this.selectedTabIndex = savedTab;
             }
             if (this.selectedTabIndex == 0 && cfg.isSidePanelExpanded()) {
@@ -555,12 +892,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         } catch (Exception ignored) {}
         initNavItems();
         cacheAvailableItems();
-        // Lazily initialize only the active tab
-        String activeTabId = (selectedTabIndex >= 0 && selectedTabIndex < navItems.size()) ? navItems.get(selectedTabIndex).id : "items";
-        initTabState(activeTabId, tabCache.getOrCreate(activeTabId));
-
-        // Asynchronously warm up PresetsConfig in the background to eliminate opening stutter
-        java.util.concurrent.CompletableFuture.runAsync(PresetsConfig::get);
     }
 
     private void initNavItems() {
@@ -570,42 +901,22 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         navItems.add(new NavItem("pillars", "▲", "Pillar IDs", "List and customize placed pillar blocks"));
         navItems.add(new NavItem("world", "⚙", "World Settings", "Griefing rules, tree felling, and stacking"));
         navItems.add(new NavItem("system", "ℹ", "System", "Client preferences and mod updates"));
+        navItems.add(new NavItem("links", "↗", "Links", "Buildscape resources, releases, and support"));
     }
 
     private void cacheAvailableItems() {
         if (!itemsCached) {
-            STATIC_AVAILABLE_ITEMS.clear();
-            for (Item item : Services.PLATFORM.getAllItems()) {
-                if (item != null && item != Items.AIR) {
-                    STATIC_AVAILABLE_ITEMS.add(item);
-                }
-            }
-            if (STATIC_AVAILABLE_ITEMS.isEmpty()) {
-                for (int rawId = 1; rawId < 2500; rawId++) {
-                    Item item = Services.PLATFORM.getItemByRawId(rawId);
-                    if (item != null && item != Items.AIR) {
-                        STATIC_AVAILABLE_ITEMS.add(item);
-                    }
-                }
-            }
-            STATIC_AVAILABLE_MOD_NAMESPACES.clear();
-            Set<String> modSet = new LinkedHashSet<>();
-            modSet.add("minecraft");
-            modSet.add("buildscape");
-            for (Item item : STATIC_AVAILABLE_ITEMS) {
-                CommonId cid = Services.PLATFORM.getItemId(item);
-                if (cid != null && cid.getNamespace() != null && !cid.getNamespace().isEmpty()) {
-                    modSet.add(cid.getNamespace());
-                }
-            }
-            STATIC_AVAILABLE_MOD_NAMESPACES.addAll(modSet);
-            itemsCached = true;
+            warmupAsync();
+            return;
         }
-
-        availableItems.clear();
-        availableItems.addAll(STATIC_AVAILABLE_ITEMS);
-        availableModNamespaces.clear();
-        availableModNamespaces.addAll(STATIC_AVAILABLE_MOD_NAMESPACES);
+        if (availableItems.isEmpty() && !STATIC_AVAILABLE_ITEMS.isEmpty()) {
+            synchronized (STATIC_AVAILABLE_ITEMS) {
+                availableItems.clear();
+                availableItems.addAll(STATIC_AVAILABLE_ITEMS);
+                availableModNamespaces.clear();
+                availableModNamespaces.addAll(STATIC_AVAILABLE_MOD_NAMESPACES);
+            }
+        }
     }
 
     private static String capitalize(String str) {
@@ -640,42 +951,23 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     allRegisteredTags.addAll(STATIC_ALL_REGISTERED_TAGS);
                     tagItemCounts.clear();
                     tagItemCounts.putAll(STATIC_TAG_ITEM_COUNTS);
+                    refreshTagNamespaces();
                 }
             }
             return;
         }
-        if (tagsLoading) return;
-        tagsLoading = true;
-        java.util.concurrent.CompletableFuture.runAsync(() -> {
-            try {
-                Set<String> seen = new HashSet<>();
-                Map<String, Integer> counts = new HashMap<>();
-                List<String> tags = new ArrayList<>();
-                List<Item> itemsToScan = STATIC_AVAILABLE_ITEMS.isEmpty() ? availableItems : STATIC_AVAILABLE_ITEMS;
-                for (Item item : itemsToScan) {
-                    try {
-                        item.builtInRegistryHolder().tags().forEach(tagKey -> {
-                            String id = "#" + tagKey.location().toString();
-                            if (seen.add(id)) {
-                                tags.add(id);
-                            }
-                            counts.put(id, counts.getOrDefault(id, 0) + 1);
-                        });
-                    } catch (Exception ignored) {}
-                }
-                tags.sort(String.CASE_INSENSITIVE_ORDER);
-                synchronized (STATIC_ALL_REGISTERED_TAGS) {
-                    STATIC_ALL_REGISTERED_TAGS.clear();
-                    STATIC_ALL_REGISTERED_TAGS.addAll(tags);
-                    STATIC_TAG_ITEM_COUNTS.clear();
-                    STATIC_TAG_ITEM_COUNTS.putAll(counts);
-                    tagsCached = true;
-                }
-            } finally {
-                tagsLoading = false;
-                tagsListDirty = true;
-            }
-        });
+        populateStaticTagCache();
+        if (tagsCached) {
+            loadRegisteredTags();
+        }
+    }
+
+    private void refreshTagNamespaces() {
+        availableTagNamespaces.clear();
+        availableTagNamespaces.addAll(discoverNamespaces(allRegisteredTags));
+        if (tagSearchNamespaceIndex >= availableTagNamespaces.size()) {
+            tagSearchNamespaceIndex = -1;
+        }
     }
 
     private List<Item> getPlayerInventoryItems() {
@@ -720,15 +1012,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 cachedFilteredItems.addAll(cachedInventoryItems);
             }
             case 2 -> {
-                String mod = !availableModNamespaces.isEmpty() ? availableModNamespaces.get(currentModIndex) : "minecraft";
-                for (Item item : availableItems) {
-                    CommonId cid = Services.PLATFORM.getItemId(item);
-                    if (cid != null && cid.getNamespace().equalsIgnoreCase(mod)) {
-                        cachedFilteredItems.add(item);
-                    }
-                }
-            }
-            case 3 -> {
                 for (Item item : availableItems) {
                     if (cachedActiveItems.contains(item)) {
                         cachedFilteredItems.add(item);
@@ -736,6 +1019,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
             }
         }
+        String selectedNamespace = itemSearchNamespaceIndex >= 0 && itemSearchNamespaceIndex < availableModNamespaces.size()
+                ? availableModNamespaces.get(itemSearchNamespaceIndex) : null;
+        cachedFilteredItems.removeIf(item -> {
+            CommonId id = Services.PLATFORM.getItemId(item);
+            if (id == null || selectedNamespace != null && !selectedNamespace.equalsIgnoreCase(id.getNamespace())) {
+                return true;
+            }
+            String displayName = itemStackCache.computeIfAbsent(item, ItemStack::new).getHoverName().getString();
+            return !matchesConfigSearch(id.toString(), displayName, itemSearchFilter);
+        });
     }
 
     private final Set<String> cachedInventoryTags = new HashSet<>();
@@ -763,20 +1056,25 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 tagItemCounts.putAll(STATIC_TAG_ITEM_COUNTS);
             }
         }
-        if (!tagsCached && !tagsLoading) {
+        if (!tagsCached) {
             loadRegisteredTags();
         }
-        if (!tagsListDirty && !cachedFilteredTags.isEmpty()) {
+        if (!tagsListDirty) {
             return cachedFilteredTags;
         }
         cachedFilteredTags.clear();
         PillarParticleConfig cfg = PillarParticleConfig.get();
 
         Set<String> invTagSet = (tagFilterMode == 1) ? getInventoryTagsSet() : null;
-        String currentMod = !availableModNamespaces.isEmpty() ? availableModNamespaces.get(currentTagModIndex) : "minecraft";
+        String selectedNamespace = tagSearchNamespaceIndex >= 0 && tagSearchNamespaceIndex < availableTagNamespaces.size()
+                ? availableTagNamespaces.get(tagSearchNamespaceIndex) : null;
 
         for (String tagId : allRegisteredTags) {
-            if (!tagSearchFilter.isEmpty() && !tagId.toLowerCase().contains(tagSearchFilter.toLowerCase())) {
+            String normalizedTag = tagId.startsWith("#") ? tagId.substring(1) : tagId;
+            if (selectedNamespace != null && !normalizedTag.regionMatches(true, 0, selectedNamespace + ":", 0, selectedNamespace.length() + 1)) {
+                continue;
+            }
+            if (!matchesConfigSearch(tagId, normalizedTag, tagSearchFilter)) {
                 continue;
             }
             switch (tagFilterMode) {
@@ -787,14 +1085,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     }
                 }
                 case 2 -> {
-                    String ns = tagId.startsWith("#") ? tagId.substring(1) : tagId;
-                    int colon = ns.indexOf(':');
-                    String tagNs = colon > 0 ? ns.substring(0, colon) : "minecraft";
-                    if (tagNs.equalsIgnoreCase(currentMod)) {
-                        cachedFilteredTags.add(tagId);
-                    }
-                }
-                case 3 -> {
                     if (cfg.items.contains(tagId)) {
                         cachedFilteredTags.add(tagId);
                     }
@@ -848,26 +1138,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return;
         }
         lastPillarsSyncTime = now;
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.getSingleplayerServer() != null) {
-            java.util.concurrent.CompletableFuture.runAsync(() -> {
-                try {
-                    for (var serverLevel : mc.getSingleplayerServer().getAllLevels()) {
-                        if (serverLevel != null) {
-                            PillarIdManager serverMgr = PillarIdManager.get(serverLevel);
-                            if (serverMgr != null) {
-                                serverMgr.checkAndReload();
-                                Map<String, PillarIdManager.PillarData> snapshot = serverMgr.copyDataSnapshot();
-                                if (!snapshot.isEmpty()) {
-                                    PillarIdManager.getClient().replaceFromServerSync(snapshot.values());
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception ignored) {}
-            });
-        }
-        PillarIdManager.getClient().checkAndReload();
         PacketFactory.sendToServer(new RequestPillarIdsPacket());
     }
 
@@ -884,6 +1154,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public void init(Minecraft mc, int width, int height, Consumer<AbstractWidget> addWidget, Consumer<GuiEventListener> removeWidget) {
+        currentInstance = this;
+        this.openStartTime = 0L;
+        this.isOpening = true;
+        this.openProgress = 0.0f;
+
         this.width = width;
         this.height = height;
         this.addWidgetConsumer = addWidget;
@@ -892,21 +1167,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         this.widgets.clear();
         this.tabWidgets.clear();
 
-        // Refresh dynamic custom backgrounds from backgrounds folder
-        ConfigBackgrounds.refreshCustomBackgrounds();
+        cacheAvailableItems();
 
-        // Lazily initialize active tab if needed
         String activeTabId = (selectedTabIndex >= 0 && selectedTabIndex < navItems.size()) ? navItems.get(selectedTabIndex).id : "items";
         TabCacheManager.TabViewState state = tabCache.getOrCreate(activeTabId);
         if (!state.isLoaded) {
             initTabState(activeTabId, state);
         }
 
+        SidePanelLayout layout = calculateLayout();
         int tabH = 26;
         int tabGap = 3;
-        int effH = getEffectiveHeight();
-        int panelH = Math.min(effH - 16, 308);
-        int panelY = (effH - panelH) / 2;
+        int panelY = layout.panelY;
         int headerH = 24;
         int navY = panelY + 7 + headerH + 5;
         int startY = navY + 4;
@@ -915,33 +1187,36 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (activeTab != null) {
             activeTab.init();
         }
+
     }
 
-    // --- Adaptive GUI Scaling Engine ---
+    @Override
+    public void tick() {
+        if (availableItems.isEmpty() && itemsCached) {
+            cacheAvailableItems();
+            rebuildActiveItemsCache();
+            loadRegisteredTags();
+            itemsListDirty = true;
+            tagsListDirty = true;
+        }
+    }
+
+    // Adaptive GUI scaling.
     public float getGuiUiScale() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.getWindow() == null) return 1.0f;
-        double guiScale = mc.getWindow().getGuiScale();
-        if (guiScale >= 2.5) {
-            return (float) (2.0 / guiScale);
-        }
-        if (width < 820 && width > 0) {
-            return Math.max(0.5f, (float) width / 820.0f);
-        }
-        return 1.0f;
+        double mcScale = mc.getWindow() != null ? mc.getWindow().getGuiScale() : 2.0;
+        return GuiScaleHelper.calculateUiScale(width, height, mcScale);
     }
 
     public int getEffectiveWidth() {
-        float s = getGuiUiScale();
-        return Math.abs(s - 1.0f) > 0.001f ? (int) Math.ceil(width / s) : width;
+        return GuiScaleHelper.getEffectiveWidth(width, getGuiUiScale());
     }
 
     public int getEffectiveHeight() {
-        float s = getGuiUiScale();
-        return Math.abs(s - 1.0f) > 0.001f ? (int) Math.ceil(height / s) : height;
+        return GuiScaleHelper.getEffectiveHeight(height, getGuiUiScale());
     }
 
-    // --- Compatibility Methods for Legacy Widgets & Tabs ---
+    // Legacy widget and tab compatibility.
     private static final int REFERENCE_WIDTH = 1920;
     private static final int REFERENCE_HEIGHT = 1080;
     private static final double REFERENCE_GUI_SCALE = 2.0;
@@ -1068,11 +1343,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         tabWidgets.remove(widget);
     }
 
-    // --- Animation Handling ---
+    // Animation state updates.
     private float updateAnimations() {
         long now = System.currentTimeMillis();
 
         if (isOpening) {
+            if (openStartTime <= 0L) {
+                openStartTime = now;
+            }
             int duration = getOpenAnimMs();
             float elapsed = (now - openStartTime) / (float) duration;
             if (elapsed >= 1.0f) {
@@ -1089,6 +1367,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             if (elapsed >= 1.0f) {
                 closeProgress = 0.0f;
                 isClosing = false;
+                if (currentInstance == this) {
+                    currentInstance = null;
+                }
                 if (closeToWorld) {
                     closeToWorld = false;
                     Services.PLATFORM.openScreen(null);
@@ -1136,7 +1417,85 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public boolean hasOpAccess() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return false;
-        return Services.PLATFORM.hasPlayerPermissions(mc.player, 2);
+        return resolveClientPermissionLevel(PillarParticleConfig.getClientPermissionLevel(),
+                Services.PLATFORM.hasPlayerPermissions(mc.player, 2),
+                Services.PLATFORM.hasPlayerPermissions(mc.player, PillarParticleConfig.CONFIG_PERMISSION_LEVEL)) >= 2;
+    }
+
+    public boolean hasConfigAccess() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.player != null && resolveClientPermissionLevel(PillarParticleConfig.getClientPermissionLevel(),
+                Services.PLATFORM.hasPlayerPermissions(mc.player, 2),
+                Services.PLATFORM.hasPlayerPermissions(mc.player, PillarParticleConfig.CONFIG_PERMISSION_LEVEL))
+                >= PillarParticleConfig.CONFIG_PERMISSION_LEVEL;
+    }
+
+    private boolean hasEditAccess(PillarParticleConfig.EditScope scope) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return false;
+        PillarParticleConfig cfg = PillarParticleConfig.get();
+        int permissionLevel = resolveClientPermissionLevel(PillarParticleConfig.getClientPermissionLevel(),
+                Services.PLATFORM.hasPlayerPermissions(mc.player, 2),
+                Services.PLATFORM.hasPlayerPermissions(mc.player, PillarParticleConfig.CONFIG_PERMISSION_LEVEL));
+        return PillarParticleConfig.canEdit(cfg.edit_permission_mode, permissionLevel, scope);
+    }
+
+    static boolean canModifyConfig(boolean hasOpAccess, boolean clientOnlyAction) {
+        return clientOnlyAction || hasOpAccess;
+    }
+
+    static boolean isConfirmedAction(String pendingAction, String requestedAction) {
+        return requestedAction != null && requestedAction.equals(pendingAction);
+    }
+
+    static String normalizePresetName(String value) {
+        String normalized = value == null ? "" : value.trim();
+        if (normalized.isEmpty()) normalized = "Custom Preset";
+        return normalized.substring(0, Math.min(32, normalized.length()));
+    }
+
+    static int moveSelection(int current, int direction, int count) {
+        if (count <= 0) return 0;
+        return Math.floorMod(current + direction, count);
+    }
+
+    private void persistServerConfig(PillarParticleConfig config) {
+        PacketFactory.sendToServer(new UpdateConfigPacket(config));
+    }
+
+    private boolean confirmDestructiveAction(String action) {
+        long now = System.currentTimeMillis();
+        if (isConfirmedAction(pendingDestructiveAction, action) && now <= pendingDestructiveActionUntil) {
+            pendingDestructiveAction = null;
+            pendingDestructiveActionUntil = 0L;
+            return true;
+        }
+        pendingDestructiveAction = action;
+        pendingDestructiveActionUntil = now + 4000L;
+        return false;
+    }
+
+    private boolean requireConfigModificationAccess() {
+        String tabId = selectedTabIndex >= 0 && selectedTabIndex < navItems.size() ? navItems.get(selectedTabIndex).id : "";
+        PillarParticleConfig.EditScope scope = "items".equals(tabId) || sidePanelType == SidePanelType.PRESETS
+                ? PillarParticleConfig.EditScope.LIMITED : PillarParticleConfig.EditScope.GENERAL;
+        return requireConfigModificationAccess(scope);
+    }
+
+    private boolean requireConfigModificationAccess(PillarParticleConfig.EditScope scope) {
+        if (hasEditAccess(scope)) {
+            return true;
+        }
+        readOnlyDeniedAt = System.currentTimeMillis();
+        readOnlyDeniedX = rawMouseX;
+        readOnlyDeniedY = rawMouseY;
+        String message = scope == PillarParticleConfig.EditScope.POLICY
+                ? "Permission level 4 is required to change the edit policy."
+                : "This setting is locked by the server edit policy.";
+        deferredTooltip = Collections.singletonList(ComponentHelper.literal(message));
+        deferredTooltipX = rawMouseX + 12;
+        deferredTooltipY = rawMouseY;
+        return false;
     }
 
     private UUID getPlayerUuid() {
@@ -1188,51 +1547,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private SidePanelLayout calculateLayout() {
         int effW = getEffectiveWidth();
         int effH = getEffectiveHeight();
-        int panelW = Math.min(effW - 20, 560);
-        int panelH = Math.min(effH - 16, 308);
-
-        int sidePanelTargetW = 188;
-
-        int panelX = (effW - panelW) / 2;
-        int panelY = (effH - panelH) / 2;
-
-        int bevelExpansion = 5;
-        int frameX = panelX - bevelExpansion;
-        int frameY = panelY - bevelExpansion;
-        int frameW = panelW + bevelExpansion * 2;
-        int frameH = panelH + bevelExpansion * 2;
-        int frameRight = frameX + frameW;
-
-        int sidePanelH;
-        int sidePanelY;
-        int sidePanelX;
-        int sidePanelW;
-
-        if (sidePanelType == SidePanelType.PRESETS) {
-            int tabW = 20;
-            int tabH = 28;
-            int targetW = sidePanelTargetW;
-            int targetH = Math.min(264, frameH - 44);
-            sidePanelY = frameY + 36;
-            sidePanelX = frameRight - 2;
-            sidePanelW = (int) Math.round(tabW + (targetW - tabW) * sidePanelProgress);
-            sidePanelH = (int) Math.round(tabH + (targetH - tabH) * sidePanelProgress);
-        } else {
-            sidePanelH = Math.min(264, frameH - 44);
-            sidePanelY = frameY + (frameH - sidePanelH) / 2;
-
-            int dockX = frameRight - 2;
-            int slideOffset = (int) Math.round((1.0f - sidePanelProgress) * sidePanelTargetW);
-            sidePanelX = dockX - slideOffset;
-            sidePanelW = sidePanelTargetW;
-        }
-
-        return new SidePanelLayout(panelX, panelY, panelW, panelH,
-                frameX, frameY, frameW, frameH, frameRight,
-                sidePanelX, sidePanelY, sidePanelW, sidePanelH, false);
+        GuiScaleHelper.LayoutResult r = GuiScaleHelper.calculateLayout(effW, effH, sidePanelProgress, sidePanelType);
+        return new SidePanelLayout(r.panelX, r.panelY, r.panelW, r.panelH,
+                r.frameX, r.frameY, r.frameW, r.frameH, r.frameRight,
+                r.sidePanelX, r.sidePanelY, r.sidePanelW, r.sidePanelH, false);
     }
 
-    // --- Main Rendering ---
+    // Main screen rendering.
     @Override
     public void render(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
         float alpha = updateAnimations();
@@ -1354,13 +1675,21 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             Services.PLATFORM.popGuiPose(poseStackOrGraphics);
         }
 
+        float deniedAlpha = readOnlyFeedbackAlpha(System.currentTimeMillis(), readOnlyDeniedAt) * alpha;
+        if (deniedAlpha > 0.0F) {
+            int pulse = 7 + Math.round(3.0F * deniedAlpha);
+            int color = applyAlpha(0xFFFF3B30, deniedAlpha);
+            drawBorder(poseStackOrGraphics, readOnlyDeniedX - pulse, readOnlyDeniedY - pulse, pulse * 2, pulse * 2, color);
+            drawText(poseStackOrGraphics, font, "✕", readOnlyDeniedX - 3, readOnlyDeniedY - 4, color);
+        }
+
         // Render deferred tooltip in unscaled screen coordinates
         if (deferredTooltip != null && !deferredTooltip.isEmpty()) {
             Services.PLATFORM.renderComponentTooltip(poseStackOrGraphics, font, deferredTooltip, deferredTooltipX, deferredTooltipY);
         }
     }
 
-    // --- Composite Master Chassis Frame (Single unified frame layout pass) ---
+    // Unified chassis frame layout.
     private void drawMasterChassisFrame(Object poseStackOrGraphics, int frameX, int frameY, int frameW, int frameH,
                                         int headerX, int headerY, int headerW, int headerH,
                                         int navX, int navY, int navW, int navH,
@@ -1378,7 +1707,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawBeveledComponent(poseStackOrGraphics, contentX, contentY, contentW, contentH, COLOR_INNER_DARK, alpha);
     }
 
-    // --- Sidenav Rendering ---
+    // Side navigation rendering.
     private void renderSidenav(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         enableGuiScissor(poseStackOrGraphics, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
 
@@ -1475,7 +1804,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Content Area Rendering ---
+    // Content area rendering.
     private void renderContentArea(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         ConfigBackgrounds.drawCurrentBackground(poseStackOrGraphics, x + 1, y + 1, w - 2, h - 2, alpha, currentTheme);
 
@@ -1502,6 +1831,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int catHeaderH = 22;
         drawText(poseStackOrGraphics, font, current.icon + "  " + current.title.toUpperCase(), x + 8, y + 6, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
         drawText(poseStackOrGraphics, font, current.subtitle, x + 8 + font.width(current.icon + "  " + current.title.toUpperCase()) + 10, y + 7, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
+        PillarParticleConfig.EditScope tabScope = "items".equals(current.id)
+                ? PillarParticleConfig.EditScope.LIMITED : PillarParticleConfig.EditScope.GENERAL;
+        boolean restricted = ("items".equals(current.id) || "particles".equals(current.id)
+                || "pillars".equals(current.id) || "world".equals(current.id)) && !hasEditAccess(tabScope);
+        boolean limited = "particles".equals(current.id) && !hasEditAccess(PillarParticleConfig.EditScope.GENERAL)
+                && hasEditAccess(PillarParticleConfig.EditScope.LIMITED);
+        if (restricted || limited) {
+            int badgeW = 62;
+            int badgeX = x + w - badgeW - 7;
+            float pulse = 0.80F + 0.20F * (float) Math.sin(System.currentTimeMillis() / 180.0D);
+            drawBeveledButton(poseStackOrGraphics, badgeX, y + 4, badgeW, 14, limited ? COLOR_BTN_BG_ACTIVE : 0xFF351616, false, true, tabAlpha);
+            drawCenteredText(poseStackOrGraphics, font, limited ? "LIMITED" : "READ ONLY", badgeX + badgeW / 2, y + 7,
+                    applyAlpha(limited ? COLOR_ACCENT : 0xFFFF5A52, tabAlpha * pulse));
+        }
         drawGroove(poseStackOrGraphics, x + 2, y + catHeaderH, w - 4, true, alpha);
 
         if ("items".equals(current.id)) {
@@ -1531,6 +1874,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 case "particles" -> renderParticleSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
                 case "world" -> renderWorldSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
                 case "system" -> renderSystemRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
+                case "links" -> renderLinksRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
             }
             disableGuiScissor(poseStackOrGraphics);
 
@@ -1556,15 +1900,26 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
         }
         int count = switch (tabId) {
-            case "particles" -> 11;
-            case "world" -> 8;
-            case "system" -> 6;
+            case "particles" -> 12;
+            case "world" -> 10;
+            case "system" -> 0;
+            case "links" -> CONFIG_LINKS.size();
             default -> 0;
         };
-        return count * (rowH + gap) + 6;
+        return "system".equals(tabId) ? calculateSystemContentHeight(gap) + 6 : count * (rowH + gap) + 6;
     }
 
-    // --- Tab 0: Items & Tags Dual Panel with Fixed Toolbars, Scissor Clipping & Beveled Slots ---
+    private void renderLinksRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap,
+                                 int clipY, int clipH, int mouseX, int mouseY, float alpha) {
+        int curY = startY;
+        for (ConfigLink link : CONFIG_LINKS) {
+            renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH,
+                    link.title(), link.description(), "Open ↗", mouseX, mouseY, alpha);
+            curY += h + gap;
+        }
+    }
+
+    // Items and tags panel rendering.
     private void renderItemAndTagsPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         PillarParticleConfig cfg = PillarParticleConfig.get();
 
@@ -1592,56 +1947,70 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         curY += row1H + 2;
 
-        // Row 2: Filter Bar (Fixed at top - 4 pill buttons)
+        // Compact filters, search, and namespace selector share one stable toolbar.
         int bar2H = 16;
-        int pillW = (w - 24) / 4;
-        int pillH = 13;
+        int pillH = getItemToolbarControlHeight();
         int pillY = curY + 1;
-
-        if (itemsSubTab == 0) {
-            String currentMod = !availableModNamespaces.isEmpty() ? availableModNamespaces.get(currentModIndex) : "minecraft";
-            String modBtnText = (itemFilterMode == 2)
-                    ? (capitalize(currentMod) + " (" + getFilteredItemsList().size() + ")")
-                    : "Mod Toggles";
-            String[] filterLabels = {
-                    "All Items (" + availableItems.size() + ")",
-                    "Inventory (" + getPlayerInventoryItems().size() + ")",
-                    modBtnText,
-                    "Active (" + cachedActiveItems.size() + ")"
-            };
-            for (int f = 0; f < 4; f++) {
-                int px = x + 6 + f * (pillW + 4);
-                boolean isF = (itemFilterMode == f);
-                boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH;
-                drawBeveledButton(poseStackOrGraphics, px, pillY, pillW, pillH, isF ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPill, isF, alpha);
-                int pText = isF ? COLOR_TEXT_WHITE : (hoverPill ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                drawCenteredText(poseStackOrGraphics, font, filterLabels[f], px + pillW / 2, pillY + 3, applyAlpha(pText, alpha));
-            }
-        } else {
-            String currentMod = !availableModNamespaces.isEmpty() ? availableModNamespaces.get(currentTagModIndex) : "minecraft";
-            String modBtnText = (tagFilterMode == 2)
-                    ? (capitalize(currentMod) + " (" + getFilteredTagsList().size() + ")")
-                    : "Mod Toggles";
-            String[] filterLabels = {
-                    "All Tags (" + allRegisteredTags.size() + ")",
-                    "Inventory (" + getInventoryTagsSet().size() + ")",
-                    modBtnText,
-                    "Active (" + cachedActiveTags.size() + ")"
-            };
-            for (int f = 0; f < 4; f++) {
-                int px = x + 6 + f * (pillW + 4);
-                boolean isF = (tagFilterMode == f);
-                boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH;
-                drawBeveledButton(poseStackOrGraphics, px, pillY, pillW, pillH, isF ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPill, isF, alpha);
-                int pText = isF ? COLOR_TEXT_WHITE : (hoverPill ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                drawCenteredText(poseStackOrGraphics, font, filterLabels[f], px + pillW / 2, pillY + 3, applyAlpha(pText, alpha));
-            }
+        int toolbarX = x + 6;
+        int toolbarAvailableW = Math.max(120, w - 18);
+        ItemToolbarGeometry toolbar = calculateItemToolbarGeometry(toolbarAvailableW);
+        int pillW = toolbar.filterWidth();
+        List<String> filterLabels = getCompactFilterLabels();
+        for (int f = 0; f < 3; f++) {
+            int px = toolbarX + f * (pillW + toolbar.gap());
+            boolean isF = (itemsSubTab == 0 ? itemFilterMode : tagFilterMode) == f;
+            boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH;
+            drawBeveledButton(poseStackOrGraphics, px, pillY, pillW, pillH, isF ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPill, isF, alpha);
+            drawCenteredText(poseStackOrGraphics, font, trimTextToWidth(font, filterLabels.get(f), pillW - 4, false), px + pillW / 2, pillY + 3,
+                    applyAlpha(isF ? COLOR_TEXT_WHITE : (hoverPill ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED), alpha));
         }
 
-        curY += bar2H + 4;
+        int searchX = toolbarX + 3 * (pillW + toolbar.gap());
+        int searchW = toolbar.searchWidth();
+        int namespaceW = toolbar.namespaceWidth();
+        int searchY = pillY;
+        int searchH = getItemToolbarControlHeight();
+        boolean itemSearch = itemsSubTab == 0;
+        String searchValue = itemSearch ? itemSearchFilter : tagSearchFilter;
+        boolean searchFocused = focusedSearchField == (itemSearch ? 1 : 2);
+        drawBeveledButton(poseStackOrGraphics, searchX, searchY, searchW, searchH, COLOR_SLOT_BG, false, searchFocused, alpha);
+        if (searchFocused) {
+            drawBorder(poseStackOrGraphics, searchX, searchY, searchW, searchH, applyAlpha(COLOR_ACCENT, alpha));
+            drawBorder(poseStackOrGraphics, searchX + 1, searchY + 1, Math.max(1, searchW - 2), Math.max(1, searchH - 2),
+                    applyAlpha(COLOR_ACCENT_GLOW, alpha * 0.65F));
+        }
+        boolean caretVisible = searchFocused && (System.currentTimeMillis() / 450L) % 2L == 0L;
+        String searchText = searchValue.isEmpty()
+                ? (searchFocused ? "Type to search..." : "Search " + (itemSearch ? "items" : "tags") + "...")
+                : searchValue + (caretVisible ? "|" : "");
+        searchText = trimTextToWidth(font, searchText, Math.max(1, searchW - 10), !searchValue.isEmpty());
+        if (searchFocused && searchTextSelected && !searchValue.isEmpty()) {
+            int selectedWidth = Math.min(searchW - 8, font.width(trimTextToWidth(font, searchValue, Math.max(1, searchW - 10), true)));
+            Services.PLATFORM.fill(poseStackOrGraphics, searchX + 4, searchY + 3, searchX + 5 + selectedWidth,
+                    searchY + searchH - 2, applyAlpha(COLOR_ACCENT, alpha * 0.45F));
+        }
+        drawText(poseStackOrGraphics, font, searchText, searchX + 5, searchY + 4,
+                applyAlpha(searchFocused ? COLOR_TEXT_WHITE : searchValue.isEmpty() ? COLOR_TEXT_MUTED : COLOR_TEXT_SILVER, alpha));
+
+        List<String> namespaces = itemSearch ? availableModNamespaces : availableTagNamespaces;
+        int namespaceIndex = itemSearch ? itemSearchNamespaceIndex : tagSearchNamespaceIndex;
+        String namespaceLabel = getNamespaceSelectorLabel(namespaceIndex, namespaces);
+        namespaceLabel = trimTextToWidth(font, namespaceLabel, Math.max(1, namespaceW - 8), false);
+        int namespaceX = searchX + searchW + toolbar.gap();
+        boolean namespaceHover = mouseX >= namespaceX && mouseX <= namespaceX + namespaceW && mouseY >= searchY && mouseY <= searchY + searchH;
+        drawBeveledButton(poseStackOrGraphics, namespaceX, searchY, namespaceW, searchH, COLOR_BTN_BG, namespaceHover, namespaceIndex >= 0, alpha);
+        drawCenteredText(poseStackOrGraphics, font, namespaceLabel, namespaceX + namespaceW / 2, searchY + 4,
+                applyAlpha(namespaceHover ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+
+        curY += bar2H + 3;
 
         // Viewport bounds for scrollable content strictly below fixed toolbars
-        int viewportY = curY;
+        int transitionDuration = getTabTransitionAnimMs();
+        float contentTransitionAlpha = itemContentTransitioning
+                ? calculateItemContentTransitionAlpha(System.currentTimeMillis(), itemContentTransitionStartTime, transitionDuration) : 1.0F;
+        if (contentTransitionAlpha >= 1.0F) itemContentTransitioning = false;
+        int viewportY = curY + (itemContentTransitioning ? Math.round((1.0F - contentTransitionAlpha) * 4.0F) : 0);
+        alpha *= contentTransitionAlpha;
         int viewportH = (y + h - 6) - viewportY;
 
         int scrollbarW = 6;
@@ -1815,7 +2184,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Tab 1: Particles (Full Controls & Color Swatch Customizer) ---
+    private static String trimTextToWidth(Font font, String text, int maximumWidth, boolean keepEnd) {
+        String result = text == null ? "" : text;
+        while (result.length() > 1 && font.width(result) > maximumWidth) {
+            result = keepEnd ? result.substring(1) : result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+
+    // Particle controls and color customization.
     private void renderParticleSettingsRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         PillarParticleConfig cfg = PillarParticleConfig.get();
         int curY = startY;
@@ -1861,11 +2238,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         renderConfigRowPalette(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Colors", cfg.particle_color, cfg.max_particle_color, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        // 11. Reset Colors Action
+        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Properties", "Restore default particle behavior", "↺ Reset Properties", mouseX, mouseY, alpha);
+        curY += h + gap;
+
         renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Colors", "Restore default particle colors", "↺ Reset Colors", mouseX, mouseY, alpha);
     }
 
-    // --- Tab 2: Pillar IDs Panel (Authoritative in-world synchronized columns) ---
+    // Server-authoritative pillar table.
     private void renderPillarsPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         renderPillarTablePanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
     }
@@ -1878,7 +2257,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int curY = y + catHeaderH + 4;
 
-        // --- 1. Fixed Top Action Toolbar ---
+        // Fixed action toolbar.
         int bar1H = 20;
         int btnH = 14;
         int barY = curY + (bar1H - btnH) / 2;
@@ -1898,7 +2277,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         boolean hoverRemSel = hasSel && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH;
         int remSelBg = hasSel ? (hoverRemSel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414)) : COLOR_BTN_BG;
         drawBeveledButton(poseStackOrGraphics, remSelX, barY, remSelW, btnH, remSelBg, hoverRemSel, false, alpha);
-        String remSelLabel = hasSel ? ("✕ Remove (" + selCount + ")") : "✕ Remove Selected";
+        boolean confirmingSelected = isConfirmedAction(pendingDestructiveAction, "remove:selected")
+                && System.currentTimeMillis() <= pendingDestructiveActionUntil;
+        String remSelLabel = confirmingSelected ? "Confirm Remove" : hasSel ? ("✕ Remove (" + selCount + ")") : "✕ Remove Selected";
         int remSelTextCol = hasSel ? (hoverRemSel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050) : COLOR_TEXT_MUTED;
         drawCenteredText(poseStackOrGraphics, font, remSelLabel, remSelX + remSelW / 2, barY + 3, applyAlpha(remSelTextCol, alpha));
 
@@ -1910,14 +2291,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int remAllBg = hasAny ? (hoverRemAll ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414)) : COLOR_BTN_BG;
         drawBeveledButton(poseStackOrGraphics, remAllX, barY, remAllW, btnH, remAllBg, hoverRemAll, false, alpha);
         int remAllTextCol = hasAny ? (hoverRemAll ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050) : COLOR_TEXT_MUTED;
-        drawCenteredText(poseStackOrGraphics, font, "✕ Remove All", remAllX + remAllW / 2, barY + 3, applyAlpha(remAllTextCol, alpha));
+        boolean confirmingAll = isConfirmedAction(pendingDestructiveAction, "remove:all")
+                && System.currentTimeMillis() <= pendingDestructiveActionUntil;
+        drawCenteredText(poseStackOrGraphics, font, confirmingAll ? "Confirm All" : "✕ Remove All", remAllX + remAllW / 2, barY + 3, applyAlpha(remAllTextCol, alpha));
 
-        // [ ✓ Save ]
-        int saveW = 50;
-        int saveX = remAllX + remAllW + 4;
-        boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH;
-        drawBeveledGreenButton(poseStackOrGraphics, saveX, barY, saveW, btnH, hoverSave, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "✓ Save", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
+        int resetW = 78;
+        int resetX = remAllX + remAllW + 4;
+        boolean hoverReset = hasSel && mouseX >= resetX && mouseX <= resetX + resetW && mouseY >= barY && mouseY <= barY + btnH;
+        drawBeveledButton(poseStackOrGraphics, resetX, barY, resetW, btnH, COLOR_BTN_BG, hoverReset, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "↺ Reset Selected", resetX + resetW / 2, barY + 3,
+                applyAlpha(hasSel ? (hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER) : COLOR_TEXT_MUTED, alpha));
 
         // Right Count Badge
         String badgeText = pillarList.size() + (pillarList.size() == 1 ? " Pillar Placed" : " Pillars Placed");
@@ -1928,7 +2311,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         curY += bar1H + 2;
 
-        // --- 2. Fixed Table Column Headers ---
+        // Fixed table headers.
         int headH = 16;
         int scrollbarW = 6;
         int scrollbarTrackX = x + w - scrollbarW - 5;
@@ -1991,7 +2374,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         curY += headH + 3;
 
-        // --- 3. Scrollable Rows Viewport ---
+        // Scrollable pillar rows.
         int viewportY = curY;
         int viewportH = (y + h - 6) - viewportY;
 
@@ -2126,7 +2509,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
     }
 
-    // --- Tab 2 (Detail): Per-Pillar Customization View ---
+    // Per-pillar customization view.
     private void renderPillarDetailPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
         if (data == null) {
@@ -2138,7 +2521,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int curY = y + catHeaderH + 4;
 
-        // --- 1. Fixed Top Detail Header Bar ---
+        // Fixed detail header.
         int bar1H = 20;
         int btnH = 14;
         int barY = curY + (bar1H - btnH) / 2;
@@ -2166,7 +2549,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         curY += bar1H + 3;
 
-        // --- 2. Scrollable Detail Viewport ---
+        // Scrollable detail rows.
         int viewportY = curY;
         int viewportH = (y + h - 6) - viewportY;
         int rowH = 26;
@@ -2229,7 +2612,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
     }
 
-    // --- Tab 3: World Settings Rows (Normalized Professional Descriptions) ---
+    // World setting rows.
     private void renderWorldSettingsRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         UUID playerUuid = getPlayerUuid();
         Level level = getLevel();
@@ -2245,11 +2628,17 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int curY = startY;
 
+        renderSectionDivider(poseStackOrGraphics, font, x, curY, w, "Player Settings", alpha);
+        curY += 14;
+
         renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Creative Tree Breaker", "Break entire trees at once in Creative mode.", treeBreaker, mouseX, mouseY, alpha);
         curY += h + gap;
 
         renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Shulker Box Preview", "Preview shulker box inventory contents on hover.", shulkerPeek, mouseX, mouseY, alpha);
         curY += h + gap;
+
+        renderSectionDivider(poseStackOrGraphics, font, x, curY, w, "World Rules", alpha);
+        curY += 14;
 
         renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Fast Leaf Decay", "Leaves decay rapidly when tree trunks are broken.", fastLeaves, mouseX, mouseY, alpha);
         curY += h + gap;
@@ -2269,27 +2658,34 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Water Bottle Stacking", "Allow water bottles to stack up to 16 in player inventories.", waterStack, mouseX, mouseY, alpha);
     }
 
-    // --- Tab 4: System Rows ---
-    private void renderSystemRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
-        int curY = startY;
-
-        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", currentTheme.displayName, mouseX, mouseY, alpha);
-        curY += h + gap;
-
-        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "UI Background", "Decorative backdrop pattern applied over the theme", ConfigBackgrounds.getCurrentBackground().displayName, mouseX, mouseY, alpha);
-        curY += h + gap;
-
-        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ANIM_SPEEDS[animSpeedIndex], mouseX, mouseY, alpha);
-        curY += h + gap;
-
-        renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Mod Version", "Currently installed Buildscape version", "4.0.3", alpha);
-        curY += h + gap;
-
-        String opStatus = hasOpAccess() ? "OP (Full Access)" : "Player (Client Only)";
-        renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Permissions", "Permission level for editing server game rules", opStatus, alpha);
+    private void renderSectionDivider(Object poseStackOrGraphics, Font font, int x, int y, int w, String label, float alpha) {
+        drawText(poseStackOrGraphics, font, label.toUpperCase(Locale.ROOT), x + 5, y + 2, applyAlpha(COLOR_ACCENT, alpha));
+        int lineX = x + 12 + font.width(label.toUpperCase(Locale.ROOT));
+        if (lineX < x + w - 4) {
+            Services.PLATFORM.fill(poseStackOrGraphics, lineX, y + 6, x + w - 4, y + 7, applyAlpha(COLOR_ROW_BORDER, alpha));
+        }
     }
 
-    // --- Draggable Color Picker Modal (2D Saturation x Brightness + Hue Spectrum Slider) ---
+    // System setting rows.
+    private void renderSystemRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
+        int curY = startY;
+        int systemRowH = getSystemSettingRowHeight();
+
+        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", currentTheme.displayName, mouseX, mouseY, alpha);
+        curY += systemRowH + gap;
+
+        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Background", "Decorative backdrop pattern applied over the theme", ConfigBackgrounds.getCurrentBackground().displayName, mouseX, mouseY, alpha);
+        curY += systemRowH + gap;
+
+        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ANIM_SPEEDS[animSpeedIndex], mouseX, mouseY, alpha);
+        curY += systemRowH + gap;
+
+        PillarParticleConfig.EditPermissionMode policy = PillarParticleConfig.get().edit_permission_mode;
+        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Edit Permissions",
+                "Choose Strict (level 4), Standard (limited level 2), or Open access", capitalize(policy.name().toLowerCase(Locale.ROOT)), mouseX, mouseY, alpha);
+    }
+
+    // Draggable saturation, brightness, and hue picker.
     private void renderColorPickerModal(Object poseStackOrGraphics, Font font, int mouseX, int mouseY, float alpha) {
         int effW = getEffectiveWidth();
         int effH = getEffectiveHeight();
@@ -2399,7 +2795,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawCenteredText(poseStackOrGraphics, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(applyTextCol, alpha));
     }
 
-    // --- Vault Hunters Border & Bevel Engine (Expanded Chassis Gap & Metallic Gradient) ---
+    // Shared border and bevel rendering.
     private void drawVaultHuntersFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
         drawVaultHuntersFrame(poseStackOrGraphics, x, y, w, h, bgRgb, false, alpha);
     }
@@ -2484,50 +2880,52 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawBorder(poseStackOrGraphics, x + 8, y + 8, w - 16, h - 16, softGroove);
     }
 
-    // --- Connected Right Side Panel Frame ---
     private void drawConnectedSidePanelFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
-        // 1. Outer Chassis Body Fill (Solid metallic chassis backing)
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
+        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
+        int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
-        // 2. Outermost 1px Black Border (Top, Right, Bottom - seamless connection on left under main frame)
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black); // Tucked under main frame edge
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
 
-        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top) & Shadow (Bottom & Right)
         drawHorizontalGradientLine(poseStackOrGraphics, x, y + 1, w - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
-        // 4. Outer Chassis Band (offset 2 to 4)
-        int sideBand = applyAlpha(COLOR_CHASSIS_BAND, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y + 2, x + w - 2, y + 3, sideBand);
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 3, x + w - 2, y + h - 2, sideBand);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 3, y + 2, x + w - 2, y + h - 2, sideBand);
+        for (int o = 2; o <= 3; o++) {
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y + o, x + w - o, y + o + 1, band);
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - o - 1, x + w - o, y + h - o, band);
+            Services.PLATFORM.fill(poseStackOrGraphics, x + w - o - 1, y + o, x + w - o, y + h - o, band);
+        }
 
-        // 5. Stepped Bevel Ridge & Groove at offset 4
-        int sideBevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-        int sideBevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y + 4, x + w - 4, y + 5, sideBevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 5, x + w - 4, y + h - 4, sideBevelHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 5, y + 4, x + w - 4, y + h - 4, sideBevelHighlight);
+        int o5 = 5;
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - o5 - 1, x + w - o5, y + h - o5, bevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - o5 - 1, y + o5, x + w - o5, y + h - o5, bevelHighlight);
+
+        if (w > 20 && h > 20) {
+            int softGroove = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y + 8, x + w - 8, y + 9, softGroove);
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 9, x + w - 8, y + h - 8, softGroove);
+            Services.PLATFORM.fill(poseStackOrGraphics, x + w - 9, y + 8, x + w - 8, y + h - 8, softGroove);
+        }
     }
 
     private void renderSidePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         if (sidePanelType == SidePanelType.NONE) return;
 
-        // 1. Chassis Frame (animates smoothly in 2 directions for Presets, or slides for others)
         drawConnectedSidePanelFrame(poseStackOrGraphics, x, y, w, h, COLOR_PANEL_BG, alpha);
 
         if (w >= 60 && h >= 40) {
-            // 2. Header
-            int sHeadX = x + 6;
-            int sHeadY = y + 7;
-            int sHeadW = w - 12;
+            int sHeadX = x + 10;
+            int sHeadY = y + 11;
+            int sHeadW = w - 21;
             int sHeadH = 22;
             drawBeveledComponent(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, COLOR_HEADER_BG, alpha);
 
@@ -2570,7 +2968,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 drawBorder(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, applyAlpha(COLOR_ACCENT, glowAlpha));
             }
 
-            // Close Button [ ✕ ]
             int closeSize = 14;
             int closeX = sHeadX + sHeadW - closeSize - 4;
             int closeY = sHeadY + 4;
@@ -2580,11 +2977,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int closeCol = hoverClose ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
             drawCenteredText(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
 
-            // 3. Content Area
-            int sContentX = x + 6;
+            int sContentX = sHeadX;
             int sContentY = sHeadY + sHeadH + 4;
             int sContentW = sHeadW;
-            int sContentH = (y + h - 7) - sContentY;
+            int sContentH = (y + h - 11) - sContentY;
 
             if (sContentH > 20) {
                 if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
@@ -2645,7 +3041,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawCenteredText(poseStackOrGraphics, font, "💾 Save to Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         curY += btnH + 4;
 
-        // Card 3: + Save as New Preset button
+        boolean hoverName = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
+        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, COLOR_SLOT_BG, hoverName, presetNameFocused, alpha);
+        String nameText = presetNameInput.isEmpty() ? "Preset name..." : presetNameInput + (presetNameFocused ? "_" : "");
+        drawText(poseStackOrGraphics, font, trimTextToWidth(font, nameText, rowW - 10, !presetNameInput.isEmpty()),
+                rowX + 5, curY + 5, applyAlpha(presetNameInput.isEmpty() ? COLOR_TEXT_MUTED : COLOR_TEXT_WHITE, alpha));
+        curY += btnH + 4;
+
+        // Creates a named preset from the active item configuration.
         boolean hoverNew = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverNew ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNew, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, "+ Save as New Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
@@ -2666,13 +3069,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private void drawPresetsSideTab(Object poseStackOrGraphics, Font font, int frameRight, int tabY, int mouseX, int mouseY, float alpha) {
-        int tabW = 20;
-        int tabH = 28;
-        int tabX = frameRight - 2;
-
-        boolean hover = mouseX >= tabX && mouseX <= tabX + tabW + 6 && mouseY >= tabY && mouseY <= tabY + tabH;
-        int popOffset = hover ? 3 : 0;
-        int currentW = tabW + popOffset;
+        PresetSideTabGeometry hoverBounds = calculatePresetSideTabGeometry(frameRight, tabY, true);
+        boolean hover = mouseX >= hoverBounds.x() && mouseX <= hoverBounds.x() + hoverBounds.width()
+                && mouseY >= hoverBounds.y() && mouseY <= hoverBounds.y() + hoverBounds.height();
+        PresetSideTabGeometry geometry = calculatePresetSideTabGeometry(frameRight, tabY, hover);
+        int tabX = geometry.x();
+        int tabH = geometry.height();
+        int currentW = geometry.width();
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
@@ -2681,53 +3084,52 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int sideBevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         int btnBg = applyAlpha(hover ? COLOR_BTN_BG_HOVER : COLOR_PANEL_BG, alpha);
 
-        // 1. Solid chassis body backing
         Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + currentW, tabY + tabH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
-        // 2. Outermost 1px Black Border (Top, Right, Bottom - seamlessly attached on left to frame)
         Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + currentW, tabY + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 1, tabX + currentW, tabY + tabH, black);
         Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 1, tabY, tabX + currentW, tabY + tabH, black);
 
-        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top) & Shadow (Bottom & Right)
         drawHorizontalGradientLine(poseStackOrGraphics, tabX, tabY + 1, currentW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 2, tabX + currentW - 1, tabY + tabH - 1, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 2, tabY + 1, tabX + currentW - 1, tabY + tabH - 1, shadow);
 
-        // 4. Outer Chassis Band (offset 2)
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 2, tabX + currentW - 2, tabY + 3, sideBand);
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 3, tabX + currentW - 2, tabY + tabH - 2, sideBand);
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 3, tabY + 2, tabX + currentW - 2, tabY + tabH - 2, sideBand);
+        for (int o = 2; o <= 3; o++) {
+            Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + o, tabX + currentW - o, tabY + o + 1, sideBand);
+            Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - o - 1, tabX + currentW - o, tabY + tabH - o, sideBand);
+            Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - o - 1, tabY + o, tabX + currentW - o, tabY + tabH - o, sideBand);
+        }
 
-        // 5. Stepped Bevel Ridge (offset 3)
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 3, tabX + currentW - 3, tabY + 4, sideBevelShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 4, tabX + currentW - 3, tabY + tabH - 3, sideBevelHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 4, tabY + 3, tabX + currentW - 3, tabY + tabH - 3, sideBevelHighlight);
+        int o5 = 5;
+        if (currentW > 14 && tabH > 14) {
+            Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + o5, tabX + currentW - o5, tabY + o5 + 1, sideBevelShadow);
+            Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - o5 - 1, tabX + currentW - o5, tabY + tabH - o5, sideBevelHighlight);
+            Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - o5 - 1, tabY + o5, tabX + currentW - o5, tabY + tabH - o5, sideBevelHighlight);
+            Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 6, tabX + currentW - 6, tabY + tabH - 6, btnBg);
+        } else {
+            Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 4, tabX + currentW - 4, tabY + tabH - 4, btnBg);
+        }
 
-        // 6. Inner button fill
-        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 4, tabX + currentW - 4, tabY + tabH - 4, btnBg);
-
-        // 7. Presets Equalizer/Sliders Icon
-        int cx = tabX + (currentW - 2) / 2;
-        int cy = tabY + tabH / 2;
+        int cx = geometry.centerX();
+        int cy = geometry.centerY() - 1;
         int trkCol = applyAlpha(hover ? (currentTheme.isLight() ? 0xFF64748B : 0xFF94A3B8) : (currentTheme.isLight() ? 0xFF94A3B8 : COLOR_CHASSIS_BAND), alpha);
         int knobCol = applyAlpha(hover ? COLOR_ACCENT : (currentTheme.isLight() ? 0xFF334155 : COLOR_TEXT_WHITE), alpha);
         int knobHighlight = applyAlpha(hover ? 0xFFFFFFFF : (currentTheme.isLight() ? 0xFFFFFFFF : 0xFFCCCCCC), alpha);
 
-        // Slider 1 (Top: knob at left)
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 5, cy - 6, cx + 5, cy - 5, trkCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 3, cy - 8, cx - 1, cy - 3, knobCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 2, cy - 7, cx - 1, cy - 4, knobHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 6, cy - 4, cx + 6, cy - 3, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 4, cy - 6, cx - 2, cy - 1, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 3, cy - 5, cx - 2, cy - 2, knobHighlight);
 
-        // Slider 2 (Middle: knob at right)
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 5, cy, cx + 5, cy + 1, trkCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, cx + 1, cy - 2, cx + 3, cy + 3, knobCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, cx + 2, cy - 1, cx + 3, cy + 2, knobHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 6, cy, cx + 6, cy + 1, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx + 2, cy - 2, cx + 4, cy + 3, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx + 3, cy - 1, cx + 4, cy + 2, knobHighlight);
 
-        // Slider 3 (Bottom: knob at center)
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 5, cy + 6, cx + 5, cy + 7, trkCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 2, cy + 4, cx, cy + 9, knobCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 1, cy + 5, cx, cy + 8, knobHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 6, cy + 4, cx + 6, cy + 5, trkCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx - 1, cy + 2, cx + 1, cy + 7, knobCol);
+        Services.PLATFORM.fill(poseStackOrGraphics, cx, cy + 3, cx + 1, cy + 6, knobHighlight);
+
+        // Draw the exposed edge last so the bevel cannot cover its black outline.
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 1, tabY, tabX + currentW, tabY + tabH, black);
 
         if (hover) {
             deferredTooltip = Collections.singletonList(ComponentHelper.literal("Presets (Click to Open)"));
@@ -3140,6 +3542,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     // Viewport Scissor Helpers
     private void enableGuiScissor(Object poseStackOrGraphics, int guiX, int guiY, int guiW, int guiH) {
         Minecraft mc = Minecraft.getInstance();
+        if (mc.getWindow() == null) return;
         double scale = mc.getWindow().getGuiScale();
         int winH = mc.getWindow().getHeight();
         int sx = (int) Math.round(guiX * scale);
@@ -3213,7 +3616,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Top Center Crest Badge (Buildscape Logo Beveled Frame with Seamless U-Shaped Cradle) ---
+    // Top-center crest frame.
     private static final CommonId LOGO_TEXTURE = CommonId.of("buildscape", "textures/gui/logo.png");
 
     private void drawTopCrestBadge(Object poseStackOrGraphics, Font font, int frameX, int frameY, int frameW, float alpha) {
@@ -3272,7 +3675,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Unified Custom Scrollbar (6px width, clean metallic bevels, no gradient banding) ---
+    // Shared custom scrollbar.
     private void renderCustomScrollbar(Object poseStackOrGraphics, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha) {
         if (maxSc <= 0) return;
 
@@ -3305,7 +3708,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, trackX + trackW - 1, thumbY + 1, trackX + trackW, thumbY + thumbH - 1, shadow);
     }
 
-    // --- Auto-Minimize & In-World Locate Helper ---
+    // In-world pillar location handling.
     private void locatePillarInWorld(PillarIdManager.PillarData data) {
         if (data == null) return;
         Minecraft mc = Minecraft.getInstance();
@@ -3339,7 +3742,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Config Row Render Helpers ---
+    // Configuration row rendering helpers.
     private void renderRowCardBase(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, int mouseX, int mouseY, float alpha) {
         if (y + h < clipY || y > clipY + clipH) return;
 
@@ -3374,9 +3777,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private void renderConfigRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String currentVal, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
-
         int cycleW = 138;
+        String visibleDescription = trimTextToWidth(font, desc, calculateCycleDescriptionWidth(w, cycleW), false);
+        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, visibleDescription, mouseX, mouseY, alpha);
+
         int cycleH = 15;
         int cycleX = x + w - cycleW - 8;
         int cycleY = y + (h - cycleH) / 2;
@@ -3408,6 +3812,36 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         boolean hoverNext = mouseX >= rightX && mouseX <= rightX + arrowW && mouseY >= cycleY && mouseY <= cycleY + cycleH;
         drawBeveledButton(poseStackOrGraphics, rightX, cycleY, arrowW, cycleH, hoverNext ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNext, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, "›", rightX + arrowW / 2, cycleY + 3, applyAlpha(hoverNext ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+    }
+
+    private void renderConfigRowCycleDetailed(Object graphics, Font font, int x, int y, int w, int h, int clipY,
+                                              int clipH, String label, String description, String value,
+                                              int mouseX, int mouseY, float alpha) {
+        if (y < clipY || y + h > clipY + clipH) return;
+        renderConfigRowCycle(graphics, font, x, y, w, h, clipY, clipH, label, "", value, mouseX, mouseY, alpha);
+        int descriptionWidth = calculateCycleDescriptionWidth(w, 138);
+        List<String> lines = wrapTextToLines(font, description, descriptionWidth, 2);
+        for (int line = 0; line < lines.size(); line++) {
+            drawText(graphics, font, lines.get(line), x + 6, y + 15 + line * 9, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        }
+    }
+
+    private static List<String> wrapTextToLines(Font font, String text, int maxWidth, int maxLines) {
+        List<String> lines = new ArrayList<>();
+        String remaining = text == null ? "" : text.trim();
+        while (!remaining.isEmpty() && lines.size() < maxLines) {
+            String line = trimTextToWidth(font, remaining, maxWidth, false);
+            if (font.width(remaining) <= maxWidth) {
+                lines.add(remaining);
+                break;
+            }
+            int split = line.lastIndexOf(' ');
+            if (split > 0) line = line.substring(0, split);
+            if (line.isEmpty()) break;
+            lines.add(line);
+            remaining = remaining.substring(Math.min(remaining.length(), line.length())).trim();
+        }
+        return lines;
     }
 
     private void renderConfigRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String valText, int mouseX, int mouseY, float alpha) {
@@ -3514,7 +3948,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Color Math Helpers ---
+    // Color conversion helpers.
     private static int hsbToRgb(float hue, float saturation, float brightness) {
         int r = 0, g = 0, b = 0;
         if (saturation <= 0.0001f) {
@@ -3575,7 +4009,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return Math.max(0, Math.min(255, val));
     }
 
-    // --- Mouse & Keyboard Event Handlers ---
+    // Mouse and keyboard event handling.
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isClosing) return true;
@@ -3613,11 +4047,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // 0b. Presets Side Tab Click (when Presets panel is closed, clicking the protruding side tab expands it)
         if (selectedTabIndex == 0 && sidePanelProgress < 0.05f) {
-            int tabX = layout.frameRight - 2;
             int tabY = frameY + 36;
-            int tabW = 20;
-            int tabH = 28;
-            if (mouseX >= tabX && mouseX <= tabX + tabW + 6 && mouseY >= tabY && mouseY <= tabY + tabH) {
+            PresetSideTabGeometry tab = calculatePresetSideTabGeometry(layout.frameRight, tabY, true);
+            if (mouseX >= tab.x() && mouseX <= tab.x() + tab.width()
+                    && mouseY >= tab.y() && mouseY <= tab.y() + tab.height()) {
                 openSidePanel(SidePanelType.PRESETS);
                 return true;
             }
@@ -3725,80 +4158,98 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 int sub0X = contentX + 6;
                 if (mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH) {
-                    itemsSubTab = 0;
-                    itemsListDirty = true;
+                    if (itemsSubTab != 0) {
+                        itemsSubTab = 0;
+                        itemsListDirty = true;
+                        startItemContentTransition();
+                    }
                     scrollOffset = 0;
                     return true;
                 }
 
                 int sub1X = sub0X + subBtnW + 4;
                 if (mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH) {
-                    itemsSubTab = 1;
-                    tagsListDirty = true;
-                    loadRegisteredTags();
+                    if (itemsSubTab != 1) {
+                        itemsSubTab = 1;
+                        tagsListDirty = true;
+                        loadRegisteredTags();
+                        startItemContentTransition();
+                    }
                     scrollOffset = 0;
                     return true;
                 }
 
                 curY += row1H + 2;
 
-                // Row 2: Filter Bar (4 buttons: All, Inventory, Mod Toggles, Active)
                 int bar2H = 16;
-                int pillW = (contentW - 24) / 4;
-                int pillH = 13;
+                int toolbarX = contentX + 6;
+                ItemToolbarGeometry toolbar = calculateItemToolbarGeometry(Math.max(120, contentW - 18));
+                int pillW = toolbar.filterWidth();
+                int pillH = getItemToolbarControlHeight();
                 int pillY = curY + 1;
 
-                if (itemsSubTab == 0) {
-                    for (int f = 0; f < 4; f++) {
-                        int px = contentX + 6 + f * (pillW + 4);
-                        if (mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH) {
-                            if (f == 2) {
-                                if (itemFilterMode == 2) {
-                                    if (!availableModNamespaces.isEmpty()) {
-                                        if (button == 1 || Services.PLATFORM.hasShiftDown()) {
-                                            currentModIndex = (currentModIndex - 1 + availableModNamespaces.size()) % availableModNamespaces.size();
-                                        } else {
-                                            currentModIndex = (currentModIndex + 1) % availableModNamespaces.size();
-                                        }
-                                    }
-                                } else {
-                                    itemFilterMode = 2;
-                                }
-                            } else {
-                                itemFilterMode = f;
-                            }
+                for (int f = 0; f < 3; f++) {
+                    int px = toolbarX + f * (pillW + toolbar.gap());
+                    if (mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH) {
+                        if (itemsSubTab == 0) {
+                            itemFilterMode = f;
                             itemsListDirty = true;
-                            scrollOffset = 0;
-                            return true;
-                        }
-                    }
-                } else {
-                    for (int f = 0; f < 4; f++) {
-                        int px = contentX + 6 + f * (pillW + 4);
-                        if (mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH) {
-                            if (f == 2) {
-                                if (tagFilterMode == 2) {
-                                    if (!availableModNamespaces.isEmpty()) {
-                                        if (button == 1 || Services.PLATFORM.hasShiftDown()) {
-                                            currentTagModIndex = (currentTagModIndex - 1 + availableModNamespaces.size()) % availableModNamespaces.size();
-                                        } else {
-                                            currentTagModIndex = (currentTagModIndex + 1) % availableModNamespaces.size();
-                                        }
-                                    }
-                                } else {
-                                    tagFilterMode = 2;
-                                }
-                            } else {
-                                tagFilterMode = f;
-                            }
+                        } else {
+                            tagFilterMode = f;
                             tagsListDirty = true;
-                            scrollOffset = 0;
-                            return true;
                         }
+                        startItemContentTransition();
+                        scrollOffset = 0;
+                        return true;
                     }
                 }
 
-                curY += bar2H + 4;
+                int searchX = toolbarX + 3 * (pillW + toolbar.gap());
+                int searchW = toolbar.searchWidth();
+                int namespaceW = toolbar.namespaceWidth();
+                int searchY = pillY;
+                int searchH = getItemToolbarControlHeight();
+                if (mouseY >= searchY && mouseY <= searchY + searchH) {
+                    if (mouseX >= searchX && mouseX <= searchX + searchW) {
+                        focusedSearchField = itemsSubTab == 0 ? 1 : 2;
+                        if (button == 1) {
+                            clearActiveSearch();
+                            return true;
+                        }
+                        long now = System.currentTimeMillis();
+                        if (lastSearchClickField == focusedSearchField && now - lastSearchClickTime <= 350L) {
+                            searchTextSelected = true;
+                        } else {
+                            searchTextSelected = false;
+                        }
+                        lastSearchClickField = focusedSearchField;
+                        lastSearchClickTime = now;
+                        return true;
+                    }
+                    int namespaceX = searchX + searchW + toolbar.gap();
+                    if (mouseX >= namespaceX && mouseX <= namespaceX + namespaceW) {
+                        List<String> namespaces = itemsSubTab == 0 ? availableModNamespaces : availableTagNamespaces;
+                        int currentIndex = itemsSubTab == 0 ? itemSearchNamespaceIndex : tagSearchNamespaceIndex;
+                        int direction = button == 1 || Services.PLATFORM.hasShiftDown() ? -1 : 1;
+                        int optionCount = namespaces.size() + 1;
+                        int option = (currentIndex + 1 + direction + optionCount) % optionCount;
+                        if (itemsSubTab == 0) {
+                            itemSearchNamespaceIndex = option - 1;
+                            itemsListDirty = true;
+                        } else {
+                            tagSearchNamespaceIndex = option - 1;
+                            tagsListDirty = true;
+                        }
+                        focusedSearchField = 0;
+                        searchTextSelected = false;
+                        startItemContentTransition();
+                        scrollOffset = 0;
+                        return true;
+                    }
+                }
+                focusedSearchField = 0;
+                searchTextSelected = false;
+                curY += bar2H + 3;
 
                 // Viewport Clicks
                 int viewportY = curY;
@@ -3827,6 +4278,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                 int slotX = gridStartX + col * step;
                                 int slotY = viewportY + 2 - (int) scrollOffset + row * step;
                                 if (mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize) {
+                                    if (!requireConfigModificationAccess()) return true;
                                     Item item = itemsToDisplay.get(index);
                                     CommonId cid = Services.PLATFORM.getItemId(item);
                                     if (cid != null) {
@@ -3838,7 +4290,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                             cfg.items.add(idStr);
                                             cachedActiveItems.add(item);
                                         }
-                                        cfg.saveItemsToDisk();
+                                        persistServerConfig(cfg);
                                         if (itemFilterMode == 3) {
                                             itemsListDirty = true;
                                         }
@@ -3860,6 +4312,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                             if (rowY + tagRowH < viewportY || rowY > viewportY + viewportH) continue;
 
                             if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= rowY && mouseY <= rowY + tagRowH) {
+                                if (!requireConfigModificationAccess()) return true;
                                 String tagId = tagsToDisplay.get(ti);
                                 if (cfg.items.contains(tagId)) {
                                     cfg.items.remove(tagId);
@@ -3868,7 +4321,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                     cfg.items.add(tagId);
                                     cachedActiveTags.add(tagId);
                                 }
-                                cfg.saveItemsToDisk();
+                                persistServerConfig(cfg);
                                 return true;
                             }
                         }
@@ -3900,8 +4353,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 // 1. Mode Toggle
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
                     cfg.use_pattern = !cfg.use_pattern;
-                    cfg.saveProperties();
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3909,6 +4363,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 2. Pattern Cycle
                 int patStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (patStep != 0) {
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
                     int pIndex = 0;
                     for (int i = 0; i < GLOBAL_PARTICLE_PATTERNS.length; i++) {
                         if (GLOBAL_PARTICLE_PATTERNS[i].equalsIgnoreCase(cfg.pattern)) {
@@ -3917,7 +4372,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         }
                     }
                     cfg.pattern = GLOBAL_PARTICLE_PATTERNS[(pIndex + patStep + GLOBAL_PARTICLE_PATTERNS.length) % GLOBAL_PARTICLE_PATTERNS.length];
-                    cfg.saveProperties();
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3925,8 +4380,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 3. Pattern Speed
                 int pSpeedStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pSpeedStep != 0) {
-                    cfg.pattern_speed = Math.max(0.01D, Math.min(0.50D, Math.round((cfg.pattern_speed + pSpeedStep * 0.01D) * 100.0) / 100.0));
-                    cfg.saveProperties();
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    cfg.pattern_speed = adjustConfigValue(cfg.pattern_speed, pSpeedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3934,8 +4390,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 4. Pattern Spread
                 int pSpreadStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pSpreadStep != 0) {
-                    cfg.pattern_spread = Math.max(0.01D, Math.min(0.50D, Math.round((cfg.pattern_spread + pSpreadStep * 0.01D) * 100.0) / 100.0));
-                    cfg.saveProperties();
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    cfg.pattern_spread = adjustConfigValue(cfg.pattern_spread, pSpreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3943,8 +4400,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 5. Pattern Intensity
                 int pIntStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pIntStep != 0) {
-                    cfg.pattern_intensity = Math.max(0.1D, Math.min(5.0D, Math.round((cfg.pattern_intensity + pIntStep * 0.1D) * 10.0) / 10.0));
-                    cfg.saveProperties();
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    cfg.pattern_intensity = adjustConfigValue(cfg.pattern_intensity, pIntStep, 0.1D, Services.PLATFORM.hasControlDown(), 0.1D, 5.0D, 1);
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3952,8 +4410,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 6. Basic Speed
                 int speedStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (speedStep != 0) {
-                    cfg.particle_speed = Math.max(0.01D, Math.min(0.50D, Math.round((cfg.particle_speed + speedStep * 0.01D) * 100.0) / 100.0));
-                    cfg.saveProperties();
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    cfg.particle_speed = adjustConfigValue(cfg.particle_speed, speedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3961,8 +4420,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 7. Basic Spread
                 int spreadStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (spreadStep != 0) {
-                    cfg.particle_spread = Math.max(0.01D, Math.min(0.50D, Math.round((cfg.particle_spread + spreadStep * 0.01D) * 100.0) / 100.0));
-                    cfg.saveProperties();
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    cfg.particle_spread = adjustConfigValue(cfg.particle_spread, spreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3970,8 +4430,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 8. Lifetime
                 int lifeStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (lifeStep != 0) {
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
                     cfg.particle_lifetime = Math.max(5, Math.min(120, cfg.particle_lifetime + lifeStep * 5));
-                    cfg.saveProperties();
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3979,8 +4440,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 9. Density
                 int denStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (denStep != 0) {
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
                     cfg.particle_density = Math.max(1, Math.min(16, cfg.particle_density + denStep));
-                    cfg.saveProperties();
+                    persistServerConfig(cfg);
                     return true;
                 }
                 curY += h + gap;
@@ -3999,12 +4461,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                     if (mouseY >= counterY && mouseY <= counterY + counterH) {
                         if (mouseX >= counterX && mouseX <= counterX + stepBtnW) {
+                            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
                             cfg.max_particle_color = Math.max(1, cfg.max_particle_color - 1);
-                            cfg.saveProperties();
+                            persistServerConfig(cfg);
                             return true;
                         } else if (mouseX >= counterX + counterW - stepBtnW && mouseX <= counterX + counterW) {
+                            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
                             cfg.max_particle_color = Math.min(7, cfg.max_particle_color + 1);
-                            cfg.saveProperties();
+                            persistServerConfig(cfg);
                             return true;
                         }
                     }
@@ -4018,6 +4482,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     for (int i = 0; i < 7; i++) {
                         int swX = swatchStartX + i * (swatchSize + swatchGap);
                         if (mouseX >= swX && mouseX <= swX + swatchSize && mouseY >= swatchY && mouseY <= swatchY + swatchSize) {
+                            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
                             editingColorIndex = i;
                             isEditingPillarColor = false;
                             editingPillarId = null;
@@ -4038,24 +4503,25 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
                 curY += h + gap;
 
-                // 11. Reset Colors Action
                 if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 86)) {
-                    cfg.particle_color.clear();
-                    cfg.particle_color.add("#FFB81C");
-                    cfg.particle_color.add("#FFFFFF");
-                    cfg.particle_color.add("#FFFF00");
-                    cfg.particle_color.add("#E8FEFD");
-                    cfg.particle_color.add("#FF5C00");
-                    cfg.particle_color.add("#3CDFFF");
-                    cfg.particle_color.add("#9B51E0");
-                    cfg.max_particle_color = 3;
-                    cfg.saveProperties();
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    resetParticleProperties(cfg);
+                    persistServerConfig(cfg);
+                    return true;
+                }
+                curY += h + gap;
+
+                if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 86)) {
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                    resetParticleColors(cfg);
+                    persistServerConfig(cfg);
                     return true;
                 }
             }
             case "world" -> {
                 UUID playerUuid = getPlayerUuid();
                 Level level = getLevel();
+                curY += 14;
 
                 // Row 0: Creative Tree Breaker
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
@@ -4073,8 +4539,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
                 curY += h + gap;
 
+                curY += 14;
+
                 // Row 2: Fast Leaf Decay
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    if (!requireConfigModificationAccess()) return true;
                     boolean cur = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.FAST_LEAF_DECAY, ModGameRules.clientFastLeafDecay) : ModGameRules.clientFastLeafDecay;
                     ModGameRules.clientFastLeafDecay = !cur;
                     PacketFactory.sendToServer(new UpdateGameRulePacket("fastLeafDecay", !cur));
@@ -4084,6 +4553,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 // Row 3: Disable Enderman Griefing
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    if (!requireConfigModificationAccess()) return true;
                     boolean cur = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.DISABLE_ENDERMAN_GRIEFING, ModGameRules.clientDisableEndermanGriefing) : ModGameRules.clientDisableEndermanGriefing;
                     ModGameRules.clientDisableEndermanGriefing = !cur;
                     PacketFactory.sendToServer(new UpdateGameRulePacket("disableEndermanGriefing", !cur));
@@ -4093,6 +4563,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 // Row 4: Disable Creeper Griefing
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    if (!requireConfigModificationAccess()) return true;
                     boolean cur = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.DISABLE_CREEPER_GRIEFING, ModGameRules.clientDisableCreeperGriefing) : ModGameRules.clientDisableCreeperGriefing;
                     ModGameRules.clientDisableCreeperGriefing = !cur;
                     PacketFactory.sendToServer(new UpdateGameRulePacket("disableCreeperGriefing", !cur));
@@ -4102,6 +4573,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 // Row 5: Disable Ghast Griefing
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    if (!requireConfigModificationAccess()) return true;
                     boolean cur = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.DISABLE_GHAST_GRIEFING, ModGameRules.clientDisableGhastGriefing) : ModGameRules.clientDisableGhastGriefing;
                     ModGameRules.clientDisableGhastGriefing = !cur;
                     PacketFactory.sendToServer(new UpdateGameRulePacket("disableGhastGriefing", !cur));
@@ -4111,6 +4583,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 // Row 6: Cake Stacking
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    if (!requireConfigModificationAccess()) return true;
                     boolean cur = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.IS_CAKE_STACK, ModGameRules.clientCakeStacking) : ModGameRules.clientCakeStacking;
                     ModGameRules.clientCakeStacking = !cur;
                     PacketFactory.sendToServer(new UpdateGameRulePacket("isCakeStack", !cur));
@@ -4120,24 +4593,39 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 // Row 7: Water Bottle Stacking
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    if (!requireConfigModificationAccess()) return true;
                     boolean cur = level != null ? Services.PLATFORM.getGameRuleBoolean(level, ModGameRules.IS_WATER_BOTTLE_STACK, ModGameRules.clientWaterBottleStacking) : ModGameRules.clientWaterBottleStacking;
                     ModGameRules.clientWaterBottleStacking = !cur;
                     PacketFactory.sendToServer(new UpdateGameRulePacket("isWaterbottleStack", !cur));
                     return true;
                 }
             }
+            case "links" -> {
+                for (ConfigLink link : CONFIG_LINKS) {
+                    if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 72)) {
+                        try {
+                            Services.PLATFORM.openUri(new URI(link.url()));
+                        } catch (Exception error) {
+                            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to open Buildscape link {}", link.url(), error);
+                        }
+                        return true;
+                    }
+                    curY += h + gap;
+                }
+            }
             case "system" -> {
+                int systemRowH = getSystemSettingRowHeight();
                 // Row 0: UI Theme Cycle
-                int themeStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
+                int themeStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (themeStep != 0) {
                     ConfigThemes.Theme next = (themeStep < 0) ? ConfigThemes.cyclePrevTheme() : ConfigThemes.cycleNextTheme();
                     applyTheme(next);
                     return true;
                 }
-                curY += h + gap;
+                curY += systemRowH + gap;
 
                 // Row 1: UI Background Cycle
-                int bgStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
+                int bgStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (bgStep != 0) {
                     if (bgStep < 0) {
                         ConfigBackgrounds.cyclePrevBackground();
@@ -4146,10 +4634,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     }
                     return true;
                 }
-                curY += h + gap;
+                curY += systemRowH + gap;
 
                 // Row 2: Screen Animation Cycle
-                int animStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
+                int animStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (animStep != 0) {
                     animSpeedIndex = (animSpeedIndex + animStep + ANIM_SPEEDS.length) % ANIM_SPEEDS.length;
                     try {
@@ -4157,12 +4645,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     } catch (Exception ignored) {}
                     return true;
                 }
-                curY += h + gap;
+                curY += systemRowH + gap;
 
-                // Row 2: Mod Version Badge (non-interactive)
-                curY += h + gap;
-
-                // Row 3: Permissions Badge (non-interactive)
+                // Row 3: Edit permission policy
+                int permissionStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
+                if (permissionStep != 0) {
+                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.POLICY)) return true;
+                    PillarParticleConfig cfg = PillarParticleConfig.get();
+                    PillarParticleConfig.EditPermissionMode[] modes = PillarParticleConfig.EditPermissionMode.values();
+                    int next = Math.floorMod(cfg.edit_permission_mode.ordinal() + permissionStep, modes.length);
+                    cfg.edit_permission_mode = modes[next];
+                    persistServerConfig(cfg);
+                    return true;
+                }
             }
                 }
             }
@@ -4190,6 +4685,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int relW = 60;
         int relX = x + 6;
         if (mouseX >= relX && mouseX <= relX + relW && mouseY >= barY && mouseY <= barY + btnH) {
+            lastPillarsSyncTime = 0L;
             syncPillars();
             return true;
         }
@@ -4198,6 +4694,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int remSelW = 105;
         int remSelX = relX + relW + 4;
         if (!selectedPillarIds.isEmpty() && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
+            if (!confirmDestructiveAction("remove:selected")) return true;
             for (String id : new ArrayList<>(selectedPillarIds)) {
                 PillarIdManager.getClient().removePillarData(id);
                 PacketFactory.sendToServer(new RemovePillarPacket(id));
@@ -4210,6 +4708,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int remAllW = 75;
         int remAllX = remSelX + remSelW + 4;
         if (!pillarList.isEmpty() && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
+            if (!confirmDestructiveAction("remove:all")) return true;
             for (PillarIdManager.PillarData data : pillarList) {
                 if (data.id != null) {
                     PillarIdManager.getClient().removePillarData(data.id);
@@ -4220,10 +4720,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return true;
         }
 
-        // [ ✓ Save ]
-        int saveW = 50;
-        int saveX = remAllX + remAllW + 4;
-        if (mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH) {
+        int resetW = 78;
+        int resetX = remAllX + remAllW + 4;
+        if (!selectedPillarIds.isEmpty() && mouseX >= resetX && mouseX <= resetX + resetW && mouseY >= barY && mouseY <= barY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
+            for (String id : selectedPillarIds) {
+                PillarIdManager.clearPillarOverrides(PillarIdManager.getClient().getPillarData(id));
+            }
             PillarIdManager.getClient().saveAllPillars();
             PacketFactory.sendToServer(new UpdateAllPillarIdsPacket(PillarIdManager.getClient().copyDataSnapshot()));
             return true;
@@ -4306,6 +4809,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
 
                 if (mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH) {
+                    if (!requireConfigModificationAccess()) return true;
                     PillarIdManager.getClient().removePillarData(data.id);
                     PacketFactory.sendToServer(new RemovePillarPacket(data.id));
                     selectedPillarIds.remove(data.id);
@@ -4369,6 +4873,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return true;
         }
 
+        if (!requireConfigModificationAccess()) return true;
+
         // [ ✓ Save Pillar ]
         int saveW = 82;
         int saveX = x + w - saveW - 6;
@@ -4429,7 +4935,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int speedStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (speedStep != 0) {
             double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-            data.pattern_speed = Math.max(0.01D, Math.min(0.50D, Math.round((cur + speedStep * 0.01D) * 100.0) / 100.0));
+            data.pattern_speed = adjustConfigValue(cur, speedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -4440,7 +4946,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int spreadStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (spreadStep != 0) {
             double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-            data.pattern_spread = Math.max(0.01D, Math.min(0.50D, Math.round((cur + spreadStep * 0.01D) * 100.0) / 100.0));
+            data.pattern_spread = adjustConfigValue(cur, spreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -4451,7 +4957,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int intStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (intStep != 0) {
             double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-            data.pattern_intensity = Math.max(0.1D, Math.min(5.0D, Math.round((cur + intStep * 0.1D) * 10.0) / 10.0));
+            data.pattern_intensity = adjustConfigValue(cur, intStep, 0.1D, Services.PLATFORM.hasControlDown(), 0.1D, 5.0D, 1);
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -4587,6 +5093,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int applyX = modalX + modalW - applyW - 16;
         int applyY = modalY + modalH - applyH - 12;
         if (mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= applyY && mouseY <= applyY + applyH) {
+            PillarParticleConfig.EditScope colorScope = isEditingPillarColor
+                    ? PillarParticleConfig.EditScope.GENERAL : PillarParticleConfig.EditScope.LIMITED;
+            if (!requireConfigModificationAccess(colorScope)) return true;
             int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
             int r = (currentColorInt >> 16) & 0xFF;
             int g = (currentColorInt >> 8) & 0xFF;
@@ -4614,7 +5123,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 } else {
                     cfg.particle_color.add(hexString);
                 }
-                cfg.saveProperties();
+                persistServerConfig(cfg);
             }
 
             showColorModal = false;
@@ -4659,12 +5168,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private boolean handleSidePanelClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {
-        int sHeadX = x + 6;
-        int sHeadY = y + 7;
-        int sHeadW = w - 12;
+        int sHeadX = x + 10;
+        int sHeadY = y + 11;
+        int sHeadW = w - 21;
         int sHeadH = 22;
 
-        // Close button [ ✕ ]
         int closeSize = 14;
         int closeX = sHeadX + sHeadW - closeSize - 4;
         int closeY = sHeadY + 4;
@@ -4678,10 +5186,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return true;
         }
 
-        int sContentX = x + 6;
+        int sContentX = sHeadX;
         int sContentY = sHeadY + sHeadH + 4;
         int sContentW = sHeadW;
-        int sContentH = (y + h - 7) - sContentY;
+        int sContentH = (y + h - 11) - sContentY;
 
         if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
             return handleSidePanelPillarClick(mouseX, mouseY, button, sContentX, sContentY, sContentW, sContentH);
@@ -4718,6 +5226,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (mouseX >= cycleBtnX && mouseX <= cycleBtnX + cycleBtnW && mouseY >= cycleBtnY && mouseY <= cycleBtnY + cycleBtnH) {
             if (!presets.isEmpty()) {
                 selectedPresetIndex = (selectedPresetIndex + 1) % presets.size();
+                presetNameInput = presets.get(selectedPresetIndex).name;
             }
             return true;
         }
@@ -4726,8 +5235,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Card 1: Apply
         int btnH = 18;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
             if (!keys.isEmpty() && selectedPresetIndex < keys.size()) {
                 presetsCfg.applyPreset(keys.get(selectedPresetIndex));
+                persistServerConfig(PillarParticleConfig.get());
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
             }
@@ -4737,10 +5248,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Card 2: Save to Preset
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
             if (!presets.isEmpty() && selectedPresetIndex < keys.size()) {
                 String key = keys.get(selectedPresetIndex);
                 PillarParticleConfig cfg = PillarParticleConfig.get();
-                presetsCfg.savePreset(key, presets.get(selectedPresetIndex).name, new HashSet<>(cfg.items));
+                String currentName = presets.get(selectedPresetIndex).name;
+                String requestedName = presetNameInput.isBlank() ? currentName : normalizePresetName(presetNameInput);
+                presetsCfg.savePreset(key, requestedName, new HashSet<>(cfg.items));
+                presetNameInput = requestedName;
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
             }
@@ -4748,12 +5263,21 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         curY += btnH + 4;
 
-        // Card 3: Save as New Preset
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+            presetNameFocused = true;
+            return true;
+        }
+        curY += btnH + 4;
+
+        // Creates a named preset from the active item configuration.
+        if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
             PillarParticleConfig cfg = PillarParticleConfig.get();
             String newKey = presetsCfg.generatePresetKey();
-            presetsCfg.savePreset(newKey, "Custom " + (presets.size()), new HashSet<>(cfg.items));
+            presetsCfg.savePreset(newKey, normalizePresetName(presetNameInput), new HashSet<>(cfg.items));
             selectedPresetIndex = presetsCfg.getPresets().size() - 1;
+            presetNameInput = "";
+            presetNameFocused = false;
             rebuildActiveItemsCache();
             itemsListDirty = true;
             return true;
@@ -4762,7 +5286,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Card 4: Reset to Defaults
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
             presetsCfg.applyPreset("default");
+            persistServerConfig(PillarParticleConfig.get());
             selectedPresetIndex = 0;
             rebuildActiveItemsCache();
             itemsListDirty = true;
@@ -4773,9 +5299,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Card 5: Delete Custom Preset (if not default)
         if (!isDefault) {
             if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+                if (!requireConfigModificationAccess()) return true;
                 presetsCfg.deletePreset(currentKey);
                 selectedPresetIndex = 0;
                 presetsCfg.applyPreset("default");
+                persistServerConfig(PillarParticleConfig.get());
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
                 return true;
@@ -4801,6 +5329,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Row 1: Custom Pattern Toggle
         if (checkSideRowToggleClick(mouseX, mouseY, rowX, curY, rowW, rowH)) {
+            if (!requireConfigModificationAccess()) return true;
             boolean cur = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
             data.use_pattern = !cur;
             PillarIdManager.getClient().updatePillarData(data);
@@ -4811,6 +5340,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Row 2: Pattern Cycle
         if (checkSideRowCycleClick(mouseX, mouseY, rowX, curY, rowW, rowH)) {
+            if (!requireConfigModificationAccess()) return true;
             String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
             int idx = 0;
             for (int i = 0; i < PARTICLE_PATTERNS.length; i++) {
@@ -4829,8 +5359,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 3: Speed Counter
         int speedStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
         if (speedStep != 0) {
+            if (!requireConfigModificationAccess()) return true;
             double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-            data.pattern_speed = Math.max(0.01D, Math.min(0.50D, Math.round((cur + speedStep * 0.01D) * 100.0) / 100.0));
+            data.pattern_speed = adjustConfigValue(cur, speedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -4840,8 +5371,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 4: Spread Counter
         int spreadStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
         if (spreadStep != 0) {
+            if (!requireConfigModificationAccess()) return true;
             double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-            data.pattern_spread = Math.max(0.01D, Math.min(0.50D, Math.round((cur + spreadStep * 0.01D) * 100.0) / 100.0));
+            data.pattern_spread = adjustConfigValue(cur, spreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -4851,8 +5383,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 5: Intensity Counter
         int intStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
         if (intStep != 0) {
+            if (!requireConfigModificationAccess()) return true;
             double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-            data.pattern_intensity = Math.max(0.1D, Math.min(5.0D, Math.round((cur + intStep * 0.1D) * 10.0) / 10.0));
+            data.pattern_intensity = adjustConfigValue(cur, intStep, 0.1D, Services.PLATFORM.hasControlDown(), 0.1D, 5.0D, 1);
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -4873,12 +5406,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int stepW = 13;
         if (mouseY >= counterY && mouseY <= counterY + counterH) {
             if (mouseX >= counterX && mouseX <= counterX + stepW) {
+                if (!requireConfigModificationAccess()) return true;
                 data.max_particle_color = Math.max(1, maxColors - 1);
                 if (data.dyeColors == null) data.dyeColors = new ArrayList<>(colors);
                 PillarIdManager.getClient().updatePillarData(data);
                 PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
                 return true;
             } else if (mouseX >= counterX + counterW - stepW && mouseX <= counterX + counterW) {
+                if (!requireConfigModificationAccess()) return true;
                 data.max_particle_color = Math.min(5, maxColors + 1);
                 if (data.dyeColors == null) data.dyeColors = new ArrayList<>(colors);
                 PillarIdManager.getClient().updatePillarData(data);
@@ -4916,6 +5451,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 7: Save Button
         int btnH = 16;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
             PillarIdManager.getClient().saveAllPillars();
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -4988,6 +5524,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnW = w - pad * 2;
         int btnH = 16;
         if (mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH) {
+            if (!requireConfigModificationAccess()) return true;
             int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
             int r = (currentColorInt >> 16) & 0xFF;
             int g = (currentColorInt >> 8) & 0xFF;
@@ -5015,7 +5552,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 } else {
                     cfg.particle_color.add(hexString);
                 }
-                cfg.saveProperties();
+                persistServerConfig(cfg);
             }
 
             if (returnSidePanelType == SidePanelType.PILLAR_DETAIL) {
@@ -5145,10 +5682,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         if (sidePanelType == SidePanelType.COLOR_PICKER && sidePanelProgress > 0.05f) {
             SidePanelLayout layout = calculateLayout();
-            int sHeadY = layout.sidePanelY + 7;
-            int sContentX = layout.sidePanelX + 6;
+            int sHeadY = layout.sidePanelY + 11;
+            int sContentX = layout.sidePanelX + 10;
             int sContentY = sHeadY + 22 + 4;
-            int sContentW = layout.sidePanelW - 12;
+            int sContentW = layout.sidePanelW - 21;
 
             int pad = 6;
             int hueW = 14;
@@ -5238,6 +5775,54 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (presetNameFocused) {
+            if (keyCode == 259 && !presetNameInput.isEmpty()) {
+                presetNameInput = presetNameInput.substring(0, presetNameInput.length() - 1);
+                return true;
+            }
+            if (keyCode == 256 || keyCode == 257) {
+                presetNameFocused = false;
+                return true;
+            }
+        }
+        if (focusedSearchField != 0) {
+            if ((modifiers & 2) != 0 && keyCode == 65) {
+                searchTextSelected = true;
+                return true;
+            }
+            if (keyCode == 259) {
+                if (focusedSearchField == 1) {
+                    itemSearchFilter = applySearchBackspace(itemSearchFilter, searchTextSelected);
+                    itemsListDirty = true;
+                } else if (focusedSearchField == 2) {
+                    tagSearchFilter = applySearchBackspace(tagSearchFilter, searchTextSelected);
+                    tagsListDirty = true;
+                }
+                searchTextSelected = false;
+                resetSearchViewport();
+                return true;
+            }
+            if (keyCode == 256 || keyCode == 257) {
+                focusedSearchField = 0;
+                searchTextSelected = false;
+                return true;
+            }
+        }
+        if ((modifiers & 2) != 0 && keyCode == 70 && selectedTabIndex == 0) {
+            focusedSearchField = itemsSubTab == 0 ? 1 : 2;
+            searchTextSelected = false;
+            return true;
+        }
+        if (keyCode == 263 || keyCode == 262 || keyCode == 258) {
+            int direction = keyCode == 263 ? -1 : 1;
+            selectedTabIndex = moveSelection(selectedTabIndex, direction, navItems.size());
+            scrollOffset = 0;
+            targetScrollOffset = 0;
+            focusedSearchField = 0;
+            searchTextSelected = false;
+            presetNameFocused = false;
+            return true;
+        }
         if (showColorModal) {
             if (keyCode == 256) {
                 showColorModal = false;
@@ -5271,9 +5856,44 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
+        if (presetNameFocused && !Character.isISOControl(codePoint) && presetNameInput.length() < 32) {
+            presetNameInput += codePoint;
+            return true;
+        }
+        if (focusedSearchField != 0 && !Character.isISOControl(codePoint)) {
+            if (focusedSearchField == 1 && (searchTextSelected || itemSearchFilter.length() < 64)) {
+                itemSearchFilter = applySearchCharacter(itemSearchFilter, searchTextSelected, codePoint);
+                itemsListDirty = true;
+            } else if (focusedSearchField == 2 && (searchTextSelected || tagSearchFilter.length() < 64)) {
+                tagSearchFilter = applySearchCharacter(tagSearchFilter, searchTextSelected, codePoint);
+                tagsListDirty = true;
+            }
+            searchTextSelected = false;
+            resetSearchViewport();
+            return true;
+        }
         if (activeTab != null && activeTab.charTyped(codePoint, modifiers)) {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Component getNarrationMessage() {
+        String tab = selectedTabIndex >= 0 && selectedTabIndex < navItems.size()
+                ? navItems.get(selectedTabIndex).title : "Configuration";
+        String state = presetNameFocused ? ". Editing preset name"
+                : focusedSearchField != 0 ? ". Editing search" : ". Use left and right arrows or Tab to change tabs";
+        return ComponentHelper.literal("Buildscape Configuration. " + tab + state);
+    }
+
+    @Override
+    public void onClose() {
+        if (currentInstance == this) {
+            currentInstance = null;
+        }
+        if (activeTab != null) {
+            activeTab.onClose();
+        }
     }
 }

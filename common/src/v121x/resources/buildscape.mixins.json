@@ -51,6 +51,7 @@
     "WallBlockMixin"
   ],
   "client": [
+    "LiquidBlockRendererV121xMixin",
     "AbstractContainerScreenMixin",
     "AdvancementWidgetMixin",
     "AnvilScreenMixin",

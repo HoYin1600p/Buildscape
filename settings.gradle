@@ -23,6 +23,9 @@ def resolveBuildscapeTarget() {
         if (normalized == 'neoforge' || normalized == 'neoforge262') return 'neoforge:26.2'
         if (normalized == 'fabric' || normalized == 'fabric262') return 'fabric:26.2'
         if (normalized == 'forge' || normalized == 'forge118' || normalized == 'forge1182') return 'forge:1.18.2'
+        if (normalized == 'neoforge263') return 'neoforge:26.3'
+        if (normalized == 'fabric263') return 'fabric:26.3'
+        if (normalized == 'forge263') return 'forge:26.3'
         return normalized
     }
 
@@ -82,11 +85,37 @@ if (activeTarget == 'neoforge:26.2') {
     include ':forge', ':forge:1.21.1'
     project(':forge').projectDir = file('forge')
     project(':forge:1.21.1').projectDir = file('forge/1.21.1')
+} else if (activeTarget == 'neoforge:26.3') {
+    include ':neoforge:26.3'
+    project(':neoforge:26.3').projectDir = file('neoforge/26.3')
+} else if (activeTarget == 'fabric:26.3') {
+    include ':fabric:26.3'
+    project(':fabric:26.3').projectDir = file('fabric/26.3')
+} else if (activeTarget == 'forge:26.3') {
+    include ':forge', ':forge:26.3'
+    project(':forge').projectDir = file('forge')
+    project(':forge:26.3').projectDir = file('forge/26.3')
 } else {
     // Default / 'all' mode
     include 'fabric:26.2', 'neoforge:26.2'
     project(':fabric:26.2').projectDir = file('fabric/26.2')
     project(':neoforge:26.2').projectDir = file('neoforge/26.2')
+
+    // Keep 26.3 dependency resolution out of the default offline graph during migration.
+    if (providers.gradleProperty('buildscape.v263').getOrElse('false') == 'true') {
+        include ':fabric:26.3', ':neoforge:26.3'
+        project(':fabric:26.3').projectDir = file('fabric/26.3')
+        project(':neoforge:26.3').projectDir = file('neoforge/26.3')
+    }
+
+    // forge:26.3 needs both the 26.3 common variant and its own opt-in (fabric:26.3 and neoforge:26.3 are
+    // included above with buildscape.v263).
+    if (providers.gradleProperty('buildscape.v263').getOrElse('false') == 'true'
+            && providers.gradleProperty('buildscape.forge263').getOrElse('false') == 'true') {
+        include ':forge', ':forge:26.3'
+        project(':forge').projectDir = file('forge')
+        project(':forge:26.3').projectDir = file('forge/26.3')
+    }
 
     if (providers.gradleProperty('buildscape.neoforge121').getOrElse('false') == 'true') {
         include ':neoforge:1.21.1'

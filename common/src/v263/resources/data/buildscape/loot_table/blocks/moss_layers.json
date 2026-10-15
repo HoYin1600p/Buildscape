@@ -1,0 +1,116 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:moss_layers",
+          "modifier": [
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:moss_layers",
+                "state": {
+                  "layers": "1"
+                }
+              },
+              "count": 1,
+              "add": false
+            },
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:moss_layers",
+                "state": {
+                  "layers": "2"
+                }
+              },
+              "count": 2,
+              "add": false
+            },
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:moss_layers",
+                "state": {
+                  "layers": "3"
+                }
+              },
+              "count": 3,
+              "add": false
+            },
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:moss_layers",
+                "state": {
+                  "layers": "4"
+                }
+              },
+              "count": 4,
+              "add": false
+            },
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:moss_layers",
+                "state": {
+                  "layers": "5"
+                }
+              },
+              "count": 5,
+              "add": false
+            },
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:moss_layers",
+                "state": {
+                  "layers": "6"
+                }
+              },
+              "count": 6,
+              "add": false
+            },
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:moss_layers",
+                "state": {
+                  "layers": "7"
+                }
+              },
+              "count": 7,
+              "add": false
+            },
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:moss_layers",
+                "state": {
+                  "layers": "8"
+                }
+              },
+              "count": 8,
+              "add": false
+            },
+            {
+              "type": "minecraft:explosion_decay"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

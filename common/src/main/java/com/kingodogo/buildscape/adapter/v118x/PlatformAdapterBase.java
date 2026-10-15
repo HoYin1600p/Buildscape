@@ -170,6 +170,24 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public Item.Properties prepareItemProperties(CommonId id, Item.Properties properties) {
         return properties.tab(CreativeTabs118x.tabFor(id));
     }
+    @Override
+    public void dropPlayerItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.item.ItemStack stack, boolean randomThrow) {
+        player.drop(stack, randomThrow);
+    }
+    @Override
+    public void swingPlayerHand(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        player.swing(hand);
+    }
+    @Override
+    public void resetSwingAnimation(net.minecraft.world.entity.LivingEntity entity) {
+        entity.swingTime = 0;
+        entity.attackAnim = 0.0F;
+        entity.oAttackAnim = 0.0F;
+    }
+    @Override
+    public boolean isEnderman(net.minecraft.world.entity.Entity entity) {
+        return entity instanceof net.minecraft.world.entity.monster.EnderMan;
+    }
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.getMaterial().isReplaceable(); }
     @Override public Boolean writeSolvedToShulker(net.minecraft.world.item.ItemStack shulker, List<net.minecraft.world.item.ItemStack> solved) {
         NonNullList<net.minecraft.world.item.ItemStack> shulkerItems = NonNullList.withSize(27, net.minecraft.world.item.ItemStack.EMPTY);
@@ -676,6 +694,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return WorldGenFactory.createRandomStateProvider(states);
     }
     @Override
+    public net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createSimpleStateProvider(BlockState state) {
+        return net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider.simple(state);
+    }
+    @Override
     public net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator getCreakingHeartTreeDecorator() {
         return WorldGenFactory.getCreakingHeartTreeDecorator();
     }
@@ -734,6 +756,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             builder.add(states.get(i), weights.get(i));
         }
         return new net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider(builder);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createTreeFeature(Object configuration) {
+        return WorldGenFactory.createTreeFeature(configuration);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration createSimpleBlockConfiguration(
+            net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider stateProvider) {
+        return WorldGenFactory.createSimpleBlockConfiguration(stateProvider);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createSimpleBlockFeature(Object configuration) {
+        return WorldGenFactory.createSimpleBlockFeature(configuration);
     }
     @Override
     public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createPatchFeature(
@@ -1159,6 +1194,16 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public int getEfficiencyLevel(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return 0;
         return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY, stack);
+    }
+
+    @Override
+    public boolean isAxeItem(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.AxeItem;
+    }
+
+    @Override
+    public boolean isHoeItem(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.HoeItem;
     }
 
     @Override

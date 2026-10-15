@@ -139,6 +139,9 @@ public class SyncPillarIdsPacket implements CommonPacket {
         }
 
         PillarIdManager.getClient().replaceFromServerSync(complete);
+        try {
+            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.onPillarsSynced();
+        } catch (Throwable ignored) {}
     }
 
     private static PillarIdManager.PillarData readPillarData(FriendlyByteBuf buf) {

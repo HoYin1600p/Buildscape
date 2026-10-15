@@ -289,14 +289,21 @@ public final class ModCommonEvents {
         if (player == null) return;
         JOINED_PLAYERS.add(player.getUUID());
         AdvancementEvents.checkFullCubeAdvancement(player);
+        MinecraftServer server = Services.PLATFORM.getServer(player);
+        if (server != null) {
+            PillarIdManager.setCurrentServer(server);
+        }
         PillarIdManager manager = PillarIdManager.get();
         if (!manager.hasLoaded() && !manager.isLoadInProgress()) {
-            manager.load();
+            if (server != null) {
+                manager.load(server);
+            } else {
+                manager.load();
+            }
         }
 
-        PacketFactory.sendToPlayer(player, new SyncConfigPacket(PillarParticleConfig.get()));
+        PacketFactory.sendToPlayer(player, new SyncConfigPacket(PillarParticleConfig.get(), player));
 
-        MinecraftServer server = Services.PLATFORM.getServer(player);
         if (server != null && server.isRunning()) {
             PacketFactory.sendToPlayer(player, new SyncGameRulesPacket(
                     ModGameRules.isFastLeafDecayEnabled(),
@@ -329,7 +336,12 @@ public final class ModCommonEvents {
     }
 
     public static void onServerStarted(MinecraftServer server) {
-        PillarIdManager.get().load();
+        if (server != null) {
+            PillarIdManager.setCurrentServer(server);
+            PillarIdManager.get().load(server);
+        } else {
+            PillarIdManager.get().load();
+        }
     }
 
     public static void onServerTick(MinecraftServer server) {

@@ -5,8 +5,10 @@ import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import java.util.List;
 
 public class RequestPillarIdsPacket implements CommonPacket {
 
@@ -48,14 +50,19 @@ public class RequestPillarIdsPacket implements CommonPacket {
         }
         persistentData.putLong(LAST_REQUEST_TIME, now);
 
+        MinecraftServer server = Services.PLATFORM.getServer(serverPlayer);
+        if (server != null) {
+            PillarIdManager.setCurrentServer(server);
+        }
+
         PillarIdManager manager = PillarIdManager.get();
-        if (!manager.hasLoaded()) {
-            manager.load(Services.PLATFORM.getServer(serverPlayer));
-            return;
+        if (!manager.hasLoaded() && !manager.isLoadInProgress()) {
+            manager.load(server);
         }
 
         try {
-            SyncPillarIdsPacket.sendToPlayer(serverPlayer, manager.getAllPillarDataForSync());
+            List<PillarIdManager.PillarData> current = manager.getAllPillarDataForSync();
+            SyncPillarIdsPacket.sendToPlayer(serverPlayer, current);
         } catch (RuntimeException e) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to sync pillar IDs to requesting player", e);
         }

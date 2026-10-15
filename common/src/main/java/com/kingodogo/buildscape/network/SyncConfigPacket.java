@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -26,10 +27,16 @@ public class SyncConfigPacket implements CommonPacket {
     public List<String> particle_color;
     public int max_particle_color;
     public Set<String> items;
+    public PillarParticleConfig.EditPermissionMode edit_permission_mode;
+    public int permission_level = -1;
 
     public SyncConfigPacket() {}
 
     public SyncConfigPacket(PillarParticleConfig config) {
+        this(config, null);
+    }
+
+    public SyncConfigPacket(PillarParticleConfig config, Player player) {
         this.particle_speed = NetworkPacketLimits.clamp(config.particle_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
         this.particle_spread = NetworkPacketLimits.clamp(config.particle_spread,
@@ -51,6 +58,13 @@ public class SyncConfigPacket implements CommonPacket {
         this.items = new HashSet<>(
                 config.items != null ? config.items : new HashSet<>()
         );
+        this.edit_permission_mode = config.edit_permission_mode != null
+                ? config.edit_permission_mode : PillarParticleConfig.EditPermissionMode.STRICT;
+        if (player != null) {
+            this.permission_level = Services.PLATFORM.hasPermission(player, PillarParticleConfig.CONFIG_PERMISSION_LEVEL)
+                    ? PillarParticleConfig.CONFIG_PERMISSION_LEVEL
+                    : Services.PLATFORM.hasPermission(player, 2) ? 2 : 0;
+        }
     }
 
     public SyncConfigPacket(FriendlyByteBuf buf) {
@@ -83,6 +97,10 @@ public class SyncConfigPacket implements CommonPacket {
         for (int i = 0; i < itemCount; i++) {
             this.items.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
         }
+        this.edit_permission_mode = PillarParticleConfig.parseEditPermissionMode(
+                NetworkPacketLimits.readUtf(buf, 16, "edit permission mode"));
+        this.permission_level = NetworkPacketLimits.readBoundedInt(buf, -1,
+                PillarParticleConfig.CONFIG_PERMISSION_LEVEL, "permission level");
     }
 
     public static SyncConfigPacket decode(FriendlyByteBuf buf) {
@@ -132,6 +150,10 @@ public class SyncConfigPacket implements CommonPacket {
                         NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item");
             }
         }
+        NetworkPacketLimits.writeUtf(buf,
+                edit_permission_mode != null ? edit_permission_mode.name() : PillarParticleConfig.EditPermissionMode.STRICT.name(),
+                16, "edit permission mode");
+        buf.writeInt(permission_level);
     }
 
     @Override
@@ -153,6 +175,11 @@ public class SyncConfigPacket implements CommonPacket {
             }
             if (this.items != null) {
                 cfg.items = new HashSet<>(this.items);
+            }
+            cfg.edit_permission_mode = this.edit_permission_mode != null
+                    ? this.edit_permission_mode : PillarParticleConfig.EditPermissionMode.STRICT;
+            if (this.permission_level >= 0) {
+                PillarParticleConfig.setClientPermissionLevel(this.permission_level);
             }
         }
     }

@@ -160,6 +160,7 @@ public interface IPlatformAdapter {
     Level getEntityLevel(Entity entity);
 
     Iterable<Item> getAllItems();
+    java.util.Collection<String> getAllItemTagIds();
     net.minecraft.resources.ResourceKey<net.minecraft.core.Registry<Item>> getItemRegistryKey();
 
     <V> void register(net.minecraft.core.Registry<V> registry, CommonId id, V value);

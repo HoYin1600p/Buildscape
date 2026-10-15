@@ -426,6 +426,14 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     @Override
+    public java.util.Collection<String> getAllItemTagIds() {
+        java.util.List<String> ids = new java.util.ArrayList<>();
+        net.minecraft.core.registries.BuiltInRegistries.ITEM.getTags()
+                .forEach(entry -> ids.add(entry.key().location().toString()));
+        return ids;
+    }
+
+    @Override
     public net.minecraft.resources.ResourceKey<Registry<Item>> getItemRegistryKey() {
         return net.minecraft.core.registries.Registries.ITEM;
     }
@@ -2254,7 +2262,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override
     @SuppressWarnings("unchecked")
     public void updateGameRule(Player player, String ruleName, boolean value) {
-        if (!(player instanceof ServerPlayer serverPlayer) || !hasPermission(serverPlayer, 2)) {
+        if (!(player instanceof ServerPlayer serverPlayer)) {
             return;
         }
         net.minecraft.server.MinecraftServer server = serverPlayer.level().getServer();

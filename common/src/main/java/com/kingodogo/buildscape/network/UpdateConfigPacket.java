@@ -54,39 +54,50 @@ public class UpdateConfigPacket implements CommonPacket {
     public void handle(Player player) {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
 
-        if (!Services.PLATFORM.hasPermission(serverPlayer, PillarParticleConfig.CONFIG_PERMISSION_LEVEL)) {
+        PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
+        PillarParticleConfig.EditPermissionMode policy = serverConfig.edit_permission_mode;
+        boolean canEditGeneral = PillarParticleConfig.canPlayerEdit(serverPlayer, policy, PillarParticleConfig.EditScope.GENERAL);
+        boolean canEditLimited = PillarParticleConfig.canPlayerEdit(serverPlayer, policy, PillarParticleConfig.EditScope.LIMITED);
+        boolean canEditPolicy = PillarParticleConfig.canPlayerEdit(serverPlayer, policy, PillarParticleConfig.EditScope.POLICY);
+        if (!canEditGeneral && !canEditLimited && !canEditPolicy) {
             Services.PLATFORM.sendActionBarMessage(serverPlayer,
                     Services.PLATFORM.translatable("buildscape.config.server_config_only"));
             return;
         }
 
-        PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
         String oldPattern = serverConfig.pattern;
 
-        serverConfig.particle_speed = data.particle_speed;
-        serverConfig.particle_spread = data.particle_spread;
-        serverConfig.particle_lifetime = data.particle_lifetime;
-        serverConfig.particle_density = data.particle_density;
-        serverConfig.use_pattern = data.use_pattern;
-        serverConfig.pattern = data.pattern;
-        serverConfig.pattern_speed = data.pattern_speed;
-        serverConfig.pattern_spread = data.pattern_spread;
-        serverConfig.pattern_intensity = data.pattern_intensity;
-        serverConfig.max_particle_color = data.max_particle_color;
-        if (data.particle_color != null) {
-            serverConfig.particle_color = new ArrayList<>(data.particle_color);
+        if (canEditGeneral) {
+            serverConfig.particle_speed = data.particle_speed;
+            serverConfig.particle_spread = data.particle_spread;
+            serverConfig.particle_lifetime = data.particle_lifetime;
+            serverConfig.particle_density = data.particle_density;
+            serverConfig.use_pattern = data.use_pattern;
+            serverConfig.pattern = data.pattern;
+            serverConfig.pattern_speed = data.pattern_speed;
+            serverConfig.pattern_spread = data.pattern_spread;
+            serverConfig.pattern_intensity = data.pattern_intensity;
         }
-        if (data.items != null) {
-            serverConfig.items = new HashSet<>(data.items);
+        if (canEditLimited) {
+            serverConfig.max_particle_color = data.max_particle_color;
+            if (data.particle_color != null) {
+                serverConfig.particle_color = new ArrayList<>(data.particle_color);
+            }
+            if (data.items != null) {
+                serverConfig.items = new HashSet<>(data.items);
+            }
+        }
+        if (canEditPolicy && data.edit_permission_mode != null) {
+            serverConfig.edit_permission_mode = data.edit_permission_mode;
         }
 
         serverConfig.savePropertiesToDisk();
-        serverConfig.saveItemsToDisk();
+        if (canEditLimited) serverConfig.saveItemsToDisk();
 
         PacketFactory.sendToAll(new SyncConfigPacket(serverConfig));
 
         PillarIdManager manager = PillarIdManager.get();
-        if (manager.hasLoaded()) {
+        if (canEditGeneral && manager.hasLoaded()) {
             boolean updatedAny = false;
             boolean isPatternChanged = !data.pattern.equals(oldPattern);
 

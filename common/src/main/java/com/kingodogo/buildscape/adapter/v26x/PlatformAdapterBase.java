@@ -3299,6 +3299,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
         @Override
         protected void addAdditionalSaveData(ValueOutput output) {
+            if (!this.level().isClientSide()) {
+                this.getOffers();
+            }
             super.addAdditionalSaveData(output);
             output.putInt("DespawnDelay", this.despawnDelay);
         }
@@ -3419,6 +3422,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
         @Override
         protected void addAdditionalSaveData(ValueOutput output) {
+            if (!this.level().isClientSide()) {
+                this.getOffers();
+            }
             super.addAdditionalSaveData(output);
             output.putInt("DespawnDelay", this.despawnDelay);
         }

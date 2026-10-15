@@ -47,6 +47,11 @@
       "apply": {
         "model": "buildscape:block/glow_lights_west"
       }
+    },
+    {
+      "apply": {
+        "model": "buildscape:block/glow_lights_particle"
+      }
     }
   ]
 }

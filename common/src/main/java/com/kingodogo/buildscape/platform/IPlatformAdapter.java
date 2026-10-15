@@ -97,6 +97,7 @@ public interface IPlatformAdapter {
     void enableScissor(Object graphics, int x, int y, int width, int height);
     void disableScissor(Object graphics);
     CommonId registerDynamicTexture(String name, net.minecraft.client.renderer.texture.DynamicTexture texture);
+    default CommonId registerExternalTexture(String name, java.io.InputStream stream) { return null; }
     net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear);
     boolean getGameRuleBoolean(net.minecraft.world.level.Level level, Object ruleKey, boolean fallback);
     Iterable<net.minecraft.world.item.ItemStack> getInventoryItems(net.minecraft.world.entity.player.Inventory inventory);

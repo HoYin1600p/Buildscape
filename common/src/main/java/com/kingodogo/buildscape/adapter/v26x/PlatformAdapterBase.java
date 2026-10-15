@@ -171,6 +171,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override public void disableScissor(Object graphics) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.disableScissor(graphics); }
 
     @Override public CommonId registerDynamicTexture(String name, net.minecraft.client.renderer.texture.DynamicTexture texture) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.registerDynamicTexture(name, texture); }
+    @Override public CommonId registerExternalTexture(String name, java.io.InputStream stream) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.registerExternalTexture(name, stream); }
 
     @Override public net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createDynamicTexture(name, width, height, clear); }
 

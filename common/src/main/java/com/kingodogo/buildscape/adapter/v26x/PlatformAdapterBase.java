@@ -162,6 +162,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     public boolean isEnderman(net.minecraft.world.entity.Entity entity) {
         return entity instanceof net.minecraft.world.entity.monster.EnderMan;
     }
+    @Override
+    public boolean isLargeFireball(net.minecraft.world.entity.Entity entity) {
+        return entity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
+    }
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.canBeReplaced(); }
     @Override public Boolean writeSolvedToShulker(net.minecraft.world.item.ItemStack shulker, List<net.minecraft.world.item.ItemStack> solved) {
         net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> shulkerItems = net.minecraft.core.NonNullList.withSize(27, net.minecraft.world.item.ItemStack.EMPTY);

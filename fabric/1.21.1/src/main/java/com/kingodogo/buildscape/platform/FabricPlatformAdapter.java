@@ -16,6 +16,20 @@ import net.minecraft.world.level.levelgen.feature.foliageplacers.*;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.*;
 
 public final class FabricPlatformAdapter extends PlatformAdapterBase implements com.kingodogo.buildscape.world.GameRuleAccess {
+    @Override
+    public net.minecraft.world.item.BlockItem createDoublePlantBlockItem(net.minecraft.world.level.block.Block block,
+                                                                       net.minecraft.world.item.Item.Properties properties) {
+        return new net.minecraft.world.item.BlockItem(block, properties) {
+            @Override
+            protected boolean placeBlock(net.minecraft.world.item.context.BlockPlaceContext context,
+                                         net.minecraft.world.level.block.state.BlockState state) {
+                // Forge defers shape updates until setPlacedBy installs the upper half.
+                // Keep replaced vegetation from removing the lower half before that happens.
+                return context.getLevel().setBlock(context.getClickedPos(), state, 11 | 16);
+            }
+        };
+    }
+
     @Override public String getPlatformName() { return "Fabric 1.21.1"; }
     @Override public boolean isModLoaded(String id) { return FabricLoader.getInstance().isModLoaded(id); }
     @Override public boolean isClient() { return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT; }

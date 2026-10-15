@@ -15,6 +15,20 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 
 public final class FabricPlatformAdapter extends PlatformAdapterBase implements GameRuleAccess {
+    @Override
+    public net.minecraft.world.item.BlockItem createDoublePlantBlockItem(net.minecraft.world.level.block.Block block,
+                                                                       net.minecraft.world.item.Item.Properties properties) {
+        return new net.minecraft.world.item.BlockItem(block, properties) {
+            @Override
+            protected boolean placeBlock(net.minecraft.world.item.context.BlockPlaceContext context,
+                                         net.minecraft.world.level.block.state.BlockState state) {
+                // Forge defers shape updates until setPlacedBy installs the upper half.
+                // Keep replaced vegetation from removing the lower half before that happens.
+                return context.getLevel().setBlock(context.getClickedPos(), state, 11 | 16);
+            }
+        };
+    }
+
     @Override public void registerMenuScreens() {
         if (!isClient()) return;
         com.kingodogo.buildscape.adapter.v118x.GuiProvider.registerMenuScreens(menuScreenRegistrar());

@@ -430,6 +430,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private float pickerBri = 1.0f;       // 0.0 to 1.0
     private boolean draggingGradient = false;
     private boolean draggingHue = false;
+    private boolean hexColorFocused = false;
+    private boolean hexColorSelected = false;
+    private String hexColorInput = "";
 
     private static final int[] PALETTE_PRESETS = {
             0xFFFFFFFF, 0xFFFFB81C, 0xFFFF3B30, 0xFF34C759,
@@ -2238,10 +2241,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         renderConfigRowPalette(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Colors", cfg.particle_color, cfg.max_particle_color, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Properties", "Restore default particle behavior", "↺ Reset Properties", mouseX, mouseY, alpha);
+        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Properties", "Restore default particle behavior", "↻ Reset Properties", mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Colors", "Restore default particle colors", "↺ Reset Colors", mouseX, mouseY, alpha);
+        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Colors", "Restore default particle colors", "↻ Reset Colors", mouseX, mouseY, alpha);
     }
 
     // Server-authoritative pillar table.
@@ -2263,7 +2266,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int barY = curY + (bar1H - btnH) / 2;
 
         // [ ⟳ Reload ]
-        int relW = 60;
+        int relW = Math.max(60, font.width("⟳ Reload") + 14);
         int relX = x + 6;
         boolean hoverRel = mouseX >= relX && mouseX <= relX + relW && mouseY >= barY && mouseY <= barY + btnH;
         drawBeveledButton(poseStackOrGraphics, relX, barY, relW, btnH, hoverRel ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverRel, false, alpha);
@@ -2271,7 +2274,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // [ ✕ Remove Selected (<N>) ]
         int selCount = selectedPillarIds.size();
-        int remSelW = 105;
+        int remSelW = Math.max(105, font.width("✕ Remove Selected") + 14);
         int remSelX = relX + relW + 4;
         boolean hasSel = selCount > 0;
         boolean hoverRemSel = hasSel && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH;
@@ -2284,7 +2287,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawCenteredText(poseStackOrGraphics, font, remSelLabel, remSelX + remSelW / 2, barY + 3, applyAlpha(remSelTextCol, alpha));
 
         // [ ✕ Remove All ]
-        int remAllW = 75;
+        int remAllW = Math.max(75, font.width("✕ Remove All") + 14);
         int remAllX = remSelX + remSelW + 4;
         boolean hasAny = !pillarList.isEmpty();
         boolean hoverRemAll = hasAny && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH;
@@ -2295,11 +2298,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 && System.currentTimeMillis() <= pendingDestructiveActionUntil;
         drawCenteredText(poseStackOrGraphics, font, confirmingAll ? "Confirm All" : "✕ Remove All", remAllX + remAllW / 2, barY + 3, applyAlpha(remAllTextCol, alpha));
 
-        int resetW = 78;
+        int resetW = Math.max(78, font.width("↻ Reset Selected") + 14);
         int resetX = remAllX + remAllW + 4;
         boolean hoverReset = hasSel && mouseX >= resetX && mouseX <= resetX + resetW && mouseY >= barY && mouseY <= barY + btnH;
         drawBeveledButton(poseStackOrGraphics, resetX, barY, resetW, btnH, COLOR_BTN_BG, hoverReset, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "↺ Reset Selected", resetX + resetW / 2, barY + 3,
+        drawCenteredText(poseStackOrGraphics, font, "↻ Reset Selected", resetX + resetW / 2, barY + 3,
                 applyAlpha(hasSel ? (hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER) : COLOR_TEXT_MUTED, alpha));
 
         // Right Count Badge
@@ -3008,38 +3011,49 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         String currentPresetName = currentPreset != null ? currentPreset.name : "Default";
         boolean isDefault = "default".equalsIgnoreCase(currentKey);
 
-        int pad = 5;
+        int pad = 8;
         int curY = y + pad;
         int rowW = w - pad * 2;
         int rowX = x + pad;
 
-        // Card 0: Active Preset selector & count
-        int selH = 34;
+        int selH = 37;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, selH, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, "Active Preset", rowX + 5, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawText(poseStackOrGraphics, font, "SELECTED PRESET", rowX + 6, curY + 5, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
-        int cycleBtnH = 15;
-        int cycleBtnY = curY + 15;
-        int cycleBtnW = rowW - 10;
-        int cycleBtnX = rowX + 5;
+        int cycleBtnH = 16;
+        int cycleBtnY = curY + 17;
+        int cycleBtnW = rowW - 12;
+        int cycleBtnX = rowX + 6;
         boolean hoverCycle = mouseX >= cycleBtnX && mouseX <= cycleBtnX + cycleBtnW && mouseY >= cycleBtnY && mouseY <= cycleBtnY + cycleBtnH;
         drawBeveledButton(poseStackOrGraphics, cycleBtnX, cycleBtnY, cycleBtnW, cycleBtnH, hoverCycle ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverCycle, false, alpha);
         String cycleLabel = "‹ " + currentPresetName + " (" + (currentPreset != null ? currentPreset.items.size() : 0) + ") ›";
         drawCenteredText(poseStackOrGraphics, font, cycleLabel, cycleBtnX + cycleBtnW / 2, cycleBtnY + 4, applyAlpha(hoverCycle ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        curY += selH + 5;
+        curY += selH + 4;
 
-        // Card 1: Apply Preset button
         int btnH = 18;
         boolean hoverApply = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledGreenButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverApply, alpha);
         drawCenteredText(poseStackOrGraphics, font, "✓ Apply Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
-        curY += btnH + 4;
+        curY += btnH + 9;
 
-        // Card 2: Save / Overwrite Current Preset button
+        drawText(poseStackOrGraphics, font, "MANAGE SELECTED", rowX + 2, curY, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        curY += 12;
+
         boolean hoverSave = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverSave ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverSave, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "💾 Save to Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "▣ Save Changes", rowX + rowW / 2, curY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         curY += btnH + 4;
+
+        if (!isDefault) {
+            boolean hoverDelete = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
+            drawBeveledRedButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverDelete, alpha);
+            drawCenteredText(poseStackOrGraphics, font, "✕ Delete Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverDelete ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT, alpha));
+            curY += btnH + 4;
+        }
+
+        curY += 5;
+        drawText(poseStackOrGraphics, font, "CREATE NEW PRESET", rowX + 2, curY, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        curY += 12;
 
         boolean hoverName = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, COLOR_SLOT_BG, hoverName, presetNameFocused, alpha);
@@ -3048,24 +3062,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 rowX + 5, curY + 5, applyAlpha(presetNameInput.isEmpty() ? COLOR_TEXT_MUTED : COLOR_TEXT_WHITE, alpha));
         curY += btnH + 4;
 
-        // Creates a named preset from the active item configuration.
         boolean hoverNew = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverNew ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNew, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "+ Save as New Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        curY += btnH + 4;
+        drawCenteredText(poseStackOrGraphics, font, "+ Create Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        curY += btnH + 12;
 
-        // Card 4: ↺ Reset to Defaults button
         boolean hoverReset = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverReset ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverReset, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "↺ Reset to Defaults", rowX + rowW / 2, curY + 5, applyAlpha(hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        curY += btnH + 4;
-
-        // Card 5: Delete Custom Preset button (only if not default)
-        if (!isDefault) {
-            boolean hoverDelete = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
-            drawBeveledRedButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverDelete, alpha);
-            drawCenteredText(poseStackOrGraphics, font, "✕ Delete Preset", rowX + rowW / 2, curY + 5, applyAlpha(hoverDelete ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT, alpha));
-        }
+        drawCenteredText(poseStackOrGraphics, font, "↻ Reset to Defaults", rowX + rowW / 2, curY + 5, applyAlpha(hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     private void drawPresetsSideTab(Object poseStackOrGraphics, Font font, int frameRight, int tabY, int mouseX, int mouseY, float alpha) {
@@ -3296,11 +3300,22 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int g = (currentColorInt >> 8) & 0xFF;
         int b = currentColorInt & 0xFF;
         String hexString = String.format("#%02X%02X%02X", r, g, b);
+        if (!hexColorFocused) {
+            hexColorInput = hexString;
+        }
 
         int prevSize = 20;
         Services.PLATFORM.fill(poseStackOrGraphics, gradX, curY, gradX + prevSize, curY + prevSize, applyAlpha(currentColorInt, alpha));
         drawBorder(poseStackOrGraphics, gradX, curY, prevSize, prevSize, applyAlpha(COLOR_FRAME_BLACK, alpha));
-        drawText(poseStackOrGraphics, font, hexString, gradX + prevSize + 6, curY + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        int hexX = gradX + prevSize + 6;
+        int hexW = gradW + hueW + pad - prevSize - 6;
+        boolean validHex = parseHexColor(hexColorInput) >= 0;
+        drawBeveledButton(poseStackOrGraphics, hexX, curY, hexW, prevSize, COLOR_SLOT_BG, false, hexColorFocused, alpha);
+        drawBorder(poseStackOrGraphics, hexX, curY, hexW, prevSize,
+                applyAlpha(validHex || !hexColorFocused ? COLOR_SLOT_BORDER : COLOR_TOGGLE_OFF_BORDER, alpha));
+        String displayedHex = hexColorInput + (hexColorFocused && !hexColorSelected ? "_" : "");
+        drawText(poseStackOrGraphics, font, trimTextToWidth(font, displayedHex, hexW - 10, true), hexX + 5, curY + 6,
+                applyAlpha(hexColorSelected ? COLOR_ACCENT : COLOR_TEXT_WHITE, alpha));
 
         curY += prevSize + 8;
 
@@ -3874,7 +3889,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (y < clipY || y + h > clipY + clipH) return;
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
 
-        int btnW = 86;
+        int btnW = getConfigRowButtonWidth(font, btnText);
         int btnH = 14;
         int btnX = x + w - btnW - 8;
         int btnY = y + (h - btnH) / 2;
@@ -3882,6 +3897,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
         drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBtn, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, btnText, btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+    }
+
+    private static int getConfigRowButtonWidth(Font font, String buttonText) {
+        return Math.max(86, font.width(buttonText) + 14);
     }
 
     private void renderConfigRowBadge(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String badgeText, float alpha) {
@@ -3996,6 +4015,34 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         hsb[0] = hue;
         hsb[1] = saturation;
         hsb[2] = brightness;
+    }
+
+    static int parseHexColor(String value) {
+        if (value == null) return -1;
+        String normalized = value.trim();
+        if (normalized.startsWith("#")) normalized = normalized.substring(1);
+        if (normalized.length() != 6) return -1;
+        try {
+            return Integer.parseInt(normalized, 16);
+        } catch (NumberFormatException ignored) {
+            return -1;
+        }
+    }
+
+    private String currentPickerHex() {
+        return String.format("#%06X", hsbToRgb(pickerHue, pickerSat, pickerBri) & 0xFFFFFF);
+    }
+
+    private boolean applyHexColorInput() {
+        int rgb = parseHexColor(hexColorInput);
+        if (rgb < 0) return false;
+        hexColorInput = String.format("#%06X", rgb);
+        float[] hsb = new float[3];
+        rgbToHsb(0xFF000000 | rgb, hsb);
+        pickerHue = hsb[0];
+        pickerSat = hsb[1];
+        pickerBri = hsb[2];
+        return true;
     }
 
     private static int scaleBrightness(int color, float ratio) {
@@ -4503,7 +4550,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
                 curY += h + gap;
 
-                if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 86)) {
+                if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH,
+                        getConfigRowButtonWidth(Minecraft.getInstance().font, "↻ Reset Properties"))) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
                     resetParticleProperties(cfg);
                     persistServerConfig(cfg);
@@ -4511,7 +4559,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
                 curY += h + gap;
 
-                if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 86)) {
+                if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH,
+                        getConfigRowButtonWidth(Minecraft.getInstance().font, "↻ Reset Colors"))) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
                     resetParticleColors(cfg);
                     persistServerConfig(cfg);
@@ -4682,7 +4731,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int barY = curY + (bar1H - btnH) / 2;
 
         // [ ⟳ Reload ]
-        int relW = 60;
+        Font font = Minecraft.getInstance().font;
+        int relW = Math.max(60, font.width("⟳ Reload") + 14);
         int relX = x + 6;
         if (mouseX >= relX && mouseX <= relX + relW && mouseY >= barY && mouseY <= barY + btnH) {
             lastPillarsSyncTime = 0L;
@@ -4691,7 +4741,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         // [ ✕ Remove Selected (<N>) ]
-        int remSelW = 105;
+        int remSelW = Math.max(105, font.width("✕ Remove Selected") + 14);
         int remSelX = relX + relW + 4;
         if (!selectedPillarIds.isEmpty() && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH) {
             if (!requireConfigModificationAccess()) return true;
@@ -4705,7 +4755,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         // [ ✕ Remove All ]
-        int remAllW = 75;
+        int remAllW = Math.max(75, font.width("✕ Remove All") + 14);
         int remAllX = remSelX + remSelW + 4;
         if (!pillarList.isEmpty() && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH) {
             if (!requireConfigModificationAccess()) return true;
@@ -4720,7 +4770,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return true;
         }
 
-        int resetW = 78;
+        int resetW = Math.max(78, font.width("↻ Reset Selected") + 14);
         int resetX = remAllX + remAllW + 4;
         if (!selectedPillarIds.isEmpty() && mouseX >= resetX && mouseX <= resetX + resetW && mouseY >= barY && mouseY <= barY + btnH) {
             if (!requireConfigModificationAccess()) return true;
@@ -5212,27 +5262,26 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         String currentKey = (keys.isEmpty() || selectedPresetIndex >= keys.size()) ? "default" : keys.get(selectedPresetIndex);
         boolean isDefault = "default".equalsIgnoreCase(currentKey);
 
-        int pad = 5;
+        int pad = 8;
         int curY = y + pad;
         int rowW = w - pad * 2;
         int rowX = x + pad;
 
-        // Card 0: Active Preset selector cycle
-        int selH = 34;
-        int cycleBtnH = 15;
-        int cycleBtnY = curY + 15;
-        int cycleBtnW = rowW - 10;
-        int cycleBtnX = rowX + 5;
+        int selH = 37;
+        int cycleBtnH = 16;
+        int cycleBtnY = curY + 17;
+        int cycleBtnW = rowW - 12;
+        int cycleBtnX = rowX + 6;
         if (mouseX >= cycleBtnX && mouseX <= cycleBtnX + cycleBtnW && mouseY >= cycleBtnY && mouseY <= cycleBtnY + cycleBtnH) {
             if (!presets.isEmpty()) {
                 selectedPresetIndex = (selectedPresetIndex + 1) % presets.size();
-                presetNameInput = presets.get(selectedPresetIndex).name;
+                presetNameInput = "";
+                presetNameFocused = false;
             }
             return true;
         }
-        curY += selH + 5;
+        curY += selH + 4;
 
-        // Card 1: Apply
         int btnH = 18;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             if (!requireConfigModificationAccess()) return true;
@@ -5244,18 +5293,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             return true;
         }
-        curY += btnH + 4;
+        curY += btnH + 9;
 
-        // Card 2: Save to Preset
+        curY += 12;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             if (!presets.isEmpty() && selectedPresetIndex < keys.size()) {
                 String key = keys.get(selectedPresetIndex);
                 PillarParticleConfig cfg = PillarParticleConfig.get();
                 String currentName = presets.get(selectedPresetIndex).name;
-                String requestedName = presetNameInput.isBlank() ? currentName : normalizePresetName(presetNameInput);
-                presetsCfg.savePreset(key, requestedName, new HashSet<>(cfg.items));
-                presetNameInput = requestedName;
+                presetsCfg.savePreset(key, currentName, new HashSet<>(cfg.items));
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
             }
@@ -5263,13 +5310,27 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         curY += btnH + 4;
 
+        if (!isDefault) {
+            if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+                if (!requireConfigModificationAccess()) return true;
+                presetsCfg.deletePreset(currentKey);
+                selectedPresetIndex = 0;
+                presetsCfg.applyPreset("default");
+                persistServerConfig(PillarParticleConfig.get());
+                rebuildActiveItemsCache();
+                itemsListDirty = true;
+                return true;
+            }
+            curY += btnH + 4;
+        }
+
+        curY += 5 + 12;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             presetNameFocused = true;
             return true;
         }
         curY += btnH + 4;
 
-        // Creates a named preset from the active item configuration.
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             PillarParticleConfig cfg = PillarParticleConfig.get();
@@ -5282,9 +5343,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             itemsListDirty = true;
             return true;
         }
-        curY += btnH + 4;
+        curY += btnH + 12;
 
-        // Card 4: Reset to Defaults
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             presetsCfg.applyPreset("default");
@@ -5293,21 +5353,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             rebuildActiveItemsCache();
             itemsListDirty = true;
             return true;
-        }
-        curY += btnH + 4;
-
-        // Card 5: Delete Custom Preset (if not default)
-        if (!isDefault) {
-            if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
-                if (!requireConfigModificationAccess()) return true;
-                presetsCfg.deletePreset(currentKey);
-                selectedPresetIndex = 0;
-                presetsCfg.applyPreset("default");
-                persistServerConfig(PillarParticleConfig.get());
-                rebuildActiveItemsCache();
-                itemsListDirty = true;
-                return true;
-            }
         }
 
         return false;
@@ -5497,6 +5542,23 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         curY += gradH + 8;
         int prevSize = 20;
+        int hexX = gradX + prevSize + 6;
+        int hexW = gradW + hueW + pad - prevSize - 6;
+        if (mouseX >= hexX && mouseX <= hexX + hexW && mouseY >= curY && mouseY <= curY + prevSize) {
+            hexColorFocused = true;
+            if (button == 1) {
+                hexColorInput = "";
+                hexColorSelected = false;
+            } else {
+                if (hexColorInput.isEmpty()) {
+                    hexColorInput = currentPickerHex();
+                }
+                hexColorSelected = true;
+            }
+            return true;
+        }
+        hexColorFocused = false;
+        hexColorSelected = false;
         curY += prevSize + 8;
 
         // 3. Preset Swatches
@@ -5775,6 +5837,45 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (hexColorFocused) {
+            if ((modifiers & 2) != 0 && keyCode == 65) {
+                hexColorSelected = true;
+                return true;
+            }
+            if ((modifiers & 2) != 0 && keyCode == 86) {
+                String clipboard = Services.PLATFORM.getClipboardText();
+                String candidate = clipboard == null ? "" : clipboard.trim();
+                if (parseHexColor(candidate) >= 0) {
+                    int rgb = parseHexColor(candidate);
+                    hexColorInput = String.format("#%06X", rgb);
+                    hexColorSelected = false;
+                    applyHexColorInput();
+                }
+                return true;
+            }
+            if (keyCode == 259) {
+                if (hexColorSelected) {
+                    hexColorInput = "";
+                    hexColorSelected = false;
+                } else if (!hexColorInput.isEmpty()) {
+                    hexColorInput = hexColorInput.substring(0, hexColorInput.length() - 1);
+                }
+                return true;
+            }
+            if (keyCode == 257) {
+                if (applyHexColorInput()) {
+                    hexColorFocused = false;
+                    hexColorSelected = false;
+                }
+                return true;
+            }
+            if (keyCode == 256) {
+                hexColorInput = currentPickerHex();
+                hexColorFocused = false;
+                hexColorSelected = false;
+                return true;
+            }
+        }
         if (presetNameFocused) {
             if (keyCode == 259 && !presetNameInput.isEmpty()) {
                 presetNameInput = presetNameInput.substring(0, presetNameInput.length() - 1);
@@ -5856,6 +5957,17 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
+        if (hexColorFocused && (codePoint == '#' || Character.digit(codePoint, 16) >= 0)) {
+            String next = hexColorSelected ? "" : hexColorInput;
+            if (next.length() < 7) {
+                hexColorInput = next + Character.toUpperCase(codePoint);
+                hexColorSelected = false;
+                if (parseHexColor(hexColorInput) >= 0) {
+                    applyHexColorInput();
+                }
+            }
+            return true;
+        }
         if (presetNameFocused && !Character.isISOControl(codePoint) && presetNameInput.length() < 32) {
             presetNameInput += codePoint;
             return true;

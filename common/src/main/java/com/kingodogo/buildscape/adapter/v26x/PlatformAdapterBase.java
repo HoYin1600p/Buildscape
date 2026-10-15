@@ -156,6 +156,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override public boolean hasControlDown() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.hasControlDown(); }
 
+    @Override public String getClipboardText() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getClipboardText(); }
+
 
 
     @Override public boolean widgetMouseClicked(net.minecraft.client.gui.components.AbstractWidget widget, double mouseX, double mouseY, int button) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.widgetMouseClicked(widget, mouseX, mouseY, button); }

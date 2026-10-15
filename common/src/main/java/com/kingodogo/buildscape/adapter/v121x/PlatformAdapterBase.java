@@ -220,6 +220,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public CommonId registerExternalTexture(String name, java.io.InputStream stream) {
+        return ClientAccess.registerExternalTexture(name, stream);
+    }
+
+    @Override
     public net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) {
         return ClientAccess.createDynamicTexture(name, width, height, clear);
     }

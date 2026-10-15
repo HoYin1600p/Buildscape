@@ -108,6 +108,17 @@ public final class ClientAccess {
         return CommonId.of(id.getNamespace(), id.getPath());
     }
 
+    public static CommonId registerExternalTexture(String name, java.io.InputStream stream) {
+        try {
+            com.mojang.blaze3d.platform.NativeImage image = com.mojang.blaze3d.platform.NativeImage.read(stream);
+            net.minecraft.client.renderer.texture.DynamicTexture texture = new net.minecraft.client.renderer.texture.DynamicTexture(image);
+            texture.upload();
+            return registerDynamicTexture(name, texture);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     public static net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) {
         net.minecraft.client.renderer.texture.DynamicTexture texture = new net.minecraft.client.renderer.texture.DynamicTexture(width, height, clear);
         texture.setFilter(false, false);

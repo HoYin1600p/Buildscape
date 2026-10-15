@@ -369,6 +369,23 @@ public final class ModCommonEvents {
         }
     }
 
+    public static void onServerStopped() {
+        try {
+            PillarIdManager manager = PillarIdManager.get();
+            if (manager.hasLoaded()) {
+                manager.savePeriodic(true);
+            }
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to save pillar data after server shutdown", exception);
+        } finally {
+            com.kingodogo.buildscape.BuildscapeCommon.setServerFullyInitialized(false);
+            pillarSaveTickCounter = 0;
+            pillarBackupTickCounter = 0;
+            PillarIdManager.fullReset();
+            PillarIdManager.setCurrentServer(null);
+        }
+    }
+
     public static void onPlayerLeave(ServerPlayer player) {
         if (player == null) return;
         JOINED_PLAYERS.remove(player.getUUID());

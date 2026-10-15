@@ -1,12 +1,21 @@
-"""Convert the shared resource tree in place using the supplied 26.2 vanilla jar.
+"""Convert the shared resource tree in place using the supplied vanilla jar.
 
 Only changed JSON is serialized; existing newline conventions are retained.
 The compact recipes_pack is a private Java format, not a vanilla recipe folder.
+
+--profile selects the target version: 26.2 (default, the original behaviour) or
+26.3, which adds the 26.3 data formats on top (see "26.3 formats" below). For 26.3,
+--derive-from BASE treats the resources root as an overlay folder: BASE (the 26.2
+resources) is converted in a temporary copy and only the files that change are written,
+e.g.  convert.py --profile 26.3 --derive-from common/src/main/resources \\
+common/src/v263/resources minecraft-26.3-client.jar
 """
 import argparse
 import copy
 import json
 from pathlib import Path
+import re
+import tempfile
 import zipfile
 
 FOLDERS = {"loot_tables": "loot_table", "recipes": "recipe",
@@ -23,16 +32,51 @@ SPECIAL_ITEMS = (
 )
 PACK = {"pack": {"description": "Buildscape resources for Minecraft 26.2",
                   "min_format": [88, 0], "max_format": [107, 1]}}
+PACK_263 = {"pack": {"description": "Buildscape resources for Minecraft 26.3",
+                     "min_format": [97, 1], "max_format": [121, 0]}}
+
+# Explicit version profiles. 26.2 is the default and is exactly the original
+# behaviour. 26.3 adds the data-format step in the "26.3 formats" section.
+# pack_version is checked against the jar's version.json when the jar has one
+# (the pack is [resource major.minor] .. [data major.minor], see PACK above).
+PROFILES = {
+    "26.2": {"version": "26.2", "pack": PACK,
+             "pack_version": {"resource_major": 88, "resource_minor": 0,
+                              "data_major": 107, "data_minor": 1}},
+    "26.3": {"version": "26.3", "pack": PACK_263,
+             "pack_version": {"resource_major": 97, "resource_minor": 1,
+                              "data_major": 121, "data_minor": 0}},
+}
+DEFAULT_PROFILE = "26.2"
+
+
+def profile_named(name):
+    try:
+        return PROFILES[name]
+    except KeyError:
+        raise ValueError("Unknown profile {!r}; expected one of {}".format(name, ", ".join(PROFILES))) from None
+
+
+def check_jar_version(version, profile):
+    if version["id"] != profile["version"]:
+        raise ValueError("Expected a {} jar, got {}".format(profile["version"], version["id"]))
+    declared = version.get("pack_version")
+    if declared is not None and declared != profile["pack_version"]:
+        raise ValueError("Jar pack_version {} differs from the {} profile {}".format(
+            declared, profile["version"], profile["pack_version"]))
 
 
 def load(path):
     return json.loads(path.read_bytes().decode("utf-8-sig"))
 
 
-def write(path, data):
+def write(path, data, strict=False):
+    """Write changed JSON. strict also treats 1.0 vs 1 and key order as changes."""
     old = path.read_bytes() if path.exists() else b""
-    if old and json.loads(old.decode("utf-8-sig")) == data:
-        return 0
+    if old:
+        previous = json.loads(old.decode("utf-8-sig"))
+        if previous == data and (not strict or json.dumps(previous) == json.dumps(data)):
+            return 0
     newline = "\r\n" if b"\r\n" in old else "\n"
     encoded = (json.dumps(data, indent=2, ensure_ascii=False) + "\n").replace("\n", newline)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -200,13 +244,242 @@ def item_definition(item, model_exists):
     return {"model": {"type": "minecraft:model", "model": "buildscape:" + target}}
 
 
-def convert(root, jar):
+# ---------------------------------------------------------------------------
+# 26.3 formats. Every rule below was read from the 26.3 client jar (data and
+# class constants) and is verified by applying it to the 26.2 vanilla data and
+# comparing with the 26.3 vanilla data (see test_convert.py for fixtures).
+# All steps are idempotent: they leave 26.3-format data unchanged.
+# ---------------------------------------------------------------------------
+# Loot predicates and functions are now keyed "type" (was "condition" and
+# "function"); "conditions"/"functions" lists became one "condition" (several
+# are wrapped in all_of) and one "modifier" (an object, or a list for several).
+NAMED_TOOL_PREDICATES = (
+    ({"items": "minecraft:shears"}, "minecraft:tool/can_shear"),
+    ({"predicates": {"minecraft:enchantments": [
+        {"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}, "minecraft:tool/can_silk_touch"),
+)
+# These keep float notation in vanilla 26.3; every other integral float is an int.
+FLOAT_NUMBER_TYPES_263 = {"minecraft:set_damage", "minecraft:enchanted_count_increase"}
+# BlockStateProvider types lost their suffix; simple_state_provider is just a state.
+PROVIDER_TYPES_263 = {
+    "minecraft:weighted_state_provider": "minecraft:weighted",
+    "minecraft:noise_threshold_provider": "minecraft:noise_threshold",
+    "minecraft:noise_provider": "minecraft:noise",
+    "minecraft:dual_noise_provider": "minecraft:dual_noise",
+    "minecraft:rotated_block_provider": "minecraft:rotated",
+    "minecraft:randomized_int_state_provider": "minecraft:randomized_int",
+    "minecraft:rule_based_state_provider": "minecraft:rule_based",
+}
+WORLDGEN_FOLDERS_263 = {"configured_feature": "feature"}
+# A string "condition" is a legacy predicate only if it names one of these types;
+# in 26.3 data it can instead name a predicate resource ("minecraft:tool/can_shear").
+LEGACY_CONDITION_TYPES_263 = {
+    "minecraft:" + name for name in (
+        "inverted", "any_of", "all_of", "alternative", "random_chance", "random_chance_with_enchanted_bonus",
+        "entity_properties", "killed_by_player", "entity_scores", "block_state_property", "match_tool",
+        "table_bonus", "survives_explosion", "damage_source_properties", "location_check", "weather_check",
+        "reference", "time_check", "value_check", "enchantment_active_check", "random_chance_with_looting")}
+FEATURE_FILE = re.compile(r"data/[^/]+/worldgen/(?:feature|placed_feature)/")
+
+
+def predicate_condition_263(conditions):
+    """A "conditions" list as the single "condition" of 26.3."""
+    if len(conditions) == 1:
+        return conditions[0]
+    return {"type": "minecraft:all_of", "terms": conditions}
+
+
+def hash_tag_ids_263(tags):
+    """Damage-type tag entries {"id", "expected"} now name the tag as #id."""
+    return [dict(t, id="#" + t["id"]) if isinstance(t, dict) and "expected" in t
+            and isinstance(t.get("id"), str) and not t["id"].startswith("#") else t for t in tags]
+
+
+def tag_ids_263(value):
+    if isinstance(value, list):
+        return [tag_ids_263(v) for v in value]
+    if isinstance(value, dict):
+        return {k: hash_tag_ids_263(tag_ids_263(v)) if k == "tags" and isinstance(v, list) else tag_ids_263(v)
+                for k, v in value.items()}
+    return value
+
+
+def loot_numbers_263(value):
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    if isinstance(value, list):
+        return [loot_numbers_263(v) for v in value]
+    if isinstance(value, dict):
+        if value.get("type") in FLOAT_NUMBER_TYPES_263:
+            return value
+        return {k: v if k == "chances" else loot_numbers_263(v) for k, v in value.items()}
+    return value
+
+
+def loot_node_263(value):
+    if isinstance(value, list):
+        return [loot_node_263(v) for v in value]
+    if not isinstance(value, dict):
+        return value
+    node = {k: loot_node_263(v) for k, v in value.items()}
+    result = {}
+    legacy_condition = isinstance(node.get("condition"), str) and node["condition"] in LEGACY_CONDITION_TYPES_263
+    kind = node.get("function") if isinstance(node.get("function"), str) else (
+        node["condition"] if legacy_condition else None)
+    if kind is not None:
+        result["type"] = kind
+    for key, item in node.items():
+        if key == "function" and kind is not None and item == kind:
+            continue
+        if key == "condition" and legacy_condition:
+            continue
+        if key == "conditions" and isinstance(item, list):
+            if item:
+                result["condition"] = predicate_condition_263(item)
+        elif key == "functions" and isinstance(item, list):
+            if item:
+                result["modifier"] = item[0] if len(item) == 1 else item
+        elif key == "tags" and isinstance(item, list):
+            result[key] = hash_tag_ids_263(item)
+        else:
+            result[key] = item
+    if result.get("type") == "minecraft:block_state_property":
+        replacement = {"type": "minecraft:match_block", "blocks": result["block"]}
+        if "properties" in result:
+            replacement["state"] = result["properties"]
+        result = replacement
+    elif result.get("type") == "minecraft:exploration_map":
+        result.setdefault("destination", "#minecraft:on_treasure_maps")
+    elif result.get("type") == "minecraft:match_tool" and set(result) == {"type", "predicate"}:
+        for shape, name in NAMED_TOOL_PREDICATES:
+            if result["predicate"] == shape:
+                return name
+    return result
+
+
+def loot_263(data):
+    return loot_numbers_263(loot_node_263(data))
+
+
+def advancement_263(data):
+    data = copy.deepcopy(data)
+    for criterion in data.get("criteria", {}).values():
+        conditions = criterion.get("conditions")
+        if not isinstance(conditions, dict):
+            continue
+        trigger = criterion.get("trigger")
+        if trigger == "minecraft:recipe_unlocked" and "recipe" in conditions:
+            conditions["recipes"] = conditions.pop("recipe")
+        if "recipe_id" in conditions:  # crafter_recipe_crafted and recipe_crafted
+            conditions["recipes"] = conditions.pop("recipe_id")
+        if trigger == "minecraft:enter_block" and "block" in conditions:
+            conditions["blocks"] = conditions.pop("block")
+        for key, value in list(conditions.items()):
+            if (isinstance(value, list) and value
+                    and all(isinstance(v, dict) and isinstance(v.get("condition"), str) for v in value)):
+                conditions[key] = predicate_condition_263([loot_node_263(v) for v in value])
+            else:
+                conditions[key] = tag_ids_263(value)
+    return data
+
+
+def state_263(value):
+    state = {"id": value["Name"]}
+    if value.get("Properties"):
+        state["properties"] = dict(value["Properties"])
+    return state
+
+
+def worldgen_node_263(value):
+    if isinstance(value, list):
+        return [worldgen_node_263(v) for v in value]
+    if not isinstance(value, dict):
+        return value
+    kind = value.get("type")
+    if "Name" in value and kind is None and isinstance(value["Name"], str):
+        return state_263(value)
+    if kind == "minecraft:simple_state_provider" and "state" in value:
+        return worldgen_node_263(value["state"])
+    node = {k: worldgen_node_263(v) for k, v in value.items()}
+    if isinstance(node.get("config"), dict) and isinstance(kind, str):
+        # Feature configuration is no longer nested under "config".
+        node = {"type": kind, **{k: v for k, v in node.items() if k not in ("type", "config")}, **node["config"]}
+    if kind in PROVIDER_TYPES_263:
+        node["type"] = PROVIDER_TYPES_263[kind]
+    if kind == "minecraft:random_offset" and ("xz_spread" in node or "y_spread" in node):
+        spread = node.get("xz_spread", 0)
+        node = {"type": "minecraft:offset", "x": spread, "y": node.get("y_spread", 0), "z": copy.deepcopy(spread)}
+    return node
+
+
+def model_263(data):
+    """Element "shade" was replaced by shade_direction_override ("up" is flat lighting)."""
+    data = copy.deepcopy(data)
+    for element in data.get("elements", []) if isinstance(data.get("elements"), list) else []:
+        if isinstance(element, dict) and "shade" in element:
+            if element.pop("shade") is False:
+                element.setdefault("shade_direction_override", "up")
+    return data
+
+
+def converted_path_263(rel):
+    parts = list(rel.parts)
+    if len(parts) > 3 and parts[0] == "data":
+        if parts[2] == "worldgen":
+            if parts[3] == "configured_carver":
+                raise ValueError("Unsupported 26.3 carver conversion for " + rel.as_posix())
+            parts[3] = WORLDGEN_FOLDERS_263.get(parts[3], parts[3])
+        elif parts[2] == "tags" and len(parts) > 4 and parts[3] == "worldgen":
+            parts[4] = WORLDGEN_FOLDERS_263.get(parts[4], parts[4])
+    return Path(*parts)
+
+
+def upgrade_263(root):
+    """Convert a 26.2-format tree in place to 26.3 formats."""
+    changed = 0
+    for p in sorted((root / "data").rglob("*.json")):
+        rel = p.relative_to(root)
+        target = root / converted_path_263(rel)
+        if p == target:
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.exists():
+            a, b = load(p), load(target)
+            if "/tags/" in rel.as_posix():
+                b["values"] += [v for v in a["values"] if v not in b["values"]]
+                changed += write(target, b)
+            elif a != b:
+                raise ValueError("Conflicting resource: " + str(rel))
+            p.unlink()
+        else:
+            p.rename(target)
+        changed += 1
+    for p in sorted(root.rglob("*.json")):
+        rel = p.relative_to(root).as_posix()
+        if "/loot_table/" in rel:
+            convert_one = loot_263
+        elif "/advancement/" in rel:
+            convert_one = advancement_263
+        elif FEATURE_FILE.match(rel):
+            convert_one = worldgen_node_263
+        elif rel.startswith("assets/") and "/models/" in rel:
+            convert_one = model_263
+        else:
+            continue
+        changed += write(p, convert_one(load(p)), strict=True)
+    for p in sorted((root / "data").rglob("*"), key=lambda p: len(p.parts), reverse=True):
+        if p.is_dir() and not any(p.iterdir()):
+            p.rmdir()
+    return changed
+
+
+def convert(root, jar, profile=DEFAULT_PROFILE):
     root = Path(root)
+    profile = profile_named(profile)
     changed = 0
     with zipfile.ZipFile(jar) as vanilla:
         version = json.loads(vanilla.read("version.json"))
-        if version["id"] != "26.2":
-            raise ValueError("Expected a 26.2 jar, got " + version["id"])
+        check_jar_version(version, profile)
         # Move files rather than recursively removing directories. Collisions must
         # be equivalent or tags whose values can safely be merged.
         for p in sorted((root / "data").rglob("*.json")):
@@ -314,7 +587,9 @@ def convert(root, jar):
                 continue
             changed += write(root / "assets/buildscape/items" / (item + ".json"),
                              item_definition(item, (items_dir / (item + ".json")).exists()))
-        changed += write(root / "pack.mcmeta", PACK)
+        if profile["version"] == "26.3":
+            changed += upgrade_263(root)
+        changed += write(root / "pack.mcmeta", profile["pack"])
     # Empty legacy directories are not part of Git but must not survive a run.
     for p in sorted((root / "data").rglob("*"), key=lambda p: len(p.parts), reverse=True):
         if p.is_dir() and not any(p.iterdir()):
@@ -322,12 +597,73 @@ def convert(root, jar):
     return changed
 
 
+# Files in an overlay folder that no conversion produces (owned by hand).
+OVERLAY_PROTECTED = {"buildscape.mixins.json"}
+TEXT_SUFFIXES = {".json", ".mcmeta", ".txt"}
+
+
+def derive_overlay(base, output, jar, profile):
+    """Write only what converting the base tree for `profile` changes into `output`.
+
+    The base tree (the 26.2 resources) is converted in a temporary copy. Files that
+    differ from the base, or are new, form the overlay for the version profile and
+    replace the previous generated contents of `output`; files in OVERLAY_PROTECTED
+    are left alone. Returns (written, removed, retired): retired lists base files the
+    conversion moved away, which a layer cannot delete, so builds must exclude them.
+    """
+    base, output = Path(base), Path(output)
+    with tempfile.TemporaryDirectory() as tmp:
+        tree = Path(tmp) / "tree"
+        before = {}
+        for p in sorted(base.rglob("*")):
+            if p.is_file() and p.suffix in TEXT_SUFFIXES:
+                rel = p.relative_to(base).as_posix()
+                before[rel] = p.read_bytes()
+                (tree / rel).parent.mkdir(parents=True, exist_ok=True)
+                (tree / rel).write_bytes(before[rel])
+        convert(tree, jar, profile)
+        after = {p.relative_to(tree).as_posix(): p.read_bytes() for p in sorted(tree.rglob("*")) if p.is_file()}
+    wanted = {rel: data for rel, data in after.items() if before.get(rel) != data}
+    retired = sorted(set(before) - set(after))
+    written = removed = 0
+    output.mkdir(parents=True, exist_ok=True)
+    for p in sorted(output.rglob("*")):
+        rel = p.relative_to(output).as_posix()
+        if p.is_file() and rel not in OVERLAY_PROTECTED and rel not in wanted:
+            p.unlink()
+            removed += 1
+    for rel, data in wanted.items():
+        target = output / rel
+        if rel in OVERLAY_PROTECTED:
+            raise ValueError("The conversion would overwrite hand-maintained " + rel)
+        if not target.exists() or target.read_bytes() != data:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+            written += 1
+    for p in sorted(output.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+        if p.is_dir() and not any(p.iterdir()):
+            p.rmdir()
+    return written, removed, retired
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("resources_root", type=Path)
     parser.add_argument("mc_jar", type=Path)
+    parser.add_argument("--profile", choices=sorted(PROFILES), default=DEFAULT_PROFILE,
+                        help="target Minecraft version profile (default: %(default)s)")
+    parser.add_argument("--derive-from", type=Path, metavar="BASE",
+                        help="treat resources_root as an overlay: convert BASE (the 26.2 resources) in a temporary "
+                             "copy and write only the files that change into resources_root")
     args = parser.parse_args()
-    print("Converted resources: {} changes".format(convert(args.resources_root, args.mc_jar)))
+    if args.derive_from:
+        written, removed, retired = derive_overlay(args.derive_from, args.resources_root, args.mc_jar, args.profile)
+        print("Overlay for {}: {} written, {} stale removed, {} base files retired".format(
+            args.profile, written, removed, len(retired)))
+        for rel in retired:
+            print("retired: " + rel)
+        return
+    print("Converted resources: {} changes".format(convert(args.resources_root, args.mc_jar, args.profile)))
 
 
 if __name__ == "__main__":

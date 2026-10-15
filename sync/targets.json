@@ -107,6 +107,85 @@
       ]
     },
     {
+      "id": "mc26.3",
+      "status": "planned",
+      "minecraft": "26.3",
+      "loaders": [
+        "fabric",
+        "neoforge"
+      ],
+      "branch": "port/26.2",
+      "modules": [
+        "fabric/26.3",
+        "neoforge/26.3",
+        "common"
+      ],
+      "version_cluster": "v263",
+      "base_commit": null,
+      "note": "Inactive until the 26.3 port is accepted. It shares ref/forge/1.18.2, the ledger and common/src/main with mc26.2, so activate it only after mc26.2 syncs are accepted, with base_commit set to the same reviewed source snapshot.",
+      "reference_snapshot": "ref/forge/1.18.2",
+      "mapping_file": "migration/ledger.csv",
+      "java_root": "common/src/main/java",
+      "resource_root": "common/src/v263/resources",
+      "state_file": "sync/state/mc26.3.json",
+      "mc_jar": "ref/artifacts/minecraft-26.3.jar",
+      "removal_policy": {
+        "file": "sync/removals26x.json",
+        "inherits": "mc26.2",
+        "inherited_resource_root": "common/src/main/resources"
+      },
+      "converter": {
+        "path": "scripts/resources26x/convert.py",
+        "profile": "26.3",
+        "command": [
+          "{python}",
+          "-B",
+          "{repo}/scripts/resources26x/convert.py",
+          "--profile",
+          "26.3",
+          "{resources}",
+          "{mc_jar}"
+        ]
+      },
+      "validator": {
+        "path": "scripts/resources26x/check.py",
+        "profile": "26.3"
+      },
+      "validation": [
+        [
+          "{python}",
+          "-B",
+          "{repo}/scripts/resources26x/check.py",
+          "--profile",
+          "26.3",
+          "--resources-root",
+          "{resources}",
+          "--mc-jar",
+          "{mc_jar}"
+        ],
+        [
+          "{gradle}",
+          "build263",
+          "-Pbuildscape.v263=true",
+          "--parallel",
+          "--max-workers=2",
+          "--offline",
+          "--console=plain",
+          "--no-daemon"
+        ]
+      ],
+      "version_clusters": [
+        "v263"
+      ],
+      "java_roots": [
+        "common/src/main/java",
+        "common/src/v263/java"
+      ],
+      "ledger_coverage": [
+        "263"
+      ]
+    },
+    {
       "id": "fabric1.18.2",
       "status": "planned",
       "minecraft": "1.18.2",

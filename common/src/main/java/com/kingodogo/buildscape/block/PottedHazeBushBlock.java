@@ -60,7 +60,7 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
         if (!level.isClientSide()) {
             ItemStack drop = plantStack(state);
             if (held.isEmpty()) player.setItemInHand(hand, drop);
-            else if (!player.addItem(drop)) player.drop(drop, false);
+            else if (!player.addItem(drop)) Services.PLATFORM.dropPlayerItem(player, drop, false);
             level.setBlock(pos, Blocks.FLOWER_POT.defaultBlockState(), 3);
             level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
         }

@@ -322,7 +322,7 @@ public final class ModCommonEvents {
         } else if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
             return ModGameRules.isCreeperGriefingDisabled();
         } else if (entity instanceof net.minecraft.world.entity.monster.Ghast
-                || entity.getClass().getSimpleName().toLowerCase().contains("fireball")) {
+                || Services.PLATFORM.isLargeFireball(entity)) {
             return ModGameRules.isGhastGriefingDisabled();
         }
         return false;

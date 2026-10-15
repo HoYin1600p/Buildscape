@@ -160,6 +160,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     public boolean isEnderman(net.minecraft.world.entity.Entity entity) {
         return entity instanceof net.minecraft.world.entity.monster.Enderman;
     }
+    @Override
+    public boolean isLargeFireball(net.minecraft.world.entity.Entity entity) {
+        return entity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
+    }
     private static final class SwingAnimationAccess {
         private static final java.lang.reflect.Field STATE = field(LivingEntity.class, "swingState");
         private static final java.lang.reflect.Field TICKS = field(LivingEntity.SwingState.class, "ticks");

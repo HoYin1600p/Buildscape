@@ -11,6 +11,8 @@
 
 ## Fixes
 
+- Dyeing a drained Haze Bush now keeps it drained instead of producing a full bush
+
 - Fixed a crash that could happen when Eyeblossoms switched between their day and night states
 - Fixed Copper Rod lightning handling: the redstone pulse is kept, doors and chests are cleaned safely, rods that already exist in the world are recognized correctly, freshly placed copper counts as copper, and Copper Rods can now be mined with a stone pickaxe
 - Fixed several Icicle problems: waterlogging, placement and breaking checks in Adventure mode and while sneaking, the falling icicle shell, repair of icicles that lost their attachment, and growth near the bottom of the world
@@ -37,6 +39,8 @@
 - New textures and a haze particle effect for the Haze Bushes
 
 ## Internal
+
+- Removed unused upward icicle textures and models
 
 - The recipe cache is now rebuilt automatically whenever recipe files are added or removed, and the bundled cache is verified byte for byte against the recipes at build time, so what ships always matches the recipes by @KyroXova & @HoYin1600p
 - Recipe pack files are formatted consistently and normalised to the same line endings, which keeps the bundled cache stable across machines

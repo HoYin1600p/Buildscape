@@ -2,15 +2,10 @@ package com.kingodogo.buildscape.config;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -51,13 +46,25 @@ public class BuildscapeClientConfig {
 
     private final Map<String, String> values;
     private final Path configDirectory;
+    private final boolean client;
+    private final Map<String, String> uiValues = new LinkedHashMap<>();
+    private boolean readOnly;
+    private boolean uiReadOnly;
+    private String source;
+    private String uiSource;
+    private static final Set<String> UI_STATE = Set.of(KEY_LAST_ACTIVE_TAB, KEY_SIDE_PANEL_EXPANDED);
 
     private BuildscapeClientConfig() {
         this(ConfigPaths.root());
     }
 
     BuildscapeClientConfig(Path configDirectory) {
+        this(configDirectory, com.kingodogo.buildscape.platform.Services.PLATFORM.isClient());
+    }
+
+    BuildscapeClientConfig(Path configDirectory, boolean client) {
         this.configDirectory = configDirectory;
+        this.client = client;
         this.values = new LinkedHashMap<>(DEFAULTS);
         load();
     }
@@ -100,61 +107,128 @@ public class BuildscapeClientConfig {
             try {
                 Files.copy(legacyFile.toPath(), file.toPath());
             } catch (IOException e) {
+                readOnly = true;
                 BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to copy legacy config", e);
+                file = legacyFile;
             }
         }
 
-        if (!file.exists()) {
-            save();
-            return;
-        }
-
-        Set<String> loadedKeys = new HashSet<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) {
-                    continue;
-                }
-
-                int eq = line.indexOf('=');
-                if (eq <= 0) {
-                    continue;
-                }
-
-                String key = line.substring(0, eq).trim();
-                String value = line.substring(eq + 1).trim();
-                if (DEFAULTS.containsKey(key)) {
-                    values.put(key, value);
-                    loadedKeys.add(key);
-                }
+        try {
+            if (file.exists()) {
+                source = ConfigLayoutIO.readText(file.toPath());
+                values.putAll(ConfigLayoutIO.readEntries(source));
             }
         } catch (IOException e) {
-            BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to read config - using defaults", e);
+            readOnly = true;
+            // Keep usable entries available, but never rewrite a partially parsed file.
+            if (source != null) {
+                for (String line : source.split("\\R")) {
+                    try { values.putAll(ConfigLayoutIO.readEntries(line)); }
+                    catch (IOException ignored) { }
+                }
+            }
+            BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Config is read-only because it could not be parsed", e);
         }
-
-        if (loadedKeys.size() != DEFAULTS.size()) {
-            save();
+        if (client) {
+            Path uiFile = configDirectory.resolve("buildscape/ui-state.cfg");
+            try {
+                if (Files.exists(uiFile)) {
+                    uiSource = ConfigLayoutIO.readText(uiFile);
+                    uiValues.putAll(ConfigLayoutIO.readEntries(uiSource));
+                }
+                for (String key : UI_STATE) {
+                    uiValues.putIfAbsent(key, values.get(key));
+                    values.put(key, uiValues.get(key));
+                }
+            } catch (IOException e) {
+                uiReadOnly = true;
+                BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: UI state is read-only because it could not be parsed", e);
+            }
         }
+        if (!file.exists()) save();
     }
 
     public void save() {
-        File file = getConfigFile();
-        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-            writer.println("# BuildScape Configuration");
-            writer.println("# Edit this file to customise BuildScape behaviour.");
-            writer.println("# Changes take effect on the next game launch.");
-            writer.println();
-            for (Map.Entry<String, String> entry : values.entrySet()) {
-                writer.println(entry.getKey() + " = " + entry.getValue());
+        if (readOnly) return;
+        try {
+            boolean moveState = client && saveUiState();
+            StringBuilder text = new StringBuilder("# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
+            for (String section : new String[]{"Gameplay", "Performance", "Visuals & particles", "Interface", "Other"}) {
+                text.append("\n# --- ").append(section).append(" ---\n");
+                for (Map.Entry<String, String> entry : values.entrySet()) {
+                    String key = entry.getKey();
+                    if (moveState && UI_STATE.contains(key)) continue;
+                    if (!section.equals(section(key))) continue;
+                    text.append("# ").append(description(key)).append('\n');
+                    text.append(key).append(" = ").append(entry.getValue()).append('\n');
+                }
             }
-            if (writer.checkError()) {
-                throw new IOException("Failed to write config " + file);
-            }
+            ConfigLayoutIO.write(getConfigFile().toPath(), text.toString(), source, true);
+            source = text.toString();
         } catch (IOException e) {
             BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to write config", e);
         }
+    }
+
+    private boolean saveUiState() {
+        if (!client || readOnly || uiReadOnly) return false;
+        try {
+            for (String key : UI_STATE) uiValues.put(key, values.get(key));
+            StringBuilder text = new StringBuilder("# BuildScape screen state\n");
+            for (Map.Entry<String, String> entry : uiValues.entrySet()) {
+                text.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
+            }
+            ConfigLayoutIO.write(configDirectory.resolve("buildscape/ui-state.cfg"), text.toString(), uiSource, false);
+            uiSource = text.toString();
+            return true;
+        } catch (IOException e) {
+            BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to save UI state; retaining the old location", e);
+            return false;
+        }
+    }
+
+    private void saveState() {
+        if (!client || readOnly) return;
+        // One layout migration may be needed; subsequent clicks only touch ui-state.cfg.
+        if (source == null || hasOldState()) save();
+        else saveUiState();
+    }
+
+    private boolean hasOldState() {
+        try {
+            Map<String, String> old = ConfigLayoutIO.readEntries(source);
+            return old.keySet().stream().anyMatch(UI_STATE::contains);
+        } catch (IOException e) { return false; }
+    }
+
+    private static String section(String key) {
+        return switch (key) {
+            case KEY_CAKE_STACKING, KEY_WATER_BOTTLE_STACKING, KEY_MAX_PIPE_NETWORK_SIZE -> "Gameplay";
+            case KEY_PARALLEL_MODEL_LOADING, KEY_CACHE_MODEL_MATERIALS,
+                    KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE -> "Performance";
+            case KEY_HIDE_CONFIG_BUTTON, KEY_UI_THEME, KEY_UI_BACKGROUND, KEY_ANIMATION_SPEED,
+                    KEY_LAST_ACTIVE_TAB, KEY_SIDE_PANEL_EXPANDED -> "Interface";
+            default -> "Other";
+        };
+    }
+
+    private static String description(String key) {
+        return switch (key) {
+            case KEY_CAKE_STACKING -> "Default cake-stacking game rule (stacks of 64).";
+            case KEY_WATER_BOTTLE_STACKING -> "Default water-bottle-stacking game rule (stacks of 16).";
+            case KEY_MAX_PIPE_NETWORK_SIZE -> "Maximum number of pipes in one network.";
+            case KEY_PARALLEL_MODEL_LOADING -> "Load bundled block models in parallel.";
+            case KEY_CACHE_MODEL_MATERIALS -> "Cache block-model material lookups.";
+            case KEY_PARALLEL_MODEL_BAKING -> "Bake bundled block models in parallel.";
+            case KEY_PARALLEL_BLOCK_STATE_CACHE -> "Build block-state caches in parallel.";
+            case KEY_HIDE_CONFIG_BUTTON -> "Hide the BuildScape button on client screens.";
+            case KEY_UI_THEME -> "Color theme for the configuration screen.";
+            case KEY_UI_BACKGROUND -> "Background for the configuration screen.";
+            case KEY_ANIMATION_SPEED -> "Screen animation speed: 0 smooth, 1 snappy, 2 instant.";
+            case KEY_LAST_ACTIVE_TAB -> "Last selected configuration tab (client screen state).";
+            case KEY_SIDE_PANEL_EXPANDED -> "Whether the presets side panel is expanded (client screen state).";
+            default -> "Unrecognized setting retained with its original value.";
+        };
     }
 
     private boolean getBoolean(String key) {
@@ -230,7 +304,7 @@ public class BuildscapeClientConfig {
 
     public void setSidePanelExpanded(boolean expanded) {
         values.put(KEY_SIDE_PANEL_EXPANDED, String.valueOf(expanded));
-        save();
+        saveState();
     }
 
     public int getAnimationSpeedIndex() {
@@ -248,6 +322,6 @@ public class BuildscapeClientConfig {
 
     public void setLastActiveTab(int tab) {
         values.put(KEY_LAST_ACTIVE_TAB, String.valueOf(tab));
-        save();
+        saveState();
     }
 }

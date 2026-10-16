@@ -97,8 +97,20 @@ class PillarConfigPersistenceTest {
     }
 
     @Test
-    void invalidPropertiesAreBackedUpBeforeAnExplicitSave() throws Exception {
-        assertCorruptedFilePreserved("pillar-properties.json", "loadPropertiesInternal", true);
+    void invalidPropertiesRemainReadOnlyAfterAnExplicitSave() throws Exception {
+        Path file = directory.resolve("pillar-properties.json");
+        String broken = "{ invalid JSON";
+        Files.writeString(file, broken);
+        PillarParticleConfig config = new PillarParticleConfig(directory);
+        Method load = PillarParticleConfig.class.getDeclaredMethod("loadPropertiesInternal");
+        load.setAccessible(true);
+        load.invoke(config);
+        config.particle_speed = 0.9;
+        config.savePropertiesToDisk();
+        assertEquals(broken, Files.readString(file));
+        try (var files = Files.list(directory)) {
+            assertEquals(List.of(file), files.toList());
+        }
     }
 
     private void assertCorruptedFilePreserved(String name, String loader, boolean properties) throws Exception {

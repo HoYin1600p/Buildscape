@@ -2,6 +2,8 @@ package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
@@ -69,6 +71,7 @@ public class PillarParticleConfig {
     };
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson LAYOUT_GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private static final String PROPERTIES_FILE_NAME = "pillar-properties.json";
     private static final String ITEMS_FILE_NAME = "pillar-items.json";
 
@@ -100,6 +103,9 @@ public class PillarParticleConfig {
 
     private transient boolean remote;
     private transient boolean corruptedProperties;
+    private transient JsonObject originalProperties;
+    private transient JsonObject loadedPropertyValues;
+    private transient String propertiesSource;
     private transient boolean corruptedItems;
     private final transient java.nio.file.Path configDirectory;
 
@@ -145,6 +151,7 @@ public class PillarParticleConfig {
         this.particle_color.add("#FF5C00");
         this.particle_color.add("#3CDFFF");
         this.particle_color.add("#9B51E0");
+        this.loadedPropertyValues = propertyValues();
     }
     public static void addConfigReloadCallback(Consumer<Boolean> callback) {
         CONFIG_RELOAD_CALLBACKS.add(callback);
@@ -253,31 +260,11 @@ public class PillarParticleConfig {
                 parentDir.mkdirs();
             }
 
-            try (FileWriter writer = new FileWriter(f)) {
-                writer.write("{\n");
-                writer.write("  // Basic particle parameters (used when use_pattern = false)\n");
-                writer.write("  \"particle_speed\": 0.02,\n");
-                writer.write("  \"particle_spread\": 0.1,\n");
-                writer.write("  \"particle_lifetime\": 20,\n");
-                writer.write("  \"particle_density\": 2,\n");
-                writer.write("  \n");
-                writer.write("  // Pattern system (overrides basic particle parameters)\n");
-                writer.write("  \"use_pattern\": true,\n");
-                writer.write("  \n");
-                writer.write("  // Available patterns: beam, spiral, fountain, pulse, ring, burst, snowflake\n");
-                writer.write("  \"pattern\": \"ring\",\n");
-                writer.write("  \n");
-                writer.write("  \"pattern_speed\": 0.05,\n");
-                writer.write("  \"pattern_spread\": 0.05,\n");
-                writer.write("  \"pattern_intensity\": 1.0,\n");
-                writer.write("  \n");
-                writer.write("  // Hexadecimal particle color palette (up to 7 colors)\n");
-                writer.write("  \"particle_color\": [\"#FFB81C\", \"#FFFFFF\", \"#FFFF00\", \"#E8FEFD\", \"#FF5C00\", \"#3CDFFF\", \"#9B51E0\"],\n");
-                writer.write("  \n");
-                writer.write("  \"max_particle_color\": 3,\n");
-                writer.write("  \"edit_permission_mode\": \"STRICT\"\n");
-                writer.write("}\n");
-            }
+            JsonObject defaults = new PillarParticleConfig(configDirectory).propertyValues();
+            String text = groupedProperties(defaults);
+            ConfigLayoutIO.write(f.toPath(), text, null, true);
+            propertiesSource = text;
+            originalProperties = defaults;
         } catch (Exception ignored) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to write default pillar properties", ignored);
         }
@@ -384,7 +371,17 @@ public class PillarParticleConfig {
             while ((ch = r.read()) != -1) {
                 content.append((char) ch);
             }
-            String jsonWithoutComments = stripComments(content.toString());
+            JsonObject original = null;
+            boolean legacyReadOnly = false;
+            String jsonWithoutComments;
+            try {
+                original = ConfigLayoutIO.readProperties(content.toString());
+                jsonWithoutComments = GSON.toJson(original);
+            } catch (Exception strictFailure) {
+                // Preserve 4.0.4's loading semantics for hand-edited files, but never migrate them.
+                jsonWithoutComments = stripComments(content.toString());
+                legacyReadOnly = true;
+            }
 
             Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
             Map<String, Object> jsonMap = GSON.fromJson(jsonWithoutComments, mapType);
@@ -452,6 +449,14 @@ public class PillarParticleConfig {
                     int numColors = this.particle_color.size();
                     this.max_particle_color = Math.max(1, Math.min(7, Math.min(loaded.max_particle_color > 0 ? loaded.max_particle_color : numColors, numColors)));
                 }
+            }
+            originalProperties = original;
+            propertiesSource = content.toString();
+            loadedPropertyValues = propertyValues();
+            corruptedProperties = legacyReadOnly;
+            if (legacyReadOnly) {
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn(
+                        "Loaded pillar properties using the legacy parser; the file is read-only and will be kept as-is");
             }
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
@@ -616,38 +621,105 @@ public class PillarParticleConfig {
         savePropertiesToDisk();
     }
     public void savePropertiesToDisk() {
-        if (remote) return;
+        if (remote || corruptedProperties) return;
         File file = getPropertiesFile();
         try {
-            if (corruptedProperties) {
-                ConfigBackup.copyCorrupted(file.toPath());
-                corruptedProperties = false;
+            if (originalProperties == null && file.exists()) {
+                // Also protect explicit saves made before the first load.
+                String source = ConfigLayoutIO.readText(file.toPath());
+                JsonObject original = ConfigLayoutIO.readProperties(source);
+                GSON.fromJson(original, PillarParticleConfig.class);
+                propertiesSource = source;
+                originalProperties = original;
             }
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();
             }
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write("{\n");
-                writer.write("  \"particle_speed\": " + particle_speed + ",\n");
-                writer.write("  \"particle_spread\": " + particle_spread + ",\n");
-                writer.write("  \"particle_lifetime\": " + particle_lifetime + ",\n");
-                writer.write("  \"particle_density\": " + particle_density + ",\n");
-                writer.write("  \"use_pattern\": " + use_pattern + ",\n");
-                writer.write("  \"pattern\": \"" + pattern + "\",\n");
-                writer.write("  \"pattern_speed\": " + pattern_speed + ",\n");
-                writer.write("  \"pattern_spread\": " + pattern_spread + ",\n");
-                writer.write("  \"pattern_intensity\": " + pattern_intensity + ",\n");
-                writer.write("  \"particle_color\": " + GSON.toJson(particle_color) + ",\n");
-                writer.write("  \"max_particle_color\": " + max_particle_color + ",\n");
-                writer.write("  \"edit_permission_mode\": \"" + edit_permission_mode.name() + "\"\n");
-                writer.write("}\n");
+            JsonObject current = propertyValues();
+            JsonObject output = originalProperties == null ? new JsonObject() : originalProperties.deepCopy();
+            for (Map.Entry<String, JsonElement> entry : current.entrySet()) {
+                String key = entry.getKey();
+                boolean changed = loadedPropertyValues == null || !entry.getValue().equals(loadedPropertyValues.get(key));
+                if (changed || !output.has(key)) {
+                    String alias = key.equals("use_pattern") ? "use_template" : key.replace("pattern", "template");
+                    output.add(key, !changed && output.has(alias) ? output.get(alias) : entry.getValue());
+                }
             }
+            String text = groupedProperties(output);
+            ConfigLayoutIO.write(file.toPath(), text, propertiesSource, true);
+            propertiesSource = text;
+            originalProperties = output;
+            loadedPropertyValues = current;
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
         } catch (Exception ignored) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to save pillar properties", ignored);
         }
+    }
+
+    private JsonObject propertyValues() {
+        JsonObject values = new JsonObject();
+        values.add("particle_color", GSON.toJsonTree(particle_color));
+        values.addProperty("max_particle_color", max_particle_color);
+        values.addProperty("particle_spread", particle_spread);
+        values.addProperty("particle_speed", particle_speed);
+        values.addProperty("particle_lifetime", particle_lifetime);
+        values.addProperty("pattern", pattern);
+        values.addProperty("pattern_speed", pattern_speed);
+        values.addProperty("pattern_spread", pattern_spread);
+        values.addProperty("pattern_intensity", pattern_intensity);
+        values.addProperty("use_pattern", use_pattern);
+        values.addProperty("particle_density", particle_density);
+        values.addProperty("edit_permission_mode", edit_permission_mode == null ? null : edit_permission_mode.name());
+        return values;
+    }
+
+    private static String groupedProperties(JsonObject values) {
+        StringBuilder text = new StringBuilder("{\n");
+        java.util.Set<String> written = new java.util.HashSet<>();
+        appendProperties(text, values, written, "Visuals", new String[][]{
+                {"particle_color", "Hexadecimal particle color palette (up to 7 colors)"},
+                {"max_particle_color", "Maximum number of colors to use from particle_color (1-7)"},
+                {"particle_spread", "How far particles spread from center when use_pattern = false"}});
+        appendProperties(text, values, written, "Timing & patterns", new String[][]{
+                {"particle_speed", "Basic particle parameters (used when use_pattern = false): base speed multiplier"},
+                {"particle_lifetime", "How long particles last (in ticks, 20 ticks = 1 second)"},
+                {"pattern", "Available patterns: beam, spiral, fountain, pulse, ring, burst, snowflake"},
+                {"pattern_speed", "Base speed multiplier for pattern particles"},
+                {"pattern_spread", "Spread amount for pattern particles"},
+                {"pattern_intensity", "Intensity multiplier for pattern effects (higher = more intense)"}});
+        appendProperties(text, values, written, "Behaviour", new String[][]{
+                {"use_pattern", "Pattern system (overrides basic particle parameters)"},
+                {"particle_density", "Number of particles spawned per tick when use_pattern = false"}});
+        text.append("\n  // --- Other ---\n");
+        // Sort unknown keys as well, so output remains stable regardless of input key order.
+        for (String key : new java.util.TreeSet<>(values.keySet())) {
+            if (!written.contains(key) && !key.equals("edit_permission_mode")) {
+                text.append("  // Unrecognized setting retained with its original value\n");
+                appendProperty(text, key, values.get(key));
+            }
+        }
+        appendProperties(text, values, written, "Permissions & policy", new String[][]{
+                {"edit_permission_mode", "Who may edit pillar settings: STRICT, STANDARD, or OPEN"}});
+        int comma = text.lastIndexOf(",\n");
+        if (comma >= 0) text.deleteCharAt(comma);
+        return text.append("}\n").toString();
+    }
+
+    private static void appendProperties(StringBuilder text, JsonObject values, Set<String> written,
+                                         String section, String[][] entries) {
+        text.append("\n  // --- ").append(section).append(" ---\n");
+        for (String[] entry : entries) {
+            written.add(entry[0]);
+            if (!values.has(entry[0])) continue;
+            text.append("  // ").append(entry[1]).append('\n');
+            appendProperty(text, entry[0], values.get(entry[0]));
+        }
+    }
+
+    private static void appendProperty(StringBuilder text, String key, JsonElement value) {
+        text.append("  ").append(LAYOUT_GSON.toJson(key)).append(": ").append(LAYOUT_GSON.toJson(value)).append(",\n");
     }
 
     public boolean addItem(String itemId) {

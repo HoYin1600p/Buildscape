@@ -87,7 +87,7 @@ public class BinaryRecipeCache {
         return switch (type) {
             case "shaped", "shapeless", "stonecutting", "smelting", "blasting", "smoking",
                     "campfire", "campfire_cooking", "smithing", "shaped_durability", "shapeless_durability",
-                    "confetti_configure", "clear_shulker_filters" -> true;
+                    "confetti_configure", "clear_shulker_filters", "haze_bush_dye" -> true;
             default -> false;
         };
     }
@@ -205,8 +205,8 @@ public class BinaryRecipeCache {
                     out.writeInt(getStringIndex(ing, stringPool, stringMap));
                 }
             }
-            case "shapeless" -> {
-                out.writeByte(2);
+            case "shapeless", "haze_bush_dye" -> {
+                out.writeByte(type.equals("haze_bush_dye") ? 13 : 2);
                 List<String> ings = recipe.ingredients();
                 out.writeInt(ings.size());
                 for (String ing : ings) {
@@ -318,7 +318,7 @@ public class BinaryRecipeCache {
                 }
                 return new RecipeIR.CompiledRecipe(id, "shaped", group, width, height, ingredients, "", "", resultItem, count, resultNbt, 0f, 0, 0);
             }
-            case 2 -> {
+            case 2, 13 -> {
                 int ingSize = in.readInt();
                 validateSize(ingSize, MAX_INGREDIENT_COUNT, "shapeless ingredient count");
                 List<String> ingredients = new ArrayList<>(ingSize);
@@ -326,7 +326,7 @@ public class BinaryRecipeCache {
                     int ingIdx = readPoolIndex(in, stringPool.length, "ingredient");
                     ingredients.add(stringPool[ingIdx]);
                 }
-                return new RecipeIR.CompiledRecipe(id, "shapeless", group, 0, 0, ingredients, "", "", resultItem, count, resultNbt, 0f, 0, 0);
+                return new RecipeIR.CompiledRecipe(id, type == 13 ? "haze_bush_dye" : "shapeless", group, 0, 0, ingredients, "", "", resultItem, count, resultNbt, 0f, 0, 0);
             }
             case 3 -> {
                 int inputIdx = readPoolIndex(in, stringPool.length, "stonecutter input");

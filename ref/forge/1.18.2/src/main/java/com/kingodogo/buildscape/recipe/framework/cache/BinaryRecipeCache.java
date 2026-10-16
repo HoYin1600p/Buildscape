@@ -327,7 +327,7 @@ public class BinaryRecipeCache {
                 writeIngredient(out, ing, stringPool, stringMap);
             }
         } else if (recipe instanceof ShapelessRecipe shapeless) {
-            out.writeByte(2);
+            out.writeByte(recipe instanceof com.kingodogo.buildscape.recipe.HazeBushDyeRecipe ? 13 : 2);
             NonNullList<Ingredient> ingredients = shapeless.getIngredients();
             out.writeInt(ingredients.size());
             for (Ingredient ing : ingredients) {
@@ -428,14 +428,16 @@ public class BinaryRecipeCache {
                 com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.Trimmed trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.trim(width, height, ingredients);
                 yield new ShapedRecipe(id, group, trimmed.width(), trimmed.height(), trimmed.ingredients(), result);
             }
-            case 2 -> {
+            case 2, 13 -> {
                 int ingSize = in.readInt();
                 validateSize(ingSize, MAX_INGREDIENT_COUNT, "shapeless ingredient count");
                 NonNullList<Ingredient> ingredients = NonNullList.create();
                 for (int i = 0; i < ingSize; i++) {
                     ingredients.add(readIngredient(in, stringPool, ingredientCache, validation));
                 }
-                yield new ShapelessRecipe(id, group, result, ingredients);
+                yield type == 13
+                        ? new com.kingodogo.buildscape.recipe.HazeBushDyeRecipe(id, group, result, ingredients)
+                        : new ShapelessRecipe(id, group, result, ingredients);
             }
             case 3 -> {
                 Ingredient ing = readIngredient(in, stringPool, ingredientCache, validation);

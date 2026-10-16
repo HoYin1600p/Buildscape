@@ -87,6 +87,24 @@ class RecipeCacheFixesTest {
         }
     }
 
+    @Test
+    void hazeDyeCacheUsesDistinctTypeAndRetainsBushIngredientOrder() throws Exception {
+        var dye = recipe("haze_bush_dye", List.of("minecraft:stone", "minecraft:orange_dye"), "minecraft:stone");
+        assertTrue(BinaryRecipeCache.isCacheable(dye));
+        assertTrue(new RecipeValidator(id -> true).validateCompiled(dye));
+        assertFalse(new RecipeValidator(id -> true).validateCompiled(recipe("haze_bush_dye", List.of(), "minecraft:stone")));
+        byte[] bytes = BinaryRecipeCache.serializeCache("haze-test", List.of(dye));
+        try (var input = new java.io.DataInputStream(new ByteArrayInputStream(bytes))) {
+            input.readInt();
+            input.readInt();
+            assertEquals("haze-test", input.readUTF());
+            int poolSize = input.readInt();
+            for (int i = 0; i < poolSize; i++) input.readUTF();
+            assertEquals(1, input.readInt());
+            for (int i = 0; i < 5; i++) input.readInt();
+            assertEquals(13, input.readUnsignedByte());
+        }
+    }
     private static RecipeIR.CompiledRecipe recipe(String type, List<String> ingredients, String result) {
         return new RecipeIR.CompiledRecipe("buildscape:test", type, "", 1, 1, ingredients,
                 "minecraft:stone", "", result, 1, "", 0f, 0, 0);

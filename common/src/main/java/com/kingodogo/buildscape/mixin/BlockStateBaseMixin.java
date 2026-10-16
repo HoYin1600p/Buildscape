@@ -1,0 +1,83 @@
+package com.kingodogo.buildscape.mixin;
+
+import com.kingodogo.buildscape.mixinsupport.MixinFactory;
+
+import com.kingodogo.buildscape.block.PlanterHelper;
+import com.kingodogo.buildscape.block.PlanterHelper.PlanterType;
+import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
+import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SignBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+@Mixin(BlockBehaviour.BlockStateBase.class)
+public class BlockStateBaseMixin {
+
+    @Inject(method = "canSurvive", at = @At("HEAD"), cancellable = true)
+    private void onCanSurvive(LevelReader level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (!buildscape$isPlanterPlant(((BlockState) (Object) this).getBlock())) {
+            return;
+        }
+        BlockPos belowPos = pos.below();
+        BlockState belowState = level.getBlockState(belowPos);
+        if (belowState.is(Blocks.COMPOSTER)) {
+            if (belowState.hasProperty(PlanterHelper.PLANTER) && belowState.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {
+                cir.setReturnValue(true);
+            }
+        }
+    }
+
+    private static boolean buildscape$isPlanterPlant(net.minecraft.world.level.block.Block block) {
+        return MixinFactory.isPlanterPlant(block);
+    }
+
+    // 26.2 removal hook; absent on 1.18.2 (require = 0 keeps each cluster's missing hook non-fatal).
+    @Inject(method = "affectNeighborsAfterRemoval(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Z)V", at = @At("HEAD"), require = 0)
+    private void buildscape$onSignRemove(ServerLevel level, BlockPos pos, boolean isMoving, CallbackInfo ci) {
+        BlockState state = (BlockState) (Object) this;
+        if (!state.is(level.getBlockState(pos).getBlock())) {
+            buildscape$dropSignFrame(state, level, pos);
+        }
+    }
+
+    // 1.18.2 removal hook (BlockStateBase.onRemove).
+    @Inject(method = "onRemove", at = @At("HEAD"), require = 0)
+    private void buildscape$onSignRemoveLegacy(net.minecraft.world.level.Level level, BlockPos pos, BlockState newState, boolean isMoving, CallbackInfo ci) {
+        BlockState state = (BlockState) (Object) this;
+        if (!state.is(newState.getBlock()) && !level.isClientSide()) {
+            buildscape$dropSignFrame(state, level, pos);
+        }
+    }
+
+    private static void buildscape$dropSignFrame(BlockState state, net.minecraft.world.level.Level level, BlockPos pos) {
+        if (state.getBlock() instanceof SignBlock) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof SignBlockEntity sign) {
+                SignFrameType frame = SignFrameAttachment.getFrame(sign);
+                if (frame != SignFrameType.NONE && frame.getItem() != null) {
+                    Containers.dropItemStack(
+                            level,
+                            (double) pos.getX() + 0.5D,
+                            (double) pos.getY() + 0.5D,
+                            (double) pos.getZ() + 0.5D,
+                            new ItemStack(frame.getItem())
+                    );
+                    SignFrameAttachment.setFrame(sign, SignFrameType.NONE);
+                }
+            }
+        }
+    }
+}

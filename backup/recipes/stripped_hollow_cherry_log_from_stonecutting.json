@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:stripped_cherry_log"
-  },
-  "result": "buildscape:stripped_hollow_cherry_log",
-  "count": 1
-}

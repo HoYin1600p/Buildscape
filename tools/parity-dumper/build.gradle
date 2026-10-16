@@ -1,0 +1,7 @@
+plugins { id 'base' }
+
+// This independent build is never included by Buildscape's settings or jar tasks.
+if (findProject(':dumper') != null) {
+    tasks.named('build') { dependsOn ':dumper:build', ':fabric:build' }
+    tasks.named('check') { dependsOn ':dumper:check', ':fabric:check' }
+}

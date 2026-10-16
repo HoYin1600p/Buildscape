@@ -1,7 +1,0 @@
-{
-  "replace": false,
-  "values": [
-    "#forge:ingots/steel",
-    "#forge:ingots/flaming_steel"
-  ]
-}

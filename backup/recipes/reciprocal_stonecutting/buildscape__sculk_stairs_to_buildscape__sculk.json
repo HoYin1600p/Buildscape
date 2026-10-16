@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:sculk_stairs"
-  },
-  "result": "buildscape:sculk",
-  "count": 1
-}

@@ -1,0 +1,32 @@
+{
+  "required": true,
+  "package": "com.kingodogo.buildscape.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "fabric.BlockPlacementMixin",
+    "fabric.CraftingMixin",
+    "fabric.CraftingResultPreparationMixin",
+    "fabric.PlayerDimensionMixin",
+    "fabric.ItemUseFinishMixin",
+    "fabric.AdvancementCompletionMixin",
+    "fabric.AnvilUpdateMixin",
+    "fabric.BeaconBlockEntityColorMixin",
+    "fabric.EndermanGriefingMixin",
+    "fabric.FireballGriefingMixin",
+    "fabric.ExplosionGriefingMixin",
+    "fabric.SneakBypassUseMixin",
+    "fabric.StrawBedSpawnMixin",
+    "fabric.LivingEntityLadderMixin"
+  ],
+  "client": [
+    "client.KeyboardInputMixin",
+    "client.MouseInputMixin",
+    "client.CameraInputMixin",
+    "client.AttackInputMixin",
+    "client.FogRendererMixin",
+    "client.ModelBakeryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

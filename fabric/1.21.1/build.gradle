@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'xyz.wagyourtail.unimined'
+}
+
+evaluationDependsOn(':common')
+def commonProject = rootProject.project(':common')
+version = providers.gradleProperty('mod_version').get()
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+unimined.minecraft {
+    version '1.21.1'
+    mappings {
+        intermediary()
+        mojmap()
+    }
+    defaultRemapJar = true
+    fabric {
+        loader '0.16.14'
+        accessWidener file('src/main/resources/buildscape.accesswidener')
+    }
+    mods {
+        modImplementation {
+            mixinRemap {
+                enableBaseMixin()
+                enableMixinExtra()
+            }
+        }
+    }
+}
+
+// Supply only shared classes to dev runs; this module processes cluster resources.
+configurations { commonVariant }
+dependencies {
+    commonVariant project(path: ':common', configuration: 'v121xElements')
+    implementation files(commonProject.sourceSets.v121x.output.classesDirs)
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.116.6+1.21.1'
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+sourceSets.main.resources.srcDir rootProject.file('common/src/v121x/resources')
+tasks.named('compileJava') { dependsOn ':common:compileV121xJava' }
+tasks.named('processResources', ProcessResources) {
+    inputs.property 'mod_version', project.version
+    filesMatching('fabric.mod.json') { expand mod_version: project.version }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.named('jar', Jar) {
+    from configurations.commonVariant
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.withType(JavaCompile).configureEach {
+    options.release.set(21)
+    options.compilerArgs += ['-proc:none']
+}
+tasks.withType(JavaExec).configureEach {
+    dependsOn ':common:compileV121xJava'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    standardInput = System.in
+}
+tasks.matching { it.name == 'remapJar' }.configureEach {
+    prodNamespace 'intermediary'
+    archiveClassifier = ''
+    archiveBaseName = 'buildscape-fabric-1.21.1'
+    mixinRemap { enableBaseMixin() }
+}
+tasks.named('assemble') { dependsOn 'remapJar' }

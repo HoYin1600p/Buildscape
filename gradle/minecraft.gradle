@@ -1,0 +1,72 @@
+import java.security.MessageDigest
+
+// Official Mojang client artifacts from the version manifest. SHA-1 is the checksum
+// published by Mojang for each exact download. Kept in the Gradle user home, keyed by
+// checksum, so every checkout and worktree shares one verified download and offline
+// builds keep working.
+def registerOfficialClient = { String mcVersion, String clientSha1, String taskName, String configurationName ->
+    def clientUrl = "https://piston-data.mojang.com/v1/objects/${clientSha1}/client.jar"
+    def clientOutput = project.provider { new File(gradle.gradleUserHomeDir,
+            "caches/buildscape/minecraft/${clientSha1}/minecraft-${mcVersion}-client.jar") }
+    def uniminedClient = new File(gradle.gradleUserHomeDir,
+            "caches/unimined/net/minecraft/minecraft/${mcVersion}/minecraft-${mcVersion}-client.jar")
+
+    def download = tasks.register(taskName) {
+        group = 'build setup'
+        description = "Obtains and verifies the official, unobfuscated Minecraft ${mcVersion} compile jar"
+        inputs.property('url', clientUrl)
+        inputs.property('sha1', clientSha1)
+        outputs.file(clientOutput)
+        // Verify cached bytes too, including on subsequent builds.
+        outputs.upToDateWhen { false }
+        doLast {
+            def checksum = { File file ->
+                def digest = MessageDigest.getInstance('SHA-1')
+                file.withInputStream { stream ->
+                    byte[] buffer = new byte[65536]
+                    int count
+                    while ((count = stream.read(buffer)) != -1) {
+                        digest.update(buffer, 0, count)
+                    }
+                }
+                digest.digest().encodeHex().toString()
+            }
+            def destination = clientOutput.get()
+            if (destination.isFile() && checksum(destination) == clientSha1) {
+                return
+            }
+            destination.parentFile.mkdirs()
+            if (uniminedClient.isFile() && checksum(uniminedClient) == clientSha1) {
+                // Reuse Unimined's public Mojang download, never a repository-local reference jar.
+                java.nio.file.Files.copy(uniminedClient.toPath(), destination.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+            } else {
+                if (gradle.startParameter.offline) {
+                    throw new GradleException("Official Minecraft ${mcVersion} jar is not cached. Populate dependencies online before using --offline.")
+                }
+                def connection = URI.create(clientUrl).toURL().openConnection()
+                connection.connectTimeout = 30000
+                connection.readTimeout = 30000
+                connection.inputStream.withCloseable { input ->
+                    destination.withOutputStream { output -> output << input }
+                }
+            }
+            if (checksum(destination) != clientSha1) {
+                destination.delete()
+                throw new GradleException("Minecraft ${mcVersion} client jar failed Mojang SHA-1 verification")
+            }
+        }
+    }
+
+    dependencies {
+        add(configurationName, files(clientOutput).builtBy(download))
+    }
+}
+
+registerOfficialClient('26.2', '2dc72797acbc1b63fc16a11c4ac393605f453754', 'downloadMinecraft26x', 'v26xCompileOnly')
+if (providers.gradleProperty('buildscape.v263').getOrElse('false') == 'true' ||
+        rootProject.findProject(':fabric:26.3') != null ||
+        rootProject.findProject(':neoforge:26.3') != null ||
+        rootProject.findProject(':forge:26.3') != null) {
+    registerOfficialClient('26.3', 'e877b6a07acd633fb3bb475002175cec036e7b87', 'downloadMinecraft263', 'v263CompileOnly')
+}

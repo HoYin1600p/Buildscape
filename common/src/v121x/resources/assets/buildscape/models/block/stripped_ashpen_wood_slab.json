@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/stripped_ashpen_log",
+    "top": "buildscape:block/stripped_ashpen_log",
+    "side": "buildscape:block/stripped_ashpen_log"
+  }
+}

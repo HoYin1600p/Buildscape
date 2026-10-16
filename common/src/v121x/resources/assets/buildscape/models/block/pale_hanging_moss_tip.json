@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "buildscape:block/pale_hanging_moss_tip"
+  },
+  "render_type": "cutout"
+}

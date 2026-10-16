@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:calcite_wall"
-  },
-  "result": "minecraft:calcite",
-  "count": 1
-}

@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:golden_dandelion",
+    "minecraft:wildflowers",
+    "minecraft:closed_eyeblossom",
+    "minecraft:open_eyeblossom",
+    "minecraft:cactus_flower"
+  ]
+}

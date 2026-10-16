@@ -1,0 +1,67 @@
+plugins {
+    id 'net.neoforged.moddev' version '2.0.146'
+}
+
+evaluationDependsOn(':common')
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+tasks.withType(JavaCompile).configureEach { options.release.set(21) }
+
+// Keep dev runs on the same cluster-only resources as the release jar. The common
+// source set also processes main's 26.2 resources, so expose only its class output.
+sourceSets {
+    sharedV121x {
+        java.srcDirs = []
+        resources.srcDirs = []
+        output.dir([builtBy: project(':common').tasks.named('compileV121xJava')],
+                project(':common').sourceSets.v121x.output.classesDirs.singleFile)
+    }
+}
+
+neoForge {
+    version = '21.1.256'
+    accessTransformers.from(file('src/main/resources/META-INF/accesstransformer.cfg'))
+    mods {
+        buildscape {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.sharedV121x
+        }
+    }
+    runs {
+        client {
+            client()
+            gameDirectory = file('run')
+            jvmArguments.addAll('-Xmx4G', '-Xms2G')
+        }
+        server {
+            server()
+            gameDirectory = file('run/server')
+            programArguments.add('--nogui')
+            jvmArguments.addAll('-Xmx4G', '-Xms2G')
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir rootProject.file('common/src/v121x/resources')
+        }
+    }
+}
+
+configurations { commonVariant }
+dependencies {
+    commonVariant project(path: ':common', configuration: 'v121xElements')
+    implementation project(path: ':common', configuration: 'v121xElements')
+}
+
+tasks.named('processResources', ProcessResources) {
+    inputs.property('mod_version', project.version)
+    filesMatching('META-INF/neoforge.mods.toml') { expand(mod_version: project.version) }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named('jar', Jar) {
+    from configurations.commonVariant
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

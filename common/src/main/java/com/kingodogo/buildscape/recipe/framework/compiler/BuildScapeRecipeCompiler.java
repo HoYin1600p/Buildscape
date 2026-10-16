@@ -162,7 +162,7 @@ public class BuildScapeRecipeCompiler {
             case "shaped" -> {
                 return compileShaped(recipeId.toString(), group, spec, resultItem, resultCount, resultNbt, false);
             }
-            case "shapeless" -> {
+            case "shapeless", "haze_bush_dye" -> {
                 return compileShapeless(recipeId.toString(), group, spec, resultItem, resultCount, resultNbt, false);
             }
             case "shaped_durability" -> {
@@ -304,7 +304,7 @@ public class BuildScapeRecipeCompiler {
         }
         return new RecipeIR.CompiledRecipe(
                 id,
-                durability ? "shapeless_durability" : "shapeless",
+                durability ? "shapeless_durability" : ("buildscape:haze_bush_dye".equalsIgnoreCase(spec.type()) || "haze_bush_dye".equalsIgnoreCase(spec.type()) ? "haze_bush_dye" : "shapeless"),
                 group,
                 0,
                 0,

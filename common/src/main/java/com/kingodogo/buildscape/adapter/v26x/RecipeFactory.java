@@ -41,6 +41,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
 public final class RecipeFactory {
+    private static final RegistrySupplier<RecipeSerializer<HazeBushDyeRecipe>> HAZE_BUSH_DYE =
+            Services.REGISTRY.registerRecipeSerializer("haze_bush_dye",
+                    () -> new RecipeSerializer<>(HazeBushDyeRecipe.MAP_CODEC, HazeBushDyeRecipe.STREAM_CODEC));
     private static final RegistrySupplier<RecipeSerializer<ShapedDurabilityRecipe>> SHAPED_DURABILITY =
             Services.REGISTRY.registerRecipeSerializer("shaped_durability",
                     () -> new RecipeSerializer<>(ShapedDurabilityRecipe.MAP_CODEC, ShapedDurabilityRecipe.STREAM_CODEC));
@@ -110,6 +113,69 @@ public final class RecipeFactory {
         }
         @SuppressWarnings({"unchecked", "rawtypes"})
         @Override public RecipeSerializer<ShapedRecipe> getSerializer() { return (RecipeSerializer) SHAPED_DURABILITY.get(); }
+    }
+
+    public static final class HazeBushDyeRecipe extends ShapelessRecipe {
+        private final ItemStackTemplate recipeResult;
+        private final java.util.List<Ingredient> recipeIngredients;
+
+        private static final MapCodec<HazeBushDyeRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Recipe.CommonInfo.MAP_CODEC.forGetter(recipe -> recipe.commonInfo),
+                CraftingRecipe.CraftingBookInfo.MAP_CODEC.forGetter(recipe -> recipe.bookInfo),
+                ItemStackTemplate.CODEC.fieldOf("result").forGetter(recipe -> recipe.recipeResult),
+                Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(recipe -> recipe.recipeIngredients)
+        ).apply(instance, HazeBushDyeRecipe::new));
+
+        private static final net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, HazeBushDyeRecipe> STREAM_CODEC =
+                net.minecraft.network.codec.StreamCodec.of(
+                        (buffer, recipe) -> {
+                            Recipe.CommonInfo.STREAM_CODEC.encode(buffer, recipe.commonInfo);
+                            CraftingRecipe.CraftingBookInfo.STREAM_CODEC.encode(buffer, recipe.bookInfo);
+                            ItemStackTemplate.STREAM_CODEC.encode(buffer, recipe.recipeResult);
+                            buffer.writeVarInt(recipe.recipeIngredients.size());
+                            for (Ingredient ingredient : recipe.recipeIngredients) Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient);
+                        },
+                        buffer -> {
+                            Recipe.CommonInfo common = Recipe.CommonInfo.STREAM_CODEC.decode(buffer);
+                            CraftingRecipe.CraftingBookInfo book = CraftingRecipe.CraftingBookInfo.STREAM_CODEC.decode(buffer);
+                            ItemStackTemplate result = ItemStackTemplate.STREAM_CODEC.decode(buffer);
+                            int count = buffer.readVarInt();
+                            java.util.List<Ingredient> ingredients = new java.util.ArrayList<>(count);
+                            for (int i = 0; i < count; i++) ingredients.add(Ingredient.CONTENTS_STREAM_CODEC.decode(buffer));
+                            return new HazeBushDyeRecipe(common, book, result, ingredients);
+                        });
+
+        private HazeBushDyeRecipe(Recipe.CommonInfo common, CraftingRecipe.CraftingBookInfo book,
+                                          ItemStackTemplate result, java.util.List<Ingredient> ingredients) {
+            super(common, book, result, ingredients);
+            this.recipeResult = result;
+            this.recipeIngredients = java.util.List.copyOf(ingredients);
+        }
+
+        @Override public ItemStack assemble(CraftingInput input) {
+            ItemStack result = super.assemble(input);
+            for (int i = 0; i < input.size(); i++) {
+                ItemStack bush = input.getItem(i);
+                if (!recipeIngredients.get(0).test(bush)) continue;
+                var state = bush.get(DataComponents.BLOCK_STATE);
+                if (state != null) result.set(DataComponents.BLOCK_STATE, state);
+                var custom = bush.get(DataComponents.CUSTOM_DATA);
+                if (custom != null) {
+                    CompoundTag data = custom.copyTag();
+                    CompoundTag preserved = new CompoundTag();
+                    if (data.contains("BlockStateTag")) preserved.put("BlockStateTag", data.get("BlockStateTag").copy());
+                    if (data.contains("HasHaze")) preserved.put("HasHaze", data.get("HasHaze").copy());
+                    if (!preserved.isEmpty()) result.set(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(preserved));
+                }
+                break;
+            }
+            return result;
+        }
+
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        @Override public RecipeSerializer<ShapelessRecipe> getSerializer() {
+            return (RecipeSerializer) HAZE_BUSH_DYE.get();
+        }
     }
 
     public static final class ShapelessDurabilityRecipe extends ShapelessRecipe {
@@ -464,6 +530,14 @@ public final class RecipeFactory {
                 }
                 ShapedRecipePattern pattern = new ShapedRecipePattern(cr.width(), cr.height(), ings, Optional.empty());
                 return new RecipeHolder<>(key, new ShapedRecipe(common, book, pattern, result));
+            }
+            case "haze_bush_dye" -> {
+                List<Ingredient> ings = new ArrayList<>();
+                for (String s : cr.ingredients()) {
+                    Ingredient ing = parseIngredient(s);
+                    if (ing != null && !ing.isEmpty()) ings.add(ing);
+                }
+                return new RecipeHolder<>(key, new HazeBushDyeRecipe(common, book, result, ings));
             }
             case "shapeless" -> {
                 List<Ingredient> ings = new ArrayList<>();

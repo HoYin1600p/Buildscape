@@ -1,8 +1,0 @@
-{
-    "parent":  "buildscape:block/icicle",
-    "textures":  {
-                     "cross":  "buildscape:block/icicle_up_tip_merge",
-                     "particle":  "#cross"
-                 },
-    "render_type":  "minecraft:cutout_mipped"
-}

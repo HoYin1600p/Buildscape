@@ -3,27 +3,24 @@ plugins {
     id 'xyz.wagyourtail.unimined'
 }
 
-// Shared code is the production default; ref remains an opt-in parity baseline.
-def sourceMode = providers.gradleProperty('buildscape.v118xSource').getOrElse('common')
-if (!(sourceMode in ['ref', 'common'])) {
-    throw new GradleException("Unknown buildscape.v118xSource '${sourceMode}'. Use 'ref' or 'common'.")
-}
-
-def referenceProject = rootProject.file('ref/forge/1.18.2')
-def referenceProperties = new Properties()
-new File(referenceProject, 'gradle.properties').withInputStream {
-    referenceProperties.load(it)
-}
 def replaceProperties = [
-    'minecraft_version', 'minecraft_version_range', 'forge_version', 'forge_version_range',
-    'loader_version_range', 'mod_id', 'mod_name', 'mod_license', 'mod_version',
-    'mod_authors', 'mod_description'
-].collectEntries { key -> [(key): referenceProperties.getProperty(key)] }
+    'minecraft_version': '1.18.2',
+    'minecraft_version_range': '[1.18.2,1.19)',
+    'forge_version': '40.3.12',
+    'forge_version_range': '[40,)',
+    'loader_version_range': '[40,)',
+    'mod_id': 'buildscape',
+    'mod_name': 'Buildscape',
+    'mod_license': 'All Rights Reserved',
+    'mod_version': providers.gradleProperty('mod_version').getOrElse('4.0.3'),
+    'mod_group_id': 'com.kingodogo.buildscape',
+    'mod_authors': 'Kingodogo',
+    'mod_description': 'Buildscape mod for Minecraft Forge 1.18.2'
+]
 
-group = referenceProperties.getProperty('mod_group_id')
-version = providers.gradleProperty('mod_version').get()
-// Release jars carry loader and Minecraft version (owner decision); ref mode keeps main's name for jar comparisons.
-base.archivesName = sourceMode == 'ref' ? referenceProperties.getProperty('mod_id') : 'buildscape-forge-1.18.2'
+group = replaceProperties.mod_group_id
+version = providers.gradleProperty('mod_version').getOrElse(replaceProperties.mod_version)
+base.archivesName = 'buildscape-forge-1.18.2'
 replaceProperties.mod_version = version.toString()
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -32,25 +29,15 @@ def java17Launcher = javaToolchains.launcherFor {
 }
 
 sourceSets.main {
-    if (sourceMode == 'common') {
-        // Compile the same source variant as common, against Forge's Mojang dev jar.
-        // Keeping the classes in this compilation also lets remapJar see every mixin.
-        java.setSrcDirs(['src/main/java', rootProject.file('common/src/main/java'),
-                         rootProject.file('common/src/v118x/java')])
-        java.exclude 'com/kingodogo/buildscape/adapter/v121x/**'
-        java.exclude 'com/kingodogo/buildscape/adapter/v26x/**'
-        // Neutral mixins that target 26.2-only signatures and have a 1.18.2 replacement in this module.
-        java.exclude 'com/kingodogo/buildscape/mixin/FlowingFluidMixin.java'
-        java.exclude 'com/kingodogo/buildscape/mixin/StonecutterMenuAccessor.java'
-        // First root wins duplicate paths: cluster mixins and loader service bindings
-        // override the frozen reference, whose assets/recipes stay authoritative.
-        resources.setSrcDirs([rootProject.file('common/src/v118x/resources'),
-                              file('src/main/resources'),
-                              new File(referenceProject, 'src/main/resources')])
-    } else {
-        java.setSrcDirs([new File(referenceProject, 'src/main/java')])
-        resources.setSrcDirs([new File(referenceProject, 'src/main/resources')])
-    }
+    // Compile common source variant against Forge's Mojang dev jar.
+    java.setSrcDirs(['src/main/java', rootProject.file('common/src/main/java'),
+                     rootProject.file('common/src/v118x/java')])
+    java.exclude 'com/kingodogo/buildscape/adapter/v121x/**'
+    java.exclude 'com/kingodogo/buildscape/adapter/v26x/**'
+    // Neutral mixins that target 26.2-only signatures and have a 1.18.2 replacement in this module.
+    java.exclude 'com/kingodogo/buildscape/mixin/FlowingFluidMixin.java'
+    java.exclude 'com/kingodogo/buildscape/mixin/StonecutterMenuAccessor.java'
+    resources.setSrcDirs([rootProject.file('common/src/v118x/resources'), file('src/main/resources')])
 }
 
 repositories {
@@ -65,17 +52,21 @@ repositories {
 // The shipped META-INF/accesstransformer.cfg stays the byte-identical SRG original.
 def devAccessTransformer = layout.buildDirectory.file('dev-at/accesstransformer.cfg').get().asFile
 devAccessTransformer.parentFile.mkdirs()
-devAccessTransformer.text = new File(referenceProject, 'src/main/resources/META-INF/accesstransformer.cfg')
-        .readLines('UTF-8').collect { String line ->
-    def m = line =~ /^(\s*(?:public|protected|private|default)(?:[-+]f)?\s+\S+\s+)([fm]_\d+_)(\S*)\s*#\s*(\w+)\s*$/
-    if (m.matches()) {
-        return m.group(1) + m.group(4) + m.group(3)
-    }
-    if (line =~ /^[^#]*\b[fm]_\d+_/) {
-        throw new GradleException("Access transformer line has an SRG id without a mojmap name comment: ${line}")
-    }
-    return line
-}.join('\n') + '\n'
+def atSource = file('src/main/resources/META-INF/accesstransformer.cfg')
+if (atSource.exists()) {
+    devAccessTransformer.text = atSource.readLines('UTF-8').collect { String line ->
+        def m = line =~ /^(\s*(?:public|protected|private|default)(?:[-+]f)?\s+\S+\s+)([fm]_\d+_)(\S*)\s*#\s*(\w+)\s*$/
+        if (m.matches()) {
+            return m.group(1) + m.group(4) + m.group(3)
+        }
+        if (line =~ /^[^#]*\b[fm]_\d+_/) {
+            throw new GradleException("Access transformer line has an SRG id without a mojmap name comment: ${line}")
+        }
+        return line
+    }.join('\n') + '\n'
+} else {
+    devAccessTransformer.text = ''
+}
 
 configurations {
     // Mod jars (SRG-named) that unimined remaps to the dev namespace; see unimined.minecraft.mods.
@@ -95,10 +86,7 @@ unimined.minecraft {
     minecraftForge {
         loader '40.3.12'
         useToolchains = false
-        // One call with the full list: each mixinConfig call replaces the dev-run list.
-        mixinConfig(sourceMode == 'common'
-                ? ['buildscape.mixins.json', 'buildscape.forge118x.mixins.json']
-                : ['buildscape.mixins.json'])
+        mixinConfig(['buildscape.mixins.json', 'buildscape.forge118x.mixins.json'])
         accessTransformer devAccessTransformer
     }
     mods {
@@ -111,11 +99,9 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     // ForgeGradle's userdev classpath carries javax.annotation (jsr305); unimined's does not.
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
-    if (sourceMode == 'common') {
-        compileOnly 'org.jetbrains:annotations:26.0.2'
-        implementation 'org.joml:joml:1.10.8'
-        compileOnly 'org.jspecify:jspecify:1.0.0'
-    }
+    compileOnly 'org.jetbrains:annotations:26.0.2'
+    implementation 'org.joml:joml:1.10.8'
+    compileOnly 'org.jspecify:jspecify:1.0.0'
     modRuntimeOnly 'mezz.jei:jei-1.18.2:9.7.1.255'
     modCompileOnly 'curse.maven:embeddium-908741:5322305'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
@@ -139,9 +125,7 @@ tasks.withType(JavaExec).configureEach {
     standardInput = System.in
 }
 
-// The ref/ tree is checked out with CRLF on Windows (core.autocrlf), while Git and the
-// ForgeGradle baseline hold LF. Text resources are normalised to LF so jar bytes do not
-// depend on the checkout's line endings (a no-op on an LF checkout).
+// Text resources are normalised to LF so jar bytes do not depend on the checkout's line endings.
 class CrlfToLfReader extends FilterReader {
     CrlfToLfReader(Reader reader) {
         super(new StringReader(reader.text.replace('\r\n', '\n')))
@@ -160,7 +144,6 @@ tasks.named('processResources', ProcessResources) {
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
-    // Use the frozen recipes.bscb; do not run main's generator against ref/ inputs.
 }
 
 tasks.named('jar', Jar) {
@@ -170,14 +153,11 @@ tasks.named('jar', Jar) {
             'Specification-Title': 'buildscape',
             'Specification-Vendor': 'kingodogo',
             'Specification-Version': '1',
-            // Match the frozen reference's root project name, not this subproject name.
             'Implementation-Title': 'buildscape',
             'Implementation-Version': version.toString(),
             'Implementation-Vendor': 'kingodogo',
             'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            'MixinConfigs': sourceMode == 'common'
-                    ? 'buildscape.mixins.json,buildscape.forge118x.mixins.json'
-                    : 'buildscape.mixins.json'
+            'MixinConfigs': 'buildscape.mixins.json,buildscape.forge118x.mixins.json'
         ])
     }
     exclude { it.path.startsWith('.') || it.path.contains('..') }

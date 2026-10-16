@@ -246,6 +246,10 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
         return false;
     }
+    /** The slot container: the block entity on the server, the synced client-side container on the client. */
+    public Container getContainer() {
+        return container;
+    }
     public BuildersWorkbenchBlockEntity getBlockEntity() {
         return blockEntity;
     }

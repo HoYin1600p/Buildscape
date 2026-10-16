@@ -22,6 +22,25 @@ public final class BeaconScanContext {
     private BeaconScanContext() {
     }
 
+    /**
+     * Beam colour (0xRRGGBB) of a block the beacon scan passes through, or null when the block does not colour the beam.
+     * Forge and NeoForge dispatch their own per-block hooks; Fabric has none, so its beacon mixins call this.
+     * Tinted ornaments mark the beam blocked while they report their colour, like the reference hook.
+     */
+    public static Integer beamColor(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) {
+        Block block = state.getBlock();
+        if (block instanceof com.kingodogo.buildscape.block.GlazedGlassBlock glass) return glass.getBeaconColor(state, level, pos, beaconPos);
+        if (block instanceof com.kingodogo.buildscape.block.OrnamentBlock ornament) return ornament.getBeaconColor(state, level, pos, beaconPos);
+        if (block instanceof com.kingodogo.buildscape.block.BigOrnamentBlock ornament) return ornament.getBeaconColor(state, level, pos, beaconPos);
+        if (block instanceof com.kingodogo.buildscape.block.SilkTouchOnlyGlassBlock
+                || block instanceof com.kingodogo.buildscape.block.SilkTouchOnlyPaneBlock) return state.getMapColor(level, pos).col;
+        return null;
+    }
+
+    public static BeaconBlockEntity activeBeacon() {
+        return ACTIVE_BEACON.get();
+    }
+
     public static void begin(BeaconBlockEntity beacon) {
         ACTIVE_BEACON.set(beacon);
     }

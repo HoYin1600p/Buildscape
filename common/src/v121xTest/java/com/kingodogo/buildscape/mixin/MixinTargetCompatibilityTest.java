@@ -46,6 +46,8 @@ class MixinTargetCompatibilityTest {
     // Shared hooks for other VersionClusters are intentionally absent on Mojang-mapped 1.21.1.
     // Each exemption names one handler and one exact selector; callback and @At errors still fail.
     private static final Set<String> EXPECTED_MISSING_METHODS = Set.of(
+            // NeoForge-only armour overload that carries the limb animation values; vanilla and Fabric lack it.
+            "com/kingodogo/buildscape/mixin/HumanoidArmorLayerV121xMixin -> net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer#buildscape$neoArmorStackBuffers#renderArmorPiece(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;FFFFFF)V",
             // 26.2 removal hook: 1.21.1 uses onRemove instead.
             "com/kingodogo/buildscape/mixin/BlockStateBaseMixin -> net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase#buildscape$onSignRemove#affectNeighborsAfterRemoval(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Z)V",
             // 26.2 particle overload: 1.21.1 has the single alwaysRender boolean.

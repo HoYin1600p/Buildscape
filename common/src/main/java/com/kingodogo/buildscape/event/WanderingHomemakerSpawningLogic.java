@@ -25,6 +25,7 @@ public final class WanderingHomemakerSpawningLogic {
 
     private enum BlockCategory {
         DECORATED_POT,
+        BIG_CANDLE,
         PILLAR,
         STAR,
         CUSHION,
@@ -32,11 +33,19 @@ public final class WanderingHomemakerSpawningLogic {
     }
 
     private static BlockCategory getCategory(Block block) {
-        if (block instanceof DecoratedPotBlock || block instanceof TrappedDecoratedPotBlock) return BlockCategory.DECORATED_POT;
+        if (block instanceof DecoratedPotBlock || block instanceof TrappedDecoratedPotBlock || isVanillaPotReplacement(block)) return BlockCategory.DECORATED_POT;
+        if (block instanceof BigCandleBlock) return BlockCategory.BIG_CANDLE;
         if (block instanceof PillarBlock || block instanceof AshenKingPillarBlock) return BlockCategory.PILLAR;
         if (block instanceof StarBlock) return BlockCategory.STAR;
         if (block instanceof CushionBlock) return BlockCategory.CUSHION;
         return BlockCategory.NONE;
+    }
+
+    // 1.21.1 and 26.x drop Buildscape's plain decorated pot in favour of the vanilla one (ContentRemovalPolicy), so the
+    // vanilla pot has to keep counting for the Wandering Homemaker square as main's plain pot does.
+    private static boolean isVanillaPotReplacement(Block block) {
+        return (Services.isVersionCluster("v121x") || Services.isVersionCluster("v26x"))
+                && "block.minecraft.decorated_pot".equals(block.getDescriptionId());
     }
 
     private static final int[][] OFFSETS_1 = {{0, 0}, {1, 0}, {0, 1}, {1, 1}};
@@ -122,10 +131,12 @@ public final class WanderingHomemakerSpawningLogic {
             Services.PLATFORM.playEvokerPrepareSummon(serverLevel, spawnPos);
 
             Entity homemaker = Services.PLATFORM.createWanderingHomemakerEntity(serverLevel, spawnFestive);
+            if (Services.isVersionCluster("v121x") && homemaker == null) return;
             if (homemaker != null) {
                 homemaker.setPos(spawnX, spawnY, spawnZ);
                 homemaker.setYRot(level.getRandom().nextFloat() * 360F);
-                serverLevel.addFreshEntity(homemaker);
+                boolean added = serverLevel.addFreshEntity(homemaker);
+                if (Services.isVersionCluster("v121x") && !added) return;
                 Services.PLATFORM.putTagUUID(data, "WanderingHomemakerUUID", homemaker.getUUID());
             }
 
@@ -138,6 +149,10 @@ public final class WanderingHomemakerSpawningLogic {
 
             long cooldownEnd = currentTime + 1800000L;
             data.putLong("WanderingHomemakerCooldownRealTime", cooldownEnd);
+            if (player instanceof ServerPlayer serverPlayer) {
+                com.kingodogo.buildscape.network.PacketFactory.sendToPlayer(serverPlayer,
+                        new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldownEnd));
+            }
         }
     }
 }

@@ -109,14 +109,36 @@ public final class ClientMixinHooks {
     }
 
     public static void addStonecutterCutAllButton(StonecutterScreen screen, int x, int y, StonecutterMenu menu) {
-        Button button = Button.builder(Component.literal("All"), b -> {
+        Button button = new Button(x, y, 18, 10, Component.empty(), b -> {
             boolean active = !((StonecutterMenuExtension) menu).buildscape$isCutAll();
             ((StonecutterMenuExtension) menu).buildscape$setCutAll(active);
             Minecraft mc = Minecraft.getInstance();
             if (mc.gameMode != null) {
                 mc.gameMode.handleInventoryButtonClick(menu.containerId, -123);
             }
-        }).bounds(x, y, 18, 10).build();
+        }, supplier -> supplier.get()) {
+            @Override
+            protected void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+                boolean active = ((StonecutterMenuExtension) menu).buildscape$isCutAll();
+                int left = this.getX(), top = this.getY(), w = this.getWidth(), h = this.getHeight();
+                int borderColor = 0xFF000000;
+                int bgColor = active ? 0xFF107C41 : 0xFF4A4A4A;
+                graphics.fill(left, top, left + w, top + h, borderColor);
+                graphics.fill(left + 1, top + 1, left + w - 1, top + h - 1, bgColor);
+                int thumbX = active ? left + w - 7 : left + 1;
+                graphics.fill(thumbX, top + 1, thumbX + 6, top + h - 1, 0xFFFFFFFF);
+                if (this.isHovered()) {
+                    List<Component> tooltip = new ArrayList<>();
+                    tooltip.add(Component.translatable("tooltip.buildscape.stonecutter.title")
+                            .withStyle(net.minecraft.ChatFormatting.GOLD, net.minecraft.ChatFormatting.BOLD));
+                    tooltip.add(Component.translatable(active ? "tooltip.buildscape.cut_all.on" : "tooltip.buildscape.cut_stack.off")
+                            .withStyle(net.minecraft.ChatFormatting.BOLD));
+                    tooltip.add(Component.translatable(active ? "tooltip.buildscape.cut_all.desc" : "tooltip.buildscape.cut_stack.desc")
+                            .withStyle(net.minecraft.ChatFormatting.GRAY));
+                    graphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, tooltip, mouseX, mouseY);
+                }
+            }
+        };
         addWidgetToScreen(screen, button);
     }
 
@@ -451,7 +473,7 @@ public final class ClientMixinHooks {
             float yaw = Math.hypot(xd, zd) > 0.05
                     ? (float) Math.toDegrees(Math.atan2(xd, zd))
                     : Minecraft.getInstance().player == null ? 0 : Minecraft.getInstance().player.getYRot();
-            yaw = root.getFloatOr("ShotYaw", yaw);
+            yaw = fireworks.get().getFloatOr("ShotYaw", yaw);
             FIREWORK_METADATA.put(starter, new FireworkMetadata(explosions.copy(), yaw));
             var particle = (net.minecraft.client.particle.Particle) starter;
             particle.setBoundingBox(particle.getBoundingBox().inflate(120.0D));

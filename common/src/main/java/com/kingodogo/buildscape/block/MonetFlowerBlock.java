@@ -60,7 +60,7 @@ public abstract class MonetFlowerBlock extends BushBlock implements SinksOnFarml
             BlockGetter level,
             BlockPos pos
     ) {
-        return state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND);
+        return state.is(BlockTags.DIRT) || state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.PODZOL) || state.is(Blocks.MYCELIUM) || state.is(Blocks.FARMLAND);
     }
 
     @Override

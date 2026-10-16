@@ -89,7 +89,7 @@ public final class AdvancementEvents {
     }
 
     private static void giveStack(ServerPlayer player, ItemStack stack) {
-        if (!player.getInventory().add(stack)) player.drop(stack, false);
+        if (!player.getInventory().add(stack)) Services.PLATFORM.dropPlayerItem(player, stack, false);
     }
 
     public static void checkFullCubeAdvancement(ServerPlayer player) {

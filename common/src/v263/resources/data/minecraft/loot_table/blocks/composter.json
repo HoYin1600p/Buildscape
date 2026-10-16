@@ -1,0 +1,209 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:composter"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:dirt",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "dirt"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:coarse_dirt",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "coarse_dirt"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:mud",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "mud"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:moss_block",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "moss_block"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:rooted_dirt",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "rooted_dirt"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:red_moss_block",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "red_moss_block"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:yellow_moss_block",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "yellow_moss_block"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:orange_moss_block",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "orange_moss_block"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:pale_moss_block",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "pale_moss_block"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:muddy_mangrove_roots",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "muddy_mangrove_roots"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:grass_block",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "grass_block"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:mycelium",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "mycelium"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:podzol",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "podzol"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:snowy_grass_block",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "snowy_grass_block"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:crimson_nylium",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "crimson_nylium"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:warped_nylium",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "warped_nylium"
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:sand",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "minecraft:composter",
+            "state": {
+              "planter": "sand"
+            }
+          }
+        }
+      ],
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      }
+    }
+  ]
+}

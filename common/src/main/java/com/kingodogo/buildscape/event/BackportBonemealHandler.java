@@ -39,6 +39,14 @@ public final class BackportBonemealHandler {
         ItemStack held = player.getItemInHand(hand);
         if (!held.is(Items.BONE_MEAL)) return InteractionResult.PASS;
         BlockState state = level.getBlockState(pos);
+        if (Services.isVersionCluster("v118x") && face == Direction.UP
+                && (state.is(Blocks.SAND) || state.is(Blocks.RED_SAND)) && level.isEmptyBlock(pos.above())) {
+            if (!level.isClientSide()) {
+                place(level, pos.above(), "dry_grass");
+            }
+            consume(player, level, held, pos);
+            return InteractionResult.SUCCESS;
+        }
         if (face == Direction.UP && state.is(Blocks.PODZOL)) {
             var positions = new java.util.ArrayList<BlockPos>();
             if (level.isEmptyBlock(pos.above())) positions.add(pos.above());

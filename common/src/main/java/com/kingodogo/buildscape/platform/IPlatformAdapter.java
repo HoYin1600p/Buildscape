@@ -159,6 +159,11 @@ public interface IPlatformAdapter {
     net.minecraft.world.entity.EntityType<?> getFestiveWanderingHomemakerEntityType();
 
     Level getEntityLevel(Entity entity);
+    void dropPlayerItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.item.ItemStack stack, boolean randomThrow);
+    void swingPlayerHand(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand);
+    void resetSwingAnimation(net.minecraft.world.entity.LivingEntity entity);
+    boolean isEnderman(Entity entity);
+    boolean isLargeFireball(Entity entity);
 
     Iterable<Item> getAllItems();
     java.util.Collection<String> getAllItemTagIds();
@@ -206,6 +211,7 @@ public interface IPlatformAdapter {
     void injectRecipes(net.minecraft.world.item.crafting.RecipeManager recipeManager, java.util.List<com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe> recipes);
 
     net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createRandomStateProvider(java.util.List<net.minecraft.world.level.block.state.BlockState> states);
+    net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createSimpleStateProvider(net.minecraft.world.level.block.state.BlockState state);
     net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator getCreakingHeartTreeDecorator();
     net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator createMangroveLeaveVineDecorator(float probability);
     net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator createMangroveMossCarpetDecorator(float probability);
@@ -213,7 +219,8 @@ public interface IPlatformAdapter {
     net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator createMangroveRootDecorator(net.minecraft.util.valueproviders.IntProvider p1, net.minecraft.util.valueproviders.IntProvider p2, float probability, net.minecraft.util.valueproviders.IntProvider p3);
     net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer createMangroveUpwardsBranchingTrunkPlacer(int baseHeight, int heightRandA, int heightRandB, net.minecraft.util.valueproviders.IntProvider extraBranchSteps, float placeBranchPerLogProbability, net.minecraft.util.valueproviders.IntProvider extraBranchLength);
     net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer createMangroveRandomSpreadFoliagePlacer(net.minecraft.util.valueproviders.IntProvider radius, net.minecraft.util.valueproviders.IntProvider offset, net.minecraft.util.valueproviders.IntProvider foliageHeight, int leafPlacementAttempts);
-    net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration createTreeConfiguration(
+    /** Cluster-owned tree configuration; callers pass it only to createTreeFeature. */
+    Object createTreeConfiguration(
             net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider trunkProvider,
             net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer trunkPlacer,
             net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider foliageProvider,
@@ -226,7 +233,10 @@ public interface IPlatformAdapter {
             java.util.List<net.minecraft.world.level.block.state.BlockState> states,
             java.util.List<java.lang.Integer> weights
     );
-    net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createPatchFeature(
+    Object createTreeFeature(Object configuration);
+    Object createSimpleBlockConfiguration(net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider stateProvider);
+    Object createSimpleBlockFeature(Object configuration);
+    Object createPatchFeature(
             net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider stateProvider,
             int tries,
             int xzSpread,
@@ -289,8 +299,18 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.ItemStack getCraftingRemainingItem(net.minecraft.world.item.ItemStack stack);
     int getEfficiencyLevel(net.minecraft.world.item.ItemStack stack);
     float getHoeMiningSpeed(net.minecraft.world.item.ItemStack stack);
+    boolean isAxeItem(net.minecraft.world.item.ItemStack stack);
+    boolean isHoeItem(net.minecraft.world.item.ItemStack stack);
     boolean hasSilkTouch(net.minecraft.world.item.ItemStack stack);
     boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state);
+    /** Writes the solved colour row into a shulker's ghost filters; null when this version has no exact implementation. */
+    default Boolean writeSolvedToShulker(net.minecraft.world.item.ItemStack shulker, java.util.List<net.minecraft.world.item.ItemStack> solved) {
+        return null;
+    }
+    /** Main's "solid material" test; 1.18.2 uses Material.isSolid, other versions fall back to a full collision cube. */
+    default boolean isSolidMaterial(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) {
+        return state.isCollisionShapeFullBlock(level, pos);
+    }
     boolean isGlassBlock(net.minecraft.world.level.block.Block block);
 
     void awardAdvancement(net.minecraft.server.level.ServerPlayer player, CommonId advancementId, String criterion);
@@ -363,6 +383,7 @@ public interface IPlatformAdapter {
     boolean isSameItemSameComponents(net.minecraft.world.item.ItemStack a, net.minecraft.world.item.ItemStack b);
     void applyNauseaEffect(net.minecraft.world.entity.LivingEntity entity, int durationTicks, int amplifier);
     void hurtFreezeDamage(net.minecraft.world.entity.LivingEntity entity, float amount);
+    void hurtGenericDamage(net.minecraft.world.entity.LivingEntity entity, float amount);
     int getSelectedSlot(net.minecraft.world.entity.player.Inventory inventory);
     <T extends net.minecraft.world.level.block.entity.BlockEntity> net.minecraft.world.level.block.entity.BlockEntityType<T> createBlockEntityType(BlockEntityFactory<T> factory, java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> isValid);
     boolean isOnGround(net.minecraft.world.entity.Entity entity);
@@ -393,6 +414,9 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.Item createInfinitePhoenixFireworkStarItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createColoredItemFrameItem(net.minecraft.world.item.Item.Properties properties, String colorVariant);
     net.minecraft.world.item.Item createExperienceBucketItem(net.minecraft.world.item.Item.Properties properties);
+    default net.minecraft.world.item.Item createHomemakerSpawnEggItem(net.minecraft.world.item.Item.Properties properties, boolean festive) {
+        return new net.minecraft.world.item.Item(properties);
+    }
     net.minecraft.world.item.Item createPoplarBoatItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.ItemStack removeItem(java.util.List<net.minecraft.world.item.ItemStack> items, int slot, int amount);
     net.minecraft.world.item.ItemStack takeItem(java.util.List<net.minecraft.world.item.ItemStack> items, int slot);
@@ -499,6 +523,10 @@ public interface IPlatformAdapter {
     default void renderEntity(net.minecraft.world.entity.Entity entity, double x, double y, double z, float yaw, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight) {
     }
 
+    /** Translucent filled box in camera-relative coordinates; versions without an implementation draw nothing. */
+    default void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
+    }
+
     default com.mojang.blaze3d.vertex.VertexConsumer getTranslucentBuffer(Object bufferSource) {
         return null;
     }
@@ -524,6 +552,10 @@ public interface IPlatformAdapter {
 
     default boolean isArmor(net.minecraft.world.item.ItemStack stack) {
         return false;
+    }
+
+    default boolean isSpawnEgg(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.SpawnEggItem;
     }
 
     default boolean isElytra(net.minecraft.world.item.ItemStack stack) {

@@ -52,6 +52,14 @@ public final class PillarRenderer implements BlockEntityRenderer<PillarBlockEnti
 
     @Override public State createRenderState() { return new State(); }
 
+    // Vanilla culls block entities by their section only; render pillars with a display off screen so the
+    // expanded display bounds (up to 8 blocks above, 2 to each side) are not cut off at the screen edge.
+    @Override public boolean shouldRenderOffScreen() { return true; }
+
+    @Override public boolean shouldRender(PillarBlockEntity entity, Vec3 camera) {
+        return entity.hasDisplayItem() && BlockEntityRenderer.super.shouldRender(entity, camera);
+    }
+
     @Override public void extractRenderState(PillarBlockEntity entity, State state, float partialTick,
             Vec3 camera, ModelFeatureRenderer.CrumblingOverlay breaking) {
         BlockEntityRenderState.extractBase(entity, state, breaking);

@@ -98,7 +98,7 @@ public class CascadeBlock extends Block implements EntityBlock, SimpleWaterlogge
                 }
                 ItemStack mistBottle = new ItemStack(Services.PLATFORM.getItem(BOTTLE_OF_MIST_ID));
                 if (!player.getInventory().add(mistBottle)) {
-                    player.drop(mistBottle, false);
+                    Services.PLATFORM.dropPlayerItem(player, mistBottle, false);
                 }
                 Services.PLATFORM.playBottleFill(level, pos);
             }

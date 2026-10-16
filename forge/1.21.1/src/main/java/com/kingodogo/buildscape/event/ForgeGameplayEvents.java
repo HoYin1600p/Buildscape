@@ -126,7 +126,8 @@ public final class ForgeGameplayEvents {
     }
 
     private static void entityInteract(PlayerInteractEvent.EntityInteract event) {
-        InteractionResult result = ModCommonEvents.onEntityInteract(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget());
+        InteractionResult result = GoldenDandelionHandler.onEntityInteract(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget());
+        if (result == InteractionResult.PASS) result = ModCommonEvents.onEntityInteract(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget());
         if (result != InteractionResult.PASS) {
             event.setCancellationResult(result);
             event.setCanceled(true);

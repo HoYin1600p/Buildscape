@@ -453,8 +453,11 @@ public final class RecipeFactory {
             net.minecraft.world.item.crafting.Recipe<?> nativeRecipe = createRecipe(recipe);
             if (nativeRecipe != null) nativeRecipes.add(nativeRecipe);
         }
-        var merged = com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjector
-                .mergeById(recipeManager.getRecipes(), nativeRecipes, recipe -> recipe.getId());
-        recipeManager.replaceRecipes(merged.values());
+        var accessor = (com.kingodogo.buildscape.mixin.RecipeManagerAccessor) recipeManager;
+        var indexes = com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjector
+                .mergeIndexesGeneric(accessor.buildscape$getRecipes(), accessor.buildscape$getByName(),
+                        nativeRecipes, recipe -> recipe.getType(), recipe -> recipe.getId());
+        accessor.buildscape$setRecipes(indexes.byType());
+        accessor.buildscape$setByName(indexes.byName());
     }
 }

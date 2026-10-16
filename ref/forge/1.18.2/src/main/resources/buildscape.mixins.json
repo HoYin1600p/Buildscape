@@ -35,13 +35,13 @@
     "ShulkerBoxBlockMixin",
     "ShulkerBoxMenuMixin",
     "SmithingMenuMixin",
-    "SimpleReloadInstanceMixin",
     "FlowingFluidMixin",
     "LavaFluidMixin",
     "LiquidBlockMixin",
     "FireworkRocketEntityMixin",
     "LightningBoltMixin",
-    "PoiTypeAccessor"
+    "PoiTypeAccessor",
+    "RecipeManagerAccessor"
   ],
   "client": [
     "AbstractContainerScreenMixin",

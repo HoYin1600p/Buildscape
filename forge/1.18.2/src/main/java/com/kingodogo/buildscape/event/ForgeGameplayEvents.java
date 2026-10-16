@@ -30,6 +30,7 @@ public final class ForgeGameplayEvents {
     public static void register() {
         AdvancementEvents.configure(new LoaderAdvancementAccess());
         var bus = MinecraftForge.EVENT_BUS;
+        bus.addListener(com.kingodogo.buildscape.worldgen.ModBiomeModifications::onBiomeLoading);
         bus.addListener(LoaderWandererTrades::register);
         bus.addListener((net.minecraftforge.event.entity.player.AdvancementEvent event) -> {
             if (event.getPlayer() instanceof ServerPlayer player) {

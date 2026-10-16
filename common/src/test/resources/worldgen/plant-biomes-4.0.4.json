@@ -1,0 +1,18 @@
+{
+  "flower_forests": {
+    "biomes": ["minecraft:flower_forest"],
+    "features": {"red_monets": 4, "blue_monets": 4, "purple_monets": 4, "light_blue_monets": 4, "pink_monets": 4, "yellow_monets": 4}
+  },
+  "birch_forests": {
+    "biomes": ["minecraft:birch_forest", "minecraft:old_growth_birch_forest"],
+    "features": {"all_petals": 11, "clover": 32, "wildflowers": 11, "leaf_litter": 11}
+  },
+  "lush_caves": {
+    "biomes": ["minecraft:lush_caves"],
+    "features": {"all_colored_spore_blossom": 5}
+  },
+  "swamps": {
+    "biomes": ["minecraft:swamp"],
+    "features": {"clover_swamp": 16, "mangrove_propagule_patch_1": 5, "mangrove_propagule_patch_2": 5, "mangrove_propagule_patch_3": 5, "mangrove_propagule_patch_4": 40, "mangrove_propagule_patch_5": 53, "mangrove_propagule_patch_6": 107, "mangrove_propagule_patch_7": 160, "mangrove_propagule_patch_8": 320}
+  }
+}

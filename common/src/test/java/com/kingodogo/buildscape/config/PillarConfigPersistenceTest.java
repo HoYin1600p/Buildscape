@@ -127,7 +127,7 @@ class PillarConfigPersistenceTest {
         assertFalse(VaultPillarItems.merge(items, false));
         assertEquals(2, items.size());
         assertTrue(VaultPillarItems.merge(items, true));
-        assertEquals(35, items.size());
+        assertEquals(47, items.size());
         assertTrue(items.containsAll(Set.of("the_vault:echo_pog", "#the_vault:vault_gear", "the_vault:yeti_egg", "other:custom")));
         assertFalse(VaultPillarItems.merge(items, true));
     }

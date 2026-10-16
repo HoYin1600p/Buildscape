@@ -89,23 +89,9 @@ public class PresetsConfig {
         if (!presets.containsKey("default")) {
             initializeDefaults();
         } else {
-            if (Services.PLATFORM.isModLoaded("the_vault")) {
-                Preset defaultPreset = presets.get("default");
-                boolean changed = false;
-
-                Set<String> allDefaults = getDefaultItems();
-
-                for (String item : allDefaults) {
-                    if ((item.startsWith("the_vault:") || item.startsWith("#the_vault:"))
-                            && !defaultPreset.items.contains(item)) {
-                        defaultPreset.items.add(item);
-                        changed = true;
-                    }
-                }
-
-                if (changed) {
-                    save();
-                }
+            Preset defaultPreset = presets.get("default");
+            if (defaultPreset.items.addAll(getDefaultItems())) {
+                save();
             }
         }
 
@@ -189,123 +175,11 @@ public class PresetsConfig {
     }
 
     private Set<String> getDefaultItems() {
-        Set<String> defaultItems = new HashSet<>();
-        List<String> allItems = new ArrayList<>();
-        allItems.add("minecraft:diamond");
-        allItems.add("minecraft:netherite_ingot");
-        allItems.add("minecraft:nether_star");
-        allItems.add("minecraft:heart_of_the_sea");
-        allItems.add("minecraft:trident");
-        allItems.add("minecraft:emerald");
-        allItems.add("minecraft:dragon_breath");
-        allItems.add("minecraft:netherite_scrap");
-        allItems.add("minecraft:totem_of_undying");
-        allItems.add("minecraft:spyglass");
-        allItems.add("minecraft:elytra");
-        allItems.add("minecraft:diamond_sword");
-        allItems.add("minecraft:diamond_hoe");
-        allItems.add("minecraft:diamond_axe");
-        allItems.add("minecraft:diamond_pickaxe");
-        allItems.add("minecraft:diamond_shovel");
-        allItems.add("minecraft:diamond_boots");
-        allItems.add("minecraft:diamond_leggings");
-        allItems.add("minecraft:diamond_chestplate");
-        allItems.add("minecraft:diamond_helmet");
-        allItems.add("minecraft:netherite_sword");
-        allItems.add("minecraft:netherite_hoe");
-        allItems.add("minecraft:netherite_pickaxe");
-        allItems.add("minecraft:netherite_axe");
-        allItems.add("minecraft:netherite_shovel");
-        allItems.add("minecraft:netherite_boots");
-        allItems.add("minecraft:netherite_leggings");
-        allItems.add("minecraft:netherite_chestplate");
-        allItems.add("minecraft:netherite_helmet");
-        allItems.add("minecraft:nautilus_shell");
-        allItems.add("minecraft:shulker_shell");
-        allItems.add("minecraft:golden_apple");
-        allItems.add("minecraft:enchanted_golden_apple");
-        allItems.add("minecraft:golden_carrot");
-        allItems.add("minecraft:experience_bottle");
-        allItems.add("minecraft:mojang_banner_pattern");
-        allItems.add("minecraft:ancient_debris");
-        allItems.add("minecraft:dragon_head");
-        allItems.add("minecraft:dragon_egg");
-        allItems.add("minecraft:player_head");
-        allItems.add("minecraft:beacon");
-        allItems.add("minecraft:end_crystal");
-        allItems.add("minecraft:conduit");
-        allItems.add("minecraft:skeleton_skull");
-        allItems.add("minecraft:zombie_head");
-        allItems.add("minecraft:wither_skeleton_skull");
-        allItems.add("minecraft:creeper_head");
-        allItems.add("minecraft:enchanting_table");
-        allItems.add("minecraft:emerald_block");
-        allItems.add("minecraft:diamond_block");
-        allItems.add("minecraft:gold_block");
-        allItems.add("minecraft:netherite_block");
-        allItems.add("minecraft:deepslate_diamond_ore");
-        allItems.add("minecraft:diamond_ore");
-        allItems.add("minecraft:bedrock");
-        allItems.add("minecraft:pufferfish");
-        allItems.add("minecraft:poisonous_potato");
-        allItems.add("minecraft:written_book");
-        allItems.add("buildscape:ancient_ashen_scroll");
+        return getDefaultItems(Services.PLATFORM.isModLoaded("the_vault"));
+    }
 
-        allItems.add("minecraft:creeper_spawn_egg");
-        allItems.add("minecraft:turtle_spawn_egg");
-        allItems.add("minecraft:axolotl_spawn_egg");
-        allItems.add("minecraft:wither_skeleton_spawn_egg");
-        allItems.add("minecraft:shulker_spawn_egg");
-        allItems.add("minecraft:elder_guardian_spawn_egg");
-        allItems.add("minecraft:ravager_spawn_egg");
-        allItems.add("minecraft:slime_spawn_egg");
-        allItems.add("minecraft:zoglin_spawn_egg");
-        allItems.add("minecraft:villager_spawn_egg");
-        allItems.add("minecraft:skeleton_horse_spawn_egg");
-        allItems.add("minecraft:glow_squid_spawn_egg");
-        allItems.add("minecraft:goat_spawn_egg");
-        allItems.add("minecraft:enderman_spawn_egg");
-
-        allItems.add("the_vault:echo_pog");
-        allItems.add("the_vault:gem_pog");
-        allItems.add("the_vault:vault_crystal");
-        allItems.add("the_vault:spicy_hearty_burger");
-        allItems.add("the_vault:omega_pog");
-        allItems.add("the_vault:knowledge_star");
-        allItems.add("the_vault:antique");
-        allItems.add("the_vault:herald_trophy");
-        allItems.add("the_vault:pvp_trophy");
-        allItems.add("the_vault:treasure_keyring");
-        allItems.add("the_vault:companion_egg");
-        allItems.add("the_vault:vault_artifact");
-        allItems.add("the_vault:tool");
-        allItems.add("the_vault:deck_socket");
-        allItems.add("the_vault:card_deck");
-        allItems.add("the_vault:vault_god_charm");
-        allItems.add("the_vault:boost_modification_stone");
-        allItems.add("the_vault:neuralizer");
-        allItems.add("the_vault:soul_vortex");
-        allItems.add("#the_vault:crystal_capstones");
-        allItems.add("#the_vault:keys");
-        allItems.add("#the_vault:gems");
-        allItems.add("#the_vault:fruits");
-        allItems.add("the_vault:unidentified_artifact");
-        allItems.add("#the_vault:playerclusters");
-        allItems.add("#the_vault:perfectgems");
-        allItems.add("#the_vault:playerchunks");
-        allItems.add("#the_vault:magnet");
-        allItems.add("#the_vault:unique");
-        allItems.add("#the_vault:vault_gear");
-        allItems.add("the_vault:santa_egg");
-        allItems.add("the_vault:grinch_egg");
-        allItems.add("the_vault:yeti_egg");
-
-        for (String item : allItems) {
-            if (isModLoaded(item)) {
-                defaultItems.add(item);
-            }
-        }
-        return defaultItems;
+    static Set<String> getDefaultItems(boolean vaultLoaded) {
+        return DefaultPillarItems.items(vaultLoaded);
     }
 
     private synchronized void rebuildCache() {

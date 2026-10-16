@@ -530,14 +530,26 @@ public final class RecipeFactory {
     public static void injectRecipes(net.minecraft.world.item.crafting.RecipeManager recipeManager,
                                      java.util.List<com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe> recipes) {
         if (recipeManager == null || recipes == null || recipes.isEmpty()) return;
-        java.util.Map<ResourceLocation, net.minecraft.world.item.crafting.RecipeHolder<?>> merged = new java.util.LinkedHashMap<>();
-        for (net.minecraft.world.item.crafting.RecipeHolder<?> existing : recipeManager.getRecipes()) {
-            if (existing != null) merged.put(existing.id(), existing);
-        }
+        var accessor = (com.kingodogo.buildscape.mixin.RecipeManagerAccessor) recipeManager;
+        java.util.Map<net.minecraft.world.item.crafting.RecipeType<?>,
+                java.util.Map<ResourceLocation, net.minecraft.world.item.crafting.RecipeHolder<?>>> byType =
+                new java.util.LinkedHashMap<>();
+        accessor.buildscape$getByType().entries().forEach(entry ->
+                byType.computeIfAbsent(entry.getKey(), ignored -> new java.util.LinkedHashMap<>())
+                        .put(entry.getValue().id(), entry.getValue()));
+        java.util.List<net.minecraft.world.item.crafting.RecipeHolder<?>> nativeRecipes = new java.util.ArrayList<>();
         for (com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe cr : recipes) {
             net.minecraft.world.item.crafting.RecipeHolder<?> holder = createRecipe(cr);
-            if (holder != null) merged.put(holder.id(), holder);
+            if (holder != null) nativeRecipes.add(holder);
         }
-        recipeManager.replaceRecipes(merged.values());
+        var indexes = com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjector
+                .mergeIndexesGeneric(byType, accessor.buildscape$getByName(), nativeRecipes,
+                        holder -> holder.value().getType(), holder -> holder.id());
+        var immutableByType = com.google.common.collect.ImmutableMultimap
+                .<net.minecraft.world.item.crafting.RecipeType<?>, net.minecraft.world.item.crafting.RecipeHolder<?>>builder();
+        indexes.byType().forEach((type, holders) -> immutableByType.putAll(type, holders.values()));
+        var mergedByType = immutableByType.build();
+        accessor.buildscape$setByType(mergedByType);
+        accessor.buildscape$setByName(indexes.byName());
     }
 }

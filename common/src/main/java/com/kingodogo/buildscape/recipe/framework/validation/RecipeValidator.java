@@ -45,7 +45,7 @@ public class RecipeValidator {
         CommonId result = parseId(recipe.resultItem());
         if (result == null || !hasItem(result)) return "result resolves to air: " + recipe.resultItem();
         boolean shaped = type.equals("shaped") || type.equals("shaped_durability");
-        if (shaped || type.equals("shapeless") || type.equals("shapeless_durability")) {
+        if (shaped || type.equals("shapeless") || type.equals("shapeless_durability") || type.equals("haze_bush_dye")) {
             if (shaped && (recipe.width() < 1 || recipe.width() > 3 || recipe.height() < 1
                     || recipe.height() > 3 || recipe.ingredients().size() != recipe.width() * recipe.height())) {
                 return "invalid shaped dimensions";

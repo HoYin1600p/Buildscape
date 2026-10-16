@@ -513,6 +513,79 @@ public class PillarIdManager {
         return positionIndex.get(posKey);
     }
 
+    public String getFrameIdAt(String dimension, BlockPos pos, net.minecraft.core.Direction facing, String storedId) {
+        return findFrameId(pillarData.values(), dimension, pos,
+                facing != null ? facing.getSerializedName() : null, storedId);
+    }
+
+    static boolean isFrameData(PillarData data) {
+        return data != null && data.id != null && (data.id.startsWith(PREFIX_ITEM_FRAME)
+                || (data.pillarType != null && data.pillarType.endsWith("item_frame")));
+    }
+
+    private static boolean isColoredFrameData(PillarData data) {
+        return data.pillarType != null && data.pillarType.startsWith("buildscape:")
+                && data.pillarType.endsWith("item_frame");
+    }
+
+    static String findFrameId(Collection<PillarData> entries, String dimension, BlockPos pos,
+                              String facing, String storedId) {
+        PillarData best = null;
+        for (PillarData data : entries) {
+            if (!isFrameData(data) || !Objects.equals(data.dimension, dimension)
+                    || !data.getBlockPos().equals(pos) || facing == null
+                    || !facing.equals(data.facing)) continue;
+            if (data.id.equals(storedId)) return data.id;
+            if (best == null || compareFrameRecency(data, best) > 0) best = data;
+        }
+        // A known identity must never inherit another frame's settings.
+        return storedId != null && !storedId.isEmpty() ? null : best != null ? best.id : null;
+    }
+
+    private static int compareFrameRecency(PillarData a, PillarData b) {
+        int result = Long.compare(a.modifiedTime, b.modifiedTime);
+        if (result == 0) result = Long.compare(a.createdTime, b.createdTime);
+        return result != 0 ? result : a.id.compareTo(b.id);
+    }
+
+    private static boolean framesConflict(PillarData a, PillarData b) {
+        return Objects.equals(a.dimension, b.dimension) && a.getBlockPos().equals(b.getBlockPos())
+                && (isColoredFrameData(a) || isColoredFrameData(b) || a.facing == null
+                || b.facing == null || Objects.equals(a.facing, b.facing));
+    }
+
+    static int deduplicateFrames(Map<String, PillarData> entries, Set<String> preferredIds) {
+        List<PillarData> frames = new ArrayList<>();
+        for (PillarData data : entries.values()) if (isFrameData(data)) frames.add(data);
+        frames.sort((a, b) -> {
+            int preferred = Boolean.compare(preferredIds.contains(b.id), preferredIds.contains(a.id));
+            return preferred != 0 ? preferred : compareFrameRecency(b, a);
+        });
+        Map<String, List<PillarData>> kept = new HashMap<>();
+        int removed = 0;
+        for (PillarData frame : frames) {
+            String key = frame.dimension + ":" + frame.x + ":" + frame.y + ":" + frame.z;
+            List<PillarData> atPosition = kept.computeIfAbsent(key, ignored -> new ArrayList<>());
+            if (atPosition.stream().anyMatch(other -> framesConflict(frame, other))) {
+                if (entries.remove(frame.id, frame)) removed++;
+            } else {
+                atPosition.add(frame);
+            }
+        }
+        return removed;
+    }
+
+    private boolean removeOtherFrameEntries(String id, String dimension, BlockPos pos,
+                                             net.minecraft.core.Direction facing, boolean colored) {
+        PillarData current = new PillarData(id, dimension, pos);
+        current.facing = facing != null ? facing.getSerializedName() : null;
+        if (colored) current.pillarType = "buildscape:item_frame";
+        boolean removed = pillarData.values().removeIf(other -> isFrameData(other)
+                && !other.id.equals(id) && framesConflict(current, other));
+        if (removed) rebuildPositionIndex();
+        return removed;
+    }
+
     public java.util.Collection<PillarData> getAllData() {
         return pillarData.values();
     }
@@ -1014,6 +1087,11 @@ public class PillarIdManager {
                 }
             }
 
+            int duplicateFrames = deduplicateFrames(pillarData, existingData.keySet());
+            rebuildPositionIndex();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.info(
+                    "BuildScape: Removed {} duplicate frame registry entries on load", duplicateFrames);
+
             int colorsCountAfterMerge = 0;
             for (PillarData data : pillarData.values()) {
                 if (data != null && data.hasColors()) {
@@ -1036,6 +1114,7 @@ public class PillarIdManager {
 
                 hasLoaded = true;
 
+                if (duplicateFrames > 0) requestSave();
                 updateCachedWorldDir();
                 refreshSyncSnapshot();
                 if (server != null && server.isRunning()) {
@@ -2304,6 +2383,7 @@ public class PillarIdManager {
             id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
         }
+        boolean removedDuplicates = removeOtherFrameEntries(id, dimension, pos, facing, false);
         if (existing == null) {
             PillarData data = new PillarData(id, dimension, pos);
             data.pattern = pattern;
@@ -2323,7 +2403,7 @@ public class PillarIdManager {
             saveFrameChange(immediate);
         } else {
             positionIndex.put(posKey, id);
-            boolean changed = false;
+            boolean changed = removedDuplicates;
 
             if (!Objects.equals(existing.pillarType, frameType)) {
                 existing.pillarType = frameType;
@@ -2356,6 +2436,7 @@ public class PillarIdManager {
             }
 
             if (changed) {
+                existing.modifiedTime = System.currentTimeMillis();
                 saveFrameChange(immediate);
             }
         }
@@ -2395,6 +2476,7 @@ public class PillarIdManager {
             id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame.asEntity());
             existing = null;
         }
+        boolean removedDuplicates = removeOtherFrameEntries(id, dimension, pos, facing, true);
         if (existing == null) {
             PillarData data = new PillarData(id, dimension, pos);
             data.pattern = pattern;
@@ -2420,7 +2502,7 @@ public class PillarIdManager {
             saveFrameChange(immediate);
         } else {
             positionIndex.put(posKey, id);
-            boolean changed = false;
+            boolean changed = removedDuplicates;
 
             String color = frame.getColorVariant();
             if (color == null || color.isEmpty()) color = "white";
@@ -2458,6 +2540,7 @@ public class PillarIdManager {
             }
 
             if (changed) {
+                existing.modifiedTime = System.currentTimeMillis();
                 saveFrameChange(immediate);
             }
         }

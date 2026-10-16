@@ -716,23 +716,17 @@ public final class ItemFrameParticleHandler {
     public static String getFrameId(ItemFrame itemFrame) {
         Level level = Services.PLATFORM.getEntityLevel(itemFrame);
         if (level != null && level.isClientSide()) {
+            CompoundTag frameData = Services.PLATFORM.getEntityData(itemFrame);
+            String storedId = Services.PLATFORM.getTagString(frameData, FRAME_ID_KEY, null);
             String cached = CLIENT_FRAME_ID_CACHE.get(itemFrame.getId());
+            if (storedId != null && !storedId.isEmpty()) return storedId;
             if (cached != null && !cached.equals("F-????")) return cached;
 
             String dimension = PillarIdManager.getDimensionKey(level);
             BlockPos pos = itemFrame.blockPosition();
             Direction dir = itemFrame.getDirection();
 
-            String exactKey = PillarIdManager.get(level).positionKey(dimension, pos, dir);
-            String idFromPos = PillarIdManager.get(level).getIdForPosition(exactKey);
-
-            if (idFromPos == null) {
-                String fuzzyKey = PillarIdManager.get(level).positionKey(dimension, pos, null);
-                String potentialId = PillarIdManager.get(level).getIdForPosition(fuzzyKey);
-                if (potentialId != null && potentialId.startsWith(FRAME_PREFIX)) {
-                    idFromPos = potentialId;
-                }
-            }
+            String idFromPos = PillarIdManager.get(level).getFrameIdAt(dimension, pos, dir, storedId);
 
             if (idFromPos != null) {
                 CLIENT_FRAME_ID_CACHE.put(itemFrame.getId(), idFromPos);
@@ -777,13 +771,7 @@ public final class ItemFrameParticleHandler {
         }
         PillarIdManager manager = PillarIdManager.get(level);
         String dimension = PillarIdManager.getDimensionKey(level);
-        String exactKey = manager.positionKey(dimension, pos, direction);
-        String exactId = manager.getIdForPosition(exactKey);
-        if (exactId != null) {
-            return exactId;
-        }
-        String positionKey = manager.positionKey(dimension, pos, null);
-        return manager.getIdForPosition(positionKey);
+        return manager.getFrameIdAt(dimension, pos, direction, null);
     }
 
     public static String getParticlePatternColored(ColoredItemFrameEntity frame) {
@@ -907,23 +895,17 @@ public final class ItemFrameParticleHandler {
     public static String getFrameIdColored(ColoredItemFrameEntity frame) {
         Level level = frame.getEntityLevel();
         if (level != null && level.isClientSide()) {
+            CompoundTag frameData = Services.PLATFORM.getEntityData(frame.asEntity());
+            String storedId = Services.PLATFORM.getTagString(frameData, FRAME_ID_KEY, null);
             String cached = CLIENT_FRAME_ID_CACHE.get(frame.getId());
+            if (storedId != null && !storedId.isEmpty()) return storedId;
             if (cached != null && !cached.equals("F-????")) return cached;
 
             String dimension = PillarIdManager.getDimensionKey(level);
             BlockPos pos = frame.blockPosition();
             Direction dir = frame.getFrameDirection();
 
-            String exactKey = PillarIdManager.get(level).positionKey(dimension, pos, dir);
-            String idFromPos = PillarIdManager.get(level).getIdForPosition(exactKey);
-
-            if (idFromPos == null) {
-                String fuzzyKey = PillarIdManager.get(level).positionKey(dimension, pos, null);
-                String potentialId = PillarIdManager.get(level).getIdForPosition(fuzzyKey);
-                if (potentialId != null && potentialId.startsWith(FRAME_PREFIX)) {
-                    idFromPos = potentialId;
-                }
-            }
+            String idFromPos = PillarIdManager.get(level).getFrameIdAt(dimension, pos, dir, storedId);
 
             if (idFromPos != null) {
                 CLIENT_FRAME_ID_CACHE.put(frame.getId(), idFromPos);

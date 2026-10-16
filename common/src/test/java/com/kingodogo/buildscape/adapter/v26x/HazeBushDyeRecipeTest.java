@@ -38,11 +38,11 @@ class HazeBushDyeRecipeTest {
         return constructor.newInstance(new Recipe.CommonInfo(true),
                 new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, ""),
                 new ItemStackTemplate(Items.ORANGE_TULIP),
-                List.of(Ingredient.of(Items.WHITE_TULIP), Ingredient.of(Items.ORANGE_DYE)));
+                List.of(Ingredient.of(Items.WHITE_TULIP), Ingredient.of(Items.STICK)));
     }
 
     private CraftingInput grid(ItemStack bush) {
-        return CraftingInput.of(2, 1, List.of(new ItemStack(Items.ORANGE_DYE), bush));
+        return CraftingInput.of(2, 1, List.of(new ItemStack(Items.STICK), bush));
     }
 
     @Test

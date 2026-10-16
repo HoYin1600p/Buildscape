@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8.7",
+  "package": "com.kingodogo.buildscape.mixin.neoforge",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "ItemStackLimitsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

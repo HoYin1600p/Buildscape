@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/cherry_planks",
+    "top": "minecraft:block/cherry_planks",
+    "side": "minecraft:block/cherry_planks",
+    "particle": "#side"
+  }
+}

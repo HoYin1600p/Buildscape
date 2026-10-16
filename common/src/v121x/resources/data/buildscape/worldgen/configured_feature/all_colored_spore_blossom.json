@@ -1,0 +1,40 @@
+{
+  "type": "minecraft:simple_block",
+  "config": {
+    "to_place": {
+      "type": "minecraft:weighted_state_provider",
+      "entries": [
+        {
+          "data": {
+            "Name": "buildscape:red_spore_blossom"
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:cyan_spore_blossom"
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_spore_blossom"
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_spore_blossom"
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_spore_blossom"
+          },
+          "weight": 1
+        }
+      ]
+    }
+  }
+}

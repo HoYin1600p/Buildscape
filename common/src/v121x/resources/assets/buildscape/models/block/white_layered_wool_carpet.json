@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/carpet",
+  "textures": {
+    "wool": "buildscape:block/white_layered_wool",
+    "particle": "buildscape:block/white_layered_wool"
+  }
+}

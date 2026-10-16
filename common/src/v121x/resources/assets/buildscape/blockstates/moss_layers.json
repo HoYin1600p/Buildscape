@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "layers=1": {
+      "model": "buildscape:block/moss_layers_layer1",
+      "particle": "minecraft:block/moss_block"
+    },
+    "layers=2": {
+      "model": "buildscape:block/moss_layers_layer2",
+      "particle": "minecraft:block/moss_block"
+    },
+    "layers=3": {
+      "model": "buildscape:block/moss_layers_layer3",
+      "particle": "minecraft:block/moss_block"
+    },
+    "layers=4": {
+      "model": "buildscape:block/moss_layers_layer4",
+      "particle": "minecraft:block/moss_block"
+    },
+    "layers=5": {
+      "model": "buildscape:block/moss_layers_layer5",
+      "particle": "minecraft:block/moss_block"
+    },
+    "layers=6": {
+      "model": "buildscape:block/moss_layers_layer6",
+      "particle": "minecraft:block/moss_block"
+    },
+    "layers=7": {
+      "model": "buildscape:block/moss_layers_layer7",
+      "particle": "minecraft:block/moss_block"
+    },
+    "layers=8": {
+      "model": "buildscape:block/moss_layers_layer8",
+      "particle": "minecraft:block/moss_block"
+    }
+  }
+}

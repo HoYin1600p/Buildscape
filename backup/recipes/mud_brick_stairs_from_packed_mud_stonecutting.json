@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:packed_mud"
-  },
-  "result": "buildscape:mud_brick_stairs",
-  "count": 1
-}

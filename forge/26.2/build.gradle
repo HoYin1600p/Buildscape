@@ -1,0 +1,64 @@
+plugins {
+    id 'java'
+    id 'xyz.wagyourtail.unimined'
+}
+
+evaluationDependsOn(':common')
+def commonProject = project(':common')
+version = providers.gradleProperty('mod_version').get()
+base.archivesName = 'buildscape-forge-26.2'
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+unimined.minecraft {
+    version '26.2'
+    // Minecraft 26.x ships official names in development and production.
+    defaultRemapJar = false
+    minecraftForge {
+        loader '65.1.4'
+        mixinConfig(['buildscape.mixins.json', 'buildscape.forge262.mixins.json'])
+    }
+}
+
+configurations { commonVariant }
+dependencies {
+    commonVariant project(path: ':common', configuration: 'v26xElements')
+    // FML must see shared packages inside this mod rather than a second module.
+    compileOnly files(commonProject.sourceSets.v26x.output.classesDirs)
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn ':common:compileV26xJava'
+    inputs.files(commonProject.sourceSets.v26x.output.classesDirs)
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+    // Both dev runs and the release jar must expose one FML module for shared packages.
+    doLast {
+        project.copy {
+            from commonProject.sourceSets.v26x.output.classesDirs
+            into destinationDirectory
+        }
+    }
+}
+tasks.named('processResources') {
+    from rootProject.file('common/src/main/resources')
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
+tasks.named('jar', Jar) {
+    // Shared classes are already merged into main's output; retain cluster resources here.
+    from(configurations.commonVariant) {
+        exclude '**/*.class'
+        // Forge 26.2 ships Mixin 0.8.7, whose newest compatibility level is JAVA_21; an unknown level
+        // throws MixinInitialisationError and the client exits silently while the config is registered.
+        filesMatching('buildscape.mixins.json') {
+            filter { line -> line.replace('"JAVA_25"', '"JAVA_21"') }
+        }
+    }
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    manifest { attributes 'MixinConfigs': 'buildscape.mixins.json,buildscape.forge262.mixins.json' }
+}
+tasks.withType(JavaCompile).configureEach {
+    options.release.set(25)
+    options.compilerArgs += ['-proc:none']
+}
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+}

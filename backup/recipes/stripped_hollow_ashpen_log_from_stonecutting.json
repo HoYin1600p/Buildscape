@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:stripped_ashpen_log"
-  },
-  "result": "buildscape:stripped_hollow_ashpen_log",
-  "count": 1
-}

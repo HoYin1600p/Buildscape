@@ -1,0 +1,9 @@
+{
+    "model":  {
+                  "model":  {
+                                "type":  "buildscape:glass_jar"
+                            },
+                  "type":  "minecraft:special",
+                  "base":  "buildscape:item/black_glass_jar"
+              }
+}

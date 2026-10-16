@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_pressed",
+  "textures": {
+    "texture": "buildscape:block/washed_cardboard_block"
+  }
+}

@@ -97,18 +97,26 @@ public class HollowLogCrawlHandler {
     }
 
     private static void clearCrawling(Player player) {
-        if (CUSTOM_CRAWLING_PLAYERS.remove(player.getUUID())) {
+        boolean wasCustom = CUSTOM_CRAWLING_PLAYERS.remove(player.getUUID());
+        boolean wasForced = FORCED_PLAYERS.remove(player.getUUID());
+        if (wasCustom) {
             player.refreshDimensions();
         }
-        clearForcedPose(player);
+        if (wasCustom || wasForced) {
+            clearForcedPose(player, true);
+        }
     }
 
     private static void clearForcedPose(Player player) {
-        FORCED_PLAYERS.remove(player.getUUID());
+        boolean wasForced = FORCED_PLAYERS.remove(player.getUUID());
+        clearForcedPose(player, wasForced);
+    }
+
+    private static void clearForcedPose(Player player, boolean wasTracked) {
         if (player.getForcedPose() == Pose.SWIMMING) {
             player.setForcedPose(null);
         }
-        if (player.getPose() == Pose.SWIMMING && !player.isInWater() && !player.isInLava()) {
+        if (wasTracked && player.getPose() == Pose.SWIMMING && !player.isInWater() && !player.isInLava()) {
             if (player.isShiftKeyDown()) {
                 player.setPose(Pose.CROUCHING);
             } else {

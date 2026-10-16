@@ -3,8 +3,10 @@
 `sync/targets.json` registers the source line and every port. Today the source is
 Forge 1.18.2 on `main` in `https://github.com/HoYin1600p/Buildscape.git`;
 `mc26.2` combines Fabric and NeoForge on `port/26.2` and also syncs Forge 1.18.2,
-covering common's `v26x` and `v118x` VersionClusters in one apply. Other targets
-are scaffolded, and 26.3 is paused by owner decision.
+covering common's `v26x` and `v118x` VersionClusters in one apply. `mc26.3` is
+registered as `planned` (Fabric and NeoForge 26.3, `v263` cluster; see
+[the 26.3 target](#the-263-target)). Other targets are scaffolded, and the older
+per-loader 26.3 placeholders stay paused by owner decision.
 Scaffolded targets do not need existing branches and are skipped by `status`.
 Every target lives on the one multi-version branch (`port/26.2` today) as its own
 `<loader>/<version>` folder; there is no branch per version.
@@ -66,6 +68,14 @@ The 26.2 removal policy records retired ids and exact `excluded_target_paths`. S
 and textures remain available. Apply filters both source resources and converted
 outputs against this policy, so later source updates cannot restore retired assets.
 Retired changes do not enter the pending review queue.
+
+A later target does not copy the policy file. It declares
+`"removal_policy": {"file", "inherits", "inherited_resource_root"}` in the registry and the tool
+loads that same approved file, which stays read-only. `inherits` must equal the file's own
+`target`, otherwise the tool stops. Removed ids and every excluded path carry over exactly;
+only paths under `inherited_resource_root` are re-rooted to the inheriting target's own
+`resource_root`. Shared Java and test paths keep their approved location. A target with no
+declaration has no removals, and `mc26.2` keeps its implicit policy, so its behaviour is unchanged.
 
 The ledger's semicolon-separated `active_paths` is authoritative. A same-relative
 Java file under the declared `java_root` or `java_roots` is the fallback. Missing
@@ -181,6 +191,34 @@ S5 must add `common/src/v118x/resources/buildscape.mixins.json`, listing the sha
 mixins and restored v118x-only implementations, and restore the v118x pipe-spill,
 tooltip preview, festive rendering, beacon/trident/liquid/item renderer and sign
 frame behavior. Shared API fixes remain in `src/main`; S4 does not implement them.
+
+## The 26.3 target
+
+`mc26.3` is `planned` with `base_commit: null`, so `status`, `plan`, `apply` and the scheduled run
+skip it. Its registry entry fixes everything needed to activate it later:
+
+| Field | Value |
+| --- | --- |
+| Clusters and Java roots | `v263`; `common/src/main/java` and `common/src/v263/java` |
+| Resource root and state file | `common/src/v263/resources`; `sync/state/mc26.3.json` |
+| Converter and checker | `scripts/resources26x/convert.py` and `check.py` with profile `26.3` |
+| Removals | inherited from `sync/removals26x.json` (see above), nothing added |
+| Ledger coverage | `263` |
+| Validation | the 26.3 resource check, then `build263 -Pbuildscape.v263=true` |
+
+It shares `ref/forge/1.18.2`, `migration/ledger.csv` and `common/src/main` with `mc26.2`.
+Activate it only after `mc26.2` syncs are accepted, with `base_commit` set to the same reviewed
+source snapshot, so one source commit is ingested once for both targets.
+
+The shared ledger lists every cluster's adapters. A target never maps source files into another
+registered target's cluster: the tool derives the foreign clusters from the registry and drops
+ledger paths whose `src/<cluster>/` or `adapter/<cluster>/` segment names one. For `mc26.2` that
+is `v263` (and `v121x`); for `mc26.3` it is `v26x`, `v118x` and `v121x`. Ledger rows that map a
+`v26x` file with a `v263` counterpart list both paths and carry `263` in `era_coverage`; the
+`v26x` mixins without a `v263` copy yet keep their existing coverage. Ledger `era_coverage` of
+`263` describes scope only, like the other eras.
+
+Validate this part without touching the working tree: `plan` or `status` only, never `apply`.
 
 ## Ledger compatibility
 

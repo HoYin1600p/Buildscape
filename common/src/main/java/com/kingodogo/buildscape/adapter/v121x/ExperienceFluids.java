@@ -39,6 +39,7 @@ public final class ExperienceFluids {
     }
 
     public static class Source extends WaterFluid.Source {
+        @Override protected boolean canConvertToSource(net.minecraft.world.level.Level level) { return false; }
         @Override public Fluid getSource() { return still(); }
         @Override public Fluid getFlowing() { return flowing(); }
         @Override public boolean isSame(Fluid fluid) { return fluid == still() || fluid == flowing(); }
@@ -46,6 +47,7 @@ public final class ExperienceFluids {
         @Override public BlockState createLegacyBlock(FluidState state) { return blockState(state); }
     }
     public static class Flowing extends WaterFluid.Flowing {
+        @Override protected boolean canConvertToSource(net.minecraft.world.level.Level level) { return false; }
         @Override public Fluid getSource() { return still(); }
         @Override public Fluid getFlowing() { return flowing(); }
         @Override public boolean isSame(Fluid fluid) { return fluid == still() || fluid == flowing(); }

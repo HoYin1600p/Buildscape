@@ -54,4 +54,12 @@ public abstract class FireworkRocketEntityMixin extends Entity {
             buildscape$applyShotYaw(shooter.getYRot());
         }
     }
+
+    @org.spongepowered.asm.mixin.Dynamic
+    @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;)V", at = @At("RETURN"), require = 0)
+    private void buildscape$onConstructAttached(Level level, ItemStack stack, LivingEntity shooter, CallbackInfo ci) {
+        if (shooter != null) {
+            buildscape$applyShotYaw(shooter.getYRot());
+        }
+    }
 }

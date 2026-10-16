@@ -42,7 +42,7 @@ public class ForgeExperienceFluids {
                     new ResourceLocation(BuildscapeCommon.MOD_ID, "fluid/experience_flow")
             ).luminosity(15).density(1000).viscosity(1000)
     ).bucket(() -> (net.minecraft.world.item.BucketItem) com.kingodogo.buildscape.platform.Services.PLATFORM.getItem(new com.kingodogo.buildscape.util.CommonId("buildscape", "experience_bucket")))
-     .block(() -> (net.minecraft.world.level.block.LiquidBlock) com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(new com.kingodogo.buildscape.util.CommonId("buildscape", "experience_block")));
+     .block(() -> (net.minecraft.world.level.block.LiquidBlock) com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(new com.kingodogo.buildscape.util.CommonId("buildscape", "experience_liquid")));
     private static <T> T wrapped(java.util.function.Supplier<T> factory) {
         var value = new java.util.concurrent.atomic.AtomicReference<T>();
         com.kingodogo.buildscape.platform.Services.PLATFORM.wrapRegistryAction(() -> value.set(factory.get()));

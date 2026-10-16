@@ -2387,7 +2387,7 @@ public class PillarIdManager {
 
         String dimension = getDimensionKey(level);
         BlockPos pos = frame.blockPosition();
-        net.minecraft.core.Direction facing = frame.getDirection();
+        net.minecraft.core.Direction facing = frame.getFrameDirection();
         String posKey = positionKey(dimension, pos, facing);
 
         PillarData existing = pillarData.get(id);

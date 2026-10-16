@@ -1,0 +1,11 @@
+{
+  "gives": {
+    "id": "buildscape:snowy_grass_block"
+  },
+  "max_uses": 2,
+  "reputation_discount": 0.05,
+  "wants": {
+    "id": "minecraft:emerald"
+  },
+  "xp": 1
+}

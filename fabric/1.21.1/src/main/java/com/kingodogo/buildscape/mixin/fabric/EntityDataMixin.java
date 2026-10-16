@@ -18,6 +18,7 @@ public abstract class EntityDataMixin implements FabricPersistentData {
     private void buildscape$save(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
         if (!buildscape$data.isEmpty()) tag.put("ForgeData", buildscape$data.copy());
     }
-    @Inject(method = "load", at = @At("HEAD"))
+    // Copy after readAdditionalSaveData has consumed migrated legacy fields.
+    @Inject(method = "load", at = @At("RETURN"))
     private void buildscape$load(CompoundTag tag, CallbackInfo ci) { buildscape$data = tag.getCompound("ForgeData").copy(); }
 }

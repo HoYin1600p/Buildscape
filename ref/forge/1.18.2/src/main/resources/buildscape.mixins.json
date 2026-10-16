@@ -40,7 +40,8 @@
     "LiquidBlockMixin",
     "FireworkRocketEntityMixin",
     "LightningBoltMixin",
-    "PoiTypeAccessor"
+    "PoiTypeAccessor",
+    "RecipeManagerAccessor"
   ],
   "client": [
     "AbstractContainerScreenMixin",

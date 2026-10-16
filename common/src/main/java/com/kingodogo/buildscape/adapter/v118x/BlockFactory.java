@@ -277,6 +277,14 @@ public class BlockFactory implements IBlockFactory {
                     @Override public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
                         return plantStack(state);
                     }
+                    @Override public java.util.List<ItemStack> getDrops(BlockState state,
+                            net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
+                        var drops = super.getDrops(state, builder);
+                        if (!state.getValue(HAS_HAZE)) for (var drop : drops) {
+                            if (drop.is(getPlant().asItem())) com.kingodogo.buildscape.item.HazeBushItem.markDrained(drop);
+                        }
+                        return drops;
+                    }
                 };
             }
             case "CopperTorchBlock": return new com.kingodogo.buildscape.block.CopperTorchBlock(props);
@@ -343,6 +351,8 @@ public class BlockFactory implements IBlockFactory {
             case "SaplingBlock": {
                 net.minecraft.world.level.block.grower.AbstractTreeGrower grower = def.getId().equals("cherry_sapling")
                         ? new com.kingodogo.buildscape.worldgen.CherryTreeGrower()
+                        : def.getId().equals("poplar_sapling")
+                        ? new com.kingodogo.buildscape.worldgen.PoplarTreeGrower()
                         : new com.kingodogo.buildscape.worldgen.PaleOakTreeGrower();
                 return new net.minecraft.world.level.block.SaplingBlock(grower, props) {};
             }
@@ -1071,6 +1081,18 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isAshenKingPillar()) {
             return new AshenKingPillarBlock(props) {
                 @Override
+                public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
+                        LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (state.getValue(WATERLOGGED)) {
+                        level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                    }
+                    Direction facing = state.getValue(FACING);
+                    if (direction == facing.getClockWise() || direction == facing.getCounterClockWise()) {
+                        return state.setValue(PART, com.kingodogo.buildscape.block.PillarPart.SINGLE);
+                    }
+                    return state;
+                }
+                @Override
                 public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, hand, hit);
                 }
@@ -1103,6 +1125,8 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isPillar()) {
             return new PillarBlock(props) {
+                @Override
+                public boolean propagatesSkylightDown(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos) { return true; }
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
                     if (state.getValue(PillarBlock.WATERLOGGED)) {
@@ -1323,6 +1347,8 @@ public class BlockFactory implements IBlockFactory {
                 public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, hand, hit);
                 }
+                @Override
+                public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) { return getAnalogOutput(state, level, pos); }
             };
         } else if (def.isCascadeNoMist()) {
             return new CascadeBlockNoMist(props) {
@@ -1607,7 +1633,7 @@ public class BlockFactory implements IBlockFactory {
                     if (state.getValue(WATERLOGGED)) {
                         level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
                     }
-                    return GlowLightsBlock.updateGlowLightShape(state, direction, neighborState, level, neighborPos);
+                    return MulticolorGlowLightsBlock.updateMulticolorShape(state, direction, neighborState, level, neighborPos);
                 }
                 @Override
                 public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
@@ -2194,6 +2220,17 @@ public class BlockFactory implements IBlockFactory {
             return new WallpaperFlatBlock(props) {};
         } else if (def.isPointedIcicle()) {
             return new PointedIcicleBlock(props) {
+                @Override
+                public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+                    InteractionResult result = onInteract(state, level, pos, player, hand,
+                            player.getItemInHand(hand).getItem() instanceof net.minecraft.world.item.PickaxeItem);
+                    return result != InteractionResult.PASS ? result : super.use(state, level, pos, player, hand, hit);
+                }
+                @Override
+                public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+                    onIcicleRemove(state, level, pos, newState, isMoving);
+                    super.onRemove(state, level, pos, newState, isMoving);
+                }
                 @Override
                 public void tick(BlockState state, ServerLevel level, BlockPos pos, java.util.Random random) {
                     onIcicleTick(state, level, pos);

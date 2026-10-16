@@ -28,6 +28,7 @@
     "ItemMixin",
     "ItemInstanceMixin",
     "LavaFluidMixin",
+    "LightningBoltV26xMixin",
     "LeavesBlockMixin",
     "LevelMixin",
     "LevelParticleV26xMixin",

@@ -3,10 +3,10 @@
 	"credit": "Made for Buildscape",
 	"parent": "block/block",
 	"textures": {
-		"particle": "",
-		"turn": "",
-		"back": "",
-		"cross": ""
+		"particle": "#turn",
+		"turn": "#turn",
+		"back": "#back",
+		"cross": "#cross"
 	},
 	"elements": [
 		{

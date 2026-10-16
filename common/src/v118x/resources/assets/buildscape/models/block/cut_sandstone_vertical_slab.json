@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/sandstone_top",
+    "top": "minecraft:block/sandstone_top",
+    "side": "minecraft:block/cut_sandstone",
+    "particle": "#side"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "values": [
+    "buildscape:mangrove_log",
+    "buildscape:mangrove_wood",
+    "buildscape:stripped_mangrove_log",
+    "buildscape:stripped_mangrove_wood",
+    "buildscape:mangrove_planks",
+    "buildscape:mangrove_slab",
+    "buildscape:mangrove_stairs",
+    "buildscape:mangrove_fence",
+    "buildscape:mangrove_fence_gate",
+    "buildscape:mangrove_button",
+    "buildscape:mangrove_pressure_plate",
+    "buildscape:mangrove_door",
+    "buildscape:mangrove_trapdoor",
+    "buildscape:mangrove_sign",
+    "buildscape:mangrove_wall_sign",
+    "buildscape:mangrove_roots",
+    "buildscape:muddy_mangrove_roots"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "buildscape:block/pearlescent_froglight"
+    },
+    "axis=z": {
+      "model": "buildscape:block/pearlescent_froglight_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "buildscape:block/pearlescent_froglight_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

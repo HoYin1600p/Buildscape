@@ -56,33 +56,30 @@ subprojects {
     }
 }
 
-def loaderProjects = []
-if (findProject(':fabric:26.2') != null) loaderProjects.add(project(':fabric:26.2'))
-if (findProject(':neoforge:26.2') != null) loaderProjects.add(project(':neoforge:26.2'))
-if (findProject(':forge:26.2') != null) loaderProjects.add(project(':forge:26.2'))
+def loaderProjects = subprojects.findAll { it.path != ':common' && it.childProjects.isEmpty() }
 def collectModJars = tasks.register('collectModJars', Copy) {
     group = 'build'
-    description = 'Collects the enabled 26.2 loader mod jars into build/libs'
+    description = 'Collects the enabled loader mod jars into build/libs'
     into layout.buildDirectory.dir('libs')
     loaderProjects.each { loader ->
-        from loader.tasks.named('jar')
+        dependsOn loader.tasks.named('assemble')
+        from(loader.layout.buildDirectory.dir('libs')) {
+            include '*.jar'
+            exclude '*-dev.jar', '*-sources.jar'
+        }
     }
 }
 
 tasks.named('assemble') { dependsOn collectModJars }
 tasks.named('build') {
     if (findProject(':common') != null) dependsOn ':common:build'
-    if (findProject(':fabric:26.2') != null) dependsOn ':fabric:26.2:build'
-    if (findProject(':neoforge:26.2') != null) dependsOn ':neoforge:26.2:build'
-    if (findProject(':forge:26.2') != null) dependsOn ':forge:26.2:build'
-    if (findProject(':forge:1.18.2') != null) dependsOn ':forge:1.18.2:build'
-    if (findProject(':neoforge:1.21.1') != null) dependsOn ':neoforge:1.21.1:build'
-    if (findProject(':fabric:1.21.1') != null) dependsOn ':fabric:1.21.1:build'
+    loaderProjects.each { loader ->
+        dependsOn loader.tasks.named('build')
+    }
 }
 
 if (findProject(':forge:1.21.1') != null) {
     project(':common').tasks.matching { it.name == 'check' }.configureEach {
         dependsOn ':common:compileV121xJava', ':common:v121xTest'
     }
-    tasks.named('build') { dependsOn ':forge:1.21.1:build' }
 }

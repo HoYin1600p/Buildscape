@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "half=bottom": {
+      "model": "buildscape:block/pink_cushion"
+    },
+    "half=top": {
+      "model": "buildscape:block/pink_cushion",
+      "x": 180
+    }
+  }
+}

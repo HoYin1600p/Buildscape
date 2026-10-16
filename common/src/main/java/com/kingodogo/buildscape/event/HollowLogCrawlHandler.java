@@ -76,21 +76,14 @@ public final class HollowLogCrawlHandler {
         }
     }
     public static void clearCrawling(Player player) {
-        if (CUSTOM_CRAWLING_PLAYERS.remove(player.getUUID())) {
-            player.refreshDimensions();
-        }
-        clearForcedPose(player);
+        boolean ours = CUSTOM_CRAWLING_PLAYERS.remove(player.getUUID());
+        ours |= FORCED_PLAYERS.remove(player.getUUID());
+        if (!ours) return;
+        player.refreshDimensions();
     }
 
     private static void clearForcedPose(Player player) {
-        FORCED_PLAYERS.remove(player.getUUID());
-        if (player.getPose() == Pose.SWIMMING && !player.isInWater() && !player.isInLava()) {
-            if (player.isShiftKeyDown()) {
-                player.setPose(Pose.CROUCHING);
-            } else {
-                player.setPose(Pose.STANDING);
-            }
-        }
+        clearCrawling(player);
     }
     public static void onPlayerLoggedOut(UUID id) {
         if (id != null) {

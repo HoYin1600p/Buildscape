@@ -273,7 +273,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public String getClipboardText() {
-        return net.minecraft.client.Minecraft.getInstance().keyboardHandler.getClipboard();
+        return ClientAccess.getClipboardText();
     }
 
     @Override

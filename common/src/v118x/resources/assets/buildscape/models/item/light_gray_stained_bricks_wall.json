@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "buildscape:block/light_gray_stained_bricks"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "block/button_inventory",
+  "textures": {
+    "texture": "buildscape:block/ashpen_orange_planks"
+  }
+}

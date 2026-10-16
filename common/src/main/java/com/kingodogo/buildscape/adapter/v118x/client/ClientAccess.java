@@ -18,6 +18,14 @@ public final class ClientAccess {
         return Minecraft.getInstance().player;
     }
 
+    public static String getClipboardText() {
+        return Minecraft.getInstance().keyboardHandler.getClipboard();
+    }
+
+    public static boolean hasControlDown() {
+        return net.minecraft.client.gui.screens.Screen.hasControlDown();
+    }
+
     public static void handleOnClientThread(com.kingodogo.buildscape.network.CommonPacket packet, Player player) {
         Minecraft mc = Minecraft.getInstance();
         mc.execute(() -> packet.handle(player != null ? player : mc.player));

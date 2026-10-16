@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:frost_rose"
+    },
+    "title": {
+      "translate": "advancements.buildscape.let_it_snow.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.let_it_snow.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

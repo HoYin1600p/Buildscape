@@ -116,7 +116,7 @@ class ConversionTests(unittest.TestCase):
                 self.assertEqual(validator.errors, [])
 
     def test_haze_set_nbt_splits_components_and_custom_data_with_conditions(self):
-        path = c.REPO / "ref/forge/1.18.2/src/main/resources/data/buildscape/loot_tables/blocks/red_haze_bush.json"
+        path = c.REPO / "common/src/v118x/resources/data/buildscape/loot_tables/blocks/red_haze_bush.json"
         original = c.load(path)
         before = json.dumps(original)
         functions = c.loot(original)["pools"][0]["entries"][0]["functions"]
@@ -159,7 +159,7 @@ class ConversionTests(unittest.TestCase):
                 c.loot({"functions": [{"function": "minecraft:set_nbt", "tag": tag}]})
 
     def test_every_source_loot_table_converts_to_known_121x_functions(self):
-        root = c.REPO / "ref/forge/1.18.2/src/main/resources/data"
+        root = c.REPO / "common/src/v118x/resources/data"
         tables = list(root.rglob("loot_tables/**/*.json"))
         self.assertTrue(tables)
         for path in tables:

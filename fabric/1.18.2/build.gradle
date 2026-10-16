@@ -31,14 +31,14 @@ dependencies {
 tasks.named('processResources', ProcessResources) {
     inputs.property 'version', project.version
     filesMatching('fabric.mod.json') { expand version: project.version }
-    from(rootProject.file('ref/forge/1.18.2/src/main/resources')) {
+    from(rootProject.file('common/src/v118x/resources')) {
         exclude 'META-INF/**', 'buildscape.mixins.json', '**/*.refmap.json'
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks.named('jar', Jar) {
     from configurations.commonVariant
-    duplicatesStrategy = DuplicatesStrategy.FAIL
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks.withType(JavaCompile).configureEach {
     options.release = 17

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "axis=x": {"model": "buildscape:block/caution_pink", "x": 90, "y": 90},
+    "axis=y": {"model": "buildscape:block/caution_pink"},
+    "axis=z": {"model": "buildscape:block/caution_pink", "x": 90}
+  }
+}

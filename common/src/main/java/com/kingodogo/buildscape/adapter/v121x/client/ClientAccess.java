@@ -77,6 +77,10 @@ public final class ClientAccess {
         return net.minecraft.client.gui.screens.Screen.hasControlDown();
     }
 
+    public static String getClipboardText() {
+        return net.minecraft.client.Minecraft.getInstance().keyboardHandler.getClipboard();
+    }
+
     public static boolean widgetMouseClicked(net.minecraft.client.gui.components.AbstractWidget widget, double mouseX, double mouseY, int button) {
         return widget != null && widget.mouseClicked(mouseX, mouseY, button);
     }

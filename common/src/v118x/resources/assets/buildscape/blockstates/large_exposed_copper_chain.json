@@ -1,0 +1,16 @@
+{
+    "variants":  {
+                     "axis=y":  {
+                                    "model":  "buildscape:block/large_exposed_copper_chain"
+                                },
+                     "axis=x":  {
+                                    "y":  90,
+                                    "model":  "buildscape:block/large_exposed_copper_chain_horizontal",
+                                    "x":  90
+                                },
+                     "axis=z":  {
+                                    "model":  "buildscape:block/large_exposed_copper_chain_horizontal",
+                                    "x":  90
+                                }
+                 }
+}

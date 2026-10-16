@@ -22,7 +22,8 @@ sourceSets {
             exclude 'com/kingodogo/buildscape/adapter/v26x/**'
             exclude 'com/kingodogo/buildscape/adapter/v263/**'
         }
-        resources.srcDirs = ['src/main/resources', 'src/v118x/resources']
+        // This cluster supplies a complete 1.18.2 resource tree.
+        resources.srcDirs = ['src/v118x/resources']
     }
 
     v121x {
@@ -58,7 +59,7 @@ sourceSets {
         // Use that task's final classpath, including its vanilla libraries.
         def minecraftClasspath = files(provider { tasks.named('compileV118xJava', JavaCompile).get().classpath })
         compileClasspath += sourceSets.v118x.output + minecraftClasspath
-        runtimeClasspath = files(rootProject.file('ref/forge/1.18.2/src/main/resources')) +
+        runtimeClasspath = files(rootProject.file('common/src/v118x/resources')) +
                 runtimeClasspath + sourceSets.v118x.output + sourceSets.v118x.runtimeClasspath + minecraftClasspath
     }
 
@@ -275,6 +276,10 @@ def v121xClusterResources = tasks.register('v121xClusterResources', Sync) {
     into v121xClusterResourcesDir
 }
 
+tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 artifacts {
     add('v118xElements', tasks.named('compileV118xJava').flatMap { it.destinationDirectory })
     add('v118xElements', v118xClusterResourcesDir) {
@@ -345,7 +350,7 @@ v118xStandaloneTests.each { taskName, testClass ->
         mainClass = testClass
         javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
         workingDir = layout.buildDirectory.get().asFile
-        systemProperty 'buildscape.mainResources', rootProject.file('ref/forge/1.18.2/src/main/resources').absolutePath
+        systemProperty 'buildscape.mainResources', rootProject.file('common/src/v118x/resources').absolutePath
         systemProperty 'java.io.tmpdir', layout.buildDirectory.dir('tmp/v118xTests').get().asFile.absolutePath
         doFirst {
             workingDir.mkdirs()
@@ -380,7 +385,7 @@ tasks.named('check') {
     if (v118xEnabled) dependsOn v118xTestTask
 }
 
-def v118xRecipePack = rootProject.file('ref/forge/1.18.2/src/main/resources/data/buildscape/recipes_pack')
+def v118xRecipePack = rootProject.file('common/src/v118x/resources/data/buildscape/recipes_pack')
 def v118xRecipeToolClasspath = sourceSets.v118x.output +
         files(provider { tasks.named('compileV118xJava', JavaCompile).get().classpath })
 def v118xVerifyBundledRecipeCache = tasks.register('v118xVerifyBundledRecipeCache', JavaExec) {

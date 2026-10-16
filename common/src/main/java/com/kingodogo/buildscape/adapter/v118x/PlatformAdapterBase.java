@@ -287,12 +287,12 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public boolean hasControlDown() {
-        return net.minecraft.client.gui.screens.Screen.hasControlDown();
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientAccess.hasControlDown();
     }
 
     @Override
     public String getClipboardText() {
-        return net.minecraft.client.Minecraft.getInstance().keyboardHandler.getClipboard();
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientAccess.getClipboardText();
     }
 
     @Override

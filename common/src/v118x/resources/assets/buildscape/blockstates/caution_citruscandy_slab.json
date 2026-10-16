@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=bottom": { "model": "buildscape:block/caution_citruscandy_slab" },
+    "type=double": { "model": "buildscape:block/caution_citruscandy" },
+    "type=top": { "model": "buildscape:block/caution_citruscandy_slab_top" }
+  }
+}

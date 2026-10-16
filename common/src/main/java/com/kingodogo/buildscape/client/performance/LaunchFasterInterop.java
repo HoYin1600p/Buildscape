@@ -60,11 +60,11 @@ public final class LaunchFasterInterop {
     }
 
     private static boolean classExists(String className) {
-        try {
-            Class.forName(className, false, LaunchFasterInterop.class.getClassLoader());
-            return true;
-        } catch (ClassNotFoundException exception) {
-            return false;
+        ClassLoader loader = LaunchFasterInterop.class.getClassLoader();
+        if (loader == null) {
+            loader = Thread.currentThread().getContextClassLoader();
         }
+        // Loading even without initialization can prevent other mods' mixins from applying.
+        return loader != null && loader.getResource(className.replace('.', '/') + ".class") != null;
     }
 }

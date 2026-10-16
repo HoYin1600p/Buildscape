@@ -86,11 +86,11 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
     }
 
     private static boolean classExists(String className) {
-        try {
-            Class.forName(className, false, BuildscapeMixinPlugin.class.getClassLoader());
-            return true;
-        } catch (ClassNotFoundException exception) {
-            return false;
+        ClassLoader loader = BuildscapeMixinPlugin.class.getClassLoader();
+        if (loader == null) {
+            loader = Thread.currentThread().getContextClassLoader();
         }
+        // Loading even without initialization can prevent other mods' mixins from applying.
+        return loader != null && loader.getResource(className.replace('.', '/') + ".class") != null;
     }
 }

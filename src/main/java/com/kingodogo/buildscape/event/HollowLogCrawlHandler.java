@@ -58,7 +58,6 @@ public class HollowLogCrawlHandler {
         if (player == null || player.isSpectator()) return;
 
         Level level = player.level;
-        if (level == null) return;
 
         if (player.isPassenger() || player.isSleeping() || player.isFallFlying()) {
             clearCrawling(player);
@@ -70,11 +69,10 @@ public class HollowLogCrawlHandler {
             return;
         }
 
-        boolean insideLog = isPlayerInsideHollowBlock(player, level);
-        boolean enteringLog = isPlayerEnteringHollowBlock(player, level);
+        boolean insideOrEntering = isPlayerAtHorizontalLogOpening(player, level);
 
         if (USE_FORCED_SWIM_POSE) {
-            if (insideLog || enteringLog) {
+            if (insideOrEntering) {
                 player.setPose(Pose.SWIMMING);
                 player.setForcedPose(Pose.SWIMMING);
                 FORCED_PLAYERS.add(player.getUUID());
@@ -82,7 +80,7 @@ public class HollowLogCrawlHandler {
                 clearForcedPose(player);
             }
         } else {
-            if (insideLog || enteringLog) {
+            if (insideOrEntering) {
                 if (!CUSTOM_CRAWLING_PLAYERS.contains(player.getUUID())) {
                     CUSTOM_CRAWLING_PLAYERS.add(player.getUUID());
                     player.refreshDimensions();
@@ -120,7 +118,10 @@ public class HollowLogCrawlHandler {
             if (player.isShiftKeyDown()) {
                 player.setPose(Pose.CROUCHING);
             } else {
-                player.setPose(Pose.STANDING);
+                AABB standingBox = player.getDimensions(Pose.STANDING).makeBoundingBox(player.position());
+                if (player.level.noCollision(player, standingBox.deflate(1.0E-7D))) {
+                    player.setPose(Pose.STANDING);
+                }
             }
         }
     }

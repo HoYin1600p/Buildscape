@@ -28,6 +28,13 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
+def java17Launcher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(17)
+}
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = java17Launcher
+}
+
 minecraft {
 
 

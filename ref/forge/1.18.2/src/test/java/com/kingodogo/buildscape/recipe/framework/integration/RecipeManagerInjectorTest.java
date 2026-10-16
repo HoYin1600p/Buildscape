@@ -29,7 +29,28 @@ public final class RecipeManagerInjectorTest {
                 "Buildscape recipe did not override the matching ID");
         require(merged.get(addedBuildscape.getId()) == addedBuildscape, "New Buildscape recipe was not added");
 
-        System.out.println("Recipe manager injection: 4 checks passed.");
+        PlainRecipe vanillaPlain = new PlainRecipe("crafting", "minecraft:shared");
+        PlainRecipe originalPlain = new PlainRecipe("crafting", "buildscape:shared");
+        PlainRecipe replacementPlain = new PlainRecipe("crafting", "buildscape:shared");
+        PlainRecipe addedPlain = new PlainRecipe("crafting", "buildscape:added");
+        PlainRecipe smelting = new PlainRecipe("smelting", "minecraft:smelting");
+        RecipeManagerInjector.Indexes<String, String, PlainRecipe> indexes = RecipeManagerInjector.mergeIndexesGeneric(
+                Map.of(
+                        "crafting", Map.of(vanillaPlain.id(), vanillaPlain, originalPlain.id(), originalPlain),
+                        "smelting", Map.of(smelting.id(), smelting)),
+                Map.of(vanillaPlain.id(), vanillaPlain, originalPlain.id(), originalPlain, smelting.id(), smelting),
+                List.of(replacementPlain, addedPlain), PlainRecipe::type, PlainRecipe::id);
+
+        require(indexes.byType().get("smelting").get(smelting.id()) == smelting,
+                "Unrelated recipe type was not preserved");
+        require(indexes.byType().get("crafting").get(replacementPlain.id()) == replacementPlain,
+                "Typed recipe index did not replace the matching ID");
+        require(indexes.byName().get(replacementPlain.id()) == replacementPlain,
+                "Named recipe index did not replace the matching ID");
+        require(indexes.byName().get(addedPlain.id()) == addedPlain,
+                "Named recipe index did not include the new recipe");
+
+        System.out.println("Recipe manager injection: 8 checks passed.");
     }
 
     private static void require(boolean condition, String message) {
@@ -38,9 +59,12 @@ public final class RecipeManagerInjectorTest {
         }
     }
 
-    private record StubRecipe(ResourceLocation id) implements Recipe<Container> {
+    private record PlainRecipe(String type, String id) {
+    }
+
+    private record StubRecipe(ResourceLocation id, RecipeType<?> type) implements Recipe<Container> {
         private StubRecipe(String id) {
-            this(new ResourceLocation(id));
+            this(new ResourceLocation(id), null);
         }
 
         @Override
@@ -75,7 +99,7 @@ public final class RecipeManagerInjectorTest {
 
         @Override
         public RecipeType<?> getType() {
-            return RecipeType.CRAFTING;
+            return type;
         }
     }
 }

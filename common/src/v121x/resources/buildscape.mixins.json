@@ -39,6 +39,7 @@
     "LivingEntityMixin",
     "MinecraftServerMixin",
     "PoiTypeAccessor",
+    "RecipeManagerAccessor",
     "PoiTypesAccessor",
     "PoiTypesV121xMixin",
     "ShulkerBoxBlockEntityV121xMixin",

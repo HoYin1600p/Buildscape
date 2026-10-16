@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client;
 import com.kingodogo.buildscape.block.LeafHedgeBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
 import com.kingodogo.buildscape.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -153,6 +154,7 @@ public class ClientEvents {
 
         TreeChopHandler.clientTick();
         SmokeVentParticleHandler.clientTick();
+        ItemFrameParticleHandler.clientTick(mc.level, mc.player, mc.level.getGameTime());
         BiomeBrushClientHandler.tickClient(mc.player);
         ZoomHandler.tick();
 

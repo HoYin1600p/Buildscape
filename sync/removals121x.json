@@ -1,0 +1,790 @@
+{
+    "schema_version":  1,
+    "target":  "mc1.21.1",
+    "reason":  "Only content with a vanilla equivalent available in Minecraft 1.21.1 is removed. Later additions and custom variants remain.",
+    "removed_ids":  [
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:bamboo_block",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_block"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_button",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_button"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_chest_raft",
+                            "kind":  "item",
+                            "vanilla_equivalent":  "minecraft:bamboo_chest_raft"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:bamboo_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_door"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_fence",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_fence"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_fence_gate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_fence_gate"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_hanging_sign",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_hanging_sign"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_mosaic",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_mosaic"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_mosaic_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_mosaic_slab"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_mosaic_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_mosaic_stairs"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_planks",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_planks"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_pressure_plate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_pressure_plate"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_raft",
+                            "kind":  "item",
+                            "vanilla_equivalent":  "minecraft:bamboo_raft"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:bamboo_sign",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_sign"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_slab"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_stairs"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:bamboo_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:bamboo_trapdoor"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:bamboo_wall_hanging_sign",
+                            "kind":  "block",
+                            "vanilla_equivalent":  "minecraft:bamboo_wall_hanging_sign"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:bamboo_wall_sign",
+                            "kind":  "block",
+                            "vanilla_equivalent":  "minecraft:bamboo_wall_sign"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:cherry_boat",
+                            "kind":  "item",
+                            "vanilla_equivalent":  "minecraft:cherry_boat"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:cherry_button",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_button"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:cherry_chest_boat",
+                            "kind":  "item",
+                            "vanilla_equivalent":  "minecraft:cherry_chest_boat"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:cherry_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_door"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:cherry_fence",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_fence"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:cherry_fence_gate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_fence_gate"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:cherry_hanging_sign",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_hanging_sign"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:cherry_leaves",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_leaves"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:cherry_log",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_log"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:cherry_planks",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_planks"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:cherry_pressure_plate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_pressure_plate"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:cherry_sapling",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_sapling"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:cherry_sign",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_sign"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:cherry_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_slab"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:cherry_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_stairs"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:cherry_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_trapdoor"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:cherry_wall_hanging_sign",
+                            "kind":  "block",
+                            "vanilla_equivalent":  "minecraft:cherry_wall_hanging_sign"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:cherry_wall_sign",
+                            "kind":  "block",
+                            "vanilla_equivalent":  "minecraft:cherry_wall_sign"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:cherry_wood",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:cherry_wood"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:chiseled_copper",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:chiseled_copper"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:chiseled_tuff",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:chiseled_tuff"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:chiseled_tuff_bricks",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:chiseled_tuff_bricks"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:copper_bulb",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:copper_bulb"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:copper_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:copper_door"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:copper_grate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:copper_grate"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:copper_rod",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:lightning_rod"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:copper_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:copper_trapdoor"
+                        },
+                        {
+                            "request":  "4",
+                            "id":  "buildscape:decorated_pot",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:decorated_pot"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:exposed_chiseled_copper",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:exposed_chiseled_copper"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:exposed_copper_bulb",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:exposed_copper_bulb"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:exposed_copper_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:exposed_copper_door"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:exposed_copper_grate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:exposed_copper_grate"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:exposed_copper_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:exposed_copper_trapdoor"
+                        },
+                        {
+                            "request":  "mangrove-boat",
+                            "id":  "buildscape:mangrove_boat",
+                            "kind":  "item",
+                            "vanilla_equivalent":  "minecraft:mangrove_boat"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_button",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_button"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:mangrove_chest_boat",
+                            "kind":  "item",
+                            "vanilla_equivalent":  "minecraft:mangrove_chest_boat"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_door"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_fence",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_fence"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_fence_gate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_fence_gate"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:mangrove_hanging_sign",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_hanging_sign"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:mangrove_leaves",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_leaves"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:mangrove_log",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_log"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:mangrove_planks",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_planks"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_pressure_plate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_pressure_plate"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:mangrove_propagule",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_propagule"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:mangrove_roots",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_roots"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_sign",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_sign"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_slab"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_stairs"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_trapdoor"
+                        },
+                        {
+                            "request":  "v121x",
+                            "id":  "buildscape:mangrove_wall_hanging_sign",
+                            "kind":  "block",
+                            "vanilla_equivalent":  "minecraft:mangrove_wall_hanging_sign"
+                        },
+                        {
+                            "request":  "5",
+                            "id":  "buildscape:mangrove_wall_sign",
+                            "kind":  "block",
+                            "vanilla_equivalent":  "minecraft:mangrove_wall_sign"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:mangrove_wood",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:mangrove_wood"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:muddy_mangrove_roots",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:muddy_mangrove_roots"
+                        },
+                        {
+                            "request":  "3",
+                            "id":  "buildscape:ochre_froglight",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:ochre_froglight"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:oxidized_chiseled_copper",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:oxidized_chiseled_copper"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:oxidized_copper_bulb",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:oxidized_copper_bulb"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:oxidized_copper_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:oxidized_copper_door"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:oxidized_copper_grate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:oxidized_copper_grate"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:oxidized_copper_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:oxidized_copper_trapdoor"
+                        },
+                        {
+                            "request":  "3",
+                            "id":  "buildscape:pearlescent_froglight",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:pearlescent_froglight"
+                        },
+                        {
+                            "request":  "6",
+                            "id":  "buildscape:pink_petal",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:pink_petals"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:polished_tuff",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:polished_tuff"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:polished_tuff_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:polished_tuff_slab"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:polished_tuff_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:polished_tuff_stairs"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:polished_tuff_wall",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:polished_tuff_wall"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:potted_cherry_sapling",
+                            "kind":  "block",
+                            "vanilla_equivalent":  "minecraft:potted_cherry_sapling"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:potted_mangrove_propagule",
+                            "kind":  "block",
+                            "vanilla_equivalent":  "minecraft:potted_mangrove_propagule"
+                        },
+                        {
+                            "request":  "8",
+                            "id":  "buildscape:sculk",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:sculk"
+                        },
+                        {
+                            "request":  "8",
+                            "id":  "buildscape:sculk_catalyst",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:sculk_catalyst"
+                        },
+                        {
+                            "request":  "8",
+                            "id":  "buildscape:sculk_sensor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:sculk_sensor"
+                        },
+                        {
+                            "request":  "8",
+                            "id":  "buildscape:sculk_shrieker",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:sculk_shrieker"
+                        },
+                        {
+                            "request":  "8",
+                            "id":  "buildscape:sculk_vein",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:sculk_vein"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:stripped_bamboo_block",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:stripped_bamboo_block"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:stripped_cherry_log",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:stripped_cherry_log"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:stripped_cherry_wood",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:stripped_cherry_wood"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:stripped_mangrove_log",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:stripped_mangrove_log"
+                        },
+                        {
+                            "request":  "5-base",
+                            "id":  "buildscape:stripped_mangrove_wood",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:stripped_mangrove_wood"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:tuff_brick_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:tuff_brick_slab"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:tuff_brick_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:tuff_brick_stairs"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:tuff_brick_wall",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:tuff_brick_wall"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:tuff_bricks",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:tuff_bricks"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:tuff_slab",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:tuff_slab"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:tuff_stairs",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:tuff_stairs"
+                        },
+                        {
+                            "request":  "7",
+                            "id":  "buildscape:tuff_wall",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:tuff_wall"
+                        },
+                        {
+                            "request":  "3",
+                            "id":  "buildscape:verdant_froglight",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:verdant_froglight"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_chiseled_copper",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_chiseled_copper"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_copper_bulb",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_copper_bulb"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_copper_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_copper_door"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_copper_grate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_copper_grate"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_copper_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_copper_trapdoor"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_exposed_chiseled_copper",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_exposed_chiseled_copper"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_exposed_copper_bulb",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_exposed_copper_bulb"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_exposed_copper_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_exposed_copper_door"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_exposed_copper_grate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_exposed_copper_grate"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_exposed_copper_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_exposed_copper_trapdoor"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_oxidized_chiseled_copper",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_oxidized_chiseled_copper"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_oxidized_copper_bulb",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_oxidized_copper_bulb"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_oxidized_copper_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_oxidized_copper_door"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_oxidized_copper_grate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_oxidized_copper_grate"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_oxidized_copper_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_oxidized_copper_trapdoor"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_weathered_chiseled_copper",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_weathered_chiseled_copper"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_weathered_copper_bulb",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_weathered_copper_bulb"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_weathered_copper_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_weathered_copper_door"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_weathered_copper_grate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_weathered_copper_grate"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:waxed_weathered_copper_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:waxed_weathered_copper_trapdoor"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:weathered_chiseled_copper",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:weathered_chiseled_copper"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:weathered_copper_bulb",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:weathered_copper_bulb"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:weathered_copper_door",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:weathered_copper_door"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:weathered_copper_grate",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:weathered_copper_grate"
+                        },
+                        {
+                            "request":  "1",
+                            "id":  "buildscape:weathered_copper_trapdoor",
+                            "kind":  "block+item",
+                            "vanilla_equivalent":  "minecraft:weathered_copper_trapdoor"
+                        }
+                    ],
+    "excluded_target_paths":  [
+
+                              ]
+}

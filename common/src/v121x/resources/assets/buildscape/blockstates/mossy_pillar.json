@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "part=single": {
+      "model": "buildscape:block/mossy_pillar_single"
+    },
+    "part=bottom": {
+      "model": "buildscape:block/mossy_pillar_bottom"
+    },
+    "part=middle": {
+      "model": "buildscape:block/mossy_pillar_middle"
+    },
+    "part=top": {
+      "model": "buildscape:block/mossy_pillar_top"
+    }
+  }
+}

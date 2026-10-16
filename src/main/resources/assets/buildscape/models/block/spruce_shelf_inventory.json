@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/template_shelf_inventory",
-  "textures": {
-    "all": "buildscape:block/spruce_shelf",
-    "particle": "minecraft:block/stripped_spruce_log"
-  }
-}

@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/cyan_stained_brick_tiles",
+    "top": "buildscape:block/cyan_stained_brick_tiles",
+    "side": "buildscape:block/cyan_stained_brick_tiles",
+    "particle": "#side"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "minecraft:block/sculk_catalyst_top",
+    "side": "minecraft:block/sculk_catalyst_side"
+  }
+}

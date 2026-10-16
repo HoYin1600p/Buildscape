@@ -1,0 +1,10 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/glass",
+    "top": "minecraft:block/glass",
+    "side": "minecraft:block/glass",
+    "particle": "#side"
+  },
+  "render_type": "minecraft:translucent"
+}

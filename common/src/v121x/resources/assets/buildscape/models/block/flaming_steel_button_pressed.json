@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_pressed",
+  "textures": {
+    "texture": "buildscape:block/flaming_steel_block"
+  }
+}

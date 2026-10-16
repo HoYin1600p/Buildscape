@@ -1,0 +1,10 @@
+{
+  "parent": "buildscape:block/planter_no_overlay_template",
+  "textures": {
+    "inside_top": "buildscape:block/snowy_grass_block_top",
+    "inside_side": "buildscape:block/snowy_grass_block_snow",
+    "particle": "minecraft:block/dirt",
+    "inside": "minecraft:block/composter_bottom",
+    "inside_bottom": "minecraft:block/dirt"
+  }
+}

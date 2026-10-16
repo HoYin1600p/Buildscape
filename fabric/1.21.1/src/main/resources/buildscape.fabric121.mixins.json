@@ -1,0 +1,38 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.kingodogo.buildscape.mixin.fabric",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "RegistryStateAccessor",
+    "LivingEntityLadderMixin",
+    "EntityDataMixin",
+    "BlockEntityDataMixin",
+    "RecipeManagerMixin",
+    "BeaconBlockEntityColorMixin",
+    "AdvancementCompletionMixin",
+    "AnvilUpdateMixin",
+    "BlockPlacementMixin",
+    "DoublePlantPlacementMixin",
+    "CraftingMixin",
+    "CraftingResultPreparationMixin",
+    "ItemUseFinishMixin",
+    "PlayerDimensionMixin",
+    "PlayerSpawnMixin",
+    "EndermanGriefingMixin",
+    "EndermanLeaveBlockGriefingMixin",
+    "ExplosionGriefingMixin"
+  ],
+  "client": [
+    "client.ScreenWidgetAccess",
+    "client.BiomeClimateAccess",
+    "client.BoatRendererAccess",
+    "client.CameraInputMixin",
+    "client.KeyboardInputMixin",
+    "client.MouseInputMixin",
+    "client.ClientWorldInputMixin",
+    "client.GameRendererMixin",
+    "client.FogRendererMixin"
+  ],
+  "injectors": {"defaultRequire": 1}
+}

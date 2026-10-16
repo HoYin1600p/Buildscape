@@ -82,6 +82,8 @@ public interface IPlatformAdapter {
     }
     /** Loader config directory; defaults to the game-relative "config" folder. */
     default java.nio.file.Path getConfigDir() { return java.nio.file.Path.of("config"); }
+    /** Game directory supplied by the loader, independent of the process working directory. */
+    java.nio.file.Path getGameDir();
     String getPlatformName();
     boolean isModLoaded(String modId);
     boolean isClient();

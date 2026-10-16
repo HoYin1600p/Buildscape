@@ -302,7 +302,7 @@ public final class ModCommonEvents {
             }
         }
 
-        PacketFactory.sendToPlayer(player, new SyncConfigPacket(PillarParticleConfig.get(), player));
+        PacketFactory.sendToPlayer(player, new SyncConfigPacket(PillarParticleConfig.getServerConfig(), player));
 
         if (server != null && server.isRunning()) {
             PacketFactory.sendToPlayer(player, new SyncGameRulesPacket(

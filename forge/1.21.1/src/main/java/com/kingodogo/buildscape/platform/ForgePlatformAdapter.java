@@ -15,6 +15,7 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
     @Override public String getPlatformName() { return "Forge 1.21.1"; }
     @Override public boolean isModLoaded(String id) { return net.minecraftforge.fml.ModList.get().isLoaded(id); }
     @Override public boolean isClient() { return net.minecraftforge.fml.loading.FMLEnvironment.dist.isClient(); }
+    @Override public java.nio.file.Path getGameDir() { return net.minecraftforge.fml.loading.FMLPaths.GAMEDIR.get(); }
     @Override public java.nio.file.Path getConfigDir() { return net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get(); }
     @Override public <V> void register(Registry<V> registry, CommonId id, V value) {
         ((ForgeRegistryAdapter) Services.REGISTRY).enqueue(registry, id, value);

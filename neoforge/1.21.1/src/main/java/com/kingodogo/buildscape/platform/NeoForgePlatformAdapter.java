@@ -15,6 +15,7 @@ public final class NeoForgePlatformAdapter extends PlatformAdapterBase implement
     @Override public String getPlatformName() { return "NeoForge 1.21.1"; }
     @Override public boolean isModLoaded(String id) { return net.neoforged.fml.ModList.get().isLoaded(id); }
     @Override public boolean isClient() { return net.neoforged.fml.loading.FMLEnvironment.dist.isClient(); }
+    @Override public java.nio.file.Path getGameDir() { return net.neoforged.fml.loading.FMLPaths.GAMEDIR.get(); }
     @Override public java.nio.file.Path getConfigDir() { return net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get(); }
     @Override public <V> void register(Registry<V> registry, CommonId id, V value) {
         ((NeoForgeRegistryAdapter) Services.REGISTRY).enqueue(registry, id, value);

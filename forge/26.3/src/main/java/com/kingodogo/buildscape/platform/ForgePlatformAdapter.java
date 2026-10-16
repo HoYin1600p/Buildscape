@@ -21,6 +21,10 @@ public class ForgePlatformAdapter extends PlatformAdapterBase {
     }
 
     @Override
+    public java.nio.file.Path getGameDir() {
+        return net.minecraftforge.fml.loading.FMLPaths.GAMEDIR.get();
+    }
+    @Override
     public java.nio.file.Path getConfigDir() {
         return net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get();
     }

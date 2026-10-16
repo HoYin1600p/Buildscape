@@ -73,6 +73,7 @@ public class PillarParticleConfig {
     private static final String ITEMS_FILE_NAME = "pillar-items.json";
 
     private static PillarParticleConfig INSTANCE;
+    private static volatile PillarParticleConfig SERVER_CONFIG;
     private static volatile PillarParticleConfig SNAPSHOT = null;
     private static volatile int CLIENT_PERMISSION_LEVEL = -1;
 
@@ -85,8 +86,22 @@ public class PillarParticleConfig {
     }
 
     public static void clearServerConfig() {
+        SERVER_CONFIG = null;
         SNAPSHOT = null;
+        CLIENT_PERMISSION_LEVEL = -1;
+        notifyCallbacks(false);
     }
+
+    public static void setServerConfig(PillarParticleConfig config) {
+        config.remote = true;
+        SERVER_CONFIG = config;
+        notifyCallbacks(true);
+    }
+
+    private transient boolean remote;
+    private transient boolean corruptedProperties;
+    private transient boolean corruptedItems;
+    private final transient java.nio.file.Path configDirectory;
 
     private long lastLoadedProperties = 0L;
     private long lastFileSizeProperties = 0L;
@@ -118,6 +133,11 @@ public class PillarParticleConfig {
     public EditPermissionMode edit_permission_mode = EditPermissionMode.STRICT;
 
     public PillarParticleConfig() {
+        this(null);
+    }
+
+    PillarParticleConfig(java.nio.file.Path configDirectory) {
+        this.configDirectory = configDirectory;
         this.particle_color.add("#FFB81C");
         this.particle_color.add("#FFFFFF");
         this.particle_color.add("#FFFF00");
@@ -145,13 +165,16 @@ public class PillarParticleConfig {
         MATCH_CACHE.clear();
     }
     public static PillarParticleConfig get() {
-        return getLocalConfig();
+        PillarParticleConfig server = SERVER_CONFIG;
+        return server != null ? server : getLocalConfig();
     }
 
     public static PillarParticleConfig getServerConfig() {
-        return get();
+        return getLocalConfig();
     }
     public static PillarParticleConfig peek() {
+        PillarParticleConfig server = SERVER_CONFIG;
+        if (server != null) return server;
         PillarParticleConfig s = SNAPSHOT;
         return s != null ? s : get();
     }
@@ -216,7 +239,7 @@ public class PillarParticleConfig {
     }
 
     private File getConfigDir() {
-        File dir = ConfigPaths.dir("buildscape", "pillar").toFile();
+        File dir = configDirectory != null ? configDirectory.toFile() : ConfigPaths.dir("buildscape", "pillar").toFile();
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -272,6 +295,7 @@ public class PillarParticleConfig {
                 writer.write("  // Item IDs that trigger particles when placed on pillars\n");
                 writer.write("  \"items\": [\n");
                 String[] defaultVanillaItems = getDefaultItemArray();
+                java.util.Arrays.sort(defaultVanillaItems);
                 for (int i = 0; i < defaultVanillaItems.length; i++) {
                     writer.write("    \"" + defaultVanillaItems[i] + "\"");
                     if (i < defaultVanillaItems.length - 1) {
@@ -452,6 +476,8 @@ public class PillarParticleConfig {
             Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
             Map<String, Object> jsonMap = GSON.fromJson(jsonWithoutComments, mapType);
 
+            if (jsonMap == null) throw new IllegalArgumentException("Empty pillar properties");
+
             if (jsonMap != null) {
                 if (jsonMap.containsKey("use_template") && !jsonMap.containsKey("use_pattern")) {
                     jsonMap.put("use_pattern", jsonMap.get("use_template"));
@@ -518,6 +544,7 @@ public class PillarParticleConfig {
             lastFileSizeProperties = file.length();
         } catch (Exception ignored) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to load pillar properties", ignored);
+            corruptedProperties = true;
         }
     }
 
@@ -526,6 +553,9 @@ public class PillarParticleConfig {
         if (!file.exists()) {
             writeDefaultItems(file);
             initializeDefaultItems();
+            if (VaultPillarItems.merge(items, Services.PLATFORM.isModLoaded("the_vault"))) {
+                saveItemsToDisk();
+            }
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
             return;
@@ -541,6 +571,10 @@ public class PillarParticleConfig {
 
             Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
             Map<String, Object> jsonMap = GSON.fromJson(jsonWithoutComments, mapType);
+
+            if (jsonMap == null || !(jsonMap.get("items") instanceof List<?>)) {
+                throw new IllegalArgumentException("Expected pillar items list");
+            }
 
             if (jsonMap != null && jsonMap.containsKey("items")) {
                 Object itemsObj = jsonMap.get("items");
@@ -561,6 +595,7 @@ public class PillarParticleConfig {
                     }
                 }
 
+                changed |= VaultPillarItems.merge(items, Services.PLATFORM.isModLoaded("the_vault"));
                 if (changed) {
                     saveItemsToDisk();
                 }
@@ -570,6 +605,7 @@ public class PillarParticleConfig {
             lastFileSizeItems = file.length();
         } catch (Exception ignored) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to load pillar items", ignored);
+            corruptedItems = true;
         }
     }
 
@@ -621,8 +657,14 @@ public class PillarParticleConfig {
         saveItemsToDisk();
     }
     public void saveItemsToDisk() {
+        clearMatchCache();
+        if (remote) return;
         File file = getItemsFile();
         try {
+            if (corruptedItems) {
+                ConfigBackup.copyCorrupted(file.toPath());
+                corruptedItems = false;
+            }
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();
@@ -632,6 +674,7 @@ public class PillarParticleConfig {
                 writer.write("  // Item IDs that trigger particles when placed on pillars\n");
                 writer.write("  \"items\": [\n");
                 List<String> itemsList = new ArrayList<>(items);
+                itemsList.sort(String::compareTo);
                 for (int i = 0; i < itemsList.size(); i++) {
                     writer.write("    \"" + itemsList.get(i) + "\"");
                     if (i < itemsList.size() - 1) {
@@ -653,8 +696,13 @@ public class PillarParticleConfig {
         savePropertiesToDisk();
     }
     public void savePropertiesToDisk() {
+        if (remote) return;
         File file = getPropertiesFile();
         try {
+            if (corruptedProperties) {
+                ConfigBackup.copyCorrupted(file.toPath());
+                corruptedProperties = false;
+            }
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();

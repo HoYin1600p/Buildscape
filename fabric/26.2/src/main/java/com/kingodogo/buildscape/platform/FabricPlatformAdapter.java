@@ -6,6 +6,10 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class FabricPlatformAdapter extends PlatformAdapterBase {
     @Override
+    public java.nio.file.Path getGameDir() {
+        return FabricLoader.getInstance().getGameDir();
+    }
+    @Override
     public java.nio.file.Path getConfigDir() {
         return FabricLoader.getInstance().getConfigDir();
     }

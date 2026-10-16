@@ -44,7 +44,7 @@ public class CosmeticsConfig {
     }
 
     private File getDataDir() {
-        return Paths.get("buildscape", "data").toFile();
+        return Services.PLATFORM.getGameDir().resolve("buildscape").resolve("data").toFile();
     }
 
     private File getPlayerFile(UUID playerUuid) {

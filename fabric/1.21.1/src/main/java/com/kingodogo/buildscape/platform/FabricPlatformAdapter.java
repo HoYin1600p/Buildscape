@@ -33,6 +33,7 @@ public final class FabricPlatformAdapter extends PlatformAdapterBase implements 
     @Override public String getPlatformName() { return "Fabric 1.21.1"; }
     @Override public boolean isModLoaded(String id) { return FabricLoader.getInstance().isModLoaded(id); }
     @Override public boolean isClient() { return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT; }
+    @Override public java.nio.file.Path getGameDir() { return FabricLoader.getInstance().getGameDir(); }
     @Override public java.nio.file.Path getConfigDir() { return FabricLoader.getInstance().getConfigDir(); }
     @Override public <V> void register(Registry<V> registry, CommonId id, V value) {
         wrapRegistryAction(() -> Registry.register(registry,

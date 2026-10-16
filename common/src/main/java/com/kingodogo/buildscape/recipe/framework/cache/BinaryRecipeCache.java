@@ -29,7 +29,7 @@ public class BinaryRecipeCache {
     private static final int MAX_INGREDIENT_COUNT = 4_096;
 
     public static Path getCacheDir() {
-        Path dir = Paths.get("buildscape", "cache");
+        Path dir = com.kingodogo.buildscape.platform.Services.PLATFORM.getGameDir().resolve("buildscape").resolve("cache");
         try {
             Files.createDirectories(dir);
         } catch (IOException e) {

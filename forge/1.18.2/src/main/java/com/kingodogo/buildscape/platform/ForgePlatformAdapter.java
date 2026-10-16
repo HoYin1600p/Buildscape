@@ -50,6 +50,7 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
     @Override public String getPlatformName() { return "Forge 1.18.2"; }
     @Override public boolean isModLoaded(String modId) { return ModList.get().isLoaded(modId); }
     @Override public boolean isClient() { return FMLEnvironment.dist.isClient(); }
+    @Override public java.nio.file.Path getGameDir() { return FMLPaths.GAMEDIR.get(); }
     @Override public java.nio.file.Path getConfigDir() { return FMLPaths.CONFIGDIR.get(); }
     @Override public CompoundTag getEntityData(Entity entity) { return entity.getPersistentData(); }
     @Override public CompoundTag getBlockEntityData(net.minecraft.world.level.block.entity.BlockEntity entity) {

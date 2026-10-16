@@ -24,6 +24,7 @@ public class PresetsConfig {
     private static final String PRESETS_FILE_NAME = "pillar-presets.json";
     private static final Map<String, Boolean> MOD_LOADED_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
     private static volatile PresetsConfig INSTANCE;
+    private boolean corrupted;
 
     private File getConfigDir() {
         String configPath = ConfigPaths.dir("buildscape", "pillar").toString();
@@ -57,6 +58,7 @@ public class PresetsConfig {
 
         try (FileReader reader = new FileReader(file)) {
             com.google.gson.JsonElement root = com.google.gson.JsonParser.parseReader(reader);
+            if (root == null || !root.isJsonObject()) throw new IllegalArgumentException("Expected presets object");
             if (root != null && root.isJsonObject()) {
                 com.google.gson.JsonObject obj = root.getAsJsonObject();
                 presets = new HashMap<>();
@@ -72,6 +74,7 @@ public class PresetsConfig {
                                 presets.put(entry.getKey(), preset);
                             }
                         } catch (Exception e) {
+                            corrupted = true;
                             BuildscapeCommon.LOGGER.warn("Skipping malformed preset entry: " + entry.getKey(), e);
                         }
                     }
@@ -79,6 +82,7 @@ public class PresetsConfig {
             }
         } catch (Exception e) {
             BuildscapeCommon.LOGGER.error("Failed to load presets", e);
+            corrupted = true;
             initializeDefaults();
         }
 
@@ -133,6 +137,10 @@ public class PresetsConfig {
     public void save() {
         File file = getPresetsFile();
         try {
+            if (corrupted) {
+                ConfigBackup.copyCorrupted(file.toPath());
+                corrupted = false;
+            }
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();

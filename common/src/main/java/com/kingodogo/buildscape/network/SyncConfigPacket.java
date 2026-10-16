@@ -158,7 +158,7 @@ public class SyncConfigPacket implements CommonPacket {
 
     @Override
     public void handle(Player player) {
-        PillarParticleConfig cfg = PillarParticleConfig.get();
+        PillarParticleConfig cfg = new PillarParticleConfig();
         if (cfg != null) {
             cfg.particle_speed = this.particle_speed;
             cfg.particle_spread = this.particle_spread;
@@ -181,6 +181,7 @@ public class SyncConfigPacket implements CommonPacket {
             if (this.permission_level >= 0) {
                 PillarParticleConfig.setClientPermissionLevel(this.permission_level);
             }
+            PillarParticleConfig.setServerConfig(cfg);
         }
     }
 

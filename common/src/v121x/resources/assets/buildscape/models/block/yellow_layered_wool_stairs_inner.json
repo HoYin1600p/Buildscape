@@ -1,0 +1,8 @@
+{
+  "textures": {
+    "bottom": "buildscape:block/yellow_layered_wool",
+    "top": "buildscape:block/yellow_layered_wool",
+    "side": "buildscape:block/yellow_layered_wool"
+  },
+  "parent": "minecraft:block/inner_stairs"
+}

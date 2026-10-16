@@ -1,8 +1,0 @@
-{
-  "ingredient": {
-    "item": "minecraft:copper_block"
-  },
-  "result": "buildscape:red_factory_mesh",
-  "count": 4,
-  "type": "minecraft:stonecutting"
-}

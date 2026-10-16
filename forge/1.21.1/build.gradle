@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'xyz.wagyourtail.unimined'
+}
+
+evaluationDependsOn(':common')
+def commonProject = project(':common')
+version = providers.gradleProperty('mod_version').get()
+base.archivesName = 'buildscape-forge-1.21.1'
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+
+// Forge 1.20.5+ uses Mojang names in production as well as development.
+// Unimined's modern FG3 transformer supports this without ForgeGradle.
+unimined.minecraft {
+    version '1.21.1'
+    mappings { mojmap() }
+    defaultRemapJar = false
+    minecraftForge {
+        loader '52.1.14'
+        mixinConfig(['buildscape.mixins.json', 'buildscape.forge121.mixins.json'])
+        accessTransformer file('src/main/resources/META-INF/accesstransformer.cfg')
+    }
+}
+
+configurations {
+    commonVariant
+}
+dependencies {
+    commonVariant project(path: ':common', configuration: 'v121xElements')
+    compileOnly files(commonProject.sourceSets.v121x.output.classesDirs)
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+// Package the complete v121x resource tree.
+sourceSets.main.resources.srcDir rootProject.file('common/src/v121x/resources')
+
+tasks.named('compileJava') { dependsOn ':common:compileV121xJava' }
+
+tasks.named('processResources', ProcessResources) {
+    inputs.property 'mod_version', project.version
+    filesMatching('META-INF/mods.toml') { expand mod_version: project.version }
+    filesMatching('assets/buildscape/models/**/*.json') {
+        filter { line -> line.replace('"neoforge_data":', '"forge_data":') }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named('jar', Jar) {
+    from(configurations.commonVariant) {
+        filesMatching('assets/buildscape/models/**/*.json') {
+            filter { line -> line.replace('"neoforge_data":', '"forge_data":') }
+        }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest { attributes 'MixinConfigs': 'buildscape.mixins.json,buildscape.forge121.mixins.json' }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release.set(21)
+    options.compilerArgs += ['-proc:none']
+}
+tasks.named('check') { dependsOn ':common:v121xTest' }

@@ -1,0 +1,14 @@
+{
+  "values": [
+    "minecraft:copper_chain",
+    "minecraft:exposed_copper_chain",
+    "minecraft:weathered_copper_chain",
+    "minecraft:oxidized_copper_chain",
+    "buildscape:gold_chain",
+    "buildscape:diamond_chain",
+    "buildscape:emerald_chain",
+    "buildscape:netherite_chain",
+    "buildscape:ancient_steel_chain"
+  ]
+}
+

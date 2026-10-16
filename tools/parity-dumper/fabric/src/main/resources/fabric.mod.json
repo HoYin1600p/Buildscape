@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "buildscape_parity_dumper",
+  "version": "${version}",
+  "name": "Buildscape parity dumper (Fabric, TEST ONLY)",
+  "description": "Offline parity diagnostics. Never distribute with Buildscape.",
+  "authors": ["HoYin1600p"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.kingodogo.buildscape.parity.ParityDumper"],
+    "client": ["com.kingodogo.buildscape.parity.ClientDump"]
+  },
+  "mixins": ["parity-dumper.fabric.mixins.json"],
+  "depends": {
+    "fabricloader": "0.16.14",
+    "fabric-api": "0.77.0+1.18.2",
+    "minecraft": "1.18.2",
+    "java": ">=17",
+    "buildscape": "*"
+  }
+}

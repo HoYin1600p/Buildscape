@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:factory_light_blue_glass"
-  },
-  "result": "minecraft:light_blue_stained_glass",
-  "count": 1
-}

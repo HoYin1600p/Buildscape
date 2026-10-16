@@ -1,0 +1,8 @@
+{
+  "parent": "buildscape:block/template_wall_side_tall_tinted",
+  "textures": {
+    "wall": "buildscape:block/snowy_orange_poplar_leaves",
+    "tint": "buildscape:block/snowy_orange_poplar_leaves",
+    "particle": "buildscape:block/snowy_orange_poplar_leaves"
+  }
+}

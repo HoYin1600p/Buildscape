@@ -1,0 +1,427 @@
+package com.kingodogo.buildscape.recipe.framework.cache;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.kingodogo.buildscape.BuildscapeCommon;
+import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
+
+public class BinaryRecipeCache {
+
+    private static final int MAGIC_HEADER = 0x4B59524F;
+    private static final int CACHE_VERSION = 5;
+
+    private static final int MAX_STRING_POOL_SIZE = 262_144;
+    private static final int MAX_RECIPE_COUNT = 262_144;
+    private static final int MAX_INGREDIENT_COUNT = 4_096;
+
+    public static Path getCacheDir() {
+        Path dir = Paths.get("buildscape", "cache");
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException e) {
+            BuildscapeCommon.LOGGER.error("Failed to create cache directory: {}", dir, e);
+        }
+        return dir;
+    }
+
+    public static String computeSourceHash(String[] categories, Map<String, byte[]> rawCategoryData) {
+        return com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator
+                .computeSourceHash(categories, rawCategoryData);
+    }
+
+    public static boolean isCacheValid(String expectedHash) {
+        return isCacheValid(getCacheDir().resolve("recipes.bscb"), expectedHash);
+    }
+
+    public static boolean isCacheValid(Path cacheFile, String expectedHash) {
+        return com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator
+                .isCacheValid(cacheFile, expectedHash);
+    }
+
+    public static byte[] serializeCache(String contentHash, List<RecipeIR.CompiledRecipe> recipes) throws IOException {
+        List<String> stringPool = new ArrayList<>();
+        Map<String, Integer> stringMap = new HashMap<>();
+        try (ByteArrayOutputStream recipeBytes = new ByteArrayOutputStream();
+                DataOutputStream recipeOut = new DataOutputStream(recipeBytes)) {
+            int savedCount = 0;
+            if (recipes != null) {
+                for (RecipeIR.CompiledRecipe recipe : recipes) {
+                    if (!isCacheable(recipe)) continue;
+                    writeRecipe(recipeOut, recipe, stringPool, stringMap);
+                    savedCount++;
+                }
+            }
+            recipeOut.flush();
+            try (ByteArrayOutputStream cacheBytes = new ByteArrayOutputStream();
+                    DataOutputStream out = new DataOutputStream(cacheBytes)) {
+                out.writeInt(MAGIC_HEADER);
+                out.writeInt(CACHE_VERSION);
+                out.writeUTF(contentHash != null ? contentHash : "");
+                out.writeInt(stringPool.size());
+                for (String value : stringPool) out.writeUTF(value);
+                out.writeInt(savedCount);
+                out.write(recipeBytes.toByteArray());
+                out.flush();
+                return cacheBytes.toByteArray();
+            }
+        }
+    }
+
+    public static boolean isCacheable(RecipeIR.CompiledRecipe recipe) {
+        if (recipe == null) return false;
+        String type = recipe.type().toLowerCase(java.util.Locale.ROOT).replaceFirst("^buildscape:", "");
+        return switch (type) {
+            case "shaped", "shapeless", "stonecutting", "smelting", "blasting", "smoking",
+                    "campfire", "campfire_cooking", "smithing", "shaped_durability", "shapeless_durability",
+                    "confetti_configure", "clear_shulker_filters", "haze_bush_dye" -> true;
+            default -> false;
+        };
+    }
+
+    public static void saveCacheToFile(Path targetFile, String contentHash,
+            List<RecipeIR.CompiledRecipe> recipes) throws IOException {
+        com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator
+                .writeAtomically(targetFile, serializeCache(contentHash, recipes));
+    }
+
+    public static void saveCache(String contentHash, List<RecipeIR.CompiledRecipe> recipes) {
+        try {
+            saveCacheToFile(getCacheDir().resolve("recipes.bscb"), contentHash, recipes);
+            BuildscapeCommon.LOGGER.info("BDRE Binary Cache saved successfully ({} recipes).",
+                    recipes == null ? 0 : recipes.stream().filter(java.util.Objects::nonNull).count());
+        } catch (IOException e) {
+            BuildscapeCommon.LOGGER.error("BDRE Binary Cache: Failed to save recipes to cache", e);
+        }
+    }
+    public static List<RecipeIR.CompiledRecipe> loadCache(String expectedHash) {
+        Path cacheFile = getCacheDir().resolve("recipes.bscb");
+        if (!Files.exists(cacheFile)) {
+            return new ArrayList<>();
+        }
+        try {
+            return loadCacheFromStream(Files.newInputStream(cacheFile), expectedHash);
+        } catch (IOException e) {
+            BuildscapeCommon.LOGGER.warn("Unable to open BDRE cache file; recompiling recipes", e);
+            // The reference recompiles recipes when a cache file cannot be opened.
+            return new ArrayList<>();
+        }
+    }
+
+    public static List<RecipeIR.CompiledRecipe> loadCacheFromStream(InputStream rawStream, String expectedHash) {
+        List<RecipeIR.CompiledRecipe> recipes = new ArrayList<>();
+        if (rawStream == null) {
+            return recipes;
+        }
+
+        try (DataInputStream in = new DataInputStream(new BufferedInputStream(rawStream, 65536))) {
+            int header = in.readInt();
+            int version = in.readInt();
+            if (header != MAGIC_HEADER || version != CACHE_VERSION) {
+                BuildscapeCommon.LOGGER.warn("BDRE Binary Cache stream version mismatch.");
+                return recipes;
+            }
+
+            String cachedHash = in.readUTF();
+            if (expectedHash != null && !expectedHash.isBlank() && !expectedHash.equals(cachedHash)) {
+                BuildscapeCommon.LOGGER.warn("BDRE Binary Cache content hash mismatch; recompiling from source recipes.");
+                return recipes;
+            }
+
+            int poolSize = in.readInt();
+            validateSize(poolSize, MAX_STRING_POOL_SIZE, "string pool");
+            String[] stringPool = new String[poolSize];
+            for (int i = 0; i < poolSize; i++) {
+                stringPool[i] = in.readUTF();
+            }
+
+            int recipeCount = in.readInt();
+            validateSize(recipeCount, MAX_RECIPE_COUNT, "recipe count");
+            recipes = new ArrayList<>(recipeCount);
+            var validator = new com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator();
+            for (int i = 0; i < recipeCount; i++) {
+                RecipeIR.CompiledRecipe r = readRecipe(in, stringPool, validator);
+                // Consume the whole record before validation so a rejected recipe cannot
+                // misalign the following record in the stream.
+                if (r != null && !validator.checkDuplicate(r.id())) {
+                    recipes.add(r);
+                }
+            }
+
+            BuildscapeCommon.LOGGER.info("BDRE Binary Cache stream loaded successfully ({} recipes).", recipes.size());
+        } catch (Exception e) {
+            BuildscapeCommon.LOGGER.warn("BDRE Binary Cache rejected: {}; recompiling from compact sources.", e.getMessage(), e);
+            recipes.clear();
+        }
+
+        return recipes;
+    }
+
+    private static int getStringIndex(String str, List<String> stringPool, Map<String, Integer> stringIndexMap) {
+        if (str == null) str = "";
+        return stringIndexMap.computeIfAbsent(str, s -> {
+            int idx = stringPool.size();
+            stringPool.add(s);
+            return idx;
+        });
+    }
+
+    private static void writeRecipe(DataOutputStream out, RecipeIR.CompiledRecipe recipe, List<String> stringPool,
+            Map<String, Integer> stringMap) throws IOException {
+        String idStr = recipe.id();
+        String groupStr = recipe.group() != null ? recipe.group() : "";
+        String resultStr = recipe.resultItem() != null ? recipe.resultItem() : "minecraft:air";
+
+        out.writeInt(getStringIndex(idStr, stringPool, stringMap));
+        out.writeInt(getStringIndex(groupStr, stringPool, stringMap));
+        out.writeInt(getStringIndex(resultStr, stringPool, stringMap));
+        out.writeInt(recipe.resultCount());
+        out.writeInt(getStringIndex(recipe.resultNbt(), stringPool, stringMap));
+
+        String type = recipe.type().toLowerCase(java.util.Locale.ROOT);
+        if (type.startsWith("buildscape:")) type = type.substring("buildscape:".length());
+
+        switch (type) {
+            case "shaped" -> {
+                out.writeByte(1);
+                out.writeInt(recipe.width());
+                out.writeInt(recipe.height());
+                List<String> ings = recipe.ingredients();
+                out.writeInt(ings.size());
+                for (String ing : ings) {
+                    out.writeInt(getStringIndex(ing, stringPool, stringMap));
+                }
+            }
+            case "shapeless", "haze_bush_dye" -> {
+                out.writeByte(type.equals("haze_bush_dye") ? 13 : 2);
+                List<String> ings = recipe.ingredients();
+                out.writeInt(ings.size());
+                for (String ing : ings) {
+                    out.writeInt(getStringIndex(ing, stringPool, stringMap));
+                }
+            }
+            case "stonecutting" -> {
+                out.writeByte(3);
+                out.writeInt(getStringIndex(recipe.input(), stringPool, stringMap));
+            }
+            case "smelting" -> {
+                out.writeByte(4);
+                out.writeInt(getStringIndex(recipe.input(), stringPool, stringMap));
+                out.writeFloat(recipe.experience());
+                out.writeInt(recipe.cookingTime());
+            }
+            case "blasting" -> {
+                out.writeByte(5);
+                out.writeInt(getStringIndex(recipe.input(), stringPool, stringMap));
+                out.writeFloat(recipe.experience());
+                out.writeInt(recipe.cookingTime());
+            }
+            case "smoking" -> {
+                out.writeByte(6);
+                out.writeInt(getStringIndex(recipe.input(), stringPool, stringMap));
+                out.writeFloat(recipe.experience());
+                out.writeInt(recipe.cookingTime());
+            }
+            case "campfire", "campfire_cooking" -> {
+                out.writeByte(7);
+                out.writeInt(getStringIndex(recipe.input(), stringPool, stringMap));
+                out.writeFloat(recipe.experience());
+                out.writeInt(recipe.cookingTime());
+            }
+            case "smithing" -> {
+                out.writeByte(8);
+                out.writeInt(getStringIndex(recipe.input(), stringPool, stringMap));
+                out.writeInt(getStringIndex(recipe.addition(), stringPool, stringMap));
+            }
+            case "shaped_durability" -> {
+                out.writeByte(9);
+                out.writeInt(recipe.width());
+                out.writeInt(recipe.height());
+                List<String> ings = recipe.ingredients();
+                out.writeInt(ings.size());
+                for (String ing : ings) {
+                    out.writeInt(getStringIndex(ing, stringPool, stringMap));
+                }
+            }
+            case "shapeless_durability" -> {
+                out.writeByte(10);
+                List<String> ings = recipe.ingredients();
+                out.writeInt(ings.size());
+                for (String ing : ings) {
+                    out.writeInt(getStringIndex(ing, stringPool, stringMap));
+                }
+            }
+            case "confetti_configure" -> {
+                out.writeByte(11);
+            }
+            case "clear_shulker_filters" -> {
+                out.writeByte(12);
+            }
+            default -> {
+                throw new IOException("Unsupported recipe type for caching: " + type);
+            }
+        }
+    }
+
+    static RecipeIR.CompiledRecipe readRecipe(DataInputStream in, String[] stringPool,
+            com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator validator) throws IOException {
+        RecipeIR.CompiledRecipe recipe = readRecord(in, stringPool);
+        // Validate after consuming the whole record, including malformed ingredients.
+        if (!validator.validateCompiled(recipe)) return null;
+        if (recipe.type().equals("shaped") || recipe.type().equals("shaped_durability")) {
+            var trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer
+                    .trimStrings(recipe.width(), recipe.height(), recipe.ingredients());
+            return new RecipeIR.CompiledRecipe(recipe.id(), recipe.type(), recipe.group(),
+                    trimmed.width(), trimmed.height(), trimmed.ingredients(), recipe.input(), recipe.addition(),
+                    recipe.resultItem(), recipe.resultCount(), recipe.resultNbt(), recipe.experience(),
+                    recipe.cookingTime(), recipe.damageAmount());
+        }
+        return recipe;
+    }
+
+    private static RecipeIR.CompiledRecipe readRecord(DataInputStream in, String[] stringPool) throws IOException {
+        int idIdx = readPoolIndex(in, stringPool.length, "recipe id");
+        int groupIdx = readPoolIndex(in, stringPool.length, "group");
+        int resultItemIdx = readPoolIndex(in, stringPool.length, "result item");
+        int count = in.readInt();
+        int resultNbtIdx = readPoolIndex(in, stringPool.length, "result nbt");
+
+        String id = stringPool[idIdx];
+        String group = stringPool[groupIdx];
+        String resultItem = stringPool[resultItemIdx];
+        String resultNbt = stringPool[resultNbtIdx];
+
+        byte type = in.readByte();
+        switch (type) {
+            case 1 -> {
+                int width = in.readInt();
+                int height = in.readInt();
+                int ingSize = in.readInt();
+                validateDimensions(width, height, ingSize);
+                List<String> ingredients = new ArrayList<>(ingSize);
+                for (int i = 0; i < ingSize; i++) {
+                    int ingIdx = readPoolIndex(in, stringPool.length, "ingredient");
+                    ingredients.add(stringPool[ingIdx]);
+                }
+                return new RecipeIR.CompiledRecipe(id, "shaped", group, width, height, ingredients, "", "", resultItem, count, resultNbt, 0f, 0, 0);
+            }
+            case 2, 13 -> {
+                int ingSize = in.readInt();
+                validateSize(ingSize, MAX_INGREDIENT_COUNT, "shapeless ingredient count");
+                List<String> ingredients = new ArrayList<>(ingSize);
+                for (int i = 0; i < ingSize; i++) {
+                    int ingIdx = readPoolIndex(in, stringPool.length, "ingredient");
+                    ingredients.add(stringPool[ingIdx]);
+                }
+                return new RecipeIR.CompiledRecipe(id, type == 13 ? "haze_bush_dye" : "shapeless", group, 0, 0, ingredients, "", "", resultItem, count, resultNbt, 0f, 0, 0);
+            }
+            case 3 -> {
+                int inputIdx = readPoolIndex(in, stringPool.length, "stonecutter input");
+                String input = stringPool[inputIdx];
+                return new RecipeIR.CompiledRecipe(id, "stonecutting", group, 0, 0, List.of(), input, "", resultItem, count, resultNbt, 0f, 0, 0);
+            }
+            case 4 -> {
+                int inputIdx = readPoolIndex(in, stringPool.length, "smelting input");
+                String input = stringPool[inputIdx];
+                float xp = in.readFloat();
+                int cookTime = in.readInt();
+                return new RecipeIR.CompiledRecipe(id, "smelting", group, 0, 0, List.of(), input, "", resultItem, count, resultNbt, xp, cookTime, 0);
+            }
+            case 5 -> {
+                int inputIdx = readPoolIndex(in, stringPool.length, "blasting input");
+                String input = stringPool[inputIdx];
+                float xp = in.readFloat();
+                int cookTime = in.readInt();
+                return new RecipeIR.CompiledRecipe(id, "blasting", group, 0, 0, List.of(), input, "", resultItem, count, resultNbt, xp, cookTime, 0);
+            }
+            case 6 -> {
+                int inputIdx = readPoolIndex(in, stringPool.length, "smoking input");
+                String input = stringPool[inputIdx];
+                float xp = in.readFloat();
+                int cookTime = in.readInt();
+                return new RecipeIR.CompiledRecipe(id, "smoking", group, 0, 0, List.of(), input, "", resultItem, count, resultNbt, xp, cookTime, 0);
+            }
+            case 7 -> {
+                int inputIdx = readPoolIndex(in, stringPool.length, "campfire input");
+                String input = stringPool[inputIdx];
+                float xp = in.readFloat();
+                int cookTime = in.readInt();
+                return new RecipeIR.CompiledRecipe(id, "campfire", group, 0, 0, List.of(), input, "", resultItem, count, resultNbt, xp, cookTime, 0);
+            }
+            case 8 -> {
+                int baseIdx = readPoolIndex(in, stringPool.length, "smithing base");
+                int additionIdx = readPoolIndex(in, stringPool.length, "smithing addition");
+                String base = stringPool[baseIdx];
+                String addition = stringPool[additionIdx];
+                return new RecipeIR.CompiledRecipe(id, "smithing", group, 0, 0, List.of(), base, addition, resultItem, count, resultNbt, 0f, 0, 0);
+            }
+            case 9 -> {
+                int width = in.readInt();
+                int height = in.readInt();
+                int ingSize = in.readInt();
+                validateDimensions(width, height, ingSize);
+                List<String> ingredients = new ArrayList<>(ingSize);
+                for (int i = 0; i < ingSize; i++) {
+                    int ingIdx = readPoolIndex(in, stringPool.length, "ingredient");
+                    ingredients.add(stringPool[ingIdx]);
+                }
+                return new RecipeIR.CompiledRecipe(id, "shaped_durability", group, width, height, ingredients, "", "", resultItem, count, resultNbt, 0f, 0, 1);
+            }
+            case 10 -> {
+                int ingSize = in.readInt();
+                validateSize(ingSize, MAX_INGREDIENT_COUNT, "shapeless durability ingredient count");
+                List<String> ingredients = new ArrayList<>(ingSize);
+                for (int i = 0; i < ingSize; i++) {
+                    int ingIdx = readPoolIndex(in, stringPool.length, "ingredient");
+                    ingredients.add(stringPool[ingIdx]);
+                }
+                return new RecipeIR.CompiledRecipe(id, "shapeless_durability", group, 0, 0, ingredients, "", "", resultItem, count, resultNbt, 0f, 0, 1);
+            }
+            case 11 -> {
+                return new RecipeIR.CompiledRecipe(id, "confetti_configure", "", 0, 0, List.of(), "", "", "minecraft:air", 1, "", 0f, 0, 0);
+            }
+            case 12 -> {
+                return new RecipeIR.CompiledRecipe(id, "clear_shulker_filters", "", 0, 0, List.of(), "", "", "minecraft:air", 1, "", 0f, 0, 0);
+            }
+            default -> {
+                throw new IOException("Unsupported cached recipe type: " + type);
+            }
+        }
+    }
+
+    private static int readPoolIndex(DataInputStream in, int poolSize, String context) throws IOException {
+        int idx = in.readInt();
+        if (idx < 0 || idx >= poolSize) {
+            throw new IOException("Corrupt cache: " + context + " string pool index " + idx + " out of bounds (" + poolSize + ")");
+        }
+        return idx;
+    }
+
+    private static void validateSize(int size, int max, String context) throws IOException {
+        if (size < 0 || size > max) {
+            throw new IOException("Corrupt cache: " + context + " size " + size + " exceeds maximum " + max);
+        }
+    }
+
+    private static void validateDimensions(int width, int height, int ingSize) throws IOException {
+        if (width <= 0 || width > 3 || height <= 0 || height > 3) {
+            throw new IOException("Corrupt cache: invalid shaped recipe dimensions " + width + "x" + height);
+        }
+        if (ingSize != width * height) {
+            throw new IOException("Corrupt cache: ingredient count " + ingSize + " doesn't match dimensions " + width + "x" + height);
+        }
+    }
+}

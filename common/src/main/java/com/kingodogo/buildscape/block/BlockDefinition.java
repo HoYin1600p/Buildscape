@@ -1,0 +1,211 @@
+package com.kingodogo.buildscape.block;
+
+import com.kingodogo.buildscape.BuildscapeCommon;
+
+public class BlockDefinition {
+    private final String id;
+    private final String blockType;
+    private final CommonBlockProperties properties;
+    private final String parentBlockId;
+
+    public BlockDefinition(String id) {
+        this(id, "Block", CommonBlockProperties.of(), null);
+    }
+
+    /** Wraps an existing vanilla block for neutral feature and family definitions. */
+    public static BlockDefinition vanilla(String id) {
+        var definition = new BlockDefinition(id);
+        definition.setBlock(com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(
+                com.kingodogo.buildscape.util.CommonId.parse(id)));
+        return definition;
+    }
+
+    public BlockDefinition(String id, String blockType, CommonBlockProperties properties) {
+        this(id, blockType, properties, null);
+    }
+
+    public BlockDefinition(String id, String blockType, CommonBlockProperties properties, String parentBlockId) {
+        this.id = id;
+        this.blockType = blockType != null ? blockType : "Block";
+        this.properties = properties != null ? properties : CommonBlockProperties.of();
+        this.parentBlockId = parentBlockId;
+    }
+
+    private net.minecraft.world.level.block.Block block;
+
+    public net.minecraft.world.level.block.Block getBlock() {
+        return block;
+    }
+
+    public net.minecraft.world.level.block.state.BlockState defaultBlockState() {
+        return block != null ? block.defaultBlockState() : net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+    }
+
+    public void setBlock(net.minecraft.world.level.block.Block block) {
+        this.block = block;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getBlockType() {
+        return blockType;
+    }
+
+    public CommonBlockProperties getProperties() {
+        return properties;
+    }
+
+    public String getParentBlockId() {
+        return parentBlockId;
+    }
+
+    public String getNamespacedId() {
+        return id.contains(":") ? id : BuildscapeCommon.MOD_ID + ":" + id;
+    }
+
+    /**
+     * Exact match of the registered block type name. Never use substring tests on the type: "WallSign" contains
+     * "Wall" and "TrapDoor" contains "Door", which built the wrong block class.
+     */
+    private boolean typeIn(String... names) {
+        for (String name : names) {
+            if (name.equals(blockType)) return true;
+        }
+        return false;
+    }
+
+    public boolean isLightningRod() { return typeIn("LightningRodBlock"); }
+    public boolean isRedstoneLamp() { return typeIn("RedstoneLampBlock"); }
+    public boolean isWeightedPressurePlate() { return typeIn("ModPressurePlateBlock"); }
+
+    public boolean isStair() { return typeIn("ModStairBlock", "StairBlock", "WeatheringStairBlock"); }
+    public boolean isVerticalSlab() { return typeIn("VerticalSlabBlock", "WeatheringVerticalSlabBlock"); }
+    public boolean isGrassSlab() { return "GrassSlabBlock".equals(blockType) || "snowy_grass_block_slab".equals(id); }
+    public boolean isHayBaleSlab() { return "HayBaleSlabBlock".equals(blockType) || id.contains("hay_bale_slab"); }
+    public boolean isLogSlab() { return "LogSlabBlock".equals(blockType) || id.endsWith("_log_slab") || id.endsWith("_wood_slab") || id.endsWith("_stem_slab") || "bamboo_block_slab".equals(id) || "stripped_bamboo_block_slab".equals(id); }
+    public boolean isMudSlab() { return "MudSlabBlock".equals(blockType) || "mud_slab".equals(id); }
+    public boolean isMud() { return "MudBlock".equals(blockType) || "mud".equals(id); }
+    public boolean isSlab() { return !isVerticalSlab() && !isGrassSlab() && !isHayBaleSlab() && !isLogSlab() && !isMudSlab() && typeIn("SlabBlock", "ModSlabBlock", "WeatheringSlabBlock"); }
+    public boolean isWall() { return typeIn("WallBlock", "ModWallBlock"); }
+    public boolean isFalling() { return typeIn("FallingSandBlock"); }
+    public boolean isCopperDoor() { return ("ModCopperDoorBlock".equals(blockType) || "steel_door".equals(id) || "flaming_steel_door".equals(id)); }
+    public boolean isDoor() { return !isCopperDoor() && typeIn("DoorBlock", "ModDoorBlock"); }
+    public boolean isCopperTrapdoor() { return ("ModCopperTrapdoorBlock".equals(blockType) || "steel_trapdoor".equals(id) || "flaming_steel_trapdoor".equals(id)); }
+    public boolean isTrapdoor() { return !isCopperTrapdoor() && typeIn("ModTrapdoorBlock", "TrapDoorBlock"); }
+    public boolean isButton() { return typeIn("ModButtonBlock", "WoodButtonBlock", "WeatheringButtonBlock"); }
+    public boolean isPressurePlate() { return typeIn("PressurePlateBlock", "ModPressurePlateBlock", "WeatheringPressurePlateBlock"); }
+    public boolean isWeatheringBars() { return "WeatheringBarsBlock".equals(blockType); }
+    public boolean isWeatheringBolt() { return "WeatheringBoltBlock".equals(blockType); }
+    public boolean isWeatheringLargeChain() { return "WeatheringLargeChainBlock".equals(blockType); }
+    public boolean isClimbableChain() { return "ClimbableChainBlock".equals(blockType); }
+    public boolean isLargeChain() { return "LargeChainBlock".equals(blockType); }
+    public boolean isWeatheringBlock() { return "WeatheringBlock".equals(blockType); }
+    public boolean isWeatheringButton() { return "WeatheringButtonBlock".equals(blockType); }
+    public boolean isWeatheringPressurePlate() { return "WeatheringPressurePlateBlock".equals(blockType); }
+    public boolean isWeatheringSlab() { return "WeatheringSlabBlock".equals(blockType); }
+    public boolean isWeatheringStair() { return "WeatheringStairBlock".equals(blockType); }
+    public boolean isWeatheringVerticalSlab() { return "WeatheringVerticalSlabBlock".equals(blockType); }
+    public boolean isMushroomShelves() { return "MushroomShelvesBlock".equals(blockType) || id.contains("mushroom_shelves"); }
+    public boolean isShelf() { return !isMushroomShelves() && typeIn("ShelfBlock"); }
+    public boolean isWorkbench() { return "BuildersWorkbenchBlock".equals(blockType) || id.contains("builders_workbench"); }
+    public boolean isGlassJar() { return typeIn("GlassJarBlock") || id.contains("glass_jar") || id.contains("golden_jar"); }
+    public boolean isSmokeVent() { return typeIn("SmokeVentBlock") || id.contains("smoke_vent"); }
+    public boolean isMuff() { return typeIn("MuffBlock") || id.contains("muff"); }
+    public boolean isChest() { return id.contains("chest"); }
+    public boolean isFenceGate() { return typeIn("FenceGateBlock"); }
+    public boolean isFence() { return !isFenceGate() && typeIn("FenceBlock"); }
+    public boolean isWaterloggableGrate() { return "WaterloggableGrateBlock".equals(blockType); }
+    public boolean isIronBars() { return !isWaterloggableGrate() && (typeIn("IronBarsBlock", "WeatheringBarsBlock")); }
+    public boolean isLadder() { return typeIn("LadderBlock"); }
+    public boolean isLantern() { return (typeIn("LanternBlock")); }
+    public boolean isLeafHedge() { return "LeafHedgeBlock".equals(blockType) || id.endsWith("_leaf_hedge"); }
+    public boolean isMangroveLeaves() { return "MangroveLeavesBlock".equals(blockType) || id.equals("mangrove_leaves"); }
+    public boolean isLeaves() { return !isLeafHedge() && !isMangroveLeaves() && !isSnowyLeaves() && typeIn("LeavesBlock"); }
+    public boolean isSnowyLeaves() { return "SnowyLeavesBlock".equals(blockType) || (id.contains("snowy") && id.contains("leaves")); }
+    public boolean isSnowOverlay() { return "SnowOverlayBlock".equals(blockType) || "snow_overlay".equals(id); }
+    public boolean isMangrovePropagule() { return "MangrovePropaguleBlock".equals(blockType) || id.equals("mangrove_propagule"); }
+    public boolean isMangroveRoots() { return "MangroveRootsBlock".equals(blockType) || id.contains("mangrove_roots"); }
+    public boolean isColoredMossLayers() { return "ColoredMossLayersBlock".equals(blockType) || (id.endsWith("_moss_layers") && !"moss_layers".equals(id)); }
+    public boolean isMossLayers() { return "MossLayersBlock".equals(blockType) || "moss_layers".equals(id); }
+    public boolean isLeafLayers() { return "LeafLayersBlock".equals(blockType) || id.endsWith("_leaf_layers"); }
+    public boolean isLeafLitter() { return "LeafLitterBlock".equals(blockType) || "leaf_litter".equals(id); }
+    public boolean isMossOverlay() { return "MossOverlayBlock".equals(blockType) || id.endsWith("_moss_overlay") || "moss_overlay".equals(id); }
+    public boolean isWoolLayers() { return "WoolLayersBlock".equals(blockType); }
+    public boolean isLayer() { return !isWoolLayers() && !isLeafLayers() && !isColoredMossLayers() && !isMossLayers() && !isMossOverlay() && (typeIn("CarpetBlock", "SnowOverlayBlock")); }
+    public boolean isAshenKingPillar() { return id.contains("ashen_king_pillar") || typeIn("AshenKingPillarBlock"); }
+    public boolean isPillar() { return !isAshenKingPillar() && "PillarBlock".equals(blockType); }
+    public boolean isHollowLog() { return typeIn("HollowLogBlock") || (!isHollowPipe() && (id.startsWith("hollow_") || id.contains("_hollow_"))); }
+    public boolean isHollowPipe() { return typeIn("HollowPipeBlock") || id.contains("hollow_pipe") || (id.startsWith("hollow_") && id.endsWith("_pipe")); }
+    public boolean isPipe() { return !isHollowPipe() && (typeIn("PipeBlock") || id.endsWith("_pipe")); }
+    public boolean isFroglight() { return typeIn("FroglightBlock") || id.contains("froglight"); }
+    public boolean isBambooBlock() { return !isSlab() && !isVerticalSlab() && !isWall() && !isStair() && ("bamboo_block".equals(id) || "stripped_bamboo_block".equals(id)); }
+    public boolean isCautionBlock() { return !isSlab() && !isVerticalSlab() && !isStair() && ("framed_caution".equals(id) || (id.startsWith("caution_") && !id.endsWith("_slab") && !id.endsWith("_vertical_slab") && !id.endsWith("_stairs"))); }
+    public boolean isLog() { return !isHollowLog() && !isSlab() && !isVerticalSlab() && !isStair() && !isWall() && (id.endsWith("_log") || "LogBlock".equals(blockType)); }
+    public boolean isWood() { return !isSlab() && !isVerticalSlab() && !isStair() && !isWall() && !id.contains("bamboo_wood") && (id.endsWith("_wood") || "WoodBlock".equals(blockType)); }
+    public boolean isRotatedPillar() { return !isHollowLog() && !isHollowPipe() && !isPipe() && !isPillar() && !isAshenKingPillar() && !isFroglight() && !isSlab() && !isVerticalSlab() && !isStair() && !isWall() && ("RotatedPillarBlock".equals(blockType) || isLog() || isWood() || isCautionBlock() || isBambooBlock()); }
+    public boolean isTrappedDecoratedPot() { return typeIn("TrappedDecoratedPotBlock") || id.contains("trapped_decorated_pot"); }
+    public boolean isDecoratedPot() { return !isTrappedDecoratedPot() && (typeIn("DecoratedPotBlock") || id.contains("decorated_pot")); }
+    public boolean isFestiveStocking() { return typeIn("FestiveStockingBlock") || id.contains("festive_stocking"); }
+    public boolean isCascadeNoMist() { return "CascadeBlockNoMist".equals(blockType) || "cascade_block_no_mist".equals(id); }
+    public boolean isCascade() { return !isCascadeNoMist() && ("CascadeBlock".equals(blockType) || "cascade_block".equals(id)); }
+    public boolean isGlazedGlass() { return "GlazedGlassBlock".equals(blockType); }
+    public boolean isIcicleCauldron() { return typeIn("IcicleCauldronBlock") || id.contains("icicle_cauldron"); }
+    public boolean isPackedIcicleBlock() { return "PackedIcicleBlock".equals(blockType) || "packed_icicle_block".equals(id); }
+    public boolean isIcicleBlock() { return !isPackedIcicleBlock() && ("IcicleBlock".equals(blockType) || "icicle_block".equals(id)); }
+    public boolean isBoneDice() { return typeIn("BoneDiceBlock") || id.contains("bone_dice"); }
+    public boolean isCopperBulb() { return typeIn("FreshCopperBulbBlock", "ExposedCopperBulbBlock", "WeatheredCopperBulbBlock", "OxidizedCopperBulbBlock"); }
+    public int copperBulbLightLevel() {
+        if (blockType.startsWith("Exposed")) return 12;
+        if (blockType.startsWith("Weathered")) return 8;
+        if (blockType.startsWith("Oxidized")) return 4;
+        return 15;
+    }
+    public boolean isStar() { return typeIn("StarBlock") || id.contains("star"); }
+    public boolean isCushion() { return typeIn("CushionBlock") || id.contains("cushion"); }
+    public boolean isBigBook() { return typeIn("BigBookBlock") || id.contains("big_book"); }
+    public boolean isBigCandle() { return "BigCandleBlock".equals(blockType) || id.contains("big_candle"); }
+    public boolean isSoftFabric() { return "SoftFabricBlock".equals(blockType) || id.endsWith("_dye_sack") || "glow_ink_sack".equals(id); }
+    public boolean isSpool() { return typeIn("SpoolBlock") || id.endsWith("_spool") || "spool".equals(id); }
+    public boolean isSteelBolt() { return "SteelBoltBlock".equals(blockType) || (!isWeatheringBolt() && (id.endsWith("_bolts") || id.contains("bolt"))); }
+    public boolean isFestiveLamp() { return typeIn("FestiveLampBlock") || id.contains("festive_lamp"); }
+    public boolean isBigOrnament() { return typeIn("BigOrnamentBlock") || id.contains("big_ornament"); }
+    public boolean isBigTintedOrnament() { return "big_tinted_glass_ornament".equals(id); }
+    public boolean isOrnament() { return !isBigOrnament() && (typeIn("OrnamentBlock") || id.contains("ornament")); }
+    public boolean isTintedOrnament() { return "tinted_glass_ornament".equals(id); }
+    public boolean isStringLight() { return typeIn("StringLightBlock") || id.contains("string_light"); }
+    public boolean isExperienceCauldron() { return typeIn("ExperienceCauldronBlock") || id.contains("experience_cauldron"); }
+    public boolean isExperienceFluid() { return "ExperienceFluidBlock".equals(blockType) || id.contains("experience_liquid"); }
+    public boolean isMulticolorGlowLights() { return typeIn("MulticolorGlowLightsBlock") || id.contains("multicolor_glow_lights"); }
+    public boolean isGlowLights() { return !isMulticolorGlowLights() && (typeIn("GlowLightsBlock") || id.contains("glow_lights")); }
+    public boolean isFrostRose() { return typeIn("FrostRoseBlock") || id.contains("frost_rose"); }
+    public boolean isStrawBed() { return typeIn("StrawBedBlock") || id.contains("straw_bed"); }
+    public boolean isClover() { return "CloverBlock".equals(blockType) || (id.contains("clover") && !id.contains("potted_clover")); }
+    public boolean isColoredMoss() { return "ColoredMossBlock".equals(blockType) || (id.endsWith("_moss_block") && !"moss_block".equals(id)); }
+    public boolean isColoredSporeBlossom() { return "ColoredSporeBlossomBlock".equals(blockType) || id.contains("spore_blossom"); }
+    public boolean isCreakingHeart() { return "CreakingHeartBlock".equals(blockType) || id.contains("creaking_heart"); }
+    public boolean isHangingMoss() { return "HangingMossBlock".equals(blockType) || id.contains("hanging_moss"); }
+    public boolean isMonetFlower() { return "MonetFlowerBlock".equals(blockType) || id.endsWith("_monets"); }
+    public boolean isPetal() { return "PetalBlock".equals(blockType) || ((id.contains("petal")) && !id.contains("potted")); }
+    public boolean isRoseVines() { return "RoseVinesBlock".equals(blockType) || id.contains("rose_vines"); }
+    public boolean isWallpaperFlat() { return "WallpaperFlatBlock".equals(blockType) || id.contains("wallpaper_flat"); }
+    public boolean isWildflowers() { return "WildflowersBlock".equals(blockType); }
+    public boolean isPlant() { return !isStar() && !isDecoratedPot() && !isTrappedDecoratedPot() && !isFrostRose() && !isClover() && !isColoredMoss() && !isColoredSporeBlossom() && !isCreakingHeart() && !isHangingMoss() && !isMonetFlower() && !isPetal() && !isWildflowers() && !isRoseVines() && !isSnowyBush() && !isSnowyFern() && !isSnowyLargeFern() && !isSnowyGrass() && !isSnowyShortGrass() && !isSnowyTallGrass() && (typeIn("ModBushBlock", "FlowerPotBlock", "SaplingBlock")); }
+    public boolean isSnowyBush() { return "SnowyBushBlock".equals(blockType) || "snowy_bush".equals(id); }
+    public boolean isSnowyFern() { return "SnowyFernBlock".equals(blockType) || "snowy_fern".equals(id); }
+    public boolean isSnowyLargeFern() { return "SnowyLargeFernBlock".equals(blockType) || "snowy_large_fern".equals(id); }
+    public boolean isSnowyGrass() { return "SnowyGrassBlock".equals(blockType) || "snowy_grass_block".equals(id); }
+    public boolean isSnowyShortGrass() { return "SnowyShortGrassBlock".equals(blockType) || "snowy_short_grass".equals(id); }
+    public boolean isSnowyTallGrass() { return "SnowyTallGrassBlock".equals(blockType) || "snowy_tall_grass".equals(id); }
+    public boolean isSilkTouchOnlyGlass() { return "SilkTouchOnlyGlassBlock".equals(blockType); }
+    public boolean isSilkTouchOnlyPane() { return "SilkTouchOnlyPaneBlock".equals(blockType); }
+    public boolean isResinClump() { return "ResinClumpBlock".equals(blockType) || id.contains("resin_clump"); }
+    public boolean isPointedIcicle() { return "PointedIcicleBlock".equals(blockType) || id.contains("pointed_icicle"); }
+    public boolean isLamp() { return !isFestiveLamp() && !isStringLight() && !isOrnament() && !isBigOrnament() && !isGlowLights() && !isMulticolorGlowLights() && (typeIn("RedstoneLampBlock")); }
+
+    @Override
+    public String toString() {
+        return getNamespacedId() + " [" + blockType + "]";
+    }
+}

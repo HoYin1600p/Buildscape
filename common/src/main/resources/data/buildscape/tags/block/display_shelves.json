@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:oak_shelf",
+    "minecraft:spruce_shelf",
+    "minecraft:birch_shelf",
+    "minecraft:jungle_shelf",
+    "minecraft:acacia_shelf",
+    "minecraft:dark_oak_shelf",
+    "minecraft:mangrove_shelf",
+    "minecraft:crimson_shelf",
+    "minecraft:warped_shelf",
+    "minecraft:cherry_shelf",
+    "minecraft:pale_oak_shelf",
+    "buildscape:poplar_shelf",
+    "minecraft:bamboo_shelf",
+    "buildscape:stripped_bamboo_shelf"
+  ]
+}

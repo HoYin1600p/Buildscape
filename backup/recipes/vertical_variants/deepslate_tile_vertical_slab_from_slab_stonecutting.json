@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:deepslate_tile_slab"
-  },
-  "result": "buildscape:deepslate_tile_vertical_slab",
-  "count": 1
-}

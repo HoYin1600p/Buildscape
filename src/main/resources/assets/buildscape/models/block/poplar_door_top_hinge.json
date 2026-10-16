@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/door_top_rh",
-  "textures": {
-    "bottom": "buildscape:block/poplar_door_bottom",
-    "top": "buildscape:block/poplar_door_top",
-    "particle": "#top"
-  }
-}

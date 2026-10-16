@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/white_glazed_glass_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/white_glazed_glass_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/white_glazed_glass"
+    }
+  }
+}

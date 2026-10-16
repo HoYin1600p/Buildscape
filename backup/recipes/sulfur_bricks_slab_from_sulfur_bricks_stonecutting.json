@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:sulfur_bricks"
-  },
-  "result": "buildscape:sulfur_bricks_slab",
-  "count": 2
-}

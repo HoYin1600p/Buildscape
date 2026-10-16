@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/yellow_factory_mesh_slab"
+    },
+    "type=double": {
+      "model": "buildscape:block/yellow_factory_mesh"
+    },
+    "type=top": {
+      "model": "buildscape:block/yellow_factory_mesh_slab_top"
+    }
+  }
+}

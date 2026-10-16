@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:cobblestone_vertical_slab"
-  },
-  "result": "minecraft:cobblestone_slab",
-  "count": 1
-}

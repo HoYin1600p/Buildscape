@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/mangrove_planks",
+    "top": "minecraft:block/mangrove_planks",
+    "side": "minecraft:block/mangrove_planks",
+    "particle": "#side"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/tinted_bundled_cardboard",
+    "top": "buildscape:block/tinted_bundled_cardboard",
+    "side": "buildscape:block/tinted_bundled_cardboard",
+    "particle": "#side"
+  }
+}

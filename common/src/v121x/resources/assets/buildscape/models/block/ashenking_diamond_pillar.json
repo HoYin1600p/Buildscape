@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/ashenking_pillar",
+  "textures": {
+    "ashenking_pillar": "buildscape:block/ashenking_diamond_pillar",
+    "particle": "minecraft:block/diamond_block"
+  }
+}

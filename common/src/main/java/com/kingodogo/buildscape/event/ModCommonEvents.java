@@ -32,10 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 public final class ModCommonEvents {
 
-    private static int pillarSaveTickCounter = 0;
-    private static int pillarBackupTickCounter = 0;
-    private static final int PILLAR_SAVE_INTERVAL = 600;
-    private static final int PILLAR_BACKUP_INTERVAL = 6000;
+    private static final PillarMaintenanceSchedule PILLAR_MAINTENANCE = new PillarMaintenanceSchedule();
 
     private ModCommonEvents() {}
 
@@ -185,6 +182,49 @@ public final class ModCommonEvents {
 
     public static void onLivingUpdate(LivingEntity entity) {
         ChainMobHandler.onLivingUpdate(entity);
+        Level level = Services.PLATFORM.getEntityLevel(entity);
+        if (com.kingodogo.buildscape.fluid.ModFluids.isExperience(level.getFluidState(entity.blockPosition()).getType())
+                && (entity.isSwimming() || entity.isInWater())) {
+            entity.setDeltaMovement(boostExperienceSwimming(entity.getDeltaMovement()));
+        }
+
+        if (entity.isPassenger() || Services.PLATFORM.isEntityTypeInTag(entity,
+                new com.kingodogo.buildscape.util.CommonId("minecraft", "not_affected_by_geysers"))
+                || entity instanceof Player player && player.getAbilities().flying) return;
+        BlockPos.MutableBlockPos testPos = entity.blockPosition().mutable();
+        for (int i = 0; i < 24; i++) {
+            BlockState state = level.getBlockState(testPos);
+            com.kingodogo.buildscape.util.CommonId blockId = Services.PLATFORM.getBlockId(state.getBlock());
+            if (blockId != null && blockId.getPath().equals("potent_sulfur")
+                    && (blockId.getNamespace().equals("buildscape") || blockId.getNamespace().equals("minecraft"))) {
+                net.minecraft.world.level.block.state.properties.Property<?> geyserState =
+                        state.getBlock().getStateDefinition().getProperty("state");
+                boolean erupting = geyserState != null && state.hasProperty(geyserState)
+                        && state.getValue(geyserState) instanceof net.minecraft.util.StringRepresentable value
+                        && (value.getSerializedName().equals("erupting") || value.getSerializedName().equals("continuous"));
+                if (erupting) {
+                    BlockPos.MutableBlockPos waterTop = testPos.above().mutable();
+                    while (level.getFluidState(waterTop).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) {
+                        waterTop.move(net.minecraft.core.Direction.UP);
+                    }
+                    int waterBlocks = Math.max(1, waterTop.getY() - testPos.getY() - 1);
+                    var velocity = entity.getDeltaMovement();
+                    if (velocity.y < 0.3D + waterBlocks * 0.1D) {
+                        entity.resetFallDistance();
+                        entity.setDeltaMovement(velocity.add(0.0D, 0.2D, 0.0D));
+                        Services.PLATFORM.markGeyserVelocityChanged(entity);
+                    }
+                }
+                break;
+            }
+            if (!state.isAir() && !state.is(net.minecraft.world.level.block.Blocks.WATER)
+                    && !state.getCollisionShape(level, testPos).isEmpty()) break;
+            testPos.move(net.minecraft.core.Direction.DOWN);
+        }
+    }
+
+    static net.minecraft.world.phys.Vec3 boostExperienceSwimming(net.minecraft.world.phys.Vec3 velocity) {
+        return velocity.multiply(1.175D, 1.06D, 1.175D);
     }
 
     public static void onItemCrafted(Player player, ItemStack stack) {
@@ -343,6 +383,8 @@ public final class ModCommonEvents {
 
         // Reset cached data from the previous world.
         PillarIdManager.resetWorldCache();
+        PILLAR_MAINTENANCE.reset();
+        com.kingodogo.buildscape.BuildscapeCommon.setServerFullyInitialized(false);
 
         // Preserve explicit server registration from dev/multiversion.
         PillarIdManager.setCurrentServer(server);
@@ -357,13 +399,18 @@ public final class ModCommonEvents {
         MudToClayHandler.onServerTick(server);
         TreeChopJobManager.onServerTick(server);
 
-        if (server != null) {
-            pillarSaveTickCounter++;
-            if (pillarSaveTickCounter >= PILLAR_SAVE_INTERVAL) {
-                pillarSaveTickCounter = 0;
-                PillarIdManager.get().saveImmediate(server);
-            }
+        if (server == null || !server.isRunning()) return;
+        PillarIdManager manager = PillarIdManager.get();
+        if (!manager.hasLoaded()) {
+            if (!manager.isLoadInProgress()) manager.load(server);
+            return;
         }
+        com.kingodogo.buildscape.BuildscapeCommon.setServerFullyInitialized(true);
+        PILLAR_MAINTENANCE.tick(() -> manager.savePeriodic(false), () -> manager.savePeriodic(true),
+                manager::flushRequestedSave, server.getPlayerList().getPlayerCount() > 0,
+                PillarIdManager::checkAndRunScheduledRecovery, () -> {
+                    if (manager.needsWorldRecovery()) manager.scheduleRecoveryFromWorld(server, false);
+                });
     }
 
     public static void onServerStopping() {
@@ -374,8 +421,7 @@ public final class ModCommonEvents {
         com.kingodogo.buildscape.block.CascadeWaterManager.onServerStopping();
         HollowLogCrawlHandler.onServerStopping();
         JOINED_PLAYERS.clear();
-        pillarSaveTickCounter = 0;
-        pillarBackupTickCounter = 0;
+        PILLAR_MAINTENANCE.reset();
         try {
             PillarIdManager manager = PillarIdManager.get();
             if (manager != null && manager.hasLoaded()) {
@@ -396,8 +442,7 @@ public final class ModCommonEvents {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to save pillar data after server shutdown", exception);
         } finally {
             com.kingodogo.buildscape.BuildscapeCommon.setServerFullyInitialized(false);
-            pillarSaveTickCounter = 0;
-            pillarBackupTickCounter = 0;
+            PILLAR_MAINTENANCE.reset();
             PillarIdManager.fullReset();
             PillarIdManager.setCurrentServer(null);
         }
@@ -411,6 +456,12 @@ public final class ModCommonEvents {
     }
 
     public static void onLevelUnload(net.minecraft.server.level.ServerLevel level) {
+        try {
+            PillarIdManager manager = PillarIdManager.get();
+            if (manager.hasLoaded()) manager.savePeriodic(true);
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to save pillar data during world unload", exception);
+        }
         com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onLevelUnload(level);
         com.kingodogo.buildscape.block.CascadeWaterManager.onLevelUnload(level);
         TreeChopJobManager.onLevelUnload(level);

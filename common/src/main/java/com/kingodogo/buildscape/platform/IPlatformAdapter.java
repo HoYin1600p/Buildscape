@@ -344,6 +344,10 @@ public interface IPlatformAdapter {
 
     void markEntityVelocityChanged(net.minecraft.world.entity.Entity entity);
 
+    default void markGeyserVelocityChanged(net.minecraft.world.entity.Entity entity) {
+        markEntityVelocityChanged(entity);
+    }
+
     net.minecraft.world.InteractionResult sidedSuccess(boolean clientSide);
     boolean doesBedExplode(net.minecraft.world.level.Level level);
     net.minecraft.world.item.trading.MerchantOffer createMerchantOffer(net.minecraft.world.item.ItemStack cost, net.minecraft.world.item.ItemStack result, int maxUses, int xp, float priceMultiplier);

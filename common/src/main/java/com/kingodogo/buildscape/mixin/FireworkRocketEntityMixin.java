@@ -62,4 +62,32 @@ public abstract class FireworkRocketEntityMixin extends Entity {
             buildscape$applyShotYaw(shooter.getYRot());
         }
     }
+
+    @Inject(method = "handleEntityEvent", at = @At("HEAD"))
+    private void buildscape$onHandleEntityEvent(byte eventId, CallbackInfo ci) {
+        if (eventId != 17 || !com.kingodogo.buildscape.platform.Services.PLATFORM.getEntityLevel(this).isClientSide()) return;
+        ItemStack stack = this.entityData.get(DATA_ID_FIREWORKS_ITEM);
+        if (stack.isEmpty()) return;
+        CompoundTag data = com.kingodogo.buildscape.platform.Services.PLATFORM.getCustomData(stack, false);
+        CompoundTag fireworks = data == null ? null : com.kingodogo.buildscape.platform.Services.PLATFORM.getTagCompound(data, "Fireworks");
+        if (fireworks != null && fireworks.contains("ShotYaw")) return;
+        Entity owner = ((Projectile) (Object) this).getOwner();
+        float yaw = this.attachedToEntity != null ? this.attachedToEntity.getYRot()
+                : owner != null ? owner.getYRot() : this.getYRot();
+        ItemStack copy = stack.copy();
+        com.kingodogo.buildscape.platform.Services.PLATFORM.updateCustomData(copy, tag -> {
+            CompoundTag facing = com.kingodogo.buildscape.platform.Services.PLATFORM.getTagCompound(tag, "Fireworks");
+            if (facing == null) facing = new CompoundTag();
+            facing.putFloat("ShotYaw", yaw);
+            if (facing.get("Explosions") instanceof ListTag explosions) {
+                for (net.minecraft.nbt.Tag value : explosions) {
+                    if (value instanceof CompoundTag explosion && !explosion.contains("ShotYaw")) {
+                        explosion.putFloat("ShotYaw", yaw);
+                    }
+                }
+            }
+            tag.put("Fireworks", facing);
+        });
+        this.entityData.set(DATA_ID_FIREWORKS_ITEM, copy);
+    }
 }

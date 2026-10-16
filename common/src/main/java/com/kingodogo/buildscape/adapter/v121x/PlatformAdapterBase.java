@@ -1463,6 +1463,12 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void markGeyserVelocityChanged(Entity entity) {
+        markEntityVelocityChanged(entity);
+        if (!getEntityLevel(entity).isClientSide()) entity.hurtMarked = true;
+    }
+
+    @Override
     public net.minecraft.world.InteractionResult sidedSuccess(boolean clientSide) {
         return net.minecraft.world.InteractionResult.sidedSuccess(clientSide);
     }

@@ -62,6 +62,8 @@ import java.util.function.Function;
 public final class BuildscapeFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack, context, lines) ->
+                com.kingodogo.buildscape.event.TagTooltipHandler.handleItemTooltip(stack, lines));
         // Vanilla has not constructed its colour tables yet. Forward adapter registrations
         // into Fabric's deferred registries, and resolve vanilla item colours when rendering.
         FoliageColors.register(new BlockColors() {

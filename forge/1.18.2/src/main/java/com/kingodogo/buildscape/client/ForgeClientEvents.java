@@ -21,6 +21,11 @@ import net.minecraftforge.fml.common.Mod;
 public final class ForgeClientEvents {
     private ForgeClientEvents() {}
 
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public static void tooltip(net.minecraftforge.event.entity.player.ItemTooltipEvent event) {
+        com.kingodogo.buildscape.event.TagTooltipHandler.handleItemTooltip(event.getItemStack(), event.getToolTip());
+    }
+
     @SubscribeEvent
     public static void tick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;

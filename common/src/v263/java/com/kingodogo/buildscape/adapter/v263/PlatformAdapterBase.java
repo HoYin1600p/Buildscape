@@ -268,6 +268,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override public boolean hasShiftDown() { return com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.hasShiftDown(); }
 
     @Override public boolean hasControlDown() { return com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.hasControlDown(); }
+    @Override public String getClipboardText() { return com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.getClipboardText(); }
 
 
 

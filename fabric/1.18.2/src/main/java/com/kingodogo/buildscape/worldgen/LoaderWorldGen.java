@@ -16,7 +16,7 @@ public final class LoaderWorldGen {
     public static boolean contains(CommonId id) {
         return "buildscape".equals(id.getNamespace()) && IDS.contains(id.getPath());
     }
-    private static void queue(FabricRegistryAdapter registry, String path, Supplier<ConfiguredFeature<?, ?>> factory) {
+    private static void queue(FabricRegistryAdapter registry, String path, Supplier<?> factory) {
         if (!IDS.add(path)) throw new IllegalStateException("Duplicate configured feature: " + path);
         com.kingodogo.buildscape.platform.Services.PLATFORM.wrapRegistryAction(() -> com.kingodogo.buildscape.platform.Services.PLATFORM.registerConfiguredFeature(new CommonId("buildscape", path), factory.get()));
     }

@@ -80,6 +80,14 @@ import java.util.function.Consumer;
 public final class MixinClientHooks {
     public static final MixinClientHooks INSTANCE = new MixinClientHooks();
 
+    /**
+     * How an extra (standalone) model registered by the loader is found in the baked model manager.
+     * Forge keeps it under a ModelResourceLocation with an empty variant; Fabric bakes it under the plain
+     * ResourceLocation, which only its BakedModelManagerHelper can read, so the Fabric client replaces this.
+     */
+    public static java.util.function.BiFunction<ModelManager, net.minecraft.resources.ResourceLocation, BakedModel> EXTRA_MODEL_LOOKUP =
+            (manager, id) -> manager.getModel(new net.minecraft.client.resources.model.ModelResourceLocation(id, ""));
+
     private MixinClientHooks() {}
 
 
@@ -91,9 +99,8 @@ public final class MixinClientHooks {
         if (frameType == SignFrameType.NONE || frameType.getModelLocation() == null) return;
 
         ModelManager modelManager = Minecraft.getInstance().getModelManager();
-        BakedModel frameModel = modelManager.getModel(new net.minecraft.client.resources.model.ModelResourceLocation(
-                new net.minecraft.resources.ResourceLocation(frameType.getModelLocation().getNamespace(), frameType.getModelLocation().getPath()), ""
-        ));
+        BakedModel frameModel = EXTRA_MODEL_LOOKUP.apply(modelManager,
+                new net.minecraft.resources.ResourceLocation(frameType.getModelLocation().getNamespace(), frameType.getModelLocation().getPath()));
         if (frameModel == null || frameModel == modelManager.getMissingModel()) return;
 
         BlockState state = blockEntity.getBlockState();

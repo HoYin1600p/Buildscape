@@ -147,6 +147,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             };
         }
         if (block instanceof net.minecraft.world.level.block.BedBlock) return new net.minecraft.world.item.BedItem(block, properties);
+        // The loader's item renderer hook (Forge render properties, Fabric builtin renderer) matches this class.
+        if (block != null && id.endsWith("copper_chest")) return new com.kingodogo.buildscape.item.CopperChestItem(block, properties);
         if (id.equals("mangrove_boat")) return new com.kingodogo.buildscape.item.MangroveBoatItem(properties.stacksTo(1));
         if (id.equals("mangrove_sign") || id.equals("bamboo_sign")) {
             Block wall = com.kingodogo.buildscape.block.ModBlocks.get(id.equals("mangrove_sign")
@@ -168,7 +170,103 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public Item.Properties prepareItemProperties(CommonId id, Item.Properties properties) {
         return properties.tab(CreativeTabs118x.tabFor(id));
     }
+    @Override
+    public void dropPlayerItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.item.ItemStack stack, boolean randomThrow) {
+        player.drop(stack, randomThrow);
+    }
+    @Override
+    public void swingPlayerHand(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        player.swing(hand);
+    }
+    @Override
+    public void resetSwingAnimation(net.minecraft.world.entity.LivingEntity entity) {
+        entity.swingTime = 0;
+        entity.attackAnim = 0.0F;
+        entity.oAttackAnim = 0.0F;
+    }
+    @Override
+    public boolean isEnderman(net.minecraft.world.entity.Entity entity) {
+        return entity instanceof net.minecraft.world.entity.monster.EnderMan;
+    }
+    @Override
+    public boolean isLargeFireball(net.minecraft.world.entity.Entity entity) {
+        return entity instanceof net.minecraft.world.entity.projectile.LargeFireball;
+    }
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.getMaterial().isReplaceable(); }
+    @Override public Boolean writeSolvedToShulker(net.minecraft.world.item.ItemStack shulker, List<net.minecraft.world.item.ItemStack> solved) {
+        NonNullList<net.minecraft.world.item.ItemStack> shulkerItems = NonNullList.withSize(27, net.minecraft.world.item.ItemStack.EMPTY);
+        net.minecraft.nbt.CompoundTag blockEntityTag = shulker.getTagElement("BlockEntityTag");
+        if (blockEntityTag != null && blockEntityTag.contains("Items", 9)) {
+            ContainerHelper.loadAllItems(blockEntityTag, shulkerItems);
+        }
+
+        net.minecraft.nbt.CompoundTag beTag = shulker.getOrCreateTagElement("BlockEntityTag");
+        net.minecraft.nbt.ListTag savedFilters = beTag.getList("GhostFilters", 8);
+        List<String> filters = new ArrayList<>(27);
+        for (int i = 0; i < 27; i++) {
+            filters.add(i < savedFilters.size() ? savedFilters.getString(i) : "");
+            net.minecraft.world.item.ItemStack item = shulkerItems.get(i);
+            if (!item.isEmpty() && item.hasTag() && item.getTag().getBoolean("ghost")) {
+                net.minecraft.resources.ResourceLocation id = net.minecraft.core.Registry.ITEM.getKey(item.getItem());
+                if (filters.get(i).isEmpty() && id != null) filters.set(i, id.toString());
+                shulkerItems.set(i, net.minecraft.world.item.ItemStack.EMPTY);
+            }
+        }
+
+        int targetRow = -1;
+        for (int row = 0; row < 3; row++) {
+            boolean rowCanFit = true;
+            boolean rowHasAnyConflict = false;
+            for (int col = 0; col < 9; col++) {
+                int slot = row * 9 + col;
+                net.minecraft.world.item.ItemStack solvedStack = solved.get(col);
+                boolean slotOccupied = !shulkerItems.get(slot).isEmpty() || !filters.get(slot).isEmpty();
+                if (slotOccupied) rowHasAnyConflict = true;
+                if (!solvedStack.isEmpty() && slotOccupied) {
+                    rowCanFit = false;
+                    break;
+                }
+            }
+            if (rowCanFit) {
+                if (!rowHasAnyConflict || targetRow < 0) {
+                    targetRow = row;
+                    if (!rowHasAnyConflict) break;
+                }
+            }
+        }
+
+        if (targetRow < 0) return false;
+
+        boolean wroteAnyFilter = false;
+        for (int i = 0; i < 9; i++) {
+            int slot = targetRow * 9 + i;
+            net.minecraft.world.item.ItemStack solvedStack = solved.get(i);
+            if (!solvedStack.isEmpty()) {
+                net.minecraft.resources.ResourceLocation itemId = net.minecraft.core.Registry.ITEM.getKey(solvedStack.getItem());
+                if (itemId != null) {
+                    filters.set(slot, itemId.toString());
+                    wroteAnyFilter = true;
+                }
+            }
+        }
+
+        if (!wroteAnyFilter) return false;
+
+        boolean hasFilter = false;
+        net.minecraft.nbt.ListTag newGhostFiltersList = new net.minecraft.nbt.ListTag();
+        for (String filter : filters) {
+            if (!filter.isEmpty()) hasFilter = true;
+            newGhostFiltersList.add(net.minecraft.nbt.StringTag.valueOf(filter));
+        }
+        ContainerHelper.saveAllItems(beTag, shulkerItems);
+        if (hasFilter) {
+            beTag.put("GhostFilters", newGhostFiltersList);
+        } else {
+            beTag.remove("GhostFilters");
+        }
+        return true;
+    }
+    @Override public boolean isSolidMaterial(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state) { return state.getMaterial().isSolid(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block instanceof net.minecraft.world.level.block.AbstractGlassBlock; }
     @Override
     public net.minecraft.world.level.block.RenderShape getEntityBlockRenderShape() { return net.minecraft.world.level.block.RenderShape.ENTITYBLOCK_ANIMATED; }
@@ -349,7 +447,37 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public Entity createWanderingHomemakerEntity(Level level, boolean festive) {
-        return festive ? new FestiveWanderingHomemakerEntityImpl(level) : new WanderingHomemakerEntityImpl(level);
+        return (festive ? getFestiveWanderingHomemakerEntityType() : getWanderingHomemakerEntityType()).create(level);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Item createHomemakerSpawnEggItem(Item.Properties properties, boolean festive) {
+        EntityType<? extends net.minecraft.world.entity.Mob> type =
+                (EntityType<? extends net.minecraft.world.entity.Mob>) (festive
+                        ? getFestiveWanderingHomemakerEntityType() : getWanderingHomemakerEntityType());
+        return new SpawnEggItem(type, festive ? 0x990000 : 0x5c3c24, festive ? 0x009900 : 0xe4b484, properties) {
+            @Override public int getColor(int tintIndex) { return -1; }
+
+            @Override
+            public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+                super.appendHoverText(stack, level, tooltip, flag);
+                tooltip.add(new TranslatableComponent("tooltip.buildscape." + (festive
+                        ? "festive_wandering_homemaker_spawn_egg" : "wandering_homemaker_spawn_egg") + ".spawn_info"));
+                if (level != null) {
+                    long remaining = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime
+                            - System.currentTimeMillis();
+                    if (remaining > 0) {
+                        long seconds = remaining / 1000;
+                        tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active",
+                                seconds / 60, seconds % 60).withStyle(net.minecraft.ChatFormatting.RED));
+                    } else {
+                        tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                                .withStyle(net.minecraft.ChatFormatting.GREEN));
+                    }
+                }
+            }
+        };
     }
 
     @Override
@@ -588,6 +716,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return WorldGenFactory.createRandomStateProvider(states);
     }
     @Override
+    public net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createSimpleStateProvider(BlockState state) {
+        return net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider.simple(state);
+    }
+    @Override
     public net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator getCreakingHeartTreeDecorator() {
         return WorldGenFactory.getCreakingHeartTreeDecorator();
     }
@@ -646,6 +778,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             builder.add(states.get(i), weights.get(i));
         }
         return new net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider(builder);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createTreeFeature(Object configuration) {
+        return WorldGenFactory.createTreeFeature(configuration);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration createSimpleBlockConfiguration(
+            net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider stateProvider) {
+        return WorldGenFactory.createSimpleBlockConfiguration(stateProvider);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createSimpleBlockFeature(Object configuration) {
+        return WorldGenFactory.createSimpleBlockFeature(configuration);
     }
     @Override
     public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createPatchFeature(
@@ -999,7 +1144,26 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public int getDyeColorValue(DyeColor color) {
-        return color != null ? color.getFireworkColor() : 0xFFFFFF;
+        if (color == null) return 0xFFFFFF;
+        // The reference's glow light dye palette (not the vanilla firework colors).
+        return switch (color) {
+            case WHITE -> 0xE8FEFD;
+            case ORANGE -> 0xFF5C00;
+            case MAGENTA -> 0xFF00FF;
+            case LIGHT_BLUE -> 0x3CDFFF;
+            case YELLOW -> 0xFFFF00;
+            case LIME -> 0xBFFE00;
+            case PINK -> 0xF686B7;
+            case GRAY -> 0x232526;
+            case LIGHT_GRAY -> 0xB1B8C5;
+            case CYAN -> 0x00FFFF;
+            case PURPLE -> 0xAB87FF;
+            case BLUE -> 0x1919EA;
+            case BROWN -> 0x411900;
+            case GREEN -> 0x39FF14;
+            case RED -> 0xFF0000;
+            case BLACK -> 0x07010C;
+        };
     }
 
     @Override
@@ -1052,6 +1216,16 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public int getEfficiencyLevel(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return 0;
         return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY, stack);
+    }
+
+    @Override
+    public boolean isAxeItem(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.AxeItem;
+    }
+
+    @Override
+    public boolean isHoeItem(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.HoeItem;
     }
 
     @Override
@@ -1361,13 +1535,21 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public boolean isSameItemSameComponents(ItemStack a, ItemStack b) {
-        return ItemStack.matches(a, b);
+        // The name and every caller mean the same item and tags regardless of count (ItemStack.matches also compares counts).
+        return ItemStack.isSameItemSameTags(a, b);
     }
 
     @Override
     public void applyNauseaEffect(LivingEntity entity, int durationTicks, int amplifier) {
         if (entity != null) {
             entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, durationTicks, amplifier, true, true));
+        }
+    }
+
+    @Override
+    public void hurtGenericDamage(LivingEntity entity, float amount) {
+        if (entity != null) {
+            entity.hurt(DamageSource.GENERIC, amount);
         }
     }
 
@@ -1718,6 +1900,30 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public Item createColoredItemFrameItem(Item.Properties properties, String colorVariant) {
         return new com.kingodogo.buildscape.item.ColoredItemFrameItem(properties, colorVariant) {
             @Override
+            public InteractionResult useOn(net.minecraft.world.item.context.UseOnContext context) {
+                BlockPos placePos = context.getClickedPos().relative(context.getClickedFace());
+                Direction face = context.getClickedFace();
+                Player player = context.getPlayer();
+                ItemStack stack = context.getItemInHand();
+                Level level = context.getLevel();
+                if (player != null && (player.level.isOutsideBuildHeight(placePos)
+                        || !player.mayUseItemAt(placePos, face, stack))) {
+                    return InteractionResult.FAIL;
+                }
+                ColoredItemFrameEntityImpl frame = (ColoredItemFrameEntityImpl)
+                        createColoredItemFrameEntity(level, placePos, face, colorVariant);
+                CompoundTag tag = stack.getTag();
+                if (tag != null) EntityType.updateCustomEntityTag(level, player, frame, tag);
+                if (!frame.survives()) return InteractionResult.CONSUME;
+                if (!level.isClientSide) {
+                    frame.playPlacementSound();
+                    level.gameEvent(player, net.minecraft.world.level.gameevent.GameEvent.ENTITY_PLACE, placePos);
+                    level.addFreshEntity(frame);
+                }
+                stack.shrink(1);
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+            @Override
             public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
                 appendColoredItemFrameTooltip(stack, tooltip::add);
                 super.appendHoverText(stack, level, tooltip, flag);
@@ -1727,9 +1933,15 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public Item createExperienceBucketItem(Item.Properties properties) {
-        return new com.kingodogo.buildscape.item.ExperienceBucketItem(properties) {
+        return new BucketItem(com.kingodogo.buildscape.fluid.ModFluids.getStill(), properties.stacksTo(1)) {
             @Override
             public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+                if (!player.isShiftKeyDown()) {
+                    InteractionResultHolder<ItemStack> placementResult = super.use(level, player, hand);
+                    if (placementResult.getResult() != InteractionResult.PASS) {
+                        return placementResult;
+                    }
+                }
                 player.startUsingItem(hand);
                 return InteractionResultHolder.consume(player.getItemInHand(hand));
             }
@@ -2386,6 +2598,27 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
+        if (bufferSource instanceof net.minecraft.client.renderer.MultiBufferSource mbs) {
+            com.mojang.blaze3d.vertex.VertexConsumer buffer = mbs.getBuffer(net.minecraft.client.renderer.RenderType.lightning());
+            com.mojang.math.Matrix4f pose = poseStack.last().pose();
+            float x0 = (float) minX, y0 = (float) minY, z0 = (float) minZ, x1 = (float) maxX, y1 = (float) maxY, z1 = (float) maxZ;
+            float[][] quads = {
+                {x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1},
+                {x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0},
+                {x0, y0, z0, x0, y1, z0, x1, y1, z0, x1, y0, z0},
+                {x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1},
+                {x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0},
+                {x1, y0, z0, x1, y1, z0, x1, y1, z1, x1, y0, z1}};
+            for (float[] q : quads) {
+                for (int i = 0; i < 12; i += 3) {
+                    buffer.vertex(pose, q[i], q[i + 1], q[i + 2]).color(r, g, b, a).endVertex();
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean isScreenOpen() {
         return net.minecraft.client.Minecraft.getInstance().screen != null;
     }
@@ -2954,8 +3187,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             this.setDirection(direction);
         }
 
+        @SuppressWarnings("unchecked")
         public ColoredItemFrameEntityImpl(Level level, BlockPos pos, Direction direction, String color) {
-            super(EntityType.ITEM_FRAME, level, pos);
+            super((EntityType<? extends HangingEntity>) Services.PLATFORM.getColoredItemFrameEntityType(), level, pos);
             this.setDirection(direction);
             this.setColorVariant(color);
             if ("invisible".equals(color)) {
@@ -3025,6 +3259,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         @Override
         public int getHeight() {
             return 12;
+        }
+
+        @Override
+        public Direction getFrameDirection() {
+            return this.getDirection();
         }
 
         @Override
@@ -3532,6 +3771,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     this.recalculateBoundingBox();
                 }
             }
+        }
+
+        @Override
+        public Direction getFrameDirection() {
+            return this.getDirection();
         }
 
         @Override
@@ -4160,5 +4404,30 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         } catch (Exception ignored) {
         }
     }
-}
 
+    // Pillar and shelf display entities and item models (client-only code lives in ClientPillarEntities).
+    @Override
+    public net.minecraft.world.entity.Entity createArmorStandEntity(net.minecraft.world.level.Level level, double x, double y, double z) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.createArmorStand(level, x, y, z);
+    }
+
+    @Override
+    public Object getItemModel(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.Level level, int seed) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.getItemModel(stack, level, seed);
+    }
+
+    @Override
+    public boolean isGui3dModel(Object model) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.isGui3dModel(model);
+    }
+
+    @Override
+    public net.minecraft.world.entity.Entity createMobPillarEntity(net.minecraft.world.item.ItemStack egg, net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos, Object state) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.createMob(egg, level, pos, state);
+    }
+
+    @Override
+    public void applyMobState(net.minecraft.world.entity.Entity entity, Object state) {
+        com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.applyMobState(entity, state);
+    }
+}

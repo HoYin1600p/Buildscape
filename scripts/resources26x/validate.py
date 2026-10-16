@@ -6,6 +6,7 @@ unbound, but concrete item/blockstate models must bind every used parameter.
 """
 import argparse
 from functools import lru_cache
+import importlib.util
 import json
 from pathlib import Path
 import re
@@ -13,8 +14,26 @@ import zipfile
 
 from convert import FOLDERS, TAG_FOLDERS, PACK, SPECIAL_ITEMS
 
+
+def _profile_support():
+    """The version profiles live in this folder's convert.py. Load that file by path:
+    resources121x loads this module while its own convert.py is the `convert` module."""
+    spec = importlib.util.spec_from_file_location("resources26x_profiles", Path(__file__).with_name("convert.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_profiles = _profile_support()
+PROFILES, DEFAULT_PROFILE, profile_named = _profiles.PROFILES, _profiles.DEFAULT_PROFILE, _profiles.profile_named
+FEATURE_FILE, LEGACY_CONDITION_TYPES_263, PROVIDER_TYPES_263 = (
+    _profiles.FEATURE_FILE, _profiles.LEGACY_CONDITION_TYPES_263, _profiles.PROVIDER_TYPES_263)
+
 ID = re.compile(r"^[a-z0-9_.-]+:[a-z0-9/._-]+$")
 BUILTINS = {"minecraft:builtin/generated"}
+REPO = Path(__file__).resolve().parents[2]
+# Folders 26.3 renamed; a copy left in an older layer is superseded, not an error.
+RETIRED_DIRS_263 = re.compile(r"data/[^/]+/(?:worldgen/configured_feature/|tags/worldgen/configured_feature/)")
 
 
 def item_model(model):
@@ -57,12 +76,25 @@ def strings(value):
 
 
 class Validator:
-    def __init__(self, root, vanilla):
+    def __init__(self, root, vanilla, profile=DEFAULT_PROFILE, base=None):
+        """root is the layer under test; base (optional) is the layer below it.
+
+        Later layers replace same-path files, as in the Gradle resource source sets,
+        so 26.3's overlay is validated together with the 26.2 resources it patches.
+        """
         self.root = Path(root)
+        self.profile = profile_named(profile)
+        self.version = self.profile["version"]
         self.vanilla = vanilla
         self.jar_files = set(vanilla.namelist())
-        self.files = {p.relative_to(self.root).as_posix(): p
-                      for p in self.root.rglob("*") if p.is_file()}
+        self.files = {}
+        if base is not None:
+            for p in Path(base).rglob("*"):
+                rel = p.relative_to(base).as_posix()
+                if p.is_file() and not (self.version == "26.3" and RETIRED_DIRS_263.match(rel)):
+                    self.files[rel] = p
+        self.files.update({p.relative_to(self.root).as_posix(): p
+                           for p in self.root.rglob("*") if p.is_file()})
         self.json = {}
         self.errors = []
         self.concrete_models = set()
@@ -139,6 +171,11 @@ class Validator:
                     self.error(path, "legacy tag folder " + parts[3])
                 if parts[1] == "forge":
                     self.error(path, "legacy forge namespace")
+                if self.version == "26.3":
+                    if parts[2] == "worldgen" and len(parts) > 3 and parts[3] in ("configured_feature", "configured_carver"):
+                        self.error(path, "legacy 26.3 worldgen folder " + parts[3])
+                    if parts[2:5] == ["tags", "worldgen", "configured_feature"]:
+                        self.error(path, "legacy 26.3 worldgen tag folder configured_feature")
         for p in (self.root / "data").rglob("*"):
             if p.is_dir():
                 parts = p.relative_to(self.root).parts
@@ -209,6 +246,10 @@ class Validator:
             if "/models/" in path:
                 if "overrides" in d:
                     self.error(path, "legacy item model overrides")
+                if self.version == "26.3":
+                    for element in d.get("elements", []) if isinstance(d.get("elements"), list) else []:
+                        if isinstance(element, dict) and "shade" in element:
+                            self.error(path, "legacy element shade (26.3 uses shade_direction_override)")
                 if "parent" in d and namespaced(d["parent"]) not in BUILTINS:
                     self.reference(path, d["parent"], "models")
                 self.textures(path, d)
@@ -225,8 +266,8 @@ class Validator:
                if path.startswith("assets/buildscape/models/item/") and path.endswith(".json")
                and not Path(path).stem.startswith("template_")}
         ids.update(SPECIAL_ITEMS)
-        order = self.root / "data/buildscape/creative_tab_order.txt"
-        if not order.exists():
+        order = self.files.get("data/buildscape/creative_tab_order.txt")
+        if order is None:
             self.error("data/buildscape/creative_tab_order.txt", "missing creative item order")
         else:
             ids.update(line.strip().removeprefix("buildscape:") for line in order.read_text(encoding="utf-8-sig").splitlines()
@@ -360,7 +401,7 @@ class Validator:
                         part.pop("when")
                     vanilla_parts.append(part)
             if vanilla_parts != base["multipart"]:
-                self.error(path, "composter vanilla levels differ from 26.2")
+                self.error(path, "composter vanilla levels differ from " + self.version)
         for name in ("hollow_log", "stripped_hollow_log"):
             path = "assets/minecraft/models/block/" + name + ".json"
             if path in self.jar_files:
@@ -379,7 +420,7 @@ class Validator:
                 baseline = json.loads(json.dumps(d))
                 baseline["pools"] = [p for p in d["pools"] if "buildscape:" not in json.dumps(p)]
                 if baseline != self.get_vanilla(path):
-                    self.error(path, "vanilla loot baseline differs from 26.2")
+                    self.error(path, "vanilla loot baseline differs from " + self.version)
         # Snow and planter loot intentionally change gameplay, but keep the
         # vanilla recipe/table serializer and output/base composter drop.
         path = "data/minecraft/recipe/snow.json"
@@ -395,18 +436,135 @@ class Validator:
             if d.get("type") != base.get("type") or not any(o.get("name") == "minecraft:composter" for o in objects(d)):
                 self.error(path, "composter loot lost vanilla type/drop")
 
+    def condition_263(self, path, node):
+        if isinstance(node, str):
+            ns, sep, name = node.partition(":")
+            if not sep or not ID.fullmatch(node) or not self.exists("data/" + ns + "/predicate/" + name + ".json"):
+                self.error(path, "missing loot predicate " + repr(node))
+        elif isinstance(node, dict):
+            if not isinstance(node.get("type"), str):
+                self.error(path, "loot predicate needs a type")
+        else:
+            self.error(path, "loot predicate must be an id or an object: " + repr(node))
+
+    def loot_263(self, path, d):
+        """26.3 loot tables: "type" keys, one "condition", one "modifier" (object or list)."""
+        for obj in objects(d):
+            if "conditions" in obj:
+                self.error(path, "legacy conditions list (26.3 has one condition)")
+            if "functions" in obj:
+                self.error(path, "legacy functions list (26.3 uses modifier)")
+            if "function" in obj:
+                self.error(path, "legacy function key (26.3 uses type)")
+            if isinstance(obj.get("condition"), str) and obj["condition"] in LEGACY_CONDITION_TYPES_263:
+                self.error(path, "legacy condition key " + obj["condition"] + " (26.3 uses type)")
+            elif "condition" in obj:
+                self.condition_263(path, obj["condition"])
+            if "modifier" in obj and not isinstance(obj["modifier"], (dict, list)):
+                self.error(path, "modifier must be a function or a list of functions")
+            kind = obj.get("type")
+            if kind in {"minecraft:any_of", "minecraft:all_of"}:
+                if not isinstance(obj.get("terms"), list):
+                    self.error(path, "predicate needs terms")
+                else:
+                    for term in obj["terms"]:
+                        self.condition_263(path, term)
+            if kind == "minecraft:inverted":
+                self.condition_263(path, obj.get("term"))
+            if kind == "minecraft:block_state_property":
+                self.error(path, "legacy block_state_property (26.3 uses match_block)")
+            if kind == "minecraft:match_block":
+                vals = obj.get("blocks")
+                for v in vals if isinstance(vals, list) else [vals]:
+                    self.tag(path, "block", v)
+            if kind == "minecraft:match_tool":
+                pred = obj.get("predicate", {})
+                if "enchantments" in pred or "stored_enchantments" in pred:
+                    self.error(path, "legacy item enchantment predicate")
+                for field in ("minecraft:enchantments", "minecraft:stored_enchantments"):
+                    for check in pred.get("predicates", {}).get(field, []):
+                        if "enchantment" in check or "enchantments" not in check:
+                            self.error(path, "enchantment check needs enchantments")
+                        else:
+                            vals = check["enchantments"]
+                            for v in vals if isinstance(vals, list) else [vals]:
+                                self.tag(path, "enchantment", v)
+                if "items" in pred:
+                    vals = pred["items"]
+                    for v in vals if isinstance(vals, list) else [vals]:
+                        self.tag(path, "item", v)
+            if kind in {"minecraft:enchant_with_levels", "minecraft:enchant_randomly"}:
+                if "treasure" in obj or "enchantments" in obj or "options" not in obj:
+                    self.error(path, "legacy enchant function fields")
+                else:
+                    options = obj["options"]
+                    for v in options if isinstance(options, list) else [options]:
+                        self.tag(path, "enchantment", v)
+            if kind == "minecraft:item" and "name" in obj:
+                self.tag(path, "item", obj["name"])
+            for tag in obj.get("tags", []) if isinstance(obj.get("tags"), list) else []:
+                if isinstance(tag, dict) and "expected" in tag and not str(tag.get("id", "")).startswith("#"):
+                    self.error(path, "damage tag id must start with #")
+
+    def advancement_263(self, path, d):
+        for name, criterion in (d.get("criteria") or {}).items():
+            conditions = criterion.get("conditions", {}) if isinstance(criterion, dict) else {}
+            if not isinstance(conditions, dict):
+                continue
+            for legacy in ("recipe", "recipe_id"):
+                if legacy in conditions:
+                    self.error(path, "criterion " + name + ": legacy " + legacy + " (26.3 uses recipes)")
+            if criterion.get("trigger") == "minecraft:enter_block" and "block" in conditions:
+                self.error(path, "criterion " + name + ": legacy block (26.3 uses blocks)")
+            for key, value in conditions.items():
+                if (isinstance(value, list) and value
+                        and all(isinstance(v, dict) and "condition" in v for v in value)):
+                    self.error(path, "criterion " + name + ": legacy predicate list in " + key)
+            self.loot_263(path, conditions)
+
+    def worldgen_263(self, path, d):
+        """Feature and placed feature schema of 26.3: flat config, id/properties states, renamed providers."""
+        for obj in objects(d):
+            if "Name" in obj or "Properties" in obj:
+                self.error(path, "legacy block state Name/Properties (26.3 uses id/properties)")
+            if isinstance(obj.get("config"), dict) and isinstance(obj.get("type"), str):
+                self.error(path, "legacy nested feature config")
+            if obj.get("type") in PROVIDER_TYPES_263 or obj.get("type") == "minecraft:simple_state_provider":
+                self.error(path, "legacy state provider type " + obj["type"])
+            if obj.get("type") == "minecraft:random_offset":
+                self.error(path, "legacy random_offset placement (26.3 uses offset)")
+        if "/worldgen/placed_feature/" in path and isinstance(d.get("feature"), str):
+            ns, _, name = d["feature"].partition(":")
+            if not self.exists("data/" + ns + "/worldgen/feature/" + name + ".json"):
+                self.error(path, "missing feature " + d["feature"])
+
+    def biome_modifiers_263(self):
+        for path, d in self.json.items():
+            if "/neoforge/biome_modifier/" in path and isinstance(d, dict):
+                features = d.get("features", [])
+                for feature in features if isinstance(features, list) else [features]:
+                    if isinstance(feature, str) and not feature.startswith("#"):
+                        ns, _, name = feature.partition(":")
+                        if not self.exists("data/" + ns + "/worldgen/placed_feature/" + name + ".json"):
+                            self.error(path, "missing placed feature " + feature)
+
     def get_vanilla(self, path):
         return json.loads(self.vanilla.read(path)) if path in self.jar_files else {}
 
     def run(self):
         version = self.get_vanilla("version.json")
-        if version.get("id") != "26.2":
-            self.error("--mc-jar", "expected real Minecraft 26.2 jar")
+        if version.get("id") != self.version:
+            self.error("--mc-jar", "expected real Minecraft " + self.version + " jar")
             return self.errors
+        if version.get("pack_version") != self.profile["pack_version"]:
+            self.error("--mc-jar", "jar pack_version differs from the " + self.version + " profile")
         self.parse()
         self.entity_ids = entity_registry_ids(self.vanilla)
-        if self.json.get("pack.mcmeta") != PACK:
-            self.error("pack.mcmeta", "expected min_format 88.0 / max_format 107.1 for resource 88 / data 107")
+        if self.json.get("pack.mcmeta") != self.profile["pack"]:
+            pv = self.profile["pack_version"]
+            self.error("pack.mcmeta", "expected min_format {}.{} / max_format {}.{} for resource {} / data {}".format(
+                pv["resource_major"], pv["resource_minor"], pv["data_major"], pv["data_minor"],
+                pv["resource_major"], pv["data_major"]))
         self.models()
         for path, d in self.json.items():
             if path.startswith("data/"):
@@ -427,9 +585,16 @@ class Validator:
                 elif "/recipe/" in path:
                     self.recipe(path, d)
                 elif "/loot_table/" in path:
-                    self.loot(path, d)
+                    if self.version == "26.3":
+                        self.loot_263(path, d)
+                    else:
+                        self.loot(path, d)
                 elif "/advancement/" in path:
                     self.advancement(path, d)
+                    if self.version == "26.3":
+                        self.advancement_263(path, d)
+                elif self.version == "26.3" and FEATURE_FILE.match(path):
+                    self.worldgen_263(path, d)
                 elif "/recipes_pack/" in path:
                     if d.get("aliases", {}).get("F") != "c:":
                         self.error(path, "compact recipe F alias must be c:")
@@ -439,6 +604,8 @@ class Validator:
                             ns, name = v[1:].split(":", 1)
                             resolved = aliases.get(ns, ns + ":") + name
                             self.tag(path, "item", "#" + resolved)
+        if self.version == "26.3":
+            self.biome_modifiers_263()
         self.overrides()
         return sorted(set(self.errors))
 
@@ -468,9 +635,9 @@ def entity_registry_ids(vanilla):
     return ids
 
 
-def validate(root, jar):
+def validate(root, jar, profile=DEFAULT_PROFILE, base=None):
     with zipfile.ZipFile(jar) as vanilla:
-        validator = Validator(root, vanilla)
+        validator = Validator(root, vanilla, profile, base)
         errors = validator.run()
         for error in errors:
             print(error)
@@ -480,11 +647,24 @@ def validate(root, jar):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--resources-root", type=Path,
-                        default=Path(__file__).resolve().parents[2] / "common/src/main/resources")
+    parser.add_argument("--profile", choices=sorted(PROFILES), default=DEFAULT_PROFILE,
+                        help="Minecraft version profile (default: %(default)s)")
+    parser.add_argument("--resources-root", type=Path, default=None,
+                        help="resource layer to validate (default: common/src/main/resources, or "
+                             "common/src/v263/resources for --profile 26.3)")
+    parser.add_argument("--base-root", type=Path, default=None,
+                        help="layer below --resources-root (26.3 default: common/src/main/resources, so the "
+                             "26.3 overlay is validated together with the resources it patches)")
     parser.add_argument("--mc-jar", type=Path, required=True)
     args = parser.parse_args()
-    return validate(args.resources_root, args.mc_jar)
+    main_resources = REPO / "common/src/main/resources"
+    root, base = args.resources_root, args.base_root
+    if args.profile == "26.3":
+        root = root or REPO / "common/src/v263/resources"
+        base = base or main_resources
+    else:
+        root = root or main_resources
+    return validate(root, args.mc_jar, args.profile, base)
 
 
 if __name__ == "__main__":

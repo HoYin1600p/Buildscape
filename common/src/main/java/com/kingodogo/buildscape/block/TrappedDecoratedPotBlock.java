@@ -45,7 +45,7 @@ public class TrappedDecoratedPotBlock extends DecoratedPotBlock {
                     ItemStack stored = be.getStoredItem().copy();
                     be.setStoredItem(ItemStack.EMPTY, true);
 
-                    if (stored.getItem() instanceof SpawnEggItem && level instanceof ServerLevel serverLevel) {
+                    if (Services.PLATFORM.isSpawnEgg(stored) && level instanceof ServerLevel serverLevel) {
                         Services.PLATFORM.spawnMobFromEgg(serverLevel, pos, stored);
                     } else {
                         if (!player.getInventory().add(stored)) {

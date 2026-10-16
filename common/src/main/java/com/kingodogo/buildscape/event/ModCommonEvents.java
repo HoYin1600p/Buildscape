@@ -111,7 +111,7 @@ public final class ModCommonEvents {
                     level.playSound(null, pos, SoundEvents.GROWING_PLANT_CROP, SoundSource.BLOCKS, 1.0F, 1.0F);
                     Services.PLATFORM.hurtAndBreak(held, 1, player, hand);
                 }
-                player.swing(hand);
+                Services.PLATFORM.swingPlayerHand(player, hand);
                 return Services.PLATFORM.sidedSuccess(level.isClientSide());
             }
         }
@@ -127,12 +127,12 @@ public final class ModCommonEvents {
                         if (held.isEmpty()) {
                             player.setItemInHand(hand, bottle);
                         } else if (!player.getInventory().add(bottle)) {
-                            player.drop(bottle, false);
+                            Services.PLATFORM.dropPlayerItem(player, bottle, false);
                         }
                     }
                 }
             }
-            player.swing(hand);
+            Services.PLATFORM.swingPlayerHand(player, hand);
             return Services.PLATFORM.sidedSuccess(level.isClientSide());
         }
         return LogStrippingLogic.handleAxeStrip(player, level, hand, pos);
@@ -324,25 +324,33 @@ public final class ModCommonEvents {
 
     public static boolean isMobGriefingDisabled(Entity entity, Level level) {
         if (entity == null || level == null) return false;
-        if (entity instanceof net.minecraft.world.entity.monster.EnderMan) {
+        if (Services.PLATFORM.isEnderman(entity)) {
             return ModGameRules.isEndermanGriefingDisabled();
         } else if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
             return ModGameRules.isCreeperGriefingDisabled();
         } else if (entity instanceof net.minecraft.world.entity.monster.Ghast
-                || entity.getClass().getSimpleName().toLowerCase().contains("fireball")) {
+                || Services.PLATFORM.isLargeFireball(entity)) {
             return ModGameRules.isGhastGriefingDisabled();
         }
         return false;
     }
 
+
     public static void onServerStarted(MinecraftServer server) {
-        if (server != null) {
-            PillarIdManager.setCurrentServer(server);
-            PillarIdManager.get().load(server);
-        } else {
-            PillarIdManager.get().load();
+        if (server == null) {
+            return;
         }
+
+        // Reset cached data from the previous world.
+        PillarIdManager.resetWorldCache();
+
+        // Preserve explicit server registration from dev/multiversion.
+        PillarIdManager.setCurrentServer(server);
+
+        // Load pillar data for the active world.
+        PillarIdManager.get().load(server);
     }
+
 
     public static void onServerTick(MinecraftServer server) {
         FrostRoseDropHandler.onServerTick(server);
@@ -369,9 +377,29 @@ public final class ModCommonEvents {
         pillarSaveTickCounter = 0;
         pillarBackupTickCounter = 0;
         try {
-            PillarIdManager.get().saveImmediate();
+            PillarIdManager manager = PillarIdManager.get();
+            if (manager != null && manager.hasLoaded()) {
+                manager.savePeriodic(true);
+            }
         } catch (Exception exception) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to save pillar data during server shutdown", exception);
+        }
+    }
+
+    public static void onServerStopped() {
+        try {
+            PillarIdManager manager = PillarIdManager.get();
+            if (manager.hasLoaded()) {
+                manager.savePeriodic(true);
+            }
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to save pillar data after server shutdown", exception);
+        } finally {
+            com.kingodogo.buildscape.BuildscapeCommon.setServerFullyInitialized(false);
+            pillarSaveTickCounter = 0;
+            pillarBackupTickCounter = 0;
+            PillarIdManager.fullReset();
+            PillarIdManager.setCurrentServer(null);
         }
     }
 

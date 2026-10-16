@@ -6,6 +6,7 @@
     "refmap":  "buildscape.refmap.json",
     "plugin":  "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
     "mixins":  [
+                   "SimpleReloadInstanceMixin",
                    "AgeableMobMixin",
                    "AbstractContainerMenuMixin",
                    "AnvilMenuMixin",
@@ -28,6 +29,7 @@
                    "LeavesBlockMixin",
                    "LevelV118xMixin",
                    "LivingEntityMixin",
+                   "HollowLogPlayerPoseMixin",
                    "StonecutterMenuLegacyAccessor",
                    "StonecutterMenuMixin",
                    "VineBlockMixin",
@@ -42,7 +44,8 @@
                    "LiquidBlockMixin",
                    "FireworkRocketEntityMixin",
                    "LightningBoltMixin",
-                   "PoiTypeAccessor"
+                   "PoiTypeAccessor",
+                   "RecipeManagerAccessor"
                ],
     "client":  [
                    "AbstractContainerScreenMixin",
@@ -58,6 +61,7 @@
                    "ParticleV118xAccessor",
                    "RenderCompositeStateV118xAccessor",
                    "ScreenV118xInvoker",
+                   "AbstractWidgetBoundsMixin",
                    "SpriteV118xAccessor",
                    "BuildscapeBlockModelMixin",
                    "BuildscapeBlockStateCacheMixin",

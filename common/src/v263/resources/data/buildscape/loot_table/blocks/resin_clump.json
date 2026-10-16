@@ -1,0 +1,97 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:resin_clump",
+          "modifier": [
+            {
+              "type": "minecraft:set_count",
+              "count": 0,
+              "add": false
+            },
+            {
+              "type": "minecraft:set_count",
+              "count": 1,
+              "add": true,
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:resin_clump",
+                "state": {
+                  "down": "true"
+                }
+              }
+            },
+            {
+              "type": "minecraft:set_count",
+              "count": 1,
+              "add": true,
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:resin_clump",
+                "state": {
+                  "up": "true"
+                }
+              }
+            },
+            {
+              "type": "minecraft:set_count",
+              "count": 1,
+              "add": true,
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:resin_clump",
+                "state": {
+                  "north": "true"
+                }
+              }
+            },
+            {
+              "type": "minecraft:set_count",
+              "count": 1,
+              "add": true,
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:resin_clump",
+                "state": {
+                  "south": "true"
+                }
+              }
+            },
+            {
+              "type": "minecraft:set_count",
+              "count": 1,
+              "add": true,
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:resin_clump",
+                "state": {
+                  "west": "true"
+                }
+              }
+            },
+            {
+              "type": "minecraft:set_count",
+              "count": 1,
+              "add": true,
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "buildscape:resin_clump",
+                "state": {
+                  "east": "true"
+                }
+              }
+            },
+            {
+              "type": "minecraft:explosion_decay"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

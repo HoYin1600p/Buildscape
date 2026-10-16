@@ -59,6 +59,8 @@ public final class FestiveSubmission {
 
     // The private render-type factory has no public counterpart in 26.2. Copy the verified
     // setup so blending, decal transforms, output targets and sampler behavior stay intact.
+    // As in 26.3, replace only the texture: source-alpha blending makes opaque glint
+    // texels cover the compass instead of adding a shimmer over its visible face.
     private static RenderType copyGlint(RenderType original) {
         try {
             RenderSetup setup = (RenderSetup) field(original, "state");

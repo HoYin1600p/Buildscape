@@ -30,6 +30,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
 public final class RecipeFactory {
+    private static final RegistrySupplier<RecipeSerializer<HazeBushDyeRecipe>> HAZE_BUSH_DYE =
+            Services.REGISTRY.registerRecipeSerializer("haze_bush_dye", HazeBushDyeSerializer::new);
     private static final RegistrySupplier<RecipeSerializer<ShapedDurabilityRecipe>> SHAPED_DURABILITY =
             Services.REGISTRY.registerRecipeSerializer("shaped_durability", ShapedDurabilitySerializer::new);
     private static final RegistrySupplier<RecipeSerializer<ShapelessDurabilityRecipe>> SHAPELESS_DURABILITY =
@@ -90,6 +92,73 @@ public final class RecipeFactory {
                         ShapedRecipePattern.STREAM_CODEC.decode(buffer), ItemStack.STREAM_CODEC.decode(buffer), buffer.readVarInt()));
         @Override public MapCodec<ShapedDurabilityRecipe> codec() { return CODEC; }
         @Override public StreamCodec<RegistryFriendlyByteBuf, ShapedDurabilityRecipe> streamCodec() { return STREAM_CODEC; }
+    }
+
+    public static final class HazeBushDyeRecipe extends ShapelessRecipe {
+
+        private HazeBushDyeRecipe(String group, CraftingBookCategory category, ItemStack result,
+                                          NonNullList<Ingredient> ingredients) {
+            super(group, category, result, ingredients);
+        }
+
+        @Override public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+            ItemStack result = super.assemble(input, registries);
+            for (int i = 0; i < input.size(); i++) {
+                ItemStack bush = input.getItem(i);
+                if (!getIngredients().get(0).test(bush)) continue;
+                var state = bush.get(DataComponents.BLOCK_STATE);
+                if (state != null) result.set(DataComponents.BLOCK_STATE, state);
+                var custom = bush.get(DataComponents.CUSTOM_DATA);
+                if (custom != null) {
+                    CompoundTag data = custom.copyTag();
+                    CompoundTag preserved = new CompoundTag();
+                    if (data.contains("BlockStateTag")) preserved.put("BlockStateTag", data.get("BlockStateTag").copy());
+                    if (data.contains("HasHaze")) preserved.put("HasHaze", data.get("HasHaze").copy());
+                    if (!preserved.isEmpty()) result.set(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(preserved));
+                }
+                break;
+            }
+            return result;
+        }
+
+        @Override public RecipeSerializer<?> getSerializer() { return HAZE_BUSH_DYE.get(); }
+    }
+
+    private static final class HazeBushDyeSerializer implements RecipeSerializer<HazeBushDyeRecipe> {
+        private static final MapCodec<HazeBushDyeRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                com.mojang.serialization.Codec.STRING.optionalFieldOf("group", "").forGetter(HazeBushDyeRecipe::getGroup),
+                CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC).forGetter(HazeBushDyeRecipe::category),
+                ItemStack.CODEC.fieldOf("result").forGetter(recipe -> recipe.getResultItem(HolderLookup.Provider.create(java.util.stream.Stream.empty()))),
+                Ingredient.CODEC_NONEMPTY.listOf().fieldOf("ingredients").forGetter(recipe -> java.util.List.copyOf(recipe.getIngredients()))
+        ).apply(instance, (group, category, result, ingredients) ->
+                new HazeBushDyeRecipe(group, category, result, toNonNullList(ingredients))));
+
+        private static final StreamCodec<RegistryFriendlyByteBuf, HazeBushDyeRecipe> STREAM_CODEC = StreamCodec.of(
+                (buffer, recipe) -> {
+                    buffer.writeUtf(recipe.getGroup());
+                    CraftingBookCategory.STREAM_CODEC.encode(buffer, recipe.category());
+                    ItemStack.STREAM_CODEC.encode(buffer, recipe.getResultItem(buffer.registryAccess()));
+                    buffer.writeVarInt(recipe.getIngredients().size());
+                    for (Ingredient ingredient : recipe.getIngredients()) Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient);
+                },
+                buffer -> {
+                    String group = buffer.readUtf();
+                    CraftingBookCategory category = CraftingBookCategory.STREAM_CODEC.decode(buffer);
+                    ItemStack result = ItemStack.STREAM_CODEC.decode(buffer);
+                    int count = buffer.readVarInt();
+                    NonNullList<Ingredient> ingredients = NonNullList.withSize(count, Ingredient.EMPTY);
+                    for (int i = 0; i < count; i++) ingredients.set(i, Ingredient.CONTENTS_STREAM_CODEC.decode(buffer));
+                    return new HazeBushDyeRecipe(group, category, result, ingredients);
+                });
+
+        @Override public MapCodec<HazeBushDyeRecipe> codec() { return CODEC; }
+        @Override public StreamCodec<RegistryFriendlyByteBuf, HazeBushDyeRecipe> streamCodec() { return STREAM_CODEC; }
+
+        private static NonNullList<Ingredient> toNonNullList(java.util.List<Ingredient> values) {
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+            ingredients.addAll(values);
+            return ingredients;
+        }
     }
 
     public static final class ShapelessDurabilityRecipe extends ShapelessRecipe {
@@ -392,6 +461,14 @@ public final class RecipeFactory {
                 }
                 ShapedRecipePattern pattern = new ShapedRecipePattern(cr.width(), cr.height(), ings, java.util.Optional.empty());
                 return new net.minecraft.world.item.crafting.RecipeHolder<>(id, new ShapedRecipe(group, CraftingBookCategory.MISC, pattern, result));
+            }
+            case "haze_bush_dye" -> {
+                NonNullList<Ingredient> ings = NonNullList.create();
+                for (String s : cr.ingredients()) {
+                    Ingredient ing = parseIngredient(s);
+                    if (!ing.isEmpty()) ings.add(ing);
+                }
+                return new net.minecraft.world.item.crafting.RecipeHolder<>(id, new HazeBushDyeRecipe(group, CraftingBookCategory.MISC, result, ings));
             }
             case "shapeless" -> {
                 NonNullList<Ingredient> ings = NonNullList.create();

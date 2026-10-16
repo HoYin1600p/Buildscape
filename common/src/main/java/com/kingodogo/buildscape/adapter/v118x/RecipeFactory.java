@@ -24,6 +24,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
 public final class RecipeFactory {
+    public static final RegistrySupplier<RecipeSerializer<HazeBushDyeRecipe>> HAZE_BUSH_DYE =
+            Services.REGISTRY.registerRecipeSerializer("haze_bush_dye", () -> create(new HazeBushDyeSerializer()));
     public static final RegistrySupplier<RecipeSerializer<ShapedDurabilityRecipe>> SHAPED_DURABILITY =
             Services.REGISTRY.registerRecipeSerializer("shaped_durability", () -> create(new ShapedDurabilitySerializer()));
     public static final RegistrySupplier<RecipeSerializer<ShapelessDurabilityRecipe>> SHAPELESS_DURABILITY =
@@ -85,6 +87,44 @@ public final class RecipeFactory {
         @Override public void toNetwork(FriendlyByteBuf buffer, ShapedDurabilityRecipe recipe) {
             RecipeSerializer.SHAPED_RECIPE.toNetwork(buffer, recipe);
             buffer.writeVarInt(recipe.damageAmount);
+        }
+    }
+
+    public static final class HazeBushDyeRecipe extends ShapelessRecipe {
+        public HazeBushDyeRecipe(ResourceLocation id, String group, ItemStack result,
+                                         NonNullList<Ingredient> ingredients) {
+            super(id, group, result, ingredients);
+        }
+        @Override public ItemStack assemble(CraftingContainer input) {
+            ItemStack result = super.assemble(input);
+            for (int i = 0; i < input.getContainerSize(); i++) {
+                ItemStack bush = input.getItem(i);
+                if (!getIngredients().get(0).test(bush)) continue;
+                CompoundTag data = bush.getTag();
+                if (data != null) {
+                    if (data.contains("BlockStateTag", Tag.TAG_COMPOUND)) result.addTagElement("BlockStateTag", data.getCompound("BlockStateTag").copy());
+                    if (data.contains("HasHaze")) result.addTagElement("HasHaze", data.get("HasHaze").copy());
+                }
+                break;
+            }
+            return result;
+        }
+        @Override public RecipeSerializer<?> getSerializer() { return HAZE_BUSH_DYE.get(); }
+    }
+
+    private static final class HazeBushDyeSerializer implements SerializerLogic<HazeBushDyeRecipe> {
+        @Override public HazeBushDyeRecipe fromJson(ResourceLocation id, com.google.gson.JsonObject json) {
+            ShapelessRecipe base = RecipeSerializer.SHAPELESS_RECIPE.fromJson(id, json);
+            return new HazeBushDyeRecipe(id, base.getGroup(), base.getResultItem(),
+                    base.getIngredients());
+        }
+        @Override public HazeBushDyeRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
+            ShapelessRecipe base = RecipeSerializer.SHAPELESS_RECIPE.fromNetwork(id, buffer);
+            return new HazeBushDyeRecipe(id, base.getGroup(), base.getResultItem(),
+                    base.getIngredients());
+        }
+        @Override public void toNetwork(FriendlyByteBuf buffer, HazeBushDyeRecipe recipe) {
+            RecipeSerializer.SHAPELESS_RECIPE.toNetwork(buffer, recipe);
         }
     }
 
@@ -340,6 +380,14 @@ public final class RecipeFactory {
                     ings.set(i, parseIngredient(cr.ingredients().get(i)));
                 }
                 return new ShapedRecipe(id, group, cr.width(), cr.height(), ings, result);
+            }
+            case "haze_bush_dye" -> {
+                NonNullList<Ingredient> ings = NonNullList.create();
+                for (String s : cr.ingredients()) {
+                    Ingredient ing = parseIngredient(s);
+                    if (!ing.isEmpty()) ings.add(ing);
+                }
+                return new HazeBushDyeRecipe(id, group, result, ings);
             }
             case "shapeless" -> {
                 NonNullList<Ingredient> ings = NonNullList.create();

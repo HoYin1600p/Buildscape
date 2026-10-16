@@ -35,6 +35,7 @@
     "ShulkerBoxBlockMixin",
     "ShulkerBoxMenuMixin",
     "SmithingMenuMixin",
+    "SimpleReloadInstanceMixin",
     "FlowingFluidMixin",
     "LavaFluidMixin",
     "LiquidBlockMixin",

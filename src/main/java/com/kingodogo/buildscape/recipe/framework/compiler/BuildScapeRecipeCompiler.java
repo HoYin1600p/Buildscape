@@ -196,6 +196,12 @@ public class BuildScapeRecipeCompiler {
                 if (base == null) return null;
                 return new ShapelessDurabilityRecipe(base.getId(), base.getGroup(), base.getResultItem(), base.getIngredients(), 1);
             }
+            case "buildscape:haze_bush_dye" -> {
+                ShapelessRecipe base = compileShapeless(recipeId, group, spec, resultStack);
+                if (base == null) return null;
+                return new com.kingodogo.buildscape.recipe.HazeBushDyeRecipe(
+                        base.getId(), base.getGroup(), base.getResultItem(), base.getIngredients());
+            }
             case "stonecutting" -> {
                 Ingredient input = resolveIngredient(spec.input());
                 return new StonecutterRecipe(recipeId, group, input, resultStack);

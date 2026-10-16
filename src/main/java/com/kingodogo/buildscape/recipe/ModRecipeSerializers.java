@@ -30,6 +30,9 @@ public class ModRecipeSerializers {
             () -> ShapelessDurabilityRecipe.SERIALIZER
     );
 
+    public static final RegistryObject<RecipeSerializer<HazeBushDyeRecipe>> HAZE_BUSH_DYE_RECIPE =
+            RECIPE_SERIALIZERS.register("haze_bush_dye", () -> HazeBushDyeRecipe.SERIALIZER);
+
     public static final RegistryObject<
             SimpleRecipeSerializer<ConfettiConfigureRecipe>
             > CONFETTI_CONFIGURE_RECIPE = RECIPE_SERIALIZERS.register(

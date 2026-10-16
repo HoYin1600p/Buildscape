@@ -36,7 +36,7 @@ public class RecipeCacheGenerator {
     public static final int CACHE_VERSION = 5;
     public static final int SOURCE_SCHEMA_VERSION = 1;
     // Bump whenever compilation logic changes, even if the binary layout does not.
-    public static final int GENERATOR_VERSION = 2;
+    public static final int GENERATOR_VERSION = 3;
 
     public static final String[] CATEGORIES = {
             "crafting", "stonecutting", "smelting", "blasting",
@@ -184,6 +184,10 @@ public class RecipeCacheGenerator {
                         }
                         case "shapeless" -> {
                             recipeDataOut.writeByte(2);
+                            writeShapelessRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
+                        }
+                        case "buildscape:haze_bush_dye" -> {
+                            recipeDataOut.writeByte(13);
                             writeShapelessRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
                         }
                         case "stonecutting" -> {

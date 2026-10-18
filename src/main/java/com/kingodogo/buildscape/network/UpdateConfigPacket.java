@@ -188,8 +188,16 @@ public class UpdateConfigPacket {
                 serverConfig.replaceItems(data.items);
             }
 
-            serverConfig.savePropertiesToDisk();
-            serverConfig.saveItemsToDisk();
+            boolean propertiesSaved = serverConfig.savePropertiesToDisk();
+            boolean itemsSaved = serverConfig.saveItemsToDisk();
+            if (!propertiesSaved || !itemsSaved) {
+                String files = !propertiesSaved && !itemsSaved ? "pillar-properties.json and pillar-items.json"
+                        : !propertiesSaved ? "pillar-properties.json" : "pillar-items.json";
+                player.displayClientMessage(new net.minecraft.network.chat.TextComponent(
+                        "BuildScape: Changes to " + files + " are active but will not survive a restart: "
+                                + serverConfig.getSaveFailureReason() + ".")
+                        .withStyle(net.minecraft.ChatFormatting.YELLOW), false);
+            }
 
             ModMessages.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),

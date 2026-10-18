@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
@@ -22,9 +21,18 @@ public class PresetsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String PRESETS_FILE_NAME = "pillar-presets.json";
     private static PresetsConfig INSTANCE;
+    private final transient Path configDirectory;
+
+    public PresetsConfig() {
+        this(null);
+    }
+
+    PresetsConfig(Path configDirectory) {
+        this.configDirectory = configDirectory;
+    }
 
     private File getConfigDir() {
-        String configPath = Paths.get("config", "buildscape", "pillar").toString();
+        String configPath = (configDirectory != null ? configDirectory : Paths.get("config", "buildscape", "pillar")).toString();
         File dir = new File(configPath);
         if (!dir.exists())
             dir.mkdirs();
@@ -46,8 +54,9 @@ public class PresetsConfig {
             return;
         }
 
-        try (FileReader reader = new FileReader(file)) {
-            com.google.gson.JsonObject loaded = GSON.fromJson(reader, com.google.gson.JsonObject.class);
+        try {
+            String source = ConfigLayoutIO.readText(file.toPath());
+            com.google.gson.JsonObject loaded = GSON.fromJson(source, com.google.gson.JsonObject.class);
             Map<String, Preset> loadedPresets = parsePresets(loaded);
             String loadedLastApplied = "default";
             if (loaded.has("_lastApplied") && loaded.get("_lastApplied").isJsonPrimitive()
@@ -56,7 +65,7 @@ public class PresetsConfig {
             }
             presets = loadedPresets;
             lastAppliedPreset = loadedLastApplied;
-            fileUnreadable = false;
+            fileUnreadable = ConfigLayoutIO.hasReplacementCharacters(source);
         } catch (Exception e) {
             fileUnreadable = true;
             PillarParticleConfig.backupUnreadableFile(file);
@@ -127,6 +136,11 @@ public class PresetsConfig {
         }
         Path temporary = null;
         try {
+            if (file.exists() && ConfigLayoutIO.hasReplacementCharacters(ConfigLayoutIO.readText(file.toPath()))) {
+                fileUnreadable = true;
+                com.kingodogo.buildscape.BuildScape.getLogger().warn("Not overwriting replacement-decoded presets " + file);
+                return;
+            }
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();

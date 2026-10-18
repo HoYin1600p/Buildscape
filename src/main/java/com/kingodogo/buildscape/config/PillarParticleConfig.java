@@ -76,6 +76,7 @@ public class PillarParticleConfig {
     public volatile Set<String> items = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private boolean itemsLoaded;
     private boolean itemsFileUnreadable;
+    private transient boolean itemsReadOnly;
     private transient boolean remote;
     private transient boolean propertiesReadOnly;
     private transient String propertiesSource;
@@ -399,7 +400,7 @@ public class PillarParticleConfig {
         }
     }
 
-    private void writeDefaultItems(File f) {
+    private void writeDefaultItems(File f, boolean vaultLoaded) {
         try {
             File parentDir = f.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
@@ -408,7 +409,7 @@ public class PillarParticleConfig {
 
             try (FileWriter writer = new FileWriter(f)) {
                 java.io.StringWriter grouped = new java.io.StringWriter();
-                DefaultPillarItems.writeGrouped(grouped, net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+                DefaultPillarItems.writeGrouped(grouped, vaultLoaded);
                 String layout = grouped.toString();
                 writer.write(layout.substring(0, layout.lastIndexOf('}')));
                 writer.write("  // MOB SPAWN EGGS:\n");
@@ -513,7 +514,7 @@ public class PillarParticleConfig {
         }
         try {
             propertiesSource = ConfigLayoutIO.readText(file.toPath());
-            propertiesReadOnly = false;
+            propertiesReadOnly = ConfigLayoutIO.hasReplacementCharacters(propertiesSource);
             try {
                 originalProperties = ConfigLayoutIO.readProperties(propertiesSource);
             } catch (Exception e) {
@@ -651,22 +652,36 @@ public class PillarParticleConfig {
     }
 
     private synchronized void loadItemsInternal() {
+        loadItemsInternal(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+    }
+
+    synchronized void loadItemsInternal(boolean vaultLoaded) {
         File file = getItemsFile();
         if (!itemsLoaded) {
-            initializeDefaultItems();
+            replaceItems(DefaultPillarItems.items(vaultLoaded));
             itemsLoaded = true;
         }
         if (!file.exists()) {
-            writeDefaultItems(file);
-            initializeDefaultItems();
+            writeDefaultItems(file, vaultLoaded);
+            replaceItems(DefaultPillarItems.items(vaultLoaded));
         }
         try {
             String source = ConfigLayoutIO.readText(file.toPath());
             Set<String> parsed = parseItems(source, file.toString());
-            JsonObject document = GSON.fromJson(stripComments(source), JsonObject.class);
-            boolean migrated = DefaultPillarItems.merge405(document, parsed,
-                    net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
-            if (migrated) {
+            String normalized = ConfigLayoutIO.itemsJson(source);
+            JsonObject document = GSON.fromJson(normalized, JsonObject.class);
+            itemsReadOnly = ConfigLayoutIO.hasReplacementCharacters(source);
+            try {
+                ConfigLayoutIO.readProperties(normalized);
+            } catch (Exception e) {
+                itemsReadOnly = true;
+            }
+            // Non-string entries can be ignored in memory, but must not be lost in a rewrite.
+            for (JsonElement entry : document.getAsJsonArray("items")) {
+                if (!entry.isJsonPrimitive() || !entry.getAsJsonPrimitive().isString()) itemsReadOnly = true;
+            }
+            boolean migrated = DefaultPillarItems.merge405(document, parsed, vaultLoaded);
+            if (migrated && !itemsReadOnly) {
                 List<String> sorted = new ArrayList<>(parsed);
                 sorted.sort(String::compareTo);
                 document.add("items", GSON.toJsonTree(sorted));
@@ -675,8 +690,10 @@ public class PillarParticleConfig {
                     ConfigLayoutIO.write(file.toPath(), output, source, true);
                     source = output;
                 } catch (Exception e) {
-                    BuildScape.LOGGER.warn("Unable to persist the one-time pillar item update", e);
+                    BuildScape.LOGGER.error("Unable to persist the one-time pillar item update", e);
                 }
+            } else if (migrated) {
+                BuildScape.LOGGER.warn("Pillar item update is in memory only; read-only legacy or replacement-decoded file kept as-is: " + file);
             }
             itemsSource = source;
             originalItems = document;
@@ -697,7 +714,12 @@ public class PillarParticleConfig {
     }
 
     static Set<String> parseItems(String content, String source) {
-        com.google.gson.JsonObject root = GSON.fromJson(stripComments(content), com.google.gson.JsonObject.class);
+        com.google.gson.JsonObject root;
+        try {
+            root = GSON.fromJson(ConfigLayoutIO.itemsJson(content), com.google.gson.JsonObject.class);
+        } catch (java.io.IOException e) {
+            throw new IllegalArgumentException("Invalid items config " + source, e);
+        }
         if (root == null || !root.has("items") || !root.get("items").isJsonArray()) {
             throw new IllegalArgumentException("Expected an items array");
         }
@@ -716,33 +738,48 @@ public class PillarParticleConfig {
         return parsed;
     }
 
-    private void initializeDefaultItems() {
-        replaceItems(DefaultPillarItems.items(net.minecraftforge.fml.ModList.get().isLoaded("the_vault")));
-    }
-
     private void migrateOldConfig() {
-        Path oldFile = Paths.get("config", "buildscape", "pillar-particles.json");
-        if (!Files.exists(oldFile)) return;
+        Path oldFile = configDirectory == null ? Paths.get("config", "buildscape", "pillar-particles.json")
+                : configDirectory.resolveSibling("pillar-particles.json");
+        Path backup = oldFile.resolveSibling("pillar-particles.json.backup");
+        if (!Files.exists(oldFile) || Files.exists(backup)) return;
         try {
             String source = ConfigLayoutIO.readText(oldFile);
-            JsonObject old = GSON.fromJson(stripComments(source), JsonObject.class);
+            JsonObject old = GSON.fromJson(ConfigLayoutIO.itemsJson(source), JsonObject.class);
             if (old == null) return;
-            Path backup = oldFile.resolveSibling("pillar-particles.json.backup");
-            if (!Files.exists(backup)) Files.copy(oldFile, backup);
-            File itemsFile = getItemsFile();
-            if (!itemsFile.exists() && old.has("items")) {
-                parseItems(source, oldFile.toString());
-                JsonObject itemValues = new JsonObject();
-                itemValues.add("items", old.get("items"));
-                ConfigLayoutIO.write(itemsFile.toPath(),
-                        ConfigLayoutIO.retainComments(source, GSON.toJson(itemValues), true), null, false);
+            boolean replacementDecoded = ConfigLayoutIO.hasReplacementCharacters(source);
+            Files.copy(oldFile, backup);
+            try {
+                File itemsFile = getItemsFile();
+                if (!itemsFile.exists() && old.has("items")) {
+                    parseItems(source, oldFile.toString());
+                    JsonObject itemValues = new JsonObject();
+                    itemValues.add("items", old.get("items"));
+                    if (replacementDecoded) {
+                        // Copy the original bytes; the loader will keep this migrated file read-only.
+                        Files.copy(oldFile, itemsFile.toPath());
+                    } else {
+                        ConfigLayoutIO.write(itemsFile.toPath(),
+                                ConfigLayoutIO.retainComments(source, GSON.toJson(itemValues), true), null, false);
+                    }
+                }
+            } catch (Exception e) {
+                BuildScape.LOGGER.error("Unable to migrate legacy pillar items; retaining the original", e);
             }
-            File propertiesFile = getPropertiesFile();
-            if (!propertiesFile.exists()) {
-                JsonObject properties = old.deepCopy();
-                properties.remove("items");
-                ConfigLayoutIO.write(propertiesFile.toPath(),
-                        ConfigLayoutIO.retainComments(source, groupedProperties(properties), true), null, false);
+            try {
+                File propertiesFile = getPropertiesFile();
+                if (!propertiesFile.exists()) {
+                    JsonObject properties = old.deepCopy();
+                    properties.remove("items");
+                    if (replacementDecoded) {
+                        Files.copy(oldFile, propertiesFile.toPath());
+                    } else {
+                        ConfigLayoutIO.write(propertiesFile.toPath(),
+                                ConfigLayoutIO.retainComments(source, groupedProperties(properties), true), null, false);
+                    }
+                }
+            } catch (Exception e) {
+                BuildScape.LOGGER.error("Unable to migrate legacy pillar properties; retaining the original", e);
             }
         } catch (Exception e) {
             BuildScape.LOGGER.error("Unable to migrate legacy pillar config; retaining the original", e);
@@ -812,12 +849,17 @@ public class PillarParticleConfig {
         saveItemsToDisk();
     }
 
-    public synchronized void saveItemsToDisk() {
-        if (remote) return;
+    public synchronized boolean saveItemsToDisk() {
+        if (remote) return false;
+        return saveItemsToDisk(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+    }
+
+    synchronized boolean saveItemsToDisk(boolean vaultLoaded) {
+        if (remote) return false;
         clearMatchCache();
-        if (itemsFileUnreadable) {
-            BuildScape.LOGGER.error("Not overwriting unreadable items config " + getItemsFile());
-            return;
+        if (itemsFileUnreadable || itemsReadOnly) {
+            BuildScape.LOGGER.warn("Not saving read-only items config; unreadable/legacy file kept as-is: " + getItemsFile());
+            return false;
         }
         File file = getItemsFile();
         try {
@@ -828,25 +870,27 @@ public class PillarParticleConfig {
             if (originalItems == null && file.exists()) {
                 itemsSource = ConfigLayoutIO.readText(file.toPath());
                 parseItems(itemsSource, file.toString());
-                originalItems = GSON.fromJson(stripComments(itemsSource), JsonObject.class);
+                originalItems = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(itemsSource));
             }
             JsonObject json = originalItems == null ? new JsonObject() : originalItems.deepCopy();
             // Explicit saves also mark the list, so removed defaults never return on the next load.
             json.addProperty("defaults_version", 405);
-            if (net.minecraftforge.fml.ModList.get().isLoaded("the_vault")) {
+            if (vaultLoaded) {
                 json.addProperty("vault_defaults_version", 405);
             }
             List<String> sorted = new ArrayList<>(items);
             sorted.sort(String::compareTo);
             json.add("items", GSON.toJsonTree(sorted));
             String output = ConfigLayoutIO.retainComments(itemsSource, GSON.toJson(json), true);
-            ConfigLayoutIO.write(file.toPath(), output, itemsSource, false);
+            ConfigLayoutIO.write(file.toPath(), output, itemsSource, true);
             itemsSource = output;
             originalItems = json;
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
+            return true;
         } catch (Exception e) {
             BuildScape.LOGGER.error("Error saving items config: " + e.getMessage());
+            return false;
         }
     }
 
@@ -864,13 +908,22 @@ public class PillarParticleConfig {
         savePropertiesToDisk();
     }
 
-    public synchronized void savePropertiesToDisk() {
-        if (remote || propertiesReadOnly) return;
+    public synchronized boolean savePropertiesToDisk() {
+        if (remote) return false;
+        if (propertiesReadOnly) {
+            BuildScape.LOGGER.warn("Not saving read-only pillar properties; unreadable/legacy file kept as-is: " + getPropertiesFile());
+            return false;
+        }
         File file = getPropertiesFile();
         try {
             if (originalProperties == null && file.exists()) {
                 // Also protect explicit saves made before the first load.
                 String source = ConfigLayoutIO.readText(file.toPath());
+                if (ConfigLayoutIO.hasReplacementCharacters(source)) {
+                    propertiesReadOnly = true;
+                    BuildScape.LOGGER.warn("Not saving read-only pillar properties; replacement-decoded file kept as-is: " + file);
+                    return false;
+                }
                 JsonObject original = ConfigLayoutIO.readProperties(source);
                 GSON.fromJson(original, PillarParticleConfig.class);
                 propertiesSource = source;
@@ -897,9 +950,17 @@ public class PillarParticleConfig {
             loadedPropertyValues = current;
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
+            return true;
         } catch (Exception ignored) {
             BuildScape.LOGGER.warn("Unable to save pillar properties", ignored);
+            return false;
         }
+    }
+
+    public String getSaveFailureReason() {
+        return propertiesReadOnly || itemsReadOnly || itemsFileUnreadable
+                ? "the server's config file is read-only because an unreadable, replacement-decoded or legacy file was kept as-is"
+                : "the server's config file changed on disk or could not be written; check the server log";
     }
 
     private JsonObject propertyValues() {
@@ -939,10 +1000,14 @@ public class PillarParticleConfig {
         appendProperties(text, values, written, "Behaviour", new String[][]{
                 {"use_pattern", "Pattern system (overrides basic particle parameters)"},
                 {"particle_density", "Number of particles spawned per tick when use_pattern = false"}});
-        text.append("\n  // --- Other ---\n");
+        boolean otherHeading = false;
         // Sort unknown keys as well, so output remains stable regardless of input key order.
         for (String key : new java.util.TreeSet<>(values.keySet())) {
             if (!written.contains(key)) {
+                if (!otherHeading) {
+                    text.append("\n  // --- Other ---\n");
+                    otherHeading = true;
+                }
                 text.append("  // Unrecognized setting retained with its original value\n");
                 appendProperty(text, key, values.get(key));
             }

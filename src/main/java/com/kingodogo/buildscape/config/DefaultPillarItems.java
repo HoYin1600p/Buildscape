@@ -85,8 +85,22 @@ final class DefaultPillarItems {
             "minecraft:shulker_shell",
             "minecraft:netherite_sword");
 
+    private static final List<String> NEW_IN_405_VAULT = List.of(
+            "#the_vault:companion_relic",
+            "the_vault:greedy_meal",
+            "the_vault:greed_coin",
+            "#the_vault:sigil",
+            "the_vault:unique_shard",
+            "#the_vault:vault_globe",
+            "the_vault:greedy_anchor",
+            "the_vault:objective_modifier_stumble",
+            "the_vault:objective_modifier_shuffle",
+            "#the_vault:trinket",
+            "#the_vault:etching",
+            "#the_vault:greed_trinket");
+
     // ===== VAULT / MODDED ITEMS =====
-    private static final List<String> VAULT = List.of(
+    private static final List<String> VAULT = withNewItems(List.of(
             "the_vault:vault_crystal",
             "the_vault:echo_pog",
             "#the_vault:fruits",
@@ -119,23 +133,10 @@ final class DefaultPillarItems {
             "#the_vault:crystal_capstones",
             "#the_vault:unique",
             "the_vault:companion_egg",
-            "#the_vault:perfectgems",
-            "#the_vault:companion_relic",
-            "the_vault:greedy_meal",
-            "the_vault:greed_coin",
-            "#the_vault:sigil",
-            "the_vault:unique_shard",
-            "#the_vault:vault_globe",
-            "the_vault:greedy_anchor",
-            "the_vault:objective_modifier_stumble",
-            "the_vault:objective_modifier_shuffle",
-            "#the_vault:trinket",
-            "#the_vault:etching",
-            "#the_vault:greed_trinket");
+            "#the_vault:perfectgems"), NEW_IN_405_VAULT);
 
     // ===== BUILDSCAPE ITEMS =====
-    private static final List<String> BUILDSCAPE = List.of(
-            "buildscape:ancient_ashen_scroll",
+    private static final List<String> NEW_IN_405_BUILDSCAPE = List.of(
             "buildscape:ashenking_gold_pillar",
             "buildscape:ashenking_diamond_pillar",
             "buildscape:ashenking_emerald_pillar",
@@ -173,6 +174,15 @@ final class DefaultPillarItems {
             "buildscape:infinite_phoenix_firework_star",
             "buildscape:bone_dice");
 
+    private static final List<String> BUILDSCAPE = withNewItems(
+            List.of("buildscape:ancient_ashen_scroll"), NEW_IN_405_BUILDSCAPE);
+
+    private static List<String> withNewItems(List<String> original, List<String> added) {
+        java.util.ArrayList<String> items = new java.util.ArrayList<>(original);
+        items.addAll(added);
+        return List.copyOf(items);
+    }
+
     static Set<String> baseItems() {
         Set<String> items = new LinkedHashSet<>(VANILLA);
         items.addAll(BUILDSCAPE);
@@ -194,12 +204,12 @@ final class DefaultPillarItems {
         // An empty list already allows every item; narrowing it would change its meaning.
         boolean unrestricted = items.isEmpty();
         if (!document.has("defaults_version")) {
-            if (!unrestricted) items.addAll(BUILDSCAPE.subList(1, BUILDSCAPE.size()));
+            if (!unrestricted) items.addAll(NEW_IN_405_BUILDSCAPE);
             document.addProperty("defaults_version", 405);
             changed = true;
         }
         if (vaultLoaded && !document.has("vault_defaults_version")) {
-            if (!unrestricted) items.addAll(VAULT.subList(33, VAULT.size()));
+            if (!unrestricted) items.addAll(NEW_IN_405_VAULT);
             document.addProperty("vault_defaults_version", 405);
             changed = true;
         }

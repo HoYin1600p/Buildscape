@@ -125,6 +125,7 @@ public class BuildscapeClientConfig {
 
         try {
             source = ConfigLayoutIO.readText(file.toPath());
+            readOnly |= ConfigLayoutIO.hasReplacementCharacters(source);
             values.putAll(ConfigLayoutIO.readEntries(source));
         } catch (IOException e) {
             readOnly = true;
@@ -141,12 +142,16 @@ public class BuildscapeClientConfig {
     }
 
     public void save() {
-        if (readOnly) return;
+        if (readOnly) {
+            BuildScape.getLogger().warn("BuildscapeClientConfig: Not saving read-only config; unreadable/legacy file kept as-is");
+            return;
+        }
         File file = getConfigFile();
         if (file == null) return;
         try {
             StringBuilder text = new StringBuilder("# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
             for (String section : new String[]{"Gameplay", "Performance", "Visuals & particles", "Interface", "Other"}) {
+                if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) continue;
                 text.append("\n# --- ").append(section).append(" ---\n");
                 for (Map.Entry<String, String> entry : values.entrySet()) {
                     if (!section.equals(section(entry.getKey()))) continue;

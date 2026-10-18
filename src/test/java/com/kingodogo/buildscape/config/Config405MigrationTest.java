@@ -41,7 +41,7 @@ public class Config405MigrationTest {
     }
 
     @Test
-    public void exactOldItemsParseAndMergeOnlyOnceWithAndWithoutVault() throws Exception {
+    public void exactOldItemsParseWithoutOverwritingOnLoad() throws Exception {
         for (boolean vault : new boolean[]{false, true}) {
             Path directory = temporary.newFolder().toPath();
             Path file = directory.resolve("pillar-items.json");
@@ -49,40 +49,25 @@ public class Config405MigrationTest {
             Set<String> oldItems = PillarParticleConfig.parseItems(original);
             assertTrue(oldItems.contains("minecraft:diamond"));
             assertTrue(oldItems.contains("buildscape:ancient_ashen_scroll"));
-            assertFalse(oldItems.contains("buildscape:bone_dice"));
             assertEquals(vault, oldItems.contains("the_vault:echo_pog"));
             Files.writeString(file, original);
             PillarParticleConfig config = new PillarParticleConfig(directory);
             config.loadItemsInternal(vault);
-            assertTrue(config.items.containsAll(oldItems));
-            assertTrue(config.items.contains("buildscape:bone_dice"));
-            assertEquals(vault, config.items.contains("the_vault:greed_coin"));
-            String merged = ConfigLayoutIO.readText(file);
-            JsonObject document = ConfigLayoutIO.readProperties(merged);
-            assertEquals(405, document.get("defaults_version").getAsInt());
-            assertEquals(vault, document.has("vault_defaults_version"));
-            assertEquals(original, ConfigLayoutIO.readText(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));
-            for (String line : original.split("\\R")) {
-                if (line.trim().startsWith("//")) assertTrue(line, merged.contains(line.trim()));
-            }
+            assertEquals(oldItems, config.items);
+            assertEquals("Existing file must remain untouched and not rewritten on launch", original, ConfigLayoutIO.readText(file));
+
             config.items.remove("minecraft:diamond");
-            config.items.remove("buildscape:bone_dice");
-            config.items.remove("the_vault:greed_coin");
             assertTrue(config.saveItemsToDisk(vault));
             String saved = ConfigLayoutIO.readText(file);
             PillarParticleConfig reloaded = new PillarParticleConfig(directory);
             reloaded.loadItemsInternal(vault);
             assertFalse(reloaded.items.contains("minecraft:diamond"));
-            assertFalse(reloaded.items.contains("buildscape:bone_dice"));
-            assertFalse(reloaded.items.contains("the_vault:greed_coin"));
-            assertEquals(saved, ConfigLayoutIO.readText(file));
-            assertTrue(reloaded.saveItemsToDisk(vault));
             assertEquals(saved, ConfigLayoutIO.readText(file));
         }
     }
 
     @Test
-    public void handRemovedOldItemsStayRemovedDuringFirstMerge() throws Exception {
+    public void handRemovedOldItemsStayRemovedAndFileIsUnmodifiedOnLoad() throws Exception {
         for (boolean vault : new boolean[]{false, true}) {
             Path directory = temporary.newFolder().toPath();
             Path file = directory.resolve("pillar-items.json");
@@ -94,7 +79,7 @@ public class Config405MigrationTest {
             config.loadItemsInternal(vault);
             assertFalse(config.items.contains("minecraft:diamond"));
             assertFalse(config.items.contains("the_vault:echo_pog"));
-            assertTrue(config.items.contains("buildscape:bone_dice"));
+            assertEquals("User modified file must not be rewritten on load", original, ConfigLayoutIO.readText(file));
         }
     }
 
@@ -219,21 +204,17 @@ public class Config405MigrationTest {
     }
 
     @Test
-    public void failedMergeCanBeSavedLaterWithOriginalBackup() throws Exception {
+    public void existingFileCanBeSavedLater() throws Exception {
         Path directory = temporary.newFolder().toPath();
         Path file = directory.resolve("pillar-items.json");
         String original = fixture("old-pillar-items-vanilla.json");
         Files.writeString(file, original);
-        Path backup = file.resolveSibling("pillar-items.json.pre-4.0.5.bak");
-        Files.createDirectory(backup);
         PillarParticleConfig config = new PillarParticleConfig(directory);
         config.loadItemsInternal(false);
-        assertTrue(config.items.contains("buildscape:bone_dice"));
         assertEquals(original, ConfigLayoutIO.readText(file));
-        Files.delete(backup);
+        config.items.add("example:new_item");
         assertTrue(config.saveItemsToDisk(false));
-        assertEquals(original, ConfigLayoutIO.readText(backup));
-        assertEquals(405, ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file)).get("defaults_version").getAsInt());
+        assertTrue(ConfigLayoutIO.readText(file).contains("example:new_item"));
     }
 
     @Test
@@ -302,7 +283,7 @@ public class Config405MigrationTest {
         assertEquals("spiral", ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(properties)).get("pattern").getAsString());
 
         Path items = directory.resolve("pillar-items.json");
-        Files.writeString(items, "{\"items\":[\"minecraft:stick\"],\"defaults_version\":405}");
+        Files.writeString(items, "{\"items\":[\"minecraft:stick\"],\"defaults_version\":410}");
         config.loadItemsInternal(false);
         Files.delete(items);
         assertTrue(config.saveItemsToDisk(false));

@@ -43,33 +43,7 @@ public class SpoolBlock extends RotatedPillarBlock {
 
     @Override
     public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        float destroySpeed = state.getDestroySpeed(level, pos);
-        if (destroySpeed == -1.0F) {
-            return 0.0F;
-        }
-
-        ItemStack tool = player.getMainHandItem();
-        float speedMultiplier = 1.0F;
-
-        if (tool.getItem() instanceof ShearsItem || tool.getItem() instanceof HoeItem) {
-            if (tool.getItem() instanceof ShearsItem) {
-                speedMultiplier = 5.0F;
-            } else if (tool.getItem() instanceof net.minecraft.world.item.DiggerItem digger) {
-                speedMultiplier = digger.getTier().getSpeed();
-            } else {
-                speedMultiplier = 2.0F;
-            }
-
-            int efficiencyLevel = net.minecraft.world.item.enchantment.EnchantmentHelper.getBlockEfficiency(player);
-            if (efficiencyLevel > 0) {
-                speedMultiplier += (float) (efficiencyLevel * efficiencyLevel + 1);
-            }
-
-            return speedMultiplier / destroySpeed / 30.0F;
-        } else {
-            speedMultiplier = 2.5F;
-            return speedMultiplier / destroySpeed / 100.0F;
-        }
+        return FabricMiningSpeed.getDestroyProgress(state, player, level, pos);
     }
 
     @Override

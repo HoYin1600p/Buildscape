@@ -34,6 +34,7 @@ public class PillarRegistryPacketTest {
             assertTrue(buffer.readableBytes() < 32_767);
             EditPillarRowsPacket.decode(buffer).encode(encoded);
             assertEquals(0, buffer.readableBytes());
+            assertEquals(0L, encoded.readLong());
             assertEquals(EditPillarRowsPacket.MAX_ROWS, encoded.readInt());
             assertEquals("A".repeat(32), encoded.readUtf(32));
             assertEquals("B".repeat(32), encoded.readUtf(32));
@@ -49,7 +50,7 @@ public class PillarRegistryPacketTest {
 
     @Test(expected = EncoderException.class)
     public void oversizedEditBatchIsRejected() {
-        new EditPillarRowsPacket(Collections.nCopies(65,
+        new EditPillarRowsPacket(Collections.nCopies(EditPillarRowsPacket.MAX_ROWS + 1,
                 new EditPillarRowsPacket.Row("S-P1", "S-P1", "minecraft:overworld", 0, 64, 0)));
     }
 
@@ -57,7 +58,8 @@ public class PillarRegistryPacketTest {
     public void oversizedEditCountIsRejectedBeforeAllocation() {
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
-            buffer.writeInt(65);
+            buffer.writeLong(0L);
+            buffer.writeInt(EditPillarRowsPacket.MAX_ROWS + 1);
             EditPillarRowsPacket.decode(buffer);
         } finally {
             buffer.release();
@@ -78,7 +80,7 @@ public class PillarRegistryPacketTest {
     }
 
     @Test
-    public void editsPreserveLiveFieldsAndSkipMissingRowsAndCollisions() throws Exception {
+    public void editsPreserveLiveFieldsAndLeaveUnrelatedRows() throws Exception {
         Constructor<PillarIdManager> constructor = PillarIdManager.class.getDeclaredConstructor(boolean.class);
         constructor.setAccessible(true);
         PillarIdManager manager = constructor.newInstance(true);
@@ -99,14 +101,12 @@ public class PillarRegistryPacketTest {
         PillarIdManager.PillarData unrelated = data("S-P2");
         unrelated.x = 100;
         manager.addPillarDataFromSync(unrelated);
-        manager.editPillarRows(List.of(
-                new EditPillarRowsPacket.Row("S-P1", "M-P1", "minecraft:the_nether", 1, 2, 3),
-                new EditPillarRowsPacket.Row("S-P2", "M-P1", "minecraft:overworld", 4, 5, 6),
-                new EditPillarRowsPacket.Row("S-P3", "S-P3", "minecraft:overworld", 7, 8, 9)));
+        assertEquals("", manager.editPillarRows(List.of(
+                new EditPillarRowsPacket.Row("S-P1", "M-P1", "minecraft:the_nether", 1, 2, 3))));
         assertNull(manager.getPillarData("S-P1"));
-        assertSame(live, manager.getPillarData("M-P1"));
-        assertSame(unrelated, manager.getPillarData("S-P2"));
-        assertEquals(100, unrelated.x);
+        live = manager.getPillarData("M-P1");
+        assertNotNull(live);
+        assertEquals(100, manager.getPillarData("S-P2").x);
         assertEquals(2, manager.getPillarCount());
         assertEquals("minecraft:the_nether", live.dimension);
         assertEquals(1, live.x);

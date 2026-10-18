@@ -380,7 +380,7 @@ public class PillarBlockEntity extends BlockEntity {
             return;
         }
 
-        if (!idToSync.startsWith(expectedPrefix)) {
+        if (!idToSync.startsWith(expectedPrefix) && manager.getPillarData(idToSync) == null) {
             return;
         }
 
@@ -470,6 +470,7 @@ public class PillarBlockEntity extends BlockEntity {
     private static final int globalParticleColorCounter = 0;
     private final int clientSyncAttempts = 0;
     private int syncTickCounter = 0;
+    private boolean registryReconciled;
 
     @Override
     public void onLoad() {
@@ -515,6 +516,12 @@ public class PillarBlockEntity extends BlockEntity {
             BlockPos pos,
             BlockState state,
             PillarBlockEntity be) {
+        PillarIdManager manager = PillarIdManager.get(level);
+        if (!be.registryReconciled && manager.hasLoaded()
+                && com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
+            manager.registerPillar(be);
+            be.registryReconciled = true;
+        }
         be.syncTickCounter++;
         if (be.syncTickCounter >= SYNC_INTERVAL) {
             be.syncTickCounter = 0;
@@ -585,7 +592,7 @@ public class PillarBlockEntity extends BlockEntity {
                 : getStackPillarId();
         if (idToSync == null || idToSync.isEmpty())
             return;
-        if (!idToSync.startsWith(expectedPrefix))
+        if (!idToSync.startsWith(expectedPrefix) && manager.getPillarData(idToSync) == null)
             return;
 
         PillarIdManager.PillarData data = manager.getPillarData(idToSync);
@@ -595,7 +602,7 @@ public class PillarBlockEntity extends BlockEntity {
             java.util.List<String> managerColors = data.getColors();
             boolean colorsDiffer = (this.particleColors == null ||
                     this.particleColors.isEmpty() ||
-                    !this.pillarId.equals(idToSync) ||
+                    !idToSync.equals(this.pillarId) ||
                     managerColors.size() != this.particleColors.size());
 
             if (!colorsDiffer) {
@@ -816,7 +823,7 @@ public class PillarBlockEntity extends BlockEntity {
             return;
         }
 
-        if (!idToSync.startsWith(expectedPrefix)) {
+        if (!idToSync.startsWith(expectedPrefix) && manager.getPillarData(idToSync) == null) {
             if (this.particleColors == null || this.particleColors.isEmpty()) {
                 this.pillarId = null;
                 this.particleColors = null;
@@ -881,7 +888,7 @@ public class PillarBlockEntity extends BlockEntity {
                 if (newData == null) {
                     newData = manager.getOrCreatePillarData(level, bottomPos);
                 }
-                if (newData != null && newData.id.equals(idToSync)) {
+                if (newData != null && idToSync.equals(newData.id)) {
                     boolean needsSync = false;
                     if (!newData.hasColors()) {
                         needsSync = true;

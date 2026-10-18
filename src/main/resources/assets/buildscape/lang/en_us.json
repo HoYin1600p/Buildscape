@@ -1,4 +1,12 @@
 {
+  "buildscape.config.ids.status.saving": "Saving...",
+  "buildscape.config.ids.status.rejected": "%s rejected: %s",
+  "buildscape.config.ids.status.too_many": "Save at most %s edited rows at once. No edits were sent.",
+  "buildscape.config.ids.reject.invalid": "Invalid edit batch; no rows were saved.",
+  "buildscape.config.ids.reject.missing": "An original ID no longer exists. Reload and retry.",
+  "buildscape.config.ids.reject.id_conflict": "The final IDs conflict; no rows were saved.",
+  "buildscape.config.ids.reject.position_conflict": "The final positions conflict; no rows were saved.",
+  "buildscape.config.ids.reject.permission": "Operator level 2 is required; no rows were saved.",
   "block.buildscape.bone_block_slab": "Bone Block Slab",
   "block.buildscape.bone_block_stairs": "Bone Block Stairs",
   "block.buildscape.bone_block_wall": "Bone Block Wall",

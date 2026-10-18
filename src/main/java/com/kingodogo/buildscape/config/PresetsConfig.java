@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class PresetsConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private static final String PRESETS_FILE_NAME = "pillar-presets.json";
     private static PresetsConfig INSTANCE;
     private final transient Path configDirectory;
@@ -40,6 +40,7 @@ public class PresetsConfig {
     }
 
     private Map<String, Preset> presets = new HashMap<>();
+    private final Map<String, com.google.gson.JsonElement> preservedPresets = new HashMap<>();
     private boolean fileUnreadable;
     private String lastAppliedPreset = "default";
     private static final String UNNAMED_PRESET_KEY = "_unnamed";
@@ -59,6 +60,18 @@ public class PresetsConfig {
             com.google.gson.JsonObject loaded = GSON.fromJson(source, com.google.gson.JsonObject.class);
             boolean[] skippedEntries = {false};
             Map<String, Preset> loadedPresets = parsePresets(loaded, skippedEntries);
+            Map<String, com.google.gson.JsonElement> preserved = new HashMap<>();
+            for (Map.Entry<String, com.google.gson.JsonElement> entry : loaded.entrySet()) {
+                if (entry.getKey().equals("_lastApplied") || entry.getKey().equals(UNNAMED_PRESET_KEY)) continue;
+                Preset preset = loadedPresets.get(entry.getKey());
+                boolean partial = preset == null;
+                if (preset != null) {
+                    for (com.google.gson.JsonElement item : entry.getValue().getAsJsonObject().getAsJsonArray("items")) {
+                        if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) partial = true;
+                    }
+                }
+                if (partial) preserved.put(entry.getKey(), entry.getValue().deepCopy());
+            }
             if (skippedEntries[0]) {
                 PillarParticleConfig.backupUnreadableFile(file);
             }
@@ -68,6 +81,8 @@ public class PresetsConfig {
                 loadedLastApplied = loaded.get("_lastApplied").getAsString();
             }
             presets = loadedPresets;
+            preservedPresets.clear();
+            preservedPresets.putAll(preserved);
             lastAppliedPreset = loadedLastApplied;
             fileUnreadable = ConfigLayoutIO.hasReplacementCharacters(source);
         } catch (Exception e) {
@@ -168,6 +183,7 @@ public class PresetsConfig {
                     }
                 }
                 toSave.put("_lastApplied", lastAppliedPreset);
+                toSave.putAll(preservedPresets);
                 GSON.toJson(toSave, writer);
             }
             try {
@@ -197,6 +213,7 @@ public class PresetsConfig {
 
     private void initializeDefaults() {
         presets.clear();
+        preservedPresets.clear();
 
         Preset defaultPreset = new Preset("Default", getDefaultItems());
         presets.put("default", defaultPreset);
@@ -254,6 +271,10 @@ public class PresetsConfig {
 
     public boolean savePreset(String key, String name, Set<String> items) {
         if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
+            return false;
+        }
+        if (preservedPresets.containsKey(key)) {
+            com.kingodogo.buildscape.BuildScape.getLogger().warn("Not replacing preserved malformed preset " + key);
             return false;
         }
 
@@ -350,7 +371,7 @@ public class PresetsConfig {
 
     public String generatePresetKey() {
         int index = 1;
-        while (presets.containsKey("preset_" + index)) {
+        while (presets.containsKey("preset_" + index) || preservedPresets.containsKey("preset_" + index)) {
             index++;
         }
         return "preset_" + index;

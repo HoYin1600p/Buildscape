@@ -325,7 +325,7 @@ public class PillarBlock
                         data.x = bottom.getX();
                         data.y = bottom.getY();
                         data.z = bottom.getZ();
-                        manager.saveImmediate();
+                        manager.requestSave();
                     }
                 }
 
@@ -414,7 +414,7 @@ public class PillarBlock
                             data.x = firstRemainingPillar.getX();
                             data.y = firstRemainingPillar.getY();
                             data.z = firstRemainingPillar.getZ();
-                            manager.saveImmediate();
+                            manager.requestSave();
                         }
 
                         current = bottom;

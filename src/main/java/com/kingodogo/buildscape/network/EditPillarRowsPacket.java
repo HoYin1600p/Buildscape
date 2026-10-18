@@ -14,15 +14,22 @@ import java.util.function.Supplier;
 
 public class EditPillarRowsPacket {
 
-    public static final int MAX_ROWS = 64;
+    public static final int MAX_ROWS = 80;
+    private final long batchId;
     private final List<Row> rows;
 
     public EditPillarRowsPacket(List<Row> rows) {
+        this(0L, rows);
+    }
+
+    public EditPillarRowsPacket(long batchId, List<Row> rows) {
         NetworkPacketLimits.checkCount(rows.size(), MAX_ROWS, "pillar edit row");
+        this.batchId = batchId;
         this.rows = new ArrayList<>(rows);
     }
 
     public EditPillarRowsPacket(FriendlyByteBuf buf) {
+        this.batchId = buf.readLong();
         int count = NetworkPacketLimits.readCount(buf, MAX_ROWS, "pillar edit row");
         this.rows = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -43,6 +50,7 @@ public class EditPillarRowsPacket {
 
     public void encode(FriendlyByteBuf buf) {
         NetworkPacketLimits.checkCount(rows.size(), MAX_ROWS, "pillar edit row");
+        buf.writeLong(batchId);
         buf.writeInt(rows.size());
         for (Row row : rows) {
             if (row == null || !row.isValid()) {
@@ -60,8 +68,13 @@ public class EditPillarRowsPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null || !player.hasPermissions(2)) return;
-            PillarIdManager.get().editPillarRows(rows);
+            if (player == null) return;
+            String reason = player.hasPermissions(2) ? PillarIdManager.get().editPillarRows(rows) : "permission";
+            if (reason.isEmpty()) {
+                SyncPillarIdsPacket.sendToPlayer(player, PillarIdManager.get().getAllPillarDataForSync());
+            }
+            ModMessages.INSTANCE.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+                    new EditPillarRowsResultPacket(batchId, rows.stream().map(row -> row.oldId).toList(), reason));
         });
         ctx.get().setPacketHandled(true);
     }

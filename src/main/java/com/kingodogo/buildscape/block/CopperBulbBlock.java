@@ -152,13 +152,4 @@ public abstract class CopperBulbBlock extends Block {
         return state.getValue(LIT) ? 15 : 0;
     }
 
-    @Override
-    public float getDestroyProgress(
-            BlockState state,
-            Player player,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return super.getDestroyProgress(state, player, level, pos);
-    }
 }

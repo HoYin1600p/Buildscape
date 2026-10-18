@@ -56,6 +56,8 @@ public class ModMessages {
                 ConfettiBurstPacket::encode, ConfettiBurstPacket::decode, ConfettiBurstPacket::handle);
         register(SyncBiomeTintPacket.class, 19, NetworkDirection.PLAY_TO_CLIENT,
                 SyncBiomeTintPacket::encode, SyncBiomeTintPacket::decode, SyncBiomeTintPacket::handle);
+        register(EditPillarRowsResultPacket.class, 20, NetworkDirection.PLAY_TO_CLIENT,
+                EditPillarRowsResultPacket::encode, EditPillarRowsResultPacket::decode, EditPillarRowsResultPacket::handle);
     }
 
     private static <T> void register(

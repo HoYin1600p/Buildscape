@@ -41,29 +41,7 @@ public class SoftFabricBlock extends Block {
 
     @Override
     public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        float destroySpeed = state.getDestroySpeed(level, pos);
-        if (destroySpeed == -1.0F) {
-            return 0.0F;
-        }
-
-        ItemStack tool = player.getMainHandItem();
-        float fabricSpeed;
-        boolean fabricTool = tool.getItem() instanceof ShearsItem || tool.getItem() instanceof HoeItem;
-
-        if (fabricTool) {
-            if (tool.getItem() instanceof ShearsItem) {
-                fabricSpeed = 5.0F;
-            } else if (tool.getItem() instanceof net.minecraft.world.item.DiggerItem digger) {
-                fabricSpeed = digger.getTier().getSpeed();
-            } else {
-                fabricSpeed = 2.0F;
-            }
-        } else {
-            fabricSpeed = 2.5F;
-        }
-        float speedMultiplier = player.getDigSpeed(state, pos)
-                * fabricSpeed / Math.max(1.0F, tool.getDestroySpeed(state));
-        return speedMultiplier / destroySpeed / (fabricTool ? 30.0F : 100.0F);
+        return FabricMiningSpeed.getDestroyProgress(state, player, level, pos);
     }
 
     @Override

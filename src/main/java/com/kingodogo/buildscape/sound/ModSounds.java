@@ -20,6 +20,16 @@ public class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, BuildScape.MODID);
 
+    public static final RegistryObject<SoundEvent> SCULK_CATALYST_BLOOM =
+            SOUND_EVENTS.register("block.sculk_catalyst.bloom", () ->
+                    new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk_catalyst.bloom")));
+    public static final RegistryObject<SoundEvent> SCULK_SPREAD =
+            SOUND_EVENTS.register("block.sculk.spread", () ->
+                    new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk.spread")));
+    public static final RegistryObject<SoundEvent> SCULK_CHARGE =
+            SOUND_EVENTS.register("block.sculk.charge", () ->
+                    new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk.charge")));
+
     public static final RegistryObject<SoundEvent> COPPER_GRATE_BREAK =
             registerSoundEvent("block.copper_grate.break");
     public static final RegistryObject<SoundEvent> COPPER_GRATE_STEP =

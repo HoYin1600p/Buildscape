@@ -1,4 +1,7 @@
 {
+  "subtitles.buildscape.block.sculk_catalyst.bloom": "Sculk Catalyst blooms",
+  "subtitles.buildscape.block.sculk.spread": "Sculk spreads",
+  "subtitles.buildscape.block.sculk.charge": "Sculk charges",
   "buildscape.config.ids.status.saving": "Saving...",
   "buildscape.config.ids.status.leave_blocked": "Stay here until saved, or Reload to discard edits. %s",
   "buildscape.config.ids.status.no_reply": "No reply from server. Edits are still unsaved; reload or retry.",

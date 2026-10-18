@@ -10,6 +10,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.TagsUpdatedEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.io.File;
@@ -116,6 +119,14 @@ public class PillarParticleConfig {
 
     private static void clearMatchCache() {
         MATCH_CACHE.clear();
+    }
+
+    @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static final class TagEvents {
+        @SubscribeEvent
+        public static void onTagsUpdated(TagsUpdatedEvent event) {
+            clearMatchCache();
+        }
     }
 
     public double particle_speed = 0.02;
@@ -228,7 +239,7 @@ public class PillarParticleConfig {
         SERVER_CONFIG.particle_lifetime = packet.particle_lifetime > 0
                 ? packet.particle_lifetime
                 : 20;
-        SERVER_CONFIG.particle_density = packet.particle_density > 0
+        SERVER_CONFIG.particle_density = packet.particle_density >= 0
                 ? packet.particle_density
                 : 2;
         SERVER_CONFIG.use_pattern = packet.use_pattern;
@@ -270,6 +281,7 @@ public class PillarParticleConfig {
 
         clearMatchCache();
         notifyCallbacks(true);
+        SNAPSHOT = SERVER_CONFIG;
     }
 
     private static void initializeFileWatcher() {
@@ -370,6 +382,7 @@ public class PillarParticleConfig {
 
     public static void clearServerConfig() {
         SERVER_CONFIG = null;
+        SNAPSHOT = INSTANCE;
         clearMatchCache();
     }
 
@@ -499,12 +512,18 @@ public class PillarParticleConfig {
     private void loadInternal() {
         File propertiesFile = getPropertiesFile();
         File itemsFile = getItemsFile();
-        if (!propertiesFile.exists() || !itemsFile.exists()) {
-            migrateOldConfig();
-        }
+        boolean migrationComplete = migrateOldConfig();
 
-        loadPropertiesInternal();
-        loadItemsInternal();
+        if (migrationComplete || propertiesFile.exists()) {
+            loadPropertiesInternal();
+        } else {
+            propertiesReadOnly = true;
+        }
+        if (migrationComplete || itemsFile.exists()) {
+            loadItemsInternal();
+        } else {
+            itemsFileUnreadable = true;
+        }
     }
 
     private synchronized void loadPropertiesInternal() {
@@ -564,8 +583,8 @@ public class PillarParticleConfig {
                     this.particle_lifetime = loaded.particle_lifetime > 0
                             ? loaded.particle_lifetime
                             : this.particle_lifetime;
-                    this.particle_density = loaded.particle_density > 0
-                            ? loaded.particle_density
+                    this.particle_density = jsonMap.containsKey("particle_density")
+                            ? Math.max(0, loaded.particle_density)
                             : this.particle_density;
                     this.use_pattern = loaded.use_pattern;
                     this.pattern = loaded.pattern != null ? loaded.pattern : "ring";
@@ -738,20 +757,21 @@ public class PillarParticleConfig {
         return parsed;
     }
 
-    private void migrateOldConfig() {
+    private boolean migrateOldConfig() {
         Path oldFile = configDirectory == null ? Paths.get("config", "buildscape", "pillar-particles.json")
                 : configDirectory.resolveSibling("pillar-particles.json");
         Path backup = oldFile.resolveSibling("pillar-particles.json.backup");
-        if (!Files.exists(oldFile) || Files.exists(backup)) return;
+        Path completion = oldFile.resolveSibling("pillar-particles.json.backup.complete");
+        if (!Files.exists(oldFile) || Files.exists(completion)) return true;
         try {
             String source = ConfigLayoutIO.readText(oldFile);
             JsonObject old = GSON.fromJson(ConfigLayoutIO.itemsJson(source), JsonObject.class);
-            if (old == null) return;
+            if (old == null) return false;
             boolean replacementDecoded = ConfigLayoutIO.hasReplacementCharacters(source);
-            Files.copy(oldFile, backup);
+            boolean hasItems = old.has("items") && !old.get("items").isJsonNull();
             try {
                 File itemsFile = getItemsFile();
-                if (!itemsFile.exists() && old.has("items")) {
+                if (!itemsFile.exists() && hasItems) {
                     parseItems(source, oldFile.toString());
                     JsonObject itemValues = new JsonObject();
                     itemValues.add("items", old.get("items"));
@@ -781,8 +801,17 @@ public class PillarParticleConfig {
             } catch (Exception e) {
                 BuildScape.LOGGER.error("Unable to migrate legacy pillar properties; retaining the original", e);
             }
+            boolean migrated = getPropertiesFile().exists() && (getItemsFile().exists() || !hasItems);
+            if (migrated) {
+                if (!Files.exists(backup)) {
+                    Files.copy(oldFile, backup);
+                }
+                Files.createFile(completion);
+            }
+            return migrated;
         } catch (Exception e) {
             BuildScape.LOGGER.error("Unable to migrate legacy pillar config; retaining the original", e);
+            return false;
         }
     }
     public static void forceReload() {

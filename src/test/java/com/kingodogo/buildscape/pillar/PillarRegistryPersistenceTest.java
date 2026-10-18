@@ -36,14 +36,16 @@ public class PillarRegistryPersistenceTest {
     }
 
     @Test
-    public void missingOrEmptyMainUsesUndyedBackup() throws Exception {
+    public void missingOrTruncatedMainUsesUndyedBackupButValidEmptyMainWins() throws Exception {
         PillarIdManager manager = manager();
         File main = new File(temporary.getRoot(), "pillar-ids.dat");
         File backup = temporary.newFile("pillar-ids.bak.dat");
         Files.writeString(backup.toPath(), "{\"S-P1\":{\"id\":\"S-P1\",\"dyeColors\":[]}}");
         assertEquals(Set.of("S-P1"), read(manager, main, backup).keySet());
-        Files.writeString(main.toPath(), "{}");
+        Files.writeString(main.toPath(), "");
         assertEquals(Set.of("S-P1"), read(manager, main, backup).keySet());
+        Files.writeString(main.toPath(), "{}");
+        assertTrue(read(manager, main, backup).isEmpty());
     }
 
     @Test

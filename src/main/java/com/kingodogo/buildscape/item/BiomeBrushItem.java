@@ -247,15 +247,15 @@ public class BiomeBrushItem extends Item {
                 for (int z = minZ; z <= maxZ; z++) {
                     BlockPos bottom = new BlockPos(x, minY, z);
                     BlockPos top = new BlockPos(x, maxY, z);
-                    if (!level.hasChunkAt(bottom) || !level.getWorldBorder().isWithinBounds(bottom)
-                            || !level.mayInteract(player, bottom) || !level.mayInteract(player, top)
-                            || !player.mayUseItemAt(bottom, context.getClickedFace(), stack)
-                            || !player.mayUseItemAt(top, context.getClickedFace(), stack)
-                            || player.blockActionRestricted(level, bottom, serverPlayer.gameMode.getGameModeForPlayer())
-                            || player.blockActionRestricted(level, top, serverPlayer.gameMode.getGameModeForPlayer())
-                            || ForgeEventFactory.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, bottom), Direction.UP)
-                            || (!bottom.equals(top) && ForgeEventFactory.onBlockPlace(player,
-                                    BlockSnapshot.create(level.dimension(), level, top), Direction.UP))) {
+                    boolean columnAllowed = level.hasChunkAt(bottom) && level.getWorldBorder().isWithinBounds(bottom)
+                            && canPaintAt(level, serverPlayer, bottom, context.getClickedFace(), stack)
+                            && (bottom.equals(top) || canPaintAt(level, serverPlayer, top, context.getClickedFace(), stack));
+                    for (int y = level.getMinBuildHeight(); y < level.getMaxBuildHeight() && columnAllowed; y += 16) {
+                        if (y != minY && y != maxY) {
+                            columnAllowed = canPaintAt(level, serverPlayer, new BlockPos(x, y, z), context.getClickedFace(), stack);
+                        }
+                    }
+                    if (!columnAllowed) {
                         player.displayClientMessage(new TextComponent("Cannot paint: the selection includes an unloaded or protected column.").withStyle(ChatFormatting.RED), true);
                         return InteractionResult.FAIL;
                     }
@@ -331,6 +331,13 @@ public class BiomeBrushItem extends Item {
 
     private static ResourceLocation registryKey(Level level, Biome biome) {
         return level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+    }
+
+    private static boolean canPaintAt(Level level, ServerPlayer player, BlockPos pos, Direction face, ItemStack stack) {
+        return level.mayInteract(player, pos)
+                && player.mayUseItemAt(pos, face, stack)
+                && !player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())
+                && !ForgeEventFactory.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP);
     }
 
     @Override

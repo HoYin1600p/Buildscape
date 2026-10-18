@@ -57,7 +57,11 @@ public class PresetsConfig {
         try {
             String source = ConfigLayoutIO.readText(file.toPath());
             com.google.gson.JsonObject loaded = GSON.fromJson(source, com.google.gson.JsonObject.class);
-            Map<String, Preset> loadedPresets = parsePresets(loaded);
+            boolean[] skippedEntries = {false};
+            Map<String, Preset> loadedPresets = parsePresets(loaded, skippedEntries);
+            if (skippedEntries[0]) {
+                PillarParticleConfig.backupUnreadableFile(file);
+            }
             String loadedLastApplied = "default";
             if (loaded.has("_lastApplied") && loaded.get("_lastApplied").isJsonPrimitive()
                     && loaded.get("_lastApplied").getAsJsonPrimitive().isString()) {
@@ -99,6 +103,10 @@ public class PresetsConfig {
     }
 
     static Map<String, Preset> parsePresets(com.google.gson.JsonObject loaded) {
+        return parsePresets(loaded, new boolean[]{false});
+    }
+
+    private static Map<String, Preset> parsePresets(com.google.gson.JsonObject loaded, boolean[] skippedEntries) {
         if (loaded == null) {
             throw new IllegalArgumentException("Expected a presets object");
         }
@@ -113,6 +121,11 @@ public class PresetsConfig {
                     }
                     Set<String> items = PillarParticleConfig.parseItems(value.toString(),
                             PRESETS_FILE_NAME + " preset " + entry.getKey());
+                    for (com.google.gson.JsonElement item : value.getAsJsonObject().getAsJsonArray("items")) {
+                        if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) {
+                            skippedEntries[0] = true;
+                        }
+                    }
                     String name = value.getAsJsonObject().has("name")
                             ? GSON.fromJson(value.getAsJsonObject().get("name"), String.class) : "";
                     if (name == null) {
@@ -120,6 +133,7 @@ public class PresetsConfig {
                     }
                     parsed.put(entry.getKey(), new Preset(name, items));
                 } catch (RuntimeException e) {
+                    skippedEntries[0] = true;
                     com.kingodogo.buildscape.BuildScape.getLogger().warn(
                             "Skipped malformed preset " + entry.getKey() + " in " + PRESETS_FILE_NAME, e);
                 }

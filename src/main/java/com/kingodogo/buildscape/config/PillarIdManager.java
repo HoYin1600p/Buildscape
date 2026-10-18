@@ -868,7 +868,7 @@ public class PillarIdManager {
         if (file.exists() && file.length() > 0) {
             try {
                 Map<String, PillarData> loaded = loadFromFile(file);
-                if (loaded != null && !loaded.isEmpty()) return new SavedData(file, loaded);
+                if (loaded != null) return new SavedData(file, loaded);
             } catch (Exception e) {
                 handleCorruptedFile(file, e, "parse");
             }
@@ -918,6 +918,9 @@ public class PillarIdManager {
                 return false;
             }
             if (!saveToFile(getDataFile(), FILE_NAME)) {
+                return false;
+            }
+            if (allowEmptySave && !saveToFile(getBackupDataFile(), BACKUP_FILE_NAME)) {
                 return false;
             }
             allowEmptySave = false;

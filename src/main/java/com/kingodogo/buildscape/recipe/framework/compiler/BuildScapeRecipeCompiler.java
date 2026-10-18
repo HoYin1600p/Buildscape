@@ -25,6 +25,7 @@ public class BuildScapeRecipeCompiler {
     private final FamilyExpander familyExpander = new FamilyExpander(templateEngine);
     private final RecipeValidator validator = new RecipeValidator();
     private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
+    private final StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
 
     public static record CompileResult(
             List<Recipe<?>> recipes,
@@ -38,6 +39,9 @@ public class BuildScapeRecipeCompiler {
         if (pack == null) {
             return new CompileResult(compiledRecipes, 0, 0);
         }
+
+        cycles.addCategory(pack);
+        cycles.validate();
 
         aliasResolver.registerAliases(pack.aliases());
 
@@ -334,5 +338,6 @@ public class BuildScapeRecipeCompiler {
     public void clear() {
         validator.clear();
         recipeIds.clear();
+        cycles.clear();
     }
 }

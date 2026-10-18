@@ -1,21 +1,193 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
+import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
-import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class WidgetLayoutHelper {
+
+    private static Field xField;
+    private static Field yField;
+    private static Field heightField;
+    private static Method getXMethod;
+    private static Method getYMethod;
+    private static Method setXMethod;
+    private static Method setYMethod;
+    private static Method setPositionMethod;
+
+    static {
+        try {
+            heightField = AbstractWidget.class.getDeclaredField("height");
+            heightField.setAccessible(true);
+        } catch (Throwable ignored) {}
+
+        try {
+            xField = AbstractWidget.class.getDeclaredField("x");
+            xField.setAccessible(true);
+        } catch (Throwable ignored) {}
+
+        try {
+            yField = AbstractWidget.class.getDeclaredField("y");
+            yField.setAccessible(true);
+        } catch (Throwable ignored) {}
+
+        try {
+            getXMethod = AbstractWidget.class.getMethod("getX");
+        } catch (Throwable ignored) {}
+
+        try {
+            getYMethod = AbstractWidget.class.getMethod("getY");
+        } catch (Throwable ignored) {}
+
+        try {
+            setXMethod = AbstractWidget.class.getMethod("setX", int.class);
+        } catch (Throwable ignored) {}
+
+        try {
+            setYMethod = AbstractWidget.class.getMethod("setY", int.class);
+        } catch (Throwable ignored) {}
+
+        try {
+            setPositionMethod = AbstractWidget.class.getMethod("setPosition", int.class, int.class);
+        } catch (Throwable ignored) {}
+    }
+
+    public static int getX(AbstractWidget widget) {
+        if (widget == null) return 0;
+        if (widget instanceof IWidgetBounds bounds) return bounds.buildscape$getX();
+        if (getXMethod != null) {
+            try {
+                return (int) getXMethod.invoke(widget);
+            } catch (Throwable ignored) {}
+        }
+        if (xField != null) {
+            try {
+                return xField.getInt(widget);
+            } catch (Throwable ignored) {}
+        }
+        return 0;
+    }
+
+    public static int getY(AbstractWidget widget) {
+        if (widget == null) return 0;
+        if (widget instanceof IWidgetBounds bounds) return bounds.buildscape$getY();
+        if (getYMethod != null) {
+            try {
+                return (int) getYMethod.invoke(widget);
+            } catch (Throwable ignored) {}
+        }
+        if (yField != null) {
+            try {
+                return yField.getInt(widget);
+            } catch (Throwable ignored) {}
+        }
+        return 0;
+    }
+
+    public static int getHeight(AbstractWidget widget) {
+        if (widget == null) return 0;
+        if (widget instanceof IWidgetBounds bounds) return bounds.buildscape$getHeight();
+        try {
+            Method getHeightMethod = widget.getClass().getMethod("getHeight");
+            return (int) getHeightMethod.invoke(widget);
+        } catch (Throwable ignored) {}
+        if (heightField != null) {
+            try {
+                return heightField.getInt(widget);
+            } catch (Throwable ignored) {}
+        }
+        return 0;
+    }
+
+    public static void setX(AbstractWidget widget, int x) {
+        if (widget == null) return;
+        if (widget instanceof IWidgetBounds bounds) {
+            bounds.buildscape$setX(x);
+            return;
+        }
+        if (setXMethod != null) {
+            try {
+                setXMethod.invoke(widget, x);
+                return;
+            } catch (Throwable ignored) {}
+        }
+        if (xField != null) {
+            try {
+                xField.setInt(widget, x);
+            } catch (Throwable ignored) {}
+        }
+    }
+
+    public static void setY(AbstractWidget widget, int y) {
+        if (widget == null) return;
+        if (widget instanceof IWidgetBounds bounds) {
+            bounds.buildscape$setY(y);
+            return;
+        }
+        if (setYMethod != null) {
+            try {
+                setYMethod.invoke(widget, y);
+                return;
+            } catch (Throwable ignored) {}
+        }
+        if (yField != null) {
+            try {
+                yField.setInt(widget, y);
+            } catch (Throwable ignored) {}
+        }
+    }
+
+    public static void setPosition(AbstractWidget widget, int x, int y) {
+        if (widget == null) return;
+        if (widget instanceof IWidgetBounds bounds) {
+            bounds.buildscape$setX(x);
+            bounds.buildscape$setY(y);
+            return;
+        }
+        if (setPositionMethod != null) {
+            try {
+                setPositionMethod.invoke(widget, x, y);
+                return;
+            } catch (Throwable ignored) {}
+        }
+        setX(widget, x);
+        setY(widget, y);
+    }
+
+    public static void setWidgetHeight(AbstractWidget widget, int height) {
+        if (widget == null) return;
+        if (widget instanceof IWidgetBounds bounds) {
+            bounds.buildscape$setHeight(height);
+            return;
+        }
+        try {
+            Method setHeightMethod = widget.getClass().getMethod("setHeight", int.class);
+            setHeightMethod.invoke(widget, height);
+            return;
+        } catch (Throwable ignored) {
+        }
+        if (heightField != null) {
+            try {
+                heightField.setInt(widget, height);
+            } catch (Throwable ignored) {
+            }
+        }
+    }
 
     public static void positionSearchBoxWithButtons(AbstractWidget parent, EditBox searchBox,
                                                     int buttonAreaWidth, int topOffset, int leftPadding) {
         if (parent == null || searchBox == null) return;
 
-        int searchBoxY = parent.y + topOffset;
+        int parentX = getX(parent);
+        int parentY = getY(parent);
+        int searchBoxY = parentY + topOffset;
         int searchBoxWidth = parent.getWidth() - buttonAreaWidth - leftPadding * 2;
-        int searchBoxX = parent.x + leftPadding;
+        int searchBoxX = parentX + leftPadding;
 
-        searchBox.x = searchBoxX;
-        searchBox.y = searchBoxY;
+        setPosition(searchBox, searchBoxX, searchBoxY);
         searchBox.setWidth(searchBoxWidth);
     }
 
@@ -24,17 +196,16 @@ public class WidgetLayoutHelper {
                                            int searchBoxWidth, int topOffset, int leftPadding) {
         if (parent == null || buttons == null) return;
 
-        int buttonY = parent.y + topOffset;
-        int buttonsStartX = parent.x + leftPadding + searchBoxWidth + BuildScapeConfigScreen.scaleSize(10);
+        int parentX = getX(parent);
+        int parentY = getY(parent);
+        int buttonY = parentY + topOffset;
+        int buttonsStartX = parentX + leftPadding + searchBoxWidth + BuildScapeConfigScreen.scaleSize(10);
 
         for (int i = 0; i < buttons.length; i++) {
             if (buttons[i] != null) {
-                buttons[i].x = buttonsStartX + i * (buttonSize + buttonSpacing);
-                buttons[i].y = buttonY;
-                if (buttons[i] instanceof AbstractWidget) {
-                    buttons[i].setWidth(buttonSize);
-                    buttons[i].setHeight(buttonSize);
-                }
+                setPosition(buttons[i], buttonsStartX + i * (buttonSize + buttonSpacing), buttonY);
+                buttons[i].setWidth(buttonSize);
+                setWidgetHeight(buttons[i], buttonSize);
             }
         }
     }
@@ -43,20 +214,14 @@ public class WidgetLayoutHelper {
                                                    int searchBoxHeight, int searchBoxOffset, int bottomPadding) {
         if (parent == null || child == null) return;
 
-        int childY = parent.y + searchBoxOffset + searchBoxHeight + BuildScapeConfigScreen.scaleSize(5);
-        int childHeight = parent.y + parent.getHeight() - childY - bottomPadding;
+        int parentX = getX(parent);
+        int parentY = getY(parent);
+        int childY = parentY + searchBoxOffset + searchBoxHeight + BuildScapeConfigScreen.scaleSize(5);
+        int childHeight = parentY + parent.getHeight() - childY - bottomPadding;
 
-        child.x = parent.x;
-        child.y = childY;
+        setPosition(child, parentX, childY);
         child.setWidth(parent.getWidth());
-
-        try {
-            java.lang.reflect.Method setHeightMethod = child.getClass().getMethod("setHeight", int.class);
-            setHeightMethod.invoke(child, childHeight);
-        } catch (NoSuchMethodException e) {
-            child.setHeight(childHeight);
-        } catch (Exception e) {
-        }
+        setWidgetHeight(child, childHeight);
     }
 
     public static void updateChildPositions(AbstractWidget parent, EditBox searchBox,
@@ -81,4 +246,3 @@ public class WidgetLayoutHelper {
         }
     }
 }
-

@@ -19,8 +19,12 @@ public class ModGameRules {
     public static GameRules.Key<GameRules.BooleanValue> IS_CAKE_STACK;
     public static GameRules.Key<GameRules.BooleanValue> IS_WATER_BOTTLE_STACK;
 
-    private static volatile boolean clientCakeStacking = true;
-    private static volatile boolean clientWaterBottleStacking = true;
+    public static volatile boolean clientFastLeafDecay = false;
+    public static volatile boolean clientDisableEndermanGriefing = false;
+    public static volatile boolean clientDisableCreeperGriefing = false;
+    public static volatile boolean clientDisableGhastGriefing = false;
+    public static volatile boolean clientCakeStacking = true;
+    public static volatile boolean clientWaterBottleStacking = true;
 
     public static void register() {
         try {

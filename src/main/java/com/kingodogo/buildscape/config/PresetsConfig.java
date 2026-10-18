@@ -50,10 +50,14 @@ public class PresetsConfig {
     public void load() {
         File file = getPresetsFile();
         if (!file.exists()) {
-            initializeDefaults();
-            fileUnreadable = false;
-            save();
-            return;
+            if (ConfigPaths.copyTemplateIfMissing(file.toPath(), "/data/buildscape/config/default_pillar_presets.json")) {
+                // Template copied from resources, proceed to parse from disk
+            } else {
+                initializeDefaults();
+                fileUnreadable = false;
+                save();
+                return;
+            }
         }
 
         try {
@@ -231,7 +235,7 @@ public class PresetsConfig {
     }
 
     private Set<String> getDefaultItems() {
-        return DefaultPillarItems.items(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+        return ConfigPaths.loadDefaultItems(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
     }
 
     public List<Preset> getPresets() {

@@ -19,6 +19,11 @@ public class BuildscapeClientConfig {
     public static final String KEY_MAX_PIPE_NETWORK_SIZE = "MaxPipeNetworkSize";
     public static final String KEY_CAKE_STACKING = "isCakeStack";
     public static final String KEY_WATER_BOTTLE_STACKING = "isWaterbottleStack";
+    public static final String KEY_UI_THEME = "UITheme";
+    public static final String KEY_UI_BACKGROUND = "UIBackground";
+    public static final String KEY_SIDE_PANEL_EXPANDED = "SidePanelExpanded";
+    public static final String KEY_ANIMATION_SPEED = "AnimationSpeed";
+    public static final String KEY_LAST_ACTIVE_TAB = "LastActiveTab";
 
     private static final LinkedHashMap<String, String> DEFAULTS = new LinkedHashMap<>();
     private static volatile BuildscapeClientConfig INSTANCE;
@@ -40,11 +45,11 @@ public class BuildscapeClientConfig {
     private String source;
 
     private BuildscapeClientConfig() {
-        this(null);
+        this(ConfigPaths.root());
     }
 
     BuildscapeClientConfig(Path configDirectory) {
-        this.configDirectory = configDirectory;
+        this.configDirectory = configDirectory != null ? configDirectory : ConfigPaths.root();
         this.values = new LinkedHashMap<>(DEFAULTS);
         load();
     }
@@ -76,7 +81,7 @@ public class BuildscapeClientConfig {
         } catch (Throwable ignored) {
         }
         if (configDir == null) {
-            return null;
+            configDir = ConfigPaths.root();
         }
         Path buildscapeDir = configDir.resolve("buildscape");
         File dir = buildscapeDir.toFile();
@@ -95,7 +100,7 @@ public class BuildscapeClientConfig {
         } catch (Throwable ignored) {
         }
         if (configDir == null) {
-            return null;
+            configDir = ConfigPaths.root();
         }
         return configDir.resolve("buildscape.cfg").toFile();
     }
@@ -109,17 +114,14 @@ public class BuildscapeClientConfig {
 
         file = migrateLegacyConfig(file, legacyFile);
 
-        if (!file.exists()) {
-            save();
-            return;
-        }
-
         try {
-            source = ConfigLayoutIO.readText(file.toPath());
-            readOnly |= ConfigLayoutIO.protectInvalidEncoding(file.toPath());
-            Map<String, String> loaded = ConfigLayoutIO.readEntries(source);
-            values.putAll(loaded);
-            if (!readOnly) appendMissingDefaults(file.toPath(), loaded);
+            if (file.exists()) {
+                source = ConfigLayoutIO.readText(file.toPath());
+                readOnly |= ConfigLayoutIO.protectInvalidEncoding(file.toPath());
+                Map<String, String> loaded = ConfigLayoutIO.readEntries(source);
+                values.putAll(loaded);
+                if (!readOnly) appendMissingDefaults(file.toPath(), loaded);
+            }
         } catch (IOException e) {
             readOnly = true;
             if (source != null) {
@@ -131,6 +133,30 @@ public class BuildscapeClientConfig {
                 }
             }
             BuildScape.getLogger().warn("BuildscapeClientConfig: Config is read-only because it could not be parsed", e);
+        }
+
+        // Migrate and merge legacy buildscape/ui-state.cfg if it exists
+        Path root = configDirectory != null ? configDirectory : ConfigPaths.root();
+        Path uiFile = root.resolve("buildscape/ui-state.cfg");
+        if (Files.exists(uiFile)) {
+            try {
+                String uiSource = ConfigLayoutIO.readText(uiFile);
+                Map<String, String> uiEntries = ConfigLayoutIO.readEntries(uiSource);
+                for (Map.Entry<String, String> entry : uiEntries.entrySet()) {
+                    values.putIfAbsent(entry.getKey(), entry.getValue());
+                }
+                Files.deleteIfExists(uiFile);
+                BuildScape.getLogger().info("BuildscapeClientConfig: Merged buildscape/ui-state.cfg into buildscape/buildscape.cfg and removed ui-state.cfg");
+                if (file.exists() && !readOnly) {
+                    save();
+                }
+            } catch (Exception e) {
+                BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to merge ui-state.cfg into buildscape.cfg", e);
+            }
+        }
+
+        if (!file.exists()) {
+            save();
         }
     }
 
@@ -223,7 +249,8 @@ public class BuildscapeClientConfig {
             case KEY_CAKE_STACKING, KEY_WATER_BOTTLE_STACKING, KEY_MAX_PIPE_NETWORK_SIZE -> "Gameplay";
             case KEY_PARALLEL_MODEL_LOADING, KEY_CACHE_MODEL_MATERIALS,
                     KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE -> "Performance";
-            case KEY_HIDE_CONFIG_BUTTON -> "Interface";
+            case KEY_HIDE_CONFIG_BUTTON, KEY_UI_THEME, KEY_UI_BACKGROUND,
+                    KEY_SIDE_PANEL_EXPANDED, KEY_ANIMATION_SPEED, KEY_LAST_ACTIVE_TAB -> "Interface";
             default -> "Other";
         };
     }
@@ -238,6 +265,11 @@ public class BuildscapeClientConfig {
             case KEY_PARALLEL_MODEL_BAKING -> "Bake bundled block models in parallel.";
             case KEY_PARALLEL_BLOCK_STATE_CACHE -> "Build block-state caches in parallel.";
             case KEY_HIDE_CONFIG_BUTTON -> "Hide the BuildScape button on client screens.";
+            case KEY_UI_THEME -> "Active theme for the BuildScape configuration screen (dark, light, cyber, etc.).";
+            case KEY_UI_BACKGROUND -> "Background style for the BuildScape configuration screen (none, blueprint, etc.).";
+            case KEY_SIDE_PANEL_EXPANDED -> "Whether the configuration screen side panel is expanded.";
+            case KEY_ANIMATION_SPEED -> "UI animation speed index (0=normal, 1=fast, 2=instant).";
+            case KEY_LAST_ACTIVE_TAB -> "Last selected tab index in the BuildScape configuration screen.";
             default -> "Unrecognized setting retained with its original value.";
         };
     }
@@ -278,11 +310,60 @@ public class BuildscapeClientConfig {
         return Math.max(1, getInt(KEY_MAX_PIPE_NETWORK_SIZE, 64));
     }
 
+    public void setMaxPipeNetworkSize(int size) {
+        values.put(KEY_MAX_PIPE_NETWORK_SIZE, String.valueOf(Math.max(1, size)));
+    }
+
     public boolean isCakeStackingEnabled() {
         return getBoolean(KEY_CAKE_STACKING);
     }
 
     public boolean isWaterBottleStackingEnabled() {
         return getBoolean(KEY_WATER_BOTTLE_STACKING);
+    }
+
+    public String getUiTheme() {
+        return values.getOrDefault(KEY_UI_THEME, "dark");
+    }
+
+    public void setUiTheme(String theme) {
+        values.put(KEY_UI_THEME, theme != null ? theme : "dark");
+        save();
+    }
+
+    public String getUiBackground() {
+        return values.getOrDefault(KEY_UI_BACKGROUND, "none");
+    }
+
+    public void setUiBackground(String background) {
+        values.put(KEY_UI_BACKGROUND, background != null ? background : "none");
+        save();
+    }
+
+    public boolean isSidePanelExpanded() {
+        return getBoolean(KEY_SIDE_PANEL_EXPANDED);
+    }
+
+    public void setSidePanelExpanded(boolean expanded) {
+        values.put(KEY_SIDE_PANEL_EXPANDED, String.valueOf(expanded));
+        save();
+    }
+
+    public int getAnimationSpeedIndex() {
+        return getInt(KEY_ANIMATION_SPEED, 0);
+    }
+
+    public void setAnimationSpeedIndex(int index) {
+        values.put(KEY_ANIMATION_SPEED, String.valueOf(index));
+        save();
+    }
+
+    public int getLastActiveTab() {
+        return getInt(KEY_LAST_ACTIVE_TAB, 0);
+    }
+
+    public void setLastActiveTab(int tab) {
+        values.put(KEY_LAST_ACTIVE_TAB, String.valueOf(tab));
+        save();
     }
 }

@@ -52,6 +52,7 @@
     "biometint.BiomeColorsMixin",
     "biometint.EmbeddiumBiomeColorMixin",
     "AbstractContainerScreenMixin",
+    "AbstractWidgetBoundsMixin",
     "AdvancementWidgetMixin",
     "AnvilScreenMixin",
     "BeaconBlockEntityRendererMixin",

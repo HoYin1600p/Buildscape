@@ -1,11 +1,13 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.block.copper.BuildscapeWeatheringCopper;
+
 import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
+
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -38,12 +40,14 @@ public abstract class CopperBulbBlock extends Block {
 
     @Override
     public boolean isRandomlyTicking(BlockState state) {
-        return true;
+        return CopperOxidationHandler.canOxidize(state);
     }
 
     @Override
     public void randomTick(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, java.util.Random random) {
-        CopperOxidationHandler.tryOxidize(level, pos, state);
+        if (this instanceof BuildscapeWeatheringCopper copper) {
+            copper.onRandomTick(state, level, pos, random);
+        }
     }
 
     @Override
@@ -155,32 +159,6 @@ public abstract class CopperBulbBlock extends Block {
             BlockGetter level,
             BlockPos pos
     ) {
-        float destroySpeed = state.getDestroySpeed(level, pos);
-        if (destroySpeed == -1.0F) {
-            return 0.0F;
-        }
-
-        int efficiencyLevel =
-                net.minecraft.world.item.enchantment.EnchantmentHelper.getBlockEfficiency(
-                        player
-                );
-        ItemStack tool = player.getMainHandItem();
-
-        float speedMultiplier = 1.0F;
-        if (!tool.isEmpty()) {
-            speedMultiplier = tool.getDestroySpeed(state);
-        }
-
-        if (speedMultiplier > 1.0F) {
-            int efficiencyBonus = efficiencyLevel > 0
-                    ? efficiencyLevel * efficiencyLevel + 1
-                    : 0;
-            speedMultiplier += (float) efficiencyBonus;
-        }
-
-        float difficultyModifier = player.hasCorrectToolForDrops(state)
-                ? 30.0F
-                : 100.0F;
-        return speedMultiplier / destroySpeed / difficultyModifier;
+        return super.getDestroyProgress(state, player, level, pos);
     }
 }

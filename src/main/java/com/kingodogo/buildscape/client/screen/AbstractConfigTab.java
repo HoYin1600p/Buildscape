@@ -1,9 +1,10 @@
 package com.kingodogo.buildscape.client.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import com.kingodogo.buildscape.client.screen.widget.ICustomWidget;
+
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 
 public abstract class AbstractConfigTab {
     protected final BuildScapeConfigScreen parent;
@@ -15,9 +16,9 @@ public abstract class AbstractConfigTab {
 
     public abstract void init();
 
-    public abstract void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick);
+    public abstract void render(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick);
 
-    public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void renderTooltips(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -44,9 +45,16 @@ public abstract class AbstractConfigTab {
         return false;
     }
 
-    protected void addTabWidget(GuiEventListener widget) {
+    public void addTabWidget(GuiEventListener widget) {
         tabWidgets.add(widget);
         parent.addTabWidget(widget);
+    }
+
+    public void addTabWidget(ICustomWidget widget) {
+        GuiEventListener nativeWidget = parent.addCustomWidget(widget);
+        if (nativeWidget != null) {
+            tabWidgets.add(nativeWidget);
+        }
     }
 
     public String getTabName() {

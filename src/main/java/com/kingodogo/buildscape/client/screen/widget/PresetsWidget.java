@@ -179,8 +179,7 @@ public class PresetsWidget extends AbstractWidget {
         }
         config.saveUnnamedPreset(newItems);
 
-        itemConfig.items.clear();
-        itemConfig.items.addAll(newItems);
+        itemConfig.editItems(newItems);
         itemConfig.saveItems();
 
         refreshPresets();

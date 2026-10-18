@@ -37,6 +37,8 @@ public class SyncConfigPacket {
     public int max_particle_color;
 
     public Set<String> items;
+    public boolean itemsReadOnly;
+    public boolean propertiesReadOnly;
 
     public SyncConfigPacket() {
     }
@@ -63,6 +65,8 @@ public class SyncConfigPacket {
         this.items = new HashSet<>(
                 config.items != null ? config.items : new HashSet<>()
         );
+        this.itemsReadOnly = !config.canEditItems();
+        this.propertiesReadOnly = !config.canEditProperties();
     }
 
     public SyncConfigPacket(FriendlyByteBuf buf) {
@@ -95,6 +99,8 @@ public class SyncConfigPacket {
         for (int i = 0; i < itemCount; i++) {
             this.items.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
         }
+        this.itemsReadOnly = buf.readBoolean();
+        this.propertiesReadOnly = buf.readBoolean();
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -129,6 +135,8 @@ public class SyncConfigPacket {
                         NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item");
             }
         }
+        buf.writeBoolean(itemsReadOnly);
+        buf.writeBoolean(propertiesReadOnly);
     }
 
     public static SyncConfigPacket decode(FriendlyByteBuf buf) {

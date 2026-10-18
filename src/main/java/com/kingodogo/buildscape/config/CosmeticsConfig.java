@@ -95,7 +95,8 @@ public class CosmeticsConfig {
 
         if (legacyJson.exists()) {
             boolean loadedSuccessfully = false;
-            try (FileReader reader = new FileReader(legacyJson)) {
+            try (FileReader reader = new FileReader(legacyJson, java.nio.charset.StandardCharsets.UTF_8)) {
+                if (ConfigLayoutIO.protectInvalidEncoding(legacyJson.toPath())) return;
                 @SuppressWarnings("unchecked")
                 Map<String, Object> loaded = GSON.fromJson(reader, Map.class);
                 if (loaded != null) {

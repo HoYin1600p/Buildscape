@@ -47,7 +47,8 @@ public class GuiConfigManager {
         GuiConfigData config = new GuiConfigData();
 
         if (file.exists()) {
-            try (FileReader reader = new FileReader(file)) {
+            try (FileReader reader = new FileReader(file, java.nio.charset.StandardCharsets.UTF_8)) {
+                ConfigLayoutIO.protectInvalidEncoding(file.toPath());
                 config = GSON.fromJson(reader, GuiConfigData.class);
                 if (config == null) {
                     config = new GuiConfigData();
@@ -77,12 +78,13 @@ public class GuiConfigManager {
 
         File file = getGuiConfigFile(tabName);
         try {
+            if (file.exists() && ConfigLayoutIO.protectInvalidEncoding(file.toPath())) return;
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();
             }
 
-            try (FileWriter writer = new FileWriter(file)) {
+            try (FileWriter writer = new FileWriter(file, java.nio.charset.StandardCharsets.UTF_8)) {
                 GSON.toJson(config, writer);
                 writer.flush();
             }

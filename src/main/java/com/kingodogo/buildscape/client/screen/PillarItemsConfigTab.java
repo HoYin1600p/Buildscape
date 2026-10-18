@@ -32,6 +32,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
     private SortToggleButton tagsModOnlyButton;
     private net.minecraft.client.gui.components.Button presetCreateButton;
     private List<String> existingItems;
+    private Set<String> invalidItems = java.util.Collections.emptySet();
     private List<String> availableModNamespaces;
     private int currentModIndex = 0;
 
@@ -83,7 +84,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
         int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
         int headerHeight = internalPaddingY + buttonSize + BuildScapeConfigScreen.scaleSize(4);
-        existingItemsWidget.setHeaderAreaHeight(headerHeight);
+        existingItemsWidget.setHeaderAreaHeight(headerHeight + (invalidItems.isEmpty() ? 0 : Minecraft.getInstance().font.lineHeight));
         addTabWidget(existingItemsWidget);
 
         loadAvailableModNamespaces();
@@ -693,9 +694,13 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
     private void refreshExistingItems() {
         PillarParticleConfig config = PillarParticleConfig.get();
         existingItems = new ArrayList<>(config.items);
+        invalidItems = config.getInvalidItems();
         existingItems.sort(String::compareTo);
         if (existingItemsWidget != null) {
             existingItemsWidget.setItems(existingItems);
+            int headerHeight = (int) (parent.height * 0.005) + 2
+                    + BuildScapeConfigScreen.getScaledButtonHeight() + BuildScapeConfigScreen.scaleSize(4);
+            existingItemsWidget.setHeaderAreaHeight(headerHeight + (invalidItems.isEmpty() ? 0 : Minecraft.getInstance().font.lineHeight));
         }
     }
 
@@ -807,6 +812,15 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                     0xFFFFFFFF
             );
             poseStack.popPose();
+            if (!invalidItems.isEmpty()) {
+                renderScaledText(poseStack, new TranslatableComponent("buildscape.config.invalid_items", invalidItems.size())
+                                .withStyle(net.minecraft.ChatFormatting.YELLOW),
+                        labelX, labelY + mc.font.lineHeight, textScale);
+                if (mouseX >= labelX && mouseX < existingItemsWidget.x + existingItemsWidget.getWidth()
+                        && mouseY >= labelY + mc.font.lineHeight && mouseY < labelY + mc.font.lineHeight * 2) {
+                    parent.renderTooltip(poseStack, new net.minecraft.network.chat.TextComponent(String.join(", ", invalidItems)), mouseX, mouseY);
+                }
+            }
             poseStack.popPose();
         }
 

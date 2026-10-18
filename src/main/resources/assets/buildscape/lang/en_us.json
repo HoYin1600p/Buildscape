@@ -1753,6 +1753,7 @@
   "buildscape.config.select_inventory": "Select from Inventory",
   "buildscape.config.select_inventory.instruction": "Click an item from your inventory to add it",
   "buildscape.config.pillar_items": "Pillar items",
+  "buildscape.config.invalid_items": "%s invalid entries kept in file (hover for IDs)",
   "buildscape.config.existing_items": "Existing Items",
   "buildscape.config.filtered_items": "Filtered Item List",
   "buildscape.config.all_items": "All items",

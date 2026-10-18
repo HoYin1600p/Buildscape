@@ -38,7 +38,6 @@ public class UpdateConfigPacket {
 
     public static List<UpdateConfigPacket> split(PillarParticleConfig config) {
         SyncConfigPacket data = new SyncConfigPacket(config);
-        validateItems(data);
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
             data.encode(buffer);
@@ -89,13 +88,34 @@ public class UpdateConfigPacket {
         buf.writeByteArray(payload);
     }
 
-    private static void validateItems(SyncConfigPacket data) {
-        for (String item : data.items) {
-            String id = item.startsWith("#") ? item.substring(1) : item;
-            if (!net.minecraft.resources.ResourceLocation.isValidResourceLocation(id)) {
-                throw new IllegalArgumentException("Invalid configured item or tag: " + item);
+    public static String applyValues(PillarParticleConfig serverConfig, SyncConfigPacket data) {
+        if (!serverConfig.canApplyUpdate()) {
+            return "BuildScape: Changes refused because the server config is read-only. Check the server log.";
+        }
+        if (data.items != null) {
+            for (String item : data.items) {
+                if (!PillarParticleConfig.isValidItemId(item) && !serverConfig.items.contains(item)) {
+                    return "BuildScape: Invalid item or tag refused: " + item;
+                }
             }
         }
+        serverConfig.particle_speed = data.particle_speed;
+        serverConfig.particle_spread = data.particle_spread;
+        serverConfig.particle_lifetime = data.particle_lifetime;
+        serverConfig.particle_density = data.particle_density;
+        serverConfig.use_pattern = data.use_pattern;
+        serverConfig.pattern = data.pattern;
+        serverConfig.pattern_speed = data.pattern_speed;
+        serverConfig.pattern_spread = data.pattern_spread;
+        serverConfig.pattern_intensity = data.pattern_intensity;
+        serverConfig.max_particle_color = data.max_particle_color;
+        if (data.particle_color != null) {
+            serverConfig.particle_color = new ArrayList<>(data.particle_color);
+        }
+        if (data.items != null) {
+            serverConfig.editItems(data.items);
+        }
+        return null;
     }
 
     public static final class Assembly {
@@ -128,7 +148,6 @@ public class UpdateConfigPacket {
                 if (buffer.isReadable()) {
                     throw new IllegalArgumentException("Trailing config update data");
                 }
-                validateItems(data);
                 return data;
             } finally {
                 buffer.release();
@@ -161,6 +180,9 @@ public class UpdateConfigPacket {
             } catch (Exception e) {
                 PENDING.remove(player);
                 com.kingodogo.buildscape.BuildScape.LOGGER.warn("Rejected config update from " + player.getUUID(), e);
+                player.displayClientMessage(new net.minecraft.network.chat.TextComponent(
+                        "BuildScape: Config update refused because it contains invalid or incomplete data.")
+                        .withStyle(net.minecraft.ChatFormatting.RED), false);
                 return;
             }
             if (data == null) {
@@ -171,21 +193,12 @@ public class UpdateConfigPacket {
             PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
             String oldPattern = serverConfig.pattern;
 
-            serverConfig.particle_speed = data.particle_speed;
-            serverConfig.particle_spread = data.particle_spread;
-            serverConfig.particle_lifetime = data.particle_lifetime;
-            serverConfig.particle_density = data.particle_density;
-            serverConfig.use_pattern = data.use_pattern;
-            serverConfig.pattern = data.pattern;
-            serverConfig.pattern_speed = data.pattern_speed;
-            serverConfig.pattern_spread = data.pattern_spread;
-            serverConfig.pattern_intensity = data.pattern_intensity;
-            serverConfig.max_particle_color = data.max_particle_color;
-            if (data.particle_color != null) {
-                serverConfig.particle_color = new ArrayList<>(data.particle_color);
-            }
-            if (data.items != null) {
-                serverConfig.replaceItems(data.items);
+            String refusal = applyValues(serverConfig, data);
+            if (refusal != null) {
+                player.displayClientMessage(new net.minecraft.network.chat.TextComponent(refusal)
+                        .withStyle(net.minecraft.ChatFormatting.RED), false);
+                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                return;
             }
 
             boolean propertiesSaved = serverConfig.savePropertiesToDisk();

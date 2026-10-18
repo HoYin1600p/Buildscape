@@ -25,8 +25,7 @@ final class ConfigLayoutIO {
     private ConfigLayoutIO() { }
 
     static String readText(Path file) throws IOException {
-        // Match the FileReader/FileWriter encoding used by existing installations.
-        return new String(Files.readAllBytes(file), java.nio.charset.Charset.defaultCharset());
+        return new String(Files.readAllBytes(file), java.nio.charset.StandardCharsets.UTF_8);
     }
 
     static boolean hasReplacementCharacters(String text) {
@@ -35,8 +34,7 @@ final class ConfigLayoutIO {
 
     static boolean protectInvalidEncoding(Path file) throws IOException {
         byte[] bytes = Files.readAllBytes(file);
-        if (!hasReplacementCharacters(new String(bytes, java.nio.charset.StandardCharsets.UTF_8))
-                && !hasReplacementCharacters(new String(bytes, java.nio.charset.Charset.defaultCharset()))) return false;
+        if (!hasReplacementCharacters(new String(bytes, java.nio.charset.StandardCharsets.UTF_8))) return false;
         Path backup = file.resolveSibling(file.getFileName() + ".bak");
         try {
             if (!Files.exists(backup)) Files.copy(file, backup);
@@ -56,7 +54,7 @@ final class ConfigLayoutIO {
         Path backup = file.resolveSibling(file.getFileName() + ".pre-4.0.5.bak");
         if (!Files.exists(backup)) Files.copy(file, backup);
         else if (!Files.isRegularFile(backup)) throw new IOException("Backup is not a regular file: " + backup);
-        Files.write(file, suffix.getBytes(java.nio.charset.Charset.defaultCharset()), java.nio.file.StandardOpenOption.APPEND);
+        Files.write(file, suffix.getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.file.StandardOpenOption.APPEND);
     }
 
     /** The old items writer left a comma before the closing object brace. */
@@ -209,6 +207,29 @@ final class ConfigLayoutIO {
             result.insert(entry.getKey().intValue(), entry.getValue());
         }
         return orphaned.append(result).toString();
+    }
+
+    static String retainInvalidItemTokens(String source, String output) {
+        if (source == null) return output;
+        Layout old = new Layout(source, true);
+        Layout target = new Layout(output, true);
+        java.util.TreeMap<Integer, Setting> retained = new java.util.TreeMap<>();
+        for (Setting setting : old.settings.values()) {
+            if (!"$/\"items\"".equals(setting.array)) continue;
+            String token = source.substring(setting.valueStart, setting.end);
+            String item = GSON.fromJson(token, String.class);
+            Setting replacement = target.settings.get(setting.key);
+            if (!PillarParticleConfig.isValidItemId(item) && replacement != null) {
+                retained.put(replacement.valueStart, setting);
+            }
+        }
+        StringBuilder result = new StringBuilder(output);
+        for (Map.Entry<Integer, Setting> entry : retained.descendingMap().entrySet()) {
+            Setting original = entry.getValue();
+            Setting replacement = target.settings.get(original.key);
+            result.replace(replacement.valueStart, replacement.end, source.substring(original.valueStart, original.end));
+        }
+        return result.toString();
     }
 
     private static final class Token {
@@ -396,7 +417,7 @@ final class ConfigLayoutIO {
         Files.createDirectories(file.getParent());
         Path temporary = Files.createTempFile(file.getParent(), file.getFileName().toString(), ".tmp");
         try {
-            Files.writeString(temporary, text, java.nio.charset.Charset.defaultCharset());
+            Files.writeString(temporary, text, java.nio.charset.StandardCharsets.UTF_8);
             Files.move(temporary, file);
         } finally {
             Files.deleteIfExists(temporary);
@@ -420,7 +441,7 @@ final class ConfigLayoutIO {
         Files.createDirectories(file.getParent());
         Path temporary = Files.createTempFile(file.getParent(), file.getFileName().toString(), ".tmp");
         try {
-            Files.writeString(temporary, text, java.nio.charset.Charset.defaultCharset());
+            Files.writeString(temporary, text, java.nio.charset.StandardCharsets.UTF_8);
             try {
                 Files.move(temporary, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException e) {

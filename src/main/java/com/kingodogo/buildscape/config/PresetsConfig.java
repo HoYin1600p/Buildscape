@@ -183,7 +183,7 @@ public class PresetsConfig {
                 parentDir.mkdirs();
             }
             temporary = Files.createTempFile(parentDir.toPath(), PRESETS_FILE_NAME, ".tmp");
-            try (FileWriter writer = new FileWriter(temporary.toFile())) {
+            try (FileWriter writer = new FileWriter(temporary.toFile(), java.nio.charset.StandardCharsets.UTF_8)) {
                 Map<String, Object> toSave = new HashMap<>();
                 for (Map.Entry<String, Preset> entry : presets.entrySet()) {
                     if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
@@ -351,7 +351,7 @@ public class PresetsConfig {
                 com.kingodogo.buildscape.BuildScape.getLogger().warn("Not applying a preset while its config files are read-only");
                 return;
             }
-            config.replaceItems(preset.items);
+            config.editItems(preset.items);
             config.saveItems();
             if (!key.equals(UNNAMED_PRESET_KEY)) {
                 lastAppliedPreset = key;

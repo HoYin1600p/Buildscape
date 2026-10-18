@@ -34,6 +34,7 @@ public class PillarParticleConfig {
     private static PillarParticleConfig INSTANCE;
 
     private static PillarParticleConfig SERVER_CONFIG = null;
+    private static final Set<String> WARNED_INVALID_ITEMS = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     private long lastLoadedProperties = 0L;
     private long lastFileSizeProperties = 0L;
@@ -100,8 +101,35 @@ public class PillarParticleConfig {
     public synchronized void replaceItems(Collection<String> updatedItems) {
         Set<String> replacement = java.util.concurrent.ConcurrentHashMap.newKeySet();
         replacement.addAll(updatedItems);
+        for (String item : replacement) {
+            if (!isValidItemId(item) && WARNED_INVALID_ITEMS.add(item)) {
+                BuildScape.LOGGER.warn("Invalid configured item or tag retained without applying it: " + item);
+            }
+        }
         items = replacement;
         clearMatchCache();
+    }
+
+    public static boolean isValidItemId(String item) {
+        if (item == null) return false;
+        String id = item.startsWith("#") ? item.substring(1) : item;
+        return !id.isEmpty() && ResourceLocation.isValidResourceLocation(id);
+    }
+
+    public Set<String> getInvalidItems() {
+        Set<String> invalid = new TreeSet<>();
+        for (String item : items) {
+            if (!isValidItemId(item)) invalid.add(item);
+        }
+        return invalid;
+    }
+
+    public synchronized void editItems(Collection<String> updatedItems) {
+        Set<String> replacement = getInvalidItems();
+        for (String item : updatedItems) {
+            if (isValidItemId(item)) replacement.add(item);
+        }
+        replaceItems(replacement);
     }
 
     static void backupUnreadableFile(File file) {
@@ -230,6 +258,8 @@ public class PillarParticleConfig {
             com.kingodogo.buildscape.network.SyncConfigPacket packet) {
         SERVER_CONFIG = new PillarParticleConfig();
         SERVER_CONFIG.remote = true;
+        SERVER_CONFIG.itemsReadOnly = packet.itemsReadOnly;
+        SERVER_CONFIG.propertiesReadOnly = packet.propertiesReadOnly;
         SERVER_CONFIG.particle_speed = packet.particle_speed > 0
                 ? packet.particle_speed
                 : 0.02;
@@ -425,7 +455,7 @@ public class PillarParticleConfig {
                 parentDir.mkdirs();
             }
 
-            try (FileWriter writer = new FileWriter(f)) {
+            try (FileWriter writer = new FileWriter(f, java.nio.charset.StandardCharsets.UTF_8)) {
                 java.io.StringWriter grouped = new java.io.StringWriter();
                 DefaultPillarItems.writeGrouped(grouped, vaultLoaded);
                 String layout = grouped.toString();
@@ -706,10 +736,9 @@ public class PillarParticleConfig {
             }
             boolean migrated = DefaultPillarItems.merge405(document, parsed, vaultLoaded);
             if (migrated && !itemsReadOnly) {
-                List<String> sorted = new ArrayList<>(parsed);
-                sorted.sort(String::compareTo);
-                document.add("items", GSON.toJsonTree(sorted));
+                document.add("items", GSON.toJsonTree(itemsForSave(document, parsed)));
                 String output = ConfigLayoutIO.retainComments(source, GSON.toJson(document), true);
+                output = ConfigLayoutIO.retainInvalidItemTokens(source, output);
                 try {
                     ConfigLayoutIO.write(file.toPath(), output, source, true);
                     source = output;
@@ -916,10 +945,9 @@ public class PillarParticleConfig {
             if (vaultLoaded) {
                 json.addProperty("vault_defaults_version", 405);
             }
-            List<String> sorted = new ArrayList<>(items);
-            sorted.sort(String::compareTo);
-            json.add("items", GSON.toJsonTree(sorted));
+            json.add("items", GSON.toJsonTree(itemsForSave(originalItems, items)));
             String output = ConfigLayoutIO.retainComments(itemsSource, GSON.toJson(json), true);
+            output = ConfigLayoutIO.retainInvalidItemTokens(itemsSource, output);
             ConfigLayoutIO.write(file.toPath(), output, itemsSource, true);
             itemsSource = output;
             originalItems = json;
@@ -1005,18 +1033,55 @@ public class PillarParticleConfig {
                 : "the server's config file changed on disk or could not be written; check the server log";
     }
 
+    private static List<String> itemsForSave(JsonObject original, Collection<String> updated) {
+        List<String> values = new ArrayList<>(updated);
+        Set<String> retained = new HashSet<>();
+        if (original != null) {
+            for (JsonElement entry : original.getAsJsonArray("items")) {
+                String item = entry.getAsString();
+                if (!isValidItemId(item)) {
+                    if (retained.add(item)) values.remove(item);
+                    values.add(item);
+                }
+            }
+        }
+        values.sort(String::compareTo);
+        return values;
+    }
+
     public boolean canEditItems() {
         if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConnectionState.hasLocalServer()) {
             return getLocalConfig().canEditItems();
         }
-        return remote || (!itemsFileUnreadable && !itemsReadOnly);
+        return !itemsFileUnreadable && !itemsReadOnly;
     }
 
     public boolean canEditProperties() {
         if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConnectionState.hasLocalServer()) {
             return getLocalConfig().canEditProperties();
         }
-        return remote || !propertiesReadOnly;
+        return !propertiesReadOnly;
+    }
+
+    public boolean canApplyUpdate() {
+        if (!canEditProperties() || !canEditItems()) return false;
+        if (remote) return true;
+        try {
+            File propertiesFile = getPropertiesFile();
+            File itemsFile = getItemsFile();
+            if (propertiesFile.exists()) {
+                propertiesReadOnly |= ConfigLayoutIO.protectInvalidEncoding(propertiesFile.toPath())
+                        || !Files.isWritable(propertiesFile.toPath());
+            }
+            if (itemsFile.exists()) {
+                itemsReadOnly |= ConfigLayoutIO.protectInvalidEncoding(itemsFile.toPath())
+                        || !Files.isWritable(itemsFile.toPath());
+            }
+            return canEditProperties() && canEditItems();
+        } catch (java.io.IOException e) {
+            BuildScape.LOGGER.warn("Unable to check server config protection", e);
+            return false;
+        }
     }
 
     private JsonObject propertyValues() {
@@ -1090,7 +1155,7 @@ public class PillarParticleConfig {
 
     public boolean addItem(String itemId) {
         if (!canEditItems()) return false;
-        if (itemId == null || itemId.isEmpty()) {
+        if (!isValidItemId(itemId)) {
             return false;
         }
         if (items.add(itemId)) {
@@ -1103,7 +1168,7 @@ public class PillarParticleConfig {
 
     public boolean removeItem(String itemId) {
         if (!canEditItems()) return false;
-        if (itemId == null || itemId.isEmpty()) {
+        if (!isValidItemId(itemId)) {
             return false;
         }
         if (items.remove(itemId)) {

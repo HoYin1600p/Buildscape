@@ -1924,10 +1924,33 @@ public class PillarIdManager {
                 }
             }
         }
+        Map<String, Map<String, String>> frameRenames = new HashMap<>();
+        for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+            PillarData previous = pillarData.get(row.oldId);
+            if (previous.facing != null) {
+                frameRenames.computeIfAbsent(previous.dimension, key -> new HashMap<>()).put(row.oldId, row.newId);
+            }
+        }
         pillarData.clear();
         pillarData.putAll(finalData);
         rebuildPositionIndex();
         loadedUpdates.forEach(com.kingodogo.buildscape.block.PillarBlockEntity::setPillarId);
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+                String dimension = getDimensionKey(level);
+                Map<String, String> renamedFrames = frameRenames.get(dimension);
+                if (renamedFrames == null) continue;
+                for (net.minecraft.world.entity.Entity entity : level.getAllEntities()) {
+                    if (entity instanceof net.minecraft.world.entity.decoration.ItemFrame
+                            || entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
+                        CompoundTag tag = entity.getPersistentData();
+                        String renamedId = renamedFrames.get(tag.getString("BuildScapeFrameId"));
+                        if (renamedId != null) tag.putString("BuildScapeFrameId", renamedId);
+                    }
+                }
+            }
+        }
         // Persist an explicit editor apply now; keep a deferred retry if the immediate save is refused.
         requestSave();
         saveImmediate();
@@ -1973,7 +1996,13 @@ public class PillarIdManager {
                 net.minecraft.core.Direction facing = data.facing != null
                         ? net.minecraft.core.Direction.byName(data.facing)
                         : null;
-                positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
+                String key = positionKey(data.dimension, data.getBlockPos(), facing);
+                String previousId = positionIndex.get(key);
+                PillarData previous = previousId != null ? pillarData.get(previousId) : null;
+                if (previous == null || data.modifiedTime > previous.modifiedTime
+                        || (data.modifiedTime == previous.modifiedTime && data.id.compareTo(previous.id) < 0)) {
+                    positionIndex.put(key, data.id);
+                }
             } catch (Exception ignored) {
             }
         }
@@ -2076,7 +2105,7 @@ public class PillarIdManager {
         if (id == null || id.isEmpty()) {
             return;
         }
-        String authoritativeId = reconcilePillarId(id, dimension, pillar.findStackBottom());
+        String authoritativeId = reconcilePillarId(id, dimension, pillar.getBlockPos(), pillar.findStackBottom());
         if (!Objects.equals(authoritativeId, id)) {
             pillar.setPillarId(authoritativeId);
             return;
@@ -2110,8 +2139,26 @@ public class PillarIdManager {
     }
 
     private String reconcilePillarId(String savedId, String dimension, BlockPos basePos) {
-        if (savedId == null || savedId.isEmpty() || pillarData.containsKey(savedId)) return savedId;
-        String authoritativeId = positionIndex.get(positionKey(dimension, basePos));
+        return reconcilePillarId(savedId, dimension, basePos, basePos);
+    }
+
+    private String reconcilePillarId(String savedId, String dimension, BlockPos pos, BlockPos basePos) {
+        if (savedId == null || savedId.isEmpty()) return savedId;
+        PillarData saved = pillarData.get(savedId);
+        if (saved != null && Objects.equals(saved.dimension, dimension)
+                && saved.x == pos.getX() && saved.z == pos.getZ()
+                && saved.y >= basePos.getY() && saved.y <= pos.getY()) {
+            return savedId;
+        }
+        for (BlockPos current = pos; current.getY() >= basePos.getY(); current = current.below()) {
+            String authoritativeId = positionIndex.get(positionKey(dimension, current));
+            if (authoritativeId != null) return authoritativeId;
+        }
+        return savedId;
+    }
+
+    private String reconcileFrameId(String savedId, String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+        String authoritativeId = getFrameIdForPosition(dimension, pos, facing);
         return authoritativeId != null ? authoritativeId : savedId;
     }
 
@@ -2150,6 +2197,8 @@ public class PillarIdManager {
         net.minecraft.core.Direction facing = frame.getDirection();
         String posKey = positionKey(dimension, pos, facing);
 
+        id = reconcileFrameId(id, dimension, pos, facing);
+        dataTag.putString("BuildScapeFrameId", id);
         PillarData existing = pillarData.get(id);
         if (existing == null && !hasFrameParticleData(pattern, colors)) return;
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
@@ -2247,6 +2296,8 @@ public class PillarIdManager {
         net.minecraft.core.Direction facing = frame.getDirection();
         String posKey = positionKey(dimension, pos, facing);
 
+        id = reconcileFrameId(id, dimension, pos, facing);
+        dataTag.putString("BuildScapeFrameId", id);
         PillarData existing = pillarData.get(id);
         if (existing == null && !hasFrameParticleData(pattern, colors)) return;
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {

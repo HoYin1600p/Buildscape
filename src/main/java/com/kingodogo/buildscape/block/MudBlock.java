@@ -27,7 +27,7 @@ public class MudBlock extends Block {
     );
 
     public MudBlock(BlockBehaviour.Properties properties) {
-        super(properties);
+        super(properties.randomTicks());
     }
 
     private boolean canDry(Level level, BlockPos pos) {
@@ -54,6 +54,11 @@ public class MudBlock extends Block {
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
                                 BlockPos neighborPos, boolean movedByPiston) {
         super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+        scheduleDrying(level, pos);
+    }
+
+    @Override
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
         scheduleDrying(level, pos);
     }
 

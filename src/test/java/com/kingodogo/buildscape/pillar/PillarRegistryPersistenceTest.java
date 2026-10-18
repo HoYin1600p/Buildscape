@@ -1,6 +1,9 @@
 package com.kingodogo.buildscape.pillar;
 
 import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.network.EditPillarRowsPacket;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -221,5 +224,111 @@ public class PillarRegistryPersistenceTest {
         Field data = saved.getClass().getDeclaredField("data");
         data.setAccessible(true);
         return (Map<String, PillarIdManager.PillarData>) data.get(saved);
+    }
+
+    @Test
+    public void unloadedSwapAndRotationReconcileAfterSaveAndRestart() throws Exception {
+        for (int count : new int[] {2, 3}) {
+            PillarIdManager manager = manager();
+            java.util.ArrayList<EditPillarRowsPacket.Row> rows = new java.util.ArrayList<>();
+            for (int i = 0; i < count; i++) {
+                String id = "Pillar" + (char) ('A' + i);
+                PillarIdManager.PillarData data = frame(id, null, 1);
+                data.pillarType = "buildscape:stone_pillar";
+                data.x = i;
+                data.y = 64;
+                manager.addPillarDataFromSync(data);
+                rows.add(new EditPillarRowsPacket.Row(id, "Pillar" + (char) ('A' + (i + 1) % count),
+                        "minecraft:overworld", i, 64, 0));
+            }
+            load(manager, manager.copyDataSnapshot());
+            assertEquals("", manager.editPillarRows(rows));
+            File saved = new File(temporary.getRoot(), "rotated-" + count + ".dat");
+            Method save = PillarIdManager.class.getDeclaredMethod("saveToFile", File.class, String.class);
+            save.setAccessible(true);
+            assertEquals(Boolean.TRUE, save.invoke(manager, saved, "rotated-" + count));
+            PillarIdManager restarted = manager();
+            load(restarted, read(restarted, saved, new File(temporary.getRoot(), "missing")));
+            Method reconcile = PillarIdManager.class.getDeclaredMethod("reconcilePillarId",
+                    String.class, String.class, BlockPos.class);
+            reconcile.setAccessible(true);
+            for (int i = 0; i < count; i++) {
+                assertEquals("Pillar" + (char) ('A' + (i + 1) % count), reconcile.invoke(restarted,
+                        "Pillar" + (char) ('A' + i), "minecraft:overworld", new BlockPos(i, 64, 0)));
+            }
+        }
+    }
+
+    @Test
+    public void joinedStacksKeepSavedIdsAcrossRestartsWithDeterministicPositionOwner() throws Exception {
+        Method rebuild = PillarIdManager.class.getDeclaredMethod("rebuildPositionIndex");
+        rebuild.setAccessible(true);
+        Method save = PillarIdManager.class.getDeclaredMethod("saveToFile", File.class, String.class);
+        save.setAccessible(true);
+        Method reconcile = PillarIdManager.class.getDeclaredMethod("reconcilePillarId",
+                String.class, String.class, BlockPos.class, BlockPos.class);
+        reconcile.setAccessible(true);
+        for (long lowerTime : new long[] {10, 20, 30}) {
+            PillarIdManager manager = manager();
+            PillarIdManager.PillarData lower = frame("PillarP", null, lowerTime);
+            lower.pillarType = "buildscape:stone_pillar";
+            lower.y = 64;
+            lower.dyeColors.add("#123456");
+            PillarIdManager.PillarData upper = frame("PillarQ", null, 20);
+            upper.pillarType = "buildscape:stone_pillar";
+            upper.y = 66;
+            upper.dyeColors.add("#654321");
+            load(manager, Map.of(lower.id, lower, upper.id, upper));
+            upper.y = 64;
+            rebuild.invoke(manager);
+            String expectedOwner = lowerTime < 20 ? "PillarQ" : "PillarP";
+            for (int restart = 0; restart < 3; restart++) {
+                assertEquals(expectedOwner, manager.getIdForPosition("minecraft:overworld:0:64:0"));
+                assertEquals(Set.of("PillarP", "PillarQ"), manager.getAllPillarIds());
+                BlockPos bottom = new BlockPos(0, 64, 0);
+                assertEquals("PillarP", reconcile.invoke(manager, "PillarP", "minecraft:overworld", bottom, bottom));
+                for (int y = 65; y <= 67; y++) {
+                    assertEquals("PillarQ", reconcile.invoke(manager, "PillarQ", "minecraft:overworld",
+                            new BlockPos(0, y, 0), bottom));
+                }
+                assertEquals(List.of("#123456"), manager.getPillarData("PillarP").dyeColors);
+                assertEquals(List.of("#654321"), manager.getPillarData("PillarQ").dyeColors);
+                File saved = temporary.newFile();
+                assertEquals(Boolean.TRUE, save.invoke(manager, saved, saved.getName()));
+                PillarIdManager restarted = manager();
+                load(restarted, read(restarted, saved, new File(temporary.getRoot(), "missing")));
+                manager = restarted;
+            }
+        }
+    }
+
+    @Test
+    public void renamedFramesReconcileByPositionAndFacingAfterRestart() throws Exception {
+        for (String type : List.of("minecraft:item_frame", "buildscape:blue_item_frame")) {
+            PillarIdManager manager = manager();
+            PillarIdManager.PillarData north = frame("FrameA", "north", 1);
+            north.pillarType = type;
+            PillarIdManager.PillarData south = frame("FrameB", "south", 1);
+            south.pillarType = type;
+            load(manager, Map.of("FrameA", north, "FrameB", south));
+            assertEquals("", manager.editPillarRows(List.of(
+                    new EditPillarRowsPacket.Row("FrameA", "FrameB", "minecraft:overworld", 0, 0, 0),
+                    new EditPillarRowsPacket.Row("FrameB", "FrameA", "minecraft:overworld", 0, 0, 0))));
+            File saved = temporary.newFile();
+            Method save = PillarIdManager.class.getDeclaredMethod("saveToFile", File.class, String.class);
+            save.setAccessible(true);
+            assertEquals(Boolean.TRUE, save.invoke(manager, saved, saved.getName()));
+            PillarIdManager restarted = manager();
+            load(restarted, read(restarted, saved, new File(temporary.getRoot(), "missing")));
+            Method reconcile = PillarIdManager.class.getDeclaredMethod("reconcileFrameId",
+                    String.class, String.class, BlockPos.class, Direction.class);
+            reconcile.setAccessible(true);
+            assertEquals("FrameB", reconcile.invoke(restarted, "FrameA", "minecraft:overworld", BlockPos.ZERO, Direction.NORTH));
+            assertEquals("FrameA", reconcile.invoke(restarted, "FrameB", "minecraft:overworld", BlockPos.ZERO, Direction.SOUTH));
+            assertEquals("SavedId", reconcile.invoke(restarted, "SavedId", "minecraft:overworld", BlockPos.ZERO, Direction.EAST));
+            assertEquals("SavedId", reconcile.invoke(restarted, "SavedId", "test:other", BlockPos.ZERO, Direction.NORTH));
+            assertEquals("FrameB", reconcile.invoke(restarted, "FrameB", "minecraft:overworld", BlockPos.ZERO, Direction.NORTH));
+            assertEquals(java.util.Set.of("FrameA", "FrameB"), restarted.getAllPillarIds());
+        }
     }
 }

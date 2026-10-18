@@ -91,11 +91,78 @@ public class PillarEditTransactionTest {
     }
 
     @Test
-    public void existingSavedIdIsNotReplacedByAnotherStacksId() throws Exception {
+    public void registryPositionOverridesSavedIdEvenWhenBothIdsExist() throws Exception {
         PillarIdManager manager = manager();
         add(manager, "ExistingId", 2);
         add(manager, "NewId", 1);
-        assertEquals("ExistingId", reconcile(manager, "ExistingId", new BlockPos(1, 64, 0)));
+        assertEquals("NewId", reconcile(manager, "ExistingId", new BlockPos(1, 64, 0)));
+        assertEquals("ExistingId", reconcile(manager, "ExistingId", new BlockPos(3, 64, 0)));
+    }
+
+    @Test
+    public void unloadedSwapAdoptsRegistryIdentityAtEachPosition() throws Exception {
+        PillarIdManager manager = manager();
+        add(manager, "PillarA", 1);
+        add(manager, "PillarB", 2);
+        assertEquals("", manager.editPillarRows(List.of(
+                row("PillarA", "PillarB", 1), row("PillarB", "PillarA", 2))));
+        assertEquals("PillarB", reconcile(manager, "PillarA", new BlockPos(1, 64, 0)));
+        assertEquals("PillarA", reconcile(manager, "PillarB", new BlockPos(2, 64, 0)));
+    }
+
+    @Test
+    public void unloadedRotationReconcilesEveryOriginalIdentity() throws Exception {
+        PillarIdManager manager = manager();
+        add(manager, "PillarA", 1);
+        add(manager, "PillarB", 2);
+        add(manager, "PillarC", 3);
+        assertEquals("", manager.editPillarRows(List.of(
+                row("PillarA", "PillarB", 1), row("PillarB", "PillarC", 2), row("PillarC", "PillarA", 3))));
+        assertEquals("PillarB", reconcile(manager, "PillarA", new BlockPos(1, 64, 0)));
+        assertEquals("PillarC", reconcile(manager, "PillarB", new BlockPos(2, 64, 0)));
+        assertEquals("PillarA", reconcile(manager, "PillarC", new BlockPos(3, 64, 0)));
+    }
+
+    @Test
+    public void mixedStackUsesNearestRegisteredSegmentAndPreservesNullIds() throws Exception {
+        PillarIdManager manager = manager();
+        add(manager, "PillarB", 1);
+        PillarIdManager.PillarData upper = new PillarIdManager.PillarData();
+        upper.id = "PillarC";
+        upper.dimension = "minecraft:overworld";
+        upper.x = 1;
+        upper.y = 66;
+        manager.addPillarDataFromSync(upper);
+        BlockPos bottom = new BlockPos(1, 64, 0);
+        Method method = PillarIdManager.class.getDeclaredMethod("reconcilePillarId",
+                String.class, String.class, BlockPos.class, BlockPos.class);
+        method.setAccessible(true);
+        assertEquals("PillarB", method.invoke(manager, "PillarA", "minecraft:overworld", bottom.above(), bottom));
+        assertEquals("PillarC", method.invoke(manager, "PillarA", "minecraft:overworld", bottom.above(2), bottom));
+        assertEquals("PillarC", method.invoke(manager, "PillarA", "minecraft:overworld", bottom.above(3), bottom));
+        assertEquals("PillarB", method.invoke(manager, "PillarB", "minecraft:overworld", bottom.above(2), bottom));
+        assertNull(method.invoke(manager, null, "minecraft:overworld", bottom.above(3), bottom));
+        assertEquals("", method.invoke(manager, "", "minecraft:overworld", bottom.above(3), bottom));
+    }
+
+    @Test
+    public void savedEntryOutsideStackSegmentDoesNotPreventPositionReconciliation() throws Exception {
+        PillarIdManager manager = manager();
+        add(manager, "PillarA", 1);
+        add(manager, "PillarB", 2);
+        PillarIdManager.PillarData upper = manager.getPillarData("PillarB");
+        upper.x = 1;
+        upper.y = 66;
+        Method rebuild = PillarIdManager.class.getDeclaredMethod("rebuildPositionIndex");
+        rebuild.setAccessible(true);
+        rebuild.invoke(manager);
+        Method method = PillarIdManager.class.getDeclaredMethod("reconcilePillarId",
+                String.class, String.class, BlockPos.class, BlockPos.class);
+        method.setAccessible(true);
+        BlockPos bottom = new BlockPos(1, 64, 0);
+        BlockPos top = bottom.above(2);
+        assertEquals("PillarA", method.invoke(manager, "PillarB", "minecraft:overworld", bottom, bottom));
+        assertEquals("PillarB", method.invoke(manager, "PillarA", "minecraft:overworld", top, top));
     }
 
     private static String reconcile(PillarIdManager manager, String savedId, BlockPos bottom) throws Exception {

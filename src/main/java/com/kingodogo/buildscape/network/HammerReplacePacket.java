@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.item.HammerItem;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
@@ -22,8 +21,9 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;
@@ -87,6 +87,23 @@ public class HammerReplacePacket {
             int experience = ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos);
             if (experience < 0) return;
             BlockSnapshot before = BlockSnapshot.create(level.dimension(), level, pos);
+            BlockEvent.EntityPlaceEvent placement = new BlockEvent.EntityPlaceEvent(
+                    before, level.getBlockState(pos.below()), player) {
+                @Override
+                public BlockState getState() {
+                    return newState;
+                }
+
+                @Override
+                public BlockState getPlacedBlock() {
+                    return newState;
+                }
+            };
+            if (MinecraftForge.EVENT_BUS.post(placement)) {
+                player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
+                return;
+            }
+            if (level.getBlockState(pos) != targetState) return;
 
             BlockEntity blockEntity = level.getBlockEntity(pos);
             LootContext.Builder builder = new LootContext.Builder(level)
@@ -97,11 +114,6 @@ public class HammerReplacePacket {
                     .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
             List<ItemStack> drops = targetState.getDrops(builder);
             if (!level.setBlock(pos, newState, 3)) return;
-            if (ForgeEventFactory.onBlockPlace(player, before, Direction.UP)) {
-                before.restore(true, false);
-                player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
-                return;
-            }
             com.kingodogo.buildscape.event.AdvancementEvents.onHammerReplace(player);
 
             if (!player.isCreative()) {

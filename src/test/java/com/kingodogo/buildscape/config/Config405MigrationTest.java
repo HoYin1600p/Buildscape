@@ -87,8 +87,8 @@ public class Config405MigrationTest {
             Path directory = temporary.newFolder().toPath();
             Path file = directory.resolve("pillar-items.json");
             String original = fixture("old-pillar-items-" + (vault ? "vault" : "vanilla") + ".json")
-                    .replace("    \"minecraft:diamond\",\n", "")
-                    .replace("    \"the_vault:echo_pog\",\n", "");
+                    .replaceAll("(?m)^\\s*\"minecraft:diamond\",\\R", "")
+                    .replaceAll("(?m)^\\s*\"the_vault:echo_pog\",\\R", "");
             Files.writeString(file, original);
             PillarParticleConfig config = new PillarParticleConfig(directory);
             config.loadItemsInternal(vault);

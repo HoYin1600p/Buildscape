@@ -304,6 +304,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void resetPropertiesToDefault() {
+        if (!checkPropertiesEditable()) return;
         PillarParticleConfig config = PillarParticleConfig.get();
         config.particle_speed = 0.02;
         config.particle_spread = 0.1;
@@ -338,6 +339,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void resetColorsToDefault() {
+        if (!checkPropertiesEditable()) return;
         PillarParticleConfig config = PillarParticleConfig.get();
         config.particle_color.clear();
         config.particle_color.add("#FFB81C");
@@ -805,6 +807,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void onColorChanged(int index, String hexColor) {
+        if (!checkPropertiesEditable()) return;
         PillarParticleConfig config = PillarParticleConfig.get();
         ParticleColorSlots.ensureCapacity(config.particle_color, index + 1);
         config.particle_color.set(index, hexColor);
@@ -812,6 +815,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void toggleUsePattern() {
+        if (!checkPropertiesEditable()) return;
         PillarParticleConfig config = PillarParticleConfig.get();
         config.use_pattern = !config.use_pattern;
         requestConfigSave();
@@ -841,6 +845,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void cyclePattern() {
+        if (!checkPropertiesEditable()) return;
         currentPatternIndex = (currentPatternIndex + 1) % PATTERNS.length;
         String pattern = PATTERNS[currentPatternIndex];
 
@@ -870,6 +875,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void onMaxParticleColorChanged(int value) {
+        if (!checkPropertiesEditable()) return;
         currentMaxColor = value;
 
         PillarParticleConfig config = PillarParticleConfig.get();
@@ -1405,6 +1411,12 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     private boolean configSavePending = false;
     private long lastConfigChangeMs = 0L;
 
+    private boolean checkPropertiesEditable() {
+        if (PillarParticleConfig.get().canEditProperties()) return true;
+        parent.showConfigReadOnly();
+        return false;
+    }
+
     private void requestConfigSave() {
         configSavePending = true;
         lastConfigChangeMs = net.minecraft.Util.getMillis();
@@ -1422,6 +1434,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void updateConfigFromFields() {
+        if (!checkPropertiesEditable()) return;
         PillarParticleConfig config = PillarParticleConfig.get();
         boolean changed = false;
 

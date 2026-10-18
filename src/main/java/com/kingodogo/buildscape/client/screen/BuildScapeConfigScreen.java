@@ -123,6 +123,7 @@ public class BuildScapeConfigScreen extends Screen {
     private AbstractConfigTab activeTab;
     private PillarIdsConfigTab pillarIdsTab;
     private Button kofiButton;
+    private boolean configReadOnlyMessage;
 
     private int lastWindowWidth = -1;
     private int lastWindowHeight = -1;
@@ -572,6 +573,11 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
+    public void showConfigReadOnly() {
+        configReadOnlyMessage = true;
+        BuildScape.getLogger().warn("Config edit refused because the file is read-only; repair the file before editing");
+    }
+
     @Override
     public void render(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         recalculateDimensions();
@@ -620,6 +626,16 @@ public class BuildScapeConfigScreen extends Screen {
         if (activeTab != null) {
             com.mojang.blaze3d.systems.RenderSystem.disableScissor();
             activeTab.renderTooltips(poseStack, mouseX, mouseY, partialTick);
+        }
+        if (configReadOnlyMessage) {
+            java.util.List<net.minecraft.util.FormattedCharSequence> lines = font.split(
+                    new TranslatableComponent("buildscape.config.error.read_only"), width - 12);
+            int messageY = height - 4 - lines.size() * 10;
+            fill(poseStack, 0, messageY - 2, width, height, 0xF0101010);
+            for (net.minecraft.util.FormattedCharSequence line : lines) {
+                font.drawShadow(poseStack, line, 6, messageY, 0xFF5555);
+                messageY += 10;
+            }
         }
     }
 

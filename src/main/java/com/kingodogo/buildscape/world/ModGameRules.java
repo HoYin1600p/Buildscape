@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.world;
 
+import com.kingodogo.buildscape.config.BuildscapeClientConfig;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.SyncGameRulesPacket;
 import net.minecraft.server.MinecraftServer;
@@ -23,74 +24,76 @@ public class ModGameRules {
 
     public static void register() {
         try {
-            BiConsumer<MinecraftServer, GameRules.BooleanValue> onRuleChange = (server, value) -> {
-                if (server != null) {
-                    ModMessages.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                            new SyncGameRulesPacket(
-                                    server.getGameRules().getBoolean(FAST_LEAF_DECAY),
-                                    server.getGameRules().getBoolean(DISABLE_ENDERMAN_GRIEFING),
-                                    server.getGameRules().getBoolean(DISABLE_CREEPER_GRIEFING),
-                                    server.getGameRules().getBoolean(DISABLE_GHAST_GRIEFING),
-                                    server.getGameRules().getBoolean(IS_CAKE_STACK),
-                                    server.getGameRules().getBoolean(IS_WATER_BOTTLE_STACK)
-                            )
-                    );
-                }
-            };
-
-            Method createMethod = ObfuscationReflectionHelper.findMethod(GameRules.BooleanValue.class, "m_46252_", boolean.class, BiConsumer.class);
-
-            GameRules.Type<GameRules.BooleanValue> booleanType =
-                    (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, false, onRuleChange);
-            boolean cakeStackingDefault = true;
-            boolean waterBottleStackingDefault = true;
-            GameRules.Type<GameRules.BooleanValue> cakeStackingType =
-                    (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, cakeStackingDefault, onRuleChange);
-            GameRules.Type<GameRules.BooleanValue> waterBottleStackingType =
-                    (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, waterBottleStackingDefault, onRuleChange);
-
-            clientCakeStacking = cakeStackingDefault;
-            clientWaterBottleStacking = waterBottleStackingDefault;
-
-            FAST_LEAF_DECAY = GameRules.register(
-                    "fastLeafDecay",
-                    GameRules.Category.MISC,
-                    booleanType
-            );
-
-            DISABLE_ENDERMAN_GRIEFING = GameRules.register(
-                    "disableEndermanGriefing",
-                    GameRules.Category.MISC,
-                    booleanType
-            );
-
-            DISABLE_CREEPER_GRIEFING = GameRules.register(
-                    "disableCreeperGriefing",
-                    GameRules.Category.MISC,
-                    booleanType
-            );
-
-            DISABLE_GHAST_GRIEFING = GameRules.register(
-                    "disableGhastGriefing",
-                    GameRules.Category.MISC,
-                    booleanType
-            );
-
-            IS_CAKE_STACK = GameRules.register(
-                    "isCakeStack",
-                    GameRules.Category.MISC,
-                    cakeStackingType
-            );
-
-            IS_WATER_BOTTLE_STACK = GameRules.register(
-                    "isWaterbottleStack",
-                    GameRules.Category.MISC,
-                    waterBottleStackingType
-            );
-
+            register(ObfuscationReflectionHelper.findMethod(GameRules.BooleanValue.class, "m_46252_", boolean.class, BiConsumer.class));
         } catch (Exception e) {
             throw new RuntimeException("Failed to register gamerules", e);
         }
+    }
+
+    private static void register(Method createMethod) throws ReflectiveOperationException {
+        BiConsumer<MinecraftServer, GameRules.BooleanValue> onRuleChange = (server, value) -> {
+            if (server != null) {
+                ModMessages.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                        new SyncGameRulesPacket(
+                                server.getGameRules().getBoolean(FAST_LEAF_DECAY),
+                                server.getGameRules().getBoolean(DISABLE_ENDERMAN_GRIEFING),
+                                server.getGameRules().getBoolean(DISABLE_CREEPER_GRIEFING),
+                                server.getGameRules().getBoolean(DISABLE_GHAST_GRIEFING),
+                                server.getGameRules().getBoolean(IS_CAKE_STACK),
+                                server.getGameRules().getBoolean(IS_WATER_BOTTLE_STACK)
+                        )
+                );
+            }
+        };
+
+        GameRules.Type<GameRules.BooleanValue> booleanType =
+                (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, false, onRuleChange);
+        BuildscapeClientConfig config = BuildscapeClientConfig.get();
+        boolean cakeStackingDefault = config.isCakeStackingEnabled();
+        boolean waterBottleStackingDefault = config.isWaterBottleStackingEnabled();
+        GameRules.Type<GameRules.BooleanValue> cakeStackingType =
+                (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, cakeStackingDefault, onRuleChange);
+        GameRules.Type<GameRules.BooleanValue> waterBottleStackingType =
+                (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, waterBottleStackingDefault, onRuleChange);
+
+        clientCakeStacking = cakeStackingDefault;
+        clientWaterBottleStacking = waterBottleStackingDefault;
+
+        FAST_LEAF_DECAY = GameRules.register(
+                "fastLeafDecay",
+                GameRules.Category.MISC,
+                booleanType
+        );
+
+        DISABLE_ENDERMAN_GRIEFING = GameRules.register(
+                "disableEndermanGriefing",
+                GameRules.Category.MISC,
+                booleanType
+        );
+
+        DISABLE_CREEPER_GRIEFING = GameRules.register(
+                "disableCreeperGriefing",
+                GameRules.Category.MISC,
+                booleanType
+        );
+
+        DISABLE_GHAST_GRIEFING = GameRules.register(
+                "disableGhastGriefing",
+                GameRules.Category.MISC,
+                booleanType
+        );
+
+        IS_CAKE_STACK = GameRules.register(
+                "isCakeStack",
+                GameRules.Category.MISC,
+                cakeStackingType
+        );
+
+        IS_WATER_BOTTLE_STACK = GameRules.register(
+                "isWaterbottleStack",
+                GameRules.Category.MISC,
+                waterBottleStackingType
+        );
     }
 
     public static boolean isCakeStackingEnabled() {

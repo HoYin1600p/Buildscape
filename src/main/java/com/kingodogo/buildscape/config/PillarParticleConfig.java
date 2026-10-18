@@ -374,6 +374,11 @@ public class PillarParticleConfig {
 
     @OnlyIn(Dist.CLIENT)
     private static final class ClientConnectionState {
+        private static boolean hasLocalServer() {
+            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+            return minecraft != null && minecraft.hasSingleplayerServer();
+        }
+
         private static boolean isConnected() {
             net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
             return minecraft.getConnection() != null && minecraft.level != null;
@@ -533,7 +538,7 @@ public class PillarParticleConfig {
         }
         try {
             propertiesSource = ConfigLayoutIO.readText(file.toPath());
-            propertiesReadOnly = ConfigLayoutIO.hasReplacementCharacters(propertiesSource);
+            propertiesReadOnly = ConfigLayoutIO.protectInvalidEncoding(file.toPath());
             try {
                 originalProperties = ConfigLayoutIO.readProperties(propertiesSource);
             } catch (Exception e) {
@@ -689,7 +694,7 @@ public class PillarParticleConfig {
             Set<String> parsed = parseItems(source, file.toString());
             String normalized = ConfigLayoutIO.itemsJson(source);
             JsonObject document = GSON.fromJson(normalized, JsonObject.class);
-            itemsReadOnly = ConfigLayoutIO.hasReplacementCharacters(source);
+            itemsReadOnly = ConfigLayoutIO.protectInvalidEncoding(file.toPath());
             try {
                 ConfigLayoutIO.readProperties(normalized);
             } catch (Exception e) {
@@ -767,7 +772,7 @@ public class PillarParticleConfig {
             String source = ConfigLayoutIO.readText(oldFile);
             JsonObject old = GSON.fromJson(ConfigLayoutIO.itemsJson(source), JsonObject.class);
             if (old == null) return false;
-            boolean replacementDecoded = ConfigLayoutIO.hasReplacementCharacters(source);
+            boolean replacementDecoded = ConfigLayoutIO.protectInvalidEncoding(oldFile);
             boolean hasItems = old.has("items") && !old.get("items").isJsonNull();
             try {
                 File itemsFile = getItemsFile();
@@ -864,6 +869,10 @@ public class PillarParticleConfig {
     }
 
     public void saveItems() {
+        if (!canEditItems()) {
+            BuildScape.LOGGER.warn("Item edit refused because the config file is read-only");
+            return;
+        }
         clearMatchCache();
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
@@ -924,6 +933,10 @@ public class PillarParticleConfig {
     }
 
     public void saveProperties() {
+        if (!canEditProperties()) {
+            BuildScape.LOGGER.warn("Particle edit refused because the config file is read-only");
+            return;
+        }
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> {
@@ -948,7 +961,7 @@ public class PillarParticleConfig {
             if (originalProperties == null && file.exists()) {
                 // Also protect explicit saves made before the first load.
                 String source = ConfigLayoutIO.readText(file.toPath());
-                if (ConfigLayoutIO.hasReplacementCharacters(source)) {
+                if (ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                     propertiesReadOnly = true;
                     BuildScape.LOGGER.warn("Not saving read-only pillar properties; replacement-decoded file kept as-is: " + file);
                     return false;
@@ -990,6 +1003,20 @@ public class PillarParticleConfig {
         return propertiesReadOnly || itemsReadOnly || itemsFileUnreadable
                 ? "the server's config file is read-only because an unreadable, replacement-decoded or legacy file was kept as-is"
                 : "the server's config file changed on disk or could not be written; check the server log";
+    }
+
+    public boolean canEditItems() {
+        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConnectionState.hasLocalServer()) {
+            return getLocalConfig().canEditItems();
+        }
+        return remote || (!itemsFileUnreadable && !itemsReadOnly);
+    }
+
+    public boolean canEditProperties() {
+        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConnectionState.hasLocalServer()) {
+            return getLocalConfig().canEditProperties();
+        }
+        return remote || !propertiesReadOnly;
     }
 
     private JsonObject propertyValues() {
@@ -1062,6 +1089,7 @@ public class PillarParticleConfig {
     }
 
     public boolean addItem(String itemId) {
+        if (!canEditItems()) return false;
         if (itemId == null || itemId.isEmpty()) {
             return false;
         }
@@ -1074,6 +1102,7 @@ public class PillarParticleConfig {
     }
 
     public boolean removeItem(String itemId) {
+        if (!canEditItems()) return false;
         if (itemId == null || itemId.isEmpty()) {
             return false;
         }

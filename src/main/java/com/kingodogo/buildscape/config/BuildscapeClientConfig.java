@@ -116,8 +116,10 @@ public class BuildscapeClientConfig {
 
         try {
             source = ConfigLayoutIO.readText(file.toPath());
-            readOnly |= ConfigLayoutIO.hasReplacementCharacters(source);
-            values.putAll(ConfigLayoutIO.readEntries(source));
+            readOnly |= ConfigLayoutIO.protectInvalidEncoding(file.toPath());
+            Map<String, String> loaded = ConfigLayoutIO.readEntries(source);
+            values.putAll(loaded);
+            if (!readOnly) appendMissingDefaults(file.toPath(), loaded);
         } catch (IOException e) {
             readOnly = true;
             if (source != null) {
@@ -130,6 +132,22 @@ public class BuildscapeClientConfig {
             }
             BuildScape.getLogger().warn("BuildscapeClientConfig: Config is read-only because it could not be parsed", e);
         }
+    }
+
+    private void appendMissingDefaults(Path file, Map<String, String> loaded) throws IOException {
+        String newline = source.contains("\r\n") ? "\r\n" : source.contains("\r") ? "\r" : "\n";
+        StringBuilder missing = new StringBuilder();
+        for (Map.Entry<String, String> entry : DEFAULTS.entrySet()) {
+            if (loaded.containsKey(entry.getKey())) continue;
+            if (missing.length() == 0 && !source.isEmpty() && !source.endsWith("\n") && !source.endsWith("\r")) {
+                missing.append(newline);
+            }
+            missing.append("# ").append(description(entry.getKey())).append(newline);
+            missing.append(entry.getKey()).append(" = ").append(entry.getValue()).append(newline);
+        }
+        if (missing.length() == 0) return;
+        ConfigLayoutIO.append(file, missing.toString(), source);
+        source += missing;
     }
 
     private File migrateLegacyConfig(File file, File legacyFile) {
@@ -145,7 +163,7 @@ public class BuildscapeClientConfig {
                 String original = ConfigLayoutIO.readText(legacy);
                 Map<String, String> migrated = new LinkedHashMap<>(DEFAULTS);
                 migrated.putAll(ConfigLayoutIO.readEntries(original));
-                replacementDecoded = ConfigLayoutIO.hasReplacementCharacters(original);
+                replacementDecoded = ConfigLayoutIO.protectInvalidEncoding(legacy);
                 output = groupedText(original, migrated);
             }
             if (!Files.exists(backup)) Files.copy(legacy, backup);

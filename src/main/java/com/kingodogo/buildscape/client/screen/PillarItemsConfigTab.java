@@ -425,6 +425,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
     }
 
     private void onTagSelected(String tagId) {
+        if (!checkItemsEditable()) return;
         PillarParticleConfig config = PillarParticleConfig.get();
         if (config.items.contains(tagId)) {
             config.removeItem(tagId);
@@ -699,6 +700,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
     }
 
     public void onItemSelected(String itemId) {
+        if (!checkItemsEditable()) return;
         PillarParticleConfig config = PillarParticleConfig.get();
         boolean wasInConfig = config.items.contains(itemId);
 
@@ -741,12 +743,19 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         }
     }
 
+    private boolean checkItemsEditable() {
+        if (PillarParticleConfig.get().canEditItems()) return true;
+        parent.showConfigReadOnly();
+        return false;
+    }
+
     private boolean isItemInConfig(String itemId) {
         PillarParticleConfig config = PillarParticleConfig.get();
         return config.items.contains(itemId);
     }
 
     public void removeItem(String itemId) {
+        if (!checkItemsEditable()) return;
         PillarParticleConfig config = PillarParticleConfig.get();
         if (config.removeItem(itemId)) {
             saveToUnnamedPreset();

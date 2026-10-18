@@ -219,7 +219,9 @@ public class Config405MigrationTest {
         Files.write(file, grouped);
         BuildscapeClientConfig config = new BuildscapeClientConfig(root);
         assertEquals(23, config.getMaxPipeNetworkSize());
-        assertArrayEquals(grouped, Files.readAllBytes(file));
+        byte[] completed = Files.readAllBytes(file);
+        assertArrayEquals(grouped, java.util.Arrays.copyOf(completed, grouped.length));
+        assertEquals("true", ConfigLayoutIO.readEntries(ConfigLayoutIO.readText(file)).get("isCakeStack"));
         assertArrayEquals(Files.readAllBytes(legacy), Files.readAllBytes(root.resolve("buildscape.cfg.backup")));
         assertTrue(Files.exists(root.resolve("buildscape.cfg.backup.complete")));
         Files.delete(file);

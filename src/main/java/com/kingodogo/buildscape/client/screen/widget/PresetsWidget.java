@@ -159,6 +159,7 @@ public class PresetsWidget extends AbstractWidget {
     }
 
     private void createNewPreset(boolean empty) {
+        if (!checkEditable()) return;
         nameEditBox.setValue("");
         nameEditBox.setEditable(true);
         selectedPresetKey = "_unnamed";
@@ -238,6 +239,16 @@ public class PresetsWidget extends AbstractWidget {
 
     private void showPresetFailure(String reason) {
         failureMessage = new TranslatableComponent("buildscape.config.preset.error." + reason);
+        if (reason.equals("unreadable")) {
+            com.kingodogo.buildscape.BuildScape.getLogger().warn("Preset edit refused because the file is read-only");
+        }
+    }
+
+    private boolean checkEditable() {
+        if (PresetsConfig.get().canEdit() && PillarParticleConfig.get().canEditItems()) return true;
+        failureMessage = new TranslatableComponent("buildscape.config.error.read_only");
+        com.kingodogo.buildscape.BuildScape.getLogger().warn("Preset edit refused because a config file is read-only");
+        return false;
     }
 
     private void deleteSelectedPreset() {
@@ -245,6 +256,7 @@ public class PresetsWidget extends AbstractWidget {
         if (selectedPresetKey != null && !selectedPresetKey.equals("default")) {
             PresetsConfig config = PresetsConfig.get();
             if (selectedPresetKey.equals("_unnamed")) {
+                if (!checkEditable()) return;
                 config.clearUnnamedPreset();
                 String revertKey = appliedPresetKey != null && !appliedPresetKey.equals("_unnamed") ? appliedPresetKey : "default";
                 config.applyPreset(revertKey);
@@ -299,6 +311,7 @@ public class PresetsWidget extends AbstractWidget {
     }
 
     private void applySelectedPreset() {
+        if (!checkEditable()) return;
         if (selectedPresetKey != null) {
             PresetsConfig config = PresetsConfig.get();
             config.applyPreset(selectedPresetKey);

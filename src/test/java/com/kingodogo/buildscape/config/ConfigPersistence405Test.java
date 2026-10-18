@@ -23,7 +23,7 @@ public class ConfigPersistence405Test {
     }
 
     @Test
-    public void clientConfigLoadsWithoutRewritingAndExplicitSaveKeepsUnknownSettings() throws Exception {
+    public void clientConfigAppendsMissingDefaultsAndExplicitSaveKeepsUnknownSettings() throws Exception {
         Path root = temporary.newFolder().toPath();
         Path file = root.resolve("buildscape/buildscape.cfg");
         Files.createDirectories(file.getParent());
@@ -31,7 +31,8 @@ public class ConfigPersistence405Test {
                 + "UITheme = light\nLastActiveTab = 4\nSidePanelExpanded = true\n";
         Files.writeString(file, original);
         BuildscapeClientConfig config = new BuildscapeClientConfig(root);
-        assertEquals(original, Files.readString(file));
+        assertTrue(Files.readString(file).startsWith(original));
+        assertEquals("true", ConfigLayoutIO.readEntries(Files.readString(file)).get("isCakeStack"));
         assertTrue(config.isConfigButtonHidden());
         assertEquals(23, config.getMaxPipeNetworkSize());
         config.save();

@@ -85,7 +85,7 @@ public class PresetsConfig {
             preservedPresets.clear();
             preservedPresets.putAll(preserved);
             lastAppliedPreset = loadedLastApplied;
-            fileUnreadable = ConfigLayoutIO.hasReplacementCharacters(source);
+            fileUnreadable = ConfigLayoutIO.protectInvalidEncoding(file.toPath());
         } catch (Exception e) {
             fileUnreadable = true;
             PillarParticleConfig.backupUnreadableFile(file);
@@ -172,7 +172,7 @@ public class PresetsConfig {
         }
         Path temporary = null;
         try {
-            if (file.exists() && ConfigLayoutIO.hasReplacementCharacters(ConfigLayoutIO.readText(file.toPath()))) {
+            if (file.exists() && ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                 fileUnreadable = true;
                 lastEditFailure = "unreadable";
                 com.kingodogo.buildscape.BuildScape.getLogger().warn("Not overwriting replacement-decoded presets " + file);
@@ -299,6 +299,10 @@ public class PresetsConfig {
         return lastEditFailure;
     }
 
+    public boolean canEdit() {
+        return !fileUnreadable;
+    }
+
     public static class Preset {
         public String name;
         public Set<String> items;
@@ -342,6 +346,11 @@ public class PresetsConfig {
         Preset preset = presets.get(key);
         if (preset != null) {
             PillarParticleConfig config = PillarParticleConfig.get();
+            if (fileUnreadable || !config.canEditItems()) {
+                lastEditFailure = "unreadable";
+                com.kingodogo.buildscape.BuildScape.getLogger().warn("Not applying a preset while its config files are read-only");
+                return;
+            }
             config.replaceItems(preset.items);
             config.saveItems();
             if (!key.equals(UNNAMED_PRESET_KEY)) {

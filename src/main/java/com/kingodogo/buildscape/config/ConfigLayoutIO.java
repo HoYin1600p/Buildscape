@@ -33,6 +33,32 @@ final class ConfigLayoutIO {
         return text != null && text.indexOf('\uFFFD') >= 0;
     }
 
+    static boolean protectInvalidEncoding(Path file) throws IOException {
+        byte[] bytes = Files.readAllBytes(file);
+        if (!hasReplacementCharacters(new String(bytes, java.nio.charset.StandardCharsets.UTF_8))
+                && !hasReplacementCharacters(new String(bytes, java.nio.charset.Charset.defaultCharset()))) return false;
+        Path backup = file.resolveSibling(file.getFileName() + ".bak");
+        try {
+            if (!Files.exists(backup)) Files.copy(file, backup);
+        } catch (IOException e) {
+            com.kingodogo.buildscape.BuildScape.getLogger().warn("Unable to back up unreadable config " + file, e);
+        }
+        com.kingodogo.buildscape.BuildScape.getLogger().warn(
+                "Config contains invalid encoding or replacement characters; keeping it read-only: " + file);
+        return true;
+    }
+
+    static void append(Path file, String suffix, String expected) throws IOException {
+        if (protectInvalidEncoding(file)) throw new IOException("Config is read-only: " + file);
+        if (!java.util.Objects.equals(expected, readText(file))) {
+            throw new IOException("Config changed on disk; reload before saving: " + file);
+        }
+        Path backup = file.resolveSibling(file.getFileName() + ".pre-4.0.5.bak");
+        if (!Files.exists(backup)) Files.copy(file, backup);
+        else if (!Files.isRegularFile(backup)) throw new IOException("Backup is not a regular file: " + backup);
+        Files.write(file, suffix.getBytes(java.nio.charset.Charset.defaultCharset()), java.nio.file.StandardOpenOption.APPEND);
+    }
+
     /** The old items writer left a comma before the closing object brace. */
     static String itemsJson(String text) throws IOException {
         String clean = withoutComments(text);
@@ -379,7 +405,7 @@ final class ConfigLayoutIO {
 
     static void write(Path file, String text, String expected, boolean backup) throws IOException {
         String current = Files.exists(file) ? readText(file) : null;
-        if (hasReplacementCharacters(current)) {
+        if (current != null && protectInvalidEncoding(file)) {
             throw new IOException("Config decoded with replacement characters; retaining original bytes: " + file);
         }
         if (current != null && !java.util.Objects.equals(expected, current)) {

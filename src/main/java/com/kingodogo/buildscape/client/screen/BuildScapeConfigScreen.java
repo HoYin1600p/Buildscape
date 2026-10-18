@@ -1712,6 +1712,7 @@ public class BuildScapeConfigScreen extends Screen {
         if (scaled) {
             pushGuiPose(poseStackOrGraphics);
             scaleGuiPose(poseStackOrGraphics, uiScale, uiScale);
+            scissorUiScale = uiScale;
         }
 
         int effMouseX = scaled ? (int) Math.round(mouseX / uiScale) : mouseX;
@@ -1812,6 +1813,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         if (scaled) {
             popGuiPose(poseStackOrGraphics);
+            scissorUiScale = 1.0f;
         }
 
         float deniedAlpha = readOnlyFeedbackAlpha(System.currentTimeMillis(), readOnlyDeniedAt) * alpha;
@@ -3731,18 +3733,27 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     // Viewport Scissor Helpers
+    // Scissor rectangles are given in the layout's effective coordinates; while renderInternal draws
+    // the screen shrunk by the UI scale (small GUI canvases), they must be shrunk by the same factor.
+    private float scissorUiScale = 1.0f;
+
     private void enableGuiScissor(Object poseStackOrGraphics, int guiX, int guiY, int guiW, int guiH) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.getWindow() == null) return;
-        double scale = mc.getWindow().getGuiScale();
-        int winH = mc.getWindow().getHeight();
-        int sx = (int) Math.round(guiX * scale);
-        int sy = (int) Math.round(winH - (guiY + guiH) * scale);
-        int sw = (int) Math.round(guiW * scale);
-        int sh = (int) Math.round(guiH * scale);
-        if (sw > 0 && sh > 0) {
-            enableScissor(poseStackOrGraphics, sx, sy, sw, sh);
+        int[] rect = scissorRect(guiX, guiY, guiW, guiH, mc.getWindow().getGuiScale() * scissorUiScale,
+                mc.getWindow().getHeight());
+        if (rect[2] > 0 && rect[3] > 0) {
+            enableScissor(poseStackOrGraphics, rect[0], rect[1], rect[2], rect[3]);
         }
+    }
+
+    static int[] scissorRect(int guiX, int guiY, int guiW, int guiH, double scale, int windowHeight) {
+        return new int[] {
+                (int) Math.round(guiX * scale),
+                (int) Math.round(windowHeight - (guiY + guiH) * scale),
+                (int) Math.round(guiW * scale),
+                (int) Math.round(guiH * scale)
+        };
     }
 
     private void disableGuiScissor(Object poseStackOrGraphics) {

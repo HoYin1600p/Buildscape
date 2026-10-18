@@ -26,6 +26,7 @@
     "ItemMixin",
     "LeavesBlockMixin",
     "LevelMixin",
+    "LivingEntityExperienceAccessor",
     "LivingEntityMixin",
     "StonecutterMenuAccessor",
     "StonecutterMenuMixin",

@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 public class SculkCatalystBlockEntity extends BlockEntity implements GameEventListener {
     private final PositionSource listenerSource;
     private final SculkSpreader spreader = new SculkSpreader();
+    private boolean loggedServerTick;
 
     public SculkCatalystBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.SCULK_CATALYST_BLOCK_ENTITY.get(), pos, state);
@@ -39,8 +40,9 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
 
     @Override
     public boolean handleGameEvent(Level level, GameEvent event, @Nullable Entity entity, BlockPos pos) {
-        return !level.isClientSide && event == GameEvent.ENTITY_KILLED
-                && SculkCatalystHandler.offerDeath(this, entity, pos);
+        if (level.isClientSide || event != GameEvent.ENTITY_KILLED) return false;
+        SculkCatalystHandler.debug("listener received death at {} catalyst={} in {}", pos, worldPosition, level.dimension().location());
+        return SculkCatalystHandler.offerDeath(this, entity, pos);
     }
 
     public void absorbExperience(BlockPos deathPos, int experience) {
@@ -57,6 +59,10 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
     }
 
     public void serverTick(ServerLevel level) {
+        if (!loggedServerTick) {
+            SculkCatalystHandler.debug("catalyst ticking at {} in {}", worldPosition, level.dimension().location());
+            loggedServerTick = true;
+        }
         if (spreader.updateCursors(level, worldPosition)) setChanged();
     }
 

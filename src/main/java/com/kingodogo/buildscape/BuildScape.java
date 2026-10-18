@@ -2638,6 +2638,11 @@ public class BuildScape {
     }
 
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public void onSculkDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
+        com.kingodogo.buildscape.block.SculkCatalystHandler.onDeath(event);
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
     public void onSculkExperienceDrop(net.minecraftforge.event.entity.living.LivingExperienceDropEvent event) {
         com.kingodogo.buildscape.block.SculkCatalystHandler.onExperienceDrop(event);
     }

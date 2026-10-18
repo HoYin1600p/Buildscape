@@ -42,7 +42,8 @@
     "FireworkRocketEntityMixin",
     "LightningBoltMixin",
     "PoiTypeAccessor",
-    "RecipeManagerAccessor"
+    "RecipeManagerAccessor",
+    "ServerRecipeBookMixin"
   ],
   "client": [
     "biometint.BiomeColorsMixin",

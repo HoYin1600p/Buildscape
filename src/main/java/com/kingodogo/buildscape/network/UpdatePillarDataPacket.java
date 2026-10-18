@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.config.PillarParticleConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -49,6 +50,19 @@ public class UpdatePillarDataPacket {
         this.maxParticleColor = maxParticleColor != null
                 ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, maxParticleColor)) : null;
         this.dyeColors = dyeColors != null ? new ArrayList<>(dyeColors) : new ArrayList<>();
+    }
+
+    public UpdatePillarDataPacket(PillarIdManager.PillarData data) {
+        this(
+                data != null ? data.id : null,
+                data != null ? data.pattern : null,
+                data != null ? data.use_pattern : null,
+                data != null ? data.pattern_speed : null,
+                data != null ? data.pattern_spread : null,
+                data != null ? data.pattern_intensity : null,
+                data != null ? data.max_particle_color : null,
+                data != null ? data.dyeColors : null
+        );
     }
 
     public UpdatePillarDataPacket(FriendlyByteBuf buf) {
@@ -126,7 +140,8 @@ public class UpdatePillarDataPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null || !player.hasPermissions(2)) return;
+            if (player == null || !PillarParticleConfig.canPlayerEdit(player,
+                    PillarParticleConfig.getServerConfig().edit_permission_mode, PillarParticleConfig.EditScope.LIMITED)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             PillarIdManager.PillarData data = manager.getPillarData(pillarId);

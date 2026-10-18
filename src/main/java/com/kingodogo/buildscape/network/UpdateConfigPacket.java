@@ -22,12 +22,16 @@ public class UpdateConfigPacket {
     private static final int CHUNK_BYTES = 24_000;
     private static final int MAX_UPDATE_BYTES = 2 * 1024 * 1024;
     private static final int MAX_CHUNKS = (MAX_UPDATE_BYTES + CHUNK_BYTES - 1) / CHUNK_BYTES;
-    private static final Map<ServerPlayer, Assembly> PENDING = new WeakHashMap<>();
 
     private final UUID transferId;
     private final int chunkIndex;
     private final int chunkCount;
     private final byte[] payload;
+
+    public UUID getTransferId() { return transferId; }
+    public int getChunkIndex() { return chunkIndex; }
+    public int getChunkCount() { return chunkCount; }
+    public byte[] getPayload() { return payload; }
 
     private UpdateConfigPacket(UUID transferId, int chunkIndex, int chunkCount, byte[] payload) {
         this.transferId = transferId;
@@ -98,42 +102,11 @@ public class UpdateConfigPacket {
         }
     }
 
-    public static final class Assembly {
-        private UUID transferId;
-        private int chunkCount;
-        private int nextIndex;
-        private long started;
-        private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    public static final class Assembly extends ConfigAssembly {
+    }
 
-        public SyncConfigPacket accept(UpdateConfigPacket packet) {
-            long now = System.currentTimeMillis();
-            if (nextIndex == 0) {
-                transferId = packet.transferId;
-                chunkCount = packet.chunkCount;
-                started = now;
-            }
-            if (!transferId.equals(packet.transferId) || chunkCount != packet.chunkCount
-                    || nextIndex != packet.chunkIndex || now - started > 30_000L
-                    || bytes.size() + packet.payload.length > MAX_UPDATE_BYTES) {
-                throw new IllegalArgumentException("Incomplete or oversized config update");
-            }
-            bytes.write(packet.payload, 0, packet.payload.length);
-            nextIndex++;
-            if (nextIndex != chunkCount) {
-                return null;
-            }
-            FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes.toByteArray()));
-            try {
-                SyncConfigPacket data = new SyncConfigPacket(buffer);
-                if (buffer.isReadable()) {
-                    throw new IllegalArgumentException("Trailing config update data");
-                }
-                validateItems(data);
-                return data;
-            } finally {
-                buffer.release();
-            }
-        }
+    private static final class ServerPendingHolder {
+        private static final Map<ServerPlayer, ConfigAssembly> PENDING = new WeakHashMap<>();
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -141,17 +114,18 @@ public class UpdateConfigPacket {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
 
-            if (!player.hasPermissions(PillarParticleConfig.CONFIG_PERMISSION_LEVEL)) {
+            PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
+            if (!PillarParticleConfig.canPlayerEdit(player, serverConfig.edit_permission_mode, PillarParticleConfig.EditScope.GENERAL)) {
                 player.displayClientMessage(new net.minecraft.network.chat.TranslatableComponent(
                         "buildscape.config.server_config_only").withStyle(net.minecraft.ChatFormatting.RED), true);
                 return;
             }
 
-            PENDING.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue().started > 30_000L);
+            ServerPendingHolder.PENDING.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue().getStarted() > 30_000L);
             if (chunkIndex == 0) {
-                PENDING.put(player, new Assembly());
+                ServerPendingHolder.PENDING.put(player, new ConfigAssembly());
             }
-            Assembly assembly = PENDING.get(player);
+            ConfigAssembly assembly = ServerPendingHolder.PENDING.get(player);
             if (assembly == null) {
                 return;
             }
@@ -159,16 +133,15 @@ public class UpdateConfigPacket {
             try {
                 data = assembly.accept(this);
             } catch (Exception e) {
-                PENDING.remove(player);
+                ServerPendingHolder.PENDING.remove(player);
                 com.kingodogo.buildscape.BuildScape.LOGGER.warn("Rejected config update from " + player.getUUID(), e);
                 return;
             }
             if (data == null) {
                 return;
             }
-            PENDING.remove(player);
+            ServerPendingHolder.PENDING.remove(player);
 
-            PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
             String oldPattern = serverConfig.pattern;
 
             serverConfig.particle_speed = data.particle_speed;
@@ -186,6 +159,11 @@ public class UpdateConfigPacket {
             }
             if (data.items != null) {
                 serverConfig.replaceItems(data.items);
+            }
+
+            if (PillarParticleConfig.canPlayerEdit(player, serverConfig.edit_permission_mode, PillarParticleConfig.EditScope.POLICY)
+                    && data.edit_permission_mode != null) {
+                serverConfig.edit_permission_mode = data.edit_permission_mode;
             }
 
             boolean propertiesSaved = serverConfig.savePropertiesToDisk();

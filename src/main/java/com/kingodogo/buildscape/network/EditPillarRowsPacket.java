@@ -69,16 +69,8 @@ public class EditPillarRowsPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
-            String reason;
-            try {
-                reason = player.hasPermissions(2) ? PillarIdManager.get().editPillarRows(rows) : "permission";
-                if (reason.isEmpty()) {
-                    SyncPillarIdsPacket.sendToPlayer(player, PillarIdManager.get().getAllPillarDataForSync());
-                }
-            } catch (Exception e) {
-                com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to edit pillar rows", e);
-                reason = "invalid";
-            }
+            // Pillar identities are read-only; network requests attempting to rename or edit identities are rejected.
+            String reason = "read_only";
             ModMessages.INSTANCE.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
                     new EditPillarRowsResultPacket(batchId, rows.stream().map(row -> row.oldId).toList(), reason));
         });

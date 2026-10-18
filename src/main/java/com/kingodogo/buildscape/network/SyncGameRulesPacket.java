@@ -59,6 +59,10 @@ public class SyncGameRulesPacket {
                     mc.level.getGameRules().getRule(com.kingodogo.buildscape.world.ModGameRules.IS_CAKE_STACK).set(cakeStacking, null);
                     mc.level.getGameRules().getRule(com.kingodogo.buildscape.world.ModGameRules.IS_WATER_BOTTLE_STACK).set(waterBottleStacking, null);
                     com.kingodogo.buildscape.world.ModGameRules.setClientStackingRules(cakeStacking, waterBottleStacking);
+                    com.kingodogo.buildscape.world.ModGameRules.clientFastLeafDecay = fastLeafDecay;
+                    com.kingodogo.buildscape.world.ModGameRules.clientDisableEndermanGriefing = disableEndermanGriefing;
+                    com.kingodogo.buildscape.world.ModGameRules.clientDisableCreeperGriefing = disableCreeperGriefing;
+                    com.kingodogo.buildscape.world.ModGameRules.clientDisableGhastGriefing = disableGhastGriefing;
                 }
             });
         });

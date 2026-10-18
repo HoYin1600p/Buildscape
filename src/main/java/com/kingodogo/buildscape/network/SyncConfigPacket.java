@@ -35,6 +35,7 @@ public class SyncConfigPacket {
     public double pattern_intensity;
     public List<String> particle_color;
     public int max_particle_color;
+    public PillarParticleConfig.EditPermissionMode edit_permission_mode = PillarParticleConfig.EditPermissionMode.STRICT;
 
     public Set<String> items;
 
@@ -60,6 +61,9 @@ public class SyncConfigPacket {
                 config.particle_color != null ? config.particle_color : new ArrayList<>()
         );
         this.max_particle_color = clamp(config.max_particle_color, 0, NetworkPacketLimits.MAX_DYE_COLORS);
+        this.edit_permission_mode = config.edit_permission_mode != null
+                ? config.edit_permission_mode
+                : PillarParticleConfig.EditPermissionMode.STRICT;
         this.items = new HashSet<>(
                 config.items != null ? config.items : new HashSet<>()
         );
@@ -89,6 +93,8 @@ public class SyncConfigPacket {
             this.particle_color.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color"));
         }
         this.max_particle_color = NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS, "maximum particle colors");
+        this.edit_permission_mode = PillarParticleConfig.parseEditPermissionMode(
+                NetworkPacketLimits.readUtf(buf, 16, "edit permission mode"));
 
         int itemCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
         this.items = new HashSet<>();
@@ -119,6 +125,9 @@ public class SyncConfigPacket {
             }
         }
         buf.writeInt(max_particle_color);
+        NetworkPacketLimits.writeUtf(buf,
+                edit_permission_mode != null ? edit_permission_mode.name() : "STRICT",
+                16, "edit permission mode");
 
         NetworkPacketLimits.checkCount(items != null ? items.size() : 0,
                 NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");

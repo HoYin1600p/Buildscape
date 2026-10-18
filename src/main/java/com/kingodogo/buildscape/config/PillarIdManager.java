@@ -682,6 +682,48 @@ public class PillarIdManager {
         }
     }
 
+    public BlockPos removePillarBlock(Level level, String pillarId, BlockPos pos, BlockPos bottom, BlockPos top) {
+        return removePillarBlock(getDimensionKey(level), pillarId, pos, bottom, top);
+    }
+
+    private BlockPos removePillarBlock(String dimension, String pillarId, BlockPos pos, BlockPos bottom, BlockPos top) {
+        BlockPos remaining = bottom.equals(pos) ? (top.equals(pos) ? null : pos.above()) : bottom;
+        if (remaining == null) {
+            if (pillarId != null && !pillarId.isEmpty()) {
+                removePillar(pillarId);
+            }
+            removePillarByPosition(dimension, pos);
+        } else if (pillarId != null) {
+            updatePillarPosition(pillarId, remaining);
+        }
+        return remaining;
+    }
+
+    public void mergePillarStack(String pillarId, BlockPos bottom, BlockPos top) {
+        PillarData data = pillarData.get(pillarId);
+        if (data == null) return;
+
+        boolean changed = false;
+        for (PillarData other : new ArrayList<>(pillarData.values())) {
+            if (!other.id.equals(pillarId) && !isItemFrameData(other)
+                    && Objects.equals(other.dimension, data.dimension)
+                    && other.x == bottom.getX() && other.z == bottom.getZ()
+                    && other.y >= bottom.getY() && other.y <= top.getY()) {
+                changed |= pillarData.remove(other.id, other);
+            }
+        }
+        if (!data.getBlockPos().equals(bottom)) {
+            data.x = bottom.getX();
+            data.y = bottom.getY();
+            data.z = bottom.getZ();
+            changed = true;
+        }
+        if (changed) {
+            rebuildPositionIndex();
+            requestSave();
+        }
+    }
+
     public void clearPillarColors(String pillarId) {
         PillarData data = pillarData.get(pillarId);
         if (data != null) {

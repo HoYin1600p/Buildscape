@@ -191,7 +191,7 @@ public class PillarRegistryPersistenceTest {
         assertNull(manager.getIdForPosition("minecraft:overworld:0:65:0"));
         assertNull(manager.getIdForPosition("minecraft:overworld:0:66:0"));
 
-        removePosition(manager, "minecraft:overworld", bottom.above(2));
+        assertEquals(bottom, removeBlock(manager, bottom.above(2), bottom, bottom.above(2)));
 
         assertSame(data, manager.getPillarData("StackId"));
         assertEquals(bottom, data.getBlockPos());
@@ -203,23 +203,29 @@ public class PillarRegistryPersistenceTest {
     public void removingStackBottomMovesEntryUpAndSurvivesAnotherReload() throws Exception {
         PillarIdManager manager = reloadedStack(3);
         BlockPos bottom = new BlockPos(0, 64, 0);
-        manager.updatePillarPosition("StackId", bottom.above());
-        removePosition(manager, "minecraft:overworld", bottom);
+        PillarIdManager.PillarData data = manager.getPillarData("StackId");
+        assertEquals(bottom.above(), removeBlock(manager, bottom, bottom, bottom.above(2)));
 
+        assertSame(data, manager.getPillarData("StackId"));
         assertNull(manager.getIdForPosition("minecraft:overworld:0:64:0"));
         assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:65:0"));
         assertEquals(bottom.above(), manager.getPillarData("StackId").getBlockPos());
+        assertEquals(List.of("#123456"), data.dyeColors);
+        assertEquals("spiral", data.pattern);
+        assertEquals("minecraft:diamond", data.displayedItem);
         manager = restart(manager);
         assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:65:0"));
         assertEquals(bottom.above(), manager.getPillarData("StackId").getBlockPos());
         assertEquals(List.of("#123456"), manager.getPillarData("StackId").dyeColors);
         assertEquals("spiral", manager.getPillarData("StackId").pattern);
+        assertEquals("minecraft:diamond", manager.getPillarData("StackId").displayedItem);
     }
 
     @Test
     public void removingSinglePillarDeletesEntryAndAllowsEmptySave() throws Exception {
         PillarIdManager manager = reloadedStack(1);
-        removePosition(manager, "minecraft:overworld", new BlockPos(0, 64, 0));
+        BlockPos bottom = new BlockPos(0, 64, 0);
+        assertNull(removeBlock(manager, bottom, bottom, bottom));
 
         assertNull(manager.getPillarData("StackId"));
         assertNull(manager.getIdForPosition("minecraft:overworld:0:64:0"));
@@ -293,6 +299,7 @@ public class PillarRegistryPersistenceTest {
         data.pillarType = "buildscape:stone_pillar";
         data.dyeColors.add("#123456");
         data.pattern = "spiral";
+        data.displayedItem = "minecraft:diamond";
         load(manager, Map.of(data.id, data));
         manager = restart(manager);
         for (int y = 64 + height - 1; y >= 64; y--) {
@@ -322,6 +329,69 @@ public class PillarRegistryPersistenceTest {
         Method remove = PillarIdManager.class.getDeclaredMethod("removePillarByPosition", String.class, BlockPos.class);
         remove.setAccessible(true);
         remove.invoke(manager, dimension, pos);
+    }
+
+    private static BlockPos removeBlock(PillarIdManager manager, BlockPos pos, BlockPos bottom, BlockPos top) throws Exception {
+        Method remove = PillarIdManager.class.getDeclaredMethod("removePillarBlock",
+                String.class, String.class, BlockPos.class, BlockPos.class, BlockPos.class);
+        remove.setAccessible(true);
+        return (BlockPos) remove.invoke(manager, "minecraft:overworld", "StackId", pos, bottom, top);
+    }
+
+    @Test
+    public void joiningStacksRemovesReplacedEntryImmediatelyAndAfterReload() throws Exception {
+        for (long lowerTime : new long[] {10, 20, 30}) {
+            PillarIdManager manager = reloadedStack(1);
+            BlockPos bottom = new BlockPos(0, 64, 0);
+            manager.getPillarData("StackId").modifiedTime = lowerTime;
+            PillarIdManager.PillarData upper = new PillarIdManager.PillarData(
+                    "UpperId", "minecraft:overworld", bottom.above(2));
+            upper.pillarType = "buildscape:stone_pillar";
+            upper.modifiedTime = 20;
+            upper.dyeColors.add("#654321");
+            upper.pattern = "beam";
+            upper.displayedItem = "minecraft:emerald";
+            manager.addPillarDataFromSync(upper);
+
+            manager.mergePillarStack("UpperId", bottom, bottom.above(3));
+
+            assertSame(upper, manager.getPillarData("UpperId"));
+            assertNull(manager.getPillarData("StackId"));
+            for (int reload = 0; reload < 3; reload++) {
+                assertEquals(Set.of("UpperId"), manager.getAllPillarIds());
+                assertEquals("UpperId", manager.getIdForPosition("minecraft:overworld:0:64:0"));
+                assertNull(manager.getIdForPosition("minecraft:overworld:0:66:0"));
+                PillarIdManager.PillarData data = manager.getPillarData("UpperId");
+                assertEquals(bottom, data.getBlockPos());
+                assertEquals(List.of("#654321"), data.dyeColors);
+                assertEquals("beam", data.pattern);
+                assertEquals("minecraft:emerald", data.displayedItem);
+                manager = restart(manager);
+            }
+        }
+    }
+
+    @Test
+    public void joiningStacksPreservesEntriesOutsideStackAndItemFrames() throws Exception {
+        PillarIdManager manager = reloadedStack(1);
+        BlockPos bottom = new BlockPos(0, 64, 0);
+        for (String id : List.of("OtherDimension", "OtherColumn", "AboveStack", "BelowStack", "Frame")) {
+            PillarIdManager.PillarData data = new PillarIdManager.PillarData(id, "minecraft:overworld", bottom);
+            data.pillarType = "buildscape:stone_pillar";
+            if (id.equals("OtherDimension")) data.dimension = "test:other";
+            if (id.equals("OtherColumn")) data.x = 1;
+            if (id.equals("AboveStack")) data.y = 68;
+            if (id.equals("BelowStack")) data.y = 63;
+            if (id.equals("Frame")) {
+                data.pillarType = "minecraft:item_frame";
+                data.facing = "north";
+                data.pattern = "spiral";
+            }
+            manager.addPillarDataFromSync(data);
+        }
+        Set<String> ids = Set.copyOf(manager.getAllPillarIds());
+        manager.mergePillarStack("StackId", bottom, bottom.above(3));
+        assertEquals(ids, manager.getAllPillarIds());
     }
 
     @SuppressWarnings("unchecked")

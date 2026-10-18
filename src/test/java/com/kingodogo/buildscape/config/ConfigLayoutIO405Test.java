@@ -41,6 +41,14 @@ public class ConfigLayoutIO405Test {
     }
 
     @Test
+    public void writeNewNeverOverwritesAnExistingFile() throws Exception {
+        Path file = temporary.getRoot().toPath().resolve("buildscape.cfg");
+        ConfigLayoutIO.writeNew(file, "original");
+        assertThrows(IOException.class, () -> ConfigLayoutIO.writeNew(file, "replacement"));
+        assertEquals("original", ConfigLayoutIO.readText(file));
+    }
+
+    @Test
     public void backupIsOnceAndDiskChangesAlwaysWin() throws Exception {
         Path file = temporary.getRoot().toPath().resolve("pillar-properties.json");
         Files.writeString(file, "original");

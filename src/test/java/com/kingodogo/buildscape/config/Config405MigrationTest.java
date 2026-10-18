@@ -143,6 +143,153 @@ public class Config405MigrationTest {
     }
 
     @Test
+    public void legacyRootClientConfigMigratesOnceAndResetWritesDefaults() throws Exception {
+        Path root = temporary.newFolder().toPath();
+        Path legacy = root.resolve("buildscape.cfg");
+        Path file = root.resolve("buildscape/buildscape.cfg");
+        byte[] original = fixture("old-buildscape.cfg").replace("\r\n", "\n").replace("\n", "\r\n")
+                .getBytes(Charset.defaultCharset());
+        Files.write(legacy, original);
+        new BuildscapeClientConfig(root);
+        String saved = ConfigLayoutIO.readText(file);
+        assertEquals(ConfigLayoutIO.readEntries(new String(original, Charset.defaultCharset())),
+                ConfigLayoutIO.readEntries(saved));
+        assertTrue(saved.contains("# --- Gameplay ---"));
+        assertTrue(saved.contains("# --- Performance ---"));
+        assertTrue(saved.contains("# --- Interface ---"));
+        assertTrue(saved.contains("# Edit this file to customise BuildScape behaviour."));
+        Path backup = root.resolve("buildscape.cfg.backup");
+        assertArrayEquals(original, Files.readAllBytes(backup));
+        assertArrayEquals(original, Files.readAllBytes(legacy));
+        assertTrue(Files.isRegularFile(root.resolve("buildscape.cfg.backup.complete")));
+        new BuildscapeClientConfig(root);
+        assertEquals(saved, ConfigLayoutIO.readText(file));
+
+        Files.writeString(legacy, fixture("old-buildscape.cfg").replace("MaxPipeNetworkSize = 64", "MaxPipeNetworkSize = 77"));
+        Files.delete(file);
+        BuildscapeClientConfig reset = new BuildscapeClientConfig(root);
+        assertEquals(64, reset.getMaxPipeNetworkSize());
+        assertEquals("64", ConfigLayoutIO.readEntries(ConfigLayoutIO.readText(file)).get("MaxPipeNetworkSize"));
+        assertArrayEquals(original, Files.readAllBytes(backup));
+    }
+
+    @Test
+    public void legacyRootClientConfigKeepsEveryValueAndAttachesCommentsToReorderedSettings() throws Exception {
+        Path root = temporary.newFolder().toPath();
+        Path legacy = root.resolve("buildscape.cfg");
+        String original = fixture("old-buildscape.cfg").replace(" = true", " = false")
+                .replace("HideBuildscapeConfig = false", "HideBuildscapeConfig = true")
+                .replace("MaxPipeNetworkSize = 64", "MaxPipeNetworkSize = 77")
+                + "FutureSetting = custom=value\n";
+        for (String key : ConfigLayoutIO.readEntries(original).keySet()) {
+            original = original.replace(key + " = ", "# note for " + key + "\n" + key + " = ");
+        }
+        Files.writeString(legacy, original, Charset.defaultCharset());
+        BuildscapeClientConfig config = new BuildscapeClientConfig(root);
+        Path file = root.resolve("buildscape/buildscape.cfg");
+        String saved = ConfigLayoutIO.readText(file);
+        assertEquals(ConfigLayoutIO.readEntries(original), ConfigLayoutIO.readEntries(saved));
+        for (String key : ConfigLayoutIO.readEntries(original).keySet()) {
+            int comment = saved.indexOf("# note for " + key + "\n");
+            assertTrue(key, comment >= 0);
+            int setting = saved.indexOf(key + " = ", comment);
+            assertTrue(key, setting > comment);
+            for (String line : saved.substring(comment, setting).split("\\R")) {
+                assertTrue(key, line.isBlank() || line.trim().startsWith("#"));
+            }
+        }
+        assertTrue(config.isConfigButtonHidden());
+        assertEquals(77, config.getMaxPipeNetworkSize());
+        assertFalse(config.isCakeStackingEnabled());
+        assertFalse(config.isWaterBottleStackingEnabled());
+        assertTrue(saved.contains("# --- Other ---"));
+        assertArrayEquals(Files.readAllBytes(legacy), Files.readAllBytes(root.resolve("buildscape.cfg.backup")));
+        config.save();
+        assertEquals(saved, ConfigLayoutIO.readText(file));
+    }
+
+    @Test
+    public void existingGroupedClientConfigWinsAndPreventsLaterLegacyImport() throws Exception {
+        Path root = temporary.newFolder().toPath();
+        Path legacy = root.resolve("buildscape.cfg");
+        Files.writeString(legacy, fixture("old-buildscape.cfg"));
+        Path file = root.resolve("buildscape/buildscape.cfg");
+        Files.createDirectories(file.getParent());
+        byte[] grouped = "# --- Gameplay ---\r\nMaxPipeNetworkSize = 23\r\n".getBytes(Charset.defaultCharset());
+        Files.write(file, grouped);
+        BuildscapeClientConfig config = new BuildscapeClientConfig(root);
+        assertEquals(23, config.getMaxPipeNetworkSize());
+        assertArrayEquals(grouped, Files.readAllBytes(file));
+        assertArrayEquals(Files.readAllBytes(legacy), Files.readAllBytes(root.resolve("buildscape.cfg.backup")));
+        assertTrue(Files.exists(root.resolve("buildscape.cfg.backup.complete")));
+        Files.delete(file);
+        Files.writeString(legacy, "MaxPipeNetworkSize = 77\n");
+        assertEquals(64, new BuildscapeClientConfig(root).getMaxPipeNetworkSize());
+    }
+
+    @Test
+    public void failedLegacyClientBackupLeavesOriginalReadableAndCanBeRetried() throws Exception {
+        Path root = temporary.newFolder().toPath();
+        Path legacy = root.resolve("buildscape.cfg");
+        String original = fixture("old-buildscape.cfg").replace("MaxPipeNetworkSize = 64", "MaxPipeNetworkSize = 77");
+        Files.writeString(legacy, original);
+        Path backup = root.resolve("buildscape.cfg.backup");
+        Files.createDirectory(backup);
+        BuildscapeClientConfig config = new BuildscapeClientConfig(root);
+        assertEquals(77, config.getMaxPipeNetworkSize());
+        config.save();
+        assertFalse(Files.exists(root.resolve("buildscape/buildscape.cfg")));
+        assertFalse(Files.exists(root.resolve("buildscape.cfg.backup.complete")));
+        assertEquals(original, ConfigLayoutIO.readText(legacy));
+        Files.delete(backup);
+        assertEquals(77, new BuildscapeClientConfig(root).getMaxPipeNetworkSize());
+        assertTrue(Files.exists(root.resolve("buildscape.cfg.backup.complete")));
+        assertArrayEquals(Files.readAllBytes(legacy), Files.readAllBytes(backup));
+    }
+
+    @Test
+    public void interruptedLegacyClientMigrationResumesWithAnExistingBackup() throws Exception {
+        Path root = temporary.newFolder().toPath();
+        Path legacy = root.resolve("buildscape.cfg");
+        Files.writeString(legacy, fixture("old-buildscape.cfg"));
+        Path backup = root.resolve("buildscape.cfg.backup");
+        Files.copy(legacy, backup);
+        new BuildscapeClientConfig(root);
+        assertTrue(ConfigLayoutIO.readText(root.resolve("buildscape/buildscape.cfg")).contains("# --- Gameplay ---"));
+        assertArrayEquals(Files.readAllBytes(legacy), Files.readAllBytes(backup));
+        assertTrue(Files.exists(root.resolve("buildscape.cfg.backup.complete")));
+    }
+
+    @Test
+    public void replacementDecodedLegacyClientConfigKeepsOriginalBytesAndLoadsReadOnly() throws Exception {
+        Path root = temporary.newFolder().toPath();
+        Path legacy = root.resolve("buildscape.cfg");
+        byte[] original = badBytes("# old note ", "\nMaxPipeNetworkSize = 27\n");
+        Files.write(legacy, original);
+        BuildscapeClientConfig config = new BuildscapeClientConfig(root);
+        assertEquals(27, config.getMaxPipeNetworkSize());
+        config.save();
+        assertArrayEquals(original, Files.readAllBytes(root.resolve("buildscape/buildscape.cfg")));
+        assertArrayEquals(original, Files.readAllBytes(legacy));
+        assertArrayEquals(original, Files.readAllBytes(root.resolve("buildscape.cfg.backup")));
+        assertTrue(Files.exists(root.resolve("buildscape.cfg.backup.complete")));
+    }
+
+    @Test
+    public void ambiguousLegacyClientConfigStaysReadOnlyWithoutCompletingMigration() throws Exception {
+        Path root = temporary.newFolder().toPath();
+        Path legacy = root.resolve("buildscape.cfg");
+        String original = "MaxPipeNetworkSize = 12\nMaxPipeNetworkSize = 19\nlegacy line\n";
+        Files.writeString(legacy, original);
+        BuildscapeClientConfig config = new BuildscapeClientConfig(root);
+        assertEquals(19, config.getMaxPipeNetworkSize());
+        config.save();
+        assertEquals(original, ConfigLayoutIO.readText(legacy));
+        assertFalse(Files.exists(root.resolve("buildscape/buildscape.cfg")));
+        assertFalse(Files.exists(root.resolve("buildscape.cfg.backup.complete")));
+    }
+
+    @Test
     public void replacementDecodedFilesLoadValuesAndNeverRewriteBytes() throws Exception {
         Path root = temporary.newFolder().toPath();
         Path client = root.resolve("buildscape/buildscape.cfg");

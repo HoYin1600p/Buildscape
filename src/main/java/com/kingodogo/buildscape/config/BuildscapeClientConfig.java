@@ -107,16 +107,7 @@ public class BuildscapeClientConfig {
         }
         File legacyFile = getLegacyConfigFile();
 
-        if (legacyFile != null && !file.exists() && legacyFile.exists()) {
-            try {
-                Files.copy(legacyFile.toPath(), file.toPath());
-                BuildScape.getLogger().info("BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
-            } catch (IOException e) {
-                readOnly = true;
-                file = legacyFile;
-                BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to copy legacy config - " + e.getMessage());
-            }
-        }
+        file = migrateLegacyConfig(file, legacyFile);
 
         if (!file.exists()) {
             save();
@@ -141,6 +132,44 @@ public class BuildscapeClientConfig {
         }
     }
 
+    private File migrateLegacyConfig(File file, File legacyFile) {
+        if (legacyFile == null || !legacyFile.exists()) return file;
+        Path legacy = legacyFile.toPath();
+        Path backup = legacy.resolveSibling(legacyFile.getName() + ".backup");
+        Path completion = legacy.resolveSibling(legacyFile.getName() + ".backup.complete");
+        if (Files.exists(completion)) return file;
+        try {
+            String output = null;
+            boolean replacementDecoded = false;
+            if (!file.exists()) {
+                String original = ConfigLayoutIO.readText(legacy);
+                Map<String, String> migrated = new LinkedHashMap<>(DEFAULTS);
+                migrated.putAll(ConfigLayoutIO.readEntries(original));
+                replacementDecoded = ConfigLayoutIO.hasReplacementCharacters(original);
+                output = groupedText(original, migrated);
+            }
+            if (!Files.exists(backup)) Files.copy(legacy, backup);
+            else if (!Files.isRegularFile(backup) || Files.mismatch(legacy, backup) != -1) {
+                throw new IOException("Legacy backup does not match the original: " + backup);
+            }
+            if (output != null) {
+                if (replacementDecoded) Files.copy(legacy, file.toPath());
+                else ConfigLayoutIO.writeNew(file.toPath(), output);
+            }
+            Files.createFile(completion);
+            if (output != null) {
+                BuildScape.getLogger().info("BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
+            }
+        } catch (IOException e) {
+            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to migrate legacy config - " + e.getMessage());
+            if (!file.exists()) {
+                readOnly = true;
+                return legacyFile;
+            }
+        }
+        return file;
+    }
+
     public void save() {
         if (readOnly) {
             BuildScape.getLogger().warn("BuildscapeClientConfig: Not saving read-only config; unreadable/legacy file kept as-is");
@@ -149,22 +178,26 @@ public class BuildscapeClientConfig {
         File file = getConfigFile();
         if (file == null) return;
         try {
-            StringBuilder text = new StringBuilder("# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
-            for (String section : new String[]{"Gameplay", "Performance", "Visuals & particles", "Interface", "Other"}) {
-                if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) continue;
-                text.append("\n# --- ").append(section).append(" ---\n");
-                for (Map.Entry<String, String> entry : values.entrySet()) {
-                    if (!section.equals(section(entry.getKey()))) continue;
-                    text.append("# ").append(description(entry.getKey())).append('\n');
-                    text.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
-                }
-            }
-            String output = ConfigLayoutIO.retainComments(source, text.toString(), false);
+            String output = groupedText(source, values);
             ConfigLayoutIO.write(file.toPath(), output, source, true);
             source = output;
         } catch (IOException e) {
             BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to write config", e);
         }
+    }
+
+    private static String groupedText(String source, Map<String, String> values) {
+        StringBuilder text = new StringBuilder("# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
+        for (String section : new String[]{"Gameplay", "Performance", "Visuals & particles", "Interface", "Other"}) {
+            if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) continue;
+            text.append("\n# --- ").append(section).append(" ---\n");
+            for (Map.Entry<String, String> entry : values.entrySet()) {
+                if (!section.equals(section(entry.getKey()))) continue;
+                text.append("# ").append(description(entry.getKey())).append('\n');
+                text.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
+            }
+        }
+        return ConfigLayoutIO.retainComments(source, text.toString(), false);
     }
 
     private static String section(String key) {

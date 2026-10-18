@@ -366,6 +366,17 @@ final class ConfigLayoutIO {
         }
     }
 
+    static void writeNew(Path file, String text) throws IOException {
+        Files.createDirectories(file.getParent());
+        Path temporary = Files.createTempFile(file.getParent(), file.getFileName().toString(), ".tmp");
+        try {
+            Files.writeString(temporary, text, java.nio.charset.Charset.defaultCharset());
+            Files.move(temporary, file);
+        } finally {
+            Files.deleteIfExists(temporary);
+        }
+    }
+
     static void write(Path file, String text, String expected, boolean backup) throws IOException {
         String current = Files.exists(file) ? readText(file) : null;
         if (hasReplacementCharacters(current)) {

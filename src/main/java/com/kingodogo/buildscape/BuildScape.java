@@ -186,7 +186,6 @@ public class BuildScape {
                             level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRE_EXTINGUISH,
                                     net.minecraft.sounds.SoundSource.BLOCKS, 0.1f, 0.1f);
 
-                            stack.shrink(1);
                             return stack;
                         }
                     }

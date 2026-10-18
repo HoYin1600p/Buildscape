@@ -155,7 +155,20 @@ public class CopperOxidationHandler {
             registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB);
             registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB);
             registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
-            initialized = true;
+
+            registerChain(ModBlocks.BIT_CHISELED_COPPER, ModBlocks.BIT_EXPOSED_CHISELED_COPPER, ModBlocks.BIT_WEATHERED_CHISELED_COPPER, ModBlocks.BIT_OXIDIZED_CHISELED_COPPER);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK, ModBlocks.BIT_EXPOSED_COPPER_BLOCK, ModBlocks.BIT_WEATHERED_COPPER_BLOCK, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK_STAIRS, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_STAIRS, ModBlocks.BIT_WEATHERED_COPPER_BLOCK_STAIRS, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_STAIRS);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK_SLAB, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_SLAB, ModBlocks.BIT_WEATHERED_COPPER_BLOCK_SLAB, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_SLAB);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK_WALL, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_WALL, ModBlocks.BIT_WEATHERED_COPPER_BLOCK_WALL, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_WALL);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK_VERTICAL_SLAB, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB, ModBlocks.BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB);
+            registerChain(ModBlocks.BIT_CUT_COPPER, ModBlocks.BIT_EXPOSED_CUT_COPPER, ModBlocks.BIT_WEATHERED_CUT_COPPER, ModBlocks.BIT_OXIDIZED_CUT_COPPER);
+            registerChain(ModBlocks.BIT_CUT_COPPER_STAIRS, ModBlocks.BIT_EXPOSED_CUT_COPPER_STAIRS, ModBlocks.BIT_WEATHERED_CUT_COPPER_STAIRS, ModBlocks.BIT_OXIDIZED_CUT_COPPER_STAIRS);
+            registerChain(ModBlocks.BIT_CUT_COPPER_SLAB, ModBlocks.BIT_EXPOSED_CUT_COPPER_SLAB, ModBlocks.BIT_WEATHERED_CUT_COPPER_SLAB, ModBlocks.BIT_OXIDIZED_CUT_COPPER_SLAB);
+            registerChain(ModBlocks.BIT_CUT_COPPER_WALL, ModBlocks.BIT_EXPOSED_CUT_COPPER_WALL, ModBlocks.BIT_WEATHERED_CUT_COPPER_WALL, ModBlocks.BIT_OXIDIZED_CUT_COPPER_WALL);
+            registerChain(ModBlocks.BIT_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerChain(ModBlocks.BIT_COPPER_BULB, ModBlocks.BIT_EXPOSED_COPPER_BULB, ModBlocks.BIT_WEATHERED_COPPER_BULB, ModBlocks.BIT_OXIDIZED_COPPER_BULB);
+            registerChain(ModBlocks.BIT_COPPER_GRATE, ModBlocks.BIT_EXPOSED_COPPER_GRATE, ModBlocks.BIT_WEATHERED_COPPER_GRATE, ModBlocks.BIT_OXIDIZED_COPPER_GRATE);            initialized = true;
         }
     }
 
@@ -181,7 +194,8 @@ public class CopperOxidationHandler {
 
     public static Optional<BlockState> getNext(BlockState state) {
         init();
-        return Optional.ofNullable(STAGES.next(state.getBlock()))
+        Block target = STAGES.next(state.getBlock());
+        return Optional.ofNullable(target).or(() -> WeatheringCopper.getNext(state.getBlock()))
                 .map(block -> copyStateProperties(state, block.defaultBlockState()));
     }
 
@@ -209,9 +223,10 @@ public class CopperOxidationHandler {
 
         if (held.is(ModItems.BOTTLE_OF_MIST.get())) {
             BlockState nextState = getNextOxidationState(state);
-            if (nextState != null) {
+            if (nextState != null && nextState.getBlock() != block) {
                 if (!level.isClientSide) {
                     setBlockStateOrDoor(level, pos, state, nextState.getBlock());
+                    if (level.getBlockState(pos).getBlock() != nextState.getBlock()) return false;
                     ((ServerLevel) level).sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE,
                             pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
                             8, 0.25D, 0.25D, 0.25D, 0.05D);
@@ -367,49 +382,7 @@ public class CopperOxidationHandler {
     }
 
     public static BlockState getNextOxidationState(BlockState state) {
-        init();
-        Block block = state.getBlock();
-        Optional<BlockState> unwaxed = getUnwaxedState(state);
-        if (unwaxed.isPresent()) {
-            BlockState next = getNextOxidationState(unwaxed.get());
-            return next == null ? null : getWaxedState(next).orElse(null);
-        }
-        Block target = STAGES.next(block);
-        if (target != null) return copyStateProperties(state, target.defaultBlockState());
-
-        net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
-        if (rl != null && rl.getNamespace().equals("buildscape")) {
-            String path = rl.getPath();
-            String nextPath = null;
-
-            if (path.startsWith("bit_oxidized_")) {
-                nextPath = null;
-            } else if (path.startsWith("bit_weathered_")) {
-                nextPath = path.replace("bit_weathered_", "weathered_");
-            } else if (path.startsWith("weathered_")) {
-                nextPath = path.replace("weathered_", "bit_oxidized_");
-            } else if (path.startsWith("bit_exposed_")) {
-                nextPath = path.replace("bit_exposed_", "exposed_");
-            } else if (path.startsWith("exposed_")) {
-                nextPath = path.replace("exposed_", "bit_weathered_");
-            } else if (!path.startsWith("waxed_")) {
-                nextPath = "bit_exposed_" + path;
-            }
-
-            if (nextPath != null) {
-                Block targetBlock = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValue(new net.minecraft.resources.ResourceLocation("buildscape", nextPath));
-                if (targetBlock != null && targetBlock != net.minecraft.world.level.block.Blocks.AIR) {
-                    return copyStateProperties(state, targetBlock.defaultBlockState());
-                }
-            }
-        }
-
-        Optional<Block> vanillaNext = WeatheringCopper.getNext(block);
-        if (vanillaNext.isPresent()) {
-            return copyStateProperties(state, vanillaNext.get().defaultBlockState());
-        }
-
-        return null;
+        return getNext(state).orElse(null);
     }
 
     static <T> void registerChain(Map<Supplier<T>, Supplier<T>> next, Map<Supplier<T>, Supplier<T>> previous,
@@ -469,17 +442,5 @@ public class CopperOxidationHandler {
             current = prev;
         }
         return current;
-    }
-
-    private static Optional<BlockState> getUnwaxedState(BlockState state) {
-        Block block = STAGES.unwaxed(state.getBlock());
-        if (block == null) block = net.minecraft.world.item.HoneycombItem.WAX_OFF_BY_BLOCK.get().get(state.getBlock());
-        return block == null ? Optional.empty() : Optional.of(copyStateProperties(state, block.defaultBlockState()));
-    }
-
-    private static Optional<BlockState> getWaxedState(BlockState state) {
-        Block block = STAGES.waxed(state.getBlock());
-        return block == null ? net.minecraft.world.item.HoneycombItem.getWaxed(state)
-                : Optional.of(copyStateProperties(state, block.defaultBlockState()));
     }
 }

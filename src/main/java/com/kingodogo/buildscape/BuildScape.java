@@ -87,9 +87,8 @@ public class BuildScape {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
 
-        com.kingodogo.buildscape.world.ModGameRules.register();
-
         event.enqueueWork(() -> {
+            com.kingodogo.buildscape.world.ModGameRules.register();
             com.kingodogo.buildscape.stat.ModStats.registerStats();
             com.kingodogo.buildscape.network.ModMessages.register();
             if (CONFIG_CALLBACK_REGISTERED.compareAndSet(false, true)) {
@@ -555,7 +554,7 @@ public class BuildScape {
         server.execute(() -> com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
                 net.minecraftforge.network.PacketDistributor.ALL.noArg(),
                 new com.kingodogo.buildscape.network.SyncConfigPacket(
-                        com.kingodogo.buildscape.config.PillarParticleConfig.get())));
+                        com.kingodogo.buildscape.config.PillarParticleConfig.getServerConfig())));
     }
 
     @SubscribeEvent
@@ -685,7 +684,7 @@ public class BuildScape {
             }
 
             com.kingodogo.buildscape.config.PillarParticleConfig serverConfig = com.kingodogo.buildscape.config.PillarParticleConfig
-                    .get();
+                    .getServerConfig();
             com.kingodogo.buildscape.network.SyncConfigPacket configPacket = new com.kingodogo.buildscape.network.SyncConfigPacket(
                     serverConfig);
             com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
@@ -1402,6 +1401,8 @@ public class BuildScape {
 
                 if (level.isClientSide) {
                     spawnSplashParticles(level, pos);
+                    event.setCanceled(true);
+                    event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
                     return;
                 }
 
@@ -1430,7 +1431,7 @@ public class BuildScape {
 
                 event.setCanceled(true);
                 event.setCancellationResult(
-                        net.minecraft.world.InteractionResult.SUCCESS);
+                        net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
             }
         }
     }
@@ -1527,17 +1528,6 @@ public class BuildScape {
                 } else {
                     playerData.remove("FrostRoseStewDamageTicks");
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onEntityJoinWorld(
-            net.minecraftforge.event.entity.EntityJoinWorldEvent event) {
-        if (event.getEntity() instanceof net.minecraft.world.entity.vehicle.Boat boat) {
-            net.minecraft.nbt.CompoundTag nbt = boat.getPersistentData();
-            if (nbt.contains("MangroveBoatType")
-                    && nbt.getString("MangroveBoatType").equals("mangrove")) {
             }
         }
     }
@@ -2659,43 +2649,6 @@ public class BuildScape {
             if (living.isSwimming() || living.isInWater()) {
                 net.minecraft.world.phys.Vec3 delta = living.getDeltaMovement();
                 living.setDeltaMovement(delta.x * 1.175D, delta.y * 1.06D, delta.z * 1.175D);
-            }
-        }
-
-        if (!living.isPassenger() && !living.getType().is(com.kingodogo.buildscape.block.PotentSulfurBlockEntity.NOT_AFFECTED_BY_GEYSERS)) {
-            if (!(living instanceof net.minecraft.world.entity.player.Player player && player.getAbilities().flying)) {
-                net.minecraft.core.BlockPos.MutableBlockPos testPos = living.blockPosition().mutable();
-                for (int i = 0; i < 24; ++i) {
-                    net.minecraft.world.level.block.state.BlockState testState = living.level.getBlockState(testPos);
-                    if (testState.is(com.kingodogo.buildscape.block.ModBlocks.POTENT_SULFUR.get())) {
-                        com.kingodogo.buildscape.block.PotentSulfurState geyserState = testState.getValue(com.kingodogo.buildscape.block.PotentSulfurBlock.STATE);
-                        if (geyserState == com.kingodogo.buildscape.block.PotentSulfurState.ERUPTING || geyserState == com.kingodogo.buildscape.block.PotentSulfurState.CONTINUOUS) {
-                            net.minecraft.core.BlockPos.MutableBlockPos sourceSearch = testPos.above().mutable();
-                            while (living.level.getFluidState(sourceSearch).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) {
-                                sourceSearch.move(net.minecraft.core.Direction.UP);
-                            }
-                            int waterBlocks = sourceSearch.getY() - testPos.getY() - 1;
-                            if (waterBlocks < 1) waterBlocks = 1;
-
-                            net.minecraft.world.phys.Vec3 entityVelocity = living.getDeltaMovement();
-                            if (entityVelocity.y < 0.3D + (double)waterBlocks * 0.1D) {
-                                living.resetFallDistance();
-                                living.setDeltaMovement(entityVelocity.add(0.0D, 0.2D, 0.0D));
-                                living.hasImpulse = true;
-                                if (!living.level.isClientSide()) {
-                                    living.hurtMarked = true;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    if (!testState.isAir() && !testState.is(net.minecraft.world.level.block.Blocks.WATER)) {
-                        if (!testState.getCollisionShape(living.level, testPos).isEmpty()) {
-                            break;
-                        }
-                    }
-                    testPos.move(net.minecraft.core.Direction.DOWN);
-                }
             }
         }
     }

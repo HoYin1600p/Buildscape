@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,7 +21,110 @@ public class SyncConfigProtocolTest {
 
     @Test
     public void protocolVersionPinsTheCurrentPacketLayout() {
-        assertEquals("9", ModMessages.PROTOCOL_VERSION);
+        assertEquals("10", ModMessages.PROTOCOL_VERSION);
+    }
+
+    @Test
+    public void unsyncedLevelFourClientUploadsItemsInStandardMode() {
+        PillarParticleConfig config = new PillarParticleConfig();
+        config.edit_permission_mode = PillarParticleConfig.EditPermissionMode.STANDARD;
+        config.replaceItems(Set.of("minecraft:stick"));
+        ConfigAssembly assembly = new ConfigAssembly();
+        SyncConfigPacket decoded = null;
+        for (UpdateConfigPacket packet : UpdateConfigPacket.splitForClient(config, -1, true, true)) {
+            decoded = assembly.accept(packet);
+        }
+        assertNotNull(decoded);
+        assertNotEquals(0, ConfigSetting.mask(decoded.uploadSettings));
+        assertTrue(decoded.uploadSettings.contains(ConfigSetting.ITEMS));
+        assertEquals(config.items, decoded.items);
+    }
+
+    @Test
+    public void strictLevelZeroChunksAreNeverBufferedEvenAfterPermissionRevocation() {
+        PillarParticleConfig config = new PillarParticleConfig();
+        UpdateConfigPacket packet = UpdateConfigPacket.split(config).get(0);
+        java.util.Map<Object, ConfigAssembly> pending = new java.util.HashMap<>();
+        Object sender = new Object();
+        assertNull(UpdateConfigPacket.pendingAssembly(pending, sender, packet,
+                PillarParticleConfig.EditPermissionMode.STRICT, 0));
+        assertTrue(pending.isEmpty());
+        assertNotNull(UpdateConfigPacket.pendingAssembly(pending, sender, packet,
+                PillarParticleConfig.EditPermissionMode.STANDARD, 2));
+        assertEquals(1, pending.size());
+        assertNull(UpdateConfigPacket.pendingAssembly(pending, sender, packet,
+                PillarParticleConfig.EditPermissionMode.STRICT, 0));
+        assertTrue(pending.isEmpty());
+    }
+
+    @Test
+    public void limitedUploadOmitsGeneralAndPolicyFieldsOnTheWire() {
+        PillarParticleConfig config = new PillarParticleConfig();
+        config.edit_permission_mode = PillarParticleConfig.EditPermissionMode.STANDARD;
+        config.replaceItems(Set.of("minecraft:stick"));
+        config.particle_color = List.of("#112233", "#445566");
+        config.max_particle_color = 2;
+        ConfigAssembly assembly = new ConfigAssembly();
+        SyncConfigPacket decoded = null;
+        for (UpdateConfigPacket packet : UpdateConfigPacket.split(config, ConfigSetting.allowed(config.edit_permission_mode, 2))) {
+            FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
+            try {
+                packet.encode(buffer);
+                decoded = assembly.accept(UpdateConfigPacket.decode(buffer));
+                assertEquals(0, buffer.readableBytes());
+            } finally {
+                buffer.release();
+            }
+        }
+        assertNotNull(decoded);
+        assertEquals(java.util.EnumSet.of(ConfigSetting.ITEMS, ConfigSetting.COLORS), decoded.uploadSettings);
+        assertEquals(config.items, decoded.items);
+        assertEquals(config.particle_color, decoded.particle_color);
+        assertEquals(2, decoded.max_particle_color);
+        assertNull(decoded.pattern);
+        assertEquals(0.0, decoded.particle_speed, 0.0);
+        assertEquals(PillarParticleConfig.EditPermissionMode.STRICT, decoded.edit_permission_mode);
+    }
+
+    @Test
+    public void eachSettingGroupRoundTripsIndependently() {
+        PillarParticleConfig config = new PillarParticleConfig();
+        config.pattern = "spiral";
+        config.edit_permission_mode = PillarParticleConfig.EditPermissionMode.OPEN;
+        config.replaceItems(Set.of("minecraft:stick"));
+        for (ConfigSetting setting : ConfigSetting.values()) {
+            ConfigAssembly assembly = new ConfigAssembly();
+            SyncConfigPacket decoded = null;
+            for (UpdateConfigPacket packet : UpdateConfigPacket.split(config, java.util.EnumSet.of(setting))) {
+                decoded = assembly.accept(packet);
+            }
+            assertNotNull(decoded);
+            assertEquals(java.util.EnumSet.of(setting), decoded.uploadSettings);
+            switch (setting) {
+                case ITEMS -> {
+                    assertEquals(config.items, decoded.items);
+                    assertNull(decoded.particle_color);
+                    assertNull(decoded.pattern);
+                }
+                case COLORS -> {
+                    assertEquals(config.particle_color, decoded.particle_color);
+                    assertEquals(config.max_particle_color, decoded.max_particle_color);
+                    assertNull(decoded.items);
+                }
+                case PARTICLES -> {
+                    assertEquals(config.pattern, decoded.pattern);
+                    assertEquals(config.particle_speed, decoded.particle_speed, 0.0);
+                    assertEquals(config.particle_spread, decoded.particle_spread, 0.0);
+                    assertEquals(config.particle_lifetime, decoded.particle_lifetime);
+                    assertEquals(config.particle_density, decoded.particle_density);
+                    assertEquals(config.use_pattern, decoded.use_pattern);
+                    assertEquals(config.pattern_speed, decoded.pattern_speed, 0.0);
+                    assertEquals(config.pattern_spread, decoded.pattern_spread, 0.0);
+                    assertEquals(config.pattern_intensity, decoded.pattern_intensity, 0.0);
+                }
+                case POLICY -> assertEquals(config.edit_permission_mode, decoded.edit_permission_mode);
+            }
+        }
     }
 
     @Test

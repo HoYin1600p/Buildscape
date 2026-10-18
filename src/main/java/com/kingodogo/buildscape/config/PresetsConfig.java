@@ -89,7 +89,8 @@ public class PresetsConfig {
             preservedPresets.clear();
             preservedPresets.putAll(preserved);
             lastAppliedPreset = loadedLastApplied;
-            fileUnreadable = ConfigLayoutIO.protectInvalidEncoding(file.toPath());
+            fileUnreadable = ConfigLayoutIO.protectInvalidEncoding(file.toPath())
+                    || !ConfigLayoutIO.isWritable(file.toPath());
         } catch (Exception e) {
             fileUnreadable = true;
             PillarParticleConfig.backupUnreadableFile(file);

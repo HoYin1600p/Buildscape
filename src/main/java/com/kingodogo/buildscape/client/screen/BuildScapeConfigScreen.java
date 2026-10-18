@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.config.BuildscapeClientConfig;
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
@@ -174,8 +175,7 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     static int resolveClientPermissionLevel(int syncedLevel, boolean localLevelTwo, boolean localLevelFour) {
-        if (syncedLevel >= 0) return Math.min(PillarParticleConfig.CONFIG_PERMISSION_LEVEL, syncedLevel);
-        return localLevelFour ? PillarParticleConfig.CONFIG_PERMISSION_LEVEL : localLevelTwo ? 2 : 0;
+        return PillarParticleConfig.resolveClientPermissionLevel(syncedLevel, localLevelTwo, localLevelFour);
     }
 
     static float readOnlyFeedbackAlpha(long now, long startedAt) {
@@ -461,6 +461,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     // Deferred Tooltip State (prevents scale drift on Scale 3/4)
     private List<Component> deferredTooltip = null;
+    private Component hoveredRefusalTooltip = null;
     private int deferredTooltipX = 0;
     private int deferredTooltipY = 0;
     private int rawMouseX = 0;
@@ -1513,14 +1514,14 @@ public class BuildScapeConfigScreen extends Screen {
     public boolean hasOpAccess() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return false;
-        return resolveClientPermissionLevel(PillarParticleConfig.getClientPermissionLevel(),
+        return resolveClientPermissionLevel(-1,
                 hasPlayerPermissions(mc.player, 2),
                 hasPlayerPermissions(mc.player, PillarParticleConfig.CONFIG_PERMISSION_LEVEL)) >= 2;
     }
 
     public boolean hasConfigAccess() {
         Minecraft mc = Minecraft.getInstance();
-        return mc.player != null && resolveClientPermissionLevel(PillarParticleConfig.getClientPermissionLevel(),
+        return mc.player != null && resolveClientPermissionLevel(-1,
                 hasPlayerPermissions(mc.player, 2),
                 hasPlayerPermissions(mc.player, PillarParticleConfig.CONFIG_PERMISSION_LEVEL))
                 >= PillarParticleConfig.CONFIG_PERMISSION_LEVEL;
@@ -1530,7 +1531,7 @@ public class BuildScapeConfigScreen extends Screen {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return false;
         PillarParticleConfig cfg = PillarParticleConfig.get();
-        int permissionLevel = resolveClientPermissionLevel(PillarParticleConfig.getClientPermissionLevel(),
+        int permissionLevel = resolveClientPermissionLevel(-1,
                 hasPlayerPermissions(mc.player, 2),
                 hasPlayerPermissions(mc.player, PillarParticleConfig.CONFIG_PERMISSION_LEVEL));
         return PillarParticleConfig.canEdit(cfg.edit_permission_mode, permissionLevel, scope);
@@ -1564,7 +1565,14 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     private void persistServerConfig(PillarParticleConfig config) {
-        for (UpdateConfigPacket chunk : UpdateConfigPacket.split(config)) {
+        java.util.Set<ConfigSetting> settings =
+                java.util.EnumSet.noneOf(ConfigSetting.class);
+        for (ConfigSetting setting : ConfigSetting.values()) {
+            if (hasEditAccess(setting.scope) && (setting.itemsFile ? config.canEditItems() : config.canEditProperties())) {
+                settings.add(setting);
+            }
+        }
+        for (UpdateConfigPacket chunk : UpdateConfigPacket.split(config, settings)) {
             ModMessages.INSTANCE.sendToServer(chunk);
         }
     }
@@ -1583,9 +1591,48 @@ public class BuildScapeConfigScreen extends Screen {
 
     private boolean requireConfigModificationAccess() {
         String tabId = selectedTabIndex >= 0 && selectedTabIndex < navItems.size() ? navItems.get(selectedTabIndex).id : "";
-        PillarParticleConfig.EditScope scope = "items".equals(tabId) || sidePanelType == SidePanelType.PRESETS
-                ? PillarParticleConfig.EditScope.LIMITED : PillarParticleConfig.EditScope.GENERAL;
-        return requireConfigModificationAccess(scope);
+        ConfigSetting setting = "items".equals(tabId) || sidePanelType == SidePanelType.PRESETS
+                ? ConfigSetting.ITEMS : ConfigSetting.PARTICLES;
+        return requireConfigModificationAccess(setting);
+    }
+
+    private boolean requireConfigModificationAccess(ConfigSetting setting) {
+        return requireConfigModificationAccess(setting.scope);
+    }
+
+    static Component refusalText(PillarParticleConfig.EditScope scope, boolean permission, boolean filesEditable) {
+        if (!permission) {
+            return ComponentHelper.literal(scope == PillarParticleConfig.EditScope.POLICY
+                    ? "Permission level 4 is required to change the edit policy."
+                    : "This setting is locked by the server edit policy.");
+        }
+        return filesEditable ? null : new TranslatableComponent("buildscape.config.error.read_only");
+    }
+
+    static Component hoverRefusal(boolean hovered, PillarParticleConfig.EditPermissionMode mode, int permissionLevel,
+                                  ConfigSetting setting, boolean filesEditable) {
+        return hovered ? refusalText(setting.scope, setting.canEdit(mode, permissionLevel), filesEditable) : null;
+    }
+
+    private void hoverConfigAccess(boolean hovered, ConfigSetting setting,
+                                   boolean items, boolean properties, boolean presets) {
+        if (!hovered) return;
+        PillarParticleConfig cfg = PillarParticleConfig.get();
+        Minecraft mc = Minecraft.getInstance();
+        int level = resolveClientPermissionLevel(-1, hasPlayerPermissions(mc.player, 2),
+                hasPlayerPermissions(mc.player, PillarParticleConfig.CONFIG_PERMISSION_LEVEL));
+        Component refusal = hoverRefusal(hovered, cfg.edit_permission_mode, level, setting,
+                (!items || cfg.canEditItems()) && (!properties || cfg.canEditProperties())
+                        && (!presets || PresetsConfig.get().canEdit()));
+        if (refusal != null) hoveredRefusalTooltip = refusal;
+    }
+
+    private void hoverWorldOrPillarAccess(boolean hovered, String label) {
+        String tabId = selectedTabIndex >= 0 && selectedTabIndex < navItems.size() ? navItems.get(selectedTabIndex).id : "";
+        if ("pillars".equals(tabId) || "world".equals(tabId)
+                && !"Creative Tree Breaker".equals(label) && !"Shulker Box Preview".equals(label)) {
+            hoverConfigAccess(hovered, ConfigSetting.PARTICLES, false, false, false);
+        }
     }
 
     private boolean requireConfigModificationAccess(PillarParticleConfig.EditScope scope) {
@@ -1595,10 +1642,7 @@ public class BuildScapeConfigScreen extends Screen {
         readOnlyDeniedAt = System.currentTimeMillis();
         readOnlyDeniedX = rawMouseX;
         readOnlyDeniedY = rawMouseY;
-        String message = scope == PillarParticleConfig.EditScope.POLICY
-                ? "Permission level 4 is required to change the edit policy."
-                : "This setting is locked by the server edit policy.";
-        deferredTooltip = Collections.singletonList(ComponentHelper.literal(message));
+        deferredTooltip = Collections.singletonList(refusalText(scope, false, true));
         deferredTooltipX = rawMouseX + 12;
         deferredTooltipY = rawMouseY;
         return false;
@@ -1616,7 +1660,7 @@ public class BuildScapeConfigScreen extends Screen {
         readOnlyDeniedAt = System.currentTimeMillis();
         readOnlyDeniedX = rawMouseX;
         readOnlyDeniedY = rawMouseY;
-        deferredTooltip = Collections.singletonList(new TranslatableComponent("buildscape.config.error.read_only"));
+        deferredTooltip = Collections.singletonList(refusalText(null, true, false));
         deferredTooltipX = rawMouseX + 12;
         deferredTooltipY = rawMouseY;
         com.kingodogo.buildscape.BuildScape.LOGGER.warn("Config edit refused because a config file is read-only");
@@ -1701,6 +1745,7 @@ public class BuildScapeConfigScreen extends Screen {
         this.rawMouseX = mouseX;
         this.rawMouseY = mouseY;
         this.deferredTooltip = null;
+        this.hoveredRefusalTooltip = null;
 
         Font font = Minecraft.getInstance().font;
 
@@ -1802,6 +1847,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         // 7. Fallback Color Picker Modal if explicitly toggled
         if (showColorModal) {
+            hoveredRefusalTooltip = null;
             renderColorPickerModal(poseStackOrGraphics, font, effMouseX, effMouseY, alpha);
         }
 
@@ -1825,6 +1871,12 @@ public class BuildScapeConfigScreen extends Screen {
         }
 
         // Render deferred tooltip in unscaled screen coordinates
+        if (hoveredRefusalTooltip != null) {
+            deferredTooltip = deferredTooltip == null ? new ArrayList<>() : new ArrayList<>(deferredTooltip);
+            deferredTooltip.add(hoveredRefusalTooltip);
+            deferredTooltipX = rawMouseX + 12;
+            deferredTooltipY = rawMouseY;
+        }
         if (deferredTooltip != null && !deferredTooltip.isEmpty()) {
             renderComponentTooltip(poseStackOrGraphics, deferredTooltip, deferredTooltipX, deferredTooltipY);
         }
@@ -1977,13 +2029,13 @@ public class BuildScapeConfigScreen extends Screen {
             drawText(poseStackOrGraphics, font, current.subtitle, x + 8 + font.width(current.icon + "  " + current.title.toUpperCase()) + 10, y + 7, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
         }
         PillarParticleConfig.EditScope tabScope = "items".equals(current.id)
-                ? PillarParticleConfig.EditScope.LIMITED : PillarParticleConfig.EditScope.GENERAL;
+                ? ConfigSetting.ITEMS.scope : ConfigSetting.PARTICLES.scope;
         boolean restricted = ("items".equals(current.id) || "particles".equals(current.id)
                 || "pillars".equals(current.id) || "world".equals(current.id)) && !hasEditAccess(tabScope)
                 || ("items".equals(current.id) && !cfg.canEditItems())
                 || ("particles".equals(current.id) && !cfg.canEditProperties());
-        boolean limited = "particles".equals(current.id) && cfg.canEditProperties() && !hasEditAccess(PillarParticleConfig.EditScope.GENERAL)
-                && hasEditAccess(PillarParticleConfig.EditScope.LIMITED);
+        boolean limited = "particles".equals(current.id) && cfg.canEditProperties() && !hasEditAccess(ConfigSetting.PARTICLES.scope)
+                && hasEditAccess(ConfigSetting.COLORS.scope);
         if (restricted || limited) {
             int badgeW = 62;
             int badgeX = x + w - badgeW - 7;
@@ -2259,6 +2311,7 @@ public class BuildScapeConfigScreen extends Screen {
             renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
 
             if (hoveredStack != null) {
+                hoverConfigAccess(true, ConfigSetting.ITEMS, true, false, false);
                 List<Component> tooltip = new ArrayList<>();
                 tooltip.add(hoveredStack.getHoverName());
                 tooltip.add(ComponentHelper.literal(hoveredIsActive ? "§a[Active Display Item - Click to Remove]" : "§7[Click to Add as Display Item]"));
@@ -2330,6 +2383,7 @@ public class BuildScapeConfigScreen extends Screen {
                 if (hover) {
                     List<Component> tooltip = new ArrayList<>();
                     tooltip.add(ComponentHelper.literal(tagId));
+                    hoverConfigAccess(true, ConfigSetting.ITEMS, true, false, false);
                     tooltip.add(ComponentHelper.literal(isActive ? "§a[Active Display Tag - Click to Remove]" : "§7[Click to Add as Display Tag]"));
                     deferredTooltip = tooltip;
                     deferredTooltipX = rawMouseX + 12;
@@ -2353,6 +2407,18 @@ public class BuildScapeConfigScreen extends Screen {
     // Particle controls and color customization.
     private void renderParticleSettingsRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         PillarParticleConfig cfg = PillarParticleConfig.get();
+        for (int row = 0; row < 12; row++) {
+            int rowY = startY + row * (h + gap);
+            boolean hovered = row == 0 ? checkToggleClick(mouseX, mouseY, x, rowY, w, h, clipY, clipH)
+                    : row == 1 ? checkCycleClick(mouseX, mouseY, x, rowY, w, h, clipY, clipH) != 0
+                    : row < 9 ? checkCounterClick(mouseX, mouseY, x, rowY, w, h, clipY, clipH) != 0
+                    : row == 9 ? paletteControlHovered(mouseX, mouseY, x, rowY, w, h, clipY, clipH)
+                    : checkButtonClick(mouseX, mouseY, x, rowY, w, h, clipY, clipH,
+                            getConfigRowButtonWidth(font, row == 10 ? "↻ Reset Properties" : "↻ Reset Colors"));
+            hoverConfigAccess(hovered, row == 9 || row == 11
+                    ? ConfigSetting.COLORS : ConfigSetting.PARTICLES,
+                    false, true, false);
+        }
         int curY = startY;
 
         // 1. Mode Toggle
@@ -2433,6 +2499,7 @@ public class BuildScapeConfigScreen extends Screen {
         int remSelX = relX + relW + 4;
         boolean hasSel = selCount > 0;
         boolean hoverRemSel = hasSel && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH;
+        hoverConfigAccess(hoverRemSel, ConfigSetting.PARTICLES, false, false, false);
         int remSelBg = hasSel ? (hoverRemSel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414)) : COLOR_BTN_BG;
         drawBeveledButton(poseStackOrGraphics, remSelX, barY, remSelW, btnH, remSelBg, hoverRemSel, false, alpha);
         boolean confirmingSelected = isConfirmedAction(pendingDestructiveAction, "remove:selected")
@@ -2446,6 +2513,7 @@ public class BuildScapeConfigScreen extends Screen {
         int remAllX = remSelX + remSelW + 4;
         boolean hasAny = !pillarList.isEmpty();
         boolean hoverRemAll = hasAny && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH;
+        hoverConfigAccess(hoverRemAll, ConfigSetting.PARTICLES, false, false, false);
         int remAllBg = hasAny ? (hoverRemAll ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414)) : COLOR_BTN_BG;
         drawBeveledButton(poseStackOrGraphics, remAllX, barY, remAllW, btnH, remAllBg, hoverRemAll, false, alpha);
         int remAllTextCol = hasAny ? (hoverRemAll ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050) : COLOR_TEXT_MUTED;
@@ -2456,6 +2524,7 @@ public class BuildScapeConfigScreen extends Screen {
         int resetW = Math.max(78, font.width("↻ Reset Selected") + 14);
         int resetX = remAllX + remAllW + 4;
         boolean hoverReset = hasSel && mouseX >= resetX && mouseX <= resetX + resetW && mouseY >= barY && mouseY <= barY + btnH;
+        hoverConfigAccess(hoverReset, ConfigSetting.PARTICLES, false, false, false);
         drawBeveledButton(poseStackOrGraphics, resetX, barY, resetW, btnH, COLOR_BTN_BG, hoverReset, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, "↻ Reset Selected", resetX + resetW / 2, barY + 3,
                 applyAlpha(hasSel ? (hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER) : COLOR_TEXT_MUTED, alpha));
@@ -2695,6 +2764,7 @@ public class BuildScapeConfigScreen extends Screen {
         int saveW = 82;
         int saveX = x + w - saveW - 6;
         boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH;
+        hoverConfigAccess(hoverSave, ConfigSetting.PARTICLES, false, false, false);
         drawBeveledGreenButton(poseStackOrGraphics, saveX, barY, saveW, btnH, hoverSave, alpha);
         drawCenteredText(poseStackOrGraphics, font, "✓ Save Pillar", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
 
@@ -2832,6 +2902,8 @@ public class BuildScapeConfigScreen extends Screen {
         curY += systemRowH + gap;
 
         PillarParticleConfig.EditPermissionMode policy = PillarParticleConfig.get().edit_permission_mode;
+        hoverConfigAccess(checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH) != 0,
+                ConfigSetting.POLICY, false, true, false);
         renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Edit Permissions",
                 "Choose Strict (level 4), Standard (limited level 2), or Open access", capitalize(policy.name().toLowerCase(Locale.ROOT)), mouseX, mouseY, alpha);
     }
@@ -2941,6 +3013,8 @@ public class BuildScapeConfigScreen extends Screen {
         int applyX = modalX + modalW - applyW - 16;
         int applyY = modalY + modalH - applyH - 12;
         boolean hoverApply = mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= applyY && mouseY <= applyY + applyH;
+        hoverConfigAccess(hoverApply, isEditingPillarColor ? ConfigSetting.PARTICLES
+                : ConfigSetting.COLORS, false, !isEditingPillarColor, false);
         drawBeveledGreenButton(poseStackOrGraphics, applyX, applyY, applyW, applyH, hoverApply, alpha);
         int applyTextCol = hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT;
         drawCenteredText(poseStackOrGraphics, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(applyTextCol, alpha));
@@ -3205,6 +3279,7 @@ public class BuildScapeConfigScreen extends Screen {
         drawCenteredText(poseStackOrGraphics, font, "›", nextX + arrowW / 2, selectorY + 5, applyAlpha(hoverNext ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         int applyY = selectorY + btnH + 5;
         boolean hoverApply = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= applyY && mouseY <= applyY + btnH;
+        hoverConfigAccess(hoverApply, ConfigSetting.ITEMS, true, false, true);
         drawBeveledGreenButton(poseStackOrGraphics, selectorX, applyY, selectorW, btnH, hoverApply, alpha);
         drawCenteredText(poseStackOrGraphics, font, "✓ Apply Preset", selectorX + selectorW / 2, applyY + 5, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
         int sectionGap = Math.round(8.0F - 4.0F * deleteReveal);
@@ -3216,12 +3291,14 @@ public class BuildScapeConfigScreen extends Screen {
         drawText(poseStackOrGraphics, font, "Manage Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
         int manageY = curY + 19;
         boolean hoverSave = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= manageY && mouseY <= manageY + btnH;
+        hoverConfigAccess(hoverSave, ConfigSetting.ITEMS, false, false, true);
         drawBeveledButton(poseStackOrGraphics, selectorX, manageY, selectorW, btnH, hoverSave ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverSave, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, "▣ Save Changes", selectorX + selectorW / 2, manageY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         int visibleDeleteH = Math.round(btnH * deleteReveal);
         if (visibleDeleteH > 0) {
             int deleteY = manageY + btnH + 4;
             boolean hoverDelete = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= deleteY && mouseY <= deleteY + btnH;
+            hoverConfigAccess(hoverDelete && deleteReveal > 0.75F, ConfigSetting.ITEMS, true, false, true);
             drawBeveledRedButton(poseStackOrGraphics, selectorX, deleteY, selectorW, visibleDeleteH, hoverDelete, alpha * deleteReveal);
             if (deleteReveal > 0.45F) {
                 drawCenteredText(poseStackOrGraphics, font, "✕ Delete Preset", selectorX + selectorW / 2, deleteY + 5,
@@ -3241,11 +3318,13 @@ public class BuildScapeConfigScreen extends Screen {
                 applyAlpha(presetNameSelected ? COLOR_ACCENT : presetNameInput.isEmpty() ? COLOR_TEXT_MUTED : COLOR_TEXT_WHITE, alpha));
         int createY = nameY + btnH + 4;
         boolean hoverNew = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= createY && mouseY <= createY + btnH;
+        hoverConfigAccess(hoverNew, ConfigSetting.ITEMS, false, false, true);
         drawBeveledButton(poseStackOrGraphics, selectorX, createY, selectorW, btnH, hoverNew ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNew, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, "+ Create Preset", selectorX + selectorW / 2, createY + 5, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         curY += createCardH + resetGap;
 
         boolean hoverReset = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
+        hoverConfigAccess(hoverReset, ConfigSetting.ITEMS, true, false, true);
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverReset ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverReset, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, "↻ Reset to Defaults", rowX + rowW / 2, curY + 5, applyAlpha(hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
@@ -3410,6 +3489,7 @@ public class BuildScapeConfigScreen extends Screen {
         // Row 7: Save Button
         int btnH = 16;
         boolean hoverSave = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
+        hoverConfigAccess(hoverSave, ConfigSetting.PARTICLES, false, false, false);
         drawBeveledGreenButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverSave, contentAlpha);
         drawCenteredText(poseStackOrGraphics, font, "✓ Save Pillar", rowX + rowW / 2, curY + 4, applyAlpha(hoverSave ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, contentAlpha));
         curY += btnH + rowGap;
@@ -3516,6 +3596,8 @@ public class BuildScapeConfigScreen extends Screen {
         int btnW = w - pad * 2;
         int btnH = 16;
         boolean hoverApply = mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH;
+        hoverConfigAccess(hoverApply, isEditingPillarColor ? ConfigSetting.PARTICLES
+                : ConfigSetting.COLORS, false, !isEditingPillarColor, false);
         drawBeveledGreenButton(poseStackOrGraphics, gradX, curY, btnW, btnH, hoverApply, alpha);
         drawCenteredText(poseStackOrGraphics, font, "✓ Apply Color", gradX + btnW / 2, curY + 4, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
         curY += btnH + 4;
@@ -3960,6 +4042,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void renderConfigRowToggle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, boolean value, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
+        hoverWorldOrPillarAccess(checkToggleClick(mouseX, mouseY, x, y, w, h, clipY, clipH), label);
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
 
         int btnW = 38;
@@ -3979,6 +4062,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void renderConfigRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String currentVal, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
+        hoverWorldOrPillarAccess(checkCycleClick(mouseX, mouseY, x, y, w, h, clipY, clipH) != 0, label);
         int cycleW = 138;
         String visibleDescription = trimTextToWidth(font, desc, calculateCycleDescriptionWidth(w, cycleW), false);
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, visibleDescription, mouseX, mouseY, alpha);
@@ -4048,6 +4132,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void renderConfigRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String valText, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
+        hoverWorldOrPillarAccess(checkCounterClick(mouseX, mouseY, x, y, w, h, clipY, clipH) != 0, label);
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
 
         int counterW = 86;
@@ -4074,6 +4159,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void renderConfigRowButton(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String btnText, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
+        hoverWorldOrPillarAccess(checkButtonClick(mouseX, mouseY, x, y, w, h, clipY, clipH, getConfigRowButtonWidth(font, btnText)), label);
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
 
         int btnW = getConfigRowButtonWidth(font, btnText);
@@ -4107,6 +4193,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void renderConfigRowPalette(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, List<String> colors, int maxColors, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
+        hoverWorldOrPillarAccess(paletteControlHovered(mouseX, mouseY, x, y, w, h, clipY, clipH), label);
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, "Max active colors: " + maxColors + " / 7", mouseX, mouseY, alpha);
 
         int counterW = 86;
@@ -4589,7 +4676,7 @@ public class BuildScapeConfigScreen extends Screen {
 
                 // 1. Mode Toggle
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.use_pattern = !cfg.use_pattern;
                     persistServerConfig(cfg);
@@ -4600,7 +4687,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // 2. Pattern Cycle
                 int patStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (patStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     int pIndex = 0;
                     for (int i = 0; i < GLOBAL_PARTICLE_PATTERNS.length; i++) {
@@ -4618,7 +4705,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // 3. Pattern Speed
                 int pSpeedStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pSpeedStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.pattern_speed = adjustConfigValue(cfg.pattern_speed, pSpeedStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
                     persistServerConfig(cfg);
@@ -4629,7 +4716,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // 4. Pattern Spread
                 int pSpreadStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pSpreadStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.pattern_spread = adjustConfigValue(cfg.pattern_spread, pSpreadStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
                     persistServerConfig(cfg);
@@ -4640,7 +4727,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // 5. Pattern Intensity
                 int pIntStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pIntStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.pattern_intensity = adjustConfigValue(cfg.pattern_intensity, pIntStep, 0.1D, Screen.hasControlDown(), 0.1D, 5.0D, 1);
                     persistServerConfig(cfg);
@@ -4651,7 +4738,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // 6. Basic Speed
                 int speedStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (speedStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.particle_speed = adjustConfigValue(cfg.particle_speed, speedStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
                     persistServerConfig(cfg);
@@ -4662,7 +4749,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // 7. Basic Spread
                 int spreadStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (spreadStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.particle_spread = adjustConfigValue(cfg.particle_spread, spreadStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
                     persistServerConfig(cfg);
@@ -4673,7 +4760,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // 8. Lifetime
                 int lifeStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (lifeStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.particle_lifetime = Math.max(5, Math.min(120, cfg.particle_lifetime + lifeStep * 5));
                     persistServerConfig(cfg);
@@ -4684,7 +4771,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // 9. Density
                 int denStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (denStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.particle_density = Math.max(1, Math.min(16, cfg.particle_density + denStep));
                     persistServerConfig(cfg);
@@ -4694,8 +4781,12 @@ public class BuildScapeConfigScreen extends Screen {
 
                 // 10. Swatch Clicks -> Opens Draggable Color Picker Modal!
                 if (curY >= clipY && curY + h <= clipY + clipH) {
-                    while (cfg.particle_color.size() < 7) {
-                        cfg.particle_color.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(cfg.particle_color.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
+                    if (paletteControlHovered((int) mouseX, (int) mouseY, x, curY, w, h, clipY, clipH)) {
+                        if (!requireConfigModificationAccess(ConfigSetting.COLORS)) return true;
+                        if (!requireConfigFilesEditable(false, true, false)) return true;
+                        while (cfg.particle_color.size() < 7) {
+                            cfg.particle_color.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(cfg.particle_color.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
+                        }
                     }
 
                     int counterW = 86;
@@ -4706,13 +4797,13 @@ public class BuildScapeConfigScreen extends Screen {
 
                     if (mouseY >= counterY && mouseY <= counterY + counterH) {
                         if (mouseX >= counterX && mouseX <= counterX + stepBtnW) {
-                            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                            if (!requireConfigModificationAccess(ConfigSetting.COLORS)) return true;
                             if (!requireConfigFilesEditable(false, true, false)) return true;
                             cfg.max_particle_color = Math.max(1, cfg.max_particle_color - 1);
                             persistServerConfig(cfg);
                             return true;
                         } else if (mouseX >= counterX + counterW - stepBtnW && mouseX <= counterX + counterW) {
-                            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                            if (!requireConfigModificationAccess(ConfigSetting.COLORS)) return true;
                             if (!requireConfigFilesEditable(false, true, false)) return true;
                             cfg.max_particle_color = Math.min(7, cfg.max_particle_color + 1);
                             persistServerConfig(cfg);
@@ -4729,7 +4820,7 @@ public class BuildScapeConfigScreen extends Screen {
                     for (int i = 0; i < 7; i++) {
                         int swX = swatchStartX + i * (swatchSize + swatchGap);
                         if (mouseX >= swX && mouseX <= swX + swatchSize && mouseY >= swatchY && mouseY <= swatchY + swatchSize) {
-                            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                            if (!requireConfigModificationAccess(ConfigSetting.COLORS)) return true;
                             if (!requireConfigFilesEditable(false, true, false)) return true;
                             editingColorIndex = i;
                             isEditingPillarColor = false;
@@ -4753,7 +4844,7 @@ public class BuildScapeConfigScreen extends Screen {
 
                 if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH,
                         getConfigRowButtonWidth(Minecraft.getInstance().font, "↻ Reset Properties"))) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     resetParticleProperties(cfg);
                     persistServerConfig(cfg);
@@ -4763,7 +4854,7 @@ public class BuildScapeConfigScreen extends Screen {
 
                 if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH,
                         getConfigRowButtonWidth(Minecraft.getInstance().font, "↻ Reset Colors"))) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.COLORS)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     resetParticleColors(cfg);
                     persistServerConfig(cfg);
@@ -4905,7 +4996,7 @@ public class BuildScapeConfigScreen extends Screen {
                 // Row 3: Edit permission policy
                 int permissionStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (permissionStep != 0) {
-                    if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.POLICY)) return true;
+                    if (!requireConfigModificationAccess(ConfigSetting.POLICY)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     PillarParticleConfig cfg = PillarParticleConfig.get();
                     PillarParticleConfig.EditPermissionMode[] modes = PillarParticleConfig.EditPermissionMode.values();
@@ -5358,7 +5449,7 @@ public class BuildScapeConfigScreen extends Screen {
         int applyY = modalY + modalH - applyH - 12;
         if (mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= applyY && mouseY <= applyY + applyH) {
             PillarParticleConfig.EditScope colorScope = isEditingPillarColor
-                    ? PillarParticleConfig.EditScope.GENERAL : PillarParticleConfig.EditScope.LIMITED;
+                    ? ConfigSetting.PARTICLES.scope : ConfigSetting.COLORS.scope;
             if (!requireConfigModificationAccess(colorScope)) return true;
             if (!isEditingPillarColor && !requireConfigFilesEditable(false, true, false)) return true;
             int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
@@ -5843,7 +5934,7 @@ public class BuildScapeConfigScreen extends Screen {
         int btnW = w - pad * 2;
         int btnH = 16;
         if (mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH) {
-            if (!requireConfigModificationAccess()) return true;
+            if (!requireConfigModificationAccess(isEditingPillarColor ? ConfigSetting.PARTICLES : ConfigSetting.COLORS)) return true;
             if (!isEditingPillarColor && !requireConfigFilesEditable(false, true, false)) return true;
             int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
             int r = (currentColorInt >> 16) & 0xFF;
@@ -5903,6 +5994,18 @@ public class BuildScapeConfigScreen extends Screen {
         int btnX = x + w - btnW - 8;
         int btnY = y + (h - btnH) / 2;
         return mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
+    }
+
+    private boolean paletteControlHovered(int mouseX, int mouseY, int x, int y, int w, int h, int clipY, int clipH) {
+        if (y < clipY || y + h > clipY + clipH) return false;
+        if (checkCounterClick(mouseX, mouseY, x, y, w, h, clipY, clipH) != 0) return true;
+        int startX = x + w - 86 - 8 - (7 * 16 - 3) - 10;
+        int swatchY = y + (h - 13) / 2;
+        for (int i = 0; i < 7; i++) {
+            if (mouseX >= startX + i * 16 && mouseX <= startX + i * 16 + 13
+                    && mouseY >= swatchY && mouseY <= swatchY + 13) return true;
+        }
+        return false;
     }
 
     private int checkCycleClick(double mouseX, double mouseY, int x, int y, int w, int h, int clipY, int clipH) {

@@ -90,4 +90,13 @@ public final class ConfigPaths {
         }
         return java.util.Collections.emptySet();
     }
+
+    static com.google.gson.JsonObject loadItemsTemplate(String name) throws IOException {
+        String resource = "/data/buildscape/config/" + name + ".json";
+        try (java.io.InputStream input = BuildScape.class.getResourceAsStream(resource)) {
+            if (input == null) throw new IOException("Missing config template: " + resource);
+            String source = new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            return ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(source));
+        }
+    }
 }

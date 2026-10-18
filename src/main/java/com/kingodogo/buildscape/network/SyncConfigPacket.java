@@ -13,6 +13,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class SyncConfigPacket {
+    // Present only for assembled uploads; server-to-client sync always contains all settings.
+    public java.util.Set<com.kingodogo.buildscape.config.ConfigSetting> uploadSettings =
+            java.util.EnumSet.allOf(com.kingodogo.buildscape.config.ConfigSetting.class);
     public static final double MIN_PARTICLE_RATE = NetworkPacketLimits.MIN_PARTICLE_RATE;
     public static final double MAX_PARTICLE_SPEED = NetworkPacketLimits.MAX_PARTICLE_SPEED;
     public static final double MAX_PARTICLE_SPREAD = NetworkPacketLimits.MAX_PARTICLE_SPREAD;

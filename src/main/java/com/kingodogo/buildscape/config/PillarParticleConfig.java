@@ -68,14 +68,9 @@ public class PillarParticleConfig {
             "#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF", "#9B51E0"
     };
 
-    private static volatile int CLIENT_PERMISSION_LEVEL = -1;
-
-    public static int getClientPermissionLevel() {
-        return CLIENT_PERMISSION_LEVEL;
-    }
-
-    public static void setClientPermissionLevel(int permissionLevel) {
-        CLIENT_PERMISSION_LEVEL = Math.max(-1, Math.min(CONFIG_PERMISSION_LEVEL, permissionLevel));
+    public static int resolveClientPermissionLevel(int syncedLevel, boolean localLevelTwo, boolean localLevelFour) {
+        if (syncedLevel >= 0) return Math.min(CONFIG_PERMISSION_LEVEL, syncedLevel);
+        return localLevelFour ? CONFIG_PERMISSION_LEVEL : localLevelTwo ? 2 : 0;
     }
 
     public EditPermissionMode edit_permission_mode = EditPermissionMode.STRICT;
@@ -593,7 +588,8 @@ public class PillarParticleConfig {
         }
         try {
             propertiesSource = ConfigLayoutIO.readText(file.toPath());
-            propertiesReadOnly = ConfigLayoutIO.protectInvalidEncoding(file.toPath());
+            propertiesReadOnly = ConfigLayoutIO.protectInvalidEncoding(file.toPath())
+                    || !ConfigLayoutIO.isWritable(file.toPath());
             try {
                 originalProperties = ConfigLayoutIO.readProperties(propertiesSource);
             } catch (Exception e) {
@@ -764,6 +760,22 @@ public class PillarParticleConfig {
             for (JsonElement entry : document.getAsJsonArray("items")) {
                 if (!entry.isJsonPrimitive() || !entry.getAsJsonPrimitive().isString()) itemsReadOnly = true;
             }
+            itemsReadOnly |= !ConfigLayoutIO.isWritable(file.toPath());
+            if (!itemsReadOnly) {
+                try {
+                    JsonObject merged = mergeDefaultItems(document, vaultLoaded);
+                    if (!merged.get("items").equals(document.get("items"))) {
+                        String output = ConfigLayoutIO.retainComments(source, GSON.toJson(merged), true);
+                        output = ConfigLayoutIO.retainInvalidItemTokens(source, output);
+                        ConfigLayoutIO.writeItems(file.toPath(), output, source, isLegacyItems(document));
+                        source = output;
+                        parsed = parseItems(output, file.toString());
+                    }
+                    document = merged;
+                } catch (Exception e) {
+                    BuildScape.LOGGER.warn("Unable to merge new default items; retaining the existing file", e);
+                }
+            }
             itemsSource = source;
             originalItems = document;
             replaceItems(parsed);
@@ -776,6 +788,59 @@ public class PillarParticleConfig {
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
         }
+    }
+
+    static JsonObject mergeDefaultItems(JsonObject document, boolean vaultLoaded) throws java.io.IOException {
+        JsonObject defaults = ConfigPaths.loadItemsTemplate(vaultLoaded ? "vault_pillar_items" : "vanilla_pillar_items");
+        Set<String> offered = new HashSet<>();
+        if (document.has("offered_defaults")) {
+            if (!document.get("offered_defaults").isJsonArray()) throw new java.io.IOException("Invalid offered defaults");
+            for (JsonElement entry : document.getAsJsonArray("offered_defaults")) offered.add(entry.getAsString());
+        } else {
+            boolean hadVaultItems = false;
+            for (JsonElement entry : document.getAsJsonArray("items")) {
+                if (isVaultItem(entry.getAsString())) hadVaultItems = true;
+            }
+            // Infer removals only from defaults the old installation could have offered.
+            for (JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items").getAsJsonArray("items")) {
+                String item = entry.getAsString();
+                if (!isVaultItem(item) || hadVaultItems) offered.add(item);
+            }
+        }
+        JsonObject merged = document.deepCopy();
+        Set<String> present = new HashSet<>();
+        for (JsonElement entry : document.getAsJsonArray("items")) present.add(entry.getAsString());
+        for (JsonElement entry : defaults.getAsJsonArray("items")) {
+            String item = entry.getAsString();
+            if (!offered.contains(item) && present.add(item)) merged.getAsJsonArray("items").add(entry.deepCopy());
+            offered.add(item);
+        }
+        merged.add("offered_defaults", GSON.toJsonTree(new TreeSet<>(offered)));
+        merged.addProperty("defaults_version", 410);
+        if (vaultLoaded) merged.addProperty("vault_defaults_version", 410);
+        return merged;
+    }
+
+    private static boolean isVaultItem(String item) {
+        return item.startsWith("the_vault:") || item.startsWith("#the_vault:");
+    }
+
+    private static boolean isLegacyItems(JsonObject document) throws java.io.IOException {
+        if (document == null || document.has("offered_defaults")) return false;
+        if (document.has("defaults_version")) return document.get("defaults_version").getAsInt() <= 405;
+        Set<String> existing = new HashSet<>();
+        for (JsonElement entry : document.getAsJsonArray("items")) {
+            existing.add(entry.getAsString());
+        }
+        Set<String> vanilla = new HashSet<>();
+        Set<String> vault = new HashSet<>();
+        for (JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items").getAsJsonArray("items")) {
+            String item = entry.getAsString();
+            vault.add(item);
+            if (!isVaultItem(item)) vanilla.add(item);
+        }
+        // Use a normal backup when an unversioned file's origin cannot be established.
+        return existing.equals(vanilla) || existing.equals(vault);
     }
 
     static Set<String> parseItems(String content) {
@@ -956,15 +1021,12 @@ public class PillarParticleConfig {
                 originalItems = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(itemsSource));
             }
             JsonObject json = originalItems == null ? new JsonObject() : originalItems.deepCopy();
-            // Explicit saves also mark the list, so removed defaults never return on the next load.
-            json.addProperty("defaults_version", 410);
-            if (vaultLoaded) {
-                json.addProperty("vault_defaults_version", 410);
-            }
             json.add("items", GSON.toJsonTree(itemsForSave(originalItems, items)));
+            json = mergeDefaultItems(json, vaultLoaded);
             String output = ConfigLayoutIO.retainComments(itemsSource, GSON.toJson(json), true);
             output = ConfigLayoutIO.retainInvalidItemTokens(itemsSource, output);
-            ConfigLayoutIO.write(file.toPath(), output, itemsSource, true);
+            ConfigLayoutIO.writeItems(file.toPath(), output, itemsSource, isLegacyItems(originalItems));
+            replaceItems(parseItems(output));
             itemsSource = output;
             originalItems = json;
             lastLoadedItems = file.lastModified();
@@ -1083,20 +1145,24 @@ public class PillarParticleConfig {
     }
 
     public boolean canApplyUpdate() {
-        if (!canEditProperties() || !canEditItems()) return false;
+        return canApplyUpdate(true, true);
+    }
+
+    public boolean canApplyUpdate(boolean items, boolean properties) {
+        if ((properties && !canEditProperties()) || (items && !canEditItems())) return false;
         if (remote) return true;
         try {
             File propertiesFile = getPropertiesFile();
             File itemsFile = getItemsFile();
-            if (propertiesFile.exists()) {
+            if (properties && propertiesFile.exists()) {
                 propertiesReadOnly |= ConfigLayoutIO.protectInvalidEncoding(propertiesFile.toPath())
-                        || !Files.isWritable(propertiesFile.toPath());
+                        || !ConfigLayoutIO.isWritable(propertiesFile.toPath());
             }
-            if (itemsFile.exists()) {
+            if (items && itemsFile.exists()) {
                 itemsReadOnly |= ConfigLayoutIO.protectInvalidEncoding(itemsFile.toPath())
-                        || !Files.isWritable(itemsFile.toPath());
+                        || !ConfigLayoutIO.isWritable(itemsFile.toPath());
             }
-            return canEditProperties() && canEditItems();
+            return (!properties || canEditProperties()) && (!items || canEditItems());
         } catch (java.io.IOException e) {
             BuildScape.LOGGER.warn("Unable to check server config protection", e);
             return false;

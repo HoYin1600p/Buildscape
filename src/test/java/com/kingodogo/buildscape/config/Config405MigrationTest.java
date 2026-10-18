@@ -41,7 +41,7 @@ public class Config405MigrationTest {
     }
 
     @Test
-    public void exactOldItemsParseWithoutOverwritingOnLoad() throws Exception {
+    public void exactOldItemsGainNewDefaultsWithoutReorderingOnLoad() throws Exception {
         for (boolean vault : new boolean[]{false, true}) {
             Path directory = temporary.newFolder().toPath();
             Path file = directory.resolve("pillar-items.json");
@@ -53,8 +53,12 @@ public class Config405MigrationTest {
             Files.writeString(file, original);
             PillarParticleConfig config = new PillarParticleConfig(directory);
             config.loadItemsInternal(vault);
-            assertEquals(oldItems, config.items);
-            assertEquals("Existing file must remain untouched and not rewritten on launch", original, ConfigLayoutIO.readText(file));
+            assertTrue(config.items.containsAll(oldItems));
+            assertTrue(config.items.containsAll(ConfigPaths.loadDefaultItems(vault)));
+            com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original)).getAsJsonArray("items");
+            com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file)).getAsJsonArray("items");
+            for (int i = 0; i < before.size(); i++) assertEquals(before.get(i), after.get(i));
+            assertEquals(original, ConfigLayoutIO.readText(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));
 
             config.items.remove("minecraft:diamond");
             assertTrue(config.saveItemsToDisk(vault));
@@ -67,7 +71,7 @@ public class Config405MigrationTest {
     }
 
     @Test
-    public void handRemovedOldItemsStayRemovedAndFileIsUnmodifiedOnLoad() throws Exception {
+    public void handRemovedOldItemsStayRemovedWhenNewDefaultsAreOffered() throws Exception {
         for (boolean vault : new boolean[]{false, true}) {
             Path directory = temporary.newFolder().toPath();
             Path file = directory.resolve("pillar-items.json");
@@ -79,8 +83,22 @@ public class Config405MigrationTest {
             config.loadItemsInternal(vault);
             assertFalse(config.items.contains("minecraft:diamond"));
             assertFalse(config.items.contains("the_vault:echo_pog"));
-            assertEquals("User modified file must not be rewritten on load", original, ConfigLayoutIO.readText(file));
+            assertTrue(config.items.contains("buildscape:bone_dice"));
+            String merged = ConfigLayoutIO.readText(file);
+            config.loadItemsInternal(vault);
+            assertEquals(merged, ConfigLayoutIO.readText(file));
         }
+    }
+
+    @Test
+    public void vanilla405FileGainsAllVaultDefaultsWhenVaultIsInstalled() throws Exception {
+        Path directory = temporary.newFolder().toPath();
+        Path file = directory.resolve("pillar-items.json");
+        Files.writeString(file, fixture("old-pillar-items-vanilla.json"));
+        PillarParticleConfig config = new PillarParticleConfig(directory);
+        config.loadItemsInternal(true);
+        assertTrue(config.items.containsAll(ConfigPaths.loadDefaultItems(true)));
+        assertTrue(config.items.contains("the_vault:echo_pog"));
     }
 
     @Test
@@ -360,7 +378,7 @@ public class Config405MigrationTest {
         Files.writeString(file, original);
         PillarParticleConfig config = new PillarParticleConfig(directory);
         config.loadItemsInternal(false);
-        assertEquals(original, ConfigLayoutIO.readText(file));
+        assertTrue(config.items.containsAll(PillarParticleConfig.parseItems(original)));
         config.items.add("example:new_item");
         assertTrue(config.saveItemsToDisk(false));
         assertTrue(ConfigLayoutIO.readText(file).contains("example:new_item"));
@@ -434,9 +452,10 @@ public class Config405MigrationTest {
         Path items = directory.resolve("pillar-items.json");
         Files.writeString(items, "{\"items\":[\"minecraft:stick\"],\"defaults_version\":410}");
         config.loadItemsInternal(false);
+        Set<String> loadedItems = Set.copyOf(config.items);
         Files.delete(items);
         assertTrue(config.saveItemsToDisk(false));
-        assertEquals(Set.of("minecraft:stick"), PillarParticleConfig.parseItems(ConfigLayoutIO.readText(items)));
+        assertEquals(loadedItems, PillarParticleConfig.parseItems(ConfigLayoutIO.readText(items)));
     }
 
     private static void assertBeforeKey(String text, String comment, String key) {

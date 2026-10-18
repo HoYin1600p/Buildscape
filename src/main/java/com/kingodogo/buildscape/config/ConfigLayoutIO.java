@@ -57,7 +57,7 @@ final class ConfigLayoutIO {
             }
             try {
                 backupOriginal(file, bytes);
-                if (!Files.isWritable(file)) throw new IOException("Config is not writable: " + file);
+                if (!isWritable(file)) throw new IOException("Config is not writable: " + file);
                 replace(file, text);
             } catch (IOException | SecurityException e) {
                 failedMigrations.put(key, new FailedMigration(bytes.clone(), text));
@@ -78,6 +78,13 @@ final class ConfigLayoutIO {
         } catch (FileAlreadyExistsException e) {
             if (!Files.isRegularFile(backup)) throw new IOException("Backup is not a regular file: " + backup, e);
         }
+    }
+
+    static boolean isWritable(Path file) throws IOException {
+        if (!Files.isWritable(file)) return false;
+        java.nio.file.attribute.DosFileAttributeView dos = Files.getFileAttributeView(file,
+                java.nio.file.attribute.DosFileAttributeView.class);
+        return dos == null || !dos.readAttributes().isReadOnly();
     }
 
     private static String decode(byte[] bytes, Charset charset) throws CharacterCodingException {
@@ -503,6 +510,15 @@ final class ConfigLayoutIO {
     }
 
     static void write(Path file, String text, String expected, boolean backup, Charset legacy) throws IOException {
+        write(file, text, expected, backup, legacy, ".pre-4.0.5.bak");
+    }
+
+    static void writeItems(Path file, String text, String expected, boolean legacyItems) throws IOException {
+        write(file, text, expected, true, legacyCharset(), legacyItems ? ".pre-4.0.5.bak" : ".bak");
+    }
+
+    private static void write(Path file, String text, String expected, boolean backup, Charset legacy, String backupSuffix) throws IOException {
+        if (Files.exists(file) && !isWritable(file)) throw new IOException("Config is not writable: " + file);
         String current = Files.exists(file) ? readText(file, legacy) : null;
         if (current != null && protectInvalidEncoding(file, legacy)) {
             throw new IOException("Config encoding is protected; retaining original bytes: " + file);
@@ -512,7 +528,7 @@ final class ConfigLayoutIO {
         }
         if (text.equals(current)) return;
         if (backup && current != null) {
-            Path original = file.resolveSibling(file.getFileName() + ".pre-4.0.5.bak");
+            Path original = file.resolveSibling(file.getFileName() + backupSuffix);
             if (!Files.exists(original)) Files.copy(file, original);
             else if (!Files.isRegularFile(original)) throw new IOException("Backup is not a regular file: " + original);
         }

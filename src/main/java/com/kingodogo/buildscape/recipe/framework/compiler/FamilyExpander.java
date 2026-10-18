@@ -88,7 +88,7 @@ public class FamilyExpander {
                 String scId = sanitizeId(prefix + target + "_stonecutting");
                 int scCount = "slab".equals(target) ? 2 : 1;
                 addStonecutterRecipe(generated, scId, baseItem, outputItem, scCount);
-                if (reversible) {
+                if (reversible && scCount == 1) {
                     String reverseScId = sanitizeId(baseItem + "_from_" + prefix + target + "_stonecutting");
                     addStonecutterRecipe(generated, reverseScId, outputItem, baseItem, 1);
                 }

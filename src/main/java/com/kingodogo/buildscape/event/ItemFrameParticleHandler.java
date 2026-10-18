@@ -304,10 +304,6 @@ public class ItemFrameParticleHandler {
 
                 String pattern = getParticlePattern(itemFrame);
 
-                if (pattern.equals(PATTERN_NOT_SET) || pattern.equals("none")) {
-                    continue;
-                }
-
                 spawnItemFrameParticles(level, itemFrame, pattern, cfg, gameTime);
             }
             else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
@@ -326,13 +322,46 @@ public class ItemFrameParticleHandler {
 
                 String pattern = getParticlePatternColored(coloredFrame);
 
-                if (pattern.equals(PATTERN_NOT_SET) || pattern.equals("none")) {
-                    continue;
-                }
-
                 spawnColoredItemFrameParticles(level, coloredFrame, pattern, cfg, gameTime);
             }
         }
+    }
+
+    private record FrameSettings(String pattern, int count, double speed, double spread, int maxColors) {
+    }
+
+    private static FrameSettings resolveFrameSettings(Level level, String frameId, String pattern,
+                                                       PillarParticleConfig cfg) {
+        com.kingodogo.buildscape.config.PillarIdManager.PillarData data =
+                com.kingodogo.buildscape.config.PillarIdManager.get(level).getPillarData(frameId);
+        return resolveFrameSettings(data, pattern, cfg);
+    }
+
+    private static FrameSettings resolveFrameSettings(
+            com.kingodogo.buildscape.config.PillarIdManager.PillarData data,
+            String pattern, PillarParticleConfig cfg) {
+        if (data != null && data.pattern != null) {
+            pattern = data.pattern;
+        }
+        if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
+            pattern = cfg.pattern;
+        }
+        if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
+            pattern = "none";
+        }
+        boolean usePattern = data != null && data.use_pattern != null ? data.use_pattern : cfg.use_pattern;
+        double intensity = data != null && data.pattern_intensity != null ? data.pattern_intensity : cfg.pattern_intensity;
+        double patternSpeed = data != null && data.pattern_speed != null ? data.pattern_speed : cfg.pattern_speed;
+        double patternSpread = data != null && data.pattern_spread != null ? data.pattern_spread : cfg.pattern_spread;
+        int maxColors = data != null && data.max_particle_color != null ? data.max_particle_color : cfg.max_particle_color;
+        int count = cfg.particle_density <= 0 ? 0 : (int) Math.min(64L,
+                Math.max(0L, Math.round(cfg.particle_density * (usePattern ? intensity : 1.0))));
+        if ("none".equals(pattern) || PATTERN_NOT_SET.equals(pattern)) {
+            count = 0;
+        }
+        return new FrameSettings(usePattern ? pattern : "random", count,
+                usePattern ? patternSpeed * intensity : cfg.particle_speed,
+                usePattern ? patternSpread : cfg.particle_spread, Math.max(1, Math.min(7, maxColors)));
     }
 
     private static void spawnItemFrameParticles(
@@ -342,6 +371,9 @@ public class ItemFrameParticleHandler {
             PillarParticleConfig cfg,
             long time
     ) {
+        FrameSettings settings = resolveFrameSettings(level, getFrameId(itemFrame), pattern, cfg);
+        if (settings.count() == 0) return;
+        pattern = settings.pattern();
         Random rand = new Random();
 
         net.minecraft.core.Direction facing = itemFrame.getDirection();
@@ -356,18 +388,9 @@ public class ItemFrameParticleHandler {
         centerY += normal.y * frameOffset;
         centerZ += normal.z * frameOffset;
 
-        int baseCount = cfg.particle_density;
-        int count = Math.max(
-                1,
-                cfg.use_pattern
-                        ? (int) Math.round(baseCount * cfg.pattern_intensity)
-                        : baseCount
-        );
-
-        double speed = cfg.use_pattern
-                ? cfg.pattern_speed * cfg.pattern_intensity
-                : cfg.particle_speed;
-        double spread = cfg.use_pattern ? cfg.pattern_spread : cfg.particle_spread;
+        int count = settings.count();
+        double speed = settings.speed();
+        double spread = settings.spread();
 
         Vec3 upVec, rightVec;
         if (facing == net.minecraft.core.Direction.UP) {
@@ -481,7 +504,7 @@ public class ItemFrameParticleHandler {
                     : ModParticles.GLOW_LIME_SPARKLE.get();
 
             if (!isSnowflake) {
-                String colorCode = getNextColor(itemFrame, cfg);
+                String colorCode = getNextColor(itemFrame, cfg, settings.maxColors());
                 com.kingodogo.buildscape.particle.PillarSparkleParticle.queueColor(
                         particleX,
                         particleY,
@@ -564,7 +587,8 @@ public class ItemFrameParticleHandler {
 
     private static String getNextColor(
             ItemFrame itemFrame,
-            PillarParticleConfig cfg
+            PillarParticleConfig cfg,
+            int colorLimit
     ) {
         int entityId = itemFrame.getId();
 
@@ -572,7 +596,7 @@ public class ItemFrameParticleHandler {
 
         if (customColors != null && !customColors.isEmpty()) {
             int counter = COLOR_COUNTERS.getOrDefault(entityId, 0);
-            int colorIndex = counter % customColors.size();
+            int colorIndex = Math.floorMod(counter, Math.min(colorLimit, customColors.size()));
             COLOR_COUNTERS.put(entityId, counter + 1);
 
             String color = customColors.get(colorIndex);
@@ -587,10 +611,10 @@ public class ItemFrameParticleHandler {
 
         int maxColors = Math.max(
                 1,
-                Math.min(7, Math.min(cfg.max_particle_color, cfg.particle_color.size()))
+                Math.min(colorLimit, cfg.particle_color.size())
         );
         int counter = COLOR_COUNTERS.getOrDefault(entityId, 0);
-        int colorIndex = counter % maxColors;
+        int colorIndex = Math.floorMod(counter, maxColors);
         COLOR_COUNTERS.put(entityId, counter + 1);
 
         if (colorIndex < 0 || colorIndex >= cfg.particle_color.size()) {
@@ -1141,7 +1165,8 @@ public class ItemFrameParticleHandler {
 
     private static String getNextColorColored(
             com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame,
-            PillarParticleConfig cfg
+            PillarParticleConfig cfg,
+            int colorLimit
     ) {
         int entityId = frame.getId();
 
@@ -1149,7 +1174,7 @@ public class ItemFrameParticleHandler {
 
         if (customColors != null && !customColors.isEmpty()) {
             int counter = COLOR_COUNTERS.getOrDefault(entityId, 0);
-            int colorIndex = counter % customColors.size();
+            int colorIndex = Math.floorMod(counter, Math.min(colorLimit, customColors.size()));
             COLOR_COUNTERS.put(entityId, counter + 1);
 
             String color = customColors.get(colorIndex);
@@ -1164,10 +1189,10 @@ public class ItemFrameParticleHandler {
 
         int maxColors = Math.max(
                 1,
-                Math.min(7, Math.min(cfg.max_particle_color, cfg.particle_color.size()))
+                Math.min(colorLimit, cfg.particle_color.size())
         );
         int counter = COLOR_COUNTERS.getOrDefault(entityId, 0);
-        int colorIndex = counter % maxColors;
+        int colorIndex = Math.floorMod(counter, maxColors);
         COLOR_COUNTERS.put(entityId, counter + 1);
 
         if (colorIndex < 0 || colorIndex >= cfg.particle_color.size()) {
@@ -1188,6 +1213,9 @@ public class ItemFrameParticleHandler {
             PillarParticleConfig cfg,
             long time
     ) {
+        FrameSettings settings = resolveFrameSettings(level, getFrameIdColored(coloredFrame), pattern, cfg);
+        if (settings.count() == 0) return;
+        pattern = settings.pattern();
         Random rand = new Random();
 
         net.minecraft.core.Direction facing = coloredFrame.getDirection();
@@ -1202,18 +1230,9 @@ public class ItemFrameParticleHandler {
         centerY += normal.y * frameOffset;
         centerZ += normal.z * frameOffset;
 
-        int baseCount = cfg.particle_density;
-        int count = Math.max(
-                1,
-                cfg.use_pattern
-                        ? (int) Math.round(baseCount * cfg.pattern_intensity)
-                        : baseCount
-        );
-
-        double speed = cfg.use_pattern
-                ? cfg.pattern_speed * cfg.pattern_intensity
-                : cfg.particle_speed;
-        double spread = cfg.use_pattern ? cfg.pattern_spread : cfg.particle_spread;
+        int count = settings.count();
+        double speed = settings.speed();
+        double spread = settings.spread();
 
         Vec3 upVec, rightVec;
         if (facing == net.minecraft.core.Direction.UP) {
@@ -1326,7 +1345,7 @@ public class ItemFrameParticleHandler {
                     : ModParticles.GLOW_LIME_SPARKLE.get();
 
             if (!isSnowflake) {
-                String colorCode = getNextColorColored(coloredFrame, cfg);
+                String colorCode = getNextColorColored(coloredFrame, cfg, settings.maxColors());
                 com.kingodogo.buildscape.particle.PillarSparkleParticle.queueColor(
                         particleX,
                         particleY,

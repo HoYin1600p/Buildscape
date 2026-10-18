@@ -163,12 +163,12 @@ public class PillarBlockEntity extends BlockEntity {
         be.lastParticleTick = time;
 
         int baseCount = cfg.particle_density;
-        int count = Math.max(
-                0,
+        int count = (int) Math.min(64L, Math.max(
+                0L,
                 settings.usePattern
-                        ? (int) Math.round(baseCount * settings.intensity)
+                        ? Math.round(baseCount * settings.intensity)
                         : baseCount
-        );
+        ));
         if (count == 0) return;
 
         java.util.Random rand = level.random;

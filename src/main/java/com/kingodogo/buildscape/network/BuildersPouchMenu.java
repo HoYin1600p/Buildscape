@@ -30,6 +30,8 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
     private final BuildersPouchInventory pouchInventory;
     private final ContainerData filterData;
     private final InteractionHand hand;
+    private final ItemStack originalStack;
+    private final int originalHotbarSlot;
 
     public BuildersPouchMenu(int id, Inventory playerInventory, FriendlyByteBuf buffer) {
         this(id, playerInventory, buffer.readEnum(InteractionHand.class));
@@ -39,6 +41,8 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
         super(ModMenuTypes.BUILDERS_POUCH_MENU.get(), id);
         this.hand = hand;
         ItemStack pouch = playerInventory.player.getItemInHand(hand);
+        this.originalStack = pouch;
+        this.originalHotbarSlot = hand == InteractionHand.MAIN_HAND ? playerInventory.selected : -1;
         this.pouchInventory = new BuildersPouchInventory(pouch);
         List<String> filters = BuildersPouchItem.getFilters(pouch);
 
@@ -89,7 +93,7 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
             addSlot(new Slot(playerInventory, col, INV_X + col * 18, HOTBAR_Y) {
                 private boolean isOpenPouchSlot() {
                     return BuildersPouchMenu.this.hand == InteractionHand.MAIN_HAND
-                            && playerInventory.selected == hotbarSlot;
+                            && BuildersPouchMenu.this.originalHotbarSlot == hotbarSlot;
                 }
 
                 @Override
@@ -127,7 +131,7 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
     @Override
     public boolean stillValid(Player player) {
         return pouchInventory.stillValid(player)
-                && player.getItemInHand(hand).getItem() instanceof BuildersPouchItem;
+                && player.getItemInHand(hand) == originalStack;
     }
 
     @Nullable

@@ -106,11 +106,16 @@ public final class TreeChopJobManager {
             for (int i = currentIndex; i < end; i++) {
                 BlockPos pos = blocks.get(i);
                 if (!level.isLoaded(pos)
+                        || !level.mayInteract(player, pos)
                         || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
                     continue;
                 }
                 BlockState state = level.getBlockState(pos);
                 if (state.getBlock() != targetBlock) {
+                    continue;
+                }
+                if (net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(
+                        level, player.gameMode.getGameModeForPlayer(), player, pos) < 0) {
                     continue;
                 }
                 if (i % 3 == 0) {

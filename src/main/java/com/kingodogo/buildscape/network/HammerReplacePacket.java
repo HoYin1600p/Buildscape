@@ -14,7 +14,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -85,11 +84,9 @@ public class HammerReplacePacket {
             BlockState newState = replacementBlock.defaultBlockState();
             if (isMultiBlockPart(newState) || !newState.canSurvive(level, pos)) return;
 
-            if (ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos) < 0) return;
-            if (ForgeEventFactory.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP)) {
-                player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
-                return;
-            }
+            int experience = ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos);
+            if (experience < 0) return;
+            BlockSnapshot before = BlockSnapshot.create(level.dimension(), level, pos);
 
             BlockEntity blockEntity = level.getBlockEntity(pos);
             LootContext.Builder builder = new LootContext.Builder(level)
@@ -99,11 +96,12 @@ public class HammerReplacePacket {
                     .withParameter(LootContextParams.THIS_ENTITY, player)
                     .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
             List<ItemStack> drops = targetState.getDrops(builder);
-            int experience = targetState.getExpDrop(level, pos,
-                    EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, harvestTool),
-                    EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, harvestTool));
-
             if (!level.setBlock(pos, newState, 3)) return;
+            if (ForgeEventFactory.onBlockPlace(player, before, Direction.UP)) {
+                before.restore(true, false);
+                player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
+                return;
+            }
             com.kingodogo.buildscape.event.AdvancementEvents.onHammerReplace(player);
 
             if (!player.isCreative()) {

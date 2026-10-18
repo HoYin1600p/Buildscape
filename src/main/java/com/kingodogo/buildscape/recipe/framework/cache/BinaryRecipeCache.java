@@ -507,7 +507,7 @@ public class BinaryRecipeCache {
                 throw new IOException("Unsupported cached recipe type: " + type);
             }
         };
-        if (resultItem == Items.AIR) {
+        if (type != 11 && type != 12 && resultItem == Items.AIR) {
             validation.reason = "result resolves to air: " + stringPool[itemIdx];
         }
         if (validation.reason != null) {

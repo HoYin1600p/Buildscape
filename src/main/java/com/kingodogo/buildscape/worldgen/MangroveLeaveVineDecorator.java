@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
@@ -50,8 +51,11 @@ public class MangroveLeaveVineDecorator extends TreeDecorator {
         leavesPositions.forEach(pos -> {
             if (random.nextFloat() < probability) {
                 BlockPos belowPos = pos.below();
-                if (level.isStateAtPosition(belowPos, BlockState::isAir)) {
-                    blockSetter.accept(belowPos, Blocks.VINE.defaultBlockState());
+                BlockState vine = Blocks.VINE.defaultBlockState().setValue(VineBlock.UP, true);
+                if (level.isStateAtPosition(belowPos, BlockState::isAir)
+                        && level instanceof net.minecraft.world.level.LevelReader reader
+                        && vine.canSurvive(reader, belowPos)) {
+                    blockSetter.accept(belowPos, vine);
                 }
             }
         });

@@ -68,6 +68,10 @@ public class MangroveRootDecorator extends TreeDecorator {
         return ModTreeDecoratorTypes.MANGROVE_ROOT.get();
     }
 
+    int sampleTrunkOffset(Random random) {
+        return trunkOffsetY.sample(random);
+    }
+
     @Override
     public void place(
             LevelSimulatedReader level,
@@ -85,6 +89,8 @@ public class MangroveRootDecorator extends TreeDecorator {
                 .min((a, b) -> Integer.compare(a.getY(), b.getY()))
                 .orElse(logPositions.get(0));
 
+        int rootWidth = maxRootWidth.sample(random);
+        int rootLength = maxRootLength.sample(random);
         int logBaseLevel = basePos.getY();
 
         int groundLevel = findGroundLevel(level, basePos);
@@ -99,7 +105,7 @@ public class MangroveRootDecorator extends TreeDecorator {
         };
 
         for (Direction direction : cardinalDirections) {
-            int horizontalDistance = 2 + random.nextInt(4);
+            int horizontalDistance = 1 + random.nextInt(Math.min(rootWidth, rootLength));
 
             List<BlockPos> horizontalRoots = new ArrayList<>();
             for (int i = 1; i <= horizontalDistance; i++) {
@@ -120,7 +126,7 @@ public class MangroveRootDecorator extends TreeDecorator {
             }
 
             BlockPos lastPos = horizontalRoots.get(horizontalRoots.size() - 1);
-            int downDepth = lastPos.getY() - groundLevel;
+            int downDepth = Math.min(lastPos.getY() - groundLevel, rootLength - horizontalDistance);
 
             if (downDepth > 0) {
                 for (int y = 1; y <= downDepth; y++) {
@@ -136,8 +142,8 @@ public class MangroveRootDecorator extends TreeDecorator {
                         horizontalRoots.size() - 2
                 );
                 int secondDownDepth = Math.min(
-                        2 + random.nextInt(2),
-                        secondLastPos.getY() - groundLevel
+                        Math.min(2 + random.nextInt(2), secondLastPos.getY() - groundLevel),
+                        rootLength - (horizontalDistance - 1)
                 );
 
                 if (secondDownDepth > 0) {

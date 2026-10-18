@@ -24,6 +24,7 @@ public class BuildScapeRecipeCompiler {
     private final TemplateEngine templateEngine = new TemplateEngine();
     private final FamilyExpander familyExpander = new FamilyExpander(templateEngine);
     private final RecipeValidator validator = new RecipeValidator();
+    private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
 
     public static record CompileResult(
             List<Recipe<?>> recipes,
@@ -129,16 +130,14 @@ public class BuildScapeRecipeCompiler {
             }
         }
 
-        if (!validator.validate(spec, aliasResolver)) {
+        try {
+            ShapedRecipeSymbols.validate(spec);
+        } catch (IllegalArgumentException e) {
+            BuildScape.LOGGER.warn("BDRE Compiler: Skipping recipe {}: {}", spec.id(), e.getMessage());
             return null;
         }
-
-        String rawId = spec.id() != null ? spec.id() : generateRecipeId(spec);
-        String cleanPath = sanitizePath("autogen/" + category + "/" + rawId);
-
-        ResourceLocation recipeId = ResourceLocation.tryParse(BuildScape.MODID + ":" + cleanPath);
-        if (recipeId == null) {
-            BuildScape.LOGGER.warn("BDRE Compiler: Invalid recipe resource location path: {}", cleanPath);
+        ResourceLocation recipeId = new ResourceLocation(recipeIds.allocate(category, spec, aliasResolver));
+        if (!validator.validate(spec, aliasResolver)) {
             return null;
         }
 
@@ -261,7 +260,11 @@ public class BuildScapeRecipeCompiler {
             for (int col = 0; col < line.length(); col++) {
                 char c = line.charAt(col);
                 if (c != ' ') {
-                    Ingredient ing = keyMap.getOrDefault(c, Ingredient.EMPTY);
+                    Ingredient ing = keyMap.get(c);
+                    if (ing == null) {
+                        BuildScape.LOGGER.warn("BDRE Compiler: Skipping recipe {}: undefined symbol '{}'", id, c);
+                        return null;
+                    }
                     ingredients.set(row * width + col, ing);
                 }
             }
@@ -328,20 +331,8 @@ public class BuildScapeRecipeCompiler {
         return ForgeRegistries.ITEMS.getValue(loc);
     }
 
-    private String generateRecipeId(RecipeIR.RecipeSpec spec) {
-        String res = spec.result() != null ? spec.result().item() : "unknown";
-        return sanitizePath(res) + "_" + Math.abs(spec.hashCode());
-    }
-
-    private String sanitizePath(String str) {
-        if (str == null) return "unknown";
-        String resolved = aliasResolver.resolveString(str);
-        return resolved.toLowerCase(Locale.ROOT)
-                .replace(":", "_")
-                .replaceAll("[^a-z0-9/._-]", "_");
-    }
-
     public void clear() {
         validator.clear();
+        recipeIds.clear();
     }
 }

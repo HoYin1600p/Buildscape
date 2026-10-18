@@ -132,9 +132,10 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             ResourceLocation location = new ResourceLocation(BuildScape.MODID, "recipes_pack/" + category + ".json");
             try {
                 if (resourceManager.hasResource(location)) {
-                    Resource resource = resourceManager.getResource(location);
-                    byte[] bytes = resource.getInputStream().readAllBytes();
-                    rawCategoryData.put(category, bytes);
+                    try (Resource resource = resourceManager.getResource(location);
+                         java.io.InputStream stream = resource.getInputStream()) {
+                        rawCategoryData.put(category, stream.readAllBytes());
+                    }
                 }
             } catch (Exception e) {
                 BuildScape.LOGGER.error("BDRE Loader: Error reading category file [{}]", location, e);
@@ -146,9 +147,9 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
         ResourceLocation bundledLocation = new ResourceLocation(BuildScape.MODID, "recipes_pack/recipes.bscb");
         if (resourceManager.hasResource(bundledLocation)) {
-            try {
-                Resource res = resourceManager.getResource(bundledLocation);
-                List<Recipe<?>> bundled = BinaryRecipeCache.loadCacheFromStream(res.getInputStream(), contentHash);
+            try (Resource res = resourceManager.getResource(bundledLocation);
+                 java.io.InputStream stream = res.getInputStream()) {
+                List<Recipe<?>> bundled = BinaryRecipeCache.loadCacheFromStream(stream, contentHash);
                 if (!bundled.isEmpty()) {
                     List<Recipe<?>> recipes = appendRuntimeRecipes(rawCategoryData, runtimeCategories, bundled);
                     profiler.pop();

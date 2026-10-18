@@ -36,7 +36,7 @@ public class RecipeCacheGenerator {
     public static final int CACHE_VERSION = 5;
     public static final int SOURCE_SCHEMA_VERSION = 1;
     // Bump whenever compilation logic changes, even if the binary layout does not.
-    public static final int GENERATOR_VERSION = 3;
+    public static final int GENERATOR_VERSION = 4;
 
     public static final String[] CATEGORIES = {
             "crafting", "stonecutting", "smelting", "blasting",
@@ -113,6 +113,7 @@ public class RecipeCacheGenerator {
 
         int totalRecipeCount = 0;
         Set<String> registeredRecipeIds = new HashSet<>();
+        RecipeIdAllocator recipeIds = new RecipeIdAllocator();
 
         for (String category : CATEGORIES) {
             if (runtimeCategories.contains(category)) {
@@ -154,9 +155,13 @@ public class RecipeCacheGenerator {
                         continue;
                     }
 
-                    String rawId = spec.id() != null ? spec.id() : generateRecipeId(spec, aliasResolver);
-                    String cleanPath = sanitizePath("autogen/" + category + "/" + rawId, aliasResolver);
-                    String recipeId = "buildscape:" + cleanPath;
+                    try {
+                        ShapedRecipeSymbols.validate(spec);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Skipping recipe " + spec.id() + ": " + e.getMessage());
+                        continue;
+                    }
+                    String recipeId = recipeIds.allocate(category, spec, aliasResolver);
 
                     if (registeredRecipeIds.contains(recipeId)) {
                         System.err.println("WARNING: Duplicate recipe ID in " + category + ": " + recipeId
@@ -303,7 +308,11 @@ public class RecipeCacheGenerator {
             for (int col = 0; col < width; col++) {
                 char c = col < line.length() ? line.charAt(col) : ' ';
                 if (c != ' ') {
-                    ingredients.add(keyMap.getOrDefault(c, ""));
+                    String ingredient = keyMap.get(c);
+                    if (ingredient == null) {
+                        throw new IllegalArgumentException("Pattern references undefined symbol '" + c + "'");
+                    }
+                    ingredients.add(ingredient);
                 } else {
                     ingredients.add("");
                 }
@@ -380,19 +389,6 @@ public class RecipeCacheGenerator {
         } else {
             return "{\"item\":\"" + resolved + "\"}";
         }
-    }
-
-    private static String generateRecipeId(RecipeIR.RecipeSpec spec, AliasResolver aliasResolver) {
-        String res = spec.result() != null ? spec.result().item() : "unknown";
-        return sanitizePath(res, aliasResolver) + "_" + Math.abs(spec.hashCode());
-    }
-
-    private static String sanitizePath(String str, AliasResolver aliasResolver) {
-        if (str == null) return "unknown";
-        String resolved = aliasResolver.resolveString(str);
-        return resolved.toLowerCase(Locale.ROOT)
-                .replace(":", "_")
-                .replaceAll("[^a-z0-9/._-]", "_");
     }
 
     private static int getStringIndex(String str, List<String> stringPool, Map<String, Integer> stringIndexMap) {

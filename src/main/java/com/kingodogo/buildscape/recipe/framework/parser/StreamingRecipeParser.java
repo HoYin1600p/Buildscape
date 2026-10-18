@@ -286,7 +286,10 @@ public class StreamingRecipeParser {
         RecipeIR.ResultSpec resultSpec = new RecipeIR.ResultSpec(resultItem, count, null);
         recipes.add(new RecipeIR.RecipeSpec(null, type, "", pattern, keys, ingredients, input, resultSpec, cookingTime, experience));
 
-        if (isReversible && input != null && !input.isEmpty()) {
+        if (isReversible && count != 1) {
+            System.err.println("Skipping nonunit reversible conversion for " + resultItem + ": yield " + count);
+        }
+        if (isReversible && count == 1 && input != null && !input.isEmpty()) {
             String reverseRecipeId = sanitizeId(input + "_from_" + resultItem + "_reversal");
             RecipeIR.ResultSpec reverseResultSpec = new RecipeIR.ResultSpec(input, 1, null);
             recipes.add(new RecipeIR.RecipeSpec(reverseRecipeId, type, "", List.of(), Map.of(), List.of(resultItem), resultItem, reverseResultSpec, cookingTime, experience));

@@ -82,7 +82,7 @@ public class RotateBlockPacket {
             BlockState state = level.getBlockState(pos);
             if (state.isAir()) return;
 
-            BlockState newState = calculateRotatedState(state, msg.direction, msg.playerFacing);
+            BlockState newState = calculateRotatedState(state, msg.direction, player.getDirection());
 
             if (!newState.equals(state)) {
                 if (net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,

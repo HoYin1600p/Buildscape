@@ -589,6 +589,39 @@ public class PillarIdManager {
         removePillars(Collections.singleton(pillarId));
     }
 
+    public void removePillarData(String pillarId) {
+        removePillar(pillarId);
+    }
+
+    public void saveAllPillars() {
+        saveImmediate();
+    }
+
+    public void updatePillarData(PillarData data) {
+        if (data != null && data.id != null) {
+            pillarData.put(data.id, data);
+            data.modifiedTime = System.currentTimeMillis();
+            saveImmediate();
+        }
+    }
+
+    public static void clearPillarOverrides(PillarData data) {
+        if (data == null) {
+            return;
+        }
+        if (data.dyeColors == null) {
+            data.dyeColors = new ArrayList<>();
+        } else {
+            data.dyeColors.clear();
+        }
+        data.use_pattern = null;
+        data.pattern = null;
+        data.pattern_speed = null;
+        data.pattern_spread = null;
+        data.pattern_intensity = null;
+        data.max_particle_color = null;
+    }
+
     public boolean removePillars(Collection<String> pillarIds) {
         if (pillarIds == null || pillarIds.isEmpty()) {
             return false;

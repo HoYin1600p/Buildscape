@@ -44,6 +44,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
     private static final String CONTACT_START_KEY = "BuildscapeFrostRoseStart";
     private static final String CONTACT_LAST_DAMAGE_KEY = "BuildscapeFrostRoseLastDamage";
     private static final String CONTACT_LAST_TICK_KEY = "BuildscapeFrostRoseLastContact";
+    private final java.util.Map<Level, java.util.Map<BlockPos, long[]>> nearbyRoseCounts = new java.util.WeakHashMap<>();
 
     public FrostRoseBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -294,14 +295,21 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
     public void animateTick(BlockState state, Level level, BlockPos pos, java.util.Random random) {
         super.animateTick(state, level, pos, random);
 
-        int radius = 3;
-        int count = 0;
-
-        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
-            if (level.getBlockState(p).is(this)) {
-                count++;
+        java.util.Map<BlockPos, long[]> counts = nearbyRoseCounts.computeIfAbsent(level, key -> new java.util.HashMap<>());
+        long now = level.getGameTime();
+        long[] cached = counts.get(pos);
+        if (cached == null || now < cached[0] || now - cached[0] >= 100L) {
+            int count = 0;
+            for (BlockPos p : BlockPos.betweenClosed(pos.offset(-3, -3, -3), pos.offset(3, 3, 3))) {
+                if (level.getBlockState(p).is(this)) {
+                    count++;
+                }
             }
+            if (counts.size() >= 4096) counts.clear();
+            cached = new long[]{now, count};
+            counts.put(pos.immutable(), cached);
         }
+        int count = (int) cached[1];
 
         double normalizedProbability = (49.0 / 15.0) / count;
 

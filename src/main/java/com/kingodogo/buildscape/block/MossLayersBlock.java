@@ -106,6 +106,11 @@ public class MossLayersBlock extends SnowLayerBlock {
     }
 
     @Override
+    public boolean isRandomlyTicking(BlockState state) {
+        return state.getValue(LAYERS) == 8;
+    }
+
+    @Override
     public void randomTick(
             BlockState state,
             ServerLevel level,
@@ -115,7 +120,6 @@ public class MossLayersBlock extends SnowLayerBlock {
         if (state.getValue(LAYERS) == 8) {
             level.setBlock(pos, Blocks.MOSS_BLOCK.defaultBlockState(), 3);
         }
-        super.randomTick(state, level, pos, random);
     }
 
     @Override

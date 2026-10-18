@@ -218,7 +218,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack result = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
-        if (slot != null && slot.hasItem()) {
+        if (slot != null && slot.isActive() && slot.hasItem()) {
             int tab = this.blockEntity.getActiveTab();
             if (tab == 0 && index >= 1 && index <= 9) {
                 return ItemStack.EMPTY;

@@ -545,13 +545,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             boolean attached = isAttached(level, pos, updatedState.getValue(BlockStateProperties.VERTICAL_DIRECTION));
             updatedState = updatedState.setValue(ATTACHED, attached);
 
-            if (level instanceof Level) {
-                Level world = (Level) level;
-                updateNeighborThickness(world, pos.above());
-                updateNeighborThickness(world, pos.below());
-                updateDripstoneNeighbors(world, pos);
-            }
-
             return updatedState;
         }
 
@@ -628,14 +621,20 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                 BlockStateProperties.VERTICAL_DIRECTION
         );
 
-        int stackHeight = countStackHeight(level, pos, direction);
-
-        int positionInStack = getPositionInStack(level, pos, direction);
-
-        DripstoneThickness thickness = calculateThicknessForPosition(
-                stackHeight,
-                positionInStack
-        );
+        BlockState tipNeighbor = level.getBlockState(pos.relative(direction));
+        DripstoneThickness thickness;
+        if (!isDripstoneBlock(tipNeighbor)
+                || tipNeighbor.getValue(BlockStateProperties.VERTICAL_DIRECTION) != direction) {
+            thickness = DripstoneThickness.TIP;
+        } else if (tipNeighbor.getValue(THICKNESS) == DripstoneThickness.TIP
+                || tipNeighbor.getValue(THICKNESS) == DripstoneThickness.TIP_MERGE) {
+            thickness = DripstoneThickness.FRUSTUM;
+        } else {
+            BlockState baseNeighbor = level.getBlockState(pos.relative(direction.getOpposite()));
+            thickness = isDripstoneBlock(baseNeighbor)
+                    && baseNeighbor.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction
+                    ? DripstoneThickness.MIDDLE : DripstoneThickness.BASE;
+        }
 
         return state.setValue(THICKNESS, thickness);
     }

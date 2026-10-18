@@ -330,25 +330,25 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                                 player.addEffect(new MobEffectInstance(effect));
                             }
                         }
-                        jarBE.extractBottle();
+                        jarBE.consumeLevel();
                         level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
                         return InteractionResult.SUCCESS;
                     } else if (liquidItem.getItem() instanceof HoneyBottleItem) {
                         player.getFoodData().eat(6, 0.6F);
                         player.removeEffect(MobEffects.POISON);
-                        jarBE.extractBottle();
+                        jarBE.consumeLevel();
                         level.playSound(null, pos, SoundEvents.HONEY_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
                         return InteractionResult.SUCCESS;
                     } else if (liquidItem.is(Items.MILK_BUCKET)) {
                         player.removeAllEffects();
-                        jarBE.extractBottle();
+                        jarBE.consumeLevel();
                         level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
                         return InteractionResult.SUCCESS;
                     } else {
                         if (player.isOnFire()) {
                             player.clearFire();
                         }
-                        jarBE.extractBottle();
+                        jarBE.consumeLevel();
                         level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
                         return InteractionResult.SUCCESS;
                     }

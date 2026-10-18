@@ -284,15 +284,20 @@ public class GlassJarBlockEntity extends BlockEntity {
         }
         ItemStack result = getBottleRepresentation();
         if (!result.isEmpty()) {
-            liquidLevel--;
-            if (liquidLevel <= 0) {
-                storedLiquidItem = ItemStack.EMPTY;
-                liquidLevel = 0;
-            }
-            triggerWobble();
-            sync();
+            consumeLevel();
         }
         return result;
+    }
+
+    public void consumeLevel() {
+        if (!hasLiquid()) return;
+        liquidLevel--;
+        if (liquidLevel <= 0) {
+            storedLiquidItem = ItemStack.EMPTY;
+            liquidLevel = 0;
+        }
+        triggerWobble();
+        sync();
     }
 
     public void sync() {

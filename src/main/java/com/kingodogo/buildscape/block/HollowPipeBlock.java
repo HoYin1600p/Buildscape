@@ -382,13 +382,14 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         return ItemStack.EMPTY;
     }
 
-    public static void trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist) {
-        trySpreadToWorld(level, pos, state, fluid, dist, null);
+    public static boolean trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist) {
+        return trySpreadToWorld(level, pos, state, fluid, dist, null);
     }
 
-    public static void trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist,
+    public static boolean trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist,
                                         @Nullable Set<Direction> allowedDirections) {
-        if (fluid == null || fluid == Fluids.EMPTY || level.isClientSide) return;
+        if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY || level.isClientSide) return false;
+        boolean hasOpenEndpoint = false;
         int outflowAmount = WaterPipeTransport.MAX_HORIZONTAL_FLOW - dist;
         for (Direction dir : Direction.values()) {
             if (dir == Direction.UP) continue;
@@ -400,9 +401,11 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 boolean falling = dir == Direction.DOWN;
                 int amount = falling ? 8 : outflowAmount;
                 if (amount <= 0) continue;
+                hasOpenEndpoint = true;
                 spreadToWorldBlock(level, pos.relative(dir), fluid, amount, falling);
             }
         }
+        return hasOpenEndpoint;
     }
 
     public static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount) {
@@ -410,7 +413,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     private static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
-        if (amount <= 0) return;
+        if (amount <= 0 || !(fluid instanceof FlowingFluid)) return;
         BlockState neighborState = level.getBlockState(neighborPos);
         if (ModFluids.cannotMix(fluid, neighborState.getFluidState().getType())) return;
         if (neighborState.getBlock() instanceof HollowLogBlock || neighborState.getBlock() instanceof HollowPipeBlock) {
@@ -429,15 +432,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                     level.scheduleTick(neighborPos, placedFluid, placedFluid.getTickDelay(level));
                 }
             }
-        } else {
-            if (neighborState.isAir() || neighborState.canBeReplaced(fluid)
-                    || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
-                BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
-                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
-                    level.setBlock(neighborPos, fluidBlock, 3);
-                    level.scheduleTick(neighborPos, fluid, fluid.getTickDelay(level));
-                }
-            }
         }
     }
 
@@ -449,8 +443,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             PipeFlowState flow = hollowBe.getPipeFlowState();
             if (flow != null && flow.hasFluid()) {
                 Fluid fluid = com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess.fluidById(flow.getFluidId());
-                trySpreadToWorld(level, pos, state, fluid, flow.getDistance(), flow.getFlowDirections());
-                level.scheduleTick(pos, this, fluid.getTickDelay(level));
+                if (trySpreadToWorld(level, pos, state, fluid, flow.getDistance(), flow.getFlowDirections())) {
+                    level.scheduleTick(pos, this, fluid.getTickDelay(level));
+                }
             }
         }
     }
@@ -782,7 +777,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             return Fluids.EMPTY.defaultFluidState();
         }
         if (state.getValue(LAVA_LOGGED)) {
-            return Fluids.LAVA.getSource(false);
+            return Fluids.EMPTY.defaultFluidState();
         }
         return super.getFluidState(state);
     }

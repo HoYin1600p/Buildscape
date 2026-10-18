@@ -52,7 +52,7 @@ public class ConfigFollowupRegressionTest {
     }
 
     @Test
-    public void invalidItemSpellingEscapesAndDuplicatesSurviveMigrationAndSaving() throws Exception {
+    public void invalidItemSpellingEscapesAndDuplicatesSurviveLoadAndSaving() throws Exception {
         Path directory = temporary.newFolder().toPath();
         Path file = directory.resolve("pillar-items.json");
         String escaped = "\"\\u0042ad Id!\"";

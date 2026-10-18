@@ -111,7 +111,7 @@ public class ConfigReadOnlyRegressionTest {
     }
 
     @Test
-    public void invalidUtf8ItemsLoadValuesButRefuseAddsRemovalsAndMigrationWrites() throws Exception {
+    public void invalidUtf8ItemsLoadValuesButRefuseAddsRemovalsAndSaves() throws Exception {
         Path directory = temporary.newFolder().toPath();
         Path file = directory.resolve("pillar-items.json");
         byte[] original = badBytes("{// note @\n\"items\":[\"minecraft:stick\"]}");

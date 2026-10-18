@@ -20,7 +20,7 @@ public class SyncConfigProtocolTest {
 
     @Test
     public void protocolVersionPinsTheCurrentPacketLayout() {
-        assertEquals("8", ModMessages.PROTOCOL_VERSION);
+        assertEquals("9", ModMessages.PROTOCOL_VERSION);
     }
 
     @Test
@@ -39,6 +39,7 @@ public class SyncConfigProtocolTest {
                 config.pattern_intensity = 0.71;
                 config.particle_color = List.of("red", "blue");
                 config.max_particle_color = 2;
+                config.edit_permission_mode = PillarParticleConfig.EditPermissionMode.STANDARD;
                 config.replaceItems(Set.of("minecraft:stick", "#forge:gems"));
                 SyncConfigPacket original = new SyncConfigPacket(config);
                 original.itemsReadOnly = itemsReadOnly;
@@ -58,6 +59,7 @@ public class SyncConfigProtocolTest {
                     assertEquals(original.pattern_intensity, decoded.pattern_intensity, 0.0);
                     assertEquals(original.particle_color, decoded.particle_color);
                     assertEquals(original.max_particle_color, decoded.max_particle_color);
+                    assertEquals(original.edit_permission_mode, decoded.edit_permission_mode);
                     assertEquals(original.items, decoded.items);
                     assertEquals(itemsReadOnly, decoded.itemsReadOnly);
                     assertEquals(propertiesReadOnly, decoded.propertiesReadOnly);

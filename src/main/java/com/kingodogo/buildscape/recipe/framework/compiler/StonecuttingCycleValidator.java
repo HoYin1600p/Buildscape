@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.recipe.framework.compiler;
 
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
+import com.google.gson.JsonElement;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -18,6 +19,22 @@ public final class StonecuttingCycleValidator {
     private final Set<String> registeredIds = new HashSet<>();
 
     private record Edge(String input, String output, int count, String recipeId) {}
+
+    public static List<String> inputNodes(JsonElement ingredient) {
+        List<String> inputs = new ArrayList<>();
+        if (ingredient.isJsonArray()) {
+            for (JsonElement alternative : ingredient.getAsJsonArray()) inputs.addAll(inputNodes(alternative));
+        } else if (ingredient.isJsonObject()) {
+            var object = ingredient.getAsJsonObject();
+            if (object.has("item")) inputs.add(inputNode(object.get("item").getAsString(), false));
+            if (object.has("tag")) inputs.add(inputNode(object.get("tag").getAsString(), true));
+        }
+        return inputs;
+    }
+
+    private static String inputNode(String id, boolean tag) {
+        return tag ? "#" + id : id;
+    }
 
     public void addRecipe(String id, List<String> inputs, String output, int count) {
         if (count < 1) return;
@@ -69,6 +86,7 @@ public final class StonecuttingCycleValidator {
             return;
         }
         String resolved = aliases.resolveString(input);
+        resolved = resolved.startsWith("#") ? inputNode(resolved.substring(1), true) : inputNode(resolved, false);
         outgoing.computeIfAbsent(resolved, key -> new ArrayList<>()).add(new Edge(resolved, output, count, id));
     }
 

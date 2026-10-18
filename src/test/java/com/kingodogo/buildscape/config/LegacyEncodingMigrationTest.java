@@ -17,6 +17,7 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class LegacyEncodingMigrationTest {
+    private static final Charset LEGACY = Charset.forName("windows-1252");
     @Rule public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
@@ -29,8 +30,9 @@ public class LegacyEncodingMigrationTest {
         Path directory = temporary.newFolder().toPath();
         Path file = directory.resolve("pillar-properties.json");
         String text = "{// Caf\u00e9\n\"pattern\":\"Caf\u00e9\",\"particle_density\":7}";
-        byte[] original = text.getBytes(Charset.forName("windows-1252"));
+        byte[] original = text.getBytes(LEGACY);
         Files.write(file, original);
+        assertEquals(text, ConfigLayoutIO.readText(file, LEGACY));
         PillarParticleConfig config = new PillarParticleConfig(directory);
         Method load = PillarParticleConfig.class.getDeclaredMethod("loadPropertiesInternal");
         load.setAccessible(true);
@@ -58,8 +60,9 @@ public class LegacyEncodingMigrationTest {
         Path file = directory.resolve("pillar-presets.json");
         String text = "{\"default\":{\"name\":\"Default\",\"items\":[]},"
                 + "\"custom\":{\"name\":\"Caf\u00e9\",\"items\":[\"minecraft:stick\"]}}";
-        byte[] original = text.getBytes(Charset.forName("windows-1252"));
+        byte[] original = text.getBytes(LEGACY);
         Files.write(file, original);
+        assertEquals(text, ConfigLayoutIO.readText(file, LEGACY));
         PresetsConfig config = new PresetsConfig(directory);
         config.load();
         assertEquals("Caf\u00e9", config.getPreset("custom").name);
@@ -93,16 +96,72 @@ public class LegacyEncodingMigrationTest {
         Path file = temporary.newFolder().toPath().resolve("config.json");
         byte[] original = {(byte) 0x81};
         Files.write(file, original);
-        assertTrue(ConfigLayoutIO.protectInvalidEncoding(file));
+        assertTrue(ConfigLayoutIO.protectInvalidEncoding(file, LEGACY));
         Path backup = file.resolveSibling("config.json.bak");
         assertArrayEquals(original, Files.readAllBytes(file));
         assertArrayEquals(original, Files.readAllBytes(backup));
         FileTime stamp = FileTime.fromMillis(1_600_000_000_000L);
         Files.setLastModifiedTime(backup, stamp);
-        assertTrue(ConfigLayoutIO.protectInvalidEncoding(file));
+        assertTrue(ConfigLayoutIO.protectInvalidEncoding(file, LEGACY));
         assertEquals(stamp, Files.getLastModifiedTime(backup));
         assertThrows(java.io.IOException.class,
-                () -> ConfigLayoutIO.write(file, "{}", ConfigLayoutIO.readText(file), false));
+                () -> ConfigLayoutIO.write(file, "{}", ConfigLayoutIO.readText(file, LEGACY), false, LEGACY));
         assertArrayEquals(original, Files.readAllBytes(file));
+    }
+
+    @Test
+    public void readOnlyLegacyFileStillLoadsAndCannotBeSaved() throws Exception {
+        Path file = temporary.newFolder().toPath().resolve("config.json");
+        String text = "{\"name\":\"Caf\u00e9\"}";
+        byte[] original = text.getBytes(LEGACY);
+        Files.write(file, original);
+        assertTrue(file.toFile().setReadOnly());
+        try {
+            org.junit.Assume.assumeFalse(Files.isWritable(file));
+            assertEquals(text, ConfigLayoutIO.readText(file, LEGACY));
+            assertArrayEquals(original, Files.readAllBytes(file));
+            assertTrue(ConfigLayoutIO.protectInvalidEncoding(file));
+            assertThrows(java.io.IOException.class, () -> ConfigLayoutIO.write(file, "{}", text, false));
+            assertArrayEquals(original, Files.readAllBytes(file));
+        } finally {
+            assertTrue(file.toFile().setWritable(true));
+        }
+    }
+
+    @Test
+    public void failedBackupProtectsReadableValuesEvenIfTheObstacleIsLaterRemoved() throws Exception {
+        Path directory = temporary.newFolder().toPath();
+        Path file = directory.resolve("pillar-properties.json");
+        String text = "{\"pattern\":\"Caf\u00e9\",\"particle_density\":7}";
+        byte[] original = text.getBytes(LEGACY);
+        Files.write(file, original);
+        Path backup = Files.createDirectory(directory.resolve("pillar-properties.json.bak"));
+        assertEquals(text, ConfigLayoutIO.readText(file, LEGACY));
+        PillarParticleConfig config = new PillarParticleConfig(directory);
+        Method load = PillarParticleConfig.class.getDeclaredMethod("loadPropertiesInternal");
+        load.setAccessible(true);
+        load.invoke(config);
+        assertEquals("Caf\u00e9", config.pattern);
+        assertEquals(7, config.particle_density);
+        assertFalse(config.canEditProperties());
+        Files.delete(backup);
+        assertTrue(ConfigLayoutIO.protectInvalidEncoding(file));
+        assertThrows(java.io.IOException.class, () -> ConfigLayoutIO.append(file, "\n", text));
+        assertFalse(config.savePropertiesToDisk());
+        assertArrayEquals(original, Files.readAllBytes(file));
+    }
+
+    @Test
+    public void backupUsesTheOriginalSnapshotEvenIfAnotherReaderAlreadyRewroteTheFile() throws Exception {
+        Path file = temporary.newFolder().toPath().resolve("config.json");
+        String text = "{\"name\":\"Caf\u00e9\"}";
+        byte[] original = text.getBytes(LEGACY);
+        Files.writeString(file, text, StandardCharsets.UTF_8);
+        assertEquals(text, ConfigLayoutIO.readText(file, original, LEGACY));
+        Path backup = file.resolveSibling("config.json.bak");
+        assertArrayEquals(original, Files.readAllBytes(backup));
+        assertEquals(text, ConfigLayoutIO.readText(file, original, LEGACY));
+        assertArrayEquals(original, Files.readAllBytes(backup));
+        assertEquals(text, Files.readString(file, StandardCharsets.UTF_8));
     }
 }

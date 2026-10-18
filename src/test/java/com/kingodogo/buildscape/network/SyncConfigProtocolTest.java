@@ -28,6 +28,15 @@ public class SyncConfigProtocolTest {
         for (boolean itemsReadOnly : new boolean[]{false, true}) {
             for (boolean propertiesReadOnly : new boolean[]{false, true}) {
                 PillarParticleConfig config = new PillarParticleConfig();
+                config.particle_speed = 0.37;
+                config.particle_spread = 0.61;
+                config.particle_lifetime = 83;
+                config.particle_density = 7;
+                config.use_pattern = true;
+                config.pattern = "spiral";
+                config.pattern_speed = 0.29;
+                config.pattern_spread = 0.43;
+                config.pattern_intensity = 0.71;
                 config.particle_color = List.of("red", "blue");
                 config.max_particle_color = 2;
                 config.replaceItems(Set.of("minecraft:stick", "#forge:gems"));

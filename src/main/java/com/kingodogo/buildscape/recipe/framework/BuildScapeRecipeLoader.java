@@ -187,7 +187,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             try (Reader reader = new InputStreamReader(new java.io.ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
-                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack, runtimeCategories.isEmpty());
+                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack, false);
                 compiledByCategory.put(category, result.recipes());
                 compiler.clear();
             } catch (Exception e) {
@@ -195,22 +195,9 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             }
         });
 
-        List<Recipe<?>> recipes = new ArrayList<>();
-        List<Recipe<?>> cacheableSourceRecipes = new ArrayList<>();
-        List<Recipe<?>> runtimeRecipes = new ArrayList<>();
-        for (String category : CATEGORIES) {
-            List<Recipe<?>> categoryRecipes = compiledByCategory.getOrDefault(category, List.of());
-            recipes.addAll(categoryRecipes);
-            if (!runtimeCategories.contains(category)) {
-                cacheableSourceRecipes.addAll(categoryRecipes);
-            } else {
-                runtimeRecipes.addAll(categoryRecipes);
-            }
-        }
-
-        if (!runtimeCategories.isEmpty()) {
-            recipes = combineRuntimeRecipes(cacheableSourceRecipes, runtimeRecipes);
-        }
+        CompiledRecipes compiled = validateCompiledRecipes(compiledByCategory, runtimeCategories);
+        List<Recipe<?>> recipes = compiled.recipes();
+        List<Recipe<?>> cacheableSourceRecipes = compiled.cacheableRecipes();
 
         if (!cacheableSourceRecipes.isEmpty()) {
             BinaryRecipeCache.saveCache(contentHash, cacheableSourceRecipes);
@@ -223,11 +210,26 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         return recipes;
     }
 
+    record CompiledRecipes(List<Recipe<?>> recipes, List<Recipe<?>> cacheableRecipes) { }
+
+    static CompiledRecipes validateCompiledRecipes(Map<String, List<Recipe<?>>> compiledByCategory,
+                                                   Set<String> runtimeCategories) {
+        List<Recipe<?>> ordered = new ArrayList<>();
+        Set<Recipe<?>> cacheable = new HashSet<>();
+        for (String category : CATEGORIES) {
+            List<Recipe<?>> recipes = compiledByCategory.getOrDefault(category, List.of());
+            ordered.addAll(recipes);
+            if (!runtimeCategories.contains(category)) cacheable.addAll(recipes);
+        }
+        List<Recipe<?>> accepted = combineRuntimeRecipes(List.of(), ordered);
+        return new CompiledRecipes(accepted, accepted.stream().filter(cacheable::contains).toList());
+    }
+
     private List<Recipe<?>> appendRuntimeRecipes(
             Map<String, byte[]> rawCategoryData,
             Set<String> runtimeCategories,
             List<Recipe<?>> cachedRecipes) {
-        if (runtimeCategories.isEmpty()) return cachedRecipes;
+        if (runtimeCategories.isEmpty()) return combineRuntimeRecipes(cachedRecipes, List.of());
         List<Recipe<?>> runtimeRecipes = new ArrayList<>();
         for (String category : CATEGORIES) {
             if (!runtimeCategories.contains(category)) {
@@ -257,25 +259,74 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
     }
 
     static List<Recipe<?>> combineRuntimeRecipes(List<Recipe<?>> cachedRecipes, List<Recipe<?>> runtimeRecipes) {
-        if (runtimeRecipes.isEmpty()) return cachedRecipes;
+        return combineRuntimeRecipes(cachedRecipes, runtimeRecipes, StonecuttingCycleValidator::validate,
+                message -> BuildScape.LOGGER.warn("BDRE Loader: Cached recipes contain a gain cycle; filtering cache: {}", message));
+    }
+
+    static List<Recipe<?>> combineRuntimeRecipes(List<Recipe<?>> cachedRecipes, List<Recipe<?>> runtimeRecipes,
+            java.util.function.Consumer<StonecuttingCycleValidator> validate,
+            java.util.function.Consumer<String> reportStaleCache) {
         Map<ResourceLocation, Recipe<?>> recipesById = new LinkedHashMap<>();
         StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
         for (Recipe<?> recipe : cachedRecipes) {
             recipesById.put(recipe.getId(), recipe);
-            addCycleRecipe(cycles, recipe);
         }
-        for (Recipe<?> recipe : runtimeRecipes) {
-            if (recipesById.containsKey(recipe.getId())) continue;
-            addCycleRecipe(cycles, recipe);
+        rebuildCycles(cycles, recipesById.values());
+        if (!recipesById.isEmpty()) {
             try {
-                if (recipe instanceof StonecutterRecipe) cycles.validate();
-                recipesById.put(recipe.getId(), recipe);
+                validate.accept(cycles);
             } catch (IllegalArgumentException e) {
-                cycles.removeRecipe(recipe.getId().toString());
-                BuildScape.LOGGER.error("BDRE Loader: Rejected runtime recipe [{}]: {}", recipe.getId(), e.getMessage());
+                reportStaleCache.accept(e.getMessage());
+                List<Recipe<?>> base = new ArrayList<>(recipesById.values());
+                recipesById.clear();
+                cycles.clear();
+                acceptIndividually(recipesById, cycles, base, validate);
             }
         }
+        if (runtimeRecipes.isEmpty()) {
+            return new ArrayList<>(recipesById.values()).equals(cachedRecipes)
+                    ? cachedRecipes : new ArrayList<>(recipesById.values());
+        }
+        Map<ResourceLocation, Recipe<?>> additions = new LinkedHashMap<>();
+        for (Recipe<?> recipe : runtimeRecipes) additions.put(recipe.getId(), recipe);
+        Map<ResourceLocation, Recipe<?>> combined = new LinkedHashMap<>(recipesById);
+        for (Recipe<?> recipe : additions.values()) {
+            if (combined.put(recipe.getId(), recipe) != null) {
+                BuildScape.LOGGER.debug("BDRE Loader: Runtime recipe [{}] overrides cached recipe.", recipe.getId());
+            }
+        }
+        rebuildCycles(cycles, combined.values());
+        try {
+            validate.accept(cycles);
+            return new ArrayList<>(combined.values());
+        } catch (IllegalArgumentException e) {
+            rebuildCycles(cycles, recipesById.values());
+            acceptIndividually(recipesById, cycles, additions.values(), validate);
+        }
         return new ArrayList<>(recipesById.values());
+    }
+
+    private static void rebuildCycles(StonecuttingCycleValidator cycles, Collection<Recipe<?>> recipes) {
+        cycles.clear();
+        recipes.forEach(recipe -> addCycleRecipe(cycles, recipe));
+    }
+
+    private static void acceptIndividually(Map<ResourceLocation, Recipe<?>> accepted,
+            StonecuttingCycleValidator cycles, Collection<Recipe<?>> candidates,
+            java.util.function.Consumer<StonecuttingCycleValidator> validate) {
+        for (Recipe<?> recipe : candidates) {
+            Recipe<?> previous = accepted.get(recipe.getId());
+            cycles.removeRecipe(recipe.getId().toString());
+            addCycleRecipe(cycles, recipe);
+            try {
+                if (recipe instanceof StonecutterRecipe) validate.accept(cycles);
+                accepted.put(recipe.getId(), recipe);
+            } catch (IllegalArgumentException e) {
+                cycles.removeRecipe(recipe.getId().toString());
+                if (previous != null) addCycleRecipe(cycles, previous);
+                BuildScape.LOGGER.error("BDRE Loader: Rejected recipe [{}]: {}", recipe.getId(), e.getMessage());
+            }
+        }
     }
 
     private static void addCycleRecipe(StonecuttingCycleValidator cycles, Recipe<?> recipe) {
@@ -283,9 +334,18 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         ItemStack result = recipe.getResultItem();
         if (result.isEmpty()) return;
         List<String> inputs = new ArrayList<>();
-        for (Ingredient ingredient : recipe.getIngredients()) {
-            for (ItemStack input : ingredient.getItems()) {
-                inputs.add(ForgeRegistries.ITEMS.getKey(input.getItem()).toString());
+        try {
+            for (Ingredient ingredient : recipe.getIngredients()) {
+                inputs.addAll(StonecuttingCycleValidator.inputNodes(ingredient.toJson()));
+            }
+        } catch (RuntimeException e) {
+            BuildScape.LOGGER.debug("BDRE Loader: Could not serialize ingredients for recipe [{}]; using expanded items.",
+                    recipe.getId(), e);
+            inputs.clear();
+            for (Ingredient ingredient : recipe.getIngredients()) {
+                for (ItemStack input : ingredient.getItems()) {
+                    inputs.add(ForgeRegistries.ITEMS.getKey(input.getItem()).toString());
+                }
             }
         }
         cycles.addRecipe(recipe.getId().toString(), inputs,

@@ -16,9 +16,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ArrayList;
@@ -27,27 +29,54 @@ import java.util.List;
 /** Lossless layout migration: validate first, back up once, then replace a complete file. */
 final class ConfigLayoutIO {
     private static final com.google.gson.Gson GSON = new com.google.gson.Gson();
+    private static final Map<Path, FailedMigration> failedMigrations = new LinkedHashMap<>();
+    private record FailedMigration(byte[] bytes, String text) { }
     private ConfigLayoutIO() { }
 
     static String readText(Path file) throws IOException {
-        byte[] bytes = Files.readAllBytes(file);
+        return readText(file, legacyCharset());
+    }
+
+    static synchronized String readText(Path file, Charset legacy) throws IOException {
+        return readText(file, Files.readAllBytes(file), legacy);
+    }
+
+    static synchronized String readText(Path file, byte[] bytes, Charset legacy) throws IOException {
+        Path key = file.toAbsolutePath().normalize();
+        FailedMigration failure = failedMigrations.get(key);
+        if (failure != null && java.util.Arrays.equals(failure.bytes(), bytes)) return failure.text();
+        failedMigrations.remove(key);
         try {
             return decode(bytes, StandardCharsets.UTF_8);
         } catch (CharacterCodingException invalidUtf8) {
-            Charset legacy = legacyCharset();
             String text;
             try {
                 text = decode(bytes, legacy);
             } catch (CharacterCodingException invalidLegacy) {
                 return new String(bytes, StandardCharsets.UTF_8);
             }
-            Path backup = file.resolveSibling(file.getFileName() + ".bak");
-            if (!Files.exists(backup)) Files.copy(file, backup);
-            else if (!Files.isRegularFile(backup)) throw new IOException("Backup is not a regular file: " + backup);
-            replace(file, text);
+            try {
+                backupOriginal(file, bytes);
+                if (!Files.isWritable(file)) throw new IOException("Config is not writable: " + file);
+                replace(file, text);
+            } catch (IOException | SecurityException e) {
+                failedMigrations.put(key, new FailedMigration(bytes.clone(), text));
+                com.kingodogo.buildscape.BuildScape.getLogger().warn(
+                        "Unable to migrate legacy config; keeping it read-only: " + file, e);
+                return text;
+            }
             com.kingodogo.buildscape.BuildScape.getLogger().info(
                     "Migrated config {} from {} to UTF-8", file, legacy.name());
             return text;
+        }
+    }
+
+    private static void backupOriginal(Path file, byte[] bytes) throws IOException {
+        Path backup = file.resolveSibling(file.getFileName() + ".bak");
+        try {
+            Files.write(backup, bytes, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+        } catch (FileAlreadyExistsException e) {
+            if (!Files.isRegularFile(backup)) throw new IOException("Backup is not a regular file: " + backup, e);
         }
     }
 
@@ -72,8 +101,14 @@ final class ConfigLayoutIO {
         return text != null && text.indexOf('\uFFFD') >= 0;
     }
 
-    static boolean protectInvalidEncoding(Path file) throws IOException {
-        if (!hasReplacementCharacters(readText(file))) return false;
+    static synchronized boolean protectInvalidEncoding(Path file) throws IOException {
+        return protectInvalidEncoding(file, legacyCharset());
+    }
+
+    static synchronized boolean protectInvalidEncoding(Path file, Charset legacy) throws IOException {
+        String text = readText(file, legacy);
+        if (failedMigrations.containsKey(file.toAbsolutePath().normalize())) return true;
+        if (!hasReplacementCharacters(text)) return false;
         Path backup = file.resolveSibling(file.getFileName() + ".bak");
         try {
             if (!Files.exists(backup)) Files.copy(file, backup);
@@ -464,9 +499,13 @@ final class ConfigLayoutIO {
     }
 
     static void write(Path file, String text, String expected, boolean backup) throws IOException {
-        String current = Files.exists(file) ? readText(file) : null;
-        if (current != null && protectInvalidEncoding(file)) {
-            throw new IOException("Config decoded with replacement characters; retaining original bytes: " + file);
+        write(file, text, expected, backup, legacyCharset());
+    }
+
+    static void write(Path file, String text, String expected, boolean backup, Charset legacy) throws IOException {
+        String current = Files.exists(file) ? readText(file, legacy) : null;
+        if (current != null && protectInvalidEncoding(file, legacy)) {
+            throw new IOException("Config encoding is protected; retaining original bytes: " + file);
         }
         if (current != null && !java.util.Objects.equals(expected, current)) {
             throw new IOException("Config changed on disk; reload before saving: " + file);

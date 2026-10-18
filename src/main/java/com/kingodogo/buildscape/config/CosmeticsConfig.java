@@ -110,10 +110,17 @@ public class CosmeticsConfig {
                 Path legacyPath = legacyJson.toPath();
                 Path backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak");
                 try {
-                    if (Files.exists(backupPath)) Files.delete(legacyPath);
-                    else Files.move(legacyPath, backupPath);
+                    int suffix = 1;
+                    while (true) {
+                        try {
+                            Files.move(legacyPath, backupPath);
+                            break;
+                        } catch (java.nio.file.FileAlreadyExistsException e) {
+                            backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak." + suffix++);
+                        }
+                    }
                 } catch (Exception e) {
-                    legacyJson.delete();
+                    BuildScape.getLogger().warn("Unable to retain legacy cosmetics backup: " + legacyPath, e);
                 }
             }
         }

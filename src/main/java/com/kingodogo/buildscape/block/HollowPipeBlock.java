@@ -389,15 +389,26 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     public static boolean trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist,
                                         @Nullable Set<Direction> allowedDirections) {
         if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY || level.isClientSide) return false;
+        return trySpreadToWorld((LevelAccessor) level, pos, state, fluid, dist, allowedDirections);
+    }
+
+    static boolean trySpreadToWorld(LevelAccessor level, BlockPos pos, BlockState state, Fluid fluid, int dist,
+                                   @Nullable Set<Direction> allowedDirections) {
+        return trySpreadToWorld(level, pos, fluid, dist, allowedDirections,
+                dir -> state.getBlock() instanceof HollowLogBlock
+                        ? HollowLogBlock.isOpenEnd(state, dir) : isOpenEndpoint(state, dir));
+    }
+
+    static boolean trySpreadToWorld(LevelAccessor level, BlockPos pos, Fluid fluid, int dist,
+                                   @Nullable Set<Direction> allowedDirections,
+                                   java.util.function.Predicate<Direction> openEndpoint) {
+        if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY) return false;
         boolean spread = false;
         int outflowAmount = WaterPipeTransport.MAX_HORIZONTAL_FLOW - dist;
         for (Direction dir : Direction.values()) {
             if (dir == Direction.UP) continue;
             if (allowedDirections != null && !allowedDirections.contains(dir)) continue;
-            boolean openEndpoint = state.getBlock() instanceof HollowLogBlock
-                    ? HollowLogBlock.isOpenEnd(state, dir)
-                    : isOpenEndpoint(state, dir);
-            if (openEndpoint) {
+            if (openEndpoint.test(dir)) {
                 boolean falling = dir == Direction.DOWN;
                 int amount = falling ? 8 : outflowAmount;
                 if (amount <= 0) continue;

@@ -449,6 +449,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
     ) {
         java.util.Set<BlockPos> breakingBlocks = new java.util.HashSet<>();
         breakingBlocks.add(pos);
+        level.destroyBlock(pos, true);
 
         Direction tipDirection = direction == Direction.DOWN
                 ? Direction.DOWN

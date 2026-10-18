@@ -148,7 +148,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
         if (direction == Direction.DOWN) {
-            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }

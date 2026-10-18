@@ -45,6 +45,11 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     private static final int FILTER_MASK_VERSION = 3;
     private int filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_DEFAULT;
     private int copyProgress = 0;
+    private boolean copyPrepared = false;
+    private int preparedTab = -1;
+    private ItemStack preparedInput = ItemStack.EMPTY;
+    private ItemStack preparedOutput = ItemStack.EMPTY;
+    private final NonNullList<ItemStack> preparedResults = NonNullList.withSize(RESULT_COUNT, ItemStack.EMPTY);
     public final net.minecraft.world.inventory.ContainerData dataAccess = new net.minecraft.world.inventory.ContainerData() {
         @Override
         public int get(int index) {
@@ -212,8 +217,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                 && hasSolvedItems();
 
         if (canCopy) {
-            ItemStack pouchCopy = inPouch.copy();
-            if (!writeSolvedToPouch(pouchCopy)) {
+            prepareCopy(inPouch);
+            if (preparedOutput.isEmpty()) {
                 if (copyProgress != -1) {
                     copyProgress = -1;
                     setChanged();
@@ -224,8 +229,10 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             copyProgress = Math.max(0, copyProgress) + 1;
             setChanged();
             if (copyProgress >= 40) {
-                this.setItem(SLOT_OUTPUT_POUCH, pouchCopy);
+                this.setItem(SLOT_OUTPUT_POUCH, preparedOutput);
                 this.setItem(SLOT_INPUT_POUCH, ItemStack.EMPTY);
+                copyPrepared = false;
+                preparedOutput = ItemStack.EMPTY;
                 level.playSound(null, pos, net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP,
                         net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, 1.0f);
                 copyProgress = 0;
@@ -237,6 +244,25 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                 setChanged();
             }
         }
+    }
+
+    private void prepareCopy(ItemStack input) {
+        int firstSlot = activeTab == 0 ? SLOT_PRESETS_START : SLOT_GRADIENT_START;
+        boolean unchanged = copyPrepared && preparedTab == activeTab && ItemStack.matches(preparedInput, input);
+        for (int i = 0; unchanged && i < RESULT_COUNT; i++) {
+            unchanged = ItemStack.matches(preparedResults.get(i), this.getItem(firstSlot + i));
+        }
+        if (unchanged) return;
+
+        if (copyPrepared) copyProgress = 0;
+        preparedInput = input.copy();
+        preparedTab = activeTab;
+        for (int i = 0; i < RESULT_COUNT; i++) {
+            preparedResults.set(i, this.getItem(firstSlot + i).copy());
+        }
+        ItemStack candidate = input.copy();
+        preparedOutput = writeSolvedToPouch(candidate) ? candidate : ItemStack.EMPTY;
+        copyPrepared = true;
     }
 
     public boolean hasSolvedItems() {

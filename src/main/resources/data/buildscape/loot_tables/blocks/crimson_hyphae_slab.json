@@ -6,7 +6,23 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "buildscape:crimson_hyphae_slab"
+          "name": "buildscape:crimson_hyphae_slab",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:crimson_hyphae_slab",
+                  "properties": {
+                    "type": "double"
+                  }
+                }
+              ],
+              "count": 2,
+              "add": false
+            }
+          ]
         }
       ],
       "conditions": [

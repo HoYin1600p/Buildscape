@@ -237,7 +237,7 @@ public class TrappedDecoratedPotBlock
                 be.setStoredItem(ItemStack.EMPTY, true);
 
                 if (stored.getItem() instanceof SpawnEggItem spawnEgg) {
-                    spawnMobFromEgg(level, pos, spawnEgg);
+                    spawnMobFromEgg(level, pos, stored);
                 } else {
                     if (!player.getInventory().add(stored)) {
                         net.minecraft.world.entity.item.ItemEntity itemEntity =
@@ -269,7 +269,7 @@ public class TrappedDecoratedPotBlock
 
             if (!level.isClientSide) {
                 if (stored.getItem() instanceof SpawnEggItem spawnEgg) {
-                    spawnMobFromEgg(level, pos, spawnEgg);
+                    spawnMobFromEgg(level, pos, stored);
                 } else {
                     net.minecraft.world.entity.item.ItemEntity itemEntity =
                             new net.minecraft.world.entity.item.ItemEntity(
@@ -307,15 +307,15 @@ public class TrappedDecoratedPotBlock
     }
 
 
-    private static void spawnMobFromEgg(Level level, BlockPos pos, SpawnEggItem spawnEgg) {
+    private static void spawnMobFromEgg(Level level, BlockPos pos, ItemStack stack) {
         if (level.isClientSide) return;
-        EntityType<?> entityType = spawnEgg.getType(null);
+        SpawnEggItem spawnEgg = (SpawnEggItem) stack.getItem();
+        EntityType<?> entityType = spawnEgg.getType(stack.getTag());
         if (entityType != null) {
             Vec3 spawnPos = Vec3.atCenterOf(pos).add(0, 0.5, 0);
             entityType.spawn(
                     (net.minecraft.server.level.ServerLevel) level,
-                    null,
-                    null,
+                    stack,
                     null,
                     new BlockPos(spawnPos.x, spawnPos.y, spawnPos.z),
                     MobSpawnType.SPAWN_EGG,

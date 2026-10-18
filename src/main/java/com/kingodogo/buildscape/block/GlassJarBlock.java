@@ -302,7 +302,10 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                         ItemStack singleFood = stored.copy();
                         singleFood.setCount(1);
 
-                        player.eat(level, singleFood);
+                        ItemStack remainder = singleFood.finishUsingItem(level, player);
+                        if (!remainder.isEmpty() && !player.getInventory().add(remainder)) {
+                            player.drop(remainder, false);
+                        }
                         jarBE.extractFood(1);
 
                         level.playSound(null, pos, SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, 0.8F, 1.0F);

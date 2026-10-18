@@ -10,6 +10,8 @@ import net.minecraft.world.level.block.AbstractGlassBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -134,6 +136,24 @@ public class VerticalSlabBlock extends SlabBlock {
         return direction.getAxisDirection() == Direction.AxisDirection.POSITIVE
                 ? SlabType.BOTTOM
                 : SlabType.TOP;
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        if (state.getValue(TYPE) == SlabType.DOUBLE) {
+            return state;
+        }
+        Direction direction = rotation.rotate(this.directionFromState(state));
+        return state.setValue(AXIS, direction.getAxis()).setValue(TYPE, this.typeFromDirection(direction));
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        if (state.getValue(TYPE) == SlabType.DOUBLE) {
+            return state;
+        }
+        Direction direction = mirror.mirror(this.directionFromState(state));
+        return state.setValue(AXIS, direction.getAxis()).setValue(TYPE, this.typeFromDirection(direction));
     }
 
     @Override

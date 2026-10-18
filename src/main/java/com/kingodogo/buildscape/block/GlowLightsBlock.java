@@ -207,9 +207,7 @@ public class GlowLightsBlock
                 if (state.hasProperty(attachProperty)) {
                     state = state.setValue(attachProperty, true);
                 }
-                BlockPos placePos = context
-                        .getClickedPos()
-                        .relative(context.getClickedFace());
+                BlockPos placePos = context.getClickedPos();
                 FluidState fluidState = context.getLevel().getFluidState(placePos);
                 return state
                         .setValue(LIT, true)
@@ -272,9 +270,7 @@ public class GlowLightsBlock
             }
 
             state = state.setValue(DOWN, true);
-            BlockPos placePos = context
-                    .getClickedPos()
-                    .relative(context.getClickedFace());
+            BlockPos placePos = context.getClickedPos();
             FluidState fluidState = context.getLevel().getFluidState(placePos);
             return state
                     .setValue(LIT, true)
@@ -339,9 +335,7 @@ public class GlowLightsBlock
                     net.minecraft.world.level.block.VineBlock.UP,
                     true
             );
-            BlockPos placePos = context
-                    .getClickedPos()
-                    .relative(context.getClickedFace());
+            BlockPos placePos = context.getClickedPos();
             FluidState fluidState = context.getLevel().getFluidState(placePos);
             return state
                     .setValue(LIT, true)
@@ -433,9 +427,7 @@ public class GlowLightsBlock
             }
         }
 
-        BlockPos placePos = context
-                .getClickedPos()
-                .relative(context.getClickedFace());
+        BlockPos placePos = context.getClickedPos();
         FluidState fluidState = context.getLevel().getFluidState(placePos);
         return state
                 .setValue(LIT, true)

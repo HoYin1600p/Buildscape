@@ -108,7 +108,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
         Direction clickedFace = context.getClickedFace();
         BlockPos clickedPos = context.getClickedPos();
         Level level = context.getLevel();
-        BlockPos placePos = clickedPos.relative(clickedFace);
+        BlockPos placePos = clickedPos;
 
         BlockState placeState = level.getBlockState(placePos);
         if (!placeState.canBeReplaced(context)) {

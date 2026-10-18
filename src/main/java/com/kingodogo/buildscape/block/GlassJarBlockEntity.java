@@ -67,8 +67,7 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (isXpLiquid(storedLiquidItem)) {
             return new ItemStack(com.kingodogo.buildscape.item.ModItems.EXPERIENCE_BUCKET.get());
         }
-        if (storedLiquidItem.is(net.minecraft.world.item.Items.WATER_BUCKET)
-                || (storedLiquidItem.getItem() instanceof PotionItem && PotionUtils.getPotion(storedLiquidItem) == net.minecraft.world.item.alchemy.Potions.WATER)) {
+        if (isPlainWater(storedLiquidItem)) {
             return new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET);
         }
         if (storedLiquidItem.is(net.minecraft.world.item.Items.LAVA_BUCKET)) {
@@ -90,8 +89,7 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (isXpLiquid(storedLiquidItem)) {
             return new ItemStack(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE);
         }
-        if (storedLiquidItem.is(net.minecraft.world.item.Items.WATER_BUCKET)
-                || (storedLiquidItem.getItem() instanceof PotionItem && PotionUtils.getPotion(storedLiquidItem) == net.minecraft.world.item.alchemy.Potions.WATER)) {
+        if (isPlainWater(storedLiquidItem)) {
             return PotionUtils.setPotion(new ItemStack(net.minecraft.world.item.Items.POTION), net.minecraft.world.item.alchemy.Potions.WATER);
         }
         if (storedLiquidItem.is(net.minecraft.world.item.Items.HONEY_BOTTLE)) {
@@ -159,18 +157,21 @@ public class GlassJarBlockEntity extends BlockEntity {
         return false;
     }
 
+    private static boolean isPlainWater(ItemStack stack) {
+        return stack.is(net.minecraft.world.item.Items.WATER_BUCKET)
+                || (stack.getItem() instanceof PotionItem
+                && PotionUtils.getPotion(stack) == net.minecraft.world.item.alchemy.Potions.WATER
+                && (stack.getTag() == null || (!stack.getTag().contains("CustomPotionEffects")
+                && !stack.getTag().contains("CustomPotionColor"))));
+    }
+
     public static boolean isSameLiquid(ItemStack a, ItemStack b) {
         if (a == null || b == null || a.isEmpty() || b.isEmpty()) return false;
         if (isXpLiquid(a) && isXpLiquid(b)) return true;
-        boolean aIsWater = a.is(net.minecraft.world.item.Items.WATER_BUCKET)
-                || (a.getItem() instanceof PotionItem && PotionUtils.getPotion(a) == net.minecraft.world.item.alchemy.Potions.WATER);
-        boolean bIsWater = b.is(net.minecraft.world.item.Items.WATER_BUCKET)
-                || (b.getItem() instanceof PotionItem && PotionUtils.getPotion(b) == net.minecraft.world.item.alchemy.Potions.WATER);
-        if (aIsWater && bIsWater) return true;
-        if (a.getItem() != b.getItem()) return false;
-        if (a.getItem() instanceof PotionItem) {
-            return PotionUtils.getPotion(a) == PotionUtils.getPotion(b);
+        if (a.getItem() instanceof PotionItem && b.getItem() instanceof PotionItem) {
+            return ItemStack.isSameItemSameTags(a, b);
         }
+        if (isPlainWater(a) && isPlainWater(b)) return true;
         return ItemStack.isSameItemSameTags(a, b);
     }
 

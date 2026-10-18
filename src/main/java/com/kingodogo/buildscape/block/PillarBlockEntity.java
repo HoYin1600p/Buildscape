@@ -138,27 +138,38 @@ public class PillarBlockEntity extends BlockEntity {
             PillarBlockEntity be
     ) {
         if (level == null || !level.isClientSide) return;
+        if (!ClientParticleHelper.isWithinRange(pos)) return;
         if (!be.hasDisplayItem()) return;
 
         long time = level.getGameTime();
         if ((time - be.lastParticleTick) < 5) return;
 
         PillarParticleConfig cfg = PillarParticleConfig.peek();
+        if (cfg.particle_density <= 0) return;
         if (!cfg.matches(be.displayedItem)) return;
 
-        String earlyPattern = be.getParticlePattern();
-        if (earlyPattern == null) earlyPattern = cfg.pattern;
-        if ("none".equals(earlyPattern)) return;
+        String pattern = be.getParticlePattern();
+        if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
+            pattern = cfg.pattern != null ? cfg.pattern : "ring";
+        }
+        if ("none".equals(pattern)) return;
+        ParticleSettings settings = new ParticleSettings(
+                pattern,
+                be.usePattern != null ? be.usePattern : cfg.use_pattern,
+                be.patternSpeed != null ? be.patternSpeed : cfg.pattern_speed,
+                be.patternSpread != null ? be.patternSpread : cfg.pattern_spread,
+                be.patternIntensity != null ? be.patternIntensity : cfg.pattern_intensity);
 
         be.lastParticleTick = time;
 
         int baseCount = cfg.particle_density;
         int count = Math.max(
-                1,
-                cfg.use_pattern
-                        ? (int) Math.round(baseCount * cfg.pattern_intensity)
+                0,
+                settings.usePattern
+                        ? (int) Math.round(baseCount * settings.intensity)
                         : baseCount
         );
+        if (count == 0) return;
 
         java.util.Random rand = level.random;
         double centerX = pos.getX() + 0.5;
@@ -171,6 +182,7 @@ public class PillarBlockEntity extends BlockEntity {
                 pos,
                 be,
                 cfg,
+                settings,
                 time,
                 count,
                 rand,
@@ -206,7 +218,7 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     private static ParticleSpawnData calculateParticleData(
-            PillarBlockEntity be,
+            ParticleSettings settings,
             PillarParticleConfig cfg,
             long time,
             int i,
@@ -215,24 +227,10 @@ public class PillarBlockEntity extends BlockEntity {
         double sx, sy, sz, vx, vy, vz;
         float size = 1.0f;
 
-        String pillarPattern = be.getParticlePattern();
-        boolean usePattern = be.usePattern != null ? be.usePattern : cfg.use_pattern;
-
-        if (usePattern) {
-            String pattern = pillarPattern;
-            if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
-                pattern = cfg.pattern != null ? cfg.pattern : "ring";
-            }
-
-            if ("none".equals(pattern)) {
-                return null;
-            }
-
-            double patternSpeed = be.patternSpeed != null ? be.patternSpeed : cfg.pattern_speed;
-            double patternIntensity = be.patternIntensity != null ? be.patternIntensity : cfg.pattern_intensity;
-            double patternSpread = be.patternSpread != null ? be.patternSpread : cfg.pattern_spread;
-            double speed = patternSpeed * patternIntensity;
-            double spread = patternSpread;
+        if (settings.usePattern) {
+            String pattern = settings.pattern;
+            double speed = settings.speed * settings.intensity;
+            double spread = settings.spread;
 
             switch (pattern) {
                 case "beam":
@@ -659,7 +657,7 @@ public class PillarBlockEntity extends BlockEntity {
             }
 
             if (data.pattern_intensity != null
-                    && (this.patternIntensity != null && !this.patternIntensity.equals(data.pattern_intensity))) {
+                    && (this.patternIntensity == null || !this.patternIntensity.equals(data.pattern_intensity))) {
                 this.patternIntensity = data.pattern_intensity;
                 changed = true;
             } else if (data.pattern_intensity == null && this.patternIntensity != null) {
@@ -1801,11 +1799,18 @@ public class PillarBlockEntity extends BlockEntity {
 
     private static class ClientParticleHelper {
 
+        private static boolean isWithinRange(BlockPos pos) {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            return mc != null && mc.gameRenderer.getMainCamera().getPosition().distanceToSqr(
+                    pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 32.0D * 32.0D;
+        }
+
         private static void spawnParticles(
                 net.minecraft.world.level.Level level,
                 BlockPos pos,
                 PillarBlockEntity be,
                 PillarParticleConfig cfg,
+                ParticleSettings settings,
                 long time,
                 int count,
                 java.util.Random rand,
@@ -1813,11 +1818,7 @@ public class PillarBlockEntity extends BlockEntity {
                 double centerY,
                 double centerZ) {
 
-            String pattern = be.getParticlePattern();
-            if (pattern == null) {
-                pattern = cfg.pattern != null ? cfg.pattern : "ring";
-            }
-            boolean isSnowflake = "snowflake".equals(pattern);
+            boolean isSnowflake = "snowflake".equals(settings.pattern);
             SimpleParticleType particleType = isSnowflake ? ModParticles.SNOWFLAKE.get()
                     : ModParticles.GLOW_LIME_SPARKLE.get();
 
@@ -1825,7 +1826,7 @@ public class PillarBlockEntity extends BlockEntity {
             if (mc == null || mc.particleEngine == null) {
                 for (int i = 0; i < count; i++) {
                     ParticleSpawnData data = calculateParticleData(
-                            be,
+                            settings,
                             cfg,
                             time,
                             i,
@@ -1868,7 +1869,7 @@ public class PillarBlockEntity extends BlockEntity {
 
             for (int i = 0; i < count; i++) {
                 ParticleSpawnData data = calculateParticleData(
-                        be,
+                        settings,
                         cfg,
                         time,
                         i,
@@ -1919,6 +1920,10 @@ public class PillarBlockEntity extends BlockEntity {
         if (needsManagerSync) {
             needsManagerSync = false;
         }
+    }
+
+    private record ParticleSettings(String pattern, boolean usePattern, double speed, double spread, double intensity) {
+
     }
 
     private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {

@@ -47,27 +47,23 @@ public class SoftFabricBlock extends Block {
         }
 
         ItemStack tool = player.getMainHandItem();
-        float speedMultiplier = 1.0F;
+        float fabricSpeed;
+        boolean fabricTool = tool.getItem() instanceof ShearsItem || tool.getItem() instanceof HoeItem;
 
-        if (tool.getItem() instanceof ShearsItem || tool.getItem() instanceof HoeItem) {
+        if (fabricTool) {
             if (tool.getItem() instanceof ShearsItem) {
-                speedMultiplier = 5.0F;
+                fabricSpeed = 5.0F;
             } else if (tool.getItem() instanceof net.minecraft.world.item.DiggerItem digger) {
-                speedMultiplier = digger.getTier().getSpeed();
+                fabricSpeed = digger.getTier().getSpeed();
             } else {
-                speedMultiplier = 2.0F;
+                fabricSpeed = 2.0F;
             }
-
-            int efficiencyLevel = net.minecraft.world.item.enchantment.EnchantmentHelper.getBlockEfficiency(player);
-            if (efficiencyLevel > 0) {
-                speedMultiplier += (float) (efficiencyLevel * efficiencyLevel + 1);
-            }
-
-            return speedMultiplier / destroySpeed / 30.0F;
         } else {
-            speedMultiplier = 2.5F;
-            return speedMultiplier / destroySpeed / 100.0F;
+            fabricSpeed = 2.5F;
         }
+        float speedMultiplier = player.getDigSpeed(state, pos)
+                * fabricSpeed / Math.max(1.0F, tool.getDestroySpeed(state));
+        return speedMultiplier / destroySpeed / (fabricTool ? 30.0F : 100.0F);
     }
 
     @Override

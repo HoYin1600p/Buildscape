@@ -10890,7 +10890,7 @@ public class ModBlocks {
                         () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
         public static final RegistryObject<Block> RED_MOSS_LAYERS = BLOCKS.register("red_moss_layers",
                         () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                                        () -> ModItems.RED_MOSS_LAYERS.get()));
+                                          () -> ModItems.RED_MOSS_LAYERS.get(), () -> ModBlocks.RED_MOSS_BLOCK.get()));
         public static final RegistryObject<Block> RED_MOSS_BLOCK = BLOCKS.register("red_moss_block",
                         () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK), RED_MOSS_CARPET,
                                         RED_MOSS_OVERLAY, RED_MOSS_LAYERS, () -> ModBlocks.POPLAR_SAPLING.get(), () -> ModBlocks.RED_BUSH.get()));
@@ -10907,7 +10907,7 @@ public class ModBlocks {
                         () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
         public static final RegistryObject<Block> ORANGE_MOSS_LAYERS = BLOCKS.register("orange_moss_layers",
                         () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                                        () -> ModItems.ORANGE_MOSS_LAYERS.get()));
+                                          () -> ModItems.ORANGE_MOSS_LAYERS.get(), () -> ModBlocks.ORANGE_MOSS_BLOCK.get()));
         public static final RegistryObject<Block> ORANGE_MOSS_BLOCK = BLOCKS.register("orange_moss_block",
                         () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
                                         ORANGE_MOSS_CARPET, ORANGE_MOSS_OVERLAY, ORANGE_MOSS_LAYERS, () -> ModBlocks.POPLAR_SAPLING.get(), () -> ModBlocks.RED_BUSH.get()));
@@ -10924,7 +10924,7 @@ public class ModBlocks {
                         () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
         public static final RegistryObject<Block> YELLOW_MOSS_LAYERS = BLOCKS.register("yellow_moss_layers",
                         () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                                        () -> ModItems.YELLOW_MOSS_LAYERS.get()));
+                                          () -> ModItems.YELLOW_MOSS_LAYERS.get(), () -> ModBlocks.YELLOW_MOSS_BLOCK.get()));
         public static final RegistryObject<Block> YELLOW_MOSS_BLOCK = BLOCKS.register("yellow_moss_block",
                         () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
                                         YELLOW_MOSS_CARPET, YELLOW_MOSS_OVERLAY, YELLOW_MOSS_LAYERS, () -> ModBlocks.POPLAR_SAPLING.get(), () -> ModBlocks.RED_BUSH.get()));
@@ -12272,7 +12272,7 @@ public class ModBlocks {
                         () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
         public static final RegistryObject<Block> PALE_MOSS_LAYERS = BLOCKS.register("pale_moss_layers",
                         () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                                        () -> ModItems.PALE_MOSS_LAYERS.get()));
+                                          () -> ModItems.PALE_MOSS_LAYERS.get(), () -> ModBlocks.PALE_MOSS_BLOCK.get()));
         public static final RegistryObject<Block> PALE_MOSS_BLOCK = BLOCKS.register("pale_moss_block",
                         () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK), PALE_MOSS_CARPET,
                                         PALE_MOSS_OVERLAY, PALE_MOSS_LAYERS, () -> ModBlocks.PALE_OAK_SAPLING.get(), () -> ModBlocks.CLOSED_EYEBLOSSOM.get()));

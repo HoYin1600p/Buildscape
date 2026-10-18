@@ -23,11 +23,19 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class MossLayersBlock extends SnowLayerBlock {
 
+    private final Supplier<Block> fullBlock;
+
     public MossLayersBlock(Properties properties) {
+        this(properties, () -> Blocks.MOSS_BLOCK);
+    }
+
+    public MossLayersBlock(Properties properties, Supplier<Block> fullBlock) {
         super(properties);
+        this.fullBlock = fullBlock;
     }
 
     @Override
@@ -100,7 +108,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             Player player
     ) {
         if (state.getValue(LAYERS) == 8) {
-            level.setBlock(pos, Blocks.MOSS_BLOCK.defaultBlockState(), 3);
+            level.setBlock(pos, fullBlock.get().defaultBlockState(), 3);
         }
         super.playerWillDestroy(level, pos, state, player);
     }
@@ -118,7 +126,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             Random random
     ) {
         if (state.getValue(LAYERS) == 8) {
-            level.setBlock(pos, Blocks.MOSS_BLOCK.defaultBlockState(), 3);
+            level.setBlock(pos, fullBlock.get().defaultBlockState(), 3);
         }
     }
 

@@ -92,7 +92,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
     @Override
     public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
         if (direction == net.minecraft.core.Direction.DOWN) {
-            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
@@ -169,24 +169,20 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
-            BlockPos upperPos = abovePos.above();
-            BlockState upperState = level.getBlockState(upperPos);
-            if (upperState.isAir()) {
-                BlockState largeFernState =
-                        com.kingodogo.buildscape.block.ModBlocks.SNOWY_LARGE_FERN.get()
-                                .defaultBlockState()
-                                .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
-                if (largeFernState.canSurvive(level, pos)) {
-                    level.setBlock(pos, largeFernState, 3);
-                    level.setBlock(
-                            abovePos,
-                            largeFernState.setValue(
-                                    DoublePlantBlock.HALF,
-                                    DoubleBlockHalf.UPPER
-                            ),
-                            3
-                    );
-                }
+            BlockState largeFernState =
+                    com.kingodogo.buildscape.block.ModBlocks.SNOWY_LARGE_FERN.get()
+                            .defaultBlockState()
+                            .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
+            if (largeFernState.canSurvive(level, pos)) {
+                level.setBlock(pos, largeFernState, 3);
+                level.setBlock(
+                        abovePos,
+                        largeFernState.setValue(
+                                DoublePlantBlock.HALF,
+                                DoubleBlockHalf.UPPER
+                        ),
+                        3
+                );
             }
         }
     }

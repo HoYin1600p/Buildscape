@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -163,59 +162,7 @@ public class WoolLayersBlock extends SnowLayerBlock {
             LootContext.Builder builder
     ) {
         int layerCount = state.getValue(LAYERS);
-        return switch (colorName) {
-            case "black" -> List.of(
-                    new ItemStack(ModItems.BLACK_CARPET_LAYERS.get(), layerCount)
-            );
-            case "blue" -> List.of(
-                    new ItemStack(ModItems.BLUE_CARPET_LAYERS.get(), layerCount)
-            );
-            case "brown" -> List.of(
-                    new ItemStack(ModItems.BROWN_CARPET_LAYERS.get(), layerCount)
-            );
-            case "cyan" -> List.of(
-                    new ItemStack(ModItems.CYAN_CARPET_LAYERS.get(), layerCount)
-            );
-            case "gray" -> List.of(
-                    new ItemStack(ModItems.GRAY_CARPET_LAYERS.get(), layerCount)
-            );
-            case "green" -> List.of(
-                    new ItemStack(ModItems.GREEN_CARPET_LAYERS.get(), layerCount)
-            );
-            case "light_blue" -> List.of(
-                    new ItemStack(ModItems.LIGHT_BLUE_CARPET_LAYERS.get(), layerCount)
-            );
-            case "light_gray" -> List.of(
-                    new ItemStack(ModItems.LIGHT_GRAY_CARPET_LAYERS.get(), layerCount)
-            );
-            case "lime" -> List.of(
-                    new ItemStack(ModItems.LIME_CARPET_LAYERS.get(), layerCount)
-            );
-            case "magenta" -> List.of(
-                    new ItemStack(ModItems.MAGENTA_CARPET_LAYERS.get(), layerCount)
-            );
-            case "orange" -> List.of(
-                    new ItemStack(ModItems.ORANGE_CARPET_LAYERS.get(), layerCount)
-            );
-            case "pink" -> List.of(
-                    new ItemStack(ModItems.PINK_CARPET_LAYERS.get(), layerCount)
-            );
-            case "purple" -> List.of(
-                    new ItemStack(ModItems.PURPLE_CARPET_LAYERS.get(), layerCount)
-            );
-            case "red" -> List.of(
-                    new ItemStack(ModItems.RED_CARPET_LAYERS.get(), layerCount)
-            );
-            case "white" -> List.of(
-                    new ItemStack(ModItems.WHITE_CARPET_LAYERS.get(), layerCount)
-            );
-            case "yellow" -> List.of(
-                    new ItemStack(ModItems.YELLOW_CARPET_LAYERS.get(), layerCount)
-            );
-            default -> List.of(
-                    new ItemStack(ModItems.WHITE_CARPET_LAYERS.get(), layerCount)
-            );
-        };
+        return List.of(new ItemStack(this.asItem(), layerCount));
     }
 
     @Override

@@ -139,6 +139,14 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
     }
 
     @Override
+    public void tick(BlockState state, net.minecraft.server.level.ServerLevel level,
+                     BlockPos pos, java.util.Random random) {
+        if (level.getBlockEntity(pos) instanceof IcicleCauldronBlockEntity cauldronEntity) {
+            cauldronEntity.convertToRegularCauldron();
+        }
+    }
+
+    @Override
     public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }

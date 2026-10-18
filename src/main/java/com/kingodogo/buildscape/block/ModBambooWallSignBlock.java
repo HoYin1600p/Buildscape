@@ -45,7 +45,8 @@ public class ModBambooWallSignBlock extends WallSignBlock {
         if (!heldItem.isEmpty()) {
             if (
                     heldItem.getItem() instanceof net.minecraft.world.item.DyeItem ||
-                            heldItem.getItem() == net.minecraft.world.item.Items.GLOW_INK_SAC
+                            heldItem.getItem() == net.minecraft.world.item.Items.GLOW_INK_SAC ||
+                            heldItem.getItem() == net.minecraft.world.item.Items.INK_SAC
             ) {
                 return super.use(state, level, pos, player, hand, hit);
             }

@@ -792,10 +792,14 @@ public class PillarParticleConfig {
 
     static JsonObject mergeDefaultItems(JsonObject document, boolean vaultLoaded) throws java.io.IOException {
         JsonObject defaults = ConfigPaths.loadItemsTemplate(vaultLoaded ? "vault_pillar_items" : "vanilla_pillar_items");
+        int defaultsVersion = defaults.get("defaults_version").getAsInt();
         Set<String> offered = new HashSet<>();
         if (document.has("offered_defaults")) {
             if (!document.get("offered_defaults").isJsonArray()) throw new java.io.IOException("Invalid offered defaults");
             for (JsonElement entry : document.getAsJsonArray("offered_defaults")) offered.add(entry.getAsString());
+        } else if (document.has("defaults_version") && document.get("defaults_version").getAsInt() >= defaultsVersion) {
+            // Current files may have been hand-edited before offered defaults were recorded.
+            for (JsonElement entry : defaults.getAsJsonArray("items")) offered.add(entry.getAsString());
         } else {
             boolean hadVaultItems = false;
             for (JsonElement entry : document.getAsJsonArray("items")) {
@@ -816,8 +820,8 @@ public class PillarParticleConfig {
             offered.add(item);
         }
         merged.add("offered_defaults", GSON.toJsonTree(new TreeSet<>(offered)));
-        merged.addProperty("defaults_version", 410);
-        if (vaultLoaded) merged.addProperty("vault_defaults_version", 410);
+        merged.addProperty("defaults_version", defaultsVersion);
+        if (vaultLoaded) merged.addProperty("vault_defaults_version", defaultsVersion);
         return merged;
     }
 

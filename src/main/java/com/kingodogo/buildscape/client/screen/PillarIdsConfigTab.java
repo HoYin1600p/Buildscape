@@ -3,6 +3,9 @@ package com.kingodogo.buildscape.client.screen;
 import com.kingodogo.buildscape.client.PillarMarkerManager;
 import com.kingodogo.buildscape.client.screen.widget.ColorSwatchButton;
 import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.network.EditPillarRowsPacket;
+import com.kingodogo.buildscape.network.ModMessages;
+import com.kingodogo.buildscape.network.RemovePillarPacket;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -173,6 +176,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     public void refreshFromManager() {
+        if (dirty) return;
         PillarIdManager manager = PillarIdManager.getClient();
         try {
             manager.checkAndReload();
@@ -300,22 +304,23 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     private void saveRows() {
         List<String> errors = new ArrayList<>();
-        Map<String, PillarIdManager.PillarData> toSave = new LinkedHashMap<>();
+        List<EditPillarRowsPacket.Row> edits = new ArrayList<>();
+        Set<String> ids = new HashSet<>();
 
         for (PillarRow row : rows) {
             if (!row.visible)
                 continue;
-            PillarIdManager.PillarData data = row.toData(errors);
-            if (data == null) {
+            EditPillarRowsPacket.Row edit = row.toEdit(errors);
+            if (edit == null) {
                 continue;
             }
 
-            if (toSave.containsKey(data.id)) {
-                errors.add("Duplicate ID: " + data.id);
+            if (!ids.add(edit.newId)) {
+                errors.add("Duplicate ID: " + edit.newId);
                 continue;
             }
 
-            toSave.put(data.id, data);
+            if (row.hasChanges(edit)) edits.add(edit);
         }
 
         if (!errors.isEmpty()) {
@@ -331,15 +336,15 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             );
         }
 
-        PillarIdManager manager = PillarIdManager.getClient();
-        manager.replaceAllPillarData(toSave);
-
-        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                new com.kingodogo.buildscape.network.UpdateAllPillarIdsPacket(toSave)
-        );
+        for (int from = 0; from < edits.size(); from += EditPillarRowsPacket.MAX_ROWS) {
+            ModMessages.INSTANCE.sendToServer(new EditPillarRowsPacket(
+                    edits.subList(from, Math.min(edits.size(), from + EditPillarRowsPacket.MAX_ROWS))));
+        }
+        for (PillarRow row : rows) {
+            if (row.visible) row.original = row.toEdit(new ArrayList<>());
+        }
 
         dirty = false;
-        lastSignature = computeSignature(toSave);
         statusMessage = new TranslatableComponent("buildscape.config.ids.status.saved");
     }
 
@@ -882,12 +887,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 manager.removePillar(id);
             }
 
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                    new com.kingodogo.buildscape.network.RemovePillarPacket(idsToRemove)
-            );
+            sendRemovals(idsToRemove);
 
+            dirty = false;
             refreshFromManager();
-            dirty = true;
             if (Minecraft.getInstance().player != null) {
                 Minecraft.getInstance().player.playSound(
                     net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
@@ -912,12 +915,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 manager.removePillar(id);
             }
 
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                    new com.kingodogo.buildscape.network.RemovePillarPacket(idsToRemove)
-            );
+            sendRemovals(idsToRemove);
 
+            dirty = false;
             refreshFromManager();
-            dirty = true;
             if (Minecraft.getInstance().player != null) {
                 Minecraft.getInstance().player.playSound(
                     net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
@@ -926,6 +927,13 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 );
             }
             statusMessage = new TranslatableComponent("buildscape.config.ids.removed_selected", idsToRemove.size());
+        }
+    }
+
+    private void sendRemovals(List<String> ids) {
+        for (int from = 0; from < ids.size(); from += RemovePillarPacket.MAX_IDS) {
+            ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(
+                    ids.subList(from, Math.min(ids.size(), from + RemovePillarPacket.MAX_IDS))));
         }
     }
 
@@ -945,6 +953,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         private boolean visible = true;
         private boolean selected = false;
         private String id;
+        private EditPillarRowsPacket.Row original;
         private long createdTime;
         private long modifiedTime;
         private net.minecraft.world.item.ItemStack displayedItem = net.minecraft.world.item.ItemStack.EMPTY;
@@ -961,6 +970,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         private PillarRow(PillarIdManager.PillarData data) {
             Minecraft mc = Minecraft.getInstance();
             this.id = data.id;
+            this.original = new EditPillarRowsPacket.Row(data.id, data.id, data.dimension, data.x, data.y, data.z);
             this.createdTime = data.createdTime;
             this.modifiedTime = data.modifiedTime;
 
@@ -1167,6 +1177,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         private void apply(PillarIdManager.PillarData data) {
             this.id = data.id;
+            this.original = new EditPillarRowsPacket.Row(data.id, data.id, data.dimension, data.x, data.y, data.z);
             idField.setValue(data.id != null ? data.id : "");
 
             if (data.pillarType != null && !data.pillarType.isEmpty()) {
@@ -1268,37 +1279,37 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         private void updateCheckboxText() {
         }
 
-        private PillarIdManager.PillarData toData(List<String> errors) {
+        private EditPillarRowsPacket.Row toEdit(List<String> errors) {
             if (id == null || id.isEmpty()) {
                 return null;
             }
 
-            PillarIdManager.PillarData data = new PillarIdManager.PillarData();
-            data.id = id;
-            data.dimension = dimensionField.getValue().trim().isEmpty()
+            String dimension = dimensionField.getValue().trim().isEmpty()
                     ? "minecraft:overworld"
                     : dimensionField.getValue().trim();
 
-            PillarIdManager manager = PillarIdManager.getClient();
-            PillarIdManager.PillarData existing = manager.getPillarData(id);
-            if (existing != null && existing.dyeColors != null) {
-                data.dyeColors = new ArrayList<>(existing.dyeColors);
-            } else {
-                data.dyeColors = new ArrayList<>();
-            }
-
             try {
-                data.x = Integer.parseInt(xField.getValue().trim());
-                data.y = Integer.parseInt(yField.getValue().trim());
-                data.z = Integer.parseInt(zField.getValue().trim());
+                EditPillarRowsPacket.Row edit = new EditPillarRowsPacket.Row(original.oldId,
+                        idField.getValue().trim(), dimension,
+                        Integer.parseInt(xField.getValue().trim()),
+                        Integer.parseInt(yField.getValue().trim()),
+                        Integer.parseInt(zField.getValue().trim()));
+                if (!edit.isValid()) {
+                    errors.add("Invalid ID or dimension for " + id);
+                    return null;
+                }
+                return edit;
             } catch (NumberFormatException e) {
                 errors.add("Invalid coords for " + id);
                 return null;
             }
 
-            data.createdTime = this.createdTime != 0L ? this.createdTime : System.currentTimeMillis();
-            data.modifiedTime = System.currentTimeMillis();
-            return data;
+        }
+
+        private boolean hasChanges(EditPillarRowsPacket.Row edit) {
+            return !Objects.equals(original.newId, edit.newId)
+                    || !Objects.equals(original.dimension, edit.dimension)
+                    || original.x != edit.x || original.y != edit.y || original.z != edit.z;
         }
 
         private void render(PoseStack poseStack, int startX, int rowY, int[] columns) {
@@ -1733,7 +1744,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 return;
             }
 
-            PillarIdManager.PillarData data = toData(new ArrayList<>());
+            EditPillarRowsPacket.Row data = toEdit(new ArrayList<>());
             if (data == null) {
                 return;
             }

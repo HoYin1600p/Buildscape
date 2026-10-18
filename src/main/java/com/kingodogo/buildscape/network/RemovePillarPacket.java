@@ -11,17 +11,20 @@ import java.util.function.Supplier;
 
 public class RemovePillarPacket {
 
+    public static final int MAX_IDS = 256;
+
     private final List<String> pillarIds;
 
     public RemovePillarPacket(List<String> pillarIds) {
+        NetworkPacketLimits.checkCount(pillarIds.size(), MAX_IDS, "pillar id");
         this.pillarIds = new ArrayList<>(pillarIds);
     }
 
     public RemovePillarPacket(FriendlyByteBuf buf) {
-        int size = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_PILLARS, "pillar id");
+        int size = NetworkPacketLimits.readCount(buf, MAX_IDS, "pillar id");
         this.pillarIds = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            this.pillarIds.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id"));
+            this.pillarIds.add(NetworkPacketLimits.readUtf(buf, 32, "pillar id"));
         }
     }
 
@@ -30,10 +33,10 @@ public class RemovePillarPacket {
     }
 
     public void encode(FriendlyByteBuf buf) {
-        NetworkPacketLimits.checkCount(pillarIds.size(), NetworkPacketLimits.MAX_PILLARS, "pillar id");
+        NetworkPacketLimits.checkCount(pillarIds.size(), MAX_IDS, "pillar id");
         buf.writeInt(pillarIds.size());
         for (String id : pillarIds) {
-            NetworkPacketLimits.writeUtf(buf, id, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
+            NetworkPacketLimits.writeUtf(buf, id, 32, "pillar id");
         }
     }
 

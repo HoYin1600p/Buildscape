@@ -66,6 +66,28 @@ public class ItemFrameParticleHandler {
     };
 
     public static final int MAX_DYE_COLORS = 5;
+    private static int registryCleanupTicks;
+
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END || ++registryCleanupTicks < 100) return;
+        registryCleanupTicks = 0;
+        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server == null || !server.isRunning() || !BuildScape.isServerFullyInitialized()) return;
+        com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager.get();
+        java.util.Set<String> dimensions = new java.util.HashSet<>();
+        for (com.kingodogo.buildscape.config.PillarIdManager.PillarData data : manager.getAllData()) {
+            if (data.pillarType != null && (data.pillarType.endsWith(":item_frame")
+                    || data.pillarType.endsWith("_item_frame"))) {
+                dimensions.add(data.dimension);
+            }
+        }
+        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            if (dimensions.contains(com.kingodogo.buildscape.config.PillarIdManager.getDimensionKey(level))) {
+                manager.cleanupOrphans(level);
+            }
+        }
+    }
 
     public static void clearClientCaches() {
         CLIENT_PATTERN_CACHE.clear();
@@ -141,7 +163,7 @@ public class ItemFrameParticleHandler {
         Level level = event.getWorld();
         ItemStack heldItem = player.getItemInHand(event.getHand());
 
-        if (!heldItem.isEmpty() && !player.isShiftKeyDown()) {
+        if (!itemFrame.getItem().isEmpty() && !heldItem.isEmpty() && !player.isShiftKeyDown()) {
             java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(
                     heldItem
             );
@@ -742,16 +764,8 @@ public class ItemFrameParticleHandler {
             net.minecraft.core.BlockPos pos = itemFrame.blockPosition();
             net.minecraft.core.Direction dir = itemFrame.getDirection();
 
-            String exactKey = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).positionKey(dimension, pos, dir);
-            String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).getIdForPosition(exactKey);
-
-            if (idFromPos == null) {
-                String fuzzyKey = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).positionKey(dimension, pos, null);
-                String potentialId = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).getIdForPosition(fuzzyKey);
-                if (potentialId != null && potentialId.startsWith(FRAME_PREFIX)) {
-                    idFromPos = potentialId;
-                }
-            }
+            String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level)
+                    .getFrameIdForPosition(dimension, pos, dir);
 
             if (idFromPos != null) {
                 CLIENT_FRAME_ID_CACHE.put(itemFrame.getId(), idFromPos);
@@ -872,7 +886,7 @@ public class ItemFrameParticleHandler {
         Level level = event.getWorld();
         ItemStack heldItem = player.getItemInHand(event.getHand());
 
-        if (!heldItem.isEmpty() && !player.isShiftKeyDown()) {
+        if (!coloredFrame.getItem().isEmpty() && !heldItem.isEmpty() && !player.isShiftKeyDown()) {
             java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(heldItem);
             if (dyeInfo != null) {
                 String dyeColor = dyeInfo.getKey();
@@ -1101,16 +1115,8 @@ public class ItemFrameParticleHandler {
             net.minecraft.core.BlockPos pos = frame.blockPosition();
             net.minecraft.core.Direction dir = frame.getDirection();
 
-            String exactKey = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).positionKey(dimension, pos, dir);
-            String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).getIdForPosition(exactKey);
-
-            if (idFromPos == null) {
-                String fuzzyKey = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).positionKey(dimension, pos, null);
-                String potentialId = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).getIdForPosition(fuzzyKey);
-                if (potentialId != null && potentialId.startsWith(FRAME_PREFIX)) {
-                    idFromPos = potentialId;
-                }
-            }
+            String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level)
+                    .getFrameIdForPosition(dimension, pos, dir);
 
             if (idFromPos != null) {
                 CLIENT_FRAME_ID_CACHE.put(frame.getId(), idFromPos);

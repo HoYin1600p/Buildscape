@@ -21,8 +21,7 @@ import java.util.function.Supplier;
 public class SyncPillarIdsPacket {
 
     private static final int PILLARS_PER_CHUNK = 64;
-    private static final int MAX_CHUNKS = (NetworkPacketLimits.MAX_PILLARS + PILLARS_PER_CHUNK - 1)
-            / PILLARS_PER_CHUNK;
+    private static final int MAX_CHUNKS = Integer.MAX_VALUE;
     private static final long ACCUMULATOR_TIMEOUT_MS = 30_000L;
     private static final AtomicLong NEXT_SYNC_ID = new AtomicLong();
     private static final Map<Long, SyncAccumulator> CLIENT_ACCUMULATORS = new HashMap<>();
@@ -97,9 +96,21 @@ public class SyncPillarIdsPacket {
     }
 
     private static List<SyncPillarIdsPacket> createChunks(List<PillarIdManager.PillarData> data) {
-        List<PillarIdManager.PillarData> snapshot = data != null ? data : java.util.Collections.emptyList();
-        NetworkPacketLimits.checkCount(snapshot.size(), NetworkPacketLimits.MAX_PILLARS, "pillar");
-        int chunkCount = Math.max(1, (snapshot.size() + PILLARS_PER_CHUNK - 1) / PILLARS_PER_CHUNK);
+        List<PillarIdManager.PillarData> snapshot = new ArrayList<>();
+        int skipped = 0;
+        if (data != null) {
+            for (PillarIdManager.PillarData entry : data) {
+                if (canEncode(entry)) {
+                    snapshot.add(entry);
+                } else {
+                    skipped++;
+                }
+            }
+        }
+        if (skipped > 0) {
+            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Skipped {} invalid pillar sync entries", skipped);
+        }
+        int chunkCount = (int) Math.max(1L, (snapshot.size() + (long) PILLARS_PER_CHUNK - 1) / PILLARS_PER_CHUNK);
         long syncId = NEXT_SYNC_ID.incrementAndGet();
         List<SyncPillarIdsPacket> packets = new ArrayList<>(chunkCount);
         for (int chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++) {
@@ -281,20 +292,20 @@ public class SyncPillarIdsPacket {
     private static final class SyncAccumulator {
         private final int chunkCount;
         private final long createdAt;
-        private final List<List<PillarIdManager.PillarData>> chunks;
+        private final Map<Integer, List<PillarIdManager.PillarData>> chunks;
         private int received;
 
         private SyncAccumulator(int chunkCount, long createdAt) {
             this.chunkCount = chunkCount;
             this.createdAt = createdAt;
-            this.chunks = new ArrayList<>(java.util.Collections.nCopies(chunkCount, null));
+            this.chunks = new HashMap<>();
         }
 
         private void add(int index, List<PillarIdManager.PillarData> data) {
             if (chunks.get(index) == null) {
                 received++;
             }
-            chunks.set(index, new ArrayList<>(data));
+            chunks.put(index, new ArrayList<>(data));
         }
 
         private boolean isComplete() {
@@ -303,11 +314,8 @@ public class SyncPillarIdsPacket {
 
         private List<PillarIdManager.PillarData> combine() {
             List<PillarIdManager.PillarData> combined = new ArrayList<>();
-            for (List<PillarIdManager.PillarData> chunk : chunks) {
-                combined.addAll(chunk);
-            }
-            if (combined.size() > NetworkPacketLimits.MAX_PILLARS) {
-                throw new DecoderException("pillar synchronization exceeds the maximum entry count");
+            for (int i = 0; i < chunkCount; i++) {
+                combined.addAll(chunks.get(i));
             }
             return combined;
         }

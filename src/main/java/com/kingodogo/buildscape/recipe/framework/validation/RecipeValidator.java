@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class RecipeValidator {
@@ -30,31 +31,51 @@ public class RecipeValidator {
             return false;
         }
 
-        if ("shapeless".equalsIgnoreCase(spec.type())) {
-            if (spec.ingredients() == null || spec.ingredients().isEmpty()) {
-                return false;
-            }
-            for (String ing : spec.ingredients()) {
-                if (!validateIngredientSpec(ing, aliasResolver)) {
+        String type = spec.type() == null ? "" : spec.type().toLowerCase(Locale.ROOT);
+        switch (type) {
+            case "shapeless", "shapeless_durability", "buildscape:shapeless_durability", "buildscape:haze_bush_dye" -> {
+                if (spec.ingredients() == null || spec.ingredients().isEmpty()) {
                     return false;
                 }
-            }
-        } else if ("shaped".equalsIgnoreCase(spec.type())) {
-            if (spec.pattern() == null || spec.pattern().isEmpty() || spec.keys() == null || spec.keys().isEmpty()) {
-                return false;
-            }
-            for (String ing : spec.keys().values()) {
-                if (!validateIngredientSpec(ing, aliasResolver)) {
-                    return false;
+                for (String ing : spec.ingredients()) {
+                    if (!validateIngredientSpec(ing, aliasResolver)) {
+                        return rejectIngredient(spec, ing);
+                    }
                 }
             }
-        } else if (spec.input() != null) {
-            if (!validateIngredientSpec(spec.input(), aliasResolver)) {
-                return false;
+            case "shaped", "shaped_durability", "buildscape:shaped_durability" -> {
+                if (spec.pattern() == null || spec.pattern().isEmpty() || spec.keys() == null || spec.keys().isEmpty()) {
+                    return false;
+                }
+                for (String ing : spec.keys().values()) {
+                    if (!validateIngredientSpec(ing, aliasResolver)) {
+                        return rejectIngredient(spec, ing);
+                    }
+                }
+            }
+            case "smithing" -> {
+                if (!validateIngredientSpec(spec.input(), aliasResolver)) {
+                    return rejectIngredient(spec, spec.input());
+                }
+                if (spec.ingredients() != null && !spec.ingredients().isEmpty()
+                        && !validateIngredientSpec(spec.ingredients().get(0), aliasResolver)) {
+                    return rejectIngredient(spec, spec.ingredients().get(0));
+                }
+            }
+            default -> {
+                if (spec.input() != null && !validateIngredientSpec(spec.input(), aliasResolver)) {
+                    return rejectIngredient(spec, spec.input());
+                }
             }
         }
 
         return true;
+    }
+
+    private boolean rejectIngredient(RecipeIR.RecipeSpec spec, String ingredient) {
+        BuildScape.LOGGER.warn("BDRE Validator: Recipe {} rejected: ingredient '{}' resolves to nothing.",
+                spec.id(), ingredient);
+        return false;
     }
 
     public boolean checkDuplicate(ResourceLocation recipeId) {

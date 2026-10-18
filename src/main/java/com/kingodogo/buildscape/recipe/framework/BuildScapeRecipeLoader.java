@@ -7,6 +7,8 @@ import com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInject
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.kingodogo.buildscape.recipe.framework.util.IngredientCache;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
@@ -35,6 +37,8 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             "smoking", "campfire", "smithing", "special"
     };
 
+    private static final String DISABLED_RECIPES_PATH = "buildscape/disabled_recipes.json";
+
     private volatile RecipeManager currentRecipeManager;
 
     @SubscribeEvent
@@ -57,9 +61,63 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             Executor backgroundExecutor,
             Executor gameExecutor
     ) {
-        return CompletableFuture.supplyAsync(() -> prepareRecipes(resourceManager, preparationsProfiler), backgroundExecutor)
+        return CompletableFuture.supplyAsync(() -> new Prepared(
+                        prepareRecipes(resourceManager, preparationsProfiler),
+                        loadDisabledIds(resourceManager)), backgroundExecutor)
                 .thenCompose(barrier::wait)
-                .thenAcceptAsync(recipes -> applyRecipes(recipes, reloadProfiler), gameExecutor);
+                .thenAcceptAsync(prepared -> applyRecipes(prepared.recipes(), prepared.disabledIds(), reloadProfiler),
+                        gameExecutor);
+    }
+
+    private record Prepared(List<Recipe<?>> recipes, Set<ResourceLocation> disabledIds) {
+    }
+
+    /**
+     * Reads every {@code data/<namespace>/buildscape/disabled_recipes.json} of the form
+     * {@code {"recipes": ["ns:id", ...]}} and merges them. Missing files mean nothing is disabled;
+     * unreadable ones are logged and skipped.
+     */
+    private Set<ResourceLocation> loadDisabledIds(ResourceManager resourceManager) {
+        Set<ResourceLocation> disabled = new HashSet<>();
+        try {
+            for (String namespace : resourceManager.getNamespaces()) {
+                ResourceLocation location = new ResourceLocation(namespace, DISABLED_RECIPES_PATH);
+                if (!resourceManager.hasResource(location)) {
+                    continue;
+                }
+                try {
+                    for (Resource resource : resourceManager.getResources(location)) {
+                        try (resource; Reader reader = new InputStreamReader(
+                                resource.getInputStream(), StandardCharsets.UTF_8)) {
+                            readDisabledIds(JsonParser.parseReader(reader), disabled, location);
+                        } catch (Exception e) {
+                            BuildScape.LOGGER.warn("BDRE Loader: Could not read disabled recipe list [{}]", location, e);
+                        }
+                    }
+                } catch (Exception e) {
+                    BuildScape.LOGGER.warn("BDRE Loader: Could not read disabled recipe list [{}]", location, e);
+                }
+            }
+        } catch (Exception e) {
+            BuildScape.LOGGER.warn("BDRE Loader: Could not look up disabled recipe lists", e);
+        }
+        return Set.copyOf(disabled);
+    }
+
+    private static void readDisabledIds(JsonElement root, Set<ResourceLocation> disabled, ResourceLocation source) {
+        if (root == null || !root.isJsonObject() || !root.getAsJsonObject().has("recipes")
+                || !root.getAsJsonObject().get("recipes").isJsonArray()) {
+            BuildScape.LOGGER.warn("BDRE Loader: Disabled recipe list [{}] has no \"recipes\" array.", source);
+            return;
+        }
+        for (JsonElement element : root.getAsJsonObject().getAsJsonArray("recipes")) {
+            ResourceLocation id = element.isJsonPrimitive() ? ResourceLocation.tryParse(element.getAsString()) : null;
+            if (id == null) {
+                BuildScape.LOGGER.warn("BDRE Loader: Ignoring invalid recipe id {} in [{}].", element, source);
+            } else {
+                disabled.add(id);
+            }
+        }
     }
 
     private List<Recipe<?>> prepareRecipes(ResourceManager resourceManager, ProfilerFiller profiler) {
@@ -203,11 +261,11 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         return runtimeCategories;
     }
 
-    private void applyRecipes(List<Recipe<?>> recipes, ProfilerFiller profiler) {
+    private void applyRecipes(List<Recipe<?>> recipes, Set<ResourceLocation> disabledIds, ProfilerFiller profiler) {
         profiler.push("BDRE_ApplyRecipes");
         RecipeManager recipeManager = currentRecipeManager;
         if (recipeManager != null && !recipes.isEmpty()) {
-            RecipeManagerInjector.inject(recipeManager, List.copyOf(recipes));
+            RecipeManagerInjector.inject(recipeManager, List.copyOf(recipes), disabledIds);
         }
         profiler.pop();
     }

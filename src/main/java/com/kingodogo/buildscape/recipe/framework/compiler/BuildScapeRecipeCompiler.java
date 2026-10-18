@@ -100,32 +100,16 @@ public class BuildScapeRecipeCompiler {
                         ? new ResourceLocation(spec.id().contains(":") ? spec.id() : BuildScape.MODID + ":" + spec.id())
                         : new ResourceLocation(BuildScape.MODID, "autogen/" + category + "/" + Math.abs(spec.rawJson().hashCode()));
 
+                if (!conditionsMet(json, recipeId)) {
+                    return null;
+                }
+
                 if (json.has("recipes") && json.get("recipes").isJsonArray()) {
                     com.google.gson.JsonArray recipesArr = json.getAsJsonArray("recipes");
                     for (int i = 0; i < recipesArr.size(); i++) {
                         com.google.gson.JsonObject entry = recipesArr.get(i).getAsJsonObject();
-                        if (entry.has("conditions")) {
-                            boolean conditionsMet = true;
-                            com.google.gson.JsonArray conds = entry.getAsJsonArray("conditions");
-                            for (int c = 0; c < conds.size(); c++) {
-                                com.google.gson.JsonObject cond = conds.get(c).getAsJsonObject();
-                                String condType = cond.has("type") ? cond.get("type").getAsString() : "";
-                                if ("forge:mod_loaded".equals(condType)) {
-                                    String modid = cond.has("modid") ? cond.get("modid").getAsString() : "";
-                                    try {
-                                        if (!net.minecraftforge.fml.ModList.get().isLoaded(modid)) {
-                                            conditionsMet = false;
-                                            break;
-                                        }
-                                    } catch (Throwable ignored) {
-                                        conditionsMet = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!conditionsMet) {
-                                continue;
-                            }
+                        if (!conditionsMet(entry, recipeId)) {
+                            continue;
                         }
                         if (entry.has("recipe")) {
                             com.google.gson.JsonObject innerRecipeJson = entry.getAsJsonObject("recipe");
@@ -232,6 +216,22 @@ public class BuildScapeRecipeCompiler {
                 BuildScape.LOGGER.warn("BDRE Compiler: Unknown recipe type '{}' for id {}", recipeType, recipeId);
                 return null;
             }
+        }
+    }
+
+    /**
+     * Evaluates the Forge recipe conditions of a JSON object. An object without conditions is met; an
+     * unknown or malformed condition counts as not met.
+     */
+    private static boolean conditionsMet(com.google.gson.JsonObject json, ResourceLocation recipeId) {
+        if (json == null || !json.has("conditions")) {
+            return true;
+        }
+        try {
+            return net.minecraftforge.common.crafting.CraftingHelper.processConditions(json, "conditions");
+        } catch (Throwable t) {
+            BuildScape.LOGGER.warn("BDRE Compiler: Could not evaluate conditions of recipe {}; skipping it.", recipeId, t);
+            return false;
         }
     }
 

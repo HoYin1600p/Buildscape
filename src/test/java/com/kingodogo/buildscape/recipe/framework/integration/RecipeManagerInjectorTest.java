@@ -25,8 +25,8 @@ public final class RecipeManagerInjectorTest {
 
         require(merged.size() == 3, "Unexpected merged recipe count");
         require(merged.get(vanilla.getId()) == vanilla, "Vanilla recipe was not preserved");
-        require(merged.get(replacementBuildscape.getId()) == replacementBuildscape,
-                "Buildscape recipe did not override the matching ID");
+        require(merged.get(originalBuildscape.getId()) == originalBuildscape,
+                "An existing recipe was overwritten by a Buildscape recipe with the same ID");
         require(merged.get(addedBuildscape.getId()) == addedBuildscape, "New Buildscape recipe was not added");
 
         PlainRecipe vanillaPlain = new PlainRecipe("crafting", "minecraft:shared");
@@ -43,14 +43,27 @@ public final class RecipeManagerInjectorTest {
 
         require(indexes.byType().get("smelting").get(smelting.id()) == smelting,
                 "Unrelated recipe type was not preserved");
-        require(indexes.byType().get("crafting").get(replacementPlain.id()) == replacementPlain,
-                "Typed recipe index did not replace the matching ID");
-        require(indexes.byName().get(replacementPlain.id()) == replacementPlain,
-                "Named recipe index did not replace the matching ID");
+        require(indexes.byType().get("crafting").get(originalPlain.id()) == originalPlain,
+                "Typed recipe index replaced an existing ID");
+        require(indexes.byName().get(originalPlain.id()) == originalPlain,
+                "Named recipe index replaced an existing ID");
         require(indexes.byName().get(addedPlain.id()) == addedPlain,
                 "Named recipe index did not include the new recipe");
 
-        System.out.println("Recipe manager injection: 8 checks passed.");
+        PlainRecipe disabledPlain = new PlainRecipe("crafting", "buildscape:disabled");
+        RecipeManagerInjector.Indexes<String, String, PlainRecipe> withDisabled =
+                RecipeManagerInjector.mergeIndexesGeneric(
+                        Map.of("crafting", Map.of(vanillaPlain.id(), vanillaPlain)),
+                        Map.of(vanillaPlain.id(), vanillaPlain),
+                        List.of(disabledPlain, addedPlain), PlainRecipe::type, PlainRecipe::id,
+                        java.util.Set.of(disabledPlain.id()));
+        require(!withDisabled.byName().containsKey(disabledPlain.id()), "Disabled recipe was injected by name");
+        require(!withDisabled.byType().get("crafting").containsKey(disabledPlain.id()),
+                "Disabled recipe was injected by type");
+        require(withDisabled.byName().get(addedPlain.id()) == addedPlain, "Enabled recipe was not injected");
+        require(withDisabled.byName().get(vanillaPlain.id()) == vanillaPlain, "Existing recipe was lost");
+
+        System.out.println("Recipe manager injection: 12 checks passed.");
     }
 
     private static void require(boolean condition, String message) {

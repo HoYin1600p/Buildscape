@@ -2700,36 +2700,28 @@ public class BuildScape {
         }
     }
 
-    @SubscribeEvent
-    public void onLivingDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
-        if (event.getEntityLiving().level.isClientSide) return;
-        net.minecraft.world.entity.LivingEntity entity = event.getEntityLiving();
-        net.minecraft.world.level.Level level = entity.level;
-        net.minecraft.core.BlockPos deathPos = entity.blockPosition();
-
-        for (net.minecraft.core.BlockPos pos : net.minecraft.core.BlockPos.betweenClosed(deathPos.offset(-8, -8, -8), deathPos.offset(8, 8, 8))) {
-            if (level.getBlockState(pos).is(ModBlocks.SCULK_CATALYST.get())) {
-                com.kingodogo.buildscape.block.SculkCatalystHandler.onMobKilledNearCatalyst(level, pos, deathPos, entity);
-                break;
-            }
-        }
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public void onSculkExperienceDrop(net.minecraftforge.event.entity.living.LivingExperienceDropEvent event) {
+        com.kingodogo.buildscape.block.SculkCatalystHandler.onExperienceDrop(event);
     }
 
     @SubscribeEvent
     public void onSculkBlockBreak(net.minecraftforge.event.world.BlockEvent.BreakEvent event) {
         if (event.getPlayer() != null && !event.getPlayer().isCreative()) {
+            net.minecraft.world.level.block.state.BlockState state = event.getState();
+            int experience;
+            if (state.is(ModBlocks.SCULK.get()) || state.is(ModBlocks.SCULK_SLAB.get()) || state.is(ModBlocks.SCULK_STAIRS.get()) || state.is(ModBlocks.SCULK_WALL.get()) || state.is(ModBlocks.SCULK_VERTICAL_SLAB.get())) {
+                experience = 1;
+            } else if (state.is(ModBlocks.SCULK_VEIN.get())) {
+                experience = 0;
+            } else if (state.is(ModBlocks.SCULK_CATALYST.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get()) || state.is(ModBlocks.SCULK_SENSOR.get())) {
+                experience = 5;
+            } else {
+                return;
+            }
             net.minecraft.world.item.ItemStack tool = event.getPlayer().getMainHandItem();
             int silkTouch = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, tool);
-            if (silkTouch == 0) {
-                net.minecraft.world.level.block.state.BlockState state = event.getState();
-                if (state.is(ModBlocks.SCULK.get()) || state.is(ModBlocks.SCULK_VEIN.get()) || state.is(ModBlocks.SCULK_SLAB.get()) || state.is(ModBlocks.SCULK_STAIRS.get()) || state.is(ModBlocks.SCULK_WALL.get()) || state.is(ModBlocks.SCULK_VERTICAL_SLAB.get())) {
-                    event.setExpToDrop(1);
-                } else if (state.is(ModBlocks.SCULK_CATALYST.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get()) || state.is(ModBlocks.SCULK_SENSOR.get())) {
-                    event.setExpToDrop(5);
-                }
-            } else {
-                event.setExpToDrop(0);
-            }
+            event.setExpToDrop(silkTouch == 0 ? experience : 0);
         }
     }
 

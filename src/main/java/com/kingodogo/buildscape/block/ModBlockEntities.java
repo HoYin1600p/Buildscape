@@ -10,6 +10,9 @@ public class ModBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister
             .create(ForgeRegistries.BLOCK_ENTITIES, BuildScape.MODID);
+    public static final RegistryObject<BlockEntityType<SculkCatalystBlockEntity>> SCULK_CATALYST_BLOCK_ENTITY = BLOCK_ENTITIES
+            .register("sculk_catalyst", () -> BlockEntityType.Builder.of(
+                    SculkCatalystBlockEntity::new, ModBlocks.SCULK_CATALYST.get()).build(null));
     public static final RegistryObject<BlockEntityType<MangroveSignBlockEntity>> MANGROVE_SIGN_BLOCK_ENTITY = BLOCK_ENTITIES
             .register(
                     "mangrove_sign_block_entity",

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.biometint.SyncBiomeTintPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.NetworkDirection;
@@ -8,7 +9,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class ModMessages {
 
-    private static final String PROTOCOL_VERSION = "6";
+    private static final String PROTOCOL_VERSION = "7";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BuildScape.MODID, "main"),
             () -> PROTOCOL_VERSION,
@@ -53,6 +54,8 @@ public class ModMessages {
                 SyncSignFramePacket::encode, SyncSignFramePacket::decode, SyncSignFramePacket::handle);
         register(ConfettiBurstPacket.class, 18, NetworkDirection.PLAY_TO_CLIENT,
                 ConfettiBurstPacket::encode, ConfettiBurstPacket::decode, ConfettiBurstPacket::handle);
+        register(SyncBiomeTintPacket.class, 19, NetworkDirection.PLAY_TO_CLIENT,
+                SyncBiomeTintPacket::encode, SyncBiomeTintPacket::decode, SyncBiomeTintPacket::handle);
     }
 
     private static <T> void register(

@@ -149,12 +149,8 @@ public class HammerReplacePacket {
                 || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED));
     }
 
-    private static ItemStack createHarvestTool(HammerItem.HammerTier tier, ItemStack hammerStack) {
-        ItemStack tool = new ItemStack(switch (tier) {
-            case IRON -> net.minecraft.world.item.Items.IRON_PICKAXE;
-            case DIAMOND -> net.minecraft.world.item.Items.DIAMOND_PICKAXE;
-            case NETHERITE -> net.minecraft.world.item.Items.NETHERITE_PICKAXE;
-        });
+    static ItemStack createHarvestTool(HammerItem.HammerTier tier, ItemStack hammerStack) {
+        ItemStack tool = new ItemStack(tier.getHarvestToolItem());
         EnchantmentHelper.setEnchantments(EnchantmentHelper.getEnchantments(hammerStack), tool);
         return tool;
     }

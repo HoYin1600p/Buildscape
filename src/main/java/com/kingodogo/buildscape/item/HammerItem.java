@@ -27,6 +27,14 @@ public class HammerItem extends Item {
         public boolean canReplaceObsidianLevel() {
             return canReplaceObsidianLevel;
         }
+
+        public Item getHarvestToolItem() {
+            return switch (this) {
+                case IRON -> net.minecraft.world.item.Items.IRON_PICKAXE;
+                case DIAMOND -> net.minecraft.world.item.Items.DIAMOND_PICKAXE;
+                case NETHERITE -> net.minecraft.world.item.Items.NETHERITE_PICKAXE;
+            };
+        }
     }
 
     private final HammerTier tier;
@@ -38,6 +46,16 @@ public class HammerItem extends Item {
 
     public HammerTier getHammerTier() {
         return tier;
+    }
+
+    public Item getHarvestToolItem() {
+        return tier.getHarvestToolItem();
+    }
+
+    @Override
+    public boolean isCorrectToolForDrops(net.minecraft.world.level.block.state.BlockState state) {
+        // Forge's break event uses the held item to decide whether the block awards XP.
+        return getHarvestToolItem().isCorrectToolForDrops(state);
     }
 
     @Override

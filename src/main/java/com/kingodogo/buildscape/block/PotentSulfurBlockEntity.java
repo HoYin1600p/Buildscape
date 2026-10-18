@@ -134,7 +134,8 @@ public class PotentSulfurBlockEntity extends BlockEntity {
    };
 
    public static final BlockEntityTicker<PotentSulfurBlockEntity> LAUNCH_ENTITY_TICKER = (level, pos, state, entity) -> {
-      tickLivingLift(level, pos);
+      int topY = getLiftTop(level, pos);
+      tickLivingLift(level, pos, topY);
       BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
       if (sourceBlock != null) {
          int rawWaterBlocks = sourceBlock.getY() - pos.getY() - 1;
@@ -146,6 +147,9 @@ public class PotentSulfurBlockEntity extends BlockEntity {
          AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double)(geyserForceHeight + 3), 0.0D).inflate(0.45D, 0.0D, 0.45D);
 
          for (Entity entityToBeLaunched : level.getEntitiesOfClass(Entity.class, aabb, EFFECT_PREDICATE)) {
+            if (entityToBeLaunched.blockPosition().getY() > topY) {
+               continue;
+            }
             Vec3 entityVelocity = entityToBeLaunched.getDeltaMovement();
 
             if (!entityToBeLaunched.isPassenger() && !entityToBeLaunched.getType().is(NOT_AFFECTED_BY_GEYSERS)) {
@@ -193,7 +197,17 @@ public class PotentSulfurBlockEntity extends BlockEntity {
       }
    };
 
-   private static void tickLivingLift(final Level level, final BlockPos pos) {
+   private static int getLiftTop(final Level level, final BlockPos pos) {
+      BlockPos.MutableBlockPos testPos = pos.mutable();
+      return GeyserLiftRules.unobstructedTop(pos.getY(), y -> {
+         testPos.setY(y);
+         BlockState testState = level.getBlockState(testPos);
+         return !testState.is(ModBlocks.POTENT_SULFUR.get())
+               && isGeyserPassableBlock(testState, level, testPos, CollisionContext.empty());
+      });
+   }
+
+   private static void tickLivingLift(final Level level, final BlockPos pos, final int topY) {
       AABB column = new AABB(pos).expandTowards(0.0D, 23.0D, 0.0D);
       List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, column, living -> {
          BlockPos livingPos = living.blockPosition();
@@ -204,19 +218,6 @@ public class PotentSulfurBlockEntity extends BlockEntity {
       });
       if (entities.isEmpty()) {
          return;
-      }
-
-      int topY = pos.getY() + 23;
-      BlockPos.MutableBlockPos testPos = pos.above().mutable();
-      for (int i = 1; i < 24; ++i) {
-         BlockState testState = level.getBlockState(testPos);
-         if (testState.is(ModBlocks.POTENT_SULFUR.get())
-               || (!testState.isAir() && !testState.is(Blocks.WATER)
-               && !testState.getCollisionShape(level, testPos).isEmpty())) {
-            topY = testPos.getY() - 1;
-            break;
-         }
-         testPos.move(Direction.UP);
       }
 
       BlockPos.MutableBlockPos sourceSearch = pos.above().mutable();

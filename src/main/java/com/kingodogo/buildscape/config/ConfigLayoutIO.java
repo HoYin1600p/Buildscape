@@ -10,6 +10,11 @@ import com.google.gson.stream.JsonToken;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +30,42 @@ final class ConfigLayoutIO {
     private ConfigLayoutIO() { }
 
     static String readText(Path file) throws IOException {
-        return new String(Files.readAllBytes(file), java.nio.charset.StandardCharsets.UTF_8);
+        byte[] bytes = Files.readAllBytes(file);
+        try {
+            return decode(bytes, StandardCharsets.UTF_8);
+        } catch (CharacterCodingException invalidUtf8) {
+            Charset legacy = legacyCharset();
+            String text;
+            try {
+                text = decode(bytes, legacy);
+            } catch (CharacterCodingException invalidLegacy) {
+                return new String(bytes, StandardCharsets.UTF_8);
+            }
+            Path backup = file.resolveSibling(file.getFileName() + ".bak");
+            if (!Files.exists(backup)) Files.copy(file, backup);
+            else if (!Files.isRegularFile(backup)) throw new IOException("Backup is not a regular file: " + backup);
+            replace(file, text);
+            com.kingodogo.buildscape.BuildScape.getLogger().info(
+                    "Migrated config {} from {} to UTF-8", file, legacy.name());
+            return text;
+        }
+    }
+
+    private static String decode(byte[] bytes, Charset charset) throws CharacterCodingException {
+        return charset.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString();
+    }
+
+    private static Charset legacyCharset() {
+        Charset legacy = Charset.defaultCharset();
+        String nativeEncoding = System.getProperty("native.encoding");
+        if (nativeEncoding != null) {
+            try {
+                legacy = Charset.forName(nativeEncoding);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return legacy.equals(StandardCharsets.UTF_8) ? Charset.forName("windows-1252") : legacy;
     }
 
     static boolean hasReplacementCharacters(String text) {
@@ -33,8 +73,7 @@ final class ConfigLayoutIO {
     }
 
     static boolean protectInvalidEncoding(Path file) throws IOException {
-        byte[] bytes = Files.readAllBytes(file);
-        if (!hasReplacementCharacters(new String(bytes, java.nio.charset.StandardCharsets.UTF_8))) return false;
+        if (!hasReplacementCharacters(readText(file))) return false;
         Path backup = file.resolveSibling(file.getFileName() + ".bak");
         try {
             if (!Files.exists(backup)) Files.copy(file, backup);
@@ -438,10 +477,14 @@ final class ConfigLayoutIO {
             if (!Files.exists(original)) Files.copy(file, original);
             else if (!Files.isRegularFile(original)) throw new IOException("Backup is not a regular file: " + original);
         }
+        replace(file, text);
+    }
+
+    private static void replace(Path file, String text) throws IOException {
         Files.createDirectories(file.getParent());
         Path temporary = Files.createTempFile(file.getParent(), file.getFileName().toString(), ".tmp");
         try {
-            Files.writeString(temporary, text, java.nio.charset.StandardCharsets.UTF_8);
+            Files.writeString(temporary, text, StandardCharsets.UTF_8);
             try {
                 Files.move(temporary, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException e) {

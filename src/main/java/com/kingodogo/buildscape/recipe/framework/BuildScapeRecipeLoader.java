@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.recipe.framework;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.recipe.framework.cache.BinaryRecipeCache;
 import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
+import com.kingodogo.buildscape.recipe.framework.compiler.StonecuttingCycleValidator;
 import com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjector;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
@@ -14,11 +15,15 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.StonecutterRecipe;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -182,7 +187,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             try (Reader reader = new InputStreamReader(new java.io.ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
-                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack);
+                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack, runtimeCategories.isEmpty());
                 compiledByCategory.put(category, result.recipes());
                 compiler.clear();
             } catch (Exception e) {
@@ -192,12 +197,19 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
         List<Recipe<?>> recipes = new ArrayList<>();
         List<Recipe<?>> cacheableSourceRecipes = new ArrayList<>();
+        List<Recipe<?>> runtimeRecipes = new ArrayList<>();
         for (String category : CATEGORIES) {
             List<Recipe<?>> categoryRecipes = compiledByCategory.getOrDefault(category, List.of());
             recipes.addAll(categoryRecipes);
             if (!runtimeCategories.contains(category)) {
                 cacheableSourceRecipes.addAll(categoryRecipes);
+            } else {
+                runtimeRecipes.addAll(categoryRecipes);
             }
+        }
+
+        if (!runtimeCategories.isEmpty()) {
+            recipes = combineRuntimeRecipes(cacheableSourceRecipes, runtimeRecipes);
         }
 
         if (!cacheableSourceRecipes.isEmpty()) {
@@ -215,12 +227,8 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             Map<String, byte[]> rawCategoryData,
             Set<String> runtimeCategories,
             List<Recipe<?>> cachedRecipes) {
-        Map<ResourceLocation, Recipe<?>> recipesById = new LinkedHashMap<>();
-        for (Recipe<?> recipe : cachedRecipes) {
-            recipesById.put(recipe.getId(), recipe);
-        }
-
-        int added = 0;
+        if (runtimeCategories.isEmpty()) return cachedRecipes;
+        List<Recipe<?>> runtimeRecipes = new ArrayList<>();
         for (String category : CATEGORIES) {
             if (!runtimeCategories.contains(category)) {
                 continue;
@@ -233,20 +241,55 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                     new java.io.ByteArrayInputStream(categoryData), StandardCharsets.UTF_8)) {
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
-                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack);
-                for (Recipe<?> recipe : result.recipes()) {
-                    recipesById.put(recipe.getId(), recipe);
-                    added++;
-                }
+                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack, false);
+                runtimeRecipes.addAll(result.recipes());
                 compiler.clear();
             } catch (Exception e) {
                 BuildScape.LOGGER.error("BDRE Loader: Failure parsing runtime-only category [{}]", category, e);
             }
         }
+        List<Recipe<?>> combined = combineRuntimeRecipes(cachedRecipes, runtimeRecipes);
+        int added = combined.size() - cachedRecipes.size();
         if (added > 0) {
             BuildScape.LOGGER.info("BDRE Loader: Added {} runtime-only recipes after cache load.", added);
         }
+        return combined;
+    }
+
+    static List<Recipe<?>> combineRuntimeRecipes(List<Recipe<?>> cachedRecipes, List<Recipe<?>> runtimeRecipes) {
+        if (runtimeRecipes.isEmpty()) return cachedRecipes;
+        Map<ResourceLocation, Recipe<?>> recipesById = new LinkedHashMap<>();
+        StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
+        for (Recipe<?> recipe : cachedRecipes) {
+            recipesById.put(recipe.getId(), recipe);
+            addCycleRecipe(cycles, recipe);
+        }
+        for (Recipe<?> recipe : runtimeRecipes) {
+            if (recipesById.containsKey(recipe.getId())) continue;
+            addCycleRecipe(cycles, recipe);
+            try {
+                if (recipe instanceof StonecutterRecipe) cycles.validate();
+                recipesById.put(recipe.getId(), recipe);
+            } catch (IllegalArgumentException e) {
+                cycles.removeRecipe(recipe.getId().toString());
+                BuildScape.LOGGER.error("BDRE Loader: Rejected runtime recipe [{}]: {}", recipe.getId(), e.getMessage());
+            }
+        }
         return new ArrayList<>(recipesById.values());
+    }
+
+    private static void addCycleRecipe(StonecuttingCycleValidator cycles, Recipe<?> recipe) {
+        if (!(recipe instanceof StonecutterRecipe)) return;
+        ItemStack result = recipe.getResultItem();
+        if (result.isEmpty()) return;
+        List<String> inputs = new ArrayList<>();
+        for (Ingredient ingredient : recipe.getIngredients()) {
+            for (ItemStack input : ingredient.getItems()) {
+                inputs.add(ForgeRegistries.ITEMS.getKey(input.getItem()).toString());
+            }
+        }
+        cycles.addRecipe(recipe.getId().toString(), inputs,
+                ForgeRegistries.ITEMS.getKey(result.getItem()).toString(), result.getCount());
     }
 
     private Set<String> findRuntimeCategories(Map<String, byte[]> rawCategoryData) {

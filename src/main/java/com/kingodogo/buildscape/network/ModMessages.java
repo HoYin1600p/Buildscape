@@ -9,7 +9,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class ModMessages {
 
-    private static final String PROTOCOL_VERSION = "7";
+    static final String PROTOCOL_VERSION = "8";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BuildScape.MODID, "main"),
             () -> PROTOCOL_VERSION,

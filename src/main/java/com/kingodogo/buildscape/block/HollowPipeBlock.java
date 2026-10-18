@@ -389,7 +389,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     public static boolean trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist,
                                         @Nullable Set<Direction> allowedDirections) {
         if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY || level.isClientSide) return false;
-        boolean hasOpenEndpoint = false;
+        boolean spread = false;
         int outflowAmount = WaterPipeTransport.MAX_HORIZONTAL_FLOW - dist;
         for (Direction dir : Direction.values()) {
             if (dir == Direction.UP) continue;
@@ -397,15 +397,14 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             boolean openEndpoint = state.getBlock() instanceof HollowLogBlock
                     ? HollowLogBlock.isOpenEnd(state, dir)
                     : isOpenEndpoint(state, dir);
-            if (openEndpoint && canSpillInto(level, pos.relative(dir), fluid)) {
+            if (openEndpoint) {
                 boolean falling = dir == Direction.DOWN;
                 int amount = falling ? 8 : outflowAmount;
                 if (amount <= 0) continue;
-                hasOpenEndpoint = true;
-                spreadToWorldBlock(level, pos.relative(dir), fluid, amount, falling);
+                spread |= spreadToWorldBlock(level, pos.relative(dir), fluid, amount, falling);
             }
         }
-        return hasOpenEndpoint;
+        return spread;
     }
 
     public static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount) {
@@ -413,36 +412,35 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public static boolean canSpillInto(BlockGetter level, BlockPos pos, Fluid fluid) {
-        if (level instanceof net.minecraft.world.level.LevelReader reader && !reader.hasChunkAt(pos)) return false;
-        BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock) return false;
-        if (ModFluids.cannotMix(fluid, state.getFluidState().getType())) return false;
-        return state.isAir() || state.canBeReplaced(fluid) || state.getBlock() instanceof LiquidBlock
-                || (state.getBlock() instanceof net.minecraft.world.level.block.LiquidBlockContainer container
-                && container.canPlaceLiquid(level, pos, state, fluid));
+        return canSpillInto(level, pos, fluid, WaterPipeTransport.MAX_HORIZONTAL_FLOW, false);
     }
 
-    private static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
-        if (amount <= 0 || !(fluid instanceof FlowingFluid)) return;
-        BlockState neighborState = level.getBlockState(neighborPos);
-        if (ModFluids.cannotMix(fluid, neighborState.getFluidState().getType())) return;
-        if (neighborState.getBlock() instanceof HollowLogBlock || neighborState.getBlock() instanceof HollowPipeBlock) {
-            return;
-        }
+    public static boolean canSpillInto(BlockGetter level, BlockPos pos, Fluid fluid, int amount, boolean falling) {
+        return spillState(level, pos, fluid, amount, falling) != null;
+    }
 
-        if (fluid instanceof FlowingFluid flowing) {
-            BlockState fluidBlock = flowing.getFlowing(amount, falling).createLegacyBlock();
-            if (!fluidBlock.isAir()) {
-                if (neighborState.isAir() || neighborState.canBeReplaced(fluid)
-                        || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
-                    if (!neighborState.equals(fluidBlock)) {
-                        level.setBlock(neighborPos, fluidBlock, 3);
-                    }
-                    Fluid placedFluid = fluidBlock.getFluidState().getType();
-                    level.scheduleTick(neighborPos, placedFluid, placedFluid.getTickDelay(level));
-                }
-            }
-        }
+    @Nullable
+    private static BlockState spillState(BlockGetter level, BlockPos pos, Fluid fluid, int amount, boolean falling) {
+        if (amount <= 0 || amount > 8 || !(fluid instanceof FlowingFluid flowing)) return null;
+        if (level instanceof net.minecraft.world.level.LevelReader reader && !reader.hasChunkAt(pos)) return null;
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock) return null;
+        if (state.getFluidState().isSource()) return null;
+        Fluid existing = state.getFluidState().getType();
+        if (existing != Fluids.EMPTY && !fluid.isSame(existing) && ModFluids.cannotMix(fluid, existing)) return null;
+        // Outlets emit flowing fluid; vanilla waterlogging requires a source.
+        if (state.getBlock() instanceof net.minecraft.world.level.block.LiquidBlockContainer) return null;
+        if (!state.isAir() && !state.canBeReplaced(fluid) && !(state.getBlock() instanceof LiquidBlock)) return null;
+        BlockState target = flowing.getFlowing(amount, falling).createLegacyBlock();
+        return target.isAir() || target.equals(state) ? null : target;
+    }
+
+    static boolean spreadToWorldBlock(LevelAccessor level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
+        BlockState target = spillState(level, neighborPos, fluid, amount, falling);
+        if (target == null || !level.setBlock(neighborPos, target, 3)) return false;
+        Fluid placedFluid = target.getFluidState().getType();
+        level.scheduleTick(neighborPos, placedFluid, placedFluid.getTickDelay(level));
+        return true;
     }
 
     @Override

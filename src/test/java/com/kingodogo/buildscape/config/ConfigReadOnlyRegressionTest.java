@@ -150,7 +150,7 @@ public class ConfigReadOnlyRegressionTest {
     }
 
     @Test
-    public void lowLevelWriterProtectsBadBytesEvenWhenThePlatformDecoderAcceptsThem() throws Exception {
+    public void lowLevelWriterProtectsBytesRejectedByBothDecoders() throws Exception {
         Path file = temporary.newFolder().toPath().resolve("config.json");
         byte[] original = badBytes("{// @\n\"value\":1}");
         Files.write(file, original);
@@ -161,7 +161,7 @@ public class ConfigReadOnlyRegressionTest {
     private static byte[] badBytes(String text) {
         byte[] bytes = text.getBytes(StandardCharsets.US_ASCII);
         for (int i = 0; i < bytes.length; i++) {
-            if (bytes[i] == '@') bytes[i] = (byte) 0xFF;
+            if (bytes[i] == '@') bytes[i] = (byte) 0x81;
         }
         return bytes;
     }

@@ -19,6 +19,20 @@ public final class StonecuttingCycleValidator {
 
     private record Edge(String input, String output, int count, String recipeId) {}
 
+    public void addRecipe(String id, List<String> inputs, String output, int count) {
+        if (count < 1) return;
+        if (!registeredIds.add(id)) return;
+        for (String input : inputs) {
+            outgoing.computeIfAbsent(input, key -> new ArrayList<>()).add(new Edge(input, output, count, id));
+        }
+    }
+
+    public void removeRecipe(String id) {
+        outgoing.values().forEach(edges -> edges.removeIf(edge -> edge.recipeId().equals(id)));
+        outgoing.values().removeIf(List::isEmpty);
+        registeredIds.remove(id);
+    }
+
     public void addCategory(RecipeIR.CategoryPack pack) {
         AliasResolver aliases = new AliasResolver();
         aliases.registerAliases(pack.aliases());

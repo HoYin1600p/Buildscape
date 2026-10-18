@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.BuildScape;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -47,9 +46,10 @@ public class GuiConfigManager {
         GuiConfigData config = new GuiConfigData();
 
         if (file.exists()) {
-            try (FileReader reader = new FileReader(file, java.nio.charset.StandardCharsets.UTF_8)) {
+            try {
+                String source = ConfigLayoutIO.readText(file.toPath());
                 ConfigLayoutIO.protectInvalidEncoding(file.toPath());
-                config = GSON.fromJson(reader, GuiConfigData.class);
+                config = GSON.fromJson(source, GuiConfigData.class);
                 if (config == null) {
                     config = new GuiConfigData();
                 }

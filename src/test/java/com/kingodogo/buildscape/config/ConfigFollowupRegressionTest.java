@@ -131,7 +131,7 @@ public class ConfigFollowupRegressionTest {
             server.replaceItems(Set.of("minecraft:stick"));
             SyncConfigPacket incoming = changedValues();
             byte[] badBytes = "// Caf@".getBytes(StandardCharsets.US_ASCII);
-            badBytes[badBytes.length - 1] = (byte) 0xE9;
+            badBytes[badBytes.length - 1] = (byte) 0x81;
             Path file = directory.resolve(name);
             Files.write(file, badBytes);
             String before = new Gson().toJson(server);

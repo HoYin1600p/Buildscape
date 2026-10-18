@@ -34,14 +34,20 @@ public class BuildScapeRecipeCompiler {
     ) {}
 
     public CompileResult compileCategory(RecipeIR.CategoryPack pack) {
+        return compileCategory(pack, true);
+    }
+
+    public CompileResult compileCategory(RecipeIR.CategoryPack pack, boolean validateCycles) {
         List<Recipe<?>> compiledRecipes = new ArrayList<>();
 
         if (pack == null) {
             return new CompileResult(compiledRecipes, 0, 0);
         }
 
-        cycles.addCategory(pack);
-        cycles.validate();
+        if (validateCycles) {
+            cycles.addCategory(pack);
+            cycles.validate();
+        }
 
         aliasResolver.registerAliases(pack.aliases());
 

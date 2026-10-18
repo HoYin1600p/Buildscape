@@ -20,6 +20,7 @@ public final class StonecuttingCycleValidator {
 
     private record Edge(String input, String output, int count, String recipeId) {}
 
+    // Cycles through tag inputs are not detected by either the generator or runtime validation.
     public static List<String> inputNodes(JsonElement ingredient) {
         List<String> inputs = new ArrayList<>();
         if (ingredient.isJsonArray()) {
@@ -45,9 +46,48 @@ public final class StonecuttingCycleValidator {
     }
 
     public void removeRecipe(String id) {
+        if (!registeredIds.remove(id)) return;
         outgoing.values().forEach(edges -> edges.removeIf(edge -> edge.recipeId().equals(id)));
         outgoing.values().removeIf(List::isEmpty);
-        registeredIds.remove(id);
+    }
+
+    private record SearchNode(String item, boolean gain) {}
+
+    /** Adds a candidate to an accepted graph that has no gain cycles. */
+    public void addRecipeChecked(String id, List<String> inputs, String output, int count) {
+        if (count < 1 || registeredIds.contains(id)) return;
+        Set<String> targets = new HashSet<>(inputs);
+        SearchNode start = new SearchNode(output, count > 1);
+        Map<SearchNode, Edge> previous = new HashMap<>();
+        Map<SearchNode, SearchNode> predecessors = new HashMap<>();
+        Set<SearchNode> visited = new HashSet<>();
+        ArrayDeque<SearchNode> queue = new ArrayDeque<>();
+        visited.add(start);
+        queue.add(start);
+        while (!queue.isEmpty()) {
+            SearchNode node = queue.remove();
+            if (node.gain() && targets.contains(node.item())) {
+                List<Edge> cycle = new ArrayList<>();
+                SearchNode step = node;
+                while (!step.equals(start)) {
+                    Edge edge = previous.get(step);
+                    cycle.add(edge);
+                    step = predecessors.get(step);
+                }
+                Collections.reverse(cycle);
+                cycle.add(0, new Edge(node.item(), output, count, id));
+                throw gainCycle(cycle);
+            }
+            for (Edge edge : outgoing.getOrDefault(node.item(), List.of())) {
+                SearchNode next = new SearchNode(edge.output(), node.gain() || edge.count() > 1);
+                if (visited.add(next)) {
+                    previous.put(next, edge);
+                    predecessors.put(next, node);
+                    queue.add(next);
+                }
+            }
+        }
+        addRecipe(id, inputs, output, count);
     }
 
     public void addCategory(RecipeIR.CategoryPack pack) {
@@ -118,13 +158,17 @@ public final class StonecuttingCycleValidator {
                     }
                     Collections.reverse(cycle);
                     cycle.add(0, gain);
-                    throw new IllegalArgumentException("Stonecutting cycle with net item gain: "
-                            + cycle.stream().map(edge -> edge.recipeId() + " (" + edge.input()
-                                    + " -> " + edge.count() + " " + edge.output() + ")")
-                                    .collect(java.util.stream.Collectors.joining("; ")));
+                    throw gainCycle(cycle);
                 }
             }
         }
+    }
+
+    private static IllegalArgumentException gainCycle(List<Edge> cycle) {
+        return new IllegalArgumentException("Stonecutting cycle with net item gain: "
+                + cycle.stream().map(edge -> edge.recipeId() + " (" + edge.input()
+                        + " -> " + edge.count() + " " + edge.output() + ")")
+                        .collect(java.util.stream.Collectors.joining("; ")));
     }
 
     public void clear() {

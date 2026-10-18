@@ -3,12 +3,11 @@ package com.kingodogo.buildscape.recipe.framework;
 import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import com.kingodogo.buildscape.recipe.framework.compiler.StonecuttingCycleValidator;
 import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
+import com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
@@ -165,21 +165,94 @@ public class RuntimeRecipeCycleTest {
     }
 
     @Test
-    public void tagNodesParticipateWithoutExpandingBoundItems() throws Exception {
-        Ingredient tag = Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation("test", "rocks")));
-        StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
-        cycles.addRecipe("test:gain", List.of("minecraft:stone"), "#test:rocks", 4);
-        Recipe<?> runtime = new StonecutterRecipe(new ResourceLocation("test", "tag_return"), "",
-                tag, new ItemStack(Items.STONE));
-        Method add = BuildScapeRecipeLoader.class.getDeclaredMethod(
-                "addCycleRecipe", StonecuttingCycleValidator.class, Recipe.class);
+    public void runtimeInputNodesMatchGeneratorItemsTagsAliasesAndArrays() throws Exception {
+        AliasResolver aliases = new AliasResolver();
+        aliases.registerAliases(Map.of("ROCK", "minecraft:stone", "ROCK_TAG", "forge:stone"));
+        List<String> generatorInputs = List.of("minecraft:stone", "MC:stone", "ROCK",
+                "#forge:stone", "#F:stone", "#ROCK_TAG", "[MC:stone, #F:stone, ROCK]");
+        List<String> ingredientJson = List.of("{\"item\":\"minecraft:stone\"}",
+                "{\"item\":\"minecraft:stone\"}", "{\"item\":\"minecraft:stone\"}",
+                "{\"tag\":\"forge:stone\"}", "{\"tag\":\"forge:stone\"}",
+                "{\"tag\":\"forge:stone\"}",
+                "[{\"item\":\"minecraft:stone\"},{\"tag\":\"forge:stone\"},{\"item\":\"minecraft:stone\"}]");
+        Method add = StonecuttingCycleValidator.class.getDeclaredMethod(
+                "addInput", String.class, String.class, int.class, String.class, AliasResolver.class);
         add.setAccessible(true);
-        add.invoke(null, cycles, runtime);
-        IllegalArgumentException error = assertThrows(IllegalArgumentException.class, cycles::validate);
-        assertTrue(error.getMessage().contains("test:tag_return"));
-        assertTrue(error.getMessage().contains("#test:rocks"));
-        assertEquals(List.of("minecraft:granite", "#test:rocks"), StonecuttingCycleValidator.inputNodes(
-                JsonParser.parseString("[{\"item\":\"minecraft:granite\"},{\"tag\":\"test:rocks\"}]")));
+        var outgoing = StonecuttingCycleValidator.class.getDeclaredField("outgoing");
+        outgoing.setAccessible(true);
+        for (int i = 0; i < generatorInputs.size(); i++) {
+            StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
+            add.invoke(cycles, generatorInputs.get(i), "minecraft:granite", 1, "test:parity", aliases);
+            var generated = (Map<?, ?>) outgoing.get(cycles);
+            assertEquals(generatorInputs.get(i), generated.keySet(),
+                    new java.util.LinkedHashSet<>(StonecuttingCycleValidator.inputNodes(
+                            JsonParser.parseString(ingredientJson.get(i)))));
+        }
+    }
+
+    @Test
+    public void incrementalChecksAgreeWithFullValidationOnSeededGraphs() {
+        Random random = new Random(846203L);
+        for (int graph = 0; graph < 600; graph++) {
+            StonecuttingCycleValidator full = new StonecuttingCycleValidator();
+            StonecuttingCycleValidator incremental = new StonecuttingCycleValidator();
+            for (StonecuttingCycleValidator cycles : List.of(full, incremental)) {
+                cycles.addRecipe("test:unit_forward", List.of("test:0"), "test:1", 1);
+                cycles.addRecipe("test:unit_return", List.of("test:1"), "test:0", 1);
+                cycles.addRecipe("test:safe_gain", List.of("test:1"), "test:2", 2);
+            }
+            for (int candidate = 0; candidate < 24; candidate++) {
+                String id = "test:candidate_" + candidate;
+                List<String> inputs = new ArrayList<>();
+                for (int alternative = 0, n = 1 + random.nextInt(3); alternative < n; alternative++) {
+                    inputs.add("test:" + random.nextInt(8));
+                }
+                String output = "test:" + random.nextInt(8);
+                int count = new int[]{0, 1, 1, 2, Integer.MAX_VALUE}[random.nextInt(5)];
+                full.addRecipe(id, inputs, output, count);
+                boolean rejected = false;
+                try {
+                    full.validate();
+                } catch (IllegalArgumentException e) {
+                    rejected = true;
+                    full.removeRecipe(id);
+                }
+                boolean incrementalRejected = false;
+                try {
+                    incremental.addRecipeChecked(id, inputs, output, count);
+                } catch (IllegalArgumentException e) {
+                    incrementalRejected = true;
+                    assertTrue(e.getMessage().contains(id));
+                }
+                assertEquals("graph " + graph + ", candidate " + candidate, rejected, incrementalRejected);
+                incremental.validate();
+            }
+        }
+    }
+
+    @Test
+    public void thousandsOfRecipesWithOneOffenderUseCheapFallbacks() {
+        List<Recipe<?>> candidates = new ArrayList<>();
+        for (int i = 0; i < 4000; i++) candidates.add(cut("safe_" + i, Items.STONE, Items.GRANITE, 2));
+        List<Recipe<?>> expected = List.copyOf(candidates);
+        candidates.add(2000, cut("offender", Items.GRANITE, Items.STONE, 1));
+        for (boolean staleCache : List.of(false, true)) {
+            AtomicInteger validations = new AtomicInteger();
+            AtomicInteger reports = new AtomicInteger();
+            long start = System.nanoTime();
+            List<Recipe<?>> accepted = BuildScapeRecipeLoader.combineRuntimeRecipes(
+                    staleCache ? candidates : List.of(), staleCache ? List.of() : candidates, cycles -> {
+                        validations.incrementAndGet();
+                        cycles.validate();
+                    }, message -> reports.incrementAndGet());
+            long elapsed = System.nanoTime() - start;
+            assertEquals(expected, accepted);
+            assertEquals(1, validations.get());
+            assertEquals(staleCache ? 1 : 0, reports.get());
+            System.out.println("4001 stonecutting recipes, stale cache=" + staleCache + ": "
+                    + elapsed / 1_000_000.0 + " ms");
+            assertTrue("Fallback took " + elapsed / 1_000_000.0 + " ms", elapsed < 10_000_000_000L);
+        }
     }
 
     @Test
@@ -213,6 +286,40 @@ public class RuntimeRecipeCycleTest {
         assertSame(cached, append(Map.of(), Set.of(), cached));
     }
 
+    @Test
+    public void bundledCacheWithoutRuntimeRecipesSkipsSerializationAndValidation() throws Exception {
+        Ingredient input = new Ingredient(java.util.stream.Stream.empty()) {
+            @Override
+            public JsonElement toJson() {
+                throw new AssertionError("Trusted bundled cache must not rebuild the graph");
+            }
+        };
+        List<Recipe<?>> bundled = List.of(new StonecutterRecipe(new ResourceLocation("test", "bundled"), "",
+                input, new ItemStack(Items.GRANITE, 2)));
+        assertSame(bundled, append(Map.of(), Set.of(), bundled, true));
+        assertSame(bundled, BuildScapeRecipeLoader.combineRuntimeRecipes(bundled, List.of(), true,
+                cycles -> fail("Trusted bundled cache must not be validated"),
+                message -> fail("Trusted bundled cache must not be filtered")));
+    }
+
+    @Test
+    public void localCacheValidatesOnceAndBundledCacheWithRuntimeRecipesStillValidates() {
+        List<Recipe<?>> cached = List.of(cut("cached", Items.STONE, Items.GRANITE, 2));
+        AtomicInteger validations = new AtomicInteger();
+        java.util.function.Consumer<StonecuttingCycleValidator> validate = cycles -> {
+            validations.incrementAndGet();
+            cycles.validate();
+        };
+        assertSame(cached, BuildScapeRecipeLoader.combineRuntimeRecipes(cached, List.of(), false, validate,
+                message -> fail(message)));
+        assertEquals(1, validations.get());
+        validations.set(0);
+        Recipe<?> runtime = cut("runtime", Items.GRANITE, Items.DIORITE, 1);
+        assertEquals(List.of(cached.get(0), runtime), BuildScapeRecipeLoader.combineRuntimeRecipes(
+                cached, List.of(runtime), true, validate, message -> fail(message)));
+        assertEquals(2, validations.get());
+    }
+
     private static Recipe<?> cut(String id, Item input, Item output, int count) {
         return new StonecutterRecipe(new ResourceLocation("test", id), "",
                 Ingredient.of(input), new ItemStack(output, count));
@@ -227,14 +334,19 @@ public class RuntimeRecipeCycleTest {
                 + "\",\"result\":{\"item\":\"minecraft:" + output + "\",\"count\":" + count + "}}";
     }
 
-    @SuppressWarnings("unchecked")
     private static List<Recipe<?>> append(Map<String, String> sources, Set<String> categories,
                                            List<Recipe<?>> cached) throws Exception {
+        return append(sources, categories, cached, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Recipe<?>> append(Map<String, String> sources, Set<String> categories,
+                                           List<Recipe<?>> cached, boolean trustedBundledCache) throws Exception {
         Map<String, byte[]> bytes = new java.util.LinkedHashMap<>();
         sources.forEach((category, source) -> bytes.put(category, source.getBytes(StandardCharsets.UTF_8)));
         Method append = BuildScapeRecipeLoader.class.getDeclaredMethod(
-                "appendRuntimeRecipes", Map.class, Set.class, List.class);
+                "appendRuntimeRecipes", Map.class, Set.class, List.class, boolean.class);
         append.setAccessible(true);
-        return (List<Recipe<?>>) append.invoke(BuildScapeRecipeLoader.INSTANCE, bytes, categories, cached);
+        return (List<Recipe<?>>) append.invoke(BuildScapeRecipeLoader.INSTANCE, bytes, categories, cached, trustedBundledCache);
     }
 }

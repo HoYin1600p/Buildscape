@@ -103,22 +103,15 @@ public class TagsSelectorWidget extends AbstractWidget {
 
         switch (sortType) {
             case INVENTORY:
+                Set<TagKey<Item>> inventoryTags = new HashSet<>();
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.player != null) {
+                    mc.player.getInventory().items.stream()
+                            .filter(stack -> !stack.isEmpty())
+                            .forEach(stack -> stack.getItem().builtInRegistryHolder().tags().forEach(inventoryTags::add));
+                }
                 filteredTags = baseList.stream()
-                        .filter(tag -> {
-                            return ForgeRegistries.ITEMS.getValues().stream()
-                                    .anyMatch(item -> {
-                                        if (!item.builtInRegistryHolder().tags().anyMatch(t -> t.equals(tag))) {
-                                            return false;
-                                        }
-                                        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft
-                                                .getInstance();
-                                        if (mc.player != null) {
-                                            return mc.player.getInventory().items.stream()
-                                                    .anyMatch(stack -> stack.getItem() == item);
-                                        }
-                                        return false;
-                                    });
-                        })
+                        .filter(inventoryTags::contains)
                         .collect(Collectors.toList());
                 break;
             case MOD_ONLY:

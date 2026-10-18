@@ -142,10 +142,20 @@ public class BuildscapeClientConfig {
             }
         } catch (IOException e) {
             BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to read config/buildscape/buildscape.cfg - using defaults. " + e.getMessage());
+            return;
         }
 
         if (loadedKeys.size() != DEFAULTS.size()) {
-            save();
+            try (FileWriter writer = new FileWriter(file, true)) {
+                writer.write(System.lineSeparator());
+                for (Map.Entry<String, String> entry : DEFAULTS.entrySet()) {
+                    if (!loadedKeys.contains(entry.getKey())) {
+                        writer.write(entry.getKey() + " = " + entry.getValue() + System.lineSeparator());
+                    }
+                }
+            } catch (IOException e) {
+                BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to append missing config keys - " + e.getMessage());
+            }
         }
     }
 

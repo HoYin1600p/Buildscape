@@ -306,14 +306,23 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         updateSelectedTags();
 
         PresetsConfig presetsConfig = PresetsConfig.get();
-        presetsConfig.autoApplyOnLoad();
         refreshExistingItems();
         if (presetsWidget != null) {
-            String appliedKey = presetsConfig.getLastAppliedPreset();
-            if (presetsConfig.hasUnnamedPreset()) {
+            String appliedKey = null;
+            Set<String> currentItems = PillarParticleConfig.get().items;
+            for (String key : presetsConfig.getPresetKeys()) {
+                if (presetsConfig.getPreset(key).items.equals(currentItems)) {
+                    appliedKey = key;
+                    break;
+                }
+            }
+            if (appliedKey == null) {
+                presetsConfig.saveUnnamedPreset(currentItems);
+                presetsWidget.refreshPresets();
                 appliedKey = "_unnamed";
             }
-            presetsWidget.setSelectedPreset(appliedKey != null ? appliedKey : "default");
+            presetsWidget.setSelectedPreset(appliedKey);
+            presetsWidget.setAppliedPreset(appliedKey);
         }
     }
 

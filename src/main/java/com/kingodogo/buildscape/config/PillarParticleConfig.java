@@ -72,7 +72,27 @@ public class PillarParticleConfig {
         clearMatchCache();
     }
 
-    public Set<String> items = new HashSet<>();
+    public volatile Set<String> items = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private boolean itemsLoaded;
+    private boolean itemsFileUnreadable;
+
+    public synchronized void replaceItems(Collection<String> updatedItems) {
+        Set<String> replacement = java.util.concurrent.ConcurrentHashMap.newKeySet();
+        replacement.addAll(updatedItems);
+        items = replacement;
+        clearMatchCache();
+    }
+
+    static void backupUnreadableFile(File file) {
+        Path backup = file.toPath().resolveSibling(file.getName() + ".bak");
+        try {
+            if (!Files.exists(backup)) {
+                Files.copy(file.toPath(), backup);
+            }
+        } catch (Exception e) {
+            BuildScape.LOGGER.error("Unable to back up unreadable config " + file, e);
+        }
+    }
 
     private static final java.util.concurrent.ConcurrentHashMap<net.minecraft.world.item.Item, Boolean> MATCH_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
@@ -92,7 +112,7 @@ public class PillarParticleConfig {
     public double pattern_spread = 0.05;
     public double pattern_intensity = 1.0;
 
-    public List<String> particle_color = new ArrayList<>();
+    public volatile List<String> particle_color = new ArrayList<>();
 
     public int max_particle_color = 3;
 
@@ -227,8 +247,7 @@ public class PillarParticleConfig {
                                 packet.max_particle_color > 0 ? packet.max_particle_color : numColors,
                                 numColors)));
 
-        SERVER_CONFIG.items = new HashSet<>(
-                packet.items != null ? packet.items : new HashSet<>());
+        SERVER_CONFIG.replaceItems(packet.items != null ? packet.items : Collections.emptySet());
 
         clearMatchCache();
         notifyCallbacks(true);
@@ -332,6 +351,7 @@ public class PillarParticleConfig {
 
     public static void clearServerConfig() {
         SERVER_CONFIG = null;
+        clearMatchCache();
     }
 
     private File getPropertiesFile() {
@@ -611,7 +631,7 @@ public class PillarParticleConfig {
         }
     }
 
-    private String stripComments(String json) {
+    private static String stripComments(String json) {
         StringBuilder result = new StringBuilder();
         boolean inString = false;
         boolean escaped = false;
@@ -677,21 +697,10 @@ public class PillarParticleConfig {
         loadItemsInternal();
     }
 
-    private void loadPropertiesInternal() {
+    private synchronized void loadPropertiesInternal() {
         File file = getPropertiesFile();
         if (!file.exists()) {
             writeDefaultProperties(file);
-            this.particle_color.clear();
-            this.particle_color.add("#FFB81C");
-            this.particle_color.add("#FFFFFF");
-            this.particle_color.add("#FFFF00");
-            this.particle_color.add("#E8FEFD");
-            this.particle_color.add("#FF5C00");
-            this.particle_color.add("#3CDFFF");
-            this.max_particle_color = 3;
-            lastLoadedProperties = file.lastModified();
-            lastFileSizeProperties = file.length();
-            return;
         }
         try (FileReader r = new FileReader(file)) {
             StringBuilder content = new StringBuilder();
@@ -771,31 +780,33 @@ public class PillarParticleConfig {
                         }
                     }
 
-                    this.particle_color = new ArrayList<>();
+                    List<String> newColors = new ArrayList<>();
                     if (rawColors != null && !rawColors.isEmpty()) {
                         for (String color : rawColors) {
                             if (color != null && color.matches("^#[0-9A-Fa-f]{6}$")) {
-                                this.particle_color.add(color.toUpperCase());
+                                newColors.add(color.toUpperCase());
                             }
                         }
                     }
 
-                    if (this.particle_color.isEmpty()) {
-                        this.particle_color.add("#FFB81C");
-                        this.particle_color.add("#FFFFFF");
-                        this.particle_color.add("#FFFF00");
+                    if (newColors.isEmpty()) {
+                        newColors.add("#FFB81C");
+                        newColors.add("#FFFFFF");
+                        newColors.add("#FFFF00");
                     }
 
-                    if (this.particle_color.size() > 7) {
-                        this.particle_color = new ArrayList<>(
-                                this.particle_color.subList(0, 7));
+                    if (newColors.size() > 7) {
+                        newColors = new ArrayList<>(
+                                newColors.subList(0, 7));
                     }
 
-                    if (this.particle_color.isEmpty()) {
-                        this.particle_color.add("#FFB81C");
-                        this.particle_color.add("#FFFFFF");
-                        this.particle_color.add("#FFFF00");
+                    if (newColors.isEmpty()) {
+                        newColors.add("#FFB81C");
+                        newColors.add("#FFFFFF");
+                        newColors.add("#FFFF00");
                     }
+
+                    this.particle_color = newColors;
 
                     int numColors = this.particle_color.size();
                     this.max_particle_color = numColors;
@@ -821,187 +832,64 @@ public class PillarParticleConfig {
         }
     }
 
-    private void loadItemsInternal() {
+    private synchronized void loadItemsInternal() {
         File file = getItemsFile();
+        if (!itemsLoaded) {
+            initializeDefaultItems();
+            itemsLoaded = true;
+        }
         if (!file.exists()) {
             writeDefaultItems(file);
             initializeDefaultItems();
+            itemsFileUnreadable = false;
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
             return;
         }
-        try (FileReader r = new FileReader(file)) {
+        try (FileReader reader = new FileReader(file)) {
             StringBuilder content = new StringBuilder();
             int ch;
-            while ((ch = r.read()) != -1) {
+            while ((ch = reader.read()) != -1) {
                 content.append((char) ch);
             }
-            String jsonWithoutComments = stripComments(content.toString());
-
-            Type mapType = new TypeToken<Map<String, Object>>() {
-            }.getType();
-            Map<String, Object> jsonMap = GSON.fromJson(jsonWithoutComments, mapType);
-
-            if (jsonMap != null && jsonMap.containsKey("items")) {
-                Object itemsObj = jsonMap.get("items");
-                this.items = new HashSet<>();
-                if (itemsObj instanceof List<?> itemsList) {
-                    for (Object item : itemsList) {
-                        if (item instanceof String) {
-                            this.items.add((String) item);
-                        }
-                    }
-                }
-
-                {
-                    boolean changed = false;
-                    String[] defaultVanillaItems = new String[] {
-                            "minecraft:diamond",
-                            "minecraft:netherite_ingot",
-                            "minecraft:nether_star",
-                            "minecraft:heart_of_the_sea",
-                            "minecraft:trident",
-                            "minecraft:emerald",
-                            "minecraft:dragon_breath",
-                            "minecraft:netherite_scrap",
-                            "minecraft:totem_of_undying",
-                            "minecraft:spyglass",
-                            "minecraft:elytra",
-                            "minecraft:diamond_sword",
-                            "minecraft:diamond_hoe",
-                            "minecraft:diamond_axe",
-                            "minecraft:diamond_pickaxe",
-                            "minecraft:diamond_shovel",
-                            "minecraft:diamond_boots",
-                            "minecraft:diamond_leggings",
-                            "minecraft:diamond_chestplate",
-                            "minecraft:diamond_helmet",
-                            "minecraft:netherite_sword",
-                            "minecraft:netherite_hoe",
-                            "minecraft:netherite_pickaxe",
-                            "minecraft:netherite_axe",
-                            "minecraft:netherite_shovel",
-                            "minecraft:netherite_boots",
-                            "minecraft:netherite_leggings",
-                            "minecraft:netherite_chestplate",
-                            "minecraft:netherite_helmet",
-                            "minecraft:nautilus_shell",
-                            "minecraft:shulker_shell",
-                            "minecraft:golden_apple",
-                            "minecraft:enchanted_golden_apple",
-                            "minecraft:golden_carrot",
-                            "minecraft:experience_bottle",
-                            "minecraft:mojang_banner_pattern",
-                            "minecraft:ancient_debris",
-                            "minecraft:dragon_head",
-                            "minecraft:dragon_egg",
-                            "minecraft:player_head",
-                            "minecraft:beacon",
-                            "minecraft:end_crystal",
-                            "minecraft:conduit",
-                            "minecraft:skeleton_skull",
-                            "minecraft:zombie_head",
-                            "minecraft:wither_skeleton_skull",
-                            "minecraft:creeper_head",
-                            "minecraft:enchanting_table",
-                            "minecraft:emerald_block",
-                            "minecraft:diamond_block",
-                            "minecraft:gold_block",
-                            "minecraft:netherite_block",
-                            "minecraft:deepslate_diamond_ore",
-                            "minecraft:diamond_ore",
-                            "minecraft:bedrock",
-                            "minecraft:pufferfish",
-                            "minecraft:poisonous_potato",
-                            "minecraft:written_book",
-                            "minecraft:creeper_spawn_egg",
-                            "minecraft:turtle_spawn_egg",
-                            "minecraft:axolotl_spawn_egg",
-                            "minecraft:wither_skeleton_spawn_egg",
-                            "minecraft:shulker_spawn_egg",
-                            "minecraft:elder_guardian_spawn_egg",
-                            "minecraft:ravager_spawn_egg",
-                            "minecraft:slime_spawn_egg",
-                            "minecraft:zoglin_spawn_egg",
-                            "minecraft:villager_spawn_egg",
-                            "minecraft:skeleton_horse_spawn_egg",
-                            "minecraft:glow_squid_spawn_egg",
-                            "minecraft:goat_spawn_egg",
-                            "minecraft:enderman_spawn_egg",
-                            "buildscape:ancient_ashen_scroll"
-                    };
-
-                    for (String defaultItem : defaultVanillaItems) {
-                        if (!this.items.contains(defaultItem)) {
-                            this.items.add(defaultItem);
-                            changed = true;
-                        }
-                    }
-
-                    if (changed) {
-                        saveItems();
-                    }
-                }
-
-                if (net.minecraftforge.fml.ModList.get().isLoaded("the_vault")) {
-                    boolean changed = false;
-                    String[] vaultItems = new String[] {
-                            "the_vault:echo_pog",
-                            "the_vault:gem_pog",
-                            "the_vault:vault_crystal",
-                            "the_vault:spicy_hearty_burger",
-                            "the_vault:omega_pog",
-                            "the_vault:knowledge_star",
-                            "the_vault:antique",
-                            "the_vault:herald_trophy",
-                            "the_vault:pvp_trophy",
-                            "the_vault:treasure_keyring",
-                            "the_vault:companion_egg",
-                            "the_vault:vault_artifact",
-                            "the_vault:tool",
-                            "the_vault:deck_socket",
-                            "the_vault:card_deck",
-                            "the_vault:vault_god_charm",
-                            "the_vault:boost_modification_stone",
-                            "the_vault:neuralizer",
-                            "the_vault:soul_vortex",
-                            "#the_vault:crystal_capstones",
-                            "#the_vault:keys",
-                            "#the_vault:gems",
-                            "#the_vault:fruits",
-                            "the_vault:unidentified_artifact",
-                            "#the_vault:playerclusters",
-                            "#the_vault:perfectgems",
-                            "#the_vault:playerchunks",
-                            "#the_vault:magnet",
-                            "#the_vault:unique",
-                            "#the_vault:vault_gear",
-                            "the_vault:santa_egg",
-                            "the_vault:grinch_egg",
-                            "the_vault:yeti_egg"
-                    };
-
-                    for (String vaultItem : vaultItems) {
-                        if (!this.items.contains(vaultItem)) {
-                            this.items.add(vaultItem);
-                            changed = true;
-                        }
-                    }
-
-                    if (changed) {
-                        saveItems();
-                    }
-                }
-            }
-
+            replaceItems(parseItems(content.toString(), file.toString()));
+            itemsFileUnreadable = false;
+        } catch (Exception e) {
+            itemsFileUnreadable = true;
+            backupUnreadableFile(file);
+            BuildScape.LOGGER.error("Unable to load items config " + file + "; keeping the last good item list", e);
+        } finally {
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
-        } catch (Exception ignored) {
         }
     }
 
+    static Set<String> parseItems(String content) {
+        return parseItems(content, ITEMS_FILE_NAME);
+    }
+
+    static Set<String> parseItems(String content, String source) {
+        com.google.gson.JsonObject root = GSON.fromJson(stripComments(content), com.google.gson.JsonObject.class);
+        if (root == null || !root.has("items") || !root.get("items").isJsonArray()) {
+            throw new IllegalArgumentException("Expected an items array");
+        }
+        Set<String> parsed = new HashSet<>();
+        boolean skippedEntries = false;
+        for (com.google.gson.JsonElement item : root.getAsJsonArray("items")) {
+            if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) {
+                skippedEntries = true;
+                continue;
+            }
+            parsed.add(item.getAsString());
+        }
+        if (skippedEntries) {
+            BuildScape.LOGGER.warn("Skipped non-string entries in items array from " + source);
+        }
+        return parsed;
+    }
+
     private void initializeDefaultItems() {
-        items.clear();
+        Set<String> items = new HashSet<>();
         items.add("minecraft:diamond");
         items.add("minecraft:netherite_ingot");
         items.add("minecraft:nether_star");
@@ -1112,6 +1000,7 @@ public class PillarParticleConfig {
             items.add("the_vault:grinch_egg");
             items.add("the_vault:yeti_egg");
         }
+        replaceItems(items);
     }
 
     private void migrateOldConfig() {
@@ -1307,13 +1196,13 @@ public class PillarParticleConfig {
     }
 
     public void saveItems() {
-        if (isClientConnectedToServer() && SERVER_CONFIG != null) {
+        clearMatchCache();
+        if (this == SERVER_CONFIG && isClientConnectedToServer()) {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> {
                         if (net.minecraft.client.Minecraft.getInstance().player != null &&
                                 net.minecraft.client.Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
-                            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                                    new com.kingodogo.buildscape.network.UpdateConfigPacket(this));
+                            com.kingodogo.buildscape.network.UpdateConfigPacket.send(this);
                         }
                     });
             return;
@@ -1321,7 +1210,12 @@ public class PillarParticleConfig {
         saveItemsToDisk();
     }
 
-    public void saveItemsToDisk() {
+    public synchronized void saveItemsToDisk() {
+        clearMatchCache();
+        if (itemsFileUnreadable) {
+            BuildScape.LOGGER.error("Not overwriting unreadable items config " + getItemsFile());
+            return;
+        }
         File file = getItemsFile();
         try {
             File parentDir = file.getParentFile();
@@ -1329,19 +1223,9 @@ public class PillarParticleConfig {
                 parentDir.mkdirs();
             }
             try (FileWriter writer = new FileWriter(file)) {
-                writer.write("{\n");
-                writer.write("  // Item IDs that trigger particles when placed on pillars\n");
-                writer.write("  \"items\": [\n");
-                List<String> itemsList = new ArrayList<>(items);
-                for (int i = 0; i < itemsList.size(); i++) {
-                    writer.write("    \"" + itemsList.get(i) + "\"");
-                    if (i < itemsList.size() - 1) {
-                        writer.write(",");
-                    }
-                    writer.write("\n");
-                }
-                writer.write("  ]\n");
-                writer.write("}\n");
+                Map<String, Object> json = new LinkedHashMap<>();
+                json.put("items", new ArrayList<>(items));
+                GSON.toJson(json, writer);
             }
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
@@ -1351,13 +1235,12 @@ public class PillarParticleConfig {
     }
 
     public void saveProperties() {
-        if (isClientConnectedToServer() && SERVER_CONFIG != null) {
+        if (this == SERVER_CONFIG && isClientConnectedToServer()) {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> {
                         if (net.minecraft.client.Minecraft.getInstance().player != null &&
                                 net.minecraft.client.Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
-                            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                                    new com.kingodogo.buildscape.network.UpdateConfigPacket(this));
+                            com.kingodogo.buildscape.network.UpdateConfigPacket.send(this);
                         }
                     });
             return;
@@ -1365,7 +1248,7 @@ public class PillarParticleConfig {
         savePropertiesToDisk();
     }
 
-    public void savePropertiesToDisk() {
+    public synchronized void savePropertiesToDisk() {
         File file = getPropertiesFile();
         try {
             File parentDir = file.getParentFile();
@@ -1399,6 +1282,7 @@ public class PillarParticleConfig {
             return false;
         }
         if (items.add(itemId)) {
+            clearMatchCache();
             saveItems();
             return true;
         }
@@ -1410,6 +1294,7 @@ public class PillarParticleConfig {
             return false;
         }
         if (items.remove(itemId)) {
+            clearMatchCache();
             saveItems();
             return true;
         }

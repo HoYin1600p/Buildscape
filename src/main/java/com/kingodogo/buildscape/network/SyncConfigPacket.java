@@ -13,6 +13,16 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class SyncConfigPacket {
+    public static final double MIN_PARTICLE_RATE = NetworkPacketLimits.MIN_PARTICLE_RATE;
+    public static final double MAX_PARTICLE_SPEED = NetworkPacketLimits.MAX_PARTICLE_SPEED;
+    public static final double MAX_PARTICLE_SPREAD = NetworkPacketLimits.MAX_PARTICLE_SPREAD;
+    public static final double MAX_PARTICLE_INTENSITY = NetworkPacketLimits.MAX_PARTICLE_INTENSITY;
+    public static final int MAX_PARTICLE_LIFETIME = NetworkPacketLimits.MAX_PARTICLE_LIFETIME;
+    public static final int MAX_PARTICLE_DENSITY = NetworkPacketLimits.MAX_PARTICLE_DENSITY;
+
+    public static double clampParticleValue(double value, double maximum) {
+        return NetworkPacketLimits.clamp(value, MIN_PARTICLE_RATE, maximum);
+    }
 
     public double particle_speed;
     public double particle_spread;

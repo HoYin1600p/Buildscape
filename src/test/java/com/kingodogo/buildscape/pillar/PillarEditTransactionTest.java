@@ -1,11 +1,13 @@
-package com.kingodogo.buildscape.kyro;
+package com.kingodogo.buildscape.pillar;
 
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
+import net.minecraft.core.BlockPos;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,8 +59,8 @@ public class PillarEditTransactionTest {
         PillarIdManager manager = manager();
         add(manager, "S-P1", 1);
         add(manager, "S-P2", 2);
-        assertEquals("id_conflict", manager.editPillarRows(List.of(row("S-P1", "S-P2", 3))));
-        assertEquals("position_conflict", manager.editPillarRows(List.of(row("S-P1", "NewId", 2))));
+        assertEquals("id_conflict:S-P1:S-P2", manager.editPillarRows(List.of(row("S-P1", "S-P2", 3))));
+        assertEquals("position_conflict:S-P1:NewId", manager.editPillarRows(List.of(row("S-P1", "NewId", 2))));
         assertEquals("", manager.editPillarRows(List.of(row("S-P1", "S-P1", 2), row("S-P2", "S-P2", 1))));
         assertEquals(2, manager.getPillarData("S-P1").x);
     }
@@ -71,6 +73,35 @@ public class PillarEditTransactionTest {
         Field requested = PillarIdManager.class.getDeclaredField("saveRequested");
         requested.setAccessible(true);
         assertTrue(requested.getBoolean(manager));
+    }
+
+    @Test
+    public void nullIdUpperBlockKeepsNullAtRegisteredStackBottom() throws Exception {
+        PillarIdManager manager = manager();
+        add(manager, "NewId", 1);
+        assertNull(reconcile(manager, null, new BlockPos(1, 64, 0)));
+    }
+
+    @Test
+    public void renamedSavedIdAdoptsRegistryIdAtStackBottom() throws Exception {
+        PillarIdManager manager = manager();
+        add(manager, "NewId", 1);
+        assertEquals("NewId", reconcile(manager, "OldId", new BlockPos(1, 64, 0)));
+        assertEquals("OldId", reconcile(manager, "OldId", new BlockPos(2, 64, 0)));
+    }
+
+    @Test
+    public void existingSavedIdIsNotReplacedByAnotherStacksId() throws Exception {
+        PillarIdManager manager = manager();
+        add(manager, "ExistingId", 2);
+        add(manager, "NewId", 1);
+        assertEquals("ExistingId", reconcile(manager, "ExistingId", new BlockPos(1, 64, 0)));
+    }
+
+    private static String reconcile(PillarIdManager manager, String savedId, BlockPos bottom) throws Exception {
+        Method method = PillarIdManager.class.getDeclaredMethod("reconcilePillarId", String.class, String.class, BlockPos.class);
+        method.setAccessible(true);
+        return (String) method.invoke(manager, savedId, "minecraft:overworld", bottom);
     }
 
     private static PillarIdManager manager() throws Exception {

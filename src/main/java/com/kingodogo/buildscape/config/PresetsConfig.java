@@ -42,6 +42,7 @@ public class PresetsConfig {
     private Map<String, Preset> presets = new HashMap<>();
     private final Map<String, com.google.gson.JsonElement> preservedPresets = new HashMap<>();
     private boolean fileUnreadable;
+    private String lastEditFailure = "";
     private String lastAppliedPreset = "default";
     private static final String UNNAMED_PRESET_KEY = "_unnamed";
     public static final int MAX_PRESETS = 5;
@@ -158,17 +159,24 @@ public class PresetsConfig {
     }
 
     public void save() {
+        saveToDisk();
+    }
+
+    private boolean saveToDisk() {
+        lastEditFailure = "save";
         File file = getPresetsFile();
         if (fileUnreadable) {
+            lastEditFailure = "unreadable";
             com.kingodogo.buildscape.BuildScape.getLogger().error("Not overwriting unreadable presets " + file);
-            return;
+            return false;
         }
         Path temporary = null;
         try {
             if (file.exists() && ConfigLayoutIO.hasReplacementCharacters(ConfigLayoutIO.readText(file.toPath()))) {
                 fileUnreadable = true;
+                lastEditFailure = "unreadable";
                 com.kingodogo.buildscape.BuildScape.getLogger().warn("Not overwriting replacement-decoded presets " + file);
-                return;
+                return false;
             }
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
@@ -191,8 +199,11 @@ public class PresetsConfig {
             } catch (AtomicMoveNotSupportedException e) {
                 Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
+            lastEditFailure = "";
+            return true;
         } catch (Exception e) {
             com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to save presets " + file, e);
+            return false;
         } finally {
             if (temporary != null) {
                 try {
@@ -225,24 +236,7 @@ public class PresetsConfig {
 
     public List<Preset> getPresets() {
         List<Preset> presetList = new ArrayList<>();
-        if (presets.containsKey("default")) {
-            presetList.add(presets.get("default"));
-        }
-        if (presets.containsKey(UNNAMED_PRESET_KEY)) {
-            presetList.add(presets.get(UNNAMED_PRESET_KEY));
-        }
-        List<String> sortedKeys = new ArrayList<>(presets.keySet());
-        sortedKeys.remove("default");
-        sortedKeys.remove(UNNAMED_PRESET_KEY);
-        sortedKeys.sort(String::compareTo);
-
-        int customCount = 0;
-        for (String key : sortedKeys) {
-            if (customCount < MAX_PRESETS - 1) {
-                presetList.add(presets.get(key));
-                customCount++;
-            }
-        }
+        for (String key : getPresetKeys()) presetList.add(getPreset(key));
         return presetList;
     }
 
@@ -254,48 +248,55 @@ public class PresetsConfig {
         if (presets.containsKey(UNNAMED_PRESET_KEY)) {
             keys.add(UNNAMED_PRESET_KEY);
         }
-        List<String> sortedKeys = new ArrayList<>(presets.keySet());
+        Set<String> allKeys = new HashSet<>(presets.keySet());
+        allKeys.addAll(preservedPresets.keySet());
+        List<String> sortedKeys = new ArrayList<>(allKeys);
         sortedKeys.remove("default");
         sortedKeys.remove(UNNAMED_PRESET_KEY);
         sortedKeys.sort(String::compareTo);
 
-        int customCount = 0;
-        for (String key : sortedKeys) {
-            if (customCount < MAX_PRESETS - 1) {
-                keys.add(key);
-                customCount++;
-            }
-        }
+        keys.addAll(sortedKeys);
         return keys;
     }
 
     public boolean savePreset(String key, String name, Set<String> items) {
         if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
+            lastEditFailure = "reserved";
             return false;
         }
-        if (preservedPresets.containsKey(key)) {
-            com.kingodogo.buildscape.BuildScape.getLogger().warn("Not replacing preserved malformed preset " + key);
+        if (fileUnreadable) {
+            lastEditFailure = "unreadable";
             return false;
         }
 
         int customPresetCount = 0;
-        for (String k : presets.keySet()) {
+        for (String k : getPresetKeys()) {
             if (!k.equals("default") && !k.equals(UNNAMED_PRESET_KEY)) {
                 customPresetCount++;
             }
         }
 
-        if (!presets.containsKey(key) && customPresetCount >= MAX_PRESETS - 1) {
+        if (!presets.containsKey(key) && !preservedPresets.containsKey(key) && customPresetCount >= MAX_PRESETS - 1) {
+            lastEditFailure = "limit";
             return false;
         }
 
-        presets.put(key, new Preset(name, items));
-        save();
-        return true;
+        Preset previous = presets.put(key, new Preset(name, items));
+        com.google.gson.JsonElement preserved = preservedPresets.remove(key);
+        if (saveToDisk()) return true;
+        if (previous != null) presets.put(key, previous);
+        else presets.remove(key);
+        if (preserved != null) preservedPresets.put(key, preserved);
+        return false;
     }
 
     public Preset getPreset(String key) {
-        return presets.get(key);
+        Preset preset = presets.get(key);
+        return preset == null && preservedPresets.containsKey(key) ? new Preset(key, Set.of()) : preset;
+    }
+
+    public String getLastEditFailure() {
+        return lastEditFailure;
     }
 
     public static class Preset {
@@ -315,12 +316,25 @@ public class PresetsConfig {
 
     public boolean deletePreset(String key) {
         if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
+            lastEditFailure = "reserved";
             return false;
         }
-        if (presets.remove(key) != null) {
-            save();
-            return true;
+        if (fileUnreadable) {
+            lastEditFailure = "unreadable";
+            return false;
         }
+        Preset previous = presets.remove(key);
+        com.google.gson.JsonElement preserved = preservedPresets.remove(key);
+        if (previous != null || preserved != null) {
+            String previousLastApplied = lastAppliedPreset;
+            if (key.equals(lastAppliedPreset)) lastAppliedPreset = "default";
+            if (saveToDisk()) return true;
+            lastAppliedPreset = previousLastApplied;
+            if (previous != null) presets.put(key, previous);
+            if (preserved != null) preservedPresets.put(key, preserved);
+            return false;
+        }
+        lastEditFailure = "missing";
         return false;
     }
 

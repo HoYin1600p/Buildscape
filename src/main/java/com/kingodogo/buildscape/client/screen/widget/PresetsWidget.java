@@ -40,6 +40,7 @@ public class PresetsWidget extends AbstractWidget {
     }
 
     private String appliedPresetKey = null;
+    private net.minecraft.network.chat.Component failureMessage = net.minecraft.network.chat.TextComponent.EMPTY;
 
     private boolean showCreateOptions = false;
     private final Button createDefaultBtn;
@@ -190,12 +191,14 @@ public class PresetsWidget extends AbstractWidget {
     }
 
     private void saveCurrentPreset() {
+        failureMessage = net.minecraft.network.chat.TextComponent.EMPTY;
         if (selectedPresetKey != null && selectedPresetKey.equals("default")) {
             return;
         }
 
         String name = nameEditBox.getValue().trim();
         if (name.isEmpty()) {
+            showPresetFailure("name");
             return;
         }
 
@@ -207,10 +210,6 @@ public class PresetsWidget extends AbstractWidget {
                 && !selectedPresetKey.equals("_unnamed")) {
             key = selectedPresetKey;
         } else {
-            List<String> existingKeys = config.getPresetKeys();
-            if (existingKeys.size() >= 5) {
-                return;
-            }
             key = config.generatePresetKey();
         }
 
@@ -232,10 +231,17 @@ public class PresetsWidget extends AbstractWidget {
                     1.0f
                 );
             }
+        } else {
+            showPresetFailure(config.getLastEditFailure());
         }
     }
 
+    private void showPresetFailure(String reason) {
+        failureMessage = new TranslatableComponent("buildscape.config.preset.error." + reason);
+    }
+
     private void deleteSelectedPreset() {
+        failureMessage = net.minecraft.network.chat.TextComponent.EMPTY;
         if (selectedPresetKey != null && !selectedPresetKey.equals("default")) {
             PresetsConfig config = PresetsConfig.get();
             if (selectedPresetKey.equals("_unnamed")) {
@@ -286,6 +292,8 @@ public class PresetsWidget extends AbstractWidget {
                 }
                 nameEditBox.setEditable(false);
                 refreshPresets();
+            } else {
+                showPresetFailure(config.getLastEditFailure());
             }
         }
     }
@@ -408,13 +416,15 @@ public class PresetsWidget extends AbstractWidget {
         fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
 
         float textScale = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.getStandardTextScale();
+        String header = failureMessage.getString().isEmpty()
+                ? new TranslatableComponent("buildscape.config.presets").getString() : failureMessage.getString();
         poseStack.pushPose();
         poseStack.scale(textScale, textScale, 1.0f);
         Minecraft.getInstance().font.draw(
                 poseStack,
-                new TranslatableComponent("buildscape.config.presets"),
+                Minecraft.getInstance().font.plainSubstrByWidth(header, (int) ((width - 10) / textScale)),
                 (x + 5) / textScale, (y + 5) / textScale,
-                0xFFFFFF);
+                failureMessage.getString().isEmpty() ? 0xFFFFFF : 0xFF5555);
         poseStack.popPose();
 
         fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderColor);
@@ -521,6 +531,10 @@ public class PresetsWidget extends AbstractWidget {
         }
 
         deleteButton.active = selectedPresetKey != null && !selectedPresetKey.equals("default");
+        if (!failureMessage.getString().isEmpty() && Minecraft.getInstance().screen != null
+                && mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + headerAreaHeight) {
+            Minecraft.getInstance().screen.renderTooltip(poseStack, failureMessage, mouseX, mouseY);
+        }
     }
 
     @Override

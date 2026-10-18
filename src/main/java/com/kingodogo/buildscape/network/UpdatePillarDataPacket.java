@@ -174,6 +174,7 @@ public class UpdatePillarDataPacket {
 
             if (changed) {
                 data.modifiedTime = System.currentTimeMillis();
+                // Flush the explicit detail editor save before returning to gameplay.
                 manager.saveImmediate();
 
                 updateBlockEntity(player.server, data);

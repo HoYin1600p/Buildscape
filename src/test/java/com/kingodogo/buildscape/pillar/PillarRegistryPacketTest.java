@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.pillar;
 
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
+import com.kingodogo.buildscape.network.EditPillarRowsResultPacket;
 import com.kingodogo.buildscape.network.RemovePillarPacket;
 import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
 import io.netty.buffer.Unpooled;
@@ -11,6 +12,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,11 +32,11 @@ public class PillarRegistryPacketTest {
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         FriendlyByteBuf encoded = new FriendlyByteBuf(Unpooled.buffer());
         try {
-            new EditPillarRowsPacket(rows).encode(buffer);
+            new EditPillarRowsPacket(123L, rows).encode(buffer);
             assertTrue(buffer.readableBytes() < 32_767);
             EditPillarRowsPacket.decode(buffer).encode(encoded);
             assertEquals(0, buffer.readableBytes());
-            assertEquals(0L, encoded.readLong());
+            assertEquals(123L, encoded.readLong());
             assertEquals(EditPillarRowsPacket.MAX_ROWS, encoded.readInt());
             assertEquals("A".repeat(32), encoded.readUtf(32));
             assertEquals("B".repeat(32), encoded.readUtf(32));
@@ -45,6 +47,26 @@ public class PillarRegistryPacketTest {
         } finally {
             buffer.release();
             encoded.release();
+        }
+    }
+
+    @Test
+    public void resultRoundTripsConflictingRowReasonAndBatchId() throws Exception {
+        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
+        String reason = "position_conflict:" + "A".repeat(32) + ":" + "B".repeat(32);
+        try {
+            new EditPillarRowsResultPacket(456L, List.of("S-P1", "S-P2"), reason).encode(buffer);
+            EditPillarRowsResultPacket decoded = EditPillarRowsResultPacket.decode(buffer);
+            assertEquals(0, buffer.readableBytes());
+            for (String name : List.of("batchId", "oldIds", "reason")) {
+                Field field = EditPillarRowsResultPacket.class.getDeclaredField(name);
+                field.setAccessible(true);
+                Object expected = name.equals("batchId") ? 456L : name.equals("oldIds")
+                        ? List.of("S-P1", "S-P2") : reason;
+                assertEquals(expected, field.get(decoded));
+            }
+        } finally {
+            buffer.release();
         }
     }
 

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class EditPillarRowsResultPacket {
+    private static final int MAX_REASON_LENGTH = 96;
     private final long batchId;
     private final List<String> oldIds;
     private final String reason;
@@ -26,7 +27,7 @@ public class EditPillarRowsResultPacket {
         int count = NetworkPacketLimits.readCount(buf, EditPillarRowsPacket.MAX_ROWS, "pillar edit result");
         List<String> ids = new ArrayList<>(count);
         for (int i = 0; i < count; i++) ids.add(NetworkPacketLimits.readUtf(buf, 32, "old pillar id"));
-        return new EditPillarRowsResultPacket(batchId, ids, NetworkPacketLimits.readUtf(buf, 32, "edit result reason"));
+        return new EditPillarRowsResultPacket(batchId, ids, NetworkPacketLimits.readUtf(buf, MAX_REASON_LENGTH, "edit result reason"));
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -34,7 +35,7 @@ public class EditPillarRowsResultPacket {
         NetworkPacketLimits.checkCount(oldIds.size(), EditPillarRowsPacket.MAX_ROWS, "pillar edit result");
         buf.writeInt(oldIds.size());
         for (String id : oldIds) NetworkPacketLimits.writeUtf(buf, id, 32, "old pillar id");
-        NetworkPacketLimits.writeUtf(buf, reason, 32, "edit result reason");
+        NetworkPacketLimits.writeUtf(buf, reason, MAX_REASON_LENGTH, "edit result reason");
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -45,8 +46,8 @@ public class EditPillarRowsResultPacket {
     private void applyClient() {
         if (net.minecraft.client.Minecraft.getInstance().screen instanceof
                 com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen screen
-                && screen.getActiveTab() instanceof com.kingodogo.buildscape.client.screen.PillarIdsConfigTab tab) {
-            tab.acceptEditResult(batchId, oldIds, reason);
+                && screen.getPillarIdsTab() != null) {
+            screen.getPillarIdsTab().acceptEditResult(batchId, oldIds, reason);
         }
     }
 }

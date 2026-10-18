@@ -69,9 +69,15 @@ public class EditPillarRowsPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
-            String reason = player.hasPermissions(2) ? PillarIdManager.get().editPillarRows(rows) : "permission";
-            if (reason.isEmpty()) {
-                SyncPillarIdsPacket.sendToPlayer(player, PillarIdManager.get().getAllPillarDataForSync());
+            String reason;
+            try {
+                reason = player.hasPermissions(2) ? PillarIdManager.get().editPillarRows(rows) : "permission";
+                if (reason.isEmpty()) {
+                    SyncPillarIdsPacket.sendToPlayer(player, PillarIdManager.get().getAllPillarDataForSync());
+                }
+            } catch (Exception e) {
+                com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to edit pillar rows", e);
+                reason = "invalid";
             }
             ModMessages.INSTANCE.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
                     new EditPillarRowsResultPacket(batchId, rows.stream().map(row -> row.oldId).toList(), reason));

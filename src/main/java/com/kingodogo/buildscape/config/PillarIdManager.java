@@ -41,6 +41,7 @@ public class PillarIdManager {
 
     public static final String VALID_ID_PATTERN = "^[A-Z][A-Za-z0-9-]{1,31}$";
     private final Map<String, String> positionIndex = new ConcurrentHashMap<>();
+    private final Set<net.minecraft.world.level.chunk.LevelChunk> loadedChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private volatile List<PillarData> syncSnapshot = Collections.emptyList();
 
     private long lastLoadedTime = 0L;
@@ -106,6 +107,7 @@ public class PillarIdManager {
         isServerSynced = serverSynced;
         pillarData.clear();
         positionIndex.clear();
+        loadedChunks.clear();
         hasLoaded = false;
         loadInProgress = false;
         hadColorsOnLoad = false;
@@ -1279,70 +1281,6 @@ public class PillarIdManager {
         requestSave();
     }
 
-    public void forceSaveImmediate() {
-        if (!serverAuthoritative) {
-            return;
-        }
-        dirty = true;
-        try {
-            if (recoveryInProgress) {
-                return;
-            }
-
-            if (!hasLoaded) {
-                return;
-            }
-
-            int saveCount = pillarData.size();
-            if (saveCount == 0) {
-                return;
-            }
-
-            File saveDir = cachedWorldSaveDir;
-            if (saveDir == null || !saveDir.exists()) {
-                try {
-                    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                    if (server != null) {
-                        Path worldPath = server.getWorldPath(LevelResource.ROOT);
-                        if (worldPath != null) {
-                            saveDir = worldPath.resolve(FOLDER_NAME).toFile();
-                            if (!saveDir.exists()) {
-                                saveDir.mkdirs();
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                }
-            }
-
-            if (saveDir == null || !saveDir.exists()) {
-                System.err.println("BuildScape: forceSaveImmediate - Cannot find save directory!");
-                return;
-            }
-
-            File saveFile = new File(saveDir, FILE_NAME);
-            if (!saveToFile(saveFile, FILE_NAME)) {
-                return;
-            }
-
-            File backupFile = new File(saveDir, BACKUP_FILE_NAME);
-            saveToFile(backupFile, BACKUP_FILE_NAME);
-
-            if (saveFile.exists()) {
-                lastLoadedTime = saveFile.lastModified();
-                lastFileSize = saveFile.length();
-            }
-
-            dirty = false;
-            fileWasDeleted = false;
-            saveRequested = false;
-            syncDirty = true;
-        } catch (Throwable t) {
-            System.err.println("BuildScape: Error in forceSaveImmediate: " + t.getMessage());
-            t.printStackTrace();
-        }
-    }
-
     public void savePeriodic(boolean includeBackup) {
         if (!serverAuthoritative) {
             return;
@@ -1952,32 +1890,37 @@ public class PillarIdManager {
             data.y = row.y;
             data.z = row.z;
             data.modifiedTime = System.currentTimeMillis();
-            if (finalData.putIfAbsent(row.newId, data) != null) return "id_conflict";
+            if (finalData.putIfAbsent(row.newId, data) != null) return editConflict("id_conflict", row);
         }
-        Set<String> positions = new HashSet<>();
+        Map<String, PillarData> positions = new HashMap<>();
         for (PillarData data : finalData.values()) {
             net.minecraft.core.Direction facing = data.facing != null
                     ? net.minecraft.core.Direction.byName(data.facing) : null;
-            if (!positions.add(positionKey(data.dimension, data.getBlockPos(), facing))) return "position_conflict";
+            PillarData conflict = positions.putIfAbsent(positionKey(data.dimension, data.getBlockPos(), facing), data);
+            if (conflict != null) {
+                for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+                    if (row.newId.equals(data.id) || row.newId.equals(conflict.id)) return editConflict("position_conflict", row);
+                }
+                return "position_conflict";
+            }
         }
         if (rows.isEmpty()) return "";
 
         Map<com.kingodogo.buildscape.block.PillarBlockEntity, String> loadedUpdates = new HashMap<>();
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server != null) {
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
-                for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
-                    PillarData previous = pillarData.get(row.oldId);
-                    if (!Objects.equals(previous.dimension, getDimensionKey(level)) || previous.facing != null) continue;
-                    BlockPos pos = previous.getBlockPos();
-                    if (!level.hasChunkAt(pos)) continue;
-                    if (!(level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.PillarBlockEntity base)) continue;
-                    pos = base.findStackBottom();
-                    while (level.hasChunkAt(pos)
-                            && level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar) {
-                        if (Objects.equals(pillar.getPillarId(), row.oldId)) loadedUpdates.put(pillar, row.newId);
-                        pos = pos.above();
-                    }
+        for (net.minecraft.world.level.chunk.LevelChunk chunk : loadedChunks) {
+            Level level = chunk.getLevel();
+            Map<String, String> renamedIds = new HashMap<>();
+            for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+                PillarData previous = pillarData.get(row.oldId);
+                if (Objects.equals(previous.dimension, getDimensionKey(level)) && previous.facing == null) {
+                    renamedIds.put(row.oldId, row.newId);
+                }
+            }
+            if (renamedIds.isEmpty()) continue;
+            for (net.minecraft.world.level.block.entity.BlockEntity be : chunk.getBlockEntities().values()) {
+                if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar && !pillar.isRemoved()) {
+                    String renamedId = renamedIds.get(pillar.getPillarId());
+                    if (renamedId != null) loadedUpdates.put(pillar, renamedId);
                 }
             }
         }
@@ -1985,10 +1928,20 @@ public class PillarIdManager {
         pillarData.putAll(finalData);
         rebuildPositionIndex();
         loadedUpdates.forEach(com.kingodogo.buildscape.block.PillarBlockEntity::setPillarId);
+        // Persist an explicit editor apply now; keep a deferred retry if the immediate save is refused.
         requestSave();
         saveImmediate();
         refreshSyncSnapshot();
         return "";
+    }
+
+    private static String editConflict(String reason, com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row) {
+        return reason + ":" + row.oldId + ":" + row.newId;
+    }
+
+    public synchronized void trackLoadedChunk(net.minecraft.world.level.chunk.LevelChunk chunk, boolean loaded) {
+        if (loaded) loadedChunks.add(chunk);
+        else loadedChunks.remove(chunk);
     }
 
     public synchronized void replaceFromServerSync(Collection<PillarData> syncedData) {
@@ -2112,16 +2065,20 @@ public class PillarIdManager {
             return;
         }
 
+        if (pillar.getLevel() instanceof net.minecraft.server.level.ServerLevel level) {
+            net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunkSource().getChunkNow(
+                    pillar.getBlockPos().getX() >> 4, pillar.getBlockPos().getZ() >> 4);
+            if (chunk != null) trackLoadedChunk(chunk, true);
+        }
         if (!hasLoaded || !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) return;
         String dimension = getDimensionKey(pillar.getLevel());
-        BlockPos basePos = pillar.findStackBottom();
-        String authoritativeId = positionIndex.get(positionKey(dimension, basePos));
-        if (authoritativeId != null && !Objects.equals(authoritativeId, pillar.getPillarId())) {
-            pillar.setPillarId(authoritativeId);
-            return;
-        }
         String id = pillar.getPillarId();
         if (id == null || id.isEmpty()) {
+            return;
+        }
+        String authoritativeId = reconcilePillarId(id, dimension, pillar.findStackBottom());
+        if (!Objects.equals(authoritativeId, id)) {
+            pillar.setPillarId(authoritativeId);
             return;
         }
 
@@ -2152,7 +2109,13 @@ public class PillarIdManager {
         }
     }
 
-    private void saveFrameChange(boolean immediate) {
+    private String reconcilePillarId(String savedId, String dimension, BlockPos basePos) {
+        if (savedId == null || savedId.isEmpty() || pillarData.containsKey(savedId)) return savedId;
+        String authoritativeId = positionIndex.get(positionKey(dimension, basePos));
+        return authoritativeId != null ? authoritativeId : savedId;
+    }
+
+    private void saveFrameChange() {
         requestSave();
     }
 
@@ -2210,7 +2173,7 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            saveFrameChange(immediate);
+            saveFrameChange();
         } else {
             positionIndex.put(posKey, id);
             boolean changed = removedDuplicate;
@@ -2247,7 +2210,7 @@ public class PillarIdManager {
 
             if (changed) {
                 existing.modifiedTime = System.currentTimeMillis();
-                saveFrameChange(immediate);
+                saveFrameChange();
             }
         }
     }
@@ -2314,7 +2277,7 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            saveFrameChange(immediate);
+            saveFrameChange();
         } else {
             positionIndex.put(posKey, id);
             boolean changed = removedDuplicate;
@@ -2356,7 +2319,7 @@ public class PillarIdManager {
 
             if (changed) {
                 existing.modifiedTime = System.currentTimeMillis();
-                saveFrameChange(immediate);
+                saveFrameChange();
             }
         }
     }

@@ -121,6 +121,7 @@ public class BuildScapeConfigScreen extends Screen {
     private ConfigCategoryButton worldSettingsButton;
     private ConfigCategoryButton reportButton;
     private AbstractConfigTab activeTab;
+    private PillarIdsConfigTab pillarIdsTab;
     private Button kofiButton;
 
     private int lastWindowWidth = -1;
@@ -475,6 +476,11 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     public void setActiveTab(AbstractConfigTab tab) {
+        if (activeTab instanceof PillarIdsConfigTab idsTab && !idsTab.canLeave()) return;
+        if (tab instanceof PillarIdsConfigTab idsTab) {
+            if (pillarIdsTab == null) pillarIdsTab = idsTab;
+            tab = pillarIdsTab;
+        }
         if (activeTab != null) {
             activeTab.onClose();
         }
@@ -500,6 +506,16 @@ public class BuildScapeConfigScreen extends Screen {
 
     public AbstractConfigTab getActiveTab() {
         return activeTab;
+    }
+
+    public PillarIdsConfigTab getPillarIdsTab() {
+        return pillarIdsTab;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (pillarIdsTab != null) pillarIdsTab.checkEditTimeout();
     }
 
     public void refreshCurrentTab() {
@@ -661,6 +677,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     @Override
     public void onClose() {
+        if (activeTab instanceof PillarIdsConfigTab idsTab && !idsTab.canLeave()) return;
         if (activeTab != null) {
             activeTab.onClose();
         }

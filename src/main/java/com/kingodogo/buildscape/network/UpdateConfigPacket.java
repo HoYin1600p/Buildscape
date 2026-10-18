@@ -230,6 +230,7 @@ public class UpdateConfigPacket {
                 }
 
                 if (updatedAny) {
+                    // Persist the explicit config apply together with the updated registry settings.
                     manager.saveImmediate();
                 }
 

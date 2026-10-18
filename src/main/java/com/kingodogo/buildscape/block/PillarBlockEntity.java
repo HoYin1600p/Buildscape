@@ -728,7 +728,7 @@ public class PillarBlockEntity extends BlockEntity {
             manager.syncPatternSettingsFromNBT(this, data);
             data.pattern = pattern;
             data.modifiedTime = System.currentTimeMillis();
-            manager.saveImmediate();
+            manager.requestSave();
         }
     }
 

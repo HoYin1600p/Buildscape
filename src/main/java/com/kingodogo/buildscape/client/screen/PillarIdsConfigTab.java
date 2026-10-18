@@ -59,8 +59,11 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     private long lastRefreshCheck = 0L;
     private String lastSignature = "";
     private boolean dirty = false;
+    private boolean leaveBlocked = false;
     private static long nextBatchId;
     private long pendingBatchId;
+    private long pendingSince;
+    private static final long EDIT_TIMEOUT_NS = 10_000_000_000L;
     private final Map<PillarRow, EditPillarRowsPacket.Row> pendingEdits = new LinkedHashMap<>();
     private Component statusMessage = TextComponent.EMPTY;
     private final com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer scrollbarRenderer = new com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer();
@@ -71,6 +74,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     @Override
     public void init() {
+        Component previousStatus = statusMessage;
         if (!dirty && pendingEdits.isEmpty()) {
             rows.clear();
             rowsById.clear();
@@ -174,6 +178,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
 
         refreshFromManager();
+        if (!previousStatus.getString().isEmpty()) statusMessage = previousStatus;
     }
 
     private void manualReload() {
@@ -342,7 +347,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             statusMessage = new TranslatableComponent("buildscape.config.ids.status.too_many", EditPillarRowsPacket.MAX_ROWS);
             return;
         }
-        if (edits.isEmpty()) return;
+        if (edits.isEmpty()) {
+            dirty = false;
+            for (PillarRow row : rows) row.rejectionReason = "";
+            statusMessage = TextComponent.EMPTY;
+            return;
+        }
         pendingBatchId = ++nextBatchId;
         for (EditPillarRowsPacket.Row edit : edits) {
             PillarRow row = findRow(edit.oldId);
@@ -353,7 +363,35 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
         dirty = true;
         statusMessage = new TranslatableComponent("buildscape.config.ids.status.saving");
+        pendingSince = System.nanoTime();
         ModMessages.INSTANCE.sendToServer(new EditPillarRowsPacket(pendingBatchId, edits));
+    }
+
+    public boolean canLeave() {
+        checkEditTimeout();
+        if (!pendingEdits.isEmpty()) {
+            leaveBlocked = true;
+            return false;
+        }
+        if (dirty) saveRows();
+        leaveBlocked = dirty || !pendingEdits.isEmpty();
+        return !leaveBlocked;
+    }
+
+    public void checkEditTimeout() {
+        if (!pendingEdits.isEmpty() && System.nanoTime() - pendingSince >= EDIT_TIMEOUT_NS) {
+            pendingEdits.clear();
+            dirty = true;
+            statusMessage = new TranslatableComponent("buildscape.config.ids.status.no_reply");
+        }
+    }
+
+    private Component rejectionMessage(String reason) {
+        String[] parts = reason.split(":", 3);
+        Component message = new TranslatableComponent("buildscape.config.ids.reject." + parts[0]);
+        return parts.length == 3
+                ? new TranslatableComponent("buildscape.config.ids.reject.row", parts[1], parts[2], message)
+                : message;
     }
 
     public void acceptEditResult(long batchId, List<String> oldIds, String reason) {
@@ -382,7 +420,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
         statusMessage = rejected > 0
                 ? new TranslatableComponent("buildscape.config.ids.status.rejected", rejected,
-                        new TranslatableComponent("buildscape.config.ids.reject." + reason))
+                        rejectionMessage(reason.isEmpty() ? "invalid" : reason))
                 : new TranslatableComponent(dirty ? "buildscape.config.ids.unsaved" : "buildscape.config.ids.status.saved");
     }
 
@@ -390,7 +428,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         for (PillarRow row : rows) {
             if (row.visible && !row.rejectionReason.isEmpty() && row.isMouseOverRow(mouseX, mouseY)) {
-                parent.renderTooltip(poseStack, new TranslatableComponent("buildscape.config.ids.reject." + row.rejectionReason), mouseX, mouseY);
+                parent.renderTooltip(poseStack, rejectionMessage(row.rejectionReason), mouseX, mouseY);
                 return;
             }
         }
@@ -469,6 +507,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        checkEditTimeout();
         boolean canSave = pendingEdits.isEmpty();
         applyButton.active = canSave;
         reloadButton.active = canSave;
@@ -576,7 +615,9 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         int statusY = contentY + contentHeight - BuildScapeConfigScreen.scaleSize(14);
         if (statusMessage != null && !statusMessage.getString().isEmpty()) {
-            Minecraft.getInstance().font.draw(poseStack, statusMessage, tableX, statusY, 0xFFFFFF);
+            Component message = leaveBlocked && dirty
+                    ? new TranslatableComponent("buildscape.config.ids.status.leave_blocked", statusMessage) : statusMessage;
+            Minecraft.getInstance().font.draw(poseStack, message, tableX, statusY, 0xFFFFFF);
         } else if (dirty) {
             Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.unsaved"),
                     tableX, statusY, 0xFFFFFF);
@@ -889,9 +930,6 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     @Override
     public void onClose() {
-        if (dirty) {
-            saveRows();
-        }
         setButtonsVisible(false);
         for (PillarRow row : rows) {
             row.setVisible(false);
@@ -1789,6 +1827,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
 
         private void handleDoubleClick() {
+            if (!canLeave()) return;
             if (id == null || id.isEmpty()) {
                 return;
             }

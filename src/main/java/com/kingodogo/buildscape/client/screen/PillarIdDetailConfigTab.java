@@ -544,11 +544,6 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             while (pillarData.dyeColors.size() > currentMaxColor) {
                 pillarData.dyeColors.remove(pillarData.dyeColors.size() - 1);
             }
-            while (!pillarData.dyeColors.isEmpty() &&
-                   (pillarData.dyeColors.get(pillarData.dyeColors.size() - 1).equals("#FFFFFF") ||
-                    pillarData.dyeColors.get(pillarData.dyeColors.size() - 1).equals("#ffffff"))) {
-                pillarData.dyeColors.remove(pillarData.dyeColors.size() - 1);
-            }
         }
 
         pillarData.modifiedTime = System.currentTimeMillis();

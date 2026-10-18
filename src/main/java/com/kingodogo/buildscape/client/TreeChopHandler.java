@@ -50,7 +50,11 @@ public class TreeChopHandler {
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null || mc.level == null) return;
+        if (player == null || mc.level == null) {
+            clearSelection();
+            cachedLevel = null;
+            return;
+        }
 
         if (cachedLevel != mc.level) {
             resetTarget(mc, player);
@@ -229,6 +233,24 @@ public class TreeChopHandler {
         if (mc.level != null && targetBlockPos != null) {
             mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
         }
+        clearSelection();
+    }
+
+    @SubscribeEvent
+    public static void onLogout(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent event) {
+        clearSelection();
+        cachedLevel = null;
+    }
+
+    @SubscribeEvent
+    public static void onWorldUnload(net.minecraftforge.event.world.WorldEvent.Unload event) {
+        if (event.getWorld() == cachedLevel) {
+            clearSelection();
+            cachedLevel = null;
+        }
+    }
+
+    private static void clearSelection() {
         targetBlockPos = null;
         breakingStartTime = 0;
         connectedLogsCache.clear();

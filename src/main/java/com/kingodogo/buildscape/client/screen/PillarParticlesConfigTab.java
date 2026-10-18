@@ -1178,10 +1178,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        poseStack.popPose();
-        poseStack.pushPose();
-        poseStack.popPose();
-
         int patternBorderColor = 0xFF666666;
         GuiComponent.fill(poseStack, patternBoxX, patternBoxY, patternBoxX + patternBoxWidth, patternBoxY + 1,
                 patternBorderColor);

@@ -21,6 +21,7 @@ public class FireflyParticle extends TextureSheetParticle {
 
     private static final Map<BlockPos, Set<FireflyParticle>> ACTIVE_FIREFLIES = new ConcurrentHashMap<>();
     private BlockPos cell;
+    private long lastTickTime;
 
     private final SpriteSet sprites;
     private final float baseAlpha;
@@ -31,8 +32,15 @@ public class FireflyParticle extends TextureSheetParticle {
         for (int cx = cellCoordinate(x - radius); cx <= cellCoordinate(x + radius); cx++) {
             for (int cy = cellCoordinate(y - radius); cy <= cellCoordinate(y + radius); cy++) {
                 for (int cz = cellCoordinate(z - radius); cz <= cellCoordinate(z + radius); cz++) {
-                    Set<FireflyParticle> particles = ACTIVE_FIREFLIES.get(new BlockPos(cx, cy, cz));
+                    BlockPos cellPos = new BlockPos(cx, cy, cz);
+                    Set<FireflyParticle> particles = ACTIVE_FIREFLIES.get(cellPos);
                     if (particles == null) continue;
+                    particles.removeIf(p -> !p.isAlive() || p.level != level
+                            || level.getGameTime() - p.lastTickTime > 2L);
+                    if (particles.isEmpty()) {
+                        ACTIVE_FIREFLIES.remove(cellPos, particles);
+                        continue;
+                    }
                     for (FireflyParticle p : particles) {
                         if (!p.isAlive() || p.level != level) continue;
                         double dx = p.x - x;
@@ -52,6 +60,7 @@ public class FireflyParticle extends TextureSheetParticle {
                               double xSpeed, double ySpeed, double zSpeed,
                               SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+        this.lastTickTime = level.getGameTime();
         this.sprites = sprites;
 
         this.lifetime = 200 + level.random.nextInt(101);
@@ -106,6 +115,7 @@ public class FireflyParticle extends TextureSheetParticle {
 
     @Override
     public void tick() {
+        this.lastTickTime = this.level.getGameTime();
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;

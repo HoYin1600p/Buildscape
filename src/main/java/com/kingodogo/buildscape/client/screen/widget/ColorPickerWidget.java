@@ -282,12 +282,12 @@ public class ColorPickerWidget extends AbstractWidget {
         fill(poseStack, hueSliderX + scaledHueSliderWidth, hueSliderY - 1, hueSliderX + scaledHueSliderWidth + 1,
                 hueSliderY + scaledHueSliderHeight + 1, 0xFF000000);
 
-        int indicatorX = gradientX + (int) (saturation * scaledGradientSize);
-        int indicatorY = gradientY + (int) ((1.0f - brightness) * scaledGradientSize);
+        int indicatorX = gradientX + (int) (saturation * Math.max(0, scaledGradientSize - 1));
+        int indicatorY = gradientY + (int) ((1.0f - brightness) * Math.max(0, scaledGradientSize - 1));
         fill(poseStack, indicatorX - 2, indicatorY - 2, indicatorX + 2, indicatorY + 2, 0xFFFFFFFF);
         fill(poseStack, indicatorX - 1, indicatorY - 1, indicatorX + 1, indicatorY + 1, 0xFF000000);
 
-        int hueIndicatorY = hueSliderY + (int) ((hue / 360.0f) * scaledHueSliderHeight);
+        int hueIndicatorY = hueSliderY + (int) ((hue / 360.0f) * Math.max(0, scaledHueSliderHeight - 1));
         fill(poseStack, hueSliderX - 3, hueIndicatorY - 2, hueSliderX, hueIndicatorY + 2, 0xFFFFFFFF);
         fill(poseStack, hueSliderX + scaledHueSliderWidth, hueIndicatorY - 2, hueSliderX + scaledHueSliderWidth + 3,
                 hueIndicatorY + 2, 0xFFFFFFFF);
@@ -358,7 +358,7 @@ public class ColorPickerWidget extends AbstractWidget {
                 sliderY + scaledSliderHeight + 1, 0xFF000000);
 
         float ratio = (value - min) / (float) (max - min);
-        int indicatorX = sliderX + (int) (ratio * scaledSliderWidth);
+        int indicatorX = sliderX + (int) (ratio * Math.max(0, scaledSliderWidth - 1));
         fill(poseStack, indicatorX - 1, sliderY - 2, indicatorX + 1, sliderY + scaledSliderHeight + 2, 0xFFFFFFFF);
         fill(poseStack, indicatorX, sliderY - 1, indicatorX, sliderY + scaledSliderHeight + 1, 0xFF000000);
 
@@ -403,22 +403,22 @@ public class ColorPickerWidget extends AbstractWidget {
         }
 
         for (int py = 0; py < GRADIENT_SIZE; py++) {
-            float pixelBrightness = 1.0f - (py / (float) GRADIENT_SIZE);
+            float pixelBrightness = 1.0f - ColorPickerGeometry.fraction(py, 0, GRADIENT_SIZE);
             for (int px = 0; px < GRADIENT_SIZE; px++) {
-                float pixelSaturation = px / (float) GRADIENT_SIZE;
+                float pixelSaturation = ColorPickerGeometry.fraction(px, 0, GRADIENT_SIZE);
                 setTexturePixel(image, px, py, hsbToRgb(hue, pixelSaturation, pixelBrightness));
             }
         }
 
         for (int py = 0; py < HUE_SLIDER_HEIGHT; py++) {
-            float pixelHue = (py / (float) HUE_SLIDER_HEIGHT) * 360.0f;
+            float pixelHue = ColorPickerGeometry.fraction(py, 0, HUE_SLIDER_HEIGHT) * 360.0f;
             setTexturePixel(image, 0, HUE_TEXTURE_Y + py, hsbToRgb(pixelHue, 1.0f, 1.0f));
         }
 
         int saturationBase = hsbToRgb(hue, 1.0f, brightness);
         int brightnessBase = hsbToRgb(hue, saturation, 1.0f);
         for (int px = 0; px < SLIDER_WIDTH; px++) {
-            float ratio = px / (float) SLIDER_WIDTH;
+            float ratio = ColorPickerGeometry.fraction(px, 0, SLIDER_WIDTH);
             int variable = (int) (ratio * 255);
             setTexturePixel(image, px, SLIDER_TEXTURE_Y, (variable << 16) | (g << 8) | b);
             setTexturePixel(image, px, SLIDER_TEXTURE_Y + 1, (r << 16) | (variable << 8) | b);
@@ -475,7 +475,7 @@ public class ColorPickerWidget extends AbstractWidget {
         if (gradientColor == -1) {
             if (label.equals("H")) {
                 for (int px = 0; px < SLIDER_WIDTH; px++) {
-                    float h = (px / (float) SLIDER_WIDTH) * 360.0f;
+                    float h = ColorPickerGeometry.fraction(px, 0, SLIDER_WIDTH) * 360.0f;
                     int color = hsbToRgb(h, 1.0f, 1.0f);
                     fill(poseStack, sliderX + px, sliderY, sliderX + px + 1, sliderY + SLIDER_HEIGHT,
                             0xFF000000 | color);
@@ -483,7 +483,7 @@ public class ColorPickerWidget extends AbstractWidget {
             } else {
                 int baseColor = label.equals("S") ? hsbToRgb(hue, 1.0f, brightness) : hsbToRgb(hue, saturation, 1.0f);
                 for (int px = 0; px < SLIDER_WIDTH; px++) {
-                    float ratio = px / (float) SLIDER_WIDTH;
+                    float ratio = ColorPickerGeometry.fraction(px, 0, SLIDER_WIDTH);
                     int r = (baseColor >> 16) & 0xFF;
                     int g = (baseColor >> 8) & 0xFF;
                     int bl = baseColor & 0xFF;
@@ -503,7 +503,7 @@ public class ColorPickerWidget extends AbstractWidget {
             }
         } else {
             for (int px = 0; px < SLIDER_WIDTH; px++) {
-                float ratio = px / (float) SLIDER_WIDTH;
+                float ratio = ColorPickerGeometry.fraction(px, 0, SLIDER_WIDTH);
                 int color = 0;
                 if (label.equals("R")) {
                     color = ((int) (ratio * 255) << 16) | ((g << 8) | b);
@@ -524,7 +524,7 @@ public class ColorPickerWidget extends AbstractWidget {
                 0xFF000000);
 
         float ratio = (value - min) / (float) (max - min);
-        int indicatorX = sliderX + (int) (ratio * SLIDER_WIDTH);
+        int indicatorX = sliderX + (int) (ratio * Math.max(0, SLIDER_WIDTH - 1));
         fill(poseStack, indicatorX - 1, sliderY - 2, indicatorX + 1, sliderY + SLIDER_HEIGHT + 2, 0xFFFFFFFF);
         fill(poseStack, indicatorX, sliderY - 1, indicatorX, sliderY + SLIDER_HEIGHT + 1, 0xFF000000);
 
@@ -568,7 +568,7 @@ public class ColorPickerWidget extends AbstractWidget {
         }
 
         float totalUnscaledWidth = GRADIENT_SIZE + 5 + HUE_SLIDER_WIDTH + 10 + 15 + SLIDER_WIDTH + VALUE_TEXT_WIDTH
-                + 10;
+                + 15;
         float totalUnscaledHeight = GRADIENT_SIZE + 5 + 20 + 10;
 
         float scaleX = (float) width / totalUnscaledWidth;
@@ -597,10 +597,8 @@ public class ColorPickerWidget extends AbstractWidget {
                 mouseY >= gradientY - 2 && mouseY < gradientY + scaledGradientSize + 2) {
             draggingGradient = true;
             clearOtherDragging();
-            double clampedX = Math.max(gradientX, Math.min(gradientX + scaledGradientSize - 1, mouseX));
-            double clampedY = Math.max(gradientY, Math.min(gradientY + scaledGradientSize - 1, mouseY));
-            saturation = (float) Math.max(0, Math.min(1, (clampedX - gradientX) / (double) scaledGradientSize));
-            brightness = (float) Math.max(0, Math.min(1, 1.0 - (clampedY - gradientY) / (double) scaledGradientSize));
+            saturation = ColorPickerGeometry.fraction(mouseX, gradientX, scaledGradientSize);
+            brightness = 1.0f - ColorPickerGeometry.fraction(mouseY, gradientY, scaledGradientSize);
             updateColorFromHsb();
             return true;
         }
@@ -611,9 +609,7 @@ public class ColorPickerWidget extends AbstractWidget {
             draggingR = draggingG = draggingB = false;
             draggingH = draggingS = draggingBrightness = false;
             draggingHue = true;
-            double clampedY = Math.max(hueSliderY, Math.min(hueSliderY + scaledHueSliderHeight - 1, mouseY));
-            hue = (float) Math.max(0,
-                    Math.min(360, ((clampedY - hueSliderY) / (double) scaledHueSliderHeight) * 360.0));
+            hue = ColorPickerGeometry.fraction(mouseY, hueSliderY, scaledHueSliderHeight) * 360.0f;
             updateColorFromHsb();
             return true;
         }
@@ -621,8 +617,7 @@ public class ColorPickerWidget extends AbstractWidget {
         int labelW = (int) (15 * scale);
         int sliderX = rgbStartX + labelW;
         if (mouseX >= sliderX - 2 && mouseX < sliderX + scaledSliderWidth + 2) {
-            double clampedX = Math.max(sliderX, Math.min(sliderX + scaledSliderWidth - 1, mouseX));
-            float ratio = (float) Math.max(0, Math.min(1, (clampedX - sliderX) / (double) scaledSliderWidth));
+            float ratio = ColorPickerGeometry.fraction(mouseX, sliderX, scaledSliderWidth);
 
             if (mouseY >= rgbStartY - 2 && mouseY < rgbStartY + scaledSliderSpacing + 2) {
                 draggingGradient = false;
@@ -657,8 +652,7 @@ public class ColorPickerWidget extends AbstractWidget {
         }
 
         if (mouseX >= sliderX - 2 && mouseX < sliderX + scaledSliderWidth + 2) {
-            double clampedX = Math.max(sliderX, Math.min(sliderX + scaledSliderWidth - 1, mouseX));
-            float ratio = (float) Math.max(0, Math.min(1, (clampedX - sliderX) / (double) scaledSliderWidth));
+            float ratio = ColorPickerGeometry.fraction(mouseX, sliderX, scaledSliderWidth);
 
             if (mouseY >= hsbStartY - 2 && mouseY < hsbStartY + scaledSliderSpacing + 2) {
                 draggingGradient = false;
@@ -711,7 +705,7 @@ public class ColorPickerWidget extends AbstractWidget {
         }
 
         float totalUnscaledWidth = GRADIENT_SIZE + 5 + HUE_SLIDER_WIDTH + 10 + 15 + SLIDER_WIDTH + VALUE_TEXT_WIDTH
-                + 10;
+                + 15;
         float totalUnscaledHeight = GRADIENT_SIZE + 5 + 20 + 10;
 
         float scaleX = (float) width / totalUnscaledWidth;
@@ -737,25 +731,20 @@ public class ColorPickerWidget extends AbstractWidget {
         int sliderX = rgbStartX + labelW;
 
         if (draggingGradient) {
-            double clampedX = Math.max(gradientX, Math.min(gradientX + scaledGradientSize - 1, mouseX));
-            double clampedY = Math.max(gradientY, Math.min(gradientY + scaledGradientSize - 1, mouseY));
-            saturation = (float) Math.max(0, Math.min(1, (clampedX - gradientX) / (double) scaledGradientSize));
-            brightness = (float) Math.max(0, Math.min(1, 1.0 - (clampedY - gradientY) / (double) scaledGradientSize));
+            saturation = ColorPickerGeometry.fraction(mouseX, gradientX, scaledGradientSize);
+            brightness = 1.0f - ColorPickerGeometry.fraction(mouseY, gradientY, scaledGradientSize);
             updateColorFromHsb();
             return true;
         }
 
         if (draggingHue) {
-            double clampedY = Math.max(hueSliderY, Math.min(hueSliderY + scaledHueSliderHeight - 1, mouseY));
-            hue = (float) Math.max(0,
-                    Math.min(360, ((clampedY - hueSliderY) / (double) scaledHueSliderHeight) * 360.0));
+            hue = ColorPickerGeometry.fraction(mouseY, hueSliderY, scaledHueSliderHeight) * 360.0f;
             updateColorFromHsb();
             return true;
         }
 
         if (draggingR || draggingG || draggingB || draggingH || draggingS || draggingBrightness) {
-            double clampedX = Math.max(sliderX, Math.min(sliderX + scaledSliderWidth - 1, mouseX));
-            float ratio = (float) Math.max(0, Math.min(1, (clampedX - sliderX) / (double) scaledSliderWidth));
+            float ratio = ColorPickerGeometry.fraction(mouseX, sliderX, scaledSliderWidth);
 
             if (draggingR) {
                 r = (int) (ratio * 255);

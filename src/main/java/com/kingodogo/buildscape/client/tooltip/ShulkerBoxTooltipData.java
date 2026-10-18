@@ -143,21 +143,20 @@ public class ShulkerBoxTooltipData implements TooltipComponent, ClientTooltipCom
                     int itemX = slotX + 1;
                     int itemY = slotY + 1;
 
+                    float prevBlit = itemRenderer.blitOffset;
                     try {
                         if (!real.isEmpty()) {
-                            float prevBlit = itemRenderer.blitOffset;
                             itemRenderer.blitOffset = blitOffset + 100.0F;
                             itemRenderer.renderAndDecorateItem(mc.player, real, itemX, itemY, index);
                             itemRenderer.renderGuiItemDecorations(font, real, itemX, itemY);
-                            itemRenderer.blitOffset = prevBlit;
                         } else if (!filter.isEmpty()) {
-                            float prevBlit = itemRenderer.blitOffset;
                             itemRenderer.blitOffset = blitOffset + 100.0F;
                             itemRenderer.renderAndDecorateItem(mc.player, filter, itemX, itemY, index);
-                            itemRenderer.blitOffset = prevBlit;
                         }
                     } catch (Throwable itemError) {
                         BuildScape.getLogger().debug("ShulkerBoxTooltipData: Error rendering item slot " + index, itemError);
+                    } finally {
+                        itemRenderer.blitOffset = prevBlit;
                     }
                 }
             }

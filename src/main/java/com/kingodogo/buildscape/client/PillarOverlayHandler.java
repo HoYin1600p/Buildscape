@@ -66,6 +66,15 @@ public class PillarOverlayHandler {
                 if (ItemFrameParticleHandler.hasCustomColors(itemFrame)) {
                     renderItemFrameOverlay(event.getMatrixStack(), mc, itemFrame);
                 }
+            } else if (entityHit.getEntity() instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
+                List<String> colors = ItemFrameParticleHandler.getParticleColorsColored(coloredFrame);
+                if (!colors.isEmpty()) {
+                    String frameId = ItemFrameParticleHandler.getFrameIdColored(coloredFrame);
+                    renderOverlay(event.getMatrixStack(), mc.font,
+                            mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(),
+                            frameId != null ? frameId : "Unknown", colors,
+                            ItemFrameParticleHandler.MAX_DYE_COLORS);
+                }
             }
             return;
         }

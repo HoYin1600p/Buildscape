@@ -132,8 +132,11 @@ public abstract class ScreenMixin {
             }
 
             poseStack.pushPose();
-            customComponent.renderImage(this.font, customX, customY, poseStack, this.itemRenderer, 400);
-            poseStack.popPose();
+            try {
+                customComponent.renderImage(this.font, customX, customY, poseStack, this.itemRenderer, 400);
+            } finally {
+                poseStack.popPose();
+            }
         } catch (Throwable t) {
             BuildScape.getLogger().debug("BuildScape: Suppressed error during custom tooltip rendering", t);
         } finally {

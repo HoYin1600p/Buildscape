@@ -71,6 +71,11 @@ public class MobPillarRenderer {
             return;
         }
 
+        if (state.parsedStates.contains("giant") &&
+                (entityType == EntityType.ZOMBIE || entityType == EntityType.HUSK || entityType == EntityType.DROWNED)) {
+            entityType = EntityType.GIANT;
+        }
+
         Entity entity = entityCache.get(pos);
         if (entity == null || entity.getType() != entityType || !entity.isAlive()) {
             if (entity != null) {
@@ -104,12 +109,6 @@ public class MobPillarRenderer {
     }
 
     private static Entity createEntity(EntityType<?> entityType, Level level, BlockPos pos, MobState state) {
-        if (state.parsedStates.contains("giant") &&
-                (entityType == EntityType.ZOMBIE || entityType == EntityType.HUSK || entityType == EntityType.DROWNED)) {
-            entityType = EntityType.GIANT;
-        }
-
-
         CompoundTag nbt = new CompoundTag();
         nbt.putString("id", net.minecraftforge.registries.ForgeRegistries.ENTITIES.getKey(entityType).toString());
 

@@ -47,6 +47,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private final List<PillarRow> rows = new ArrayList<>();
+    private final Map<String, PillarRow> rowsById = new HashMap<>();
     private Button reloadButton;
     private Button selectAllButton;
     private Button removeAllButton;
@@ -68,6 +69,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     @Override
     public void init() {
         rows.clear();
+        rowsById.clear();
         scrollOffset = 0;
         maxScroll = 0;
         dirty = false;
@@ -232,6 +234,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             if (row == null) {
                 row = new PillarRow(entry.getValue());
                 rows.add(row);
+                rowsById.put(entry.getKey(), row);
             } else {
                 row.apply(entry.getValue());
             }
@@ -239,22 +242,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             seenIds.add(entry.getKey());
         }
 
-        for (PillarRow row : rows) {
-            if (!seenIds.contains(row.id)) {
-                row.setVisible(false);
-            }
-        }
+        rows.removeIf(row -> !seenIds.contains(row.id));
+        rowsById.keySet().removeIf(id -> !seenIds.contains(id));
 
         recomputeScroll();
     }
 
     private PillarRow findRow(String id) {
-        for (PillarRow row : rows) {
-            if (row.id != null && row.id.equals(id)) {
-                return row;
-            }
-        }
-        return null;
+        return rowsById.get(id);
     }
 
     private void recomputeScroll() {
@@ -297,6 +292,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         PillarRow row = new PillarRow(data);
         rows.add(row);
+        rowsById.put(newId, row);
         row.setVisible(true);
         dirty = true;
         statusMessage = new TranslatableComponent("buildscape.config.ids.unsaved");

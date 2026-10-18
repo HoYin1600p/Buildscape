@@ -57,7 +57,8 @@ public class TreeChopHandler {
             cachedLevel = mc.level;
         }
 
-        if (!player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
+        if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild()
+                || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
                 || !com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
             resetTarget(mc, player);
             return;
@@ -113,7 +114,7 @@ public class TreeChopHandler {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null || mc.level == null) return;
-        if (!player.isCreative() || !player.isShiftKeyDown()) return;
+        if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild() || !player.isShiftKeyDown()) return;
         if (!com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
             return;
 
@@ -146,7 +147,7 @@ public class TreeChopHandler {
         Player player = mc.player;
         if (player == null || mc.level == null) return;
 
-        if (!player.isCreative() || !player.isShiftKeyDown()) return;
+        if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild() || !player.isShiftKeyDown()) return;
         if (!com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
             return;
 
@@ -198,7 +199,7 @@ public class TreeChopHandler {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
 
-        if (mc.player.isCreative() && mc.player.isShiftKeyDown() &&
+        if (mc.player.isCreative() && mc.player.hasPermissions(2) && mc.player.mayBuild() && mc.player.isShiftKeyDown() &&
                 com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID())) {
             HitResult hit = mc.hitResult;
             if (hit != null && hit.getType() == HitResult.Type.BLOCK) {

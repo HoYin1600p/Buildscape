@@ -34,7 +34,7 @@ public final class BuildscapeBlockStateCacheCoordinator {
         return collecting;
     }
 
-    public static boolean deferIfBuildscape(BlockState state) {
+    public static synchronized boolean deferIfBuildscape(BlockState state) {
         if (!collecting || !buildscapeBlocks.contains(state.getBlock())) {
             return false;
         }

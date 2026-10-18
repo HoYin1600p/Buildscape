@@ -34,7 +34,67 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.Set;
 
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = com.kingodogo.buildscape.BuildScape.MODID, value = net.minecraftforge.api.distmarker.Dist.CLIENT)
 public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowLogBlockEntity> {
+
+    private static final ResourceLocation LAVA_FLOW = new ResourceLocation("minecraft", "block/lava_flow");
+    private static final ResourceLocation LAVA_STILL = new ResourceLocation("minecraft", "block/lava_still");
+    private static final ResourceLocation WATER_FLOW = new ResourceLocation("minecraft", "block/water_flow");
+    private static final ResourceLocation WATER_STILL = new ResourceLocation("minecraft", "block/water_still");
+    private static final ResourceLocation EXPERIENCE_FLOW = new ResourceLocation("buildscape", "fluid/experience_flow");
+    private static final ResourceLocation EXPERIENCE_STILL = new ResourceLocation("buildscape", "fluid/experience_still");
+
+    private static final java.util.Map<ResourceLocation, TextureAtlasSprite> FLUID_SPRITES = new java.util.HashMap<>();
+    private static final java.util.Map<BlockState, BakedModel> DECORATION_MODELS = new java.util.IdentityHashMap<>();
+    private static final java.util.Map<HollowLogBlockEntity, FluidRenderCache> FLUID_CACHE = new java.util.WeakHashMap<>();
+
+    private static final class FluidRenderCache {
+        long tick = Long.MIN_VALUE;
+        BlockState state;
+        Fluid fluid;
+        int checkedNeighbors;
+        int fluidNeighbors;
+        int waterColor = -1;
+    }
+
+    private static FluidRenderCache fluidCache(HollowLogBlockEntity blockEntity, Level level, BlockState state, Fluid fluid) {
+        FluidRenderCache cache = FLUID_CACHE.computeIfAbsent(blockEntity, key -> new FluidRenderCache());
+        long tick = level != null ? level.getGameTime() : Long.MIN_VALUE;
+        if (cache.tick != tick || cache.state != state || cache.fluid != fluid) {
+            cache.tick = tick;
+            cache.state = state;
+            cache.fluid = fluid;
+            cache.checkedNeighbors = 0;
+            cache.fluidNeighbors = 0;
+            cache.waterColor = -1;
+        }
+        return cache;
+    }
+
+    private static int waterColor(Level level, BlockPos pos, FluidRenderCache cache) {
+        if (cache.waterColor == -1) {
+            cache.waterColor = level != null && pos != null ? BiomeColors.getAverageWaterColor(level, pos) : 0x3F76E4;
+        }
+        return cache.waterColor;
+    }
+
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public static void onWorldUnload(net.minecraftforge.event.world.WorldEvent.Unload event) {
+        if (event.getWorld().isClientSide()) FLUID_CACHE.clear();
+    }
+
+    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(
+            modid = com.kingodogo.buildscape.BuildScape.MODID,
+            bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD,
+            value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+    public static final class ReloadEvents {
+        @net.minecraftforge.eventbus.api.SubscribeEvent
+        public static void onTextureStitch(net.minecraftforge.client.event.TextureStitchEvent.Post event) {
+            FLUID_SPRITES.clear();
+            DECORATION_MODELS.clear();
+            FLUID_CACHE.clear();
+        }
+    }
 
     private final BlockRenderDispatcher blockRenderer;
 
@@ -172,34 +232,35 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         boolean connWest  = state.getValue(HollowPipeBlock.WEST);
         boolean connEast  = state.getValue(HollowPipeBlock.EAST);
 
+        FluidRenderCache cache = fluidCache(blockEntity, level, state, fluid);
         ResourceLocation texLoc;
         if (fluid == Fluids.LAVA) {
             texLoc = hasNetworkFlow && !flowState.getFlowDirections().isEmpty()
-                    ? new ResourceLocation("minecraft", "block/lava_flow")
-                    : new ResourceLocation("minecraft", "block/lava_still");
+                    ? LAVA_FLOW
+                    : LAVA_STILL;
         } else if (fluid == Fluids.WATER) {
             boolean isStationarySource = (flowState != null && flowState.isSource() && flowState.getInflowDirection() == null && flowState.getFlowDirections().size() != 1);
             texLoc = (flowState != null && flowState.hasWater() && !flowState.getFlowDirections().isEmpty() && !isStationarySource)
-                    ? new ResourceLocation("minecraft", "block/water_flow")
-                    : new ResourceLocation("minecraft", "block/water_still");
+                    ? WATER_FLOW
+                    : WATER_STILL;
         } else if (hasXp) {
             texLoc = (hasNetworkFlow && !flowState.getFlowDirections().isEmpty())
-                    ? new ResourceLocation("buildscape", "fluid/experience_flow")
-                    : new ResourceLocation("buildscape", "fluid/experience_still");
+                    ? EXPERIENCE_FLOW
+                    : EXPERIENCE_STILL;
         } else {
             texLoc = (flowState != null && !flowState.isSource() && fluid.getAttributes().getFlowingTexture() != null)
                     ? fluid.getAttributes().getFlowingTexture()
                     : fluid.getAttributes().getStillTexture();
             if (texLoc == null) {
-                texLoc = new ResourceLocation("minecraft", "block/water_still");
+                texLoc = WATER_STILL;
             }
         }
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texLoc);
+        TextureAtlasSprite sprite = FLUID_SPRITES.computeIfAbsent(texLoc, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS));
 
         int fluidColor = 0xFFFFFFFF;
         if (fluid == Fluids.WATER) {
-            fluidColor = (level != null && pos != null) ? BiomeColors.getAverageWaterColor(level, pos) : 0x3F76E4;
+            fluidColor = waterColor(level, pos, cache);
             fluidColor |= 0xFF000000;
         } else if (fluid == Fluids.LAVA || hasXp) {
             fluidColor = 0xFFFFFFFF;
@@ -264,7 +325,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                     uZ1, vX2,
                     light, overlay, 0, 1, 0);
 
-            if (!connWest && openWest && !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+            if (!connWest && openWest && !isNeighborFluid(level, pos, cache, Direction.WEST, fluid)) {
                 float uW0 = getSpriteU(sprite, z1);
                 float uW1 = getSpriteU(sprite, z2);
                 float vW0 = getSpriteV(sprite, yFloor);
@@ -273,7 +334,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                 renderQuad(matrix, buffer, x1, yW, z2, x1, yFloor, z2, x1, yFloor, z1, x1, yW, z1, r, g, b, a, uW1, vW1, uW1, vW0, uW0, vW0, uW0, vW1, light, overlay, 1, 0, 0);
             }
 
-            if (!connEast && openEast && !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+            if (!connEast && openEast && !isNeighborFluid(level, pos, cache, Direction.EAST, fluid)) {
                 float uE0 = getSpriteU(sprite, z1);
                 float uE1 = getSpriteU(sprite, z2);
                 float vE0 = getSpriteV(sprite, yFloor);
@@ -325,7 +386,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                     uX2, vZ1,
                     light, overlay, 0, 1, 0);
 
-            if (!connNorth && openNorth && !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+            if (!connNorth && openNorth && !isNeighborFluid(level, pos, cache, Direction.NORTH, fluid)) {
                 float uN0 = getSpriteU(sprite, x1);
                 float uN1 = getSpriteU(sprite, x2);
                 float vN0 = getSpriteV(sprite, yFloor);
@@ -334,7 +395,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                 renderQuad(matrix, buffer, x1, yN, z1, x1, yFloor, z1, x2, yFloor, z1, x2, yN, z1, r, g, b, a, uN0, vN1, uN0, vN0, uN1, vN0, uN1, vN1, light, overlay, 0, 0, 1);
             }
 
-            if (!connSouth && openSouth && !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+            if (!connSouth && openSouth && !isNeighborFluid(level, pos, cache, Direction.SOUTH, fluid)) {
                 float uS0 = getSpriteU(sprite, x1);
                 float uS1 = getSpriteU(sprite, x2);
                 float vS0 = getSpriteV(sprite, yFloor);
@@ -373,7 +434,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                     light, overlay, 0, 1, 0);
         }
 
-        if (!connNorth && openNorth && !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+        if (!connNorth && openNorth && !isNeighborFluid(level, pos, cache, Direction.NORTH, fluid)) {
             float uN0 = getSpriteU(sprite, x1);
             float uN1 = getSpriteU(sprite, x2);
             float vN0 = getSpriteV(sprite, yFloor);
@@ -382,7 +443,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             renderQuad(matrix, buffer, x1, yTop, z1, x1, yFloor, z1, x2, yFloor, z1, x2, yTop, z1, r, g, b, a, uN0, vN1, uN0, vN0, uN1, vN0, uN1, vN1, light, overlay, 0, 0, 1);
         }
 
-        if (!connSouth && openSouth && !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+        if (!connSouth && openSouth && !isNeighborFluid(level, pos, cache, Direction.SOUTH, fluid)) {
             float uS0 = getSpriteU(sprite, x1);
             float uS1 = getSpriteU(sprite, x2);
             float vS0 = getSpriteV(sprite, yFloor);
@@ -391,7 +452,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             renderQuad(matrix, buffer, x2, yTop, z2, x2, yFloor, z2, x1, yFloor, z2, x1, yTop, z2, r, g, b, a, uS1, vS1, uS1, vS0, uS0, vS0, uS0, vS1, light, overlay, 0, 0, -1);
         }
 
-        if (!connWest && openWest && !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+        if (!connWest && openWest && !isNeighborFluid(level, pos, cache, Direction.WEST, fluid)) {
             float uW0 = getSpriteU(sprite, z1);
             float uW1 = getSpriteU(sprite, z2);
             float vW0 = getSpriteV(sprite, yFloor);
@@ -400,7 +461,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             renderQuad(matrix, buffer, x1, yTop, z2, x1, yFloor, z2, x1, yFloor, z1, x1, yTop, z1, r, g, b, a, uW1, vW1, uW1, vW0, uW0, vW0, uW0, vW1, light, overlay, 1, 0, 0);
         }
 
-        if (!connEast && openEast && !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+        if (!connEast && openEast && !isNeighborFluid(level, pos, cache, Direction.EAST, fluid)) {
             float uE0 = getSpriteU(sprite, z1);
             float uE1 = getSpriteU(sprite, z2);
             float vE0 = getSpriteV(sprite, yFloor);
@@ -520,7 +581,16 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         return sprite.getV0() + (sprite.getV1() - sprite.getV0()) * coord0To1;
     }
 
-    private static boolean isNeighborFluid(Level level, BlockPos pos, Direction dir, Fluid fluid) {
+    private static boolean isNeighborFluid(Level level, BlockPos pos, FluidRenderCache cache, Direction dir, Fluid fluid) {
+        int bit = 1 << dir.ordinal();
+        if ((cache.checkedNeighbors & bit) == 0) {
+            cache.checkedNeighbors |= bit;
+            if (queryNeighborFluid(level, pos, dir, fluid)) cache.fluidNeighbors |= bit;
+        }
+        return (cache.fluidNeighbors & bit) != 0;
+    }
+
+    private static boolean queryNeighborFluid(Level level, BlockPos pos, Direction dir, Fluid fluid) {
         if (level == null || pos == null || dir == null) return false;
         BlockPos neighborPos = pos.relative(dir);
         BlockState neighborState = level.getBlockState(neighborPos);
@@ -594,7 +664,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
     }
 
     private void renderBlockState(BlockState state, BlockPos pos, Level level, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
-        BakedModel model = blockRenderer.getBlockModel(state);
+        BakedModel model = DECORATION_MODELS.computeIfAbsent(state, blockRenderer::getBlockModel);
         RenderType renderType = ItemBlockRenderTypes.getRenderType(state, true);
         VertexConsumer buffer = bufferSource.getBuffer(renderType);
 
@@ -665,32 +735,33 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             return;
         }
 
+        FluidRenderCache cache = fluidCache(blockEntity, level, state, fluid);
         ResourceLocation texLoc;
         if (fluid == Fluids.LAVA) {
             texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
-                    ? new ResourceLocation("minecraft", "block/lava_flow")
-                    : new ResourceLocation("minecraft", "block/lava_still");
+                    ? LAVA_FLOW
+                    : LAVA_STILL;
         } else if (fluid == Fluids.WATER) {
             texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
-                    ? new ResourceLocation("minecraft", "block/water_flow")
-                    : new ResourceLocation("minecraft", "block/water_still");
+                    ? WATER_FLOW
+                    : WATER_STILL;
         } else if (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get() || fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get()) {
             texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
-                    ? new ResourceLocation("buildscape", "fluid/experience_flow")
-                    : new ResourceLocation("buildscape", "fluid/experience_still");
+                    ? EXPERIENCE_FLOW
+                    : EXPERIENCE_STILL;
         } else {
             texLoc = fluid.getAttributes().getStillTexture();
             if (texLoc == null) {
-                texLoc = new ResourceLocation("minecraft", "block/water_still");
+                texLoc = WATER_STILL;
             }
         }
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texLoc);
+        TextureAtlasSprite sprite = FLUID_SPRITES.computeIfAbsent(texLoc, Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS));
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.translucent());
 
         int color = 0xFFFFFFFF;
         if (fluid == Fluids.WATER) {
-            color = (level != null && pos != null) ? BiomeColors.getAverageWaterColor(level, pos) : 0x3F76E4;
+            color = waterColor(level, pos, cache);
             color |= 0xFF000000;
         } else if (fluid == Fluids.LAVA || fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get()) {
             color = 0xFFFFFFFF;
@@ -747,14 +818,14 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                     uX2, vZ1,
                     light, overlay, 0, 1, 0);
 
-            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+            if (hasGlassNeg || !isNeighborFluid(level, pos, cache, Direction.NORTH, fluid)) {
                 float vY1 = getSpriteV(sprite, y1);
                 float vY2 = getSpriteV(sprite, yNorth);
                 renderQuad(matrix, buffer, x2, yNorth, z1, x2, y1, z1, x1, y1, z1, x1, yNorth, z1, r, g, b, a, uX2, vY2, uX2, vY1, uX1, vY1, uX1, vY2, light, overlay, 0, 0, -1);
                 renderQuad(matrix, buffer, x1, yNorth, z1, x1, y1, z1, x2, y1, z1, x2, yNorth, z1, r, g, b, a, uX1, vY2, uX1, vY1, uX2, vY1, uX2, vY2, light, overlay, 0, 0, 1);
             }
 
-            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+            if (hasGlassPos || !isNeighborFluid(level, pos, cache, Direction.SOUTH, fluid)) {
                 float vY1 = getSpriteV(sprite, y1);
                 float vY2 = getSpriteV(sprite, ySouth);
                 renderQuad(matrix, buffer, x1, ySouth, z2, x1, y1, z2, x2, y1, z2, x2, ySouth, z2, r, g, b, a, uX1, vY2, uX1, vY1, uX2, vY1, uX2, vY2, light, overlay, 0, 0, 1);
@@ -787,14 +858,14 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                     uZ1, vX2,
                     light, overlay, 0, 1, 0);
 
-            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+            if (hasGlassNeg || !isNeighborFluid(level, pos, cache, Direction.WEST, fluid)) {
                 float vY1 = getSpriteV(sprite, y1);
                 float vY2 = getSpriteV(sprite, yWest);
                 renderQuad(matrix, buffer, x1, yWest, z1, x1, y1, z1, x1, y1, z2, x1, yWest, z2, r, g, b, a, uZ1, vY2, uZ1, vY1, uZ2, vY1, uZ2, vY2, light, overlay, -1, 0, 0);
                 renderQuad(matrix, buffer, x1, yWest, z2, x1, y1, z2, x1, y1, z1, x1, yWest, z1, r, g, b, a, uZ2, vY2, uZ2, vY1, uZ1, vY1, uZ1, vY2, light, overlay, 1, 0, 0);
             }
 
-            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+            if (hasGlassPos || !isNeighborFluid(level, pos, cache, Direction.EAST, fluid)) {
                 float vY1 = getSpriteV(sprite, y1);
                 float vY2 = getSpriteV(sprite, yEast);
                 renderQuad(matrix, buffer, x2, yEast, z2, x2, y1, z2, x2, y1, z1, x2, yEast, z1, r, g, b, a, uZ2, vY2, uZ2, vY1, uZ1, vY1, uZ1, vY2, light, overlay, 1, 0, 0);
@@ -802,14 +873,14 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             }
         } else {
             y1 = hasGlassNeg ? 0.08F : 0.0F;
-            y2 = hasGlassPos ? 0.92F : (isNeighborFluid(level, pos, Direction.UP, fluid) ? 1.0F : HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT);
+            y2 = hasGlassPos ? 0.92F : (isNeighborFluid(level, pos, cache, Direction.UP, fluid) ? 1.0F : HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT);
 
             float uX1 = getSpriteU(sprite, x1);
             float uX2 = getSpriteU(sprite, x2);
             float vZ1 = getSpriteV(sprite, z1);
             float vZ2 = getSpriteV(sprite, z2);
 
-            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.UP, fluid)) {
+            if (hasGlassPos || !isNeighborFluid(level, pos, cache, Direction.UP, fluid)) {
                 renderQuad(matrix, buffer,
                         x1, y2, z1,
                         x1, y2, z2,
@@ -823,7 +894,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                         light, overlay, 0, 1, 0);
             }
 
-            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.DOWN, fluid)) {
+            if (hasGlassNeg || !isNeighborFluid(level, pos, cache, Direction.DOWN, fluid)) {
                 renderQuad(matrix, buffer,
                         x1, y1, z2,
                         x1, y1, z1,

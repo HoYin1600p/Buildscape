@@ -12,7 +12,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
 
@@ -23,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MobPillarRenderer {
 
-    private static final Map<String, Entity> entityCache = new ConcurrentHashMap<>();
+    private static final Map<BlockPos, Entity> entityCache = new ConcurrentHashMap<>();
 
     private static final Map<Integer, MobState> lastAppliedStates = new ConcurrentHashMap<>();
     private static final Map<String, Integer> DYE_COLORS = new HashMap<>();
@@ -52,7 +51,7 @@ public class MobPillarRenderer {
 
     public static void renderMob(
             SpawnEggItem spawnEgg,
-            ItemStack spawnEggStack,
+            MobState state,
             BlockPos pos,
             Level level,
             float partialTicks,
@@ -72,21 +71,17 @@ public class MobPillarRenderer {
             return;
         }
 
-        MobState state = MobStateParser.parseStates(spawnEggStack, entityType);
-
-        String cacheKey = pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":" +
-                net.minecraftforge.registries.ForgeRegistries.ENTITIES.getKey(entityType).toString();
-
-        Entity entity = entityCache.get(cacheKey);
+        Entity entity = entityCache.get(pos);
         if (entity == null || entity.getType() != entityType || !entity.isAlive()) {
-            if (entity != null && entity.isAlive()) {
-                entity.remove(Entity.RemovalReason.DISCARDED);
+            if (entity != null) {
                 lastAppliedStates.remove(entity.getId());
+                entityCache.remove(pos);
+                if (entity.isAlive()) entity.remove(Entity.RemovalReason.DISCARDED);
             }
 
             entity = createEntity(entityType, level, pos, state);
             if (entity != null) {
-                entityCache.put(cacheKey, entity);
+                entityCache.put(pos.immutable(), entity);
             }
         }
 
@@ -843,17 +838,11 @@ public class MobPillarRenderer {
     }
 
     public static void clearEntityCache(BlockPos pos) {
-        entityCache.entrySet().removeIf(entry -> {
-            if (entry.getKey().startsWith(pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":")) {
-                Entity entity = entry.getValue();
-                if (entity != null && entity.isAlive()) {
-                    lastAppliedStates.remove(entity.getId());
-                    entity.remove(Entity.RemovalReason.DISCARDED);
-                }
-                return true;
-            }
-            return false;
-        });
+        Entity entity = entityCache.remove(pos);
+        if (entity != null) {
+            lastAppliedStates.remove(entity.getId());
+            if (entity.isAlive()) entity.remove(Entity.RemovalReason.DISCARDED);
+        }
     }
 
     public static void clearAllEntityCaches() {

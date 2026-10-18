@@ -83,6 +83,10 @@ public class TintableHeartParticle extends TextureSheetParticle {
         }
     }
 
+    public static void clearColorCache() {
+        POSITION_COLOR_MAP.clear();
+    }
+
     private static void cleanupOldEntries() {
         long now = System.currentTimeMillis();
         POSITION_COLOR_MAP.entrySet()

@@ -18,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.Vec3;
@@ -26,6 +27,14 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
 
     private static final ResourceLocation BIRCH_PLANKS = new ResourceLocation("minecraft", "textures/block/birch_planks.png");
     private static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(BuildScape.MODID, "textures/entity/white_item_frame.png");
+    private static final java.util.Map<String, ResourceLocation> COLOR_TEXTURES = new java.util.HashMap<>();
+
+    static {
+        for (DyeColor color : DyeColor.values()) {
+            COLOR_TEXTURES.put(color.getName(), new ResourceLocation(BuildScape.MODID,
+                    "textures/entity/" + color.getName() + "_item_frame.png"));
+        }
+    }
 
     private final net.minecraft.client.renderer.entity.ItemRenderer itemRenderer;
 
@@ -38,7 +47,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         if (color == null || color.isEmpty()) {
             return DEFAULT_TEXTURE;
         }
-        return new ResourceLocation(BuildScape.MODID, "textures/entity/" + color + "_item_frame.png");
+        return COLOR_TEXTURES.getOrDefault(color, DEFAULT_TEXTURE);
     }
 
     @Override

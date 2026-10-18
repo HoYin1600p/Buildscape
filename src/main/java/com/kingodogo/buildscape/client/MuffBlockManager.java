@@ -41,6 +41,7 @@ public class MuffBlockManager {
         if (event.getSound() == null) return;
 
         SoundInstance sound = event.getSound();
+        if (sound.isRelative()) return;
         if (sound.getSource() == net.minecraft.sounds.SoundSource.PLAYERS || sound.getSource() == net.minecraft.sounds.SoundSource.MASTER) {
             return;
         }

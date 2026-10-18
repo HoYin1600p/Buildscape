@@ -102,7 +102,8 @@ public class InvisibleFrameOverlayRenderer {
             renderOutline(poseStack, lineBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, lineAlpha);
         }
 
-        bufferSource.endBatch();
+        bufferSource.endBatch(RenderType.lightning());
+        bufferSource.endBatch(RenderType.lines());
     }
 
     private static void renderFilledBox(PoseStack poseStack, VertexConsumer buffer,

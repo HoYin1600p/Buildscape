@@ -11,11 +11,13 @@ import java.io.InputStream;
 
 public class DryFoliageColor {
     private static final int[] pixels = new int[65536];
-    private static boolean loaded = false;
+    private static volatile boolean loaded = false;
 
     public static final ColorResolver DRY_FOLIAGE_RESOLVER = (biome, x, z) -> get(biome.getBaseTemperature(), biome.getDownfall());
 
-    public static void init() {
+    public static synchronized void init() {
+        if (loaded) return;
+        java.util.Arrays.fill(pixels, 0x867E36);
         try {
             ResourceLocation loc = new ResourceLocation("minecraft", "textures/colormap/dry_foliage.png");
             Resource resource = Minecraft.getInstance().getResourceManager().getResource(loc);
@@ -23,11 +25,12 @@ public class DryFoliageColor {
                 BufferedImage image = ImageIO.read(stream);
                 if (image != null) {
                     image.getRGB(0, 0, 256, 256, pixels, 0, 256);
-                    loaded = true;
                 }
             }
         } catch (Exception e) {
             java.util.Arrays.fill(pixels, 0x867E36);
+        } finally {
+            loaded = true;
         }
     }
 

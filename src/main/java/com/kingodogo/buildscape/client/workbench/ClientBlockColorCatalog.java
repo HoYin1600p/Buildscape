@@ -37,6 +37,7 @@ public final class ClientBlockColorCatalog {
     private static final int MAX_SAMPLES_PER_AXIS = 32;
     private static boolean ready;
     private static boolean building;
+    private static boolean failed;
     private static int generation;
 
     private ClientBlockColorCatalog() {
@@ -44,6 +45,7 @@ public final class ClientBlockColorCatalog {
 
     public static synchronized void invalidate() {
         ready = false;
+        failed = false;
         generation++;
     }
 
@@ -54,7 +56,7 @@ public final class ClientBlockColorCatalog {
     public static boolean ensureReady() {
         synchronized (ClientBlockColorCatalog.class) {
             if (ready) return true;
-            if (building) return false;
+            if (building || failed) return false;
             building = true;
         }
 
@@ -104,6 +106,9 @@ public final class ClientBlockColorCatalog {
                     colors.size(), spriteCache.size(), elapsedMs);
             return true;
         } catch (Throwable error) {
+            synchronized (ClientBlockColorCatalog.class) {
+                failed = true;
+            }
             BuildScape.LOGGER.error("Builder's Workbench could not build its texture color catalog", error);
             return false;
         } finally {

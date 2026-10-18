@@ -28,21 +28,15 @@ public class MobStateParser {
         try {
             addUniversalStates();
 
-            java.io.File rootStatesFile = new java.io.File("states.txt");
             InputStream stream = null;
-
-            if (rootStatesFile.exists()) {
-                stream = new java.io.FileInputStream(rootStatesFile);
-            } else {
-                ResourceLocation statesFile = new ResourceLocation("buildscape:mob_states.txt");
-                try {
-                    stream = Minecraft.getInstance()
-                            .getResourceManager()
-                            .getResource(statesFile)
-                            .getInputStream();
-                } catch (Exception e) {
-                    BuildScape.LOGGER.error("Could not find mob_states.txt resource.");
-                }
+            ResourceLocation statesFile = new ResourceLocation("buildscape:mob_states.txt");
+            try {
+                stream = Minecraft.getInstance()
+                        .getResourceManager()
+                        .getResource(statesFile)
+                        .getInputStream();
+            } catch (Exception e) {
+                BuildScape.LOGGER.error("Could not find mob_states.txt resource.");
             }
 
             if (stream != null) {

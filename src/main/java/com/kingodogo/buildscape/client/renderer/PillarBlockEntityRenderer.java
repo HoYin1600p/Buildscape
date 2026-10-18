@@ -15,10 +15,16 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Mod.EventBusSubscriber(modid = com.kingodogo.buildscape.BuildScape.MODID, value = Dist.CLIENT)
 public class PillarBlockEntityRenderer
         implements BlockEntityRenderer<PillarBlockEntity> {
 
@@ -35,15 +41,17 @@ public class PillarBlockEntityRenderer
         final boolean isSpawnEgg;
         final boolean isFixed;
         final MobState mobState;
+        final java.lang.ref.WeakReference<PillarBlockEntity> owner;
 
         DisplayInfo(ItemStack stack, long startTime, boolean renderAsItem, boolean isSpawnEgg,
-                    boolean isFixed, MobState mobState) {
+                    boolean isFixed, MobState mobState, PillarBlockEntity owner) {
             this.stack = stack;
             this.startTime = startTime;
             this.renderAsItem = renderAsItem;
             this.isSpawnEgg = isSpawnEgg;
             this.isFixed = isFixed;
             this.mobState = mobState;
+            this.owner = new java.lang.ref.WeakReference<>(owner);
         }
     }
 
@@ -61,14 +69,42 @@ public class PillarBlockEntityRenderer
 
     public static void clearEntityCache(BlockPos pos) {
         MobPillarRenderer.clearEntityCache(pos);
+        ArmorPillarRenderer.clearCache(pos);
         displayInfo.remove(pos);
         cachedIsAshenKing.remove(pos);
     }
 
     public static void clearEntityCache() {
         MobPillarRenderer.clearAllEntityCaches();
+        ArmorPillarRenderer.clearAllCaches();
         displayInfo.clear();
         cachedIsAshenKing.clear();
+        loggedRenderFailures.clear();
+        modelBoundsCache.clear();
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        Level level = Minecraft.getInstance().level;
+        for (Map.Entry<BlockPos, DisplayInfo> entry : displayInfo.entrySet()) {
+            PillarBlockEntity owner = entry.getValue().owner.get();
+            if (owner == null || owner.isRemoved() || owner.getLevel() != level
+                    || !ItemStack.matches(entry.getValue().stack, owner.getDisplayedItem())) {
+                clearEntityCache(entry.getKey());
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onChunkUnload(ChunkEvent.Unload event) {
+        if (!event.getWorld().isClientSide()) return;
+        net.minecraft.world.level.ChunkPos chunk = event.getChunk().getPos();
+        for (BlockPos pos : displayInfo.keySet()) {
+            if ((pos.getX() >> 4) == chunk.x && (pos.getZ() >> 4) == chunk.z) {
+                clearEntityCache(pos);
+            }
+        }
     }
 
     @Override
@@ -95,7 +131,7 @@ public class PillarBlockEntityRenderer
         }
 
         if (displayedItem.isEmpty()) {
-            displayInfo.remove(pos);
+            if (displayInfo.containsKey(pos)) clearEntityCache(pos);
             return;
         }
 
@@ -114,8 +150,9 @@ public class PillarBlockEntityRenderer
 
         long currentRenderTime = System.currentTimeMillis();
         DisplayInfo info = displayInfo.get(pos);
-        if (info == null || !ItemStack.matches(info.stack, displayedItem)) {
-            info = createDisplayInfo(displayedItem, currentRenderTime);
+        if (info == null || info.owner.get() != blockEntity || !ItemStack.matches(info.stack, displayedItem)) {
+            if (info != null) clearEntityCache(pos);
+            info = createDisplayInfo(displayedItem, currentRenderTime, blockEntity);
             displayInfo.put(pos, info);
         }
 
@@ -191,7 +228,7 @@ public class PillarBlockEntityRenderer
                 try {
                     MobPillarRenderer.renderMob(
                             (SpawnEggItem) displayedItem.getItem(),
-                            displayedItem,
+                            info.mobState,
                             pos,
                             blockEntity.getLevel(),
                             partialTicks,
@@ -318,7 +355,7 @@ public class PillarBlockEntityRenderer
         }
     }
 
-    private DisplayInfo createDisplayInfo(ItemStack displayedItem, long startTime) {
+    private DisplayInfo createDisplayInfo(ItemStack displayedItem, long startTime, PillarBlockEntity owner) {
         boolean renderAsItem = hasItemNameTag(displayedItem);
         boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem && !renderAsItem;
         boolean fixed = !isSpawnEgg && isFixed(displayedItem);
@@ -327,7 +364,7 @@ public class PillarBlockEntityRenderer
             EntityType<?> entityType = ((SpawnEggItem) displayedItem.getItem()).getType(null);
             mobState = MobStateParser.parseStates(displayedItem, entityType);
         }
-        return new DisplayInfo(displayedItem.copy(), startTime, renderAsItem, isSpawnEgg, fixed, mobState);
+        return new DisplayInfo(displayedItem.copy(), startTime, renderAsItem, isSpawnEgg, fixed, mobState, owner);
     }
 
     private static void restorePose(PoseStack poseStack, PoseStack.Pose pose) {

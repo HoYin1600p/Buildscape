@@ -123,7 +123,7 @@ public class ItemFrameParticleHandler {
             }
             String frameId = data.getString("BuildScapeFrameId");
             if (frameId != null && !frameId.isEmpty()) {
-                com.kingodogo.buildscape.config.PillarIdManager.get(entity.level).removePillar(frameId);
+                com.kingodogo.buildscape.config.PillarIdManager.get(entity.level).unregisterDestroyedFrame(frameId);
                 clearCaches(entity.getId());
             }
         }

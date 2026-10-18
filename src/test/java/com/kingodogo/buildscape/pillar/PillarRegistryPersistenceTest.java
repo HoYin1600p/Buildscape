@@ -4,6 +4,9 @@ import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -201,19 +204,21 @@ public class PillarRegistryPersistenceTest {
         assertTrue(reloaded.getAllPillarDataForSync().isEmpty());
         assertTrue(reloaded.isIdTaken("I-F1"));
         assertTrue(removedFrame(reloaded, "I-F1", Direction.NORTH));
-        assertTrue(removedFrame(reloaded, "OldFrameId", Direction.NORTH));
+        assertFalse(removedFrame(reloaded, "OldFrameId", Direction.NORTH));
         assertFalse(removedFrame(reloaded, "OtherFrameId", Direction.SOUTH));
-        assertFalse(removedFrame(reloaded, "", Direction.NORTH));
+        assertTrue(removedFrame(reloaded, "", Direction.NORTH));
+        assertTrue(removedFrame(reloaded, null, Direction.NORTH));
+        assertFalse(removedFrame(reloaded, "", Direction.SOUTH));
     }
 
     @Test
-    public void removalWinsOverEarlyRegistrationButKeepsReplacementAndRename() throws Exception {
+    public void removalKeepsEarlyRegistrationWithDifferentIdAndRename() throws Exception {
         PillarIdManager manager = manager();
         manager.addPillarDataFromSync(frame("OldFrameId", "north", 10));
         PillarIdManager.PillarData removed = frame("RenamedFrameId", "north", 20);
         removed.removed = true;
         load(manager, Map.of(removed.id, removed));
-        assertTrue(manager.getAllPillarIds().isEmpty());
+        assertEquals(Set.of("OldFrameId"), manager.getAllPillarIds());
 
         manager.addPillarDataFromSync(frame("ReplacementId", "north", 30));
         assertFalse(removedFrame(manager, "ReplacementId", Direction.NORTH));
@@ -223,6 +228,105 @@ public class PillarRegistryPersistenceTest {
         reconcile.setAccessible(true);
         assertEquals("ReplacementId", reconcile.invoke(manager, "BeforeRename", "minecraft:overworld",
                 BlockPos.ZERO, Direction.NORTH));
+    }
+
+    @Test
+    public void guiRemovalClearsOldFrameDataAfterReload() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("OldFrameId", frame("OldFrameId", "north", 10)));
+        CompoundTag unloadedFrame = frameTag("OldFrameId");
+        assertTrue(manager.removePillars(List.of("OldFrameId")));
+
+        manager = restart(manager);
+        assertFalse(prepareFrame(manager, unloadedFrame, Direction.NORTH));
+        assertEquals(Set.of("OtherModData"), unloadedFrame.getAllKeys());
+        assertEquals("retained", unloadedFrame.getString("OtherModData"));
+        assertTrue(manager.getAllPillarIds().isEmpty());
+    }
+
+    @Test
+    public void destroyedFrameAllowsNewFrameDataAtSameFaceAfterReload() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("OldFrameId", frame("OldFrameId", "north", 10)));
+        manager.unregisterDestroyedFrame("OldFrameId");
+        assertNull(manager.getPillarData("OldFrameId"));
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:0:0:north"));
+        assertFalse(manager.isIdTaken("OldFrameId"));
+
+        manager = restart(manager);
+        assertFalse(removedFrame(manager, "OldFrameId", Direction.NORTH));
+        CompoundTag replacement = frameTag("NewFrameId");
+        CompoundTag expected = replacement.copy();
+        assertTrue(prepareFrame(manager, replacement, Direction.NORTH));
+        assertEquals(expected, replacement);
+        assertTrue(manager.getAllPillarIds().isEmpty());
+    }
+
+    @Test
+    public void guiRemovalRejectsSameOldIdButPreservesNewIdAtSameFace() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("OldFrameId", frame("OldFrameId", "north", 10)));
+        assertTrue(manager.removePillars(List.of("OldFrameId")));
+
+        CompoundTag replacement = frameTag("NewFrameId");
+        CompoundTag expected = replacement.copy();
+        assertTrue(prepareFrame(manager, replacement, Direction.NORTH));
+        assertEquals(expected, replacement);
+        CompoundTag stale = frameTag("OldFrameId");
+        assertFalse(prepareFrame(manager, stale, Direction.NORTH));
+        assertEquals(Set.of("OtherModData"), stale.getAllKeys());
+
+        CompoundTag noId = frameTag("");
+        assertFalse(prepareFrame(manager, noId, Direction.NORTH));
+        assertEquals(Set.of("OtherModData"), noId.getAllKeys());
+    }
+
+    @Test
+    public void removedFrameHistoryIsBoundedOnLoadAndRemovalAndStaysPersisted() throws Exception {
+        Field limit = PillarIdManager.class.getDeclaredField("MAX_REMOVED_FRAMES");
+        limit.setAccessible(true);
+        int maximum = limit.getInt(null);
+        Map<String, PillarIdManager.PillarData> history = new java.util.HashMap<>();
+        for (int i = 1; i <= maximum + 1; i++) {
+            PillarIdManager.PillarData removed = frame("Frame" + i, "north", i);
+            removed.removed = true;
+            history.put(removed.id, removed);
+        }
+        PillarIdManager manager = manager();
+        load(manager, history);
+        assertFalse(manager.isIdTaken("Frame1"));
+        assertTrue(manager.isIdTaken("Frame2"));
+        manager.addPillarDataFromSync(frame("NewestFrame", "north", 0));
+        assertTrue(manager.removePillars(List.of("NewestFrame")));
+
+        manager = restart(manager);
+        Field removed = PillarIdManager.class.getDeclaredField("removedFrames");
+        removed.setAccessible(true);
+        assertEquals(maximum, ((Map<?, ?>) removed.get(manager)).size());
+        assertFalse(manager.isIdTaken("Frame2"));
+        assertTrue(removedFrame(manager, "NewestFrame", Direction.NORTH));
+        assertTrue(removedFrame(manager, "Frame" + (maximum + 1), Direction.NORTH));
+    }
+
+    private static CompoundTag frameTag(String id) {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("BuildScapeFrameId", id);
+        tag.putString("BuildScapeParticlePattern", "spiral");
+        ListTag colors = new ListTag();
+        colors.add(StringTag.valueOf("#123456"));
+        tag.put("BuildScapeParticleColors", colors);
+        tag.putBoolean("BuildScapeParticleEnabled", true);
+        tag.putString("PATTERN", "spiral");
+        tag.putString("COLORS", "#123456");
+        tag.putString("OtherModData", "retained");
+        return tag;
+    }
+
+    private static boolean prepareFrame(PillarIdManager manager, CompoundTag tag, Direction facing) throws Exception {
+        Method prepare = PillarIdManager.class.getDeclaredMethod("prepareFrameRegistration", CompoundTag.class,
+                String.class, BlockPos.class, Direction.class);
+        prepare.setAccessible(true);
+        return (Boolean) prepare.invoke(manager, tag, "minecraft:overworld", BlockPos.ZERO, facing);
     }
 
     private static boolean removedFrame(PillarIdManager manager, String id, Direction facing) throws Exception {

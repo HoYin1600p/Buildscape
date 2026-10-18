@@ -2841,7 +2841,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> BLACK_CARPET_LAYERS = BLOCKS.register("black_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLACK)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2851,7 +2851,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> BLUE_CARPET_LAYERS = BLOCKS.register("blue_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLUE)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2861,7 +2861,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> BROWN_CARPET_LAYERS = BLOCKS.register("brown_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BROWN)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2871,7 +2871,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> CYAN_CARPET_LAYERS = BLOCKS.register("cyan_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_CYAN)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2881,7 +2881,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> GRAY_CARPET_LAYERS = BLOCKS.register("gray_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GRAY)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2891,7 +2891,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> GREEN_CARPET_LAYERS = BLOCKS.register("green_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GREEN)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2903,7 +2903,7 @@ public class ModBlocks {
                                         BlockBehaviour.Properties.of(
                                                         Material.WOOL,
                                                         MaterialColor.COLOR_LIGHT_BLUE)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2915,7 +2915,7 @@ public class ModBlocks {
                                         BlockBehaviour.Properties.of(
                                                         Material.WOOL,
                                                         MaterialColor.COLOR_LIGHT_GRAY)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2927,7 +2927,7 @@ public class ModBlocks {
                                         BlockBehaviour.Properties.of(
                                                         Material.WOOL,
                                                         MaterialColor.COLOR_LIGHT_GREEN)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2937,7 +2937,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> MAGENTA_CARPET_LAYERS = BLOCKS.register("magenta_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_MAGENTA)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2947,7 +2947,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> ORANGE_CARPET_LAYERS = BLOCKS.register("orange_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_ORANGE)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2957,7 +2957,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> PINK_CARPET_LAYERS = BLOCKS.register("pink_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PINK)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2967,7 +2967,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> PURPLE_CARPET_LAYERS = BLOCKS.register("purple_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PURPLE)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2978,7 +2978,7 @@ public class ModBlocks {
                         "red_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_RED)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2988,7 +2988,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> WHITE_CARPET_LAYERS = BLOCKS.register("white_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.SNOW)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)
@@ -2998,7 +2998,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> YELLOW_CARPET_LAYERS = BLOCKS.register("yellow_carpet_layers",
                         () -> new WoolLayersBlock(
                                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_YELLOW)
-                                                        .strength(0.8f)
+                                                        .strength(0.1f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOL)
                                                         .noOcclusion()
                                                         .isRedstoneConductor((state, reader, pos) -> false)

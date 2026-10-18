@@ -78,6 +78,10 @@
     "buildscape:yellow_moss_layers",
     "buildscape:yellow_moss_overlay",
     "buildscape:yellow_poplar_leaf_layers",
-    "buildscape:yellow_poplar_leaves"
+    "buildscape:yellow_poplar_leaves",
+    "#buildscape:hedges",
+    "#buildscape:leaf_layers",
+    "buildscape:moss_block_slab",
+    "buildscape:moss_block_vertical_slab"
   ]
 }

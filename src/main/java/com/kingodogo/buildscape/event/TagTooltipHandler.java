@@ -87,8 +87,9 @@ public class TagTooltipHandler {
                     List<Component> tooltips = event.getToolTip();
                     if (tooltips.size() > 1) {
                         tooltips.removeIf(comp -> {
-                            String str = comp.getString();
-                            return str.contains(" x") || str.matches(".*x\\d+.*") || str.startsWith("and ") || str.contains("more...");
+                            if (!(comp instanceof TranslatableComponent translated)) return false;
+                            String key = translated.getKey();
+                            return "container.shulkerBox.itemCount".equals(key) || "container.shulkerBox.more".equals(key);
                         });
                     }
                     if (!Screen.hasShiftDown()) {

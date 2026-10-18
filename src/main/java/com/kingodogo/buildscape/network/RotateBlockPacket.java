@@ -113,6 +113,12 @@ public class RotateBlockPacket {
 
     @SuppressWarnings("unchecked")
     private static BlockState calculateRotatedState(BlockState state, ArrowDirection arrowDir, Direction playerFacing) {
+        if (state.hasProperty(BlockStateProperties.BED_PART)
+                || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
+                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
+                || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED))) {
+            return state;
+        }
         BlockState newState = state;
 
         if (arrowDir == ArrowDirection.UP || arrowDir == ArrowDirection.DOWN) {

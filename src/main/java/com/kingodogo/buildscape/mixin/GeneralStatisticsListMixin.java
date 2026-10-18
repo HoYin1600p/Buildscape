@@ -13,7 +13,7 @@ import java.util.Comparator;
 @Mixin(targets = "net.minecraft.client.gui.screens.achievement.StatsScreen$GeneralStatisticsList")
 public abstract class GeneralStatisticsListMixin {
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/ObjectArrayList;sort(Ljava/util/Comparator;)V", remap = false))
+    @Redirect(method = "<init>", require = 0, at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/ObjectArrayList;sort(Ljava/util/Comparator;)V", remap = false))
     private void redirectSort(ObjectArrayList<Stat<ResourceLocation>> list, Comparator<Stat<ResourceLocation>> originalComparator) {
         boolean hasOtherMods = false;
         for (Stat<ResourceLocation> s : list) {

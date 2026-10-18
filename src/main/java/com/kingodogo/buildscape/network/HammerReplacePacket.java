@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.item.HammerItem;
-import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -76,6 +74,8 @@ public class HammerReplacePacket {
 
             HammerItem.HammerTier tier = hammer.getHammerTier();
             if (!tier.canReplaceObsidianLevel() && destroyTime >= 50.0f) return;
+            ItemStack harvestTool = createHarvestTool(tier, hammerStack);
+            if (targetState.requiresCorrectToolForDrops() && !harvestTool.isCorrectToolForDrops(targetState)) return;
 
             Block replacementBlock = blockItem.getBlock();
             if (targetState.getBlock() == replacementBlock) return;
@@ -92,26 +92,18 @@ public class HammerReplacePacket {
             }
 
             BlockEntity blockEntity = level.getBlockEntity(pos);
-            boolean hasSilkTouch = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, hammerStack) > 0;
+            LootContext.Builder builder = new LootContext.Builder(level)
+                    .withRandom(level.random)
+                    .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+                    .withParameter(LootContextParams.TOOL, harvestTool)
+                    .withParameter(LootContextParams.THIS_ENTITY, player)
+                    .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
+            List<ItemStack> drops = targetState.getDrops(builder);
+            int experience = targetState.getExpDrop(level, pos,
+                    EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, harvestTool),
+                    EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, harvestTool));
 
-            List<ItemStack> drops;
-            if (hasSilkTouch) {
-                LootContext.Builder builder = new LootContext.Builder(level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                        .withParameter(LootContextParams.TOOL, createSilkTouchFakeTool())
-                        .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
-                drops = targetState.getDrops(builder);
-            } else {
-                LootContext.Builder builder = new LootContext.Builder(level)
-                        .withRandom(level.random)
-                        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                        .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
-                        .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
-                drops = targetState.getDrops(builder);
-            }
-
-            level.setBlock(pos, newState, 3);
+            if (!level.setBlock(pos, newState, 3)) return;
             com.kingodogo.buildscape.event.AdvancementEvents.onHammerReplace(player);
 
             if (!player.isCreative()) {
@@ -120,6 +112,10 @@ public class HammerReplacePacket {
 
             for (ItemStack drop : drops) {
                 Block.popResource(level, pos, drop);
+            }
+            if (!player.isCreative() && experience > 0
+                    && level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOBLOCKDROPS)) {
+                net.minecraft.world.entity.ExperienceOrb.award(level, Vec3.atCenterOf(pos), experience);
             }
 
             if (!player.isCreative()) {
@@ -138,12 +134,18 @@ public class HammerReplacePacket {
 
     private static boolean isMultiBlockPart(BlockState state) {
         return state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
-                || state.hasProperty(BlockStateProperties.BED_PART);
+                || state.hasProperty(BlockStateProperties.BED_PART)
+                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
+                || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED));
     }
 
-    private static ItemStack createSilkTouchFakeTool() {
-        ItemStack fakeTool = new ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE);
-        fakeTool.enchant(Enchantments.SILK_TOUCH, 1);
-        return fakeTool;
+    private static ItemStack createHarvestTool(HammerItem.HammerTier tier, ItemStack hammerStack) {
+        ItemStack tool = new ItemStack(switch (tier) {
+            case IRON -> net.minecraft.world.item.Items.IRON_PICKAXE;
+            case DIAMOND -> net.minecraft.world.item.Items.DIAMOND_PICKAXE;
+            case NETHERITE -> net.minecraft.world.item.Items.NETHERITE_PICKAXE;
+        });
+        EnchantmentHelper.setEnchantments(EnchantmentHelper.getEnchantments(hammerStack), tool);
+        return tool;
     }
 }

@@ -30,14 +30,21 @@ public class HollowLogCrawlHandler {
 
     public static boolean USE_FORCED_SWIM_POSE = false;
 
-    private static final Set<UUID> FORCED_PLAYERS = Collections.synchronizedSet(new HashSet<>());
-    private static final Set<UUID> CUSTOM_CRAWLING_PLAYERS = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<PlayerSide> FORCED_PLAYERS = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<PlayerSide> CUSTOM_CRAWLING_PLAYERS = Collections.synchronizedSet(new HashSet<>());
+
+    private record PlayerSide(UUID id, boolean clientSide) {
+    }
+
+    private static PlayerSide playerSide(Player player) {
+        return new PlayerSide(player.getUUID(), player.level.isClientSide);
+    }
 
     private static final EntityDimensions CRAWL_DIMENSIONS = EntityDimensions.scalable(0.6F, 0.6F);
     private static final float CRAWL_EYE_HEIGHT = 0.4F;
 
     public static boolean isPlayerCustomCrawling(Player player) {
-        return player != null && CUSTOM_CRAWLING_PLAYERS.contains(player.getUUID());
+        return player != null && CUSTOM_CRAWLING_PLAYERS.contains(playerSide(player));
     }
 
     @SubscribeEvent
@@ -75,14 +82,14 @@ public class HollowLogCrawlHandler {
             if (insideOrEntering) {
                 player.setPose(Pose.SWIMMING);
                 player.setForcedPose(Pose.SWIMMING);
-                FORCED_PLAYERS.add(player.getUUID());
+                FORCED_PLAYERS.add(playerSide(player));
             } else {
                 clearForcedPose(player);
             }
         } else {
             if (insideOrEntering) {
-                if (!CUSTOM_CRAWLING_PLAYERS.contains(player.getUUID())) {
-                    CUSTOM_CRAWLING_PLAYERS.add(player.getUUID());
+                if (!CUSTOM_CRAWLING_PLAYERS.contains(playerSide(player))) {
+                    CUSTOM_CRAWLING_PLAYERS.add(playerSide(player));
                     player.refreshDimensions();
                 }
                 if (player.getPose() != Pose.SWIMMING) {
@@ -95,8 +102,8 @@ public class HollowLogCrawlHandler {
     }
 
     private static void clearCrawling(Player player) {
-        boolean wasCustom = CUSTOM_CRAWLING_PLAYERS.remove(player.getUUID());
-        boolean wasForced = FORCED_PLAYERS.remove(player.getUUID());
+        boolean wasCustom = CUSTOM_CRAWLING_PLAYERS.remove(playerSide(player));
+        boolean wasForced = FORCED_PLAYERS.remove(playerSide(player));
         if (wasCustom) {
             player.refreshDimensions();
         }
@@ -106,7 +113,7 @@ public class HollowLogCrawlHandler {
     }
 
     private static void clearForcedPose(Player player) {
-        boolean wasForced = FORCED_PLAYERS.remove(player.getUUID());
+        boolean wasForced = FORCED_PLAYERS.remove(playerSide(player));
         clearForcedPose(player, wasForced);
     }
 
@@ -128,8 +135,8 @@ public class HollowLogCrawlHandler {
 
     @SubscribeEvent
     public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getEntity() != null) {
-            UUID id = event.getEntity().getUUID();
+        if (event.getPlayer() != null) {
+            PlayerSide id = playerSide(event.getPlayer());
             FORCED_PLAYERS.remove(id);
             CUSTOM_CRAWLING_PLAYERS.remove(id);
         }

@@ -31,7 +31,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 
     @Inject(method = "mayPickup", at = @At("HEAD"), cancellable = true)
     private void buildscape$mayPickupZeroCost(Player player, boolean hasStack, CallbackInfoReturnable<Boolean> cir) {
-        if (hasStack && this.cost.get() == 0) {
+        if (hasStack && this.cost.get() == 0 && this.inputSlots.getItem(1).is(ModItems.FESTIVE_GLINT_SHARD.get())) {
             cir.setReturnValue(true);
         }
     }

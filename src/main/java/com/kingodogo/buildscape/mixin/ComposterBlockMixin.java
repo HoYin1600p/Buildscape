@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -102,6 +103,50 @@ public abstract class ComposterBlockMixin extends Block {
                     }
                 }
             }
+        }
+    }
+
+    @Inject(method = "getContainer", at = @At("HEAD"), cancellable = true)
+    private void buildscape$disablePlanterAutomation(BlockState state, LevelAccessor level, BlockPos pos,
+                                                     CallbackInfoReturnable<WorldlyContainer> cir) {
+        if (state.hasProperty(PlanterHelper.PLANTER) && state.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {
+            cir.setReturnValue(new WorldlyContainer() {
+                @Override
+                public int[] getSlotsForFace(Direction side) { return new int[0]; }
+
+                @Override
+                public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction side) { return false; }
+
+                @Override
+                public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) { return false; }
+
+                @Override
+                public int getContainerSize() { return 0; }
+
+                @Override
+                public boolean isEmpty() { return true; }
+
+                @Override
+                public ItemStack getItem(int slot) { return ItemStack.EMPTY; }
+
+                @Override
+                public ItemStack removeItem(int slot, int count) { return ItemStack.EMPTY; }
+
+                @Override
+                public ItemStack removeItemNoUpdate(int slot) { return ItemStack.EMPTY; }
+
+                @Override
+                public void setItem(int slot, ItemStack stack) { }
+
+                @Override
+                public void setChanged() { }
+
+                @Override
+                public boolean stillValid(Player player) { return true; }
+
+                @Override
+                public void clearContent() { }
+            });
         }
     }
 

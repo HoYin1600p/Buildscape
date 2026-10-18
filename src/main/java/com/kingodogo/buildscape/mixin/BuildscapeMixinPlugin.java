@@ -63,11 +63,10 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
     }
 
     private static boolean classExists(String className) {
-        try {
-            Class.forName(className, false, BuildscapeMixinPlugin.class.getClassLoader());
-            return true;
-        } catch (ClassNotFoundException exception) {
-            return false;
-        }
+        String resource = className.replace('.', '/') + ".class";
+        ClassLoader loader = BuildscapeMixinPlugin.class.getClassLoader();
+        ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+        return (loader != null && loader.getResource(resource) != null)
+                || (contextLoader != null && contextLoader.getResource(resource) != null);
     }
 }

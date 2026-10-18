@@ -2,6 +2,8 @@ package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.resources.ResourceLocation;
@@ -11,7 +13,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.nio.file.*;
@@ -75,6 +76,22 @@ public class PillarParticleConfig {
     public volatile Set<String> items = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private boolean itemsLoaded;
     private boolean itemsFileUnreadable;
+    private transient boolean remote;
+    private transient boolean propertiesReadOnly;
+    private transient String propertiesSource;
+    private transient JsonObject originalProperties;
+    private transient JsonObject loadedPropertyValues;
+    private transient String itemsSource;
+    private transient JsonObject originalItems;
+    private final transient Path configDirectory;
+
+    public PillarParticleConfig() {
+        this(null);
+    }
+
+    PillarParticleConfig(Path configDirectory) {
+        this.configDirectory = configDirectory;
+    }
 
     public synchronized void replaceItems(Collection<String> updatedItems) {
         Set<String> replacement = java.util.concurrent.ConcurrentHashMap.newKeySet();
@@ -200,6 +217,7 @@ public class PillarParticleConfig {
     public static void setServerConfig(
             com.kingodogo.buildscape.network.SyncConfigPacket packet) {
         SERVER_CONFIG = new PillarParticleConfig();
+        SERVER_CONFIG.remote = true;
         SERVER_CONFIG.particle_speed = packet.particle_speed > 0
                 ? packet.particle_speed
                 : 0.02;
@@ -363,8 +381,7 @@ public class PillarParticleConfig {
     }
 
     private File getConfigDir() {
-        String configPath = Paths.get("config", "buildscape", "pillar").toString();
-        File dir = new File(configPath);
+        File dir = (configDirectory != null ? configDirectory : Paths.get("config", "buildscape", "pillar")).toFile();
         if (!dir.exists())
             dir.mkdirs();
         return dir;
@@ -372,96 +389,13 @@ public class PillarParticleConfig {
 
     private void writeDefaultProperties(File f) {
         try {
-            File parentDir = f.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-
-            try (FileWriter writer = new FileWriter(f)) {
-                writer.write("{\n");
-                writer.write(
-                        "  // Basic particle parameters (used when use_pattern = false)\n");
-                writer.write(
-                        "  // These parameters control particle behavior when patterns are disabled\n");
-                writer.write(
-                        "  \"particle_speed\": 0.02,      // Base speed multiplier for particles\n");
-                writer.write(
-                        "  \"particle_spread\": 0.1,      // How far particles spread from center\n");
-                writer.write(
-                        "  \"particle_lifetime\": 20,     // How long particles last (in ticks, 20 ticks = 1 second)\n");
-                writer.write(
-                        "  \"particle_density\": 2,       // Number of particles spawned per tick\n");
-                writer.write("  \n");
-                writer.write(
-                        "  // Pattern system - set use_pattern to true to enable patterns (overrides basic parameters above)\n");
-                writer.write(
-                        "  // When use_pattern is false, basic particle parameters (particle_speed, particle_spread, etc.) are used\n");
-                writer.write(
-                        "  // When use_pattern is true, pattern-specific parameters (pattern_speed, pattern_spread, etc.) are used\n");
-                writer.write("  \"use_pattern\": true,\n");
-                writer.write("  \n");
-                writer.write(
-                        "  // Available patterns: \"beam\", \"spiral\", \"fountain\", \"pulse\", \"ring\", \"burst\"\n");
-                writer.write("  //   \"ring\" - Default ring of particles\n");
-                writer.write(
-                        "  //   \"beam\" - Straight upward beam with subtle spread\n");
-                writer.write(
-                        "  //   \"spiral\" - Particles spiral upward in a helix pattern\n");
-                writer.write(
-                        "  //   \"fountain\" - Particles spread outward then fall down\n");
-                writer.write(
-                        "  //   \"pulse\" - Particles pulse in and out from the center\n");
-                writer.write(
-                        "  //   \"ring\" - Particles form a ring around the pillar\n");
-                writer.write(
-                        "  //   \"burst\" - Particles burst outward in all directions (half size)\n");
-                writer.write(
-                        "  // You can cycle through patterns in-game by pressing the cycle pattern keybind (default: P)\n");
-                writer.write("  \"pattern\": \"ring\",\n");
-                writer.write("  \n");
-                writer.write(
-                        "  // Pattern-specific parameters (only used when use_pattern = true)\n");
-                writer.write(
-                        "  // These parameters control pattern behavior and override basic particle parameters\n");
-                writer.write(
-                        "  \"pattern_speed\": 0.05,       // Base speed multiplier for pattern particles\n");
-                writer.write(
-                        "  \"pattern_spread\": 0.05,      // Spread amount for pattern particles\n");
-                writer.write(
-                        "  \"pattern_intensity\": 1.0,    // Intensity multiplier for pattern effects (higher = more intense)\n");
-                writer.write("  \n");
-                writer.write(
-                        "  // Particle colors (array of #RRGGBB format colors, up to 7 colors)\n");
-                writer.write(
-                        "  // Particles cycle through these colors (1st particle = 1st color, 2nd particle = 2nd color, etc.)\n");
-                writer.write(
-                        "  // The texture is white, so any color will tint it appropriately\n");
-                writer.write("  // \n");
-                writer.write("  // DYING PILLARS:\n");
-                writer.write(
-                        "  // You can dye pillars by right-clicking them with any dye item (red, blue, green, etc.)\n");
-                writer.write(
-                        "  // Each pillar can have up to 5 different dye colors applied to it\n");
-                writer.write(
-                        "  // When a pillar is dyed, it overrides these config colors for that specific pillar\n");
-                writer.write(
-                        "  // Dye colors are applied in order - particles will cycle through all applied dye colors\n");
-                writer.write(
-                        "  // Each pillar can have its own dye colors, independent of other pillars\n");
-                writer.write("  // To reset a pillar's colors, break and replace it\n");
-                writer.write(
-                        "  \"particle_color\": [\"#FFB81C\", \"#FFFFFF\", \"#FFFF00\", \"#E8FEFD\", \"#FF5C00\", \"#3CDFFF\"],\n");
-                writer.write("  \n");
-                writer.write(
-                        "  // Maximum number of colors to use from particle_color array (1-7)\n");
-                writer.write(
-                        "  // Particles will cycle through colors from first to max_particle_color\n");
-                writer.write(
-                        "  // This only applies when using config colors - dyed pillars use their dye colors instead\n");
-                writer.write("  \"max_particle_color\": 3\n");
-                writer.write("}\n");
-            }
-        } catch (Exception ignored) {
+            PillarParticleConfig defaults = new PillarParticleConfig();
+            defaults.use_pattern = true;
+            defaults.particle_color = new ArrayList<>(List.of(
+                    "#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF"));
+            ConfigLayoutIO.write(f.toPath(), groupedProperties(defaults.propertyValues()), null, false);
+        } catch (Exception e) {
+            BuildScape.LOGGER.error("Unable to create default pillar properties", e);
         }
     }
 
@@ -473,135 +407,10 @@ public class PillarParticleConfig {
             }
 
             try (FileWriter writer = new FileWriter(f)) {
-                writer.write("{\n");
-                writer.write(
-                        "  // Item IDs that trigger particles when placed on pillars\n");
-                writer.write(
-                        "  // Add or remove item IDs from this list to control which items create particles\n");
-                writer.write(
-                        "  // Format: \"minecraft:item_name\" (use the item's registry name)\n");
-                writer.write(
-                        "  // Items must be placed on a pillar block to trigger particles\n");
-                writer.write(
-                        "  // Right-click a pillar with an item from this list to place it and activate particles\n");
-                writer.write(
-                        "  // You can also use item tags by prefixing with \"#\" (e.g., \"#minecraft:planks\")\n");
-                writer.write("  \"items\": [\n");
-                writer.write("    \"minecraft:diamond\",\n");
-                writer.write("    \"minecraft:netherite_ingot\",\n");
-                writer.write("    \"minecraft:nether_star\",\n");
-                writer.write("    \"minecraft:heart_of_the_sea\",\n");
-                writer.write("    \"minecraft:trident\",\n");
-                writer.write("    \"minecraft:emerald\",\n");
-                writer.write("    \"minecraft:dragon_breath\",\n");
-                writer.write("    \"minecraft:netherite_scrap\",\n");
-                writer.write("    \"minecraft:totem_of_undying\",\n");
-                writer.write("    \"minecraft:spyglass\",\n");
-                writer.write("    \"minecraft:elytra\",\n");
-                writer.write("    \"minecraft:diamond_sword\",\n");
-                writer.write("    \"minecraft:diamond_hoe\",\n");
-                writer.write("    \"minecraft:diamond_axe\",\n");
-                writer.write("    \"minecraft:diamond_pickaxe\",\n");
-                writer.write("    \"minecraft:diamond_shovel\",\n");
-                writer.write("    \"minecraft:diamond_boots\",\n");
-                writer.write("    \"minecraft:diamond_leggings\",\n");
-                writer.write("    \"minecraft:diamond_chestplate\",\n");
-                writer.write("    \"minecraft:diamond_helmet\",\n");
-                writer.write("    \"minecraft:netherite_sword\",\n");
-                writer.write("    \"minecraft:netherite_hoe\",\n");
-                writer.write("    \"minecraft:netherite_pickaxe\",\n");
-                writer.write("    \"minecraft:netherite_axe\",\n");
-                writer.write("    \"minecraft:netherite_shovel\",\n");
-                writer.write("    \"minecraft:netherite_boots\",\n");
-                writer.write("    \"minecraft:netherite_leggings\",\n");
-                writer.write("    \"minecraft:netherite_chestplate\",\n");
-                writer.write("    \"minecraft:netherite_helmet\",\n");
-                writer.write("    \"minecraft:nautilus_shell\",\n");
-                writer.write("    \"minecraft:shulker_shell\",\n");
-                writer.write("    \"minecraft:golden_apple\",\n");
-                writer.write("    \"minecraft:enchanted_golden_apple\",\n");
-                writer.write("    \"minecraft:golden_carrot\",\n");
-                writer.write("    \"minecraft:experience_bottle\",\n");
-                writer.write("    \"minecraft:mojang_banner_pattern\",\n");
-                writer.write("    \"minecraft:ancient_debris\",\n");
-                writer.write("    \"minecraft:dragon_head\",\n");
-                writer.write("    \"minecraft:dragon_egg\",\n");
-                writer.write("    \"minecraft:player_head\",\n");
-                writer.write("    \"minecraft:beacon\",\n");
-                writer.write("    \"minecraft:end_crystal\",\n");
-                writer.write("    \"minecraft:conduit\",\n");
-                writer.write("    \"minecraft:skeleton_skull\",\n");
-                writer.write("    \"minecraft:zombie_head\",\n");
-                writer.write("    \"minecraft:wither_skeleton_skull\",\n");
-                writer.write("    \"minecraft:creeper_head\",\n");
-                writer.write("    \"minecraft:enchanting_table\",\n");
-                writer.write("    \"minecraft:emerald_block\",\n");
-                writer.write("    \"minecraft:diamond_block\",\n");
-                writer.write("    \"minecraft:gold_block\",\n");
-                writer.write("    \"minecraft:netherite_block\",\n");
-                writer.write("    \"minecraft:deepslate_diamond_ore\",\n");
-                writer.write("    \"minecraft:diamond_ore\",\n");
-                writer.write("    \"minecraft:bedrock\",\n");
-                writer.write("    \"minecraft:pufferfish\",\n");
-                writer.write("    \"minecraft:poisonous_potato\",\n");
-                writer.write("    \"minecraft:creeper_spawn_egg\",\n");
-                writer.write("    \"minecraft:turtle_spawn_egg\",\n");
-                writer.write("    \"minecraft:axolotl_spawn_egg\",\n");
-                writer.write("    \"minecraft:wither_skeleton_spawn_egg\",\n");
-                writer.write("    \"minecraft:shulker_spawn_egg\",\n");
-                writer.write("    \"minecraft:elder_guardian_spawn_egg\",\n");
-                writer.write("    \"minecraft:ravager_spawn_egg\",\n");
-                writer.write("    \"minecraft:slime_spawn_egg\",\n");
-                writer.write("    \"minecraft:zoglin_spawn_egg\",\n");
-                writer.write("    \"minecraft:villager_spawn_egg\",\n");
-                writer.write("    \"minecraft:skeleton_horse_spawn_egg\",\n");
-                writer.write("    \"minecraft:glow_squid_spawn_egg\",\n");
-                writer.write("    \"minecraft:goat_spawn_egg\",\n");
-                writer.write("    \"minecraft:enderman_spawn_egg\",\n");
-                writer.write("    \"minecraft:written_book\",\n");
-                writer.write("    \"buildscape:ancient_ashen_scroll\"");
-
-                boolean hasVaultHunters = net.minecraftforge.fml.ModList.get().isLoaded("the_vault");
-                if (hasVaultHunters) {
-                    writer.write(",\n");
-                    writer.write("    \"the_vault:echo_pog\",\n");
-                    writer.write("    \"the_vault:gem_pog\",\n");
-                    writer.write("    \"the_vault:vault_crystal\",\n");
-                    writer.write("    \"the_vault:spicy_hearty_burger\",\n");
-                    writer.write("    \"the_vault:omega_pog\",\n");
-                    writer.write("    \"the_vault:knowledge_star\",\n");
-                    writer.write("    \"the_vault:antique\",\n");
-                    writer.write("    \"the_vault:herald_trophy\",\n");
-                    writer.write("    \"the_vault:pvp_trophy\",\n");
-                    writer.write("    \"the_vault:treasure_keyring\",\n");
-                    writer.write("    \"the_vault:companion_egg\",\n");
-                    writer.write("    \"the_vault:vault_artifact\",\n");
-                    writer.write("    \"the_vault:tool\",\n");
-                    writer.write("    \"the_vault:deck_socket\",\n");
-                    writer.write("    \"the_vault:card_deck\",\n");
-                    writer.write("    \"the_vault:vault_god_charm\",\n");
-                    writer.write("    \"the_vault:boost_modification_stone\",\n");
-                    writer.write("    \"the_vault:neuralizer\",\n");
-                    writer.write("    \"the_vault:soul_vortex\",\n");
-                    writer.write("    \"#the_vault:crystal_capstones\",\n");
-                    writer.write("    \"#the_vault:keys\",\n");
-                    writer.write("    \"#the_vault:gems\",\n");
-                    writer.write("    \"#the_vault:fruits\",\n");
-                    writer.write("    \"the_vault:unidentified_artifact\",\n");
-                    writer.write("    \"#the_vault:playerclusters\",\n");
-                    writer.write("    \"#the_vault:perfectgems\",\n");
-                    writer.write("    \"#the_vault:playerchunks\",\n");
-                    writer.write("    \"#the_vault:magnet\",\n");
-                    writer.write("    \"#the_vault:unique\",\n");
-                    writer.write("    \"#the_vault:vault_gear\",\n");
-                    writer.write("    \"the_vault:santa_egg\",\n");
-                    writer.write("    \"the_vault:grinch_egg\",\n");
-                    writer.write("    \"the_vault:yeti_egg\"\n");
-                } else {
-                    writer.write("\n");
-                }
-                writer.write("  ],\n");
-                writer.write("  \n");
+                java.io.StringWriter grouped = new java.io.StringWriter();
+                DefaultPillarItems.writeGrouped(grouped, net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+                String layout = grouped.toString();
+                writer.write(layout.substring(0, layout.lastIndexOf('}')));
                 writer.write("  // MOB SPAWN EGGS:\n");
                 writer.write(
                         "  // Spawn eggs (e.g., creeper_spawn_egg, zombie_spawn_egg) render the actual entity/mob on the pillar\n");
@@ -702,18 +511,18 @@ public class PillarParticleConfig {
         if (!file.exists()) {
             writeDefaultProperties(file);
         }
-        try (FileReader r = new FileReader(file)) {
-            StringBuilder content = new StringBuilder();
-            int ch;
-            while ((ch = r.read()) != -1) {
-                content.append((char) ch);
+        try {
+            propertiesSource = ConfigLayoutIO.readText(file.toPath());
+            propertiesReadOnly = false;
+            try {
+                originalProperties = ConfigLayoutIO.readProperties(propertiesSource);
+            } catch (Exception e) {
+                propertiesReadOnly = true;
+                originalProperties = null;
             }
-            String jsonWithoutComments = stripComments(content.toString());
-
-            Type mapType = new TypeToken<Map<String, Object>>() {
-            }.getType();
-            Map<String, Object> jsonMap = GSON.fromJson(jsonWithoutComments, mapType);
-
+            Type mapType = new TypeToken<Map<String, Object>>() { }.getType();
+            Map<String, Object> jsonMap = GSON.fromJson(stripComments(propertiesSource), mapType);
+            if (jsonMap == null) throw new IllegalArgumentException("Expected pillar properties");
             if (jsonMap != null) {
                 if (jsonMap.containsKey("use_template") &&
                         !jsonMap.containsKey("use_pattern")) {
@@ -735,6 +544,10 @@ public class PillarParticleConfig {
                     jsonMap.put("pattern_intensity", jsonMap.get("template_intensity"));
                 }
 
+                // The legacy single-color form still has the same meaning as a one-element palette.
+                if (jsonMap.get("particle_color") instanceof String color) {
+                    jsonMap.put("particle_color", List.of(color));
+                }
                 String updatedJson = GSON.toJson(jsonMap);
                 Type type = new TypeToken<PillarParticleConfig>() {
                 }.getType();
@@ -826,9 +639,14 @@ public class PillarParticleConfig {
                             Math.min(7, Math.min(this.max_particle_color, numColors)));
                 }
             }
+            loadedPropertyValues = propertyValues();
+        } catch (Exception e) {
+            propertiesReadOnly = true;
+            backupUnreadableFile(file);
+            BuildScape.LOGGER.error("Unable to load pillar properties; retaining the original file", e);
+        } finally {
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
-        } catch (Exception ignored) {
         }
     }
 
@@ -841,18 +659,28 @@ public class PillarParticleConfig {
         if (!file.exists()) {
             writeDefaultItems(file);
             initializeDefaultItems();
-            itemsFileUnreadable = false;
-            lastLoadedItems = file.lastModified();
-            lastFileSizeItems = file.length();
-            return;
         }
-        try (FileReader reader = new FileReader(file)) {
-            StringBuilder content = new StringBuilder();
-            int ch;
-            while ((ch = reader.read()) != -1) {
-                content.append((char) ch);
+        try {
+            String source = ConfigLayoutIO.readText(file.toPath());
+            Set<String> parsed = parseItems(source, file.toString());
+            JsonObject document = GSON.fromJson(stripComments(source), JsonObject.class);
+            boolean migrated = DefaultPillarItems.merge405(document, parsed,
+                    net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+            if (migrated) {
+                List<String> sorted = new ArrayList<>(parsed);
+                sorted.sort(String::compareTo);
+                document.add("items", GSON.toJsonTree(sorted));
+                String output = ConfigLayoutIO.retainComments(source, GSON.toJson(document), true);
+                try {
+                    ConfigLayoutIO.write(file.toPath(), output, source, true);
+                    source = output;
+                } catch (Exception e) {
+                    BuildScape.LOGGER.warn("Unable to persist the one-time pillar item update", e);
+                }
             }
-            replaceItems(parseItems(content.toString(), file.toString()));
+            itemsSource = source;
+            originalItems = document;
+            replaceItems(parsed);
             itemsFileUnreadable = false;
         } catch (Exception e) {
             itemsFileUnreadable = true;
@@ -889,263 +717,37 @@ public class PillarParticleConfig {
     }
 
     private void initializeDefaultItems() {
-        Set<String> items = new HashSet<>();
-        items.add("minecraft:diamond");
-        items.add("minecraft:netherite_ingot");
-        items.add("minecraft:nether_star");
-        items.add("minecraft:heart_of_the_sea");
-        items.add("minecraft:trident");
-        items.add("minecraft:emerald");
-        items.add("minecraft:dragon_breath");
-        items.add("minecraft:netherite_scrap");
-        items.add("minecraft:totem_of_undying");
-        items.add("minecraft:spyglass");
-        items.add("minecraft:elytra");
-        items.add("minecraft:diamond_sword");
-        items.add("minecraft:diamond_hoe");
-        items.add("minecraft:diamond_axe");
-        items.add("minecraft:diamond_pickaxe");
-        items.add("minecraft:diamond_shovel");
-        items.add("minecraft:diamond_boots");
-        items.add("minecraft:diamond_leggings");
-        items.add("minecraft:diamond_chestplate");
-        items.add("minecraft:diamond_helmet");
-        items.add("minecraft:netherite_sword");
-        items.add("minecraft:netherite_hoe");
-        items.add("minecraft:netherite_pickaxe");
-        items.add("minecraft:netherite_axe");
-        items.add("minecraft:netherite_shovel");
-        items.add("minecraft:netherite_boots");
-        items.add("minecraft:netherite_leggings");
-        items.add("minecraft:netherite_chestplate");
-        items.add("minecraft:netherite_helmet");
-        items.add("minecraft:nautilus_shell");
-        items.add("minecraft:shulker_shell");
-        items.add("minecraft:golden_apple");
-        items.add("minecraft:enchanted_golden_apple");
-        items.add("minecraft:golden_carrot");
-        items.add("minecraft:experience_bottle");
-        items.add("minecraft:mojang_banner_pattern");
-        items.add("minecraft:ancient_debris");
-        items.add("minecraft:dragon_head");
-        items.add("minecraft:dragon_egg");
-        items.add("minecraft:player_head");
-        items.add("minecraft:beacon");
-        items.add("minecraft:end_crystal");
-        items.add("minecraft:conduit");
-        items.add("minecraft:skeleton_skull");
-        items.add("minecraft:zombie_head");
-        items.add("minecraft:wither_skeleton_skull");
-        items.add("minecraft:creeper_head");
-        items.add("minecraft:enchanting_table");
-        items.add("minecraft:emerald_block");
-        items.add("minecraft:diamond_block");
-        items.add("minecraft:gold_block");
-        items.add("minecraft:netherite_block");
-        items.add("minecraft:deepslate_diamond_ore");
-        items.add("minecraft:diamond_ore");
-        items.add("minecraft:bedrock");
-        items.add("minecraft:pufferfish");
-        items.add("minecraft:poisonous_potato");
-        items.add("minecraft:written_book");
-
-        items.add("minecraft:creeper_spawn_egg");
-        items.add("minecraft:turtle_spawn_egg");
-        items.add("minecraft:axolotl_spawn_egg");
-        items.add("minecraft:wither_skeleton_spawn_egg");
-        items.add("minecraft:shulker_spawn_egg");
-        items.add("minecraft:elder_guardian_spawn_egg");
-        items.add("minecraft:ravager_spawn_egg");
-        items.add("minecraft:slime_spawn_egg");
-        items.add("minecraft:zoglin_spawn_egg");
-        items.add("minecraft:villager_spawn_egg");
-        items.add("minecraft:skeleton_horse_spawn_egg");
-        items.add("minecraft:glow_squid_spawn_egg");
-        items.add("minecraft:goat_spawn_egg");
-        items.add("minecraft:enderman_spawn_egg");
-        items.add("buildscape:ancient_ashen_scroll");
-
-        if (net.minecraftforge.fml.ModList.get().isLoaded("the_vault")) {
-            items.add("the_vault:echo_pog");
-            items.add("the_vault:gem_pog");
-            items.add("the_vault:vault_crystal");
-            items.add("the_vault:spicy_hearty_burger");
-            items.add("the_vault:omega_pog");
-            items.add("the_vault:knowledge_star");
-            items.add("the_vault:antique");
-            items.add("the_vault:herald_trophy");
-            items.add("the_vault:pvp_trophy");
-            items.add("the_vault:treasure_keyring");
-            items.add("the_vault:companion_egg");
-            items.add("the_vault:vault_artifact");
-            items.add("the_vault:tool");
-            items.add("the_vault:deck_socket");
-            items.add("the_vault:card_deck");
-            items.add("the_vault:vault_god_charm");
-            items.add("the_vault:boost_modification_stone");
-            items.add("the_vault:neuralizer");
-            items.add("the_vault:soul_vortex");
-            items.add("#the_vault:crystal_capstones");
-            items.add("#the_vault:keys");
-            items.add("#the_vault:gems");
-            items.add("#the_vault:fruits");
-            items.add("the_vault:unidentified_artifact");
-            items.add("#the_vault:playerclusters");
-            items.add("#the_vault:perfectgems");
-            items.add("#the_vault:playerchunks");
-            items.add("#the_vault:magnet");
-            items.add("#the_vault:unique");
-            items.add("#the_vault:vault_gear");
-            items.add("the_vault:santa_egg");
-            items.add("the_vault:grinch_egg");
-            items.add("the_vault:yeti_egg");
-        }
-        replaceItems(items);
+        replaceItems(DefaultPillarItems.items(net.minecraftforge.fml.ModList.get().isLoaded("the_vault")));
     }
 
     private void migrateOldConfig() {
-        File oldConfigDir = new File(Paths.get("config", "buildscape").toString());
-        File oldConfigFile = new File(oldConfigDir, "pillar-particles.json");
-
-        if (oldConfigFile.exists()) {
-            try (FileReader r = new FileReader(oldConfigFile)) {
-                StringBuilder content = new StringBuilder();
-                int ch;
-                while ((ch = r.read()) != -1) {
-                    content.append((char) ch);
-                }
-                String jsonWithoutComments = stripComments(content.toString());
-
-                Type mapType = new TypeToken<Map<String, Object>>() {
-                }.getType();
-                Map<String, Object> jsonMap = GSON.fromJson(
-                        jsonWithoutComments,
-                        mapType);
-
-                if (jsonMap != null) {
-                    if (jsonMap.containsKey("items")) {
-                        Object itemsObj = jsonMap.get("items");
-                        if (itemsObj instanceof List<?> itemsList) {
-                            File newItemsFile = getItemsFile();
-                            writeDefaultItems(newItemsFile);
-
-                            try (FileWriter writer = new FileWriter(newItemsFile)) {
-                                writer.write("{\n");
-                                writer.write(
-                                        "  // Item IDs that trigger particles when placed on pillars\n");
-                                writer.write("  // Migrated from old config file\n");
-                                writer.write("  \"items\": [\n");
-                                for (int i = 0; i < itemsList.size(); i++) {
-                                    Object item = itemsList.get(i);
-                                    if (item instanceof String) {
-                                        writer.write("    \"" + item + "\"");
-                                        if (i < itemsList.size() - 1) {
-                                            writer.write(",");
-                                        }
-                                        writer.write("\n");
-                                    }
-                                }
-                                writer.write("  ]\n");
-                                writer.write("}\n");
-                            }
-                        }
-                    }
-
-                    File newPropertiesFile = getPropertiesFile();
-                    writeDefaultProperties(newPropertiesFile);
-
-                    try (FileWriter writer = new FileWriter(newPropertiesFile)) {
-                        writer.write("{\n");
-                        writer.write("  // Migrated from old config file\n");
-                        boolean first = true;
-                        if (jsonMap.containsKey("particle_speed")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"particle_speed\": " + jsonMap.get("particle_speed"));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("particle_spread")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"particle_spread\": " + jsonMap.get("particle_spread"));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("particle_lifetime")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"particle_lifetime\": " + jsonMap.get("particle_lifetime"));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("particle_density")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"particle_density\": " + jsonMap.get("particle_density"));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("use_pattern")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write("  \"use_pattern\": " + jsonMap.get("use_pattern"));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("pattern")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write("  \"pattern\": \"" + jsonMap.get("pattern") + "\"");
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("pattern_speed")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"pattern_speed\": " + jsonMap.get("pattern_speed"));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("pattern_spread")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"pattern_spread\": " + jsonMap.get("pattern_spread"));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("pattern_intensity")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"pattern_intensity\": " + jsonMap.get("pattern_intensity"));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("particle_color")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"particle_color\": " +
-                                            GSON.toJson(jsonMap.get("particle_color")));
-                            first = false;
-                        }
-                        if (jsonMap.containsKey("max_particle_color")) {
-                            if (!first)
-                                writer.write(",\n");
-                            writer.write(
-                                    "  \"max_particle_color\": " + jsonMap.get("max_particle_color"));
-                        }
-                        writer.write("\n}\n");
-                    }
-
-                    File backupFile = new File(
-                            oldConfigDir,
-                            "pillar-particles.json.backup");
-                    oldConfigFile.renameTo(backupFile);
-                }
-            } catch (Exception ignored) {
+        Path oldFile = Paths.get("config", "buildscape", "pillar-particles.json");
+        if (!Files.exists(oldFile)) return;
+        try {
+            String source = ConfigLayoutIO.readText(oldFile);
+            JsonObject old = GSON.fromJson(stripComments(source), JsonObject.class);
+            if (old == null) return;
+            Path backup = oldFile.resolveSibling("pillar-particles.json.backup");
+            if (!Files.exists(backup)) Files.copy(oldFile, backup);
+            File itemsFile = getItemsFile();
+            if (!itemsFile.exists() && old.has("items")) {
+                parseItems(source, oldFile.toString());
+                JsonObject itemValues = new JsonObject();
+                itemValues.add("items", old.get("items"));
+                ConfigLayoutIO.write(itemsFile.toPath(),
+                        ConfigLayoutIO.retainComments(source, GSON.toJson(itemValues), true), null, false);
             }
+            File propertiesFile = getPropertiesFile();
+            if (!propertiesFile.exists()) {
+                JsonObject properties = old.deepCopy();
+                properties.remove("items");
+                ConfigLayoutIO.write(propertiesFile.toPath(),
+                        ConfigLayoutIO.retainComments(source, groupedProperties(properties), true), null, false);
+            }
+        } catch (Exception e) {
+            BuildScape.LOGGER.error("Unable to migrate legacy pillar config; retaining the original", e);
         }
     }
-
     public static void forceReload() {
         if (INSTANCE != null) {
             INSTANCE.loadInternal();
@@ -1211,6 +813,7 @@ public class PillarParticleConfig {
     }
 
     public synchronized void saveItemsToDisk() {
+        if (remote) return;
         clearMatchCache();
         if (itemsFileUnreadable) {
             BuildScape.LOGGER.error("Not overwriting unreadable items config " + getItemsFile());
@@ -1222,11 +825,24 @@ public class PillarParticleConfig {
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();
             }
-            try (FileWriter writer = new FileWriter(file)) {
-                Map<String, Object> json = new LinkedHashMap<>();
-                json.put("items", new ArrayList<>(items));
-                GSON.toJson(json, writer);
+            if (originalItems == null && file.exists()) {
+                itemsSource = ConfigLayoutIO.readText(file.toPath());
+                parseItems(itemsSource, file.toString());
+                originalItems = GSON.fromJson(stripComments(itemsSource), JsonObject.class);
             }
+            JsonObject json = originalItems == null ? new JsonObject() : originalItems.deepCopy();
+            // Explicit saves also mark the list, so removed defaults never return on the next load.
+            json.addProperty("defaults_version", 405);
+            if (net.minecraftforge.fml.ModList.get().isLoaded("the_vault")) {
+                json.addProperty("vault_defaults_version", 405);
+            }
+            List<String> sorted = new ArrayList<>(items);
+            sorted.sort(String::compareTo);
+            json.add("items", GSON.toJsonTree(sorted));
+            String output = ConfigLayoutIO.retainComments(itemsSource, GSON.toJson(json), true);
+            ConfigLayoutIO.write(file.toPath(), output, itemsSource, false);
+            itemsSource = output;
+            originalItems = json;
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
         } catch (Exception e) {
@@ -1249,32 +865,106 @@ public class PillarParticleConfig {
     }
 
     public synchronized void savePropertiesToDisk() {
+        if (remote || propertiesReadOnly) return;
         File file = getPropertiesFile();
         try {
+            if (originalProperties == null && file.exists()) {
+                // Also protect explicit saves made before the first load.
+                String source = ConfigLayoutIO.readText(file.toPath());
+                JsonObject original = ConfigLayoutIO.readProperties(source);
+                GSON.fromJson(original, PillarParticleConfig.class);
+                propertiesSource = source;
+                originalProperties = original;
+            }
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();
             }
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write("{\n");
-                writer.write("  \"particle_speed\": " + particle_speed + ",\n");
-                writer.write("  \"particle_spread\": " + particle_spread + ",\n");
-                writer.write("  \"particle_lifetime\": " + particle_lifetime + ",\n");
-                writer.write("  \"particle_density\": " + particle_density + ",\n");
-                writer.write("  \"use_pattern\": " + use_pattern + ",\n");
-                writer.write("  \"pattern\": \"" + pattern + "\",\n");
-                writer.write("  \"pattern_speed\": " + pattern_speed + ",\n");
-                writer.write("  \"pattern_spread\": " + pattern_spread + ",\n");
-                writer.write("  \"pattern_intensity\": " + pattern_intensity + ",\n");
-                writer.write("  \"particle_color\": " + GSON.toJson(particle_color) + ",\n");
-                writer.write("  \"max_particle_color\": " + max_particle_color + "\n");
-                writer.write("}\n");
+            JsonObject current = propertyValues();
+            JsonObject output = originalProperties == null ? new JsonObject() : originalProperties.deepCopy();
+            for (Map.Entry<String, JsonElement> entry : current.entrySet()) {
+                String key = entry.getKey();
+                boolean changed = loadedPropertyValues == null || !entry.getValue().equals(loadedPropertyValues.get(key));
+                if (changed || !output.has(key)) {
+                    String alias = key.equals("use_pattern") ? "use_template" : key.replace("pattern", "template");
+                    output.add(key, !changed && output.has(alias) ? output.get(alias) : entry.getValue());
+                }
             }
+            String text = ConfigLayoutIO.retainComments(propertiesSource, groupedProperties(output), true);
+            ConfigLayoutIO.write(file.toPath(), text, propertiesSource, true);
+            propertiesSource = text;
+            originalProperties = output;
+            loadedPropertyValues = current;
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
-        } catch (Exception e) {
-            BuildScape.LOGGER.error("Error saving properties config: " + e.getMessage());
+        } catch (Exception ignored) {
+            BuildScape.LOGGER.warn("Unable to save pillar properties", ignored);
         }
+    }
+
+    private JsonObject propertyValues() {
+        JsonObject values = new JsonObject();
+        values.add("particle_color", GSON.toJsonTree(particle_color));
+        values.addProperty("max_particle_color", max_particle_color);
+        values.addProperty("particle_spread", particle_spread);
+        values.addProperty("particle_speed", particle_speed);
+        values.addProperty("particle_lifetime", particle_lifetime);
+        values.addProperty("pattern", pattern);
+        values.addProperty("pattern_speed", pattern_speed);
+        values.addProperty("pattern_spread", pattern_spread);
+        values.addProperty("pattern_intensity", pattern_intensity);
+        values.addProperty("use_pattern", use_pattern);
+        values.addProperty("particle_density", particle_density);
+        return values;
+    }
+
+    private static String groupedProperties(JsonObject values) {
+        StringBuilder text = new StringBuilder("{\n"
+                + "  // Basic parameters apply when use_pattern = false; patterns use pattern_* values instead.\n"
+                + "  // Right-click a pillar with dyes to override config colors for that pillar (up to 5 dyes).\n"
+                + "  // Dye colors cycle in application order; break and replace the pillar to reset them.\n"
+                + "  // Config colors cycle from the first color through max_particle_color.\n");
+        java.util.Set<String> written = new java.util.HashSet<>();
+        appendProperties(text, values, written, "Visuals", new String[][]{
+                {"particle_color", "Hexadecimal particle color palette (up to 7 colors)"},
+                {"max_particle_color", "Maximum number of colors to use from particle_color (1-7)"},
+                {"particle_spread", "How far particles spread from center when use_pattern = false"}});
+        appendProperties(text, values, written, "Timing & patterns", new String[][]{
+                {"particle_speed", "Basic particle parameters (used when use_pattern = false): base speed multiplier"},
+                {"particle_lifetime", "How long particles last (in ticks, 20 ticks = 1 second)"},
+                {"pattern", "Available patterns: beam, spiral, fountain, pulse, ring, burst"},
+                {"pattern_speed", "Base speed multiplier for pattern particles"},
+                {"pattern_spread", "Spread amount for pattern particles"},
+                {"pattern_intensity", "Intensity multiplier for pattern effects (higher = more intense)"}});
+        appendProperties(text, values, written, "Behaviour", new String[][]{
+                {"use_pattern", "Pattern system (overrides basic particle parameters)"},
+                {"particle_density", "Number of particles spawned per tick when use_pattern = false"}});
+        text.append("\n  // --- Other ---\n");
+        // Sort unknown keys as well, so output remains stable regardless of input key order.
+        for (String key : new java.util.TreeSet<>(values.keySet())) {
+            if (!written.contains(key)) {
+                text.append("  // Unrecognized setting retained with its original value\n");
+                appendProperty(text, key, values.get(key));
+            }
+        }
+        int comma = text.lastIndexOf(",\n");
+        if (comma >= 0) text.deleteCharAt(comma);
+        return text.append("}\n").toString();
+    }
+
+    private static void appendProperties(StringBuilder text, JsonObject values, Set<String> written,
+                                         String section, String[][] entries) {
+        text.append("\n  // --- ").append(section).append(" ---\n");
+        for (String[] entry : entries) {
+            written.add(entry[0]);
+            if (!values.has(entry[0])) continue;
+            text.append("  // ").append(entry[1]).append('\n');
+            appendProperty(text, entry[0], values.get(entry[0]));
+        }
+    }
+
+    private static void appendProperty(StringBuilder text, String key, JsonElement value) {
+        text.append("  ").append(GSON.toJson(key)).append(": ").append(GSON.toJson(value)).append(",\n");
     }
 
     public boolean addItem(String itemId) {

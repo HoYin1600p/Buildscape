@@ -184,6 +184,12 @@ public class HollowLogBlockEntity extends BlockEntity {
         if (state.hasProperty(HollowLogBlock.LAVA_LOGGED) && state.getValue(HollowLogBlock.LAVA_LOGGED)) {
             if (blockEntity.lavaTicks > 0) {
                 blockEntity.lavaTicks--;
+                if (blockEntity.lavaTicks > 0 && blockEntity.lavaTicks <= 100 && blockEntity.lavaTicks % 20 == 0) {
+                    level.playSound(null, pos, SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS, 0.8F, 1.0F);
+                    if (level instanceof ServerLevel serverLevel) {
+                        serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 4, 0.3, 0.2, 0.3, 0.02);
+                    }
+                }
                 if (blockEntity.lavaTicks <= 0) {
                     level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, 1.0F);
                     if (level instanceof ServerLevel serverLevel) {

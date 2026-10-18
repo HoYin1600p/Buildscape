@@ -3,6 +3,9 @@ package com.kingodogo.buildscape.client.screen;
 import com.kingodogo.buildscape.client.PillarMarkerManager;
 import com.kingodogo.buildscape.client.screen.widget.ColorSwatchButton;
 import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.network.EditPillarRowsPacket;
+import com.kingodogo.buildscape.network.ModMessages;
+import com.kingodogo.buildscape.network.RemovePillarPacket;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -44,6 +47,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private final List<PillarRow> rows = new ArrayList<>();
+    private final Map<String, PillarRow> rowsById = new HashMap<>();
     private Button reloadButton;
     private Button selectAllButton;
     private Button removeAllButton;
@@ -55,6 +59,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     private long lastRefreshCheck = 0L;
     private String lastSignature = "";
     private boolean dirty = false;
+    private boolean leaveBlocked = false;
+    private static long nextBatchId;
+    private long pendingBatchId;
+    private long pendingSince;
+    private static final long EDIT_TIMEOUT_NS = 10_000_000_000L;
+    private final Map<PillarRow, EditPillarRowsPacket.Row> pendingEdits = new LinkedHashMap<>();
     private Component statusMessage = TextComponent.EMPTY;
     private final com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer scrollbarRenderer = new com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer();
 
@@ -64,11 +74,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     @Override
     public void init() {
-        rows.clear();
+        Component previousStatus = statusMessage;
+        if (!dirty && pendingEdits.isEmpty()) {
+            rows.clear();
+            rowsById.clear();
+            statusMessage = TextComponent.EMPTY;
+        }
         scrollOffset = 0;
         maxScroll = 0;
-        dirty = false;
-        statusMessage = TextComponent.EMPTY;
 
         int buttonWidth = BuildScapeConfigScreen.scaleSize(100);
         int buttonHeight = BuildScapeConfigScreen.getScaledButtonHeight();
@@ -165,14 +178,17 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
 
         refreshFromManager();
+        if (!previousStatus.getString().isEmpty()) statusMessage = previousStatus;
     }
 
     private void manualReload() {
+        if (!pendingEdits.isEmpty()) return;
         dirty = false;
         refreshFromManager();
     }
 
     public void refreshFromManager() {
+        if (dirty) return;
         PillarIdManager manager = PillarIdManager.getClient();
         try {
             manager.checkAndReload();
@@ -228,6 +244,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             if (row == null) {
                 row = new PillarRow(entry.getValue());
                 rows.add(row);
+                rowsById.put(entry.getKey(), row);
             } else {
                 row.apply(entry.getValue());
             }
@@ -235,22 +252,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             seenIds.add(entry.getKey());
         }
 
-        for (PillarRow row : rows) {
-            if (!seenIds.contains(row.id)) {
-                row.setVisible(false);
-            }
-        }
+        rows.removeIf(row -> !seenIds.contains(row.id));
+        rowsById.keySet().removeIf(id -> !seenIds.contains(id));
 
         recomputeScroll();
     }
 
     private PillarRow findRow(String id) {
-        for (PillarRow row : rows) {
-            if (row.id != null && row.id.equals(id)) {
-                return row;
-            }
-        }
-        return null;
+        return rowsById.get(id);
     }
 
     private void recomputeScroll() {
@@ -293,29 +302,32 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         PillarRow row = new PillarRow(data);
         rows.add(row);
+        rowsById.put(newId, row);
         row.setVisible(true);
         dirty = true;
         statusMessage = new TranslatableComponent("buildscape.config.ids.unsaved");
     }
 
     private void saveRows() {
+        if (!pendingEdits.isEmpty()) return;
         List<String> errors = new ArrayList<>();
-        Map<String, PillarIdManager.PillarData> toSave = new LinkedHashMap<>();
+        List<EditPillarRowsPacket.Row> edits = new ArrayList<>();
+        Set<String> ids = new HashSet<>();
 
         for (PillarRow row : rows) {
             if (!row.visible)
                 continue;
-            PillarIdManager.PillarData data = row.toData(errors);
-            if (data == null) {
+            EditPillarRowsPacket.Row edit = row.toEdit(errors);
+            if (edit == null) {
                 continue;
             }
 
-            if (toSave.containsKey(data.id)) {
-                errors.add("Duplicate ID: " + data.id);
+            if (!ids.add(edit.newId)) {
+                errors.add("Duplicate ID: " + edit.newId);
                 continue;
             }
 
-            toSave.put(data.id, data);
+            if (row.hasChanges(edit)) edits.add(edit);
         }
 
         if (!errors.isEmpty()) {
@@ -331,16 +343,95 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             );
         }
 
-        PillarIdManager manager = PillarIdManager.getClient();
-        manager.replaceAllPillarData(toSave);
+        if (edits.size() > EditPillarRowsPacket.MAX_ROWS) {
+            statusMessage = new TranslatableComponent("buildscape.config.ids.status.too_many", EditPillarRowsPacket.MAX_ROWS);
+            return;
+        }
+        if (edits.isEmpty()) {
+            dirty = false;
+            for (PillarRow row : rows) row.rejectionReason = "";
+            statusMessage = TextComponent.EMPTY;
+            return;
+        }
+        pendingBatchId = ++nextBatchId;
+        for (EditPillarRowsPacket.Row edit : edits) {
+            PillarRow row = findRow(edit.oldId);
+            if (row != null) {
+                row.rejectionReason = "";
+                pendingEdits.put(row, edit);
+            }
+        }
+        dirty = true;
+        statusMessage = new TranslatableComponent("buildscape.config.ids.status.saving");
+        pendingSince = System.nanoTime();
+        ModMessages.INSTANCE.sendToServer(new EditPillarRowsPacket(pendingBatchId, edits));
+    }
 
-        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                new com.kingodogo.buildscape.network.UpdateAllPillarIdsPacket(toSave)
-        );
+    public boolean canLeave() {
+        checkEditTimeout();
+        if (!pendingEdits.isEmpty()) {
+            leaveBlocked = true;
+            return false;
+        }
+        if (dirty) saveRows();
+        leaveBlocked = dirty || !pendingEdits.isEmpty();
+        return !leaveBlocked;
+    }
 
+    public void checkEditTimeout() {
+        if (!pendingEdits.isEmpty() && System.nanoTime() - pendingSince >= EDIT_TIMEOUT_NS) {
+            pendingEdits.clear();
+            dirty = true;
+            statusMessage = new TranslatableComponent("buildscape.config.ids.status.no_reply");
+        }
+    }
+
+    private Component rejectionMessage(String reason) {
+        String[] parts = reason.split(":", 3);
+        Component message = new TranslatableComponent("buildscape.config.ids.reject." + parts[0]);
+        return parts.length == 3
+                ? new TranslatableComponent("buildscape.config.ids.reject.row", parts[1], parts[2], message)
+                : message;
+    }
+
+    public void acceptEditResult(long batchId, List<String> oldIds, String reason) {
+        if (pendingEdits.isEmpty() || batchId != pendingBatchId) return;
+        Set<String> resultIds = new HashSet<>(oldIds);
+        int rejected = 0;
+        for (Map.Entry<PillarRow, EditPillarRowsPacket.Row> entry : pendingEdits.entrySet()) {
+            PillarRow row = entry.getKey();
+            EditPillarRowsPacket.Row edit = entry.getValue();
+            if (reason.isEmpty() && resultIds.contains(edit.oldId)) {
+                row.id = edit.newId;
+                row.original = new EditPillarRowsPacket.Row(edit.newId, edit.newId, edit.dimension, edit.x, edit.y, edit.z);
+                row.rejectionReason = "";
+            } else {
+                row.rejectionReason = reason.isEmpty() ? "invalid" : reason;
+                rejected++;
+            }
+        }
+        pendingEdits.clear();
+        rowsById.clear();
         dirty = false;
-        lastSignature = computeSignature(toSave);
-        statusMessage = new TranslatableComponent("buildscape.config.ids.status.saved");
+        for (PillarRow row : rows) {
+            rowsById.put(row.id, row);
+            EditPillarRowsPacket.Row current = row.toEdit(new ArrayList<>());
+            if (current == null || row.hasChanges(current) || !row.rejectionReason.isEmpty()) dirty = true;
+        }
+        statusMessage = rejected > 0
+                ? new TranslatableComponent("buildscape.config.ids.status.rejected", rejected,
+                        rejectionMessage(reason.isEmpty() ? "invalid" : reason))
+                : new TranslatableComponent(dirty ? "buildscape.config.ids.unsaved" : "buildscape.config.ids.status.saved");
+    }
+
+    @Override
+    public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        for (PillarRow row : rows) {
+            if (row.visible && !row.rejectionReason.isEmpty() && row.isMouseOverRow(mouseX, mouseY)) {
+                parent.renderTooltip(poseStack, rejectionMessage(row.rejectionReason), mouseX, mouseY);
+                return;
+            }
+        }
     }
 
     private int[] computeColumns(int tableWidth) {
@@ -416,6 +507,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        checkEditTimeout();
+        boolean canSave = pendingEdits.isEmpty();
+        applyButton.active = canSave;
+        reloadButton.active = canSave;
+        removeButton.active = canSave;
+        removeAllButton.active = canSave;
         int contentX = parent.getContentX();
         int contentY = parent.getContentY();
         int contentWidth = parent.getRightPanelX() + parent.getRightPanelWidth() - parent.getContentX();
@@ -518,7 +615,9 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         int statusY = contentY + contentHeight - BuildScapeConfigScreen.scaleSize(14);
         if (statusMessage != null && !statusMessage.getString().isEmpty()) {
-            Minecraft.getInstance().font.draw(poseStack, statusMessage, tableX, statusY, 0xFFFFFF);
+            Component message = leaveBlocked && dirty
+                    ? new TranslatableComponent("buildscape.config.ids.status.leave_blocked", statusMessage) : statusMessage;
+            Minecraft.getInstance().font.draw(poseStack, message, tableX, statusY, 0xFFFFFF);
         } else if (dirty) {
             Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.unsaved"),
                     tableX, statusY, 0xFFFFFF);
@@ -831,9 +930,6 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     @Override
     public void onClose() {
-        if (dirty) {
-            saveRows();
-        }
         setButtonsVisible(false);
         for (PillarRow row : rows) {
             row.setVisible(false);
@@ -857,6 +953,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private void confirmRemoveAll() {
+        if (!pendingEdits.isEmpty()) return;
         Minecraft.getInstance().setScreen(new net.minecraft.client.gui.screens.ConfirmScreen(
                 (confirmed) -> {
                     if (confirmed) {
@@ -870,6 +967,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private void removeAll() {
+        if (!pendingEdits.isEmpty()) return;
         List<String> idsToRemove = new ArrayList<>();
         for (PillarRow row : rows) {
             if (row.visible && row.id != null) {
@@ -882,12 +980,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 manager.removePillar(id);
             }
 
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                    new com.kingodogo.buildscape.network.RemovePillarPacket(idsToRemove)
-            );
+            sendRemovals(idsToRemove);
 
+            dirty = false;
             refreshFromManager();
-            dirty = true;
             if (Minecraft.getInstance().player != null) {
                 Minecraft.getInstance().player.playSound(
                     net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
@@ -900,6 +996,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private void removeSelected() {
+        if (!pendingEdits.isEmpty()) return;
         List<String> idsToRemove = new ArrayList<>();
         for (PillarRow row : rows) {
             if (row.visible && row.isSelected() && row.id != null) {
@@ -912,12 +1009,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 manager.removePillar(id);
             }
 
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                    new com.kingodogo.buildscape.network.RemovePillarPacket(idsToRemove)
-            );
+            sendRemovals(idsToRemove);
 
+            dirty = false;
             refreshFromManager();
-            dirty = true;
             if (Minecraft.getInstance().player != null) {
                 Minecraft.getInstance().player.playSound(
                     net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
@@ -926,6 +1021,13 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 );
             }
             statusMessage = new TranslatableComponent("buildscape.config.ids.removed_selected", idsToRemove.size());
+        }
+    }
+
+    private void sendRemovals(List<String> ids) {
+        for (int from = 0; from < ids.size(); from += RemovePillarPacket.MAX_IDS) {
+            ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(
+                    ids.subList(from, Math.min(ids.size(), from + RemovePillarPacket.MAX_IDS))));
         }
     }
 
@@ -945,6 +1047,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         private boolean visible = true;
         private boolean selected = false;
         private String id;
+        private EditPillarRowsPacket.Row original;
+        private String rejectionReason = "";
         private long createdTime;
         private long modifiedTime;
         private net.minecraft.world.item.ItemStack displayedItem = net.minecraft.world.item.ItemStack.EMPTY;
@@ -961,6 +1065,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         private PillarRow(PillarIdManager.PillarData data) {
             Minecraft mc = Minecraft.getInstance();
             this.id = data.id;
+            this.original = new EditPillarRowsPacket.Row(data.id, data.id, data.dimension, data.x, data.y, data.z);
             this.createdTime = data.createdTime;
             this.modifiedTime = data.modifiedTime;
 
@@ -1167,6 +1272,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         private void apply(PillarIdManager.PillarData data) {
             this.id = data.id;
+            this.original = new EditPillarRowsPacket.Row(data.id, data.id, data.dimension, data.x, data.y, data.z);
             idField.setValue(data.id != null ? data.id : "");
 
             if (data.pillarType != null && !data.pillarType.isEmpty()) {
@@ -1268,37 +1374,37 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         private void updateCheckboxText() {
         }
 
-        private PillarIdManager.PillarData toData(List<String> errors) {
+        private EditPillarRowsPacket.Row toEdit(List<String> errors) {
             if (id == null || id.isEmpty()) {
                 return null;
             }
 
-            PillarIdManager.PillarData data = new PillarIdManager.PillarData();
-            data.id = id;
-            data.dimension = dimensionField.getValue().trim().isEmpty()
+            String dimension = dimensionField.getValue().trim().isEmpty()
                     ? "minecraft:overworld"
                     : dimensionField.getValue().trim();
 
-            PillarIdManager manager = PillarIdManager.getClient();
-            PillarIdManager.PillarData existing = manager.getPillarData(id);
-            if (existing != null && existing.dyeColors != null) {
-                data.dyeColors = new ArrayList<>(existing.dyeColors);
-            } else {
-                data.dyeColors = new ArrayList<>();
-            }
-
             try {
-                data.x = Integer.parseInt(xField.getValue().trim());
-                data.y = Integer.parseInt(yField.getValue().trim());
-                data.z = Integer.parseInt(zField.getValue().trim());
+                EditPillarRowsPacket.Row edit = new EditPillarRowsPacket.Row(original.oldId,
+                        idField.getValue().trim(), dimension,
+                        Integer.parseInt(xField.getValue().trim()),
+                        Integer.parseInt(yField.getValue().trim()),
+                        Integer.parseInt(zField.getValue().trim()));
+                if (!edit.isValid()) {
+                    errors.add("Invalid ID or dimension for " + id);
+                    return null;
+                }
+                return edit;
             } catch (NumberFormatException e) {
                 errors.add("Invalid coords for " + id);
                 return null;
             }
 
-            data.createdTime = this.createdTime != 0L ? this.createdTime : System.currentTimeMillis();
-            data.modifiedTime = System.currentTimeMillis();
-            return data;
+        }
+
+        private boolean hasChanges(EditPillarRowsPacket.Row edit) {
+            return !Objects.equals(original.newId, edit.newId)
+                    || !Objects.equals(original.dimension, edit.dimension)
+                    || original.x != edit.x || original.y != edit.y || original.z != edit.z;
         }
 
         private void render(PoseStack poseStack, int startX, int rowY, int[] columns) {
@@ -1721,6 +1827,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
 
         private void handleDoubleClick() {
+            if (!canLeave()) return;
             if (id == null || id.isEmpty()) {
                 return;
             }
@@ -1733,7 +1840,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 return;
             }
 
-            PillarIdManager.PillarData data = toData(new ArrayList<>());
+            EditPillarRowsPacket.Row data = toEdit(new ArrayList<>());
             if (data == null) {
                 return;
             }

@@ -150,6 +150,17 @@ public class MulticolorGlowLightsBlock
 
         Direction clickedFace = context.getClickedFace();
         Direction attachDirection = clickedFace.getOpposite();
+        BlockState placementState = this.defaultBlockState();
+        if (isExistingGlowLight) {
+            for (Direction face : Direction.values()) {
+                BooleanProperty property = face == Direction.DOWN
+                        ? DOWN : net.minecraft.world.level.block.VineBlock.getPropertyForFace(face);
+                if (property != null && blockState.hasProperty(property)) {
+                    placementState = placementState.setValue(property, blockState.getValue(property));
+                }
+            }
+            placementState = placementState.setValue(WATERLOGGED, blockState.getValue(WATERLOGGED));
+        }
 
         if (
                 isExistingGlowLight &&
@@ -201,13 +212,11 @@ public class MulticolorGlowLightsBlock
                     return null;
                 }
 
-                BlockState state = this.defaultBlockState();
+                BlockState state = placementState;
                 if (state.hasProperty(attachProperty)) {
                     state = state.setValue(attachProperty, true);
                 }
-                BlockPos placePos = context
-                        .getClickedPos()
-                        .relative(context.getClickedFace());
+                BlockPos placePos = context.getClickedPos();
                 FluidState fluidState = context.getLevel().getFluidState(placePos);
                 return state
                         .setValue(LIT, true)
@@ -216,11 +225,9 @@ public class MulticolorGlowLightsBlock
         }
 
         if (clickedFace == Direction.UP) {
-            BlockState state = this.defaultBlockState();
+            BlockState state = placementState;
             state = state.setValue(DOWN, true);
-            BlockPos placePos = context
-                    .getClickedPos()
-                    .relative(context.getClickedFace());
+            BlockPos placePos = context.getClickedPos();
             FluidState fluidState = context.getLevel().getFluidState(placePos);
             return state
                     .setValue(LIT, true)
@@ -228,30 +235,31 @@ public class MulticolorGlowLightsBlock
         }
 
         if (clickedFace == Direction.DOWN) {
-            BlockState state = this.defaultBlockState();
+            BlockState state = placementState;
             state = state.setValue(
                     net.minecraft.world.level.block.VineBlock.UP,
                     true
             );
-            BlockPos placePos = context
-                    .getClickedPos()
-                    .relative(context.getClickedFace());
+            BlockPos placePos = context.getClickedPos();
             FluidState fluidState = context.getLevel().getFluidState(placePos);
             return state
                     .setValue(LIT, true)
                     .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
         }
 
-        BlockState state = this.defaultBlockState();
+        BlockState state = placementState;
         BlockState parentState = super.getStateForPlacement(context);
-        if (parentState != null && parentState.is(this)) {
+        if (!isExistingGlowLight && parentState != null && parentState.is(this)) {
             state = parentState;
         }
 
-        BlockPos placePos = context
-                .getClickedPos()
-                .relative(context.getClickedFace());
+        BlockPos placePos = context.getClickedPos();
         FluidState fluidState = context.getLevel().getFluidState(placePos);
+        BooleanProperty property = attachDirection == Direction.DOWN
+                ? DOWN : net.minecraft.world.level.block.VineBlock.getPropertyForFace(attachDirection);
+        if (isExistingGlowLight && property != null) {
+            state = state.setValue(property, true);
+        }
         return state
                 .setValue(LIT, true)
                 .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
@@ -355,6 +363,27 @@ public class MulticolorGlowLightsBlock
         }
 
         return false;
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!level.isClientSide && newState.is(this)) {
+            int removedFaces = countFaces(state) - countFaces(newState);
+            if (removedFaces > 0) {
+                Block.popResource(level, pos, new ItemStack(this, removedFaces));
+            }
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
+    }
+
+    private int countFaces(BlockState state) {
+        int count = 0;
+        for (Direction direction : Direction.values()) {
+            BooleanProperty property = direction == Direction.DOWN
+                    ? DOWN : net.minecraft.world.level.block.VineBlock.getPropertyForFace(direction);
+            if (state.getValue(property)) count++;
+        }
+        return count;
     }
 
     private boolean hasAnyFace(BlockState state) {

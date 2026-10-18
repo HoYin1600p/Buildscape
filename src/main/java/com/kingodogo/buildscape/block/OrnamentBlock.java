@@ -184,15 +184,15 @@ public class OrnamentBlock
         Direction facing;
 
         if (clickedFace == Direction.UP) {
-            placePos = clickedPos.relative(clickedFace);
+            placePos = clickedPos;
             attachment = AttachmentType.FLOOR;
             facing = playerFacing;
         } else if (clickedFace == Direction.DOWN) {
-            placePos = clickedPos.relative(clickedFace);
+            placePos = clickedPos;
             attachment = AttachmentType.CEILING;
             facing = playerFacing;
         } else {
-            placePos = clickedPos.relative(clickedFace);
+            placePos = clickedPos;
             attachment = AttachmentType.WALL;
             facing = playerFacing;
         }
@@ -294,6 +294,14 @@ public class OrnamentBlock
         return state.getValue(WATERLOGGED)
                 ? Fluids.WATER.getSource(false)
                 : super.getFluidState(state);
+    }
+
+    @Override
+    public void tick(BlockState state, net.minecraft.server.level.ServerLevel level,
+                     BlockPos pos, java.util.Random random) {
+        if (!canSurvive(state, level, pos)) {
+            level.destroyBlock(pos, true);
+        }
     }
 
     @Override

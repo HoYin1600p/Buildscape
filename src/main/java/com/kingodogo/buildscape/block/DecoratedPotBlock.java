@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -451,7 +452,7 @@ public class DecoratedPotBlock
                 net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL
         );
 
-        if (tool != null && !tool.isEmpty()) {
+        if (tool != null && tool.is(ItemTags.CLUSTER_MAX_HARVESTABLES)) {
             return java.util.Collections.singletonList(new ItemStack(Items.BRICK, 4));
         }
         return java.util.Collections.singletonList(new ItemStack(this));

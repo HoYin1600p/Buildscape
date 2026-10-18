@@ -66,10 +66,10 @@ public class CopperRodHandler {
         if (!CopperOxidationHandler.isWeatheringCopper(baseState.getBlock())) {
             return;
         }
-        if (baseState.getBlock() instanceof WeatheringCopper) {
-            level.setBlockAndUpdate(basePos, WeatheringCopper.getFirst(baseState));
-        } else {
+        if (CopperOxidationHandler.getFirstStage(baseState.getBlock()) != null) {
             deoxidizeBuildscapeCopperFirst(level, basePos, baseState);
+        } else {
+            level.setBlockAndUpdate(basePos, WeatheringCopper.getFirst(baseState));
         }
 
         BlockPos.MutableBlockPos mutable = strikePos.mutable();
@@ -114,13 +114,11 @@ public class CopperRodHandler {
             if (!CopperOxidationHandler.isWeatheringCopper(testState.getBlock())) {
                 continue;
             }
-            if (testState.getBlock() instanceof WeatheringCopper) {
+            Block prev = CopperOxidationHandler.getPrevStage(testState.getBlock());
+            if (prev != null) {
+                CopperOxidationHandler.setBlockStateOrDoor(level, testPos, testState, prev);
+            } else if (testState.getBlock() instanceof WeatheringCopper) {
                 WeatheringCopper.getPrevious(testState).ifPresent(s -> level.setBlockAndUpdate(testPos, s));
-            } else {
-                Block prev = CopperOxidationHandler.getPrevStage(testState.getBlock());
-                if (prev != null) {
-                    CopperOxidationHandler.setBlockStateOrDoor(level, testPos, testState, prev);
-                }
             }
             level.levelEvent(3002, testPos, -1);
             return Optional.of(testPos);

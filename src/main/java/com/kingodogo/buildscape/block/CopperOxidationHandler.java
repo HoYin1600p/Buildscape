@@ -1,6 +1,11 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.block.copper.CopperTransitions;
+import com.kingodogo.buildscape.item.ModItems;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -10,171 +15,191 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LightningRodBlock;
 import net.minecraft.world.level.block.ButtonBlock;
-import net.minecraft.world.level.block.WeightedPressurePlateBlock;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.LightningRodBlock;
+import net.minecraft.world.level.block.WeatheringCopper;
+import net.minecraft.world.level.block.WeightedPressurePlateBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.Event;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.WeatheringCopper;
-import com.kingodogo.buildscape.item.ModItems;
-
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CopperOxidationHandler {
 
-    private static final Map<Supplier<Block>, Supplier<Block>> NEXT_STAGE = new HashMap<>();
-    private static final Map<Supplier<Block>, Supplier<Block>> PREV_STAGE = new HashMap<>();
-    private static final Map<Supplier<Block>, Supplier<Block>> WAXED_MAP = new HashMap<>();
-    private static final Map<Supplier<Block>, Supplier<Block>> UNWAXED_MAP = new HashMap<>();
+    private static final CopperTransitions<Block> STAGES = new CopperTransitions<>();
+    private static final Map<Block, WeatheringCopper.WeatherState> AGES = new IdentityHashMap<>();
+    private static volatile boolean initialized;
 
-    public static synchronized void init() {
-        if (!NEXT_STAGE.isEmpty()) return;
+    public static void init() {
+        if (initialized) return;
+        synchronized (STAGES) {
+            if (initialized) return;
+            registerChain(ModBlocks.CHISELED_COPPER, ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.OXIDIZED_CHISELED_COPPER);
+            registerWaxPair(ModBlocks.CHISELED_COPPER, ModBlocks.WAXED_CHISELED_COPPER);
+            registerWaxPair(ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WAXED_EXPOSED_CHISELED_COPPER);
+            registerWaxPair(ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.WAXED_WEATHERED_CHISELED_COPPER);
+            registerWaxPair(ModBlocks.OXIDIZED_CHISELED_COPPER, ModBlocks.WAXED_OXIDIZED_CHISELED_COPPER);
 
-        registerChain(ModBlocks.CHISELED_COPPER, ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.OXIDIZED_CHISELED_COPPER);
-        registerWaxPair(ModBlocks.CHISELED_COPPER, ModBlocks.WAXED_CHISELED_COPPER);
-        registerWaxPair(ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WAXED_EXPOSED_CHISELED_COPPER);
-        registerWaxPair(ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.WAXED_WEATHERED_CHISELED_COPPER);
-        registerWaxPair(ModBlocks.OXIDIZED_CHISELED_COPPER, ModBlocks.WAXED_OXIDIZED_CHISELED_COPPER);
+            registerChain(ModBlocks.COPPER_GRATE, ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.OXIDIZED_COPPER_GRATE);
+            registerWaxPair(ModBlocks.COPPER_GRATE, ModBlocks.WAXED_COPPER_GRATE);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WAXED_EXPOSED_COPPER_GRATE);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.WAXED_WEATHERED_COPPER_GRATE);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_GRATE, ModBlocks.WAXED_OXIDIZED_COPPER_GRATE);
 
-        registerChain(ModBlocks.COPPER_GRATE, ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.OXIDIZED_COPPER_GRATE);
-        registerWaxPair(ModBlocks.COPPER_GRATE, ModBlocks.WAXED_COPPER_GRATE);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WAXED_EXPOSED_COPPER_GRATE);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.WAXED_WEATHERED_COPPER_GRATE);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_GRATE, ModBlocks.WAXED_OXIDIZED_COPPER_GRATE);
+            registerChain(ModBlocks.COPPER_BULB, ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.OXIDIZED_COPPER_BULB);
+            registerWaxPair(ModBlocks.COPPER_BULB, ModBlocks.WAXED_COPPER_BULB);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WAXED_EXPOSED_COPPER_BULB);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.WAXED_WEATHERED_COPPER_BULB);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_BULB, ModBlocks.WAXED_OXIDIZED_COPPER_BULB);
 
-        registerChain(ModBlocks.COPPER_BULB, ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.OXIDIZED_COPPER_BULB);
-        registerWaxPair(ModBlocks.COPPER_BULB, ModBlocks.WAXED_COPPER_BULB);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WAXED_EXPOSED_COPPER_BULB);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.WAXED_WEATHERED_COPPER_BULB);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_BULB, ModBlocks.WAXED_OXIDIZED_COPPER_BULB);
+            registerChain(ModBlocks.COPPER_ROD, ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.OXIDIZED_COPPER_ROD);
+            registerWaxPair(ModBlocks.COPPER_ROD, ModBlocks.WAXED_COPPER_ROD);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WAXED_EXPOSED_COPPER_ROD);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.WAXED_WEATHERED_COPPER_ROD);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_ROD, ModBlocks.WAXED_OXIDIZED_COPPER_ROD);
 
-        registerChain(ModBlocks.COPPER_ROD, ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.OXIDIZED_COPPER_ROD);
-        registerWaxPair(ModBlocks.COPPER_ROD, ModBlocks.WAXED_COPPER_ROD);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WAXED_EXPOSED_COPPER_ROD);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.WAXED_WEATHERED_COPPER_ROD);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_ROD, ModBlocks.WAXED_OXIDIZED_COPPER_ROD);
+            registerChain(ModBlocks.COPPER_LANTERN, ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.OXIDIZED_COPPER_LANTERN);
+            registerWaxPair(ModBlocks.COPPER_LANTERN, ModBlocks.WAXED_COPPER_LANTERN);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WAXED_EXPOSED_COPPER_LANTERN);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.WAXED_WEATHERED_COPPER_LANTERN);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_LANTERN, ModBlocks.WAXED_OXIDIZED_COPPER_LANTERN);
 
-        registerChain(ModBlocks.COPPER_LANTERN, ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.OXIDIZED_COPPER_LANTERN);
-        registerWaxPair(ModBlocks.COPPER_LANTERN, ModBlocks.WAXED_COPPER_LANTERN);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WAXED_EXPOSED_COPPER_LANTERN);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.WAXED_WEATHERED_COPPER_LANTERN);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_LANTERN, ModBlocks.WAXED_OXIDIZED_COPPER_LANTERN);
+            registerChain(ModBlocks.COPPER_DOOR, ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.OXIDIZED_COPPER_DOOR);
+            registerWaxPair(ModBlocks.COPPER_DOOR, ModBlocks.WAXED_COPPER_DOOR);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WAXED_EXPOSED_COPPER_DOOR);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.WAXED_WEATHERED_COPPER_DOOR);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_DOOR, ModBlocks.WAXED_OXIDIZED_COPPER_DOOR);
 
-        registerChain(ModBlocks.COPPER_DOOR, ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.OXIDIZED_COPPER_DOOR);
-        registerWaxPair(ModBlocks.COPPER_DOOR, ModBlocks.WAXED_COPPER_DOOR);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WAXED_EXPOSED_COPPER_DOOR);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.WAXED_WEATHERED_COPPER_DOOR);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_DOOR, ModBlocks.WAXED_OXIDIZED_COPPER_DOOR);
+            registerChain(ModBlocks.COPPER_TRAPDOOR, ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.OXIDIZED_COPPER_TRAPDOOR);
+            registerWaxPair(ModBlocks.COPPER_TRAPDOOR, ModBlocks.WAXED_COPPER_TRAPDOOR);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WAXED_EXPOSED_COPPER_TRAPDOOR);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.WAXED_WEATHERED_COPPER_TRAPDOOR);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_TRAPDOOR, ModBlocks.WAXED_OXIDIZED_COPPER_TRAPDOOR);
 
-        registerChain(ModBlocks.COPPER_TRAPDOOR, ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.OXIDIZED_COPPER_TRAPDOOR);
-        registerWaxPair(ModBlocks.COPPER_TRAPDOOR, ModBlocks.WAXED_COPPER_TRAPDOOR);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WAXED_EXPOSED_COPPER_TRAPDOOR);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.WAXED_WEATHERED_COPPER_TRAPDOOR);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_TRAPDOOR, ModBlocks.WAXED_OXIDIZED_COPPER_TRAPDOOR);
+            registerChain(ModBlocks.COPPER_BARS, ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.OXIDIZED_COPPER_BARS);
+            registerWaxPair(ModBlocks.COPPER_BARS, ModBlocks.WAXED_COPPER_BARS);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WAXED_EXPOSED_COPPER_BARS);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.WAXED_WEATHERED_COPPER_BARS);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_BARS, ModBlocks.WAXED_OXIDIZED_COPPER_BARS);
 
-        registerChain(ModBlocks.COPPER_BARS, ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.OXIDIZED_COPPER_BARS);
-        registerWaxPair(ModBlocks.COPPER_BARS, ModBlocks.WAXED_COPPER_BARS);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WAXED_EXPOSED_COPPER_BARS);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.WAXED_WEATHERED_COPPER_BARS);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_BARS, ModBlocks.WAXED_OXIDIZED_COPPER_BARS);
+            registerChain(ModBlocks.COPPER_MESH, ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.OXIDIZED_COPPER_MESH);
+            registerWaxPair(ModBlocks.COPPER_MESH, ModBlocks.WAXED_COPPER_MESH);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WAXED_EXPOSED_COPPER_MESH);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.WAXED_WEATHERED_COPPER_MESH);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_MESH, ModBlocks.WAXED_OXIDIZED_COPPER_MESH);
 
-        registerChain(ModBlocks.COPPER_MESH, ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.OXIDIZED_COPPER_MESH);
-        registerWaxPair(ModBlocks.COPPER_MESH, ModBlocks.WAXED_COPPER_MESH);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WAXED_EXPOSED_COPPER_MESH);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.WAXED_WEATHERED_COPPER_MESH);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_MESH, ModBlocks.WAXED_OXIDIZED_COPPER_MESH);
+            registerChain(ModBlocks.COPPER_BOLTS, ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.OXIDIZED_COPPER_BOLTS);
+            registerWaxPair(ModBlocks.COPPER_BOLTS, ModBlocks.WAXED_COPPER_BOLTS);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WAXED_EXPOSED_COPPER_BOLTS);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.WAXED_WEATHERED_COPPER_BOLTS);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_BOLTS, ModBlocks.WAXED_OXIDIZED_COPPER_BOLTS);
 
-        registerChain(ModBlocks.COPPER_BOLTS, ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.OXIDIZED_COPPER_BOLTS);
-        registerWaxPair(ModBlocks.COPPER_BOLTS, ModBlocks.WAXED_COPPER_BOLTS);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WAXED_EXPOSED_COPPER_BOLTS);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.WAXED_WEATHERED_COPPER_BOLTS);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_BOLTS, ModBlocks.WAXED_OXIDIZED_COPPER_BOLTS);
+            registerChain(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
 
-        registerChain(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
-        registerWaxPair(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
-        registerWaxPair(ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
-        registerWaxPair(ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
-        registerWaxPair(ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerChain(ModBlocks.COPPER_BUTTON, ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.OXIDIZED_COPPER_BUTTON);
+            registerWaxPair(ModBlocks.COPPER_BUTTON, ModBlocks.WAXED_COPPER_BUTTON);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WAXED_EXPOSED_COPPER_BUTTON);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.WAXED_WEATHERED_COPPER_BUTTON);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_BUTTON, ModBlocks.WAXED_OXIDIZED_COPPER_BUTTON);
 
-        registerChain(ModBlocks.COPPER_BUTTON, ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.OXIDIZED_COPPER_BUTTON);
-        registerWaxPair(ModBlocks.COPPER_BUTTON, ModBlocks.WAXED_COPPER_BUTTON);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WAXED_EXPOSED_COPPER_BUTTON);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.WAXED_WEATHERED_COPPER_BUTTON);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_BUTTON, ModBlocks.WAXED_OXIDIZED_COPPER_BUTTON);
+            registerChain(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE);
+            registerWaxPair(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.WAXED_COPPER_PRESSURE_PLATE);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE);
 
-        registerChain(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE);
-        registerWaxPair(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.WAXED_COPPER_PRESSURE_PLATE);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE);
+            registerChain(ModBlocks.COPPER_CHEST, ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.OXIDIZED_COPPER_CHEST);
+            registerWaxPair(ModBlocks.COPPER_CHEST, ModBlocks.WAXED_COPPER_CHEST);
+            registerWaxPair(ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WAXED_EXPOSED_COPPER_CHEST);
+            registerWaxPair(ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.WAXED_WEATHERED_COPPER_CHEST);
+            registerWaxPair(ModBlocks.OXIDIZED_COPPER_CHEST, ModBlocks.WAXED_OXIDIZED_COPPER_CHEST);
 
-        registerChain(ModBlocks.COPPER_CHEST, ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.OXIDIZED_COPPER_CHEST);
-        registerWaxPair(ModBlocks.COPPER_CHEST, ModBlocks.WAXED_COPPER_CHEST);
-        registerWaxPair(ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WAXED_EXPOSED_COPPER_CHEST);
-        registerWaxPair(ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.WAXED_WEATHERED_COPPER_CHEST);
-        registerWaxPair(ModBlocks.OXIDIZED_COPPER_CHEST, ModBlocks.WAXED_OXIDIZED_COPPER_CHEST);
+            registerChain(ModBlocks.COPPER_CHAIN, ModBlocks.EXPOSED_COPPER_CHAIN, ModBlocks.WEATHERED_COPPER_CHAIN, ModBlocks.OXIDIZED_COPPER_CHAIN);
 
-        registerChain(ModBlocks.COPPER_CHAIN, ModBlocks.EXPOSED_COPPER_CHAIN, ModBlocks.WEATHERED_COPPER_CHAIN, ModBlocks.OXIDIZED_COPPER_CHAIN);
+            registerChain(ModBlocks.LARGE_COPPER_CHAIN, ModBlocks.LARGE_EXPOSED_COPPER_CHAIN, ModBlocks.LARGE_WEATHERED_COPPER_CHAIN, ModBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
 
-        registerChain(ModBlocks.LARGE_COPPER_CHAIN, ModBlocks.LARGE_EXPOSED_COPPER_CHAIN, ModBlocks.LARGE_WEATHERED_COPPER_CHAIN, ModBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
+            registerChain(ModBlocks.SLIT_COPPER, ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.OXIDIZED_SLIT_COPPER);
+            registerWaxPair(ModBlocks.SLIT_COPPER, ModBlocks.WAXED_SLIT_COPPER);
+            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WAXED_EXPOSED_SLIT_COPPER);
+            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.WAXED_WEATHERED_SLIT_COPPER);
+            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER);
 
-        registerChain(ModBlocks.SLIT_COPPER, ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.OXIDIZED_SLIT_COPPER);
-        registerWaxPair(ModBlocks.SLIT_COPPER, ModBlocks.WAXED_SLIT_COPPER);
-        registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WAXED_EXPOSED_SLIT_COPPER);
-        registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.WAXED_WEATHERED_SLIT_COPPER);
-        registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER);
+            registerChain(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS);
+            registerWaxPair(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.WAXED_SLIT_COPPER_STAIRS);
+            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_STAIRS);
+            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_STAIRS);
+            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_STAIRS);
 
-        registerChain(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS);
-        registerWaxPair(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.WAXED_SLIT_COPPER_STAIRS);
-        registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_STAIRS);
-        registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_STAIRS);
-        registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_STAIRS);
+            registerChain(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_SLAB);
+            registerWaxPair(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.WAXED_SLIT_COPPER_SLAB);
+            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_SLAB);
+            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_SLAB);
+            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_SLAB);
 
-        registerChain(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_SLAB);
-        registerWaxPair(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.WAXED_SLIT_COPPER_SLAB);
-        registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_SLAB);
-        registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_SLAB);
-        registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_SLAB);
-
-        registerChain(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
-        registerWaxPair(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_SLIT_COPPER_VERTICAL_SLAB);
-        registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB);
-        registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB);
-        registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
+            registerChain(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
+            initialized = true;
+        }
     }
 
     private static void registerChain(Supplier<Block> b0, Supplier<Block> b1, Supplier<Block> b2, Supplier<Block> b3) {
-        registerChain(NEXT_STAGE, PREV_STAGE, b0, b1, b2, b3);
-    }
-
-    static <T> void registerChain(Map<Supplier<T>, Supplier<T>> next, Map<Supplier<T>, Supplier<T>> previous,
-                                  Supplier<T> b0, Supplier<T> b1, Supplier<T> b2, Supplier<T> b3) {
-        next.put(b0, b1);
-        next.put(b1, b2);
-        next.put(b2, b3);
-
-        previous.put(b3, b2);
-        previous.put(b2, b1);
-        previous.put(b1, b0);
+        Block[] stages = {b0.get(), b1.get(), b2.get(), b3.get()};
+        STAGES.addChain(stages[0], stages[1], stages[2], stages[3]);
+        for (int i = 0; i < stages.length; i++) {
+            Block block = stages[i];
+            AGES.put(block, WeatheringCopper.WeatherState.values()[i]);
+        }
     }
 
     private static void registerWaxPair(Supplier<Block> unwaxed, Supplier<Block> waxed) {
-        WAXED_MAP.put(unwaxed, waxed);
-        UNWAXED_MAP.put(waxed, unwaxed);
+        Block unwaxedBlock = unwaxed.get();
+        Block waxedBlock = waxed.get();
+        STAGES.addWaxPair(unwaxedBlock, waxedBlock);
+    }
+
+    public static WeatheringCopper.WeatherState getAge(Block block) {
+        init();
+        return AGES.get(block);
+    }
+
+    public static Optional<BlockState> getNext(BlockState state) {
+        init();
+        return Optional.ofNullable(STAGES.next(state.getBlock()))
+                .map(block -> copyStateProperties(state, block.defaultBlockState()));
+    }
+
+    public static boolean canOxidize(BlockState state) {
+        init();
+        return STAGES.next(state.getBlock()) != null
+                && (!(state.getBlock() instanceof DoorBlock)
+                || state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER);
+    }
+
+    public static BlockState getToolModifiedState(BlockState state, net.minecraftforge.common.ToolAction action) {
+        init();
+        Block target = action == ToolActions.AXE_SCRAPE ? STAGES.previous(state.getBlock())
+                : action == ToolActions.AXE_WAX_OFF ? STAGES.unwaxed(state.getBlock()) : null;
+        return target == null ? null : copyStateProperties(state, target.defaultBlockState());
     }
 
     public static boolean handleRightClick(PlayerInteractEvent.RightClickBlock event) {
-        init();
         Level level = event.getWorld();
         BlockPos pos = event.getPos();
         BlockState state = level.getBlockState(pos);
@@ -187,27 +212,17 @@ public class CopperOxidationHandler {
             if (nextState != null) {
                 if (!level.isClientSide) {
                     setBlockStateOrDoor(level, pos, state, nextState.getBlock());
-
-                    if (level instanceof ServerLevel serverLevel) {
-                        serverLevel.sendParticles(
-                            net.minecraft.core.particles.ParticleTypes.SMOKE,
-                            (double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D,
-                            8, 0.25D, 0.25D, 0.25D, 0.05D
-                        );
-                    }
-
-                    if (player != null && !player.getAbilities().instabuild) {
+                    ((ServerLevel) level).sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE,
+                            pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                            8, 0.25D, 0.25D, 0.25D, 0.05D);
+                    if (!player.getAbilities().instabuild) {
                         held.shrink(1);
                         ItemStack emptyBottle = new ItemStack(Items.GLASS_BOTTLE);
-                        if (held.isEmpty()) {
-                            player.setItemInHand(event.getHand(), emptyBottle);
-                        } else if (!player.getInventory().add(emptyBottle)) {
-                            player.drop(emptyBottle, false);
-                        }
+                        if (held.isEmpty()) player.setItemInHand(event.getHand(), emptyBottle);
+                        else if (!player.getInventory().add(emptyBottle)) player.drop(emptyBottle, false);
                     }
                 }
-
-                level.playSound(player, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.6f, 0.8f);
+                level.playSound(player, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.6F, 0.8F);
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
                 return true;
@@ -215,111 +230,59 @@ public class CopperOxidationHandler {
         }
 
         if (held.is(Items.HONEYCOMB)) {
-            if (block instanceof EyeblossomBlock) {
-                if (!state.getValue(EyeblossomBlock.WAXED)) {
-                    if (!level.isClientSide) {
-                        level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, true), 3);
-                        level.levelEvent(3003, pos, 0);
-                        if (player != null && !player.getAbilities().instabuild) {
-                            held.shrink(1);
-                        }
-                    }
-                    level.playSound(player, pos, SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0f, 1.0f);
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
-                    return true;
+            if (block instanceof EyeblossomBlock && !state.getValue(EyeblossomBlock.WAXED)) {
+                if (!level.isClientSide) {
+                    level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, true), 3);
+                    level.levelEvent(3003, pos, 0);
+                    if (!player.getAbilities().instabuild) held.shrink(1);
                 }
+                level.playSound(player, pos, SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0F, 1.0F);
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
+                return true;
             }
-            for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : WAXED_MAP.entrySet()) {
-                if (entry.getKey().get() == block) {
-                    Block targetBlock = entry.getValue().get();
-                    if (!level.isClientSide) {
-                        setBlockStateOrDoor(level, pos, state, targetBlock);
-                        level.levelEvent(3003, pos, 0);
-                        if (player != null && !player.getAbilities().instabuild) {
-                            held.shrink(1);
-                        }
+            init();
+            Block target = STAGES.waxed(block);
+            if (target != null) {
+                if (!level.isClientSide) {
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(serverPlayer, pos, held);
                     }
-                    level.playSound(player, pos, SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0f, 1.0f);
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
-                    return true;
+                    setBlockStateOrDoor(level, pos, state, target);
+                    level.levelEvent(3003, pos, 0);
+                    if (!player.getAbilities().instabuild) held.shrink(1);
                 }
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
+                return true;
             }
         }
 
-        if (held.getItem() instanceof AxeItem) {
-            if (block instanceof EyeblossomBlock) {
-                if (state.getValue(EyeblossomBlock.WAXED)) {
-                    if (!level.isClientSide) {
-                        level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, false), 3);
-                        level.levelEvent(3004, pos, 0);
-                        if (player != null && !player.getAbilities().instabuild) {
-                            held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
-                        }
-                    }
-                    level.playSound(player, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0f, 1.0f);
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
-                    return true;
+        if (held.getItem() instanceof AxeItem && block instanceof EyeblossomBlock
+                && state.getValue(EyeblossomBlock.WAXED)) {
+            if (!level.isClientSide) {
+                level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, false), 3);
+                level.levelEvent(3004, pos, 0);
+                if (!player.getAbilities().instabuild) {
+                    held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
                 }
             }
-            for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : UNWAXED_MAP.entrySet()) {
-                if (entry.getKey().get() == block) {
-                    Block targetBlock = entry.getValue().get();
-                    if (!level.isClientSide) {
-                        setBlockStateOrDoor(level, pos, state, targetBlock);
-                        level.levelEvent(3004, pos, 0);
-                        if (player != null && !player.getAbilities().instabuild) {
-                            held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
-                        }
-                    }
-                    level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0f, 1.0f);
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
-                    return true;
-                }
-            }
-
-            for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : PREV_STAGE.entrySet()) {
-                if (entry.getKey().get() == block) {
-                    Block targetBlock = entry.getValue().get();
-                    if (!level.isClientSide) {
-                        setBlockStateOrDoor(level, pos, state, targetBlock);
-                        level.levelEvent(3005, pos, 0);
-                        if (player != null && !player.getAbilities().instabuild) {
-                            held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
-                        }
-                    }
-                    level.playSound(player, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0f, 1.0f);
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
-                    return true;
-                }
-            }
+            level.playSound(player, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0F, 1.0F);
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
+            return true;
         }
 
+        if ((held.canPerformAction(ToolActions.AXE_SCRAPE)
+                && getToolModifiedState(state, ToolActions.AXE_SCRAPE) != null)
+                || (held.canPerformAction(ToolActions.AXE_WAX_OFF)
+                && getToolModifiedState(state, ToolActions.AXE_WAX_OFF) != null)) {
+            event.setUseBlock(Event.Result.DENY);
+        }
         return false;
     }
 
-    public static void tryOxidize(Level level, BlockPos pos, BlockState state) {
-        init();
-        if (state.hasProperty(DoorBlock.HALF) && state.getValue(DoorBlock.HALF) != DoubleBlockHalf.LOWER) {
-            return;
-        }
-        Block block = state.getBlock();
-        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : NEXT_STAGE.entrySet()) {
-            if (entry.getKey().get() == block) {
-                if (level.random.nextFloat() < 0.05688889F) {
-                    Block targetBlock = entry.getValue().get();
-                    setBlockStateOrDoor(level, pos, state, targetBlock);
-                }
-                break;
-            }
-        }
-    }
-
-    static void setBlockStateOrDoor(Level level, BlockPos pos, BlockState state, Block targetBlock) {
+    public static void setBlockStateOrDoor(Level level, BlockPos pos, BlockState state, Block targetBlock) {
         if (state.hasProperty(DoorBlock.HALF)) {
             DoubleBlockHalf half = state.getValue(DoorBlock.HALF);
             BlockPos lowerPos = half == DoubleBlockHalf.LOWER ? pos : pos.below();
@@ -390,68 +353,29 @@ public class CopperOxidationHandler {
 
     public static Block getPrevStage(Block block) {
         init();
-        return getMappedStage(block, PREV_STAGE);
-    }
-
-    static <T> T getMappedStage(T stage, Map<Supplier<T>, Supplier<T>> stages) {
-        for (Map.Entry<Supplier<T>, Supplier<T>> entry : stages.entrySet()) {
-            if (entry.getKey().get() == stage) {
-                return entry.getValue().get();
-            }
-        }
-        return null;
+        return STAGES.previous(block);
     }
 
     public static Block getFirstStage(Block block) {
         init();
-        return getFirstStage(block, NEXT_STAGE, PREV_STAGE);
+        return STAGES.first(block);
     }
 
     public static boolean isWeatheringCopper(Block block) {
         init();
-        return block instanceof WeatheringCopper || isWeatheringStage(block, NEXT_STAGE, PREV_STAGE);
-    }
-
-    static <T> boolean isWeatheringStage(T stage, Map<Supplier<T>, Supplier<T>> next,
-                                         Map<Supplier<T>, Supplier<T>> previous) {
-        return getMappedStage(stage, next) != null || getMappedStage(stage, previous) != null;
-    }
-
-    static <T> T getFirstStage(T stage, Map<Supplier<T>, Supplier<T>> next,
-                               Map<Supplier<T>, Supplier<T>> previous) {
-        if (!isWeatheringStage(stage, next, previous)) return null;
-        T current = stage;
-        while (true) {
-            T prev = getMappedStage(current, previous);
-            if (prev == null) break;
-            current = prev;
-        }
-        return current;
+        return AGES.containsKey(block) || block instanceof WeatheringCopper;
     }
 
     public static BlockState getNextOxidationState(BlockState state) {
         init();
         Block block = state.getBlock();
-
-        Optional<BlockState> unwaxedOpt = getUnwaxedState(state);
-        if (unwaxedOpt.isPresent()) {
-            BlockState unwaxedState = unwaxedOpt.get();
-            BlockState nextUnwaxedState = getNextOxidationState(unwaxedState);
-            if (nextUnwaxedState != null) {
-                Optional<BlockState> nextWaxedOpt = getWaxedState(nextUnwaxedState);
-                if (nextWaxedOpt.isPresent()) {
-                    return nextWaxedOpt.get();
-                }
-            }
-            return null;
+        Optional<BlockState> unwaxed = getUnwaxedState(state);
+        if (unwaxed.isPresent()) {
+            BlockState next = getNextOxidationState(unwaxed.get());
+            return next == null ? null : getWaxedState(next).orElse(null);
         }
-
-        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : NEXT_STAGE.entrySet()) {
-            if (entry.getKey().get() == block) {
-                Block targetBlock = entry.getValue().get();
-                return copyStateProperties(state, targetBlock.defaultBlockState());
-            }
-        }
+        Block target = STAGES.next(block);
+        if (target != null) return copyStateProperties(state, target.defaultBlockState());
 
         net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
         if (rl != null && rl.getNamespace().equals("buildscape")) {
@@ -488,29 +412,74 @@ public class CopperOxidationHandler {
         return null;
     }
 
+    static <T> void registerChain(Map<Supplier<T>, Supplier<T>> next, Map<Supplier<T>, Supplier<T>> previous,
+                                  Supplier<T> b0, Supplier<T> b1, Supplier<T> b2, Supplier<T> b3) {
+        Supplier<T> s0 = new StageSupplier<>(b0.get());
+        Supplier<T> s1 = new StageSupplier<>(b1.get());
+        Supplier<T> s2 = new StageSupplier<>(b2.get());
+        Supplier<T> s3 = new StageSupplier<>(b3.get());
+        next.put(s0, s1);
+        next.put(s1, s2);
+        next.put(s2, s3);
+        previous.put(s3, s2);
+        previous.put(s2, s1);
+        previous.put(s1, s0);
+    }
+
+    static <T> T getMappedStage(T stage, Map<Supplier<T>, Supplier<T>> stages) {
+        Supplier<T> result = stages.get(new StageSupplier<>(stage));
+        return result == null ? null : result.get();
+    }
+
+    private static final class StageSupplier<T> implements Supplier<T> {
+        private final T stage;
+
+        private StageSupplier(T stage) {
+            this.stage = stage;
+        }
+
+        @Override
+        public T get() {
+            return stage;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(stage);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof StageSupplier<?> supplier && stage == supplier.stage;
+        }
+    }
+
+    static <T> boolean isWeatheringStage(T stage, Map<Supplier<T>, Supplier<T>> next,
+                                         Map<Supplier<T>, Supplier<T>> previous) {
+        return getMappedStage(stage, next) != null || getMappedStage(stage, previous) != null;
+    }
+
+    static <T> T getFirstStage(T stage, Map<Supplier<T>, Supplier<T>> next,
+                               Map<Supplier<T>, Supplier<T>> previous) {
+        if (!isWeatheringStage(stage, next, previous)) return null;
+        T current = stage;
+        while (true) {
+            T prev = getMappedStage(current, previous);
+            if (prev == null) break;
+            current = prev;
+        }
+        return current;
+    }
+
     private static Optional<BlockState> getUnwaxedState(BlockState state) {
-        Block block = state.getBlock();
-        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : UNWAXED_MAP.entrySet()) {
-            if (entry.getKey().get() == block) {
-                Block unwaxedBlock = entry.getValue().get();
-                return Optional.of(copyStateProperties(state, unwaxedBlock.defaultBlockState()));
-            }
-        }
-        Block unwaxedVanilla = net.minecraft.world.item.HoneycombItem.WAX_OFF_BY_BLOCK.get().get(block);
-        if (unwaxedVanilla != null) {
-            return Optional.of(copyStateProperties(state, unwaxedVanilla.defaultBlockState()));
-        }
-        return Optional.empty();
+        Block block = STAGES.unwaxed(state.getBlock());
+        if (block == null) block = net.minecraft.world.item.HoneycombItem.WAX_OFF_BY_BLOCK.get().get(state.getBlock());
+        return block == null ? Optional.empty() : Optional.of(copyStateProperties(state, block.defaultBlockState()));
     }
 
     private static Optional<BlockState> getWaxedState(BlockState state) {
-        Block block = state.getBlock();
-        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : WAXED_MAP.entrySet()) {
-            if (entry.getKey().get() == block) {
-                Block waxedBlock = entry.getValue().get();
-                return Optional.of(copyStateProperties(state, waxedBlock.defaultBlockState()));
-            }
-        }
-        return net.minecraft.world.item.HoneycombItem.getWaxed(state);
+        Block block = STAGES.waxed(state.getBlock());
+        return block == null ? net.minecraft.world.item.HoneycombItem.getWaxed(state)
+                : Optional.of(copyStateProperties(state, block.defaultBlockState()));
     }
 }

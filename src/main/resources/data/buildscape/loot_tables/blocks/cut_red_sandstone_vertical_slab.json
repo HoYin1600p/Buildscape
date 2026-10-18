@@ -6,7 +6,23 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "buildscape:cut_red_sandstone_vertical_slab"
+          "name": "buildscape:cut_red_sandstone_vertical_slab",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:cut_red_sandstone_vertical_slab",
+                  "properties": {
+                    "type": "double"
+                  }
+                }
+              ],
+              "count": 2,
+              "add": false
+            }
+          ]
         }
       ],
       "conditions": [

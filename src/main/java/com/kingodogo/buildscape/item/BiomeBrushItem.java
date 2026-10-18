@@ -1,8 +1,11 @@
 package com.kingodogo.buildscape.item;
 
+import com.kingodogo.buildscape.biometint.BiomeTintData;
+import com.kingodogo.buildscape.biometint.BiomeTintSync;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.core.Registry;
@@ -28,11 +31,9 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -216,9 +217,6 @@ public class BiomeBrushItem extends Item {
                 player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.invalid_biome", biomeStr).withStyle(ChatFormatting.RED), true);
                 return InteractionResult.FAIL;
             }
-
-            Holder<Biome> biomeHolder = holderOpt.get();
-
             int minX = Math.min(pos1.getX(), pos2.getX());
             int maxX = Math.max(pos1.getX(), pos2.getX());
             int minY = Math.min(pos1.getY(), pos2.getY());
@@ -232,124 +230,61 @@ public class BiomeBrushItem extends Item {
                 player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.wrong_dimension").withStyle(ChatFormatting.RED), true);
                 return InteractionResult.FAIL;
             }
-            if (maxX - minX + 1 > MAX_HORIZONTAL_SIZE || maxZ - minZ + 1 > MAX_HORIZONTAL_SIZE) {
+            if ((long) maxX - minX + 1 > MAX_HORIZONTAL_SIZE || (long) maxZ - minZ + 1 > MAX_HORIZONTAL_SIZE) {
                 player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.too_large", MAX_HORIZONTAL_SIZE).withStyle(ChatFormatting.RED), true);
                 return InteractionResult.FAIL;
             }
 
+            if (!(player instanceof ServerPlayer serverPlayer) || !player.mayBuild()
+                    || player.distanceToSqr(pos1.getX() + 0.5, pos1.getY() + 0.5, pos1.getZ() + 0.5) > 64.0 * 64.0
+                    || player.distanceToSqr(pos2.getX() + 0.5, pos2.getY() + 0.5, pos2.getZ() + 0.5) > 64.0 * 64.0
+                    || minY < level.getMinBuildHeight() || maxY >= level.getMaxBuildHeight()) {
+                player.displayClientMessage(new TextComponent("Cannot paint: both corners must be within 64 blocks and you must have build permission.").withStyle(ChatFormatting.RED), true);
+                return InteractionResult.FAIL;
+            }
+
+            for (int x = minX; x <= maxX; x++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    BlockPos bottom = new BlockPos(x, minY, z);
+                    BlockPos top = new BlockPos(x, maxY, z);
+                    boolean columnAllowed = level.hasChunkAt(bottom) && level.getWorldBorder().isWithinBounds(bottom)
+                            && canPaintAt(level, serverPlayer, bottom, context.getClickedFace(), stack)
+                            && (bottom.equals(top) || canPaintAt(level, serverPlayer, top, context.getClickedFace(), stack));
+                    for (int y = level.getMinBuildHeight(); y < level.getMaxBuildHeight() && columnAllowed; y += 16) {
+                        if (y != minY && y != maxY) {
+                            columnAllowed = canPaintAt(level, serverPlayer, new BlockPos(x, y, z), context.getClickedFace(), stack);
+                        }
+                    }
+                    if (!columnAllowed) {
+                        player.displayClientMessage(new TextComponent("Cannot paint: the selection includes an unloaded or protected column.").withStyle(ChatFormatting.RED), true);
+                        return InteractionResult.FAIL;
+                    }
+                }
+            }
+
             int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack);
             int affectedBlocks = 0;
-            Set<LevelChunk> modifiedChunks = new HashSet<>();
-
-            LevelChunk lastChunk = null;
-            int lastChunkX = Integer.MIN_VALUE;
-            int lastChunkZ = Integer.MIN_VALUE;
-
-            LevelChunkSection lastSection = null;
-            int lastSectionIndex = Integer.MIN_VALUE;
-
-            PalettedContainer<Holder<Biome>> lastBiomes = null;
-            int lastQuartX = Integer.MIN_VALUE;
-            int lastQuartY = Integer.MIN_VALUE;
-            int lastQuartZ = Integer.MIN_VALUE;
-
+            Set<ChunkPos> modifiedChunks = new HashSet<>();
+            BiomeTintData tints = BiomeTintData.get(serverLevel);
             boolean broken = false;
-            for (int x = minX; x <= maxX; x++) {
-                int shiftedX = x - 2;
-                int chunkX = shiftedX >> 4;
-                int qX = shiftedX >> 2;
-                int localQx = qX & 3;
-
+            for (int x = minX; x <= maxX && !broken; x++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    int shiftedZ = z - 2;
-                    int chunkZ = shiftedZ >> 4;
-                    int qZ = shiftedZ >> 2;
-                    int localQz = qZ & 3;
-
-                    LevelChunk chunk;
-                    if (chunkX == lastChunkX && chunkZ == lastChunkZ && lastChunk != null) {
-                        chunk = lastChunk;
-                    } else {
-                        chunk = serverLevel.getChunkSource().getChunkNow(chunkX, chunkZ);
-                        lastChunk = chunk;
-                        lastChunkX = chunkX;
-                        lastChunkZ = chunkZ;
-                        lastSection = null;
-                        lastSectionIndex = Integer.MIN_VALUE;
-                        lastBiomes = null;
-                        lastQuartX = Integer.MIN_VALUE;
-                        lastQuartY = Integer.MIN_VALUE;
-                        lastQuartZ = Integer.MIN_VALUE;
-                        if (chunk != null) {
-                            modifiedChunks.add(chunk);
-                        }
-                    }
-
-                    if (chunk == null) {
-                        continue;
-                    }
-
-                    for (int y = minY; y <= maxY; y++) {
-                        if (stack.getDamageValue() >= stack.getMaxDamage()) {
-                            broken = true;
-                            break;
-                        }
-
-                        int shiftedY = y - 2;
-                        int sectionIndex = chunk.getSectionIndex(shiftedY);
-                        int qY = shiftedY >> 2;
-                        int localQy = qY & 3;
-
-                        LevelChunkSection section;
-                        if (sectionIndex == lastSectionIndex && lastSection != null) {
-                            section = lastSection;
-                        } else {
-                            if (sectionIndex >= 0 && sectionIndex < chunk.getSections().length) {
-                                section = chunk.getSections()[sectionIndex];
-                            } else {
-                                section = null;
-                            }
-                            lastSection = section;
-                            lastSectionIndex = sectionIndex;
-                            lastBiomes = section != null ? section.getBiomes() : null;
-                            lastQuartX = Integer.MIN_VALUE;
-                            lastQuartY = Integer.MIN_VALUE;
-                            lastQuartZ = Integer.MIN_VALUE;
-                        }
-
-                        if (lastBiomes != null) {
-                            if (qX != lastQuartX || qY != lastQuartY || qZ != lastQuartZ) {
-                                lastBiomes.set(localQx, localQy, localQz, biomeHolder);
-                                lastQuartX = qX;
-                                lastQuartY = qY;
-                                lastQuartZ = qZ;
-                            }
-                        }
-
-                        affectedBlocks++;
-
-                        boolean shouldDamage = true;
-                        if (unbreakingLevel > 0) {
-                            shouldDamage = level.random.nextInt(unbreakingLevel + 1) == 0;
-                        }
-                        if (shouldDamage) {
-                            stack.setDamageValue(stack.getDamageValue() + 1);
-                        }
-                    }
-                    if (broken) {
+                    if (stack.getDamageValue() >= stack.getMaxDamage()) {
+                        broken = true;
                         break;
                     }
-                }
-                if (broken) {
-                    break;
+                    if (!tints.putColumn(x, z, biomeKey)) continue;
+                    modifiedChunks.add(new ChunkPos(x >> 4, z >> 4));
+                    affectedBlocks++;
+                    if (unbreakingLevel == 0 || level.random.nextInt(unbreakingLevel + 1) == 0) {
+                        stack.setDamageValue(stack.getDamageValue() + 1);
+                    }
                 }
             }
 
-            for (LevelChunk chunk : modifiedChunks) {
-                chunk.setUnsaved(true);
-                syncChunk(serverLevel, chunk);
+            for (ChunkPos chunk : modifiedChunks) {
+                BiomeTintSync.sync(serverLevel, chunk);
             }
-
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BONE_MEAL_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
 
             Component biomeName = new TranslatableComponent("biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
@@ -398,17 +333,11 @@ public class BiomeBrushItem extends Item {
         return level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
     }
 
-    private static void syncChunk(ServerLevel level, LevelChunk chunk) {
-        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(
-                chunk,
-                level.getLightEngine(),
-                null,
-                null,
-                true
-        );
-        level.getChunkSource().chunkMap.getPlayers(chunk.getPos(), false).forEach(player -> {
-            player.connection.send(packet);
-        });
+    private static boolean canPaintAt(Level level, ServerPlayer player, BlockPos pos, Direction face, ItemStack stack) {
+        return level.mayInteract(player, pos)
+                && player.mayUseItemAt(pos, face, stack)
+                && !player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())
+                && !ForgeEventFactory.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP);
     }
 
     @Override

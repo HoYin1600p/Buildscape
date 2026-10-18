@@ -181,6 +181,37 @@ public class RecipeCacheRegressionTest {
         }
     }
 
+    @Test
+    public void dynamicSpecialRecipesSurviveWarmCacheWithoutStaticResults() throws Exception {
+        List<Recipe<?>> cold = List.of(
+                new com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe(
+                        new ResourceLocation("buildscape:autogen/special/confetti_configure")),
+                new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(
+                        new ResourceLocation("buildscape:autogen/special/clear_shulker_filters")));
+        byte[] cache = BinaryRecipeCache.serializeCache("dynamic-specials", cold);
+        List<Recipe<?>> warm = BinaryRecipeCache.loadCacheFromStream(new ByteArrayInputStream(cache), "dynamic-specials");
+        assertEquals(cold.stream().map(Recipe::getId).toList(), warm.stream().map(Recipe::getId).toList());
+        assertEquals(cold.stream().map(Object::getClass).toList(), warm.stream().map(Object::getClass).toList());
+    }
+
+    @Test
+    public void durabilityPatternsRejectUndefinedSymbolsAndInvalidDimensions() throws Exception {
+        Class<?> serializer = com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe.Serializer.class;
+        java.lang.reflect.Method dissolve = serializer.getDeclaredMethod("dissolvePattern", String[].class,
+                Map.class, int.class, int.class);
+        dissolve.setAccessible(true);
+        java.lang.reflect.InvocationTargetException undefined = assertThrows(java.lang.reflect.InvocationTargetException.class,
+                () -> dissolve.invoke(null, new String[]{"AB"}, Map.of('A', Ingredient.of(Items.STONE)), 2, 1));
+        assertTrue(undefined.getCause() instanceof com.google.gson.JsonParseException);
+        java.lang.reflect.Method pattern = serializer.getDeclaredMethod("deserializePattern", com.google.gson.JsonArray.class);
+        pattern.setAccessible(true);
+        for (String source : List.of("[]", "[\"AAAA\"]", "[\"AA\",\"A\"]", "[\"A\",\"A\",\"A\",\"A\"]")) {
+            java.lang.reflect.InvocationTargetException dimensions = assertThrows(java.lang.reflect.InvocationTargetException.class,
+                    () -> pattern.invoke(null, com.google.gson.JsonParser.parseString(source).getAsJsonArray()));
+            assertTrue(dimensions.getCause() instanceof com.google.gson.JsonParseException);
+        }
+    }
+
     private static void writeRecord(DataOutputStream out, int type, int result, int ingredient) throws Exception {
         for (int value : new int[]{0, 1, result, 1, 1}) out.writeInt(value);
         out.writeByte(type);

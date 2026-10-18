@@ -41,6 +41,7 @@ public class PillarIdManager {
 
     public static final String VALID_ID_PATTERN = "^[A-Z][A-Za-z0-9-]{1,31}$";
     private final Map<String, String> positionIndex = new ConcurrentHashMap<>();
+    private final Set<net.minecraft.world.level.chunk.LevelChunk> loadedChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private volatile List<PillarData> syncSnapshot = Collections.emptyList();
 
     private long lastLoadedTime = 0L;
@@ -52,6 +53,7 @@ public class PillarIdManager {
     private boolean isServerSynced = false;
     private boolean allowEmptySave = false;
     private volatile boolean dirty = false;
+    private volatile boolean syncDirty = false;
 
     private static boolean recoveryScheduled = false;
     private static long recoveryScheduledTime = 0L;
@@ -105,6 +107,7 @@ public class PillarIdManager {
         isServerSynced = serverSynced;
         pillarData.clear();
         positionIndex.clear();
+        loadedChunks.clear();
         hasLoaded = false;
         loadInProgress = false;
         hadColorsOnLoad = false;
@@ -112,6 +115,9 @@ public class PillarIdManager {
         lastFileSize = 0L;
         allowEmptySave = false;
         dirty = false;
+        saveRequested = false;
+        syncDirty = false;
+        corruptedFileUnpreserved = false;
         fileWasDeleted = false;
         syncSnapshot = Collections.emptyList();
     }
@@ -448,12 +454,7 @@ public class PillarIdManager {
         if (existingId != null) {
             PillarData existing = pillarData.get(existingId);
             if (existing != null) {
-                if (existing.id != null && existing.id.startsWith(expectedPrefix)) {
-                    return existing;
-                } else {
-                    pillarData.remove(existingId);
-                    positionIndex.remove(posKey);
-                }
+                return existing;
             } else {
                 positionIndex.remove(posKey);
             }
@@ -480,7 +481,7 @@ public class PillarIdManager {
         positionIndex.put(posKey, id);
 
         if (!recoveryInProgress) {
-            saveImmediate();
+            requestSave();
         }
         return newData;
     }
@@ -531,7 +532,7 @@ public class PillarIdManager {
                     data.pattern = "ring";
                 }
             }
-            saveImmediate();
+            requestSave();
             return data.id;
         }
         return null;
@@ -565,7 +566,16 @@ public class PillarIdManager {
     public void flushRequestedSave() {
         if (saveRequested) {
             saveRequested = false;
-            saveImmediate();
+            if (!saveImmediate()) saveRequested = true;
+        }
+        if (syncDirty && hasLoaded) {
+            try {
+                refreshSyncSnapshot();
+                com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
+                syncDirty = false;
+            } catch (RuntimeException e) {
+                com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to sync pillar data to players", e);
+            }
         }
     }
 
@@ -604,7 +614,7 @@ public class PillarIdManager {
             if (pillarData.isEmpty()) {
                 allowEmptySave = true;
             }
-            saveImmediate();
+            requestSave();
         }
         return changed;
     }
@@ -626,22 +636,49 @@ public class PillarIdManager {
 
             if (changed) {
                 data.modifiedTime = System.currentTimeMillis();
-                forceSaveImmediate();
+                requestSave();
             }
         }
     }
 
     public void removePillarByPosition(Level level, BlockPos pos) {
-        String dimension = getDimensionKey(level);
+        removePillarByPosition(getDimensionKey(level), pos);
+    }
+
+    private void removePillarByPosition(String dimension, BlockPos pos) {
         String posKey = positionKey(dimension, pos);
 
         String idToRemove = positionIndex.remove(posKey);
         if (idToRemove != null) {
-            PillarData dataToReset = pillarData.remove(idToRemove);
-            if (dataToReset != null) {
-                PillarResetHandler.resetPillarFromData(dataToReset);
+            PillarData data = pillarData.get(idToRemove);
+            if (data != null && Objects.equals(data.dimension, dimension)
+                    && data.getBlockPos().equals(pos)) {
+                removePillar(idToRemove);
             }
-            saveImmediate();
+        }
+    }
+
+    public void removeStalePillarPositionIndex(Level level, BlockPos pos) {
+        String dimension = getDimensionKey(level);
+        String key = positionKey(dimension, pos);
+        String id = positionIndex.get(key);
+        if (id != null) {
+            PillarData data = pillarData.get(id);
+            if (data == null || !Objects.equals(data.dimension, dimension)
+                    || !data.getBlockPos().equals(pos)) {
+                positionIndex.remove(key, id);
+            }
+        }
+    }
+
+    public void updatePillarPosition(String pillarId, BlockPos pos) {
+        PillarData data = pillarData.get(pillarId);
+        if (data != null && !data.getBlockPos().equals(pos)) {
+            data.x = pos.getX();
+            data.y = pos.getY();
+            data.z = pos.getZ();
+            rebuildPositionIndex();
+            requestSave();
         }
     }
 
@@ -649,7 +686,7 @@ public class PillarIdManager {
         PillarData data = pillarData.get(pillarId);
         if (data != null) {
             data.clearColors();
-            saveImmediate();
+            requestSave();
         }
     }
 
@@ -682,7 +719,7 @@ public class PillarIdManager {
 
             if (changed) {
                 data.modifiedTime = System.currentTimeMillis();
-                forceSaveImmediate();
+                requestSave();
             }
         }
     }
@@ -707,7 +744,7 @@ public class PillarIdManager {
             }
 
             File file = getDataFile();
-            if (hasLoaded && pillarData.isEmpty() && file.exists()) {
+            if (hasLoaded && pillarData.isEmpty() && file.exists() && !dirty) {
                 hasLoaded = false;
             }
 
@@ -752,280 +789,63 @@ public class PillarIdManager {
         return pillarData.size();
     }
 
-    private void handleCorruptedFile(
-            File file,
-            Throwable error,
-            String errorType
-    ) {
-        System.err.println(
-                "BuildScape: Pillar data file is corrupted (" +
-                        errorType +
-                        "). Creating backup and starting fresh."
-        );
-        System.err.println("BuildScape: Error details: " + error.getMessage());
+    private boolean corruptedFileUnpreserved = false;
 
-        pillarData.clear();
-        lastLoadedTime = 0L;
-        lastFileSize = 0L;
-
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server != null && server.isRunning()) {
-            server.execute(() -> {
-                try {
-                    try {
-                        File backupFile = new File(
-                                file.getParent(),
-                                FILE_NAME + ".corrupted." + System.currentTimeMillis()
-                        );
-                        if (file.exists() && file.length() > 0) {
-                            java.nio.file.Files.copy(
-                                    file.toPath(),
-                                    backupFile.toPath(),
-                                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
-                            );
-
-                        }
-                    } catch (Exception backupEx) {
-                        System.err.println(
-                                "BuildScape: Failed to backup corrupted file: " +
-                                        backupEx.getMessage()
-                        );
-                    }
-
-                    try {
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                    } catch (Exception deleteEx) {
-                    }
-
-                    try {
-                        saveImmediate();
-                    } catch (Exception saveEx) {
-                        System.err.println(
-                                "BuildScape: Failed to create new pillar data file: " +
-                                        saveEx.getMessage()
-                        );
-                    }
-                } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error in deferred file recovery: " + e.getMessage()
-                    );
-                }
-            });
-        } else {
-            try {
-                try {
-                    File backupFile = new File(
-                            file.getParent(),
-                            FILE_NAME + ".corrupted." + System.currentTimeMillis()
-                    );
-                    if (file.exists() && file.length() > 0) {
-                        java.nio.file.Files.copy(
-                                file.toPath(),
-                                backupFile.toPath(),
-                                java.nio.file.StandardCopyOption.REPLACE_EXISTING
-                        );
-
-                    }
-                } catch (Exception backupEx) {
-                    System.err.println(
-                            "BuildScape: Failed to backup corrupted file: " +
-                                    backupEx.getMessage()
-                    );
-                }
-
-                try {
-                    if (file.exists()) {
-                        file.delete();
-                    }
-                } catch (Exception deleteEx) {
-                }
-
-                try {
-                    saveImmediate();
-                } catch (Exception saveEx) {
-                    System.err.println(
-                            "BuildScape: Failed to create new pillar data file (will retry later): " +
-                                    saveEx.getMessage()
-                    );
-                }
-            } catch (Exception e) {
-                System.err.println(
-                        "BuildScape: Error in file recovery: " + e.getMessage()
-                );
-            }
+    private void handleCorruptedFile(File file, Throwable error, String errorType) {
+        lastFileSize = Math.max(lastFileSize, file.length());
+        corruptedFileUnpreserved = true;
+        try {
+            Files.copy(file.toPath(), new File(file.getParentFile(),
+                    file.getName() + ".corrupted." + System.currentTimeMillis()).toPath());
+            corruptedFileUnpreserved = false;
+        } catch (IOException e) {
+            org.apache.logging.log4j.LogManager.getLogger(PillarIdManager.class).error("Unable to preserve corrupted pillar data; saves are blocked", e);
         }
+        org.apache.logging.log4j.LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar data (" + errorType + ")", error);
     }
 
     private boolean fileWasDeleted = false;
 
     private void processLoadedData(Map<String, PillarData> loaded, MinecraftServer server, File sourceFile) {
-        try {
-
-                Map<String, PillarData> existingData = new HashMap<>(pillarData);
-
-                pillarData.clear();
-            positionIndex.clear();
-
-                if (loaded != null && !loaded.isEmpty()) {
-                    int migrated = 0;
-                    int skipped = 0;
-
-                    for (Map.Entry<String, PillarData> entry : loaded.entrySet()) {
-                        try {
-                            String id = entry.getKey();
-                            PillarData data = entry.getValue();
-
-                            if (id == null || id.isEmpty() || data == null) {
-                                skipped++;
-                                continue;
-                            }
-
-                            boolean needsMigration = false;
-
-                            if (data.dimension == null || data.dimension.isEmpty()) {
-                                data.dimension = "minecraft:overworld";
-                                needsMigration = true;
-                            }
-
-                            List<String> originalFileColors = null;
-                            if (data.dyeColors != null) {
-                                originalFileColors = new ArrayList<>(data.dyeColors);
-                            }
-
-                            PillarData existing = existingData.get(id);
-
-                            if (originalFileColors != null && !originalFileColors.isEmpty()) {
-                                data.dyeColors = originalFileColors;
-                            } else {
-                                if (data.dyeColors == null) {
-                                    data.dyeColors = new ArrayList<>();
-                                    needsMigration = true;
-                                }
-
-                                if (existing != null && existing.hasColors() && existing.dyeColors != null) {
-                                    data.dyeColors = new ArrayList<>(existing.dyeColors);
-                                }
-                            }
-
-                            try {
-                                BlockPos pos = data.getBlockPos();
-                                if (pos == null) {
-                                    skipped++;
-                                    continue;
-                                }
-                            } catch (Exception e) {
-                                skipped++;
-                                continue;
-                            }
-
-                            if (!id.matches(VALID_ID_PATTERN)) {
-                                skipped++;
-                                continue;
-                            }
-
-                            if (data.dyeColors == null || data.dyeColors.isEmpty()) {
-                                if (originalFileColors != null && !originalFileColors.isEmpty()) {
-                                    data.dyeColors = new ArrayList<>(originalFileColors);
-                                } else if (data.dyeColors == null) {
-                                    data.dyeColors = new ArrayList<>();
-                                }
-                            }
-
-                            pillarData.put(id, data);
-                            net.minecraft.core.Direction facing = null;
-                            if (data.facing != null) {
-                                facing = net.minecraft.core.Direction.byName(data.facing);
-                            }
-                            positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), id);
-                            if (needsMigration) {
-                                migrated++;
-                            }
-                        } catch (Exception e) {
-                            skipped++;
-                            continue;
-                        }
-                    }
-
-                    if (migrated > 0) {
-                        if (server != null && server.isRunning()) {
-                            server.execute(() -> {
-                                try {
-                                    saveImmediate();
-                                } catch (Exception e) {
-                                }
-                            });
-                        }
-                    }
-
-                    if (skipped > 0) {
-                    }
-
+        Map<String, PillarData> existingData = new HashMap<>(pillarData);
+        pillarData.clear();
+        boolean changed = false;
+        if (loaded != null) {
+            for (Map.Entry<String, PillarData> entry : loaded.entrySet()) {
+                String id = entry.getKey();
+                PillarData data = entry.getValue();
+                if (id == null || !id.matches(VALID_ID_PATTERN) || data == null) {
+                    changed = true;
+                    continue;
                 }
-
-            for (Map.Entry<String, PillarData> entry : existingData.entrySet()) {
-                if (!pillarData.containsKey(entry.getKey())) {
-                    PillarData earlyData = entry.getValue();
-                    pillarData.put(entry.getKey(), earlyData);
-
-                    net.minecraft.core.Direction facing = null;
-                    if (earlyData.facing != null) {
-                        facing = net.minecraft.core.Direction.byName(earlyData.facing);
-                    }
-                    positionIndex.put(positionKey(earlyData.dimension, earlyData.getBlockPos(), facing), entry.getKey());
+                data.id = id;
+                if (data.dimension == null || data.dimension.isEmpty()) {
+                    data.dimension = "minecraft:overworld";
+                    changed = true;
                 }
+                if (data.dyeColors == null) {
+                    data.dyeColors = new ArrayList<>();
+                    changed = true;
+                }
+                pillarData.put(id, data);
             }
-
-            int colorsCountAfterMerge = 0;
-            for (PillarData data : pillarData.values()) {
-                if (data != null && data.hasColors()) {
-                    colorsCountAfterMerge++;
-                }
-            }
-            hadColorsOnLoad = (colorsCountAfterMerge > 0);
-
-                if (pillarData.isEmpty()) {
-                    fileWasDeleted = true;
-                    hadColorsOnLoad = false;
-                } else {
-                    fileWasDeleted = false;
-                }
-
-                if (sourceFile != null) {
-                    lastLoadedTime = sourceFile.lastModified();
-                    lastFileSize = sourceFile.length();
-                }
-
-                hasLoaded = true;
-
-                updateCachedWorldDir();
-                refreshSyncSnapshot();
-
-
-        } catch (Exception e) {
-            fileWasDeleted = true;
-            System.err.println(
-                    "BuildScape: Error processing loaded data: " + e.getMessage()
-            );
-            e.printStackTrace();
-            pillarData.clear();
-            lastLoadedTime = 0L;
-            lastFileSize = 0L;
-            hasLoaded = true;
-            scheduleRecoveryFromWorld(server, false);
-        } catch (Throwable t) {
-            System.err.println(
-                    "BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
-                            t.getMessage()
-            );
-            t.printStackTrace();
-            fileWasDeleted = true;
-            pillarData.clear();
-            lastLoadedTime = 0L;
-            lastFileSize = 0L;
-            hasLoaded = true;
-            scheduleRecoveryFromWorld(server, false);
+        }
+        for (Map.Entry<String, PillarData> entry : existingData.entrySet()) {
+            if (pillarData.putIfAbsent(entry.getKey(), entry.getValue()) == null) changed = true;
+        }
+        changed |= pruneRegistry();
+        hadColorsOnLoad = pillarData.values().stream().anyMatch(PillarData::hasColors);
+        fileWasDeleted = false;
+        if (sourceFile != null) {
+            lastLoadedTime = sourceFile.lastModified();
+            lastFileSize = Math.max(lastFileSize, sourceFile.length());
+        }
+        hasLoaded = true;
+        updateCachedWorldDir();
+        refreshSyncSnapshot();
+        if (changed) {
+            if (pillarData.isEmpty()) allowEmptySave = true;
+            requestSave();
         }
     }
 
@@ -1033,60 +853,14 @@ public class PillarIdManager {
         try {
             File file = getDataFile();
 
-            Map<String, PillarData> loadedData = null;
-            File sourceFile = null;
-
-            if (file.exists() && file.length() > 0) {
-                try {
-                    loadedData = loadFromFile(file);
-                    if (loadedData != null && !loadedData.isEmpty()) {
-                        sourceFile = file;
-                    }
-                } catch (Exception e) {
-                    System.err.println("BuildScape: Error loading main file: " + e.getMessage());
-                }
-            }
-
-            boolean mainFileHasColors = false;
-            if (loadedData != null) {
-                for (PillarData data : loadedData.values()) {
-                    if (data != null && data.hasColors()) {
-                        mainFileHasColors = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!mainFileHasColors) {
-                File backupFile = getBackupDataFile();
-                if (backupFile.exists() && backupFile.length() > 0) {
-                    try {
-                        Map<String, PillarData> backupData = loadFromFile(backupFile);
-                        if (backupData != null && !backupData.isEmpty()) {
-                            boolean backupHasColors = false;
-                            for (PillarData data : backupData.values()) {
-                                if (data != null && data.hasColors()) {
-                                    backupHasColors = true;
-                                    break;
-                                }
-                            }
-
-                            if (backupHasColors) {
-                                loadedData = backupData;
-                                sourceFile = backupFile;
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.err.println("BuildScape: Error loading backup file: " + e.getMessage());
-                    }
-                }
-            }
-
+            SavedData saved = readSavedData(file, getBackupDataFile());
+            Map<String, PillarData> loadedData = saved.data;
+            File sourceFile = saved.file;
             if (loadedData == null || loadedData.isEmpty()) {
                 fileWasDeleted = true;
                 pillarData.clear();
                 lastLoadedTime = 0L;
-                lastFileSize = 0L;
+                lastFileSize = Math.max(lastFileSize, file.length());
                 hasLoaded = true;
                 scheduleRecoveryFromWorld(server, false);
                 return;
@@ -1103,10 +877,40 @@ public class PillarIdManager {
             fileWasDeleted = true;
             pillarData.clear();
             lastLoadedTime = 0L;
-            lastFileSize = 0L;
+
             hasLoaded = true;
             scheduleRecoveryFromWorld(server, false);
         }
+    }
+
+    private static class SavedData {
+        private final File file;
+        private final Map<String, PillarData> data;
+
+        private SavedData(File file, Map<String, PillarData> data) {
+            this.file = file;
+            this.data = data;
+        }
+    }
+
+    private SavedData readSavedData(File file, File backupFile) {
+        if (file.exists() && file.length() > 0) {
+            try {
+                Map<String, PillarData> loaded = loadFromFile(file);
+                if (loaded != null) return new SavedData(file, loaded);
+            } catch (Exception e) {
+                handleCorruptedFile(file, e, "parse");
+            }
+        }
+        if (backupFile.exists() && backupFile.length() > 0) {
+            try {
+                Map<String, PillarData> loaded = loadFromFile(backupFile);
+                if (loaded != null && !loaded.isEmpty()) return new SavedData(backupFile, loaded);
+            } catch (Exception e) {
+                org.apache.logging.log4j.LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar backup", e);
+            }
+        }
+        return new SavedData(file, Collections.emptyMap());
     }
 
     private Map<String, PillarData> loadFromFile(File file) throws Exception {
@@ -1140,33 +944,12 @@ public class PillarIdManager {
             }
 
             if (pillarData.isEmpty() && lastFileSize > 0 && !allowEmptySave) {
-                boolean fileHasColors = false;
-                try {
-                    File mainFile = getDataFile();
-                    if (mainFile.exists() && mainFile.length() > 0) {
-                        try (FileInputStream fis = new FileInputStream(mainFile);
-                             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-                             BufferedReader reader = new BufferedReader(isr)) {
-                            Type type = new TypeToken<Map<String, PillarData>>() {
-                            }.getType();
-                            Map<String, PillarData> fileData = GSON.fromJson(reader, type);
-                            if (fileData != null && !fileData.isEmpty()) {
-                                fileHasColors = true;
-                            }
-                        }
-                    }
-                } catch (Exception exception) {
-                    com.kingodogo.buildscape.BuildScape.LOGGER.warn(
-                            "Unable to verify existing pillar data before an empty save", exception);
-                }
-
-                if (fileHasColors && !hasLoaded) {
-                    load();
-                    return false;
-                }
+                return false;
             }
-
             if (!saveToFile(getDataFile(), FILE_NAME)) {
+                return false;
+            }
+            if (allowEmptySave && !saveToFile(getBackupDataFile(), BACKUP_FILE_NAME)) {
                 return false;
             }
             allowEmptySave = false;
@@ -1179,8 +962,8 @@ public class PillarIdManager {
 
             dirty = false;
             fileWasDeleted = false;
-            refreshSyncSnapshot();
-            com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
+            saveRequested = false;
+            syncDirty = true;
             return true;
         } catch (Throwable t) {
             com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to save pillar data", t);
@@ -1321,7 +1104,7 @@ public class PillarIdManager {
         try {
             if (clearColors) {
                 int clearedCount = clearAllPillarIdsFromWorld(server);
-                saveImmediate();
+                requestSave();
                 return;
             }
 
@@ -1506,7 +1289,7 @@ public class PillarIdManager {
             recoveryInProgress = false;
 
             if (recoveredCount > 0 || colorClearedCount > 0) {
-                saveImmediate();
+                requestSave();
             } else {
             }
 
@@ -1521,71 +1304,7 @@ public class PillarIdManager {
     }
 
     public void save() {
-        saveImmediate();
-    }
-
-    public void forceSaveImmediate() {
-        if (!serverAuthoritative) {
-            return;
-        }
-        dirty = true;
-        try {
-            if (recoveryInProgress) {
-                return;
-            }
-
-            if (!hasLoaded) {
-                return;
-            }
-
-            int saveCount = pillarData.size();
-            if (saveCount == 0) {
-                return;
-            }
-
-            File saveDir = cachedWorldSaveDir;
-            if (saveDir == null || !saveDir.exists()) {
-                try {
-                    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                    if (server != null) {
-                        Path worldPath = server.getWorldPath(LevelResource.ROOT);
-                        if (worldPath != null) {
-                            saveDir = worldPath.resolve(FOLDER_NAME).toFile();
-                            if (!saveDir.exists()) {
-                                saveDir.mkdirs();
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                }
-            }
-
-            if (saveDir == null || !saveDir.exists()) {
-                System.err.println("BuildScape: forceSaveImmediate - Cannot find save directory!");
-                return;
-            }
-
-            File saveFile = new File(saveDir, FILE_NAME);
-            if (!saveToFile(saveFile, FILE_NAME)) {
-                return;
-            }
-
-            File backupFile = new File(saveDir, BACKUP_FILE_NAME);
-            saveToFile(backupFile, BACKUP_FILE_NAME);
-
-            if (saveFile.exists()) {
-                lastLoadedTime = saveFile.lastModified();
-                lastFileSize = saveFile.length();
-            }
-
-            dirty = false;
-            fileWasDeleted = false;
-            refreshSyncSnapshot();
-            com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
-        } catch (Throwable t) {
-            System.err.println("BuildScape: Error in forceSaveImmediate: " + t.getMessage());
-            t.printStackTrace();
-        }
+        requestSave();
     }
 
     public void savePeriodic(boolean includeBackup) {
@@ -1599,7 +1318,6 @@ public class PillarIdManager {
             return;
         }
 
-        boolean savedPendingChanges = false;
         if (dirty) {
             File mainFile = getDataFile();
             if (!saveToFile(mainFile, FILE_NAME)) {
@@ -1612,18 +1330,11 @@ public class PillarIdManager {
             dirty = false;
             allowEmptySave = false;
             fileWasDeleted = false;
-            refreshSyncSnapshot();
-            savedPendingChanges = true;
+            saveRequested = false;
+            syncDirty = true;
         }
         if (includeBackup) {
             saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
-        }
-        if (savedPendingChanges) {
-            try {
-                com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
-            } catch (RuntimeException e) {
-                com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to sync pillar data to players", e);
-            }
         }
     }
 
@@ -1645,6 +1356,7 @@ public class PillarIdManager {
     }
 
     private synchronized boolean saveToFile(File file, String tempFileName) {
+        if (corruptedFileUnpreserved || !hasLoaded) return false;
         try {
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
@@ -1799,6 +1511,49 @@ public class PillarIdManager {
     }
 
     public void cleanupOrphans(Level level) {
+        if (!serverAuthoritative || !hasLoaded || !(level instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
+            return;
+        }
+        String dimension = getDimensionKey(level);
+        Map<net.minecraft.world.level.ChunkPos, List<PillarData>> chunks = new HashMap<>();
+        for (PillarData data : pillarData.values()) {
+            if (!isItemFrameData(data) || !Objects.equals(dimension, data.dimension)) continue;
+            BlockPos pos = data.getBlockPos();
+            if (!level.hasChunkAt(pos) || !serverLevel.areEntitiesLoaded(net.minecraft.world.level.ChunkPos.asLong(pos))) continue;
+            chunks.computeIfAbsent(new net.minecraft.world.level.ChunkPos(pos), key -> new ArrayList<>()).add(data);
+        }
+        boolean changed = false;
+        for (Map.Entry<net.minecraft.world.level.ChunkPos, List<PillarData>> entry : chunks.entrySet()) {
+            net.minecraft.world.level.ChunkPos chunk = entry.getKey();
+            Set<String> livePositions = new HashSet<>();
+            net.minecraft.world.phys.AABB bounds = new net.minecraft.world.phys.AABB(
+                    chunk.getMinBlockX() - 1, level.getMinBuildHeight() - 1, chunk.getMinBlockZ() - 1,
+                    chunk.getMinBlockX() + 17, level.getMaxBuildHeight() + 1, chunk.getMinBlockZ() + 17);
+            for (net.minecraft.world.entity.Entity entity : level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, bounds)) {
+                net.minecraft.core.Direction facing;
+                if (entity instanceof net.minecraft.world.entity.decoration.ItemFrame frame) {
+                    facing = frame.getDirection();
+                } else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
+                    facing = frame.getDirection();
+                } else {
+                    continue;
+                }
+                livePositions.add(positionKey(dimension, entity.blockPosition(), facing));
+                livePositions.add(positionKey(dimension, entity.blockPosition(), null));
+            }
+            for (PillarData data : entry.getValue()) {
+                net.minecraft.core.Direction facing = data.facing != null
+                        ? net.minecraft.core.Direction.byName(data.facing) : null;
+                if (!livePositions.contains(positionKey(dimension, data.getBlockPos(), facing))) {
+                    changed |= pillarData.remove(data.id, data);
+                }
+            }
+        }
+        if (changed) {
+            rebuildPositionIndex();
+            if (pillarData.isEmpty()) allowEmptySave = true;
+            requestSave();
+        }
     }
 
     public void syncColorsFromNBTToManager(MinecraftServer server) {
@@ -1914,7 +1669,7 @@ public class PillarIdManager {
             }
 
             if (syncedCount > 0 || patternSyncedCount > 0) {
-                saveImmediate();
+                requestSave();
             } else if (preservedCount > 0) {
             }
         } catch (Exception e) {
@@ -2000,7 +1755,7 @@ public class PillarIdManager {
             }
 
             if (loadedCount > 0) {
-                saveImmediate();
+                requestSave();
             } else {
             }
         } catch (Exception e) {
@@ -2140,14 +1895,102 @@ public class PillarIdManager {
         return snapshot;
     }
 
-    public synchronized void replaceAllPillarData(Map<String, PillarData> newData) {
-        if (newData == null) {
-            return;
+    public synchronized String editPillarRows(List<com.kingodogo.buildscape.network.EditPillarRowsPacket.Row> rows) {
+        if (!serverAuthoritative || rows == null
+                || rows.size() > com.kingodogo.buildscape.network.EditPillarRowsPacket.MAX_ROWS) {
+            return "invalid";
+        }
+        Map<String, PillarData> originals = copyDataSnapshot();
+        Map<String, PillarData> finalData = new HashMap<>(originals);
+        Set<String> oldIds = new HashSet<>();
+        for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+            if (row == null || !row.isValid() || !oldIds.add(row.oldId)) return "invalid";
+            if (!pillarData.containsKey(row.oldId)) return "missing";
+            finalData.remove(row.oldId);
+        }
+        for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+            PillarData data = originals.get(row.oldId);
+            data.id = row.newId;
+            data.dimension = row.dimension;
+            data.x = row.x;
+            data.y = row.y;
+            data.z = row.z;
+            data.modifiedTime = System.currentTimeMillis();
+            if (finalData.putIfAbsent(row.newId, data) != null) return editConflict("id_conflict", row);
+        }
+        Map<String, PillarData> positions = new HashMap<>();
+        for (PillarData data : finalData.values()) {
+            net.minecraft.core.Direction facing = data.facing != null
+                    ? net.minecraft.core.Direction.byName(data.facing) : null;
+            PillarData conflict = positions.putIfAbsent(positionKey(data.dimension, data.getBlockPos(), facing), data);
+            if (conflict != null) {
+                for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+                    if (row.newId.equals(data.id) || row.newId.equals(conflict.id)) return editConflict("position_conflict", row);
+                }
+                return "position_conflict";
+            }
+        }
+        if (rows.isEmpty()) return "";
+
+        Map<com.kingodogo.buildscape.block.PillarBlockEntity, String> loadedUpdates = new HashMap<>();
+        for (net.minecraft.world.level.chunk.LevelChunk chunk : loadedChunks) {
+            Level level = chunk.getLevel();
+            Map<String, String> renamedIds = new HashMap<>();
+            for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+                PillarData previous = pillarData.get(row.oldId);
+                if (Objects.equals(previous.dimension, getDimensionKey(level)) && previous.facing == null) {
+                    renamedIds.put(row.oldId, row.newId);
+                }
+            }
+            if (renamedIds.isEmpty()) continue;
+            for (net.minecraft.world.level.block.entity.BlockEntity be : chunk.getBlockEntities().values()) {
+                if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar && !pillar.isRemoved()) {
+                    String renamedId = renamedIds.get(pillar.getPillarId());
+                    if (renamedId != null) loadedUpdates.put(pillar, renamedId);
+                }
+            }
+        }
+        Map<String, Map<String, String>> frameRenames = new HashMap<>();
+        for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+            PillarData previous = pillarData.get(row.oldId);
+            if (previous.facing != null) {
+                frameRenames.computeIfAbsent(previous.dimension, key -> new HashMap<>()).put(row.oldId, row.newId);
+            }
         }
         pillarData.clear();
-        pillarData.putAll(newData);
+        pillarData.putAll(finalData);
         rebuildPositionIndex();
+        loadedUpdates.forEach(com.kingodogo.buildscape.block.PillarBlockEntity::setPillarId);
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+                String dimension = getDimensionKey(level);
+                Map<String, String> renamedFrames = frameRenames.get(dimension);
+                if (renamedFrames == null) continue;
+                for (net.minecraft.world.entity.Entity entity : level.getAllEntities()) {
+                    if (entity instanceof net.minecraft.world.entity.decoration.ItemFrame
+                            || entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
+                        CompoundTag tag = entity.getPersistentData();
+                        String renamedId = renamedFrames.get(tag.getString("BuildScapeFrameId"));
+                        if (renamedId != null) tag.putString("BuildScapeFrameId", renamedId);
+                    }
+                }
+            }
+        }
+        // Persist an explicit editor apply now; keep a deferred retry if the immediate save is refused.
+        requestSave();
         saveImmediate();
+        refreshSyncSnapshot();
+        return "";
+    }
+
+    private static String editConflict(String reason, com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row) {
+        return reason + ":" + row.oldId + ":" + row.newId;
+    }
+
+    public synchronized void trackLoadedChunk(net.minecraft.world.level.chunk.LevelChunk chunk, boolean loaded) {
+        if (loaded) loadedChunks.add(chunk);
+        else loadedChunks.remove(chunk);
     }
 
     public synchronized void replaceFromServerSync(Collection<PillarData> syncedData) {
@@ -2169,19 +2012,83 @@ public class PillarIdManager {
     }
 
     private void rebuildPositionIndex() {
+        deduplicateFramePositions();
         positionIndex.clear();
         for (PillarData data : pillarData.values()) {
             if (data == null || data.id == null || data.dimension == null) {
                 continue;
             }
             try {
-                net.minecraft.core.Direction facing = data.facing != null
-                        ? net.minecraft.core.Direction.byName(data.facing)
-                        : null;
-                positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
+                indexPosition(data);
             } catch (Exception ignored) {
             }
         }
+    }
+
+    private void indexPosition(PillarData data) {
+        net.minecraft.core.Direction facing = data.facing != null
+                ? net.minecraft.core.Direction.byName(data.facing)
+                : null;
+        String key = positionKey(data.dimension, data.getBlockPos(), facing);
+        String previousId = positionIndex.get(key);
+        PillarData previous = previousId != null ? pillarData.get(previousId) : null;
+        if (previous == null || data.modifiedTime > previous.modifiedTime
+                || (data.modifiedTime == previous.modifiedTime && data.id.compareTo(previous.id) < 0)) {
+            positionIndex.put(key, data.id);
+        }
+    }
+
+    private static boolean isItemFrameData(PillarData data) {
+        return data.pillarType != null && (data.pillarType.endsWith(":item_frame")
+                || data.pillarType.endsWith("_item_frame"));
+    }
+
+    private static boolean hasFrameParticleData(String pattern, List<String> colors) {
+        return (colors != null && !colors.isEmpty()) || (pattern != null && !pattern.isEmpty()
+                && !"none".equals(pattern) && !"__not_set__".equals(pattern));
+    }
+
+    private void deduplicateFramePositions() {
+        Map<String, PillarData> frames = new HashMap<>();
+        for (PillarData data : new ArrayList<>(pillarData.values())) {
+            if (!isItemFrameData(data)) continue;
+            net.minecraft.core.Direction facing = data.facing != null
+                    ? net.minecraft.core.Direction.byName(data.facing) : null;
+            String key = positionKey(data.dimension, data.getBlockPos(), facing);
+            PillarData previous = frames.get(key);
+            if (previous == null) {
+                frames.put(key, data);
+            } else if (data.modifiedTime > previous.modifiedTime
+                    || (data.modifiedTime == previous.modifiedTime && data.id.compareTo(previous.id) < 0)) {
+                pillarData.remove(previous.id, previous);
+                frames.put(key, data);
+            } else {
+                pillarData.remove(data.id, data);
+            }
+        }
+    }
+
+    private boolean pruneRegistry() {
+        int previousSize = pillarData.size();
+        // Dimensions are never a pruning reason: mods register some dimensions dynamically after startup.
+        pillarData.values().removeIf(data -> isItemFrameData(data)
+                && !hasFrameParticleData(data.pattern, data.dyeColors));
+        rebuildPositionIndex();
+        return previousSize != pillarData.size();
+    }
+
+    public String getFrameIdForPosition(String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+        return facing == null ? null : positionIndex.get(positionKey(dimension, pos, facing));
+    }
+
+    private boolean removeOtherFrameAtPosition(String key, String id) {
+        String previousId = positionIndex.get(key);
+        if (previousId == null || previousId.equals(id)) return false;
+        PillarData previous = pillarData.get(previousId);
+        if (previous == null || !isItemFrameData(previous)) return false;
+        pillarData.remove(previousId, previous);
+        positionIndex.remove(key, previousId);
+        return true;
     }
 
     public void clearForServerSync() {
@@ -2217,19 +2124,26 @@ public class PillarIdManager {
             return;
         }
 
+        if (pillar.getLevel() instanceof net.minecraft.server.level.ServerLevel level) {
+            net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunkSource().getChunkNow(
+                    pillar.getBlockPos().getX() >> 4, pillar.getBlockPos().getZ() >> 4);
+            if (chunk != null) trackLoadedChunk(chunk, true);
+        }
+        if (!hasLoaded || !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) return;
+        String dimension = getDimensionKey(pillar.getLevel());
         String id = pillar.getPillarId();
         if (id == null || id.isEmpty()) {
             return;
         }
-
-        String dimension = getDimensionKey(pillar.getLevel());
-        BlockPos pos = pillar.getBlockPos();
-        String posKey = positionKey(dimension, pos);
+        String authoritativeId = reconcilePillarId(id, dimension, pillar.getBlockPos(), pillar.findStackBottom());
+        if (!Objects.equals(authoritativeId, id)) {
+            pillar.setPillarId(authoritativeId);
+            return;
+        }
 
         PillarData existing = pillarData.get(id);
+        PillarData data = registerPillarData(id, dimension, pillar.getBlockPos());
         if (existing == null) {
-            PillarData data = new PillarData(id, dimension, pos);
-
             syncPatternSettingsFromNBT(pillar, data);
 
             List<String> colors = pillar.getParticleColors();
@@ -2237,25 +2151,50 @@ public class PillarIdManager {
                 for (String c : colors) data.addColor(c);
             }
 
-            pillarData.put(id, data);
-            positionIndex.put(posKey, id);
-
             requestSave();
         } else {
-            positionIndex.put(posKey, id);
-
             if (syncPatternSettingsFromNBT(pillar, existing)) {
                 requestSave();
             }
         }
     }
 
-    private void saveFrameChange(boolean immediate) {
-        if (immediate) {
-            saveImmediate();
-        } else {
-            requestSave();
+    private PillarData registerPillarData(String id, String dimension, BlockPos pos) {
+        PillarData data = pillarData.get(id);
+        if (data == null) {
+            data = new PillarData(id, dimension, pos);
+            pillarData.put(id, data);
         }
+        indexPosition(data);
+        return data;
+    }
+
+    private String reconcilePillarId(String savedId, String dimension, BlockPos basePos) {
+        return reconcilePillarId(savedId, dimension, basePos, basePos);
+    }
+
+    private String reconcilePillarId(String savedId, String dimension, BlockPos pos, BlockPos basePos) {
+        if (savedId == null || savedId.isEmpty()) return savedId;
+        PillarData saved = pillarData.get(savedId);
+        if (saved != null && Objects.equals(saved.dimension, dimension)
+                && saved.x == pos.getX() && saved.z == pos.getZ()
+                && saved.y >= basePos.getY() && saved.y <= pos.getY()) {
+            return savedId;
+        }
+        for (BlockPos current = pos; current.getY() >= basePos.getY(); current = current.below()) {
+            String authoritativeId = positionIndex.get(positionKey(dimension, current));
+            if (authoritativeId != null) return authoritativeId;
+        }
+        return savedId;
+    }
+
+    private String reconcileFrameId(String savedId, String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+        String authoritativeId = getFrameIdForPosition(dimension, pos, facing);
+        return authoritativeId != null ? authoritativeId : savedId;
+    }
+
+    private void saveFrameChange() {
+        requestSave();
     }
 
     public void registerItemFrame(net.minecraft.world.entity.decoration.ItemFrame frame) {
@@ -2270,11 +2209,7 @@ public class PillarIdManager {
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString("BuildScapeFrameId");
 
-        if (id == null || id.isEmpty()) {
-            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getFrameId(frame);
-        }
-
-        String pattern = dataTag.getString("BuildScapeParticlePattern");
+        String pattern = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getParticlePattern(frame);
         List<String> colors = new ArrayList<>();
         if (dataTag.contains("BuildScapeParticleColors")) {
             net.minecraft.nbt.ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
@@ -2283,16 +2218,25 @@ public class PillarIdManager {
             }
         }
 
+        if (id == null || id.isEmpty()) {
+            if (!hasFrameParticleData(pattern, colors)) return;
+            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getFrameId(frame);
+        }
+
         String dimension = getDimensionKey(frame.level);
         BlockPos pos = frame.blockPosition();
         net.minecraft.core.Direction facing = frame.getDirection();
         String posKey = positionKey(dimension, pos, facing);
 
+        id = reconcileFrameId(id, dimension, pos, facing);
+        dataTag.putString("BuildScapeFrameId", id);
         PillarData existing = pillarData.get(id);
+        if (existing == null && !hasFrameParticleData(pattern, colors)) return;
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
             id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
         }
+        boolean removedDuplicate = removeOtherFrameAtPosition(posKey, id);
         if (existing == null) {
             PillarData data = new PillarData(id, dimension, pos);
             data.pattern = pattern;
@@ -2309,10 +2253,10 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            saveFrameChange(immediate);
+            saveFrameChange();
         } else {
             positionIndex.put(posKey, id);
-            boolean changed = false;
+            boolean changed = removedDuplicate;
 
             if (existing.pillarType == null || !existing.pillarType.equals("minecraft:item_frame")) {
                 existing.pillarType = "minecraft:item_frame";
@@ -2345,7 +2289,8 @@ public class PillarIdManager {
             }
 
             if (changed) {
-                saveFrameChange(immediate);
+                existing.modifiedTime = System.currentTimeMillis();
+                saveFrameChange();
             }
         }
     }
@@ -2363,11 +2308,7 @@ public class PillarIdManager {
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString("BuildScapeFrameId");
 
-        if (id == null || id.isEmpty()) {
-            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getFrameIdColored(frame);
-        }
-
-        String pattern = dataTag.getString("BuildScapeParticlePattern");
+        String pattern = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getParticlePatternColored(frame);
         List<String> colors = new ArrayList<>();
         if (dataTag.contains("BuildScapeParticleColors")) {
             net.minecraft.nbt.ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
@@ -2376,16 +2317,25 @@ public class PillarIdManager {
             }
         }
 
+        if (id == null || id.isEmpty()) {
+            if (!hasFrameParticleData(pattern, colors)) return;
+            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getFrameIdColored(frame);
+        }
+
         String dimension = getDimensionKey(frame.level);
         BlockPos pos = frame.blockPosition();
         net.minecraft.core.Direction facing = frame.getDirection();
         String posKey = positionKey(dimension, pos, facing);
 
+        id = reconcileFrameId(id, dimension, pos, facing);
+        dataTag.putString("BuildScapeFrameId", id);
         PillarData existing = pillarData.get(id);
+        if (existing == null && !hasFrameParticleData(pattern, colors)) return;
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
             id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
         }
+        boolean removedDuplicate = removeOtherFrameAtPosition(posKey, id);
         if (existing == null) {
             PillarData data = new PillarData(id, dimension, pos);
             data.pattern = pattern;
@@ -2409,10 +2359,10 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            saveFrameChange(immediate);
+            saveFrameChange();
         } else {
             positionIndex.put(posKey, id);
-            boolean changed = false;
+            boolean changed = removedDuplicate;
 
             String color = frame.getColorVariant();
             if (color == null || color.isEmpty()) color = "white";
@@ -2450,7 +2400,8 @@ public class PillarIdManager {
             }
 
             if (changed) {
-                saveFrameChange(immediate);
+                existing.modifiedTime = System.currentTimeMillis();
+                saveFrameChange();
             }
         }
     }

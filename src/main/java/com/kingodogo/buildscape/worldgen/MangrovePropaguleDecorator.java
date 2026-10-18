@@ -94,12 +94,17 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
         java.util.Collections.shuffle(supportedLeaves, random);
 
         int placed = 0;
+        List<net.minecraft.world.phys.AABB> exclusions = new ArrayList<>();
         for (BlockPos leafPos : supportedLeaves) {
             if (placed >= propagulesToPlace) {
                 break;
             }
 
             BlockPos belowPos = leafPos.below();
+            if (random.nextFloat() >= probability || exclusions.stream().anyMatch(
+                    bounds -> bounds.contains(net.minecraft.world.phys.Vec3.atCenterOf(belowPos)))) {
+                continue;
+            }
 
             if (
                     level.isStateAtPosition(
@@ -140,6 +145,9 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
                                     );
 
                     blockSetter.accept(belowPos, propaguleState);
+                    int radiusXZ = exclusionRadiusXZ.sample(random);
+                    exclusions.add(new net.minecraft.world.phys.AABB(belowPos).inflate(
+                            radiusXZ, exclusionRadiusY.sample(random), radiusXZ));
                     placed++;
                 }
             }

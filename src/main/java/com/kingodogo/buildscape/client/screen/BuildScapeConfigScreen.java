@@ -121,8 +121,8 @@ public class BuildScapeConfigScreen extends Screen {
     private ConfigCategoryButton worldSettingsButton;
     private ConfigCategoryButton reportButton;
     private AbstractConfigTab activeTab;
+    private PillarIdsConfigTab pillarIdsTab;
     private Button kofiButton;
-    private Button editGuiButton;
 
     private int lastWindowWidth = -1;
     private int lastWindowHeight = -1;
@@ -328,11 +328,6 @@ public class BuildScapeConfigScreen extends Screen {
         int bottomPadding = scaleSize(10);
         int kofiY = this.height - frameHeight - bottomPadding;
 
-        if (editGuiButton != null) {
-            editGuiButton.x = buttonX;
-            editGuiButton.y = this.height - scaleSize(60);
-            editGuiButton.setWidth(buttonWidth);
-        }
         if (kofiButton != null) {
             kofiButton.x = buttonX;
             kofiButton.y = kofiY;
@@ -481,6 +476,11 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     public void setActiveTab(AbstractConfigTab tab) {
+        if (activeTab instanceof PillarIdsConfigTab idsTab && !idsTab.canLeave()) return;
+        if (tab instanceof PillarIdsConfigTab idsTab) {
+            if (pillarIdsTab == null) pillarIdsTab = idsTab;
+            tab = pillarIdsTab;
+        }
         if (activeTab != null) {
             activeTab.onClose();
         }
@@ -506,6 +506,16 @@ public class BuildScapeConfigScreen extends Screen {
 
     public AbstractConfigTab getActiveTab() {
         return activeTab;
+    }
+
+    public PillarIdsConfigTab getPillarIdsTab() {
+        return pillarIdsTab;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (pillarIdsTab != null) pillarIdsTab.checkEditTimeout();
     }
 
     public void refreshCurrentTab() {
@@ -559,14 +569,6 @@ public class BuildScapeConfigScreen extends Screen {
         try {
             net.minecraft.Util.getPlatform().openUri(new java.net.URI(reportUrl));
         } catch (Exception e) {
-        }
-    }
-
-    private void openGuiEditor() {
-        if (activeTab != null) {
-            String tabName = activeTab.getTabName();
-            Minecraft.getInstance()
-                    .setScreen(new com.kingodogo.buildscape.client.screen.GuiEditorScreen(this, tabName, activeTab));
         }
     }
 
@@ -675,6 +677,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     @Override
     public void onClose() {
+        if (activeTab instanceof PillarIdsConfigTab idsTab && !idsTab.canLeave()) return;
         if (activeTab != null) {
             activeTab.onClose();
         }

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.biometint.SyncBiomeTintPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.NetworkDirection;
@@ -8,7 +9,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class ModMessages {
 
-    private static final String PROTOCOL_VERSION = "5";
+    private static final String PROTOCOL_VERSION = "7";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BuildScape.MODID, "main"),
             () -> PROTOCOL_VERSION,
@@ -33,8 +34,8 @@ public class ModMessages {
                 UpdateConfigPacket::encode, UpdateConfigPacket::decode, UpdateConfigPacket::handle);
         register(RemovePillarPacket.class, 8, NetworkDirection.PLAY_TO_SERVER,
                 RemovePillarPacket::encode, RemovePillarPacket::decode, RemovePillarPacket::handle);
-        register(UpdateAllPillarIdsPacket.class, 9, NetworkDirection.PLAY_TO_SERVER,
-                UpdateAllPillarIdsPacket::encode, UpdateAllPillarIdsPacket::decode, UpdateAllPillarIdsPacket::handle);
+        register(EditPillarRowsPacket.class, 9, NetworkDirection.PLAY_TO_SERVER,
+                EditPillarRowsPacket::encode, EditPillarRowsPacket::decode, EditPillarRowsPacket::handle);
         register(SyncGameRulesPacket.class, 10, NetworkDirection.PLAY_TO_CLIENT,
                 SyncGameRulesPacket::encode, SyncGameRulesPacket::decode, SyncGameRulesPacket::handle);
         register(UpdateGameRulePacket.class, 11, NetworkDirection.PLAY_TO_SERVER,
@@ -53,6 +54,10 @@ public class ModMessages {
                 SyncSignFramePacket::encode, SyncSignFramePacket::decode, SyncSignFramePacket::handle);
         register(ConfettiBurstPacket.class, 18, NetworkDirection.PLAY_TO_CLIENT,
                 ConfettiBurstPacket::encode, ConfettiBurstPacket::decode, ConfettiBurstPacket::handle);
+        register(SyncBiomeTintPacket.class, 19, NetworkDirection.PLAY_TO_CLIENT,
+                SyncBiomeTintPacket::encode, SyncBiomeTintPacket::decode, SyncBiomeTintPacket::handle);
+        register(EditPillarRowsResultPacket.class, 20, NetworkDirection.PLAY_TO_CLIENT,
+                EditPillarRowsResultPacket::encode, EditPillarRowsResultPacket::decode, EditPillarRowsResultPacket::handle);
     }
 
     private static <T> void register(

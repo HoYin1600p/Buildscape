@@ -18,6 +18,7 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
 
     @Inject(method = "load", at = @At("HEAD"))
     private void migrateStoredGhostItems(CompoundTag tag, CallbackInfo ci) {
+        if (tag.getBoolean("GhostMigrated")) return;
         ListTag filters = tag.contains("GhostFilters", 9)
                 ? tag.getList("GhostFilters", 8).copy()
                 : new ListTag();
@@ -39,6 +40,7 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
             tag.put("Items", items);
         }
         tag.put("GhostFilters", filters);
+        tag.putBoolean("GhostMigrated", true);
     }
 
     @Inject(method = "load", at = @At("TAIL"))
@@ -57,6 +59,7 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
 
     @Inject(method = "saveAdditional", at = @At("TAIL"))
     private void onSaveAdditional(CompoundTag tag, CallbackInfo ci) {
+        tag.putBoolean("GhostMigrated", true);
         boolean hasFilter = false;
         ListTag list = new ListTag();
         for (int i = 0; i < 27; i++) {

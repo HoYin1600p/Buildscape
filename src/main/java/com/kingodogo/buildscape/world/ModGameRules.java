@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.world;
 
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.SyncGameRulesPacket;
-import com.kingodogo.buildscape.config.BuildscapeClientConfig;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
@@ -43,8 +42,8 @@ public class ModGameRules {
 
             GameRules.Type<GameRules.BooleanValue> booleanType =
                     (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, false, onRuleChange);
-            boolean cakeStackingDefault = BuildscapeClientConfig.get().isCakeStackingEnabled();
-            boolean waterBottleStackingDefault = BuildscapeClientConfig.get().isWaterBottleStackingEnabled();
+            boolean cakeStackingDefault = true;
+            boolean waterBottleStackingDefault = true;
             GameRules.Type<GameRules.BooleanValue> cakeStackingType =
                     (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, cakeStackingDefault, onRuleChange);
             GameRules.Type<GameRules.BooleanValue> waterBottleStackingType =

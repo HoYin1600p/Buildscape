@@ -488,7 +488,7 @@ public class FestiveStockingBlock
                         ) >
                                 0;
 
-                if (!hasSilkTouch) {
+                if (!level.isClientSide && (!hasSilkTouch || player.isCreative())) {
                     ItemStack stored = stockingEntity.getStoredItem().copy();
                     ItemEntity itemEntity = new ItemEntity(
                             level,

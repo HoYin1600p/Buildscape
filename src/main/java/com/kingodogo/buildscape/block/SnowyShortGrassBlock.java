@@ -93,7 +93,7 @@ public class SnowyShortGrassBlock
     @Override
     public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
         if (direction == net.minecraft.core.Direction.DOWN) {
-            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
@@ -170,24 +170,20 @@ public class SnowyShortGrassBlock
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
-            BlockPos upperPos = abovePos.above();
-            BlockState upperState = level.getBlockState(upperPos);
-            if (upperState.isAir()) {
-                BlockState tallGrassState =
-                        com.kingodogo.buildscape.block.ModBlocks.SNOWY_TALL_GRASS.get()
-                                .defaultBlockState()
-                                .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
-                if (tallGrassState.canSurvive(level, pos)) {
-                    level.setBlock(pos, tallGrassState, 3);
-                    level.setBlock(
-                            abovePos,
-                            tallGrassState.setValue(
-                                    DoublePlantBlock.HALF,
-                                    DoubleBlockHalf.UPPER
-                            ),
-                            3
-                    );
-                }
+            BlockState tallGrassState =
+                    com.kingodogo.buildscape.block.ModBlocks.SNOWY_TALL_GRASS.get()
+                            .defaultBlockState()
+                            .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
+            if (tallGrassState.canSurvive(level, pos)) {
+                level.setBlock(pos, tallGrassState, 3);
+                level.setBlock(
+                        abovePos,
+                        tallGrassState.setValue(
+                                DoublePlantBlock.HALF,
+                                DoubleBlockHalf.UPPER
+                        ),
+                        3
+                );
             }
         }
     }

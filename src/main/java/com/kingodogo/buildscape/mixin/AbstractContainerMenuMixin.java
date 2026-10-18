@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.mixin;
 import com.kingodogo.buildscape.util.StonecutterMenuExtension;
 import com.kingodogo.buildscape.util.GhostFilterMenu;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.StonecutterMenu;
@@ -65,7 +66,7 @@ public abstract class AbstractContainerMenuMixin {
                                 int totalInputCount = inputStack.getCount();
                                 List<Integer> playerInvSlots = new ArrayList<>();
 
-                                for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+                                for (int i = 0; i < Inventory.INVENTORY_SIZE; i++) {
                                     ItemStack invStack = player.getInventory().getItem(i);
                                     if (!invStack.isEmpty() && invStack.getItem() == inputItem && ItemStack.isSameItemSameTags(invStack, inputStack)) {
                                         totalInputCount += invStack.getCount();

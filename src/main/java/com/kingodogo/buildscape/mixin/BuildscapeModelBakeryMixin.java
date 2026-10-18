@@ -35,8 +35,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,6 +62,10 @@ public abstract class BuildscapeModelBakeryMixin {
     @Shadow
     @Final
     private Map<ResourceLocation, UnbakedModel> topLevelModels;
+
+    @Shadow
+    @Final
+    private Map<ResourceLocation, UnbakedModel> unbakedCache;
 
     @Shadow
     @Nullable
@@ -200,6 +206,16 @@ public abstract class BuildscapeModelBakeryMixin {
             return;
         }
 
+        Set<ResourceLocation> checked = new HashSet<>();
+        for (ResourceLocation candidate : candidates) {
+            if (!buildscape$hasCachedDependencies(candidate, checked)) {
+                BuildScape.LOGGER.info(
+                        "Buildscape startup kept model baking sequential because model dependencies were not safely cached"
+                );
+                return;
+            }
+        }
+
         long startedAt = System.nanoTime();
         bakedCache = new ConcurrentHashMap<>(bakedCache);
         java.util.Set<ResourceLocation> completed = ConcurrentHashMap.newKeySet();
@@ -231,6 +247,23 @@ public abstract class BuildscapeModelBakeryMixin {
                 elapsedMillis,
                 fallbackCount.get()
         );
+    }
+
+    @Unique
+    private boolean buildscape$hasCachedDependencies(ResourceLocation location, Set<ResourceLocation> checked) {
+        if (!checked.add(location)) {
+            return true;
+        }
+        UnbakedModel model = unbakedCache.get(location);
+        if (!(model instanceof BlockModel blockModel) || blockModel.customData.hasCustomGeometry()) {
+            return false;
+        }
+        for (ResourceLocation dependency : model.getDependencies()) {
+            if (!buildscape$hasCachedDependencies(dependency, checked)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Unique

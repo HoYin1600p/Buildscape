@@ -6,17 +6,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SmokeColorRegistry {
 
-    private static final Map<String, ColorEntry> POSITION_COLOR_MAP = new ConcurrentHashMap<>();
+    private static final Map<ParticlePositionKey, ColorEntry> POSITION_COLOR_MAP = new ConcurrentHashMap<>();
 
     public static void registerColorForPosition(double x, double y, double z, String colorCode) {
-        String posKey = makePositionKey(x, y, z);
+        ParticlePositionKey posKey = ParticlePositionKey.of(x, y, z);
         POSITION_COLOR_MAP.put(posKey, new ColorEntry(colorCode));
     }
 
     public static String consumeColor(double x, double y, double z) {
-        String posKey = makePositionKey(x, y, z);
+        ParticlePositionKey posKey = ParticlePositionKey.of(x, y, z);
         ColorEntry entry = POSITION_COLOR_MAP.remove(posKey);
-        cleanupOldEntries();
         return entry != null ? entry.color : null;
     }
 
@@ -24,15 +23,11 @@ public class SmokeColorRegistry {
         POSITION_COLOR_MAP.clear();
     }
 
-    private static String makePositionKey(double x, double y, double z) {
-        return String.format("%.4f,%.4f,%.4f", x, y, z);
-    }
-
-    private static void cleanupOldEntries() {
+    static void cleanupOldEntries() {
         long now = System.currentTimeMillis();
-        Iterator<Map.Entry<String, ColorEntry>> iterator = POSITION_COLOR_MAP.entrySet().iterator();
+        Iterator<Map.Entry<ParticlePositionKey, ColorEntry>> iterator = POSITION_COLOR_MAP.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<String, ColorEntry> entry = iterator.next();
+            Map.Entry<ParticlePositionKey, ColorEntry> entry = iterator.next();
             if (now - entry.getValue().timestamp > 1000) {
                 iterator.remove();
             }

@@ -82,7 +82,7 @@ public class RotateBlockPacket {
             BlockState state = level.getBlockState(pos);
             if (state.isAir()) return;
 
-            BlockState newState = calculateRotatedState(state, msg.direction, msg.playerFacing);
+            BlockState newState = calculateRotatedState(state, msg.direction, player.getDirection());
 
             if (!newState.equals(state)) {
                 if (net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,
@@ -113,6 +113,12 @@ public class RotateBlockPacket {
 
     @SuppressWarnings("unchecked")
     private static BlockState calculateRotatedState(BlockState state, ArrowDirection arrowDir, Direction playerFacing) {
+        if (state.hasProperty(BlockStateProperties.BED_PART)
+                || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
+                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
+                || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED))) {
+            return state;
+        }
         BlockState newState = state;
 
         if (arrowDir == ArrowDirection.UP || arrowDir == ArrowDirection.DOWN) {

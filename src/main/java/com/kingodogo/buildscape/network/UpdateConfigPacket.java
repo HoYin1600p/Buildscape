@@ -1,25 +1,81 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.function.Supplier;
 
 public class UpdateConfigPacket {
 
-    private final SyncConfigPacket data;
+    private static final int CHUNK_BYTES = 24_000;
+    private static final int MAX_UPDATE_BYTES = 2 * 1024 * 1024;
+    private static final int MAX_CHUNKS = (MAX_UPDATE_BYTES + CHUNK_BYTES - 1) / CHUNK_BYTES;
+    private static final Map<ServerPlayer, Assembly> PENDING = new WeakHashMap<>();
 
-    public UpdateConfigPacket(PillarParticleConfig config) {
-        this.data = new SyncConfigPacket(config);
+    private final UUID transferId;
+    private final int chunkIndex;
+    private final int chunkCount;
+    private final byte[] payload;
+
+    private UpdateConfigPacket(UUID transferId, int chunkIndex, int chunkCount, byte[] payload) {
+        this.transferId = transferId;
+        this.chunkIndex = chunkIndex;
+        this.chunkCount = chunkCount;
+        this.payload = payload;
+    }
+
+    public static List<UpdateConfigPacket> split(PillarParticleConfig config) {
+        SyncConfigPacket data = new SyncConfigPacket(config);
+        validateItems(data);
+        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
+        try {
+            data.encode(buffer);
+            if (buffer.readableBytes() > MAX_UPDATE_BYTES) {
+                throw new IllegalArgumentException("Config update exceeds maximum size");
+            }
+            byte[] bytes = new byte[buffer.readableBytes()];
+            buffer.readBytes(bytes);
+            int count = (bytes.length + CHUNK_BYTES - 1) / CHUNK_BYTES;
+            UUID id = UUID.randomUUID();
+            List<UpdateConfigPacket> packets = new ArrayList<>();
+            for (int index = 0; index < count; index++) {
+                int offset = index * CHUNK_BYTES;
+                packets.add(new UpdateConfigPacket(id, index, count,
+                        Arrays.copyOfRange(bytes, offset, Math.min(bytes.length, offset + CHUNK_BYTES))));
+            }
+            return packets;
+        } finally {
+            buffer.release();
+        }
+    }
+
+    public static void send(PillarParticleConfig config) {
+        for (UpdateConfigPacket packet : split(config)) {
+            ModMessages.INSTANCE.sendToServer(packet);
+        }
     }
 
     public UpdateConfigPacket(FriendlyByteBuf buf) {
-        this.data = new SyncConfigPacket(buf);
+        this.transferId = buf.readUUID();
+        this.chunkIndex = NetworkPacketLimits.readBoundedInt(buf, 0, MAX_CHUNKS - 1, "config chunk index");
+        this.chunkCount = NetworkPacketLimits.readBoundedInt(buf, 1, MAX_CHUNKS, "config chunk count");
+        this.payload = buf.readByteArray(CHUNK_BYTES);
+        if (chunkIndex >= chunkCount || payload.length == 0
+                || (chunkIndex < chunkCount - 1 && payload.length != CHUNK_BYTES)) {
+            throw new DecoderException("Invalid config chunk");
+        }
     }
 
     public static UpdateConfigPacket decode(FriendlyByteBuf buf) {
@@ -27,7 +83,57 @@ public class UpdateConfigPacket {
     }
 
     public void encode(FriendlyByteBuf buf) {
-        data.encode(buf);
+        buf.writeUUID(transferId);
+        buf.writeInt(chunkIndex);
+        buf.writeInt(chunkCount);
+        buf.writeByteArray(payload);
+    }
+
+    private static void validateItems(SyncConfigPacket data) {
+        for (String item : data.items) {
+            String id = item.startsWith("#") ? item.substring(1) : item;
+            if (!net.minecraft.resources.ResourceLocation.isValidResourceLocation(id)) {
+                throw new IllegalArgumentException("Invalid configured item or tag: " + item);
+            }
+        }
+    }
+
+    public static final class Assembly {
+        private UUID transferId;
+        private int chunkCount;
+        private int nextIndex;
+        private long started;
+        private final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+        public SyncConfigPacket accept(UpdateConfigPacket packet) {
+            long now = System.currentTimeMillis();
+            if (nextIndex == 0) {
+                transferId = packet.transferId;
+                chunkCount = packet.chunkCount;
+                started = now;
+            }
+            if (!transferId.equals(packet.transferId) || chunkCount != packet.chunkCount
+                    || nextIndex != packet.chunkIndex || now - started > 30_000L
+                    || bytes.size() + packet.payload.length > MAX_UPDATE_BYTES) {
+                throw new IllegalArgumentException("Incomplete or oversized config update");
+            }
+            bytes.write(packet.payload, 0, packet.payload.length);
+            nextIndex++;
+            if (nextIndex != chunkCount) {
+                return null;
+            }
+            FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes.toByteArray()));
+            try {
+                SyncConfigPacket data = new SyncConfigPacket(buffer);
+                if (buffer.isReadable()) {
+                    throw new IllegalArgumentException("Trailing config update data");
+                }
+                validateItems(data);
+                return data;
+            } finally {
+                buffer.release();
+            }
+        }
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -40,6 +146,27 @@ public class UpdateConfigPacket {
                         "buildscape.config.server_config_only").withStyle(net.minecraft.ChatFormatting.RED), true);
                 return;
             }
+
+            PENDING.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue().started > 30_000L);
+            if (chunkIndex == 0) {
+                PENDING.put(player, new Assembly());
+            }
+            Assembly assembly = PENDING.get(player);
+            if (assembly == null) {
+                return;
+            }
+            SyncConfigPacket data;
+            try {
+                data = assembly.accept(this);
+            } catch (Exception e) {
+                PENDING.remove(player);
+                com.kingodogo.buildscape.BuildScape.LOGGER.warn("Rejected config update from " + player.getUUID(), e);
+                return;
+            }
+            if (data == null) {
+                return;
+            }
+            PENDING.remove(player);
 
             PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
             String oldPattern = serverConfig.pattern;
@@ -58,11 +185,19 @@ public class UpdateConfigPacket {
                 serverConfig.particle_color = new ArrayList<>(data.particle_color);
             }
             if (data.items != null) {
-                serverConfig.items = new HashSet<>(data.items);
+                serverConfig.replaceItems(data.items);
             }
 
-            serverConfig.savePropertiesToDisk();
-            serverConfig.saveItemsToDisk();
+            boolean propertiesSaved = serverConfig.savePropertiesToDisk();
+            boolean itemsSaved = serverConfig.saveItemsToDisk();
+            if (!propertiesSaved || !itemsSaved) {
+                String files = !propertiesSaved && !itemsSaved ? "pillar-properties.json and pillar-items.json"
+                        : !propertiesSaved ? "pillar-properties.json" : "pillar-items.json";
+                player.displayClientMessage(new net.minecraft.network.chat.TextComponent(
+                        "BuildScape: Changes to " + files + " are active but will not survive a restart: "
+                                + serverConfig.getSaveFailureReason() + ".")
+                        .withStyle(net.minecraft.ChatFormatting.YELLOW), false);
+            }
 
             ModMessages.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
@@ -95,6 +230,7 @@ public class UpdateConfigPacket {
                 }
 
                 if (updatedAny) {
+                    // Persist the explicit config apply together with the updated registry settings.
                     manager.saveImmediate();
                 }
 

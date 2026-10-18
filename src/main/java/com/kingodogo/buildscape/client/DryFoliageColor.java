@@ -3,31 +3,55 @@ package com.kingodogo.buildscape.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.level.ColorResolver;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(
+        modid = com.kingodogo.buildscape.BuildScape.MODID,
+        bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD,
+        value = net.minecraftforge.api.distmarker.Dist.CLIENT)
 public class DryFoliageColor {
     private static final int[] pixels = new int[65536];
-    private static boolean loaded = false;
+    private static volatile boolean loaded = false;
 
     public static final ColorResolver DRY_FOLIAGE_RESOLVER = (biome, x, z) -> get(biome.getBaseTemperature(), biome.getDownfall());
 
-    public static void init() {
+    public static synchronized void init() {
+        if (loaded) return;
+        reload(Minecraft.getInstance().getResourceManager());
+    }
+
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public static void registerReloadListeners(net.minecraftforge.client.event.RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener((ResourceManagerReloadListener) resourceManager -> {
+            reload(resourceManager);
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.level != null) {
+                mc.levelRenderer.allChanged();
+            }
+        });
+    }
+
+    private static synchronized void reload(ResourceManager resourceManager) {
+        java.util.Arrays.fill(pixels, 0x867E36);
         try {
             ResourceLocation loc = new ResourceLocation("minecraft", "textures/colormap/dry_foliage.png");
-            Resource resource = Minecraft.getInstance().getResourceManager().getResource(loc);
+            Resource resource = resourceManager.getResource(loc);
             try (InputStream stream = resource.getInputStream()) {
                 BufferedImage image = ImageIO.read(stream);
                 if (image != null) {
                     image.getRGB(0, 0, 256, 256, pixels, 0, 256);
-                    loaded = true;
                 }
             }
         } catch (Exception e) {
             java.util.Arrays.fill(pixels, 0x867E36);
+        } finally {
+            loaded = true;
         }
     }
 

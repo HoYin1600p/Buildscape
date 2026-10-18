@@ -16,19 +16,18 @@ import java.lang.reflect.Field;
 public class ClientAdvancementEvents {
 
     private static Field selectedTabField = null;
+    private static boolean selectedTabLookupFailed;
 
     private static AdvancementTab getSelectedTab(AdvancementsScreen screen) {
+        if (selectedTabLookupFailed) return null;
         try {
             if (selectedTabField == null) {
-                try {
-                    selectedTabField = ObfuscationReflectionHelper.findField(AdvancementsScreen.class, "selectedTab");
-                } catch (Exception e) {
-                    selectedTabField = ObfuscationReflectionHelper.findField(AdvancementsScreen.class, "f_97316_");
-                }
+                selectedTabField = ObfuscationReflectionHelper.findField(AdvancementsScreen.class, "f_97336_");
                 selectedTabField.setAccessible(true);
             }
             return (AdvancementTab) selectedTabField.get(screen);
         } catch (Exception e) {
+            selectedTabLookupFailed = true;
             return null;
         }
     }
@@ -37,20 +36,14 @@ public class ClientAdvancementEvents {
     public static void onMouseScroll(ScreenEvent.MouseScrollEvent.Pre event) {
         if (event.getScreen() instanceof AdvancementsScreen screen) {
             double delta = event.getScrollDelta();
-
+            AdvancementTab tab = getSelectedTab(screen);
+            if (tab == null) return;
             if (Screen.hasShiftDown()) {
-                AdvancementTab tab = getSelectedTab(screen);
-                if (tab != null) {
-                    tab.scroll(delta * 32.0, 0.0);
-                }
-                event.setCanceled(true);
+                tab.scroll(delta * 32.0, 0.0);
             } else {
-                AdvancementTab tab = getSelectedTab(screen);
-                if (tab != null) {
-                    tab.scroll(0.0, delta * 32.0);
-                }
-                event.setCanceled(true);
+                tab.scroll(0.0, delta * 32.0);
             }
+            event.setCanceled(true);
         }
     }
 }

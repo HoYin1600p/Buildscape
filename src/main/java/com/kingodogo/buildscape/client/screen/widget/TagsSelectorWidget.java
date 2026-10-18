@@ -103,22 +103,15 @@ public class TagsSelectorWidget extends AbstractWidget {
 
         switch (sortType) {
             case INVENTORY:
+                Set<TagKey<Item>> inventoryTags = new HashSet<>();
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.player != null) {
+                    mc.player.getInventory().items.stream()
+                            .filter(stack -> !stack.isEmpty())
+                            .forEach(stack -> stack.getItem().builtInRegistryHolder().tags().forEach(inventoryTags::add));
+                }
                 filteredTags = baseList.stream()
-                        .filter(tag -> {
-                            return ForgeRegistries.ITEMS.getValues().stream()
-                                    .anyMatch(item -> {
-                                        if (!item.builtInRegistryHolder().tags().anyMatch(t -> t.equals(tag))) {
-                                            return false;
-                                        }
-                                        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft
-                                                .getInstance();
-                                        if (mc.player != null) {
-                                            return mc.player.getInventory().items.stream()
-                                                    .anyMatch(stack -> stack.getItem() == item);
-                                        }
-                                        return false;
-                                    });
-                        })
+                        .filter(inventoryTags::contains)
                         .collect(Collectors.toList());
                 break;
             case MOD_ONLY:
@@ -169,8 +162,7 @@ public class TagsSelectorWidget extends AbstractWidget {
         int startRow = (int) Math.floor(scrollOffset);
         int endRow = Math.min(startRow + maxVisibleRows + 2, filteredTags.size());
 
-        double pixelOffsetInRow = (scrollOffset % 1.0) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
-        int tagY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
+        int tagY = getFirstRowY();
         int tagWidth = width - CustomScrollbarRenderer.getScrollbarWidth() - 20;
 
         for (int row = startRow; row < endRow; row++) {
@@ -323,11 +315,11 @@ public class TagsSelectorWidget extends AbstractWidget {
         maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
         maxVisibleRows = Math.max(1, maxVisibleRows);
 
-        int startRow = (int) scrollOffset;
-        int endRow = Math.min(startRow + maxVisibleRows + 1, filteredTags.size());
+        int startRow = (int) Math.floor(scrollOffset);
+        int endRow = Math.min(startRow + maxVisibleRows + 2, filteredTags.size());
 
-        int tagY = y + topPadding;
-        int tagWidth = width - 21;
+        int tagY = getFirstRowY();
+        int tagWidth = width - CustomScrollbarRenderer.getScrollbarWidth() - 20;
 
         for (int row = startRow; row < endRow; row++) {
             if (row >= filteredTags.size())
@@ -337,7 +329,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             String tagId = "#" + tag.location();
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
 
-            if (rowY + TAG_BUTTON_HEIGHT < y + headerAreaHeight + GRID_PADDING_TOP || rowY > y + height) {
+            if (rowY + TAG_BUTTON_HEIGHT < y + headerAreaHeight || rowY > y + height - bottomMargin) {
                 continue;
             }
 
@@ -346,7 +338,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             if (mouseX >= tagX && mouseX < tagX + tagWidth &&
                     mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
                     mouseX >= x && mouseX < x + width &&
-                    mouseY >= y + headerAreaHeight + GRID_PADDING_TOP && mouseY < y + height) {
+                    mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin) {
                 if (selectedTags.contains(tagId)) {
                     selectedTags.remove(tagId);
                 } else {
@@ -370,6 +362,11 @@ public class TagsSelectorWidget extends AbstractWidget {
 
         scrollOffset = Math.max(0, Math.min(getMaxScroll(), scrollOffset - delta));
         return true;
+    }
+
+    private int getFirstRowY() {
+        double pixelOffsetInRow = (scrollOffset % 1.0) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
+        return y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
     }
 
     @Override

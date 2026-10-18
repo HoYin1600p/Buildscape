@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class TintedDripParticle extends TextureSheetParticle {
 
-    private static final Map<String, ColorEntry> POSITION_COLOR_MAP =
+    private static final Map<ParticlePositionKey, ColorEntry> POSITION_COLOR_MAP =
             new ConcurrentHashMap<>();
 
     private static class ColorEntry {
@@ -63,7 +63,7 @@ public class TintedDripParticle extends TextureSheetParticle {
         this.yd = ySpeed;
         this.zd = zSpeed;
 
-        String posKey = makePositionKey(x, y, z);
+        ParticlePositionKey posKey = ParticlePositionKey.of(x, y, z);
         ColorEntry entry = POSITION_COLOR_MAP.remove(posKey);
 
         if (entry != null && entry.color != null && !entry.color.isEmpty()) {
@@ -73,7 +73,6 @@ public class TintedDripParticle extends TextureSheetParticle {
             this.setColor(0.92F, 0.58F, 0.84F);
         }
 
-        cleanupOldEntries();
     }
 
     @Override
@@ -129,20 +128,16 @@ public class TintedDripParticle extends TextureSheetParticle {
             double z,
             String colorCode
     ) {
-        String posKey = makePositionKey(x, y, z);
+        ParticlePositionKey posKey = ParticlePositionKey.of(x, y, z);
         POSITION_COLOR_MAP.put(posKey, new ColorEntry(colorCode));
     }
 
-    private static String makePositionKey(double x, double y, double z) {
-        return String.format("%.4f,%.4f,%.4f", x, y, z);
-    }
-
-    private static void cleanupOldEntries() {
+    static void cleanupOldEntries() {
         long now = System.currentTimeMillis();
-        Iterator<Map.Entry<String, ColorEntry>> iterator =
+        Iterator<Map.Entry<ParticlePositionKey, ColorEntry>> iterator =
                 POSITION_COLOR_MAP.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<String, ColorEntry> entry = iterator.next();
+            Map.Entry<ParticlePositionKey, ColorEntry> entry = iterator.next();
             if (now - entry.getValue().timestamp > 1000) {
                 iterator.remove();
             }

@@ -112,12 +112,15 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
 
         private static String[] deserializePattern(JsonArray json) {
             String[] pattern = new String[json.size()];
-            if (pattern.length == 0) {
-                throw new JsonParseException("Invalid pattern: empty pattern not allowed");
+            if (pattern.length == 0 || pattern.length > 3) {
+                throw new JsonParseException("Invalid pattern: expected 1 to 3 rows");
             }
 
             for (int i = 0; i < json.size(); i++) {
                 String line = GsonHelper.convertToString(json.get(i), "pattern[" + i + "]");
+                if (line.isEmpty() || line.length() > 3 || (i > 0 && line.length() != pattern[0].length())) {
+                    throw new JsonParseException("Invalid pattern: rows must have the same width from 1 to 3");
+                }
                 pattern[i] = line;
             }
             return pattern;
@@ -137,7 +140,7 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
             }
 
             if (lastRow < firstRow) {
-                return new String[]{""};
+                throw new JsonParseException("Invalid pattern: all slots are empty");
             }
 
             for (int row = firstRow; row <= lastRow; row++) {
@@ -184,7 +187,10 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
                 String line = pattern[row];
                 for (int col = 0; col < line.length(); col++) {
                     char symbol = line.charAt(col);
-                    Ingredient ingredient = key.getOrDefault(symbol, Ingredient.EMPTY);
+                    Ingredient ingredient = key.get(symbol);
+                    if (ingredient == null) {
+                        throw new JsonParseException("Pattern references undefined symbol '" + symbol + "'");
+                    }
                     ingredients.set(col + row * width, ingredient);
                 }
             }

@@ -3,11 +3,12 @@ package com.kingodogo.buildscape.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,27 +19,37 @@ public class FireflyParticle extends TextureSheetParticle {
     public static final double RANGE = 10.0D;
     public static final double RANGE_SQR = RANGE * RANGE;
 
-    private static final Set<FireflyParticle> ACTIVE_FIREFLIES = ConcurrentHashMap.newKeySet();
+    private static final Map<BlockPos, Set<FireflyParticle>> ACTIVE_FIREFLIES = new ConcurrentHashMap<>();
+    private BlockPos cell;
+    private long lastTickTime;
 
     private final SpriteSet sprites;
     private final float baseAlpha;
 
     public static int getFireflyCountInRange(ClientLevel level, double x, double y, double z, double rangeSqr) {
         int count = 0;
-        Iterator<FireflyParticle> it = ACTIVE_FIREFLIES.iterator();
-        while (it.hasNext()) {
-            FireflyParticle p = it.next();
-            if (!p.isAlive() || p.level != level) {
-                it.remove();
-                continue;
-            }
-            double dx = p.x - x;
-            double dy = p.y - y;
-            double dz = p.z - z;
-            if (dx * dx + dy * dy + dz * dz <= rangeSqr) {
-                count++;
-                if (count >= MAX_FIREFLIES_IN_RANGE) {
-                    return count;
+        double radius = Math.sqrt(rangeSqr);
+        for (int cx = cellCoordinate(x - radius); cx <= cellCoordinate(x + radius); cx++) {
+            for (int cy = cellCoordinate(y - radius); cy <= cellCoordinate(y + radius); cy++) {
+                for (int cz = cellCoordinate(z - radius); cz <= cellCoordinate(z + radius); cz++) {
+                    BlockPos cellPos = new BlockPos(cx, cy, cz);
+                    Set<FireflyParticle> particles = ACTIVE_FIREFLIES.get(cellPos);
+                    if (particles == null) continue;
+                    particles.removeIf(p -> !p.isAlive() || p.level != level
+                            || level.getGameTime() - p.lastTickTime > 2L);
+                    if (particles.isEmpty()) {
+                        ACTIVE_FIREFLIES.remove(cellPos, particles);
+                        continue;
+                    }
+                    for (FireflyParticle p : particles) {
+                        if (!p.isAlive() || p.level != level) continue;
+                        double dx = p.x - x;
+                        double dy = p.y - y;
+                        double dz = p.z - z;
+                        if (dx * dx + dy * dy + dz * dz <= rangeSqr && ++count >= MAX_FIREFLIES_IN_RANGE) {
+                            return count;
+                        }
+                    }
                 }
             }
         }
@@ -49,6 +60,7 @@ public class FireflyParticle extends TextureSheetParticle {
                               double xSpeed, double ySpeed, double zSpeed,
                               SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+        this.lastTickTime = level.getGameTime();
         this.sprites = sprites;
 
         this.lifetime = 200 + level.random.nextInt(101);
@@ -70,15 +82,40 @@ public class FireflyParticle extends TextureSheetParticle {
 
         this.pickSprite(sprites);
 
-        if (getFireflyCountInRange(level, x, y, z, RANGE_SQR) >= MAX_FIREFLIES_IN_RANGE) {
-            this.remove();
-            return;
+        updateCell();
+    }
+
+    private static int cellCoordinate(double coordinate) {
+        return Mth.floor(coordinate / RANGE);
+    }
+
+    private void updateCell() {
+        int cx = cellCoordinate(x);
+        int cy = cellCoordinate(y);
+        int cz = cellCoordinate(z);
+        if (cell != null && cell.getX() == cx && cell.getY() == cy && cell.getZ() == cz) return;
+        leaveCell();
+        cell = new BlockPos(cx, cy, cz);
+        ACTIVE_FIREFLIES.computeIfAbsent(cell, key -> ConcurrentHashMap.newKeySet()).add(this);
+    }
+
+    private void leaveCell() {
+        if (cell == null) return;
+        Set<FireflyParticle> particles = ACTIVE_FIREFLIES.get(cell);
+        if (particles != null) {
+            particles.remove(this);
+            if (particles.isEmpty()) ACTIVE_FIREFLIES.remove(cell, particles);
         }
-        ACTIVE_FIREFLIES.add(this);
+        cell = null;
+    }
+
+    public static void clearActiveParticles() {
+        ACTIVE_FIREFLIES.clear();
     }
 
     @Override
     public void tick() {
+        this.lastTickTime = this.level.getGameTime();
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;
@@ -97,6 +134,7 @@ public class FireflyParticle extends TextureSheetParticle {
         this.zd = Mth.clamp(this.zd, -0.02, 0.02);
 
         this.move(this.xd, this.yd, this.zd);
+        updateCell();
 
         float progress = (float) this.age / (float) this.lifetime;
         if (progress < 0.3F) {
@@ -112,7 +150,7 @@ public class FireflyParticle extends TextureSheetParticle {
     @Override
     public void remove() {
         super.remove();
-        ACTIVE_FIREFLIES.remove(this);
+        leaveCell();
     }
 
     @Override

@@ -23,11 +23,19 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class MossLayersBlock extends SnowLayerBlock {
 
+    private final Supplier<Block> fullBlock;
+
     public MossLayersBlock(Properties properties) {
+        this(properties, () -> Blocks.MOSS_BLOCK);
+    }
+
+    public MossLayersBlock(Properties properties, Supplier<Block> fullBlock) {
         super(properties);
+        this.fullBlock = fullBlock;
     }
 
     @Override
@@ -100,9 +108,14 @@ public class MossLayersBlock extends SnowLayerBlock {
             Player player
     ) {
         if (state.getValue(LAYERS) == 8) {
-            level.setBlock(pos, Blocks.MOSS_BLOCK.defaultBlockState(), 3);
+            level.setBlock(pos, fullBlock.get().defaultBlockState(), 3);
         }
         super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    public boolean isRandomlyTicking(BlockState state) {
+        return state.getValue(LAYERS) == 8;
     }
 
     @Override
@@ -113,9 +126,8 @@ public class MossLayersBlock extends SnowLayerBlock {
             Random random
     ) {
         if (state.getValue(LAYERS) == 8) {
-            level.setBlock(pos, Blocks.MOSS_BLOCK.defaultBlockState(), 3);
+            level.setBlock(pos, fullBlock.get().defaultBlockState(), 3);
         }
-        super.randomTick(state, level, pos, random);
     }
 
     @Override
@@ -196,39 +208,4 @@ public class MossLayersBlock extends SnowLayerBlock {
         return List.of(new ItemStack(ModItems.MOSS_LAYERS.get(), layerCount));
     }
 
-    @Override
-    public float getDestroyProgress(
-            BlockState state,
-            Player player,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        float destroySpeed = state.getDestroySpeed(level, pos);
-        if (destroySpeed == -1.0F) {
-            return 0.0F;
-        }
-
-        int efficiencyLevel =
-                net.minecraft.world.item.enchantment.EnchantmentHelper.getBlockEfficiency(
-                        player
-                );
-        ItemStack tool = player.getMainHandItem();
-
-        float speedMultiplier = 1.0F;
-        if (!tool.isEmpty()) {
-            speedMultiplier = tool.getDestroySpeed(state);
-        }
-
-        if (speedMultiplier > 1.0F) {
-            int efficiencyBonus = efficiencyLevel > 0
-                    ? efficiencyLevel * efficiencyLevel + 1
-                    : 0;
-            speedMultiplier += (float) efficiencyBonus;
-        }
-
-        float difficultyModifier = player.hasCorrectToolForDrops(state)
-                ? 30.0F
-                : 100.0F;
-        return speedMultiplier / destroySpeed / difficultyModifier;
-    }
 }

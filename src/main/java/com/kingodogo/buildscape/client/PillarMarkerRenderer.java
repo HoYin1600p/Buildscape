@@ -28,6 +28,16 @@ public class PillarMarkerRenderer {
     private static final double MAX_RENDER_DISTANCE = 64.0;
 
     @SubscribeEvent
+    public static void onWorldUnload(net.minecraftforge.event.world.WorldEvent.Unload event) {
+        if (event.getWorld().isClientSide()) PillarMarkerManager.get().clearAll();
+    }
+
+    @SubscribeEvent
+    public static void onDisconnect(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent event) {
+        PillarMarkerManager.get().clearAll();
+    }
+
+    @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         try {
             if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
@@ -170,7 +180,7 @@ public class PillarMarkerRenderer {
         drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, maxZ + offsetZ, maxX + offsetX, maxY + offsetY, maxZ + offsetZ, color);
         drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY, maxZ + offsetZ, color);
 
-        bufferSource.endBatch();
+        bufferSource.endBatch(RenderType.lines());
         poseStack.popPose();
     }
 

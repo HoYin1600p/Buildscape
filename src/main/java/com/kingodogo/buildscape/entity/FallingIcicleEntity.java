@@ -71,6 +71,9 @@ public class FallingIcicleEntity extends Entity {
 
         if (!this.level.isClientSide && fallTime > 2) {
             checkEntityCollision();
+            if (this.isRemoved()) {
+                return;
+            }
         }
 
         this.setDeltaMovement(this.getDeltaMovement().scale(0.98D));

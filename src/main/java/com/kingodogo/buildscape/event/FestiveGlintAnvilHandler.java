@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.item.ModItems;
 import com.kingodogo.buildscape.util.FestiveGlintHelper;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,12 +23,11 @@ public class FestiveGlintAnvilHandler {
         }
 
         if (right.is(ModItems.FESTIVE_GLINT_SHARD.get())) {
-            if (!FestiveGlintHelper.isEnchantedItem(left)) {
+            if (EnchantmentHelper.getEnchantments(left).isEmpty()) {
                 return;
             }
 
             ItemStack output = left.copy();
-            output.setCount(1);
             FestiveGlintHelper.applyFestiveGlint(output);
 
             String name = event.getName();

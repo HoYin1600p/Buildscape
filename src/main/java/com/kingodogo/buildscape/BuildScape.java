@@ -87,9 +87,8 @@ public class BuildScape {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
 
-        com.kingodogo.buildscape.world.ModGameRules.register();
-
         event.enqueueWork(() -> {
+            com.kingodogo.buildscape.world.ModGameRules.register();
             com.kingodogo.buildscape.stat.ModStats.registerStats();
             com.kingodogo.buildscape.network.ModMessages.register();
             if (CONFIG_CALLBACK_REGISTERED.compareAndSet(false, true)) {
@@ -555,7 +554,7 @@ public class BuildScape {
         server.execute(() -> com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
                 net.minecraftforge.network.PacketDistributor.ALL.noArg(),
                 new com.kingodogo.buildscape.network.SyncConfigPacket(
-                        com.kingodogo.buildscape.config.PillarParticleConfig.get())));
+                        com.kingodogo.buildscape.config.PillarParticleConfig.getServerConfig())));
     }
 
     @SubscribeEvent
@@ -685,7 +684,7 @@ public class BuildScape {
             }
 
             com.kingodogo.buildscape.config.PillarParticleConfig serverConfig = com.kingodogo.buildscape.config.PillarParticleConfig
-                    .get();
+                    .getServerConfig();
             com.kingodogo.buildscape.network.SyncConfigPacket configPacket = new com.kingodogo.buildscape.network.SyncConfigPacket(
                     serverConfig);
             com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
@@ -1171,17 +1170,6 @@ public class BuildScape {
                         0.05f));
 
         event
-                .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
-                                1),
-                        new net.minecraft.world.item.ItemStack(ModItems.POPLAR_SAPLING.get(), 2),
-                        8,
-                        1,
-                        0.05f));
-
-        event
                 .getRareTrades()
                 .add((trader, rand) -> {
                     if (rand.nextInt(5000) == 0) {
@@ -1402,6 +1390,8 @@ public class BuildScape {
 
                 if (level.isClientSide) {
                     spawnSplashParticles(level, pos);
+                    event.setCanceled(true);
+                    event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
                     return;
                 }
 
@@ -1430,7 +1420,7 @@ public class BuildScape {
 
                 event.setCanceled(true);
                 event.setCancellationResult(
-                        net.minecraft.world.InteractionResult.SUCCESS);
+                        net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
             }
         }
     }
@@ -1527,17 +1517,6 @@ public class BuildScape {
                 } else {
                     playerData.remove("FrostRoseStewDamageTicks");
                 }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onEntityJoinWorld(
-            net.minecraftforge.event.entity.EntityJoinWorldEvent event) {
-        if (event.getEntity() instanceof net.minecraft.world.entity.vehicle.Boat boat) {
-            net.minecraft.nbt.CompoundTag nbt = boat.getPersistentData();
-            if (nbt.contains("MangroveBoatType")
-                    && nbt.getString("MangroveBoatType").equals("mangrove")) {
             }
         }
     }
@@ -1702,6 +1681,10 @@ public class BuildScape {
 
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
                         com.kingodogo.buildscape.entity.ModEntities.SEAT_ENTITY.get(),
+                        net.minecraft.client.renderer.entity.NoopRenderer::new);
+
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        com.kingodogo.buildscape.entity.ModEntities.FESTIVE_STOCKING.get(),
                         net.minecraft.client.renderer.entity.NoopRenderer::new);
 
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
@@ -2186,6 +2169,7 @@ public class BuildScape {
                             return -1;
                         },
                         ModItems.OAK_LEAF_LAYERS.get(),
+                        ModItems.LEAF_LITTER.get(),
                         ModItems.SPRUCE_LEAF_LAYERS.get(),
                         ModItems.BIRCH_LEAF_LAYERS.get(),
                         ModItems.JUNGLE_LEAF_LAYERS.get(),
@@ -2267,10 +2251,6 @@ public class BuildScape {
                     new net.minecraft.resources.ResourceLocation(BuildScape.MODID, "block/stringlight_frame")
             );
         }
-    }
-
-    @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-    public static class ClientForgeEvents {
 
         @SubscribeEvent
         public static void onModelBake(
@@ -2566,12 +2546,6 @@ public class BuildScape {
 
             net.minecraft.client.Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.COPPER_FIRE_FLAME.get(),
-                            net.minecraft.client.particle.FlameParticle.Provider::new
-                    );
-
-            net.minecraft.client.Minecraft.getInstance()
-                    .particleEngine.register(
                             com.kingodogo.buildscape.particle.ModParticles.SULFUR_BUBBLES.get(),
                             com.kingodogo.buildscape.particle.SulfurBubbleParticle.Provider::new
                     );
@@ -2661,75 +2635,30 @@ public class BuildScape {
                 living.setDeltaMovement(delta.x * 1.175D, delta.y * 1.06D, delta.z * 1.175D);
             }
         }
-
-        if (!living.isPassenger() && !living.getType().is(com.kingodogo.buildscape.block.PotentSulfurBlockEntity.NOT_AFFECTED_BY_GEYSERS)) {
-            if (!(living instanceof net.minecraft.world.entity.player.Player player && player.getAbilities().flying)) {
-                net.minecraft.core.BlockPos.MutableBlockPos testPos = living.blockPosition().mutable();
-                for (int i = 0; i < 24; ++i) {
-                    net.minecraft.world.level.block.state.BlockState testState = living.level.getBlockState(testPos);
-                    if (testState.is(com.kingodogo.buildscape.block.ModBlocks.POTENT_SULFUR.get())) {
-                        com.kingodogo.buildscape.block.PotentSulfurState geyserState = testState.getValue(com.kingodogo.buildscape.block.PotentSulfurBlock.STATE);
-                        if (geyserState == com.kingodogo.buildscape.block.PotentSulfurState.ERUPTING || geyserState == com.kingodogo.buildscape.block.PotentSulfurState.CONTINUOUS) {
-                            net.minecraft.core.BlockPos.MutableBlockPos sourceSearch = testPos.above().mutable();
-                            while (living.level.getFluidState(sourceSearch).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) {
-                                sourceSearch.move(net.minecraft.core.Direction.UP);
-                            }
-                            int waterBlocks = sourceSearch.getY() - testPos.getY() - 1;
-                            if (waterBlocks < 1) waterBlocks = 1;
-
-                            net.minecraft.world.phys.Vec3 entityVelocity = living.getDeltaMovement();
-                            if (entityVelocity.y < 0.3D + (double)waterBlocks * 0.1D) {
-                                living.resetFallDistance();
-                                living.setDeltaMovement(entityVelocity.add(0.0D, 0.2D, 0.0D));
-                                living.hasImpulse = true;
-                                if (!living.level.isClientSide()) {
-                                    living.hurtMarked = true;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    if (!testState.isAir() && !testState.is(net.minecraft.world.level.block.Blocks.WATER)) {
-                        if (!testState.getCollisionShape(living.level, testPos).isEmpty()) {
-                            break;
-                        }
-                    }
-                    testPos.move(net.minecraft.core.Direction.DOWN);
-                }
-            }
-        }
     }
 
-    @SubscribeEvent
-    public void onLivingDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
-        if (event.getEntityLiving().level.isClientSide) return;
-        net.minecraft.world.entity.LivingEntity entity = event.getEntityLiving();
-        net.minecraft.world.level.Level level = entity.level;
-        net.minecraft.core.BlockPos deathPos = entity.blockPosition();
-
-        for (net.minecraft.core.BlockPos pos : net.minecraft.core.BlockPos.betweenClosed(deathPos.offset(-8, -8, -8), deathPos.offset(8, 8, 8))) {
-            if (level.getBlockState(pos).is(ModBlocks.SCULK_CATALYST.get())) {
-                com.kingodogo.buildscape.block.SculkCatalystHandler.onMobKilledNearCatalyst(level, pos, deathPos, entity);
-                break;
-            }
-        }
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public void onSculkExperienceDrop(net.minecraftforge.event.entity.living.LivingExperienceDropEvent event) {
+        com.kingodogo.buildscape.block.SculkCatalystHandler.onExperienceDrop(event);
     }
 
     @SubscribeEvent
     public void onSculkBlockBreak(net.minecraftforge.event.world.BlockEvent.BreakEvent event) {
         if (event.getPlayer() != null && !event.getPlayer().isCreative()) {
+            net.minecraft.world.level.block.state.BlockState state = event.getState();
+            int experience;
+            if (state.is(ModBlocks.SCULK.get()) || state.is(ModBlocks.SCULK_SLAB.get()) || state.is(ModBlocks.SCULK_STAIRS.get()) || state.is(ModBlocks.SCULK_WALL.get()) || state.is(ModBlocks.SCULK_VERTICAL_SLAB.get())) {
+                experience = 1;
+            } else if (state.is(ModBlocks.SCULK_VEIN.get())) {
+                experience = 0;
+            } else if (state.is(ModBlocks.SCULK_CATALYST.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get()) || state.is(ModBlocks.SCULK_SENSOR.get())) {
+                experience = 5;
+            } else {
+                return;
+            }
             net.minecraft.world.item.ItemStack tool = event.getPlayer().getMainHandItem();
             int silkTouch = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, tool);
-            if (silkTouch == 0) {
-                net.minecraft.world.level.block.state.BlockState state = event.getState();
-                if (state.is(ModBlocks.SCULK.get()) || state.is(ModBlocks.SCULK_VEIN.get()) || state.is(ModBlocks.SCULK_SLAB.get()) || state.is(ModBlocks.SCULK_STAIRS.get()) || state.is(ModBlocks.SCULK_WALL.get()) || state.is(ModBlocks.SCULK_VERTICAL_SLAB.get())) {
-                    event.setExpToDrop(1);
-                } else if (state.is(ModBlocks.SCULK_CATALYST.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get()) || state.is(ModBlocks.SCULK_SENSOR.get())) {
-                    event.setExpToDrop(5);
-                }
-            } else {
-                event.setExpToDrop(0);
-            }
+            event.setExpToDrop(silkTouch == 0 ? experience : 0);
         }
     }
 

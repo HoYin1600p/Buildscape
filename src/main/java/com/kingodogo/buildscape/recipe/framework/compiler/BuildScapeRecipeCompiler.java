@@ -24,6 +24,7 @@ public class BuildScapeRecipeCompiler {
     private final TemplateEngine templateEngine = new TemplateEngine();
     private final FamilyExpander familyExpander = new FamilyExpander(templateEngine);
     private final RecipeValidator validator = new RecipeValidator();
+    private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
 
     public static record CompileResult(
             List<Recipe<?>> recipes,
@@ -100,32 +101,16 @@ public class BuildScapeRecipeCompiler {
                         ? new ResourceLocation(spec.id().contains(":") ? spec.id() : BuildScape.MODID + ":" + spec.id())
                         : new ResourceLocation(BuildScape.MODID, "autogen/" + category + "/" + Math.abs(spec.rawJson().hashCode()));
 
+                if (!conditionsMet(json, recipeId)) {
+                    return null;
+                }
+
                 if (json.has("recipes") && json.get("recipes").isJsonArray()) {
                     com.google.gson.JsonArray recipesArr = json.getAsJsonArray("recipes");
                     for (int i = 0; i < recipesArr.size(); i++) {
                         com.google.gson.JsonObject entry = recipesArr.get(i).getAsJsonObject();
-                        if (entry.has("conditions")) {
-                            boolean conditionsMet = true;
-                            com.google.gson.JsonArray conds = entry.getAsJsonArray("conditions");
-                            for (int c = 0; c < conds.size(); c++) {
-                                com.google.gson.JsonObject cond = conds.get(c).getAsJsonObject();
-                                String condType = cond.has("type") ? cond.get("type").getAsString() : "";
-                                if ("forge:mod_loaded".equals(condType)) {
-                                    String modid = cond.has("modid") ? cond.get("modid").getAsString() : "";
-                                    try {
-                                        if (!net.minecraftforge.fml.ModList.get().isLoaded(modid)) {
-                                            conditionsMet = false;
-                                            break;
-                                        }
-                                    } catch (Throwable ignored) {
-                                        conditionsMet = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!conditionsMet) {
-                                continue;
-                            }
+                        if (!conditionsMet(entry, recipeId)) {
+                            continue;
                         }
                         if (entry.has("recipe")) {
                             com.google.gson.JsonObject innerRecipeJson = entry.getAsJsonObject("recipe");
@@ -145,16 +130,14 @@ public class BuildScapeRecipeCompiler {
             }
         }
 
-        if (!validator.validate(spec, aliasResolver)) {
+        try {
+            ShapedRecipeSymbols.validate(spec);
+        } catch (IllegalArgumentException e) {
+            BuildScape.LOGGER.warn("BDRE Compiler: Skipping recipe {}: {}", spec.id(), e.getMessage());
             return null;
         }
-
-        String rawId = spec.id() != null ? spec.id() : generateRecipeId(spec);
-        String cleanPath = sanitizePath("autogen/" + category + "/" + rawId);
-
-        ResourceLocation recipeId = ResourceLocation.tryParse(BuildScape.MODID + ":" + cleanPath);
-        if (recipeId == null) {
-            BuildScape.LOGGER.warn("BDRE Compiler: Invalid recipe resource location path: {}", cleanPath);
+        ResourceLocation recipeId = new ResourceLocation(recipeIds.allocate(category, spec, aliasResolver));
+        if (!validator.validate(spec, aliasResolver)) {
             return null;
         }
 
@@ -235,6 +218,22 @@ public class BuildScapeRecipeCompiler {
         }
     }
 
+    /**
+     * Evaluates the Forge recipe conditions of a JSON object. An object without conditions is met; an
+     * unknown or malformed condition counts as not met.
+     */
+    private static boolean conditionsMet(com.google.gson.JsonObject json, ResourceLocation recipeId) {
+        if (json == null || !json.has("conditions")) {
+            return true;
+        }
+        try {
+            return net.minecraftforge.common.crafting.CraftingHelper.processConditions(json, "conditions");
+        } catch (Throwable t) {
+            BuildScape.LOGGER.warn("BDRE Compiler: Could not evaluate conditions of recipe {}; skipping it.", recipeId, t);
+            return false;
+        }
+    }
+
     private ShapedRecipe compileShaped(ResourceLocation id, String group, RecipeIR.RecipeSpec spec, ItemStack result) {
         List<String> patternList = spec.pattern();
         if (patternList == null || patternList.isEmpty()) return null;
@@ -261,7 +260,11 @@ public class BuildScapeRecipeCompiler {
             for (int col = 0; col < line.length(); col++) {
                 char c = line.charAt(col);
                 if (c != ' ') {
-                    Ingredient ing = keyMap.getOrDefault(c, Ingredient.EMPTY);
+                    Ingredient ing = keyMap.get(c);
+                    if (ing == null) {
+                        BuildScape.LOGGER.warn("BDRE Compiler: Skipping recipe {}: undefined symbol '{}'", id, c);
+                        return null;
+                    }
                     ingredients.set(row * width + col, ing);
                 }
             }
@@ -328,20 +331,8 @@ public class BuildScapeRecipeCompiler {
         return ForgeRegistries.ITEMS.getValue(loc);
     }
 
-    private String generateRecipeId(RecipeIR.RecipeSpec spec) {
-        String res = spec.result() != null ? spec.result().item() : "unknown";
-        return sanitizePath(res) + "_" + Math.abs(spec.hashCode());
-    }
-
-    private String sanitizePath(String str) {
-        if (str == null) return "unknown";
-        String resolved = aliasResolver.resolveString(str);
-        return resolved.toLowerCase(Locale.ROOT)
-                .replace(":", "_")
-                .replaceAll("[^a-z0-9/._-]", "_");
-    }
-
     public void clear() {
         validator.clear();
+        recipeIds.clear();
     }
 }

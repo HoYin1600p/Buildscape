@@ -33,6 +33,7 @@ public class SignFrameInteractionHandler {
 
         SignBlockEntity sign = (SignBlockEntity) be;
         Player player = event.getPlayer();
+        if (!player.mayBuild()) return;
         ItemStack heldItem = event.getItemStack();
         InteractionHand hand = event.getHand();
 

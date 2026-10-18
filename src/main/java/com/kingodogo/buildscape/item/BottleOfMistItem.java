@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.particle.ModParticles;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +25,7 @@ public class BottleOfMistItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (level.isClientSide) {
+        if (level instanceof ServerLevel serverLevel) {
             double px = player.getX();
             double py = player.getEyeY();
             double pz = player.getZ();
@@ -43,11 +44,8 @@ public class BottleOfMistItem extends Item {
                 double ySpeed = RANDOM.nextDouble() * 0.05;
                 double zSpeed = (RANDOM.nextDouble() - 0.5) * 0.2;
 
-                level.addAlwaysVisibleParticle(ModParticles.CASCADE.get(), true, x, y, z, xSpeed, ySpeed, zSpeed);
+                serverLevel.sendParticles(ModParticles.CASCADE.get(), x, y, z, 0, xSpeed, ySpeed, zSpeed, 1.0);
             }
-        }
-
-        if (!level.isClientSide) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.1f, 0.1f);
         }

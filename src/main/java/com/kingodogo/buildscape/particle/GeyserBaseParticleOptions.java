@@ -39,7 +39,7 @@ public class GeyserBaseParticleOptions implements ParticleOptions {
 
     public GeyserBaseParticleOptions(ParticleType<GeyserBaseParticleOptions> type, int waterBlocks, float burstImpulseBase) {
         this.type = type;
-        this.waterBlocks = waterBlocks;
+        this.waterBlocks = Math.max(0, Math.min(4, waterBlocks));
         this.burstImpulseBase = burstImpulseBase;
     }
 

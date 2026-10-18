@@ -1,10 +1,7 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.particle.ModParticles;
-import com.kingodogo.buildscape.particle.SmokeColorRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -18,6 +15,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -28,7 +27,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Map;
-import java.util.Random;
 
 public class SmokeVentBlock extends Block implements EntityBlock {
 
@@ -61,6 +59,17 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SmokeVentBlockEntity(pos, state);
+    }
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        PillarPart part = state.getValue(PART);
+        if (!level.isClientSide || type != ModBlockEntities.SMOKE_VENT_BLOCK_ENTITY.get()
+                || (part != PillarPart.TOP && part != PillarPart.SINGLE)) {
+            return null;
+        }
+        return (tickLevel, pos, tickState, blockEntity) ->
+                SmokeVentBlockEntity.particleTick(tickLevel, pos, tickState, (SmokeVentBlockEntity) blockEntity);
     }
 
     @Override
@@ -283,35 +292,6 @@ public class SmokeVentBlock extends Block implements EntityBlock {
         }
 
         return InteractionResult.PASS;
-    }
-
-    @Override
-    public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
-        PillarPart part = state.getValue(PART);
-        if (part != PillarPart.TOP && part != PillarPart.SINGLE) {
-            return;
-        }
-
-        BlockEntity activeBe = level.getBlockEntity(pos);
-        if (activeBe instanceof SmokeVentBlockEntity ventBE && !ventBE.isActive()) {
-            return;
-        }
-
-        if (random.nextFloat() < 0.1F) {
-            return;
-        }
-
-        double x = (double) pos.getX() + 0.5 + random.nextDouble() / 3.0 * (double) (random.nextBoolean() ? 1 : -1);
-        double y = (double) pos.getY() + SmokeVentBlock.SMOKE_SPAWN_BASE + random.nextDouble() * (2.0 - SmokeVentBlock.SMOKE_SPAWN_BASE);
-        double z = (double) pos.getZ() + 0.5 + random.nextDouble() / 3.0 * (double) (random.nextBoolean() ? 1 : -1);
-
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof SmokeVentBlockEntity ventBE && ventBE.getSmokeColor() != null) {
-            SmokeColorRegistry.registerColorForPosition(x, y, z, ventBE.getSmokeColor());
-            level.addAlwaysVisibleParticle(ModParticles.COLORED_SMOKE.get(), true, x, y, z, 0.0, 0.07, 0.0);
-        } else {
-            level.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0.0, 0.07, 0.0);
-        }
     }
 
     private boolean getStackActive(Level level, BlockPos pos) {

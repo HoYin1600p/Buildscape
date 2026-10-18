@@ -11,12 +11,20 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(
+        modid = com.kingodogo.buildscape.BuildScape.MODID,
+        value = net.minecraftforge.api.distmarker.Dist.CLIENT)
 public class CopperChestItemRenderer extends BlockEntityWithoutLevelRenderer {
     public static final CopperChestItemRenderer INSTANCE = new CopperChestItemRenderer();
     private CopperChestBlockEntity dummyBE;
 
     public CopperChestItemRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+    }
+
+    @net.minecraftforge.eventbus.api.SubscribeEvent
+    public static void onLogout(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent event) {
+        INSTANCE.dummyBE = null;
     }
 
     @Override

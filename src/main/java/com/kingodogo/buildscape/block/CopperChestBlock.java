@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.block.copper.BuildscapeWeatheringCopper;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -27,13 +29,13 @@ public class CopperChestBlock extends ChestBlock {
 
     @Override
     public boolean isRandomlyTicking(BlockState state) {
-        return !isWaxed;
+        return !isWaxed && CopperOxidationHandler.canOxidize(state);
     }
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-        if (!isWaxed) {
-            CopperOxidationHandler.tryOxidize(level, pos, state);
+        if (!isWaxed && this instanceof BuildscapeWeatheringCopper copper) {
+            copper.onRandomTick(state, level, pos, random);
         }
     }
 

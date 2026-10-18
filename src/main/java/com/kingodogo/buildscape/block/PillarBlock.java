@@ -322,10 +322,7 @@ public class PillarBlock
 
                     if (data != null) {
                         BlockPos bottom = findBottomBlock(level, pos);
-                        data.x = bottom.getX();
-                        data.y = bottom.getY();
-                        data.z = bottom.getZ();
-                        manager.saveImmediate();
+                        manager.updatePillarPosition(stackId, bottom);
                     }
                 }
 
@@ -411,10 +408,7 @@ public class PillarBlock
                         com.kingodogo.buildscape.config.PillarIdManager.PillarData data =
                                 manager.getPillarData(pillarIdToPreserve);
                         if (data != null) {
-                            data.x = firstRemainingPillar.getX();
-                            data.y = firstRemainingPillar.getY();
-                            data.z = firstRemainingPillar.getZ();
-                            manager.saveImmediate();
+                            manager.updatePillarPosition(pillarIdToPreserve, firstRemainingPillar);
                         }
 
                         current = bottom;
@@ -441,7 +435,7 @@ public class PillarBlock
 
                 com.kingodogo.buildscape.config.PillarIdManager manager =
                         com.kingodogo.buildscape.config.PillarIdManager.get(level);
-                manager.removePillarByPosition(level, pos);
+                manager.removeStalePillarPositionIndex(level, pos);
             } else {
                 com.kingodogo.buildscape.config.PillarIdManager manager =
                         com.kingodogo.buildscape.config.PillarIdManager.get(level);
@@ -950,61 +944,29 @@ public class PillarBlock
     }
 
     private void enforceSingleItemPerStack(Level level, BlockPos anyPosInStack) {
+        if (level.isClientSide) return;
         BlockPos top = findTopBlock(level, anyPosInStack);
         BlockPos bottom = findBottomBlock(level, anyPosInStack);
+        if (!(level.getBlockEntity(top) instanceof PillarBlockEntity topBE)) return;
 
-        boolean topHasItem = false;
-        ItemStack firstItem = ItemStack.EMPTY;
+        ItemStack retained = topBE.getDisplayedItem().copy();
         BlockPos current = bottom;
-
         while (level.getBlockState(current).getBlock() instanceof PillarBlock &&
                !(level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock)) {
-            BlockEntity be = level.getBlockEntity(current);
-            if (
-                    be instanceof PillarBlockEntity pillarBE && pillarBE.hasDisplayItem()
-            ) {
-                if (current.equals(top)) {
-                    topHasItem = true;
-                }
-                if (firstItem.isEmpty()) {
-                    firstItem = pillarBE.getDisplayedItem().copy();
+            if (!current.equals(top)
+                    && level.getBlockEntity(current) instanceof PillarBlockEntity pillarBE
+                    && pillarBE.hasDisplayItem()) {
+                ItemStack displaced = pillarBE.getDisplayedItem().copy();
+                pillarBE.setDisplayedItem(ItemStack.EMPTY);
+                if (retained.isEmpty()) {
+                    retained = displaced;
+                } else {
+                    Block.popResource(level, current, displaced);
                 }
             }
             current = current.above();
         }
-
-        if (!topHasItem && !firstItem.isEmpty()) {
-            BlockEntity beTop = level.getBlockEntity(top);
-            if (beTop instanceof PillarBlockEntity topBE) {
-                topBE.setDisplayedItem(firstItem);
-                level.sendBlockUpdated(
-                        top,
-                        level.getBlockState(top),
-                        level.getBlockState(top),
-                        3
-                );
-            }
-        }
-
-        current = bottom;
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock &&
-               !(level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock)) {
-            if (!current.equals(top)) {
-                BlockEntity be = level.getBlockEntity(current);
-                if (
-                        be instanceof PillarBlockEntity pillarBE && pillarBE.hasDisplayItem()
-                ) {
-                    pillarBE.setDisplayedItem(ItemStack.EMPTY);
-                    level.sendBlockUpdated(
-                            current,
-                            level.getBlockState(current),
-                            level.getBlockState(current),
-                            3
-                    );
-                }
-            }
-            current = current.above();
-        }
+        topBE.setDisplayedItem(retained);
     }
 
     private BlockPos findBottomBlock(Level level, BlockPos pos) {

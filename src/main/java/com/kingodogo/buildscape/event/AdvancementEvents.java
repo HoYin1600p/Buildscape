@@ -34,6 +34,17 @@ import com.kingodogo.buildscape.trophy.Trophies;
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AdvancementEvents {
 
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        CompoundTag original = event.getOriginal().getPersistentData();
+        CompoundTag restored = event.getPlayer().getPersistentData();
+        for (String key : original.getAllKeys()) {
+            if (key.startsWith("BS_Base_") || key.startsWith("BS_PillarPlaced_")) {
+                restored.put(key, original.get(key).copy());
+            }
+        }
+    }
+
     public static boolean grant(ServerPlayer player, String id) {
         if (player == null || player.getServer() == null) return false;
         Advancement adv = player.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", id));

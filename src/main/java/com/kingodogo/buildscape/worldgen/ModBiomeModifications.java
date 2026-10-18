@@ -182,6 +182,9 @@ public class ModBiomeModifications {
 
     @SubscribeEvent
     public static void onBiomeLoading(BiomeLoadingEvent event) {
+        if (event.getName() == null) {
+            return;
+        }
         if (event.getName().equals(Biomes.FLOWER_FOREST.location())) {
             addFeatureToBiome(event, ModConfiguredFeatures.RED_MONETS.get(), 4);
             addFeatureToBiome(event, ModConfiguredFeatures.BLUE_MONETS.get(), 4);

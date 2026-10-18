@@ -207,9 +207,7 @@ public class GlowLightsBlock
                 if (state.hasProperty(attachProperty)) {
                     state = state.setValue(attachProperty, true);
                 }
-                BlockPos placePos = context
-                        .getClickedPos()
-                        .relative(context.getClickedFace());
+                BlockPos placePos = context.getClickedPos();
                 FluidState fluidState = context.getLevel().getFluidState(placePos);
                 return state
                         .setValue(LIT, true)
@@ -272,9 +270,7 @@ public class GlowLightsBlock
             }
 
             state = state.setValue(DOWN, true);
-            BlockPos placePos = context
-                    .getClickedPos()
-                    .relative(context.getClickedFace());
+            BlockPos placePos = context.getClickedPos();
             FluidState fluidState = context.getLevel().getFluidState(placePos);
             return state
                     .setValue(LIT, true)
@@ -339,9 +335,7 @@ public class GlowLightsBlock
                     net.minecraft.world.level.block.VineBlock.UP,
                     true
             );
-            BlockPos placePos = context
-                    .getClickedPos()
-                    .relative(context.getClickedFace());
+            BlockPos placePos = context.getClickedPos();
             FluidState fluidState = context.getLevel().getFluidState(placePos);
             return state
                     .setValue(LIT, true)
@@ -433,9 +427,7 @@ public class GlowLightsBlock
             }
         }
 
-        BlockPos placePos = context
-                .getClickedPos()
-                .relative(context.getClickedFace());
+        BlockPos placePos = context.getClickedPos();
         FluidState fluidState = context.getLevel().getFluidState(placePos);
         return state
                 .setValue(LIT, true)
@@ -530,6 +522,27 @@ public class GlowLightsBlock
         }
 
         return false;
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!level.isClientSide && newState.is(this)) {
+            int removedFaces = countFaces(state) - countFaces(newState);
+            if (removedFaces > 0) {
+                Block.popResource(level, pos, new ItemStack(this, removedFaces));
+            }
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
+    }
+
+    private int countFaces(BlockState state) {
+        int count = 0;
+        for (Direction direction : Direction.values()) {
+            BooleanProperty property = direction == Direction.DOWN
+                    ? DOWN : net.minecraft.world.level.block.VineBlock.getPropertyForFace(direction);
+            if (state.getValue(property)) count++;
+        }
+        return count;
     }
 
     private boolean hasAnyFace(BlockState state) {

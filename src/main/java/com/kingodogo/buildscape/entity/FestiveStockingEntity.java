@@ -405,7 +405,7 @@ public class FestiveStockingEntity extends HangingEntity {
             return false;
         } else if (!source.isExplosion() && !this.getItem().isEmpty()) {
             if (!this.level.isClientSide) {
-                this.dropItem(source.getEntity());
+                this.spawnAtLocation(this.getItem().copy());
                 this.playSound(this.getRemoveItemSound(), 1.0F, 1.0F);
                 this.setItem(ItemStack.EMPTY);
             }

@@ -76,7 +76,16 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
                 Lists.newArrayList();
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
-        int elevationShift = 2 + random.nextInt(3);
+        int elevationShift = -1;
+        for (net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator decorator : config.decorators) {
+            if (decorator instanceof MangroveRootDecorator roots) {
+                elevationShift = roots.sampleTrunkOffset(random);
+                break;
+            }
+        }
+        if (elevationShift < 0) {
+            elevationShift = 2 + random.nextInt(3);
+        }
         int elevatedStartY = pos.getY() + elevationShift;
 
         int trunkHeight = freeTreeHeight;

@@ -87,7 +87,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
     @Override
     public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
         if (direction == net.minecraft.core.Direction.DOWN) {
-            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }

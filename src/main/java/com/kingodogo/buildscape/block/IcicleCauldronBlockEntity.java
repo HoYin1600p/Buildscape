@@ -47,7 +47,7 @@ public class IcicleCauldronBlockEntity
         this.setChanged();
         if (level != null && !level.isClientSide) {
             if (this.storedIcicle.isEmpty() && !wasEmpty) {
-                convertToRegularCauldron();
+                scheduleEmptyCheck();
             } else if (!this.storedIcicle.isEmpty()) {
                 level.sendBlockUpdated(
                         worldPosition,
@@ -59,8 +59,15 @@ public class IcicleCauldronBlockEntity
         }
     }
 
-    private void convertToRegularCauldron() {
+    private void scheduleEmptyCheck() {
         if (level != null && !level.isClientSide) {
+            level.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
+        }
+    }
+
+    public void convertToRegularCauldron() {
+        if (level != null && !level.isClientSide
+                && level.getBlockEntity(worldPosition) == this && storedIcicle.isEmpty()) {
             level.setBlock(
                     worldPosition,
                     net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState(),
@@ -128,7 +135,7 @@ public class IcicleCauldronBlockEntity
                 storedIcicle = ItemStack.EMPTY;
                 this.setChanged();
                 if (level != null && !level.isClientSide) {
-                    convertToRegularCauldron();
+                    scheduleEmptyCheck();
                 }
             } else {
                 this.setChanged();
@@ -145,7 +152,7 @@ public class IcicleCauldronBlockEntity
             storedIcicle = ItemStack.EMPTY;
             this.setChanged();
             if (level != null && !level.isClientSide) {
-                convertToRegularCauldron();
+                scheduleEmptyCheck();
             }
             return result;
         }

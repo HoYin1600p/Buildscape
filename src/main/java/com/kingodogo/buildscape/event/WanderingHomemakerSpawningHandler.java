@@ -6,6 +6,7 @@ import com.kingodogo.buildscape.entity.ModEntities;
 import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -14,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -24,6 +26,17 @@ import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WanderingHomemakerSpawningHandler {
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        CompoundTag original = event.getOriginal().getPersistentData();
+        CompoundTag restored = event.getPlayer().getPersistentData();
+        for (String key : new String[]{"WanderingHomemakerCooldownRealTime", "WanderingHomemakerUUID"}) {
+            if (original.contains(key)) {
+                restored.put(key, original.get(key).copy());
+            }
+        }
+    }
 
     private enum BlockCategory {
         DECORATED_POT,

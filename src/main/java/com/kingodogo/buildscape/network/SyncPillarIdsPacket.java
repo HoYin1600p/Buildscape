@@ -21,16 +21,20 @@ import java.util.function.Supplier;
 public class SyncPillarIdsPacket {
 
     private static final int PILLARS_PER_CHUNK = 64;
-    private static final int MAX_CHUNKS = (NetworkPacketLimits.MAX_PILLARS + PILLARS_PER_CHUNK - 1)
-            / PILLARS_PER_CHUNK;
+    private static final int MAX_BUFFERED_ENTRIES = 65_536;
+    private static final int MAX_CHUNKS = MAX_BUFFERED_ENTRIES / PILLARS_PER_CHUNK;
+    private static final int MAX_BUFFERED_BYTES = 16 * 1024 * 1024;
     private static final long ACCUMULATOR_TIMEOUT_MS = 30_000L;
     private static final AtomicLong NEXT_SYNC_ID = new AtomicLong();
     private static final Map<Long, SyncAccumulator> CLIENT_ACCUMULATORS = new HashMap<>();
+    private static long latestClientSyncId = Long.MIN_VALUE;
+    private static boolean clientSyncDiscarded;
 
     private final long syncId;
     private final int chunkIndex;
     private final int chunkCount;
     private final List<PillarIdManager.PillarData> pillarDataList;
+    private final int encodedSize;
 
     private SyncPillarIdsPacket(long syncId, int chunkIndex, int chunkCount,
                                 Collection<PillarIdManager.PillarData> pillarDataList) {
@@ -38,9 +42,11 @@ public class SyncPillarIdsPacket {
         this.chunkIndex = chunkIndex;
         this.chunkCount = chunkCount;
         this.pillarDataList = new ArrayList<>(pillarDataList);
+        this.encodedSize = 0;
     }
 
     public SyncPillarIdsPacket(FriendlyByteBuf buf) {
+        int start = buf.readerIndex();
         this.syncId = buf.readLong();
         this.chunkCount = NetworkPacketLimits.readBoundedInt(buf, 1, MAX_CHUNKS, "pillar sync chunk count");
         this.chunkIndex = NetworkPacketLimits.readBoundedInt(buf, 0, chunkCount - 1, "pillar sync chunk index");
@@ -49,6 +55,7 @@ public class SyncPillarIdsPacket {
         for (int i = 0; i < count; i++) {
             this.pillarDataList.add(readPillarData(buf));
         }
+        this.encodedSize = buf.readerIndex() - start;
     }
 
     public static SyncPillarIdsPacket decode(FriendlyByteBuf buf) {
@@ -93,13 +100,31 @@ public class SyncPillarIdsPacket {
     public static void clearClientState() {
         synchronized (CLIENT_ACCUMULATORS) {
             CLIENT_ACCUMULATORS.clear();
+            latestClientSyncId = Long.MIN_VALUE;
+            clientSyncDiscarded = false;
         }
     }
 
     private static List<SyncPillarIdsPacket> createChunks(List<PillarIdManager.PillarData> data) {
-        List<PillarIdManager.PillarData> snapshot = data != null ? data : java.util.Collections.emptyList();
-        NetworkPacketLimits.checkCount(snapshot.size(), NetworkPacketLimits.MAX_PILLARS, "pillar");
-        int chunkCount = Math.max(1, (snapshot.size() + PILLARS_PER_CHUNK - 1) / PILLARS_PER_CHUNK);
+        List<PillarIdManager.PillarData> snapshot = new ArrayList<>();
+        int skipped = 0;
+        if (data != null) {
+            for (PillarIdManager.PillarData entry : data) {
+                if (canEncode(entry)) {
+                    snapshot.add(entry);
+                } else {
+                    skipped++;
+                }
+            }
+        }
+        if (skipped > 0) {
+            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Skipped {} invalid pillar sync entries", skipped);
+        }
+        if (snapshot.size() > MAX_BUFFERED_ENTRIES) {
+            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Pillar sync exceeds the {} entry limit", MAX_BUFFERED_ENTRIES);
+            return List.of();
+        }
+        int chunkCount = (int) Math.max(1L, (snapshot.size() + (long) PILLARS_PER_CHUNK - 1) / PILLARS_PER_CHUNK);
         long syncId = NEXT_SYNC_ID.incrementAndGet();
         List<SyncPillarIdsPacket> packets = new ArrayList<>(chunkCount);
         for (int chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++) {
@@ -114,16 +139,35 @@ public class SyncPillarIdsPacket {
         List<PillarIdManager.PillarData> complete = null;
         long now = System.currentTimeMillis();
         synchronized (CLIENT_ACCUMULATORS) {
-            CLIENT_ACCUMULATORS.entrySet().removeIf(entry ->
-                    now - entry.getValue().createdAt > ACCUMULATOR_TIMEOUT_MS);
-            SyncAccumulator accumulator = CLIENT_ACCUMULATORS.compute(packet.syncId, (id, existing) ->
-                    existing != null && existing.chunkCount == packet.chunkCount
-                            ? existing
-                            : new SyncAccumulator(packet.chunkCount, now));
-            accumulator.add(packet.chunkIndex, packet.pillarDataList);
+            expireClientState();
+            if (packet.syncId < latestClientSyncId) {
+                return;
+            }
+            if (packet.syncId > latestClientSyncId) {
+                CLIENT_ACCUMULATORS.clear();
+                latestClientSyncId = packet.syncId;
+                clientSyncDiscarded = false;
+            }
+            if (clientSyncDiscarded) {
+                return;
+            }
+            SyncAccumulator existing = CLIENT_ACCUMULATORS.get(packet.syncId);
+            if (existing != null && existing.chunkCount != packet.chunkCount) {
+                CLIENT_ACCUMULATORS.clear();
+                clientSyncDiscarded = true;
+                return;
+            }
+            SyncAccumulator accumulator = CLIENT_ACCUMULATORS.computeIfAbsent(packet.syncId,
+                    id -> new SyncAccumulator(packet.chunkCount, now));
+            if (!accumulator.add(packet.chunkIndex, packet.pillarDataList, packet.encodedSize)) {
+                CLIENT_ACCUMULATORS.clear();
+                clientSyncDiscarded = true;
+                return;
+            }
             if (accumulator.isComplete()) {
                 complete = accumulator.combine();
                 CLIENT_ACCUMULATORS.remove(packet.syncId);
+                clientSyncDiscarded = true;
             }
         }
         if (complete == null) {
@@ -134,6 +178,27 @@ public class SyncPillarIdsPacket {
         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
         if (mc.screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen configScreen) {
             configScreen.refreshCurrentTab();
+        }
+    }
+
+    private static void expireClientState() {
+        long now = System.currentTimeMillis();
+        synchronized (CLIENT_ACCUMULATORS) {
+            if (CLIENT_ACCUMULATORS.entrySet().removeIf(entry ->
+                    now - entry.getValue().createdAt > ACCUMULATOR_TIMEOUT_MS)) {
+                clientSyncDiscarded = true;
+            }
+        }
+    }
+
+    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(
+            modid = com.kingodogo.buildscape.BuildScape.MODID, value = Dist.CLIENT)
+    public static final class ClientEvents {
+        @net.minecraftforge.eventbus.api.SubscribeEvent
+        public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
+            if (event.phase == net.minecraftforge.event.TickEvent.Phase.END) {
+                expireClientState();
+            }
         }
     }
 
@@ -281,20 +346,36 @@ public class SyncPillarIdsPacket {
     private static final class SyncAccumulator {
         private final int chunkCount;
         private final long createdAt;
-        private final List<List<PillarIdManager.PillarData>> chunks;
+        private final Map<Integer, List<PillarIdManager.PillarData>> chunks;
         private int received;
+        private int bufferedEntries;
+        private int bufferedBytes;
 
         private SyncAccumulator(int chunkCount, long createdAt) {
             this.chunkCount = chunkCount;
             this.createdAt = createdAt;
-            this.chunks = new ArrayList<>(java.util.Collections.nCopies(chunkCount, null));
+            this.chunks = new HashMap<>();
+        }
+
+        private boolean add(int index, List<PillarIdManager.PillarData> data, int bytes) {
+            if (chunks.containsKey(index)) {
+                return true;
+            }
+            if (bufferedEntries + data.size() > MAX_BUFFERED_ENTRIES
+                    || bufferedBytes + bytes > MAX_BUFFERED_BYTES) {
+                return false;
+            }
+            received++;
+            bufferedEntries += data.size();
+            bufferedBytes += bytes;
+            chunks.put(index, new ArrayList<>(data));
+            return true;
         }
 
         private void add(int index, List<PillarIdManager.PillarData> data) {
-            if (chunks.get(index) == null) {
-                received++;
+            if (!add(index, data, 0)) {
+                throw new DecoderException("pillar sync exceeds buffer limits");
             }
-            chunks.set(index, new ArrayList<>(data));
         }
 
         private boolean isComplete() {
@@ -303,11 +384,8 @@ public class SyncPillarIdsPacket {
 
         private List<PillarIdManager.PillarData> combine() {
             List<PillarIdManager.PillarData> combined = new ArrayList<>();
-            for (List<PillarIdManager.PillarData> chunk : chunks) {
-                combined.addAll(chunk);
-            }
-            if (combined.size() > NetworkPacketLimits.MAX_PILLARS) {
-                throw new DecoderException("pillar synchronization exceeds the maximum entry count");
+            for (int i = 0; i < chunkCount; i++) {
+                combined.addAll(chunks.get(i));
             }
             return combined;
         }

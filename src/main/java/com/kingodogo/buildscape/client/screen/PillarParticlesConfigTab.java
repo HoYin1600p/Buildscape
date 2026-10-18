@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client.screen;
 import com.kingodogo.buildscape.client.screen.widget.*;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.network.SyncConfigPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -1177,10 +1178,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        poseStack.popPose();
-        poseStack.pushPose();
-        poseStack.popPose();
-
         int patternBorderColor = 0xFF666666;
         GuiComponent.fill(poseStack, patternBoxX, patternBoxY, patternBoxX + patternBoxWidth, patternBoxY + 1,
                 patternBorderColor);
@@ -1336,6 +1333,16 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     @Override
     public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        if (selectedColorIndex < 0) {
+            renderFieldRange(poseStack, mouseX, mouseY, particleSpeedField, FIELD_MIN_VALUE, SyncConfigPacket.MAX_PARTICLE_SPEED);
+            renderFieldRange(poseStack, mouseX, mouseY, particleSpreadField, FIELD_MIN_VALUE, SyncConfigPacket.MAX_PARTICLE_SPREAD);
+            renderFieldRange(poseStack, mouseX, mouseY, particleLifetimeField, 1, SyncConfigPacket.MAX_PARTICLE_LIFETIME);
+            renderFieldRange(poseStack, mouseX, mouseY, particleDensityField, 0, SyncConfigPacket.MAX_PARTICLE_DENSITY);
+            renderFieldRange(poseStack, mouseX, mouseY, patternSpeedField, FIELD_MIN_VALUE, SyncConfigPacket.MAX_PARTICLE_SPEED);
+            renderFieldRange(poseStack, mouseX, mouseY, patternSpreadField, FIELD_MIN_VALUE, SyncConfigPacket.MAX_PARTICLE_SPREAD);
+            renderFieldRange(poseStack, mouseX, mouseY, patternIntensityField, FIELD_MIN_VALUE, SyncConfigPacket.MAX_PARTICLE_INTENSITY);
+        }
+
         if (sharedColorPicker != null) {
             sharedColorPicker.visible = false;
 
@@ -1384,7 +1391,15 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         }
     }
 
-    private static final double FIELD_MIN_VALUE = 0.001;
+    private void renderFieldRange(PoseStack poseStack, int mouseX, int mouseY, EditBox field, double minimum, double maximum) {
+        if (field != null && field.visible && field.isMouseOver(mouseX, mouseY)) {
+            parent.renderComponentTooltip(poseStack,
+                    java.util.Collections.singletonList(new TextComponent("Range: " + minimum + " - " + maximum)),
+                    mouseX, mouseY);
+        }
+    }
+
+    private static final double FIELD_MIN_VALUE = SyncConfigPacket.MIN_PARTICLE_RATE;
 
     private static final long SAVE_DEBOUNCE_MS = 400L;
     private boolean configSavePending = false;
@@ -1412,7 +1427,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         if (!config.use_pattern) {
             try {
-                double speed = Math.max(FIELD_MIN_VALUE, Double.parseDouble(particleSpeedField.getValue()));
+                double speed = SyncConfigPacket.clampParticleValue(Double.parseDouble(particleSpeedField.getValue()), SyncConfigPacket.MAX_PARTICLE_SPEED);
                 if (config.particle_speed != speed) {
                     config.particle_speed = speed;
                     changed = true;
@@ -1421,7 +1436,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                double spread = Math.max(FIELD_MIN_VALUE, Double.parseDouble(particleSpreadField.getValue()));
+                double spread = SyncConfigPacket.clampParticleValue(Double.parseDouble(particleSpreadField.getValue()), SyncConfigPacket.MAX_PARTICLE_SPREAD);
                 if (config.particle_spread != spread) {
                     config.particle_spread = spread;
                     changed = true;
@@ -1430,7 +1445,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                int lifetime = Math.max(1, Integer.parseInt(particleLifetimeField.getValue()));
+                int lifetime = Math.max(1, Math.min(SyncConfigPacket.MAX_PARTICLE_LIFETIME, Integer.parseInt(particleLifetimeField.getValue())));
                 if (config.particle_lifetime != lifetime) {
                     config.particle_lifetime = lifetime;
                     changed = true;
@@ -1439,7 +1454,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                int density = Math.max(1, Integer.parseInt(particleDensityField.getValue()));
+                int density = Math.max(0, Math.min(SyncConfigPacket.MAX_PARTICLE_DENSITY, Integer.parseInt(particleDensityField.getValue())));
                 if (config.particle_density != density) {
                     config.particle_density = density;
                     changed = true;
@@ -1450,7 +1465,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         if (config.use_pattern) {
             try {
-                double speed = Math.max(FIELD_MIN_VALUE, Double.parseDouble(patternSpeedField.getValue()));
+                double speed = SyncConfigPacket.clampParticleValue(Double.parseDouble(patternSpeedField.getValue()), SyncConfigPacket.MAX_PARTICLE_SPEED);
                 if (config.pattern_speed != speed) {
                     config.pattern_speed = speed;
                     changed = true;
@@ -1459,7 +1474,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                double spread = Math.max(FIELD_MIN_VALUE, Double.parseDouble(patternSpreadField.getValue()));
+                double spread = SyncConfigPacket.clampParticleValue(Double.parseDouble(patternSpreadField.getValue()), SyncConfigPacket.MAX_PARTICLE_SPREAD);
                 if (config.pattern_spread != spread) {
                     config.pattern_spread = spread;
                     changed = true;
@@ -1468,7 +1483,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                double intensity = Math.max(FIELD_MIN_VALUE, Double.parseDouble(patternIntensityField.getValue()));
+                double intensity = SyncConfigPacket.clampParticleValue(Double.parseDouble(patternIntensityField.getValue()), SyncConfigPacket.MAX_PARTICLE_INTENSITY);
                 if (config.pattern_intensity != intensity) {
                     config.pattern_intensity = intensity;
                     changed = true;

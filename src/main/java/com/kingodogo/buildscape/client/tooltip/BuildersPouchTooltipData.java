@@ -94,21 +94,20 @@ public class BuildersPouchTooltipData implements TooltipComponent, ClientTooltip
                 int itemX = slotX + 1;
                 int itemY = slotY + 1;
 
+                float prevBlit = itemRenderer.blitOffset;
                 try {
                     if (!real.isEmpty()) {
-                        float prevBlit = itemRenderer.blitOffset;
                         itemRenderer.blitOffset = blitOffset + 100.0F;
                         itemRenderer.renderAndDecorateItem(mc.player, real, itemX, itemY, col);
                         itemRenderer.renderGuiItemDecorations(font, real, itemX, itemY);
-                        itemRenderer.blitOffset = prevBlit;
                     } else if (!filter.isEmpty()) {
-                        float prevBlit = itemRenderer.blitOffset;
                         itemRenderer.blitOffset = blitOffset + 100.0F;
                         itemRenderer.renderAndDecorateItem(mc.player, filter, itemX, itemY, col);
-                        itemRenderer.blitOffset = prevBlit;
                     }
                 } catch (Throwable itemError) {
                     BuildScape.getLogger().debug("BuildersPouchTooltipData: Error rendering item slot " + col, itemError);
+                } finally {
+                    itemRenderer.blitOffset = prevBlit;
                 }
             }
         } catch (Throwable t) {

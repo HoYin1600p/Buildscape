@@ -15,6 +15,7 @@ import java.util.WeakHashMap;
 public final class BeaconScanContext {
     private static final ThreadLocal<BeaconBlockEntity> ACTIVE_BEACON = new ThreadLocal<>();
     private static final Map<Level, Map<BlockPos, CachedHeight>> CLIENT_HEIGHTS = new WeakHashMap<>();
+    private static int cleanupTicks;
 
     private BeaconScanContext() {
     }
@@ -79,6 +80,25 @@ public final class BeaconScanContext {
         private CachedHeight(int height, long validUntil) {
             this.height = height;
             this.validUntil = validUntil;
+        }
+    }
+
+    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(
+            modid = com.kingodogo.buildscape.BuildScape.MODID,
+            value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+    public static final class ClientEvents {
+        @net.minecraftforge.eventbus.api.SubscribeEvent
+        public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
+            if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || ++cleanupTicks < 20) {
+                return;
+            }
+            cleanupTicks = 0;
+            synchronized (BeaconScanContext.class) {
+                CLIENT_HEIGHTS.forEach((level, heights) -> {
+                    long now = level.getGameTime();
+                    heights.values().removeIf(height -> height.validUntil <= now);
+                });
+            }
         }
     }
 }

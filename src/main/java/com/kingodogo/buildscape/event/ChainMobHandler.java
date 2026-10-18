@@ -1,19 +1,20 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ClimbableChainBlock;
-import com.kingodogo.buildscape.block.LargeChainBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.ChainBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID)
 public class ChainMobHandler {
+    private static final TagKey<Block> MOB_CHAINS = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(BuildScape.MODID, "mob_chains"));
 
     @SubscribeEvent
     public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
@@ -24,18 +25,10 @@ public class ChainMobHandler {
         }
 
         BlockPos pos = entity.blockPosition();
-        boolean inChain = isChainBlock(entity.level.getBlockState(pos));
+        boolean inChain = entity.level.getBlockState(pos).is(MOB_CHAINS);
 
         if (inChain) {
             entity.setOnGround(false);
         }
-    }
-
-    private static boolean isChainBlock(BlockState state) {
-        return (
-                state.getBlock() instanceof ChainBlock ||
-                        state.getBlock() instanceof ClimbableChainBlock ||
-                        state.getBlock() instanceof LargeChainBlock
-        );
     }
 }

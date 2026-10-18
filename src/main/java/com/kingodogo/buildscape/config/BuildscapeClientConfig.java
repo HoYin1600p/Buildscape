@@ -3,18 +3,12 @@ package com.kingodogo.buildscape.config;
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class BuildscapeClientConfig {
     public static final String KEY_HIDE_CONFIG_BUTTON = "HideBuildscapeConfig";
@@ -41,8 +35,16 @@ public class BuildscapeClientConfig {
     }
 
     private final Map<String, String> values;
+    private final Path configDirectory;
+    private boolean readOnly;
+    private String source;
 
     private BuildscapeClientConfig() {
+        this(null);
+    }
+
+    BuildscapeClientConfig(Path configDirectory) {
+        this.configDirectory = configDirectory;
         this.values = new LinkedHashMap<>(DEFAULTS);
         load();
     }
@@ -65,10 +67,10 @@ public class BuildscapeClientConfig {
         INSTANCE = new BuildscapeClientConfig();
     }
 
-    private static File getConfigFile() {
-        Path configDir = null;
+    private File getConfigFile() {
+        Path configDir = configDirectory;
         try {
-            if (FMLPaths.CONFIGDIR != null) {
+            if (configDir == null && FMLPaths.CONFIGDIR != null) {
                 configDir = FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable ignored) {
@@ -84,10 +86,10 @@ public class BuildscapeClientConfig {
         return buildscapeDir.resolve("buildscape.cfg").toFile();
     }
 
-    private static File getLegacyConfigFile() {
-        Path configDir = null;
+    private File getLegacyConfigFile() {
+        Path configDir = configDirectory;
         try {
-            if (FMLPaths.CONFIGDIR != null) {
+            if (configDir == null && FMLPaths.CONFIGDIR != null) {
                 configDir = FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable ignored) {
@@ -110,6 +112,8 @@ public class BuildscapeClientConfig {
                 Files.copy(legacyFile.toPath(), file.toPath());
                 BuildScape.getLogger().info("BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
             } catch (IOException e) {
+                readOnly = true;
+                file = legacyFile;
                 BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to copy legacy config - " + e.getMessage());
             }
         }
@@ -119,52 +123,72 @@ public class BuildscapeClientConfig {
             return;
         }
 
-        Set<String> loadedKeys = new HashSet<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) {
-                    continue;
-                }
-
-                int eq = line.indexOf('=');
-                if (eq <= 0) {
-                    continue;
-                }
-
-                String key = line.substring(0, eq).trim();
-                String value = line.substring(eq + 1).trim();
-                if (DEFAULTS.containsKey(key)) {
-                    values.put(key, value);
-                    loadedKeys.add(key);
+        try {
+            source = ConfigLayoutIO.readText(file.toPath());
+            readOnly |= ConfigLayoutIO.hasReplacementCharacters(source);
+            values.putAll(ConfigLayoutIO.readEntries(source));
+        } catch (IOException e) {
+            readOnly = true;
+            if (source != null) {
+                for (String line : source.split("\\R")) {
+                    try {
+                        values.putAll(ConfigLayoutIO.readEntries(line));
+                    } catch (IOException ignored) {
+                    }
                 }
             }
-        } catch (IOException e) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to read config/buildscape/buildscape.cfg - using defaults. " + e.getMessage());
-        }
-
-        if (loadedKeys.size() != DEFAULTS.size()) {
-            save();
+            BuildScape.getLogger().warn("BuildscapeClientConfig: Config is read-only because it could not be parsed", e);
         }
     }
 
-    private void save() {
-        File file = getConfigFile();
-        if (file == null) {
+    public void save() {
+        if (readOnly) {
+            BuildScape.getLogger().warn("BuildscapeClientConfig: Not saving read-only config; unreadable/legacy file kept as-is");
             return;
         }
-        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-            writer.println("# BuildScape Configuration");
-            writer.println("# Edit this file to customise BuildScape behaviour.");
-            writer.println("# Changes take effect on the next game launch.");
-            writer.println();
-            for (Map.Entry<String, String> entry : values.entrySet()) {
-                writer.println(entry.getKey() + " = " + entry.getValue());
+        File file = getConfigFile();
+        if (file == null) return;
+        try {
+            StringBuilder text = new StringBuilder("# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
+            for (String section : new String[]{"Gameplay", "Performance", "Visuals & particles", "Interface", "Other"}) {
+                if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) continue;
+                text.append("\n# --- ").append(section).append(" ---\n");
+                for (Map.Entry<String, String> entry : values.entrySet()) {
+                    if (!section.equals(section(entry.getKey()))) continue;
+                    text.append("# ").append(description(entry.getKey())).append('\n');
+                    text.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
+                }
             }
+            String output = ConfigLayoutIO.retainComments(source, text.toString(), false);
+            ConfigLayoutIO.write(file.toPath(), output, source, true);
+            source = output;
         } catch (IOException e) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to write config/buildscape/buildscape.cfg - " + e.getMessage());
+            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to write config", e);
         }
+    }
+
+    private static String section(String key) {
+        return switch (key) {
+            case KEY_CAKE_STACKING, KEY_WATER_BOTTLE_STACKING, KEY_MAX_PIPE_NETWORK_SIZE -> "Gameplay";
+            case KEY_PARALLEL_MODEL_LOADING, KEY_CACHE_MODEL_MATERIALS,
+                    KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE -> "Performance";
+            case KEY_HIDE_CONFIG_BUTTON -> "Interface";
+            default -> "Other";
+        };
+    }
+
+    private static String description(String key) {
+        return switch (key) {
+            case KEY_CAKE_STACKING -> "Default cake-stacking game rule (stacks of 64).";
+            case KEY_WATER_BOTTLE_STACKING -> "Default water-bottle-stacking game rule (stacks of 16).";
+            case KEY_MAX_PIPE_NETWORK_SIZE -> "Maximum number of pipes in one network.";
+            case KEY_PARALLEL_MODEL_LOADING -> "Load bundled block models in parallel.";
+            case KEY_CACHE_MODEL_MATERIALS -> "Cache block-model material lookups.";
+            case KEY_PARALLEL_MODEL_BAKING -> "Bake bundled block models in parallel.";
+            case KEY_PARALLEL_BLOCK_STATE_CACHE -> "Build block-state caches in parallel.";
+            case KEY_HIDE_CONFIG_BUTTON -> "Hide the BuildScape button on client screens.";
+            default -> "Unrecognized setting retained with its original value.";
+        };
     }
 
     private boolean getBoolean(String key) {

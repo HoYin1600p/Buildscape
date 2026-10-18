@@ -62,11 +62,10 @@ public final class LaunchFasterInterop {
     }
 
     private static boolean classExists(String className) {
-        try {
-            Class.forName(className, false, LaunchFasterInterop.class.getClassLoader());
-            return true;
-        } catch (ClassNotFoundException exception) {
-            return false;
-        }
+        String resource = className.replace('.', '/') + ".class";
+        ClassLoader loader = LaunchFasterInterop.class.getClassLoader();
+        ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+        return (loader != null && loader.getResource(resource) != null)
+                || (contextLoader != null && contextLoader.getResource(resource) != null);
     }
 }

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.particle.FireflyParticle;
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.FlameParticle;
@@ -14,6 +15,7 @@ public class ModClientParticleEvents {
 
     @SubscribeEvent
     public static void registerParticleFactories(ParticleFactoryRegisterEvent event) {
+        FireflyParticle.clearActiveParticles();
         Minecraft.getInstance().particleEngine.register(ModParticles.COPPER_FIRE_FLAME.get(), FlameParticle.Provider::new);
     }
 }

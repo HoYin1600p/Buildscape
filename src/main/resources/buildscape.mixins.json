@@ -45,6 +45,8 @@
     "RecipeManagerAccessor"
   ],
   "client": [
+    "biometint.BiomeColorsMixin",
+    "biometint.EmbeddiumBiomeColorMixin",
     "AbstractContainerScreenMixin",
     "AdvancementWidgetMixin",
     "AnvilScreenMixin",

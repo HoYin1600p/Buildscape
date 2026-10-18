@@ -1,12 +1,18 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.particle.SmokeColorRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.Level;
+
+import java.util.Random;
 
 public class SmokeVentBlockEntity extends BlockEntity {
 
@@ -15,6 +21,29 @@ public class SmokeVentBlockEntity extends BlockEntity {
 
     public SmokeVentBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.SMOKE_VENT_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    public static void particleTick(Level level, BlockPos pos, BlockState state, SmokeVentBlockEntity vent) {
+        PillarPart part = state.getValue(SmokeVentBlock.PART);
+        if (!level.isClientSide || !vent.isActive() || (part != PillarPart.TOP && part != PillarPart.SINGLE)) {
+            return;
+        }
+        Random random = level.random;
+        if (random.nextFloat() >= 0.11F) {
+            return;
+        }
+        int count = random.nextInt(2) + 2;
+        for (int i = 0; i < count; i++) {
+            double x = pos.getX() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);
+            double y = pos.getY() + SmokeVentBlock.SMOKE_SPAWN_BASE + random.nextDouble() * (2.0 - SmokeVentBlock.SMOKE_SPAWN_BASE);
+            double z = pos.getZ() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);
+            if (vent.getSmokeColor() != null) {
+                SmokeColorRegistry.registerColorForPosition(x, y, z, vent.getSmokeColor());
+                level.addAlwaysVisibleParticle(ModParticles.COLORED_SMOKE.get(), true, x, y, z, 0.0, 0.07, 0.0);
+            } else {
+                level.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0.0, 0.07, 0.0);
+            }
+        }
     }
 
     public String getSmokeColor() {

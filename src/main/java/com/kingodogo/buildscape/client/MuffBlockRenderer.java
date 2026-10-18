@@ -108,7 +108,7 @@ public class MuffBlockRenderer {
             }
         }
 
-        bufferSource.endBatch();
+        bufferSource.endBatch(RenderType.lines());
         poseStack.popPose();
     }
 

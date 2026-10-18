@@ -35,7 +35,7 @@ public class GeyserParticleOptions implements ParticleOptions {
 
     public GeyserParticleOptions(ParticleType<GeyserParticleOptions> type, int waterBlocks) {
         this.type = type;
-        this.waterBlocks = waterBlocks;
+        this.waterBlocks = Math.max(0, Math.min(4, waterBlocks));
     }
 
     @Override

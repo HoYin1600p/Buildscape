@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 
@@ -14,8 +15,8 @@ public class ColoredMossLayersBlock extends MossLayersBlock {
 
     private final Supplier<Item> dropItem;
 
-    public ColoredMossLayersBlock(Properties properties, Supplier<Item> dropItem) {
-        super(properties);
+    public ColoredMossLayersBlock(Properties properties, Supplier<Item> dropItem, Supplier<Block> fullBlock) {
+        super(properties, fullBlock);
         this.dropItem = dropItem;
     }
 

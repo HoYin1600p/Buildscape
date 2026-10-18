@@ -9,6 +9,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -19,6 +20,8 @@ import java.util.UUID;
 public class CosmeticsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static CosmeticsConfig INSTANCE;
+    private final Path dataDirectory;
+    private final Path legacyConfigDirectory;
 
     private final Map<String, Map<Integer, String>> playerCosmetics = new HashMap<>();
 
@@ -32,6 +35,13 @@ public class CosmeticsConfig {
     private Integer colorPickerY = null;
 
     private CosmeticsConfig() {
+        this(FMLPaths.GAMEDIR.get().resolve("buildscape").resolve("data"),
+                FMLPaths.CONFIGDIR.get().resolve(BuildScape.MODID));
+    }
+
+    CosmeticsConfig(Path dataDirectory, Path legacyConfigDirectory) {
+        this.dataDirectory = dataDirectory;
+        this.legacyConfigDirectory = legacyConfigDirectory;
         File dataDir = getDataDir();
         if (!dataDir.exists()) dataDir.mkdirs();
 
@@ -48,7 +58,7 @@ public class CosmeticsConfig {
     }
 
     private File getDataDir() {
-        return FMLPaths.GAMEDIR.get().resolve("buildscape").resolve("data").toFile();
+        return dataDirectory.toFile();
     }
 
     private File getPlayerFile(UUID playerUuid) {
@@ -61,7 +71,7 @@ public class CosmeticsConfig {
     }
 
     private void migrateLegacyData() {
-        Path legacyConfigDir = FMLPaths.CONFIGDIR.get().resolve(BuildScape.MODID);
+        Path legacyConfigDir = legacyConfigDirectory;
         File legacyJson = legacyConfigDir.resolve("equipped-cosmetics.json").toFile();
         File legacyDataDir = legacyConfigDir.toFile();
 
@@ -74,7 +84,7 @@ public class CosmeticsConfig {
                         if (!newFile.exists()) {
                             Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         } else {
-                            oldFile.delete();
+                            Files.move(oldFile.toPath(), oldFile.toPath().resolveSibling(oldFile.getName() + ".migrated"));
                         }
                     } catch (Exception e) {
                         BuildScape.getLogger().error("CosmeticsConfig: Failed to relocate " + oldFile.getName(), e);
@@ -129,6 +139,8 @@ public class CosmeticsConfig {
                 try { uuid = UUID.fromString(key); } catch (Exception ignored) {}
             }
 
+            if (getPlayerFile(uuid).exists()) continue;
+
             Map<Integer, String> cosmetics = new HashMap<>();
             Map<String, String> colors = new HashMap<>();
 
@@ -179,6 +191,7 @@ public class CosmeticsConfig {
                     UUID storedUuid = nbt.getUUID("player_uuid");
                     if (!storedUuid.equals(playerUuid)) {
                         BuildScape.getLogger().error("CosmeticsConfig: SECURITY MISMATCH for " + file.getName());
+                        PillarParticleConfig.backupUnreadableFile(file);
                         playerCosmetics.putIfAbsent(uuidStr, null);
                         playerCosmeticColors.putIfAbsent(uuidStr, null);
                         playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
@@ -219,6 +232,7 @@ public class CosmeticsConfig {
             }
         } catch (Exception e) {
             BuildScape.getLogger().error("CosmeticsConfig: Failed to read data for " + uuidStr, e);
+            PillarParticleConfig.backupUnreadableFile(file);
             playerCosmetics.putIfAbsent(uuidStr, null);
             playerCosmeticColors.putIfAbsent(uuidStr, null);
             playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
@@ -262,10 +276,25 @@ public class CosmeticsConfig {
             nbt.putBoolean("shulker_preview", shulkerPreview);
         }
 
+        Path temporary = null;
         try {
-            NbtIo.writeCompressed(nbt, file);
+            temporary = Files.createTempFile(file.getParentFile().toPath(), file.getName(), ".tmp");
+            NbtIo.writeCompressed(nbt, temporary.toFile());
+            try {
+                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (Exception e) {
             BuildScape.getLogger().error("CosmeticsConfig: Failed to write data for " + uuidStr, e);
+        } finally {
+            if (temporary != null) {
+                try {
+                    Files.deleteIfExists(temporary);
+                } catch (java.io.IOException e) {
+                    BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for " + uuidStr, e);
+                }
+            }
         }
     }
 

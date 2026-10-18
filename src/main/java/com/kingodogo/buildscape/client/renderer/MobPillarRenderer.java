@@ -1,9 +1,12 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.mixin.EntityAccessor;
+import com.kingodogo.buildscape.mixin.PillarEntityRenderDispatcherInvoker;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.core.BlockPos;
@@ -153,15 +156,12 @@ public class MobPillarRenderer {
 
         if (state.fire) {
             entity.setSecondsOnFire(1);
+        } else {
+            entity.clearFire();
         }
 
-        if (state.glowing) {
-            entity.setGlowingTag(true);
-        }
-
-        if (state.invisible) {
-            entity.setInvisible(true);
-        }
+        entity.setGlowingTag(state.glowing);
+        entity.setInvisible(state.invisible);
 
         if (entity instanceof LivingEntity livingEntity) {
 
@@ -223,6 +223,7 @@ public class MobPillarRenderer {
         }
 
         updateEntityFromState(entity, state);
+        ((EntityAccessor) entity).buildscape$setSharedFlag(6, state.glowing);
 
         applyEntitySpecificStates(entity, state);
     }
@@ -812,6 +813,15 @@ public class MobPillarRenderer {
         EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) dispatcher.getRenderer(entity);
 
         if (entityRenderer != null) {
+            MultiBufferSource entityBuffers = bufferSource;
+            if (PillarDisplayEffects.outlinesEnabled()
+                    && (state.glowing || Minecraft.getInstance().shouldEntityAppearGlowing(entity))) {
+                OutlineBufferSource outlines = Minecraft.getInstance().renderBuffers().outlineBufferSource();
+                int color = entity.getTeamColor();
+                outlines.setColor(color >> 16 & 255, color >> 8 & 255, color & 255, 255);
+                entityBuffers = outlines;
+                PillarDisplayEffects.markOutlineRendered();
+            }
             poseStack.pushPose();
 
             poseStack.scale(scale, scale, scale);
@@ -828,9 +838,13 @@ public class MobPillarRenderer {
                     entity.getYRot(),
                     partialTicks,
                     poseStack,
-                    bufferSource,
+                    entityBuffers,
                     combinedLight
             );
+
+            if (state.fire || entity.displayFireAnimation()) {
+                ((PillarEntityRenderDispatcherInvoker) dispatcher).buildscape$renderFlame(poseStack, bufferSource, entity);
+            }
 
             poseStack.popPose();
         }

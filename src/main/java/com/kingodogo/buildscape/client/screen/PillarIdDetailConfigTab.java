@@ -538,6 +538,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             pillarData.pattern_intensity = globalConfig.pattern_intensity;
         }
 
+        currentMaxColor = maxParticleColorSlider.getValue();
         pillarData.max_particle_color = currentMaxColor;
 
         if (pillarData.dyeColors != null) {

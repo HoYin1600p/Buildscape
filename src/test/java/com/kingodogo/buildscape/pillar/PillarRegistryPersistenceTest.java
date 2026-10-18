@@ -183,6 +183,56 @@ public class PillarRegistryPersistenceTest {
     }
 
     @Test
+    public void removedFramesStayHiddenAfterSaveAndReload() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("I-F1", frame("I-F1", "north", 10)));
+        assertTrue(manager.removePillars(List.of("I-F1")));
+        assertTrue(manager.getAllPillarIds().isEmpty());
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:0:0:north"));
+        assertTrue(manager.isIdTaken("I-F1"));
+
+        File saved = new File(temporary.getRoot(), "removed-frames.dat");
+        Method save = PillarIdManager.class.getDeclaredMethod("saveToFile", File.class, String.class);
+        save.setAccessible(true);
+        assertEquals(Boolean.TRUE, save.invoke(manager, saved, "removed-frames"));
+        PillarIdManager reloaded = manager();
+        load(reloaded, read(reloaded, saved, new File(temporary.getRoot(), "none")));
+        assertTrue(reloaded.getAllPillarIds().isEmpty());
+        assertTrue(reloaded.getAllPillarDataForSync().isEmpty());
+        assertTrue(reloaded.isIdTaken("I-F1"));
+        assertTrue(removedFrame(reloaded, "I-F1", Direction.NORTH));
+        assertTrue(removedFrame(reloaded, "OldFrameId", Direction.NORTH));
+        assertFalse(removedFrame(reloaded, "OtherFrameId", Direction.SOUTH));
+        assertFalse(removedFrame(reloaded, "", Direction.NORTH));
+    }
+
+    @Test
+    public void removalWinsOverEarlyRegistrationButKeepsReplacementAndRename() throws Exception {
+        PillarIdManager manager = manager();
+        manager.addPillarDataFromSync(frame("OldFrameId", "north", 10));
+        PillarIdManager.PillarData removed = frame("RenamedFrameId", "north", 20);
+        removed.removed = true;
+        load(manager, Map.of(removed.id, removed));
+        assertTrue(manager.getAllPillarIds().isEmpty());
+
+        manager.addPillarDataFromSync(frame("ReplacementId", "north", 30));
+        assertFalse(removedFrame(manager, "ReplacementId", Direction.NORTH));
+        assertFalse(removedFrame(manager, "BeforeRename", Direction.NORTH));
+        Method reconcile = PillarIdManager.class.getDeclaredMethod("reconcileFrameId", String.class,
+                String.class, BlockPos.class, Direction.class);
+        reconcile.setAccessible(true);
+        assertEquals("ReplacementId", reconcile.invoke(manager, "BeforeRename", "minecraft:overworld",
+                BlockPos.ZERO, Direction.NORTH));
+    }
+
+    private static boolean removedFrame(PillarIdManager manager, String id, Direction facing) throws Exception {
+        Method removed = PillarIdManager.class.getDeclaredMethod("isRemovedFrame", String.class,
+                String.class, BlockPos.class, Direction.class);
+        removed.setAccessible(true);
+        return (Boolean) removed.invoke(manager, id, "minecraft:overworld", BlockPos.ZERO, facing);
+    }
+
+    @Test
     public void reloadedStackKeepsEntryWhenTopIsRemoved() throws Exception {
         PillarIdManager manager = reloadedStack(3);
         BlockPos bottom = new BlockPos(0, 64, 0);

@@ -397,7 +397,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             boolean openEndpoint = state.getBlock() instanceof HollowLogBlock
                     ? HollowLogBlock.isOpenEnd(state, dir)
                     : isOpenEndpoint(state, dir);
-            if (openEndpoint) {
+            if (openEndpoint && canSpillInto(level, pos.relative(dir), fluid)) {
                 boolean falling = dir == Direction.DOWN;
                 int amount = falling ? 8 : outflowAmount;
                 if (amount <= 0) continue;
@@ -410,6 +410,16 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     public static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount) {
         spreadToWorldBlock(level, neighborPos, fluid, amount, false);
+    }
+
+    public static boolean canSpillInto(BlockGetter level, BlockPos pos, Fluid fluid) {
+        if (level instanceof net.minecraft.world.level.LevelReader reader && !reader.hasChunkAt(pos)) return false;
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock) return false;
+        if (ModFluids.cannotMix(fluid, state.getFluidState().getType())) return false;
+        return state.isAir() || state.canBeReplaced(fluid) || state.getBlock() instanceof LiquidBlock
+                || (state.getBlock() instanceof net.minecraft.world.level.block.LiquidBlockContainer container
+                && container.canPlaceLiquid(level, pos, state, fluid));
     }
 
     private static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
@@ -664,6 +674,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         updated = updateConnections(level, pos, updated);
         if (!level.isClientSide() && level instanceof Level lvl) {
             HollowPipeTransportManager.onNeighborChanged(lvl, pos, updated, neighborPos);
+            scheduleOutletTick(lvl, pos);
         }
         return updated;
     }
@@ -673,6 +684,17 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
         if (!level.isClientSide) {
             HollowPipeTransportManager.onNeighborChanged(level, pos, state, fromPos);
+            scheduleOutletTick(level, pos);
+        }
+    }
+
+    private void scheduleOutletTick(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof HollowLogBlockEntity hollowBe) {
+            PipeFlowState flow = hollowBe.getPipeFlowState();
+            if (flow != null && flow.hasFluid()) {
+                Fluid fluid = com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess.fluidById(flow.getFluidId());
+                if (fluid instanceof FlowingFluid) level.scheduleTick(pos, this, fluid.getTickDelay(level));
+            }
         }
     }
 

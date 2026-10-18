@@ -47,6 +47,8 @@
     "ServerRecipeBookMixin"
   ],
   "client": [
+    "PillarEntityRenderDispatcherInvoker",
+    "PillarOutlineRendererMixin",
     "biometint.BiomeColorsMixin",
     "biometint.EmbeddiumBiomeColorMixin",
     "AbstractContainerScreenMixin",

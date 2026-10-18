@@ -642,16 +642,42 @@ public class PillarIdManager {
     }
 
     public void removePillarByPosition(Level level, BlockPos pos) {
-        String dimension = getDimensionKey(level);
+        removePillarByPosition(getDimensionKey(level), pos);
+    }
+
+    private void removePillarByPosition(String dimension, BlockPos pos) {
         String posKey = positionKey(dimension, pos);
 
         String idToRemove = positionIndex.remove(posKey);
         if (idToRemove != null) {
-            PillarData dataToReset = pillarData.remove(idToRemove);
-            if (dataToReset != null) {
-                PillarResetHandler.resetPillarFromData(dataToReset);
+            PillarData data = pillarData.get(idToRemove);
+            if (data != null && Objects.equals(data.dimension, dimension)
+                    && data.getBlockPos().equals(pos)) {
+                removePillar(idToRemove);
             }
-            if (pillarData.isEmpty()) allowEmptySave = true;
+        }
+    }
+
+    public void removeStalePillarPositionIndex(Level level, BlockPos pos) {
+        String dimension = getDimensionKey(level);
+        String key = positionKey(dimension, pos);
+        String id = positionIndex.get(key);
+        if (id != null) {
+            PillarData data = pillarData.get(id);
+            if (data == null || !Objects.equals(data.dimension, dimension)
+                    || !data.getBlockPos().equals(pos)) {
+                positionIndex.remove(key, id);
+            }
+        }
+    }
+
+    public void updatePillarPosition(String pillarId, BlockPos pos) {
+        PillarData data = pillarData.get(pillarId);
+        if (data != null && !data.getBlockPos().equals(pos)) {
+            data.x = pos.getX();
+            data.y = pos.getY();
+            data.z = pos.getZ();
+            rebuildPositionIndex();
             requestSave();
         }
     }
@@ -1993,18 +2019,22 @@ public class PillarIdManager {
                 continue;
             }
             try {
-                net.minecraft.core.Direction facing = data.facing != null
-                        ? net.minecraft.core.Direction.byName(data.facing)
-                        : null;
-                String key = positionKey(data.dimension, data.getBlockPos(), facing);
-                String previousId = positionIndex.get(key);
-                PillarData previous = previousId != null ? pillarData.get(previousId) : null;
-                if (previous == null || data.modifiedTime > previous.modifiedTime
-                        || (data.modifiedTime == previous.modifiedTime && data.id.compareTo(previous.id) < 0)) {
-                    positionIndex.put(key, data.id);
-                }
+                indexPosition(data);
             } catch (Exception ignored) {
             }
+        }
+    }
+
+    private void indexPosition(PillarData data) {
+        net.minecraft.core.Direction facing = data.facing != null
+                ? net.minecraft.core.Direction.byName(data.facing)
+                : null;
+        String key = positionKey(data.dimension, data.getBlockPos(), facing);
+        String previousId = positionIndex.get(key);
+        PillarData previous = previousId != null ? pillarData.get(previousId) : null;
+        if (previous == null || data.modifiedTime > previous.modifiedTime
+                || (data.modifiedTime == previous.modifiedTime && data.id.compareTo(previous.id) < 0)) {
+            positionIndex.put(key, data.id);
         }
     }
 
@@ -2111,13 +2141,9 @@ public class PillarIdManager {
             return;
         }
 
-        BlockPos pos = pillar.getBlockPos();
-        String posKey = positionKey(dimension, pos);
-
         PillarData existing = pillarData.get(id);
+        PillarData data = registerPillarData(id, dimension, pillar.getBlockPos());
         if (existing == null) {
-            PillarData data = new PillarData(id, dimension, pos);
-
             syncPatternSettingsFromNBT(pillar, data);
 
             List<String> colors = pillar.getParticleColors();
@@ -2125,17 +2151,22 @@ public class PillarIdManager {
                 for (String c : colors) data.addColor(c);
             }
 
-            pillarData.put(id, data);
-            positionIndex.put(posKey, id);
-
             requestSave();
         } else {
-            positionIndex.put(posKey, id);
-
             if (syncPatternSettingsFromNBT(pillar, existing)) {
                 requestSave();
             }
         }
+    }
+
+    private PillarData registerPillarData(String id, String dimension, BlockPos pos) {
+        PillarData data = pillarData.get(id);
+        if (data == null) {
+            data = new PillarData(id, dimension, pos);
+            pillarData.put(id, data);
+        }
+        indexPosition(data);
+        return data;
     }
 
     private String reconcilePillarId(String savedId, String dimension, BlockPos basePos) {

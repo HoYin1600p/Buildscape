@@ -322,10 +322,7 @@ public class PillarBlock
 
                     if (data != null) {
                         BlockPos bottom = findBottomBlock(level, pos);
-                        data.x = bottom.getX();
-                        data.y = bottom.getY();
-                        data.z = bottom.getZ();
-                        manager.requestSave();
+                        manager.updatePillarPosition(stackId, bottom);
                     }
                 }
 
@@ -411,10 +408,7 @@ public class PillarBlock
                         com.kingodogo.buildscape.config.PillarIdManager.PillarData data =
                                 manager.getPillarData(pillarIdToPreserve);
                         if (data != null) {
-                            data.x = firstRemainingPillar.getX();
-                            data.y = firstRemainingPillar.getY();
-                            data.z = firstRemainingPillar.getZ();
-                            manager.requestSave();
+                            manager.updatePillarPosition(pillarIdToPreserve, firstRemainingPillar);
                         }
 
                         current = bottom;
@@ -441,7 +435,7 @@ public class PillarBlock
 
                 com.kingodogo.buildscape.config.PillarIdManager manager =
                         com.kingodogo.buildscape.config.PillarIdManager.get(level);
-                manager.removePillarByPosition(level, pos);
+                manager.removeStalePillarPositionIndex(level, pos);
             } else {
                 com.kingodogo.buildscape.config.PillarIdManager manager =
                         com.kingodogo.buildscape.config.PillarIdManager.get(level);

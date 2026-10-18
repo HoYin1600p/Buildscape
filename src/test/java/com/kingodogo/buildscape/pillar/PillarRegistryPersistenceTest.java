@@ -183,6 +183,155 @@ public class PillarRegistryPersistenceTest {
     }
 
     @Test
+    public void reloadedStackKeepsEntryWhenTopIsRemoved() throws Exception {
+        PillarIdManager manager = reloadedStack(3);
+        BlockPos bottom = new BlockPos(0, 64, 0);
+        PillarIdManager.PillarData data = manager.getPillarData("StackId");
+        assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:64:0"));
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:65:0"));
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:66:0"));
+
+        removePosition(manager, "minecraft:overworld", bottom.above(2));
+
+        assertSame(data, manager.getPillarData("StackId"));
+        assertEquals(bottom, data.getBlockPos());
+        assertEquals(List.of("#123456"), data.dyeColors);
+        assertEquals("spiral", data.pattern);
+    }
+
+    @Test
+    public void removingStackBottomMovesEntryUpAndSurvivesAnotherReload() throws Exception {
+        PillarIdManager manager = reloadedStack(3);
+        BlockPos bottom = new BlockPos(0, 64, 0);
+        manager.updatePillarPosition("StackId", bottom.above());
+        removePosition(manager, "minecraft:overworld", bottom);
+
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:64:0"));
+        assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:65:0"));
+        assertEquals(bottom.above(), manager.getPillarData("StackId").getBlockPos());
+        manager = restart(manager);
+        assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:65:0"));
+        assertEquals(bottom.above(), manager.getPillarData("StackId").getBlockPos());
+        assertEquals(List.of("#123456"), manager.getPillarData("StackId").dyeColors);
+        assertEquals("spiral", manager.getPillarData("StackId").pattern);
+    }
+
+    @Test
+    public void removingSinglePillarDeletesEntryAndAllowsEmptySave() throws Exception {
+        PillarIdManager manager = reloadedStack(1);
+        removePosition(manager, "minecraft:overworld", new BlockPos(0, 64, 0));
+
+        assertNull(manager.getPillarData("StackId"));
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:64:0"));
+        Field allowEmpty = PillarIdManager.class.getDeclaredField("allowEmptySave");
+        allowEmpty.setAccessible(true);
+        assertTrue(allowEmpty.getBoolean(manager));
+        assertTrue(restart(manager).getAllPillarIds().isEmpty());
+    }
+
+    @Test
+    public void staleIndexCannotDeleteEntryAtAnotherPositionOrDimension() throws Exception {
+        PillarIdManager manager = reloadedStack(3);
+        Map<String, String> index = positionIndex(manager);
+        index.put("minecraft:overworld:0:66:0", "StackId");
+        index.put("test:other:0:64:0", "StackId");
+
+        removePosition(manager, "minecraft:overworld", new BlockPos(0, 66, 0));
+        removePosition(manager, "test:other", new BlockPos(0, 64, 0));
+
+        assertNotNull(manager.getPillarData("StackId"));
+        assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:64:0"));
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:66:0"));
+        assertNull(manager.getIdForPosition("test:other:0:64:0"));
+    }
+
+    @Test
+    public void remainingStackCleanupOnlyRemovesIndexKey() throws Exception {
+        PillarIdManager manager = reloadedStack(3);
+        positionIndex(manager).put("unknown:0:66:0", "StackId");
+        manager.removeStalePillarPositionIndex(null, new BlockPos(0, 66, 0));
+        assertNull(manager.getIdForPosition("unknown:0:66:0"));
+        assertNotNull(manager.getPillarData("StackId"));
+        assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:64:0"));
+    }
+
+    @Test
+    public void staleIndexCleanupPreservesEntryRecordedAtPosition() throws Exception {
+        PillarIdManager manager = manager();
+        BlockPos pos = new BlockPos(0, 64, 0);
+        PillarIdManager.PillarData data = new PillarIdManager.PillarData("StackId", "unknown", pos);
+        manager.addPillarDataFromSync(data);
+        manager.removeStalePillarPositionIndex(null, pos);
+        assertSame(data, manager.getPillarData("StackId"));
+        assertEquals("StackId", manager.getIdForPosition("unknown:0:64:0"));
+    }
+
+    @Test
+    public void stackRegistrationPreservesDeterministicPositionOwner() throws Exception {
+        for (long firstTime : new long[] {10, 20, 30}) {
+            PillarIdManager manager = manager();
+            PillarIdManager.PillarData first = new PillarIdManager.PillarData(
+                    "PillarA", "minecraft:overworld", new BlockPos(0, 64, 0));
+            first.modifiedTime = firstTime;
+            PillarIdManager.PillarData second = new PillarIdManager.PillarData(
+                    "PillarB", "minecraft:overworld", first.getBlockPos());
+            second.modifiedTime = 20;
+            load(manager, Map.of(first.id, first, second.id, second));
+            for (String id : List.of("PillarB", "PillarA", "PillarB", "PillarA")) {
+                registerPosition(manager, id, first.getBlockPos().above(2));
+                assertEquals(firstTime < 20 ? "PillarB" : "PillarA",
+                        manager.getIdForPosition("minecraft:overworld:0:64:0"));
+                assertNull(manager.getIdForPosition("minecraft:overworld:0:66:0"));
+            }
+        }
+    }
+
+    private PillarIdManager reloadedStack(int height) throws Exception {
+        PillarIdManager manager = manager();
+        PillarIdManager.PillarData data = new PillarIdManager.PillarData(
+                "StackId", "minecraft:overworld", new BlockPos(0, 64, 0));
+        data.pillarType = "buildscape:stone_pillar";
+        data.dyeColors.add("#123456");
+        data.pattern = "spiral";
+        load(manager, Map.of(data.id, data));
+        manager = restart(manager);
+        for (int y = 64 + height - 1; y >= 64; y--) {
+            registerPosition(manager, "StackId", new BlockPos(0, y, 0));
+        }
+        return manager;
+    }
+
+    private PillarIdManager restart(PillarIdManager manager) throws Exception {
+        File saved = temporary.newFile();
+        Method save = PillarIdManager.class.getDeclaredMethod("saveToFile", File.class, String.class);
+        save.setAccessible(true);
+        assertEquals(Boolean.TRUE, save.invoke(manager, saved, saved.getName()));
+        PillarIdManager restarted = manager();
+        load(restarted, read(restarted, saved, new File(temporary.getRoot(), "missing")));
+        return restarted;
+    }
+
+    private static void registerPosition(PillarIdManager manager, String id, BlockPos pos) throws Exception {
+        Method register = PillarIdManager.class.getDeclaredMethod("registerPillarData",
+                String.class, String.class, BlockPos.class);
+        register.setAccessible(true);
+        register.invoke(manager, id, "minecraft:overworld", pos);
+    }
+
+    private static void removePosition(PillarIdManager manager, String dimension, BlockPos pos) throws Exception {
+        Method remove = PillarIdManager.class.getDeclaredMethod("removePillarByPosition", String.class, BlockPos.class);
+        remove.setAccessible(true);
+        remove.invoke(manager, dimension, pos);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, String> positionIndex(PillarIdManager manager) throws Exception {
+        Field index = PillarIdManager.class.getDeclaredField("positionIndex");
+        index.setAccessible(true);
+        return (Map<String, String>) index.get(manager);
+    }
+
+    @Test
     public void framesOnDifferentFacesKeepSeparatePatternsWithoutPositionFallback() throws Exception {
         PillarIdManager manager = manager();
         PillarIdManager.PillarData north = frame("F-N1", "north", 10);

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.biometint;
+package com.kingodogo.buildscape.feature.biome;
 
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.client.Minecraft;

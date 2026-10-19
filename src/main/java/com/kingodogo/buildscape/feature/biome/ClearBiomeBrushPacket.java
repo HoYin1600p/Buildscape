@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.network;
+package com.kingodogo.buildscape.feature.biome;
 
-import com.kingodogo.buildscape.item.BiomeBrushItem;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;

@@ -1,7 +1,5 @@
-package com.kingodogo.buildscape.item;
+package com.kingodogo.buildscape.feature.biome;
 
-import com.kingodogo.buildscape.biometint.BiomeTintData;
-import com.kingodogo.buildscape.biometint.BiomeTintSync;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;

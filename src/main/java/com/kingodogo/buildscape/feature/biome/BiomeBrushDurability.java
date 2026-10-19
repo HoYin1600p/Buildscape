@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.item;
+package com.kingodogo.buildscape.feature.biome;
 
 import java.util.function.IntUnaryOperator;
 

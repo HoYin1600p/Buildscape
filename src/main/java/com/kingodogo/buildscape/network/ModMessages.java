@@ -1,7 +1,8 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.biometint.SyncBiomeTintPacket;
+import com.kingodogo.buildscape.feature.biome.ClearBiomeBrushPacket;
+import com.kingodogo.buildscape.feature.biome.SyncBiomeTintPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;

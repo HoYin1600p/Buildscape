@@ -1,8 +1,6 @@
-package com.kingodogo.buildscape.event;
+package com.kingodogo.buildscape.feature.biome;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.item.BiomeBrushItem;
-import com.kingodogo.buildscape.network.ClearBiomeBrushPacket;
 import com.kingodogo.buildscape.network.ModMessages;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;

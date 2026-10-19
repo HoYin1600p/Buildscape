@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.biometint;
+package com.kingodogo.buildscape.feature.biome;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;

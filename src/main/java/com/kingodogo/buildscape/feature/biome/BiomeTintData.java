@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.biometint;
+package com.kingodogo.buildscape.feature.biome;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

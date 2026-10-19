@@ -2,9 +2,9 @@ package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.HomemakerCooldownTracker;
+import com.kingodogo.buildscape.feature.biome.BiomeBrushItem;
 import com.kingodogo.buildscape.feature.copper.CopperChestItem;
 import com.kingodogo.buildscape.item.BigOrnamentTemplateItem;
-import com.kingodogo.buildscape.item.BiomeBrushItem;
 import com.kingodogo.buildscape.item.BottleOfMistItem;
 import com.kingodogo.buildscape.item.BuildersPouchItem;
 import com.kingodogo.buildscape.item.ColoredItemFrameItem;

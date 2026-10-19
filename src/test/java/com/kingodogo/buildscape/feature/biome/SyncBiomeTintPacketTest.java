@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.biometint;
+package com.kingodogo.buildscape.feature.biome;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;

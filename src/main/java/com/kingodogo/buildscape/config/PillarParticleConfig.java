@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.util.*;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -693,7 +694,7 @@ public class PillarParticleConfig {
                     if (rawColors != null && !rawColors.isEmpty()) {
                         for (String color : rawColors) {
                             if (color != null && color.matches("^#[0-9A-Fa-f]{6}$")) {
-                                newColors.add(color.toUpperCase());
+                                newColors.add(color.toUpperCase(Locale.ROOT));
                             }
                         }
                     }

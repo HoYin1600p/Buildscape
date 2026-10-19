@@ -46,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PillarIdManager {
@@ -405,14 +406,14 @@ public class PillarIdManager {
 
         for (int attempt = 0; attempt < 50; attempt++) {
             int num = random.nextInt(9999) + 1;
-            String id = prefix + String.format("%04d", num);
+            String id = prefix + String.format(Locale.ROOT, "%04d", num);
             if (!pillarData.containsKey(id)) {
                 return id;
             }
         }
 
         for (int num = 1; num <= 9999; num++) {
-            String id = prefix + String.format("%04d", num);
+            String id = prefix + String.format(Locale.ROOT, "%04d", num);
             if (!pillarData.containsKey(id)) {
                 return id;
             }
@@ -2742,7 +2743,7 @@ public class PillarIdManager {
             if (dyeColors.size() >= 5) {
                 return false;
             }
-            dyeColors.add(colorCode.toUpperCase());
+            dyeColors.add(colorCode.toUpperCase(Locale.ROOT));
             modifiedTime = System.currentTimeMillis();
             return true;
         }

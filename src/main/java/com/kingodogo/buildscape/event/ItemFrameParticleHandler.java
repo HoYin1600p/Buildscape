@@ -648,7 +648,7 @@ public class ItemFrameParticleHandler {
 
         String color = cfg.particle_color.get(colorIndex);
         if (color != null && color.matches("^#[0-9A-Fa-f]{6}$")) {
-            return color.toUpperCase();
+            return color.toUpperCase(Locale.ROOT);
         }
         return "#FFFFFF";
     }
@@ -817,14 +817,14 @@ public class ItemFrameParticleHandler {
     private static String generateUniqueId(String prefix, PillarIdManager manager) {
         ThreadLocalRandom random = ThreadLocalRandom.current();
         for (int attempt = 0; attempt < 64; attempt++) {
-            String id = prefix + String.format("%04X", random.nextInt(0x10000));
+            String id = prefix + String.format(Locale.ROOT, "%04X", random.nextInt(0x10000));
             if (manager == null || !manager.isIdTaken(id)) {
                 return id;
             }
         }
         String id;
         do {
-            id = prefix + String.format("%08X", random.nextInt() & 0x7FFFFFFF);
+            id = prefix + String.format(Locale.ROOT, "%08X", random.nextInt() & 0x7FFFFFFF);
         } while (manager != null && manager.isIdTaken(id));
         return id;
     }
@@ -840,7 +840,7 @@ public class ItemFrameParticleHandler {
 
     private static String getColorCode(String colorName) {
         if (colorName == null || colorName.isEmpty()) return "W";
-        switch (colorName.toLowerCase()) {
+        switch (colorName.toLowerCase(Locale.ROOT)) {
             case "white":
                 return "W";
             case "orange":
@@ -1173,7 +1173,7 @@ public class ItemFrameParticleHandler {
 
             String color = customColors.get(colorIndex);
             if (color != null && color.matches("^#[0-9A-Fa-f]{6}$")) {
-                return color.toUpperCase();
+                return color.toUpperCase(Locale.ROOT);
             }
         }
 
@@ -1195,7 +1195,7 @@ public class ItemFrameParticleHandler {
 
         String color = cfg.particle_color.get(colorIndex);
         if (color != null && color.matches("^#[0-9A-Fa-f]{6}$")) {
-            return color.toUpperCase();
+            return color.toUpperCase(Locale.ROOT);
         }
         return "#E8FEFD";
     }

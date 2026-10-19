@@ -11,6 +11,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.Color;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -46,7 +47,7 @@ public class TrailNoteParticle extends TextureSheetParticle {
 
         this.setSprite(sprites.get(level.random));
 
-        String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+        String positionKey = String.format(Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
 
         ColorEntry colorEntry = POSITION_COLOR_MAP.remove(positionKey);
@@ -122,7 +123,7 @@ public class TrailNoteParticle extends TextureSheetParticle {
 
     public static void queueColor(double x, double y, double z, String colorCode) {
         if (colorCode != null && !colorCode.isEmpty()) {
-            String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+            String positionKey = String.format(Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
             POSITION_COLOR_MAP.put(positionKey, new ColorEntry(colorCode));
         }
     }

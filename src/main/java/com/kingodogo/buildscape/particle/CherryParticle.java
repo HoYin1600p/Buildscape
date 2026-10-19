@@ -6,6 +6,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,7 +55,7 @@ public class CherryParticle extends TextureSheetParticle {
 
         this.quadSize *= 0.5F;
 
-        String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+        String positionKey = String.format(Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
 
         ColorEntry colorEntry = POSITION_COLOR_MAP.remove(positionKey);
@@ -127,7 +128,7 @@ public class CherryParticle extends TextureSheetParticle {
 
     public static void queueColor(double x, double y, double z, String colorCode) {
         if (colorCode != null && !colorCode.isEmpty()) {
-            String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+            String positionKey = String.format(Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
             POSITION_COLOR_MAP.put(positionKey, new ColorEntry(colorCode));
         }
     }

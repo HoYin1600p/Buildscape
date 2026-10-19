@@ -39,6 +39,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -321,7 +322,7 @@ public class MobPillarRenderer {
     }
 
     private static void applyVariantToNBT(CompoundTag nbt, EntityType<?> entityType, MobState state) {
-        String entityTypeName = entityType.getDescriptionId().toLowerCase();
+        String entityTypeName = entityType.getDescriptionId().toLowerCase(Locale.ROOT);
         if (entityTypeName.contains(".")) {
             String[] parts = entityTypeName.split("\\.");
             entityTypeName = parts[parts.length - 1];

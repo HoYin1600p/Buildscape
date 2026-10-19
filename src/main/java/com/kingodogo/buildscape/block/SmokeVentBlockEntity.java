@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.Level;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class SmokeVentBlockEntity extends BlockEntity {
@@ -78,7 +79,7 @@ public class SmokeVentBlockEntity extends BlockEntity {
         if (tag.contains(NbtKeys.SMOKE_COLOR, 8)) {
             String color = tag.getString(NbtKeys.SMOKE_COLOR);
             if (color != null && !color.isEmpty() && color.matches("^#[0-9A-Fa-f]{6}$")) {
-                this.smokeColor = color.toUpperCase();
+                this.smokeColor = color.toUpperCase(Locale.ROOT);
             } else {
                 this.smokeColor = null;
             }

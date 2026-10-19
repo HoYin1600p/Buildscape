@@ -65,7 +65,7 @@ public class RecipeCacheGenerator {
             byte[] hashBytes = digest.digest();
             StringBuilder hex = new StringBuilder();
             for (byte b : hashBytes) {
-                hex.append(String.format("%02x", b));
+                hex.append(String.format(Locale.ROOT, "%02x", b));
             }
             return hex.toString();
         } catch (NoSuchAlgorithmException e) {

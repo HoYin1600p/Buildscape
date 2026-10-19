@@ -489,14 +489,14 @@ public class PillarBlockEntityRenderer
             trimmedName = ChatFormatting.stripFormatting(trimmedName);
 
             if (trimmedName != null && !trimmedName.isEmpty()) {
-                String lowerName = trimmedName.toLowerCase();
+                String lowerName = trimmedName.toLowerCase(Locale.ROOT);
                 return lowerName.contains("grum") || lowerName.contains("dinnerbone");
             }
         } catch (Exception e) {
             String trimmedName = nameJson.trim();
             trimmedName = ChatFormatting.stripFormatting(trimmedName);
             if (trimmedName != null && !trimmedName.isEmpty()) {
-                String lowerName = trimmedName.toLowerCase();
+                String lowerName = trimmedName.toLowerCase(Locale.ROOT);
                 return lowerName.contains("grum") || lowerName.contains("dinnerbone");
             }
         }

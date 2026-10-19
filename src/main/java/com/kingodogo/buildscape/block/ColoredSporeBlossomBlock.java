@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.SporeBlossomBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class ColoredSporeBlossomBlock
@@ -38,7 +39,7 @@ public class ColoredSporeBlossomBlock
         int j = pos.getY();
         int k = pos.getZ();
 
-        String colorHex = String.format("#%06x", particleColorRGB);
+        String colorHex = String.format(Locale.ROOT, "#%06x", particleColorRGB);
 
         if (level.isClientSide) {
             double centerX = (double) i + 0.5D;

@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.cosmetics;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -200,7 +201,7 @@ public class CosmeticManager {
             return true;
         }
 
-        String idLower = cosmeticId.toLowerCase();
+        String idLower = cosmeticId.toLowerCase(Locale.ROOT);
         return idLower.contains("particle") &&
                 (idLower.contains("trail") ||
                         idLower.contains("star") ||

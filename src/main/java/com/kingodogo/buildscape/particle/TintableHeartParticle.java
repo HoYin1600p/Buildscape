@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.particle;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -53,7 +54,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
             this.yd = 0.1;
         }
 
-        String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+        String positionKey = String.format(Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
 
         ColorEntry colorEntry = POSITION_COLOR_MAP.remove(positionKey);
@@ -180,7 +181,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
             String colorCode
     ) {
         if (colorCode != null && !colorCode.isEmpty()) {
-            String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+            String positionKey = String.format(Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
             POSITION_COLOR_MAP.put(positionKey, new ColorEntry(colorCode));
         }
     }

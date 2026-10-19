@@ -37,6 +37,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -1090,7 +1091,7 @@ public class PillarBlockEntity extends BlockEntity {
 
             String customColor = particleColors.get(colorIndex);
             if (customColor != null && HEX_COLOR_PATTERN.matcher(customColor).matches()) {
-                return customColor.toUpperCase();
+                return customColor.toUpperCase(Locale.ROOT);
             }
         }
 
@@ -1117,7 +1118,7 @@ public class PillarBlockEntity extends BlockEntity {
 
         String configColor = colorsToUse.get(colorIndex);
         if (configColor != null && HEX_COLOR_PATTERN.matcher(configColor).matches()) {
-            return configColor.toUpperCase();
+            return configColor.toUpperCase(Locale.ROOT);
         }
         return "#FFFFFF";
     }
@@ -1172,7 +1173,7 @@ public class PillarBlockEntity extends BlockEntity {
             return false;
         }
 
-        String normalizedColor = color.toUpperCase();
+        String normalizedColor = color.toUpperCase(Locale.ROOT);
         if (!normalizedColor.startsWith("#")) {
             normalizedColor = "#" + normalizedColor;
         }
@@ -1647,7 +1648,7 @@ public class PillarBlockEntity extends BlockEntity {
                             if (color != null &&
                                     !color.isEmpty() &&
                                     color.matches("^#[0-9A-Fa-f]{6}$")) {
-                                this.particleColors.add(color.toUpperCase());
+                                this.particleColors.add(color.toUpperCase(Locale.ROOT));
                             }
                         } catch (Exception e) {
                         }

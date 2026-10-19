@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,8 +59,8 @@ public class MobStateParser {
                     if (line.contains("|")) {
                         String[] parts = line.split("\\|");
                         if (parts.length >= 2) {
-                            String mobName = parts[0].trim().toLowerCase().replace(" ", "_");
-                            String stateName = parts[1].trim().toLowerCase();
+                            String mobName = parts[0].trim().toLowerCase(Locale.ROOT).replace(" ", "_");
+                            String stateName = parts[1].trim().toLowerCase(Locale.ROOT);
 
                             if (stateName.contains(" ")) {
                                 String[] stateWords = stateName.split("\\s+");
@@ -78,14 +79,14 @@ public class MobStateParser {
                     }
 
                     if (line.startsWith("**") && line.endsWith("**")) {
-                        currentMob = line.substring(2, line.length() - 2).trim().toLowerCase();
+                        currentMob = line.substring(2, line.length() - 2).trim().toLowerCase(Locale.ROOT);
                         currentMob = currentMob.replace(" ", "_");
                         continue;
                     }
 
                     if (line.startsWith("•") || line.startsWith("-") || line.startsWith("*")) {
                         if (currentMob != null) {
-                            String stateName = line.substring(1).trim().toLowerCase();
+                            String stateName = line.substring(1).trim().toLowerCase(Locale.ROOT);
                             if (stateName.endsWith(":")) {
                                 continue;
                             }
@@ -226,13 +227,13 @@ public class MobStateParser {
 
         loadStates();
 
-        String mobTypeName = entityType.getDescriptionId().toLowerCase();
+        String mobTypeName = entityType.getDescriptionId().toLowerCase(Locale.ROOT);
         if (mobTypeName.contains(".")) {
             String[] parts = mobTypeName.split("\\.");
             mobTypeName = parts[parts.length - 1];
         }
 
-        String lowerName = customName.toLowerCase();
+        String lowerName = customName.toLowerCase(Locale.ROOT);
 
         lowerName = lowerName.replace("no pumpkin", "nopumpkin");
         lowerName = lowerName.replace("no horns", "nohorns");

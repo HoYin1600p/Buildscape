@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.trophy;
+package com.kingodogo.buildscape.feature.trophy;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.registry.ModBlockEntities;

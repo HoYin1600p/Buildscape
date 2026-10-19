@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.trophy;
+package com.kingodogo.buildscape.feature.trophy;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;

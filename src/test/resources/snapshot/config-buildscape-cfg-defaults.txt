@@ -1,0 +1,9 @@
+HideBuildscapeConfig = false
+OptimizeBuildscapeModelLoading = true
+OptimizeBuildscapeModelMaterials = true
+OptimizeBuildscapeModelBaking = true
+OptimizeBuildscapeBlockStateCache = true
+MaxPipeNetworkSize = 64
+isCakeStack = true
+isWaterbottleStack = true
+MaxCustomPresets = 4

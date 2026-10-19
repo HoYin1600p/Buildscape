@@ -1,0 +1,7 @@
+buildscape:shaped_durability
+buildscape:shapeless_durability
+buildscape:haze_bush_dye
+buildscape:confetti_configure
+buildscape:clear_shulker_filters
+buildscape:custom_firework_star
+buildscape:infinite_phoenix_firework_star

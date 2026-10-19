@@ -1,6 +1,9 @@
 package com.kingodogo.buildscape.copper;
 
+import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.block.copper.CopperTransitions;
+import com.kingodogo.buildscape.testutil.RegistryTestSupport;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -16,6 +19,11 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.*;
 
 public class CopperRegistryMappingTest {
+    @BeforeClass
+    public static void bootstrap() {
+        RegistryTestSupport.bootstrap();
+    }
+
     private static final Path BLOCK_SOURCE = Path.of("src/main/java/com/kingodogo/buildscape/block");
     private static final String[] AGES = {"", "exposed_", "weathered_", "oxidized_"};
 
@@ -86,15 +94,8 @@ public class CopperRegistryMappingTest {
                 + "return CopperOxidationHandler\\.getNext\\(state\\);\\s*}").matcher(weathering).find());
     }
 
-    private static Map<String, String> registrations() throws IOException {
-        String source = Files.readString(BLOCK_SOURCE.resolve("ModBlocks.java"));
-        Matcher entries = Pattern.compile("RegistryObject<Block>\\s+(\\w+)\\s*=\\s*"
-                + "BLOCKS\\s*\\.register\\(\\s*\"([^\"]+)\"").matcher(source);
-        Map<String, String> registry = new HashMap<>();
-        while (entries.find()) {
-            assertNull("duplicate block field: " + entries.group(1),
-                    registry.put(entries.group(1), entries.group(2)));
-        }
+    private static Map<String, String> registrations() {
+        Map<String, String> registry = RegistryTestSupport.pathsByField(ModBlocks.class);
         assertFalse("block registrations were found", registry.isEmpty());
         return registry;
     }

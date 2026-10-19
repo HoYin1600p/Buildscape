@@ -1,0 +1,13 @@
+edit_permission_mode = STRICT
+items = []
+max_particle_color = 3
+particle_color = [#FFB81C, #FFFFFF, #FFFF00, #E8FEFD, #FF5C00, #3CDFFF, #9B51E0]
+particle_density = 2
+particle_lifetime = 20
+particle_speed = 0.02
+particle_spread = 0.1
+pattern = ring
+pattern_intensity = 1.0
+pattern_speed = 0.05
+pattern_spread = 0.05
+use_pattern = true

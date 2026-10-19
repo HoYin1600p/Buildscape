@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.sculk;
 
-import com.kingodogo.buildscape.block.sculk.SculkSpreader;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.core.BlockPos;

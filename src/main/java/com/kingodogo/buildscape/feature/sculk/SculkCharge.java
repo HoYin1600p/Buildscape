@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block.sculk;
+package com.kingodogo.buildscape.feature.sculk;
 
 public final class SculkCharge {
     public static final int MAX_CURSORS = 32;

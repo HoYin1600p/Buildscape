@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.block.sculk;
+package com.kingodogo.buildscape.feature.sculk;
 
-import com.kingodogo.buildscape.block.SculkVeinBlock;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModSounds;

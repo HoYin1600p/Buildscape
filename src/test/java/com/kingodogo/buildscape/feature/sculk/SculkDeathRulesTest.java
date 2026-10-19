@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.sculk;
+package com.kingodogo.buildscape.feature.sculk;
 
-import com.kingodogo.buildscape.block.sculk.SculkDeathRules;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

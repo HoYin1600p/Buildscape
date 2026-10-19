@@ -1,7 +1,6 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.sculk;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.sculk.SculkDeathRules;
 import com.kingodogo.buildscape.mixin.LivingEntityExperienceAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

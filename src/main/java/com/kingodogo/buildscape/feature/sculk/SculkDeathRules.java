@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block.sculk;
+package com.kingodogo.buildscape.feature.sculk;
 
 import java.util.Collections;
 import java.util.Set;

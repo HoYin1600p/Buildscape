@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.sculk;
+package com.kingodogo.buildscape.feature.sculk;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

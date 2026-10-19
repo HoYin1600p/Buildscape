@@ -1,8 +1,8 @@
-package com.kingodogo.buildscape.pipe.transport;
+package com.kingodogo.buildscape.feature.pipe.transport;
 
-import com.kingodogo.buildscape.block.HollowLogBlockEntity;
-import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.config.BuildScapeConfig;
+import com.kingodogo.buildscape.feature.pipe.HollowLogBlockEntity;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

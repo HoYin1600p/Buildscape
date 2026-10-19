@@ -1,11 +1,11 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.HollowLogBlockEntity;
-import com.kingodogo.buildscape.block.HollowPipeBlock;
-import com.kingodogo.buildscape.pipe.transport.BubbleColumnState;
-import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
-import com.kingodogo.buildscape.pipe.transport.PipeFluidTransport;
-import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
+import com.kingodogo.buildscape.feature.pipe.HollowLogBlockEntity;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
+import com.kingodogo.buildscape.feature.pipe.transport.BubbleColumnState;
+import com.kingodogo.buildscape.feature.pipe.transport.PipeFlowState;
+import com.kingodogo.buildscape.feature.pipe.transport.PipeFluidTransport;
+import com.kingodogo.buildscape.feature.pipe.transport.WorldPipeTopologyAccess;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.pipe.transport;
+package com.kingodogo.buildscape.feature.pipe.transport;
 
 import net.minecraft.util.StringRepresentable;
 

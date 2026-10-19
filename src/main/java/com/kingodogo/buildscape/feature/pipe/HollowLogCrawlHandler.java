@@ -1,7 +1,5 @@
-package com.kingodogo.buildscape.event;
+package com.kingodogo.buildscape.feature.pipe;
 
-import com.kingodogo.buildscape.block.HollowLogBlock;
-import com.kingodogo.buildscape.block.HollowPipeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;

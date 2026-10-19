@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.pipe;
 
 import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import net.minecraft.core.BlockPos;

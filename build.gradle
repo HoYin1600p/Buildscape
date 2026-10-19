@@ -208,7 +208,7 @@ tasks.register('runPipeSpillTests', JavaExec) {
 
 tasks.register('runPipeOutletTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.pipe.transport.PipeOutletWaterTest'
+    mainClass = 'com.kingodogo.buildscape.feature.pipe.transport.PipeOutletWaterTest'
 }
 
 tasks.register('runRecipeManagerInjectorTests', JavaExec) {

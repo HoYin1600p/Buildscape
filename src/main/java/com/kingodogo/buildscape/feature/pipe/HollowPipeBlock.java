@@ -1,10 +1,10 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.pipe;
 
-import com.kingodogo.buildscape.pipe.transport.BubbleColumnHandler;
-import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
-import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
-import com.kingodogo.buildscape.pipe.transport.WaterPipeTransport;
-import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
+import com.kingodogo.buildscape.feature.pipe.transport.BubbleColumnHandler;
+import com.kingodogo.buildscape.feature.pipe.transport.HollowPipeTransportManager;
+import com.kingodogo.buildscape.feature.pipe.transport.PipeFlowState;
+import com.kingodogo.buildscape.feature.pipe.transport.WaterPipeTransport;
+import com.kingodogo.buildscape.feature.pipe.transport.WorldPipeTopologyAccess;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import com.kingodogo.buildscape.registry.ModFluids;
 import com.kingodogo.buildscape.registry.ModItems;

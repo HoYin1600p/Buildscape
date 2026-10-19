@@ -1,8 +1,8 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.pipe;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
-import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
+import com.kingodogo.buildscape.feature.pipe.transport.HollowPipeTransportManager;
+import com.kingodogo.buildscape.feature.pipe.transport.PipeFlowState;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

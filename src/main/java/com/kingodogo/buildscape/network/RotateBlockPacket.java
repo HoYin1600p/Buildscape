@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.block.HollowPipeBlock;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
 import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.HollowLogBlock;
-import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.client.renderer.PipeSpillVertexConsumer;
+import com.kingodogo.buildscape.feature.pipe.HollowLogBlock;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.block.LiquidBlockRenderer;
 import net.minecraft.core.BlockPos;

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.HollowPipeBlock;
-import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
+import com.kingodogo.buildscape.feature.pipe.transport.PipeFlowState;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class PipeWaterSurface {

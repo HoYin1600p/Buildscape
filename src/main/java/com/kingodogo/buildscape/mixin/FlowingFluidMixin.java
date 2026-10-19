@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.HollowLogBlock;
-import com.kingodogo.buildscape.block.HollowLogBlockEntity;
-import com.kingodogo.buildscape.block.HollowPipeBlock;
-import com.kingodogo.buildscape.pipe.transport.PipeOutletWater;
-import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
+import com.kingodogo.buildscape.feature.pipe.HollowLogBlock;
+import com.kingodogo.buildscape.feature.pipe.HollowLogBlockEntity;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
+import com.kingodogo.buildscape.feature.pipe.transport.PipeOutletWater;
+import com.kingodogo.buildscape.feature.pipe.transport.WorldPipeTopologyAccess;
 import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.pipe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

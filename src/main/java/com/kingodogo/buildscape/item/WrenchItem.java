@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.block.HollowPipeBlock;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

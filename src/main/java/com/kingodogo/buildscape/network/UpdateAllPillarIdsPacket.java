@@ -118,6 +118,7 @@ public class UpdateAllPillarIdsPacket {
                         existing.dyeColors = new ArrayList<>(incoming.dyeColors);
                     }
                     existing.modifiedTime = System.currentTimeMillis();
+                    manager.applyFrameEdit(existing);
                     changed = true;
                 }
             }

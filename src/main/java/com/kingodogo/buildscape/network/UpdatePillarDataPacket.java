@@ -190,6 +190,7 @@ public class UpdatePillarDataPacket {
                 data.modifiedTime = System.currentTimeMillis();
                 // Flush the explicit detail editor save before returning to gameplay.
                 updateBlockEntity(player.server, data);
+                manager.applyFrameEdit(data);
                 manager.saveImmediate();
             }
         });

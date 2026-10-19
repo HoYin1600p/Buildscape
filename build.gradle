@@ -35,6 +35,18 @@ tasks.withType(JavaExec).configureEach {
     javaLauncher = java17Launcher
 }
 
+def devClientMinHeap = providers.gradleProperty('dev_client_min_heap').getOrElse('512M')
+def devClientMaxHeap = providers.gradleProperty('dev_client_max_heap').getOrElse('4G')
+def heapMiB = { String value ->
+    def match = value =~ /^([1-9][0-9]*)([mMgG])$/
+    if (!match.matches()) throw new GradleException("Development heap '${value}' must use a positive M or G value.")
+    new BigInteger(match[0][1]) * (match[0][2].equalsIgnoreCase('G') ? 1024 : 1)
+}
+if (heapMiB(devClientMinHeap) > heapMiB(devClientMaxHeap)) {
+    throw new GradleException('dev_client_min_heap must not exceed dev_client_max_heap.')
+}
+def devRegistryLogging = providers.gradleProperty('dev_registry_logging').getOrElse('false').toBoolean()
+
 minecraft {
 
 
@@ -50,7 +62,8 @@ minecraft {
             workingDirectory project.file('run')
 
 
-            property 'forge.logging.markers', 'REGISTRIES'
+            // Registry debug dumps are expensive for the large block catalogue; enable when diagnosing registration.
+            if (devRegistryLogging) property 'forge.logging.markers', 'REGISTRIES'
 
 
             property 'forge.logging.console.level', 'info'
@@ -64,7 +77,7 @@ minecraft {
             args '--username', 'Dev'
 
 
-            jvmArgs '-Xmx4G', '-Xms2G'
+            jvmArgs "-Xmx${devClientMaxHeap}", "-Xms${devClientMinHeap}", '-XX:+UseG1GC'
         }
 
         server {
@@ -147,7 +160,8 @@ dependencies {
 
 tasks.named('processResources', ProcessResources).configure {
     dependsOn 'syncBundledRecipeCache'
-    doNotTrackState("18k+ resource files causes incremental builds to hang during state tracking")
+    // Keep Gradle's input/output tracking: unchanged launches must not recopy the entire resource catalogue.
+    // File-system watching retains snapshots between daemon runs; metadata inputs below still invalidate this task.
 
     var replaceProperties = [minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
                              forge_version       : forge_version, forge_version_range: forge_version_range,
@@ -165,6 +179,26 @@ tasks.named('processResources', ProcessResources).configure {
         expand replaceProperties + [project: project]
     }
 
+}
+
+tasks.register('verifyDevLaunch') {
+    group = 'verification'
+    description = 'Checks development client heap, Java toolchain and diagnostic logging without launching Minecraft.'
+    doLast {
+        def clientArgs = minecraft.runs.client.jvmArgs
+        if (!clientArgs.contains("-Xms${devClientMinHeap}".toString())
+                || !clientArgs.contains("-Xmx${devClientMaxHeap}".toString())) {
+            throw new GradleException('Development client heap arguments were not applied.')
+        }
+        if (java17Launcher.get().metadata.languageVersion.asInt() != 17) {
+            throw new GradleException('The development client requires Java 17.')
+        }
+        def registryMarkers = minecraft.runs.client.properties.get('forge.logging.markers')
+        if ((registryMarkers == 'REGISTRIES') != devRegistryLogging) {
+            throw new GradleException('Development registry logging does not match dev_registry_logging.')
+        }
+        logger.lifecycle("Development client: Java 17, initial heap ${devClientMinHeap}, maximum heap ${devClientMaxHeap}, registry logging ${devRegistryLogging}")
+    }
 }
 
 tasks.named('compileJava', JavaCompile).configure {

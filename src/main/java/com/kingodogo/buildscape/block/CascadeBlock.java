@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.WaterloggedBlock;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;
@@ -34,7 +35,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
 
-public class CascadeBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
+public class CascadeBlock extends WaterloggedBlock implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
@@ -69,12 +70,6 @@ public class CascadeBlock extends Block implements EntityBlock, SimpleWaterlogge
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override

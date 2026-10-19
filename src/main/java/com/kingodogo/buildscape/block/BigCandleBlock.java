@@ -38,7 +38,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.List;
 import java.util.Random;
 
-public class BigCandleBlock extends Block implements SimpleWaterloggedBlock {
+import com.kingodogo.buildscape.core.WaterloggedBlock;
+
+public class BigCandleBlock extends WaterloggedBlock implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
             BlockStateProperties.WATERLOGGED;
@@ -125,13 +127,6 @@ public class BigCandleBlock extends Block implements SimpleWaterloggedBlock {
                 pos,
                 neighborPos
         );
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED)
-                ? Fluids.WATER.getSource(false)
-                : super.getFluidState(state);
     }
 
     @Override

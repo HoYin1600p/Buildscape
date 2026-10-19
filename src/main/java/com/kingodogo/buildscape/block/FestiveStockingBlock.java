@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.core.WaterloggedBlock;
 import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,7 +44,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.List;
 
 public class FestiveStockingBlock
-        extends Block
+        extends WaterloggedBlock
         implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
@@ -204,13 +205,6 @@ public class FestiveStockingBlock
                 pos,
                 neighborPos
         );
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED)
-                ? Fluids.WATER.getSource(false)
-                : super.getFluidState(state);
     }
 
     @Override

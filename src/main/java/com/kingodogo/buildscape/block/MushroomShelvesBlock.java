@@ -22,8 +22,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.kingodogo.buildscape.core.WaterloggedBlock;
+
 public class MushroomShelvesBlock
-        extends Block
+        extends WaterloggedBlock
         implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
@@ -109,13 +111,6 @@ public class MushroomShelvesBlock
                 pos,
                 neighborPos
         );
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED)
-                ? Fluids.WATER.getSource(false)
-                : super.getFluidState(state);
     }
 
     @Override

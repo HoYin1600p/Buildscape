@@ -34,7 +34,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.Collections;
 import java.util.List;
 
-public class SteelBoltBlock extends Block implements SimpleWaterloggedBlock {
+import com.kingodogo.buildscape.core.WaterloggedBlock;
+
+public class SteelBoltBlock extends WaterloggedBlock implements SimpleWaterloggedBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final IntegerProperty BOLTS = IntegerProperty.create("bolts", 1, 3);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -132,11 +134,6 @@ public class SteelBoltBlock extends Block implements SimpleWaterloggedBlock {
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         int stage = state.getValue(BOLTS);
         return Collections.singletonList(new ItemStack(this, stage));
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override

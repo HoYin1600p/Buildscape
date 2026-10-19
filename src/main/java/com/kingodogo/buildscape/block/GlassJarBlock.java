@@ -49,8 +49,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.core.WaterloggedBlock;
 
-public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
+public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     protected static final VoxelShape SHAPE = Shapes.or(
@@ -73,11 +74,6 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
         return this.defaultBlockState().setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override

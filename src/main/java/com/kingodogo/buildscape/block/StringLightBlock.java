@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.core.DyeColors;
+import com.kingodogo.buildscape.core.WaterloggedGlassBlock;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
 import net.minecraft.ChatFormatting;
@@ -37,7 +38,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.PacketDistributor;
 
 public class StringLightBlock
-        extends AbstractGlassBlock
+        extends WaterloggedGlassBlock
         implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
@@ -158,13 +159,6 @@ public class StringLightBlock
                 pos,
                 neighborPos
         );
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED)
-                ? Fluids.WATER.getSource(false)
-                : super.getFluidState(state);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.WaterloggedBlock;
 import com.kingodogo.buildscape.entity.SeatEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,7 +34,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 
-public class CushionBlock extends Block implements SimpleWaterloggedBlock {
+public class CushionBlock extends WaterloggedBlock implements SimpleWaterloggedBlock {
     public static final EnumProperty<Half> HALF = BlockStateProperties.HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     protected static final VoxelShape BOTTOM_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D);
@@ -75,11 +76,6 @@ public class CushionBlock extends Block implements SimpleWaterloggedBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HALF, WATERLOGGED);
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override

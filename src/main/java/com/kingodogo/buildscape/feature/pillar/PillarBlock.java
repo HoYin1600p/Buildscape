@@ -6,6 +6,7 @@ import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
+import com.kingodogo.buildscape.core.WaterloggedBlock;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
@@ -63,7 +64,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 public class PillarBlock
-        extends Block
+        extends WaterloggedBlock
         implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
@@ -1115,12 +1116,5 @@ public class PillarBlock
     @Override
     public boolean useShapeForLightOcclusion(BlockState state) {
         return false;
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED)
-                ? Fluids.WATER.getSource(false)
-                : super.getFluidState(state);
     }
 }

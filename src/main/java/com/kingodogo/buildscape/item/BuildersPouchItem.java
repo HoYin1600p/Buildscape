@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.menu.BuildersPouchMenu;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;

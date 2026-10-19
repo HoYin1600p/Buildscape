@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity;
+import com.kingodogo.buildscape.block.BuildersWorkbenchMenu;
 import com.kingodogo.buildscape.client.screen.workbench.WbRenderer;
 import com.kingodogo.buildscape.client.workbench.ClientBlockColorCatalog;
-import com.kingodogo.buildscape.menu.BuildersWorkbenchMenu;
 import com.kingodogo.buildscape.network.BuildersWorkbenchResultsPacket;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.util.ColorGradientSolver;

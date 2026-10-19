@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.menu.BuildersPouchMenu;
-import com.kingodogo.buildscape.menu.BuildersWorkbenchMenu;
+import com.kingodogo.buildscape.block.BuildersWorkbenchMenu;
+import com.kingodogo.buildscape.item.BuildersPouchMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.eventbus.api.IEventBus;

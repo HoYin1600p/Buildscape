@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity;
-import com.kingodogo.buildscape.menu.BuildersWorkbenchMenu;
+import com.kingodogo.buildscape.block.BuildersWorkbenchMenu;
 import com.kingodogo.buildscape.util.ColorGradientSolver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;

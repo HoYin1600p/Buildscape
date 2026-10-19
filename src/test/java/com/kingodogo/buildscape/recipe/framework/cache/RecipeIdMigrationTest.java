@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.recipe.framework.cache;
 
-import com.kingodogo.buildscape.recipe.RecipeIdMigration;
+import com.kingodogo.buildscape.core.RecipeIdMigration;
 import com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

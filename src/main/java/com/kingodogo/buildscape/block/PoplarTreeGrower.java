@@ -1,5 +1,6 @@
-package com.kingodogo.buildscape.worldgen;
+package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.worldgen.ModConfiguredFeatures;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;

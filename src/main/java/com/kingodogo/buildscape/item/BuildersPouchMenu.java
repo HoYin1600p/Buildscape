@@ -1,7 +1,6 @@
-package com.kingodogo.buildscape.menu;
+package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.item.BuildersPouchInventory;
-import com.kingodogo.buildscape.item.BuildersPouchItem;
+import com.kingodogo.buildscape.menu.GhostFilterMenu;
 import com.kingodogo.buildscape.registry.ModMenuTypes;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;

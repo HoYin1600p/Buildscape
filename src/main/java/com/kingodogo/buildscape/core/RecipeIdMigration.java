@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.recipe;
+package com.kingodogo.buildscape.core;
 
 import net.minecraft.resources.ResourceLocation;
 

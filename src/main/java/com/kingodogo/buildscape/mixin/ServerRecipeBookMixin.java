@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.recipe.RecipeIdMigration;
+import com.kingodogo.buildscape.core.RecipeIdMigration;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.ServerRecipeBook;
 import net.minecraft.world.item.crafting.Recipe;

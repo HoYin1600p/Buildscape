@@ -77,4 +77,45 @@ public class ConfigScreenConsistencyTest {
         assertEquals(Set.of(Items.APPLE), items);
         assertTrue(tags.isEmpty());
     }
+
+    @Test
+    public void worldSettingsRowHeightAndContentHeightAlignWithSystemTab() {
+        assertEquals(36, BuildScapeConfigScreen.getWorldSettingRowHeight());
+        int gap = 3;
+        int expectedHeight = 14 + 14 + 9 * (36 + gap) - gap;
+        assertEquals(expectedHeight, BuildScapeConfigScreen.calculateWorldContentHeight(gap));
+        int rowWidth = 230;
+        int btnWidth = 38;
+        int descWidth = BuildScapeConfigScreen.calculateToggleDescriptionWidth(rowWidth, btnWidth);
+        assertTrue(descWidth < rowWidth - btnWidth - 8);
+        assertEquals(rowWidth - btnWidth - 20, descWidth);
+    }
+
+    @Test
+    public void navItemsAndLinksAndSubtabsHaveValidTextures() {
+        List<BuildScapeConfigScreen.NavItem> navItems = BuildScapeConfigScreen.createDefaultNavItems();
+        assertEquals(6, navItems.size());
+        for (BuildScapeConfigScreen.NavItem navItem : navItems) {
+            assertNotNull(navItem.id);
+            assertNotNull(navItem.title);
+            assertNotNull(navItem.iconTexture);
+            assertTrue(navItem.iconTexture.getPath().startsWith("textures/client/ui/nav_"));
+            assertTrue(navItem.iconTexture.getPath().endsWith(".png"));
+        }
+
+        List<BuildScapeConfigScreen.ConfigLink> links = BuildScapeConfigScreen.getConfigLinks();
+        assertEquals(5, links.size());
+        for (BuildScapeConfigScreen.ConfigLink link : links) {
+            assertNotNull(link.title());
+            assertNotNull(link.url());
+            assertNotNull(link.icon());
+            assertTrue(link.icon().getPath().startsWith("textures/client/ui/link_"));
+            assertTrue(link.icon().getPath().endsWith(".png"));
+        }
+
+        assertEquals("textures/client/ui/subtab_items.png", BuildScapeConfigScreen.SUBTAB_ITEMS_TEXTURE.getPath());
+        assertEquals("textures/client/ui/subtab_tags.png", BuildScapeConfigScreen.SUBTAB_TAGS_TEXTURE.getPath());
+        assertEquals("textures/client/ui/panel_pillar.png", BuildScapeConfigScreen.PANEL_PILLAR_TEXTURE.getPath());
+        assertEquals("textures/client/ui/panel_color.png", BuildScapeConfigScreen.PANEL_COLOR_TEXTURE.getPath());
+    }
 }

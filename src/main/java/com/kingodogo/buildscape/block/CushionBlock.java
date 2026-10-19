@@ -44,6 +44,7 @@ public class CushionBlock extends Block implements SimpleWaterloggedBlock {
                 .setValue(WATERLOGGED, Boolean.valueOf(false)));
     }
 
+
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(HALF) == Half.TOP ? TOP_SHAPE : BOTTOM_SHAPE;

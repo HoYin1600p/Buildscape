@@ -210,9 +210,9 @@ public final class SculkSpreader {
                         charge /= 2;
                     }
                 }
-            } else {
-                charge = 0;
             }
+            // Any other cell (for example the air a mob died in, above sculk that refuses a vein) keeps its
+            // charge: it moves onto adjacent sculk below, or halves with the normal decay delay, as in vanilla 1.19.
             BlockPos next = charge > 0 ? movementPos(level, pos, random) : null;
             if (charge <= 0 || next != null) {
                 SculkVeinBlock.discharge(level, pos);

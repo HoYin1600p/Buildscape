@@ -95,14 +95,9 @@ public class BuildScape {
                 com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback(
                         BuildScape::onPillarConfigReload);
             }
-            try {
-                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
-                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.POTION, 16, "f_41370_");
-                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
-                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.CAKE, 64, "f_41370_");
-            } catch (Exception e) {
-                LOGGER.error("Failed to set max stack size for potions or cakes", e);
-            }
+            // Potion and cake stack sizes are decided per world by the isWaterbottleStack / isCakeStack
+            // game rules through ItemMixin (ItemStack.getMaxStackSize). The Item field stays vanilla (1) so
+            // /give and other Item-level callers add single items that merge under those rules.
 
             try {
                 java.util.Map<net.minecraft.sounds.SoundEvent, net.minecraft.world.item.RecordItem> recordMap =

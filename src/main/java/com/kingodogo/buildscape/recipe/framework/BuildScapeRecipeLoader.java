@@ -35,7 +35,8 @@ import java.util.concurrent.Executor;
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
-    public static final BuildScapeRecipeLoader INSTANCE = new BuildScapeRecipeLoader();
+    /** Manager-less instance for code that only needs the loader's parsing helpers; never registered. */
+    public static final BuildScapeRecipeLoader INSTANCE = new BuildScapeRecipeLoader(null);
 
     private static final String[] CATEGORIES = {
             "crafting", "stonecutting", "smelting", "blasting",
@@ -44,17 +45,27 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
     private static final String DISABLED_RECIPES_PATH = "buildscape/disabled_recipes.json";
 
-    private volatile RecipeManager currentRecipeManager;
+    /** The manager of the reload this listener belongs to; each reload gets its own listener and manager. */
+    private final RecipeManager recipeManager;
 
-    @SubscribeEvent
-    public static void onAddReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(INSTANCE);
-        INSTANCE.currentRecipeManager = event.getServerResources().getRecipeManager();
+    private BuildScapeRecipeLoader(RecipeManager recipeManager) {
+        this.recipeManager = recipeManager;
+    }
+
+    static BuildScapeRecipeLoader forReload(RecipeManager recipeManager) {
+        return new BuildScapeRecipeLoader(recipeManager);
+    }
+
+    RecipeManager recipeManager() {
+        return recipeManager;
     }
 
     @SubscribeEvent
-    public static void onServerStopped(net.minecraftforge.event.server.ServerStoppedEvent event) {
-        INSTANCE.currentRecipeManager = null;
+    public static void onAddReloadListeners(AddReloadListenerEvent event) {
+        // One listener per reload, bound to that reload's RecipeManager. A shared listener would inject into
+        // whichever manager registered last, leaving the manager that finishes last without the recipes when
+        // two reloads overlap.
+        event.addListener(forReload(event.getServerResources().getRecipeManager()));
     }
 
     @Override
@@ -383,7 +394,6 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
     private void applyRecipes(List<Recipe<?>> recipes, Set<ResourceLocation> disabledIds, ProfilerFiller profiler) {
         profiler.push("BDRE_ApplyRecipes");
-        RecipeManager recipeManager = currentRecipeManager;
         if (recipeManager != null && !recipes.isEmpty()) {
             RecipeManagerInjector.inject(recipeManager, List.copyOf(recipes), disabledIds);
         }

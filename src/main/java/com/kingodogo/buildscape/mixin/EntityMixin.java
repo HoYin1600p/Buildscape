@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -19,6 +20,17 @@ public abstract class EntityMixin {
         Entity self = (Entity) (Object) this;
         if (isEntityInExperienceFluid(self)) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "getOnPos", at = @At("RETURN"), cancellable = true)
+    private void buildscape$cushionOnPos(CallbackInfoReturnable<BlockPos> cir) {
+        Entity self = (Entity) (Object) this;
+        BlockPos vanilla = cir.getReturnValue();
+        BlockPos fixed = com.kingodogo.buildscape.block.CushionSupport.supportingPos(vanilla, self.getX(), self.getY(), self.getZ(),
+                pos -> self.level.getBlockState(pos).getBlock() instanceof com.kingodogo.buildscape.block.CushionBlock);
+        if (fixed != vanilla) {
+            cir.setReturnValue(fixed);
         }
     }
 

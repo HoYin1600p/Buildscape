@@ -122,6 +122,7 @@ public class BiomeBrushItem extends Item {
         stack.getOrCreateTag().putString(KEY_BIOME, biomeId);
     }
 
+
     public void clearCapturedBiome(ItemStack stack, Player player) {
         CompoundTag tag = stack.getTag();
         if (tag != null) {
@@ -263,20 +264,21 @@ public class BiomeBrushItem extends Item {
             }
 
             int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack);
+            boolean creative = player.getAbilities().instabuild;
             int affectedBlocks = 0;
             Set<ChunkPos> modifiedChunks = new HashSet<>();
             BiomeTintData tints = BiomeTintData.get(serverLevel);
             boolean broken = false;
             for (int x = minX; x <= maxX && !broken; x++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    if (stack.getDamageValue() >= stack.getMaxDamage()) {
+                    if (!creative && stack.getDamageValue() >= stack.getMaxDamage()) {
                         broken = true;
                         break;
                     }
                     if (!tints.putColumn(x, z, biomeKey)) continue;
                     modifiedChunks.add(new ChunkPos(x >> 4, z >> 4));
                     affectedBlocks++;
-                    if (unbreakingLevel == 0 || level.random.nextInt(unbreakingLevel + 1) == 0) {
+                    if (BiomeBrushDurability.chargesDurability(creative, unbreakingLevel, level.random::nextInt)) {
                         stack.setDamageValue(stack.getDamageValue() + 1);
                     }
                 }

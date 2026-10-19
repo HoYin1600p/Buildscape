@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.command.FireworkTestCommand;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
 import com.kingodogo.buildscape.trophy.Trophies;
 import com.kingodogo.buildscape.trophy.TrophyDefinition;
@@ -33,17 +34,17 @@ public class ModCreativeModeTab {
 
         private boolean isCustomFireworkVariant(ItemStack stack) {
             if (stack.is(Items.FIREWORK_STAR)) {
-                CompoundTag explosion = stack.getTagElement("Explosion");
+                CompoundTag explosion = stack.getTagElement(NbtKeys.EXPLOSION);
                 return explosion != null
-                        && CustomFireworkShapeRegistry.isCustomShape(explosion.getByte("Type"));
+                        && CustomFireworkShapeRegistry.isCustomShape(explosion.getByte(NbtKeys.TYPE));
             }
             if (stack.is(Items.FIREWORK_ROCKET)) {
-                CompoundTag fireworks = stack.getTagElement("Fireworks");
-                if (fireworks == null || !fireworks.contains("Explosions", 9)) return false;
-                ListTag explosions = fireworks.getList("Explosions", 10);
+                CompoundTag fireworks = stack.getTagElement(NbtKeys.FIREWORKS);
+                if (fireworks == null || !fireworks.contains(NbtKeys.EXPLOSIONS, 9)) return false;
+                ListTag explosions = fireworks.getList(NbtKeys.EXPLOSIONS, 10);
                 for (int i = 0; i < explosions.size(); i++) {
                     if (CustomFireworkShapeRegistry.isCustomShape(
-                            explosions.getCompound(i).getByte("Type"))) {
+                            explosions.getCompound(i).getByte(NbtKeys.TYPE))) {
                         return true;
                     }
                 }
@@ -2467,45 +2468,45 @@ public class ModCreativeModeTab {
             items.add(new ItemStack(ModItems.MUSIC_DISC_BUILDER.get()));
 
             ItemStack cakeStar = new ItemStack(Items.FIREWORK_STAR);
-            CompoundTag cakeExp = cakeStar.getOrCreateTagElement("Explosion");
-            cakeExp.putByte("Type", CustomFireworkShapeRegistry.CAKE_ID);
-            cakeExp.putIntArray("Colors", new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55});
+            CompoundTag cakeExp = cakeStar.getOrCreateTagElement(NbtKeys.EXPLOSION);
+            cakeExp.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.CAKE_ID);
+            cakeExp.putIntArray(NbtKeys.COLORS, new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55});
             items.add(cakeStar);
 
             ItemStack crownStar = new ItemStack(Items.FIREWORK_STAR);
-            CompoundTag crownExp = crownStar.getOrCreateTagElement("Explosion");
-            crownExp.putByte("Type", CustomFireworkShapeRegistry.CROWN_ID);
-            crownExp.putIntArray("Colors", new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF});
+            CompoundTag crownExp = crownStar.getOrCreateTagElement(NbtKeys.EXPLOSION);
+            crownExp.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.CROWN_ID);
+            crownExp.putIntArray(NbtKeys.COLORS, new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF});
             items.add(crownStar);
 
             ItemStack trophyStar = new ItemStack(Items.FIREWORK_STAR);
-            CompoundTag trophyExp = trophyStar.getOrCreateTagElement("Explosion");
-            trophyExp.putByte("Type", CustomFireworkShapeRegistry.TROPHY_ID);
-            trophyExp.putIntArray("Colors", new int[]{0xFFD700, 0xFFFF88, 0x00FFFF});
+            CompoundTag trophyExp = trophyStar.getOrCreateTagElement(NbtKeys.EXPLOSION);
+            trophyExp.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.TROPHY_ID);
+            trophyExp.putIntArray(NbtKeys.COLORS, new int[]{0xFFD700, 0xFFFF88, 0x00FFFF});
             items.add(trophyStar);
 
             ItemStack treeStar = new ItemStack(Items.FIREWORK_STAR);
-            CompoundTag treeExp = treeStar.getOrCreateTagElement("Explosion");
-            treeExp.putByte("Type", CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID);
-            treeExp.putIntArray("Colors", new int[]{0x227733, 0xFF3030, 0xFFD700});
+            CompoundTag treeExp = treeStar.getOrCreateTagElement(NbtKeys.EXPLOSION);
+            treeExp.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID);
+            treeExp.putIntArray(NbtKeys.COLORS, new int[]{0x227733, 0xFF3030, 0xFFD700});
             items.add(treeStar);
 
             ItemStack presentsStar = new ItemStack(Items.FIREWORK_STAR);
-            CompoundTag presentsExp = presentsStar.getOrCreateTagElement("Explosion");
-            presentsExp.putByte("Type", CustomFireworkShapeRegistry.PRESENTS_ID);
-            presentsExp.putIntArray("Colors", new int[]{0xFF2233, 0xFFD700});
+            CompoundTag presentsExp = presentsStar.getOrCreateTagElement(NbtKeys.EXPLOSION);
+            presentsExp.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.PRESENTS_ID);
+            presentsExp.putIntArray(NbtKeys.COLORS, new int[]{0xFF2233, 0xFFD700});
             items.add(presentsStar);
 
             ItemStack candyCaneStar = new ItemStack(Items.FIREWORK_STAR);
-            CompoundTag candyCaneExp = candyCaneStar.getOrCreateTagElement("Explosion");
-            candyCaneExp.putByte("Type", CustomFireworkShapeRegistry.CANDY_CANE_ID);
-            candyCaneExp.putIntArray("Colors", new int[]{0xFF0033});
+            CompoundTag candyCaneExp = candyCaneStar.getOrCreateTagElement(NbtKeys.EXPLOSION);
+            candyCaneExp.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.CANDY_CANE_ID);
+            candyCaneExp.putIntArray(NbtKeys.COLORS, new int[]{0xFF0033});
             items.add(candyCaneStar);
 
             ItemStack snowflakeStar = new ItemStack(Items.FIREWORK_STAR);
-            CompoundTag snowflakeExp = snowflakeStar.getOrCreateTagElement("Explosion");
-            snowflakeExp.putByte("Type", CustomFireworkShapeRegistry.SNOWFLAKE_ID);
-            snowflakeExp.putIntArray("Colors", new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF});
+            CompoundTag snowflakeExp = snowflakeStar.getOrCreateTagElement(NbtKeys.EXPLOSION);
+            snowflakeExp.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.SNOWFLAKE_ID);
+            snowflakeExp.putIntArray(NbtKeys.COLORS, new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF});
             items.add(snowflakeStar);
 
             items.add(InfinitePhoenixFireworkStarItem.createDefaultStack());

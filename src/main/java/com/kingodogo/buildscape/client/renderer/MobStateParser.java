@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.NbtKeys;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -330,16 +331,16 @@ public class MobStateParser {
         }
 
         CompoundTag tag = stack.getTag();
-        if (tag == null || !tag.contains("display", 10)) {
+        if (tag == null || !tag.contains(NbtKeys.DISPLAY, 10)) {
             return null;
         }
 
-        CompoundTag displayTag = tag.getCompound("display");
-        if (!displayTag.contains("Name", 8)) {
+        CompoundTag displayTag = tag.getCompound(NbtKeys.DISPLAY);
+        if (!displayTag.contains(NbtKeys.NAME, 8)) {
             return null;
         }
 
-        String nameJson = displayTag.getString("Name");
+        String nameJson = displayTag.getString(NbtKeys.NAME);
         if (nameJson == null || nameJson.isEmpty()) {
             return null;
         }

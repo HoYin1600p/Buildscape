@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.kingodogo.buildscape.util.GhostFilterMenu;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -30,7 +31,7 @@ public abstract class AbstractContainerScreenMixin {
         if (filter == null) return;
 
         ItemStack placeholder = new ItemStack(filter);
-        placeholder.getOrCreateTag().putBoolean("ghost", true);
+        placeholder.getOrCreateTag().putBoolean(NbtKeys.GHOST, true);
         Minecraft minecraft = Minecraft.getInstance();
         ItemRenderer renderer = minecraft.getItemRenderer();
         float previousBlitOffset = renderer.blitOffset;

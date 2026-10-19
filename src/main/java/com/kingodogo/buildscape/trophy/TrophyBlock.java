@@ -35,6 +35,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class TrophyBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     private final TrophyDefinition definition;
@@ -84,9 +86,9 @@ public class TrophyBlock extends HorizontalDirectionalBlock implements EntityBlo
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof TrophyBlockEntity trophyBe) {
             CompoundTag tag = stack.getTag();
-            if (tag != null && tag.contains("ObtainedBy")) {
-                trophyBe.setObtainedBy(tag.getString("ObtainedBy"));
-                trophyBe.setObtainedOn(tag.getString("ObtainedOn"));
+            if (tag != null && tag.contains(NbtKeys.OBTAINED_BY)) {
+                trophyBe.setObtainedBy(tag.getString(NbtKeys.OBTAINED_BY));
+                trophyBe.setObtainedOn(tag.getString(NbtKeys.OBTAINED_ON));
             } else if (placer instanceof Player player) {
                 trophyBe.setObtainedBy(player.getScoreboardName());
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -111,10 +113,10 @@ public class TrophyBlock extends HorizontalDirectionalBlock implements EntityBlo
         if (blockEntity instanceof TrophyBlockEntity trophyBe) {
             CompoundTag tag = stack.getOrCreateTag();
             if (!trophyBe.getObtainedBy().isEmpty()) {
-                tag.putString("ObtainedBy", trophyBe.getObtainedBy());
+                tag.putString(NbtKeys.OBTAINED_BY, trophyBe.getObtainedBy());
             }
             if (!trophyBe.getObtainedOn().isEmpty()) {
-                tag.putString("ObtainedOn", trophyBe.getObtainedOn());
+                tag.putString(NbtKeys.OBTAINED_ON, trophyBe.getObtainedOn());
             }
         }
         return stack;

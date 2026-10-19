@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.particle.GeyserParticleOptions;
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.sound.ModSounds;
@@ -255,8 +256,8 @@ public class PotentSulfurBlockEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         super.load(tag);
         this.waitingCountdown = tag.getInt("countdown");
-        if (tag.contains("eruption_tick")) {
-            this.eruptionTick = tag.getLong("eruption_tick");
+        if (tag.contains(NbtKeys.ERUPTION_TICK)) {
+            this.eruptionTick = tag.getLong(NbtKeys.ERUPTION_TICK);
         }
     }
 
@@ -264,7 +265,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.putInt("countdown", this.waitingCountdown);
-        tag.putLong("eruption_tick", this.eruptionTick);
+        tag.putLong(NbtKeys.ERUPTION_TICK, this.eruptionTick);
     }
 
     @Override

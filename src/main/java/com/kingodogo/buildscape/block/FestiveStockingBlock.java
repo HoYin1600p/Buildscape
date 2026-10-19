@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -563,7 +564,7 @@ public class FestiveStockingBlock
                 CompoundTag tag = result.getOrCreateTag();
                 CompoundTag storedTag = new CompoundTag();
                 stockingEntity.getStoredItem().save(storedTag);
-                tag.put("StoredItem", storedTag);
+                tag.put(NbtKeys.STORED_ITEM, storedTag);
                 stockingEntity.markContentsHandled();
             }
         }

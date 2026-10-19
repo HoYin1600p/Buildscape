@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 @Mixin(FireworkRocketEntity.class)
 public abstract class FireworkRocketEntityMixin extends Projectile {
 
@@ -36,11 +38,11 @@ public abstract class FireworkRocketEntityMixin extends Projectile {
         ItemStack stack = this.entityData.get(DATA_ID_FIREWORKS_ITEM);
         if (!stack.isEmpty()) {
             ItemStack copy = stack.copy();
-            CompoundTag fireworks = copy.getOrCreateTagElement("Fireworks");
-            fireworks.putFloat("ShotYaw", yaw);
-            ListTag explosions = fireworks.getList("Explosions", 10);
+            CompoundTag fireworks = copy.getOrCreateTagElement(NbtKeys.FIREWORKS);
+            fireworks.putFloat(NbtKeys.SHOT_YAW, yaw);
+            ListTag explosions = fireworks.getList(NbtKeys.EXPLOSIONS, 10);
             for (int i = 0; i < explosions.size(); i++) {
-                explosions.getCompound(i).putFloat("ShotYaw", yaw);
+                explosions.getCompound(i).putFloat(NbtKeys.SHOT_YAW, yaw);
             }
             this.entityData.set(DATA_ID_FIREWORKS_ITEM, copy);
         }
@@ -72,19 +74,19 @@ public abstract class FireworkRocketEntityMixin extends Projectile {
         if (eventId == 17 && this.level.isClientSide) {
             ItemStack stack = this.entityData.get(DATA_ID_FIREWORKS_ITEM);
             if (!stack.isEmpty()) {
-                CompoundTag fireworks = stack.getTagElement("Fireworks");
-                if (fireworks != null && !fireworks.contains("ShotYaw")) {
+                CompoundTag fireworks = stack.getTagElement(NbtKeys.FIREWORKS);
+                if (fireworks != null && !fireworks.contains(NbtKeys.SHOT_YAW)) {
                     float yaw = this.getYRot();
                     if (this.attachedToEntity != null) {
                         yaw = this.attachedToEntity.getYRot();
                     } else if (this.getOwner() != null) {
                         yaw = this.getOwner().getYRot();
                     }
-                    fireworks.putFloat("ShotYaw", yaw);
-                    ListTag explosions = fireworks.getList("Explosions", 10);
+                    fireworks.putFloat(NbtKeys.SHOT_YAW, yaw);
+                    ListTag explosions = fireworks.getList(NbtKeys.EXPLOSIONS, 10);
                     for (int i = 0; i < explosions.size(); i++) {
-                        if (!explosions.getCompound(i).contains("ShotYaw")) {
-                            explosions.getCompound(i).putFloat("ShotYaw", yaw);
+                        if (!explosions.getCompound(i).contains(NbtKeys.SHOT_YAW)) {
+                            explosions.getCompound(i).putFloat(NbtKeys.SHOT_YAW, yaw);
                         }
                     }
                 }

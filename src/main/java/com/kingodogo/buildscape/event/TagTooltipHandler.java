@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData;
 import com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData;
 import com.kingodogo.buildscape.config.CosmeticsConfig;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.BuildersPouchItem;
 import com.kingodogo.buildscape.item.FestiveStockingItem;
 import net.minecraft.client.Minecraft;
@@ -59,8 +60,8 @@ public class TagTooltipHandler {
 
             if (stack.getItem() instanceof FestiveStockingItem) {
                 CompoundTag tag = stack.getTag();
-                if (tag != null && tag.contains("StoredItem", 10)) {
-                    CompoundTag storedTag = tag.getCompound("StoredItem");
+                if (tag != null && tag.contains(NbtKeys.STORED_ITEM, 10)) {
+                    CompoundTag storedTag = tag.getCompound(NbtKeys.STORED_ITEM);
                     if (!storedTag.isEmpty()) {
                         ItemStack storedItem = ItemStack.of(storedTag);
                         if (!storedItem.isEmpty()) {
@@ -83,8 +84,8 @@ public class TagTooltipHandler {
             }
 
             if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
-                CompoundTag blockEntityTag = stack.getTagElement("BlockEntityTag");
-                if (blockEntityTag != null && (blockEntityTag.contains("GhostFilters", 9) || blockEntityTag.contains("Items", 9))) {
+                CompoundTag blockEntityTag = stack.getTagElement(NbtKeys.BLOCK_ENTITY_TAG);
+                if (blockEntityTag != null && (blockEntityTag.contains(NbtKeys.GHOST_FILTERS, 9) || blockEntityTag.contains(NbtKeys.ITEMS, 9))) {
                     List<Component> tooltips = event.getToolTip();
                     if (tooltips.size() > 1) {
                         tooltips.removeIf(comp -> {
@@ -112,21 +113,21 @@ public class TagTooltipHandler {
         try {
             if (stack == null || stack.isEmpty()) return null;
             if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock sbb) {
-                CompoundTag blockEntityTag = stack.getTagElement("BlockEntityTag");
-                if (blockEntityTag != null && (blockEntityTag.contains("GhostFilters", 9) || blockEntityTag.contains("Items", 9))) {
+                CompoundTag blockEntityTag = stack.getTagElement(NbtKeys.BLOCK_ENTITY_TAG);
+                if (blockEntityTag != null && (blockEntityTag.contains(NbtKeys.GHOST_FILTERS, 9) || blockEntityTag.contains(NbtKeys.ITEMS, 9))) {
                     NonNullList<ItemStack> filterStacks = NonNullList.withSize(27, ItemStack.EMPTY);
                     NonNullList<ItemStack> realStacks = NonNullList.withSize(27, ItemStack.EMPTY);
                     boolean hasAnyData = false;
 
-                    if (blockEntityTag.contains("GhostFilters", 9)) {
-                        ListTag list = blockEntityTag.getList("GhostFilters", 8);
+                    if (blockEntityTag.contains(NbtKeys.GHOST_FILTERS, 9)) {
+                        ListTag list = blockEntityTag.getList(NbtKeys.GHOST_FILTERS, 8);
                         for (int i = 0; i < 27 && i < list.size(); i++) {
                             String id = list.getString(i);
                             if (!id.isEmpty() && ResourceLocation.isValidResourceLocation(id)) {
                                 Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
                                 if (item != null && item != Items.AIR) {
                                     ItemStack ghostStack = new ItemStack(item);
-                                    ghostStack.getOrCreateTag().putBoolean("ghost", true);
+                                    ghostStack.getOrCreateTag().putBoolean(NbtKeys.GHOST, true);
                                     filterStacks.set(i, ghostStack);
                                     hasAnyData = true;
                                 }
@@ -134,7 +135,7 @@ public class TagTooltipHandler {
                         }
                     }
 
-                    if (blockEntityTag.contains("Items", 9)) {
+                    if (blockEntityTag.contains(NbtKeys.ITEMS, 9)) {
                         ContainerHelper.loadAllItems(blockEntityTag, realStacks);
                         for (ItemStack item : realStacks) {
                             if (!item.isEmpty()) {
@@ -170,14 +171,14 @@ public class TagTooltipHandler {
                         Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
                         if (item != null && item != Items.AIR) {
                             ItemStack ghostStack = new ItemStack(item);
-                            ghostStack.getOrCreateTag().putBoolean("ghost", true);
+                            ghostStack.getOrCreateTag().putBoolean(NbtKeys.GHOST, true);
                             filterStacks.set(i, ghostStack);
                         }
                     }
                 }
 
                 CompoundTag data = BuildersPouchItem.getData(stack, false);
-                if (data != null && data.contains("Items", 9)) {
+                if (data != null && data.contains(NbtKeys.ITEMS, 9)) {
                     ContainerHelper.loadAllItems(data, realStacks);
                 }
 

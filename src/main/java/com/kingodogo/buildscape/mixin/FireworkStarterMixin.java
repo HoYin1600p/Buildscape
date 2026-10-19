@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkRenderer;
 import com.kingodogo.buildscape.firework.CustomFireworkShape;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
@@ -39,20 +40,20 @@ public abstract class FireworkStarterMixin extends Particle {
 
             for (int i = 0; i < this.explosions.size(); ++i) {
                 CompoundTag tag = this.explosions.getCompound(i);
-                byte type = tag.getByte("Type");
+                byte type = tag.getByte(NbtKeys.TYPE);
 
                 if (CustomFireworkShapeRegistry.isCustomShape(type)) {
                     Optional<CustomFireworkShape> shapeOpt = CustomFireworkShapeRegistry.getByNumericId(type);
                     if (shapeOpt.isPresent()) {
                         CustomFireworkShape shape = shapeOpt.get();
-                        boolean trail = tag.getBoolean("Trail");
-                        boolean flicker = tag.getBoolean("Flicker");
-                        int[] colors = tag.getIntArray("Colors");
+                        boolean trail = tag.getBoolean(NbtKeys.TRAIL);
+                        boolean flicker = tag.getBoolean(NbtKeys.FLICKER);
+                        int[] colors = tag.getIntArray(NbtKeys.COLORS);
                         int[] fadeColors = tag.getIntArray("FadeColors");
 
                         float yaw = 0.0F;
-                        if (tag.contains("ShotYaw")) {
-                            yaw = tag.getFloat("ShotYaw");
+                        if (tag.contains(NbtKeys.SHOT_YAW)) {
+                            yaw = tag.getFloat(NbtKeys.SHOT_YAW);
                         } else if (Math.hypot(this.xd, this.zd) > 0.05) {
                             yaw = (float) (Mth.atan2(this.xd, this.zd) * (180.0F / (float) Math.PI));
                         } else if (Minecraft.getInstance().player != null) {

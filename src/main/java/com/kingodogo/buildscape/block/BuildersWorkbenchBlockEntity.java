@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.BuildersPouchInventory;
 import com.kingodogo.buildscape.item.BuildersPouchItem;
 import com.kingodogo.buildscape.network.BuildersWorkbenchMenu;
@@ -318,18 +319,18 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
 
     private boolean writeSolvedToShulker(ItemStack shulker, List<ItemStack> solved) {
         NonNullList<ItemStack> shulkerItems = NonNullList.withSize(27, ItemStack.EMPTY);
-        CompoundTag blockEntityTag = shulker.getTagElement("BlockEntityTag");
-        if (blockEntityTag != null && blockEntityTag.contains("Items", 9)) {
+        CompoundTag blockEntityTag = shulker.getTagElement(NbtKeys.BLOCK_ENTITY_TAG);
+        if (blockEntityTag != null && blockEntityTag.contains(NbtKeys.ITEMS, 9)) {
             ContainerHelper.loadAllItems(blockEntityTag, shulkerItems);
         }
 
-        CompoundTag beTag = shulker.getOrCreateTagElement("BlockEntityTag");
-        ListTag savedFilters = beTag.getList("GhostFilters", 8);
+        CompoundTag beTag = shulker.getOrCreateTagElement(NbtKeys.BLOCK_ENTITY_TAG);
+        ListTag savedFilters = beTag.getList(NbtKeys.GHOST_FILTERS, 8);
         List<String> filters = new ArrayList<>(27);
         for (int i = 0; i < 27; i++) {
             filters.add(i < savedFilters.size() ? savedFilters.getString(i) : "");
             ItemStack item = shulkerItems.get(i);
-            if (!item.isEmpty() && item.hasTag() && item.getTag().getBoolean("ghost")) {
+            if (!item.isEmpty() && item.hasTag() && item.getTag().getBoolean(NbtKeys.GHOST)) {
                 ResourceLocation id =
                         ForgeRegistries.ITEMS.getKey(item.getItem());
                 if (filters.get(i).isEmpty() && id != null) filters.set(i, id.toString());
@@ -385,9 +386,9 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         }
         ContainerHelper.saveAllItems(beTag, shulkerItems);
         if (hasFilter) {
-            beTag.put("GhostFilters", newGhostFiltersList);
+            beTag.put(NbtKeys.GHOST_FILTERS, newGhostFiltersList);
         } else {
-            beTag.remove("GhostFilters");
+            beTag.remove(NbtKeys.GHOST_FILTERS);
         }
         return true;
     }
@@ -587,29 +588,29 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     public void load(CompoundTag tag) {
         super.load(tag);
         ContainerHelper.loadAllItems(tag, items);
-        if (tag.contains("ActiveTab")) this.activeTab = validTab(tag.getInt("ActiveTab"));
+        if (tag.contains(NbtKeys.ACTIVE_TAB)) this.activeTab = validTab(tag.getInt(NbtKeys.ACTIVE_TAB));
         if (tag.getInt("FilterMaskVersion") >= FILTER_MASK_VERSION) {
             this.filterMask = tag.getInt("FilterMask")
                     & ColorGradientSolver.FILTER_STATE_MASK;
         } else {
             this.filterMask = ColorGradientSolver.FILTER_DEFAULT;
         }
-        if (tag.contains("CopyProgress")) this.copyProgress = tag.getInt("CopyProgress");
+        if (tag.contains(NbtKeys.COPY_PROGRESS)) this.copyProgress = tag.getInt(NbtKeys.COPY_PROGRESS);
         for (int tab = 0; tab < TAB_COUNT; tab++) {
             Arrays.fill(this.resultOffsetsByTab[tab], 0);
         }
-        if (tag.contains("ColorResultOffsets")) {
-            int[] saved = tag.getIntArray("ColorResultOffsets");
+        if (tag.contains(NbtKeys.COLOR_RESULT_OFFSETS)) {
+            int[] saved = tag.getIntArray(NbtKeys.COLOR_RESULT_OFFSETS);
             for (int i = 0; i < RESULT_COUNT && i < saved.length; i++) {
                 this.resultOffsetsByTab[0][i] = Math.max(0, saved[i]);
             }
         }
-        if (tag.contains("GradientResultOffsets")) {
-            int[] saved = tag.getIntArray("GradientResultOffsets");
+        if (tag.contains(NbtKeys.GRADIENT_RESULT_OFFSETS)) {
+            int[] saved = tag.getIntArray(NbtKeys.GRADIENT_RESULT_OFFSETS);
             for (int i = 0; i < RESULT_COUNT && i < saved.length; i++) {
                 this.resultOffsetsByTab[1][i] = Math.max(0, saved[i]);
             }
-        } else if (!tag.contains("ColorResultOffsets") && tag.contains("ResultOffsets")) {
+        } else if (!tag.contains(NbtKeys.COLOR_RESULT_OFFSETS) && tag.contains("ResultOffsets")) {
             int[] saved = tag.getIntArray("ResultOffsets");
             for (int i = 0; i < RESULT_COUNT && i < saved.length; i++) {
                 this.resultOffsetsByTab[this.activeTab][i] = Math.max(0, saved[i]);
@@ -621,12 +622,12 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         ContainerHelper.saveAllItems(tag, items);
-        tag.putInt("ActiveTab", activeTab);
+        tag.putInt(NbtKeys.ACTIVE_TAB, activeTab);
         tag.putInt("FilterMask", filterMask);
         tag.putInt("FilterMaskVersion", FILTER_MASK_VERSION);
-        tag.putInt("CopyProgress", copyProgress);
-        tag.putIntArray("ColorResultOffsets", resultOffsetsByTab[0]);
-        tag.putIntArray("GradientResultOffsets", resultOffsetsByTab[1]);
+        tag.putInt(NbtKeys.COPY_PROGRESS, copyProgress);
+        tag.putIntArray(NbtKeys.COLOR_RESULT_OFFSETS, resultOffsetsByTab[0]);
+        tag.putIntArray(NbtKeys.GRADIENT_RESULT_OFFSETS, resultOffsetsByTab[1]);
      }
 
      public static boolean isPouch(ItemStack stack) {

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.recipe;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -56,14 +57,14 @@ public class ConfettiConfigureRecipe extends CustomRecipe {
         }
 
         int currentLevel = 1;
-        if (confettiStack.hasTag() && confettiStack.getTag().contains("BurstLevel")) {
-            currentLevel = confettiStack.getTag().getInt("BurstLevel");
+        if (confettiStack.hasTag() && confettiStack.getTag().contains(NbtKeys.BURST_LEVEL)) {
+            currentLevel = confettiStack.getTag().getInt(NbtKeys.BURST_LEVEL);
         }
 
         int nextLevel = Math.min(5, currentLevel + gunpowderCount);
         ItemStack result = confettiStack.copy();
         result.setCount(1);
-        result.getOrCreateTag().putInt("BurstLevel", nextLevel);
+        result.getOrCreateTag().putInt(NbtKeys.BURST_LEVEL, nextLevel);
         return result;
     }
 

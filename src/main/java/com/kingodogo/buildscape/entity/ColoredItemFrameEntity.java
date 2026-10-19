@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
@@ -348,21 +349,21 @@ public class ColoredItemFrameEntity extends HangingEntity {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         if (!this.getItem().isEmpty()) {
-            tag.put("Item", this.getItem().save(new CompoundTag()));
+            tag.put(NbtKeys.ITEM, this.getItem().save(new CompoundTag()));
             tag.putByte("ItemRotation", (byte) this.getRotation());
-            tag.putFloat("ItemDropChance", this.dropChance);
+            tag.putFloat(NbtKeys.ITEM_DROP_CHANCE, this.dropChance);
         }
-        tag.putString("ColorVariant", this.getColorVariant());
+        tag.putString(NbtKeys.COLOR_VARIANT, this.getColorVariant());
         tag.putByte("Facing", (byte) this.direction.get3DDataValue());
-        tag.putBoolean("Invisible", this.isInvisible());
+        tag.putBoolean(NbtKeys.INVISIBLE, this.isInvisible());
         tag.putBoolean("Fixed", this.fixed);
 
-        tag.putString("BuildScapeParticlePattern", this.getParticlePattern());
-        tag.putString("BuildScapeParticleColorsRaw", this.getParticleColorsRaw());
+        tag.putString(NbtKeys.BUILD_SCAPE_PARTICLE_PATTERN, this.getParticlePattern());
+        tag.putString(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS_RAW, this.getParticleColorsRaw());
 
         CompoundTag persistentData = this.getPersistentData();
-        if (persistentData.contains("BuildScapeFrameId", 8)) {
-            tag.putString("BuildScapeFrameId", persistentData.getString("BuildScapeFrameId"));
+        if (persistentData.contains(NbtKeys.BUILD_SCAPE_FRAME_ID, 8)) {
+            tag.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, persistentData.getString(NbtKeys.BUILD_SCAPE_FRAME_ID));
         }
     }
 
@@ -370,7 +371,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
 
-        CompoundTag itemTag = tag.getCompound("Item");
+        CompoundTag itemTag = tag.getCompound(NbtKeys.ITEM);
         if (itemTag != null && !itemTag.isEmpty()) {
             ItemStack itemstack = ItemStack.of(itemTag);
             if (itemstack.isEmpty()) {
@@ -379,12 +380,12 @@ public class ColoredItemFrameEntity extends HangingEntity {
                 this.setItem(itemstack, false);
             }
             this.setRotation(tag.getByte("ItemRotation"), false);
-            if (tag.contains("ItemDropChance", 99)) {
-                this.dropChance = tag.getFloat("ItemDropChance");
+            if (tag.contains(NbtKeys.ITEM_DROP_CHANCE, 99)) {
+                this.dropChance = tag.getFloat(NbtKeys.ITEM_DROP_CHANCE);
             }
         }
-        else if (tag.contains("ITEM", 8)) {
-            String itemId = tag.getString("ITEM");
+        else if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
+            String itemId = tag.getString(NbtKeys.PILLAR_ITEM);
             try {
                 ResourceLocation itemLocation =
                         new ResourceLocation(itemId);
@@ -398,25 +399,25 @@ public class ColoredItemFrameEntity extends HangingEntity {
             }
         }
 
-        if (tag.contains("BuildScapeParticlePattern", 8)) {
-            this.setParticlePattern(tag.getString("BuildScapeParticlePattern"));
+        if (tag.contains(NbtKeys.BUILD_SCAPE_PARTICLE_PATTERN, 8)) {
+            this.setParticlePattern(tag.getString(NbtKeys.BUILD_SCAPE_PARTICLE_PATTERN));
         }
-        if (tag.contains("BuildScapeParticleColorsRaw", 8)) {
-            this.setParticleColorsRaw(tag.getString("BuildScapeParticleColorsRaw"));
+        if (tag.contains(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS_RAW, 8)) {
+            this.setParticleColorsRaw(tag.getString(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS_RAW));
         }
 
         CompoundTag persistentData = this.getPersistentData();
-        if (tag.contains("BuildScapeFrameId", 8)) {
-            persistentData.putString("BuildScapeFrameId", tag.getString("BuildScapeFrameId"));
+        if (tag.contains(NbtKeys.BUILD_SCAPE_FRAME_ID, 8)) {
+            persistentData.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, tag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID));
         }
 
-        if (tag.contains("PATTERN", 8)) {
-            String pattern = tag.getString("PATTERN");
+        if (tag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
+            String pattern = tag.getString(NbtKeys.PILLAR_PATTERN);
             this.setParticlePattern(pattern);
         }
 
-        if (tag.contains("COLORS", 9)) {
-            ListTag colorList = tag.getList("COLORS", 8);
+        if (tag.contains(NbtKeys.PILLAR_COLORS, 9)) {
+            ListTag colorList = tag.getList(NbtKeys.PILLAR_COLORS, 8);
             if (colorList.size() > 0) {
                 List<String> colors = new ArrayList<>();
                 for (int i = 0; i < colorList.size(); i++) {
@@ -426,12 +427,12 @@ public class ColoredItemFrameEntity extends HangingEntity {
             }
         }
 
-        if (tag.contains("ColorVariant")) {
-            this.setColorVariant(tag.getString("ColorVariant"));
+        if (tag.contains(NbtKeys.COLOR_VARIANT)) {
+            this.setColorVariant(tag.getString(NbtKeys.COLOR_VARIANT));
         }
 
         this.setDirection(Direction.from3DDataValue(tag.getByte("Facing")));
-        this.setInvisible(tag.getBoolean("Invisible"));
+        this.setInvisible(tag.getBoolean(NbtKeys.INVISIBLE));
         this.fixed = tag.getBoolean("Fixed");
     }
 
@@ -457,21 +458,21 @@ public class ColoredItemFrameEntity extends HangingEntity {
             ResourceLocation itemId =
                     ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
             if (itemId != null) {
-                tag.putString("ITEM", itemId.toString());
+                tag.putString(NbtKeys.PILLAR_ITEM, itemId.toString());
                 hasCustomData = true;
             }
         }
 
         CompoundTag persistentData = this.getPersistentData();
-        if (persistentData.contains("BuildScapeParticlePattern", 8)) {
-            tag.putString("PATTERN", persistentData.getString("BuildScapeParticlePattern"));
+        if (persistentData.contains(NbtKeys.BUILD_SCAPE_PARTICLE_PATTERN, 8)) {
+            tag.putString(NbtKeys.PILLAR_PATTERN, persistentData.getString(NbtKeys.BUILD_SCAPE_PARTICLE_PATTERN));
             hasCustomData = true;
         }
 
-        if (persistentData.contains("BuildScapeParticleColors", 9)) {
-            ListTag colorList = persistentData.getList("BuildScapeParticleColors", 8);
+        if (persistentData.contains(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS, 9)) {
+            ListTag colorList = persistentData.getList(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS, 8);
             if (colorList.size() > 0) {
-                tag.put("COLORS", colorList.copy());
+                tag.put(NbtKeys.PILLAR_COLORS, colorList.copy());
                 hasCustomData = true;
             }
         }

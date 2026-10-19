@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.io.AtomicFiles;
 import com.kingodogo.buildscape.core.io.Json;
@@ -2098,8 +2099,8 @@ public class PillarIdManager {
                     if (entity instanceof ItemFrame
                             || entity instanceof ColoredItemFrameEntity) {
                         CompoundTag tag = entity.getPersistentData();
-                        String renamedId = renamedFrames.get(tag.getString("BuildScapeFrameId"));
-                        if (renamedId != null) tag.putString("BuildScapeFrameId", renamedId);
+                        String renamedId = renamedFrames.get(tag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID));
+                        if (renamedId != null) tag.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, renamedId);
                     }
                 }
             }
@@ -2330,12 +2331,12 @@ public class PillarIdManager {
     }
 
     private static void clearFrameData(CompoundTag tag) {
-        tag.remove("BuildScapeFrameId");
-        tag.remove("BuildScapeParticlePattern");
-        tag.remove("BuildScapeParticleColors");
+        tag.remove(NbtKeys.BUILD_SCAPE_FRAME_ID);
+        tag.remove(NbtKeys.BUILD_SCAPE_PARTICLE_PATTERN);
+        tag.remove(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS);
         tag.remove("BuildScapeParticleEnabled");
-        tag.remove("PATTERN");
-        tag.remove("COLORS");
+        tag.remove(NbtKeys.PILLAR_PATTERN);
+        tag.remove(NbtKeys.PILLAR_COLORS);
     }
 
     private static void clearColoredFrameData(Entity frame) {
@@ -2357,7 +2358,7 @@ public class PillarIdManager {
                 Direction facing = entity instanceof ItemFrame itemFrame
                         ? itemFrame.getDirection()
                         : ((ColoredItemFrameEntity) entity).getDirection();
-                if (isRemovedFrame(entity.getPersistentData().getString("BuildScapeFrameId"),
+                if (isRemovedFrame(entity.getPersistentData().getString(NbtKeys.BUILD_SCAPE_FRAME_ID),
                         data.dimension, entity.blockPosition(), facing)) clearFrameData(entity);
             }
         }
@@ -2408,10 +2409,10 @@ public class PillarIdManager {
         if (colors != null) {
             for (String color : colors) colorList.add(StringTag.valueOf(color));
         }
-        tag.putString("BuildScapeParticlePattern", framePattern(pattern));
-        tag.put("BuildScapeParticleColors", colorList);
-        if (tag.contains("PATTERN")) tag.putString("PATTERN", framePattern(pattern));
-        if (tag.contains("COLORS")) tag.put("COLORS", colorList.copy());
+        tag.putString(NbtKeys.BUILD_SCAPE_PARTICLE_PATTERN, framePattern(pattern));
+        tag.put(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS, colorList);
+        if (tag.contains(NbtKeys.PILLAR_PATTERN)) tag.putString(NbtKeys.PILLAR_PATTERN, framePattern(pattern));
+        if (tag.contains(NbtKeys.PILLAR_COLORS)) tag.put(NbtKeys.PILLAR_COLORS, colorList.copy());
     }
 
     /**
@@ -2443,7 +2444,7 @@ public class PillarIdManager {
                 ? itemFrame.getDirection()
                 : ((ColoredItemFrameEntity) frame).getDirection();
         if (immediate) {
-            if (isRemovedFrame(frame.getPersistentData().getString("BuildScapeFrameId"),
+            if (isRemovedFrame(frame.getPersistentData().getString(NbtKeys.BUILD_SCAPE_FRAME_ID),
                     getDimensionKey(frame.level), frame.blockPosition(), facing)) {
                 ItemFrameParticleHandler.reassignFrameId(frame);
             }
@@ -2457,7 +2458,7 @@ public class PillarIdManager {
 
     private boolean prepareFrameRegistration(CompoundTag tag, String dimension, BlockPos pos,
                                              Direction facing) {
-        if (!isRemovedFrame(tag.getString("BuildScapeFrameId"), dimension, pos, facing)) return true;
+        if (!isRemovedFrame(tag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID), dimension, pos, facing)) return true;
         clearFrameData(tag);
         return false;
     }
@@ -2473,12 +2474,12 @@ public class PillarIdManager {
 
         if (!prepareFrameRegistration(frame, immediate)) return;
         CompoundTag dataTag = frame.getPersistentData();
-        String id = dataTag.getString("BuildScapeFrameId");
+        String id = dataTag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID);
 
         String pattern = ItemFrameParticleHandler.getParticlePattern(frame);
         List<String> colors = new ArrayList<>();
-        if (dataTag.contains("BuildScapeParticleColors")) {
-            ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
+        if (dataTag.contains(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS)) {
+            ListTag colorList = dataTag.getList(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS, 8);
             for (int i = 0; i < colorList.size(); i++) {
                 colors.add(colorList.getString(i));
             }
@@ -2495,7 +2496,7 @@ public class PillarIdManager {
         String posKey = positionKey(dimension, pos, facing);
 
         id = reconcileFrameId(id, dimension, pos, facing);
-        dataTag.putString("BuildScapeFrameId", id);
+        dataTag.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, id);
         PillarData existing = pillarData.get(id);
         if (existing == null && !hasFrameParticleData(pattern, colors)) return;
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
@@ -2577,12 +2578,12 @@ public class PillarIdManager {
 
         if (!prepareFrameRegistration(frame, immediate)) return;
         CompoundTag dataTag = frame.getPersistentData();
-        String id = dataTag.getString("BuildScapeFrameId");
+        String id = dataTag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID);
 
         String pattern = ItemFrameParticleHandler.getParticlePatternColored(frame);
         List<String> colors = new ArrayList<>();
-        if (dataTag.contains("BuildScapeParticleColors")) {
-            ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
+        if (dataTag.contains(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS)) {
+            ListTag colorList = dataTag.getList(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS, 8);
             for (int i = 0; i < colorList.size(); i++) {
                 colors.add(colorList.getString(i));
             }
@@ -2599,7 +2600,7 @@ public class PillarIdManager {
         String posKey = positionKey(dimension, pos, facing);
 
         id = reconcileFrameId(id, dimension, pos, facing);
-        dataTag.putString("BuildScapeFrameId", id);
+        dataTag.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, id);
         PillarData existing = pillarData.get(id);
         if (existing == null && !hasFrameParticleData(pattern, colors)) return;
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {

@@ -22,6 +22,8 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class FallingIcicleEntity extends Entity {
 
     private BlockState blockState = Blocks.AIR.defaultBlockState();
@@ -178,9 +180,9 @@ public class FallingIcicleEntity extends Entity {
     protected void readAdditionalSaveData(CompoundTag tag) {
         this.blockState = NbtUtils.readBlockState(tag.getCompound("BlockState"));
         this.fallTime = tag.getInt("FallTime");
-        if (tag.contains("StartX")) {
+        if (tag.contains(NbtKeys.START_X)) {
             this.startPos = new BlockPos(
-                    tag.getInt("StartX"),
+                    tag.getInt(NbtKeys.START_X),
                     tag.getInt("StartY"),
                     tag.getInt("StartZ")
             );
@@ -195,7 +197,7 @@ public class FallingIcicleEntity extends Entity {
         tag.put("BlockState", NbtUtils.writeBlockState(this.blockState));
         tag.putInt("FallTime", this.fallTime);
         if (this.startPos != null) {
-            tag.putInt("StartX", this.startPos.getX());
+            tag.putInt(NbtKeys.START_X, this.startPos.getX());
             tag.putInt("StartY", this.startPos.getY());
             tag.putInt("StartZ", this.startPos.getZ());
         }

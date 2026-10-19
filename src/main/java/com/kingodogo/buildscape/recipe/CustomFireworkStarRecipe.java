@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.recipe;
 
 import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
 import com.kingodogo.buildscape.item.FestiveStockingItem;
 import com.kingodogo.buildscape.item.ModItems;
@@ -124,9 +125,9 @@ public class CustomFireworkStarRecipe extends CustomRecipe {
 
         ItemStack result = new ItemStack(Items.FIREWORK_STAR);
         CompoundTag explosionTag = new CompoundTag();
-        explosionTag.putByte("Type", shapeId);
-        explosionTag.putIntArray("Colors", colors.stream().mapToInt(Integer::intValue).toArray());
-        result.getOrCreateTag().put("Explosion", explosionTag);
+        explosionTag.putByte(NbtKeys.TYPE, shapeId);
+        explosionTag.putIntArray(NbtKeys.COLORS, colors.stream().mapToInt(Integer::intValue).toArray());
+        result.getOrCreateTag().put(NbtKeys.EXPLOSION, explosionTag);
 
         return result;
     }
@@ -150,7 +151,7 @@ public class CustomFireworkStarRecipe extends CustomRecipe {
             return false;
         }
         CompoundTag tag = stack.getTag();
-        return tag == null || !tag.contains("StoredItem", 10) || tag.getCompound("StoredItem").isEmpty();
+        return tag == null || !tag.contains(NbtKeys.STORED_ITEM, 10) || tag.getCompound(NbtKeys.STORED_ITEM).isEmpty();
     }
 
     @Override

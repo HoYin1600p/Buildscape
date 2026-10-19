@@ -48,6 +48,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -111,10 +113,10 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (stack.hasTag() && stack.getTag().contains("BlockEntityTag", 10)) {
+        if (stack.hasTag() && stack.getTag().contains(NbtKeys.BLOCK_ENTITY_TAG, 10)) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof GlassJarBlockEntity jarBE) {
-                jarBE.load(stack.getTag().getCompound("BlockEntityTag"));
+                jarBE.load(stack.getTag().getCompound(NbtKeys.BLOCK_ENTITY_TAG));
                 jarBE.sync();
             }
         }
@@ -130,7 +132,7 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
             jarBE.saveAdditional(tag);
 
             CompoundTag stackTag = new CompoundTag();
-            stackTag.put("BlockEntityTag", tag);
+            stackTag.put(NbtKeys.BLOCK_ENTITY_TAG, tag);
             jarStack.setTag(stackTag);
         }
 
@@ -145,18 +147,18 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
             TooltipFlag flag
     ) {
         super.appendHoverText(stack, level, tooltip, flag);
-        if (stack.hasTag() && stack.getTag().contains("BlockEntityTag", 10)) {
-            CompoundTag beTag = stack.getTag().getCompound("BlockEntityTag");
-            if (beTag.contains("StoredItem", 10)) {
-                ItemStack stored = ItemStack.of(beTag.getCompound("StoredItem"));
-                int count = beTag.getCompound("StoredItem").getInt("RealCount");
+        if (stack.hasTag() && stack.getTag().contains(NbtKeys.BLOCK_ENTITY_TAG, 10)) {
+            CompoundTag beTag = stack.getTag().getCompound(NbtKeys.BLOCK_ENTITY_TAG);
+            if (beTag.contains(NbtKeys.STORED_ITEM, 10)) {
+                ItemStack stored = ItemStack.of(beTag.getCompound(NbtKeys.STORED_ITEM));
+                int count = beTag.getCompound(NbtKeys.STORED_ITEM).getInt(NbtKeys.REAL_COUNT);
                 if (count <= 0) count = stored.getCount();
                 if (!stored.isEmpty() && count > 0) {
                     tooltip.add(new TextComponent("Stored: ").append(stored.getHoverName()).append(" x" + count).withStyle(ChatFormatting.GRAY));
                 }
-            } else if (beTag.contains("StoredLiquidItem", 10)) {
-                ItemStack liquid = ItemStack.of(beTag.getCompound("StoredLiquidItem"));
-                int levelAmount = beTag.getInt("LiquidLevel");
+            } else if (beTag.contains(NbtKeys.STORED_LIQUID_ITEM, 10)) {
+                ItemStack liquid = ItemStack.of(beTag.getCompound(NbtKeys.STORED_LIQUID_ITEM));
+                int levelAmount = beTag.getInt(NbtKeys.LIQUID_LEVEL);
                 if (!liquid.isEmpty() && levelAmount > 0) {
                     int maxLevel = GlassJarBlockEntity.isXpLiquid(liquid)
                             ? GlassJarBlockEntity.XP_BOTTLE_MAX

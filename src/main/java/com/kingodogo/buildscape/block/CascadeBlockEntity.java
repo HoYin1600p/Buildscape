@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.BottleOfMistItem;
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.client.Minecraft;
@@ -47,14 +48,14 @@ public class CascadeBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.putInt("ParticleLevel", getParticleLevel());
+        tag.putInt(NbtKeys.PARTICLE_LEVEL, getParticleLevel());
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        if (tag.contains("ParticleLevel")) {
-            this.particleLevel = tag.getInt("ParticleLevel");
+        if (tag.contains(NbtKeys.PARTICLE_LEVEL)) {
+            this.particleLevel = tag.getInt(NbtKeys.PARTICLE_LEVEL);
         } else {
             this.particleLevel = 5;
         }

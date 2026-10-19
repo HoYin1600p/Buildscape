@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.mixin.EntityAccessor;
 import com.kingodogo.buildscape.mixin.PillarEntityRenderDispatcherInvoker;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -132,7 +133,7 @@ public class MobPillarRenderer {
 
     private static Entity createEntity(EntityType<?> entityType, Level level, BlockPos pos, MobState state) {
         CompoundTag nbt = new CompoundTag();
-        nbt.putString("id", ForgeRegistries.ENTITIES.getKey(entityType).toString());
+        nbt.putString(NbtKeys.ID, ForgeRegistries.ENTITIES.getKey(entityType).toString());
 
         applyVariantToNBT(nbt, entityType, state);
 
@@ -334,7 +335,7 @@ public class MobPillarRenderer {
 
         if (state.glowing) nbt.putBoolean("Glowing", true);
         if (state.fire) nbt.putShort("Fire", (short) 32767);
-        if (state.invisible) nbt.putBoolean("Invisible", true);
+        if (state.invisible) nbt.putBoolean(NbtKeys.INVISIBLE, true);
 
         if (state.frozen) nbt.putInt("TicksFrozen", 140);
 
@@ -354,9 +355,9 @@ public class MobPillarRenderer {
         boolean isTameable = entityTypeName.equals("wolf") || entityTypeName.equals("cat") || entityTypeName.equals("parrot");
         if (isTameable) {
             if (state.tamed) {
-                if (!nbt.hasUUID("Owner")) nbt.putUUID("Owner", UUID.randomUUID());
+                if (!nbt.hasUUID(NbtKeys.OWNER)) nbt.putUUID(NbtKeys.OWNER, UUID.randomUUID());
             } else {
-                nbt.remove("Owner");
+                nbt.remove(NbtKeys.OWNER);
             }
             nbt.putBoolean("Sitting", state.sitting);
         }
@@ -380,8 +381,8 @@ public class MobPillarRenderer {
             if (catType >= 0) nbt.putInt("CatType", catType);
             if (state.tamed) nbt.putByte("CollarColor", (byte) (genericColor >= 0 ? genericColor : 14));
         } else if (entityTypeName.equals("wolf")) {
-            if (state.angry) nbt.putInt("AngerTime", 999999);
-            else nbt.putInt("AngerTime", 0);
+            if (state.angry) nbt.putInt(NbtKeys.ANGER_TIME, 999999);
+            else nbt.putInt(NbtKeys.ANGER_TIME, 0);
             if (state.tamed) nbt.putByte("CollarColor", (byte) (genericColor >= 0 ? genericColor : 14));
         } else if (entityTypeName.equals("creeper")) {
             boolean powered = state.charged || state.powered;
@@ -389,7 +390,7 @@ public class MobPillarRenderer {
             nbt.putBoolean("ignited", state.parsedStates.contains("ignited") || state.parsedStates.contains("ignite"));
         } else if (entityTypeName.equals("sheep")) {
             if (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb")) {
-                nbt.putString("CustomName", "{\"text\":\"jeb_\"}");
+                nbt.putString(NbtKeys.CUSTOM_NAME, "{\"text\":\"jeb_\"}");
                 nbt.putBoolean("CustomNameVisible", false);
             } else {
             }
@@ -397,7 +398,7 @@ public class MobPillarRenderer {
             nbt.putBoolean("Saddle", state.saddled);
         } else if (entityTypeName.equals("vindicator")) {
             if (state.parsedStates.contains("johnny")) {
-                nbt.putString("CustomName", "{\"text\":\"Johnny\"}");
+                nbt.putString(NbtKeys.CUSTOM_NAME, "{\"text\":\"Johnny\"}");
                 nbt.putBoolean("CustomNameVisible", false);
             }
         } else if (entityTypeName.equals("evoker") || entityTypeName.equals("illusioner")) {
@@ -407,27 +408,27 @@ public class MobPillarRenderer {
         } else if (entityTypeName.equals("enderman")) {
             if (state.parsedStates.contains("block") || state.parsedStates.contains("carrying")) {
                 CompoundTag blockState = new CompoundTag();
-                blockState.putString("Name", "minecraft:grass_block");
+                blockState.putString(NbtKeys.NAME, "minecraft:grass_block");
                 nbt.put("carriedBlockState", blockState);
             }
         } else if (entityTypeName.equals("rabbit")) {
             int variant = getRabbitVariant(state);
             if (variant >= 0) nbt.putInt("RabbitType", variant);
             if (state.parsedStates.contains("toast")) {
-                nbt.putString("CustomName", "{\"text\":\"Toast\"}");
+                nbt.putString(NbtKeys.CUSTOM_NAME, "{\"text\":\"Toast\"}");
             }
         } else if (entityTypeName.equals("axolotl")) {
             int variant = getAxolotlVariant(state);
-            if (variant >= 0) nbt.putInt("Variant", variant);
+            if (variant >= 0) nbt.putInt(NbtKeys.VARIANT, variant);
         } else if (entityTypeName.equals("fox")) {
             String type = getFoxType(state);
-            if (type != null) nbt.putString("Type", type);
+            if (type != null) nbt.putString(NbtKeys.TYPE, type);
             nbt.putBoolean("Sitting", state.sitting);
             nbt.putBoolean("Sleeping", state.parsedStates.contains("sleeping") || state.parsedStates.contains("sleep"));
             nbt.putBoolean("Crouching", state.parsedStates.contains("crouching") || state.parsedStates.contains("crouch"));
         } else if (entityTypeName.equals("mooshroom")) {
             String type = getMooshroomType(state);
-            if (type != null) nbt.putString("Type", type);
+            if (type != null) nbt.putString(NbtKeys.TYPE, type);
         } else if (entityTypeName.equals("panda")) {
             String gene = getPandaGene(state);
             if (gene != null) {
@@ -444,50 +445,50 @@ public class MobPillarRenderer {
                 nbt.putBoolean("HasRightHorn", true);
             }
         } else if (entityTypeName.equals("bee")) {
-            if (state.angry) nbt.putInt("AngerTime", 999999);
-            else nbt.putInt("AngerTime", 0);
+            if (state.angry) nbt.putInt(NbtKeys.ANGER_TIME, 999999);
+            else nbt.putInt(NbtKeys.ANGER_TIME, 0);
             nbt.putBoolean("HasNectar", state.parsedStates.contains("nectar"));
             nbt.putBoolean("HasStung", state.parsedStates.contains("stung"));
         } else if (entityTypeName.equals("parrot")) {
             int variant = getParrotVariant(state);
-            if (variant >= 0) nbt.putInt("Variant", variant);
+            if (variant >= 0) nbt.putInt(NbtKeys.VARIANT, variant);
         } else if (entityTypeName.equals("llama") || entityTypeName.equals("trader_llama")) {
             int variant = getLlamaVariant(state);
-            if (variant >= 0) nbt.putInt("Variant", variant);
+            if (variant >= 0) nbt.putInt(NbtKeys.VARIANT, variant);
             nbt.putInt("Strength", 5);
             if (genericColor >= 0) nbt.putInt("DecorColor", genericColor);
         } else if (entityTypeName.contains("horse") || entityTypeName.equals("donkey") || entityTypeName.equals("mule")) {
             if (entityTypeName.equals("horse")) {
                 int variant = getHorseVariant(state);
-                if (variant >= 0) nbt.putInt("Variant", variant);
+                if (variant >= 0) nbt.putInt(NbtKeys.VARIANT, variant);
 
                 if (state.parsedStates.contains("diamond") || state.parsedStates.contains("diamond_armor")) {
                     CompoundTag itemTag = new CompoundTag();
-                    itemTag.putString("id", "minecraft:diamond_horse_armor");
-                    itemTag.putByte("Count", (byte) 1);
-                    nbt.put("ArmorItem", itemTag);
+                    itemTag.putString(NbtKeys.ID, "minecraft:diamond_horse_armor");
+                    itemTag.putByte(NbtKeys.COUNT, (byte) 1);
+                    nbt.put(NbtKeys.ARMOR_ITEM, itemTag);
                 } else if (state.parsedStates.contains("gold") || state.parsedStates.contains("gold_armor")) {
                     CompoundTag itemTag = new CompoundTag();
-                    itemTag.putString("id", "minecraft:golden_horse_armor");
-                    itemTag.putByte("Count", (byte) 1);
-                    nbt.put("ArmorItem", itemTag);
+                    itemTag.putString(NbtKeys.ID, "minecraft:golden_horse_armor");
+                    itemTag.putByte(NbtKeys.COUNT, (byte) 1);
+                    nbt.put(NbtKeys.ARMOR_ITEM, itemTag);
                 } else if (state.parsedStates.contains("iron") || state.parsedStates.contains("iron_armor")) {
                     CompoundTag itemTag = new CompoundTag();
-                    itemTag.putString("id", "minecraft:iron_horse_armor");
-                    itemTag.putByte("Count", (byte) 1);
-                    nbt.put("ArmorItem", itemTag);
+                    itemTag.putString(NbtKeys.ID, "minecraft:iron_horse_armor");
+                    itemTag.putByte(NbtKeys.COUNT, (byte) 1);
+                    nbt.put(NbtKeys.ARMOR_ITEM, itemTag);
                 } else if (state.parsedStates.contains("leather") || state.parsedStates.contains("leather_armor")) {
                     CompoundTag itemTag = new CompoundTag();
-                    itemTag.putString("id", "minecraft:leather_horse_armor");
-                    itemTag.putByte("Count", (byte) 1);
-                    nbt.put("ArmorItem", itemTag);
+                    itemTag.putString(NbtKeys.ID, "minecraft:leather_horse_armor");
+                    itemTag.putByte(NbtKeys.COUNT, (byte) 1);
+                    nbt.put(NbtKeys.ARMOR_ITEM, itemTag);
                 }
             }
 
             if (state.saddled) {
                 CompoundTag itemTag = new CompoundTag();
-                itemTag.putString("id", "minecraft:saddle");
-                itemTag.putByte("Count", (byte) 1);
+                itemTag.putString(NbtKeys.ID, "minecraft:saddle");
+                itemTag.putByte(NbtKeys.COUNT, (byte) 1);
                 nbt.put("SaddleItem", itemTag);
             } else {
                 nbt.remove("SaddleItem");
@@ -510,7 +511,7 @@ public class MobPillarRenderer {
             else if (state.parsedStates.contains("dark_oak") || state.parsedStates.contains("darkoak"))
                 type = "dark_oak";
             else if (state.parsedStates.contains("mangrove")) type = "mangrove";
-            nbt.putString("Type", type);
+            nbt.putString(NbtKeys.TYPE, type);
         } else if (entityTypeName.equals("slime") || entityTypeName.equals("magma_cube") || entityTypeName.equals("phantom")) {
             int size = 1;
             if (state.parsedStates.contains("tiny")) size = 0;
@@ -522,25 +523,25 @@ public class MobPillarRenderer {
             nbt.putInt("Size", size);
         } else if (entityTypeName.equals("iron_golem")) {
             if (state.parsedStates.contains("cracked") || state.parsedStates.contains("broken")) {
-                nbt.putFloat("Health", 10.0f);
+                nbt.putFloat(NbtKeys.HEALTH, 10.0f);
             }
         } else if (entityTypeName.equals("tropical_fish")) {
-            if (state.parsedStates.contains("kob")) nbt.putInt("Variant", 65536);
-            else if (state.parsedStates.contains("sunstreak")) nbt.putInt("Variant", 131072);
-            else if (state.parsedStates.contains("snooper")) nbt.putInt("Variant", 196608);
-            else if (state.parsedStates.contains("dasher")) nbt.putInt("Variant", 262144);
-            else if (state.parsedStates.contains("brinely")) nbt.putInt("Variant", 327680);
-            else if (state.parsedStates.contains("spotty")) nbt.putInt("Variant", 393216);
-            else if (state.parsedStates.contains("flopper")) nbt.putInt("Variant", 458752);
-            else if (state.parsedStates.contains("stripey")) nbt.putInt("Variant", 524288);
-            else if (state.parsedStates.contains("glitter")) nbt.putInt("Variant", 589824);
-            else if (state.parsedStates.contains("blockfish")) nbt.putInt("Variant", 655360);
-            else if (state.parsedStates.contains("betty")) nbt.putInt("Variant", 720896);
-            else if (state.parsedStates.contains("clayfish")) nbt.putInt("Variant", 786432);
+            if (state.parsedStates.contains("kob")) nbt.putInt(NbtKeys.VARIANT, 65536);
+            else if (state.parsedStates.contains("sunstreak")) nbt.putInt(NbtKeys.VARIANT, 131072);
+            else if (state.parsedStates.contains("snooper")) nbt.putInt(NbtKeys.VARIANT, 196608);
+            else if (state.parsedStates.contains("dasher")) nbt.putInt(NbtKeys.VARIANT, 262144);
+            else if (state.parsedStates.contains("brinely")) nbt.putInt(NbtKeys.VARIANT, 327680);
+            else if (state.parsedStates.contains("spotty")) nbt.putInt(NbtKeys.VARIANT, 393216);
+            else if (state.parsedStates.contains("flopper")) nbt.putInt(NbtKeys.VARIANT, 458752);
+            else if (state.parsedStates.contains("stripey")) nbt.putInt(NbtKeys.VARIANT, 524288);
+            else if (state.parsedStates.contains("glitter")) nbt.putInt(NbtKeys.VARIANT, 589824);
+            else if (state.parsedStates.contains("blockfish")) nbt.putInt(NbtKeys.VARIANT, 655360);
+            else if (state.parsedStates.contains("betty")) nbt.putInt(NbtKeys.VARIANT, 720896);
+            else if (state.parsedStates.contains("clayfish")) nbt.putInt(NbtKeys.VARIANT, 786432);
         } else if (entityTypeName.equals("armor_stand")) {
             nbt.putBoolean("ShowArms", state.parsedStates.contains("arms") || state.parsedStates.contains("show_arms"));
             nbt.putBoolean("Small", state.parsedStates.contains("small") || state.baby);
-            nbt.putBoolean("NoBasePlate", state.parsedStates.contains("no_base") || state.parsedStates.contains("nobase"));
+            nbt.putBoolean(NbtKeys.NO_BASE_PLATE, state.parsedStates.contains("no_base") || state.parsedStates.contains("nobase"));
         } else if (entityTypeName.equals("end_crystal")) {
             nbt.putBoolean("ShowBottom", !state.parsedStates.contains("no_bottom"));
         } else if (entityTypeName.equals("wither")) {
@@ -549,9 +550,9 @@ public class MobPillarRenderer {
             }
         } else if (entityTypeName.equals("iron_golem")) {
             if (state.parsedStates.contains("cracked") || state.parsedStates.contains("broken")) {
-                nbt.putFloat("Health", 25.0f);
+                nbt.putFloat(NbtKeys.HEALTH, 25.0f);
             } else {
-                nbt.putFloat("Health", 100.0f);
+                nbt.putFloat(NbtKeys.HEALTH, 100.0f);
             }
         } else if (entityTypeName.equals("snow_golem")) {
             nbt.putBoolean("Pumpkin", !state.parsedStates.contains("no_pumpkin"));

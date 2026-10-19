@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -122,8 +123,8 @@ public class ArmorPillarRenderer {
         nbt.putBoolean("ShowArms", true);
         nbt.putBoolean("Small", false);
         nbt.putBoolean("NoGravity", true);
-        nbt.putBoolean("NoBasePlate", true);
-        nbt.putBoolean("Invisible", true);
+        nbt.putBoolean(NbtKeys.NO_BASE_PLATE, true);
+        nbt.putBoolean(NbtKeys.INVISIBLE, true);
         armorStand.readAdditionalSaveData(nbt);
 
         armorStand.setUUID(UUID.randomUUID());
@@ -142,11 +143,11 @@ public class ArmorPillarRenderer {
 
 
         if (isStandItem) {
-            nbt.putBoolean("Invisible", false);
-            nbt.putBoolean("NoBasePlate", false);
+            nbt.putBoolean(NbtKeys.INVISIBLE, false);
+            nbt.putBoolean(NbtKeys.NO_BASE_PLATE, false);
         } else {
-            nbt.putBoolean("Invisible", true);
-            nbt.putBoolean("NoBasePlate", true);
+            nbt.putBoolean(NbtKeys.INVISIBLE, true);
+            nbt.putBoolean(NbtKeys.NO_BASE_PLATE, true);
 
             if (slot != null && !stack.isEmpty()) {
                 armorStand.setItemSlot(slot, stack.copy());

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.item.HammerItem;
 import net.minecraft.core.BlockPos;
@@ -83,7 +84,7 @@ public class HammerReplacePacket {
             Block replacementBlock = blockItem.getBlock();
             if (targetState.getBlock() == replacementBlock) return;
             if (isMultiBlockPart(targetState)) return;
-            if (offhandStack.getTagElement("BlockEntityTag") != null) return;
+            if (offhandStack.getTagElement(NbtKeys.BLOCK_ENTITY_TAG) != null) return;
 
             BlockState newState = replacementBlock.defaultBlockState();
             if (isMultiBlockPart(newState) || !newState.canSurvive(level, pos)) return;

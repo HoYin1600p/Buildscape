@@ -16,6 +16,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 
 import javax.annotation.Nullable;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class FestiveStockingBlockEntity
         extends BlockEntity
         implements WorldlyContainer {
@@ -195,8 +197,8 @@ public class FestiveStockingBlockEntity
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        if (tag.contains("StoredItem", 10)) {
-            this.storedItem = ItemStack.of(tag.getCompound("StoredItem"));
+        if (tag.contains(NbtKeys.STORED_ITEM, 10)) {
+            this.storedItem = ItemStack.of(tag.getCompound(NbtKeys.STORED_ITEM));
         } else {
             this.storedItem = ItemStack.EMPTY;
         }
@@ -206,7 +208,7 @@ public class FestiveStockingBlockEntity
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!storedItem.isEmpty()) {
-            tag.put("StoredItem", storedItem.save(new CompoundTag()));
+            tag.put(NbtKeys.STORED_ITEM, storedItem.save(new CompoundTag()));
         }
     }
 
@@ -214,7 +216,7 @@ public class FestiveStockingBlockEntity
     public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
         tag.put(
-                "StoredItem",
+                NbtKeys.STORED_ITEM,
                 storedItem.isEmpty()
                         ? ItemStack.EMPTY.save(new CompoundTag())
                         : storedItem.save(new CompoundTag())

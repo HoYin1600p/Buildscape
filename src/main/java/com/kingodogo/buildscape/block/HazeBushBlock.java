@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.client.HazeBushParticleHandler;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.ModItems;
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.client.Minecraft;
@@ -86,10 +87,10 @@ public class HazeBushBlock extends ModBushBlock {
         if (stack.hasTag()) {
             CompoundTag tag = stack.getTag();
             if (tag != null) {
-                if (tag.contains("BlockStateTag") && tag.getCompound("BlockStateTag").contains("has_haze")) {
-                    hasHaze = !"false".equalsIgnoreCase(tag.getCompound("BlockStateTag").getString("has_haze"));
-                } else if (tag.contains("HasHaze")) {
-                    hasHaze = tag.getBoolean("HasHaze");
+                if (tag.contains(NbtKeys.BLOCK_STATE_TAG) && tag.getCompound(NbtKeys.BLOCK_STATE_TAG).contains(NbtKeys.HAS_HAZE_PROPERTY)) {
+                    hasHaze = !"false".equalsIgnoreCase(tag.getCompound(NbtKeys.BLOCK_STATE_TAG).getString(NbtKeys.HAS_HAZE_PROPERTY));
+                } else if (tag.contains(NbtKeys.HAS_HAZE)) {
+                    hasHaze = tag.getBoolean(NbtKeys.HAS_HAZE);
                 }
             }
         }
@@ -204,9 +205,9 @@ public class HazeBushBlock extends ModBushBlock {
         ItemStack stack = super.getCloneItemStack(level, pos, state);
         if (!state.getValue(HAS_HAZE)) {
             CompoundTag blockStateTag = new CompoundTag();
-            blockStateTag.putString("has_haze", "false");
+            blockStateTag.putString(NbtKeys.HAS_HAZE_PROPERTY, "false");
             stack.addTagElement("BlockStateTag", blockStateTag);
-            stack.getOrCreateTag().putBoolean("HasHaze", false);
+            stack.getOrCreateTag().putBoolean(NbtKeys.HAS_HAZE, false);
         }
         return stack;
     }

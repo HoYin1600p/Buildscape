@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import net.minecraft.core.BlockPos;
@@ -218,24 +219,24 @@ public class HollowLogBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!decorationState.isAir()) {
-            tag.put("DecorationState", NbtUtils.writeBlockState(decorationState));
+            tag.put(NbtKeys.DECORATION_STATE, NbtUtils.writeBlockState(decorationState));
         }
         if (!glassCoverNeg.isAir()) {
-            tag.put("GlassCoverNeg", NbtUtils.writeBlockState(glassCoverNeg));
+            tag.put(NbtKeys.GLASS_COVER_NEG, NbtUtils.writeBlockState(glassCoverNeg));
         }
         if (!glassCoverPos.isAir()) {
-            tag.put("GlassCoverPos", NbtUtils.writeBlockState(glassCoverPos));
+            tag.put(NbtKeys.GLASS_COVER_POS, NbtUtils.writeBlockState(glassCoverPos));
         }
         tag.putString("FluidType", fluidType);
         tag.putInt("LavaTicks", lavaTicks);
         if (lavaPlacedByPlayer != null) {
-            tag.putUUID("LavaPlacedByPlayer", lavaPlacedByPlayer);
+            tag.putUUID(NbtKeys.LAVA_PLACED_BY_PLAYER, lavaPlacedByPlayer);
         }
         if (glassPlacedByPlayer != null) {
-            tag.putUUID("GlassPlacedByPlayer", glassPlacedByPlayer);
+            tag.putUUID(NbtKeys.GLASS_PLACED_BY_PLAYER, glassPlacedByPlayer);
         }
         if (pipeFlowState != null && !pipeFlowState.isEmpty()) {
-            tag.put("PipeFlowState", pipeFlowState.writeToNbt(new CompoundTag()));
+            tag.put(NbtKeys.PIPE_FLOW_STATE, pipeFlowState.writeToNbt(new CompoundTag()));
         }
     }
 
@@ -243,31 +244,31 @@ public class HollowLogBlockEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         PipeFlowState previousFlow = pipeFlowState;
         super.load(tag);
-        if (tag.contains("DecorationState")) {
-            decorationState = NbtUtils.readBlockState(tag.getCompound("DecorationState"));
+        if (tag.contains(NbtKeys.DECORATION_STATE)) {
+            decorationState = NbtUtils.readBlockState(tag.getCompound(NbtKeys.DECORATION_STATE));
         } else {
             decorationState = Blocks.AIR.defaultBlockState();
         }
-        if (tag.contains("GlassCoverNeg")) {
-            glassCoverNeg = NbtUtils.readBlockState(tag.getCompound("GlassCoverNeg"));
+        if (tag.contains(NbtKeys.GLASS_COVER_NEG)) {
+            glassCoverNeg = NbtUtils.readBlockState(tag.getCompound(NbtKeys.GLASS_COVER_NEG));
         } else {
             glassCoverNeg = Blocks.AIR.defaultBlockState();
         }
-        if (tag.contains("GlassCoverPos")) {
-            glassCoverPos = NbtUtils.readBlockState(tag.getCompound("GlassCoverPos"));
+        if (tag.contains(NbtKeys.GLASS_COVER_POS)) {
+            glassCoverPos = NbtUtils.readBlockState(tag.getCompound(NbtKeys.GLASS_COVER_POS));
         } else {
             glassCoverPos = Blocks.AIR.defaultBlockState();
         }
         fluidType = tag.getString("FluidType");
         lavaTicks = tag.getInt("LavaTicks");
-        if (tag.hasUUID("LavaPlacedByPlayer")) {
-            lavaPlacedByPlayer = tag.getUUID("LavaPlacedByPlayer");
+        if (tag.hasUUID(NbtKeys.LAVA_PLACED_BY_PLAYER)) {
+            lavaPlacedByPlayer = tag.getUUID(NbtKeys.LAVA_PLACED_BY_PLAYER);
         }
-        if (tag.hasUUID("GlassPlacedByPlayer")) {
-            glassPlacedByPlayer = tag.getUUID("GlassPlacedByPlayer");
+        if (tag.hasUUID(NbtKeys.GLASS_PLACED_BY_PLAYER)) {
+            glassPlacedByPlayer = tag.getUUID(NbtKeys.GLASS_PLACED_BY_PLAYER);
         }
-        if (getBlockState().getBlock() instanceof HollowPipeBlock && tag.contains("PipeFlowState")) {
-            pipeFlowState = PipeFlowState.readFromNbt(tag.getCompound("PipeFlowState"));
+        if (getBlockState().getBlock() instanceof HollowPipeBlock && tag.contains(NbtKeys.PIPE_FLOW_STATE)) {
+            pipeFlowState = PipeFlowState.readFromNbt(tag.getCompound(NbtKeys.PIPE_FLOW_STATE));
         } else {
             pipeFlowState = new PipeFlowState();
         }

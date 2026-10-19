@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.Block;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class HazeBushItem extends BlockItem {
 
     public HazeBushItem(Block block, Properties properties) {
@@ -23,11 +25,11 @@ public class HazeBushItem extends BlockItem {
         if (stack.hasTag()) {
             CompoundTag tag = stack.getTag();
             if (tag != null) {
-                if (tag.contains("BlockStateTag") && tag.getCompound("BlockStateTag").contains("has_haze")) {
-                    return "false".equalsIgnoreCase(tag.getCompound("BlockStateTag").getString("has_haze"));
+                if (tag.contains(NbtKeys.BLOCK_STATE_TAG) && tag.getCompound(NbtKeys.BLOCK_STATE_TAG).contains(NbtKeys.HAS_HAZE_PROPERTY)) {
+                    return "false".equalsIgnoreCase(tag.getCompound(NbtKeys.BLOCK_STATE_TAG).getString(NbtKeys.HAS_HAZE_PROPERTY));
                 }
-                if (tag.contains("HasHaze")) {
-                    return !tag.getBoolean("HasHaze");
+                if (tag.contains(NbtKeys.HAS_HAZE)) {
+                    return !tag.getBoolean(NbtKeys.HAS_HAZE);
                 }
             }
         }

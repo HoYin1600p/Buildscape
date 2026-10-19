@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.recipe;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.NonNullList;
@@ -62,25 +63,25 @@ public class InfinitePhoenixFireworkStarRecipe extends CustomRecipe {
         flight = Math.min(flight - 1, 3);
 
         ItemStack result = new ItemStack(Items.FIREWORK_ROCKET, 3);
-        CompoundTag fireworksTag = result.getOrCreateTagElement("Fireworks");
+        CompoundTag fireworksTag = result.getOrCreateTagElement(NbtKeys.FIREWORKS);
         ListTag explosionsList = new ListTag();
 
         CompoundTag explosionTag = new CompoundTag();
-        explosionTag.putByte("Type", CustomFireworkShapeRegistry.PHOENIX_ID);
+        explosionTag.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.PHOENIX_ID);
 
         int[] colors = new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00};
         if (!starStack.isEmpty() && starStack.hasTag()) {
-            CompoundTag starExp = starStack.getTagElement("Explosion");
-            if (starExp != null && starExp.contains("Colors")) {
-                colors = starExp.getIntArray("Colors");
+            CompoundTag starExp = starStack.getTagElement(NbtKeys.EXPLOSION);
+            if (starExp != null && starExp.contains(NbtKeys.COLORS)) {
+                colors = starExp.getIntArray(NbtKeys.COLORS);
             }
         }
-        explosionTag.putIntArray("Colors", colors);
-        explosionTag.putBoolean("Flicker", true);
-        explosionTag.putBoolean("Trail", true);
+        explosionTag.putIntArray(NbtKeys.COLORS, colors);
+        explosionTag.putBoolean(NbtKeys.FLICKER, true);
+        explosionTag.putBoolean(NbtKeys.TRAIL, true);
 
         explosionsList.add(explosionTag);
-        fireworksTag.put("Explosions", explosionsList);
+        fireworksTag.put(NbtKeys.EXPLOSIONS, explosionsList);
         fireworksTag.putByte("Flight", (byte) flight);
 
         return result;

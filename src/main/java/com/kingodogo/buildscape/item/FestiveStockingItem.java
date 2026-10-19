@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.block.FestiveStockingBlockEntity;
 import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.core.NbtKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -85,8 +86,8 @@ public class FestiveStockingItem extends BlockItem {
             FestiveStockingBlockEntity stockingEntity =
                     (FestiveStockingBlockEntity) be;
             CompoundTag tag = stack.getTag();
-            if (tag != null && tag.contains("StoredItem", 10)) {
-                CompoundTag storedTag = tag.getCompound("StoredItem");
+            if (tag != null && tag.contains(NbtKeys.STORED_ITEM, 10)) {
+                CompoundTag storedTag = tag.getCompound(NbtKeys.STORED_ITEM);
                 if (!storedTag.isEmpty()) {
                     ItemStack storedItem =
                             ItemStack.of(storedTag);

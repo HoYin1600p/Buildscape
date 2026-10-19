@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -191,15 +192,15 @@ public class IcicleCauldronBlockEntity
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!storedIcicle.isEmpty()) {
-            tag.put("Icicle", storedIcicle.save(new CompoundTag()));
+            tag.put(NbtKeys.ICICLE, storedIcicle.save(new CompoundTag()));
         }
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        if (tag.contains("Icicle")) {
-            storedIcicle = ItemStack.of(tag.getCompound("Icicle"));
+        if (tag.contains(NbtKeys.ICICLE)) {
+            storedIcicle = ItemStack.of(tag.getCompound(NbtKeys.ICICLE));
         } else {
             storedIcicle = ItemStack.EMPTY;
         }

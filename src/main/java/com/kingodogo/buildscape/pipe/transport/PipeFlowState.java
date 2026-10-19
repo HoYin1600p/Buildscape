@@ -12,6 +12,8 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class PipeFlowState {
     public static final String WATER_FLUID_ID = "minecraft:water";
 
@@ -159,23 +161,23 @@ public class PipeFlowState {
     public CompoundTag writeToNbt(CompoundTag tag) {
         tag.putBoolean("HasWater", hasWater());
         if (hasFluid()) {
-            tag.putString("FluidId", fluidId);
+            tag.putString(NbtKeys.FLUID_ID, fluidId);
         }
         tag.putBoolean("IsSource", isSource);
         tag.putString("BubbleColumn", bubbleColumn.getSerializedName());
         tag.putInt("Distance", distance);
-        tag.putInt("MaxDistance", maxDistance);
-        tag.putBoolean("IsOpenEndpoint", isOpenEndpoint);
+        tag.putInt(NbtKeys.MAX_DISTANCE, maxDistance);
+        tag.putBoolean(NbtKeys.IS_OPEN_ENDPOINT, isOpenEndpoint);
 
         if (inflowDirection != null) {
-            tag.putString("InflowDir", inflowDirection.getName());
+            tag.putString(NbtKeys.INFLOW_DIR, inflowDirection.getName());
         }
 
         ListTag list = new ListTag();
         for (Direction dir : flowDirections) {
             list.add(StringTag.valueOf(dir.getName()));
         }
-        tag.put("FlowDirs", list);
+        tag.put(NbtKeys.FLOW_DIRS, list);
         return tag;
     }
 
@@ -183,21 +185,21 @@ public class PipeFlowState {
         PipeFlowState state = new PipeFlowState();
         if (tag == null) return state;
 
-        state.fluidId = tag.contains("FluidId", Tag.TAG_STRING)
-                ? tag.getString("FluidId")
+        state.fluidId = tag.contains(NbtKeys.FLUID_ID, Tag.TAG_STRING)
+                ? tag.getString(NbtKeys.FLUID_ID)
                 : (tag.getBoolean("HasWater") ? WATER_FLUID_ID : "");
         state.isSource = tag.getBoolean("IsSource");
         state.bubbleColumn = BubbleColumnState.byName(tag.getString("BubbleColumn"));
         state.distance = tag.getInt("Distance");
-        state.maxDistance = tag.contains("MaxDistance") ? tag.getInt("MaxDistance") : 0;
-        state.isOpenEndpoint = tag.contains("IsOpenEndpoint") && tag.getBoolean("IsOpenEndpoint");
+        state.maxDistance = tag.contains(NbtKeys.MAX_DISTANCE) ? tag.getInt(NbtKeys.MAX_DISTANCE) : 0;
+        state.isOpenEndpoint = tag.contains(NbtKeys.IS_OPEN_ENDPOINT) && tag.getBoolean(NbtKeys.IS_OPEN_ENDPOINT);
 
-        if (tag.contains("InflowDir")) {
-            state.inflowDirection = Direction.byName(tag.getString("InflowDir"));
+        if (tag.contains(NbtKeys.INFLOW_DIR)) {
+            state.inflowDirection = Direction.byName(tag.getString(NbtKeys.INFLOW_DIR));
         }
 
-        if (tag.contains("FlowDirs", Tag.TAG_LIST)) {
-            ListTag list = tag.getList("FlowDirs", Tag.TAG_STRING);
+        if (tag.contains(NbtKeys.FLOW_DIRS, Tag.TAG_LIST)) {
+            ListTag list = tag.getList(NbtKeys.FLOW_DIRS, Tag.TAG_STRING);
             for (int i = 0; i < list.size(); i++) {
                 Direction d = Direction.byName(list.getString(i));
                 if (d != null) {

@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
@@ -532,11 +533,11 @@ public class PillarBlock
             if (stack.hasTag()) {
                 CompoundTag tag = stack.getTag();
                 CompoundTag placementTag = null;
-                if (tag.contains("ITEM", 8) || tag.contains("PATTERN", 8)) {
+                if (tag.contains(NbtKeys.PILLAR_ITEM, 8) || tag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
                     placementTag = tag;
-                } else if (tag.contains("BlockEntityTag", 10)) {
-                    CompoundTag beTag = tag.getCompound("BlockEntityTag");
-                    if (beTag.contains("ITEM", 8) || beTag.contains("PATTERN", 8)) {
+                } else if (tag.contains(NbtKeys.BLOCK_ENTITY_TAG, 10)) {
+                    CompoundTag beTag = tag.getCompound(NbtKeys.BLOCK_ENTITY_TAG);
+                    if (beTag.contains(NbtKeys.PILLAR_ITEM, 8) || beTag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
                         placementTag = beTag;
                     }
                 }
@@ -549,17 +550,17 @@ public class PillarBlock
     }
 
     private static void applyPlacementNbt(PillarBlockEntity pillarBE, CompoundTag tag) {
-        if (tag.contains("ITEM", 8)) {
+        if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
             ResourceLocation itemLocation =
-                    ResourceLocation.tryParse(tag.getString("ITEM"));
+                    ResourceLocation.tryParse(tag.getString(NbtKeys.PILLAR_ITEM));
             Item item = itemLocation == null ? null
                     : ForgeRegistries.ITEMS.getValue(itemLocation);
             if (item != null && item != Items.AIR) {
                 pillarBE.setDisplayedItem(new ItemStack(item));
             }
         }
-        if (tag.contains("PATTERN", 8)) {
-            pillarBE.setParticlePattern(tag.getString("PATTERN"));
+        if (tag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
+            pillarBE.setParticlePattern(tag.getString(NbtKeys.PILLAR_PATTERN));
         }
         pillarBE.setChanged();
     }
@@ -609,7 +610,7 @@ public class PillarBlock
                         ResourceLocation itemId =
                                 ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
                         if (itemId != null) {
-                            beTag.putString("ITEM", itemId.toString());
+                            beTag.putString(NbtKeys.PILLAR_ITEM, itemId.toString());
                             hasCustomData = true;
                         }
                     }
@@ -617,13 +618,13 @@ public class PillarBlock
 
                 String pattern = pillarBE.getParticlePattern();
                 if (pattern != null && !pattern.isEmpty()) {
-                    beTag.putString("PATTERN", pattern);
+                    beTag.putString(NbtKeys.PILLAR_PATTERN, pattern);
                     hasCustomData = true;
                 }
 
                 if (hasCustomData) {
                     CompoundTag tag = stack.getOrCreateTag();
-                    tag.put("BlockEntityTag", beTag);
+                    tag.put(NbtKeys.BLOCK_ENTITY_TAG, beTag);
                     stack.setTag(tag);
                 }
             }

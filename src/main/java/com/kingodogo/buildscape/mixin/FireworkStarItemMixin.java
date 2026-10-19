@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +21,7 @@ public abstract class FireworkStarItemMixin {
 
     @Inject(method = "appendHoverText(Lnet/minecraft/nbt/CompoundTag;Ljava/util/List;)V", at = @At("HEAD"), cancellable = true)
     private static void buildscape$appendCustomShapeHoverText(CompoundTag tag, List<Component> tooltip, CallbackInfo ci) {
-        byte type = tag.getByte("Type");
+        byte type = tag.getByte(NbtKeys.TYPE);
         if (CustomFireworkShapeRegistry.isCustomShape(type)) {
             String shapeTranslationKey = switch (type) {
                 case CustomFireworkShapeRegistry.CAKE_ID -> "item.minecraft.firework_star.shape.cake";
@@ -36,7 +37,7 @@ public abstract class FireworkStarItemMixin {
 
             tooltip.add(new TranslatableComponent(shapeTranslationKey).withStyle(ChatFormatting.GRAY));
 
-            int[] colors = tag.getIntArray("Colors");
+            int[] colors = tag.getIntArray(NbtKeys.COLORS);
             if (colors.length > 0) {
                 tooltip.add(appendColors(new TextComponent("").withStyle(ChatFormatting.GRAY), colors));
             }
@@ -46,11 +47,11 @@ public abstract class FireworkStarItemMixin {
                 tooltip.add(appendColors((new TranslatableComponent("item.minecraft.firework_star.fade_to")).append(" ").withStyle(ChatFormatting.GRAY), fadeColors));
             }
 
-            if (tag.getBoolean("Flicker")) {
+            if (tag.getBoolean(NbtKeys.FLICKER)) {
                 tooltip.add((new TranslatableComponent("item.minecraft.firework_star.flicker")).withStyle(ChatFormatting.GRAY));
             }
 
-            if (tag.getBoolean("Trail")) {
+            if (tag.getBoolean(NbtKeys.TRAIL)) {
                 tooltip.add((new TranslatableComponent("item.minecraft.firework_star.trail")).withStyle(ChatFormatting.GRAY));
             }
 

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.util.GhostFilterable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -18,36 +19,36 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
 
     @Inject(method = "load", at = @At("HEAD"))
     private void migrateStoredGhostItems(CompoundTag tag, CallbackInfo ci) {
-        if (tag.getBoolean("GhostMigrated")) return;
-        ListTag filters = tag.contains("GhostFilters", 9)
-                ? tag.getList("GhostFilters", 8).copy()
+        if (tag.getBoolean(NbtKeys.GHOST_MIGRATED)) return;
+        ListTag filters = tag.contains(NbtKeys.GHOST_FILTERS, 9)
+                ? tag.getList(NbtKeys.GHOST_FILTERS, 8).copy()
                 : new ListTag();
         while (filters.size() < 27) filters.add(StringTag.valueOf(""));
 
-        if (tag.contains("Items", 9)) {
-            ListTag items = tag.getList("Items", 10);
+        if (tag.contains(NbtKeys.ITEMS, 9)) {
+            ListTag items = tag.getList(NbtKeys.ITEMS, 10);
             for (int i = items.size() - 1; i >= 0; i--) {
                 CompoundTag item = items.getCompound(i);
                 int slot = item.getByte("Slot") & 255;
-                if (slot >= 27 || !item.contains("tag", 10)
-                        || !item.getCompound("tag").getBoolean("ghost")) continue;
+                if (slot >= 27 || !item.contains(NbtKeys.TAG, 10)
+                        || !item.getCompound(NbtKeys.TAG).getBoolean(NbtKeys.GHOST)) continue;
 
                 if (filters.getString(slot).isEmpty()) {
-                    filters.set(slot, StringTag.valueOf(item.getString("id")));
+                    filters.set(slot, StringTag.valueOf(item.getString(NbtKeys.ID)));
                 }
                 items.remove(i);
             }
-            tag.put("Items", items);
+            tag.put(NbtKeys.ITEMS, items);
         }
-        tag.put("GhostFilters", filters);
-        tag.putBoolean("GhostMigrated", true);
+        tag.put(NbtKeys.GHOST_FILTERS, filters);
+        tag.putBoolean(NbtKeys.GHOST_MIGRATED, true);
     }
 
     @Inject(method = "load", at = @At("TAIL"))
     private void onLoad(CompoundTag tag, CallbackInfo ci) {
         for (int i = 0; i < 27; i++) buildscape$ghostFilters[i] = "";
-        if (tag.contains("GhostFilters", 9)) {
-            ListTag list = tag.getList("GhostFilters", 8);
+        if (tag.contains(NbtKeys.GHOST_FILTERS, 9)) {
+            ListTag list = tag.getList(NbtKeys.GHOST_FILTERS, 8);
             for (int i = 0; i < 27; i++) {
                 if (i < list.size()) {
                     String str = list.getString(i);
@@ -59,7 +60,7 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
 
     @Inject(method = "saveAdditional", at = @At("TAIL"))
     private void onSaveAdditional(CompoundTag tag, CallbackInfo ci) {
-        tag.putBoolean("GhostMigrated", true);
+        tag.putBoolean(NbtKeys.GHOST_MIGRATED, true);
         boolean hasFilter = false;
         ListTag list = new ListTag();
         for (int i = 0; i < 27; i++) {
@@ -68,9 +69,9 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
             list.add(StringTag.valueOf(filter));
         }
         if (hasFilter) {
-            tag.put("GhostFilters", list);
+            tag.put(NbtKeys.GHOST_FILTERS, list);
         } else {
-            tag.remove("GhostFilters");
+            tag.remove(NbtKeys.GHOST_FILTERS);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.util.GhostFilterable;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -36,7 +37,7 @@ public class ShulkerBoxBlockMixin {
                     List<ItemStack> drops = cir.getReturnValue();
                     for (ItemStack stack : drops) {
                         if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
-                            stack.getOrCreateTagElement("BlockEntityTag").put("GhostFilters", filterList.copy());
+                            stack.getOrCreateTagElement(NbtKeys.BLOCK_ENTITY_TAG).put(NbtKeys.GHOST_FILTERS, filterList.copy());
                         }
                     }
                 }

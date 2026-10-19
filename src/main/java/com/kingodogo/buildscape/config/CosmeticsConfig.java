@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.io.AtomicFiles;
 import com.kingodogo.buildscape.core.io.Json;
 import net.minecraft.nbt.CompoundTag;
@@ -138,10 +139,10 @@ public class CosmeticsConfig {
             if (key.equals("global_settings")) {
                 if (val instanceof Map) {
                     Map<String, Object> globalData = (Map<String, Object>) val;
-                    if (globalData.containsKey("colorPickerX") && globalData.get("colorPickerX") instanceof Number)
-                        colorPickerX = ((Number) globalData.get("colorPickerX")).intValue();
-                    if (globalData.containsKey("colorPickerY") && globalData.get("colorPickerY") instanceof Number)
-                        colorPickerY = ((Number) globalData.get("colorPickerY")).intValue();
+                    if (globalData.containsKey("colorPickerX") && globalData.get(NbtKeys.COLOR_PICKER_X) instanceof Number)
+                        colorPickerX = ((Number) globalData.get(NbtKeys.COLOR_PICKER_X)).intValue();
+                    if (globalData.containsKey("colorPickerY") && globalData.get(NbtKeys.COLOR_PICKER_Y) instanceof Number)
+                        colorPickerY = ((Number) globalData.get(NbtKeys.COLOR_PICKER_Y)).intValue();
                 }
                 continue;
             }
@@ -199,8 +200,8 @@ public class CosmeticsConfig {
         try {
             CompoundTag nbt = NbtIo.readCompressed(file);
             if (nbt != null) {
-                if (playerUuid != null && nbt.hasUUID("player_uuid")) {
-                    UUID storedUuid = nbt.getUUID("player_uuid");
+                if (playerUuid != null && nbt.hasUUID(NbtKeys.PLAYER_UUID)) {
+                    UUID storedUuid = nbt.getUUID(NbtKeys.PLAYER_UUID);
                     if (!storedUuid.equals(playerUuid)) {
                         BuildScape.getLogger().error("CosmeticsConfig: SECURITY MISMATCH for {}", file.getName());
                         PillarParticleConfig.backupUnreadableFile(file);
@@ -213,8 +214,8 @@ public class CosmeticsConfig {
                 }
 
                 Map<Integer, String> cosmetics = new HashMap<>();
-                if (nbt.contains("equipped_cosmetics", 10)) {
-                    CompoundTag equipped = nbt.getCompound("equipped_cosmetics");
+                if (nbt.contains(NbtKeys.EQUIPPED_COSMETICS, 10)) {
+                    CompoundTag equipped = nbt.getCompound(NbtKeys.EQUIPPED_COSMETICS);
                     for (String key : equipped.getAllKeys()) {
                         try { cosmetics.put(Integer.parseInt(key), equipped.getString(key)); } catch (Exception ignored) {}
                     }
@@ -222,22 +223,22 @@ public class CosmeticsConfig {
                 playerCosmetics.put(uuidStr, cosmetics);
 
                 Map<String, String> colors = new HashMap<>();
-                if (nbt.contains("cosmetic_colors", 10)) {
-                    CompoundTag colorsTag = nbt.getCompound("cosmetic_colors");
+                if (nbt.contains(NbtKeys.COSMETIC_COLORS, 10)) {
+                    CompoundTag colorsTag = nbt.getCompound(NbtKeys.COSMETIC_COLORS);
                     for (String key : colorsTag.getAllKeys()) {
                         colors.put(key, colorsTag.getString(key));
                     }
                 }
                 playerCosmeticColors.put(uuidStr, colors);
 
-                if (nbt.contains("creative_tree_breaker")) {
-                    playerCreativeTreeBreaker.put(uuidStr, nbt.getBoolean("creative_tree_breaker"));
+                if (nbt.contains(NbtKeys.CREATIVE_TREE_BREAKER)) {
+                    playerCreativeTreeBreaker.put(uuidStr, nbt.getBoolean(NbtKeys.CREATIVE_TREE_BREAKER));
                 } else {
                     playerCreativeTreeBreaker.put(uuidStr, false);
                 }
 
-                if (nbt.contains("shulker_preview")) {
-                    playerShulkerPreview.put(uuidStr, nbt.getBoolean("shulker_preview"));
+                if (nbt.contains(NbtKeys.SHULKER_PREVIEW)) {
+                    playerShulkerPreview.put(uuidStr, nbt.getBoolean(NbtKeys.SHULKER_PREVIEW));
                 } else {
                     playerShulkerPreview.put(uuidStr, true);
                 }
@@ -260,7 +261,7 @@ public class CosmeticsConfig {
         Map<String, String> colors = playerCosmeticColors.get(uuidStr);
 
         CompoundTag nbt = new CompoundTag();
-        if (playerUuid != null) nbt.putUUID("player_uuid", playerUuid);
+        if (playerUuid != null) nbt.putUUID(NbtKeys.PLAYER_UUID, playerUuid);
 
         CompoundTag equippedTag = new CompoundTag();
         if (cosmetics != null) {
@@ -268,7 +269,7 @@ public class CosmeticsConfig {
                 equippedTag.putString(entry.getKey().toString(), entry.getValue());
             }
         }
-        nbt.put("equipped_cosmetics", equippedTag);
+        nbt.put(NbtKeys.EQUIPPED_COSMETICS, equippedTag);
 
         CompoundTag colorsTag = new CompoundTag();
         if (colors != null) {
@@ -276,16 +277,16 @@ public class CosmeticsConfig {
                 colorsTag.putString(entry.getKey(), entry.getValue());
             }
         }
-        nbt.put("cosmetic_colors", colorsTag);
+        nbt.put(NbtKeys.COSMETIC_COLORS, colorsTag);
 
         Boolean treeBreaker = playerCreativeTreeBreaker.get(uuidStr);
         if (treeBreaker != null) {
-            nbt.putBoolean("creative_tree_breaker", treeBreaker);
+            nbt.putBoolean(NbtKeys.CREATIVE_TREE_BREAKER, treeBreaker);
         }
 
         Boolean shulkerPreview = playerShulkerPreview.get(uuidStr);
         if (shulkerPreview != null) {
-            nbt.putBoolean("shulker_preview", shulkerPreview);
+            nbt.putBoolean(NbtKeys.SHULKER_PREVIEW, shulkerPreview);
         }
 
         try {
@@ -302,8 +303,8 @@ public class CosmeticsConfig {
         if (file.exists()) {
             try {
                 CompoundTag nbt = NbtIo.readCompressed(file);
-                if (nbt.contains("colorPickerX")) colorPickerX = nbt.getInt("colorPickerX");
-                if (nbt.contains("colorPickerY")) colorPickerY = nbt.getInt("colorPickerY");
+                if (nbt.contains(NbtKeys.COLOR_PICKER_X)) colorPickerX = nbt.getInt(NbtKeys.COLOR_PICKER_X);
+                if (nbt.contains(NbtKeys.COLOR_PICKER_Y)) colorPickerY = nbt.getInt(NbtKeys.COLOR_PICKER_Y);
             } catch (Exception ignored) {}
         }
     }
@@ -311,8 +312,8 @@ public class CosmeticsConfig {
     private void saveGlobalSettings() {
         File file = getGlobalSettingsFile();
         CompoundTag nbt = new CompoundTag();
-        if (colorPickerX != null) nbt.putInt("colorPickerX", colorPickerX);
-        if (colorPickerY != null) nbt.putInt("colorPickerY", colorPickerY);
+        if (colorPickerX != null) nbt.putInt(NbtKeys.COLOR_PICKER_X, colorPickerX);
+        if (colorPickerY != null) nbt.putInt(NbtKeys.COLOR_PICKER_Y, colorPickerY);
 
         try {
             NbtIo.writeCompressed(nbt, file);

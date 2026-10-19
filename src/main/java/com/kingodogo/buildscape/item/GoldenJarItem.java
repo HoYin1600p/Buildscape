@@ -13,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class GoldenJarItem extends GlassJarItem {
 
     public GoldenJarItem(Block block, Properties properties) {
@@ -27,8 +29,8 @@ public class GoldenJarItem extends GlassJarItem {
 
     public static void addAdvancementTooltip(ItemStack stack, List<Component> tooltip) {
         CompoundTag tag = stack.getTag();
-        String obtainedBy = (tag != null && tag.contains("ObtainedBy")) ? tag.getString("ObtainedBy") : null;
-        String obtainedOn = (tag != null && tag.contains("ObtainedOn")) ? tag.getString("ObtainedOn") : null;
+        String obtainedBy = (tag != null && tag.contains(NbtKeys.OBTAINED_BY)) ? tag.getString(NbtKeys.OBTAINED_BY) : null;
+        String obtainedOn = (tag != null && tag.contains(NbtKeys.OBTAINED_ON)) ? tag.getString(NbtKeys.OBTAINED_ON) : null;
 
         if (obtainedBy != null && !obtainedBy.isEmpty()) {
             tooltip.add(new TranslatableComponent("tooltip.buildscape.trophy.obtained_by_prefix")

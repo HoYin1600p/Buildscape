@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.SmokeColorRegistry;
 import net.minecraft.core.BlockPos;
@@ -74,8 +75,8 @@ public class SmokeVentBlockEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         super.load(tag);
 
-        if (tag.contains("SmokeColor", 8)) {
-            String color = tag.getString("SmokeColor");
+        if (tag.contains(NbtKeys.SMOKE_COLOR, 8)) {
+            String color = tag.getString(NbtKeys.SMOKE_COLOR);
             if (color != null && !color.isEmpty() && color.matches("^#[0-9A-Fa-f]{6}$")) {
                 this.smokeColor = color.toUpperCase();
             } else {
@@ -85,8 +86,8 @@ public class SmokeVentBlockEntity extends BlockEntity {
             this.smokeColor = null;
         }
 
-        if (tag.contains("Active", 1)) {
-            this.active = tag.getBoolean("Active");
+        if (tag.contains(NbtKeys.ACTIVE, 1)) {
+            this.active = tag.getBoolean(NbtKeys.ACTIVE);
         } else {
             this.active = true;
         }
@@ -97,10 +98,10 @@ public class SmokeVentBlockEntity extends BlockEntity {
         super.saveAdditional(tag);
 
         if (smokeColor != null && !smokeColor.isEmpty()) {
-            tag.putString("SmokeColor", smokeColor);
+            tag.putString(NbtKeys.SMOKE_COLOR, smokeColor);
         }
 
-        tag.putBoolean("Active", active);
+        tag.putBoolean(NbtKeys.ACTIVE, active);
     }
 
     @Override

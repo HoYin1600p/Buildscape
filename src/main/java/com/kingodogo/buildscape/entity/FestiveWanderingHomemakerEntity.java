@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
@@ -49,14 +50,14 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
-        compound.putInt("DespawnDelay", this.despawnDelay);
+        compound.putInt(NbtKeys.DESPAWN_DELAY, this.despawnDelay);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
-        if (compound.contains("DespawnDelay")) {
-            this.despawnDelay = compound.getInt("DespawnDelay");
+        if (compound.contains(NbtKeys.DESPAWN_DELAY)) {
+            this.despawnDelay = compound.getInt(NbtKeys.DESPAWN_DELAY);
         }
     }
 

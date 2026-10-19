@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.command;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -50,17 +51,17 @@ public class FireworkTestCommand {
 
     public static ItemStack createCustomFireworkRocket(byte shapeId, int[] colors) {
         ItemStack stack = new ItemStack(Items.FIREWORK_ROCKET);
-        CompoundTag fireworksTag = stack.getOrCreateTagElement("Fireworks");
+        CompoundTag fireworksTag = stack.getOrCreateTagElement(NbtKeys.FIREWORKS);
         ListTag explosionsList = new ListTag();
 
         CompoundTag explosionTag = new CompoundTag();
-        explosionTag.putByte("Type", shapeId);
-        explosionTag.putIntArray("Colors", colors);
-        explosionTag.putBoolean("Flicker", true);
-        explosionTag.putBoolean("Trail", true);
+        explosionTag.putByte(NbtKeys.TYPE, shapeId);
+        explosionTag.putIntArray(NbtKeys.COLORS, colors);
+        explosionTag.putBoolean(NbtKeys.FLICKER, true);
+        explosionTag.putBoolean(NbtKeys.TRAIL, true);
 
         explosionsList.add(explosionTag);
-        fireworksTag.put("Explosions", explosionsList);
+        fireworksTag.put(NbtKeys.EXPLOSIONS, explosionsList);
         fireworksTag.putByte("Flight", (byte) 1);
         return stack;
     }

@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.*;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.entity.ModEntities;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket;
@@ -87,8 +88,8 @@ public class WanderingHomemakerSpawningHandler {
     }
 
     public static boolean isHomemakerAlive(ServerLevel level, Player player) {
-        if (player.getPersistentData().hasUUID("WanderingHomemakerUUID")) {
-            UUID uuid = player.getPersistentData().getUUID("WanderingHomemakerUUID");
+        if (player.getPersistentData().hasUUID(NbtKeys.WANDERING_HOMEMAKER_UUID)) {
+            UUID uuid = player.getPersistentData().getUUID(NbtKeys.WANDERING_HOMEMAKER_UUID);
             for (ServerLevel sl : level.getServer().getAllLevels()) {
                 Entity entity = sl.getEntity(uuid);
                 if (entity != null && entity.isAlive()) {
@@ -114,16 +115,16 @@ public class WanderingHomemakerSpawningHandler {
         if (formsSquare(level, pos, category)) {
             long currentTime = System.currentTimeMillis();
             long cooldown = 0;
-            if (player.getPersistentData().contains("WanderingHomemakerCooldownRealTime")) {
-                cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldownRealTime");
+            if (player.getPersistentData().contains(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME)) {
+                cooldown = player.getPersistentData().getLong(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME);
             }
 
             if (currentTime < cooldown) {
                 return;
             }
 
-            if (player.getPersistentData().hasUUID("WanderingHomemakerUUID")) {
-                UUID oldUuid = player.getPersistentData().getUUID("WanderingHomemakerUUID");
+            if (player.getPersistentData().hasUUID(NbtKeys.WANDERING_HOMEMAKER_UUID)) {
+                UUID oldUuid = player.getPersistentData().getUUID(NbtKeys.WANDERING_HOMEMAKER_UUID);
                 for (ServerLevel sl : level.getServer().getAllLevels()) {
                     Entity oldEntity = sl.getEntity(oldUuid);
                     if (oldEntity != null && oldEntity.isAlive()) {
@@ -168,8 +169,8 @@ public class WanderingHomemakerSpawningHandler {
                 }
 
                 long cooldownEnd = currentTime + 1800000L;
-                player.getPersistentData().putLong("WanderingHomemakerCooldownRealTime", cooldownEnd);
-                player.getPersistentData().putUUID("WanderingHomemakerUUID", homemaker.getUUID());
+                player.getPersistentData().putLong(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME, cooldownEnd);
+                player.getPersistentData().putUUID(NbtKeys.WANDERING_HOMEMAKER_UUID, homemaker.getUUID());
 
                 if (player instanceof ServerPlayer serverPlayer) {
                     ModMessages.INSTANCE.send(

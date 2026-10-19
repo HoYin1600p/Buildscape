@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.mixin;
 import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
 import com.kingodogo.buildscape.client.renderer.FestiveRenderTypes;
 import com.kingodogo.buildscape.client.renderer.TransparentMultiBufferSource;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -31,7 +32,7 @@ public class ItemRendererMixin {
             MultiBufferSource source,
             ItemStack stack,
             ItemTransforms.TransformType transformType) {
-        if (!stack.isEmpty() && stack.hasTag() && stack.getTag().getBoolean("ghost")) {
+        if (!stack.isEmpty() && stack.hasTag() && stack.getTag().getBoolean(NbtKeys.GHOST)) {
             return new TransparentMultiBufferSource(source, GHOST_ALPHA);
         }
         return source;

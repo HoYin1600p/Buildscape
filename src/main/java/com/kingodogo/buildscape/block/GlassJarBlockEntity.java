@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -316,52 +317,52 @@ public class GlassJarBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        if (tag.getBoolean("IsEmpty")) {
+        if (tag.getBoolean(NbtKeys.IS_EMPTY)) {
             this.storedItem = ItemStack.EMPTY;
             this.storedLiquidItem = ItemStack.EMPTY;
             this.liquidLevel = 0;
         } else {
-            if (tag.contains("StoredItem", 10)) {
-                CompoundTag itemTag = tag.getCompound("StoredItem");
+            if (tag.contains(NbtKeys.STORED_ITEM, 10)) {
+                CompoundTag itemTag = tag.getCompound(NbtKeys.STORED_ITEM);
                 this.storedItem = ItemStack.of(itemTag);
-                if (itemTag.contains("RealCount")) {
-                    this.storedItem.setCount(itemTag.getInt("RealCount"));
+                if (itemTag.contains(NbtKeys.REAL_COUNT)) {
+                    this.storedItem.setCount(itemTag.getInt(NbtKeys.REAL_COUNT));
                 }
             } else {
                 this.storedItem = ItemStack.EMPTY;
             }
 
-            if (tag.contains("StoredLiquidItem", 10)) {
-                CompoundTag liquidTag = tag.getCompound("StoredLiquidItem");
+            if (tag.contains(NbtKeys.STORED_LIQUID_ITEM, 10)) {
+                CompoundTag liquidTag = tag.getCompound(NbtKeys.STORED_LIQUID_ITEM);
                 this.storedLiquidItem = ItemStack.of(liquidTag);
-                this.liquidLevel = Math.max(0, Math.min(getLiquidCap(this.storedLiquidItem), tag.getInt("LiquidLevel")));
+                this.liquidLevel = Math.max(0, Math.min(getLiquidCap(this.storedLiquidItem), tag.getInt(NbtKeys.LIQUID_LEVEL)));
             } else {
                 this.storedLiquidItem = ItemStack.EMPTY;
                 this.liquidLevel = 0;
             }
         }
-        this.wobbleStartedAtTick = tag.getLong("WobbleStartTick");
+        this.wobbleStartedAtTick = tag.getLong(NbtKeys.WOBBLE_START_TICK);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!isEmpty()) {
-            tag.putBoolean("IsEmpty", false);
+            tag.putBoolean(NbtKeys.IS_EMPTY, false);
             if (!storedItem.isEmpty()) {
                 CompoundTag itemTag = storedItem.save(new CompoundTag());
-                itemTag.putInt("RealCount", storedItem.getCount());
-                tag.put("StoredItem", itemTag);
+                itemTag.putInt(NbtKeys.REAL_COUNT, storedItem.getCount());
+                tag.put(NbtKeys.STORED_ITEM, itemTag);
             }
             if (hasLiquid()) {
                 CompoundTag liquidTag = storedLiquidItem.save(new CompoundTag());
-                tag.put("StoredLiquidItem", liquidTag);
-                tag.putInt("LiquidLevel", liquidLevel);
+                tag.put(NbtKeys.STORED_LIQUID_ITEM, liquidTag);
+                tag.putInt(NbtKeys.LIQUID_LEVEL, liquidLevel);
             }
         } else {
-            tag.putBoolean("IsEmpty", true);
+            tag.putBoolean(NbtKeys.IS_EMPTY, true);
         }
-        tag.putLong("WobbleStartTick", wobbleStartedAtTick);
+        tag.putLong(NbtKeys.WOBBLE_START_TICK, wobbleStartedAtTick);
     }
 
     @Override

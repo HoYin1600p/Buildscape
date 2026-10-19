@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.trophy;
 
 import com.kingodogo.buildscape.block.ModBlockEntities;
+import com.kingodogo.buildscape.core.NbtKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -40,11 +41,11 @@ public class TrophyBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        if (tag.contains("ObtainedBy")) {
-            this.obtainedBy = tag.getString("ObtainedBy");
+        if (tag.contains(NbtKeys.OBTAINED_BY)) {
+            this.obtainedBy = tag.getString(NbtKeys.OBTAINED_BY);
         }
-        if (tag.contains("ObtainedOn")) {
-            this.obtainedOn = tag.getString("ObtainedOn");
+        if (tag.contains(NbtKeys.OBTAINED_ON)) {
+            this.obtainedOn = tag.getString(NbtKeys.OBTAINED_ON);
         }
     }
 
@@ -52,10 +53,10 @@ public class TrophyBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!this.obtainedBy.isEmpty()) {
-            tag.putString("ObtainedBy", this.obtainedBy);
+            tag.putString(NbtKeys.OBTAINED_BY, this.obtainedBy);
         }
         if (!this.obtainedOn.isEmpty()) {
-            tag.putString("ObtainedOn", this.obtainedOn);
+            tag.putString(NbtKeys.OBTAINED_ON, this.obtainedOn);
         }
     }
 

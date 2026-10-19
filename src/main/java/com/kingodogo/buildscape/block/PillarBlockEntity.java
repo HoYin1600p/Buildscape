@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleParticle;
@@ -1557,12 +1558,12 @@ public class PillarBlockEntity extends BlockEntity {
                 : null;
 
         try {
-            if (tag.contains("DisplayedItem", 10)) {
-                ItemStack loaded = ItemStack.of(tag.getCompound("DisplayedItem"));
+            if (tag.contains(NbtKeys.DISPLAYED_ITEM, 10)) {
+                ItemStack loaded = ItemStack.of(tag.getCompound(NbtKeys.DISPLAYED_ITEM));
                 this.displayedItem = loaded == null ? ItemStack.EMPTY : loaded;
             }
-            else if (tag.contains("ITEM", 8)) {
-                String itemId = tag.getString("ITEM");
+            else if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
+                String itemId = tag.getString(NbtKeys.PILLAR_ITEM);
                 try {
                     ResourceLocation itemLocation = new ResourceLocation(
                             itemId);
@@ -1583,8 +1584,8 @@ public class PillarBlockEntity extends BlockEntity {
             this.displayedItem = ItemStack.EMPTY;
         }
 
-        if (tag.contains("ParticlePattern", 8)) {
-            this.particlePattern = tag.getString("ParticlePattern");
+        if (tag.contains(NbtKeys.PARTICLE_PATTERN, 8)) {
+            this.particlePattern = tag.getString(NbtKeys.PARTICLE_PATTERN);
             boolean valid = false;
             for (String p : PATTERNS) {
                 if (p.equals(this.particlePattern)) {
@@ -1596,8 +1597,8 @@ public class PillarBlockEntity extends BlockEntity {
                 this.particlePattern = null;
             }
         }
-        else if (tag.contains("PATTERN", 8)) {
-            this.particlePattern = tag.getString("PATTERN");
+        else if (tag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
+            this.particlePattern = tag.getString(NbtKeys.PILLAR_PATTERN);
             boolean valid = false;
             for (String p : PATTERNS) {
                 if (p.equals(this.particlePattern)) {
@@ -1612,31 +1613,31 @@ public class PillarBlockEntity extends BlockEntity {
             this.particlePattern = null;
         }
 
-        if (tag.contains("PatternSpeed", 6)) {
-            this.patternSpeed = tag.getDouble("PatternSpeed");
+        if (tag.contains(NbtKeys.PATTERN_SPEED, 6)) {
+            this.patternSpeed = tag.getDouble(NbtKeys.PATTERN_SPEED);
         } else {
             this.patternSpeed = null;
         }
-        if (tag.contains("PatternSpread", 6)) {
-            this.patternSpread = tag.getDouble("PatternSpread");
+        if (tag.contains(NbtKeys.PATTERN_SPREAD, 6)) {
+            this.patternSpread = tag.getDouble(NbtKeys.PATTERN_SPREAD);
         } else {
             this.patternSpread = null;
         }
-        if (tag.contains("PatternIntensity", 6)) {
-            this.patternIntensity = tag.getDouble("PatternIntensity");
+        if (tag.contains(NbtKeys.PATTERN_INTENSITY, 6)) {
+            this.patternIntensity = tag.getDouble(NbtKeys.PATTERN_INTENSITY);
         } else {
             this.patternIntensity = null;
         }
 
-        if (tag.contains("MaxParticleColor", 3)) {
-            this.maxParticleColor = tag.getInt("MaxParticleColor");
+        if (tag.contains(NbtKeys.MAX_PARTICLE_COLOR, 3)) {
+            this.maxParticleColor = tag.getInt(NbtKeys.MAX_PARTICLE_COLOR);
         } else {
             this.maxParticleColor = null;
         }
 
         try {
-            if (tag.contains("ParticleColors", 9)) {
-                ListTag colorList = tag.getList("ParticleColors", 8);
+            if (tag.contains(NbtKeys.PARTICLE_COLORS, 9)) {
+                ListTag colorList = tag.getList(NbtKeys.PARTICLE_COLORS, 8);
                 if (colorList.size() > 0) {
                     this.particleColors = new ArrayList<>();
                     int maxColors = Math.min(7, colorList.size());
@@ -1664,14 +1665,14 @@ public class PillarBlockEntity extends BlockEntity {
             this.particleColors = null;
         }
 
-        if (tag.contains("ParticleColorCounter", 3)) {
-            this.particleColorCounter = tag.getInt("ParticleColorCounter");
+        if (tag.contains(NbtKeys.PARTICLE_COLOR_COUNTER, 3)) {
+            this.particleColorCounter = tag.getInt(NbtKeys.PARTICLE_COLOR_COUNTER);
         } else {
             this.particleColorCounter = 0;
         }
 
-        if (tag.contains("ColorsInitialized", 1)) {
-            this.colorsInitialized = tag.getBoolean("ColorsInitialized");
+        if (tag.contains(NbtKeys.COLORS_INITIALIZED, 1)) {
+            this.colorsInitialized = tag.getBoolean(NbtKeys.COLORS_INITIALIZED);
         } else {
             this.colorsInitialized = (this.particleColors != null &&
                     !this.particleColors.isEmpty());
@@ -1681,8 +1682,8 @@ public class PillarBlockEntity extends BlockEntity {
             this.colorsInitialized = true;
         }
 
-        if (tag.contains("PillarId", 8)) {
-            this.pillarId = tag.getString("PillarId");
+        if (tag.contains(NbtKeys.PILLAR_ID, 8)) {
+            this.pillarId = tag.getString(NbtKeys.PILLAR_ID);
             if (this.pillarId.isEmpty()) {
                 this.pillarId = null;
             }
@@ -1690,14 +1691,14 @@ public class PillarBlockEntity extends BlockEntity {
             this.pillarId = null;
         }
 
-        if (tag.contains("UsePattern", 1)) {
-            this.usePattern = tag.getBoolean("UsePattern");
+        if (tag.contains(NbtKeys.USE_PATTERN, 1)) {
+            this.usePattern = tag.getBoolean(NbtKeys.USE_PATTERN);
         } else {
             this.usePattern = null;
         }
 
-        if (tag.contains("FacingYaw", 5)) {
-            this.facingYaw = tag.getFloat("FacingYaw");
+        if (tag.contains(NbtKeys.FACING_YAW, 5)) {
+            this.facingYaw = tag.getFloat(NbtKeys.FACING_YAW);
             this.facingYaw = this.facingYaw % 360.0f;
             if (this.facingYaw < 0) {
                 this.facingYaw += 360.0f;
@@ -1774,29 +1775,29 @@ public class PillarBlockEntity extends BlockEntity {
         super.saveAdditional(tag);
 
         if (!displayedItem.isEmpty()) {
-            tag.put("DisplayedItem", displayedItem.save(new CompoundTag()));
+            tag.put(NbtKeys.DISPLAYED_ITEM, displayedItem.save(new CompoundTag()));
         }
 
         if (particlePattern != null) {
-            tag.putString("ParticlePattern", particlePattern);
+            tag.putString(NbtKeys.PARTICLE_PATTERN, particlePattern);
         }
 
         if (patternSpeed != null) {
-            tag.putDouble("PatternSpeed", patternSpeed);
+            tag.putDouble(NbtKeys.PATTERN_SPEED, patternSpeed);
         }
         if (patternSpread != null) {
-            tag.putDouble("PatternSpread", patternSpread);
+            tag.putDouble(NbtKeys.PATTERN_SPREAD, patternSpread);
         }
         if (patternIntensity != null) {
-            tag.putDouble("PatternIntensity", patternIntensity);
+            tag.putDouble(NbtKeys.PATTERN_INTENSITY, patternIntensity);
         }
 
         if (usePattern != null) {
-            tag.putBoolean("UsePattern", usePattern);
+            tag.putBoolean(NbtKeys.USE_PATTERN, usePattern);
         }
 
         if (maxParticleColor != null) {
-            tag.putInt("MaxParticleColor", maxParticleColor);
+            tag.putInt(NbtKeys.MAX_PARTICLE_COLOR, maxParticleColor);
         }
 
         if (particleColors != null && !particleColors.isEmpty()) {
@@ -1804,18 +1805,18 @@ public class PillarBlockEntity extends BlockEntity {
             for (String color : particleColors) {
                 colorList.add(StringTag.valueOf(color));
             }
-            tag.put("ParticleColors", colorList);
+            tag.put(NbtKeys.PARTICLE_COLORS, colorList);
         }
 
         if (pillarId != null && !pillarId.isEmpty()) {
-            tag.putString("PillarId", pillarId);
+            tag.putString(NbtKeys.PILLAR_ID, pillarId);
         }
 
-        tag.putInt("ParticleColorCounter", particleColorCounter);
+        tag.putInt(NbtKeys.PARTICLE_COLOR_COUNTER, particleColorCounter);
 
-        tag.putBoolean("ColorsInitialized", colorsInitialized);
+        tag.putBoolean(NbtKeys.COLORS_INITIALIZED, colorsInitialized);
 
-        tag.putFloat("FacingYaw", facingYaw);
+        tag.putFloat(NbtKeys.FACING_YAW, facingYaw);
     }
 
     public void initializeDefaultColors() {
@@ -1974,8 +1975,8 @@ public class PillarBlockEntity extends BlockEntity {
         CompoundTag tag = super.getUpdateTag();
         saveAdditional(tag);
 
-        if (displayedItem.isEmpty() && !tag.contains("DisplayedItem")) {
-            tag.put("DisplayedItem", ItemStack.EMPTY.save(new CompoundTag()));
+        if (displayedItem.isEmpty() && !tag.contains(NbtKeys.DISPLAYED_ITEM)) {
+            tag.put(NbtKeys.DISPLAYED_ITEM, ItemStack.EMPTY.save(new CompoundTag()));
         }
 
         return tag;

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.item;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ConfettiBurstPacket;
 import com.kingodogo.buildscape.network.ModMessages;
@@ -63,8 +64,8 @@ public class ConfettiItem extends Item {
         double startZ = player.getZ() + look.z * 0.9D;
 
         int burstLevel = 1;
-        if (stack.hasTag() && stack.getTag().contains("BurstLevel")) {
-            burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
+        if (stack.hasTag() && stack.getTag().contains(NbtKeys.BURST_LEVEL)) {
+            burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt(NbtKeys.BURST_LEVEL)));
         }
 
         ModMessages.INSTANCE.send(
@@ -79,8 +80,8 @@ public class ConfettiItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         int burstLevel = 1;
-        if (stack.hasTag() && stack.getTag().contains("BurstLevel")) {
-            burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
+        if (stack.hasTag() && stack.getTag().contains(NbtKeys.BURST_LEVEL)) {
+            burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt(NbtKeys.BURST_LEVEL)));
         }
         tooltip.add(new TranslatableComponent("tooltip.buildscape.confetti.burst_level", burstLevel).withStyle(ChatFormatting.GRAY));
     }

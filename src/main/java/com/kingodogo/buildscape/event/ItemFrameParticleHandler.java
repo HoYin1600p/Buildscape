@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.particle.ModParticles;
@@ -63,8 +64,8 @@ public class ItemFrameParticleHandler {
             "BuildScapeParticlePattern";
     private static final String PARTICLE_ENABLED_KEY =
             "BuildScapeParticleEnabled";
-    private static final String PARTICLE_COLORS_KEY = "BuildScapeParticleColors";
-    private static final String FRAME_ID_KEY = "BuildScapeFrameId";
+    private static final String PARTICLE_COLORS_KEY = NbtKeys.BUILD_SCAPE_PARTICLE_COLORS;
+    private static final String FRAME_ID_KEY = NbtKeys.BUILD_SCAPE_FRAME_ID;
     private static final String FRAME_PREFIX = "F-";
 
     private static final Map<Integer, String> CLIENT_PATTERN_CACHE =
@@ -145,7 +146,7 @@ public class ItemFrameParticleHandler {
             if (reason == null || !reason.shouldDestroy()) {
                 return;
             }
-            String frameId = data.getString("BuildScapeFrameId");
+            String frameId = data.getString(NbtKeys.BUILD_SCAPE_FRAME_ID);
             if (frameId != null && !frameId.isEmpty()) {
                 PillarIdManager.get(entity.level).unregisterDestroyedFrame(frameId);
                 clearCaches(entity.getId());
@@ -1022,8 +1023,8 @@ public class ItemFrameParticleHandler {
             String p = data.getString(PARTICLE_PATTERN_KEY);
             return (p == null || p.isEmpty()) ? ParticlePatterns.NONE : p;
         }
-        if (data.contains("PATTERN", 8)) {
-            String p = data.getString("PATTERN");
+        if (data.contains(NbtKeys.PILLAR_PATTERN, 8)) {
+            String p = data.getString(NbtKeys.PILLAR_PATTERN);
             return (p == null || p.isEmpty()) ? ParticlePatterns.NONE : p;
         }
         return ParticlePatterns.NONE;

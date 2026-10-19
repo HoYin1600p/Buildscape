@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.recipe;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.BuildersPouchItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -14,8 +15,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
 public class ClearShulkerFiltersRecipe extends CustomRecipe {
-    private static final String BLOCK_ENTITY_TAG = "BlockEntityTag";
-    private static final String FILTERS_TAG = "GhostFilters";
+    private static final String BLOCK_ENTITY_TAG = NbtKeys.BLOCK_ENTITY_TAG;
+    private static final String FILTERS_TAG = NbtKeys.GHOST_FILTERS;
 
     public ClearShulkerFiltersRecipe(ResourceLocation id) {
         super(id);
@@ -78,12 +79,12 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
             }
         }
 
-        if (!blockEntityTag.contains("Items", Tag.TAG_LIST)) return false;
-        ListTag items = blockEntityTag.getList("Items", Tag.TAG_COMPOUND);
+        if (!blockEntityTag.contains(NbtKeys.ITEMS, Tag.TAG_LIST)) return false;
+        ListTag items = blockEntityTag.getList(NbtKeys.ITEMS, Tag.TAG_COMPOUND);
         for (int i = 0; i < items.size(); i++) {
             CompoundTag item = items.getCompound(i);
-            if (item.contains("tag", Tag.TAG_COMPOUND)
-                    && item.getCompound("tag").getBoolean("ghost")) {
+            if (item.contains(NbtKeys.TAG, Tag.TAG_COMPOUND)
+                    && item.getCompound(NbtKeys.TAG).getBoolean(NbtKeys.GHOST)) {
                 return true;
             }
         }
@@ -99,16 +100,16 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
         if (blockEntityTag == null) return;
 
         blockEntityTag.remove(FILTERS_TAG);
-        if (!blockEntityTag.contains("Items", Tag.TAG_LIST)) return;
+        if (!blockEntityTag.contains(NbtKeys.ITEMS, Tag.TAG_LIST)) return;
 
-        ListTag items = blockEntityTag.getList("Items", Tag.TAG_COMPOUND);
+        ListTag items = blockEntityTag.getList(NbtKeys.ITEMS, Tag.TAG_COMPOUND);
         for (int i = items.size() - 1; i >= 0; i--) {
             CompoundTag item = items.getCompound(i);
-            if (item.contains("tag", Tag.TAG_COMPOUND)
-                    && item.getCompound("tag").getBoolean("ghost")) {
+            if (item.contains(NbtKeys.TAG, Tag.TAG_COMPOUND)
+                    && item.getCompound(NbtKeys.TAG).getBoolean(NbtKeys.GHOST)) {
                 items.remove(i);
             }
         }
-        blockEntityTag.put("Items", items);
+        blockEntityTag.put(NbtKeys.ITEMS, items);
     }
 }

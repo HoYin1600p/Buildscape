@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -229,7 +230,7 @@ public class FestiveStockingEntity extends HangingEntity {
                 CompoundTag tag = stockingItem.getOrCreateTag();
                 CompoundTag storedTag = new CompoundTag();
                 storedItem.save(storedTag);
-                tag.put("StoredItem", storedTag);
+                tag.put(NbtKeys.STORED_ITEM, storedTag);
             }
 
             this.spawnAtLocation(stockingItem);
@@ -345,15 +346,15 @@ public class FestiveStockingEntity extends HangingEntity {
         if (!storedItem.isEmpty()) {
             CompoundTag itemTag = new CompoundTag();
             storedItem.save(itemTag);
-            tag.put("Item", itemTag);
+            tag.put(NbtKeys.ITEM, itemTag);
         }
-        tag.putString("ColorVariant", colorVariant);
+        tag.putString(NbtKeys.COLOR_VARIANT, colorVariant);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        CompoundTag itemTag = tag.getCompound("Item");
+        CompoundTag itemTag = tag.getCompound(NbtKeys.ITEM);
         if (itemTag != null && !itemTag.isEmpty()) {
             ItemStack item = ItemStack.of(itemTag);
             if (item.isEmpty()) {
@@ -364,8 +365,8 @@ public class FestiveStockingEntity extends HangingEntity {
         } else {
             this.setItem(ItemStack.EMPTY, false);
         }
-        if (tag.contains("ColorVariant")) {
-            this.colorVariant = tag.getString("ColorVariant");
+        if (tag.contains(NbtKeys.COLOR_VARIANT)) {
+            this.colorVariant = tag.getString(NbtKeys.COLOR_VARIANT);
         }
     }
 
@@ -431,7 +432,7 @@ public class FestiveStockingEntity extends HangingEntity {
             CompoundTag tag = result.getOrCreateTag();
             CompoundTag storedTag = new CompoundTag();
             storedItem.save(storedTag);
-            tag.put("StoredItem", storedTag);
+            tag.put(NbtKeys.STORED_ITEM, storedTag);
         }
         return result;
     }

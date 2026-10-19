@@ -1,0 +1,107 @@
+package com.kingodogo.buildscape.core;
+
+/**
+ * Keys of NBT compounds BuildScape reads and writes (block entities, entities, item tags and the
+ * player data files). The values are the stored strings and must never change.
+ */
+public final class NbtKeys {
+    public static final String ACTIVE = "Active";
+    public static final String ACTIVE_TAB = "ActiveTab";
+    public static final String ANGER_TIME = "AngerTime";
+    public static final String ARMOR_ITEM = "ArmorItem";
+    public static final String BLOCK_ENTITY_TAG = "BlockEntityTag";
+    public static final String BLOCK_STATE_TAG = "BlockStateTag";
+    public static final String BUILD_SCAPE_FRAME_ID = "BuildScapeFrameId";
+    public static final String BUILD_SCAPE_PARTICLE_COLORS = "BuildScapeParticleColors";
+    public static final String BUILD_SCAPE_PARTICLE_COLORS_RAW = "BuildScapeParticleColorsRaw";
+    public static final String BUILD_SCAPE_PARTICLE_PATTERN = "BuildScapeParticlePattern";
+    public static final String BURST_LEVEL = "BurstLevel";
+    public static final String COLORS = "Colors";
+    public static final String COLORS_INITIALIZED = "ColorsInitialized";
+    public static final String COLOR_PICKER_X = "colorPickerX";
+    public static final String COLOR_PICKER_Y = "colorPickerY";
+    public static final String COLOR_RESULT_OFFSETS = "ColorResultOffsets";
+    public static final String COLOR_VARIANT = "ColorVariant";
+    public static final String COPY_PROGRESS = "CopyProgress";
+    public static final String COSMETIC_COLORS = "cosmetic_colors";
+    public static final String COUNT = "Count";
+    public static final String CREATIVE_TREE_BREAKER = "creative_tree_breaker";
+    public static final String CUSTOM_NAME = "CustomName";
+    public static final String DECORATION_STATE = "DecorationState";
+    public static final String DESPAWN_DELAY = "DespawnDelay";
+    public static final String DISPLAY = "display";
+    public static final String DISPLAYED_ITEM = "DisplayedItem";
+    public static final String DYE_COLORS = "DyeColors";
+    public static final String EQUIPPED_COSMETICS = "equipped_cosmetics";
+    public static final String ERUPTION_TICK = "eruption_tick";
+    public static final String EXPLOSION = "Explosion";
+    public static final String EXPLOSIONS = "Explosions";
+    public static final String FACING_YAW = "FacingYaw";
+    public static final String FIREWORKS = "Fireworks";
+    public static final String FLICKER = "Flicker";
+    public static final String FLOW_DIRS = "FlowDirs";
+    public static final String FLUID_ID = "FluidId";
+    public static final String FROST_ROSE_STEW = "FrostRoseStew";
+    public static final String FROST_ROSE_STEW_DAMAGE_TICKS = "FrostRoseStewDamageTicks";
+    public static final String GHOST = "ghost";
+    public static final String GHOST_FILTERS = "GhostFilters";
+    public static final String GHOST_MIGRATED = "GhostMigrated";
+    public static final String GLASS_COVER_NEG = "GlassCoverNeg";
+    public static final String GLASS_COVER_POS = "GlassCoverPos";
+    public static final String GLASS_PLACED_BY_PLAYER = "GlassPlacedByPlayer";
+    public static final String GRADIENT_RESULT_OFFSETS = "GradientResultOffsets";
+    public static final String HAS_HAZE = "HasHaze";
+    public static final String HAS_HAZE_PROPERTY = "has_haze";
+    public static final String HEALTH = "Health";
+    public static final String ICICLE = "Icicle";
+    public static final String ID = "id";
+    public static final String INFLOW_DIR = "InflowDir";
+    public static final String INVISIBLE = "Invisible";
+    public static final String IS_EMPTY = "IsEmpty";
+    public static final String IS_OPEN_ENDPOINT = "IsOpenEndpoint";
+    public static final String ITEM = "Item";
+    public static final String ITEMS = "Items";
+    public static final String ITEM_DROP_CHANCE = "ItemDropChance";
+    public static final String LAST_WOBBLE_STYLE = "LastWobbleStyle";
+    public static final String LAVA_PLACED_BY_PLAYER = "LavaPlacedByPlayer";
+    public static final String LIQUID_LEVEL = "LiquidLevel";
+    public static final String MAX_DISTANCE = "MaxDistance";
+    public static final String MAX_PARTICLE_COLOR = "MaxParticleColor";
+    public static final String NAME = "Name";
+    public static final String NO_BASE_PLATE = "NoBasePlate";
+    public static final String OBTAINED_BY = "ObtainedBy";
+    public static final String OBTAINED_ON = "ObtainedOn";
+    public static final String OWNER = "Owner";
+    public static final String PARTICLE_COLORS = "ParticleColors";
+    public static final String PARTICLE_COLOR_COUNTER = "ParticleColorCounter";
+    public static final String PARTICLE_LEVEL = "ParticleLevel";
+    public static final String PARTICLE_PATTERN = "ParticlePattern";
+    public static final String PATTERN_INTENSITY = "PatternIntensity";
+    public static final String PATTERN_SPEED = "PatternSpeed";
+    public static final String PATTERN_SPREAD = "PatternSpread";
+    public static final String PILLAR_COLORS = "COLORS";
+    public static final String PILLAR_ID = "PillarId";
+    public static final String PILLAR_ITEM = "ITEM";
+    public static final String PILLAR_PATTERN = "PATTERN";
+    public static final String PIPE_FLOW_STATE = "PipeFlowState";
+    public static final String PLAYER_UUID = "player_uuid";
+    public static final String POS = "pos";
+    public static final String REAL_COUNT = "RealCount";
+    public static final String SHOT_YAW = "ShotYaw";
+    public static final String SHULKER_PREVIEW = "shulker_preview";
+    public static final String SMOKE_COLOR = "SmokeColor";
+    public static final String START_X = "StartX";
+    public static final String STORED_ITEM = "StoredItem";
+    public static final String STORED_LIQUID_ITEM = "StoredLiquidItem";
+    public static final String TAG = "tag";
+    public static final String TRAIL = "Trail";
+    public static final String TYPE = "Type";
+    public static final String USE_PATTERN = "UsePattern";
+    public static final String VARIANT = "Variant";
+    public static final String WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME = "WanderingHomemakerCooldownRealTime";
+    public static final String WANDERING_HOMEMAKER_UUID = "WanderingHomemakerUUID";
+    public static final String WOBBLE_START_TICK = "WobbleStartTick";
+
+    private NbtKeys() {
+    }
+}

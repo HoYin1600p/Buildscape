@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client.renderer;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.AshenKingPillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.ChatFormatting;
@@ -458,16 +459,16 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        if (!tag.contains("display", 10)) {
+        if (!tag.contains(NbtKeys.DISPLAY, 10)) {
             return false;
         }
 
-        CompoundTag displayTag = tag.getCompound("display");
-        if (!displayTag.contains("Name", 8)) {
+        CompoundTag displayTag = tag.getCompound(NbtKeys.DISPLAY);
+        if (!displayTag.contains(NbtKeys.NAME, 8)) {
             return false;
         }
 
-        String nameJson = displayTag.getString("Name");
+        String nameJson = displayTag.getString(NbtKeys.NAME);
         if (nameJson == null || nameJson.isEmpty()) {
             return false;
         }
@@ -513,16 +514,16 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        if (!tag.contains("display", 10)) {
+        if (!tag.contains(NbtKeys.DISPLAY, 10)) {
             return false;
         }
 
-        CompoundTag displayTag = tag.getCompound("display");
-        if (!displayTag.contains("Name", 8)) {
+        CompoundTag displayTag = tag.getCompound(NbtKeys.DISPLAY);
+        if (!displayTag.contains(NbtKeys.NAME, 8)) {
             return false;
         }
 
-        String nameJson = displayTag.getString("Name");
+        String nameJson = displayTag.getString(NbtKeys.NAME);
         if (nameJson == null || nameJson.isEmpty()) {
             return false;
         }
@@ -566,16 +567,16 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        if (!tag.contains("display", 10)) {
+        if (!tag.contains(NbtKeys.DISPLAY, 10)) {
             return false;
         }
 
-        CompoundTag displayTag = tag.getCompound("display");
-        if (!displayTag.contains("Name", 8)) {
+        CompoundTag displayTag = tag.getCompound(NbtKeys.DISPLAY);
+        if (!displayTag.contains(NbtKeys.NAME, 8)) {
             return false;
         }
 
-        String nameJson = displayTag.getString("Name");
+        String nameJson = displayTag.getString(NbtKeys.NAME);
         if (nameJson == null || nameJson.isEmpty()) {
             return false;
         }

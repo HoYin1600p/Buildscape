@@ -48,6 +48,7 @@ import com.kingodogo.buildscape.client.workbench.ClientBlockColorCatalog;
 import com.kingodogo.buildscape.command.FireworkTestCommand;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.kingodogo.buildscape.entity.ModEntities;
 import com.kingodogo.buildscape.fluid.ModFluids;
@@ -464,8 +465,8 @@ public class BuildScape {
                             if (level instanceof ServerLevel serverLevel) {
                                  Random rand = level.random;
                                  int burstLevel = 1;
-                                 if (stack.hasTag() && stack.getTag().contains("BurstLevel")) {
-                                     burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
+                                 if (stack.hasTag() && stack.getTag().contains(NbtKeys.BURST_LEVEL)) {
+                                     burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt(NbtKeys.BURST_LEVEL)));
                                  }
                                  int particleCount = (65 + rand.nextInt(36)) * burstLevel;
                                  double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2D;
@@ -916,8 +917,8 @@ public class BuildScape {
 
                 schedulePillarIdSync(server, serverPlayer, manager, 0);
 
-                long cooldown = serverPlayer.getPersistentData().contains("WanderingHomemakerCooldownRealTime")
-                        ? serverPlayer.getPersistentData().getLong("WanderingHomemakerCooldownRealTime") : 0L;
+                long cooldown = serverPlayer.getPersistentData().contains(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME)
+                        ? serverPlayer.getPersistentData().getLong(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME) : 0L;
                 ModMessages.INSTANCE.send(
                         PacketDistributor.PLAYER.with(() -> serverPlayer),
                         new SyncHomemakerCooldownPacket(cooldown));
@@ -992,8 +993,8 @@ public class BuildScape {
     public void onPlayerChangedDimension(
             PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
-            long cooldown = serverPlayer.getPersistentData().contains("WanderingHomemakerCooldownRealTime")
-                    ? serverPlayer.getPersistentData().getLong("WanderingHomemakerCooldownRealTime") : 0L;
+            long cooldown = serverPlayer.getPersistentData().contains(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME)
+                    ? serverPlayer.getPersistentData().getLong(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME) : 0L;
             ModMessages.INSTANCE.send(
                     PacketDistributor.PLAYER.with(() -> serverPlayer),
                     new SyncHomemakerCooldownPacket(cooldown));
@@ -1655,7 +1656,7 @@ public class BuildScape {
 
             if (hasFrostRose) {
                 CompoundTag nbt = crafted.getOrCreateTag();
-                nbt.putInt("FrostRoseStew", 1);
+                nbt.putInt(NbtKeys.FROST_ROSE_STEW, 1);
             }
         }
     }
@@ -1672,11 +1673,11 @@ public class BuildScape {
         if (itemStack.getItem() == Items.SUSPICIOUS_STEW) {
             CompoundTag nbt = itemStack.getTag();
             if (nbt != null
-                    && nbt.contains("FrostRoseStew")
-                    && nbt.getInt("FrostRoseStew") == 1) {
+                    && nbt.contains(NbtKeys.FROST_ROSE_STEW)
+                    && nbt.getInt(NbtKeys.FROST_ROSE_STEW) == 1) {
                 if (!player.level.isClientSide) {
                     CompoundTag playerData = player.getPersistentData();
-                    playerData.putInt("FrostRoseStewDamageTicks", 120);
+                    playerData.putInt(NbtKeys.FROST_ROSE_STEW_DAMAGE_TICKS, 120);
                 }
             }
         }
@@ -1695,8 +1696,8 @@ public class BuildScape {
         }
 
         CompoundTag playerData = player.getPersistentData();
-        if (playerData.contains("FrostRoseStewDamageTicks")) {
-            int ticksRemaining = playerData.getInt("FrostRoseStewDamageTicks");
+        if (playerData.contains(NbtKeys.FROST_ROSE_STEW_DAMAGE_TICKS)) {
+            int ticksRemaining = playerData.getInt(NbtKeys.FROST_ROSE_STEW_DAMAGE_TICKS);
 
             if (ticksRemaining > 0) {
                 if (ticksRemaining % 20 == 0 && player.isAlive()) {
@@ -1720,9 +1721,9 @@ public class BuildScape {
 
                 ticksRemaining--;
                 if (ticksRemaining > 0) {
-                    playerData.putInt("FrostRoseStewDamageTicks", ticksRemaining);
+                    playerData.putInt(NbtKeys.FROST_ROSE_STEW_DAMAGE_TICKS, ticksRemaining);
                 } else {
-                    playerData.remove("FrostRoseStewDamageTicks");
+                    playerData.remove(NbtKeys.FROST_ROSE_STEW_DAMAGE_TICKS);
                 }
             }
         }
@@ -2291,8 +2292,8 @@ public class BuildScape {
                 itemColors.register(
                         (stack, tintIndex) -> {
                             if (tintIndex != 1) return -1;
-                            CompoundTag tag = stack.getTagElement("Explosion");
-                            int[] colors = tag != null ? tag.getIntArray("Colors") : null;
+                            CompoundTag tag = stack.getTagElement(NbtKeys.EXPLOSION);
+                            int[] colors = tag != null ? tag.getIntArray(NbtKeys.COLORS) : null;
                             if (colors != null && colors.length > 0) {
                                 if (colors.length == 1) return colors[0];
                                 int r = 0, g = 0, b = 0;

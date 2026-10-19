@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class TrophyBlockItem extends BlockItem {
     private final TrophyDefinition definition;
 
@@ -46,8 +48,8 @@ public class TrophyBlockItem extends BlockItem {
         super.appendHoverText(stack, level, tooltip, flag);
 
         CompoundTag tag = stack.getTag();
-        String obtainedBy = (tag != null && tag.contains("ObtainedBy")) ? tag.getString("ObtainedBy") : null;
-        String obtainedOn = (tag != null && tag.contains("ObtainedOn")) ? tag.getString("ObtainedOn") : null;
+        String obtainedBy = (tag != null && tag.contains(NbtKeys.OBTAINED_BY)) ? tag.getString(NbtKeys.OBTAINED_BY) : null;
+        String obtainedOn = (tag != null && tag.contains(NbtKeys.OBTAINED_ON)) ? tag.getString(NbtKeys.OBTAINED_ON) : null;
 
         if (obtainedBy != null && !obtainedBy.isEmpty()) {
             tooltip.add(new TranslatableComponent("tooltip.buildscape.trophy.obtained_by_prefix")

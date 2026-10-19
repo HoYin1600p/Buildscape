@@ -17,6 +17,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 
 import javax.annotation.Nullable;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class TrappedDecoratedPotBlockEntity
         extends BlockEntity
         implements WorldlyContainer {
@@ -178,17 +180,17 @@ public class TrappedDecoratedPotBlockEntity
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        if (tag.contains("StoredItem", 10)) {
-            this.storedItem = ItemStack.of(tag.getCompound("StoredItem"));
+        if (tag.contains(NbtKeys.STORED_ITEM, 10)) {
+            this.storedItem = ItemStack.of(tag.getCompound(NbtKeys.STORED_ITEM));
         } else {
             this.storedItem = ItemStack.EMPTY;
         }
-        if (tag.contains("WobbleStartTick")) {
-            this.wobbleStartedAtTick = tag.getLong("WobbleStartTick");
+        if (tag.contains(NbtKeys.WOBBLE_START_TICK)) {
+            this.wobbleStartedAtTick = tag.getLong(NbtKeys.WOBBLE_START_TICK);
         }
-        if (tag.contains("LastWobbleStyle")) {
+        if (tag.contains(NbtKeys.LAST_WOBBLE_STYLE)) {
             try {
-                this.lastWobbleStyle = WobbleStyle.valueOf(tag.getString("LastWobbleStyle"));
+                this.lastWobbleStyle = WobbleStyle.valueOf(tag.getString(NbtKeys.LAST_WOBBLE_STYLE));
             } catch (IllegalArgumentException e) {
                 this.lastWobbleStyle = WobbleStyle.NONE;
             }
@@ -199,21 +201,21 @@ public class TrappedDecoratedPotBlockEntity
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!storedItem.isEmpty()) {
-            tag.put("StoredItem", storedItem.save(new CompoundTag()));
+            tag.put(NbtKeys.STORED_ITEM, storedItem.save(new CompoundTag()));
         }
-        tag.putLong("WobbleStartTick", wobbleStartedAtTick);
-        tag.putString("LastWobbleStyle", lastWobbleStyle.name());
+        tag.putLong(NbtKeys.WOBBLE_START_TICK, wobbleStartedAtTick);
+        tag.putString(NbtKeys.LAST_WOBBLE_STYLE, lastWobbleStyle.name());
     }
 
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
         tag.put(
-                "StoredItem",
+                NbtKeys.STORED_ITEM,
                 storedItem.isEmpty() ? ItemStack.EMPTY.save(new CompoundTag()) : storedItem.save(new CompoundTag())
         );
-        tag.putLong("WobbleStartTick", wobbleStartedAtTick);
-        tag.putString("LastWobbleStyle", lastWobbleStyle.name());
+        tag.putLong(NbtKeys.WOBBLE_START_TICK, wobbleStartedAtTick);
+        tag.putString(NbtKeys.LAST_WOBBLE_STYLE, lastWobbleStyle.name());
         return tag;
     }
 

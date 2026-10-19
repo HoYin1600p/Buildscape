@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.client.HazeBushParticleHandler;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.ModItems;
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.client.Minecraft;
@@ -179,9 +180,9 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
         ItemStack plantDrop = new ItemStack(this.getContent());
         if (!state.getValue(HAS_HAZE)) {
             CompoundTag blockStateTag = new CompoundTag();
-            blockStateTag.putString("has_haze", "false");
+            blockStateTag.putString(NbtKeys.HAS_HAZE_PROPERTY, "false");
             plantDrop.addTagElement("BlockStateTag", blockStateTag);
-            plantDrop.getOrCreateTag().putBoolean("HasHaze", false);
+            plantDrop.getOrCreateTag().putBoolean(NbtKeys.HAS_HAZE, false);
         }
 
         if (held.isEmpty()) {
@@ -202,9 +203,9 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             for (ItemStack drop : drops) {
                 if (drop.getItem() instanceof BlockItem bi && bi.getBlock() == this.getContent()) {
                     CompoundTag blockStateTag = new CompoundTag();
-                    blockStateTag.putString("has_haze", "false");
+                    blockStateTag.putString(NbtKeys.HAS_HAZE_PROPERTY, "false");
                     drop.addTagElement("BlockStateTag", blockStateTag);
-                    drop.getOrCreateTag().putBoolean("HasHaze", false);
+                    drop.getOrCreateTag().putBoolean(NbtKeys.HAS_HAZE, false);
                 }
             }
         }
@@ -216,9 +217,9 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
         ItemStack stack = super.getCloneItemStack(level, pos, state);
         if (!state.getValue(HAS_HAZE)) {
             CompoundTag blockStateTag = new CompoundTag();
-            blockStateTag.putString("has_haze", "false");
+            blockStateTag.putString(NbtKeys.HAS_HAZE_PROPERTY, "false");
             stack.addTagElement("BlockStateTag", blockStateTag);
-            stack.getOrCreateTag().putBoolean("HasHaze", false);
+            stack.getOrCreateTag().putBoolean(NbtKeys.HAS_HAZE, false);
         }
         return stack;
     }

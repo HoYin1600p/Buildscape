@@ -14,6 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+
 public class GlowLightsBlockEntity extends BlockEntity {
 
     public static final int MAX_DYE_COLORS = 5;
@@ -76,16 +78,16 @@ public class GlowLightsBlockEntity extends BlockEntity {
         for (String color : dyeColors) {
             colorsList.add(StringTag.valueOf(color));
         }
-        tag.put("DyeColors", colorsList);
+        tag.put(NbtKeys.DYE_COLORS, colorsList);
     }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         dyeColors.clear();
-        if (tag.contains("DyeColors", Tag.TAG_LIST)) {
+        if (tag.contains(NbtKeys.DYE_COLORS, Tag.TAG_LIST)) {
             ListTag colorsList = tag.getList(
-                    "DyeColors",
+                    NbtKeys.DYE_COLORS,
                     Tag.TAG_STRING
             );
             for (int i = 0; i < colorsList.size(); i++) {

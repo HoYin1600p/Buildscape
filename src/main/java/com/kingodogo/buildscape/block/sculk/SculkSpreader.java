@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.block.sculk;
 
 import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.block.SculkVeinBlock;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -143,7 +144,7 @@ public final class SculkSpreader {
         ListTag list = new ListTag();
         for (ChargeCursor cursor : cursors) {
             CompoundTag saved = new CompoundTag();
-            saved.put("pos", NbtUtils.writeBlockPos(cursor.pos));
+            saved.put(NbtKeys.POS, NbtUtils.writeBlockPos(cursor.pos));
             saved.putInt("charge", cursor.charge);
             saved.putInt("update_delay", cursor.updateDelay);
             saved.putInt("decay_delay", cursor.decayDelay);
@@ -158,8 +159,8 @@ public final class SculkSpreader {
         for (int i = 0; i < Math.min(list.size(), SculkCharge.MAX_CURSORS); i++) {
             CompoundTag saved = list.getCompound(i);
             int charge = Math.max(0, Math.min(saved.getInt("charge"), SculkCharge.MAX_CHARGE));
-            if (charge == 0 || !saved.contains("pos", Tag.TAG_COMPOUND)) continue;
-            ChargeCursor cursor = new ChargeCursor(NbtUtils.readBlockPos(saved.getCompound("pos")), charge);
+            if (charge == 0 || !saved.contains(NbtKeys.POS, Tag.TAG_COMPOUND)) continue;
+            ChargeCursor cursor = new ChargeCursor(NbtUtils.readBlockPos(saved.getCompound(NbtKeys.POS)), charge);
             cursor.updateDelay = Math.max(0, Math.min(saved.getInt("update_delay"), 1));
             cursor.decayDelay = Math.max(0, Math.min(saved.getInt("decay_delay"), 1));
             cursors.add(cursor);

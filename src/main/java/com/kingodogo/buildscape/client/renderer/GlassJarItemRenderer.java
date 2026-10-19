@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.block.GlassJarBlockEntity;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -39,8 +40,8 @@ public class GlassJarItemRenderer extends BlockEntityWithoutLevelRenderer {
                 dummyBE.setBlockState(state);
             }
 
-            if (stack.hasTag() && stack.getTag().contains("BlockEntityTag", 10)) {
-                dummyBE.load(stack.getTag().getCompound("BlockEntityTag"));
+            if (stack.hasTag() && stack.getTag().contains(NbtKeys.BLOCK_ENTITY_TAG, 10)) {
+                dummyBE.load(stack.getTag().getCompound(NbtKeys.BLOCK_ENTITY_TAG));
             } else {
                 dummyBE.load(new CompoundTag());
             }

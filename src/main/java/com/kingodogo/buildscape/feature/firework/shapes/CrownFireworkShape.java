@@ -1,7 +1,7 @@
-package com.kingodogo.buildscape.firework.shapes;
+package com.kingodogo.buildscape.feature.firework.shapes;
 
-import com.kingodogo.buildscape.firework.CustomFireworkShape;
-import com.kingodogo.buildscape.firework.FireworkPoint;
+import com.kingodogo.buildscape.feature.firework.CustomFireworkShape;
+import com.kingodogo.buildscape.feature.firework.FireworkPoint;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;

@@ -1,14 +1,14 @@
-package com.kingodogo.buildscape.firework;
+package com.kingodogo.buildscape.feature.firework;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.firework.shapes.CakeFireworkShape;
-import com.kingodogo.buildscape.firework.shapes.CandyCaneFireworkShape;
-import com.kingodogo.buildscape.firework.shapes.ChristmasTreeFireworkShape;
-import com.kingodogo.buildscape.firework.shapes.CrownFireworkShape;
-import com.kingodogo.buildscape.firework.shapes.PhoenixFireworkShape;
-import com.kingodogo.buildscape.firework.shapes.PresentsFireworkShape;
-import com.kingodogo.buildscape.firework.shapes.SnowflakeFireworkShape;
-import com.kingodogo.buildscape.firework.shapes.TrophyFireworkShape;
+import com.kingodogo.buildscape.feature.firework.shapes.CakeFireworkShape;
+import com.kingodogo.buildscape.feature.firework.shapes.CandyCaneFireworkShape;
+import com.kingodogo.buildscape.feature.firework.shapes.ChristmasTreeFireworkShape;
+import com.kingodogo.buildscape.feature.firework.shapes.CrownFireworkShape;
+import com.kingodogo.buildscape.feature.firework.shapes.PhoenixFireworkShape;
+import com.kingodogo.buildscape.feature.firework.shapes.PresentsFireworkShape;
+import com.kingodogo.buildscape.feature.firework.shapes.SnowflakeFireworkShape;
+import com.kingodogo.buildscape.feature.firework.shapes.TrophyFireworkShape;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;

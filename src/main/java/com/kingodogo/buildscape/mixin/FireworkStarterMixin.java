@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.firework.CustomFireworkRenderer;
-import com.kingodogo.buildscape.firework.CustomFireworkShape;
-import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
+import com.kingodogo.buildscape.feature.firework.CustomFireworkRenderer;
+import com.kingodogo.buildscape.feature.firework.CustomFireworkShape;
+import com.kingodogo.buildscape.feature.firework.CustomFireworkShapeRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.FireworkParticles;

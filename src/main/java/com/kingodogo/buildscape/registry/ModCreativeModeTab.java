@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.command.FireworkTestCommand;
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
-import com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem;
+import com.kingodogo.buildscape.feature.firework.CustomFireworkShapeRegistry;
+import com.kingodogo.buildscape.feature.firework.FireworkTestCommand;
+import com.kingodogo.buildscape.feature.firework.InfinitePhoenixFireworkStarItem;
 import com.kingodogo.buildscape.trophy.Trophies;
 import com.kingodogo.buildscape.trophy.TrophyDefinition;
 import net.minecraft.core.NonNullList;

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.firework;
+package com.kingodogo.buildscape.feature.firework;
 
 import net.minecraft.world.phys.Vec3;
 

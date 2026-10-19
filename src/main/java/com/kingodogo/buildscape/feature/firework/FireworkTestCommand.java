@@ -1,7 +1,6 @@
-package com.kingodogo.buildscape.command;
+package com.kingodogo.buildscape.feature.firework;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;

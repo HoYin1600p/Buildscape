@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.gameplay;
+package com.kingodogo.buildscape.event;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

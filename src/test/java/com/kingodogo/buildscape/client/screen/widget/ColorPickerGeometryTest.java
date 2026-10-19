@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.client410;
+package com.kingodogo.buildscape.client.screen.widget;
 
-import com.kingodogo.buildscape.client.screen.widget.ColorPickerGeometry;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

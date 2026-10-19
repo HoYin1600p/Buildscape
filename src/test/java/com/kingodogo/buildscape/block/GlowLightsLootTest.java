@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.blocks;
+package com.kingodogo.buildscape.block;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

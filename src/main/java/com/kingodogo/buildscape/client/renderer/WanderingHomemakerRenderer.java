@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.model.WanderingHomemakerModel;
-import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
+import com.kingodogo.buildscape.feature.homemaker.WanderingHomemakerEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.network;
+package com.kingodogo.buildscape.feature.homemaker;
 
 import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.entity;
+package com.kingodogo.buildscape.feature.homemaker;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.registry.ModItems;

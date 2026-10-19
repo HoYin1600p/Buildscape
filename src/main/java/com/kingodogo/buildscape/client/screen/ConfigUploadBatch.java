@@ -170,6 +170,36 @@ final class ConfigUploadBatch {
         }
     }
 
+    /** The groups with edits waiting. */
+    Set<ConfigSetting> pendingSettings() {
+        return groups.isEmpty() ? EnumSet.noneOf(ConfigSetting.class) : EnumSet.copyOf(groups);
+    }
+
+    /**
+     * {@code setting}'s edits will not be uploaded (edit access was lost during the wait): put the server's values
+     * back into {@code config} and forget the edits, so the screen does not keep showing a change the server never got.
+     */
+    void revert(ConfigSetting setting, PillarParticleConfig config) {
+        if (setting == null) return;
+        if (baseline != null) {
+            for (Field field : fieldEdits.keySet()) {
+                if (field.group == setting) field.write.accept(config, baseline.fields.get(field));
+            }
+            if (setting == ConfigSetting.COLORS && (colorList != null || !colorSlots.isEmpty())) {
+                config.particle_color = new ArrayList<>(baseline.colors);
+            }
+            if (setting == ConfigSetting.ITEMS && (!itemsAdded.isEmpty() || !itemsRemoved.isEmpty())) {
+                List<String> restored = new ArrayList<>(config.items);
+                restored.removeAll(itemsAdded);
+                for (String item : itemsRemoved) {
+                    if (!restored.contains(item)) restored.add(item);
+                }
+                config.replaceItems(restored);
+            }
+        }
+        dropRefused(setting);
+    }
+
     /** The server refused an upload: drop the refused group (all of them when it names none) so its state shows. */
     void dropRefused(ConfigSetting setting) {
         if (setting == null) {

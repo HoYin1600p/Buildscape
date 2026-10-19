@@ -203,6 +203,27 @@ public class UploadBatchingTest {
     }
 
     @Test
+    public void editsThatCanNoLongerBeUploadedAreRevertedToTheServerValues() {
+        PillarParticleConfig local = new PillarParticleConfig();
+        local.particle_speed = 0.06D;
+        ConfigUploadBatch batch = new ConfigUploadBatch();
+        batch.rebase(local);
+        local.particle_speed = 0.07D;
+        local.particle_lifetime = local.particle_lifetime + 5;
+        batch.edited(ConfigSetting.PARTICLES, local, 1L);
+        local.max_particle_color = local.max_particle_color + 1;
+        batch.edited(ConfigSetting.COLORS, local, 2L);
+        int maxColors = local.max_particle_color;
+
+        // Access to particles was lost during the wait: they go back to what the server has, colours stay pending.
+        batch.revert(ConfigSetting.PARTICLES, local);
+        assertEquals(0.06D, local.particle_speed, 0.0D);
+        assertEquals(new PillarParticleConfig().particle_lifetime, local.particle_lifetime);
+        assertEquals(maxColors, local.max_particle_color);
+        assertEquals(Set.of(ConfigSetting.COLORS), batch.pendingSettings());
+    }
+
+    @Test
     public void aRefusedGroupIsDroppedSoTheServerStateShowsAndOthersStay() {
         PillarParticleConfig local = new PillarParticleConfig();
         ConfigUploadBatch batch = new ConfigUploadBatch();

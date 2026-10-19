@@ -1642,19 +1642,38 @@ public class BuildScapeConfigScreen extends Screen {
     /** Sends the queued edits now: the wait ran out, or the screen is closing. */
     private void flushConfigUpload() {
         if (!uploadBatch.hasPending()) return;
+        PillarParticleConfig config = PillarParticleConfig.get();
+        // Edit access can be lost during the wait (deop, policy change): those edits are not sent, so put the
+        // server's values back and give the refusal X instead of leaving a change on screen the server never got.
+        boolean reverted = false;
+        for (ConfigSetting setting : uploadBatch.pendingSettings()) {
+            if (setting.isUploaded() && !canUpload(setting, config)) {
+                uploadBatch.revert(setting, config);
+                reverted = true;
+            }
+        }
+        if (reverted) {
+            flashDenied();
+            rebuildActiveItemsCache();
+        }
+        if (!uploadBatch.hasPending()) return;
         Set<ConfigSetting> changed = uploadBatch.take();
-        uploadBatch.rebase(PillarParticleConfig.get());
+        uploadBatch.rebase(config);
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.getConnection() == null) return;
-        persistServerConfig(PillarParticleConfig.get(), changed);
+        persistServerConfig(config, changed);
+    }
+
+    private boolean canUpload(ConfigSetting setting, PillarParticleConfig config) {
+        return hasEditAccess(setting.scope)
+                && (setting.itemsFile ? config.canEditItems() : config.canEditProperties());
     }
 
     private void persistServerConfig(PillarParticleConfig config, Set<ConfigSetting> changed) {
         java.util.Set<ConfigSetting> settings =
                 java.util.EnumSet.noneOf(ConfigSetting.class);
         for (ConfigSetting setting : changed) {
-            if (setting.isUploaded() && hasEditAccess(setting.scope)
-                    && (setting.itemsFile ? config.canEditItems() : config.canEditProperties())) {
+            if (setting.isUploaded() && canUpload(setting, config)) {
                 settings.add(setting);
             }
         }

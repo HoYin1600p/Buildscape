@@ -138,6 +138,8 @@ public class PillarParticleConfig {
     private transient JsonObject loadedPropertyValues;
     private transient String itemsSource;
     private transient JsonObject originalItems;
+    /** True while the file on disk is still the untouched 4.0.5 file (a load that adds nothing does not rewrite it). */
+    private transient boolean itemsOnDiskIs405;
     private final transient Path configDirectory;
 
     public PillarParticleConfig() {
@@ -763,11 +765,13 @@ public class PillarParticleConfig {
             itemsReadOnly |= !ConfigLayoutIO.isWritable(file.toPath());
             if (!itemsReadOnly) {
                 try {
+                    itemsOnDiskIs405 = isLegacyItems(document);
                     JsonObject merged = mergeDefaultItems(document, vaultLoaded);
                     if (!merged.get("items").equals(document.get("items"))) {
                         String output = ConfigLayoutIO.retainComments(source, GSON.toJson(merged), true);
                         output = ConfigLayoutIO.retainInvalidItemTokens(source, output);
-                        ConfigLayoutIO.writeItems(file.toPath(), output, source, isLegacyItems(document));
+                        ConfigLayoutIO.writeItems(file.toPath(), output, source, itemsOnDiskIs405);
+                        itemsOnDiskIs405 = false;
                         source = output;
                         parsed = parseItems(output, file.toString());
                     }
@@ -1029,7 +1033,8 @@ public class PillarParticleConfig {
             json = mergeDefaultItems(json, vaultLoaded);
             String output = ConfigLayoutIO.retainComments(itemsSource, GSON.toJson(json), true);
             output = ConfigLayoutIO.retainInvalidItemTokens(itemsSource, output);
-            ConfigLayoutIO.writeItems(file.toPath(), output, itemsSource, isLegacyItems(originalItems));
+            ConfigLayoutIO.writeItems(file.toPath(), output, itemsSource, itemsOnDiskIs405 || isLegacyItems(originalItems));
+            itemsOnDiskIs405 = false;
             replaceItems(parseItems(output));
             itemsSource = output;
             originalItems = json;

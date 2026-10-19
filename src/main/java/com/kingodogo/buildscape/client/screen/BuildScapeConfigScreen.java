@@ -6465,8 +6465,27 @@ public class BuildScapeConfigScreen extends Screen {
         RenderSystem.disableScissor();
     }
 
-    private static void renderGuiItem(Object poseStackOrGraphics, ItemStack stack, int x, int y) {
-        Minecraft.getInstance().getItemRenderer().renderGuiItem(stack, x, y);
+    /**
+     * Items are drawn through the global model-view stack, not the screen's PoseStack, so the
+     * shrink scale applied to the PoseStack in renderInternal does not reach them. Mirror it here
+     * whenever it is active so icons land in their slots.
+     */
+    private void renderGuiItem(Object poseStackOrGraphics, ItemStack stack, int x, int y) {
+        float scale = scissorUiScale;
+        if (!GuiScaleHelper.isShrunk(scale)) {
+            Minecraft.getInstance().getItemRenderer().renderGuiItem(stack, x, y);
+            return;
+        }
+        PoseStack modelView = RenderSystem.getModelViewStack();
+        modelView.pushPose();
+        modelView.scale(scale, scale, 1.0f);
+        RenderSystem.applyModelViewMatrix();
+        try {
+            Minecraft.getInstance().getItemRenderer().renderGuiItem(stack, x, y);
+        } finally {
+            modelView.popPose();
+            RenderSystem.applyModelViewMatrix();
+        }
     }
 
     private void renderComponentTooltip(Object poseStackOrGraphics, List<Component> tooltips, int mouseX, int mouseY) {

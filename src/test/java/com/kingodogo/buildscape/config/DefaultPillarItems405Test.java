@@ -52,7 +52,7 @@ public class DefaultPillarItems405Test {
         config.loadItemsInternal(true);
 
         assertTrue(config.items.contains("custom_mod:special_item"));
-        assertTrue(config.items.contains("buildscape:bone_dice"));
+        assertFalse(config.items.contains("buildscape:bone_dice"));
         assertFalse(config.items.contains("minecraft:diamond"));
         assertTrue(config.items.contains("the_vault:echo_pog"));
         String currentContent = Files.readString(itemsFile.toPath());
@@ -71,12 +71,12 @@ public class DefaultPillarItems405Test {
         java.nio.file.Path file = dir.resolve("pillar-items.json");
         Files.writeString(file, "{\"items\":[\"minecraft:stick\"]}");
         PillarParticleConfig config = new PillarParticleConfig(dir);
-        config.loadItemsInternal(false);
-        assertTrue(config.items.remove("buildscape:bone_dice"));
-        assertTrue(config.saveItemsToDisk(false));
+        config.loadItemsInternal(true);
+        assertTrue(config.items.remove("the_vault:echo_pog"));
+        assertTrue(config.saveItemsToDisk(true));
         String saved = Files.readString(file);
-        new PillarParticleConfig(dir).loadItemsInternal(false);
-        assertFalse(PillarParticleConfig.parseItems(Files.readString(file)).contains("buildscape:bone_dice"));
+        new PillarParticleConfig(dir).loadItemsInternal(true);
+        assertFalse(PillarParticleConfig.parseItems(Files.readString(file)).contains("the_vault:echo_pog"));
         assertEquals(saved, Files.readString(file));
     }
 
@@ -136,7 +136,7 @@ public class DefaultPillarItems405Test {
         PillarParticleConfig config = new PillarParticleConfig(dir);
         config.loadItemsInternal(true);
         assertTrue(config.items.contains("minecraft:stick"));
-        assertTrue(config.items.contains("buildscape:bone_dice"));
+        assertFalse(config.items.contains("buildscape:bone_dice"));
         assertTrue(config.items.contains("the_vault:echo_pog"));
         assertFalse(config.items.contains("minecraft:diamond"));
         assertTrue(ConfigLayoutIO.readProperties(Files.readString(file)).has("offered_defaults"));
@@ -251,8 +251,8 @@ public class DefaultPillarItems405Test {
         java.nio.file.Path dir = temporaryFolder.newFolder().toPath();
         PillarParticleConfig config = new PillarParticleConfig(dir);
         config.items.add("minecraft:stick");
-        assertTrue(config.saveItemsToDisk(false));
-        assertTrue(config.items.contains("buildscape:bone_dice"));
+        assertTrue(config.saveItemsToDisk(true));
+        assertTrue(config.items.contains("the_vault:echo_pog"));
         assertTrue(ConfigLayoutIO.readProperties(Files.readString(dir.resolve("pillar-items.json"))).has("offered_defaults"));
     }
 
@@ -273,5 +273,23 @@ public class DefaultPillarItems405Test {
         assertFalse(Files.exists(dir.resolve("pillar-items.json.bak")));
         assertFalse(Files.exists(dir.resolve("pillar-items.json.pre-4.0.5.bak")));
     }
-}
 
+    @Test
+    public void legacyListMatchesTheDefaultsTheReleased405JarWrote() throws Exception {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        for (com.google.gson.JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items").getAsJsonArray("items")) {
+            names.add(entry.getAsString());
+        }
+        assertEquals(154, names.size());
+        assertEquals(154, new HashSet<>(names).size());
+        for (String item : new String[]{"buildscape:confetti", "buildscape:bone_dice", "buildscape:ashenking_gold_pillar",
+                "buildscape:music_disc_builder", "buildscape:star_trophy", "#the_vault:etching", "the_vault:greedy_meal"}) {
+            assertTrue(item, names.contains(item));
+        }
+        String real;
+        try (java.io.InputStream input = DefaultPillarItems405Test.class.getResourceAsStream("/config405/old-pillar-items-vault.json")) {
+            real = new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        }
+        assertEquals(new HashSet<>(names), PillarParticleConfig.parseItems(real));
+    }
+}

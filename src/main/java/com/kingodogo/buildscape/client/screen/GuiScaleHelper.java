@@ -30,6 +30,10 @@ public final class GuiScaleHelper {
         return 1.0f;
     }
 
+    public static boolean isShrunk(float uiScale) {
+        return Math.abs(uiScale - 1.0f) > 0.001f;
+    }
+
     public static int getEffectiveWidth(int windowWidth, float uiScale) {
         return Math.abs(uiScale - 1.0f) > 0.001f ? (int) Math.ceil(windowWidth / uiScale) : windowWidth;
     }

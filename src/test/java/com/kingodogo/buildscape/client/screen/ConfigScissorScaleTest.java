@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ConfigScissorScaleTest {
 
@@ -32,5 +34,13 @@ public class ConfigScissorScaleTest {
         assertEquals(Math.round(200 * scale), rect[2]);
         assertEquals(Math.round(1440 - 220 * scale), rect[1]);
         assertEquals(Math.round(120 * scale), rect[3]);
+    }
+
+    @Test
+    public void shrinkIsActiveOnlyBelowTheRequiredCanvas() {
+        assertTrue(GuiScaleHelper.isShrunk(GuiScaleHelper.calculateUiScale(853, 480, 3.0)));
+        assertTrue(GuiScaleHelper.isShrunk(GuiScaleHelper.calculateUiScale(640, 360, 3.0)));
+        assertFalse(GuiScaleHelper.isShrunk(GuiScaleHelper.calculateUiScale(1280, 720, 2.0)));
+        assertFalse(GuiScaleHelper.isShrunk(1.0f));
     }
 }

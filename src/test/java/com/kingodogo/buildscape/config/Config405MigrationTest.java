@@ -58,10 +58,10 @@ public class Config405MigrationTest {
             com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original)).getAsJsonArray("items");
             com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file)).getAsJsonArray("items");
             for (int i = 0; i < before.size(); i++) assertEquals(before.get(i), after.get(i));
-            assertEquals(original, ConfigLayoutIO.readText(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));
 
             config.items.remove("minecraft:diamond");
             assertTrue(config.saveItemsToDisk(vault));
+            assertEquals(original, ConfigLayoutIO.readText(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));
             String saved = ConfigLayoutIO.readText(file);
             PillarParticleConfig reloaded = new PillarParticleConfig(directory);
             reloaded.loadItemsInternal(vault);
@@ -466,5 +466,45 @@ public class Config405MigrationTest {
         // No different setting may intervene between the old comment and its setting.
         String between = text.substring(commentPosition, keyPosition);
         for (String line : between.split("\\R")) assertFalse(between, line.trim().startsWith("\""));
+    }
+
+    @Test
+    public void realReleased405FileIsDetectedAndLeftUntouchedByTheMerge() throws Exception {
+        for (boolean vault : new boolean[]{false, true}) {
+            Path directory = temporary.newFolder().toPath();
+            Path file = directory.resolve("pillar-items.json");
+            String original = fixture("old-pillar-items-" + (vault ? "vault" : "vanilla") + ".json");
+            Files.writeString(file, original);
+            PillarParticleConfig config = new PillarParticleConfig(directory);
+            config.loadItemsInternal(vault);
+            assertEquals(PillarParticleConfig.parseItems(original), config.items);
+            com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original)).getAsJsonArray("items");
+            com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file)).getAsJsonArray("items");
+            assertEquals(before, after);
+            assertEquals(original, ConfigLayoutIO.readText(file));
+            assertFalse(Files.exists(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));
+            assertTrue(config.items.remove("minecraft:diamond"));
+            assertTrue(config.saveItemsToDisk(vault));
+            assertEquals(original, ConfigLayoutIO.readText(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));
+        }
+    }
+
+    @Test
+    public void realReleased405FileWithConfettiRemovedKeepsItRemoved() throws Exception {
+        for (boolean vault : new boolean[]{false, true}) {
+            Path directory = temporary.newFolder().toPath();
+            Path file = directory.resolve("pillar-items.json");
+            String original = fixture("old-pillar-items-" + (vault ? "vault" : "vanilla") + ".json")
+                    .replaceAll("(?m)^\\s*\"buildscape:confetti\",\\R", "");
+            assertFalse(original.contains("buildscape:confetti"));
+            Files.writeString(file, original);
+            PillarParticleConfig config = new PillarParticleConfig(directory);
+            config.loadItemsInternal(vault);
+            assertFalse(config.items.contains("buildscape:confetti"));
+            String merged = ConfigLayoutIO.readText(file);
+            assertFalse(PillarParticleConfig.parseItems(merged).contains("buildscape:confetti"));
+            new PillarParticleConfig(directory).loadItemsInternal(vault);
+            assertEquals(merged, ConfigLayoutIO.readText(file));
+        }
     }
 }

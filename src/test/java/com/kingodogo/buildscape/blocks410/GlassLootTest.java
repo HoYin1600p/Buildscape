@@ -57,6 +57,25 @@ public class GlassLootTest {
         }
     }
 
+    @Test
+    public void glazedGlassNeedsSilkTouchInEveryShape() throws Exception {
+        List<String> colors = List.of("white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
+                "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black");
+        for (String color : colors) {
+            String base = color + "_glazed_glass";
+            for (String suffix : List.of("", "_pane", "_stairs", "_slab", "_vertical_slab")) {
+                String id = base + suffix;
+                JsonObject table = load(id);
+                boolean slab = suffix.endsWith("slab");
+                for (String type : List.of("bottom", "top", "double")) {
+                    assertEquals(id + " " + type + " without Silk Touch", 0, drops(table, id, false, type));
+                    int expected = slab && "double".equals(type) ? 2 : 1;
+                    assertEquals(id + " " + type + " with Silk Touch", expected, drops(table, id, true, type));
+                }
+            }
+        }
+    }
+
     private int baseCount(String id, boolean silk) throws Exception {
         if (Files.exists(DIRECTORY.resolve(id + ".json"))) {
             return drops(load(id), id, silk, "bottom");

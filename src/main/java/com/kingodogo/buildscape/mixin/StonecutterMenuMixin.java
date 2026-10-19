@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class StonecutterMenuMixin extends AbstractContainerMenu implements StonecutterMenuExtension {
     private boolean buildscape$cutAll = false;
 
-    protected StonecutterMenuMixin(MenuType<?> p_38852_, int p_38853_) {
-        super(p_38852_, p_38853_);
+    protected StonecutterMenuMixin(MenuType<?> menuType, int containerId) {
+        super(menuType, containerId);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class BuildScapeRecipeCompiler {
     private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
     private final StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
 
-    public static record CompileResult(
+    public record CompileResult(
             List<Recipe<?>> recipes,
             int totalProcessed,
             int totalGeneratedFromFamilies

@@ -18,8 +18,8 @@ import java.util.List;
 
 @Mixin(StonecutterScreen.class)
 public abstract class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterMenu> {
-    public StonecutterScreenMixin(StonecutterMenu p_97741_, Inventory p_97742_, Component p_97743_) {
-        super(p_97741_, p_97742_, p_97743_);
+    public StonecutterScreenMixin(StonecutterMenu menu, Inventory playerInventory, Component title) {
+        super(menu, playerInventory, title);
     }
 
     @Override

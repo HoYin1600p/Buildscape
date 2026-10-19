@@ -186,8 +186,8 @@ public class FestiveStockingEntity extends HangingEntity {
         }
     }
 
-    private double offs(int p_31731_) {
-        return p_31731_ % 32 == 0 ? 0.5D : 0.0D;
+    private double offs(int index) {
+        return index % 32 == 0 ? 0.5D : 0.0D;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.setup;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.GlowLightsBlockEntity;
 import com.kingodogo.buildscape.block.ModWoodTypes;
 import com.kingodogo.buildscape.block.OrnamentBlock;
@@ -76,7 +77,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import com.kingodogo.buildscape.BuildScape;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientSetup {

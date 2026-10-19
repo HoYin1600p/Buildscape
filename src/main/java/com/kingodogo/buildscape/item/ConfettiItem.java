@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.advancement.AdvancementEvents;
+import com.kingodogo.buildscape.advancement.AdvancementGrants;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.network.ConfettiBurstPacket;
 import com.kingodogo.buildscape.network.ModMessages;
@@ -45,7 +45,7 @@ public class ConfettiItem extends Item {
             spawnConfettiParticles((ServerLevel) level, player, itemstack);
 
             if (player instanceof ServerPlayer serverPlayer) {
-                AdvancementEvents.onConfettiUsed(serverPlayer);
+                AdvancementGrants.onConfettiUsed(serverPlayer);
             }
 
             if (!player.getAbilities().instabuild) {

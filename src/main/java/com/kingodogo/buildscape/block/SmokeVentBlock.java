@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.advancement.AdvancementEvents;
+import com.kingodogo.buildscape.advancement.AdvancementGrants;
 import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.feature.pillar.PillarPart;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
@@ -247,7 +247,7 @@ public class SmokeVentBlock extends Block implements EntityBlock {
                 message.withStyle(ChatFormatting.GRAY);
                 if (player instanceof ServerPlayer serverPlayer) {
                     serverPlayer.awardStat(ModStats.SMOKE_VENTS_DYED);
-                    AdvancementEvents.grant(serverPlayer, "colorful_smoke");
+                    AdvancementGrants.grant(serverPlayer, "colorful_smoke");
                     ModMessages.INSTANCE.send(
                             PacketDistributor.PLAYER.with(() -> serverPlayer),
                             new ActionBarMessagePacket(message));

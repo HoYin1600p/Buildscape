@@ -1,6 +1,7 @@
-package com.kingodogo.buildscape.advancement;
+package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.advancement.AdvancementGrants;
 import com.kingodogo.buildscape.block.CascadeBlock;
 import com.kingodogo.buildscape.block.CascadeBlockNoMist;
 import com.kingodogo.buildscape.block.FrostRoseBlock;
@@ -18,9 +19,6 @@ import com.kingodogo.buildscape.feature.trophy.TrophyBlockItem;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModStats;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementProgress;
-import net.minecraft.advancements.CriterionProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -53,21 +51,6 @@ public class AdvancementEvents {
                 restored.put(key, original.get(key).copy());
             }
         }
-    }
-
-    public static boolean grant(ServerPlayer player, String id) {
-        if (player == null || player.getServer() == null) return false;
-        Advancement adv = player.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", id));
-        if (adv != null) {
-            AdvancementProgress progress = player.getAdvancements().getOrStartProgress(adv);
-            if (!progress.isDone()) {
-                for (String criterion : progress.getRemainingCriteria()) {
-                    player.getAdvancements().award(adv, criterion);
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     public static void giveItemReward(ServerPlayer player, Item item, int count) {
@@ -123,7 +106,7 @@ public class AdvancementEvents {
                     }
 
                     if (!"a_full_buildscape_cube".equals(path) && !path.startsWith("recipes/")) {
-                        checkFullCubeAdvancement(serverPlayer);
+                        AdvancementGrants.checkFullCubeAdvancement(serverPlayer);
                     }
                 }
             }
@@ -133,28 +116,7 @@ public class AdvancementEvents {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
-            checkFullCubeAdvancement(serverPlayer);
-        }
-    }
-
-    public static void checkFullCubeAdvancement(ServerPlayer serverPlayer) {
-        if (serverPlayer == null || serverPlayer.getServer() == null) return;
-        Advancement cubeAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", "a_full_buildscape_cube"));
-        if (cubeAdv == null) return;
-        AdvancementProgress cubeProgress = serverPlayer.getAdvancements().getOrStartProgress(cubeAdv);
-        if (cubeProgress.isDone()) return;
-
-        for (String criterion : cubeAdv.getCriteria().keySet()) {
-            CriterionProgress cp = cubeProgress.getCriterion(criterion);
-            if (cp != null && cp.isDone()) continue;
-
-            Advancement reqAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", criterion));
-            if (reqAdv != null) {
-                AdvancementProgress reqProgress = serverPlayer.getAdvancements().getOrStartProgress(reqAdv);
-                if (reqProgress.isDone()) {
-                    serverPlayer.getAdvancements().award(cubeAdv, criterion);
-                }
-            }
+            AdvancementGrants.checkFullCubeAdvancement(serverPlayer);
         }
     }
 
@@ -163,61 +125,9 @@ public class AdvancementEvents {
         if (!(event.getPlayer() instanceof ServerPlayer serverPlayer)) return;
 
         if (event.getTarget() instanceof WanderingHomemakerEntity) {
-            grant(serverPlayer, "the_homemaker_cometh");
+            AdvancementGrants.grant(serverPlayer, "the_homemaker_cometh");
         } else if (event.getTarget() instanceof FestiveWanderingHomemakerEntity) {
-            grant(serverPlayer, "its_beginning_to_look_a_lot_like_christmas");
-        }
-    }
-
-    private static boolean checkRelativeMilestone(ServerPlayer player, String advId, int targetCount, int currentStat) {
-        Advancement adv = player.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", advId));
-        if (adv == null) return false;
-        AdvancementProgress progress = player.getAdvancements().getOrStartProgress(adv);
-        if (progress.isDone()) return false;
-
-        CompoundTag tag = player.getPersistentData();
-        String baseKey = "BS_Base_" + advId;
-
-        if (!tag.contains(baseKey)) {
-            tag.putInt(baseKey, Math.max(0, currentStat - 1));
-        }
-
-        int baseStat = tag.getInt(baseKey);
-        int delta = currentStat - baseStat;
-
-        if (delta < 0) {
-            tag.putInt(baseKey, Math.max(0, currentStat - 1));
-            baseStat = tag.getInt(baseKey);
-            delta = currentStat - baseStat;
-        }
-
-        if (delta >= targetCount) {
-            boolean granted = grant(player, advId);
-            if (granted) {
-                tag.remove(baseKey);
-            }
-            return granted;
-        }
-        return false;
-    }
-
-    public static void onPillarItemInserted(ServerPlayer serverPlayer) {
-        if (serverPlayer == null) return;
-
-        serverPlayer.awardStat(ModStats.INTERACT_WITH_PILLAR);
-        int count = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.INTERACT_WITH_PILLAR);
-
-        if (checkRelativeMilestone(serverPlayer, "put_it_on_display", 10, count)) {
-            return;
-        }
-        if (checkRelativeMilestone(serverPlayer, "columnist", 69, count)) {
-            return;
-        }
-        if (checkRelativeMilestone(serverPlayer, "art_collector", 100, count)) {
-            return;
-        }
-        if (checkRelativeMilestone(serverPlayer, "buildscape_museum", 1000, count)) {
-            return;
+            AdvancementGrants.grant(serverPlayer, "its_beginning_to_look_a_lot_like_christmas");
         }
     }
 
@@ -241,56 +151,56 @@ public class AdvancementEvents {
             serverPlayer.awardStat(ModStats.BLOCKS_PLACED);
             int placedCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.BLOCKS_PLACED);
 
-            if (checkRelativeMilestone(serverPlayer, "one_more_block", 100, placedCount)) {
-            } else if (checkRelativeMilestone(serverPlayer, "okay_one_more", 1000, placedCount)) {
-            } else if (checkRelativeMilestone(serverPlayer, "actually_one_last", 10000, placedCount)) {
-            } else if (checkRelativeMilestone(serverPlayer, "one_last_one_i_promise", 100000, placedCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "one_more_block", 100, placedCount)) {
+            } else if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "okay_one_more", 1000, placedCount)) {
+            } else if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "actually_one_last", 10000, placedCount)) {
+            } else if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "one_last_one_i_promise", 100000, placedCount)) {
             }
         }
 
         if (path.contains("stained_brick")) {
-            grant(serverPlayer, "brick_by_brick");
+            AdvancementGrants.grant(serverPlayer, "brick_by_brick");
         }
 
         if (path.startsWith("hollow_")) {
             serverPlayer.awardStat(ModStats.HOLLOW_LOGS_PLACED);
             int hollowCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.HOLLOW_LOGS_PLACED);
-            if (checkRelativeMilestone(serverPlayer, "i_vented", 10, hollowCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "i_vented", 10, hollowCount)) {
             }
         }
 
         if (path.contains("icicle")) {
             serverPlayer.awardStat(ModStats.ICICLES_PLACED);
             int icicleCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.ICICLES_PLACED);
-            if (checkRelativeMilestone(serverPlayer, "chill_out", 10, icicleCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "chill_out", 10, icicleCount)) {
             }
         }
 
         if (path.contains("ornament")) {
             serverPlayer.awardStat(ModStats.ORNAMENTS_PLACED);
             int ornCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.ORNAMENTS_PLACED);
-            if (checkRelativeMilestone(serverPlayer, "ornamental", 100, ornCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "ornamental", 100, ornCount)) {
             }
         }
 
         if (path.contains("string_light")) {
             serverPlayer.awardStat(ModStats.STRING_LIGHTS_PLACED);
             int lightCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.STRING_LIGHTS_PLACED);
-            if (checkRelativeMilestone(serverPlayer, "light_em_up", 100, lightCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "light_em_up", 100, lightCount)) {
             }
         }
 
         if (path.contains("_star")) {
             serverPlayer.awardStat(ModStats.STARS_PLACED);
             int starCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.STARS_PLACED);
-            if (checkRelativeMilestone(serverPlayer, "santas_little_helper", 100, starCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "santas_little_helper", 100, starCount)) {
             }
         }
 
         if (path.startsWith("snowy_")) {
             serverPlayer.awardStat(ModStats.SNOWY_LEAVES_PLACED);
             int snowCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.SNOWY_LEAVES_PLACED);
-            if (checkRelativeMilestone(serverPlayer, "a_white_christmas", 100, snowCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "a_white_christmas", 100, snowCount)) {
             }
         }
 
@@ -304,33 +214,33 @@ public class AdvancementEvents {
                 }
             }
             if (roseCount >= 5) {
-                grant(serverPlayer, "let_it_snow");
+                AdvancementGrants.grant(serverPlayer, "let_it_snow");
             }
         }
 
         if (block instanceof CascadeBlock || block instanceof CascadeBlockNoMist || path.contains("cascade_block")) {
             serverPlayer.awardStat(ModStats.CASCADE_BLOCKS_PLACED);
-            grant(serverPlayer, "let_it_cascade");
+            AdvancementGrants.grant(serverPlayer, "let_it_cascade");
         }
 
         if (block instanceof SmokeVentBlock || path.equals("smoke_vent")) {
             serverPlayer.awardStat(ModStats.SMOKE_VENTS_PLACED);
             int ventCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.SMOKE_VENTS_PLACED);
-            if (checkRelativeMilestone(serverPlayer, "let_it_out", 5, ventCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "let_it_out", 5, ventCount)) {
             }
         }
 
         if (block instanceof MuffBlock || path.equals("muff_block")) {
             if (level.hasNeighborSignal(pos)) {
                 serverPlayer.awardStat(ModStats.MUFF_BLOCKS_ACTIVATED);
-                grant(serverPlayer, "can_you_hear_me_now");
+                AdvancementGrants.grant(serverPlayer, "can_you_hear_me_now");
             }
         }
 
         if (path.endsWith("_bolts") || block instanceof SteelBoltBlock || block instanceof WeatheringBoltBlock) {
             serverPlayer.awardStat(ModStats.BOLTS_PLACED);
             int boltCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.BOLTS_PLACED);
-            if (checkRelativeMilestone(serverPlayer, "are_you_nuts", 20, boltCount)) {
+            if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "are_you_nuts", 20, boltCount)) {
             }
         }
 
@@ -348,7 +258,7 @@ public class AdvancementEvents {
             tag.putInt("BS_PillarPlaced_" + path, samePillarCount);
 
             if (samePillarCount >= 4) {
-                grant(player, "support_system");
+                AdvancementGrants.grant(player, "support_system");
             }
         }
 
@@ -365,11 +275,11 @@ public class AdvancementEvents {
         }
 
         if (height >= 50) {
-            grant(player, "thats_a_tall_order");
+            AdvancementGrants.grant(player, "thats_a_tall_order");
         }
 
         if (pos.getY() >= level.getMaxBuildHeight() - 1) {
-            grant(player, "reach_for_the_sky");
+            AdvancementGrants.grant(player, "reach_for_the_sky");
         }
     }
 
@@ -385,29 +295,13 @@ public class AdvancementEvents {
         if (path.contains("jar") && !path.contains("pattern")) {
             serverPlayer.awardStat(ModStats.JARS_CRAFTED, itemStack.getCount());
             int jars = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.JARS_CRAFTED);
-            checkRelativeMilestone(serverPlayer, "jar_ring_display", 100, jars);
+            AdvancementGrants.checkRelativeMilestone(serverPlayer, "jar_ring_display", 100, jars);
         }
 
         if (path.contains("festive_stocking") || path.contains("stocking")) {
             serverPlayer.awardStat(ModStats.STOCKINGS_CRAFTED, itemStack.getCount());
             int stockings = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.STOCKINGS_CRAFTED);
-            checkRelativeMilestone(serverPlayer, "christmas_every_day", 365, stockings);
+            AdvancementGrants.checkRelativeMilestone(serverPlayer, "christmas_every_day", 365, stockings);
         }
-    }
-
-    public static void onHammerReplace(ServerPlayer player) {
-        if (player == null) return;
-        player.awardStat(ModStats.HAMMER_USED);
-        int count = player.getStats().getValue(Stats.CUSTOM, ModStats.HAMMER_USED);
-
-        grant(player, "fixer_upper");
-        checkRelativeMilestone(player, "hammer_time", 1000, count);
-    }
-
-    public static void onConfettiUsed(ServerPlayer player) {
-        if (player == null) return;
-        player.awardStat(ModStats.CONFETTI_USED);
-        int count = player.getStats().getValue(Stats.CUSTOM, ModStats.CONFETTI_USED);
-        checkRelativeMilestone(player, "celebrate_in_style", 20, count);
     }
 }

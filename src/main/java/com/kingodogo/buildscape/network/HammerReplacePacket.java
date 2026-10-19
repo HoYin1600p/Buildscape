@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.advancement.AdvancementEvents;
+import com.kingodogo.buildscape.advancement.AdvancementGrants;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.HammerItem;
 import net.minecraft.core.BlockPos;
@@ -119,7 +119,7 @@ public class HammerReplacePacket {
                     .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
             List<ItemStack> drops = targetState.getDrops(builder);
             if (!level.setBlock(pos, newState, 3)) return;
-            AdvancementEvents.onHammerReplace(player);
+            AdvancementGrants.onHammerReplace(player);
 
             if (!player.isCreative()) {
                 offhandStack.shrink(1);

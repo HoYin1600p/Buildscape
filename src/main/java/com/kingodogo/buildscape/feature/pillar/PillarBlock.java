@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.feature.pillar;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.advancement.AdvancementEvents;
+import com.kingodogo.buildscape.advancement.AdvancementGrants;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.core.NbtKeys;
@@ -913,7 +913,7 @@ public class PillarBlock
             blockEntity.setDisplayedItem(displayItem, facingYaw);
 
             if (player instanceof ServerPlayer serverPlayer) {
-                AdvancementEvents.onPillarItemInserted(serverPlayer);
+                AdvancementGrants.onPillarItemInserted(serverPlayer);
             }
 
             if (blockEntity.getParticlePattern() == null) {

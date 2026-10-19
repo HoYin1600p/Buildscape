@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.advancement.AdvancementEvents;
+import com.kingodogo.buildscape.advancement.AdvancementGrants;
 import com.kingodogo.buildscape.registry.ModStats;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -95,7 +95,7 @@ public class MuffBlock extends Block implements EntityBlock {
                 Player nearestPlayer = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 32.0, false);
                 if (nearestPlayer instanceof ServerPlayer serverPlayer) {
                     serverPlayer.awardStat(ModStats.MUFF_BLOCKS_ACTIVATED);
-                    AdvancementEvents.grant(serverPlayer, "can_you_hear_me_now");
+                    AdvancementGrants.grant(serverPlayer, "can_you_hear_me_now");
                 }
             }
         }

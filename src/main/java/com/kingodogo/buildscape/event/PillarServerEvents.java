@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.event;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.feature.homemaker.SyncHomemakerCooldownPacket;
@@ -21,7 +22,6 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import com.kingodogo.buildscape.BuildScape;
 
 public class PillarServerEvents {
 

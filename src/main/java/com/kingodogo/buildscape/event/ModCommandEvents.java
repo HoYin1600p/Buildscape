@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.event;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.feature.cosmetic.CosmeticManager;
 import com.kingodogo.buildscape.feature.firework.FireworkTestCommand;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
@@ -9,7 +10,6 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import com.kingodogo.buildscape.BuildScape;
 
 public class ModCommandEvents {
 

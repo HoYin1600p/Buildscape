@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.setup;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.feature.geyser.GeyserBaseParticle;
 import com.kingodogo.buildscape.feature.geyser.GeyserEruptionParticle;
 import com.kingodogo.buildscape.feature.geyser.GeyserPlumeParticle;
@@ -27,7 +28,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import com.kingodogo.buildscape.BuildScape;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientParticleSetup {

@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.item;
+package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.block.FestiveStockingBlockEntity;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.core.BlockPos;

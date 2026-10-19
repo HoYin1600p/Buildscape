@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.client.HazeBushParticleHandler;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;

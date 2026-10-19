@@ -1,8 +1,6 @@
-package com.kingodogo.buildscape.client;
+package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.HazeBushBlock;
-import com.kingodogo.buildscape.block.PottedHazeBushBlock;
 import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ParticleStatus;

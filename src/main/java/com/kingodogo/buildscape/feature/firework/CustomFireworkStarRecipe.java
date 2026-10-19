@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.feature.firework;
 
+import com.kingodogo.buildscape.block.FestiveStockingItem;
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.item.FestiveStockingItem;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModRecipeSerializers;

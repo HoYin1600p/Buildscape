@@ -22,6 +22,7 @@ public class BuildscapeClientConfig {
     public static final String KEY_UI_THEME = "UITheme";
     public static final String KEY_UI_BACKGROUND = "UIBackground";
     public static final String KEY_SIDE_PANEL_EXPANDED = "SidePanelExpanded";
+    public static final String KEY_NAVBAR_EXPANDED = "NavbarExpanded";
     public static final String KEY_ANIMATION_SPEED = "AnimationSpeed";
     public static final String KEY_LAST_ACTIVE_TAB = "LastActiveTab";
     public static final String KEY_MAX_CUSTOM_PRESETS = "MaxCustomPresets";
@@ -43,7 +44,6 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_CAKE_STACKING, "true");
         DEFAULTS.put(KEY_WATER_BOTTLE_STACKING, "true");
         DEFAULTS.put(KEY_MAX_CUSTOM_PRESETS, String.valueOf(DEFAULT_CUSTOM_PRESETS));
-
     }
 
     private final Map<String, String> values;
@@ -257,7 +257,7 @@ public class BuildscapeClientConfig {
             case KEY_PARALLEL_MODEL_LOADING, KEY_CACHE_MODEL_MATERIALS,
                     KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE -> "Performance";
             case KEY_HIDE_CONFIG_BUTTON, KEY_UI_THEME, KEY_UI_BACKGROUND,
-                    KEY_SIDE_PANEL_EXPANDED, KEY_ANIMATION_SPEED, KEY_LAST_ACTIVE_TAB,
+                    KEY_SIDE_PANEL_EXPANDED, KEY_NAVBAR_EXPANDED, KEY_ANIMATION_SPEED, KEY_LAST_ACTIVE_TAB,
                     KEY_MAX_CUSTOM_PRESETS, KEY_LAST_PRESET -> "Interface";
             default -> "Other";
         };
@@ -276,6 +276,7 @@ public class BuildscapeClientConfig {
             case KEY_UI_THEME -> "Active theme for the BuildScape configuration screen (dark, light, cyber, etc.).";
             case KEY_UI_BACKGROUND -> "Background style for the BuildScape configuration screen (none, blueprint, etc.).";
             case KEY_SIDE_PANEL_EXPANDED -> "Whether the configuration screen side panel is expanded.";
+            case KEY_NAVBAR_EXPANDED -> "Whether the configuration screen navigation bar is expanded.";
             case KEY_ANIMATION_SPEED -> "UI animation speed index (0=normal, 1=fast, 2=instant).";
             case KEY_LAST_ACTIVE_TAB -> "Last selected tab index in the BuildScape configuration screen.";
             case KEY_MAX_CUSTOM_PRESETS -> "Number of custom item presets that can be saved besides Default (1-32, default 4).";
@@ -351,11 +352,20 @@ public class BuildscapeClientConfig {
     }
 
     public boolean isSidePanelExpanded() {
-        return getBoolean(KEY_SIDE_PANEL_EXPANDED);
+        return values.containsKey(KEY_SIDE_PANEL_EXPANDED) ? Boolean.parseBoolean(values.get(KEY_SIDE_PANEL_EXPANDED)) : true;
     }
 
     public void setSidePanelExpanded(boolean expanded) {
         values.put(KEY_SIDE_PANEL_EXPANDED, String.valueOf(expanded));
+        save();
+    }
+
+    public boolean isNavbarExpanded() {
+        return getBoolean(KEY_NAVBAR_EXPANDED);
+    }
+
+    public void setNavbarExpanded(boolean expanded) {
+        values.put(KEY_NAVBAR_EXPANDED, String.valueOf(expanded));
         save();
     }
 

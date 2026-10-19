@@ -2646,19 +2646,17 @@ public class BuildScape {
     public void onSculkBlockBreak(net.minecraftforge.event.world.BlockEvent.BreakEvent event) {
         if (event.getPlayer() != null && !event.getPlayer().isCreative()) {
             net.minecraft.world.level.block.state.BlockState state = event.getState();
-            int experience;
-            if (state.is(ModBlocks.SCULK.get()) || state.is(ModBlocks.SCULK_SLAB.get()) || state.is(ModBlocks.SCULK_STAIRS.get()) || state.is(ModBlocks.SCULK_WALL.get()) || state.is(ModBlocks.SCULK_VERTICAL_SLAB.get())) {
-                experience = 1;
-            } else if (state.is(ModBlocks.SCULK_VEIN.get())) {
-                experience = 0;
-            } else if (state.is(ModBlocks.SCULK_CATALYST.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get()) || state.is(ModBlocks.SCULK_SENSOR.get())) {
-                experience = 5;
-            } else {
+            net.minecraft.resources.ResourceLocation key = state.getBlock().getRegistryName();
+            if (key == null || !"buildscape".equals(key.getNamespace())) {
+                return;
+            }
+            int experience = com.kingodogo.buildscape.block.sculk.SculkBreakExperience.forBlock(key.getPath());
+            if (experience < 0) {
                 return;
             }
             net.minecraft.world.item.ItemStack tool = event.getPlayer().getMainHandItem();
             int silkTouch = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, tool);
-            event.setExpToDrop(silkTouch == 0 ? experience : 0);
+            event.setExpToDrop(com.kingodogo.buildscape.block.sculk.SculkBreakExperience.withTool(experience, silkTouch));
         }
     }
 

@@ -24,6 +24,11 @@ public class BuildscapeClientConfig {
     public static final String KEY_SIDE_PANEL_EXPANDED = "SidePanelExpanded";
     public static final String KEY_ANIMATION_SPEED = "AnimationSpeed";
     public static final String KEY_LAST_ACTIVE_TAB = "LastActiveTab";
+    public static final String KEY_MAX_CUSTOM_PRESETS = "MaxCustomPresets";
+    public static final String KEY_LAST_PRESET = "LastPreset";
+    public static final int DEFAULT_CUSTOM_PRESETS = 4;
+    public static final int MIN_CUSTOM_PRESETS = 1;
+    public static final int MAX_CUSTOM_PRESETS = 32;
 
     private static final LinkedHashMap<String, String> DEFAULTS = new LinkedHashMap<>();
     private static volatile BuildscapeClientConfig INSTANCE;
@@ -37,6 +42,8 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_MAX_PIPE_NETWORK_SIZE, "64");
         DEFAULTS.put(KEY_CAKE_STACKING, "true");
         DEFAULTS.put(KEY_WATER_BOTTLE_STACKING, "true");
+        DEFAULTS.put(KEY_MAX_CUSTOM_PRESETS, String.valueOf(DEFAULT_CUSTOM_PRESETS));
+
     }
 
     private final Map<String, String> values;
@@ -250,7 +257,8 @@ public class BuildscapeClientConfig {
             case KEY_PARALLEL_MODEL_LOADING, KEY_CACHE_MODEL_MATERIALS,
                     KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE -> "Performance";
             case KEY_HIDE_CONFIG_BUTTON, KEY_UI_THEME, KEY_UI_BACKGROUND,
-                    KEY_SIDE_PANEL_EXPANDED, KEY_ANIMATION_SPEED, KEY_LAST_ACTIVE_TAB -> "Interface";
+                    KEY_SIDE_PANEL_EXPANDED, KEY_ANIMATION_SPEED, KEY_LAST_ACTIVE_TAB,
+                    KEY_MAX_CUSTOM_PRESETS, KEY_LAST_PRESET -> "Interface";
             default -> "Other";
         };
     }
@@ -270,6 +278,8 @@ public class BuildscapeClientConfig {
             case KEY_SIDE_PANEL_EXPANDED -> "Whether the configuration screen side panel is expanded.";
             case KEY_ANIMATION_SPEED -> "UI animation speed index (0=normal, 1=fast, 2=instant).";
             case KEY_LAST_ACTIVE_TAB -> "Last selected tab index in the BuildScape configuration screen.";
+            case KEY_MAX_CUSTOM_PRESETS -> "Number of custom item presets that can be saved besides Default (1-32, default 4).";
+            case KEY_LAST_PRESET -> "Last applied item preset, shown as selected when the configuration screen opens.";
             default -> "Unrecognized setting retained with its original value.";
         };
     }
@@ -355,6 +365,27 @@ public class BuildscapeClientConfig {
 
     public void setAnimationSpeedIndex(int index) {
         values.put(KEY_ANIMATION_SPEED, String.valueOf(index));
+        save();
+    }
+
+    /** Custom preset slots besides Default; an unreadable or out-of-bounds value falls back to the nearest sane one. */
+    public int getMaxCustomPresets() {
+        return clampCustomPresets(getInt(KEY_MAX_CUSTOM_PRESETS, DEFAULT_CUSTOM_PRESETS));
+    }
+
+    public static int clampCustomPresets(int slots) {
+        return Math.max(MIN_CUSTOM_PRESETS, Math.min(MAX_CUSTOM_PRESETS, slots));
+    }
+
+    public String getLastPreset() {
+        String key = values.getOrDefault(KEY_LAST_PRESET, "default");
+        return key == null || key.isBlank() ? "default" : key;
+    }
+
+    public void setLastPreset(String key) {
+        String normalized = key == null || key.isBlank() ? "default" : key;
+        if (normalized.equals(getLastPreset())) return;
+        values.put(KEY_LAST_PRESET, normalized);
         save();
     }
 

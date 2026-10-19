@@ -416,6 +416,11 @@ public class BuildScapeConfigScreen extends Screen {
 
     // Preset, item, and tag state.
     private int selectedPresetIndex = 0;
+    // Edits wait here and go to the server together, three seconds after the last one or when the screen closes.
+    private final ConfigUploadBatch uploadBatch = new ConfigUploadBatch();
+    private final ParticleRange.Migration rangeMigration = new ParticleRange.Migration();
+    private String headerNotice = null;
+    private long headerNoticeUntil = 0L;
     private int itemsSubTab = 0; // 0 = Display Items, 1 = Display Tags
     private int itemFilterMode = 0; // 0=All Items, 1=Inventory, 2=Active
     private int tagFilterMode = 0; // 0=All Tags, 1=Inventory, 2=Active
@@ -933,6 +938,7 @@ public class BuildScapeConfigScreen extends Screen {
             applyTheme(ConfigThemes.getById(savedTheme));
             ConfigBackgrounds.setBackgroundById(cfg.getUiBackground());
             animSpeedIndex = Math.max(0, Math.min(ANIM_SPEEDS.length - 1, cfg.getAnimationSpeedIndex()));
+            this.selectedPresetIndex = presetIndexFor(PresetsConfig.get().getPresetKeys(), cfg.getLastPreset());
             int savedTab = cfg.getLastActiveTab();
             if (savedTab >= 0 && savedTab < 6) {
                 this.selectedTabIndex = savedTab;
@@ -1265,6 +1271,9 @@ public class BuildScapeConfigScreen extends Screen {
 
     @Override
     public void tick() {
+        if (uploadBatch.isDue(System.currentTimeMillis())) {
+            flushConfigUpload();
+        }
         if (availableItems.isEmpty() && itemsCached) {
             cacheAvailableItems();
             rebuildActiveItemsCache();
@@ -1582,16 +1591,78 @@ public class BuildScapeConfigScreen extends Screen {
         return batches;
     }
 
-    private void persistServerConfig(PillarParticleConfig config) {
+    /** Records an edit of one setting group; the upload follows {@link ConfigUploadBatch#DELAY_MS} after the last edit. */
+    private void queueConfigUpload(ConfigSetting setting) {
+        uploadBatch.edited(setting, System.currentTimeMillis());
+    }
+
+    /** Sends the queued edits now: the wait ran out, or the screen is closing. */
+    private void flushConfigUpload() {
+        if (!uploadBatch.hasPending()) return;
+        Set<ConfigSetting> changed = uploadBatch.take();
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.getConnection() == null) return;
+        persistServerConfig(PillarParticleConfig.get(), changed);
+    }
+
+    private void persistServerConfig(PillarParticleConfig config, Set<ConfigSetting> changed) {
         java.util.Set<ConfigSetting> settings =
                 java.util.EnumSet.noneOf(ConfigSetting.class);
-        for (ConfigSetting setting : ConfigSetting.uploadable()) {
-            if (hasEditAccess(setting.scope) && (setting.itemsFile ? config.canEditItems() : config.canEditProperties())) {
+        for (ConfigSetting setting : changed) {
+            if (setting.isUploaded() && hasEditAccess(setting.scope)
+                    && (setting.itemsFile ? config.canEditItems() : config.canEditProperties())) {
                 settings.add(setting);
             }
         }
+        if (settings.isEmpty()) return;
         for (UpdateConfigPacket chunk : UpdateConfigPacket.split(config, settings)) {
             ModMessages.INSTANCE.sendToServer(chunk);
+        }
+    }
+
+    private void showHeaderNotice(String text) {
+        headerNotice = text;
+        headerNoticeUntil = System.currentTimeMillis() + ParticleRange.MIGRATION_WINDOW_MS;
+    }
+
+    private void flashDenied() {
+        readOnlyDeniedAt = System.currentTimeMillis();
+        readOnlyDeniedX = rawMouseX;
+        readOnlyDeniedY = rawMouseY;
+    }
+
+    /**
+     * The counter's next value. A value outside the screen's range is left alone by everything else; the first
+     * click on it only says so, and the second sets it in range. Null means this click changed nothing.
+     */
+    private Double stepRangeValue(ParticleRange range, String scope, double current, int direction) {
+        switch (rangeMigration.click(range, scope, current, System.currentTimeMillis())) {
+            case WARN -> {
+                showHeaderNotice(range.warning(current));
+                flashDenied();
+                return null;
+            }
+            case COMMIT -> {
+                showHeaderNotice(range.migrated(current));
+                return range.nearestInRange(current);
+            }
+            default -> {
+                return adjustConfigValue(current, direction, range.step, range.decimals > 0 && Screen.hasControlDown(),
+                        range.min, range.max, range.decimals);
+            }
+        }
+    }
+
+    /** Index of the remembered preset in the drawer's list; Default (0) when it is gone or none was applied. */
+    static int presetIndexFor(List<String> keys, String remembered) {
+        int index = remembered == null ? -1 : keys.indexOf(remembered);
+        return Math.max(0, index);
+    }
+
+    private void rememberPreset(String key) {
+        try {
+            BuildscapeClientConfig.get().setLastPreset(key);
+        } catch (Exception ignored) {
         }
     }
 
@@ -2054,7 +2125,8 @@ public class BuildScapeConfigScreen extends Screen {
         PillarParticleConfig cfg = PillarParticleConfig.get();
         Set<String> invalidItems = "items".equals(current.id) ? cfg.getInvalidItems() : Collections.emptySet();
         drawText(poseStackOrGraphics, font, current.icon + "  " + current.title.toUpperCase(), x + 8, y + 6, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
-        if (invalidItems.isEmpty()) {
+        boolean noticeShown = headerNotice != null && System.currentTimeMillis() <= headerNoticeUntil;
+        if (invalidItems.isEmpty() && !noticeShown) {
             drawText(poseStackOrGraphics, font, current.subtitle, x + 8 + font.width(current.icon + "  " + current.title.toUpperCase()) + 10, y + 7, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
         }
         PillarParticleConfig.EditScope tabScope = settingForTab(current.id, false).scope;
@@ -2071,6 +2143,11 @@ public class BuildScapeConfigScreen extends Screen {
             drawBeveledButton(poseStackOrGraphics, badgeX, y + 4, badgeW, 14, limited ? COLOR_BTN_BG_ACTIVE : 0xFF351616, false, true, tabAlpha);
             drawCenteredText(poseStackOrGraphics, font, limited ? "LIMITED" : "READ ONLY", badgeX + badgeW / 2, y + 7,
                     applyAlpha(limited ? COLOR_ACCENT : 0xFFFF5A52, tabAlpha * pulse));
+        }
+        if (noticeShown) {
+            int invalidW = invalidItems.isEmpty() ? 0 : font.width(new TranslatableComponent("buildscape.config.invalid_items", invalidItems.size())) + 10;
+            int headerNoticeX = x + w - 7 - (restricted || limited ? 68 : 0) - invalidW - font.width(headerNotice);
+            drawText(poseStackOrGraphics, font, headerNotice, headerNoticeX, y + 7, applyAlpha(0xFFFFFF55, tabAlpha));
         }
         if (!invalidItems.isEmpty()) {
             Component notice = new TranslatableComponent("buildscape.config.invalid_items", invalidItems.size());
@@ -2459,31 +2536,31 @@ public class BuildScapeConfigScreen extends Screen {
         curY += h + gap;
 
         // 3. Pattern Speed
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Animation rotation and movement speed", String.format("%.2f", cfg.pattern_speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED, cfg.pattern_speed, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 4. Pattern Spread
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Particle spread radius", String.format("%.2f", cfg.pattern_spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD, cfg.pattern_spread, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 5. Pattern Intensity
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Particle spawn rate and density multiplier", String.format("%.1fx", cfg.pattern_intensity), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY, cfg.pattern_intensity, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 6. Basic Particle Speed
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Base vertical speed of particles", String.format("%.2f", cfg.particle_speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Base vertical speed of particles", ParticleRange.PARTICLE_SPEED, cfg.particle_speed, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 7. Basic Particle Spread
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Base spread distance of particles", String.format("%.2f", cfg.particle_spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Base spread distance of particles", ParticleRange.PARTICLE_SPREAD, cfg.particle_spread, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 8. Particle Lifetime
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Lifetime", "Particle duration in ticks before fading", cfg.particle_lifetime + " ticks", mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Lifetime", "Particle duration in ticks before fading", ParticleRange.PARTICLE_LIFETIME, cfg.particle_lifetime, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 9. Particle Density
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Density", "Particle count emitted per pillar", cfg.particle_density + "x", mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Density", "Particle count emitted per pillar", ParticleRange.PARTICLE_DENSITY, cfg.particle_density, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 10. Swatches & Active Colors
@@ -2831,17 +2908,17 @@ public class BuildScapeConfigScreen extends Screen {
 
         // Row 3: Pattern Speed Counter (fallback to global pattern_speed)
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Animation rotation and movement speed", String.format("%.2f", speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED, speed, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 4: Pattern Spread Counter (fallback to global pattern_spread)
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Particle spread radius", String.format("%.2f", spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD, spread, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 5: Pattern Intensity Counter (fallback to global pattern_intensity)
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Particle spawn rate and density multiplier", String.format("%.1fx", intensity), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY, intensity, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 6: Per-Pillar Color Palette (fallback to global particle_color & max_particle_color)
@@ -3496,17 +3573,17 @@ public class BuildScapeConfigScreen extends Screen {
 
         // Row 3: Speed Counter
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Speed", String.format("%.2f", speed), mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Speed", ParticleRange.PATTERN_SPEED, speed, mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 4: Spread Counter
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Spread", String.format("%.2f", spread), mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Spread", ParticleRange.PATTERN_SPREAD, spread, mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 5: Intensity Counter
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Intensity", String.format("%.1fx", intensity), mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Intensity", ParticleRange.PATTERN_INTENSITY, intensity, mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 6: Per-Pillar Colors Palette
@@ -3671,6 +3748,17 @@ public class BuildScapeConfigScreen extends Screen {
         boolean hover = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
         drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hover, false, alpha);
         drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(value, btnW - 4), btnX + btnW / 2, btnY + 4, applyAlpha(hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+    }
+
+    private void renderSideRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, ParticleRange range, double value, int mouseX, int mouseY, float alpha) {
+        renderSideRowCounter(poseStackOrGraphics, font, x, y, w, h, label, range.formatValue(value), mouseX, mouseY, alpha);
+        int counterX = x + w - 74 - 4;
+        int counterY = y + (h - 15) / 2;
+        if (mouseX >= counterX && mouseX <= counterX + 74 && mouseY >= counterY && mouseY <= counterY + 15) {
+            deferredTooltip = Collections.singletonList(ComponentHelper.literal(range.tooltip(value)));
+            deferredTooltipX = rawMouseX + 12;
+            deferredTooltipY = rawMouseY;
+        }
     }
 
     private void renderSideRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
@@ -4189,6 +4277,19 @@ public class BuildScapeConfigScreen extends Screen {
         drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(hoverPlus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
+    /** A particle counter: the value as stored, and its allowed range in the hover tooltip. */
+    private void renderConfigRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, ParticleRange range, double value, int mouseX, int mouseY, float alpha) {
+        renderConfigRowCounter(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, range.formatValue(value), mouseX, mouseY, alpha);
+        if (y < clipY || y + h > clipY + clipH) return;
+        int counterX = x + w - 86 - 8;
+        int counterY = y + (h - 16) / 2;
+        if (mouseX >= counterX && mouseX <= counterX + 86 && mouseY >= counterY && mouseY <= counterY + 16) {
+            deferredTooltip = Collections.singletonList(ComponentHelper.literal(range.tooltip(value)));
+            deferredTooltipX = rawMouseX + 12;
+            deferredTooltipY = rawMouseY;
+        }
+    }
+
     private void renderConfigRowButton(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String btnText, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
         hoverWorldOrPillarAccess(checkButtonClick(mouseX, mouseY, x, y, w, h, clipY, clipH, getConfigRowButtonWidth(font, btnText)), label);
@@ -4644,7 +4745,7 @@ public class BuildScapeConfigScreen extends Screen {
                                             cfg.items.add(idStr);
                                             cachedActiveItems.add(item);
                                         }
-                                        persistServerConfig(cfg);
+                                        queueConfigUpload(ConfigSetting.ITEMS);
                                         itemsListDirty = true;
                                     }
                                     return true;
@@ -4674,7 +4775,7 @@ public class BuildScapeConfigScreen extends Screen {
                                     cfg.items.add(tagId);
                                     cachedActiveTags.add(tagId);
                                 }
-                                persistServerConfig(cfg);
+                                queueConfigUpload(ConfigSetting.ITEMS);
                                 tagsListDirty = true;
                                 return true;
                             }
@@ -4710,7 +4811,7 @@ public class BuildScapeConfigScreen extends Screen {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     cfg.use_pattern = !cfg.use_pattern;
-                    persistServerConfig(cfg);
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4728,7 +4829,7 @@ public class BuildScapeConfigScreen extends Screen {
                         }
                     }
                     cfg.pattern = GLOBAL_PARTICLE_PATTERNS[(pIndex + patStep + GLOBAL_PARTICLE_PATTERNS.length) % GLOBAL_PARTICLE_PATTERNS.length];
-                    persistServerConfig(cfg);
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4738,8 +4839,10 @@ public class BuildScapeConfigScreen extends Screen {
                 if (pSpeedStep != 0) {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
-                    cfg.pattern_speed = adjustConfigValue(cfg.pattern_speed, pSpeedStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
-                    persistServerConfig(cfg);
+                    Double next = stepRangeValue(ParticleRange.PATTERN_SPEED, "global", cfg.pattern_speed, pSpeedStep);
+                    if (next == null) return true;
+                    cfg.pattern_speed = next;
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4749,8 +4852,10 @@ public class BuildScapeConfigScreen extends Screen {
                 if (pSpreadStep != 0) {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
-                    cfg.pattern_spread = adjustConfigValue(cfg.pattern_spread, pSpreadStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
-                    persistServerConfig(cfg);
+                    Double next = stepRangeValue(ParticleRange.PATTERN_SPREAD, "global", cfg.pattern_spread, pSpreadStep);
+                    if (next == null) return true;
+                    cfg.pattern_spread = next;
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4760,8 +4865,10 @@ public class BuildScapeConfigScreen extends Screen {
                 if (pIntStep != 0) {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
-                    cfg.pattern_intensity = adjustConfigValue(cfg.pattern_intensity, pIntStep, 0.1D, Screen.hasControlDown(), 0.1D, 5.0D, 1);
-                    persistServerConfig(cfg);
+                    Double next = stepRangeValue(ParticleRange.PATTERN_INTENSITY, "global", cfg.pattern_intensity, pIntStep);
+                    if (next == null) return true;
+                    cfg.pattern_intensity = next;
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4771,8 +4878,10 @@ public class BuildScapeConfigScreen extends Screen {
                 if (speedStep != 0) {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
-                    cfg.particle_speed = adjustConfigValue(cfg.particle_speed, speedStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
-                    persistServerConfig(cfg);
+                    Double next = stepRangeValue(ParticleRange.PARTICLE_SPEED, "global", cfg.particle_speed, speedStep);
+                    if (next == null) return true;
+                    cfg.particle_speed = next;
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4782,8 +4891,10 @@ public class BuildScapeConfigScreen extends Screen {
                 if (spreadStep != 0) {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
-                    cfg.particle_spread = adjustConfigValue(cfg.particle_spread, spreadStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
-                    persistServerConfig(cfg);
+                    Double next = stepRangeValue(ParticleRange.PARTICLE_SPREAD, "global", cfg.particle_spread, spreadStep);
+                    if (next == null) return true;
+                    cfg.particle_spread = next;
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4793,8 +4904,10 @@ public class BuildScapeConfigScreen extends Screen {
                 if (lifeStep != 0) {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
-                    cfg.particle_lifetime = Math.max(5, Math.min(120, cfg.particle_lifetime + lifeStep * 5));
-                    persistServerConfig(cfg);
+                    Double next = stepRangeValue(ParticleRange.PARTICLE_LIFETIME, "global", cfg.particle_lifetime, lifeStep);
+                    if (next == null) return true;
+                    cfg.particle_lifetime = (int) Math.round(next);
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4804,8 +4917,10 @@ public class BuildScapeConfigScreen extends Screen {
                 if (denStep != 0) {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
-                    cfg.particle_density = Math.max(1, Math.min(16, cfg.particle_density + denStep));
-                    persistServerConfig(cfg);
+                    Double next = stepRangeValue(ParticleRange.PARTICLE_DENSITY, "global", cfg.particle_density, denStep);
+                    if (next == null) return true;
+                    cfg.particle_density = (int) Math.round(next);
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4831,13 +4946,13 @@ public class BuildScapeConfigScreen extends Screen {
                             if (!requireConfigModificationAccess(ConfigSetting.COLORS)) return true;
                             if (!requireConfigFilesEditable(false, true, false)) return true;
                             cfg.max_particle_color = Math.max(1, cfg.max_particle_color - 1);
-                            persistServerConfig(cfg);
+                            queueConfigUpload(ConfigSetting.COLORS);
                             return true;
                         } else if (mouseX >= counterX + counterW - stepBtnW && mouseX <= counterX + counterW) {
                             if (!requireConfigModificationAccess(ConfigSetting.COLORS)) return true;
                             if (!requireConfigFilesEditable(false, true, false)) return true;
                             cfg.max_particle_color = Math.min(7, cfg.max_particle_color + 1);
-                            persistServerConfig(cfg);
+                            queueConfigUpload(ConfigSetting.COLORS);
                             return true;
                         }
                     }
@@ -4878,7 +4993,7 @@ public class BuildScapeConfigScreen extends Screen {
                     if (!requireConfigModificationAccess(ConfigSetting.PARTICLES)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     resetParticleProperties(cfg);
-                    persistServerConfig(cfg);
+                    queueConfigUpload(ConfigSetting.PARTICLES);
                     return true;
                 }
                 curY += h + gap;
@@ -4888,7 +5003,7 @@ public class BuildScapeConfigScreen extends Screen {
                     if (!requireConfigModificationAccess(ConfigSetting.COLORS)) return true;
                     if (!requireConfigFilesEditable(false, true, false)) return true;
                     resetParticleColors(cfg);
-                    persistServerConfig(cfg);
+                    queueConfigUpload(ConfigSetting.COLORS);
                     return true;
                 }
             }
@@ -5043,7 +5158,7 @@ public class BuildScapeConfigScreen extends Screen {
                     PillarParticleConfig.EditPermissionMode[] modes = PillarParticleConfig.EditPermissionMode.values();
                     int next = Math.floorMod(cfg.edit_permission_mode.ordinal() + permissionStep, modes.length);
                     cfg.edit_permission_mode = modes[next];
-                    persistServerConfig(cfg);
+                    queueConfigUpload(ConfigSetting.POLICY);
                     return true;
                 }
             }
@@ -5331,7 +5446,9 @@ public class BuildScapeConfigScreen extends Screen {
         int speedStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (speedStep != 0) {
             double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-            data.pattern_speed = adjustConfigValue(cur, speedStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
+            Double next = stepRangeValue(ParticleRange.PATTERN_SPEED, data.id, cur, speedStep);
+            if (next == null) return true;
+            data.pattern_speed = next;
             PillarIdManager.getClient().updatePillarData(data);
             ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5342,7 +5459,9 @@ public class BuildScapeConfigScreen extends Screen {
         int spreadStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (spreadStep != 0) {
             double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-            data.pattern_spread = adjustConfigValue(cur, spreadStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
+            Double next = stepRangeValue(ParticleRange.PATTERN_SPREAD, data.id, cur, spreadStep);
+            if (next == null) return true;
+            data.pattern_spread = next;
             PillarIdManager.getClient().updatePillarData(data);
             ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5353,7 +5472,9 @@ public class BuildScapeConfigScreen extends Screen {
         int intStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (intStep != 0) {
             double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-            data.pattern_intensity = adjustConfigValue(cur, intStep, 0.1D, Screen.hasControlDown(), 0.1D, 5.0D, 1);
+            Double next = stepRangeValue(ParticleRange.PATTERN_INTENSITY, data.id, cur, intStep);
+            if (next == null) return true;
+            data.pattern_intensity = next;
             PillarIdManager.getClient().updatePillarData(data);
             ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5521,7 +5642,7 @@ public class BuildScapeConfigScreen extends Screen {
                 } else {
                     cfg.particle_color.add(hexString);
                 }
-                persistServerConfig(cfg);
+                queueConfigUpload(ConfigSetting.COLORS);
             }
 
             showColorModal = false;
@@ -5648,7 +5769,8 @@ public class BuildScapeConfigScreen extends Screen {
             if (!keys.isEmpty() && selectedPresetIndex < keys.size()) {
                 presetsCfg.applyPreset(keys.get(selectedPresetIndex));
                 if (showPresetReadOnlyFailure(presetsCfg)) return true;
-                persistServerConfig(PillarParticleConfig.get());
+                rememberPreset(keys.get(selectedPresetIndex));
+                queueConfigUpload(ConfigSetting.ITEMS);
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
             }
@@ -5686,7 +5808,8 @@ public class BuildScapeConfigScreen extends Screen {
                 selectedPresetIndex = 0;
                 presetsCfg.applyPreset("default");
                 if (showPresetReadOnlyFailure(presetsCfg)) return true;
-                persistServerConfig(PillarParticleConfig.get());
+                rememberPreset("default");
+                queueConfigUpload(ConfigSetting.ITEMS);
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
                 return true;
@@ -5721,7 +5844,8 @@ public class BuildScapeConfigScreen extends Screen {
             if (!requireConfigFilesEditable(true, false, true)) return true;
             presetsCfg.applyPreset("default");
             if (showPresetReadOnlyFailure(presetsCfg)) return true;
-            persistServerConfig(PillarParticleConfig.get());
+            rememberPreset("default");
+            queueConfigUpload(ConfigSetting.ITEMS);
             selectedPresetIndex = 0;
             rebuildActiveItemsCache();
             itemsListDirty = true;
@@ -5737,8 +5861,14 @@ public class BuildScapeConfigScreen extends Screen {
         String newKey = presetsCfg.generatePresetKey();
         boolean saved = presetsCfg.savePreset(newKey, normalizePresetName(presetNameInput), new HashSet<>(cfg.items));
         if (showPresetReadOnlyFailure(presetsCfg)) return;
+        if (!saved && "limit".equals(presetsCfg.getLastEditFailure())) {
+            flashDenied();
+            showHeaderNotice(new TranslatableComponent("buildscape.config.preset.error.limit").getString());
+            return;
+        }
         if (saved) {
             selectedPresetIndex = presetsCfg.getPresets().size() - 1;
+            rememberPreset(newKey);
             presetNameInput = "";
             presetNameFocused = false;
             presetNameSelected = false;
@@ -5795,7 +5925,9 @@ public class BuildScapeConfigScreen extends Screen {
         if (speedStep != 0) {
             if (!requireConfigModificationAccess()) return true;
             double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-            data.pattern_speed = adjustConfigValue(cur, speedStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
+            Double next = stepRangeValue(ParticleRange.PATTERN_SPEED, data.id, cur, speedStep);
+            if (next == null) return true;
+            data.pattern_speed = next;
             PillarIdManager.getClient().updatePillarData(data);
             ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5807,7 +5939,9 @@ public class BuildScapeConfigScreen extends Screen {
         if (spreadStep != 0) {
             if (!requireConfigModificationAccess()) return true;
             double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-            data.pattern_spread = adjustConfigValue(cur, spreadStep, 0.01D, Screen.hasControlDown(), 0.01D, 0.50D, 2);
+            Double next = stepRangeValue(ParticleRange.PATTERN_SPREAD, data.id, cur, spreadStep);
+            if (next == null) return true;
+            data.pattern_spread = next;
             PillarIdManager.getClient().updatePillarData(data);
             ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5819,7 +5953,9 @@ public class BuildScapeConfigScreen extends Screen {
         if (intStep != 0) {
             if (!requireConfigModificationAccess()) return true;
             double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-            data.pattern_intensity = adjustConfigValue(cur, intStep, 0.1D, Screen.hasControlDown(), 0.1D, 5.0D, 1);
+            Double next = stepRangeValue(ParticleRange.PATTERN_INTENSITY, data.id, cur, intStep);
+            if (next == null) return true;
+            data.pattern_intensity = next;
             PillarIdManager.getClient().updatePillarData(data);
             ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -6005,7 +6141,7 @@ public class BuildScapeConfigScreen extends Screen {
                 } else {
                     cfg.particle_color.add(hexString);
                 }
-                persistServerConfig(cfg);
+                queueConfigUpload(ConfigSetting.COLORS);
             }
 
             if (returnSidePanelType == SidePanelType.PILLAR_DETAIL) {
@@ -6421,6 +6557,12 @@ public class BuildScapeConfigScreen extends Screen {
         String state = presetNameFocused ? ". Editing preset name"
                 : focusedSearchField != 0 ? ". Editing search" : ". Use left and right arrows or Tab to change tabs";
         return ComponentHelper.literal("Buildscape Configuration. " + tab + state);
+    }
+
+    @Override
+    public void removed() {
+        flushConfigUpload();
+        super.removed();
     }
 
     @Override

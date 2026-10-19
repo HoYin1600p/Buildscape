@@ -45,7 +45,8 @@ public class PresetsConfig {
     private String lastEditFailure = "";
     private String lastAppliedPreset = "default";
     private static final String UNNAMED_PRESET_KEY = "_unnamed";
-    public static final int MAX_PRESETS = 5;
+    /** Custom preset slots besides Default; null reads the buildscape.cfg setting. */
+    private transient Integer customSlotsOverride;
 
     public void load() {
         File file = getPresetsFile();
@@ -109,6 +110,28 @@ public class PresetsConfig {
         if (lastAppliedPreset == null || lastAppliedPreset.isEmpty()) {
             lastAppliedPreset = "default";
         }
+    }
+
+    /** Number of custom presets that may exist besides Default (MaxCustomPresets in buildscape.cfg, default 4). */
+    public int getCustomSlots() {
+        if (customSlotsOverride != null) return customSlotsOverride;
+        try {
+            return BuildscapeClientConfig.get().getMaxCustomPresets();
+        } catch (Throwable e) {
+            return BuildscapeClientConfig.DEFAULT_CUSTOM_PRESETS;
+        }
+    }
+
+    void setCustomSlots(int slots) {
+        customSlotsOverride = BuildscapeClientConfig.clampCustomPresets(slots);
+    }
+
+    public int getCustomPresetCount() {
+        int count = 0;
+        for (String k : getPresetKeys()) {
+            if (!k.equals("default") && !k.equals(UNNAMED_PRESET_KEY)) count++;
+        }
+        return count;
     }
 
     private File getPresetsFile() {
@@ -274,14 +297,7 @@ public class PresetsConfig {
             return false;
         }
 
-        int customPresetCount = 0;
-        for (String k : getPresetKeys()) {
-            if (!k.equals("default") && !k.equals(UNNAMED_PRESET_KEY)) {
-                customPresetCount++;
-            }
-        }
-
-        if (!presets.containsKey(key) && !preservedPresets.containsKey(key) && customPresetCount >= MAX_PRESETS - 1) {
+        if (!presets.containsKey(key) && !preservedPresets.containsKey(key) && getCustomPresetCount() >= getCustomSlots()) {
             lastEditFailure = "limit";
             return false;
         }

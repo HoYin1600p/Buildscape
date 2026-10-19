@@ -44,7 +44,9 @@ public class ConfigReadOnlyRegressionTest {
                 assertArrayEquals(bytes, Arrays.copyOf(completed, bytes.length));
                 assertEquals(original + (trailingNewline ? "" : newline)
                         + "# Maximum number of pipes in one network." + newline
-                        + "MaxPipeNetworkSize = 64" + newline, ConfigLayoutIO.readText(file));
+                        + "MaxPipeNetworkSize = 64" + newline
+                        + "# Number of custom item presets that can be saved besides Default (1-32, default 4)." + newline
+                        + "MaxCustomPresets = 4" + newline, ConfigLayoutIO.readText(file));
                 assertEquals(64, config.getMaxPipeNetworkSize());
                 assertFalse(config.isCakeStackingEnabled());
                 assertFalse(config.isWaterBottleStackingEnabled());

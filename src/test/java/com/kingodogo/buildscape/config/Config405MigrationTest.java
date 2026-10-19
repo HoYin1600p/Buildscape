@@ -27,6 +27,13 @@ public class Config405MigrationTest {
         RecipeCacheRegressionTest.bootstrap();
     }
 
+    /** A 4.0.5 client config gains the settings added since: just the preset slot count so far. */
+    private static java.util.Map<String, String> withNewDefaults(java.util.Map<String, String> entries) {
+        java.util.Map<String, String> expected = new java.util.LinkedHashMap<>(entries);
+        expected.putIfAbsent("MaxCustomPresets", "4");
+        return expected;
+    }
+
     private static String fixture(String name) throws Exception {
         try (InputStream input = Config405MigrationTest.class.getResourceAsStream("/config405/" + name)) {
             assertNotNull(name, input);
@@ -136,10 +143,11 @@ public class Config405MigrationTest {
         String original = fixture("old-buildscape.cfg");
         Files.writeString(file, original);
         BuildscapeClientConfig config = new BuildscapeClientConfig(root);
-        assertEquals(original, ConfigLayoutIO.readText(file));
+        assertTrue(ConfigLayoutIO.readText(file).startsWith(original));
+        assertEquals(withNewDefaults(ConfigLayoutIO.readEntries(original)), ConfigLayoutIO.readEntries(ConfigLayoutIO.readText(file)));
         config.save();
         String saved = ConfigLayoutIO.readText(file);
-        assertEquals(ConfigLayoutIO.readEntries(original), ConfigLayoutIO.readEntries(saved));
+        assertEquals(withNewDefaults(ConfigLayoutIO.readEntries(original)), ConfigLayoutIO.readEntries(saved));
         assertTrue(saved.contains("# Edit this file to customise BuildScape behaviour."));
         config.save();
         assertEquals(saved, ConfigLayoutIO.readText(file));
@@ -155,7 +163,7 @@ public class Config405MigrationTest {
         Files.write(legacy, original);
         new BuildscapeClientConfig(root);
         String saved = ConfigLayoutIO.readText(file);
-        assertEquals(ConfigLayoutIO.readEntries(new String(original, Charset.defaultCharset())),
+        assertEquals(withNewDefaults(ConfigLayoutIO.readEntries(new String(original, Charset.defaultCharset()))),
                 ConfigLayoutIO.readEntries(saved));
         assertTrue(saved.contains("# --- Gameplay ---"));
         assertTrue(saved.contains("# --- Performance ---"));
@@ -191,7 +199,7 @@ public class Config405MigrationTest {
         BuildscapeClientConfig config = new BuildscapeClientConfig(root);
         Path file = root.resolve("buildscape/buildscape.cfg");
         String saved = ConfigLayoutIO.readText(file);
-        assertEquals(ConfigLayoutIO.readEntries(original), ConfigLayoutIO.readEntries(saved));
+        assertEquals(withNewDefaults(ConfigLayoutIO.readEntries(original)), ConfigLayoutIO.readEntries(saved));
         for (String key : ConfigLayoutIO.readEntries(original).keySet()) {
             int comment = saved.indexOf("# note for " + key + "\n");
             assertTrue(key, comment >= 0);

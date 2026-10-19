@@ -1124,18 +1124,32 @@ public class PillarParticleConfig {
     }
 
     private static List<String> itemsForSave(JsonObject original, Collection<String> updated) {
-        List<String> values = new ArrayList<>(updated);
-        Set<String> retained = new HashSet<>();
+        List<String> existing = new ArrayList<>();
         if (original != null) {
-            for (JsonElement entry : original.getAsJsonArray("items")) {
-                String item = entry.getAsString();
-                if (!isValidItemId(item)) {
-                    if (retained.add(item)) values.remove(item);
-                    values.add(item);
-                }
-            }
+            for (JsonElement entry : original.getAsJsonArray("items")) existing.add(entry.getAsString());
         }
-        values.sort(String::compareTo);
+        return orderedItemsForSave(existing, updated);
+    }
+
+    /**
+     * The list to write: entries already in the file keep their position (and any duplicates, and invalid
+     * tokens, are left as they are); removed entries disappear; entries new to the file are appended at the
+     * end, sorted among themselves so one batch of additions is written the same way every time.
+     */
+    static List<String> orderedItemsForSave(List<String> existing, Collection<String> updated) {
+        Set<String> wanted = new HashSet<>(updated);
+        List<String> values = new ArrayList<>();
+        Set<String> present = new HashSet<>();
+        for (String item : existing) {
+            present.add(item);
+            if (wanted.contains(item) || !isValidItemId(item)) values.add(item);
+        }
+        List<String> added = new ArrayList<>();
+        for (String item : wanted) {
+            if (!present.contains(item)) added.add(item);
+        }
+        added.sort(String::compareTo);
+        values.addAll(added);
         return values;
     }
 

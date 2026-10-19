@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.ChatFormatting;
@@ -281,11 +282,11 @@ public class UpdateConfigPacket {
                 boolean isPatternChanged = !serverConfig.pattern.equals(oldPattern);
 
                 for (PillarIdManager.PillarData pData : manager.getAllData()) {
-                    boolean hasPatternOverride = pData.pattern != null && !pData.pattern.equals("default");
+                    boolean hasPatternOverride = pData.pattern != null && !pData.pattern.equals(ParticlePatterns.DEFAULT);
                     boolean isCustomized = pData.hasColors() || hasPatternOverride;
 
                     if (isCustomized) {
-                        if (isPatternChanged && (pData.pattern == null || pData.pattern.equals("default"))) {
+                        if (isPatternChanged && (pData.pattern == null || pData.pattern.equals(ParticlePatterns.DEFAULT))) {
                             pData.pattern = oldPattern;
                             updatedAny = true;
                         }

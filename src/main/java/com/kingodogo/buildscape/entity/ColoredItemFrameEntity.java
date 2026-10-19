@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -81,7 +82,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
         this.getEntityData().define(DATA_ITEM, ItemStack.EMPTY);
         this.getEntityData().define(DATA_ROTATION, 0);
         this.getEntityData().define(DATA_COLOR, "white");
-        this.getEntityData().define(DATA_PARTICLE_PATTERN, "none");
+        this.getEntityData().define(DATA_PARTICLE_PATTERN, ParticlePatterns.NONE);
         this.getEntityData().define(DATA_PARTICLE_COLORS, "");
     }
 
@@ -159,7 +160,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
     }
 
     public void setParticlePattern(String pattern) {
-        this.getEntityData().set(DATA_PARTICLE_PATTERN, (pattern == null || pattern.isEmpty()) ? "none" : pattern);
+        this.getEntityData().set(DATA_PARTICLE_PATTERN, (pattern == null || pattern.isEmpty()) ? ParticlePatterns.NONE : pattern);
     }
 
     public String getParticleColorsRaw() {

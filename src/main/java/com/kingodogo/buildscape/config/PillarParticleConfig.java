@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.network.SyncConfigPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
@@ -226,7 +227,7 @@ public class PillarParticleConfig {
     public int particle_density = 2;
 
     public boolean use_pattern = true;
-    public String pattern = "ring";
+    public String pattern = ParticlePatterns.RING;
 
     public double pattern_speed = 0.05;
     public double pattern_spread = 0.05;
@@ -338,7 +339,7 @@ public class PillarParticleConfig {
         SERVER_CONFIG.use_pattern = packet.use_pattern;
         SERVER_CONFIG.pattern = packet.pattern != null && !packet.pattern.isEmpty()
                 ? packet.pattern
-                : "ring";
+                : ParticlePatterns.RING;
         SERVER_CONFIG.pattern_speed = packet.pattern_speed > 0
                 ? packet.pattern_speed
                 : 0.05;
@@ -656,7 +657,7 @@ public class PillarParticleConfig {
                             ? Math.max(0, loaded.particle_density)
                             : this.particle_density;
                     this.use_pattern = loaded.use_pattern;
-                    this.pattern = loaded.pattern != null ? loaded.pattern : "ring";
+                    this.pattern = loaded.pattern != null ? loaded.pattern : ParticlePatterns.RING;
                     this.pattern_speed = loaded.pattern_speed > 0
                             ? loaded.pattern_speed
                             : this.pattern_speed;

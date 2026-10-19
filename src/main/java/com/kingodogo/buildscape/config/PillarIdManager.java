@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.io.AtomicFiles;
 import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
@@ -549,10 +550,10 @@ public class PillarIdManager {
         }
 
         if (data.addColor(colorCode)) {
-            if (data.pattern == null || data.pattern.equals("default")) {
+            if (data.pattern == null || data.pattern.equals(ParticlePatterns.DEFAULT)) {
                 data.pattern = PillarParticleConfig.get().pattern;
                 if (data.pattern == null || data.pattern.isEmpty()) {
-                    data.pattern = "ring";
+                    data.pattern = ParticlePatterns.RING;
                 }
             }
             requestSave();
@@ -2171,7 +2172,7 @@ public class PillarIdManager {
 
     private static boolean hasFrameParticleData(String pattern, List<String> colors) {
         return (colors != null && !colors.isEmpty()) || (pattern != null && !pattern.isEmpty()
-                && !"none".equals(pattern) && !"__not_set__".equals(pattern));
+                && !ParticlePatterns.NONE.equals(pattern) && !ParticlePatterns.NOT_SET.equals(pattern));
     }
 
     private void deduplicateFramePositions() {
@@ -2339,7 +2340,7 @@ public class PillarIdManager {
 
     private static void clearColoredFrameData(Entity frame) {
         if (frame instanceof ColoredItemFrameEntity coloredFrame) {
-            coloredFrame.setParticlePattern("none");
+            coloredFrame.setParticlePattern(ParticlePatterns.NONE);
             coloredFrame.setParticleColorsRaw("");
         }
     }
@@ -2398,7 +2399,7 @@ public class PillarIdManager {
     }
 
     private static String framePattern(String pattern) {
-        return pattern == null || pattern.isEmpty() ? "none" : pattern;
+        return pattern == null || pattern.isEmpty() ? ParticlePatterns.NONE : pattern;
     }
 
     /** Puts a frame's pattern and colours into its entity data, replacing the previous values. */

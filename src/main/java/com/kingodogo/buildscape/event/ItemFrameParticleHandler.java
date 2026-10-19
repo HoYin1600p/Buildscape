@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleParticle;
@@ -75,17 +76,17 @@ public class ItemFrameParticleHandler {
     private static final Map<Integer, String> CLIENT_FRAME_ID_CACHE =
             new ConcurrentHashMap<>();
 
-    private static final String PATTERN_NOT_SET = "__not_set__";
+    private static final String PATTERN_NOT_SET = ParticlePatterns.NOT_SET;
     private static final String[] PATTERNS = {
-            "none",
-            "default",
-            "beam",
-            "spiral",
-            "fountain",
-            "pulse",
-            "ring",
-            "burst",
-            "snowflake",
+            ParticlePatterns.NONE,
+            ParticlePatterns.DEFAULT,
+            ParticlePatterns.BEAM,
+            ParticlePatterns.SPIRAL,
+            ParticlePatterns.FOUNTAIN,
+            ParticlePatterns.PULSE,
+            ParticlePatterns.RING,
+            ParticlePatterns.BURST,
+            ParticlePatterns.SNOWFLAKE,
     };
 
     public static final int MAX_DYE_COLORS = 5;
@@ -366,11 +367,11 @@ public class ItemFrameParticleHandler {
         if (data != null && data.pattern != null) {
             pattern = data.pattern;
         }
-        if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
+        if (pattern == null || pattern.isEmpty() || ParticlePatterns.DEFAULT.equals(pattern)) {
             pattern = cfg.pattern;
         }
-        if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
-            pattern = "none";
+        if (pattern == null || pattern.isEmpty() || ParticlePatterns.DEFAULT.equals(pattern)) {
+            pattern = ParticlePatterns.NONE;
         }
         boolean usePattern = data != null && data.use_pattern != null ? data.use_pattern : cfg.use_pattern;
         double intensity = data != null && data.pattern_intensity != null ? data.pattern_intensity : cfg.pattern_intensity;
@@ -379,7 +380,7 @@ public class ItemFrameParticleHandler {
         int maxColors = data != null && data.max_particle_color != null ? data.max_particle_color : cfg.max_particle_color;
         int count = cfg.particle_density <= 0 ? 0 : (int) Math.min(64L,
                 Math.max(0L, Math.round(cfg.particle_density * (usePattern ? intensity : 1.0))));
-        if ("none".equals(pattern) || PATTERN_NOT_SET.equals(pattern)) {
+        if (ParticlePatterns.NONE.equals(pattern) || PATTERN_NOT_SET.equals(pattern)) {
             count = 0;
         }
         return new FrameSettings(usePattern ? pattern : "random", count,
@@ -431,7 +432,7 @@ public class ItemFrameParticleHandler {
             double u, v, w, vu, vv, vw;
 
             switch (pattern) {
-                case "beam":
+                case ParticlePatterns.BEAM:
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 0.0;
@@ -439,7 +440,7 @@ public class ItemFrameParticleHandler {
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = speed * (0.8 + rand.nextDouble() * 0.4);
                     break;
-                case "spiral":
+                case ParticlePatterns.SPIRAL:
                     double angle =
                             (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
@@ -450,7 +451,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(angle) * speed * 0.3;
                     vw = speed * 0.6;
                     break;
-                case "fountain":
+                case ParticlePatterns.FOUNTAIN:
                     double fAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double fRadius = rand.nextDouble() * spread;
                     u = Math.cos(fAngle) * fRadius;
@@ -460,7 +461,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(fAngle) * speed * 0.5;
                     vw = speed * 0.3 - rand.nextDouble() * speed * 0.2;
                     break;
-                case "pulse":
+                case ParticlePatterns.PULSE:
                     double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
                     double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
                     double pAngle = rand.nextDouble() * 2.0 * Math.PI;
@@ -471,7 +472,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
                     vw = speed * 0.2;
                     break;
-                case "ring":
+                case ParticlePatterns.RING:
                     double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
                     double rRadius = spread * 0.8;
                     u = Math.cos(rAngle) * rRadius;
@@ -481,7 +482,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
                     vw = speed * 0.3;
                     break;
-                case "burst":
+                case ParticlePatterns.BURST:
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.7;
                     u = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.6;
@@ -491,7 +492,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(bAngle) * Math.cos(bElevation) * speed * 1.5;
                     vw = Math.sin(bElevation) * speed * 1.5;
                     break;
-                case "snowflake":
+                case ParticlePatterns.SNOWFLAKE:
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 2.0;
@@ -521,7 +522,7 @@ public class ItemFrameParticleHandler {
             double particleY = centerY + sy;
             double particleZ = centerZ + sz;
 
-            boolean isSnowflake = "snowflake".equals(pattern);
+            boolean isSnowflake = ParticlePatterns.SNOWFLAKE.equals(pattern);
             SimpleParticleType particleType = isSnowflake
                     ? ModParticles.SNOWFLAKE_STILL.get()
                     : ModParticles.GLOW_LIME_SPARKLE.get();
@@ -675,15 +676,15 @@ public class ItemFrameParticleHandler {
                 }
             }
 
-            return "none";
+            return ParticlePatterns.NONE;
         }
 
         CompoundTag data = itemFrame.getPersistentData();
         if (data.contains(PARTICLE_PATTERN_KEY)) {
             String p = data.getString(PARTICLE_PATTERN_KEY);
-            return (p == null || p.isEmpty()) ? "none" : p;
+            return (p == null || p.isEmpty()) ? ParticlePatterns.NONE : p;
         }
-        return "none";
+        return ParticlePatterns.NONE;
     }
 
     public static void setParticlePattern(ItemFrame itemFrame, String pattern) {
@@ -707,7 +708,7 @@ public class ItemFrameParticleHandler {
 
     private static String cyclePattern(String current) {
         if (current.equals(PATTERN_NOT_SET)) {
-            return "none";
+            return ParticlePatterns.NONE;
         }
 
         int currentIndex = -1;
@@ -731,23 +732,23 @@ public class ItemFrameParticleHandler {
         }
 
         switch (pattern) {
-            case "none":
+            case ParticlePatterns.NONE:
                 return ChatFormatting.DARK_GRAY;
-            case "default":
+            case ParticlePatterns.DEFAULT:
                 return ChatFormatting.WHITE;
-            case "beam":
+            case ParticlePatterns.BEAM:
                 return ChatFormatting.AQUA;
-            case "spiral":
+            case ParticlePatterns.SPIRAL:
                 return ChatFormatting.LIGHT_PURPLE;
-            case "fountain":
+            case ParticlePatterns.FOUNTAIN:
                 return ChatFormatting.BLUE;
-            case "pulse":
+            case ParticlePatterns.PULSE:
                 return ChatFormatting.RED;
-            case "ring":
+            case ParticlePatterns.RING:
                 return ChatFormatting.GOLD;
-            case "burst":
+            case ParticlePatterns.BURST:
                 return ChatFormatting.YELLOW;
-            case "snowflake":
+            case ParticlePatterns.SNOWFLAKE:
                 return ChatFormatting.AQUA;
             default:
                 return ChatFormatting.GRAY;
@@ -997,7 +998,7 @@ public class ItemFrameParticleHandler {
                 return cached;
             }
             String pattern = frame.getParticlePattern();
-            if (pattern != null && !pattern.isEmpty() && !"none".equals(pattern)) {
+            if (pattern != null && !pattern.isEmpty() && !ParticlePatterns.NONE.equals(pattern)) {
                 CLIENT_PATTERN_CACHE.put(frame.getId(), pattern);
                 return pattern;
             }
@@ -1007,25 +1008,25 @@ public class ItemFrameParticleHandler {
                 PillarIdManager.PillarData managerData =
                         PillarIdManager.get(frame.level).getPillarData(frameId);
                 if (managerData != null) {
-                    pattern = (managerData.pattern == null || managerData.pattern.isEmpty()) ? "none" : managerData.pattern;
+                    pattern = (managerData.pattern == null || managerData.pattern.isEmpty()) ? ParticlePatterns.NONE : managerData.pattern;
                     CLIENT_PATTERN_CACHE.put(frame.getId(), pattern);
                     return pattern;
                 }
             }
 
-            return "none";
+            return ParticlePatterns.NONE;
         }
 
         CompoundTag data = frame.getPersistentData();
         if (data.contains(PARTICLE_PATTERN_KEY)) {
             String p = data.getString(PARTICLE_PATTERN_KEY);
-            return (p == null || p.isEmpty()) ? "none" : p;
+            return (p == null || p.isEmpty()) ? ParticlePatterns.NONE : p;
         }
         if (data.contains("PATTERN", 8)) {
             String p = data.getString("PATTERN");
-            return (p == null || p.isEmpty()) ? "none" : p;
+            return (p == null || p.isEmpty()) ? ParticlePatterns.NONE : p;
         }
-        return "none";
+        return ParticlePatterns.NONE;
     }
 
     public static void setParticlePatternColored(
@@ -1242,7 +1243,7 @@ public class ItemFrameParticleHandler {
             double u, v, w, vu, vv, vw;
 
             switch (pattern) {
-                case "beam":
+                case ParticlePatterns.BEAM:
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 0.0;
@@ -1250,7 +1251,7 @@ public class ItemFrameParticleHandler {
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = speed * (0.8 + rand.nextDouble() * 0.4);
                     break;
-                case "spiral":
+                case ParticlePatterns.SPIRAL:
                     double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
                     u = Math.cos(angle) * radius;
@@ -1260,7 +1261,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(angle) * speed * 0.3;
                     vw = speed * 0.6;
                     break;
-                case "fountain":
+                case ParticlePatterns.FOUNTAIN:
                     double fAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double fRadius = rand.nextDouble() * spread;
                     u = Math.cos(fAngle) * fRadius;
@@ -1270,7 +1271,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(fAngle) * speed * 0.5;
                     vw = speed * 0.3 - rand.nextDouble() * speed * 0.2;
                     break;
-                case "pulse":
+                case ParticlePatterns.PULSE:
                     double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
                     double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
                     double pAngle = rand.nextDouble() * 2.0 * Math.PI;
@@ -1281,7 +1282,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
                     vw = speed * 0.2;
                     break;
-                case "ring":
+                case ParticlePatterns.RING:
                     double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
                     double rRadius = spread * 0.8;
                     u = Math.cos(rAngle) * rRadius;
@@ -1291,7 +1292,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
                     vw = speed * 0.3;
                     break;
-                case "burst":
+                case ParticlePatterns.BURST:
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.5;
                     u = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.3;
@@ -1301,7 +1302,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(bAngle) * Math.cos(bElevation) * speed;
                     vw = Math.sin(bElevation) * speed;
                     break;
-                case "snowflake":
+                case ParticlePatterns.SNOWFLAKE:
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 2.0;
@@ -1331,7 +1332,7 @@ public class ItemFrameParticleHandler {
             double particleY = centerY + sy;
             double particleZ = centerZ + sz;
 
-            boolean isSnowflake = "snowflake".equals(pattern);
+            boolean isSnowflake = ParticlePatterns.SNOWFLAKE.equals(pattern);
             SimpleParticleType particleType = isSnowflake
                     ? ModParticles.SNOWFLAKE_STILL.get()
                     : ModParticles.GLOW_LIME_SPARKLE.get();

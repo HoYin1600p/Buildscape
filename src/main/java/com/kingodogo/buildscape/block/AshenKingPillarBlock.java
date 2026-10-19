@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
@@ -378,13 +379,13 @@ public class AshenKingPillarBlock extends PillarBlock {
         if (pattern == null) return ChatFormatting.WHITE;
 
         switch (pattern) {
-            case "default": return ChatFormatting.WHITE;
-            case "beam": return ChatFormatting.AQUA;
-            case "spiral": return ChatFormatting.LIGHT_PURPLE;
-            case "fountain": return ChatFormatting.BLUE;
-            case "pulse": return ChatFormatting.RED;
-            case "ring": return ChatFormatting.GOLD;
-            case "burst": return ChatFormatting.YELLOW;
+            case ParticlePatterns.DEFAULT: return ChatFormatting.WHITE;
+            case ParticlePatterns.BEAM: return ChatFormatting.AQUA;
+            case ParticlePatterns.SPIRAL: return ChatFormatting.LIGHT_PURPLE;
+            case ParticlePatterns.FOUNTAIN: return ChatFormatting.BLUE;
+            case ParticlePatterns.PULSE: return ChatFormatting.RED;
+            case ParticlePatterns.RING: return ChatFormatting.GOLD;
+            case ParticlePatterns.BURST: return ChatFormatting.YELLOW;
             default: return ChatFormatting.GRAY;
         }
     }

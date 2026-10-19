@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleParticle;
 import net.minecraft.client.Minecraft;
@@ -123,15 +124,15 @@ public class PillarBlockEntity extends BlockEntity {
     private float facingYaw = 0.0f;
 
     private static final String[] PATTERNS = {
-            "none",
-            "default",
-            "beam",
-            "spiral",
-            "fountain",
-            "pulse",
-            "ring",
-            "burst",
-            "snowflake",
+            ParticlePatterns.NONE,
+            ParticlePatterns.DEFAULT,
+            ParticlePatterns.BEAM,
+            ParticlePatterns.SPIRAL,
+            ParticlePatterns.FOUNTAIN,
+            ParticlePatterns.PULSE,
+            ParticlePatterns.RING,
+            ParticlePatterns.BURST,
+            ParticlePatterns.SNOWFLAKE,
     };
 
     private static final String[] RAINBOW_COLORS = {
@@ -169,10 +170,10 @@ public class PillarBlockEntity extends BlockEntity {
         if (!cfg.matches(be.displayedItem)) return;
 
         String pattern = be.getParticlePattern();
-        if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
-            pattern = cfg.pattern != null ? cfg.pattern : "ring";
+        if (pattern == null || pattern.isEmpty() || ParticlePatterns.DEFAULT.equals(pattern)) {
+            pattern = cfg.pattern != null ? cfg.pattern : ParticlePatterns.RING;
         }
-        if ("none".equals(pattern)) return;
+        if (ParticlePatterns.NONE.equals(pattern)) return;
         ParticleSettings settings = new ParticleSettings(
                 pattern,
                 be.usePattern != null ? be.usePattern : cfg.use_pattern,
@@ -253,7 +254,7 @@ public class PillarBlockEntity extends BlockEntity {
             double spread = settings.spread;
 
             switch (pattern) {
-                case "beam":
+                case ParticlePatterns.BEAM:
                     sx = (rand.nextDouble() - 0.5) * spread * 0.3;
                     sy = 0.0;
                     sz = (rand.nextDouble() - 0.5) * spread * 0.3;
@@ -261,7 +262,7 @@ public class PillarBlockEntity extends BlockEntity {
                     vy = speed * (0.8 + rand.nextDouble() * 0.4);
                     vz = (rand.nextDouble() - 0.5) * speed * 0.2;
                     break;
-                case "spiral":
+                case ParticlePatterns.SPIRAL:
                     double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
                     sx = Math.cos(angle) * radius;
@@ -271,7 +272,7 @@ public class PillarBlockEntity extends BlockEntity {
                     vy = speed * 0.6;
                     vz = Math.sin(angle) * speed * 0.3;
                     break;
-                case "fountain":
+                case ParticlePatterns.FOUNTAIN:
                     double fAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double fRadius = rand.nextDouble() * spread;
                     sx = Math.cos(fAngle) * fRadius;
@@ -281,7 +282,7 @@ public class PillarBlockEntity extends BlockEntity {
                     vy = speed * 0.3 - rand.nextDouble() * speed * 0.2;
                     vz = Math.sin(fAngle) * speed * 0.5;
                     break;
-                case "pulse":
+                case ParticlePatterns.PULSE:
                     double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
                     double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
                     double pAngle = rand.nextDouble() * 2.0 * Math.PI;
@@ -292,7 +293,7 @@ public class PillarBlockEntity extends BlockEntity {
                     vy = speed * 0.2;
                     vz = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
                     break;
-                case "ring":
+                case ParticlePatterns.RING:
                     double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
                     double rRadius = spread * 0.8;
                     sx = Math.cos(rAngle) * rRadius;
@@ -302,7 +303,7 @@ public class PillarBlockEntity extends BlockEntity {
                     vy = speed * 0.3;
                     vz = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
                     break;
-                case "burst":
+                case ParticlePatterns.BURST:
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.5;
                     sx = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.3;
@@ -313,7 +314,7 @@ public class PillarBlockEntity extends BlockEntity {
                     vz = Math.sin(bAngle) * Math.cos(bElevation) * speed;
                     size = 0.5f;
                     break;
-                case "snowflake":
+                case ParticlePatterns.SNOWFLAKE:
                     double sfAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double sfRadius = rand.nextDouble() * spread;
                     sx = Math.cos(sfAngle) * sfRadius;
@@ -757,7 +758,7 @@ public class PillarBlockEntity extends BlockEntity {
         String currentPattern = getParticlePattern();
 
         if (currentPattern == null) {
-            currentPattern = "default";
+            currentPattern = ParticlePatterns.DEFAULT;
         }
 
         int currentIndex = -1;
@@ -942,13 +943,13 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     public String getParticlePattern() {
-        if (particlePattern != null && !particlePattern.isEmpty() && !particlePattern.equals("default")) {
+        if (particlePattern != null && !particlePattern.isEmpty() && !particlePattern.equals(ParticlePatterns.DEFAULT)) {
             return particlePattern;
         }
 
         if (level != null) {
             String stackPattern = getStackParticlePattern();
-            if (stackPattern != null && !stackPattern.isEmpty() && !stackPattern.equals("default")) {
+            if (stackPattern != null && !stackPattern.isEmpty() && !stackPattern.equals(ParticlePatterns.DEFAULT)) {
                 return stackPattern;
             }
         }
@@ -1066,7 +1067,7 @@ public class PillarBlockEntity extends BlockEntity {
                 if (be instanceof PillarBlockEntity pillarBE) {
                     if (pillarBE.particlePattern != null &&
                             !pillarBE.particlePattern.isEmpty() &&
-                            !pillarBE.particlePattern.equals("default")) {
+                            !pillarBE.particlePattern.equals(ParticlePatterns.DEFAULT)) {
                         return pillarBE.particlePattern;
                     }
                 }
@@ -1845,7 +1846,7 @@ public class PillarBlockEntity extends BlockEntity {
                 double centerY,
                 double centerZ) {
 
-            boolean isSnowflake = "snowflake".equals(settings.pattern);
+            boolean isSnowflake = ParticlePatterns.SNOWFLAKE.equals(settings.pattern);
             SimpleParticleType particleType = isSnowflake ? ModParticles.SNOWFLAKE.get()
                     : ModParticles.GLOW_LIME_SPARKLE.get();
 

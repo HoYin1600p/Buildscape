@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
@@ -1043,19 +1044,19 @@ public class PillarBlock
         }
 
         switch (pattern) {
-            case "default":
+            case ParticlePatterns.DEFAULT:
                 return ChatFormatting.WHITE;
-            case "beam":
+            case ParticlePatterns.BEAM:
                 return ChatFormatting.AQUA;
-            case "spiral":
+            case ParticlePatterns.SPIRAL:
                 return ChatFormatting.LIGHT_PURPLE;
-            case "fountain":
+            case ParticlePatterns.FOUNTAIN:
                 return ChatFormatting.BLUE;
-            case "pulse":
+            case ParticlePatterns.PULSE:
                 return ChatFormatting.RED;
-            case "ring":
+            case ParticlePatterns.RING:
                 return ChatFormatting.GOLD;
-            case "burst":
+            case ParticlePatterns.BURST:
                 return ChatFormatting.YELLOW;
             default:
                 return ChatFormatting.GRAY;

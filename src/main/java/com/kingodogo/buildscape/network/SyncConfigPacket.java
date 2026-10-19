@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.network;
 import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -57,7 +58,7 @@ public class SyncConfigPacket {
         this.particle_lifetime = clamp(config.particle_lifetime, 1, NetworkPacketLimits.MAX_PARTICLE_LIFETIME);
         this.particle_density = clamp(config.particle_density, 0, NetworkPacketLimits.MAX_PARTICLE_DENSITY);
         this.use_pattern = config.use_pattern;
-        this.pattern = config.pattern != null ? config.pattern : "ring";
+        this.pattern = config.pattern != null ? config.pattern : ParticlePatterns.RING;
         this.pattern_speed = NetworkPacketLimits.clamp(config.pattern_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
         this.pattern_spread = NetworkPacketLimits.clamp(config.pattern_spread,
@@ -120,7 +121,7 @@ public class SyncConfigPacket {
         buf.writeInt(particle_lifetime);
         buf.writeInt(particle_density);
         buf.writeBoolean(use_pattern);
-        NetworkPacketLimits.writeUtf(buf, pattern != null ? pattern : "ring",
+        NetworkPacketLimits.writeUtf(buf, pattern != null ? pattern : ParticlePatterns.RING,
                 NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern");
         buf.writeDouble(pattern_speed);
         buf.writeDouble(pattern_spread);

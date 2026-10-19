@@ -20,6 +20,10 @@ public class RemovePillarPacket {
         this.pillarIds = new ArrayList<>(pillarIds);
     }
 
+    public RemovePillarPacket(String pillarId) {
+        this(pillarId != null ? List.of(pillarId) : List.of());
+    }
+
     public RemovePillarPacket(FriendlyByteBuf buf) {
         int size = NetworkPacketLimits.readCount(buf, MAX_IDS, "pillar id");
         this.pillarIds = new ArrayList<>(size);
@@ -44,7 +48,7 @@ public class RemovePillarPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
-            if (!player.hasPermissions(2)) return;
+            if (!EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_EDIT)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             boolean changed = manager.removePillars(pillarIds);

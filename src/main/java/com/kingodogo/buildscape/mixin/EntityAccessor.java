@@ -20,4 +20,7 @@ public interface EntityAccessor {
 
     @Invoker("blockPosition")
     BlockPos callBlockPosition();
+
+    @Invoker("setSharedFlag")
+    void buildscape$setSharedFlag(int flag, boolean value);
 }

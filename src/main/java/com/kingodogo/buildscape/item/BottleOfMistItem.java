@@ -50,10 +50,6 @@ public class BottleOfMistItem extends Item {
                     SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.1f, 0.1f);
         }
 
-        if (!player.getAbilities().instabuild) {
-            stack.shrink(1);
-        }
-
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 

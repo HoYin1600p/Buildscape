@@ -32,12 +32,14 @@ public class PillarIdManager {
     private static final String FILE_NAME = "pillar-ids.dat";
     private static final String BACKUP_FILE_NAME = "pillar-ids.bak.dat";
     private static final String FOLDER_NAME = "buildscape";
+    private static final int MAX_REMOVED_FRAMES = 4096;
     private static final PillarIdManager SERVER_INSTANCE = new PillarIdManager(true);
     private static final PillarIdManager CLIENT_INSTANCE = new PillarIdManager(false);
 
     private final boolean serverAuthoritative;
 
     private final Map<String, PillarData> pillarData = new ConcurrentHashMap<>();
+    private final Map<String, PillarData> removedFrames = new ConcurrentHashMap<>();
 
     public static final String VALID_ID_PATTERN = "^[A-Z][A-Za-z0-9-]{1,31}$";
     private final Map<String, String> positionIndex = new ConcurrentHashMap<>();
@@ -106,6 +108,7 @@ public class PillarIdManager {
     private void resetState(boolean serverSynced) {
         isServerSynced = serverSynced;
         pillarData.clear();
+        removedFrames.clear();
         positionIndex.clear();
         loadedChunks.clear();
         hasLoaded = false;
@@ -550,7 +553,7 @@ public class PillarIdManager {
     }
 
     public boolean isIdTaken(String id) {
-        return id != null && pillarData.containsKey(id);
+        return id != null && (pillarData.containsKey(id) || removedFrames.containsKey(id));
     }
 
     private volatile boolean saveRequested = false;
@@ -589,12 +592,74 @@ public class PillarIdManager {
         removePillars(Collections.singleton(pillarId));
     }
 
+    public void unregisterDestroyedFrame(String frameId) {
+        removePillars(Collections.singleton(frameId), false);
+    }
+
+    public void removePillarData(String pillarId) {
+        removePillar(pillarId);
+    }
+
+    public void saveAllPillars() {
+        saveImmediate();
+    }
+
+    public void updatePillarData(PillarData data) {
+        if (data != null && data.id != null) {
+            pillarData.put(data.id, data);
+            data.modifiedTime = System.currentTimeMillis();
+            saveImmediate();
+        }
+    }
+
+    public static void clearPillarOverrides(PillarData data) {
+        if (data == null) {
+            return;
+        }
+        if (data.dyeColors == null) {
+            data.dyeColors = new ArrayList<>();
+        } else {
+            data.dyeColors.clear();
+        }
+        data.use_pattern = null;
+        data.pattern = null;
+        data.pattern_speed = null;
+        data.pattern_spread = null;
+        data.pattern_intensity = null;
+        data.max_particle_color = null;
+    }
+
+    /**
+     * Clears the particle overrides of the given pillars. A frame keeps its pattern and colours in the
+     * entity, so a reset frame is recorded like a frame removed in the screen: loaded frames are cleared
+     * now and unloaded ones are cleared when they load, instead of copying the old values back in.
+     */
+    public boolean resetPillars(Collection<String> pillarIds) {
+        if (pillarIds == null) return false;
+        boolean changed = false;
+        Set<String> frames = new LinkedHashSet<>();
+        for (String id : pillarIds) {
+            PillarData existing = id == null ? null : pillarData.get(id);
+            if (existing == null) continue;
+            clearPillarOverrides(existing);
+            if (serverAuthoritative && isItemFrameData(existing)) frames.add(id);
+            changed = true;
+        }
+        if (!frames.isEmpty()) removePillars(frames, true);
+        return changed;
+    }
+
     public boolean removePillars(Collection<String> pillarIds) {
+        return removePillars(pillarIds, true);
+    }
+
+    private boolean removePillars(Collection<String> pillarIds, boolean rememberRemovedFrames) {
         if (pillarIds == null || pillarIds.isEmpty()) {
             return false;
         }
 
         boolean changed = false;
+        Set<String> removedIds = new HashSet<>();
         for (String pillarId : pillarIds) {
             if (pillarId == null) {
                 continue;
@@ -603,20 +668,45 @@ public class PillarIdManager {
             if (data == null) {
                 continue;
             }
-            positionIndex.values().removeIf(pillarId::equals);
+            removedIds.add(pillarId);
             if (serverAuthoritative) {
-                PillarResetHandler.resetPillarFromData(data);
+                if (isItemFrameData(data)) {
+                    if (rememberRemovedFrames) {
+                        data.removed = true;
+                        data.frameEditPending = null;
+                        data.modifiedTime = System.currentTimeMillis();
+                        removedFrames.put(pillarId, data);
+                        resetLoadedFrame(data);
+                    }
+                } else {
+                    PillarResetHandler.resetPillarFromData(data);
+                }
             }
             changed = true;
         }
 
         if (changed) {
+            pruneRemovedFrames();
+            positionIndex.values().removeIf(removedIds::contains);
             if (pillarData.isEmpty()) {
                 allowEmptySave = true;
             }
             requestSave();
         }
         return changed;
+    }
+
+    private boolean pruneRemovedFrames() {
+        int excess = removedFrames.size() - MAX_REMOVED_FRAMES;
+        if (excess <= 0) return false;
+        List<PillarData> oldest = new ArrayList<>(removedFrames.values());
+        oldest.sort(Comparator.comparingLong((PillarData data) -> data.modifiedTime)
+                .thenComparing(data -> data.id));
+        for (int i = 0; i < excess; i++) {
+            PillarData data = oldest.get(i);
+            removedFrames.remove(data.id, data);
+        }
+        return true;
     }
 
     public void updateDisplayedItem(String pillarId, String itemResourceId) {
@@ -677,6 +767,48 @@ public class PillarIdManager {
             data.x = pos.getX();
             data.y = pos.getY();
             data.z = pos.getZ();
+            rebuildPositionIndex();
+            requestSave();
+        }
+    }
+
+    public BlockPos removePillarBlock(Level level, String pillarId, BlockPos pos, BlockPos bottom, BlockPos top) {
+        return removePillarBlock(getDimensionKey(level), pillarId, pos, bottom, top);
+    }
+
+    private BlockPos removePillarBlock(String dimension, String pillarId, BlockPos pos, BlockPos bottom, BlockPos top) {
+        BlockPos remaining = bottom.equals(pos) ? (top.equals(pos) ? null : pos.above()) : bottom;
+        if (remaining == null) {
+            if (pillarId != null && !pillarId.isEmpty()) {
+                removePillar(pillarId);
+            }
+            removePillarByPosition(dimension, pos);
+        } else if (pillarId != null) {
+            updatePillarPosition(pillarId, remaining);
+        }
+        return remaining;
+    }
+
+    public void mergePillarStack(String pillarId, BlockPos bottom, BlockPos top) {
+        PillarData data = pillarData.get(pillarId);
+        if (data == null) return;
+
+        boolean changed = false;
+        for (PillarData other : new ArrayList<>(pillarData.values())) {
+            if (!other.id.equals(pillarId) && !isItemFrameData(other)
+                    && Objects.equals(other.dimension, data.dimension)
+                    && other.x == bottom.getX() && other.z == bottom.getZ()
+                    && other.y >= bottom.getY() && other.y <= top.getY()) {
+                changed |= pillarData.remove(other.id, other);
+            }
+        }
+        if (!data.getBlockPos().equals(bottom)) {
+            data.x = bottom.getX();
+            data.y = bottom.getY();
+            data.z = bottom.getZ();
+            changed = true;
+        }
+        if (changed) {
             rebuildPositionIndex();
             requestSave();
         }
@@ -827,10 +959,20 @@ public class PillarIdManager {
                     data.dyeColors = new ArrayList<>();
                     changed = true;
                 }
-                pillarData.put(id, data);
+                if (Boolean.TRUE.equals(data.removed) && isItemFrameData(data)) {
+                    removedFrames.put(id, data);
+                } else {
+                    pillarData.put(id, data);
+                }
             }
         }
+        changed |= pruneRemovedFrames();
+        rebuildPositionIndex();
         for (Map.Entry<String, PillarData> entry : existingData.entrySet()) {
+            if (removedFrames.containsKey(entry.getKey())) continue;
+            PillarData data = entry.getValue();
+            if (isItemFrameData(data) && isRemovedFrame(data.id, data.dimension, data.getBlockPos(),
+                    data.facing == null ? null : net.minecraft.core.Direction.byName(data.facing))) continue;
             if (pillarData.putIfAbsent(entry.getKey(), entry.getValue()) == null) changed = true;
         }
         changed |= pruneRegistry();
@@ -841,6 +983,13 @@ public class PillarIdManager {
             lastFileSize = Math.max(lastFileSize, sourceFile.length());
         }
         hasLoaded = true;
+        for (PillarData removed : removedFrames.values()) resetLoadedFrame(removed);
+        for (PillarData edited : new ArrayList<>(pillarData.values())) {
+            if (edited.frameEditPending != null && isItemFrameData(edited)) {
+                applyFrameEdit(edited);
+                if (edited.frameEditPending == null) changed = true;
+            }
+        }
         updateCachedWorldDir();
         refreshSyncSnapshot();
         if (changed) {
@@ -1373,7 +1522,9 @@ public class PillarIdManager {
                     );
                     BufferedWriter writer = new BufferedWriter(osw)
             ) {
-                GSON.toJson(pillarData, writer);
+                Map<String, PillarData> savedData = new HashMap<>(removedFrames);
+                savedData.putAll(pillarData);
+                GSON.toJson(savedData, writer);
                 writer.flush();
                 osw.flush();
                 fos.flush();
@@ -1814,13 +1965,14 @@ public class PillarIdManager {
             }
         }
 
-        java.util.List<String> nbtColors = pillarBE.getParticleColors();
-        if (nbtColors != null && !nbtColors.isEmpty()) {
-            int nbtColorCount = nbtColors.size();
-            if (data.max_particle_color == null || data.max_particle_color != nbtColorCount) {
-                data.max_particle_color = nbtColorCount;
-                needsSave = true;
-            }
+        Integer nbtMaxColor = pillarBE.getMaxParticleColor();
+        if (nbtMaxColor == null && data.max_particle_color == null) {
+            List<String> nbtColors = pillarBE.getParticleColors();
+            if (nbtColors != null && !nbtColors.isEmpty()) nbtMaxColor = nbtColors.size();
+        }
+        if (nbtMaxColor != null && !nbtMaxColor.equals(data.max_particle_color)) {
+            data.max_particle_color = nbtMaxColor;
+            needsSave = true;
         }
 
         net.minecraft.core.BlockPos topPos = pillarBE.findStackTop();
@@ -1884,6 +2036,7 @@ public class PillarIdManager {
                 copy.pillarType = original.pillarType;
                 copy.facing = original.facing;
                 copy.itemYaw = original.itemYaw;
+                copy.frameEditPending = original.frameEditPending;
                 if (original.dyeColors != null && !original.dyeColors.isEmpty()) {
                     copy.dyeColors = new ArrayList<>(original.dyeColors);
                 } else {
@@ -1910,6 +2063,7 @@ public class PillarIdManager {
         }
         for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
             PillarData data = originals.get(row.oldId);
+            if (removedFrames.containsKey(row.newId)) return editConflict("id_conflict", row);
             data.id = row.newId;
             data.dimension = row.dimension;
             data.x = row.x;
@@ -2071,7 +2225,7 @@ public class PillarIdManager {
     private boolean pruneRegistry() {
         int previousSize = pillarData.size();
         // Dimensions are never a pruning reason: mods register some dimensions dynamically after startup.
-        pillarData.values().removeIf(data -> isItemFrameData(data)
+        pillarData.values().removeIf(data -> isItemFrameData(data) && data.frameEditPending == null
                 && !hasFrameParticleData(data.pattern, data.dyeColors));
         rebuildPositionIndex();
         return previousSize != pillarData.size();
@@ -2197,6 +2351,144 @@ public class PillarIdManager {
         requestSave();
     }
 
+    private static void clearFrameData(net.minecraft.world.entity.Entity frame) {
+        clearFrameData(frame.getPersistentData());
+        clearColoredFrameData(frame);
+    }
+
+    private static void clearFrameData(CompoundTag tag) {
+        tag.remove("BuildScapeFrameId");
+        tag.remove("BuildScapeParticlePattern");
+        tag.remove("BuildScapeParticleColors");
+        tag.remove("BuildScapeParticleEnabled");
+        tag.remove("PATTERN");
+        tag.remove("COLORS");
+    }
+
+    private static void clearColoredFrameData(net.minecraft.world.entity.Entity frame) {
+        if (frame instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
+            coloredFrame.setParticlePattern("none");
+            coloredFrame.setParticleColorsRaw("");
+        }
+    }
+
+    private void resetLoadedFrame(PillarData data) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            if (!Objects.equals(getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
+            for (net.minecraft.world.entity.Entity entity : level.getEntities(null,
+                    new net.minecraft.world.phys.AABB(data.getBlockPos()).inflate(1.0))) {
+                if (!(entity instanceof net.minecraft.world.entity.decoration.ItemFrame)
+                        && !(entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity)) continue;
+                net.minecraft.core.Direction facing = entity instanceof net.minecraft.world.entity.decoration.ItemFrame itemFrame
+                        ? itemFrame.getDirection()
+                        : ((com.kingodogo.buildscape.entity.ColoredItemFrameEntity) entity).getDirection();
+                if (isRemovedFrame(entity.getPersistentData().getString("BuildScapeFrameId"),
+                        data.dimension, entity.blockPosition(), facing)) clearFrameData(entity);
+            }
+        }
+    }
+
+    /**
+     * Writes a frame edited in the detail editor to the entity's data. A frame keeps its pattern and colours
+     * in the entity and registers them again when it loads, so the entity must carry the edit. Frames that are
+     * not loaded are marked pending and take the registry values when they register.
+     */
+    public void applyFrameEdit(PillarData data) {
+        if (!serverAuthoritative || data == null || !isItemFrameData(data)) return;
+        data.frameEditPending = writeLoadedFrame(data) ? null : Boolean.TRUE;
+    }
+
+    private boolean writeLoadedFrame(PillarData data) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return false;
+        boolean written = false;
+        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            if (!Objects.equals(getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
+            for (net.minecraft.world.entity.Entity entity : level.getEntities(null,
+                    new net.minecraft.world.phys.AABB(data.getBlockPos()).inflate(1.0))) {
+                if (!(entity instanceof net.minecraft.world.entity.decoration.ItemFrame)
+                        && !(entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity)) continue;
+                net.minecraft.core.Direction facing = entity instanceof net.minecraft.world.entity.decoration.ItemFrame itemFrame
+                        ? itemFrame.getDirection()
+                        : ((com.kingodogo.buildscape.entity.ColoredItemFrameEntity) entity).getDirection();
+                if (!isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) continue;
+                writeFrameData(entity.getPersistentData(), data.pattern, data.dyeColors);
+                if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
+                    coloredFrame.setParticlePattern(framePattern(data.pattern));
+                    coloredFrame.setParticleColorsRaw(String.join(";", data.dyeColors));
+                }
+                written = true;
+            }
+        }
+        return written;
+    }
+
+    private static String framePattern(String pattern) {
+        return pattern == null || pattern.isEmpty() ? "none" : pattern;
+    }
+
+    /** Puts a frame's pattern and colours into its entity data, replacing the previous values. */
+    static void writeFrameData(CompoundTag tag, String pattern, List<String> colors) {
+        net.minecraft.nbt.ListTag colorList = new net.minecraft.nbt.ListTag();
+        if (colors != null) {
+            for (String color : colors) colorList.add(net.minecraft.nbt.StringTag.valueOf(color));
+        }
+        tag.putString("BuildScapeParticlePattern", framePattern(pattern));
+        tag.put("BuildScapeParticleColors", colorList);
+        if (tag.contains("PATTERN")) tag.putString("PATTERN", framePattern(pattern));
+        if (tag.contains("COLORS")) tag.put("COLORS", colorList.copy());
+    }
+
+    /**
+     * Settles an edit made while the frame was unloaded. When the frame registers by itself the registry
+     * wins and its values are written to the entity; when a player changed the frame (immediate), the
+     * entity is newer, so the pending edit is dropped. Returns true when the entity data was rewritten.
+     */
+    private boolean applyPendingFrameEdit(PillarData existing, CompoundTag tag, boolean immediate) {
+        if (existing == null || existing.frameEditPending == null) return false;
+        existing.frameEditPending = null;
+        saveFrameChange();
+        if (immediate) return false;
+        writeFrameData(tag, existing.pattern, existing.dyeColors);
+        return true;
+    }
+
+    private boolean isRemovedFrame(String id, String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+        boolean hasId = id != null && !id.isEmpty();
+        if (hasId && removedFrames.containsKey(id)) return true;
+        if (getFrameIdForPosition(dimension, pos, facing) != null) return false;
+        for (PillarData data : removedFrames.values()) {
+            if ((!hasId || id.equals(data.id)) && isSameFrameLocation(data, dimension, pos, facing)) return true;
+        }
+        return false;
+    }
+
+    private boolean prepareFrameRegistration(net.minecraft.world.entity.Entity frame, boolean immediate) {
+        net.minecraft.core.Direction facing = frame instanceof net.minecraft.world.entity.decoration.ItemFrame itemFrame
+                ? itemFrame.getDirection()
+                : ((com.kingodogo.buildscape.entity.ColoredItemFrameEntity) frame).getDirection();
+        if (immediate) {
+            if (isRemovedFrame(frame.getPersistentData().getString("BuildScapeFrameId"),
+                    getDimensionKey(frame.level), frame.blockPosition(), facing)) {
+                com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
+            }
+            return true;
+        }
+        if (prepareFrameRegistration(frame.getPersistentData(), getDimensionKey(frame.level),
+                frame.blockPosition(), facing)) return true;
+        clearColoredFrameData(frame);
+        return false;
+    }
+
+    private boolean prepareFrameRegistration(CompoundTag tag, String dimension, BlockPos pos,
+                                             net.minecraft.core.Direction facing) {
+        if (!isRemovedFrame(tag.getString("BuildScapeFrameId"), dimension, pos, facing)) return true;
+        clearFrameData(tag);
+        return false;
+    }
+
     public void registerItemFrame(net.minecraft.world.entity.decoration.ItemFrame frame) {
         registerItemFrame(frame, false);
     }
@@ -2206,6 +2498,7 @@ public class PillarIdManager {
             return;
         }
 
+        if (!prepareFrameRegistration(frame, immediate)) return;
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString("BuildScapeFrameId");
 
@@ -2235,6 +2528,10 @@ public class PillarIdManager {
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
             id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
+        }
+        if (applyPendingFrameEdit(existing, dataTag, immediate)) {
+            pattern = framePattern(existing.pattern);
+            colors = new ArrayList<>(existing.dyeColors);
         }
         boolean removedDuplicate = removeOtherFrameAtPosition(posKey, id);
         if (existing == null) {
@@ -2305,6 +2602,7 @@ public class PillarIdManager {
             return;
         }
 
+        if (!prepareFrameRegistration(frame, immediate)) return;
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString("BuildScapeFrameId");
 
@@ -2334,6 +2632,12 @@ public class PillarIdManager {
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
             id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
+        }
+        if (applyPendingFrameEdit(existing, dataTag, immediate)) {
+            pattern = framePattern(existing.pattern);
+            colors = new ArrayList<>(existing.dyeColors);
+            frame.setParticlePattern(pattern);
+            frame.setParticleColorsRaw(String.join(";", colors));
         }
         boolean removedDuplicate = removeOtherFrameAtPosition(posKey, id);
         if (existing == null) {
@@ -2422,6 +2726,9 @@ public class PillarIdManager {
     public static class PillarData {
 
         public String id;
+        public Boolean removed = null;
+        /** Set on a frame whose pattern or colours were edited while its entity was not loaded. */
+        public Boolean frameEditPending = null;
         public List<String> dyeColors = new ArrayList<>();
         public String dimension;
         public int x, y, z;

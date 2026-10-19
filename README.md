@@ -167,6 +167,8 @@ BuildScape works with Minecraft 1.18.2 and requires Forge 40.3.11 or higher. All
 
 ## Credits
 
+**Sculk sounds:** sculk spread and charge sounds from Minecraft 1.19 by Mojang Studios, used with permission; the catalyst bloom reuses vanilla Soul Speed sounds.
+
 **Developer:** Kingodogo  
 **Minecraft Version:** 1.18.2  
 **Forge Version:** 40.3.11+

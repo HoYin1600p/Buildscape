@@ -36,7 +36,7 @@ public class UpdateGameRulePacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null || !player.hasPermissions(2)) {
+            if (player == null || !EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.WORLD_RULES)) {
                 return;
             }
 

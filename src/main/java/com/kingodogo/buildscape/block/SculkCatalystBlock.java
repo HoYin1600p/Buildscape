@@ -68,10 +68,14 @@ public class SculkCatalystBlock extends Block implements EntityBlock {
         return InteractionResult.PASS;
     }
 
-    private static void ensureBlockEntity(Level level, BlockPos pos, BlockState state) {
-        if (level.getBlockEntity(pos) == null) {
-            level.setBlockEntity(new SculkCatalystBlockEntity(pos, state));
+    static SculkCatalystBlockEntity ensureBlockEntity(Level level, BlockPos pos, BlockState state) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity == null) {
+            blockEntity = new SculkCatalystBlockEntity(pos, state);
+            level.setBlockEntity(blockEntity);
+            SculkCatalystHandler.debug("created catalyst at {} in {}", pos, level.dimension().location());
         }
+        return blockEntity instanceof SculkCatalystBlockEntity catalyst ? catalyst : null;
     }
 
     @Override
@@ -81,6 +85,9 @@ public class SculkCatalystBlock extends Block implements EntityBlock {
 
     @Override
     public <T extends BlockEntity> GameEventListener getListener(Level level, T blockEntity) {
+        if (!level.isClientSide && blockEntity instanceof SculkCatalystBlockEntity) {
+            SculkCatalystHandler.debug("listener requested at {} in {}", blockEntity.getBlockPos(), level.dimension().location());
+        }
         return !level.isClientSide && blockEntity instanceof SculkCatalystBlockEntity catalyst ? catalyst : null;
     }
 

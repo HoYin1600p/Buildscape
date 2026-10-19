@@ -181,7 +181,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             if ("water".equals(ft)) return Fluids.WATER;
             if ("lava".equals(ft)) return Fluids.LAVA;
             if ("experience".equals(ft) || "buildscape:experience_still".equals(ft) || "buildscape:experience".equals(ft)) {
-                return ModFluids.EXPERIENCE_STILL.get();
+                Fluid xp = ModFluids.experienceStillOrNull();
+                if (xp != null) return xp;
             }
             if (!"none".equals(ft) && !ft.isEmpty()) {
                 ResourceLocation loc = ResourceLocation.tryParse(ft);
@@ -219,7 +220,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     public static ItemStack getFilledBucketForFluid(Fluid fluid) {
         if (fluid == Fluids.WATER) return new ItemStack(Items.WATER_BUCKET);
         if (fluid == Fluids.LAVA) return new ItemStack(Items.LAVA_BUCKET);
-        if (fluid == ModFluids.EXPERIENCE_STILL.get() || fluid == ModFluids.EXPERIENCE_FLOWING.get()) {
+        if (ModFluids.isExperience(fluid)) {
             return new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
         }
         Item bucket = fluid.getBucket();
@@ -389,50 +390,69 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     public static boolean trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist,
                                         @Nullable Set<Direction> allowedDirections) {
         if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY || level.isClientSide) return false;
-        boolean hasOpenEndpoint = false;
+        return trySpreadToWorld((LevelAccessor) level, pos, state, fluid, dist, allowedDirections);
+    }
+
+    static boolean trySpreadToWorld(LevelAccessor level, BlockPos pos, BlockState state, Fluid fluid, int dist,
+                                   @Nullable Set<Direction> allowedDirections) {
+        return trySpreadToWorld(level, pos, fluid, dist, allowedDirections,
+                dir -> state.getBlock() instanceof HollowLogBlock
+                        ? HollowLogBlock.isOpenEnd(state, dir) : isOpenEndpoint(state, dir));
+    }
+
+    static boolean trySpreadToWorld(LevelAccessor level, BlockPos pos, Fluid fluid, int dist,
+                                   @Nullable Set<Direction> allowedDirections,
+                                   java.util.function.Predicate<Direction> openEndpoint) {
+        if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY) return false;
+        boolean spread = false;
         int outflowAmount = WaterPipeTransport.MAX_HORIZONTAL_FLOW - dist;
         for (Direction dir : Direction.values()) {
             if (dir == Direction.UP) continue;
             if (allowedDirections != null && !allowedDirections.contains(dir)) continue;
-            boolean openEndpoint = state.getBlock() instanceof HollowLogBlock
-                    ? HollowLogBlock.isOpenEnd(state, dir)
-                    : isOpenEndpoint(state, dir);
-            if (openEndpoint) {
+            if (openEndpoint.test(dir)) {
                 boolean falling = dir == Direction.DOWN;
                 int amount = falling ? 8 : outflowAmount;
                 if (amount <= 0) continue;
-                hasOpenEndpoint = true;
-                spreadToWorldBlock(level, pos.relative(dir), fluid, amount, falling);
+                spread |= spreadToWorldBlock(level, pos.relative(dir), fluid, amount, falling);
             }
         }
-        return hasOpenEndpoint;
+        return spread;
     }
 
     public static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount) {
         spreadToWorldBlock(level, neighborPos, fluid, amount, false);
     }
 
-    private static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
-        if (amount <= 0 || !(fluid instanceof FlowingFluid)) return;
-        BlockState neighborState = level.getBlockState(neighborPos);
-        if (ModFluids.cannotMix(fluid, neighborState.getFluidState().getType())) return;
-        if (neighborState.getBlock() instanceof HollowLogBlock || neighborState.getBlock() instanceof HollowPipeBlock) {
-            return;
-        }
+    public static boolean canSpillInto(BlockGetter level, BlockPos pos, Fluid fluid) {
+        return canSpillInto(level, pos, fluid, WaterPipeTransport.MAX_HORIZONTAL_FLOW, false);
+    }
 
-        if (fluid instanceof FlowingFluid flowing) {
-            BlockState fluidBlock = flowing.getFlowing(amount, falling).createLegacyBlock();
-            if (!fluidBlock.isAir()) {
-                if (neighborState.isAir() || neighborState.canBeReplaced(fluid)
-                        || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
-                    if (!neighborState.equals(fluidBlock)) {
-                        level.setBlock(neighborPos, fluidBlock, 3);
-                    }
-                    Fluid placedFluid = fluidBlock.getFluidState().getType();
-                    level.scheduleTick(neighborPos, placedFluid, placedFluid.getTickDelay(level));
-                }
-            }
-        }
+    public static boolean canSpillInto(BlockGetter level, BlockPos pos, Fluid fluid, int amount, boolean falling) {
+        return spillState(level, pos, fluid, amount, falling) != null;
+    }
+
+    @Nullable
+    private static BlockState spillState(BlockGetter level, BlockPos pos, Fluid fluid, int amount, boolean falling) {
+        if (amount <= 0 || amount > 8 || !(fluid instanceof FlowingFluid flowing)) return null;
+        if (level instanceof net.minecraft.world.level.LevelReader reader && !reader.hasChunkAt(pos)) return null;
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock) return null;
+        if (state.getFluidState().isSource()) return null;
+        Fluid existing = state.getFluidState().getType();
+        if (existing != Fluids.EMPTY && !fluid.isSame(existing) && ModFluids.cannotMix(fluid, existing)) return null;
+        // Outlets emit flowing fluid; vanilla waterlogging requires a source.
+        if (state.getBlock() instanceof net.minecraft.world.level.block.LiquidBlockContainer) return null;
+        if (!state.isAir() && !state.canBeReplaced(fluid) && !(state.getBlock() instanceof LiquidBlock)) return null;
+        BlockState target = flowing.getFlowing(amount, falling).createLegacyBlock();
+        return target.isAir() || target.equals(state) ? null : target;
+    }
+
+    static boolean spreadToWorldBlock(LevelAccessor level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
+        BlockState target = spillState(level, neighborPos, fluid, amount, falling);
+        if (target == null || !level.setBlock(neighborPos, target, 3)) return false;
+        Fluid placedFluid = target.getFluidState().getType();
+        level.scheduleTick(neighborPos, placedFluid, placedFluid.getTickDelay(level));
+        return true;
     }
 
     @Override
@@ -664,6 +684,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         updated = updateConnections(level, pos, updated);
         if (!level.isClientSide() && level instanceof Level lvl) {
             HollowPipeTransportManager.onNeighborChanged(lvl, pos, updated, neighborPos);
+            scheduleOutletTick(lvl, pos);
         }
         return updated;
     }
@@ -673,6 +694,17 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
         if (!level.isClientSide) {
             HollowPipeTransportManager.onNeighborChanged(level, pos, state, fromPos);
+            scheduleOutletTick(level, pos);
+        }
+    }
+
+    private void scheduleOutletTick(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof HollowLogBlockEntity hollowBe) {
+            PipeFlowState flow = hollowBe.getPipeFlowState();
+            if (flow != null && flow.hasFluid()) {
+                Fluid fluid = com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess.fluidById(flow.getFluidId());
+                if (fluid instanceof FlowingFluid) level.scheduleTick(pos, this, fluid.getTickDelay(level));
+            }
         }
     }
 

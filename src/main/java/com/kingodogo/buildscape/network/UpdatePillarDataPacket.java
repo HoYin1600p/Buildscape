@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.config.PillarParticleConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -49,6 +50,19 @@ public class UpdatePillarDataPacket {
         this.maxParticleColor = maxParticleColor != null
                 ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, maxParticleColor)) : null;
         this.dyeColors = dyeColors != null ? new ArrayList<>(dyeColors) : new ArrayList<>();
+    }
+
+    public UpdatePillarDataPacket(PillarIdManager.PillarData data) {
+        this(
+                data != null ? data.id : null,
+                data != null ? data.pattern : null,
+                data != null ? data.use_pattern : null,
+                data != null ? data.pattern_speed : null,
+                data != null ? data.pattern_spread : null,
+                data != null ? data.pattern_intensity : null,
+                data != null ? data.max_particle_color : null,
+                data != null ? data.dyeColors : null
+        );
     }
 
     public UpdatePillarDataPacket(FriendlyByteBuf buf) {
@@ -126,7 +140,7 @@ public class UpdatePillarDataPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null || !player.hasPermissions(2)) return;
+            if (player == null || !EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_EDIT)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             PillarIdManager.PillarData data = manager.getPillarData(pillarId);
@@ -175,9 +189,9 @@ public class UpdatePillarDataPacket {
             if (changed) {
                 data.modifiedTime = System.currentTimeMillis();
                 // Flush the explicit detail editor save before returning to gameplay.
-                manager.saveImmediate();
-
                 updateBlockEntity(player.server, data);
+                manager.applyFrameEdit(data);
+                manager.saveImmediate();
             }
         });
         ctx.get().setPacketHandled(true);
@@ -214,70 +228,10 @@ public class UpdatePillarDataPacket {
                 continue;
             }
 
-            boolean needsUpdate = false;
-
-            if (data.pattern != null && !data.pattern.isEmpty()) {
-                if (bottomPillarBE.getParticlePattern() == null ||
-                        !bottomPillarBE.getParticlePattern().equals(data.pattern)) {
-                    bottomPillarBE.setParticlePattern(data.pattern);
-                    needsUpdate = true;
-                }
-            }
-
-            if (data.pattern_speed != null) {
-                if (bottomPillarBE.getPatternSpeed() == null ||
-                        !bottomPillarBE.getPatternSpeed().equals(data.pattern_speed)) {
-                    bottomPillarBE.setPatternSpeed(data.pattern_speed);
-                    needsUpdate = true;
-                }
-            }
-
-            if (data.pattern_spread != null) {
-                if (bottomPillarBE.getPatternSpread() == null ||
-                        !bottomPillarBE.getPatternSpread().equals(data.pattern_spread)) {
-                    bottomPillarBE.setPatternSpread(data.pattern_spread);
-                    needsUpdate = true;
-                }
-            }
-
-            if (data.pattern_intensity != null) {
-                if (bottomPillarBE.getPatternIntensity() == null ||
-                        !bottomPillarBE.getPatternIntensity().equals(data.pattern_intensity)) {
-                    bottomPillarBE.setPatternIntensity(data.pattern_intensity);
-                    needsUpdate = true;
-                }
-            }
-
-            if (data.use_pattern != null) {
-                if (bottomPillarBE.getUsePattern() == null ||
-                        !bottomPillarBE.getUsePattern().equals(data.use_pattern)) {
-                    bottomPillarBE.setUsePattern(data.use_pattern);
-                    needsUpdate = true;
-                }
-            }
-
-            if (data.max_particle_color != null) {
-                if (bottomPillarBE.getMaxParticleColor() == null ||
-                        !bottomPillarBE.getMaxParticleColor().equals(data.max_particle_color)) {
-                    bottomPillarBE.setMaxParticleColor(data.max_particle_color);
-                    needsUpdate = true;
-                }
-            }
-
-            if (data.dyeColors != null) {
-                bottomPillarBE.setParticleColors(new ArrayList<>(data.dyeColors));
-                needsUpdate = true;
-            }
-
-            if (needsUpdate) {
-                bottomPillarBE.setChanged();
-                level.sendBlockUpdated(
-                        bottomPos,
-                        level.getBlockState(bottomPos),
-                        level.getBlockState(bottomPos),
-                        3
-                );
-            }
+            boolean patternChanged = data.pattern != null && !data.pattern.isEmpty()
+                    && !data.pattern.equals(bottomPillarBE.getParticlePattern());
+            bottomPillarBE.syncFromData(data);
+            if (patternChanged) bottomPillarBE.setParticlePattern(data.pattern);
 
             break;
         }

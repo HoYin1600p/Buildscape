@@ -95,14 +95,9 @@ public class BuildScape {
                 com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback(
                         BuildScape::onPillarConfigReload);
             }
-            try {
-                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
-                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.POTION, 16, "f_41370_");
-                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
-                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.CAKE, 64, "f_41370_");
-            } catch (Exception e) {
-                LOGGER.error("Failed to set max stack size for potions or cakes", e);
-            }
+            // Potion and cake stack sizes are decided per world by the isWaterbottleStack / isCakeStack
+            // game rules through ItemMixin (ItemStack.getMaxStackSize). The Item field stays vanilla (1) so
+            // /give and other Item-level callers add single items that merge under those rules.
 
             try {
                 java.util.Map<net.minecraft.sounds.SoundEvent, net.minecraft.world.item.RecordItem> recordMap =
@@ -186,7 +181,6 @@ public class BuildScape {
                             level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRE_EXTINGUISH,
                                     net.minecraft.sounds.SoundSource.BLOCKS, 0.1f, 0.1f);
 
-                            stack.shrink(1);
                             return stack;
                         }
                     }
@@ -2629,12 +2623,17 @@ public class BuildScape {
     public void onLivingUpdate(net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent event) {
         net.minecraft.world.entity.LivingEntity living = event.getEntityLiving();
         net.minecraft.world.level.material.FluidState fluid = living.level.getFluidState(living.blockPosition());
-        if (fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get() || fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get()) {
+        if (com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid.getType())) {
             if (living.isSwimming() || living.isInWater()) {
                 net.minecraft.world.phys.Vec3 delta = living.getDeltaMovement();
                 living.setDeltaMovement(delta.x * 1.175D, delta.y * 1.06D, delta.z * 1.175D);
             }
         }
+    }
+
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    public void onSculkDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
+        com.kingodogo.buildscape.block.SculkCatalystHandler.onDeath(event);
     }
 
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
@@ -2646,19 +2645,17 @@ public class BuildScape {
     public void onSculkBlockBreak(net.minecraftforge.event.world.BlockEvent.BreakEvent event) {
         if (event.getPlayer() != null && !event.getPlayer().isCreative()) {
             net.minecraft.world.level.block.state.BlockState state = event.getState();
-            int experience;
-            if (state.is(ModBlocks.SCULK.get()) || state.is(ModBlocks.SCULK_SLAB.get()) || state.is(ModBlocks.SCULK_STAIRS.get()) || state.is(ModBlocks.SCULK_WALL.get()) || state.is(ModBlocks.SCULK_VERTICAL_SLAB.get())) {
-                experience = 1;
-            } else if (state.is(ModBlocks.SCULK_VEIN.get())) {
-                experience = 0;
-            } else if (state.is(ModBlocks.SCULK_CATALYST.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get()) || state.is(ModBlocks.SCULK_SENSOR.get())) {
-                experience = 5;
-            } else {
+            net.minecraft.resources.ResourceLocation key = state.getBlock().getRegistryName();
+            if (key == null || !"buildscape".equals(key.getNamespace())) {
+                return;
+            }
+            int experience = com.kingodogo.buildscape.block.sculk.SculkBreakExperience.forBlock(key.getPath());
+            if (experience < 0) {
                 return;
             }
             net.minecraft.world.item.ItemStack tool = event.getPlayer().getMainHandItem();
             int silkTouch = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, tool);
-            event.setExpToDrop(silkTouch == 0 ? experience : 0);
+            event.setExpToDrop(com.kingodogo.buildscape.block.sculk.SculkBreakExperience.withTool(experience, silkTouch));
         }
     }
 

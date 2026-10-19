@@ -44,10 +44,8 @@ public class EditPillarRowsResultPacket {
     }
 
     private void applyClient() {
-        if (net.minecraft.client.Minecraft.getInstance().screen instanceof
-                com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen screen
-                && screen.getPillarIdsTab() != null) {
-            screen.getPillarIdsTab().acceptEditResult(batchId, oldIds, reason);
-        }
+        try {
+            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.onPillarsSynced();
+        } catch (Throwable ignored) {}
     }
 }

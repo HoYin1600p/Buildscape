@@ -26,6 +26,7 @@
     "ItemMixin",
     "LeavesBlockMixin",
     "LevelMixin",
+    "LivingEntityExperienceAccessor",
     "LivingEntityMixin",
     "StonecutterMenuAccessor",
     "StonecutterMenuMixin",
@@ -42,12 +43,16 @@
     "FireworkRocketEntityMixin",
     "LightningBoltMixin",
     "PoiTypeAccessor",
-    "RecipeManagerAccessor"
+    "RecipeManagerAccessor",
+    "ServerRecipeBookMixin"
   ],
   "client": [
+    "PillarEntityRenderDispatcherInvoker",
+    "PillarOutlineRendererMixin",
     "biometint.BiomeColorsMixin",
     "biometint.EmbeddiumBiomeColorMixin",
     "AbstractContainerScreenMixin",
+    "AbstractWidgetBoundsMixin",
     "AdvancementWidgetMixin",
     "AnvilScreenMixin",
     "BeaconBlockEntityRendererMixin",

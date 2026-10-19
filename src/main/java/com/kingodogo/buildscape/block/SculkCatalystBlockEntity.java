@@ -1,11 +1,11 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.block.sculk.SculkSpreader;
+import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 public class SculkCatalystBlockEntity extends BlockEntity implements GameEventListener {
     private final PositionSource listenerSource;
     private final SculkSpreader spreader = new SculkSpreader();
+    private boolean loggedServerTick;
 
     public SculkCatalystBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.SCULK_CATALYST_BLOCK_ENTITY.get(), pos, state);
@@ -39,8 +40,9 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
 
     @Override
     public boolean handleGameEvent(Level level, GameEvent event, @Nullable Entity entity, BlockPos pos) {
-        return !level.isClientSide && event == GameEvent.ENTITY_KILLED
-                && SculkCatalystHandler.offerDeath(this, entity, pos);
+        if (level.isClientSide || event != GameEvent.ENTITY_KILLED) return false;
+        SculkCatalystHandler.debug("listener received death at {} catalyst={} in {}", pos, worldPosition, level.dimension().location());
+        return SculkCatalystHandler.offerDeath(this, entity, pos);
     }
 
     public void absorbExperience(BlockPos deathPos, int experience) {
@@ -51,12 +53,16 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
         serverLevel.scheduleTick(worldPosition, state.getBlock(), 8);
         serverLevel.sendParticles(ParticleTypes.SOUL, worldPosition.getX() + 0.5D,
                 worldPosition.getY() + 1.15D, worldPosition.getZ() + 0.5D, 2, 0.2D, 0.0D, 0.2D, 0.0D);
-        serverLevel.playSound(null, worldPosition, SoundEvents.SCULK_CLICKING, SoundSource.BLOCKS,
+        serverLevel.playSound(null, worldPosition, ModSounds.SCULK_CATALYST_BLOOM.get(), SoundSource.BLOCKS,
                 2.0F, 0.6F + serverLevel.random.nextFloat() * 0.4F);
         setChanged();
     }
 
     public void serverTick(ServerLevel level) {
+        if (!loggedServerTick) {
+            SculkCatalystHandler.debug("catalyst ticking at {} in {}", worldPosition, level.dimension().location());
+            loggedServerTick = true;
+        }
         if (spreader.updateCursors(level, worldPosition)) setChanged();
     }
 

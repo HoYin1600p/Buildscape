@@ -1,4 +1,42 @@
 {
+  "block.sculk_catalyst.bloom": {
+    "subtitle": "subtitles.buildscape.block.sculk_catalyst.bloom",
+    "sounds": [
+      { "name": "minecraft:enchant/soulspeed/soulspeed1", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed2", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed3", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed4", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed5", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed6", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed7", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed8", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed9", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed10", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed11", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed12", "volume": 0.25, "attenuation_distance": 12 },
+      { "name": "minecraft:enchant/soulspeed/soulspeed13", "volume": 0.25, "attenuation_distance": 12 }
+    ]
+  },
+  "block.sculk.spread": {
+    "subtitle": "subtitles.buildscape.block.sculk.spread",
+    "sounds": [
+      { "name": "buildscape:block/sculk/spread1", "pitch": 0.9 },
+      { "name": "buildscape:block/sculk/spread2", "pitch": 0.9 },
+      { "name": "buildscape:block/sculk/spread3", "pitch": 0.9 },
+      { "name": "buildscape:block/sculk/spread4", "pitch": 0.9 },
+      { "name": "buildscape:block/sculk/spread5", "pitch": 0.9 }
+    ]
+  },
+  "block.sculk.charge": {
+    "subtitle": "subtitles.buildscape.block.sculk.charge",
+    "sounds": [
+      "buildscape:block/sculk/charge1",
+      "buildscape:block/sculk/charge2",
+      "buildscape:block/sculk/charge3",
+      "buildscape:block/sculk/charge4",
+      "buildscape:block/sculk/charge5"
+    ]
+  },
   "block_copper_grate_break": {
     "sounds": [
       "buildscape:block/copper_grate/break1",

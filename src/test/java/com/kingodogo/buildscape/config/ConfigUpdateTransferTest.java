@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.network.SyncConfigPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -13,6 +14,11 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class ConfigUpdateTransferTest {
+    @BeforeClass
+    public static void bootstrap() {
+        com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest.bootstrap();
+    }
+
     private PillarParticleConfig largeConfig() {
         PillarParticleConfig config = new PillarParticleConfig();
         Set<String> items = new HashSet<>();
@@ -64,10 +70,16 @@ public class ConfigUpdateTransferTest {
     }
 
     @Test
-    public void invalidResourceIdsCannotBeSent() {
+    public void loadedInvalidResourceIdsDoNotThrowDuringUpload() {
         PillarParticleConfig config = new PillarParticleConfig();
-        config.replaceItems(Set.of("example:invalid\"id"));
-        assertThrows(IllegalArgumentException.class, () -> UpdateConfigPacket.split(config));
+        config.replaceItems(Set.of("Bad Id!", "minecraft:stick", "#forge:gems"));
+        UpdateConfigPacket.Assembly assembly = new UpdateConfigPacket.Assembly();
+        SyncConfigPacket decoded = null;
+        for (UpdateConfigPacket packet : UpdateConfigPacket.split(config)) {
+            decoded = assembly.accept(packet);
+        }
+        assertNotNull(decoded);
+        assertEquals(config.items, decoded.items);
     }
 
     @Test

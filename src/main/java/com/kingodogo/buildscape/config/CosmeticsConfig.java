@@ -8,7 +8,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
-import java.io.FileReader;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -95,9 +94,11 @@ public class CosmeticsConfig {
 
         if (legacyJson.exists()) {
             boolean loadedSuccessfully = false;
-            try (FileReader reader = new FileReader(legacyJson)) {
+            try {
+                String source = ConfigLayoutIO.readText(legacyJson.toPath());
+                if (ConfigLayoutIO.protectInvalidEncoding(legacyJson.toPath())) return;
                 @SuppressWarnings("unchecked")
-                Map<String, Object> loaded = GSON.fromJson(reader, Map.class);
+                Map<String, Object> loaded = GSON.fromJson(source, Map.class);
                 if (loaded != null) {
                     processLegacyJsonMap(loaded);
                 }
@@ -109,9 +110,17 @@ public class CosmeticsConfig {
                 Path legacyPath = legacyJson.toPath();
                 Path backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak");
                 try {
-                    Files.move(legacyPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
+                    int suffix = 1;
+                    while (true) {
+                        try {
+                            Files.move(legacyPath, backupPath);
+                            break;
+                        } catch (java.nio.file.FileAlreadyExistsException e) {
+                            backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak." + suffix++);
+                        }
+                    }
                 } catch (Exception e) {
-                    legacyJson.delete();
+                    BuildScape.getLogger().warn("Unable to retain legacy cosmetics backup: " + legacyPath, e);
                 }
             }
         }

@@ -23,7 +23,7 @@ public class ConfigPersistence405Test {
     }
 
     @Test
-    public void clientConfigLoadsWithoutRewritingAndExplicitSaveKeepsUnknownSettings() throws Exception {
+    public void clientConfigAppendsMissingDefaultsAndExplicitSaveKeepsUnknownSettings() throws Exception {
         Path root = temporary.newFolder().toPath();
         Path file = root.resolve("buildscape/buildscape.cfg");
         Files.createDirectories(file.getParent());
@@ -31,7 +31,8 @@ public class ConfigPersistence405Test {
                 + "UITheme = light\nLastActiveTab = 4\nSidePanelExpanded = true\n";
         Files.writeString(file, original);
         BuildscapeClientConfig config = new BuildscapeClientConfig(root);
-        assertEquals(original, Files.readString(file));
+        assertTrue(Files.readString(file).startsWith(original));
+        assertEquals("true", ConfigLayoutIO.readEntries(Files.readString(file)).get("isCakeStack"));
         assertTrue(config.isConfigButtonHidden());
         assertEquals(23, config.getMaxPipeNetworkSize());
         config.save();
@@ -62,6 +63,58 @@ public class ConfigPersistence405Test {
         assertEquals(19, config.getMaxPipeNetworkSize());
         config.save();
         assertEquals(original, Files.readString(file));
+    }
+
+    @Test
+    public void legacyUiStateFileIsMergedIntoBuildscapeCfgAndDeleted() throws Exception {
+        Path root = temporary.newFolder().toPath();
+        Path cfgFile = root.resolve("buildscape/buildscape.cfg");
+        Path uiFile = root.resolve("buildscape/ui-state.cfg");
+        Files.createDirectories(cfgFile.getParent());
+        Files.writeString(cfgFile, "HideBuildscapeConfig = false\nMaxPipeNetworkSize = 48\n");
+        Files.writeString(uiFile, "UITheme = cyberpunk\nLastActiveTab = 3\nAnimationSpeed = 1\n");
+
+        BuildscapeClientConfig config = new BuildscapeClientConfig(root);
+        assertEquals("cyberpunk", config.getUiTheme());
+        assertEquals(3, config.getLastActiveTab());
+        assertEquals(1, config.getAnimationSpeedIndex());
+        assertFalse("ui-state.cfg must be deleted after merge", Files.exists(uiFile));
+
+        config.setUiTheme("light");
+        assertFalse("ui-state.cfg must not be recreated", Files.exists(uiFile));
+        String cfgContent = Files.readString(cfgFile);
+        assertTrue(cfgContent.contains("UITheme = light"));
+        assertTrue(cfgContent.contains("LastActiveTab = 3"));
+    }
+
+    @Test
+    public void templatesAreCopiedWhenConfigFilesAreMissing() throws Exception {
+        Path directory = temporary.newFolder().toPath();
+        Path itemsFile = directory.resolve("pillar-items.json");
+        Path propsFile = directory.resolve("pillar-properties.json");
+        Path presetsFile = directory.resolve("pillar-presets.json");
+
+        assertFalse(Files.exists(itemsFile));
+        assertFalse(Files.exists(propsFile));
+        assertFalse(Files.exists(presetsFile));
+
+        PillarParticleConfig config = new PillarParticleConfig(directory);
+        config.loadItemsInternal(false);
+        assertTrue(Files.exists(itemsFile));
+        String itemsContent = Files.readString(itemsFile);
+        assertTrue(itemsContent.contains("minecraft:diamond"));
+        assertTrue(itemsContent.contains("// MOB SPAWN EGGS:"));
+
+        loadProperties(config);
+        assertTrue(Files.exists(propsFile));
+        String propsContent = Files.readString(propsFile);
+        assertTrue(propsContent.contains("particle_color"));
+
+        PresetsConfig presetsConfig = new PresetsConfig(directory);
+        presetsConfig.load();
+        assertTrue(Files.exists(presetsFile));
+        String presetsContent = Files.readString(presetsFile);
+        assertTrue(presetsContent.contains("\"_lastApplied\": \"default\""));
     }
 
     @Test

@@ -17,7 +17,7 @@ public class ClientFluidEvents {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null && mc.player != null) {
             FluidState fluidState = mc.level.getFluidState(event.getCamera().getBlockPosition());
-            if (fluidState.getType() == ModFluids.EXPERIENCE_STILL.get() || fluidState.getType() == ModFluids.EXPERIENCE_FLOWING.get()) {
+            if (ModFluids.isExperience(fluidState.getType())) {
                 event.setRed(0.3F);
                 event.setGreen(0.9F);
                 event.setBlue(0.1F);
@@ -30,7 +30,7 @@ public class ClientFluidEvents {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null && mc.player != null) {
             FluidState fluidState = mc.level.getFluidState(event.getCamera().getBlockPosition());
-            if (fluidState.getType() == ModFluids.EXPERIENCE_STILL.get() || fluidState.getType() == ModFluids.EXPERIENCE_FLOWING.get()) {
+            if (ModFluids.isExperience(fluidState.getType())) {
                 event.setFarPlaneDistance(12.0F);
                 event.setNearPlaneDistance(0.5F);
             }

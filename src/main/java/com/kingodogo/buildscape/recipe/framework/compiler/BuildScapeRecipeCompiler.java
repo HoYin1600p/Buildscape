@@ -25,6 +25,7 @@ public class BuildScapeRecipeCompiler {
     private final FamilyExpander familyExpander = new FamilyExpander(templateEngine);
     private final RecipeValidator validator = new RecipeValidator();
     private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
+    private final StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
 
     public static record CompileResult(
             List<Recipe<?>> recipes,
@@ -33,10 +34,19 @@ public class BuildScapeRecipeCompiler {
     ) {}
 
     public CompileResult compileCategory(RecipeIR.CategoryPack pack) {
+        return compileCategory(pack, true);
+    }
+
+    public CompileResult compileCategory(RecipeIR.CategoryPack pack, boolean validateCycles) {
         List<Recipe<?>> compiledRecipes = new ArrayList<>();
 
         if (pack == null) {
             return new CompileResult(compiledRecipes, 0, 0);
+        }
+
+        if (validateCycles) {
+            cycles.addCategory(pack);
+            cycles.validate();
         }
 
         aliasResolver.registerAliases(pack.aliases());
@@ -334,5 +344,6 @@ public class BuildScapeRecipeCompiler {
     public void clear() {
         validator.clear();
         recipeIds.clear();
+        cycles.clear();
     }
 }

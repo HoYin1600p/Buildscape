@@ -84,6 +84,21 @@ public class Cosmetics410RegressionTest {
         assertFalse(config.getShulkerPreview(player));
     }
 
+    @Test
+    public void legacyJsonUsesTheFirstFreeBackupWithoutDeletingEarlierCopies() throws Exception {
+        Path legacy = temporary.newFolder().toPath();
+        Path file = legacy.resolve("equipped-cosmetics.json");
+        String original = "{\"global_settings\":{\"colorPickerX\":17}}";
+        Files.writeString(file, original);
+        Files.writeString(legacy.resolve("equipped-cosmetics.json.bak"), "first");
+        Files.writeString(legacy.resolve("equipped-cosmetics.json.bak.1"), "second");
+        new CosmeticsConfig(temporary.newFolder().toPath(), legacy);
+        assertFalse(Files.exists(file));
+        assertEquals("first", Files.readString(legacy.resolve("equipped-cosmetics.json.bak")));
+        assertEquals("second", Files.readString(legacy.resolve("equipped-cosmetics.json.bak.1")));
+        assertEquals(original, Files.readString(legacy.resolve("equipped-cosmetics.json.bak.2")));
+    }
+
     private static CompoundTag record(UUID player, String cosmetic) {
         CompoundTag record = new CompoundTag();
         record.putUUID("player_uuid", player);

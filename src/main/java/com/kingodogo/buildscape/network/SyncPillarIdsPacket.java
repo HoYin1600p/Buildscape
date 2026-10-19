@@ -175,10 +175,9 @@ public class SyncPillarIdsPacket {
         }
 
         PillarIdManager.getClient().replaceFromServerSync(complete);
-        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-        if (mc.screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen configScreen) {
-            configScreen.refreshCurrentTab();
-        }
+        try {
+            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.onPillarsSynced();
+        } catch (Throwable ignored) {}
     }
 
     private static void expireClientState() {

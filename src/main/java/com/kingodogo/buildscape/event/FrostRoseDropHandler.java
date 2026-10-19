@@ -26,7 +26,7 @@ public class FrostRoseDropHandler {
 
     private static final List<TrackedDeath> trackedDeaths = new ArrayList<>();
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDeath(LivingDeathEvent event) {
         if (!(event.getEntityLiving() instanceof SnowGolem)) return;
         if (event.getEntityLiving().level.isClientSide) return;
@@ -38,17 +38,8 @@ public class FrostRoseDropHandler {
         double deathY = event.getEntityLiving().getY();
         double deathZ = event.getEntityLiving().getZ();
 
-        ItemStack frostRose = new ItemStack(ModBlocks.FROST_ROSE.get());
-        ItemEntity itemEntity = new ItemEntity(
-                level,
-                deathPos.getX() + 0.5,
-                deathPos.getY() + 0.5,
-                deathPos.getZ() + 0.5,
-                frostRose
-        );
-        level.addFreshEntity(itemEntity);
-
-        trackedDeaths.add(new TrackedDeath(level.dimension(), deathPos, deathX, deathY, deathZ, 20));
+        trackedDeaths.add(new TrackedDeath(level.dimension(), deathPos, deathX, deathY, deathZ,
+                (SnowGolem) event.getEntityLiving(), 20));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -95,6 +86,19 @@ public class FrostRoseDropHandler {
                 continue;
             }
 
+            if (death.dropPending) {
+                // A skull applies damage before exploding. Wait until all entity ticks have finished.
+                // A golem revived before the end of the tick must not create a rose.
+                if (!death.golem.isDeadOrDying()) {
+                    it.remove();
+                    continue;
+                }
+                level.addFreshEntity(new ItemEntity(level,
+                        death.pos.getX() + 0.5, death.pos.getY() + 0.5, death.pos.getZ() + 0.5,
+                        new ItemStack(ModBlocks.FROST_ROSE.get())));
+                death.dropPending = false;
+            }
+
             if (level.getBlockState(death.pos).is(Blocks.WITHER_ROSE)) {
                 level.removeBlock(death.pos, false);
                 it.remove();
@@ -114,14 +118,17 @@ public class FrostRoseDropHandler {
         final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
         final BlockPos pos;
         final double x, y, z;
+        final SnowGolem golem;
+        boolean dropPending = true;
         int ticksRemaining;
 
-        TrackedDeath(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension, BlockPos pos, double x, double y, double z, int ticks) {
+        TrackedDeath(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension, BlockPos pos, double x, double y, double z, SnowGolem golem, int ticks) {
             this.dimension = dimension;
             this.pos = pos;
             this.x = x;
             this.y = y;
             this.z = z;
+            this.golem = golem;
             this.ticksRemaining = ticks;
         }
     }

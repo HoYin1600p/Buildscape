@@ -43,9 +43,14 @@ public class CascadeWaterManager {
             old.invalidate();
         }
 
-        AABB aabb = new AABB(pos);
+        AABB aabb = hydrationArea(pos);
         AABBTicket ticket = FarmlandWaterManager.addAABBTicket(level, aabb);
         dimensionTickets.put(pos, ticket);
+    }
+
+    static AABB hydrationArea(BlockPos pos) {
+        // Vanilla farmland searches four blocks sideways and one block above itself for water.
+        return new AABB(pos).inflate(4.0D, 0.0D, 4.0D).expandTowards(0.0D, -1.0D, 0.0D);
     }
 
     public static void removeWaterTicket(Level level, BlockPos pos) {

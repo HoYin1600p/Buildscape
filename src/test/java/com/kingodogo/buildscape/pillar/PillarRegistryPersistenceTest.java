@@ -4,6 +4,9 @@ import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -183,6 +186,214 @@ public class PillarRegistryPersistenceTest {
     }
 
     @Test
+    public void removedFramesStayHiddenAfterSaveAndReload() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("I-F1", frame("I-F1", "north", 10)));
+        assertTrue(manager.removePillars(List.of("I-F1")));
+        assertTrue(manager.getAllPillarIds().isEmpty());
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:0:0:north"));
+        assertTrue(manager.isIdTaken("I-F1"));
+
+        File saved = new File(temporary.getRoot(), "removed-frames.dat");
+        Method save = PillarIdManager.class.getDeclaredMethod("saveToFile", File.class, String.class);
+        save.setAccessible(true);
+        assertEquals(Boolean.TRUE, save.invoke(manager, saved, "removed-frames"));
+        PillarIdManager reloaded = manager();
+        load(reloaded, read(reloaded, saved, new File(temporary.getRoot(), "none")));
+        assertTrue(reloaded.getAllPillarIds().isEmpty());
+        assertTrue(reloaded.getAllPillarDataForSync().isEmpty());
+        assertTrue(reloaded.isIdTaken("I-F1"));
+        assertTrue(removedFrame(reloaded, "I-F1", Direction.NORTH));
+        assertFalse(removedFrame(reloaded, "OldFrameId", Direction.NORTH));
+        assertFalse(removedFrame(reloaded, "OtherFrameId", Direction.SOUTH));
+        assertTrue(removedFrame(reloaded, "", Direction.NORTH));
+        assertTrue(removedFrame(reloaded, null, Direction.NORTH));
+        assertFalse(removedFrame(reloaded, "", Direction.SOUTH));
+    }
+
+    @Test
+    public void removalKeepsEarlyRegistrationWithDifferentIdAndRename() throws Exception {
+        PillarIdManager manager = manager();
+        manager.addPillarDataFromSync(frame("OldFrameId", "north", 10));
+        PillarIdManager.PillarData removed = frame("RenamedFrameId", "north", 20);
+        removed.removed = true;
+        load(manager, Map.of(removed.id, removed));
+        assertEquals(Set.of("OldFrameId"), manager.getAllPillarIds());
+
+        manager.addPillarDataFromSync(frame("ReplacementId", "north", 30));
+        assertFalse(removedFrame(manager, "ReplacementId", Direction.NORTH));
+        assertFalse(removedFrame(manager, "BeforeRename", Direction.NORTH));
+        Method reconcile = PillarIdManager.class.getDeclaredMethod("reconcileFrameId", String.class,
+                String.class, BlockPos.class, Direction.class);
+        reconcile.setAccessible(true);
+        assertEquals("ReplacementId", reconcile.invoke(manager, "BeforeRename", "minecraft:overworld",
+                BlockPos.ZERO, Direction.NORTH));
+    }
+
+    @Test
+    public void guiRemovalClearsOldFrameDataAfterReload() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("OldFrameId", frame("OldFrameId", "north", 10)));
+        CompoundTag unloadedFrame = frameTag("OldFrameId");
+        assertTrue(manager.removePillars(List.of("OldFrameId")));
+
+        manager = restart(manager);
+        assertFalse(prepareFrame(manager, unloadedFrame, Direction.NORTH));
+        assertEquals(Set.of("OtherModData"), unloadedFrame.getAllKeys());
+        assertEquals("retained", unloadedFrame.getString("OtherModData"));
+        assertTrue(manager.getAllPillarIds().isEmpty());
+    }
+
+    @Test
+    public void destroyedFrameAllowsNewFrameDataAtSameFaceAfterReload() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("OldFrameId", frame("OldFrameId", "north", 10)));
+        manager.unregisterDestroyedFrame("OldFrameId");
+        assertNull(manager.getPillarData("OldFrameId"));
+        assertNull(manager.getIdForPosition("minecraft:overworld:0:0:0:north"));
+        assertFalse(manager.isIdTaken("OldFrameId"));
+
+        manager = restart(manager);
+        assertFalse(removedFrame(manager, "OldFrameId", Direction.NORTH));
+        CompoundTag replacement = frameTag("NewFrameId");
+        CompoundTag expected = replacement.copy();
+        assertTrue(prepareFrame(manager, replacement, Direction.NORTH));
+        assertEquals(expected, replacement);
+        assertTrue(manager.getAllPillarIds().isEmpty());
+    }
+
+    @Test
+    public void guiRemovalRejectsSameOldIdButPreservesNewIdAtSameFace() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("OldFrameId", frame("OldFrameId", "north", 10)));
+        assertTrue(manager.removePillars(List.of("OldFrameId")));
+
+        CompoundTag replacement = frameTag("NewFrameId");
+        CompoundTag expected = replacement.copy();
+        assertTrue(prepareFrame(manager, replacement, Direction.NORTH));
+        assertEquals(expected, replacement);
+        CompoundTag stale = frameTag("OldFrameId");
+        assertFalse(prepareFrame(manager, stale, Direction.NORTH));
+        assertEquals(Set.of("OtherModData"), stale.getAllKeys());
+
+        CompoundTag noId = frameTag("");
+        assertFalse(prepareFrame(manager, noId, Direction.NORTH));
+        assertEquals(Set.of("OtherModData"), noId.getAllKeys());
+    }
+
+    @Test
+    public void removedFrameHistoryIsBoundedOnLoadAndRemovalAndStaysPersisted() throws Exception {
+        Field limit = PillarIdManager.class.getDeclaredField("MAX_REMOVED_FRAMES");
+        limit.setAccessible(true);
+        int maximum = limit.getInt(null);
+        Map<String, PillarIdManager.PillarData> history = new java.util.HashMap<>();
+        for (int i = 1; i <= maximum + 1; i++) {
+            PillarIdManager.PillarData removed = frame("Frame" + i, "north", i);
+            removed.removed = true;
+            history.put(removed.id, removed);
+        }
+        PillarIdManager manager = manager();
+        load(manager, history);
+        assertFalse(manager.isIdTaken("Frame1"));
+        assertTrue(manager.isIdTaken("Frame2"));
+        manager.addPillarDataFromSync(frame("NewestFrame", "north", 0));
+        assertTrue(manager.removePillars(List.of("NewestFrame")));
+
+        manager = restart(manager);
+        Field removed = PillarIdManager.class.getDeclaredField("removedFrames");
+        removed.setAccessible(true);
+        assertEquals(maximum, ((Map<?, ?>) removed.get(manager)).size());
+        assertFalse(manager.isIdTaken("Frame2"));
+        assertTrue(removedFrame(manager, "NewestFrame", Direction.NORTH));
+        assertTrue(removedFrame(manager, "Frame" + (maximum + 1), Direction.NORTH));
+    }
+
+    @Test
+    public void resetFramesAreClearedWhenTheyLoadAfterARestart() throws Exception {
+        for (String type : new String[]{"minecraft:item_frame", "buildscape:white_item_frame"}) {
+            PillarIdManager manager = manager();
+            PillarIdManager.PillarData data = frame("OldFrameId", "north", 10);
+            data.pillarType = type;
+            data.dyeColors = new java.util.ArrayList<>(List.of("#123456"));
+            load(manager, Map.of("OldFrameId", data));
+            CompoundTag unloadedFrame = frameTag("OldFrameId");
+
+            assertTrue(manager.resetPillars(List.of("OldFrameId")));
+            assertNull(manager.getPillarData("OldFrameId"));
+            assertNull(manager.getIdForPosition("minecraft:overworld:0:0:0:north"));
+            assertTrue(removedFrame(manager, "OldFrameId", Direction.NORTH));
+
+            manager = restart(manager);
+            assertFalse(type, prepareFrame(manager, unloadedFrame, Direction.NORTH));
+            assertEquals(type, Set.of("OtherModData"), unloadedFrame.getAllKeys());
+            assertTrue(manager.getAllPillarIds().isEmpty());
+        }
+    }
+
+    @Test
+    public void resetFrameStillAllowsANewFrameAtTheSameFace() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("OldFrameId", frame("OldFrameId", "north", 10)));
+        assertTrue(manager.resetPillars(List.of("OldFrameId")));
+        CompoundTag replacement = frameTag("NewFrameId");
+        CompoundTag expected = replacement.copy();
+        assertTrue(prepareFrame(manager, replacement, Direction.NORTH));
+        assertEquals(expected, replacement);
+    }
+
+    @Test
+    public void resetKeepsPillarBlocksListedAndOnlyClearsTheirOverrides() throws Exception {
+        PillarIdManager manager = manager();
+        PillarIdManager.PillarData pillar = new PillarIdManager.PillarData();
+        pillar.id = "S-P1";
+        pillar.dimension = "minecraft:overworld";
+        pillar.pattern = "spiral";
+        pillar.max_particle_color = 3;
+        pillar.dyeColors = new java.util.ArrayList<>(List.of("#123456"));
+        load(manager, Map.of("S-P1", pillar, "I-F1", frame("I-F1", "north", 10)));
+
+        assertTrue(manager.resetPillars(java.util.Arrays.asList("S-P1", null, "Unknown")));
+        PillarIdManager.PillarData reset = manager.getPillarData("S-P1");
+        assertNotNull(reset);
+        assertNull(reset.pattern);
+        assertNull(reset.max_particle_color);
+        assertTrue(reset.dyeColors.isEmpty());
+        assertNotNull(manager.getPillarData("I-F1"));
+        assertFalse(removedFrame(manager, "I-F1", Direction.NORTH));
+
+        assertFalse(manager.resetPillars(List.of("Unknown")));
+        assertFalse(manager.resetPillars(null));
+    }
+
+    private static CompoundTag frameTag(String id) {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("BuildScapeFrameId", id);
+        tag.putString("BuildScapeParticlePattern", "spiral");
+        ListTag colors = new ListTag();
+        colors.add(StringTag.valueOf("#123456"));
+        tag.put("BuildScapeParticleColors", colors);
+        tag.putBoolean("BuildScapeParticleEnabled", true);
+        tag.putString("PATTERN", "spiral");
+        tag.putString("COLORS", "#123456");
+        tag.putString("OtherModData", "retained");
+        return tag;
+    }
+
+    private static boolean prepareFrame(PillarIdManager manager, CompoundTag tag, Direction facing) throws Exception {
+        Method prepare = PillarIdManager.class.getDeclaredMethod("prepareFrameRegistration", CompoundTag.class,
+                String.class, BlockPos.class, Direction.class);
+        prepare.setAccessible(true);
+        return (Boolean) prepare.invoke(manager, tag, "minecraft:overworld", BlockPos.ZERO, facing);
+    }
+
+    private static boolean removedFrame(PillarIdManager manager, String id, Direction facing) throws Exception {
+        Method removed = PillarIdManager.class.getDeclaredMethod("isRemovedFrame", String.class,
+                String.class, BlockPos.class, Direction.class);
+        removed.setAccessible(true);
+        return (Boolean) removed.invoke(manager, id, "minecraft:overworld", BlockPos.ZERO, facing);
+    }
+
+    @Test
     public void reloadedStackKeepsEntryWhenTopIsRemoved() throws Exception {
         PillarIdManager manager = reloadedStack(3);
         BlockPos bottom = new BlockPos(0, 64, 0);
@@ -191,7 +402,7 @@ public class PillarRegistryPersistenceTest {
         assertNull(manager.getIdForPosition("minecraft:overworld:0:65:0"));
         assertNull(manager.getIdForPosition("minecraft:overworld:0:66:0"));
 
-        removePosition(manager, "minecraft:overworld", bottom.above(2));
+        assertEquals(bottom, removeBlock(manager, bottom.above(2), bottom, bottom.above(2)));
 
         assertSame(data, manager.getPillarData("StackId"));
         assertEquals(bottom, data.getBlockPos());
@@ -203,23 +414,29 @@ public class PillarRegistryPersistenceTest {
     public void removingStackBottomMovesEntryUpAndSurvivesAnotherReload() throws Exception {
         PillarIdManager manager = reloadedStack(3);
         BlockPos bottom = new BlockPos(0, 64, 0);
-        manager.updatePillarPosition("StackId", bottom.above());
-        removePosition(manager, "minecraft:overworld", bottom);
+        PillarIdManager.PillarData data = manager.getPillarData("StackId");
+        assertEquals(bottom.above(), removeBlock(manager, bottom, bottom, bottom.above(2)));
 
+        assertSame(data, manager.getPillarData("StackId"));
         assertNull(manager.getIdForPosition("minecraft:overworld:0:64:0"));
         assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:65:0"));
         assertEquals(bottom.above(), manager.getPillarData("StackId").getBlockPos());
+        assertEquals(List.of("#123456"), data.dyeColors);
+        assertEquals("spiral", data.pattern);
+        assertEquals("minecraft:diamond", data.displayedItem);
         manager = restart(manager);
         assertEquals("StackId", manager.getIdForPosition("minecraft:overworld:0:65:0"));
         assertEquals(bottom.above(), manager.getPillarData("StackId").getBlockPos());
         assertEquals(List.of("#123456"), manager.getPillarData("StackId").dyeColors);
         assertEquals("spiral", manager.getPillarData("StackId").pattern);
+        assertEquals("minecraft:diamond", manager.getPillarData("StackId").displayedItem);
     }
 
     @Test
     public void removingSinglePillarDeletesEntryAndAllowsEmptySave() throws Exception {
         PillarIdManager manager = reloadedStack(1);
-        removePosition(manager, "minecraft:overworld", new BlockPos(0, 64, 0));
+        BlockPos bottom = new BlockPos(0, 64, 0);
+        assertNull(removeBlock(manager, bottom, bottom, bottom));
 
         assertNull(manager.getPillarData("StackId"));
         assertNull(manager.getIdForPosition("minecraft:overworld:0:64:0"));
@@ -293,6 +510,7 @@ public class PillarRegistryPersistenceTest {
         data.pillarType = "buildscape:stone_pillar";
         data.dyeColors.add("#123456");
         data.pattern = "spiral";
+        data.displayedItem = "minecraft:diamond";
         load(manager, Map.of(data.id, data));
         manager = restart(manager);
         for (int y = 64 + height - 1; y >= 64; y--) {
@@ -322,6 +540,69 @@ public class PillarRegistryPersistenceTest {
         Method remove = PillarIdManager.class.getDeclaredMethod("removePillarByPosition", String.class, BlockPos.class);
         remove.setAccessible(true);
         remove.invoke(manager, dimension, pos);
+    }
+
+    private static BlockPos removeBlock(PillarIdManager manager, BlockPos pos, BlockPos bottom, BlockPos top) throws Exception {
+        Method remove = PillarIdManager.class.getDeclaredMethod("removePillarBlock",
+                String.class, String.class, BlockPos.class, BlockPos.class, BlockPos.class);
+        remove.setAccessible(true);
+        return (BlockPos) remove.invoke(manager, "minecraft:overworld", "StackId", pos, bottom, top);
+    }
+
+    @Test
+    public void joiningStacksRemovesReplacedEntryImmediatelyAndAfterReload() throws Exception {
+        for (long lowerTime : new long[] {10, 20, 30}) {
+            PillarIdManager manager = reloadedStack(1);
+            BlockPos bottom = new BlockPos(0, 64, 0);
+            manager.getPillarData("StackId").modifiedTime = lowerTime;
+            PillarIdManager.PillarData upper = new PillarIdManager.PillarData(
+                    "UpperId", "minecraft:overworld", bottom.above(2));
+            upper.pillarType = "buildscape:stone_pillar";
+            upper.modifiedTime = 20;
+            upper.dyeColors.add("#654321");
+            upper.pattern = "beam";
+            upper.displayedItem = "minecraft:emerald";
+            manager.addPillarDataFromSync(upper);
+
+            manager.mergePillarStack("UpperId", bottom, bottom.above(3));
+
+            assertSame(upper, manager.getPillarData("UpperId"));
+            assertNull(manager.getPillarData("StackId"));
+            for (int reload = 0; reload < 3; reload++) {
+                assertEquals(Set.of("UpperId"), manager.getAllPillarIds());
+                assertEquals("UpperId", manager.getIdForPosition("minecraft:overworld:0:64:0"));
+                assertNull(manager.getIdForPosition("minecraft:overworld:0:66:0"));
+                PillarIdManager.PillarData data = manager.getPillarData("UpperId");
+                assertEquals(bottom, data.getBlockPos());
+                assertEquals(List.of("#654321"), data.dyeColors);
+                assertEquals("beam", data.pattern);
+                assertEquals("minecraft:emerald", data.displayedItem);
+                manager = restart(manager);
+            }
+        }
+    }
+
+    @Test
+    public void joiningStacksPreservesEntriesOutsideStackAndItemFrames() throws Exception {
+        PillarIdManager manager = reloadedStack(1);
+        BlockPos bottom = new BlockPos(0, 64, 0);
+        for (String id : List.of("OtherDimension", "OtherColumn", "AboveStack", "BelowStack", "Frame")) {
+            PillarIdManager.PillarData data = new PillarIdManager.PillarData(id, "minecraft:overworld", bottom);
+            data.pillarType = "buildscape:stone_pillar";
+            if (id.equals("OtherDimension")) data.dimension = "test:other";
+            if (id.equals("OtherColumn")) data.x = 1;
+            if (id.equals("AboveStack")) data.y = 68;
+            if (id.equals("BelowStack")) data.y = 63;
+            if (id.equals("Frame")) {
+                data.pillarType = "minecraft:item_frame";
+                data.facing = "north";
+                data.pattern = "spiral";
+            }
+            manager.addPillarDataFromSync(data);
+        }
+        Set<String> ids = Set.copyOf(manager.getAllPillarIds());
+        manager.mergePillarStack("StackId", bottom, bottom.above(3));
+        assertEquals(ids, manager.getAllPillarIds());
     }
 
     @SuppressWarnings("unchecked")

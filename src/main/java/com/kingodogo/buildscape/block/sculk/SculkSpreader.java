@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.block.sculk;
 
 import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.block.SculkVeinBlock;
+import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -12,6 +13,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.GlowLichenBlock;
@@ -89,6 +91,7 @@ public final class SculkSpreader {
             if (state.getValue(GlowLichenBlock.getFaceProperty(face)) && level.hasChunkAt(target)
                     && level.getBlockState(target).is(REPLACEABLE)
                     && level.setBlock(target, ModBlocks.SCULK.get().defaultBlockState(), 3)) {
+                level.playSound(null, target, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                 for (Direction direction : Direction.values()) SculkVeinBlock.regrow(level, target.relative(direction));
                 return true;
             }
@@ -181,12 +184,16 @@ public final class SculkSpreader {
             }
             Random random = level.random;
             BlockState state = level.getBlockState(pos);
+            boolean spreadVeins = false;
             if (!state.is(ModBlocks.SCULK.get()) && !state.is(ModBlocks.SCULK_VEIN.get())) {
-                SculkVeinBlock.regrow(level, pos);
+                spreadVeins = SculkVeinBlock.regrow(level, pos);
                 state = level.getBlockState(pos);
             }
             if (state.is(ModBlocks.SCULK_VEIN.get())) {
-                SculkVeinBlock.spread(level, pos, random);
+                spreadVeins |= SculkVeinBlock.spread(level, pos, random);
+                if (spreadVeins) {
+                    level.playSound(null, pos, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
                 if (convertSubstrate(level, pos, random)) charge--;
                 else if (random.nextInt(CHARGE_DECAY_RATE) == 0) charge /= 2;
             } else if (state.is(ModBlocks.SCULK.get())) {
@@ -194,16 +201,18 @@ public final class SculkSpreader {
                     if (pos.distSqr(origin) > NO_GROWTH_RADIUS * NO_GROWTH_RADIUS && canPlaceGrowth(level, pos)) {
                         if (random.nextInt(GROWTH_COST) < charge) {
                             Block growth = random.nextInt(11) == 0 ? ModBlocks.SCULK_SHRIEKER.get() : ModBlocks.SCULK_SENSOR.get();
-                            level.setBlock(pos.above(), growth.defaultBlockState(), 3);
+                            if (level.setBlock(pos.above(), growth.defaultBlockState(), 3)) {
+                                level.playSound(null, pos, ModSounds.SCULK_CHARGE.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                            }
                         }
                         charge = Math.max(0, charge - GROWTH_COST);
                     } else if (random.nextInt(ADDITIONAL_DECAY_RATE) == 0) {
                         charge /= 2;
                     }
                 }
-            } else {
-                charge = 0;
             }
+            // Any other cell (for example the air a mob died in, above sculk that refuses a vein) keeps its
+            // charge: it moves onto adjacent sculk below, or halves with the normal decay delay, as in vanilla 1.19.
             BlockPos next = charge > 0 ? movementPos(level, pos, random) : null;
             if (charge <= 0 || next != null) {
                 SculkVeinBlock.discharge(level, pos);

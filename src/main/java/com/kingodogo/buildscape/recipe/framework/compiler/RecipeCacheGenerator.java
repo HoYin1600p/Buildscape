@@ -36,7 +36,7 @@ public class RecipeCacheGenerator {
     public static final int CACHE_VERSION = 5;
     public static final int SOURCE_SCHEMA_VERSION = 1;
     // Bump whenever compilation logic changes, even if the binary layout does not.
-    public static final int GENERATOR_VERSION = 4;
+    public static final int GENERATOR_VERSION = 5;
 
     public static final String[] CATEGORIES = {
             "crafting", "stonecutting", "smelting", "blasting",
@@ -92,6 +92,7 @@ public class RecipeCacheGenerator {
 
     public static byte[] generateCache(Path sourceDirectory) throws IOException {
         Map<String, byte[]> rawCategoryData = new LinkedHashMap<>();
+        StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
 
         for (String category : CATEGORIES) {
             Path sourceFile = sourceDirectory.resolve(category + ".json");
@@ -99,8 +100,12 @@ public class RecipeCacheGenerator {
                 rawCategoryData.put(category, Files.readAllBytes(sourceFile));
                 com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter.validateJson(
                         Files.readString(sourceFile, StandardCharsets.UTF_8));
+                try (Reader reader = Files.newBufferedReader(sourceFile, StandardCharsets.UTF_8)) {
+                    cycles.addCategory(StreamingRecipeParser.parseCategory(category, reader));
+                }
             }
         }
+        cycles.validate();
 
         String contentHash = computeSourceHash(CATEGORIES, rawCategoryData);
         Set<String> runtimeCategories = findRuntimeCategories(rawCategoryData);

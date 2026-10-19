@@ -177,7 +177,7 @@ public class PillarBlock
                 ejectNeighborDisplayItem(level, pos, state);
             }
             enforceSingleItemPerStack(level, pos);
-            syncNewPillarWithStack(level, pos);
+            syncNewPillarWithStack(level, pos, !oldState.is(state.getBlock()));
 
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof PillarBlockEntity pillarBE) {
@@ -210,7 +210,7 @@ public class PillarBlock
         }
     }
 
-    private void syncNewPillarWithStack(Level level, BlockPos pos) {
+    private void syncNewPillarWithStack(Level level, BlockPos pos, boolean newlyPlaced) {
         if (
                 !level.isClientSide &&
                         !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
@@ -322,7 +322,18 @@ public class PillarBlock
 
                     if (data != null) {
                         BlockPos bottom = findBottomBlock(level, pos);
-                        manager.updatePillarPosition(stackId, bottom);
+                        if (newlyPlaced) {
+                            BlockPos top = findTopBlock(level, pos);
+                            manager.mergePillarStack(stackId, bottom, top);
+                            for (BlockPos current = bottom; current.getY() <= top.getY(); current = current.above()) {
+                                if (level.getBlockEntity(current) instanceof PillarBlockEntity stackPillarBE) {
+                                    stackPillarBE.syncFromData(data);
+                                    stackPillarBE.forceSetColors(stackColors, stackId);
+                                }
+                            }
+                        } else {
+                            manager.updatePillarPosition(stackId, bottom);
+                        }
                     }
                 }
 
@@ -375,22 +386,12 @@ public class PillarBlock
 
             BlockPos bottom = findBottomBlock(level, pos);
             BlockPos top = findTopBlock(level, pos);
-            boolean hasOtherPillars = false;
-            BlockPos firstRemainingPillar = null;
+            com.kingodogo.buildscape.config.PillarIdManager manager =
+                    com.kingodogo.buildscape.config.PillarIdManager.get(level);
+            BlockPos firstRemainingPillar = manager.removePillarBlock(
+                    level, pillarIdToPreserve, pos, bottom, top);
 
-            BlockPos current = bottom;
-            while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
-                if (!current.equals(pos)) {
-                    hasOtherPillars = true;
-                    if (firstRemainingPillar == null) {
-                        firstRemainingPillar = current;
-                    }
-                }
-                if (current.equals(top)) break;
-                current = current.above();
-            }
-
-            if (hasOtherPillars && firstRemainingPillar != null) {
+            if (firstRemainingPillar != null) {
                 BlockEntity remainingBe = level.getBlockEntity(firstRemainingPillar);
                 if (remainingBe instanceof PillarBlockEntity remainingPillarBE) {
                     if (
@@ -403,18 +404,8 @@ public class PillarBlock
                                 pillarIdToPreserve
                         );
 
-                        com.kingodogo.buildscape.config.PillarIdManager manager =
-                                com.kingodogo.buildscape.config.PillarIdManager.get(level);
-                        com.kingodogo.buildscape.config.PillarIdManager.PillarData data =
-                                manager.getPillarData(pillarIdToPreserve);
-                        if (data != null) {
-                            manager.updatePillarPosition(pillarIdToPreserve, firstRemainingPillar);
-                        }
-
-                        current = bottom;
-                        while (
-                                level.getBlockState(current).getBlock() instanceof PillarBlock
-                        ) {
+                        BlockPos current = bottom;
+                        while (current.getY() <= top.getY()) {
                             if (!current.equals(pos)) {
                                 BlockEntity currentBe = level.getBlockEntity(current);
                                 if (
@@ -433,16 +424,7 @@ public class PillarBlock
                     }
                 }
 
-                com.kingodogo.buildscape.config.PillarIdManager manager =
-                        com.kingodogo.buildscape.config.PillarIdManager.get(level);
                 manager.removeStalePillarPositionIndex(level, pos);
-            } else {
-                com.kingodogo.buildscape.config.PillarIdManager manager =
-                        com.kingodogo.buildscape.config.PillarIdManager.get(level);
-                if (pillarIdToPreserve != null && !pillarIdToPreserve.isEmpty()) {
-                    manager.removePillar(pillarIdToPreserve);
-                }
-                manager.removePillarByPosition(level, pos);
             }
         }
 

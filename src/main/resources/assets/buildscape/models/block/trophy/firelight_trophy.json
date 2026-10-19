@@ -7,7 +7,7 @@
   ],
   "textures": {
     "3": "buildscape:block/trophy/firelight_trophy",
-    "particle": "minecraft:block/ochre_froglight_side"
+    "particle": "buildscape:block/ochre_froglight_side"
   },
   "elements": [
     {

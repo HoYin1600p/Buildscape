@@ -45,15 +45,20 @@ public class PresetsConfig {
     private String lastEditFailure = "";
     private String lastAppliedPreset = "default";
     private static final String UNNAMED_PRESET_KEY = "_unnamed";
-    public static final int MAX_PRESETS = 5;
+    /** Custom preset slots besides Default; null reads the buildscape.cfg setting. */
+    private transient Integer customSlotsOverride;
 
     public void load() {
         File file = getPresetsFile();
         if (!file.exists()) {
-            initializeDefaults();
-            fileUnreadable = false;
-            save();
-            return;
+            if (ConfigPaths.copyTemplateIfMissing(file.toPath(), "/data/buildscape/config/default_pillar_presets.json")) {
+                // Template copied from resources, proceed to parse from disk
+            } else {
+                initializeDefaults();
+                fileUnreadable = false;
+                save();
+                return;
+            }
         }
 
         try {
@@ -85,7 +90,8 @@ public class PresetsConfig {
             preservedPresets.clear();
             preservedPresets.putAll(preserved);
             lastAppliedPreset = loadedLastApplied;
-            fileUnreadable = ConfigLayoutIO.hasReplacementCharacters(source);
+            fileUnreadable = ConfigLayoutIO.protectInvalidEncoding(file.toPath())
+                    || !ConfigLayoutIO.isWritable(file.toPath());
         } catch (Exception e) {
             fileUnreadable = true;
             PillarParticleConfig.backupUnreadableFile(file);
@@ -104,6 +110,28 @@ public class PresetsConfig {
         if (lastAppliedPreset == null || lastAppliedPreset.isEmpty()) {
             lastAppliedPreset = "default";
         }
+    }
+
+    /** Number of custom presets that may exist besides Default (MaxCustomPresets in buildscape.cfg, default 4). */
+    public int getCustomSlots() {
+        if (customSlotsOverride != null) return customSlotsOverride;
+        try {
+            return BuildscapeClientConfig.get().getMaxCustomPresets();
+        } catch (Throwable e) {
+            return BuildscapeClientConfig.DEFAULT_CUSTOM_PRESETS;
+        }
+    }
+
+    void setCustomSlots(int slots) {
+        customSlotsOverride = BuildscapeClientConfig.clampCustomPresets(slots);
+    }
+
+    public int getCustomPresetCount() {
+        int count = 0;
+        for (String k : getPresetKeys()) {
+            if (!k.equals("default") && !k.equals(UNNAMED_PRESET_KEY)) count++;
+        }
+        return count;
     }
 
     private File getPresetsFile() {
@@ -172,7 +200,7 @@ public class PresetsConfig {
         }
         Path temporary = null;
         try {
-            if (file.exists() && ConfigLayoutIO.hasReplacementCharacters(ConfigLayoutIO.readText(file.toPath()))) {
+            if (file.exists() && ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                 fileUnreadable = true;
                 lastEditFailure = "unreadable";
                 com.kingodogo.buildscape.BuildScape.getLogger().warn("Not overwriting replacement-decoded presets " + file);
@@ -183,7 +211,7 @@ public class PresetsConfig {
                 parentDir.mkdirs();
             }
             temporary = Files.createTempFile(parentDir.toPath(), PRESETS_FILE_NAME, ".tmp");
-            try (FileWriter writer = new FileWriter(temporary.toFile())) {
+            try (FileWriter writer = new FileWriter(temporary.toFile(), java.nio.charset.StandardCharsets.UTF_8)) {
                 Map<String, Object> toSave = new HashMap<>();
                 for (Map.Entry<String, Preset> entry : presets.entrySet()) {
                     if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
@@ -231,7 +259,7 @@ public class PresetsConfig {
     }
 
     private Set<String> getDefaultItems() {
-        return DefaultPillarItems.items(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+        return ConfigPaths.loadDefaultItems(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
     }
 
     public List<Preset> getPresets() {
@@ -269,14 +297,7 @@ public class PresetsConfig {
             return false;
         }
 
-        int customPresetCount = 0;
-        for (String k : getPresetKeys()) {
-            if (!k.equals("default") && !k.equals(UNNAMED_PRESET_KEY)) {
-                customPresetCount++;
-            }
-        }
-
-        if (!presets.containsKey(key) && !preservedPresets.containsKey(key) && customPresetCount >= MAX_PRESETS - 1) {
+        if (!presets.containsKey(key) && !preservedPresets.containsKey(key) && getCustomPresetCount() >= getCustomSlots()) {
             lastEditFailure = "limit";
             return false;
         }
@@ -297,6 +318,10 @@ public class PresetsConfig {
 
     public String getLastEditFailure() {
         return lastEditFailure;
+    }
+
+    public boolean canEdit() {
+        return !fileUnreadable;
     }
 
     public static class Preset {
@@ -342,7 +367,12 @@ public class PresetsConfig {
         Preset preset = presets.get(key);
         if (preset != null) {
             PillarParticleConfig config = PillarParticleConfig.get();
-            config.replaceItems(preset.items);
+            if (fileUnreadable || !config.canEditItems()) {
+                lastEditFailure = "unreadable";
+                com.kingodogo.buildscape.BuildScape.getLogger().warn("Not applying a preset while its config files are read-only");
+                return;
+            }
+            config.editItems(preset.items);
             config.saveItems();
             if (!key.equals(UNNAMED_PRESET_KEY)) {
                 lastAppliedPreset = key;

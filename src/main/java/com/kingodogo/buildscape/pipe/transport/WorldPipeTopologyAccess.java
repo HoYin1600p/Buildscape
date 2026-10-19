@@ -113,13 +113,13 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
 
     public static boolean isTransportFluid(@Nullable Fluid fluid) {
         return fluid != null && (fluid.isSame(Fluids.WATER) || fluid.isSame(Fluids.LAVA)
-                || fluid.isSame(ModFluids.EXPERIENCE_STILL.get()));
+                || ModFluids.isExperienceSame(fluid));
     }
 
     public static String fluidId(Fluid fluid) {
         Fluid canonical = fluid.isSame(Fluids.WATER) ? Fluids.WATER
                 : fluid.isSame(Fluids.LAVA) ? Fluids.LAVA
-                : fluid.isSame(ModFluids.EXPERIENCE_STILL.get()) ? ModFluids.EXPERIENCE_STILL.get() : fluid;
+                : ModFluids.isExperienceSame(fluid) ? ModFluids.experienceStillOrNull() : fluid;
         ResourceLocation key = ForgeRegistries.FLUIDS.getKey(canonical);
         return key == null ? "" : key.toString();
     }

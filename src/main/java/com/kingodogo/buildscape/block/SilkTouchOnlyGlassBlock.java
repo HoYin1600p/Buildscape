@@ -2,6 +2,9 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -90,7 +93,7 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
 
             if (newName != null) {
                 Block newBlock = ForgeRegistries.BLOCKS.getValue(
-                        new net.minecraft.resources.ResourceLocation("buildscape", newName)
+                        new ResourceLocation("buildscape", newName)
                 );
                 if (newBlock != null && newBlock != this) {
                     if (!level.isClientSide) {
@@ -101,8 +104,8 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
                         level.playSound(
                                 null,
                                 pos,
-                                net.minecraft.sounds.SoundEvents.DYE_USE,
-                                net.minecraft.sounds.SoundSource.BLOCKS,
+                                SoundEvents.DYE_USE,
+                                SoundSource.BLOCKS,
                                 1.0f,
                                 1.0f
                         );

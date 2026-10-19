@@ -6,8 +6,10 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
@@ -63,8 +65,8 @@ public class CopperChestRenderer extends ChestRenderer<CopperChestBlockEntity> {
 
     @Override
     protected Material getMaterial(CopperChestBlockEntity blockEntity, ChestType chestType) {
-        net.minecraft.world.level.block.Block block = blockEntity.getBlockState().getBlock();
-        ResourceLocation blockId = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
+        Block block = blockEntity.getBlockState().getBlock();
+        ResourceLocation blockId = ForgeRegistries.BLOCKS.getKey(block);
         String path = blockId == null ? "" : blockId.getPath();
 
         if (path.contains("oxidized")) {

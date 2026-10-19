@@ -6,6 +6,8 @@ import com.kingodogo.buildscape.block.MuffBlock;
 import com.kingodogo.buildscape.item.ModItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -119,8 +121,8 @@ public class MuffBlockRenderer {
         int b = (color >> 8) & 0xFF;
         int a = color & 0xFF;
 
-        com.mojang.math.Matrix4f pose = poseStack.last().pose();
-        com.mojang.math.Matrix3f normal = poseStack.last().normal();
+        Matrix4f pose = poseStack.last().pose();
+        Matrix3f normal = poseStack.last().normal();
 
         buffer.vertex(pose, (float) x1, (float) y1, (float) z1)
                 .color(r, g, b, a)

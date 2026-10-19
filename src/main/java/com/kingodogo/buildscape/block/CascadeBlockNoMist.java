@@ -2,11 +2,21 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -14,8 +24,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.BlockHitResult;
+
 import javax.annotation.Nullable;
 
 public class CascadeBlockNoMist extends Block implements EntityBlock, SimpleWaterloggedBlock {
@@ -34,7 +44,7 @@ public class CascadeBlockNoMist extends Block implements EntityBlock, SimpleWate
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
         return this.defaultBlockState().setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
     }
@@ -70,7 +80,7 @@ public class CascadeBlockNoMist extends Block implements EntityBlock, SimpleWate
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean canBeReplaced(BlockState state, net.minecraft.world.item.context.BlockPlaceContext context) {
+    public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         return false;
     }
 
@@ -87,22 +97,22 @@ public class CascadeBlockNoMist extends Block implements EntityBlock, SimpleWate
 
     @Override
     @SuppressWarnings("deprecation")
-    public net.minecraft.world.InteractionResult use(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
-            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
-        net.minecraft.world.item.ItemStack heldItem = player.getItemInHand(hand);
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit) {
+        ItemStack heldItem = player.getItemInHand(hand);
         if (heldItem.isEmpty()) {
             if (level.getBlockEntity(pos) instanceof CascadeBlockEntity be) {
                 if (!level.isClientSide) {
                     int newLevel = be.cycleParticleLevel();
                     int percentage = newLevel * 20;
-                    player.displayClientMessage(new net.minecraft.network.chat.TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
+                    player.displayClientMessage(new TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
                     float pitch = 0.6f + (newLevel * 0.16f);
-                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.LEVER_CLICK, net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, pitch);
+                    level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.5f, pitch);
                 }
-                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
-        return net.minecraft.world.InteractionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Nullable

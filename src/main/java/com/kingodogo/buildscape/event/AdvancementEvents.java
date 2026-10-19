@@ -1,35 +1,45 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.AshenKingPillarBlock;
-import com.kingodogo.buildscape.block.FrostRoseBlock;
 import com.kingodogo.buildscape.block.CascadeBlock;
 import com.kingodogo.buildscape.block.CascadeBlockNoMist;
-import com.kingodogo.buildscape.block.SmokeVentBlock;
+import com.kingodogo.buildscape.block.FrostRoseBlock;
+import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.block.MuffBlock;
+import com.kingodogo.buildscape.block.PillarBlock;
+import com.kingodogo.buildscape.block.SmokeVentBlock;
 import com.kingodogo.buildscape.block.SteelBoltBlock;
 import com.kingodogo.buildscape.block.WeatheringBoltBlock;
-import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
 import com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity;
+import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
+import com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem;
 import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.stat.ModStats;
+import com.kingodogo.buildscape.trophy.Trophies;
+import com.kingodogo.buildscape.trophy.TrophyBlockItem;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.advancements.CriterionProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import com.kingodogo.buildscape.trophy.Trophies;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AdvancementEvents {
@@ -63,14 +73,14 @@ public class AdvancementEvents {
     public static void giveItemReward(ServerPlayer player, Item item, int count) {
         if (player == null || item == null || count <= 0) return;
         ItemStack stack = new ItemStack(item, count);
-        if (item instanceof com.kingodogo.buildscape.trophy.TrophyBlockItem
+        if (item instanceof TrophyBlockItem
                 || item == ModItems.GOLDEN_JAR.get() || item == ModItems.FESTIVE_STAR.get()
                 || item == ModItems.GOLDEN_JAR_PATTERN.get() || item == ModItems.FESTIVE_STAR_PATTERN.get()
                 || item == ModItems.STRINGLIGHT_FRAME_PATTERN.get()) {
-            net.minecraft.nbt.CompoundTag tag = stack.getOrCreateTag();
+            CompoundTag tag = stack.getOrCreateTag();
             tag.putString("ObtainedBy", player.getScoreboardName());
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-            tag.putString("ObtainedOn", java.time.LocalDateTime.now().format(formatter));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+            tag.putString("ObtainedOn", LocalDateTime.now().format(formatter));
         }
         if (!player.getInventory().add(stack)) {
             player.drop(stack, false);
@@ -78,7 +88,7 @@ public class AdvancementEvents {
     }
 
     @SubscribeEvent
-    public static void onAdvancementEarned(net.minecraftforge.event.entity.player.AdvancementEvent event) {
+    public static void onAdvancementEarned(AdvancementEvent event) {
         if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
             if (event.getAdvancement() != null) {
                 ResourceLocation id = event.getAdvancement().getId();
@@ -91,17 +101,17 @@ public class AdvancementEvents {
                     }
 
                     switch (path) {
-                        case "put_it_on_display" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_GOLD_PILLAR.get().asItem(), 1);
-                        case "columnist" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_EMERALD_PILLAR.get().asItem(), 1);
-                        case "art_collector" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_DIAMOND_PILLAR.get().asItem(), 1);
-                        case "buildscape_museum" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_NETHERITE_PILLAR.get().asItem(), 1);
+                        case "put_it_on_display" -> giveItemReward(serverPlayer, ModBlocks.ASHENKING_GOLD_PILLAR.get().asItem(), 1);
+                        case "columnist" -> giveItemReward(serverPlayer, ModBlocks.ASHENKING_EMERALD_PILLAR.get().asItem(), 1);
+                        case "art_collector" -> giveItemReward(serverPlayer, ModBlocks.ASHENKING_DIAMOND_PILLAR.get().asItem(), 1);
+                        case "buildscape_museum" -> giveItemReward(serverPlayer, ModBlocks.ASHENKING_NETHERITE_PILLAR.get().asItem(), 1);
                         case "ornamental" -> giveItemReward(serverPlayer, ModItems.BIG_ORNAMENT_TEMPLATE.get(), 1);
                         case "jar_ring_display" -> giveItemReward(serverPlayer, ModItems.GOLDEN_JAR_PATTERN.get(), 1);
                         case "christmas_every_day" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_SNOWFALL.get(), 1);
                         case "light_em_up" -> giveItemReward(serverPlayer, ModItems.STRINGLIGHT_FRAME_PATTERN.get(), 1);
                         case "santas_little_helper" -> giveItemReward(serverPlayer, ModItems.FESTIVE_STAR_PATTERN.get(), 1);
                         case "grand_celebration" -> {
-                            ItemStack reward = com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem.createDefaultStack();
+                            ItemStack reward = InfinitePhoenixFireworkStarItem.createDefaultStack();
                             if (!serverPlayer.getInventory().add(reward)) {
                                 serverPlayer.drop(reward, false);
                             }
@@ -135,7 +145,7 @@ public class AdvancementEvents {
         if (cubeProgress.isDone()) return;
 
         for (String criterion : cubeAdv.getCriteria().keySet()) {
-            net.minecraft.advancements.CriterionProgress cp = cubeProgress.getCriterion(criterion);
+            CriterionProgress cp = cubeProgress.getCriterion(criterion);
             if (cp != null && cp.isDone()) continue;
 
             Advancement reqAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", criterion));
@@ -194,8 +204,8 @@ public class AdvancementEvents {
     public static void onPillarItemInserted(ServerPlayer serverPlayer) {
         if (serverPlayer == null) return;
 
-        serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.INTERACT_WITH_PILLAR);
-        int count = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.INTERACT_WITH_PILLAR);
+        serverPlayer.awardStat(ModStats.INTERACT_WITH_PILLAR);
+        int count = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.INTERACT_WITH_PILLAR);
 
         if (checkRelativeMilestone(serverPlayer, "put_it_on_display", 10, count)) {
             return;
@@ -228,8 +238,8 @@ public class AdvancementEvents {
         CompoundTag tag = serverPlayer.getPersistentData();
 
         if ("buildscape".equals(modId)) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.BLOCKS_PLACED);
-            int placedCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.BLOCKS_PLACED);
+            serverPlayer.awardStat(ModStats.BLOCKS_PLACED);
+            int placedCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.BLOCKS_PLACED);
 
             if (checkRelativeMilestone(serverPlayer, "one_more_block", 100, placedCount)) {
             } else if (checkRelativeMilestone(serverPlayer, "okay_one_more", 1000, placedCount)) {
@@ -243,49 +253,49 @@ public class AdvancementEvents {
         }
 
         if (path.startsWith("hollow_")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.HOLLOW_LOGS_PLACED);
-            int hollowCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.HOLLOW_LOGS_PLACED);
+            serverPlayer.awardStat(ModStats.HOLLOW_LOGS_PLACED);
+            int hollowCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.HOLLOW_LOGS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "i_vented", 10, hollowCount)) {
             }
         }
 
         if (path.contains("icicle")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.ICICLES_PLACED);
-            int icicleCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.ICICLES_PLACED);
+            serverPlayer.awardStat(ModStats.ICICLES_PLACED);
+            int icicleCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.ICICLES_PLACED);
             if (checkRelativeMilestone(serverPlayer, "chill_out", 10, icicleCount)) {
             }
         }
 
         if (path.contains("ornament")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.ORNAMENTS_PLACED);
-            int ornCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.ORNAMENTS_PLACED);
+            serverPlayer.awardStat(ModStats.ORNAMENTS_PLACED);
+            int ornCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.ORNAMENTS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "ornamental", 100, ornCount)) {
             }
         }
 
         if (path.contains("string_light")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.STRING_LIGHTS_PLACED);
-            int lightCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.STRING_LIGHTS_PLACED);
+            serverPlayer.awardStat(ModStats.STRING_LIGHTS_PLACED);
+            int lightCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.STRING_LIGHTS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "light_em_up", 100, lightCount)) {
             }
         }
 
         if (path.contains("_star")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.STARS_PLACED);
-            int starCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.STARS_PLACED);
+            serverPlayer.awardStat(ModStats.STARS_PLACED);
+            int starCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.STARS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "santas_little_helper", 100, starCount)) {
             }
         }
 
         if (path.startsWith("snowy_")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.SNOWY_LEAVES_PLACED);
-            int snowCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.SNOWY_LEAVES_PLACED);
+            serverPlayer.awardStat(ModStats.SNOWY_LEAVES_PLACED);
+            int snowCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.SNOWY_LEAVES_PLACED);
             if (checkRelativeMilestone(serverPlayer, "a_white_christmas", 100, snowCount)) {
             }
         }
 
         if (block instanceof FrostRoseBlock || path.equals("frost_rose")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.FROSTY_ROSES_PLACED);
+            serverPlayer.awardStat(ModStats.FROSTY_ROSES_PLACED);
             int radius = 3;
             int roseCount = 0;
             for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
@@ -299,27 +309,27 @@ public class AdvancementEvents {
         }
 
         if (block instanceof CascadeBlock || block instanceof CascadeBlockNoMist || path.contains("cascade_block")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.CASCADE_BLOCKS_PLACED);
+            serverPlayer.awardStat(ModStats.CASCADE_BLOCKS_PLACED);
             grant(serverPlayer, "let_it_cascade");
         }
 
         if (block instanceof SmokeVentBlock || path.equals("smoke_vent")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.SMOKE_VENTS_PLACED);
-            int ventCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.SMOKE_VENTS_PLACED);
+            serverPlayer.awardStat(ModStats.SMOKE_VENTS_PLACED);
+            int ventCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.SMOKE_VENTS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "let_it_out", 5, ventCount)) {
             }
         }
 
         if (block instanceof MuffBlock || path.equals("muff_block")) {
             if (level.hasNeighborSignal(pos)) {
-                serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.MUFF_BLOCKS_ACTIVATED);
+                serverPlayer.awardStat(ModStats.MUFF_BLOCKS_ACTIVATED);
                 grant(serverPlayer, "can_you_hear_me_now");
             }
         }
 
         if (path.endsWith("_bolts") || block instanceof SteelBoltBlock || block instanceof WeatheringBoltBlock) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.BOLTS_PLACED);
-            int boltCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.BOLTS_PLACED);
+            serverPlayer.awardStat(ModStats.BOLTS_PLACED);
+            int boltCount = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.BOLTS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "are_you_nuts", 20, boltCount)) {
             }
         }
@@ -373,22 +383,22 @@ public class AdvancementEvents {
         String path = reg.getPath();
 
         if (path.contains("jar") && !path.contains("pattern")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.JARS_CRAFTED, itemStack.getCount());
-            int jars = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.JARS_CRAFTED);
+            serverPlayer.awardStat(ModStats.JARS_CRAFTED, itemStack.getCount());
+            int jars = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.JARS_CRAFTED);
             checkRelativeMilestone(serverPlayer, "jar_ring_display", 100, jars);
         }
 
         if (path.contains("festive_stocking") || path.contains("stocking")) {
-            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.STOCKINGS_CRAFTED, itemStack.getCount());
-            int stockings = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.STOCKINGS_CRAFTED);
+            serverPlayer.awardStat(ModStats.STOCKINGS_CRAFTED, itemStack.getCount());
+            int stockings = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.STOCKINGS_CRAFTED);
             checkRelativeMilestone(serverPlayer, "christmas_every_day", 365, stockings);
         }
     }
 
     public static void onHammerReplace(ServerPlayer player) {
         if (player == null) return;
-        player.awardStat(com.kingodogo.buildscape.stat.ModStats.HAMMER_USED);
-        int count = player.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.HAMMER_USED);
+        player.awardStat(ModStats.HAMMER_USED);
+        int count = player.getStats().getValue(Stats.CUSTOM, ModStats.HAMMER_USED);
 
         grant(player, "fixer_upper");
         checkRelativeMilestone(player, "hammer_time", 1000, count);
@@ -396,8 +406,8 @@ public class AdvancementEvents {
 
     public static void onConfettiUsed(ServerPlayer player) {
         if (player == null) return;
-        player.awardStat(com.kingodogo.buildscape.stat.ModStats.CONFETTI_USED);
-        int count = player.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.CONFETTI_USED);
+        player.awardStat(ModStats.CONFETTI_USED);
+        int count = player.getStats().getValue(Stats.CUSTOM, ModStats.CONFETTI_USED);
         checkRelativeMilestone(player, "celebrate_in_style", 20, count);
     }
 }

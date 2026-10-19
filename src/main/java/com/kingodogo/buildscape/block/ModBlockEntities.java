@@ -1,10 +1,16 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.trophy.Trophies;
+import com.kingodogo.buildscape.trophy.TrophyBlockEntity;
+import com.kingodogo.buildscape.trophy.TrophyDefinition;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
+import java.util.Objects;
 
 public class ModBlockEntities {
 
@@ -247,14 +253,14 @@ public class ModBlockEntities {
                             ModBlocks.POPLAR_SHELF.get()
                     ).build(null));
 
-    public static final RegistryObject<BlockEntityType<com.kingodogo.buildscape.trophy.TrophyBlockEntity>> TROPHY_BLOCK_ENTITY =
+    public static final RegistryObject<BlockEntityType<TrophyBlockEntity>> TROPHY_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("trophy_block_entity",
                     () -> BlockEntityType.Builder.of(
-                            com.kingodogo.buildscape.trophy.TrophyBlockEntity::new,
-                            com.kingodogo.buildscape.trophy.Trophies.getAll().stream()
-                                    .map(com.kingodogo.buildscape.trophy.TrophyDefinition::getBlock)
-                                    .filter(java.util.Objects::nonNull)
-                                    .toArray(net.minecraft.world.level.block.Block[]::new)
+                            TrophyBlockEntity::new,
+                            Trophies.getAll().stream()
+                                    .map(TrophyDefinition::getBlock)
+                                    .filter(Objects::nonNull)
+                                    .toArray(Block[]::new)
                     ).build(null));
 
     public static final RegistryObject<BlockEntityType<HollowLogBlockEntity>> HOLLOW_LOG_BLOCK_ENTITY =

@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -19,8 +20,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 public class HollowLogBlockEntity extends BlockEntity {
     private BlockState decorationState = Blocks.AIR.defaultBlockState();
@@ -274,8 +275,8 @@ public class HollowLogBlockEntity extends BlockEntity {
                 && (getBlockState().getBlock() instanceof HollowPipeBlock
                 || getBlockState().getBlock() instanceof HollowLogBlock)
                 && !previousFlow.equals(pipeFlowState)) {
-            for (net.minecraft.core.Direction direction : net.minecraft.core.Direction.values()) {
-                if (direction == net.minecraft.core.Direction.UP) continue;
+            for (Direction direction : Direction.values()) {
+                if (direction == Direction.UP) continue;
                 BlockPos neighbor = worldPosition.relative(direction);
                 BlockState neighborState = level.getBlockState(neighbor);
                 level.sendBlockUpdated(neighbor, neighborState, neighborState, Block.UPDATE_CLIENTS);

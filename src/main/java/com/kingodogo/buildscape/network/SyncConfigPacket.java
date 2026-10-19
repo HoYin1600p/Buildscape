@@ -1,6 +1,10 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -14,8 +18,8 @@ import java.util.function.Supplier;
 
 public class SyncConfigPacket {
     // Present only for assembled uploads; server-to-client sync always contains all settings.
-    public java.util.Set<com.kingodogo.buildscape.config.ConfigSetting> uploadSettings =
-            com.kingodogo.buildscape.config.ConfigSetting.uploadable();
+    public Set<ConfigSetting> uploadSettings =
+            ConfigSetting.uploadable();
     public static final double MIN_PARTICLE_RATE = NetworkPacketLimits.MIN_PARTICLE_RATE;
     public static final double MAX_PARTICLE_SPEED = NetworkPacketLimits.MAX_PARTICLE_SPEED;
     public static final double MAX_PARTICLE_SPREAD = NetworkPacketLimits.MAX_PARTICLE_SPREAD;
@@ -168,9 +172,9 @@ public class SyncConfigPacket {
                             () ->
                                     () -> {
                                         PillarParticleConfig.setServerConfig(this);
-                                        net.minecraft.client.gui.screens.Screen screen =
-                                                net.minecraft.client.Minecraft.getInstance().screen;
-                                        if (screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen open) {
+                                        Screen screen =
+                                                Minecraft.getInstance().screen;
+                                        if (screen instanceof BuildScapeConfigScreen open) {
                                             open.onServerConfigSynced();
                                         }
                                     }

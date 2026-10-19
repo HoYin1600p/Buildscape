@@ -1,11 +1,14 @@
 package com.kingodogo.buildscape.network;
 
-import io.netty.buffer.Unpooled;
-import net.minecraft.network.FriendlyByteBuf;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class ConfigAssembly {
@@ -49,7 +52,7 @@ public class ConfigAssembly {
         }
     }
 
-    static void writeUpload(FriendlyByteBuf buffer, SyncConfigPacket data, java.util.Set<ConfigSetting> settings) {
+    static void writeUpload(FriendlyByteBuf buffer, SyncConfigPacket data, Set<ConfigSetting> settings) {
         buffer.writeInt(ConfigSetting.mask(settings));
         if (settings.contains(ConfigSetting.ITEMS)) {
             NetworkPacketLimits.checkCount(data.items.size(), NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
@@ -87,14 +90,14 @@ public class ConfigAssembly {
         data.uploadSettings = ConfigSetting.fromMask(buffer.readInt());
         if (data.uploadSettings.contains(ConfigSetting.ITEMS)) {
             int count = NetworkPacketLimits.readCount(buffer, NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
-            data.items = new java.util.HashSet<>();
+            data.items = new HashSet<>();
             for (int i = 0; i < count; i++) {
                 data.items.add(NetworkPacketLimits.readUtf(buffer, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
             }
         }
         if (data.uploadSettings.contains(ConfigSetting.COLORS)) {
             int count = NetworkPacketLimits.readCount(buffer, NetworkPacketLimits.MAX_DYE_COLORS, "particle color");
-            data.particle_color = new java.util.ArrayList<>();
+            data.particle_color = new ArrayList<>();
             for (int i = 0; i < count; i++) {
                 data.particle_color.add(NetworkPacketLimits.readUtf(buffer, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color"));
             }

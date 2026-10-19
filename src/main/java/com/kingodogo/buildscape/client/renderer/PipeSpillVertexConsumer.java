@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.FluidState;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
         }
         BlockPos above = pos.above();
         BlockState pipeAbove = level.getBlockState(above);
-        if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
+        if (fluid.getValue(FlowingFluid.FALLING)
                 && PipeFluidTransport.isHollowPipe(pipeAbove)
                 && level.getBlockEntity(above) instanceof HollowLogBlockEntity entity
                 && entity.getPipeFlowState().hasFluid()
@@ -65,7 +66,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 && entity.getPipeFlowState().hasFlowDirection(Direction.DOWN)) {
             return List.of(new Outlet(Direction.UP, 1.0));
         }
-        if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
+        if (fluid.getValue(FlowingFluid.FALLING)
                 || level.getFluidState(pos.above()).getType().isSame(fluid.getType())) {
             return List.of();
         }

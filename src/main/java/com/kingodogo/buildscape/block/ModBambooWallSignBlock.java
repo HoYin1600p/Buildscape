@@ -1,7 +1,12 @@
 package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.WallSignBlock;
@@ -31,22 +36,22 @@ public class ModBambooWallSignBlock extends WallSignBlock {
     }
 
     @Override
-    public net.minecraft.world.InteractionResult use(
+    public InteractionResult use(
             BlockState state,
             Level level,
             BlockPos pos,
             Player player,
-            net.minecraft.world.InteractionHand hand,
+            InteractionHand hand,
             BlockHitResult hit
     ) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        net.minecraft.world.item.ItemStack heldItem = player.getItemInHand(hand);
+        ItemStack heldItem = player.getItemInHand(hand);
 
         if (!heldItem.isEmpty()) {
             if (
-                    heldItem.getItem() instanceof net.minecraft.world.item.DyeItem ||
-                            heldItem.getItem() == net.minecraft.world.item.Items.GLOW_INK_SAC ||
-                            heldItem.getItem() == net.minecraft.world.item.Items.INK_SAC
+                    heldItem.getItem() instanceof DyeItem ||
+                            heldItem.getItem() == Items.GLOW_INK_SAC ||
+                            heldItem.getItem() == Items.INK_SAC
             ) {
                 return super.use(state, level, pos, player, hand, hit);
             }
@@ -60,6 +65,6 @@ public class ModBambooWallSignBlock extends WallSignBlock {
             return super.use(state, level, pos, player, hand, hit);
         }
 
-        return net.minecraft.world.InteractionResult.PASS;
+        return InteractionResult.PASS;
     }
 }

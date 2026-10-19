@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.item.HammerItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -10,11 +11,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -114,7 +118,7 @@ public class HammerReplacePacket {
                     .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
             List<ItemStack> drops = targetState.getDrops(builder);
             if (!level.setBlock(pos, newState, 3)) return;
-            com.kingodogo.buildscape.event.AdvancementEvents.onHammerReplace(player);
+            AdvancementEvents.onHammerReplace(player);
 
             if (!player.isCreative()) {
                 offhandStack.shrink(1);
@@ -124,8 +128,8 @@ public class HammerReplacePacket {
                 Block.popResource(level, pos, drop);
             }
             if (!player.isCreative() && experience > 0
-                    && level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOBLOCKDROPS)) {
-                net.minecraft.world.entity.ExperienceOrb.award(level, Vec3.atCenterOf(pos), experience);
+                    && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
+                ExperienceOrb.award(level, Vec3.atCenterOf(pos), experience);
             }
 
             if (!player.isCreative()) {
@@ -145,7 +149,7 @@ public class HammerReplacePacket {
     private static boolean isMultiBlockPart(BlockState state) {
         return state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
                 || state.hasProperty(BlockStateProperties.BED_PART)
-                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
+                || state.getBlock() instanceof PistonHeadBlock
                 || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED));
     }
 

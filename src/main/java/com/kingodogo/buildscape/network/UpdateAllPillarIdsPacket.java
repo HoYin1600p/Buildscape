@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -60,7 +61,7 @@ public class UpdateAllPillarIdsPacket {
         NetworkEvent.Context context = ctx.get();
         context.enqueueWork(() -> {
             ServerPlayer serverPlayer = context.getSender();
-            if (serverPlayer == null || !EditGuard.require(serverPlayer, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_BULK)) {
+            if (serverPlayer == null || !EditGuard.require(serverPlayer, ConfigSetting.PILLAR_BULK)) {
                 return;
             }
 

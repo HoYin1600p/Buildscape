@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -27,8 +28,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber(
         modid = BuildScape.MODID,
@@ -118,7 +119,7 @@ public class TagTooltipHandler {
                     boolean hasAnyData = false;
 
                     if (blockEntityTag.contains("GhostFilters", 9)) {
-                        net.minecraft.nbt.ListTag list = blockEntityTag.getList("GhostFilters", 8);
+                        ListTag list = blockEntityTag.getList("GhostFilters", 8);
                         for (int i = 0; i < 27 && i < list.size(); i++) {
                             String id = list.getString(i);
                             if (!id.isEmpty() && ResourceLocation.isValidResourceLocation(id)) {

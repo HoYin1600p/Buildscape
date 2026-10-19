@@ -2,17 +2,24 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,7 +36,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 
 public class MulticolorGlowLightsBlock
-        extends net.minecraft.world.level.block.VineBlock
+        extends VineBlock
         implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
@@ -90,11 +97,11 @@ public class MulticolorGlowLightsBlock
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition.any()
-                        .setValue(net.minecraft.world.level.block.VineBlock.NORTH, false)
-                        .setValue(net.minecraft.world.level.block.VineBlock.EAST, false)
-                        .setValue(net.minecraft.world.level.block.VineBlock.SOUTH, false)
-                        .setValue(net.minecraft.world.level.block.VineBlock.WEST, false)
-                        .setValue(net.minecraft.world.level.block.VineBlock.UP, false)
+                        .setValue(VineBlock.NORTH, false)
+                        .setValue(VineBlock.EAST, false)
+                        .setValue(VineBlock.SOUTH, false)
+                        .setValue(VineBlock.WEST, false)
+                        .setValue(VineBlock.UP, false)
                         .setValue(DOWN, false)
                         .setValue(WATERLOGGED, false)
                         .setValue(LIT, true)
@@ -126,15 +133,15 @@ public class MulticolorGlowLightsBlock
             CollisionContext context
     ) {
         VoxelShape shape = Shapes.empty();
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.NORTH)) shape =
+        if (state.getValue(VineBlock.NORTH)) shape =
                 Shapes.or(shape, SHAPE_NORTH);
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.SOUTH)) shape =
+        if (state.getValue(VineBlock.SOUTH)) shape =
                 Shapes.or(shape, SHAPE_SOUTH);
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.EAST)) shape =
+        if (state.getValue(VineBlock.EAST)) shape =
                 Shapes.or(shape, SHAPE_EAST);
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.WEST)) shape =
+        if (state.getValue(VineBlock.WEST)) shape =
                 Shapes.or(shape, SHAPE_WEST);
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.UP)) shape =
+        if (state.getValue(VineBlock.UP)) shape =
                 Shapes.or(shape, SHAPE_UP);
         if (state.getValue(DOWN)) shape = Shapes.or(shape, SHAPE_DOWN);
         return shape.isEmpty() ? Shapes.block() : shape;
@@ -154,7 +161,7 @@ public class MulticolorGlowLightsBlock
         if (isExistingGlowLight) {
             for (Direction face : Direction.values()) {
                 BooleanProperty property = face == Direction.DOWN
-                        ? DOWN : net.minecraft.world.level.block.VineBlock.getPropertyForFace(face);
+                        ? DOWN : VineBlock.getPropertyForFace(face);
                 if (property != null && blockState.hasProperty(property)) {
                     placementState = placementState.setValue(property, blockState.getValue(property));
                 }
@@ -177,7 +184,7 @@ public class MulticolorGlowLightsBlock
             if (blockState.getBlock() == this) {
                 BooleanProperty property = attachDirection == Direction.DOWN
                         ? DOWN
-                        : net.minecraft.world.level.block.VineBlock.getPropertyForFace(
+                        : VineBlock.getPropertyForFace(
                         attachDirection
                 );
                 if (
@@ -200,7 +207,7 @@ public class MulticolorGlowLightsBlock
                 Direction attachToGlow = clickedFace.getOpposite();
                 BooleanProperty attachProperty = attachToGlow == Direction.DOWN
                         ? DOWN
-                        : net.minecraft.world.level.block.VineBlock.getPropertyForFace(
+                        : VineBlock.getPropertyForFace(
                         attachToGlow
                 );
 
@@ -237,7 +244,7 @@ public class MulticolorGlowLightsBlock
         if (clickedFace == Direction.DOWN) {
             BlockState state = placementState;
             state = state.setValue(
-                    net.minecraft.world.level.block.VineBlock.UP,
+                    VineBlock.UP,
                     true
             );
             BlockPos placePos = context.getClickedPos();
@@ -256,7 +263,7 @@ public class MulticolorGlowLightsBlock
         BlockPos placePos = context.getClickedPos();
         FluidState fluidState = context.getLevel().getFluidState(placePos);
         BooleanProperty property = attachDirection == Direction.DOWN
-                ? DOWN : net.minecraft.world.level.block.VineBlock.getPropertyForFace(attachDirection);
+                ? DOWN : VineBlock.getPropertyForFace(attachDirection);
         if (isExistingGlowLight && property != null) {
             state = state.setValue(property, true);
         }
@@ -279,7 +286,7 @@ public class MulticolorGlowLightsBlock
         }
 
         BooleanProperty faceProperty =
-                net.minecraft.world.level.block.VineBlock.getPropertyForFace(direction);
+                VineBlock.getPropertyForFace(direction);
         if (
                 faceProperty != null &&
                         state.hasProperty(faceProperty) &&
@@ -300,7 +307,7 @@ public class MulticolorGlowLightsBlock
         }
 
         if (!hasAnyFace(state)) {
-            return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            return Blocks.AIR.defaultBlockState();
         }
 
         return state;
@@ -316,7 +323,7 @@ public class MulticolorGlowLightsBlock
     @Override
     public boolean canSurvive(
             BlockState state,
-            net.minecraft.world.level.LevelReader level,
+            LevelReader level,
             BlockPos pos
     ) {
         return hasAnyFace(state);
@@ -324,10 +331,10 @@ public class MulticolorGlowLightsBlock
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        net.minecraft.world.item.Item heldItem = context.getItemInHand().getItem();
-        if (heldItem instanceof net.minecraft.world.item.BlockItem) {
-            net.minecraft.world.level.block.Block heldBlock =
-                    ((net.minecraft.world.item.BlockItem) heldItem).getBlock();
+        Item heldItem = context.getItemInHand().getItem();
+        if (heldItem instanceof BlockItem) {
+            Block heldBlock =
+                    ((BlockItem) heldItem).getBlock();
 
             if (
                     !(heldBlock instanceof MulticolorGlowLightsBlock ||
@@ -344,7 +351,7 @@ public class MulticolorGlowLightsBlock
             Direction attachDirection = clickedFace.getOpposite();
             BooleanProperty property = attachDirection == Direction.DOWN
                     ? DOWN
-                    : net.minecraft.world.level.block.VineBlock.getPropertyForFace(
+                    : VineBlock.getPropertyForFace(
                     attachDirection
             );
 
@@ -380,7 +387,7 @@ public class MulticolorGlowLightsBlock
         int count = 0;
         for (Direction direction : Direction.values()) {
             BooleanProperty property = direction == Direction.DOWN
-                    ? DOWN : net.minecraft.world.level.block.VineBlock.getPropertyForFace(direction);
+                    ? DOWN : VineBlock.getPropertyForFace(direction);
             if (state.getValue(property)) count++;
         }
         return count;
@@ -388,11 +395,11 @@ public class MulticolorGlowLightsBlock
 
     private boolean hasAnyFace(BlockState state) {
         return (
-                state.getValue(net.minecraft.world.level.block.VineBlock.NORTH) ||
-                        state.getValue(net.minecraft.world.level.block.VineBlock.EAST) ||
-                        state.getValue(net.minecraft.world.level.block.VineBlock.SOUTH) ||
-                        state.getValue(net.minecraft.world.level.block.VineBlock.WEST) ||
-                        state.getValue(net.minecraft.world.level.block.VineBlock.UP) ||
+                state.getValue(VineBlock.NORTH) ||
+                        state.getValue(VineBlock.EAST) ||
+                        state.getValue(VineBlock.SOUTH) ||
+                        state.getValue(VineBlock.WEST) ||
+                        state.getValue(VineBlock.UP) ||
                         state.getValue(DOWN)
         );
     }
@@ -439,8 +446,8 @@ public class MulticolorGlowLightsBlock
                 level.playSound(
                         null,
                         pos,
-                        net.minecraft.sounds.SoundEvents.STONE_BUTTON_CLICK_OFF,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.STONE_BUTTON_CLICK_OFF,
+                        SoundSource.BLOCKS,
                         0.3f,
                         1.0f
                 );
@@ -448,8 +455,8 @@ public class MulticolorGlowLightsBlock
                 level.playSound(
                         null,
                         pos,
-                        net.minecraft.sounds.SoundEvents.STONE_BUTTON_CLICK_ON,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.STONE_BUTTON_CLICK_ON,
+                        SoundSource.BLOCKS,
                         0.3f,
                         1.0f
                 );

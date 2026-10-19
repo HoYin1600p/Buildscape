@@ -1,21 +1,26 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -85,12 +90,12 @@ public class RotateBlockPacket {
             BlockState newState = calculateRotatedState(state, msg.direction, player.getDirection());
 
             if (!newState.equals(state)) {
-                if (net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,
-                        net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos), Direction.UP)) {
-                    player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(level, pos));
+                if (ForgeEventFactory.onBlockPlace(player,
+                        BlockSnapshot.create(level.dimension(), level, pos), Direction.UP)) {
+                    player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
                     return;
                 }
-                if (state.getBlock() instanceof com.kingodogo.buildscape.block.HollowPipeBlock pipe
+                if (state.getBlock() instanceof HollowPipeBlock pipe
                         && newState.hasProperty(BlockStateProperties.AXIS)) {
                     pipe.setAxisAndRefresh(level, pos, state, newState.getValue(BlockStateProperties.AXIS));
                 } else {
@@ -115,7 +120,7 @@ public class RotateBlockPacket {
     private static BlockState calculateRotatedState(BlockState state, ArrowDirection arrowDir, Direction playerFacing) {
         if (state.hasProperty(BlockStateProperties.BED_PART)
                 || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
-                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
+                || state.getBlock() instanceof PistonHeadBlock
                 || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED))) {
             return state;
         }

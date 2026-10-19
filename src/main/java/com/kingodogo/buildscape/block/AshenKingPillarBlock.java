@@ -1,7 +1,24 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.event.AdvancementEvents;
+import com.kingodogo.buildscape.network.ActionBarMessagePacket;
+import com.kingodogo.buildscape.network.ModMessages;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -9,15 +26,21 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.network.PacketDistributor;
+
+import java.util.AbstractMap;
+import java.util.Map;
 
 public class AshenKingPillarBlock extends PillarBlock {
 
@@ -141,7 +164,7 @@ public class AshenKingPillarBlock extends PillarBlock {
     }
 
     @Override
-    public void onPlace(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (!level.isClientSide) {
             BlockPos above = pos.above();
             BlockPos below = pos.below();
@@ -155,150 +178,150 @@ public class AshenKingPillarBlock extends PillarBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.level.block.Block block, BlockPos neighborPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
     }
 
     @Override
-    public net.minecraft.world.InteractionResult use(
+    public InteractionResult use(
             BlockState state,
-            net.minecraft.world.level.Level level,
+            Level level,
             BlockPos pos,
-            net.minecraft.world.entity.player.Player player,
-            net.minecraft.world.InteractionHand hand,
-            net.minecraft.world.phys.BlockHitResult hit) {
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
 
         if (level.isClientSide) {
-            return net.minecraft.world.InteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
+        BlockEntity blockEntity = level.getBlockEntity(pos);
         if (!(blockEntity instanceof PillarBlockEntity pillarBE)) {
-            return net.minecraft.world.InteractionResult.PASS;
+            return InteractionResult.PASS;
         }
 
-        net.minecraft.world.item.ItemStack heldItem = player.getItemInHand(hand);
+        ItemStack heldItem = player.getItemInHand(hand);
 
         if (!heldItem.isEmpty()) {
-            java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(heldItem);
+            Map.Entry<String, String> dyeInfo = getDyeColorAndName(heldItem);
             if (dyeInfo != null) {
                 if (pillarBE.hasDisplayItem()) {
                     String dyeColor = dyeInfo.getKey();
                     String dyeName = dyeInfo.getValue();
 
                     if (!pillarBE.canAddMoreColors()) {
-                        net.minecraft.network.chat.TextComponent message =
-                                new net.minecraft.network.chat.TextComponent(
+                        TextComponent message =
+                                new TextComponent(
                                         "Pillar already has " +
                                                 PillarBlockEntity.MAX_DYE_COLORS +
                                                 " colors! Break and replace to reset."
                                 );
-                        message.withStyle(net.minecraft.ChatFormatting.RED);
-                        if (player instanceof net.minecraft.server.level.ServerPlayer) {
-                            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
-                                            (net.minecraft.server.level.ServerPlayer) player
+                        message.withStyle(ChatFormatting.RED);
+                        if (player instanceof ServerPlayer) {
+                            ModMessages.INSTANCE.send(
+                                    PacketDistributor.PLAYER.with(() ->
+                                            (ServerPlayer) player
                                     ),
-                                    new com.kingodogo.buildscape.network.ActionBarMessagePacket(message)
+                                    new ActionBarMessagePacket(message)
                             );
                         }
-                        return net.minecraft.world.InteractionResult.CONSUME;
+                        return InteractionResult.CONSUME;
                     }
 
                     boolean added = pillarBE.addParticleColor(dyeColor);
                     if (!added) {
-                        return net.minecraft.world.InteractionResult.PASS;
+                        return InteractionResult.PASS;
                     }
 
                     if (!player.getAbilities().instabuild) {
                         heldItem.shrink(1);
                     }
 
-                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.DYE_USE,
-                            net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
+                    level.playSound(null, pos, SoundEvents.DYE_USE,
+                            SoundSource.BLOCKS, 1.0f, 1.0f);
 
                     String pillarId = pillarBE.getPillarId();
                     int colorCount = pillarBE.getDyeColorCount();
                     String progressText = " (" + colorCount + "/" + PillarBlockEntity.MAX_DYE_COLORS + ")";
-                    net.minecraft.network.chat.TextComponent message;
+                    TextComponent message;
                     if (pillarId != null) {
-                        message = new net.minecraft.network.chat.TextComponent(
+                        message = new TextComponent(
                                 "[" + pillarId + "] Dyed " + dyeName + progressText);
                     } else {
-                        message = new net.minecraft.network.chat.TextComponent(
+                        message = new TextComponent(
                                 "Pillar Dyed " + dyeName + progressText);
                     }
 
-                    if (player instanceof net.minecraft.server.level.ServerPlayer) {
-                        com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                                net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
-                                        (net.minecraft.server.level.ServerPlayer) player
+                    if (player instanceof ServerPlayer) {
+                        ModMessages.INSTANCE.send(
+                                PacketDistributor.PLAYER.with(() ->
+                                        (ServerPlayer) player
                                 ),
-                                new com.kingodogo.buildscape.network.ActionBarMessagePacket(message)
+                                new ActionBarMessagePacket(message)
                         );
                     }
 
-                    return net.minecraft.world.InteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
             }
         }
 
         if (player.isShiftKeyDown()) {
-            net.minecraft.world.item.ItemStack displayedItem = pillarBE.getDisplayedItem();
+            ItemStack displayedItem = pillarBE.getDisplayedItem();
             boolean isSpawnEgg = !displayedItem.isEmpty() &&
-                    displayedItem.getItem() instanceof net.minecraft.world.item.SpawnEggItem;
+                    displayedItem.getItem() instanceof SpawnEggItem;
 
             if (isSpawnEgg) {
                 pillarBE.rotateFacing();
                 float facingYaw = pillarBE.getFacingYaw();
                 String direction = getDirectionName(facingYaw);
-                net.minecraft.network.chat.TextComponent message =
-                        new net.minecraft.network.chat.TextComponent("Mob facing: " + direction);
-                message.withStyle(net.minecraft.ChatFormatting.GREEN);
+                TextComponent message =
+                        new TextComponent("Mob facing: " + direction);
+                message.withStyle(ChatFormatting.GREEN);
                 player.displayClientMessage(message, true);
 
-                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK,
-                        net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, 1.0f);
-                return net.minecraft.world.InteractionResult.SUCCESS;
+                level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK,
+                        SoundSource.BLOCKS, 0.5f, 1.0f);
+                return InteractionResult.SUCCESS;
             } else {
                 pillarBE.cycleParticlePattern();
                 String pattern = pillarBE.getParticlePattern();
                 if (pattern == null) {
-                    pattern = com.kingodogo.buildscape.config.PillarParticleConfig.get().pattern;
+                    pattern = PillarParticleConfig.get().pattern;
                 }
 
-                net.minecraft.ChatFormatting color = getPatternColor(pattern);
-                net.minecraft.network.chat.TextComponent patternText =
-                        (net.minecraft.network.chat.TextComponent) new net.minecraft.network.chat.TextComponent(pattern)
+                ChatFormatting color = getPatternColor(pattern);
+                TextComponent patternText =
+                        (TextComponent) new TextComponent(pattern)
                                 .withStyle(color);
                 player.displayClientMessage(patternText, true);
 
-                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK,
-                        net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, 1.0f);
-                return net.minecraft.world.InteractionResult.SUCCESS;
+                level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK,
+                        SoundSource.BLOCKS, 0.5f, 1.0f);
+                return InteractionResult.SUCCESS;
             }
         }
 
         if (heldItem.isEmpty() && pillarBE.hasDisplayItem()) {
-            net.minecraft.world.item.ItemStack displayedItem = pillarBE.getDisplayedItem();
+            ItemStack displayedItem = pillarBE.getDisplayedItem();
             if (!displayedItem.isEmpty()) {
-                pillarBE.setDisplayedItem(net.minecraft.world.item.ItemStack.EMPTY);
+                pillarBE.setDisplayedItem(ItemStack.EMPTY);
                 level.sendBlockUpdated(pos, level.getBlockState(pos), level.getBlockState(pos), 3);
 
-                net.minecraft.world.entity.item.ItemEntity itemEntity =
-                        new net.minecraft.world.entity.item.ItemEntity(
+                ItemEntity itemEntity =
+                        new ItemEntity(
                                 level, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5,
                                 displayedItem.copy());
                 itemEntity.setDefaultPickUpDelay();
                 level.addFreshEntity(itemEntity);
 
-                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.ITEM_FRAME_REMOVE_ITEM,
-                        net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
-                return net.minecraft.world.InteractionResult.SUCCESS;
+                level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM,
+                        SoundSource.BLOCKS, 1.0f, 1.0f);
+                return InteractionResult.SUCCESS;
             }
         }
 
         if (!heldItem.isEmpty() && !pillarBE.hasDisplayItem()) {
-            net.minecraft.world.item.ItemStack displayItem = heldItem.copy();
+            ItemStack displayItem = heldItem.copy();
             displayItem.setCount(1);
 
             float playerYaw = player.getYRot();
@@ -308,13 +331,13 @@ public class AshenKingPillarBlock extends PillarBlock {
             }
             pillarBE.setDisplayedItem(displayItem, facingYaw);
 
-            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                com.kingodogo.buildscape.event.AdvancementEvents.onPillarItemInserted(serverPlayer);
+            if (player instanceof ServerPlayer serverPlayer) {
+                AdvancementEvents.onPillarItemInserted(serverPlayer);
             }
 
             if (pillarBE.getParticlePattern() == null) {
-                com.kingodogo.buildscape.config.PillarParticleConfig cfg =
-                        com.kingodogo.buildscape.config.PillarParticleConfig.get();
+                PillarParticleConfig cfg =
+                        PillarParticleConfig.get();
                 if (cfg.use_pattern && cfg.pattern != null) {
                 }
             }
@@ -323,50 +346,50 @@ public class AshenKingPillarBlock extends PillarBlock {
                 heldItem.shrink(1);
             }
 
-            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.ITEM_FRAME_ADD_ITEM,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
-            return net.minecraft.world.InteractionResult.SUCCESS;
+            level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM,
+                    SoundSource.BLOCKS, 1.0f, 1.0f);
+            return InteractionResult.SUCCESS;
         }
 
-        return net.minecraft.world.InteractionResult.PASS;
+        return InteractionResult.PASS;
     }
 
-    private java.util.Map.Entry<String, String> getDyeColorAndName(net.minecraft.world.item.ItemStack stack) {
+    private Map.Entry<String, String> getDyeColorAndName(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return null;
 
-        net.minecraft.world.item.Item item = stack.getItem();
-        if (item == net.minecraft.world.item.Items.WHITE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#E8FEFD", "White");
-        else if (item == net.minecraft.world.item.Items.ORANGE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#FF5C00", "Orange");
-        else if (item == net.minecraft.world.item.Items.MAGENTA_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#FF00FF", "Magenta");
-        else if (item == net.minecraft.world.item.Items.LIGHT_BLUE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#3CDFFF", "Light Blue");
-        else if (item == net.minecraft.world.item.Items.YELLOW_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#FFFF00", "Yellow");
-        else if (item == net.minecraft.world.item.Items.LIME_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#BFFE00", "Lime");
-        else if (item == net.minecraft.world.item.Items.PINK_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#F686B7", "Pink");
-        else if (item == net.minecraft.world.item.Items.GRAY_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#232526", "Gray");
-        else if (item == net.minecraft.world.item.Items.LIGHT_GRAY_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#B1B8C5", "Light Gray");
-        else if (item == net.minecraft.world.item.Items.CYAN_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#00FFFF", "Cyan");
-        else if (item == net.minecraft.world.item.Items.PURPLE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#AB87FF", "Purple");
-        else if (item == net.minecraft.world.item.Items.BLUE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#1919EA", "Blue");
-        else if (item == net.minecraft.world.item.Items.BROWN_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#411900", "Brown");
-        else if (item == net.minecraft.world.item.Items.GREEN_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#39FF14", "Green");
-        else if (item == net.minecraft.world.item.Items.RED_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#FF0000", "Red");
-        else if (item == net.minecraft.world.item.Items.BLACK_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#07010C", "Black");
+        Item item = stack.getItem();
+        if (item == Items.WHITE_DYE)
+            return new AbstractMap.SimpleEntry<>("#E8FEFD", "White");
+        else if (item == Items.ORANGE_DYE)
+            return new AbstractMap.SimpleEntry<>("#FF5C00", "Orange");
+        else if (item == Items.MAGENTA_DYE)
+            return new AbstractMap.SimpleEntry<>("#FF00FF", "Magenta");
+        else if (item == Items.LIGHT_BLUE_DYE)
+            return new AbstractMap.SimpleEntry<>("#3CDFFF", "Light Blue");
+        else if (item == Items.YELLOW_DYE)
+            return new AbstractMap.SimpleEntry<>("#FFFF00", "Yellow");
+        else if (item == Items.LIME_DYE)
+            return new AbstractMap.SimpleEntry<>("#BFFE00", "Lime");
+        else if (item == Items.PINK_DYE)
+            return new AbstractMap.SimpleEntry<>("#F686B7", "Pink");
+        else if (item == Items.GRAY_DYE)
+            return new AbstractMap.SimpleEntry<>("#232526", "Gray");
+        else if (item == Items.LIGHT_GRAY_DYE)
+            return new AbstractMap.SimpleEntry<>("#B1B8C5", "Light Gray");
+        else if (item == Items.CYAN_DYE)
+            return new AbstractMap.SimpleEntry<>("#00FFFF", "Cyan");
+        else if (item == Items.PURPLE_DYE)
+            return new AbstractMap.SimpleEntry<>("#AB87FF", "Purple");
+        else if (item == Items.BLUE_DYE)
+            return new AbstractMap.SimpleEntry<>("#1919EA", "Blue");
+        else if (item == Items.BROWN_DYE)
+            return new AbstractMap.SimpleEntry<>("#411900", "Brown");
+        else if (item == Items.GREEN_DYE)
+            return new AbstractMap.SimpleEntry<>("#39FF14", "Green");
+        else if (item == Items.RED_DYE)
+            return new AbstractMap.SimpleEntry<>("#FF0000", "Red");
+        else if (item == Items.BLACK_DYE)
+            return new AbstractMap.SimpleEntry<>("#07010C", "Black");
 
         return null;
     }
@@ -381,18 +404,18 @@ public class AshenKingPillarBlock extends PillarBlock {
         else return "East";
     }
 
-    private net.minecraft.ChatFormatting getPatternColor(String pattern) {
-        if (pattern == null) return net.minecraft.ChatFormatting.WHITE;
+    private ChatFormatting getPatternColor(String pattern) {
+        if (pattern == null) return ChatFormatting.WHITE;
 
         switch (pattern) {
-            case "default": return net.minecraft.ChatFormatting.WHITE;
-            case "beam": return net.minecraft.ChatFormatting.AQUA;
-            case "spiral": return net.minecraft.ChatFormatting.LIGHT_PURPLE;
-            case "fountain": return net.minecraft.ChatFormatting.BLUE;
-            case "pulse": return net.minecraft.ChatFormatting.RED;
-            case "ring": return net.minecraft.ChatFormatting.GOLD;
-            case "burst": return net.minecraft.ChatFormatting.YELLOW;
-            default: return net.minecraft.ChatFormatting.GRAY;
+            case "default": return ChatFormatting.WHITE;
+            case "beam": return ChatFormatting.AQUA;
+            case "spiral": return ChatFormatting.LIGHT_PURPLE;
+            case "fountain": return ChatFormatting.BLUE;
+            case "pulse": return ChatFormatting.RED;
+            case "ring": return ChatFormatting.GOLD;
+            case "burst": return ChatFormatting.YELLOW;
+            default: return ChatFormatting.GRAY;
         }
     }
 }

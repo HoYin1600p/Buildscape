@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -39,7 +40,7 @@ public class SyncSignFramePacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+                Minecraft mc = Minecraft.getInstance();
                 if (mc.level != null) {
                     BlockEntity be = mc.level.getBlockEntity(this.pos);
                     if (be instanceof SignBlockEntity sign) {

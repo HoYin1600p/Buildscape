@@ -1,19 +1,26 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.CopperChestBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-        modid = com.kingodogo.buildscape.BuildScape.MODID,
-        value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+@Mod.EventBusSubscriber(
+        modid = BuildScape.MODID,
+        value = Dist.CLIENT)
 public class CopperChestItemRenderer extends BlockEntityWithoutLevelRenderer {
     public static final CopperChestItemRenderer INSTANCE = new CopperChestItemRenderer();
     private CopperChestBlockEntity dummyBE;
@@ -22,8 +29,8 @@ public class CopperChestItemRenderer extends BlockEntityWithoutLevelRenderer {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
     }
 
-    @net.minecraftforge.eventbus.api.SubscribeEvent
-    public static void onLogout(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent event) {
+    @SubscribeEvent
+    public static void onLogout(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         INSTANCE.dummyBE = null;
     }
 
@@ -48,14 +55,14 @@ public class CopperChestItemRenderer extends BlockEntityWithoutLevelRenderer {
                 dummyBE.setLevel(Minecraft.getInstance().level);
             }
 
-            net.minecraft.client.renderer.blockentity.BlockEntityRenderer<CopperChestBlockEntity> renderer = Minecraft
+            BlockEntityRenderer<CopperChestBlockEntity> renderer = Minecraft
                     .getInstance()
                     .getBlockEntityRenderDispatcher()
                     .getRenderer(dummyBE);
             if (renderer != null) {
                 poseStack.pushPose();
                 poseStack.translate(0.5D, 0.5D, 0.5D);
-                poseStack.mulPose(com.mojang.math.Vector3f.YP.rotationDegrees(270.0F));
+                poseStack.mulPose(Vector3f.YP.rotationDegrees(270.0F));
                 poseStack.translate(-0.5D, -0.5D, -0.5D);
 
                 renderer.render(dummyBE, 0.0F, poseStack, bufferSource, combinedLight, combinedOverlay);

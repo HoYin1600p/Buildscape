@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.block.CushionBlock;
+import com.kingodogo.buildscape.block.CushionSupport;
 import com.kingodogo.buildscape.block.ExperienceFluidBlock;
 import com.kingodogo.buildscape.fluid.ModFluids;
 import net.minecraft.core.BlockPos;
@@ -27,8 +29,8 @@ public abstract class EntityMixin {
     private void buildscape$cushionOnPos(CallbackInfoReturnable<BlockPos> cir) {
         Entity self = (Entity) (Object) this;
         BlockPos vanilla = cir.getReturnValue();
-        BlockPos fixed = com.kingodogo.buildscape.block.CushionSupport.supportingPos(vanilla, self.getX(), self.getY(), self.getZ(),
-                pos -> self.level.getBlockState(pos).getBlock() instanceof com.kingodogo.buildscape.block.CushionBlock);
+        BlockPos fixed = CushionSupport.supportingPos(vanilla, self.getX(), self.getY(), self.getZ(),
+                pos -> self.level.getBlockState(pos).getBlock() instanceof CushionBlock);
         if (fixed != vanilla) {
             cir.setReturnValue(fixed);
         }

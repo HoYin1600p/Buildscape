@@ -6,7 +6,9 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.tags.FluidTags;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -47,7 +49,7 @@ public class CascadeParticle extends TextureSheetParticle {
 
         this.setSpriteFromAge(this.sprites);
 
-        if (this.level.getFluidState(new net.minecraft.core.BlockPos(this.x, this.y, this.z)).is(net.minecraft.tags.FluidTags.WATER)) {
+        if (this.level.getFluidState(new BlockPos(this.x, this.y, this.z)).is(FluidTags.WATER)) {
             this.yd += 0.005F;
         } else {
             this.yd -= this.gravity;

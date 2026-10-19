@@ -6,13 +6,16 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @OnlyIn(Dist.CLIENT)
 public class CherryParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;
     private final float rotSpeed;
 
-    private static final java.util.Map<String, ColorEntry> POSITION_COLOR_MAP = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<String, ColorEntry> POSITION_COLOR_MAP = new ConcurrentHashMap<>();
 
     private static class ColorEntry {
         final String colorCode;

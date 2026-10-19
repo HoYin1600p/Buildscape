@@ -9,10 +9,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -37,8 +40,8 @@ public class SignFrameInteractionHandler {
         ItemStack heldItem = event.getItemStack();
         InteractionHand hand = event.getHand();
 
-        boolean isShears = heldItem.getItem() instanceof net.minecraft.world.item.ShearsItem
-                || heldItem.is(net.minecraft.world.item.Items.SHEARS);
+        boolean isShears = heldItem.getItem() instanceof ShearsItem
+                || heldItem.is(Items.SHEARS);
         boolean signHasFrame = SignFrameAttachment.hasFrame(sign);
 
         if (isShears && signHasFrame) {
@@ -58,7 +61,7 @@ public class SignFrameInteractionHandler {
 
                 heldItem.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                 level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
-                level.gameEvent(player, net.minecraft.world.level.gameevent.GameEvent.SHEAR, pos);
+                level.gameEvent(player, GameEvent.SHEAR, pos);
             }
 
             player.swing(hand);

@@ -1,31 +1,43 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.client.HazeBushParticleHandler;
 import com.kingodogo.buildscape.item.ModItems;
 import com.kingodogo.buildscape.particle.ModParticles;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.RegistryObject;
 
-import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 public class PottedHazeBushBlock extends FlowerPotBlock {
 
@@ -58,22 +70,22 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             return;
         }
 
-        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-        if (mc.options.particles == net.minecraft.client.ParticleStatus.MINIMAL) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.particles == ParticleStatus.MINIMAL) {
             return;
         }
 
-        com.kingodogo.buildscape.client.HazeBushParticleHandler.track(pos);
+        HazeBushParticleHandler.track(pos);
 
-        if (mc.options.particles == net.minecraft.client.ParticleStatus.DECREASED && random.nextFloat() > 0.5F) {
+        if (mc.options.particles == ParticleStatus.DECREASED && random.nextFloat() > 0.5F) {
             return;
         }
 
         float[] rgb = HazeBushBlock.getPastelColor(this.color);
 
-        int count = (mc.options.particles == net.minecraft.client.ParticleStatus.DECREASED) ? 1 : (1 + random.nextInt(2));
+        int count = (mc.options.particles == ParticleStatus.DECREASED) ? 1 : (1 + random.nextInt(2));
         for (int i = 0; i < count; i++) {
-            net.minecraft.world.phys.Vec3 particlePos = com.kingodogo.buildscape.client.HazeBushParticleHandler.findHazeParticlePos(level, pos, random);
+            Vec3 particlePos = HazeBushParticleHandler.findHazeParticlePos(level, pos, random);
             if (particlePos != null) {
                 level.addParticle(ModParticles.HAZE.get(), particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1], rgb[2]);
             }
@@ -111,7 +123,7 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             DyeColor dyeColor = dyeItem.getDyeColor();
             if (this.color != dyeColor) {
                 if (!level.isClientSide) {
-                    net.minecraftforge.registries.RegistryObject<Block> targetBlock = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(dyeColor);
+                    RegistryObject<Block> targetBlock = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(dyeColor);
                     if (targetBlock != null) {
                         boolean hadHaze = state.getValue(HAS_HAZE);
                         level.setBlock(pos, targetBlock.get().defaultBlockState().setValue(HAS_HAZE, hadHaze), 3);
@@ -166,7 +178,7 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
 
         ItemStack plantDrop = new ItemStack(this.getContent());
         if (!state.getValue(HAS_HAZE)) {
-            net.minecraft.nbt.CompoundTag blockStateTag = new net.minecraft.nbt.CompoundTag();
+            CompoundTag blockStateTag = new CompoundTag();
             blockStateTag.putString("has_haze", "false");
             plantDrop.addTagElement("BlockStateTag", blockStateTag);
             plantDrop.getOrCreateTag().putBoolean("HasHaze", false);
@@ -178,18 +190,18 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             player.drop(plantDrop, false);
         }
 
-        level.setBlock(pos, net.minecraft.world.level.block.Blocks.FLOWER_POT.defaultBlockState(), 3);
-        level.gameEvent(player, net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE, pos);
+        level.setBlock(pos, Blocks.FLOWER_POT.defaultBlockState(), 3);
+        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
-    public java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
-        java.util.List<ItemStack> drops = super.getDrops(state, builder);
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+        List<ItemStack> drops = super.getDrops(state, builder);
         if (!state.getValue(HAS_HAZE)) {
             for (ItemStack drop : drops) {
-                if (drop.getItem() instanceof net.minecraft.world.item.BlockItem bi && bi.getBlock() == this.getContent()) {
-                    net.minecraft.nbt.CompoundTag blockStateTag = new net.minecraft.nbt.CompoundTag();
+                if (drop.getItem() instanceof BlockItem bi && bi.getBlock() == this.getContent()) {
+                    CompoundTag blockStateTag = new CompoundTag();
                     blockStateTag.putString("has_haze", "false");
                     drop.addTagElement("BlockStateTag", blockStateTag);
                     drop.getOrCreateTag().putBoolean("HasHaze", false);
@@ -200,10 +212,10 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         ItemStack stack = super.getCloneItemStack(level, pos, state);
         if (!state.getValue(HAS_HAZE)) {
-            net.minecraft.nbt.CompoundTag blockStateTag = new net.minecraft.nbt.CompoundTag();
+            CompoundTag blockStateTag = new CompoundTag();
             blockStateTag.putString("has_haze", "false");
             stack.addTagElement("BlockStateTag", blockStateTag);
             stack.getOrCreateTag().putBoolean("HasHaze", false);

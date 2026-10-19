@@ -1,14 +1,9 @@
 package com.kingodogo.buildscape.worldgen;
 
+import com.kingodogo.buildscape.block.MangrovePropaguleBlock;
+import com.kingodogo.buildscape.block.ModBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelSimulatedReader;
@@ -17,6 +12,15 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.function.BiConsumer;
 
 public class MangrovePropaguleDecorator extends TreeDecorator {
 
@@ -90,10 +94,10 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
         }
         var supportedLeaves = new ArrayList<>(supported);
         supportedLeaves.sort(BlockPos::compareTo);
-        java.util.Collections.shuffle(supportedLeaves, random);
+        Collections.shuffle(supportedLeaves, random);
 
         int placed = 0;
-        List<net.minecraft.world.phys.AABB> exclusions = new ArrayList<>();
+        List<AABB> exclusions = new ArrayList<>();
         for (BlockPos leafPos : supportedLeaves) {
             if (placed >= propagulesToPlace) {
                 break;
@@ -101,7 +105,7 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
 
             BlockPos belowPos = leafPos.below();
             if (random.nextFloat() >= probability || exclusions.stream().anyMatch(
-                    bounds -> bounds.contains(net.minecraft.world.phys.Vec3.atCenterOf(belowPos)))) {
+                    bounds -> bounds.contains(Vec3.atCenterOf(belowPos)))) {
                 continue;
             }
 
@@ -128,24 +132,24 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
                 if (canPlace) {
                     int age = random.nextInt(5);
                     BlockState propaguleState =
-                            com.kingodogo.buildscape.block.ModBlocks.MANGROVE_PROPAGULE.get()
+                            ModBlocks.MANGROVE_PROPAGULE.get()
                                     .defaultBlockState()
                                     .setValue(
-                                            com.kingodogo.buildscape.block.MangrovePropaguleBlock.AGE,
+                                            MangrovePropaguleBlock.AGE,
                                             age
                                     )
                                     .setValue(
-                                            com.kingodogo.buildscape.block.MangrovePropaguleBlock.HANGING,
+                                            MangrovePropaguleBlock.HANGING,
                                             true
                                     )
                                     .setValue(
-                                            com.kingodogo.buildscape.block.MangrovePropaguleBlock.WATERLOGGED,
+                                            MangrovePropaguleBlock.WATERLOGGED,
                                             level.isStateAtPosition(belowPos, state -> state.is(Blocks.WATER))
                                     );
 
                     blockSetter.accept(belowPos, propaguleState);
                     int radiusXZ = exclusionRadiusXZ.sample(random);
-                    exclusions.add(new net.minecraft.world.phys.AABB(belowPos).inflate(
+                    exclusions.add(new AABB(belowPos).inflate(
                             radiusXZ, exclusionRadiusY.sample(random), radiusXZ));
                     placed++;
                 }

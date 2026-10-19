@@ -1,6 +1,19 @@
 package com.kingodogo.buildscape.item;
 
+import com.kingodogo.buildscape.block.HollowPipeBlock;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+
+import java.util.List;
+import javax.annotation.Nullable;
 
 public class WrenchItem extends Item {
 
@@ -9,15 +22,15 @@ public class WrenchItem extends Item {
     }
 
     @Override
-    public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
-        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wrench.desc1").withStyle(net.minecraft.ChatFormatting.GRAY));
-        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wrench.desc2").withStyle(net.minecraft.ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(new TranslatableComponent("tooltip.buildscape.wrench.desc1").withStyle(ChatFormatting.GRAY));
+        tooltip.add(new TranslatableComponent("tooltip.buildscape.wrench.desc2").withStyle(ChatFormatting.GRAY));
         super.appendHoverText(stack, level, tooltip, flag);
     }
 
     @Override
-    public boolean doesSneakBypassUse(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.LevelReader level,
-                                      net.minecraft.core.BlockPos pos, net.minecraft.world.entity.player.Player player) {
-        return level.getBlockState(pos).getBlock() instanceof com.kingodogo.buildscape.block.HollowPipeBlock;
+    public boolean doesSneakBypassUse(ItemStack stack, LevelReader level,
+                                      BlockPos pos, Player player) {
+        return level.getBlockState(pos).getBlock() instanceof HollowPipeBlock;
     }
 }

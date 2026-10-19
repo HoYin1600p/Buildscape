@@ -1,34 +1,45 @@
 package com.kingodogo.buildscape.worldgen;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.block.CloverBlock;
+import com.kingodogo.buildscape.block.LeafLitterBlock;
 import com.kingodogo.buildscape.block.ModBlocks;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
+import com.kingodogo.buildscape.block.PetalBlock;
+import com.kingodogo.buildscape.block.WildflowersBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraft.world.level.levelgen.feature.treedecorators.BeehiveDecorator;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer;
+import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @Mod.EventBusSubscriber(
         modid = BuildScape.MODID,
@@ -997,8 +1008,8 @@ public class ModConfiguredFeatures {
                             Feature.RANDOM_PATCH,
                             createFlowerPatchConfiguration(
                                     ModBlocks.WILDFLOWERS.get(),
-                                    com.kingodogo.buildscape.block.WildflowersBlock.FLOWER_AMOUNT,
-                                    com.kingodogo.buildscape.block.WildflowersBlock.FACING
+                                    WildflowersBlock.FLOWER_AMOUNT,
+                                    WildflowersBlock.FACING
                             )
                     )
             );
@@ -1009,8 +1020,8 @@ public class ModConfiguredFeatures {
                             Feature.RANDOM_PATCH,
                             createFlowerPatchConfiguration(
                                     ModBlocks.LEAF_LITTER.get(),
-                                    com.kingodogo.buildscape.block.LeafLitterBlock.FLOWER_AMOUNT,
-                                    com.kingodogo.buildscape.block.LeafLitterBlock.FACING
+                                    LeafLitterBlock.FLOWER_AMOUNT,
+                                    LeafLitterBlock.FACING
                             )
                     )
             );
@@ -1131,7 +1142,7 @@ public class ModConfiguredFeatures {
     );
 
     private static RandomPatchConfiguration createMonetConfiguration(
-            net.minecraft.world.level.block.Block monetBlock
+            Block monetBlock
     ) {
         ConfiguredFeature<?, ?> simpleBlockFeature = new ConfiguredFeature<>(
                 Feature.SIMPLE_BLOCK,
@@ -1143,9 +1154,9 @@ public class ModConfiguredFeatures {
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
                 List.of(
-                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
-                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                        BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesBlocks(
+                                        List.of(Blocks.AIR)
                                 )
                         )
                 )
@@ -1155,13 +1166,13 @@ public class ModConfiguredFeatures {
     }
 
     private static RandomPatchConfiguration createPetalConfigurationWithRandomStates(
-            net.minecraft.world.level.block.Block petalBlock
+            Block petalBlock
     ) {
         IntegerProperty FLOWER_AMOUNT =
-                com.kingodogo.buildscape.block.PetalBlock.FLOWER_AMOUNT;
+                PetalBlock.FLOWER_AMOUNT;
         DirectionProperty FACING_PROP = BlockStateProperties.HORIZONTAL_FACING;
 
-        List<net.minecraft.world.level.block.state.BlockState> states =
+        List<BlockState> states =
                 new ArrayList<>();
 
         Direction[] facings = {
@@ -1172,7 +1183,7 @@ public class ModConfiguredFeatures {
         };
         for (int state = 1; state <= 4; state++) {
             for (Direction facing : facings) {
-                net.minecraft.world.level.block.state.BlockState blockState = petalBlock
+                BlockState blockState = petalBlock
                         .defaultBlockState()
                         .setValue(FLOWER_AMOUNT, state)
                         .setValue(FACING_PROP, facing);
@@ -1190,9 +1201,9 @@ public class ModConfiguredFeatures {
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
                 List.of(
-                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
-                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                        BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesBlocks(
+                                        List.of(Blocks.AIR)
                                 )
                         )
                 )
@@ -1203,13 +1214,13 @@ public class ModConfiguredFeatures {
 
     private static RandomPatchConfiguration createAllPetalsConfigurationWithRandomStates() {
         IntegerProperty FLOWER_AMOUNT =
-                com.kingodogo.buildscape.block.PetalBlock.FLOWER_AMOUNT;
+                PetalBlock.FLOWER_AMOUNT;
         DirectionProperty FACING_PROP = BlockStateProperties.HORIZONTAL_FACING;
 
-        List<net.minecraft.world.level.block.state.BlockState> states =
+        List<BlockState> states =
                 new ArrayList<>();
 
-        net.minecraft.world.level.block.Block[] petalBlocks = {
+        Block[] petalBlocks = {
                 ModBlocks.RED_PETAL.get(),
                 ModBlocks.BLUE_PETAL.get(),
                 ModBlocks.ORANGE_PETAL.get(),
@@ -1224,10 +1235,10 @@ public class ModConfiguredFeatures {
                 Direction.WEST,
         };
 
-        for (net.minecraft.world.level.block.Block petalBlock : petalBlocks) {
+        for (Block petalBlock : petalBlocks) {
             for (int state = 1; state <= 4; state++) {
                 for (Direction facing : facings) {
-                    net.minecraft.world.level.block.state.BlockState blockState =
+                    BlockState blockState =
                             petalBlock
                                     .defaultBlockState()
                                     .setValue(FLOWER_AMOUNT, state)
@@ -1247,9 +1258,9 @@ public class ModConfiguredFeatures {
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
                 List.of(
-                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
-                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                        BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesBlocks(
+                                        List.of(Blocks.AIR)
                                 )
                         )
                 )
@@ -1264,13 +1275,13 @@ public class ModConfiguredFeatures {
     }
 
     private static RandomPatchConfiguration createCloverConfigurationWithRandomStates(
-            net.minecraft.world.level.block.Block cloverBlock
+            Block cloverBlock
     ) {
         IntegerProperty FLOWER_AMOUNT =
-                com.kingodogo.buildscape.block.CloverBlock.FLOWER_AMOUNT;
+                CloverBlock.FLOWER_AMOUNT;
         DirectionProperty FACING_PROP = BlockStateProperties.HORIZONTAL_FACING;
 
-        List<net.minecraft.world.level.block.state.BlockState> states =
+        List<BlockState> states =
                 new ArrayList<>();
 
         Direction[] facings = {
@@ -1281,7 +1292,7 @@ public class ModConfiguredFeatures {
         };
         for (int state = 1; state <= 4; state++) {
             for (Direction facing : facings) {
-                net.minecraft.world.level.block.state.BlockState blockState =
+                BlockState blockState =
                         cloverBlock
                                 .defaultBlockState()
                                 .setValue(FLOWER_AMOUNT, state)
@@ -1300,9 +1311,9 @@ public class ModConfiguredFeatures {
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
                 List.of(
-                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
-                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                        BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesBlocks(
+                                        List.of(Blocks.AIR)
                                 )
                         )
                 )
@@ -1312,11 +1323,11 @@ public class ModConfiguredFeatures {
     }
 
     private static RandomPatchConfiguration createFlowerPatchConfiguration(
-            net.minecraft.world.level.block.Block block,
+            Block block,
             IntegerProperty amountProp,
             DirectionProperty facingProp
     ) {
-        List<net.minecraft.world.level.block.state.BlockState> states = new ArrayList<>();
+        List<BlockState> states = new ArrayList<>();
         Direction[] facings = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
         for (int state = 1; state <= 4; state++) {
             for (Direction facing : facings) {
@@ -1331,9 +1342,9 @@ public class ModConfiguredFeatures {
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
                 List.of(
-                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
-                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                        BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesBlocks(
+                                        List.of(Blocks.AIR)
                                 )
                         )
                 )
@@ -1342,14 +1353,14 @@ public class ModConfiguredFeatures {
     }
 
     private static RandomPatchConfiguration createPetalConfiguration(
-            net.minecraft.world.level.block.Block petalBlock,
+            Block petalBlock,
             int flowerAmount,
             Direction facing
     ) {
-        net.minecraft.world.level.block.state.BlockState state =
+        BlockState state =
                 petalBlock.defaultBlockState();
         IntegerProperty FLOWER_AMOUNT =
-                com.kingodogo.buildscape.block.PetalBlock.FLOWER_AMOUNT;
+                PetalBlock.FLOWER_AMOUNT;
         DirectionProperty FACING_PROP = BlockStateProperties.HORIZONTAL_FACING;
 
         state = state
@@ -1364,9 +1375,9 @@ public class ModConfiguredFeatures {
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
                 List.of(
-                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
-                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                        BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesBlocks(
+                                        List.of(Blocks.AIR)
                                 )
                         )
                 )
@@ -1379,10 +1390,10 @@ public class ModConfiguredFeatures {
             int flowerAmount,
             Direction facing
     ) {
-        net.minecraft.world.level.block.state.BlockState state =
+        BlockState state =
                 ModBlocks.CLOVER.get().defaultBlockState();
         IntegerProperty FLOWER_AMOUNT =
-                com.kingodogo.buildscape.block.CloverBlock.FLOWER_AMOUNT;
+                CloverBlock.FLOWER_AMOUNT;
         DirectionProperty FACING_PROP = BlockStateProperties.HORIZONTAL_FACING;
 
         state = state
@@ -1397,9 +1408,9 @@ public class ModConfiguredFeatures {
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
                 List.of(
-                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
-                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                        BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesBlocks(
+                                        List.of(Blocks.AIR)
                                 )
                         )
                 )
@@ -1417,7 +1428,7 @@ public class ModConfiguredFeatures {
     }
 
     private static SimpleBlockConfiguration createAllColoredSporeBlossomConfiguration() {
-        List<net.minecraft.world.level.block.state.BlockState> states =
+        List<BlockState> states =
                 new ArrayList<>();
 
         states.add(ModBlocks.RED_SPORE_BLOSSOM.get().defaultBlockState());
@@ -1454,9 +1465,9 @@ public class ModConfiguredFeatures {
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
                 List.of(
-                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
-                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                        BlockPredicateFilter.forPredicate(
+                                BlockPredicate.matchesBlocks(
+                                        List.of(Blocks.AIR)
                                 )
                         )
                 )
@@ -1582,23 +1593,23 @@ public class ModConfiguredFeatures {
                 BlockStateProvider.simple(
                         ModBlocks.POPLAR_LOG.get().defaultBlockState()
                 ),
-                new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(
+                new StraightTrunkPlacer(
                         4,
                         2,
                         0
                 ),
-                new net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider(
-                        net.minecraft.util.random.SimpleWeightedRandomList.<net.minecraft.world.level.block.state.BlockState>builder()
+                new WeightedStateProvider(
+                        SimpleWeightedRandomList.<BlockState>builder()
                                 .add(ModBlocks.RED_POPLAR_LEAVES.get().defaultBlockState(), 1)
                                 .add(ModBlocks.ORANGE_POPLAR_LEAVES.get().defaultBlockState(), 1)
                                 .add(ModBlocks.YELLOW_POPLAR_LEAVES.get().defaultBlockState(), 1)
                 ),
-                new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
-                        net.minecraft.util.valueproviders.ConstantInt.of(2),
-                        net.minecraft.util.valueproviders.ConstantInt.of(0),
+                new BlobFoliagePlacer(
+                        ConstantInt.of(2),
+                        ConstantInt.of(0),
                         3
                 ),
-                new net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize(1, 0, 1)
+                new TwoLayersFeatureSize(1, 0, 1)
         )
                 .ignoreVines()
                 .build();
@@ -1607,16 +1618,16 @@ public class ModConfiguredFeatures {
     private static TreeConfiguration createPaleOakTreeConfiguration() {
         return new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider.simple(ModBlocks.PALE_OAK_LOG.get().defaultBlockState()),
-                new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(5, 2, 1),
+                new StraightTrunkPlacer(5, 2, 1),
                 BlockStateProvider.simple(ModBlocks.PALE_OAK_LEAVES.get().defaultBlockState()),
-                new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
-                        net.minecraft.util.valueproviders.ConstantInt.of(2),
-                        net.minecraft.util.valueproviders.ConstantInt.of(0),
+                new BlobFoliagePlacer(
+                        ConstantInt.of(2),
+                        ConstantInt.of(0),
                         3
                 ),
-                new net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize(1, 0, 1)
+                new TwoLayersFeatureSize(1, 0, 1)
         )
-                .decorators(java.util.List.of(CreakingHeartTreeDecorator.INSTANCE))
+                .decorators(List.of(CreakingHeartTreeDecorator.INSTANCE))
                 .ignoreVines()
                 .build();
     }
@@ -1624,14 +1635,14 @@ public class ModConfiguredFeatures {
     private static TreeConfiguration createCherryTreeConfiguration() {
         return new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider.simple(ModBlocks.CHERRY_LOG.get().defaultBlockState()),
-                new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(4, 2, 0),
+                new StraightTrunkPlacer(4, 2, 0),
                 BlockStateProvider.simple(ModBlocks.CHERRY_LEAVES.get().defaultBlockState()),
-                new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
-                        net.minecraft.util.valueproviders.ConstantInt.of(2),
-                        net.minecraft.util.valueproviders.ConstantInt.of(0),
+                new BlobFoliagePlacer(
+                        ConstantInt.of(2),
+                        ConstantInt.of(0),
                         3
                 ),
-                new net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize(1, 0, 1)
+                new TwoLayersFeatureSize(1, 0, 1)
         )
                 .ignoreVines()
                 .build();

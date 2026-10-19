@@ -7,6 +7,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -19,9 +20,8 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 
-import javax.annotation.Nullable;
-
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 public class ExperienceBucketItem extends BucketItem {
     public ExperienceBucketItem(Supplier<? extends Fluid> supplier, Properties properties) {
@@ -43,7 +43,7 @@ public class ExperienceBucketItem extends BucketItem {
         }
 
         InteractionResultHolder<ItemStack> placementResult = super.use(level, player, hand);
-        if (placementResult.getResult() == net.minecraft.world.InteractionResult.PASS) {
+        if (placementResult.getResult() == InteractionResult.PASS) {
             player.startUsingItem(hand);
             return InteractionResultHolder.consume(itemstack);
         }

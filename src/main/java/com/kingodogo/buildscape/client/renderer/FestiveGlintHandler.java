@@ -1,14 +1,19 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.util.FestiveGlintHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-        modid = com.kingodogo.buildscape.BuildScape.MODID,
-        value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+@Mod.EventBusSubscriber(
+        modid = BuildScape.MODID,
+        value = Dist.CLIENT)
 public final class FestiveGlintHandler {
 
     private static final ThreadLocal<Deque<ItemStack>> STACK_TRACKER = ThreadLocal.withInitial(ArrayDeque::new);
@@ -16,9 +21,9 @@ public final class FestiveGlintHandler {
     private FestiveGlintHandler() {
     }
 
-    @net.minecraftforge.eventbus.api.SubscribeEvent
-    public static void onRenderTick(net.minecraftforge.event.TickEvent.RenderTickEvent event) {
-        if (event.phase == net.minecraftforge.event.TickEvent.Phase.START) {
+    @SubscribeEvent
+    public static void onRenderTick(TickEvent.RenderTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
             STACK_TRACKER.get().clear();
         }
     }

@@ -5,6 +5,8 @@ import com.kingodogo.buildscape.block.FestiveStockingBlock;
 import com.kingodogo.buildscape.block.FestiveStockingBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -126,8 +128,8 @@ public class FestiveStockingBlockEntityRenderer
         float vMin = 0.0F;
         float vMax = 1.0F;
 
-        com.mojang.math.Matrix4f pose = poseStack.last().pose();
-        com.mojang.math.Matrix3f normal = poseStack.last().normal();
+        Matrix4f pose = poseStack.last().pose();
+        Matrix3f normal = poseStack.last().normal();
 
         vertexConsumer
                 .vertex(pose, -width, -height, 0.0F)

@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -48,7 +49,7 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
                             String filter = ghostFilters[filterSlot];
                             if (filter != null && !filter.isEmpty() && ResourceLocation.isValidResourceLocation(filter)) {
                                 Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(filter));
-                                if (item != null && item != net.minecraft.world.item.Items.AIR) {
+                                if (item != null && item != Items.AIR) {
                                     return Registry.ITEM.getId(item) + 1;
                                 }
                             }
@@ -75,7 +76,7 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
                 String filter = ghostFilters[menuSlot];
                 if (filter != null && !filter.isEmpty() && ResourceLocation.isValidResourceLocation(filter)) {
                     Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(filter));
-                    if (item != null && item != net.minecraft.world.item.Items.AIR) return item;
+                    if (item != null && item != Items.AIR) return item;
                 }
             }
             return null;
@@ -83,7 +84,7 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
         int rawId = buildscape$filterIds[menuSlot] - 1;
         if (rawId < 0) return null;
         Item item = Registry.ITEM.byId(rawId);
-        return (item == null || item == net.minecraft.world.item.Items.AIR) ? null : item;
+        return (item == null || item == Items.AIR) ? null : item;
     }
 
     @Override

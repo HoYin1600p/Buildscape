@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -45,7 +46,7 @@ public class EditPillarRowsResultPacket {
 
     private void applyClient() {
         try {
-            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.onPillarsSynced();
+            BuildScapeConfigScreen.onPillarsSynced();
         } catch (Throwable ignored) {}
     }
 }

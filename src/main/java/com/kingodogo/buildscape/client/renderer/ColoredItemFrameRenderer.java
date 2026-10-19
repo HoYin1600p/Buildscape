@@ -8,26 +8,31 @@ import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEntity> {
 
     private static final ResourceLocation BIRCH_PLANKS = new ResourceLocation("minecraft", "textures/block/birch_planks.png");
     private static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(BuildScape.MODID, "textures/entity/white_item_frame.png");
-    private static final java.util.Map<String, ResourceLocation> COLOR_TEXTURES = new java.util.HashMap<>();
+    private static final Map<String, ResourceLocation> COLOR_TEXTURES = new HashMap<>();
 
     static {
         for (DyeColor color : DyeColor.values()) {
@@ -36,7 +41,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         }
     }
 
-    private final net.minecraft.client.renderer.entity.ItemRenderer itemRenderer;
+    private final ItemRenderer itemRenderer;
 
     public ColoredItemFrameRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -71,7 +76,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
 
         if (direction == Direction.UP || direction == Direction.DOWN) {
             BlockPos lightPos = entity.blockPosition().relative(direction);
-            packedLight = net.minecraft.client.renderer.LevelRenderer.getLightColor(entity.level, lightPos);
+            packedLight = LevelRenderer.getLightColor(entity.level, lightPos);
         }
 
         poseStack.pushPose();

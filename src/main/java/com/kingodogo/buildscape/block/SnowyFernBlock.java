@@ -1,11 +1,10 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -13,11 +12,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.DoublePlantBlock;
@@ -26,10 +28,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
@@ -74,14 +81,14 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
     ) {
         return (
                 state.is(BlockTags.DIRT) ||
-                        state.is(net.minecraft.world.level.block.Blocks.FARMLAND) ||
-                        state.is(net.minecraft.world.level.block.Blocks.SNOW_BLOCK) ||
-                        state.is(com.kingodogo.buildscape.block.ModBlocks.SNOW_BRICKS.get())
+                        state.is(Blocks.FARMLAND) ||
+                        state.is(Blocks.SNOW_BLOCK) ||
+                        state.is(ModBlocks.SNOW_BRICKS.get())
         );
     }
 
     @Override
-    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state != null) {
             return state.setValue(ON_FARMLAND, shouldSink(context.getLevel(), context.getClickedPos()));
@@ -90,8 +97,8 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
     }
 
     @Override
-    public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
-        if (direction == net.minecraft.core.Direction.DOWN) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+        if (direction == Direction.DOWN) {
             return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
@@ -126,8 +133,8 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
                 level.playSound(
                         player,
                         pos,
-                        net.minecraft.sounds.SoundEvents.BONE_MEAL_USE,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.BONE_MEAL_USE,
+                        SoundSource.BLOCKS,
                         1.0f,
                         1.0f
                 );
@@ -170,7 +177,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
             BlockState largeFernState =
-                    com.kingodogo.buildscape.block.ModBlocks.SNOWY_LARGE_FERN.get()
+                    ModBlocks.SNOWY_LARGE_FERN.get()
                             .defaultBlockState()
                             .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
             if (largeFernState.canSurvive(level, pos)) {
@@ -195,7 +202,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
         LootContext ctx = builder
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK
+                        LootContextParamSets.BLOCK
                 );
         ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
         if (tool != null && !tool.isEmpty()) {
@@ -203,7 +210,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
                 return Collections.singletonList(new ItemStack(this));
             }
             if (
-                    net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
+                    EnchantmentHelper.getItemEnchantmentLevel(
                             Enchantments.SILK_TOUCH,
                             tool
                     ) >

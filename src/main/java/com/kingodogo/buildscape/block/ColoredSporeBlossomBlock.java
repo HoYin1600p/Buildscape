@@ -1,17 +1,18 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.particle.TintedDripParticle;
 import com.mojang.math.Vector3f;
-
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SporeBlossomBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Random;
+
 public class ColoredSporeBlossomBlock
-        extends net.minecraft.world.level.block.SporeBlossomBlock {
+        extends SporeBlossomBlock {
 
     private final Vector3f particleColor;
     private final int particleColorRGB;
@@ -57,7 +58,7 @@ public class ColoredSporeBlossomBlock
                     double fallSpeed = -0.007D - random.nextDouble() * 0.006D;
 
                     if (level.isClientSide) {
-                        com.kingodogo.buildscape.particle.TintedDripParticle.registerColorForPosition(
+                        TintedDripParticle.registerColorForPosition(
                                 spawnX,
                                 centerY,
                                 spawnZ,
@@ -65,7 +66,7 @@ public class ColoredSporeBlossomBlock
                         );
                     }
                     level.addParticle(
-                            com.kingodogo.buildscape.particle.ModParticles.TINTED_DRIP_FALL.get(),
+                            ModParticles.TINTED_DRIP_FALL.get(),
                             spawnX,
                             centerY,
                             spawnZ,
@@ -91,7 +92,7 @@ public class ColoredSporeBlossomBlock
                     double velocityZ = (random.nextDouble() - 0.5D) * 0.04D;
 
                     if (level.isClientSide) {
-                        com.kingodogo.buildscape.particle.TintedDripParticle.registerColorForPosition(
+                        TintedDripParticle.registerColorForPosition(
                                 spreadX,
                                 spreadY,
                                 spreadZ,
@@ -99,7 +100,7 @@ public class ColoredSporeBlossomBlock
                         );
                     }
                     level.addParticle(
-                            com.kingodogo.buildscape.particle.ModParticles.TINTED_DRIP_FALL.get(),
+                            ModParticles.TINTED_DRIP_FALL.get(),
                             spreadX,
                             spreadY,
                             spreadZ,

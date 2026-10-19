@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -121,7 +122,7 @@ public class LogStrippingHandler {
                 BlockState nextState = copyStateProperties(state, targetBlock.defaultBlockState());
 
                 if (!level.isClientSide) {
-                    net.minecraft.nbt.CompoundTag carriedData = null;
+                    CompoundTag carriedData = null;
                     if (level.getBlockEntity(pos) instanceof HollowLogBlockEntity oldBe) {
                         carriedData = oldBe.saveWithoutMetadata();
                         oldBe.setGlassCoverNeg(null);

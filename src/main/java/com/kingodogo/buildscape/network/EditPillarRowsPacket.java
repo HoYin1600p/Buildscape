@@ -7,6 +7,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,7 @@ public class EditPillarRowsPacket {
             if (player == null) return;
             // Pillar identities are read-only; network requests attempting to rename or edit identities are rejected.
             String reason = "read_only";
-            ModMessages.INSTANCE.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+            ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
                     new EditPillarRowsResultPacket(batchId, rows.stream().map(row -> row.oldId).toList(), reason));
         });
         ctx.get().setPacketHandled(true);

@@ -1,12 +1,11 @@
 package com.kingodogo.buildscape.entity;
 
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -20,6 +19,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
 
 public class FallingIcicleEntity extends Entity {
 
@@ -96,7 +97,7 @@ public class FallingIcicleEntity extends Entity {
                         null,
                         this.blockPosition(),
                         blockState.getSoundType().getBreakSound(),
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundSource.BLOCKS,
                         1.0f,
                         1.0f
                 );
@@ -156,7 +157,7 @@ public class FallingIcicleEntity extends Entity {
                         null,
                         this.blockPosition(),
                         blockState.getSoundType().getBreakSound(),
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundSource.BLOCKS,
                         1.0f,
                         1.0f
                 );

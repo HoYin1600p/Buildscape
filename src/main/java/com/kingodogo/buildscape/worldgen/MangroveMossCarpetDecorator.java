@@ -1,19 +1,19 @@
 package com.kingodogo.buildscape.worldgen;
 
+import com.kingodogo.buildscape.block.ModBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelSimulatedReader;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelSimulatedReader;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
-import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
 
 public class MangroveMossCarpetDecorator extends TreeDecorator {
 
@@ -71,10 +71,10 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
                             checkPos,
                             state ->
                                     state.is(
-                                            com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get()
+                                            ModBlocks.MANGROVE_ROOTS.get()
                                     ) ||
                                             state.is(
-                                                    com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get()
+                                                    ModBlocks.MUDDY_MANGROVE_ROOTS.get()
                                             )
                     );
 
@@ -85,7 +85,7 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
                             if (level.isStateAtPosition(abovePos, state -> state.isAir())) {
                                 blockSetter.accept(
                                         abovePos,
-                                        com.kingodogo.buildscape.block.ModBlocks.MOSS_OVERLAY.get()
+                                        ModBlocks.MOSS_OVERLAY.get()
                                                 .defaultBlockState()
                                 );
                             }

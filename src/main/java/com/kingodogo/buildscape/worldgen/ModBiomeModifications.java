@@ -2,23 +2,26 @@ package com.kingodogo.buildscape.worldgen;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModBlocks;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod.EventBusSubscriber(
         modid = BuildScape.MODID,
@@ -27,11 +30,11 @@ import net.minecraftforge.fml.common.Mod;
 public class ModBiomeModifications {
 
     private static BlockPredicate matchesBlocksBelow(List<Block> blocks) {
-        return BlockPredicate.matchesBlocks(blocks, new net.minecraft.core.Vec3i(0, -1, 0));
+        return BlockPredicate.matchesBlocks(blocks, new Vec3i(0, -1, 0));
     }
 
     private static BlockPredicate mossBlockAboveAir() {
-        return BlockPredicate.matchesBlocks(List.of(net.minecraft.world.level.block.Blocks.MOSS_BLOCK), new net.minecraft.core.Vec3i(0, 1, 0));
+        return BlockPredicate.matchesBlocks(List.of(Blocks.MOSS_BLOCK), new Vec3i(0, 1, 0));
     }
 
     private static void addFeatureToBiome(
@@ -47,13 +50,13 @@ public class ModBiomeModifications {
                             InSquarePlacement.spread(),
                             HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
                             BlockPredicateFilter.forPredicate(
-                                    net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                            List.of(net.minecraft.world.level.block.Blocks.AIR)
+                                    BlockPredicate.matchesBlocks(
+                                            List.of(Blocks.AIR)
                                     )
                             ),
                             BlockPredicateFilter.forPredicate(
                                     matchesBlocksBelow(
-                                            List.of(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)
+                                            List.of(Blocks.GRASS_BLOCK)
                                     )
                             ),
                             BiomeFilter.biome()
@@ -119,25 +122,25 @@ public class ModBiomeModifications {
                             InSquarePlacement.spread(),
                             HeightmapPlacement.onHeightmap(Heightmap.Types.OCEAN_FLOOR_WG),
                             BlockPredicateFilter.forPredicate(
-                                    net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                            List.of(net.minecraft.world.level.block.Blocks.AIR)
+                                    BlockPredicate.matchesBlocks(
+                                            List.of(Blocks.AIR)
                                     )
                             ),
                             BlockPredicateFilter.forPredicate(
                                     matchesBlocksBelow(
-                                            new java.util.ArrayList<net.minecraft.world.level.block.Block>() {
+                                            new ArrayList<Block>() {
                                                 {
-                                                    add(net.minecraft.world.level.block.Blocks.GRASS_BLOCK);
-                                                    add(com.kingodogo.buildscape.block.ModBlocks.MUD.get());
+                                                    add(Blocks.GRASS_BLOCK);
+                                                    add(ModBlocks.MUD.get());
                                                 }
                                             }
                                     )
                             ),
                             BlockPredicateFilter.forPredicate(
-                                    net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.wouldSurvive(
-                                            com.kingodogo.buildscape.block.ModBlocks.MANGROVE_PROPAGULE.get()
+                                    BlockPredicate.wouldSurvive(
+                                            ModBlocks.MANGROVE_PROPAGULE.get()
                                                     .defaultBlockState(),
-                                            net.minecraft.core.BlockPos.ZERO
+                                            BlockPos.ZERO
                                     )
                             ),
                             BiomeFilter.biome()
@@ -210,18 +213,18 @@ public class ModBiomeModifications {
                 PlacedFeature innerPlaced = new PlacedFeature(
                         Holder.direct(sporeBlossomFeature),
                         List.of(
-                                com.kingodogo.buildscape.worldgen.MossBlockCeilingPlacement.INSTANCE,
+                                MossBlockCeilingPlacement.INSTANCE,
                                 BlockPredicateFilter.forPredicate(
-                                        net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                                List.of(net.minecraft.world.level.block.Blocks.AIR)
+                                        BlockPredicate.matchesBlocks(
+                                                List.of(Blocks.AIR)
                                         )
                                 )
                         )
                 );
 
                 ConfiguredFeature<?, ?> patchFeature = new ConfiguredFeature<>(
-                        net.minecraft.world.level.levelgen.feature.Feature.RANDOM_PATCH,
-                        new net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration(
+                        Feature.RANDOM_PATCH,
+                        new RandomPatchConfiguration(
                                 10,
                                 7,
                                 2,
@@ -258,27 +261,27 @@ public class ModBiomeModifications {
                                 InSquarePlacement.spread(),
                                 HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
                                 BlockPredicateFilter.forPredicate(
-                                        net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                                List.of(net.minecraft.world.level.block.Blocks.AIR)
+                                        BlockPredicate.matchesBlocks(
+                                                List.of(Blocks.AIR)
                                         )
                                 ),
                                 BlockPredicateFilter.forPredicate(
                                         matchesBlocksBelow(
-                                                new java.util.ArrayList<
-                                                        net.minecraft.world.level.block.Block
+                                                new ArrayList<
+                                                        Block
                                                         >() {
                                                     {
-                                                        add(net.minecraft.world.level.block.Blocks.GRASS_BLOCK);
-                                                        add(com.kingodogo.buildscape.block.ModBlocks.MUD.get());
+                                                        add(Blocks.GRASS_BLOCK);
+                                                        add(ModBlocks.MUD.get());
                                                     }
                                                 }
                                         )
                                 ),
                                 BlockPredicateFilter.forPredicate(
-                                        net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.wouldSurvive(
-                                                com.kingodogo.buildscape.block.ModBlocks.CLOVER.get()
+                                        BlockPredicate.wouldSurvive(
+                                                ModBlocks.CLOVER.get()
                                                         .defaultBlockState(),
-                                                net.minecraft.core.BlockPos.ZERO
+                                                BlockPos.ZERO
                                         )
                                 ),
                                 BiomeFilter.biome()

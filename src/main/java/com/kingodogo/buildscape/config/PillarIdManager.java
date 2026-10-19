@@ -3,14 +3,37 @@ package com.kingodogo.buildscape.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.block.PillarBlock;
+import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
+import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.network.EditPillarRowsPacket;
+import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -43,7 +66,7 @@ public class PillarIdManager {
 
     public static final String VALID_ID_PATTERN = "^[A-Z][A-Za-z0-9-]{1,31}$";
     private final Map<String, String> positionIndex = new ConcurrentHashMap<>();
-    private final Set<net.minecraft.world.level.chunk.LevelChunk> loadedChunks = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Set<LevelChunk> loadedChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private volatile List<PillarData> syncSnapshot = Collections.emptyList();
 
     private long lastLoadedTime = 0L;
@@ -142,7 +165,7 @@ public class PillarIdManager {
 
         if (
                 !level.isClientSide &&
-                        !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
+                        !BuildScape.isServerFullyInitialized()
         ) {
             return PREFIX_STONE + "-P";
         }
@@ -153,14 +176,14 @@ public class PillarIdManager {
 
         try {
             if (!level.isClientSide) {
-                net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(pos);
-                if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                ChunkAccess chunk = level.getChunk(pos);
+                if (!(chunk instanceof LevelChunk)) {
                     return PREFIX_STONE + "-P";
                 }
                 if (
                         !chunk
                                 .getStatus()
-                                .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
+                                .isOrAfter(ChunkStatus.FULL)
                 ) {
                     return PREFIX_STONE + "-P";
                 }
@@ -173,7 +196,7 @@ public class PillarIdManager {
             BlockState state = level.getBlockState(pos);
             Block block = state.getBlock();
             String blockName =
-                    net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(
+                    ForgeRegistries.BLOCKS.getKey(
                             block
                     ).getPath();
 
@@ -249,7 +272,7 @@ public class PillarIdManager {
 
     private void updateCachedWorldDir() {
         try {
-            if (!com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
+            if (!BuildScape.isServerFullyInitialized()) {
                 return;
             }
 
@@ -439,10 +462,10 @@ public class PillarIdManager {
     public PillarData getOrCreatePillarData(Level level, BlockPos pos) {
         BlockPos basePos = pos;
         BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof com.kingodogo.buildscape.block.PillarBlock) {
+        if (state.getBlock() instanceof PillarBlock) {
             BlockPos current = pos;
             int limit = 256;
-            while (limit > 0 && level.getBlockState(current.below()).getBlock() instanceof com.kingodogo.buildscape.block.PillarBlock) {
+            while (limit > 0 && level.getBlockState(current.below()).getBlock() instanceof PillarBlock) {
                 current = current.below();
                 limit--;
             }
@@ -466,8 +489,8 @@ public class PillarIdManager {
         String id = generatePillarId(expectedPrefix);
         PillarData newData = new PillarData(id, dimension, basePos);
 
-        net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(basePos);
-        if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar) {
+        BlockEntity be = level.getBlockEntity(basePos);
+        if (be instanceof PillarBlockEntity pillar) {
             pillar.setPillarId(id);
             pillar.setChanged();
             syncPatternSettingsFromNBT(pillar, newData);
@@ -493,7 +516,7 @@ public class PillarIdManager {
         return positionKey(dimension, pos, null);
     }
 
-    public String positionKey(String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+    public String positionKey(String dimension, BlockPos pos, Direction facing) {
         String key = dimension + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
         if (facing != null) {
             key += ":" + facing.getSerializedName();
@@ -511,7 +534,7 @@ public class PillarIdManager {
         return positionIndex.get(posKey);
     }
 
-    public java.util.Collection<PillarData> getAllData() {
+    public Collection<PillarData> getAllData() {
         return pillarData.values();
     }
 
@@ -523,14 +546,14 @@ public class PillarIdManager {
     public String addDyeColor(Level level, BlockPos pos, String colorCode) {
         PillarData data = getOrCreatePillarData(level, pos);
 
-        net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof PillarBlockEntity pillar) {
             syncPatternSettingsFromNBT(pillar, data);
         }
 
         if (data.addColor(colorCode)) {
             if (data.pattern == null || data.pattern.equals("default")) {
-                data.pattern = com.kingodogo.buildscape.config.PillarParticleConfig.get().pattern;
+                data.pattern = PillarParticleConfig.get().pattern;
                 if (data.pattern == null || data.pattern.isEmpty()) {
                     data.pattern = "ring";
                 }
@@ -574,15 +597,15 @@ public class PillarIdManager {
         if (syncDirty && hasLoaded) {
             try {
                 refreshSyncSnapshot();
-                com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
+                SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
                 syncDirty = false;
             } catch (RuntimeException e) {
-                com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to sync pillar data to players", e);
+                BuildScape.LOGGER.error("Unable to sync pillar data to players", e);
             }
         }
     }
 
-    private static boolean isSameFrameLocation(PillarData data, String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+    private static boolean isSameFrameLocation(PillarData data, String dimension, BlockPos pos, Direction facing) {
         if (!Objects.equals(data.dimension, dimension)) return false;
         if (data.x != pos.getX() || data.y != pos.getY() || data.z != pos.getZ()) return false;
         return data.facing == null || facing == null || data.facing.equals(facing.getSerializedName());
@@ -832,8 +855,8 @@ public class PillarIdManager {
         if (data != null) {
             boolean changed = false;
 
-            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof PillarBlockEntity pillar) {
                 if (syncPatternSettingsFromNBT(pillar, data)) {
                     changed = true;
                 }
@@ -931,9 +954,9 @@ public class PillarIdManager {
                     file.getName() + ".corrupted." + System.currentTimeMillis()).toPath());
             corruptedFileUnpreserved = false;
         } catch (IOException e) {
-            org.apache.logging.log4j.LogManager.getLogger(PillarIdManager.class).error("Unable to preserve corrupted pillar data; saves are blocked", e);
+            LogManager.getLogger(PillarIdManager.class).error("Unable to preserve corrupted pillar data; saves are blocked", e);
         }
-        org.apache.logging.log4j.LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar data (" + errorType + ")", error);
+        LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar data (" + errorType + ")", error);
     }
 
     private boolean fileWasDeleted = false;
@@ -972,7 +995,7 @@ public class PillarIdManager {
             if (removedFrames.containsKey(entry.getKey())) continue;
             PillarData data = entry.getValue();
             if (isItemFrameData(data) && isRemovedFrame(data.id, data.dimension, data.getBlockPos(),
-                    data.facing == null ? null : net.minecraft.core.Direction.byName(data.facing))) continue;
+                    data.facing == null ? null : Direction.byName(data.facing))) continue;
             if (pillarData.putIfAbsent(entry.getKey(), entry.getValue()) == null) changed = true;
         }
         changed |= pruneRegistry();
@@ -1056,7 +1079,7 @@ public class PillarIdManager {
                 Map<String, PillarData> loaded = loadFromFile(backupFile);
                 if (loaded != null && !loaded.isEmpty()) return new SavedData(backupFile, loaded);
             } catch (Exception e) {
-                org.apache.logging.log4j.LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar backup", e);
+                LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar backup", e);
             }
         }
         return new SavedData(file, Collections.emptyMap());
@@ -1088,7 +1111,7 @@ public class PillarIdManager {
                 return false;
             }
 
-            if (!com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
+            if (!BuildScape.isServerFullyInitialized()) {
                 return false;
             }
 
@@ -1115,7 +1138,7 @@ public class PillarIdManager {
             syncDirty = true;
             return true;
         } catch (Throwable t) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to save pillar data", t);
+            BuildScape.LOGGER.error("Unable to save pillar data", t);
             return false;
         }
     }
@@ -1145,15 +1168,15 @@ public class PillarIdManager {
 
         try {
 
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            for (ServerLevel level : server.getAllLevels()) {
                 if (level == null) continue;
 
                 try {
                     int chunkRange = 64;
-                    net.minecraft.core.BlockPos spawnPos = level.getSharedSpawnPos();
-                    net.minecraft.world.level.ChunkPos spawnChunk = spawnPos != null
-                            ? new net.minecraft.world.level.ChunkPos(spawnPos)
-                            : new net.minecraft.world.level.ChunkPos(0, 0);
+                    BlockPos spawnPos = level.getSharedSpawnPos();
+                    ChunkPos spawnChunk = spawnPos != null
+                            ? new ChunkPos(spawnPos)
+                            : new ChunkPos(0, 0);
 
                     for (
                             int chunkX = spawnChunk.x - chunkRange;
@@ -1165,19 +1188,19 @@ public class PillarIdManager {
                                 chunkZ <= spawnChunk.z + chunkRange;
                                 chunkZ++
                         ) {
-                            net.minecraft.world.level.ChunkPos chunkPos =
-                                    new net.minecraft.world.level.ChunkPos(chunkX, chunkZ);
+                            ChunkPos chunkPos =
+                                    new ChunkPos(chunkX, chunkZ);
 
                             if (!level.hasChunkAt(chunkPos.getWorldPosition())) {
                                 continue;
                             }
 
                             try {
-                                net.minecraft.world.level.chunk.ChunkAccess chunkAccess =
+                                ChunkAccess chunkAccess =
                                         level.getChunk(chunkX, chunkZ);
 
                                 if (
-                                        !(chunkAccess instanceof net.minecraft.world.level.chunk.LevelChunk chunk)
+                                        !(chunkAccess instanceof LevelChunk chunk)
                                 ) {
                                     continue;
                                 }
@@ -1185,16 +1208,16 @@ public class PillarIdManager {
                                 if (
                                         !chunkAccess
                                                 .getStatus()
-                                                .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
+                                                .isOrAfter(ChunkStatus.FULL)
                                 ) {
                                     continue;
                                 }
 
-                                for (net.minecraft.world.level.block.entity.BlockEntity be : chunk
+                                for (BlockEntity be : chunk
                                         .getBlockEntities()
                                         .values()) {
                                     if (
-                                            be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE
+                                            be instanceof PillarBlockEntity pillarBE
                                     ) {
 
                                         if (
@@ -1262,21 +1285,21 @@ public class PillarIdManager {
             int skippedCount = 0;
             int colorClearedCount = 0;
 
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            for (ServerLevel level : server.getAllLevels()) {
                 if (level == null) continue;
 
                 String dimensionKey = getDimensionKey(level);
 
                 try {
-                    java.util.Set<
-                            net.minecraft.world.level.block.entity.BlockEntity
-                            > allBlockEntities = new java.util.HashSet<>();
+                    Set<
+                            BlockEntity
+                            > allBlockEntities = new HashSet<>();
 
                     int chunkRange = 64;
-                    net.minecraft.core.BlockPos spawnPos = level.getSharedSpawnPos();
-                    net.minecraft.world.level.ChunkPos spawnChunk = spawnPos != null
-                            ? new net.minecraft.world.level.ChunkPos(spawnPos)
-                            : new net.minecraft.world.level.ChunkPos(0, 0);
+                    BlockPos spawnPos = level.getSharedSpawnPos();
+                    ChunkPos spawnChunk = spawnPos != null
+                            ? new ChunkPos(spawnPos)
+                            : new ChunkPos(0, 0);
 
                     for (
                             int chunkX = spawnChunk.x - chunkRange;
@@ -1288,19 +1311,19 @@ public class PillarIdManager {
                                 chunkZ <= spawnChunk.z + chunkRange;
                                 chunkZ++
                         ) {
-                            net.minecraft.world.level.ChunkPos chunkPos =
-                                    new net.minecraft.world.level.ChunkPos(chunkX, chunkZ);
+                            ChunkPos chunkPos =
+                                    new ChunkPos(chunkX, chunkZ);
 
                             if (!level.hasChunkAt(chunkPos.getWorldPosition())) {
                                 continue;
                             }
 
                             try {
-                                net.minecraft.world.level.chunk.ChunkAccess chunkAccess =
+                                ChunkAccess chunkAccess =
                                         level.getChunk(chunkX, chunkZ);
 
                                 if (
-                                        !(chunkAccess instanceof net.minecraft.world.level.chunk.LevelChunk chunk)
+                                        !(chunkAccess instanceof LevelChunk chunk)
                                 ) {
                                     continue;
                                 }
@@ -1308,17 +1331,17 @@ public class PillarIdManager {
                                 if (
                                         !chunkAccess
                                                 .getStatus()
-                                                .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
+                                                .isOrAfter(ChunkStatus.FULL)
                                 ) {
                                     continue;
                                 }
 
-                                for (net.minecraft.world.level.block.entity.BlockEntity be : chunk
+                                for (BlockEntity be : chunk
                                         .getBlockEntities()
                                         .values()) {
                                     if (
                                             be instanceof
-                                                    com.kingodogo.buildscape.block.PillarBlockEntity
+                                                    PillarBlockEntity
                                     ) {
                                         allBlockEntities.add(be);
                                     }
@@ -1329,9 +1352,9 @@ public class PillarIdManager {
                         }
                     }
 
-                    for (net.minecraft.world.level.block.entity.BlockEntity be : allBlockEntities) {
+                    for (BlockEntity be : allBlockEntities) {
                         if (
-                                be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE
+                                be instanceof PillarBlockEntity pillarBE
                         ) {
                             try {
 
@@ -1363,7 +1386,7 @@ public class PillarIdManager {
                                     }
 
                                     if (!clearColors) {
-                                        java.util.List<String> pillarColors =
+                                        List<String> pillarColors =
                                                 pillarBE.getParticleColors();
                                         if (pillarColors != null && !pillarColors.isEmpty()) {
                                             boolean colorsChanged = false;
@@ -1403,7 +1426,7 @@ public class PillarIdManager {
                                     data.clearColors();
                                     colorClearedCount++;
                                 } else {
-                                    java.util.List<String> pillarColors =
+                                    List<String> pillarColors =
                                             pillarBE.getParticleColors();
                                     if (pillarColors != null && !pillarColors.isEmpty()) {
                                         for (String color : pillarColors) {
@@ -1544,7 +1567,7 @@ public class PillarIdManager {
             }
             return true;
         } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.error(
+            BuildScape.LOGGER.error(
                     "BuildScape: Error saving pillar data to " + file.getAbsolutePath(), e);
             return false;
         }
@@ -1555,7 +1578,7 @@ public class PillarIdManager {
     }
 
     public void syncAllLoadedPillars(
-            net.minecraft.server.MinecraftServer server
+            MinecraftServer server
     ) {
         if (server == null || !server.isRunning()) {
             return;
@@ -1569,7 +1592,7 @@ public class PillarIdManager {
             int syncedCount = 0;
             int skippedCount = 0;
 
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            for (ServerLevel level : server.getAllLevels()) {
                 if (level == null) continue;
 
                 if (!server.isRunning()) break;
@@ -1588,11 +1611,11 @@ public class PillarIdManager {
                             continue;
                         }
 
-                        net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
+                        ChunkAccess chunk = level.getChunk(
                                 pos
                         );
                         if (
-                                !(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)
+                                !(chunk instanceof LevelChunk)
                         ) {
                             skippedCount++;
                             continue;
@@ -1601,16 +1624,16 @@ public class PillarIdManager {
                         if (
                                 !chunk
                                         .getStatus()
-                                        .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
+                                        .isOrAfter(ChunkStatus.FULL)
                         ) {
                             skippedCount++;
                             continue;
                         }
 
-                        net.minecraft.world.level.block.entity.BlockEntity be =
+                        BlockEntity be =
                                 level.getBlockEntity(pos);
                         if (
-                                be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE
+                                be instanceof PillarBlockEntity pillarBE
                         ) {
 
                             pillarBE.syncFromData(data);
@@ -1662,29 +1685,29 @@ public class PillarIdManager {
     }
 
     public void cleanupOrphans(Level level) {
-        if (!serverAuthoritative || !hasLoaded || !(level instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
+        if (!serverAuthoritative || !hasLoaded || !(level instanceof ServerLevel serverLevel)) {
             return;
         }
         String dimension = getDimensionKey(level);
-        Map<net.minecraft.world.level.ChunkPos, List<PillarData>> chunks = new HashMap<>();
+        Map<ChunkPos, List<PillarData>> chunks = new HashMap<>();
         for (PillarData data : pillarData.values()) {
             if (!isItemFrameData(data) || !Objects.equals(dimension, data.dimension)) continue;
             BlockPos pos = data.getBlockPos();
-            if (!level.hasChunkAt(pos) || !serverLevel.areEntitiesLoaded(net.minecraft.world.level.ChunkPos.asLong(pos))) continue;
-            chunks.computeIfAbsent(new net.minecraft.world.level.ChunkPos(pos), key -> new ArrayList<>()).add(data);
+            if (!level.hasChunkAt(pos) || !serverLevel.areEntitiesLoaded(ChunkPos.asLong(pos))) continue;
+            chunks.computeIfAbsent(new ChunkPos(pos), key -> new ArrayList<>()).add(data);
         }
         boolean changed = false;
-        for (Map.Entry<net.minecraft.world.level.ChunkPos, List<PillarData>> entry : chunks.entrySet()) {
-            net.minecraft.world.level.ChunkPos chunk = entry.getKey();
+        for (Map.Entry<ChunkPos, List<PillarData>> entry : chunks.entrySet()) {
+            ChunkPos chunk = entry.getKey();
             Set<String> livePositions = new HashSet<>();
-            net.minecraft.world.phys.AABB bounds = new net.minecraft.world.phys.AABB(
+            AABB bounds = new AABB(
                     chunk.getMinBlockX() - 1, level.getMinBuildHeight() - 1, chunk.getMinBlockZ() - 1,
                     chunk.getMinBlockX() + 17, level.getMaxBuildHeight() + 1, chunk.getMinBlockZ() + 17);
-            for (net.minecraft.world.entity.Entity entity : level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, bounds)) {
-                net.minecraft.core.Direction facing;
-                if (entity instanceof net.minecraft.world.entity.decoration.ItemFrame frame) {
+            for (Entity entity : level.getEntitiesOfClass(Entity.class, bounds)) {
+                Direction facing;
+                if (entity instanceof ItemFrame frame) {
                     facing = frame.getDirection();
-                } else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
+                } else if (entity instanceof ColoredItemFrameEntity frame) {
                     facing = frame.getDirection();
                 } else {
                     continue;
@@ -1693,8 +1716,8 @@ public class PillarIdManager {
                 livePositions.add(positionKey(dimension, entity.blockPosition(), null));
             }
             for (PillarData data : entry.getValue()) {
-                net.minecraft.core.Direction facing = data.facing != null
-                        ? net.minecraft.core.Direction.byName(data.facing) : null;
+                Direction facing = data.facing != null
+                        ? Direction.byName(data.facing) : null;
                 if (!livePositions.contains(positionKey(dimension, data.getBlockPos(), facing))) {
                     changed |= pillarData.remove(data.id, data);
                 }
@@ -1722,7 +1745,7 @@ public class PillarIdManager {
             int preservedCount = 0;
             int patternSyncedCount = 0;
 
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            for (ServerLevel level : server.getAllLevels()) {
                 if (level == null) continue;
 
                 String dimensionKey = getDimensionKey(level);
@@ -1741,32 +1764,32 @@ public class PillarIdManager {
                             continue;
                         }
 
-                        net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(pos);
-                        if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                        ChunkAccess chunk = level.getChunk(pos);
+                        if (!(chunk instanceof LevelChunk)) {
                             preservedCount++;
                             continue;
                         }
 
-                        if (!chunk.getStatus().isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
+                        if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
                             preservedCount++;
                             continue;
                         }
 
-                        net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
-                        if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE)) {
+                        BlockEntity be = level.getBlockEntity(pos);
+                        if (!(be instanceof PillarBlockEntity pillarBE)) {
                             preservedCount++;
                             continue;
                         }
 
                         BlockPos bottomPos = pillarBE.findStackBottom();
-                        net.minecraft.world.level.block.entity.BlockEntity bottomBE = level.getBlockEntity(bottomPos);
+                        BlockEntity bottomBE = level.getBlockEntity(bottomPos);
 
-                        if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
+                        if (!(bottomBE instanceof PillarBlockEntity bottomPillarBE)) {
                             preservedCount++;
                             continue;
                         }
 
-                        java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
+                        List<String> nbtColors = bottomPillarBE.getParticleColors();
 
                         if (nbtColors != null && !nbtColors.isEmpty()) {
                             boolean needsSync = false;
@@ -1843,7 +1866,7 @@ public class PillarIdManager {
         try {
             int loadedCount = 0;
 
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            for (ServerLevel level : server.getAllLevels()) {
                 if (level == null) continue;
 
                 String dimensionKey = getDimensionKey(level);
@@ -1859,28 +1882,28 @@ public class PillarIdManager {
                             continue;
                         }
 
-                        net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(pos);
-                        if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                        ChunkAccess chunk = level.getChunk(pos);
+                        if (!(chunk instanceof LevelChunk)) {
                             continue;
                         }
 
-                        if (!chunk.getStatus().isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
+                        if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
                             continue;
                         }
 
-                        net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
-                        if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE)) {
+                        BlockEntity be = level.getBlockEntity(pos);
+                        if (!(be instanceof PillarBlockEntity pillarBE)) {
                             continue;
                         }
 
                         BlockPos bottomPos = pillarBE.findStackBottom();
-                        net.minecraft.world.level.block.entity.BlockEntity bottomBE = level.getBlockEntity(bottomPos);
+                        BlockEntity bottomBE = level.getBlockEntity(bottomPos);
 
-                        if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
+                        if (!(bottomBE instanceof PillarBlockEntity bottomPillarBE)) {
                             continue;
                         }
 
-                        java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
+                        List<String> nbtColors = bottomPillarBE.getParticleColors();
 
                         if (nbtColors != null && !nbtColors.isEmpty()) {
                             data.clearColors();
@@ -1918,7 +1941,7 @@ public class PillarIdManager {
     }
 
     public boolean syncPatternSettingsFromNBT(
-            com.kingodogo.buildscape.block.PillarBlockEntity pillarBE,
+            PillarBlockEntity pillarBE,
             PillarData data
     ) {
         if (pillarBE == null || data == null) {
@@ -1927,7 +1950,7 @@ public class PillarIdManager {
 
         boolean needsSave = false;
 
-        String pillarType = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(pillarBE.getBlockState().getBlock().asItem()).toString();
+        String pillarType = ForgeRegistries.ITEMS.getKey(pillarBE.getBlockState().getBlock().asItem()).toString();
         if (data.pillarType == null || !data.pillarType.equals(pillarType)) {
             data.pillarType = pillarType;
             needsSave = true;
@@ -1975,18 +1998,18 @@ public class PillarIdManager {
             needsSave = true;
         }
 
-        net.minecraft.core.BlockPos topPos = pillarBE.findStackTop();
-        net.minecraft.world.level.block.entity.BlockEntity topBE = pillarBE.getLevel().getBlockEntity(topPos);
-        net.minecraft.world.item.ItemStack displayedItem = net.minecraft.world.item.ItemStack.EMPTY;
+        BlockPos topPos = pillarBE.findStackTop();
+        BlockEntity topBE = pillarBE.getLevel().getBlockEntity(topPos);
+        ItemStack displayedItem = ItemStack.EMPTY;
 
-        if (topBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity topPillar) {
+        if (topBE instanceof PillarBlockEntity topPillar) {
             displayedItem = topPillar.getDisplayedItem();
         } else {
             displayedItem = pillarBE.getDisplayedItem();
         }
 
         if (displayedItem != null && !displayedItem.isEmpty()) {
-            net.minecraft.resources.ResourceLocation key = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
+            ResourceLocation key = ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
             String itemId = key != null ? key.toString() : null;
             if (itemId != null && (data.displayedItem == null || !data.displayedItem.equals(itemId))) {
                 data.displayedItem = itemId;
@@ -2048,20 +2071,20 @@ public class PillarIdManager {
         return snapshot;
     }
 
-    public synchronized String editPillarRows(List<com.kingodogo.buildscape.network.EditPillarRowsPacket.Row> rows) {
+    public synchronized String editPillarRows(List<EditPillarRowsPacket.Row> rows) {
         if (!serverAuthoritative || rows == null
-                || rows.size() > com.kingodogo.buildscape.network.EditPillarRowsPacket.MAX_ROWS) {
+                || rows.size() > EditPillarRowsPacket.MAX_ROWS) {
             return "invalid";
         }
         Map<String, PillarData> originals = copyDataSnapshot();
         Map<String, PillarData> finalData = new HashMap<>(originals);
         Set<String> oldIds = new HashSet<>();
-        for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+        for (EditPillarRowsPacket.Row row : rows) {
             if (row == null || !row.isValid() || !oldIds.add(row.oldId)) return "invalid";
             if (!pillarData.containsKey(row.oldId)) return "missing";
             finalData.remove(row.oldId);
         }
-        for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+        for (EditPillarRowsPacket.Row row : rows) {
             PillarData data = originals.get(row.oldId);
             if (removedFrames.containsKey(row.newId)) return editConflict("id_conflict", row);
             data.id = row.newId;
@@ -2074,11 +2097,11 @@ public class PillarIdManager {
         }
         Map<String, PillarData> positions = new HashMap<>();
         for (PillarData data : finalData.values()) {
-            net.minecraft.core.Direction facing = data.facing != null
-                    ? net.minecraft.core.Direction.byName(data.facing) : null;
+            Direction facing = data.facing != null
+                    ? Direction.byName(data.facing) : null;
             PillarData conflict = positions.putIfAbsent(positionKey(data.dimension, data.getBlockPos(), facing), data);
             if (conflict != null) {
-                for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+                for (EditPillarRowsPacket.Row row : rows) {
                     if (row.newId.equals(data.id) || row.newId.equals(conflict.id)) return editConflict("position_conflict", row);
                 }
                 return "position_conflict";
@@ -2086,26 +2109,26 @@ public class PillarIdManager {
         }
         if (rows.isEmpty()) return "";
 
-        Map<com.kingodogo.buildscape.block.PillarBlockEntity, String> loadedUpdates = new HashMap<>();
-        for (net.minecraft.world.level.chunk.LevelChunk chunk : loadedChunks) {
+        Map<PillarBlockEntity, String> loadedUpdates = new HashMap<>();
+        for (LevelChunk chunk : loadedChunks) {
             Level level = chunk.getLevel();
             Map<String, String> renamedIds = new HashMap<>();
-            for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+            for (EditPillarRowsPacket.Row row : rows) {
                 PillarData previous = pillarData.get(row.oldId);
                 if (Objects.equals(previous.dimension, getDimensionKey(level)) && previous.facing == null) {
                     renamedIds.put(row.oldId, row.newId);
                 }
             }
             if (renamedIds.isEmpty()) continue;
-            for (net.minecraft.world.level.block.entity.BlockEntity be : chunk.getBlockEntities().values()) {
-                if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar && !pillar.isRemoved()) {
+            for (BlockEntity be : chunk.getBlockEntities().values()) {
+                if (be instanceof PillarBlockEntity pillar && !pillar.isRemoved()) {
                     String renamedId = renamedIds.get(pillar.getPillarId());
                     if (renamedId != null) loadedUpdates.put(pillar, renamedId);
                 }
             }
         }
         Map<String, Map<String, String>> frameRenames = new HashMap<>();
-        for (com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row : rows) {
+        for (EditPillarRowsPacket.Row row : rows) {
             PillarData previous = pillarData.get(row.oldId);
             if (previous.facing != null) {
                 frameRenames.computeIfAbsent(previous.dimension, key -> new HashMap<>()).put(row.oldId, row.newId);
@@ -2114,16 +2137,16 @@ public class PillarIdManager {
         pillarData.clear();
         pillarData.putAll(finalData);
         rebuildPositionIndex();
-        loadedUpdates.forEach(com.kingodogo.buildscape.block.PillarBlockEntity::setPillarId);
+        loadedUpdates.forEach(PillarBlockEntity::setPillarId);
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            for (ServerLevel level : server.getAllLevels()) {
                 String dimension = getDimensionKey(level);
                 Map<String, String> renamedFrames = frameRenames.get(dimension);
                 if (renamedFrames == null) continue;
-                for (net.minecraft.world.entity.Entity entity : level.getAllEntities()) {
-                    if (entity instanceof net.minecraft.world.entity.decoration.ItemFrame
-                            || entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
+                for (Entity entity : level.getAllEntities()) {
+                    if (entity instanceof ItemFrame
+                            || entity instanceof ColoredItemFrameEntity) {
                         CompoundTag tag = entity.getPersistentData();
                         String renamedId = renamedFrames.get(tag.getString("BuildScapeFrameId"));
                         if (renamedId != null) tag.putString("BuildScapeFrameId", renamedId);
@@ -2138,11 +2161,11 @@ public class PillarIdManager {
         return "";
     }
 
-    private static String editConflict(String reason, com.kingodogo.buildscape.network.EditPillarRowsPacket.Row row) {
+    private static String editConflict(String reason, EditPillarRowsPacket.Row row) {
         return reason + ":" + row.oldId + ":" + row.newId;
     }
 
-    public synchronized void trackLoadedChunk(net.minecraft.world.level.chunk.LevelChunk chunk, boolean loaded) {
+    public synchronized void trackLoadedChunk(LevelChunk chunk, boolean loaded) {
         if (loaded) loadedChunks.add(chunk);
         else loadedChunks.remove(chunk);
     }
@@ -2160,7 +2183,7 @@ public class PillarIdManager {
             }
         }
         rebuildPositionIndex();
-        com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearClientCaches();
+        ItemFrameParticleHandler.clearClientCaches();
         hasLoaded = true;
         isServerSynced = true;
     }
@@ -2180,8 +2203,8 @@ public class PillarIdManager {
     }
 
     private void indexPosition(PillarData data) {
-        net.minecraft.core.Direction facing = data.facing != null
-                ? net.minecraft.core.Direction.byName(data.facing)
+        Direction facing = data.facing != null
+                ? Direction.byName(data.facing)
                 : null;
         String key = positionKey(data.dimension, data.getBlockPos(), facing);
         String previousId = positionIndex.get(key);
@@ -2206,8 +2229,8 @@ public class PillarIdManager {
         Map<String, PillarData> frames = new HashMap<>();
         for (PillarData data : new ArrayList<>(pillarData.values())) {
             if (!isItemFrameData(data)) continue;
-            net.minecraft.core.Direction facing = data.facing != null
-                    ? net.minecraft.core.Direction.byName(data.facing) : null;
+            Direction facing = data.facing != null
+                    ? Direction.byName(data.facing) : null;
             String key = positionKey(data.dimension, data.getBlockPos(), facing);
             PillarData previous = frames.get(key);
             if (previous == null) {
@@ -2231,7 +2254,7 @@ public class PillarIdManager {
         return previousSize != pillarData.size();
     }
 
-    public String getFrameIdForPosition(String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+    public String getFrameIdForPosition(String dimension, BlockPos pos, Direction facing) {
         return facing == null ? null : positionIndex.get(positionKey(dimension, pos, facing));
     }
 
@@ -2248,7 +2271,7 @@ public class PillarIdManager {
     public void clearForServerSync() {
         pillarData.clear();
         positionIndex.clear();
-        com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearClientCaches();
+        ItemFrameParticleHandler.clearClientCaches();
         hasLoaded = false;
     }
 
@@ -2259,9 +2282,9 @@ public class PillarIdManager {
         pillarData.put(data.id, data);
         if (data.dimension != null) {
             try {
-                net.minecraft.core.Direction facing = null;
+                Direction facing = null;
                 if (data.facing != null) {
-                    facing = net.minecraft.core.Direction.byName(data.facing);
+                    facing = Direction.byName(data.facing);
                 }
                 positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
             } catch (Exception ignored) {
@@ -2269,21 +2292,21 @@ public class PillarIdManager {
         }
     }
 
-    public void registerPillar(net.minecraft.world.level.block.entity.BlockEntity be) {
+    public void registerPillar(BlockEntity be) {
         if (be == null || be.getLevel() == null || be.getLevel().isClientSide) {
             return;
         }
 
-        if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar)) {
+        if (!(be instanceof PillarBlockEntity pillar)) {
             return;
         }
 
-        if (pillar.getLevel() instanceof net.minecraft.server.level.ServerLevel level) {
-            net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunkSource().getChunkNow(
+        if (pillar.getLevel() instanceof ServerLevel level) {
+            LevelChunk chunk = level.getChunkSource().getChunkNow(
                     pillar.getBlockPos().getX() >> 4, pillar.getBlockPos().getZ() >> 4);
             if (chunk != null) trackLoadedChunk(chunk, true);
         }
-        if (!hasLoaded || !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) return;
+        if (!hasLoaded || !BuildScape.isServerFullyInitialized()) return;
         String dimension = getDimensionKey(pillar.getLevel());
         String id = pillar.getPillarId();
         if (id == null || id.isEmpty()) {
@@ -2342,7 +2365,7 @@ public class PillarIdManager {
         return savedId;
     }
 
-    private String reconcileFrameId(String savedId, String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+    private String reconcileFrameId(String savedId, String dimension, BlockPos pos, Direction facing) {
         String authoritativeId = getFrameIdForPosition(dimension, pos, facing);
         return authoritativeId != null ? authoritativeId : savedId;
     }
@@ -2351,7 +2374,7 @@ public class PillarIdManager {
         requestSave();
     }
 
-    private static void clearFrameData(net.minecraft.world.entity.Entity frame) {
+    private static void clearFrameData(Entity frame) {
         clearFrameData(frame.getPersistentData());
         clearColoredFrameData(frame);
     }
@@ -2365,8 +2388,8 @@ public class PillarIdManager {
         tag.remove("COLORS");
     }
 
-    private static void clearColoredFrameData(net.minecraft.world.entity.Entity frame) {
-        if (frame instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
+    private static void clearColoredFrameData(Entity frame) {
+        if (frame instanceof ColoredItemFrameEntity coloredFrame) {
             coloredFrame.setParticlePattern("none");
             coloredFrame.setParticleColorsRaw("");
         }
@@ -2375,15 +2398,15 @@ public class PillarIdManager {
     private void resetLoadedFrame(PillarData data) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) return;
-        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+        for (ServerLevel level : server.getAllLevels()) {
             if (!Objects.equals(getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
-            for (net.minecraft.world.entity.Entity entity : level.getEntities(null,
-                    new net.minecraft.world.phys.AABB(data.getBlockPos()).inflate(1.0))) {
-                if (!(entity instanceof net.minecraft.world.entity.decoration.ItemFrame)
-                        && !(entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity)) continue;
-                net.minecraft.core.Direction facing = entity instanceof net.minecraft.world.entity.decoration.ItemFrame itemFrame
+            for (Entity entity : level.getEntities(null,
+                    new AABB(data.getBlockPos()).inflate(1.0))) {
+                if (!(entity instanceof ItemFrame)
+                        && !(entity instanceof ColoredItemFrameEntity)) continue;
+                Direction facing = entity instanceof ItemFrame itemFrame
                         ? itemFrame.getDirection()
-                        : ((com.kingodogo.buildscape.entity.ColoredItemFrameEntity) entity).getDirection();
+                        : ((ColoredItemFrameEntity) entity).getDirection();
                 if (isRemovedFrame(entity.getPersistentData().getString("BuildScapeFrameId"),
                         data.dimension, entity.blockPosition(), facing)) clearFrameData(entity);
             }
@@ -2404,18 +2427,18 @@ public class PillarIdManager {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) return false;
         boolean written = false;
-        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+        for (ServerLevel level : server.getAllLevels()) {
             if (!Objects.equals(getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
-            for (net.minecraft.world.entity.Entity entity : level.getEntities(null,
-                    new net.minecraft.world.phys.AABB(data.getBlockPos()).inflate(1.0))) {
-                if (!(entity instanceof net.minecraft.world.entity.decoration.ItemFrame)
-                        && !(entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity)) continue;
-                net.minecraft.core.Direction facing = entity instanceof net.minecraft.world.entity.decoration.ItemFrame itemFrame
+            for (Entity entity : level.getEntities(null,
+                    new AABB(data.getBlockPos()).inflate(1.0))) {
+                if (!(entity instanceof ItemFrame)
+                        && !(entity instanceof ColoredItemFrameEntity)) continue;
+                Direction facing = entity instanceof ItemFrame itemFrame
                         ? itemFrame.getDirection()
-                        : ((com.kingodogo.buildscape.entity.ColoredItemFrameEntity) entity).getDirection();
+                        : ((ColoredItemFrameEntity) entity).getDirection();
                 if (!isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) continue;
                 writeFrameData(entity.getPersistentData(), data.pattern, data.dyeColors);
-                if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
+                if (entity instanceof ColoredItemFrameEntity coloredFrame) {
                     coloredFrame.setParticlePattern(framePattern(data.pattern));
                     coloredFrame.setParticleColorsRaw(String.join(";", data.dyeColors));
                 }
@@ -2431,9 +2454,9 @@ public class PillarIdManager {
 
     /** Puts a frame's pattern and colours into its entity data, replacing the previous values. */
     static void writeFrameData(CompoundTag tag, String pattern, List<String> colors) {
-        net.minecraft.nbt.ListTag colorList = new net.minecraft.nbt.ListTag();
+        ListTag colorList = new ListTag();
         if (colors != null) {
-            for (String color : colors) colorList.add(net.minecraft.nbt.StringTag.valueOf(color));
+            for (String color : colors) colorList.add(StringTag.valueOf(color));
         }
         tag.putString("BuildScapeParticlePattern", framePattern(pattern));
         tag.put("BuildScapeParticleColors", colorList);
@@ -2455,7 +2478,7 @@ public class PillarIdManager {
         return true;
     }
 
-    private boolean isRemovedFrame(String id, String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+    private boolean isRemovedFrame(String id, String dimension, BlockPos pos, Direction facing) {
         boolean hasId = id != null && !id.isEmpty();
         if (hasId && removedFrames.containsKey(id)) return true;
         if (getFrameIdForPosition(dimension, pos, facing) != null) return false;
@@ -2465,14 +2488,14 @@ public class PillarIdManager {
         return false;
     }
 
-    private boolean prepareFrameRegistration(net.minecraft.world.entity.Entity frame, boolean immediate) {
-        net.minecraft.core.Direction facing = frame instanceof net.minecraft.world.entity.decoration.ItemFrame itemFrame
+    private boolean prepareFrameRegistration(Entity frame, boolean immediate) {
+        Direction facing = frame instanceof ItemFrame itemFrame
                 ? itemFrame.getDirection()
-                : ((com.kingodogo.buildscape.entity.ColoredItemFrameEntity) frame).getDirection();
+                : ((ColoredItemFrameEntity) frame).getDirection();
         if (immediate) {
             if (isRemovedFrame(frame.getPersistentData().getString("BuildScapeFrameId"),
                     getDimensionKey(frame.level), frame.blockPosition(), facing)) {
-                com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
+                ItemFrameParticleHandler.reassignFrameId(frame);
             }
             return true;
         }
@@ -2483,17 +2506,17 @@ public class PillarIdManager {
     }
 
     private boolean prepareFrameRegistration(CompoundTag tag, String dimension, BlockPos pos,
-                                             net.minecraft.core.Direction facing) {
+                                             Direction facing) {
         if (!isRemovedFrame(tag.getString("BuildScapeFrameId"), dimension, pos, facing)) return true;
         clearFrameData(tag);
         return false;
     }
 
-    public void registerItemFrame(net.minecraft.world.entity.decoration.ItemFrame frame) {
+    public void registerItemFrame(ItemFrame frame) {
         registerItemFrame(frame, false);
     }
 
-    public void registerItemFrame(net.minecraft.world.entity.decoration.ItemFrame frame, boolean immediate) {
+    public void registerItemFrame(ItemFrame frame, boolean immediate) {
         if (frame == null || frame.level == null || frame.level.isClientSide) {
             return;
         }
@@ -2502,10 +2525,10 @@ public class PillarIdManager {
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString("BuildScapeFrameId");
 
-        String pattern = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getParticlePattern(frame);
+        String pattern = ItemFrameParticleHandler.getParticlePattern(frame);
         List<String> colors = new ArrayList<>();
         if (dataTag.contains("BuildScapeParticleColors")) {
-            net.minecraft.nbt.ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
+            ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
             for (int i = 0; i < colorList.size(); i++) {
                 colors.add(colorList.getString(i));
             }
@@ -2513,12 +2536,12 @@ public class PillarIdManager {
 
         if (id == null || id.isEmpty()) {
             if (!hasFrameParticleData(pattern, colors)) return;
-            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getFrameId(frame);
+            id = ItemFrameParticleHandler.getFrameId(frame);
         }
 
         String dimension = getDimensionKey(frame.level);
         BlockPos pos = frame.blockPosition();
-        net.minecraft.core.Direction facing = frame.getDirection();
+        Direction facing = frame.getDirection();
         String posKey = positionKey(dimension, pos, facing);
 
         id = reconcileFrameId(id, dimension, pos, facing);
@@ -2526,7 +2549,7 @@ public class PillarIdManager {
         PillarData existing = pillarData.get(id);
         if (existing == null && !hasFrameParticleData(pattern, colors)) return;
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
-            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
+            id = ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
         }
         if (applyPendingFrameEdit(existing, dataTag, immediate)) {
@@ -2543,7 +2566,7 @@ public class PillarIdManager {
             data.facing = facing != null ? facing.getSerializedName() : null;
 
             if (!frame.getItem().isEmpty()) {
-                net.minecraft.resources.ResourceLocation itemRL = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
+                ResourceLocation itemRL = ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
                 if (itemRL != null) data.displayedItem = itemRL.toString();
             }
 
@@ -2574,7 +2597,7 @@ public class PillarIdManager {
             }
 
             if (!frame.getItem().isEmpty()) {
-                net.minecraft.resources.ResourceLocation itemKey = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
+                ResourceLocation itemKey = ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
                 String itemId = itemKey != null ? itemKey.toString() : null;
                 if (!Objects.equals(existing.displayedItem, itemId)) {
                     existing.displayedItem = itemId;
@@ -2593,11 +2616,11 @@ public class PillarIdManager {
     }
 
 
-    public void registerColoredItemFrame(com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
+    public void registerColoredItemFrame(ColoredItemFrameEntity frame) {
         registerColoredItemFrame(frame, false);
     }
 
-    public void registerColoredItemFrame(com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame, boolean immediate) {
+    public void registerColoredItemFrame(ColoredItemFrameEntity frame, boolean immediate) {
         if (frame == null || frame.level == null || frame.level.isClientSide) {
             return;
         }
@@ -2606,10 +2629,10 @@ public class PillarIdManager {
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString("BuildScapeFrameId");
 
-        String pattern = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getParticlePatternColored(frame);
+        String pattern = ItemFrameParticleHandler.getParticlePatternColored(frame);
         List<String> colors = new ArrayList<>();
         if (dataTag.contains("BuildScapeParticleColors")) {
-            net.minecraft.nbt.ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
+            ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
             for (int i = 0; i < colorList.size(); i++) {
                 colors.add(colorList.getString(i));
             }
@@ -2617,12 +2640,12 @@ public class PillarIdManager {
 
         if (id == null || id.isEmpty()) {
             if (!hasFrameParticleData(pattern, colors)) return;
-            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getFrameIdColored(frame);
+            id = ItemFrameParticleHandler.getFrameIdColored(frame);
         }
 
         String dimension = getDimensionKey(frame.level);
         BlockPos pos = frame.blockPosition();
-        net.minecraft.core.Direction facing = frame.getDirection();
+        Direction facing = frame.getDirection();
         String posKey = positionKey(dimension, pos, facing);
 
         id = reconcileFrameId(id, dimension, pos, facing);
@@ -2630,7 +2653,7 @@ public class PillarIdManager {
         PillarData existing = pillarData.get(id);
         if (existing == null && !hasFrameParticleData(pattern, colors)) return;
         if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
-            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
+            id = ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
         }
         if (applyPendingFrameEdit(existing, dataTag, immediate)) {
@@ -2647,14 +2670,14 @@ public class PillarIdManager {
 
             String color = frame.getColorVariant();
             if (color == null || color.isEmpty()) color = "white";
-            else color = color.toLowerCase(java.util.Locale.ROOT);
+            else color = color.toLowerCase(Locale.ROOT);
 
-            net.minecraft.resources.ResourceLocation typeRL = new net.minecraft.resources.ResourceLocation("buildscape", color + "_item_frame");
+            ResourceLocation typeRL = new ResourceLocation("buildscape", color + "_item_frame");
             data.pillarType = typeRL.toString();
             data.facing = facing != null ? facing.getSerializedName() : null;
 
             if (!frame.getItem().isEmpty()) {
-                net.minecraft.resources.ResourceLocation itemKey = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
+                ResourceLocation itemKey = ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
                 if (itemKey != null) {
                     data.displayedItem = itemKey.toString();
                 }
@@ -2670,7 +2693,7 @@ public class PillarIdManager {
 
             String color = frame.getColorVariant();
             if (color == null || color.isEmpty()) color = "white";
-            else color = color.toLowerCase(java.util.Locale.ROOT);
+            else color = color.toLowerCase(Locale.ROOT);
             String expectedType = "buildscape:" + color + "_item_frame";
 
             if (existing.pillarType == null || !existing.pillarType.equals(expectedType)) {
@@ -2692,7 +2715,7 @@ public class PillarIdManager {
             }
 
             if (!frame.getItem().isEmpty()) {
-                net.minecraft.resources.ResourceLocation itemKey = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
+                ResourceLocation itemKey = ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
                 String itemId = itemKey != null ? itemKey.toString() : null;
                 if (!Objects.equals(existing.displayedItem, itemId)) {
                     existing.displayedItem = itemId;
@@ -2715,7 +2738,7 @@ public class PillarIdManager {
         isServerSynced = true;
     }
 
-    public java.util.List<PillarData> getAllPillarDataForSync() {
+    public List<PillarData> getAllPillarDataForSync() {
         return serverAuthoritative ? syncSnapshot : new ArrayList<>(pillarData.values());
     }
 

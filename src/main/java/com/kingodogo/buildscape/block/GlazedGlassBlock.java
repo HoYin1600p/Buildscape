@@ -4,7 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.AbstractGlassBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -29,7 +31,7 @@ public class GlazedGlassBlock extends AbstractGlassBlock {
     @Override
     public float[] getBeaconColorMultiplier(
             BlockState state,
-            net.minecraft.world.level.LevelReader level,
+            LevelReader level,
             BlockPos pos,
             BlockPos beaconPos
     ) {
@@ -44,7 +46,7 @@ public class GlazedGlassBlock extends AbstractGlassBlock {
     @Override
     protected void createBlockStateDefinition(
             StateDefinition.Builder<
-                    net.minecraft.world.level.block.Block,
+                    Block,
                     BlockState
                     > builder
     ) {

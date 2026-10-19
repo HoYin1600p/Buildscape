@@ -1,10 +1,20 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.event.AdvancementEvents;
+import com.kingodogo.buildscape.network.ActionBarMessagePacket;
+import com.kingodogo.buildscape.network.ModMessages;
+import com.kingodogo.buildscape.stat.ModStats;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,6 +35,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.Map;
 
@@ -151,8 +162,8 @@ public class SmokeVentBlock extends Block implements EntityBlock {
                 current = current.above();
             }
 
-            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, powered ? 1.2f : 0.8f);
+            level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK,
+                    SoundSource.BLOCKS, 0.5f, powered ? 1.2f : 0.8f);
         }
     }
 
@@ -226,18 +237,18 @@ public class SmokeVentBlock extends Block implements EntityBlock {
                     heldItem.shrink(1);
                 }
 
-                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.DYE_USE,
-                        net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
+                level.playSound(null, pos, SoundEvents.DYE_USE,
+                        SoundSource.BLOCKS, 1.0f, 1.0f);
 
-                net.minecraft.network.chat.TextComponent message =
-                        new net.minecraft.network.chat.TextComponent("Smoke color: " + dyeName);
-                message.withStyle(net.minecraft.ChatFormatting.GRAY);
-                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                    serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.SMOKE_VENTS_DYED);
-                    com.kingodogo.buildscape.event.AdvancementEvents.grant(serverPlayer, "colorful_smoke");
-                    com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new com.kingodogo.buildscape.network.ActionBarMessagePacket(message));
+                TextComponent message =
+                        new TextComponent("Smoke color: " + dyeName);
+                message.withStyle(ChatFormatting.GRAY);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.awardStat(ModStats.SMOKE_VENTS_DYED);
+                    AdvancementEvents.grant(serverPlayer, "colorful_smoke");
+                    ModMessages.INSTANCE.send(
+                            PacketDistributor.PLAYER.with(() -> serverPlayer),
+                            new ActionBarMessagePacket(message));
                 }
 
                 return InteractionResult.SUCCESS;
@@ -248,8 +259,8 @@ public class SmokeVentBlock extends Block implements EntityBlock {
             boolean newActive = !getStackActive(level, pos);
             applyActiveToStack(level, pos, newActive);
 
-            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, newActive ? 1.2f : 0.8f);
+            level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK,
+                    SoundSource.BLOCKS, 0.5f, newActive ? 1.2f : 0.8f);
 
             BlockPos current = findBottomBlock(level, pos);
             while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
@@ -258,14 +269,14 @@ public class SmokeVentBlock extends Block implements EntityBlock {
                 current = current.above();
             }
 
-            net.minecraft.network.chat.TextComponent message =
-                    new net.minecraft.network.chat.TextComponent(newActive ? "Smoke Vent: On" : "Smoke Vent: Off");
-            message.withStyle(newActive ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED);
-            if (player instanceof net.minecraft.server.level.ServerPlayer) {
-                com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                        net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
-                                (net.minecraft.server.level.ServerPlayer) player),
-                        new com.kingodogo.buildscape.network.ActionBarMessagePacket(message));
+            TextComponent message =
+                    new TextComponent(newActive ? "Smoke Vent: On" : "Smoke Vent: Off");
+            message.withStyle(newActive ? ChatFormatting.GREEN : ChatFormatting.RED);
+            if (player instanceof ServerPlayer) {
+                ModMessages.INSTANCE.send(
+                        PacketDistributor.PLAYER.with(() ->
+                                (ServerPlayer) player),
+                        new ActionBarMessagePacket(message));
             }
 
             return InteractionResult.SUCCESS;
@@ -275,17 +286,17 @@ public class SmokeVentBlock extends Block implements EntityBlock {
                 heldItem.getItem() == Items.WATER_BUCKET) {
             applyColorToStack(level, pos, null);
 
-            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BUCKET_EMPTY,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
+            level.playSound(null, pos, SoundEvents.BUCKET_EMPTY,
+                    SoundSource.BLOCKS, 1.0f, 1.0f);
 
-            net.minecraft.network.chat.TextComponent message =
-                    new net.minecraft.network.chat.TextComponent("Smoke color cleared");
-            message.withStyle(net.minecraft.ChatFormatting.GRAY);
-            if (player instanceof net.minecraft.server.level.ServerPlayer) {
-                com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                        net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
-                                (net.minecraft.server.level.ServerPlayer) player),
-                        new com.kingodogo.buildscape.network.ActionBarMessagePacket(message));
+            TextComponent message =
+                    new TextComponent("Smoke color cleared");
+            message.withStyle(ChatFormatting.GRAY);
+            if (player instanceof ServerPlayer) {
+                ModMessages.INSTANCE.send(
+                        PacketDistributor.PLAYER.with(() ->
+                                (ServerPlayer) player),
+                        new ActionBarMessagePacket(message));
             }
 
             return InteractionResult.SUCCESS;
@@ -346,7 +357,7 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     private Map.Entry<String, String> getDyeColorAndName(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return null;
 
-        net.minecraft.world.item.Item item = stack.getItem();
+        Item item = stack.getItem();
 
         if (item == Items.WHITE_DYE) return Map.entry("#E8FEFD", "White");
         else if (item == Items.ORANGE_DYE) return Map.entry("#FF5C00", "Orange");

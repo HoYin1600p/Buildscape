@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client;
 import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.RegistryObject;
 
 public final class BuildscapeRenderLayers {
@@ -10,7 +11,7 @@ public final class BuildscapeRenderLayers {
     }
 
     public static void register() {
-        for (RegistryObject<net.minecraft.world.level.block.Block> entry : ModBlocks.BLOCKS.getEntries()) {
+        for (RegistryObject<Block> entry : ModBlocks.BLOCKS.getEntries()) {
             RenderType renderType = getRenderType(entry.getId().getPath());
             if (renderType != null) {
                 ItemBlockRenderTypes.setRenderLayer(entry.get(), renderType);

@@ -1,8 +1,5 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -10,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -36,6 +34,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.List;
+import java.util.Random;
 
 public class BigCandleBlock extends Block implements SimpleWaterloggedBlock {
 
@@ -175,8 +176,8 @@ public class BigCandleBlock extends Block implements SimpleWaterloggedBlock {
                 level.playSound(
                         null,
                         pos,
-                        net.minecraft.sounds.SoundEvents.FLINTANDSTEEL_USE,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.FLINTANDSTEEL_USE,
+                        SoundSource.BLOCKS,
                         1.0f,
                         1.0f
                 );
@@ -189,7 +190,7 @@ public class BigCandleBlock extends Block implements SimpleWaterloggedBlock {
                         null,
                         pos,
                         SoundEvents.CANDLE_EXTINGUISH,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundSource.BLOCKS,
                         1.0f,
                         1.0f
                 );
@@ -254,7 +255,7 @@ public class BigCandleBlock extends Block implements SimpleWaterloggedBlock {
                         pos.getY() + 0.5,
                         pos.getZ() + 0.5,
                         candleAmbient,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundSource.BLOCKS,
                         0.8f + random.nextFloat() * 0.2f,
                         0.8f + random.nextFloat() * 0.4f,
                         false
@@ -370,7 +371,7 @@ public class BigCandleBlock extends Block implements SimpleWaterloggedBlock {
                         null,
                         pos,
                         candleAmbient,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundSource.BLOCKS,
                         0.8f + random.nextFloat() * 0.2f,
                         0.8f + random.nextFloat() * 0.4f
                 );

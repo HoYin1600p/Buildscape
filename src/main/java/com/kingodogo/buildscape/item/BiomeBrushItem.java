@@ -2,14 +2,14 @@ package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.biometint.BiomeTintData;
 import com.kingodogo.buildscape.biometint.BiomeTintSync;
-import net.minecraft.advancements.Advancement;
 import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -20,9 +20,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -31,15 +33,14 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 public class BiomeBrushItem extends Item {
 
@@ -95,9 +96,9 @@ public class BiomeBrushItem extends Item {
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return switch (tier) {
-            case COPPER -> repair.is(net.minecraft.world.item.Items.COPPER_INGOT);
-            case DIAMOND -> repair.is(net.minecraft.world.item.Items.DIAMOND);
-            case NETHERITE -> repair.is(net.minecraft.world.item.Items.NETHERITE_SCRAP);
+            case COPPER -> repair.is(Items.COPPER_INGOT);
+            case DIAMOND -> repair.is(Items.DIAMOND);
+            case NETHERITE -> repair.is(Items.NETHERITE_SCRAP);
         };
     }
 

@@ -3,6 +3,9 @@ package com.kingodogo.buildscape.entity;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -21,11 +24,11 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         super(type, level);
     }
 
-    public static net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder createAttributes() {
-        return net.minecraft.world.entity.Mob.createMobAttributes()
-                .add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, 0.5D)
-                .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, 20.0D)
-                .add(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE, 16.0D);
+    public static AttributeSupplier.Builder createAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.5D)
+                .add(Attributes.MAX_HEALTH, 20.0D)
+                .add(Attributes.FOLLOW_RANGE, 16.0D);
     }
 
     @Override

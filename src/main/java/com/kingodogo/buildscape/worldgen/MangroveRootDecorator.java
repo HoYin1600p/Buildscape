@@ -1,20 +1,22 @@
 package com.kingodogo.buildscape.worldgen;
 
+import com.kingodogo.buildscape.block.ModBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.*;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
+
+import java.util.*;
+import java.util.function.BiConsumer;
 
 public class MangroveRootDecorator extends TreeDecorator {
 
@@ -174,12 +176,12 @@ public class MangroveRootDecorator extends TreeDecorator {
                                 state.is(Blocks.GRAVEL) ||
                                 state.is(Blocks.CLAY);
                 boolean isTreeBlock =
-                        state.is(net.minecraft.tags.BlockTags.LOGS) ||
+                        state.is(BlockTags.LOGS) ||
                                 state.is(
-                                        com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get()
+                                        ModBlocks.MANGROVE_ROOTS.get()
                                 ) ||
                                 state.is(
-                                        com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get()
+                                        ModBlocks.MUDDY_MANGROVE_ROOTS.get()
                                 );
                 return (
                         isTerrainBlock &&
@@ -205,15 +207,15 @@ public class MangroveRootDecorator extends TreeDecorator {
             BlockPos rootPos
     ) {
         boolean canPlace = level.isStateAtPosition(rootPos, state -> {
-            if (state.is(net.minecraft.tags.BlockTags.LOGS)) {
+            if (state.is(BlockTags.LOGS)) {
                 return false;
             }
             if (
                     state.is(
-                            com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get()
+                            ModBlocks.MANGROVE_ROOTS.get()
                     ) ||
                             state.is(
-                                    com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get()
+                                    ModBlocks.MUDDY_MANGROVE_ROOTS.get()
                             )
             ) {
                 return true;
@@ -226,11 +228,11 @@ public class MangroveRootDecorator extends TreeDecorator {
         }
 
         BlockState rootState =
-                com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get()
+                ModBlocks.MANGROVE_ROOTS.get()
                         .defaultBlockState()
                         .setValue(
-                                net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
-                                net.minecraft.core.Direction.Axis.Y
+                                RotatedPillarBlock.AXIS,
+                                Direction.Axis.Y
                         );
 
         blockSetter.accept(rootPos, rootState);

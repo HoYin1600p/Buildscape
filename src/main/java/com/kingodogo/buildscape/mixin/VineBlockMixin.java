@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.block.ModBlockProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
@@ -19,7 +20,7 @@ import java.util.Random;
 public abstract class VineBlockMixin extends Block {
 
     @Unique
-    private static final BooleanProperty BUILDSCAPE_SHEARED = com.kingodogo.buildscape.block.ModBlockProperties.SHEARED;
+    private static final BooleanProperty BUILDSCAPE_SHEARED = ModBlockProperties.SHEARED;
 
     protected VineBlockMixin(Properties properties) {
         super(properties);

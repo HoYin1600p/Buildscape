@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 
 public class BuildersWorkbenchMenu extends AbstractContainerMenu {
@@ -40,7 +41,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         this.addSlot(new Slot(be, 0, C_PICKER_X, C_PICKER_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.getItem() instanceof net.minecraft.world.item.BlockItem;
+                return stack.getItem() instanceof BlockItem;
             }
 
             @Override
@@ -73,7 +74,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         this.addSlot(new Slot(be, 10, C_POUCH_IN_X, C_POUCH_IN_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity.isPouch(stack);
+                return BuildersWorkbenchBlockEntity.isPouch(stack);
             }
 
             @Override
@@ -126,7 +127,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         this.addSlot(new Slot(be, 10, G_POUCH_IN_X, G_POUCH_IN_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity.isPouch(stack);
+                return BuildersWorkbenchBlockEntity.isPouch(stack);
             }
 
             @Override
@@ -233,12 +234,12 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             boolean isPlayerInv = (tab == 0) ? (index >= 12 && index < 48) : (index >= 68 && index < 104);
 
             if (isPlayerInv) {
-                if (com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity.isPouch(stack)) {
+                if (BuildersWorkbenchBlockEntity.isPouch(stack)) {
                     int targetSlot = (tab == 0) ? 10 : 57;
                     if (!this.moveItemStackTo(stack, targetSlot, targetSlot + 1, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (stack.getItem() instanceof net.minecraft.world.item.BlockItem) {
+                } else if (stack.getItem() instanceof BlockItem) {
                     if (tab == 0) {
                         if (!this.moveItemStackTo(stack, 0, 1, false)) return ItemStack.EMPTY;
                     } else {
@@ -276,7 +277,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            return stack.getItem() instanceof net.minecraft.world.item.BlockItem;
+            return stack.getItem() instanceof BlockItem;
         }
     }
 

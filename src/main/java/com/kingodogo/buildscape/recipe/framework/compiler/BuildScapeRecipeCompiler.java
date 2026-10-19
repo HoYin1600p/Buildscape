@@ -1,19 +1,28 @@
 package com.kingodogo.buildscape.recipe.framework.compiler;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe;
 import com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe;
+import com.kingodogo.buildscape.recipe.HazeBushDyeRecipe;
 import com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe;
 import com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.util.IngredientCache;
+import com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer;
 import com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
@@ -101,12 +110,12 @@ public class BuildScapeRecipeCompiler {
         }
         if ("clear_shulker_filters".equalsIgnoreCase(spec.type()) || "buildscape:clear_shulker_filters".equalsIgnoreCase(spec.type())) {
             ResourceLocation shulkerId = new ResourceLocation(BuildScape.MODID, "autogen/special/clear_shulker_filters");
-            return new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(shulkerId);
+            return new ClearShulkerFiltersRecipe(shulkerId);
         }
 
         if (spec.rawJson() != null && ("forge:conditional".equalsIgnoreCase(spec.type()) || spec.rawJson().contains("\"conditions\"") || spec.rawJson().contains("\"botanypots:crop\""))) {
             try {
-                com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(spec.rawJson()).getAsJsonObject();
+                JsonObject json = JsonParser.parseString(spec.rawJson()).getAsJsonObject();
                 ResourceLocation recipeId = spec.id() != null
                         ? new ResourceLocation(spec.id().contains(":") ? spec.id() : BuildScape.MODID + ":" + spec.id())
                         : new ResourceLocation(BuildScape.MODID, "autogen/" + category + "/" + Math.abs(spec.rawJson().hashCode()));
@@ -116,14 +125,14 @@ public class BuildScapeRecipeCompiler {
                 }
 
                 if (json.has("recipes") && json.get("recipes").isJsonArray()) {
-                    com.google.gson.JsonArray recipesArr = json.getAsJsonArray("recipes");
+                    JsonArray recipesArr = json.getAsJsonArray("recipes");
                     for (int i = 0; i < recipesArr.size(); i++) {
-                        com.google.gson.JsonObject entry = recipesArr.get(i).getAsJsonObject();
+                        JsonObject entry = recipesArr.get(i).getAsJsonObject();
                         if (!conditionsMet(entry, recipeId)) {
                             continue;
                         }
                         if (entry.has("recipe")) {
-                            com.google.gson.JsonObject innerRecipeJson = entry.getAsJsonObject("recipe");
+                            JsonObject innerRecipeJson = entry.getAsJsonObject("recipe");
                             ResourceLocation innerId = new ResourceLocation(recipeId.getNamespace(), recipeId.getPath() + (recipesArr.size() > 1 ? "_" + i : ""));
                             try {
                                 Recipe<?> compiled = RecipeManager.fromJson(innerId, innerRecipeJson);
@@ -162,8 +171,8 @@ public class BuildScapeRecipeCompiler {
         ItemStack resultStack = new ItemStack(resultItem, spec.result().count());
         if (spec.result().nbt() != null && !spec.result().nbt().isBlank()) {
             try {
-                resultStack.setTag(net.minecraft.nbt.TagParser.parseTag(spec.result().nbt()));
-            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+                resultStack.setTag(TagParser.parseTag(spec.result().nbt()));
+            } catch (CommandSyntaxException e) {
                 BuildScape.LOGGER.warn("BDRE Compiler: Invalid result NBT for recipe {}", spec.id(), e);
                 return null;
             }
@@ -192,7 +201,7 @@ public class BuildScapeRecipeCompiler {
             case "buildscape:haze_bush_dye" -> {
                 ShapelessRecipe base = compileShapeless(recipeId, group, spec, resultStack);
                 if (base == null) return null;
-                return new com.kingodogo.buildscape.recipe.HazeBushDyeRecipe(
+                return new HazeBushDyeRecipe(
                         base.getId(), base.getGroup(), base.getResultItem(), base.getIngredients());
             }
             case "stonecutting" -> {
@@ -232,12 +241,12 @@ public class BuildScapeRecipeCompiler {
      * Evaluates the Forge recipe conditions of a JSON object. An object without conditions is met; an
      * unknown or malformed condition counts as not met.
      */
-    private static boolean conditionsMet(com.google.gson.JsonObject json, ResourceLocation recipeId) {
+    private static boolean conditionsMet(JsonObject json, ResourceLocation recipeId) {
         if (json == null || !json.has("conditions")) {
             return true;
         }
         try {
-            return net.minecraftforge.common.crafting.CraftingHelper.processConditions(json, "conditions");
+            return CraftingHelper.processConditions(json, "conditions");
         } catch (Throwable t) {
             BuildScape.LOGGER.warn("BDRE Compiler: Could not evaluate conditions of recipe {}; skipping it.", recipeId, t);
             return false;
@@ -280,7 +289,7 @@ public class BuildScapeRecipeCompiler {
             }
         }
 
-        com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.Trimmed trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.trim(width, height, ingredients);
+        ShapedPatternTrimmer.Trimmed trimmed = ShapedPatternTrimmer.trim(width, height, ingredients);
         return new ShapedRecipe(id, group, trimmed.width(), trimmed.height(), trimmed.ingredients(), result);
     }
 

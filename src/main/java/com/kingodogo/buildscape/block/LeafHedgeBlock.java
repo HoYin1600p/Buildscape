@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -105,7 +106,7 @@ public class LeafHedgeBlock extends WallBlock {
 
         if (currentStep != lastStep && player.walkDist > player.walkDistO) {
             SoundType sounds = this.getSoundType(state);
-            net.minecraft.sounds.SoundEvent stepSound = sounds.getStepSound();
+            SoundEvent stepSound = sounds.getStepSound();
             float volume = 0.15f;
             float pitch = 1.0f;
 

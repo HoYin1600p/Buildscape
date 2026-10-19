@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.item;
 
+import com.kingodogo.buildscape.entity.MangroveBoatEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -64,7 +65,7 @@ public class MangroveBoatItem extends Item {
             }
 
             if (hitresult.getType() == HitResult.Type.BLOCK) {
-                Boat boat = new com.kingodogo.buildscape.entity.MangroveBoatEntity(
+                Boat boat = new MangroveBoatEntity(
                         level,
                         hitresult.getLocation().x,
                         hitresult.getLocation().y,

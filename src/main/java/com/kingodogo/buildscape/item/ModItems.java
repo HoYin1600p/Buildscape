@@ -2,14 +2,36 @@ package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModBlocks;
-import net.minecraft.world.item.BlockItem;
+import com.kingodogo.buildscape.client.HomemakerCooldownTracker;
+import com.kingodogo.buildscape.entity.ModEntities;
+import com.kingodogo.buildscape.fluid.ModFluids;
+import com.kingodogo.buildscape.sound.ModSounds;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.BedItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
-import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.item.SignItem;
+import net.minecraft.world.item.StandingAndWallBlockItem;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
+import java.util.List;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 public class ModItems {
 
@@ -3013,119 +3035,119 @@ public class ModItems {
     public static final RegistryObject<Item> FESTIVE_STOCKING = ITEMS.register(
             "festive_stocking",
             () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "festive"
                     )
     );
     public static final RegistryObject<Item> BLACK_FESTIVE_STOCKING =
             ITEMS.register("black_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "black"
                     )
             );
     public static final RegistryObject<Item> BLUE_FESTIVE_STOCKING =
             ITEMS.register("blue_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "blue"
                     )
             );
     public static final RegistryObject<Item> BROWN_FESTIVE_STOCKING =
             ITEMS.register("brown_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "brown"
                     )
             );
     public static final RegistryObject<Item> CYAN_FESTIVE_STOCKING =
             ITEMS.register("cyan_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "cyan"
                     )
             );
     public static final RegistryObject<Item> GRAY_FESTIVE_STOCKING =
             ITEMS.register("gray_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "gray"
                     )
             );
     public static final RegistryObject<Item> GREEN_FESTIVE_STOCKING =
             ITEMS.register("green_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "green"
                     )
             );
     public static final RegistryObject<Item> LIGHT_BLUE_FESTIVE_STOCKING =
             ITEMS.register("light_blue_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                             createBlockItemProperties(),
                             "light_blue"
                     )
             );
     public static final RegistryObject<Item> LIGHT_GRAY_FESTIVE_STOCKING =
             ITEMS.register("light_gray_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                             createBlockItemProperties(),
                             "light_gray"
                     )
             );
     public static final RegistryObject<Item> LIME_FESTIVE_STOCKING =
             ITEMS.register("lime_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "lime"
                     )
             );
     public static final RegistryObject<Item> MAGENTA_FESTIVE_STOCKING =
             ITEMS.register("magenta_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "magenta"
                     )
             );
     public static final RegistryObject<Item> ORANGE_FESTIVE_STOCKING =
             ITEMS.register("orange_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "orange"
                     )
             );
     public static final RegistryObject<Item> PINK_FESTIVE_STOCKING =
             ITEMS.register("pink_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "pink"
                     )
             );
     public static final RegistryObject<Item> PURPLE_FESTIVE_STOCKING =
             ITEMS.register("purple_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "purple"
                     )
             );
     public static final RegistryObject<Item> RED_FESTIVE_STOCKING =
             ITEMS.register("red_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "red"
                     )
             );
     public static final RegistryObject<Item> WHITE_FESTIVE_STOCKING =
             ITEMS.register("white_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "white"
                     )
             );
     public static final RegistryObject<Item> YELLOW_FESTIVE_STOCKING =
             ITEMS.register("yellow_festive_stocking", () ->
-                    new com.kingodogo.buildscape.item.FestiveStockingItem(
+                    new FestiveStockingItem(
                     createBlockItemProperties(),
                             "yellow"
                     )
@@ -6102,7 +6124,7 @@ public class ModItems {
     public static final RegistryObject<Item> MANGROVE_SIGN = ITEMS.register(
             "mangrove_sign",
             () ->
-                    new net.minecraft.world.item.SignItem(
+                    new SignItem(
                     new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16),
                     ModBlocks.MANGROVE_SIGN.get(),
                             ModBlocks.MANGROVE_WALL_SIGN.get()
@@ -6112,7 +6134,7 @@ public class ModItems {
     public static final RegistryObject<Item> BAMBOO_SIGN = ITEMS.register(
             "bamboo_sign",
             () ->
-                    new net.minecraft.world.item.SignItem(
+                    new SignItem(
                     new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16),
                     ModBlocks.BAMBOO_SIGN.get(),
                             ModBlocks.BAMBOO_WALL_SIGN.get()
@@ -6137,9 +6159,9 @@ public class ModItems {
             "frost_rose",
             () -> new BlockItem(ModBlocks.FROST_ROSE.get(), createBlockItemProperties()) {
                 @Override
-                public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
-                    tooltip.add(new net.minecraft.network.chat.TextComponent("Obtained when a Wither kills a Snow Golem")
-                            .withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
+                public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+                    tooltip.add(new TextComponent("Obtained when a Wither kills a Snow Golem")
+                            .withStyle(ChatFormatting.DARK_AQUA));
                 }
             }
     );
@@ -8033,35 +8055,35 @@ public class ModItems {
     public static final RegistryObject<Item> ANCIENT_ASHEN_SCROLL = ITEMS.register("ancient_ashen_scroll",
             () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).durability(28)) {
                 @Override
-                public boolean isEnchantable(net.minecraft.world.item.ItemStack stack) {
+                public boolean isEnchantable(ItemStack stack) {
                     return false;
                 }
 
                 @Override
-                public boolean isBookEnchantable(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.ItemStack book) {
+                public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
                     return false;
                 }
 
                 @Override
-                public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
-                    tooltip.add(new net.minecraft.network.chat.TextComponent("Found rarely in ")
-                            .withStyle(net.minecraft.ChatFormatting.GRAY)
-                            .append(new net.minecraft.network.chat.TextComponent("End Cities")
-                                    .withStyle(net.minecraft.ChatFormatting.AQUA))
-                            .append(new net.minecraft.network.chat.TextComponent(" & ")
-                                    .withStyle(net.minecraft.ChatFormatting.GRAY))
-                            .append(new net.minecraft.network.chat.TextComponent("Woodland Mansions")
-                                    .withStyle(net.minecraft.ChatFormatting.AQUA))
-                            .append(new net.minecraft.network.chat.TextComponent(", also if")
-                                    .withStyle(net.minecraft.ChatFormatting.GRAY)));
-                    tooltip.add(new net.minecraft.network.chat.TextComponent("you are lucky a ")
-                            .withStyle(net.minecraft.ChatFormatting.GRAY)
-                            .append(new net.minecraft.network.chat.TextComponent("Wandering Trader")
-                                    .withStyle(net.minecraft.ChatFormatting.AQUA))
-                            .append(new net.minecraft.network.chat.TextComponent(" might trade")
-                                    .withStyle(net.minecraft.ChatFormatting.GRAY)));
-                    tooltip.add(new net.minecraft.network.chat.TextComponent("it for a sweet price.")
-                            .withStyle(net.minecraft.ChatFormatting.GRAY));
+                public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+                    tooltip.add(new TextComponent("Found rarely in ")
+                            .withStyle(ChatFormatting.GRAY)
+                            .append(new TextComponent("End Cities")
+                                    .withStyle(ChatFormatting.AQUA))
+                            .append(new TextComponent(" & ")
+                                    .withStyle(ChatFormatting.GRAY))
+                            .append(new TextComponent("Woodland Mansions")
+                                    .withStyle(ChatFormatting.AQUA))
+                            .append(new TextComponent(", also if")
+                                    .withStyle(ChatFormatting.GRAY)));
+                    tooltip.add(new TextComponent("you are lucky a ")
+                            .withStyle(ChatFormatting.GRAY)
+                            .append(new TextComponent("Wandering Trader")
+                                    .withStyle(ChatFormatting.AQUA))
+                            .append(new TextComponent(" might trade")
+                                    .withStyle(ChatFormatting.GRAY)));
+                    tooltip.add(new TextComponent("it for a sweet price.")
+                            .withStyle(ChatFormatting.GRAY));
                 }
             });
 
@@ -10306,8 +10328,8 @@ public class ModItems {
     public static final RegistryObject<Item> OXIDIZED_COPPER_PRESSURE_PLATE = ITEMS.register("oxidized_copper_pressure_plate", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_oxidized_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
 
-    public static class WanderingHomemakerSpawnEggItem extends net.minecraftforge.common.ForgeSpawnEggItem {
-        public WanderingHomemakerSpawnEggItem(java.util.function.Supplier<? extends net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
+    public static class WanderingHomemakerSpawnEggItem extends ForgeSpawnEggItem {
+        public WanderingHomemakerSpawnEggItem(Supplier<? extends EntityType<? extends Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
             super(type, backgroundColor, highlightColor, properties);
         }
 
@@ -10316,29 +10338,29 @@ public class ModItems {
         }
 
         @Override
-        public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltip, flag);
-            tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.spawn_info"));
+            tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.spawn_info"));
             if (level != null) {
                 long currentTime = System.currentTimeMillis();
-                long endTime = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime;
+                long endTime = HomemakerCooldownTracker.cooldownEndTime;
                 if (endTime > currentTime) {
                     long remainingMs = endTime - currentTime;
                     long totalSeconds = remainingMs / 1000;
                     long minutes = totalSeconds / 60;
                     long seconds = totalSeconds % 60;
-                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
-                            .withStyle(net.minecraft.ChatFormatting.RED));
+                    tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
+                            .withStyle(ChatFormatting.RED));
                 } else {
-                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
-                            .withStyle(net.minecraft.ChatFormatting.GREEN));
+                    tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                            .withStyle(ChatFormatting.GREEN));
                 }
             }
         }
     }
 
-    public static class FestiveWanderingHomemakerSpawnEggItem extends net.minecraftforge.common.ForgeSpawnEggItem {
-        public FestiveWanderingHomemakerSpawnEggItem(java.util.function.Supplier<? extends net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
+    public static class FestiveWanderingHomemakerSpawnEggItem extends ForgeSpawnEggItem {
+        public FestiveWanderingHomemakerSpawnEggItem(Supplier<? extends EntityType<? extends Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
             super(type, backgroundColor, highlightColor, properties);
         }
 
@@ -10347,22 +10369,22 @@ public class ModItems {
         }
 
         @Override
-        public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltip, flag);
-            tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.festive_wandering_homemaker_spawn_egg.spawn_info"));
+            tooltip.add(new TranslatableComponent("tooltip.buildscape.festive_wandering_homemaker_spawn_egg.spawn_info"));
             if (level != null) {
                 long currentTime = System.currentTimeMillis();
-                long endTime = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime;
+                long endTime = HomemakerCooldownTracker.cooldownEndTime;
                 if (endTime > currentTime) {
                     long remainingMs = endTime - currentTime;
                     long totalSeconds = remainingMs / 1000;
                     long minutes = totalSeconds / 60;
                     long seconds = totalSeconds % 60;
-                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
-                            .withStyle(net.minecraft.ChatFormatting.RED));
+                    tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
+                            .withStyle(ChatFormatting.RED));
                 } else {
-                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
-                            .withStyle(net.minecraft.ChatFormatting.GREEN));
+                    tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                            .withStyle(ChatFormatting.GREEN));
                 }
             }
         }
@@ -10371,7 +10393,7 @@ public class ModItems {
     public static final RegistryObject<Item> WANDERING_HOMEMAKER_SPAWN_EGG = ITEMS.register(
             "wandering_homemaker_spawn_egg",
             () -> new WanderingHomemakerSpawnEggItem(
-                    com.kingodogo.buildscape.entity.ModEntities.WANDERING_HOMEMAKER,
+                    ModEntities.WANDERING_HOMEMAKER,
                     0x5c3c24,
                     0xe4b484,
                     createBlockItemProperties()
@@ -10381,7 +10403,7 @@ public class ModItems {
     public static final RegistryObject<Item> FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG = ITEMS.register(
             "festive_wandering_homemaker_spawn_egg",
             () -> new FestiveWanderingHomemakerSpawnEggItem(
-                    com.kingodogo.buildscape.entity.ModEntities.FESTIVE_WANDERING_HOMEMAKER,
+                    ModEntities.FESTIVE_WANDERING_HOMEMAKER,
                     0x990000,
                     0x009900,
                     createBlockItemProperties()
@@ -12227,32 +12249,32 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
     );
     public static final RegistryObject<Item> GOLDEN_JAR = ITEMS.register(
             "golden_jar",
-            () -> new GoldenJarItem(ModBlocks.GOLDEN_JAR.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+            () -> new GoldenJarItem(ModBlocks.GOLDEN_JAR.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(Rarity.UNCOMMON)));
 
     public static final RegistryObject<Item> FESTIVE_STAR = ITEMS.register(
             "festive_star",
-            () -> new FestiveStarItem(ModBlocks.FESTIVE_STAR.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.RARE)));
+            () -> new FestiveStarItem(ModBlocks.FESTIVE_STAR.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(Rarity.RARE)));
 
 
     public static final RegistryObject<Item> EXPERIENCE_BUCKET = ITEMS.register(
             "experience_bucket",
             () -> new ExperienceBucketItem(
-                    () -> com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get(),
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).craftRemainder(net.minecraft.world.item.Items.BUCKET)
+                    () -> ModFluids.EXPERIENCE_STILL.get(),
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).craftRemainder(Items.BUCKET)
             )
     );
 
     public static final RegistryObject<Item> FESTIVE_GLINT_SHARD = ITEMS.register(
             "festive_glint_shard",
             () -> new FestiveGlintShardItem(
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.RARE)
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(Rarity.RARE)
             )
     );
 
     public static final RegistryObject<Item> GOLDEN_JAR_PATTERN = ITEMS.register(
             "golden_jar_pattern",
             () -> new PatternItem(
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON),
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(Rarity.UNCOMMON),
                     "tooltip.buildscape.golden_jar_pattern"
             )
     );
@@ -12260,7 +12282,7 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
     public static final RegistryObject<Item> FESTIVE_STAR_PATTERN = ITEMS.register(
             "festive_star_pattern",
             () -> new PatternItem(
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE),
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(Rarity.RARE),
                     "tooltip.buildscape.festive_star_pattern"
             )
     );
@@ -12286,7 +12308,7 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
 
     public static final RegistryObject<Item> BIG_ORNAMENT_TEMPLATE = ITEMS.register(
             "big_ornament_template",
-            () -> new BigOrnamentTemplateItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.UNCOMMON))
+            () -> new BigOrnamentTemplateItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(Rarity.UNCOMMON))
     );
 
     public static final RegistryObject<Item> STRINGLIGHT_FRAME = ITEMS.register(
@@ -12297,35 +12319,35 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
     public static final RegistryObject<Item> STRINGLIGHT_FRAME_PATTERN = ITEMS.register(
             "stringlight_frame_pattern",
             () -> new PatternItem(
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE),
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(Rarity.RARE),
                     "tooltip.buildscape.stringlight_frame_pattern"
             )
     );
 
     public static final RegistryObject<Item> MUSIC_DISC_CELEBRATION = ITEMS.register(
             "music_disc_celebration",
-            () -> new net.minecraft.world.item.RecordItem(
+            () -> new RecordItem(
                     14,
-                    com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_CELEBRATION,
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)
+                    ModSounds.MUSIC_DISC_CELEBRATION,
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(Rarity.RARE)
             )
     );
 
     public static final RegistryObject<Item> MUSIC_DISC_SNOWFALL = ITEMS.register(
             "music_disc_snowfall",
-            () -> new net.minecraft.world.item.RecordItem(
+            () -> new RecordItem(
                     15,
-                    com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_SNOWFALL,
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)
+                    ModSounds.MUSIC_DISC_SNOWFALL,
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(Rarity.RARE)
             )
     );
 
     public static final RegistryObject<Item> MUSIC_DISC_BUILDER = ITEMS.register(
             "music_disc_builder",
-            () -> new net.minecraft.world.item.RecordItem(
+            () -> new RecordItem(
                     13,
-                    com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_BUILDER,
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)
+                    ModSounds.MUSIC_DISC_BUILDER,
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(Rarity.RARE)
             )
     );
 }

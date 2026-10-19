@@ -11,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorStandItem;
 import net.minecraft.world.item.ElytraItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -53,7 +54,7 @@ public class ArmorPillarRenderer {
             }
         }
 
-        boolean isStandItem = itemStack.getItem() instanceof net.minecraft.world.item.ArmorStandItem;
+        boolean isStandItem = itemStack.getItem() instanceof ArmorStandItem;
         EquipmentSlot slot = getEquipmentSlot(itemStack);
 
         ItemStack cachedStack = lastRenderedStacks.get(pos);

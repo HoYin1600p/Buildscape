@@ -1,6 +1,9 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.item.BottleOfMistItem;
 import com.kingodogo.buildscape.particle.ModParticles;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -8,6 +11,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -97,11 +101,11 @@ public class CascadeBlockEntity extends BlockEntity {
 
     private static class ClientHandler {
         private static void tick(Level level, BlockPos pos, BlockState state, CascadeBlockEntity be) {
-            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
-            net.minecraft.client.ParticleStatus particleSetting = minecraft.options.particles;
-            if (particleSetting == net.minecraft.client.ParticleStatus.MINIMAL) {
+            Minecraft minecraft = Minecraft.getInstance();
+            ParticleStatus particleSetting = minecraft.options.particles;
+            if (particleSetting == ParticleStatus.MINIMAL) {
                 if (level.getGameTime() % 10 != 0) return;
-            } else if (particleSetting == net.minecraft.client.ParticleStatus.DECREASED) {
+            } else if (particleSetting == ParticleStatus.DECREASED) {
                 if (level.getGameTime() % 2 != 0) return;
             }
 
@@ -121,9 +125,9 @@ public class CascadeBlockEntity extends BlockEntity {
             double levelFactor = be.getParticleLevel() * 0.2;
             int rawBase = 5 + RANDOM.nextInt(3);
             int count;
-            if (particleSetting == net.minecraft.client.ParticleStatus.MINIMAL) {
+            if (particleSetting == ParticleStatus.MINIMAL) {
                 count = 1;
-            } else if (particleSetting == net.minecraft.client.ParticleStatus.DECREASED) {
+            } else if (particleSetting == ParticleStatus.DECREASED) {
                 count = Math.max(1, (int) Math.round(rawBase * 0.5 * levelFactor));
             } else {
                 count = Math.max(1, (int) Math.round(rawBase * levelFactor));
@@ -144,8 +148,8 @@ public class CascadeBlockEntity extends BlockEntity {
 
         private static boolean isMistSuppressor(ItemStack stack) {
             if (stack.isEmpty()) return false;
-            net.minecraft.world.item.Item item = stack.getItem();
-            if (item instanceof com.kingodogo.buildscape.item.BottleOfMistItem) return true;
+            Item item = stack.getItem();
+            if (item instanceof BottleOfMistItem) return true;
             if (item instanceof BlockItem blockItem) {
                 return blockItem.getBlock() instanceof CascadeBlock;
             }

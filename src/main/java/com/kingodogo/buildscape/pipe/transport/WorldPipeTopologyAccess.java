@@ -1,12 +1,13 @@
 package com.kingodogo.buildscape.pipe.transport;
 
-import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.block.HollowLogBlock;
+import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.fluid.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -108,7 +109,7 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
     }
 
     private boolean isLoaded(BlockPos pos) {
-        return !(level instanceof net.minecraft.world.level.LevelReader reader) || reader.hasChunkAt(pos);
+        return !(level instanceof LevelReader reader) || reader.hasChunkAt(pos);
     }
 
     public static boolean isTransportFluid(@Nullable Fluid fluid) {

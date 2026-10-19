@@ -18,11 +18,16 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DripstoneThickness;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
@@ -228,7 +233,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                     BlockStateProperties.VERTICAL_DIRECTION
             );
 
-            java.util.Set<BlockPos> fallingBlocks = new java.util.HashSet<>();
+            Set<BlockPos> fallingBlocks = new HashSet<>();
             fallingBlocks.add(pos);
 
             if (direction == Direction.DOWN) {
@@ -361,7 +366,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             BlockPos pos,
             Direction direction
     ) {
-        java.util.Set<BlockPos> breakingBlocks = new java.util.HashSet<>();
+        Set<BlockPos> breakingBlocks = new HashSet<>();
         breakingBlocks.add(pos);
         level.destroyBlock(pos, true);
 
@@ -802,16 +807,16 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                         (thickness == DripstoneThickness.TIP ||
                                 thickness == DripstoneThickness.TIP_MERGE)
         ) {
-            net.minecraft.world.level.material.Fluid fluid = getFluidAboveSulfurSpikeChain(level, pos);
+            Fluid fluid = getFluidAboveSulfurSpikeChain(level, pos);
 
-            if (fluid != net.minecraft.world.level.material.Fluids.EMPTY) {
+            if (fluid != Fluids.EMPTY) {
                 double tipX = pos.getX() + 0.5D;
                 double tipY = pos.getY() + 0.1D;
                 double tipZ = pos.getZ() + 0.5D;
 
                 if (random.nextInt(3) == 0) {
                     level.addParticle(
-                            fluid == net.minecraft.world.level.material.Fluids.WATER ? ParticleTypes.DRIPPING_WATER : ParticleTypes.DRIPPING_LAVA,
+                            fluid == Fluids.WATER ? ParticleTypes.DRIPPING_WATER : ParticleTypes.DRIPPING_LAVA,
                             tipX,
                             tipY,
                             tipZ,
@@ -824,7 +829,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
         }
     }
 
-    private net.minecraft.world.level.material.Fluid getFluidAboveSulfurSpikeChain(
+    private Fluid getFluidAboveSulfurSpikeChain(
             LevelAccessor level,
             BlockPos tipPos
     ) {
@@ -839,19 +844,19 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
         }
 
         if (!isSulfurSpikeSourceBlock(checkState)) {
-            return net.minecraft.world.level.material.Fluids.EMPTY;
+            return Fluids.EMPTY;
         }
 
         BlockPos fluidPos = checkPos.above();
         BlockState fluidState = level.getBlockState(fluidPos);
-        net.minecraft.world.level.material.FluidState fluid = fluidState.getFluidState();
+        FluidState fluid = fluidState.getFluidState();
         if (fluid.is(FluidTags.WATER) || fluidState.is(Blocks.WATER)) {
-            return net.minecraft.world.level.material.Fluids.WATER;
+            return Fluids.WATER;
         }
         if (fluid.is(FluidTags.LAVA) || fluidState.is(Blocks.LAVA)) {
-            return net.minecraft.world.level.material.Fluids.LAVA;
+            return Fluids.LAVA;
         }
-        return net.minecraft.world.level.material.Fluids.EMPTY;
+        return Fluids.EMPTY;
     }
 
     private void tryStalactiteGrowth(
@@ -881,8 +886,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             return;
         }
 
-        net.minecraft.world.level.material.Fluid fluid = getFluidAboveSulfurSpikeChain(level, pos);
-        if (fluid == net.minecraft.world.level.material.Fluids.EMPTY) {
+        Fluid fluid = getFluidAboveSulfurSpikeChain(level, pos);
+        if (fluid == Fluids.EMPTY) {
             return;
         }
 
@@ -998,8 +1003,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             return;
         }
 
-        net.minecraft.world.level.material.Fluid fluid = getFluidAboveSulfurSpikeChain(level, stalactiteTipPos);
-        if (fluid == net.minecraft.world.level.material.Fluids.EMPTY) {
+        Fluid fluid = getFluidAboveSulfurSpikeChain(level, stalactiteTipPos);
+        if (fluid == Fluids.EMPTY) {
             return;
         }
 

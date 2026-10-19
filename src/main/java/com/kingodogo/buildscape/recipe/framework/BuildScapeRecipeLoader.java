@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.recipe.framework;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.recipe.framework.cache.BinaryRecipeCache;
 import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
@@ -8,8 +10,6 @@ import com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInject
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.kingodogo.buildscape.recipe.framework.util.IngredientCache;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
@@ -25,12 +25,16 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BuildScapeRecipeLoader implements PreparableReloadListener {
@@ -149,7 +153,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             try {
                 if (resourceManager.hasResource(location)) {
                     try (Resource resource = resourceManager.getResource(location);
-                         java.io.InputStream stream = resource.getInputStream()) {
+                         InputStream stream = resource.getInputStream()) {
                         rawCategoryData.put(category, stream.readAllBytes());
                     }
                 }
@@ -164,7 +168,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         ResourceLocation bundledLocation = new ResourceLocation(BuildScape.MODID, "recipes_pack/recipes.bscb");
         if (resourceManager.hasResource(bundledLocation)) {
             try (Resource res = resourceManager.getResource(bundledLocation);
-                 java.io.InputStream stream = res.getInputStream()) {
+                 InputStream stream = res.getInputStream()) {
                 List<Recipe<?>> bundled = BinaryRecipeCache.loadCacheFromStream(stream, contentHash);
                 if (!bundled.isEmpty()) {
                     List<Recipe<?>> recipes = appendRuntimeRecipes(rawCategoryData, runtimeCategories, bundled, true);
@@ -189,13 +193,13 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         }
 
         BuildScape.LOGGER.debug("BDRE Loader: Cache MISS/Invalid. Parallel streaming and compiling category source files...");
-        Map<String, List<Recipe<?>>> compiledByCategory = new java.util.concurrent.ConcurrentHashMap<>();
+        Map<String, List<Recipe<?>>> compiledByCategory = new ConcurrentHashMap<>();
 
         rawCategoryData.entrySet().parallelStream().forEach(entry -> {
             String category = entry.getKey();
             byte[] bytes = entry.getValue();
 
-            try (Reader reader = new InputStreamReader(new java.io.ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
+            try (Reader reader = new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
                 BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack, false);
@@ -252,7 +256,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                 continue;
             }
             try (Reader reader = new InputStreamReader(
-                    new java.io.ByteArrayInputStream(categoryData), StandardCharsets.UTF_8)) {
+                    new ByteArrayInputStream(categoryData), StandardCharsets.UTF_8)) {
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
                 BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack, false);
@@ -281,14 +285,14 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
     }
 
     static List<Recipe<?>> combineRuntimeRecipes(List<Recipe<?>> cachedRecipes, List<Recipe<?>> runtimeRecipes,
-            java.util.function.Consumer<StonecuttingCycleValidator> validate,
-            java.util.function.Consumer<String> reportStaleCache) {
+            Consumer<StonecuttingCycleValidator> validate,
+            Consumer<String> reportStaleCache) {
         return combineRuntimeRecipes(cachedRecipes, runtimeRecipes, false, validate, reportStaleCache);
     }
 
     static List<Recipe<?>> combineRuntimeRecipes(List<Recipe<?>> cachedRecipes, List<Recipe<?>> runtimeRecipes,
-            boolean trustedBundledCache, java.util.function.Consumer<StonecuttingCycleValidator> validate,
-            java.util.function.Consumer<String> reportStaleCache) {
+            boolean trustedBundledCache, Consumer<StonecuttingCycleValidator> validate,
+            Consumer<String> reportStaleCache) {
         if (trustedBundledCache && runtimeRecipes.isEmpty()) return cachedRecipes;
         Map<ResourceLocation, Recipe<?>> recipesById = new LinkedHashMap<>();
         StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();

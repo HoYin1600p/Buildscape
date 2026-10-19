@@ -1,7 +1,9 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 
 public class MangroveBoatEntity extends Boat {
@@ -16,7 +18,7 @@ public class MangroveBoatEntity extends Boat {
 
     public MangroveBoatEntity(Level level, double x, double y, double z) {
         this(
-                com.kingodogo.buildscape.entity.ModEntities.MANGROVE_BOAT.get(),
+                ModEntities.MANGROVE_BOAT.get(),
                 level
         );
         this.setPos(x, y, z);
@@ -27,7 +29,7 @@ public class MangroveBoatEntity extends Boat {
     }
 
     @Override
-    public net.minecraft.world.item.Item getDropItem() {
-        return com.kingodogo.buildscape.item.ModItems.MANGROVE_BOAT.get();
+    public Item getDropItem() {
+        return ModItems.MANGROVE_BOAT.get();
     }
 }

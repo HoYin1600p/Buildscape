@@ -1,30 +1,57 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.block.AshenKingPillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorStandItem;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ElytraItem;
+import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mod.EventBusSubscriber(modid = com.kingodogo.buildscape.BuildScape.MODID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
 public class PillarBlockEntityRenderer
         implements BlockEntityRenderer<PillarBlockEntity> {
 
@@ -32,7 +59,7 @@ public class PillarBlockEntityRenderer
 
     private static final Map<BlockPos, DisplayInfo> displayInfo = new ConcurrentHashMap<>();
     private static final Map<BlockPos, Boolean> cachedIsAshenKing = new ConcurrentHashMap<>();
-    private static final java.util.Set<String> loggedRenderFailures = ConcurrentHashMap.newKeySet();
+    private static final Set<String> loggedRenderFailures = ConcurrentHashMap.newKeySet();
 
     private static final class DisplayInfo {
         final ItemStack stack;
@@ -41,7 +68,7 @@ public class PillarBlockEntityRenderer
         final boolean isSpawnEgg;
         final boolean isFixed;
         final MobState mobState;
-        final java.lang.ref.WeakReference<PillarBlockEntity> owner;
+        final WeakReference<PillarBlockEntity> owner;
 
         DisplayInfo(ItemStack stack, long startTime, boolean renderAsItem, boolean isSpawnEgg,
                     boolean isFixed, MobState mobState, PillarBlockEntity owner) {
@@ -51,7 +78,7 @@ public class PillarBlockEntityRenderer
             this.isSpawnEgg = isSpawnEgg;
             this.isFixed = isFixed;
             this.mobState = mobState;
-            this.owner = new java.lang.ref.WeakReference<>(owner);
+            this.owner = new WeakReference<>(owner);
         }
     }
 
@@ -61,7 +88,7 @@ public class PillarBlockEntityRenderer
         this.itemRenderer = Minecraft.getInstance().getItemRenderer();
     }
 
-    private static final Map<BakedModel, net.minecraft.world.phys.AABB> modelBoundsCache = new java.util.WeakHashMap<>();
+    private static final Map<BakedModel, AABB> modelBoundsCache = new WeakHashMap<>();
 
     public static void cleanupStaleEntities() {
         MobPillarRenderer.cleanupStaleEntities();
@@ -99,7 +126,7 @@ public class PillarBlockEntityRenderer
     @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
         if (!event.getWorld().isClientSide()) return;
-        net.minecraft.world.level.ChunkPos chunk = event.getChunk().getPos();
+        ChunkPos chunk = event.getChunk().getPos();
         for (BlockPos pos : displayInfo.keySet()) {
             if ((pos.getX() >> 4) == chunk.x && (pos.getZ() >> 4) == chunk.z) {
                 clearEntityCache(pos);
@@ -135,7 +162,7 @@ public class PillarBlockEntityRenderer
             return;
         }
 
-        net.minecraft.client.player.LocalPlayer localPlayer = Minecraft.getInstance().player;
+        LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
             int renderDistanceChunks = Minecraft.getInstance().options.renderDistance;
             double maxRenderDistBlocks = renderDistanceChunks * 16.0;
@@ -163,7 +190,7 @@ public class PillarBlockEntityRenderer
 
             boolean isAshenKing = cachedIsAshenKing.computeIfAbsent(
                     pos, k -> blockEntity.getBlockState().getBlock()
-                            instanceof com.kingodogo.buildscape.block.AshenKingPillarBlock);
+                            instanceof AshenKingPillarBlock);
             float hoverHeight;
             if (isAshenKing) {
                 hoverHeight = isSpawnEgg ? 0.875f : 1.0f;
@@ -202,9 +229,9 @@ public class PillarBlockEntityRenderer
 
             boolean renderAsItem = info.renderAsItem;
 
-            boolean isArmor = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorItem;
-            boolean isElytra = displayedItem.getItem() instanceof net.minecraft.world.item.ElytraItem;
-            boolean isArmorStand = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorStandItem;
+            boolean isArmor = displayedItem.getItem() instanceof ArmorItem;
+            boolean isElytra = displayedItem.getItem() instanceof ElytraItem;
+            boolean isArmorStand = displayedItem.getItem() instanceof ArmorStandItem;
 
             if (!isSpawnEgg && (isArmor || isElytra || isArmorStand) && !renderAsItem) {
                 ArmorPillarRenderer.renderArmor(
@@ -261,7 +288,7 @@ public class PillarBlockEntityRenderer
             } else {
                 if (isFixed) {
                     BakedModel model = this.itemRenderer.getModel(displayedItem, blockEntity.getLevel(), null, 0);
-                    net.minecraft.world.phys.AABB bounds = getOrCalculateBounds(model);
+                    AABB bounds = getOrCalculateBounds(model);
 
                     double lenX = bounds.maxX - bounds.minX;
                     double lenY = bounds.maxY - bounds.minY;
@@ -271,13 +298,13 @@ public class PillarBlockEntityRenderer
                     float scale = 0.8f;
                     double standardLength = 0.85;
 
-                    net.minecraft.world.item.Item item = displayedItem.getItem();
-                    boolean isSword = item instanceof net.minecraft.world.item.SwordItem ||
-                            item instanceof net.minecraft.world.item.TridentItem ||
-                            item instanceof net.minecraft.world.item.ShovelItem;
-                    boolean isAxe = item instanceof net.minecraft.world.item.AxeItem ||
-                            item instanceof net.minecraft.world.item.PickaxeItem ||
-                            item instanceof net.minecraft.world.item.HoeItem;
+                    Item item = displayedItem.getItem();
+                    boolean isSword = item instanceof SwordItem ||
+                            item instanceof TridentItem ||
+                            item instanceof ShovelItem;
+                    boolean isAxe = item instanceof AxeItem ||
+                            item instanceof PickaxeItem ||
+                            item instanceof HoeItem;
 
                     if (isSword) {
                         double baseTransY = -0.5;
@@ -374,24 +401,24 @@ public class PillarBlockEntityRenderer
     }
 
     private static void logRenderFailure(ItemStack stack, Exception e) {
-        String key = String.valueOf(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()));
+        String key = String.valueOf(ForgeRegistries.ITEMS.getKey(stack.getItem()));
         if (loggedRenderFailures.add(key)) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.warn("BuildScape: failed to render {} on a pillar", key, e);
+            BuildScape.LOGGER.warn("BuildScape: failed to render {} on a pillar", key, e);
         }
     }
-    private net.minecraft.world.phys.AABB getOrCalculateBounds(BakedModel model) {
+    private AABB getOrCalculateBounds(BakedModel model) {
         return modelBoundsCache.computeIfAbsent(model, this::calculateBounds);
     }
 
-    private net.minecraft.world.phys.AABB calculateBounds(BakedModel model) {
+    private AABB calculateBounds(BakedModel model) {
         double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE, minZ = Double.MAX_VALUE;
         double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
 
-        java.util.Random rand = new java.util.Random();
-        for (net.minecraft.core.Direction dir : new net.minecraft.core.Direction[]{null, net.minecraft.core.Direction.DOWN, net.minecraft.core.Direction.UP, net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.WEST, net.minecraft.core.Direction.EAST}) {
+        Random rand = new Random();
+        for (Direction dir : new Direction[]{null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST}) {
             rand.setSeed(42L);
-            java.util.List<net.minecraft.client.renderer.block.model.BakedQuad> quads = model.getQuads(null, dir, rand);
-            for (net.minecraft.client.renderer.block.model.BakedQuad quad : quads) {
+            List<BakedQuad> quads = model.getQuads(null, dir, rand);
+            for (BakedQuad quad : quads) {
                 int[] vertices = quad.getVertices();
 
                 int step = vertices.length / 4;
@@ -411,10 +438,10 @@ public class PillarBlockEntityRenderer
         }
 
         if (minX == Double.MAX_VALUE) {
-            return new net.minecraft.world.phys.AABB(0, 0, 0, 1, 1, 1);
+            return new AABB(0, 0, 0, 1, 1, 1);
         }
 
-        return new net.minecraft.world.phys.AABB(minX, minY, minZ, maxX, maxY, maxZ);
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     private boolean hasUpsideDownName(ItemStack stack) {
@@ -426,7 +453,7 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        net.minecraft.nbt.CompoundTag tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return false;
         }
@@ -435,7 +462,7 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        net.minecraft.nbt.CompoundTag displayTag = tag.getCompound("display");
+        CompoundTag displayTag = tag.getCompound("display");
         if (!displayTag.contains("Name", 8)) {
             return false;
         }
@@ -446,8 +473,8 @@ public class PillarBlockEntityRenderer
         }
 
         try {
-            net.minecraft.network.chat.Component nameComponent =
-                    net.minecraft.network.chat.Component.Serializer.fromJson(nameJson);
+            Component nameComponent =
+                    Component.Serializer.fromJson(nameJson);
             if (nameComponent == null) {
                 return false;
             }
@@ -458,7 +485,7 @@ public class PillarBlockEntityRenderer
             }
 
             String trimmedName = displayName.trim();
-            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+            trimmedName = ChatFormatting.stripFormatting(trimmedName);
 
             if (trimmedName != null && !trimmedName.isEmpty()) {
                 String lowerName = trimmedName.toLowerCase();
@@ -466,7 +493,7 @@ public class PillarBlockEntityRenderer
             }
         } catch (Exception e) {
             String trimmedName = nameJson.trim();
-            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+            trimmedName = ChatFormatting.stripFormatting(trimmedName);
             if (trimmedName != null && !trimmedName.isEmpty()) {
                 String lowerName = trimmedName.toLowerCase();
                 return lowerName.contains("grum") || lowerName.contains("dinnerbone");
@@ -481,7 +508,7 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        net.minecraft.nbt.CompoundTag tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return false;
         }
@@ -490,7 +517,7 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        net.minecraft.nbt.CompoundTag displayTag = tag.getCompound("display");
+        CompoundTag displayTag = tag.getCompound("display");
         if (!displayTag.contains("Name", 8)) {
             return false;
         }
@@ -501,8 +528,8 @@ public class PillarBlockEntityRenderer
         }
 
         try {
-            net.minecraft.network.chat.Component nameComponent =
-                    net.minecraft.network.chat.Component.Serializer.fromJson(nameJson);
+            Component nameComponent =
+                    Component.Serializer.fromJson(nameJson);
             if (nameComponent == null) {
                 return false;
             }
@@ -513,14 +540,14 @@ public class PillarBlockEntityRenderer
             }
 
             String trimmedName = displayName.trim();
-            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+            trimmedName = ChatFormatting.stripFormatting(trimmedName);
 
             if (trimmedName != null && !trimmedName.isEmpty()) {
                 return trimmedName.equalsIgnoreCase("item");
             }
         } catch (Exception e) {
             String trimmedName = nameJson.trim();
-            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+            trimmedName = ChatFormatting.stripFormatting(trimmedName);
             if (trimmedName != null && !trimmedName.isEmpty()) {
                 return trimmedName.equalsIgnoreCase("item");
             }
@@ -534,7 +561,7 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        net.minecraft.nbt.CompoundTag tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return false;
         }
@@ -543,7 +570,7 @@ public class PillarBlockEntityRenderer
             return false;
         }
 
-        net.minecraft.nbt.CompoundTag displayTag = tag.getCompound("display");
+        CompoundTag displayTag = tag.getCompound("display");
         if (!displayTag.contains("Name", 8)) {
             return false;
         }
@@ -554,8 +581,8 @@ public class PillarBlockEntityRenderer
         }
 
         try {
-            net.minecraft.network.chat.Component nameComponent =
-                    net.minecraft.network.chat.Component.Serializer.fromJson(nameJson);
+            Component nameComponent =
+                    Component.Serializer.fromJson(nameJson);
             if (nameComponent == null) {
                 return false;
             }
@@ -566,31 +593,31 @@ public class PillarBlockEntityRenderer
             }
 
             String trimmedName = displayName.trim();
-            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+            trimmedName = ChatFormatting.stripFormatting(trimmedName);
 
             if (trimmedName != null && !trimmedName.isEmpty()) {
-                if (trimmedName.toLowerCase(java.util.Locale.ROOT).contains("fixed")) {
-                    net.minecraft.world.item.Item item = stack.getItem();
-                    return item instanceof net.minecraft.world.item.SwordItem ||
-                            item instanceof net.minecraft.world.item.TridentItem ||
-                            item instanceof net.minecraft.world.item.AxeItem ||
-                            item instanceof net.minecraft.world.item.PickaxeItem ||
-                            item instanceof net.minecraft.world.item.ShovelItem ||
-                            item instanceof net.minecraft.world.item.HoeItem;
+                if (trimmedName.toLowerCase(Locale.ROOT).contains("fixed")) {
+                    Item item = stack.getItem();
+                    return item instanceof SwordItem ||
+                            item instanceof TridentItem ||
+                            item instanceof AxeItem ||
+                            item instanceof PickaxeItem ||
+                            item instanceof ShovelItem ||
+                            item instanceof HoeItem;
                 }
             }
         } catch (Exception e) {
             String trimmedName = nameJson.trim();
-            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+            trimmedName = ChatFormatting.stripFormatting(trimmedName);
             if (trimmedName != null && !trimmedName.isEmpty()) {
-                if (trimmedName.toLowerCase(java.util.Locale.ROOT).contains("fixed")) {
-                    net.minecraft.world.item.Item item = stack.getItem();
-                    return item instanceof net.minecraft.world.item.SwordItem ||
-                            item instanceof net.minecraft.world.item.TridentItem ||
-                            item instanceof net.minecraft.world.item.AxeItem ||
-                            item instanceof net.minecraft.world.item.PickaxeItem ||
-                            item instanceof net.minecraft.world.item.ShovelItem ||
-                            item instanceof net.minecraft.world.item.HoeItem;
+                if (trimmedName.toLowerCase(Locale.ROOT).contains("fixed")) {
+                    Item item = stack.getItem();
+                    return item instanceof SwordItem ||
+                            item instanceof TridentItem ||
+                            item instanceof AxeItem ||
+                            item instanceof PickaxeItem ||
+                            item instanceof ShovelItem ||
+                            item instanceof HoeItem;
                 }
             }
         }

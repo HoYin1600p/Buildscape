@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.recipe.framework.compiler;
 
-import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.google.gson.JsonElement;
+import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class StonecuttingCycleValidator {
     private final Map<String, List<Edge>> outgoing = new LinkedHashMap<>();
@@ -168,7 +169,7 @@ public final class StonecuttingCycleValidator {
         return new IllegalArgumentException("Stonecutting cycle with net item gain: "
                 + cycle.stream().map(edge -> edge.recipeId() + " (" + edge.input()
                         + " -> " + edge.count() + " " + edge.output() + ")")
-                        .collect(java.util.stream.Collectors.joining("; ")));
+                        .collect(Collectors.joining("; ")));
     }
 
     public void clear() {

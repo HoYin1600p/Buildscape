@@ -10,12 +10,16 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.awt.Color;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @OnlyIn(Dist.CLIENT)
 public class TrailNoteParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;
 
-    private static final java.util.Map<String, ColorEntry> POSITION_COLOR_MAP = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<String, ColorEntry> POSITION_COLOR_MAP = new ConcurrentHashMap<>();
 
     private static class ColorEntry {
         final String colorCode;
@@ -55,7 +59,7 @@ public class TrailNoteParticle extends TextureSheetParticle {
             this.setColor(color[0], color[1], color[2]);
         } else {
             float hue = level.random.nextFloat();
-            int rgb = java.awt.Color.HSBtoRGB(hue, 0.8f, 0.9f);
+            int rgb = Color.HSBtoRGB(hue, 0.8f, 0.9f);
             float r = ((rgb >> 16) & 0xFF) / 255.0f;
             float g = ((rgb >> 8) & 0xFF) / 255.0f;
             float b = (rgb & 0xFF) / 255.0f;

@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.fluids.FluidStack;
 
 public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJarBlockEntity> {
 
@@ -182,7 +183,7 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
                 color = 0xFF3F76E4;
                 textureLoc = new ResourceLocation("minecraft", "block/water_still");
             } else {
-                net.minecraftforge.fluids.FluidStack fluidStack = new net.minecraftforge.fluids.FluidStack(fluid, 1000);
+                FluidStack fluidStack = new FluidStack(fluid, 1000);
                 ResourceLocation stillTexture = fluid.getAttributes().getStillTexture(fluidStack);
                 if (stillTexture != null) {
                     textureLoc = stillTexture;

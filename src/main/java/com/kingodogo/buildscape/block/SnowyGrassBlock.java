@@ -1,18 +1,17 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -20,14 +19,21 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.lighting.LayerLightEngine;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class SnowyGrassBlock extends Block implements BonemealableBlock {
 
@@ -106,8 +112,8 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
 
                 if (targetState.is(ModBlocks.DIRT_SLAB.get()) && canPropagate(snowyGrassState, level, targetPos)) {
                     BlockState grassSlabState = ModBlocks.SNOWY_GRASS_BLOCK_SLAB.get().defaultBlockState()
-                            .setValue(net.minecraft.world.level.block.SlabBlock.TYPE, targetState.getValue(net.minecraft.world.level.block.SlabBlock.TYPE))
-                            .setValue(net.minecraft.world.level.block.SlabBlock.WATERLOGGED, targetState.getValue(net.minecraft.world.level.block.SlabBlock.WATERLOGGED));
+                            .setValue(SlabBlock.TYPE, targetState.getValue(SlabBlock.TYPE))
+                            .setValue(SlabBlock.WATERLOGGED, targetState.getValue(SlabBlock.WATERLOGGED));
                     level.setBlockAndUpdate(targetPos, grassSlabState);
                 } else if (
                         targetState.is(Blocks.DIRT) &&
@@ -127,13 +133,13 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
         LootContext ctx = builder
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK
+                        LootContextParamSets.BLOCK
                 );
         ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
 
         if (tool != null && !tool.isEmpty()) {
             if (
-                    net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
+                    EnchantmentHelper.getItemEnchantmentLevel(
                             Enchantments.SILK_TOUCH,
                             tool
                     ) >
@@ -174,8 +180,8 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
                 level.playSound(
                         player,
                         pos,
-                        net.minecraft.sounds.SoundEvents.BONE_MEAL_USE,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.BONE_MEAL_USE,
+                        SoundSource.BLOCKS,
                         1.0f,
                         1.0f
                 );
@@ -188,7 +194,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
 
     @Override
     public boolean isValidBonemealTarget(
-            net.minecraft.world.level.BlockGetter level,
+            BlockGetter level,
             BlockPos pos,
             BlockState state,
             boolean isClient
@@ -242,9 +248,9 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
             Block foliageBlock = getRandomSnowyFoliage(random);
             if (foliageBlock != null) {
                 BlockState foliageState = foliageBlock.defaultBlockState();
-                if (foliageBlock instanceof net.minecraft.world.level.block.BushBlock) {
+                if (foliageBlock instanceof BushBlock) {
                     if (
-                            !((net.minecraft.world.level.block.BushBlock) foliageBlock).canSurvive(
+                            !((BushBlock) foliageBlock).canSurvive(
                                     foliageState,
                                     level,
                                     abovePos

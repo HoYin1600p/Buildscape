@@ -6,6 +6,7 @@ import com.kingodogo.buildscape.block.PlanterHelper.PlanterType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.WorldlyContainer;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ComposterBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
@@ -41,7 +43,7 @@ public abstract class ComposterBlockMixin extends Block {
     }
 
     @Override
-    public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, net.minecraft.core.Direction facing, IPlantable plantable) {
+    public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, Direction facing, IPlantable plantable) {
         if (state.hasProperty(PlanterHelper.PLANTER) && state.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {
             return true;
         }
@@ -84,7 +86,7 @@ public abstract class ComposterBlockMixin extends Block {
                     if (newType != null) {
                         if (!level.isClientSide) {
                             if (newType == PlanterType.GRASS_BLOCK) {
-                                boolean isSnowy = level.getBlockState(pos.above()).is(net.minecraft.tags.BlockTags.SNOW);
+                                boolean isSnowy = level.getBlockState(pos.above()).is(BlockTags.SNOW);
                                 if (isSnowy) {
                                     newType = PlanterType.SNOWY_GRASS_BLOCK;
                                 }
@@ -92,7 +94,7 @@ public abstract class ComposterBlockMixin extends Block {
 
                             level.setBlock(pos, state.setValue(PlanterHelper.PLANTER, newType), 3);
 
-                            net.minecraft.world.level.block.SoundType soundType = block.getSoundType(block.defaultBlockState(), level, pos, player);
+                            SoundType soundType = block.getSoundType(block.defaultBlockState(), level, pos, player);
                             level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
 
                             if (!player.getAbilities().instabuild) {
@@ -156,7 +158,7 @@ public abstract class ComposterBlockMixin extends Block {
         if (facing == Direction.UP && state.hasProperty(PlanterHelper.PLANTER)) {
             PlanterType planter = state.getValue(PlanterHelper.PLANTER);
             if (planter == PlanterType.GRASS_BLOCK || planter == PlanterType.SNOWY_GRASS_BLOCK) {
-                boolean isSnowy = facingState.is(net.minecraft.tags.BlockTags.SNOW);
+                boolean isSnowy = facingState.is(BlockTags.SNOW);
                 if (isSnowy) {
                     if (planter != PlanterType.SNOWY_GRASS_BLOCK) {
                         state = state.setValue(PlanterHelper.PLANTER, PlanterType.SNOWY_GRASS_BLOCK);

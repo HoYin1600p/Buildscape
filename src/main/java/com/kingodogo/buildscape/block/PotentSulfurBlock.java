@@ -1,18 +1,21 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.TagKey;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,8 +26,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
-import com.kingodogo.buildscape.sound.ModSounds;
-import com.kingodogo.buildscape.particle.ModParticles;
 
 import java.util.Random;
 
@@ -71,8 +72,8 @@ public class PotentSulfurBlock extends BaseEntityBlock {
          return state.setValue(STATE, PotentSulfurState.DRY);
       } else {
          BlockState belowState = level.getBlockState(pos.below());
-         boolean isContinuous = (belowState.is(net.minecraft.world.level.block.Blocks.LAVA) || belowState.is(CAUSES_CONTINUOUS_GEYSER_ERUPTIONS)) && isSourceIfFluid(belowState);
-         boolean isPeriodic = (belowState.is(net.minecraft.world.level.block.Blocks.MAGMA_BLOCK) || belowState.is(CAUSES_PERIODIC_GEYSER_ERUPTIONS)) && isSourceIfFluid(belowState);
+         boolean isContinuous = (belowState.is(Blocks.LAVA) || belowState.is(CAUSES_CONTINUOUS_GEYSER_ERUPTIONS)) && isSourceIfFluid(belowState);
+         boolean isPeriodic = (belowState.is(Blocks.MAGMA_BLOCK) || belowState.is(CAUSES_PERIODIC_GEYSER_ERUPTIONS)) && isSourceIfFluid(belowState);
 
          if (isContinuous) {
             return state.setValue(STATE, PotentSulfurState.CONTINUOUS);

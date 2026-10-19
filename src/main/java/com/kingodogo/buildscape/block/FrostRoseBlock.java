@@ -1,8 +1,12 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -11,8 +15,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
@@ -24,9 +28,15 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.WeakHashMap;
 
 public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
@@ -44,7 +54,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
     private static final String CONTACT_START_KEY = "BuildscapeFrostRoseStart";
     private static final String CONTACT_LAST_DAMAGE_KEY = "BuildscapeFrostRoseLastDamage";
     private static final String CONTACT_LAST_TICK_KEY = "BuildscapeFrostRoseLastContact";
-    private final java.util.Map<Level, java.util.Map<BlockPos, long[]>> nearbyRoseCounts = new java.util.WeakHashMap<>();
+    private final Map<Level, Map<BlockPos, long[]>> nearbyRoseCounts = new WeakHashMap<>();
 
     public FrostRoseBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -96,7 +106,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
                         state.is(Blocks.SNOW) ||
                         state.is(Blocks.SNOW_BLOCK) ||
                         state.is(Blocks.POWDER_SNOW) ||
-                        state.is(com.kingodogo.buildscape.block.ModBlocks.SNOW_BRICKS.get())
+                        state.is(ModBlocks.SNOW_BRICKS.get())
         );
     }
 
@@ -113,7 +123,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
     @Override
     public boolean isBonemealSuccess(
             Level level,
-            java.util.Random random,
+            Random random,
             BlockPos pos,
             BlockState state
     ) {
@@ -123,7 +133,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
     @Override
     public void performBonemeal(
             ServerLevel level,
-            java.util.Random random,
+            Random random,
             BlockPos pos,
             BlockState state
     ) {
@@ -179,7 +189,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
     }
 
     private static void handleContact(Level level, BlockPos pos, LivingEntity entity) {
-        net.minecraft.nbt.CompoundTag data = entity.getPersistentData();
+        CompoundTag data = entity.getPersistentData();
         long currentTick = level.getGameTime();
         String dimension = level.dimension().location().toString();
         boolean continuing = data.contains(CONTACT_START_KEY)
@@ -218,14 +228,14 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
 
     private static void applyFreezeDamage(Level level, BlockPos pos, LivingEntity entity) {
         entity.hurt(DamageSource.GENERIC, 1.0F);
-        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.POWDER_SNOW_STEP,
-                net.minecraft.sounds.SoundSource.BLOCKS, 0.5F, 1.0F);
+        level.playSound(null, pos, SoundEvents.POWDER_SNOW_STEP,
+                SoundSource.BLOCKS, 0.5F, 1.0F);
         if (entity.canFreeze()) {
             entity.setTicksFrozen(Math.min(entity.getTicksFrozen() + 140, 300));
         }
     }
 
-    private static void clearContact(net.minecraft.nbt.CompoundTag data) {
+    private static void clearContact(CompoundTag data) {
         data.remove(CONTACT_POSITION_KEY);
         data.remove(CONTACT_DIMENSION_KEY);
         data.remove(CONTACT_START_KEY);
@@ -290,12 +300,12 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
         return Collections.singletonList(new ItemStack(this));
     }
 
-    @net.minecraftforge.api.distmarker.OnlyIn(net.minecraftforge.api.distmarker.Dist.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
-    public void animateTick(BlockState state, Level level, BlockPos pos, java.util.Random random) {
+    public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
         super.animateTick(state, level, pos, random);
 
-        java.util.Map<BlockPos, long[]> counts = nearbyRoseCounts.computeIfAbsent(level, key -> new java.util.HashMap<>());
+        Map<BlockPos, long[]> counts = nearbyRoseCounts.computeIfAbsent(level, key -> new HashMap<>());
         long now = level.getGameTime();
         long[] cached = counts.get(pos);
         if (cached == null || now < cached[0] || now - cached[0] >= 100L) {
@@ -334,7 +344,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
                 double zSpeed = (random.nextDouble() - 0.5) * 0.1;
 
                 level.addParticle(
-                        com.kingodogo.buildscape.particle.ModParticles.SNOWFLAKE.get(),
+                        ModParticles.SNOWFLAKE.get(),
                         spawnX, spawnY, spawnZ,
                         xSpeed, ySpeed, zSpeed
                 );

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -47,7 +48,7 @@ public class PetalBlock extends BushBlock implements SinksOnFarmland, Bonemealab
     private static SoundType getFlowerBedSounds() {
         if (cachedSoundType == null) {
             cachedSoundType =
-                    com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS();
+                    ModSounds.FLOWER_BED_SOUNDS();
         }
         return cachedSoundType;
     }
@@ -322,7 +323,7 @@ public class PetalBlock extends BushBlock implements SinksOnFarmland, Bonemealab
             BlockGetter level,
             BlockPos pos
     ) {
-        return state.isFaceSturdy(level, pos, Direction.UP) || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
+        return state.isFaceSturdy(level, pos, Direction.UP) || state.is(Blocks.FARMLAND);
     }
 
     @Override

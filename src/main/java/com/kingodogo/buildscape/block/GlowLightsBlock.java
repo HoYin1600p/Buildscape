@@ -1,18 +1,31 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.network.ActionBarMessagePacket;
+import com.kingodogo.buildscape.network.ModMessages;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,11 +38,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.network.PacketDistributor;
 
+import java.util.AbstractMap;
+import java.util.Map;
 import javax.annotation.Nullable;
 
 public class GlowLightsBlock
-        extends net.minecraft.world.level.block.VineBlock
+        extends VineBlock
         implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
@@ -90,11 +106,11 @@ public class GlowLightsBlock
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition.any()
-                        .setValue(net.minecraft.world.level.block.VineBlock.NORTH, false)
-                        .setValue(net.minecraft.world.level.block.VineBlock.EAST, false)
-                        .setValue(net.minecraft.world.level.block.VineBlock.SOUTH, false)
-                        .setValue(net.minecraft.world.level.block.VineBlock.WEST, false)
-                        .setValue(net.minecraft.world.level.block.VineBlock.UP, false)
+                        .setValue(VineBlock.NORTH, false)
+                        .setValue(VineBlock.EAST, false)
+                        .setValue(VineBlock.SOUTH, false)
+                        .setValue(VineBlock.WEST, false)
+                        .setValue(VineBlock.UP, false)
                         .setValue(DOWN, false)
                         .setValue(WATERLOGGED, false)
                         .setValue(LIT, true)
@@ -126,15 +142,15 @@ public class GlowLightsBlock
             CollisionContext context
     ) {
         VoxelShape shape = Shapes.empty();
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.NORTH)) shape =
+        if (state.getValue(VineBlock.NORTH)) shape =
                 Shapes.or(shape, SHAPE_NORTH);
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.SOUTH)) shape =
+        if (state.getValue(VineBlock.SOUTH)) shape =
                 Shapes.or(shape, SHAPE_SOUTH);
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.EAST)) shape =
+        if (state.getValue(VineBlock.EAST)) shape =
                 Shapes.or(shape, SHAPE_EAST);
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.WEST)) shape =
+        if (state.getValue(VineBlock.WEST)) shape =
                 Shapes.or(shape, SHAPE_WEST);
-        if (state.getValue(net.minecraft.world.level.block.VineBlock.UP)) shape =
+        if (state.getValue(VineBlock.UP)) shape =
                 Shapes.or(shape, SHAPE_UP);
         if (state.getValue(DOWN)) shape = Shapes.or(shape, SHAPE_DOWN);
         return shape.isEmpty() ? Shapes.block() : shape;
@@ -164,7 +180,7 @@ public class GlowLightsBlock
         ) {
             if (blockState.getBlock() == this) {
                 BooleanProperty property =
-                        net.minecraft.world.level.block.VineBlock.getPropertyForFace(
+                        VineBlock.getPropertyForFace(
                                 attachDirection
                         );
                 if (
@@ -191,7 +207,7 @@ public class GlowLightsBlock
                 Direction attachToGlow = clickedFace.getOpposite();
                 BooleanProperty attachProperty = attachToGlow == Direction.DOWN
                         ? DOWN
-                        : net.minecraft.world.level.block.VineBlock.getPropertyForFace(
+                        : VineBlock.getPropertyForFace(
                         attachToGlow
                 );
 
@@ -223,10 +239,10 @@ public class GlowLightsBlock
                 } else {
                     state = this.defaultBlockState();
                     if (
-                            blockState.hasProperty(net.minecraft.world.level.block.VineBlock.UP)
+                            blockState.hasProperty(VineBlock.UP)
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.UP,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.UP)
+                            VineBlock.UP,
+                            blockState.getValue(VineBlock.UP)
                     );
                     if (blockState.hasProperty(DOWN)) state = state.setValue(
                             DOWN,
@@ -234,35 +250,35 @@ public class GlowLightsBlock
                     );
                     if (
                             blockState.hasProperty(
-                                    net.minecraft.world.level.block.VineBlock.NORTH
+                                    VineBlock.NORTH
                             )
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.NORTH,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.NORTH)
+                            VineBlock.NORTH,
+                            blockState.getValue(VineBlock.NORTH)
                     );
                     if (
                             blockState.hasProperty(
-                                    net.minecraft.world.level.block.VineBlock.SOUTH
+                                    VineBlock.SOUTH
                             )
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.SOUTH,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.SOUTH)
+                            VineBlock.SOUTH,
+                            blockState.getValue(VineBlock.SOUTH)
                     );
                     if (
                             blockState.hasProperty(
-                                    net.minecraft.world.level.block.VineBlock.EAST
+                                    VineBlock.EAST
                             )
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.EAST,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.EAST)
+                            VineBlock.EAST,
+                            blockState.getValue(VineBlock.EAST)
                     );
                     if (
                             blockState.hasProperty(
-                                    net.minecraft.world.level.block.VineBlock.WEST
+                                    VineBlock.WEST
                             )
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.WEST,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.WEST)
+                            VineBlock.WEST,
+                            blockState.getValue(VineBlock.WEST)
                     );
                 }
             } else {
@@ -285,10 +301,10 @@ public class GlowLightsBlock
                 } else {
                     state = this.defaultBlockState();
                     if (
-                            blockState.hasProperty(net.minecraft.world.level.block.VineBlock.UP)
+                            blockState.hasProperty(VineBlock.UP)
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.UP,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.UP)
+                            VineBlock.UP,
+                            blockState.getValue(VineBlock.UP)
                     );
                     if (blockState.hasProperty(DOWN)) state = state.setValue(
                             DOWN,
@@ -296,35 +312,35 @@ public class GlowLightsBlock
                     );
                     if (
                             blockState.hasProperty(
-                                    net.minecraft.world.level.block.VineBlock.NORTH
+                                    VineBlock.NORTH
                             )
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.NORTH,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.NORTH)
+                            VineBlock.NORTH,
+                            blockState.getValue(VineBlock.NORTH)
                     );
                     if (
                             blockState.hasProperty(
-                                    net.minecraft.world.level.block.VineBlock.SOUTH
+                                    VineBlock.SOUTH
                             )
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.SOUTH,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.SOUTH)
+                            VineBlock.SOUTH,
+                            blockState.getValue(VineBlock.SOUTH)
                     );
                     if (
                             blockState.hasProperty(
-                                    net.minecraft.world.level.block.VineBlock.EAST
+                                    VineBlock.EAST
                             )
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.EAST,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.EAST)
+                            VineBlock.EAST,
+                            blockState.getValue(VineBlock.EAST)
                     );
                     if (
                             blockState.hasProperty(
-                                    net.minecraft.world.level.block.VineBlock.WEST
+                                    VineBlock.WEST
                             )
                     ) state = state.setValue(
-                            net.minecraft.world.level.block.VineBlock.WEST,
-                            blockState.getValue(net.minecraft.world.level.block.VineBlock.WEST)
+                            VineBlock.WEST,
+                            blockState.getValue(VineBlock.WEST)
                     );
                 }
             } else {
@@ -332,7 +348,7 @@ public class GlowLightsBlock
             }
 
             state = state.setValue(
-                    net.minecraft.world.level.block.VineBlock.UP,
+                    VineBlock.UP,
                     true
             );
             BlockPos placePos = context.getClickedPos();
@@ -347,7 +363,7 @@ public class GlowLightsBlock
             if (blockState.getBlock() == this) {
                 BooleanProperty property = attachDirection == Direction.DOWN
                         ? DOWN
-                        : net.minecraft.world.level.block.VineBlock.getPropertyForFace(
+                        : VineBlock.getPropertyForFace(
                         attachDirection
                 );
                 if (
@@ -364,10 +380,10 @@ public class GlowLightsBlock
             } else {
                 state = this.defaultBlockState();
                 if (
-                        blockState.hasProperty(net.minecraft.world.level.block.VineBlock.UP)
+                        blockState.hasProperty(VineBlock.UP)
                 ) state = state.setValue(
-                        net.minecraft.world.level.block.VineBlock.UP,
-                        blockState.getValue(net.minecraft.world.level.block.VineBlock.UP)
+                        VineBlock.UP,
+                        blockState.getValue(VineBlock.UP)
                 );
                 if (blockState.hasProperty(DOWN)) state = state.setValue(
                         DOWN,
@@ -375,37 +391,37 @@ public class GlowLightsBlock
                 );
                 if (
                         blockState.hasProperty(
-                                net.minecraft.world.level.block.VineBlock.NORTH
+                                VineBlock.NORTH
                         )
                 ) state = state.setValue(
-                        net.minecraft.world.level.block.VineBlock.NORTH,
-                        blockState.getValue(net.minecraft.world.level.block.VineBlock.NORTH)
+                        VineBlock.NORTH,
+                        blockState.getValue(VineBlock.NORTH)
                 );
                 if (
                         blockState.hasProperty(
-                                net.minecraft.world.level.block.VineBlock.SOUTH
+                                VineBlock.SOUTH
                         )
                 ) state = state.setValue(
-                        net.minecraft.world.level.block.VineBlock.SOUTH,
-                        blockState.getValue(net.minecraft.world.level.block.VineBlock.SOUTH)
+                        VineBlock.SOUTH,
+                        blockState.getValue(VineBlock.SOUTH)
                 );
                 if (
-                        blockState.hasProperty(net.minecraft.world.level.block.VineBlock.EAST)
+                        blockState.hasProperty(VineBlock.EAST)
                 ) state = state.setValue(
-                        net.minecraft.world.level.block.VineBlock.EAST,
-                        blockState.getValue(net.minecraft.world.level.block.VineBlock.EAST)
+                        VineBlock.EAST,
+                        blockState.getValue(VineBlock.EAST)
                 );
                 if (
-                        blockState.hasProperty(net.minecraft.world.level.block.VineBlock.WEST)
+                        blockState.hasProperty(VineBlock.WEST)
                 ) state = state.setValue(
-                        net.minecraft.world.level.block.VineBlock.WEST,
-                        blockState.getValue(net.minecraft.world.level.block.VineBlock.WEST)
+                        VineBlock.WEST,
+                        blockState.getValue(VineBlock.WEST)
                 );
             }
 
             BooleanProperty property = attachDirection == Direction.DOWN
                     ? DOWN
-                    : net.minecraft.world.level.block.VineBlock.getPropertyForFace(
+                    : VineBlock.getPropertyForFace(
                     attachDirection
             );
             if (property != null && state.hasProperty(property)) {
@@ -448,7 +464,7 @@ public class GlowLightsBlock
         }
 
         BooleanProperty faceProperty =
-                net.minecraft.world.level.block.VineBlock.getPropertyForFace(direction);
+                VineBlock.getPropertyForFace(direction);
         if (
                 faceProperty != null &&
                         state.hasProperty(faceProperty) &&
@@ -469,7 +485,7 @@ public class GlowLightsBlock
         }
 
         if (!hasAnyFace(state)) {
-            return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            return Blocks.AIR.defaultBlockState();
         }
 
         return state;
@@ -485,7 +501,7 @@ public class GlowLightsBlock
     @Override
     public boolean canSurvive(
             BlockState state,
-            net.minecraft.world.level.LevelReader level,
+            LevelReader level,
             BlockPos pos
     ) {
         return hasAnyFace(state);
@@ -493,10 +509,10 @@ public class GlowLightsBlock
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        net.minecraft.world.item.Item heldItem = context.getItemInHand().getItem();
-        if (heldItem instanceof net.minecraft.world.item.BlockItem) {
-            net.minecraft.world.level.block.Block heldBlock =
-                    ((net.minecraft.world.item.BlockItem) heldItem).getBlock();
+        Item heldItem = context.getItemInHand().getItem();
+        if (heldItem instanceof BlockItem) {
+            Block heldBlock =
+                    ((BlockItem) heldItem).getBlock();
 
             if (!(heldBlock instanceof GlowLightsBlock)) {
                 return false;
@@ -510,7 +526,7 @@ public class GlowLightsBlock
             Direction attachDirection = clickedFace.getOpposite();
             BooleanProperty property = attachDirection == Direction.DOWN
                     ? DOWN
-                    : net.minecraft.world.level.block.VineBlock.getPropertyForFace(
+                    : VineBlock.getPropertyForFace(
                     attachDirection
             );
 
@@ -539,7 +555,7 @@ public class GlowLightsBlock
         int count = 0;
         for (Direction direction : Direction.values()) {
             BooleanProperty property = direction == Direction.DOWN
-                    ? DOWN : net.minecraft.world.level.block.VineBlock.getPropertyForFace(direction);
+                    ? DOWN : VineBlock.getPropertyForFace(direction);
             if (state.getValue(property)) count++;
         }
         return count;
@@ -547,11 +563,11 @@ public class GlowLightsBlock
 
     private boolean hasAnyFace(BlockState state) {
         return (
-                state.getValue(net.minecraft.world.level.block.VineBlock.NORTH) ||
-                        state.getValue(net.minecraft.world.level.block.VineBlock.EAST) ||
-                        state.getValue(net.minecraft.world.level.block.VineBlock.SOUTH) ||
-                        state.getValue(net.minecraft.world.level.block.VineBlock.WEST) ||
-                        state.getValue(net.minecraft.world.level.block.VineBlock.UP) ||
+                state.getValue(VineBlock.NORTH) ||
+                        state.getValue(VineBlock.EAST) ||
+                        state.getValue(VineBlock.SOUTH) ||
+                        state.getValue(VineBlock.WEST) ||
+                        state.getValue(VineBlock.UP) ||
                         state.getValue(DOWN)
         );
     }
@@ -598,8 +614,8 @@ public class GlowLightsBlock
                 level.playSound(
                         null,
                         pos,
-                        net.minecraft.sounds.SoundEvents.STONE_BUTTON_CLICK_OFF,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.STONE_BUTTON_CLICK_OFF,
+                        SoundSource.BLOCKS,
                         0.3f,
                         1.0f
                 );
@@ -607,8 +623,8 @@ public class GlowLightsBlock
                 level.playSound(
                         null,
                         pos,
-                        net.minecraft.sounds.SoundEvents.STONE_BUTTON_CLICK_ON,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.STONE_BUTTON_CLICK_ON,
+                        SoundSource.BLOCKS,
                         0.3f,
                         1.0f
                 );
@@ -619,24 +635,24 @@ public class GlowLightsBlock
 
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof GlowLightsBlockEntity glowBE) {
-            java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(
+            Map.Entry<String, String> dyeInfo = getDyeColorAndName(
                     heldItem
             );
             if (dyeInfo != null) {
                 if (!glowBE.canAddMoreColors()) {
-                    net.minecraft.network.chat.TextComponent message =
-                            new net.minecraft.network.chat.TextComponent(
+                    TextComponent message =
+                            new TextComponent(
                                     "Glow Lights already has " +
                                             GlowLightsBlockEntity.MAX_DYE_COLORS +
                                             " colors! Break and replace to reset."
                             );
-                    message.withStyle(net.minecraft.ChatFormatting.RED);
-                    if (player instanceof net.minecraft.server.level.ServerPlayer) {
-                        com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                                net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
-                                        (net.minecraft.server.level.ServerPlayer) player
+                    message.withStyle(ChatFormatting.RED);
+                    if (player instanceof ServerPlayer) {
+                        ModMessages.INSTANCE.send(
+                                PacketDistributor.PLAYER.with(() ->
+                                        (ServerPlayer) player
                                 ),
-                                new com.kingodogo.buildscape.network.ActionBarMessagePacket(
+                                new ActionBarMessagePacket(
                                         message
                                 )
                         );
@@ -656,8 +672,8 @@ public class GlowLightsBlock
                     level.playSound(
                             null,
                             pos,
-                            net.minecraft.sounds.SoundEvents.DYE_USE,
-                            net.minecraft.sounds.SoundSource.BLOCKS,
+                            SoundEvents.DYE_USE,
+                            SoundSource.BLOCKS,
                             1.0f,
                             1.0f
                     );
@@ -669,17 +685,17 @@ public class GlowLightsBlock
                                     "/" +
                                     GlowLightsBlockEntity.MAX_DYE_COLORS +
                                     ")";
-                    net.minecraft.network.chat.TextComponent message =
-                            new net.minecraft.network.chat.TextComponent(
+                    TextComponent message =
+                            new TextComponent(
                                     "Glow Lights color added: " + dyeName + progressText
                             );
-                    message.withStyle(net.minecraft.ChatFormatting.GREEN);
-                    if (player instanceof net.minecraft.server.level.ServerPlayer) {
-                        com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                                net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
-                                        (net.minecraft.server.level.ServerPlayer) player
+                    message.withStyle(ChatFormatting.GREEN);
+                    if (player instanceof ServerPlayer) {
+                        ModMessages.INSTANCE.send(
+                                PacketDistributor.PLAYER.with(() ->
+                                        (ServerPlayer) player
                                 ),
-                                new com.kingodogo.buildscape.network.ActionBarMessagePacket(
+                                new ActionBarMessagePacket(
                                         message
                                 )
                         );
@@ -694,47 +710,47 @@ public class GlowLightsBlock
     }
 
     @Nullable
-    private java.util.Map.Entry<String, String> getDyeColorAndName(
+    private Map.Entry<String, String> getDyeColorAndName(
             ItemStack stack
     ) {
         if (stack == null || stack.isEmpty()) {
             return null;
         }
 
-        net.minecraft.world.item.Item item = stack.getItem();
+        Item item = stack.getItem();
 
-        if (item == net.minecraft.world.item.Items.WHITE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#E8FEFD", "White");
-        } else if (item == net.minecraft.world.item.Items.ORANGE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#FF5C00", "Orange");
-        } else if (item == net.minecraft.world.item.Items.MAGENTA_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#FF00FF", "Magenta");
-        } else if (item == net.minecraft.world.item.Items.LIGHT_BLUE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#3CDFFF", "Light Blue");
-        } else if (item == net.minecraft.world.item.Items.YELLOW_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#FFFF00", "Yellow");
-        } else if (item == net.minecraft.world.item.Items.LIME_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#BFFE00", "Lime");
-        } else if (item == net.minecraft.world.item.Items.PINK_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#F686B7", "Pink");
-        } else if (item == net.minecraft.world.item.Items.GRAY_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#232526", "Gray");
-        } else if (item == net.minecraft.world.item.Items.LIGHT_GRAY_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#B1B8C5", "Light Gray");
-        } else if (item == net.minecraft.world.item.Items.CYAN_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#00FFFF", "Cyan");
-        } else if (item == net.minecraft.world.item.Items.PURPLE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#AB87FF", "Purple");
-        } else if (item == net.minecraft.world.item.Items.BLUE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#1919EA", "Blue");
-        } else if (item == net.minecraft.world.item.Items.BROWN_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#411900", "Brown");
-        } else if (item == net.minecraft.world.item.Items.GREEN_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#39FF14", "Green");
-        } else if (item == net.minecraft.world.item.Items.RED_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#FF0000", "Red");
-        } else if (item == net.minecraft.world.item.Items.BLACK_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#07010C", "Black");
+        if (item == Items.WHITE_DYE) {
+            return new AbstractMap.SimpleEntry<>("#E8FEFD", "White");
+        } else if (item == Items.ORANGE_DYE) {
+            return new AbstractMap.SimpleEntry<>("#FF5C00", "Orange");
+        } else if (item == Items.MAGENTA_DYE) {
+            return new AbstractMap.SimpleEntry<>("#FF00FF", "Magenta");
+        } else if (item == Items.LIGHT_BLUE_DYE) {
+            return new AbstractMap.SimpleEntry<>("#3CDFFF", "Light Blue");
+        } else if (item == Items.YELLOW_DYE) {
+            return new AbstractMap.SimpleEntry<>("#FFFF00", "Yellow");
+        } else if (item == Items.LIME_DYE) {
+            return new AbstractMap.SimpleEntry<>("#BFFE00", "Lime");
+        } else if (item == Items.PINK_DYE) {
+            return new AbstractMap.SimpleEntry<>("#F686B7", "Pink");
+        } else if (item == Items.GRAY_DYE) {
+            return new AbstractMap.SimpleEntry<>("#232526", "Gray");
+        } else if (item == Items.LIGHT_GRAY_DYE) {
+            return new AbstractMap.SimpleEntry<>("#B1B8C5", "Light Gray");
+        } else if (item == Items.CYAN_DYE) {
+            return new AbstractMap.SimpleEntry<>("#00FFFF", "Cyan");
+        } else if (item == Items.PURPLE_DYE) {
+            return new AbstractMap.SimpleEntry<>("#AB87FF", "Purple");
+        } else if (item == Items.BLUE_DYE) {
+            return new AbstractMap.SimpleEntry<>("#1919EA", "Blue");
+        } else if (item == Items.BROWN_DYE) {
+            return new AbstractMap.SimpleEntry<>("#411900", "Brown");
+        } else if (item == Items.GREEN_DYE) {
+            return new AbstractMap.SimpleEntry<>("#39FF14", "Green");
+        } else if (item == Items.RED_DYE) {
+            return new AbstractMap.SimpleEntry<>("#FF0000", "Red");
+        } else if (item == Items.BLACK_DYE) {
+            return new AbstractMap.SimpleEntry<>("#07010C", "Black");
         }
 
         return null;

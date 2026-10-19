@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.model;
 
+import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -7,9 +8,10 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.npc.WanderingTrader;
 
-public class WanderingHomemakerModel<T extends net.minecraft.world.entity.npc.WanderingTrader> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "wandering_homemaker"), "main");
+public class WanderingHomemakerModel<T extends WanderingTrader> extends HierarchicalModel<T> {
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BuildScape.MODID, "wandering_homemaker"), "main");
 
     private final ModelPart root;
     private final ModelPart head;

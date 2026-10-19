@@ -1,9 +1,7 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
+import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -20,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.Mirror;
@@ -37,6 +36,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 public class CloverBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
     public static final IntegerProperty FLOWER_AMOUNT = IntegerProperty.create(
@@ -52,7 +55,7 @@ public class CloverBlock extends BushBlock implements SinksOnFarmland, Bonemeala
     private static SoundType getFlowerBedSounds() {
         if (cachedSoundType == null) {
             cachedSoundType =
-                    com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS();
+                    ModSounds.FLOWER_BED_SOUNDS();
         }
         return cachedSoundType;
     }
@@ -323,7 +326,7 @@ public class CloverBlock extends BushBlock implements SinksOnFarmland, Bonemeala
                 state.isFaceSturdy(level, pos, Direction.UP) &&
                         state.getMaterial().isSolid() &&
                         !state.getMaterial().isReplaceable()
-        ) || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
+        ) || state.is(Blocks.FARMLAND);
     }
 
     @Override
@@ -375,7 +378,7 @@ public class CloverBlock extends BushBlock implements SinksOnFarmland, Bonemeala
         ItemStack itemStack = player.getItemInHand(hand);
 
         if (
-                itemStack.getItem() == com.kingodogo.buildscape.item.ModItems.CLOVER.get()
+                itemStack.getItem() == ModItems.CLOVER.get()
         ) {
             int currentAmount = state.getValue(FLOWER_AMOUNT);
             if (currentAmount < 4) {
@@ -438,7 +441,7 @@ public class CloverBlock extends BushBlock implements SinksOnFarmland, Bonemeala
             level.setBlock(pos, state.setValue(FLOWER_AMOUNT, currentStage + 1), 3);
         } else {
             ItemStack cloverStack = new ItemStack(
-                    com.kingodogo.buildscape.item.ModItems.CLOVER.get(),
+                    ModItems.CLOVER.get(),
                     1
             );
             ItemEntity itemEntity = new ItemEntity(
@@ -460,7 +463,7 @@ public class CloverBlock extends BushBlock implements SinksOnFarmland, Bonemeala
     ) {
         int stage = state.getValue(FLOWER_AMOUNT);
         return Collections.singletonList(
-                new ItemStack(com.kingodogo.buildscape.item.ModItems.CLOVER.get(), stage)
+                new ItemStack(ModItems.CLOVER.get(), stage)
         );
     }
 }

@@ -1,10 +1,20 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.entity.FallingIcicleEntity;
+import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -14,6 +24,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.PointedDripstoneBlock;
 import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -21,21 +32,15 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DripstoneThickness;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolActions;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class PointedIcicleBlock extends PointedDripstoneBlock {
 
@@ -278,8 +283,8 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
     }
 
     private void makeIcicleFall(Level level, BlockPos pos, BlockState state) {
-        com.kingodogo.buildscape.entity.FallingIcicleEntity fallingEntity =
-                new com.kingodogo.buildscape.entity.FallingIcicleEntity(
+        FallingIcicleEntity fallingEntity =
+                new FallingIcicleEntity(
                         level,
                         (double) pos.getX() + 0.5D,
                         (double) pos.getY(),
@@ -310,7 +315,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                     BlockStateProperties.VERTICAL_DIRECTION
             );
 
-            java.util.Set<BlockPos> fallingBlocks = new java.util.HashSet<>();
+            Set<BlockPos> fallingBlocks = new HashSet<>();
             fallingBlocks.add(pos);
 
             if (direction == Direction.DOWN) {
@@ -447,7 +452,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             BlockPos pos,
             Direction direction
     ) {
-        java.util.Set<BlockPos> breakingBlocks = new java.util.HashSet<>();
+        Set<BlockPos> breakingBlocks = new HashSet<>();
         breakingBlocks.add(pos);
         level.destroyBlock(pos, true);
 
@@ -933,23 +938,23 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                     3
             );
 
-            net.minecraft.world.level.block.entity.BlockEntity blockEntity =
+            BlockEntity blockEntity =
                     level.getBlockEntity(cauldronPos);
             if (blockEntity instanceof IcicleCauldronBlockEntity) {
                 IcicleCauldronBlockEntity cauldronEntity =
                         (IcicleCauldronBlockEntity) blockEntity;
-                net.minecraft.world.item.Item icicleItem =
-                        com.kingodogo.buildscape.item.ModItems.PACKED_ICICLE_BLOCK.get();
+                Item icicleItem =
+                        ModItems.PACKED_ICICLE_BLOCK.get();
                 cauldronEntity.setStoredIcicle(
-                        new net.minecraft.world.item.ItemStack(icicleItem, 1)
+                        new ItemStack(icicleItem, 1)
                 );
             }
 
             level.playSound(
                     null,
                     cauldronPos,
-                    net.minecraft.sounds.SoundEvents.POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON,
-                    net.minecraft.sounds.SoundSource.BLOCKS,
+                    SoundEvents.POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON,
+                    SoundSource.BLOCKS,
                     1.0f,
                     1.0f
             );

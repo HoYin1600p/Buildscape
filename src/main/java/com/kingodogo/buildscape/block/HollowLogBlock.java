@@ -1,11 +1,14 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.item.HazeBushItem;
 import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -74,10 +77,12 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, SimpleWaterloggedBlock {
 
@@ -345,7 +350,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             BlockState pottedState = getPottedBlockState(held.getItem());
             if (pottedState != null) {
                 if (pottedState.hasProperty(PottedHazeBushBlock.HAS_HAZE)) {
-                    boolean hasHaze = !com.kingodogo.buildscape.item.HazeBushItem.isDrained(held);
+                    boolean hasHaze = !HazeBushItem.isDrained(held);
                     pottedState = pottedState.setValue(PottedHazeBushBlock.HAS_HAZE, hasHaze);
                 }
                 if (!level.isClientSide) {
@@ -460,7 +465,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 ItemStack plantDrop = (content != null && content != Blocks.AIR) ? new ItemStack(content) : ItemStack.EMPTY;
                 if (!plantDrop.isEmpty()) {
                     if (decState.hasProperty(PottedHazeBushBlock.HAS_HAZE) && !decState.getValue(PottedHazeBushBlock.HAS_HAZE)) {
-                        net.minecraft.nbt.CompoundTag blockStateTag = new net.minecraft.nbt.CompoundTag();
+                        CompoundTag blockStateTag = new CompoundTag();
                         blockStateTag.putString("has_haze", "false");
                         plantDrop.addTagElement("BlockStateTag", blockStateTag);
                         plantDrop.getOrCreateTag().putBoolean("HasHaze", false);
@@ -482,11 +487,11 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 return true;
             }
 
-            if (stack.is(net.minecraftforge.common.Tags.Items.GLASS) || stack.is(net.minecraftforge.common.Tags.Items.GLASS_COLORLESS) || stack.is(net.minecraftforge.common.Tags.Items.STAINED_GLASS)) {
+            if (stack.is(Tags.Items.GLASS) || stack.is(Tags.Items.GLASS_COLORLESS) || stack.is(Tags.Items.STAINED_GLASS)) {
                 return true;
             }
 
-            net.minecraft.resources.ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(block);
+            ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(block);
             if (rl != null && rl.getPath().contains("glass")) {
                 String path = rl.getPath();
                 if (!path.contains("pane") && !path.contains("fence") && !path.contains("slab")
@@ -521,7 +526,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof AbstractGlassBlock) {
             return false;
         }
-        net.minecraft.resources.ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(block);
+        ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(block);
         if (rl != null) {
             String path = rl.getPath();
             if (path.contains("glass") || path.contains("chain") || path.contains("shelf") || path.contains("jar")) {
@@ -579,9 +584,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 return pot.defaultBlockState();
             }
             if (Blocks.FLOWER_POT instanceof FlowerPotBlock emptyPot) {
-                net.minecraft.resources.ResourceLocation rl = b.getRegistryName();
+                ResourceLocation rl = b.getRegistryName();
                 if (rl != null) {
-                    java.util.function.Supplier<? extends Block> potSupplier = emptyPot.getFullPotsView().get(rl);
+                    Supplier<? extends Block> potSupplier = emptyPot.getFullPotsView().get(rl);
                     if (potSupplier != null && potSupplier.get() != null && potSupplier.get() != Blocks.AIR) {
                         return potSupplier.get().defaultBlockState();
                     }

@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -114,7 +115,7 @@ public final class TreeChopJobManager {
                 if (state.getBlock() != targetBlock) {
                     continue;
                 }
-                if (net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(
+                if (ForgeHooks.onBlockBreakEvent(
                         level, player.gameMode.getGameModeForPlayer(), player, pos) < 0) {
                     continue;
                 }

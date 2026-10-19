@@ -1,26 +1,39 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.item.BuildersPouchInventory;
+import com.kingodogo.buildscape.item.BuildersPouchItem;
 import com.kingodogo.buildscape.network.BuildersWorkbenchMenu;
+import com.kingodogo.buildscape.util.ColorGradientSolver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
 
@@ -42,14 +55,14 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     private final int[][] resultOffsetsByTab = new int[TAB_COUNT][RESULT_COUNT];
     private int activeTab = 0;
     private static final int FILTER_MASK_VERSION = 3;
-    private int filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_DEFAULT;
+    private int filterMask = ColorGradientSolver.FILTER_DEFAULT;
     private int copyProgress = 0;
     private boolean copyPrepared = false;
     private int preparedTab = -1;
     private ItemStack preparedInput = ItemStack.EMPTY;
     private ItemStack preparedOutput = ItemStack.EMPTY;
     private final NonNullList<ItemStack> preparedResults = NonNullList.withSize(RESULT_COUNT, ItemStack.EMPTY);
-    public final net.minecraft.world.inventory.ContainerData dataAccess = new net.minecraft.world.inventory.ContainerData() {
+    public final ContainerData dataAccess = new ContainerData() {
         @Override
         public int get(int index) {
             switch (index) {
@@ -180,7 +193,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             return;
         }
 
-        java.util.List<ItemStack> solved = com.kingodogo.buildscape.util.ColorGradientSolver.solveColorPicker(
+        List<ItemStack> solved = ColorGradientSolver.solveColorPicker(
                 target, filterMask, resultOffsetsByTab[0]);
 
         for (int i = 0; i < 9; i++) {
@@ -192,11 +205,11 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     public void updateGradientResults() {
         if (this.level == null || this.level.isClientSide()) return;
 
-        java.util.List<ItemStack> anchors = new java.util.ArrayList<>(9);
+        List<ItemStack> anchors = new ArrayList<>(9);
         for (int i = 0; i < 9; i++) {
             anchors.add(this.getItem(SLOT_GRADIENT_INPUT_START + i));
         }
-        java.util.List<ItemStack> solved = com.kingodogo.buildscape.util.ColorGradientSolver
+        List<ItemStack> solved = ColorGradientSolver
                 .solveGradient(anchors, filterMask, resultOffsetsByTab[1]);
         for (int i = 0; i < 9; i++) {
             this.items.set(SLOT_GRADIENT_START + i, solved.get(i));
@@ -204,7 +217,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         setChanged();
     }
 
-    public void tick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state) {
+    public void tick(Level level, BlockPos pos, BlockState state) {
         if (level.isClientSide()) return;
 
         ItemStack inPouch = this.getItem(SLOT_INPUT_POUCH);
@@ -232,8 +245,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                 this.setItem(SLOT_INPUT_POUCH, ItemStack.EMPTY);
                 copyPrepared = false;
                 preparedOutput = ItemStack.EMPTY;
-                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP,
-                        net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, 1.0f);
+                level.playSound(null, pos, SoundEvents.EXPERIENCE_ORB_PICKUP,
+                        SoundSource.BLOCKS, 0.5f, 1.0f);
                 copyProgress = 0;
                 setChanged();
             }
@@ -277,20 +290,20 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
 
     public boolean writeSolvedToPouch(ItemStack pouch) {
         List<ItemStack> solved = getSolvedItems();
-        if (pouch.getItem() instanceof com.kingodogo.buildscape.item.BuildersPouchItem) {
-            com.kingodogo.buildscape.item.BuildersPouchInventory inventory =
-                    new com.kingodogo.buildscape.item.BuildersPouchInventory(pouch);
+        if (pouch.getItem() instanceof BuildersPouchItem) {
+            BuildersPouchInventory inventory =
+                    new BuildersPouchInventory(pouch);
             for (int i = 0; i < solved.size(); i++) {
                 if (!inventory.getItem(i).isEmpty()) {
                     return false;
                 }
             }
-            com.kingodogo.buildscape.item.BuildersPouchItem.setFilters(pouch, solved);
+            BuildersPouchItem.setFilters(pouch, solved);
             return true;
         }
 
-        if (pouch.getItem() instanceof net.minecraft.world.item.BlockItem bi
-                && bi.getBlock() instanceof net.minecraft.world.level.block.ShulkerBoxBlock) {
+        if (pouch.getItem() instanceof BlockItem bi
+                && bi.getBlock() instanceof ShulkerBoxBlock) {
             return writeSolvedToShulker(pouch, solved);
         }
         return false;
@@ -317,8 +330,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             filters.add(i < savedFilters.size() ? savedFilters.getString(i) : "");
             ItemStack item = shulkerItems.get(i);
             if (!item.isEmpty() && item.hasTag() && item.getTag().getBoolean("ghost")) {
-                net.minecraft.resources.ResourceLocation id =
-                        net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item.getItem());
+                ResourceLocation id =
+                        ForgeRegistries.ITEMS.getKey(item.getItem());
                 if (filters.get(i).isEmpty() && id != null) filters.set(i, id.toString());
                 shulkerItems.set(i, ItemStack.EMPTY);
             }
@@ -353,8 +366,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             int slot = targetRow * 9 + i;
             ItemStack solvedStack = solved.get(i);
             if (!solvedStack.isEmpty()) {
-                net.minecraft.resources.ResourceLocation itemId =
-                        net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(solvedStack.getItem());
+                ResourceLocation itemId =
+                        ForgeRegistries.ITEMS.getKey(solvedStack.getItem());
                 if (itemId != null) {
                     filters.set(slot, itemId.toString());
                     wroteAnyFilter = true;
@@ -368,7 +381,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         ListTag newGhostFiltersList = new ListTag();
         for (String filter : filters) {
             if (!filter.isEmpty()) hasFilter = true;
-            newGhostFiltersList.add(net.minecraft.nbt.StringTag.valueOf(filter));
+            newGhostFiltersList.add(StringTag.valueOf(filter));
         }
         ContainerHelper.saveAllItems(beTag, shulkerItems);
         if (hasFilter) {
@@ -443,7 +456,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void setFilterMask(int mask) {
-        if (mask < 0 || (mask & ~com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_STATE_MASK) != 0) return;
+        if (mask < 0 || (mask & ~ColorGradientSolver.FILTER_STATE_MASK) != 0) return;
         this.filterMask = mask;
         setChanged();
         if (activeTab == 0) {
@@ -495,7 +508,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         if (tab == 0) {
             ItemStack input = this.getItem(SLOT_COLOR_PICKER);
             if (input.isEmpty()) return results.stream().allMatch(ItemStack::isEmpty);
-            return input.getItem() instanceof net.minecraft.world.item.BlockItem;
+            return input.getItem() instanceof BlockItem;
         }
 
         int anchors = 0;
@@ -518,7 +531,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
 
     public void applyClientResults(int tab, int mask, int[] offsets, List<ItemStack> results) {
         if (tab < 0 || tab > 1 || mask < 0
-                || (mask & ~com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_STATE_MASK) != 0
+                || (mask & ~ColorGradientSolver.FILTER_STATE_MASK) != 0
                 || results == null || results.size() != 9) {
             return;
         }
@@ -554,13 +567,13 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void resetResultOffsets(int tab) {
-        java.util.Arrays.fill(resultOffsetsByTab[validTab(tab)], 0);
+        Arrays.fill(resultOffsetsByTab[validTab(tab)], 0);
         setChanged();
     }
 
     private void resetAllResultOffsets() {
         for (int tab = 0; tab < TAB_COUNT; tab++) {
-            java.util.Arrays.fill(resultOffsetsByTab[tab], 0);
+            Arrays.fill(resultOffsetsByTab[tab], 0);
         }
         setChanged();
     }
@@ -577,13 +590,13 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         if (tag.contains("ActiveTab")) this.activeTab = validTab(tag.getInt("ActiveTab"));
         if (tag.getInt("FilterMaskVersion") >= FILTER_MASK_VERSION) {
             this.filterMask = tag.getInt("FilterMask")
-                    & com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_STATE_MASK;
+                    & ColorGradientSolver.FILTER_STATE_MASK;
         } else {
-            this.filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_DEFAULT;
+            this.filterMask = ColorGradientSolver.FILTER_DEFAULT;
         }
         if (tag.contains("CopyProgress")) this.copyProgress = tag.getInt("CopyProgress");
         for (int tab = 0; tab < TAB_COUNT; tab++) {
-            java.util.Arrays.fill(this.resultOffsetsByTab[tab], 0);
+            Arrays.fill(this.resultOffsetsByTab[tab], 0);
         }
         if (tag.contains("ColorResultOffsets")) {
             int[] saved = tag.getIntArray("ColorResultOffsets");
@@ -618,8 +631,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
 
      public static boolean isPouch(ItemStack stack) {
          if (stack.isEmpty()) return false;
-         if (stack.getItem() instanceof com.kingodogo.buildscape.item.BuildersPouchItem) return true;
-         return stack.getItem() instanceof net.minecraft.world.item.BlockItem bi
-                 && bi.getBlock() instanceof net.minecraft.world.level.block.ShulkerBoxBlock;
+         if (stack.getItem() instanceof BuildersPouchItem) return true;
+         return stack.getItem() instanceof BlockItem bi
+                 && bi.getBlock() instanceof ShulkerBoxBlock;
      }
 }

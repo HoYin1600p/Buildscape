@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -14,9 +15,11 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.HoneyBottleItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MilkBucketItem;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.PotionUtils;
@@ -39,6 +42,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +51,7 @@ import java.util.List;
 public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    protected static final VoxelShape SHAPE = net.minecraft.world.phys.shapes.Shapes.or(
+    protected static final VoxelShape SHAPE = Shapes.or(
             Block.box(4.0D, 0.0D, 4.0D, 12.0D, 12.0D, 12.0D),
             Block.box(5.0D, 12.0D, 5.0D, 11.0D, 13.0D, 11.0D),
             Block.box(4.5D, 13.0D, 4.5D, 11.5D, 14.0D, 11.5D)
@@ -185,8 +189,8 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                 if (level.isClientSide) {
                     return InteractionResult.SUCCESS;
                 }
-                boolean isBucket = handStack.getItem() instanceof net.minecraft.world.item.BucketItem
-                        || handStack.getItem() instanceof net.minecraft.world.item.MilkBucketItem;
+                boolean isBucket = handStack.getItem() instanceof BucketItem
+                        || handStack.getItem() instanceof MilkBucketItem;
                 ItemStack copy = handStack.copy();
 
                 if (jarBE.addLiquid(copy)) {
@@ -197,7 +201,7 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                             player.drop(returnItem, false);
                         }
                     }
-                    net.minecraft.sounds.SoundEvent sound = isBucket ? SoundEvents.BUCKET_EMPTY : SoundEvents.BOTTLE_EMPTY;
+                    SoundEvent sound = isBucket ? SoundEvents.BUCKET_EMPTY : SoundEvents.BOTTLE_EMPTY;
                     level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
                     return InteractionResult.SUCCESS;
                 }
@@ -318,7 +322,7 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                 ItemStack liquidItem = jarBE.getStoredLiquidItem();
                 if (!liquidItem.isEmpty()) {
                     if (liquidItem.is(Items.LAVA_BUCKET)
-                            || (liquidItem.getItem() instanceof net.minecraft.world.item.BucketItem bucket && bucket.getFluid() == net.minecraft.world.level.material.Fluids.LAVA)
+                            || (liquidItem.getItem() instanceof BucketItem bucket && bucket.getFluid() == Fluids.LAVA)
                             || GlassJarBlockEntity.isXpLiquid(liquidItem)) {
                         return InteractionResult.PASS;
                     }

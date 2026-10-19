@@ -9,6 +9,7 @@ import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -220,7 +221,7 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
         }
 
         @Override
-        public VertexConsumer getBuffer(net.minecraft.client.renderer.RenderType renderType) {
+        public VertexConsumer getBuffer(RenderType renderType) {
             return this;
         }
 

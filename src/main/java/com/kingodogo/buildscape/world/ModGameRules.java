@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
@@ -101,7 +102,7 @@ public class ModGameRules {
     }
 
     public static boolean isCakeStackingEnabled() {
-        MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null && server.overworld() != null) {
             return server.getGameRules().getBoolean(IS_CAKE_STACK);
         }
@@ -109,7 +110,7 @@ public class ModGameRules {
     }
 
     public static boolean isWaterBottleStackingEnabled() {
-        MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null && server.overworld() != null) {
             return server.getGameRules().getBoolean(IS_WATER_BOTTLE_STACK);
         }

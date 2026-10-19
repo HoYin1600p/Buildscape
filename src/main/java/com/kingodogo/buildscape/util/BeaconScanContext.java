@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.util;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -7,6 +8,10 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,13 +88,13 @@ public final class BeaconScanContext {
         }
     }
 
-    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-            modid = com.kingodogo.buildscape.BuildScape.MODID,
-            value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+    @Mod.EventBusSubscriber(
+            modid = BuildScape.MODID,
+            value = Dist.CLIENT)
     public static final class ClientEvents {
-        @net.minecraftforge.eventbus.api.SubscribeEvent
-        public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
-            if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || ++cleanupTicks < 20) {
+        @SubscribeEvent
+        public static void onClientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase != TickEvent.Phase.END || ++cleanupTicks < 20) {
                 return;
             }
             cleanupTicks = 0;

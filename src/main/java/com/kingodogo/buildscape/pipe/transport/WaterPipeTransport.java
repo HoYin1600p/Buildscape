@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.pipe.transport;
 
 import com.kingodogo.buildscape.block.HollowLogBlockEntity;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
+import com.kingodogo.buildscape.config.BuildScapeConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -41,7 +42,7 @@ public class WaterPipeTransport extends PipeFluidTransport {
         visited.add(startPos);
 
         int maxNetworkLimit = Math.min(MAX_NETWORK_SIZE,
-                Math.max(1, com.kingodogo.buildscape.config.BuildScapeConfig.getMaxPipeNetworkSize()));
+                Math.max(1, BuildScapeConfig.getMaxPipeNetworkSize()));
 
         while (!queue.isEmpty() && visited.size() < maxNetworkLimit) {
             BlockPos curr = queue.poll();

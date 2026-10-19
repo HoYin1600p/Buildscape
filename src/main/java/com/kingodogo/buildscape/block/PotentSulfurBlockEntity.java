@@ -1,30 +1,34 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.List;
-import java.util.Random;
-import java.util.function.Predicate;
+import com.kingodogo.buildscape.particle.GeyserParticleOptions;
+import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ClipContext.Block;
 import net.minecraft.world.level.ClipContext.Fluid;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -32,13 +36,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.HitResult.Type;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
-import com.kingodogo.buildscape.sound.ModSounds;
-import com.kingodogo.buildscape.particle.ModParticles;
-import com.kingodogo.buildscape.particle.GeyserParticleOptions;
+
+import java.util.List;
+import java.util.Random;
+import java.util.function.Predicate;
 
 public class PotentSulfurBlockEntity extends BlockEntity {
    private static final Predicate<Entity> EFFECT_PREDICATE = EntitySelector.NO_SPECTATORS.and(EntitySelector.ENTITY_STILL_ALIVE);
@@ -78,7 +83,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
       tickClientPlume(level, pos, state, entity, ModSounds.GEYSER_CONTINUOUS_ACTIVE.get());
    };
 
-   private static void tickClientPlume(Level level, BlockPos pos, BlockState state, PotentSulfurBlockEntity entity, net.minecraft.sounds.SoundEvent sound) {
+   private static void tickClientPlume(Level level, BlockPos pos, BlockState state, PotentSulfurBlockEntity entity, SoundEvent sound) {
       BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
       if (sourceBlock != null) {
          long eruptionTime = level.getGameTime() - entity.eruptionTick;
@@ -186,10 +191,10 @@ public class PotentSulfurBlockEntity extends BlockEntity {
                entityToBeLaunched.setDeltaMovement(newVelocity);
                entityToBeLaunched.hasImpulse = true;
 
-               if (entityToBeLaunched instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+               if (entityToBeLaunched instanceof ServerPlayer serverPlayer) {
                   serverPlayer.hurtMarked = true;
                   if (entityY < targetY - 1.0D && entityVelocity.y < 0.2D) {
-                     serverPlayer.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(serverPlayer));
+                     serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
                   }
                }
             }
@@ -301,7 +306,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
    }
 
    public static Random geyserPositional(final Level level, final BlockPos pos) {
-      long seed = (level instanceof net.minecraft.server.level.ServerLevel ? ((net.minecraft.server.level.ServerLevel) level).getSeed() : 0L) ^ -904011478L ^ pos.asLong();
+      long seed = (level instanceof ServerLevel ? ((ServerLevel) level).getSeed() : 0L) ^ -904011478L ^ pos.asLong();
       return new Random(seed);
    }
 

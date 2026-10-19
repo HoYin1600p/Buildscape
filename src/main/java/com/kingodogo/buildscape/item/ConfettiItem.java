@@ -1,6 +1,13 @@
 package com.kingodogo.buildscape.item;
 
+import com.kingodogo.buildscape.event.AdvancementEvents;
+import com.kingodogo.buildscape.network.ConfettiBurstPacket;
+import com.kingodogo.buildscape.network.ModMessages;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -10,11 +17,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.ChatFormatting;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class ConfettiItem extends Item {
 
@@ -36,8 +43,8 @@ public class ConfettiItem extends Item {
 
             spawnConfettiParticles((ServerLevel) level, player, itemstack);
 
-            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                com.kingodogo.buildscape.event.AdvancementEvents.onConfettiUsed(serverPlayer);
+            if (player instanceof ServerPlayer serverPlayer) {
+                AdvancementEvents.onConfettiUsed(serverPlayer);
             }
 
             if (!player.getAbilities().instabuild) {
@@ -50,7 +57,7 @@ public class ConfettiItem extends Item {
     }
 
     private void spawnConfettiParticles(ServerLevel level, Player player, ItemStack stack) {
-        net.minecraft.world.phys.Vec3 look = player.getLookAngle();
+        Vec3 look = player.getLookAngle();
         double startX = player.getX() + look.x * 0.9D;
         double startY = player.getEyeY() + look.y * 0.9D;
         double startZ = player.getZ() + look.z * 0.9D;
@@ -60,17 +67,17 @@ public class ConfettiItem extends Item {
             burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
         }
 
-        com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                net.minecraftforge.network.PacketDistributor.NEAR.with(() ->
-                        new net.minecraftforge.network.PacketDistributor.TargetPoint(
+        ModMessages.INSTANCE.send(
+                PacketDistributor.NEAR.with(() ->
+                        new PacketDistributor.TargetPoint(
                                 startX, startY, startZ, 32.0D, level.dimension())),
-                new com.kingodogo.buildscape.network.ConfettiBurstPacket(
+                new ConfettiBurstPacket(
                         startX, startY, startZ, (float) look.x, (float) look.y, (float) look.z,
                         burstLevel, level.random.nextLong()));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         int burstLevel = 1;
         if (stack.hasTag() && stack.getTag().contains("BurstLevel")) {
             burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));

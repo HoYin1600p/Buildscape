@@ -1,7 +1,11 @@
 package com.kingodogo.buildscape.block;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -14,13 +18,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -36,7 +43,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
     public static final BooleanProperty WATERLOGGED =
             BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
-    public static final net.minecraft.world.level.block.state.properties.DirectionProperty VERTICAL_DIRECTION =
+    public static final DirectionProperty VERTICAL_DIRECTION =
             BlockStateProperties.VERTICAL_DIRECTION;
 
     protected static final VoxelShape SHAPE_UP = Block.box(
@@ -95,7 +102,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
             BlockGetter level,
             BlockPos pos
     ) {
-        return !state.isAir() || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
+        return !state.isAir() || state.is(Blocks.FARMLAND);
     }
 
     @Override
@@ -223,21 +230,21 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
                 null,
                 pos,
                 currentLit
-                        ? net.minecraft.sounds.SoundEvents.STONE_BUTTON_CLICK_OFF
-                        : net.minecraft.sounds.SoundEvents.STONE_BUTTON_CLICK_ON,
-                net.minecraft.sounds.SoundSource.BLOCKS,
+                        ? SoundEvents.STONE_BUTTON_CLICK_OFF
+                        : SoundEvents.STONE_BUTTON_CLICK_ON,
+                SoundSource.BLOCKS,
                 0.3f,
                 1.0f
         );
 
-        net.minecraft.network.chat.TextComponent message =
-                new net.minecraft.network.chat.TextComponent(
+        TextComponent message =
+                new TextComponent(
                         newLit ? "Turned On" : "Turned Off"
                 );
         message.withStyle(
                 newLit
-                        ? net.minecraft.ChatFormatting.GREEN
-                        : net.minecraft.ChatFormatting.RED
+                        ? ChatFormatting.GREEN
+                        : ChatFormatting.RED
         );
         player.displayClientMessage(message, true);
 
@@ -262,8 +269,8 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
                     float volume = 0.15f;
                     float pitch = 1.0f;
 
-                    net.minecraft.sounds.SoundEvent amethystStepSound =
-                            net.minecraft.world.level.block.SoundType.AMETHYST.getStepSound();
+                    SoundEvent amethystStepSound =
+                            SoundType.AMETHYST.getStepSound();
 
                     level.playLocalSound(
                             pos.getX() + 0.5,

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.config;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -7,9 +8,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import com.kingodogo.buildscape.BuildScape;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -21,14 +24,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.nio.file.attribute.DosFileAttributeView;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 /** Lossless layout migration: validate first, back up once, then replace a complete file. */
 final class ConfigLayoutIO {
-    private static final com.google.gson.Gson GSON = new com.google.gson.Gson();
+    private static final Gson GSON = new Gson();
     private static final Map<Path, FailedMigration> failedMigrations = new LinkedHashMap<>();
     private record FailedMigration(byte[] bytes, String text) { }
     private ConfigLayoutIO() { }
@@ -44,7 +51,7 @@ final class ConfigLayoutIO {
     static synchronized String readText(Path file, byte[] bytes, Charset legacy) throws IOException {
         Path key = file.toAbsolutePath().normalize();
         FailedMigration failure = failedMigrations.get(key);
-        if (failure != null && java.util.Arrays.equals(failure.bytes(), bytes)) return failure.text();
+        if (failure != null && Arrays.equals(failure.bytes(), bytes)) return failure.text();
         failedMigrations.remove(key);
         try {
             return decode(bytes, StandardCharsets.UTF_8);
@@ -61,11 +68,11 @@ final class ConfigLayoutIO {
                 replace(file, text);
             } catch (IOException | SecurityException e) {
                 failedMigrations.put(key, new FailedMigration(bytes.clone(), text));
-                com.kingodogo.buildscape.BuildScape.getLogger().warn(
+                BuildScape.getLogger().warn(
                         "Unable to migrate legacy config; keeping it read-only: " + file, e);
                 return text;
             }
-            com.kingodogo.buildscape.BuildScape.getLogger().info(
+            BuildScape.getLogger().info(
                     "Migrated config {} from {} to UTF-8", file, legacy.name());
             return text;
         }
@@ -82,8 +89,8 @@ final class ConfigLayoutIO {
 
     static boolean isWritable(Path file) throws IOException {
         if (!Files.isWritable(file)) return false;
-        java.nio.file.attribute.DosFileAttributeView dos = Files.getFileAttributeView(file,
-                java.nio.file.attribute.DosFileAttributeView.class);
+        DosFileAttributeView dos = Files.getFileAttributeView(file,
+                DosFileAttributeView.class);
         return dos == null || !dos.readAttributes().isReadOnly();
     }
 
@@ -120,22 +127,22 @@ final class ConfigLayoutIO {
         try {
             if (!Files.exists(backup)) Files.copy(file, backup);
         } catch (IOException e) {
-            com.kingodogo.buildscape.BuildScape.getLogger().warn("Unable to back up unreadable config " + file, e);
+            BuildScape.getLogger().warn("Unable to back up unreadable config " + file, e);
         }
-        com.kingodogo.buildscape.BuildScape.getLogger().warn(
+        BuildScape.getLogger().warn(
                 "Config contains invalid encoding or replacement characters; keeping it read-only: " + file);
         return true;
     }
 
     static void append(Path file, String suffix, String expected) throws IOException {
         if (protectInvalidEncoding(file)) throw new IOException("Config is read-only: " + file);
-        if (!java.util.Objects.equals(expected, readText(file))) {
+        if (!Objects.equals(expected, readText(file))) {
             throw new IOException("Config changed on disk; reload before saving: " + file);
         }
         Path backup = file.resolveSibling(file.getFileName() + ".pre-4.0.5.bak");
         if (!Files.exists(backup)) Files.copy(file, backup);
         else if (!Files.isRegularFile(backup)) throw new IOException("Backup is not a regular file: " + backup);
-        Files.write(file, suffix.getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.file.StandardOpenOption.APPEND);
+        Files.write(file, suffix.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
     }
 
     /** The old items writer left a comma before the closing object brace. */
@@ -209,7 +216,7 @@ final class ConfigLayoutIO {
                 reader.endArray();
                 return array;
             case STRING: return new JsonPrimitive(reader.nextString());
-            case NUMBER: return new JsonPrimitive(new java.math.BigDecimal(reader.nextString()));
+            case NUMBER: return new JsonPrimitive(new BigDecimal(reader.nextString()));
             case BOOLEAN: return new JsonPrimitive(reader.nextBoolean());
             case NULL:
                 reader.nextNull();
@@ -266,7 +273,7 @@ final class ConfigLayoutIO {
         }
         String plain = generated.withoutCommentLines();
         Layout target = new Layout(plain, json);
-        java.util.TreeMap<Integer, StringBuilder> insertions = new java.util.TreeMap<>();
+        TreeMap<Integer, StringBuilder> insertions = new TreeMap<>();
         StringBuilder orphaned = new StringBuilder();
         for (Map.Entry<String, List<String>> entry : comments.entrySet()) {
             Setting setting = target.settings.get(entry.getKey());
@@ -294,7 +301,7 @@ final class ConfigLayoutIO {
         if (source == null) return output;
         Layout old = new Layout(source, true);
         Layout target = new Layout(output, true);
-        java.util.TreeMap<Integer, Setting> retained = new java.util.TreeMap<>();
+        TreeMap<Integer, Setting> retained = new TreeMap<>();
         for (Setting setting : old.settings.values()) {
             if (!"$/\"items\"".equals(setting.array)) continue;
             String token = source.substring(setting.valueStart, setting.end);
@@ -498,7 +505,7 @@ final class ConfigLayoutIO {
         Files.createDirectories(file.getParent());
         Path temporary = Files.createTempFile(file.getParent(), file.getFileName().toString(), ".tmp");
         try {
-            Files.writeString(temporary, text, java.nio.charset.StandardCharsets.UTF_8);
+            Files.writeString(temporary, text, StandardCharsets.UTF_8);
             Files.move(temporary, file);
         } finally {
             Files.deleteIfExists(temporary);
@@ -523,7 +530,7 @@ final class ConfigLayoutIO {
         if (current != null && protectInvalidEncoding(file, legacy)) {
             throw new IOException("Config encoding is protected; retaining original bytes: " + file);
         }
-        if (current != null && !java.util.Objects.equals(expected, current)) {
+        if (current != null && !Objects.equals(expected, current)) {
             throw new IOException("Config changed on disk; reload before saving: " + file);
         }
         if (text.equals(current)) return;

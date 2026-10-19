@@ -1,7 +1,9 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 
 public class PoplarBoatEntity extends Boat {
@@ -16,7 +18,7 @@ public class PoplarBoatEntity extends Boat {
 
     public PoplarBoatEntity(Level level, double x, double y, double z) {
         this(
-                com.kingodogo.buildscape.entity.ModEntities.POPLAR_BOAT.get(),
+                ModEntities.POPLAR_BOAT.get(),
                 level
         );
         this.setPos(x, y, z);
@@ -27,7 +29,7 @@ public class PoplarBoatEntity extends Boat {
     }
 
     @Override
-    public net.minecraft.world.item.Item getDropItem() {
-        return com.kingodogo.buildscape.item.ModItems.POPLAR_BOAT.get();
+    public Item getDropItem() {
+        return ModItems.POPLAR_BOAT.get();
     }
 }

@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.item.BuildersPouchItem;
 import com.kingodogo.buildscape.util.GhostFilterMenu;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,9 +15,10 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFilterMenu {
     private static final int POUCH_SLOTS = BuildersPouchItem.SLOT_COUNT;
@@ -54,9 +56,9 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
                 public int get(int index) {
                     if (index < 0 || index >= filters.size() || filters.get(index).isEmpty()) return 0;
                     String filterStr = filters.get(index);
-                    if (!net.minecraft.resources.ResourceLocation.isValidResourceLocation(filterStr)) return 0;
-                    Item item = Registry.ITEM.get(new net.minecraft.resources.ResourceLocation(filterStr));
-                    if (item == null || item == net.minecraft.world.item.Items.AIR) return 0;
+                    if (!ResourceLocation.isValidResourceLocation(filterStr)) return 0;
+                    Item item = Registry.ITEM.get(new ResourceLocation(filterStr));
+                    if (item == null || item == Items.AIR) return 0;
                     return Registry.ITEM.getId(item) + 1;
                 }
 
@@ -141,7 +143,7 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
         int rawId = (filterData.get(menuSlot) & 0xFFFF) - 1;
         if (rawId < 0) return null;
         Item item = Registry.ITEM.byId(rawId);
-        return (item == null || item == net.minecraft.world.item.Items.AIR) ? null : item;
+        return (item == null || item == Items.AIR) ? null : item;
     }
 
     @Override

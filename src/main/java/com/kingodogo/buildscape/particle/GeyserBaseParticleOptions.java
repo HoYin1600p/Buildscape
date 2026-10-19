@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
@@ -56,7 +57,7 @@ public class GeyserBaseParticleOptions implements ParticleOptions {
 
     @Override
     public String writeToString() {
-        return net.minecraft.core.Registry.PARTICLE_TYPE.getKey(this.getType()) + " " + this.waterBlocks + " " + this.burstImpulseBase;
+        return Registry.PARTICLE_TYPE.getKey(this.getType()) + " " + this.waterBlocks + " " + this.burstImpulseBase;
     }
 
     public int getWaterBlocks() {

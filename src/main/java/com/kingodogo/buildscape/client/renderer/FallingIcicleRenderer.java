@@ -4,10 +4,12 @@ import com.kingodogo.buildscape.entity.FallingIcicleEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -47,8 +49,8 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
                 poseStack.translate(-0.5D, 0.0D, -0.5D);
 
                 BlockRenderDispatcher blockRenderer = getBlockRenderer();
-                net.minecraft.client.renderer.RenderType renderType =
-                        net.minecraft.client.renderer.RenderType.cutout();
+                RenderType renderType =
+                        RenderType.cutout();
                 blockRenderer
                         .getModelRenderer()
                         .tesselateBlock(
@@ -79,6 +81,6 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(FallingIcicleEntity entity) {
-        return net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS;
+        return TextureAtlas.LOCATION_BLOCKS;
     }
 }

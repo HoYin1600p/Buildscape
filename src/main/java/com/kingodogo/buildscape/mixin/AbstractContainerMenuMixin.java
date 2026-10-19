@@ -1,11 +1,13 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.util.StonecutterMenuExtension;
 import com.kingodogo.buildscape.util.GhostFilterMenu;
-import net.minecraft.world.entity.player.Player;
+import com.kingodogo.buildscape.util.StonecutterMenuExtension;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ShulkerBoxMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Mixin(AbstractContainerMenu.class)
@@ -24,11 +27,11 @@ public abstract class AbstractContainerMenuMixin {
     private void onBeforeClicked(int slotId, int buttonId, ClickType clickType, Player player, CallbackInfo ci) {
         AbstractContainerMenu containerMenu = (AbstractContainerMenu) (Object) this;
 
-        if ((Object) this instanceof net.minecraft.world.inventory.ShulkerBoxMenu
+        if ((Object) this instanceof ShulkerBoxMenu
                 && (Object) this instanceof GhostFilterMenu filterMenu) {
             if (clickType == ClickType.QUICK_MOVE && slotId >= filterMenu.buildscape$getFilterSlotCount()
                     && slotId < containerMenu.slots.size()) {
-                net.minecraft.world.inventory.Slot sourceSlot = containerMenu.getSlot(slotId);
+                Slot sourceSlot = containerMenu.getSlot(slotId);
                 ItemStack source = sourceSlot.getItem();
                 if (!source.isEmpty() && hasFilters(filterMenu)) {
                     moveToFilteredSlots(containerMenu, filterMenu, source);
@@ -107,7 +110,7 @@ public abstract class AbstractContainerMenuMixin {
                                         remainingOutput -= toGive;
                                     }
 
-                                    player.awardRecipes(java.util.Collections.singleton(recipe));
+                                    player.awardRecipes(Collections.singleton(recipe));
 
                                     ((StonecutterMenuAccessor) menu).callSetupRecipeList(menu.container, menu.getSlot(0).getItem());
 
@@ -132,7 +135,7 @@ public abstract class AbstractContainerMenuMixin {
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter != null && source.getItem() == filter) {
-                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Slot target = menu.getSlot(i);
                 if (!target.getItem().isEmpty()) {
                     target.safeInsert(source);
                 }
@@ -141,7 +144,7 @@ public abstract class AbstractContainerMenuMixin {
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter == null) {
-                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Slot target = menu.getSlot(i);
                 if (!target.getItem().isEmpty()) {
                     target.safeInsert(source);
                 }
@@ -150,7 +153,7 @@ public abstract class AbstractContainerMenuMixin {
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter != null && source.getItem() == filter) {
-                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Slot target = menu.getSlot(i);
                 if (target.getItem().isEmpty()) {
                     target.safeInsert(source);
                 }
@@ -159,7 +162,7 @@ public abstract class AbstractContainerMenuMixin {
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter == null) {
-                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Slot target = menu.getSlot(i);
                 if (target.getItem().isEmpty()) {
                     target.safeInsert(source);
                 }

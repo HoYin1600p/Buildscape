@@ -8,7 +8,9 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -115,7 +117,7 @@ public class CosmeticsConfig {
                         try {
                             Files.move(legacyPath, backupPath);
                             break;
-                        } catch (java.nio.file.FileAlreadyExistsException e) {
+                        } catch (FileAlreadyExistsException e) {
                             backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak." + suffix++);
                         }
                     }
@@ -300,7 +302,7 @@ public class CosmeticsConfig {
             if (temporary != null) {
                 try {
                     Files.deleteIfExists(temporary);
-                } catch (java.io.IOException e) {
+                } catch (IOException e) {
                     BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for " + uuidStr, e);
                 }
             }

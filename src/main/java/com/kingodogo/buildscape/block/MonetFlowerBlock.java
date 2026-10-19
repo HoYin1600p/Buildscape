@@ -1,10 +1,7 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -12,16 +9,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
@@ -64,7 +67,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
             BlockGetter level,
             BlockPos pos
     ) {
-        return state.is(BlockTags.DIRT) || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
+        return state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND);
     }
 
     @Override
@@ -84,8 +87,8 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
     }
 
     @Override
-    public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
-        if (direction == net.minecraft.core.Direction.DOWN) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+        if (direction == Direction.DOWN) {
             return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);

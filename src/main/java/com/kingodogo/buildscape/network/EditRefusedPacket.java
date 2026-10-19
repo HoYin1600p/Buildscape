@@ -1,6 +1,9 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import com.kingodogo.buildscape.config.ConfigSetting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -61,8 +64,8 @@ public class EditRefusedPacket {
 
     private static final class ClientHandler {
         private static void handle(EditRefusedPacket packet) {
-            net.minecraft.client.gui.screens.Screen screen = net.minecraft.client.Minecraft.getInstance().screen;
-            if (screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen open) {
+            Screen screen = Minecraft.getInstance().screen;
+            if (screen instanceof BuildScapeConfigScreen open) {
                 open.onServerRefusal(packet.reason, packet.setting());
             }
         }

@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -20,6 +21,8 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -30,6 +33,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -260,10 +265,10 @@ public class FestiveStockingBlock
     @Override
     public <
             T extends BlockEntity
-            > net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+            > BlockEntityTicker<T> getTicker(
             Level level,
             BlockState state,
-            net.minecraft.world.level.block.entity.BlockEntityType<T> type
+            BlockEntityType<T> type
     ) {
         return null;
     }
@@ -387,9 +392,9 @@ public class FestiveStockingBlock
             }
 
             if (!heldItem.isEmpty()) {
-                if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem) {
-                    net.minecraft.world.item.BlockItem blockItem =
-                            (net.minecraft.world.item.BlockItem) heldItem.getItem();
+                if (heldItem.getItem() instanceof BlockItem) {
+                    BlockItem blockItem =
+                            (BlockItem) heldItem.getItem();
                     if (blockItem.getBlock() instanceof FestiveStockingBlock) {
                         return InteractionResult.PASS;
                     }
@@ -531,17 +536,17 @@ public class FestiveStockingBlock
     ) {
         LootContext ctx = builder
                 .withParameter(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_STATE,
+                        LootContextParams.BLOCK_STATE,
                         state
                 )
                 .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK
+                        LootContextParamSets.BLOCK
                 );
         ItemStack tool = ctx.getParamOrNull(
-                net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL
+                LootContextParams.TOOL
         );
         BlockEntity be = ctx.getParamOrNull(
-                net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY
+                LootContextParams.BLOCK_ENTITY
         );
         ItemStack result = new ItemStack(this);
 

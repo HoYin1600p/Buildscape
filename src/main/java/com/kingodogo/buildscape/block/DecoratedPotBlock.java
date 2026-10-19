@@ -1,18 +1,17 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.sound.ModSounds;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,6 +24,8 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -34,10 +35,15 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.util.ForgeSoundType;
+
+import java.util.Collections;
+import java.util.List;
 
 public class DecoratedPotBlock
         extends Block
@@ -137,10 +143,10 @@ public class DecoratedPotBlock
     @Override
     public <
             T extends BlockEntity
-            > net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+            > BlockEntityTicker<T> getTicker(
             Level level,
             BlockState state,
-            net.minecraft.world.level.block.entity.BlockEntityType<T> type
+            BlockEntityType<T> type
     ) {
         return null;
     }
@@ -178,9 +184,9 @@ public class DecoratedPotBlock
             if (!heldItem.isEmpty() && player.isShiftKeyDown()) {
                 ItemStack stored = be.getStoredItem();
 
-                if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem) {
+                if (heldItem.getItem() instanceof BlockItem) {
                     Block heldBlock =
-                            ((net.minecraft.world.item.BlockItem) heldItem.getItem()).getBlock();
+                            ((BlockItem) heldItem.getItem()).getBlock();
                     if (heldBlock instanceof DecoratedPotBlock) {
                         return InteractionResult.PASS;
                     }
@@ -272,10 +278,10 @@ public class DecoratedPotBlock
 
             if (
                     !heldItem.isEmpty() &&
-                            heldItem.getItem() instanceof net.minecraft.world.item.BlockItem
+                            heldItem.getItem() instanceof BlockItem
             ) {
                 Block heldBlock =
-                        ((net.minecraft.world.item.BlockItem) heldItem.getItem()).getBlock();
+                        ((BlockItem) heldItem.getItem()).getBlock();
                 if (heldBlock instanceof DecoratedPotBlock) {
                     return InteractionResult.PASS;
                 }
@@ -440,20 +446,20 @@ public class DecoratedPotBlock
     ) {
         LootContext ctx = builder
                 .withParameter(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_STATE,
+                        LootContextParams.BLOCK_STATE,
                         state
                 )
                 .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK
+                        LootContextParamSets.BLOCK
                 );
         ItemStack tool = ctx.getParamOrNull(
-                net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL
+                LootContextParams.TOOL
         );
 
         if (tool != null && tool.is(ItemTags.CLUSTER_MAX_HARVESTABLES)) {
-            return java.util.Collections.singletonList(new ItemStack(Items.BRICK, 4));
+            return Collections.singletonList(new ItemStack(Items.BRICK, 4));
         }
-        return java.util.Collections.singletonList(new ItemStack(this));
+        return Collections.singletonList(new ItemStack(this));
     }
 
     private static SoundType createDecoratedPotSoundType() {
@@ -474,7 +480,7 @@ public class DecoratedPotBlock
         double centerZ = pos.getZ() + 0.5;
         double upwardVelocity = 0.1;
 
-        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+        if (level instanceof ServerLevel serverLevel) {
             for (int i = 0; i < 2; i++) {
                 serverLevel.sendParticles(
                         ParticleTypes.LARGE_SMOKE,

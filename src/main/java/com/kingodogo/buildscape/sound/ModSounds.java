@@ -1,8 +1,10 @@
 package com.kingodogo.buildscape.sound;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.block.CustomSoundType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.common.util.ForgeSoundType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -167,7 +169,7 @@ public class ModSounds {
                             return COPPER_GRATE_BREAK.get();
                         }
                     } catch (Throwable ignored) {}
-                    return net.minecraft.sounds.SoundEvents.COPPER_BREAK;
+                    return SoundEvents.COPPER_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
                     try {
@@ -175,7 +177,7 @@ public class ModSounds {
                             return COPPER_GRATE_STEP.get();
                         }
                     } catch (Throwable ignored) {}
-                    return net.minecraft.sounds.SoundEvents.COPPER_STEP;
+                    return SoundEvents.COPPER_STEP;
                 };
 
                 copperGrateSounds = new ForgeSoundType(
@@ -192,11 +194,11 @@ public class ModSounds {
                 return new ForgeSoundType(
                         1f,
                         1f,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_BREAK,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_STEP
+                        () -> SoundEvents.COPPER_BREAK,
+                        () -> SoundEvents.COPPER_STEP,
+                        () -> SoundEvents.COPPER_STEP,
+                        () -> SoundEvents.COPPER_STEP,
+                        () -> SoundEvents.COPPER_STEP
                 );
             }
         }
@@ -212,7 +214,7 @@ public class ModSounds {
                             return COPPER_BULB_BREAK.get();
                         }
                     } catch (Throwable ignored) {}
-                    return net.minecraft.sounds.SoundEvents.COPPER_BREAK;
+                    return SoundEvents.COPPER_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
                     try {
@@ -220,7 +222,7 @@ public class ModSounds {
                             return COPPER_BULB_STEP.get();
                         }
                     } catch (Throwable ignored) {}
-                    return net.minecraft.sounds.SoundEvents.COPPER_STEP;
+                    return SoundEvents.COPPER_STEP;
                 };
                 Supplier<SoundEvent> placeSound = () -> {
                     try {
@@ -228,7 +230,7 @@ public class ModSounds {
                             return COPPER_BULB_PLACE.get();
                         }
                     } catch (Throwable ignored) {}
-                    return net.minecraft.sounds.SoundEvents.COPPER_STEP;
+                    return SoundEvents.COPPER_STEP;
                 };
 
                 copperBulbSounds = new ForgeSoundType(
@@ -245,64 +247,64 @@ public class ModSounds {
                 return new ForgeSoundType(
                         1f,
                         1f,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_BREAK,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.COPPER_STEP
+                        () -> SoundEvents.COPPER_BREAK,
+                        () -> SoundEvents.COPPER_STEP,
+                        () -> SoundEvents.COPPER_STEP,
+                        () -> SoundEvents.COPPER_STEP,
+                        () -> SoundEvents.COPPER_STEP
                 );
             }
         }
         return copperBulbSounds;
     }
 
-    public static com.kingodogo.buildscape.block.CustomSoundType MUD_SOUNDS() {
-        return new com.kingodogo.buildscape.block.CustomSoundType(
+    public static CustomSoundType MUD_SOUNDS() {
+        return new CustomSoundType(
                 1.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 1.0f,
-                () -> MUD_BREAK.isPresent() ? MUD_BREAK.get() : net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
-                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
-                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_PLACE,
-                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_HIT,
-                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_FALL
+                () -> MUD_BREAK.isPresent() ? MUD_BREAK.get() : SoundEvents.GRAVEL_BREAK,
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_STEP,
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_PLACE,
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_HIT,
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_FALL
         );
     }
 
-    public static com.kingodogo.buildscape.block.CustomSoundType PACKED_MUD_SOUNDS() {
-        return new com.kingodogo.buildscape.block.CustomSoundType(
+    public static CustomSoundType PACKED_MUD_SOUNDS() {
+        return new CustomSoundType(
                 0.3f, 1.0f,
                 1.0f, 0.95f,
                 0.3f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 1.0f,
-                () -> PACKED_MUD_BREAK.isPresent() ? PACKED_MUD_BREAK.get() : net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
-                () -> PACKED_MUD_STEP.isPresent() ? PACKED_MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
-                () -> PACKED_MUD_PLACE.isPresent() ? PACKED_MUD_PLACE.get() : net.minecraft.sounds.SoundEvents.GRAVEL_PLACE,
-                () -> PACKED_MUD_HIT.isPresent() ? PACKED_MUD_HIT.get() : net.minecraft.sounds.SoundEvents.GRAVEL_HIT,
-                () -> PACKED_MUD_FALL.isPresent() ? PACKED_MUD_FALL.get() : net.minecraft.sounds.SoundEvents.GRAVEL_FALL
+                () -> PACKED_MUD_BREAK.isPresent() ? PACKED_MUD_BREAK.get() : SoundEvents.GRAVEL_BREAK,
+                () -> PACKED_MUD_STEP.isPresent() ? PACKED_MUD_STEP.get() : SoundEvents.GRAVEL_STEP,
+                () -> PACKED_MUD_PLACE.isPresent() ? PACKED_MUD_PLACE.get() : SoundEvents.GRAVEL_PLACE,
+                () -> PACKED_MUD_HIT.isPresent() ? PACKED_MUD_HIT.get() : SoundEvents.GRAVEL_HIT,
+                () -> PACKED_MUD_FALL.isPresent() ? PACKED_MUD_FALL.get() : SoundEvents.GRAVEL_FALL
         );
     }
 
-    public static com.kingodogo.buildscape.block.CustomSoundType MUD_BRICKS_SOUNDS() {
-        return new com.kingodogo.buildscape.block.CustomSoundType(
+    public static CustomSoundType MUD_BRICKS_SOUNDS() {
+        return new CustomSoundType(
                 1.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 1.0f,
                 1.0f, 1.0f,
-                () -> MUD_BRICKS_BREAK.isPresent() ? MUD_BRICKS_BREAK.get() : net.minecraft.sounds.SoundEvents.STONE_BREAK,
-                () -> MUD_BRICKS_STEP.isPresent() ? MUD_BRICKS_STEP.get() : net.minecraft.sounds.SoundEvents.STONE_STEP,
-                () -> MUD_BRICKS_PLACE.isPresent() ? MUD_BRICKS_PLACE.get() : net.minecraft.sounds.SoundEvents.STONE_PLACE,
-                () -> MUD_BRICKS_HIT.isPresent() ? MUD_BRICKS_HIT.get() : net.minecraft.sounds.SoundEvents.STONE_HIT,
-                () -> MUD_BRICKS_FALL.isPresent() ? MUD_BRICKS_FALL.get() : net.minecraft.sounds.SoundEvents.STONE_FALL
+                () -> MUD_BRICKS_BREAK.isPresent() ? MUD_BRICKS_BREAK.get() : SoundEvents.STONE_BREAK,
+                () -> MUD_BRICKS_STEP.isPresent() ? MUD_BRICKS_STEP.get() : SoundEvents.STONE_STEP,
+                () -> MUD_BRICKS_PLACE.isPresent() ? MUD_BRICKS_PLACE.get() : SoundEvents.STONE_PLACE,
+                () -> MUD_BRICKS_HIT.isPresent() ? MUD_BRICKS_HIT.get() : SoundEvents.STONE_HIT,
+                () -> MUD_BRICKS_FALL.isPresent() ? MUD_BRICKS_FALL.get() : SoundEvents.STONE_FALL
         );
     }
 
-    public static com.kingodogo.buildscape.block.CustomSoundType PETAL_CLOVER_SOUNDS() {
-        return new com.kingodogo.buildscape.block.CustomSoundType(
+    public static CustomSoundType PETAL_CLOVER_SOUNDS() {
+        return new CustomSoundType(
                 0.8f,
                 0.96f,
                 0.12f,
@@ -313,16 +315,16 @@ public class ModSounds {
                 0.6f,
                 0.4f,
                 0.9f,
-                () -> net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_BREAK,
-                () -> net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_STEP,
-                () -> net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_PLACE,
-                () -> net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_HIT,
-                () -> net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_FALL
+                () -> SoundEvents.FLOWERING_AZALEA_BREAK,
+                () -> SoundEvents.FLOWERING_AZALEA_STEP,
+                () -> SoundEvents.FLOWERING_AZALEA_PLACE,
+                () -> SoundEvents.FLOWERING_AZALEA_HIT,
+                () -> SoundEvents.FLOWERING_AZALEA_FALL
         );
     }
 
-    public static com.kingodogo.buildscape.block.CustomSoundType FLOWER_BED_SOUNDS() {
-        return new com.kingodogo.buildscape.block.CustomSoundType(
+    public static CustomSoundType FLOWER_BED_SOUNDS() {
+        return new CustomSoundType(
                 0.8f,
                 0.96f,
                 0.25f,
@@ -337,37 +339,37 @@ public class ModSounds {
                     if (FLOWER_BED_BREAK.isPresent()) {
                         return FLOWER_BED_BREAK.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_BREAK;
+                    return SoundEvents.FLOWERING_AZALEA_BREAK;
                 },
                 () -> {
                     if (FLOWER_BED_STEP.isPresent()) {
                         return FLOWER_BED_STEP.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_STEP;
+                    return SoundEvents.FLOWERING_AZALEA_STEP;
                 },
                 () -> {
                     if (FLOWER_BED_PLACE.isPresent()) {
                         return FLOWER_BED_PLACE.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_PLACE;
+                    return SoundEvents.FLOWERING_AZALEA_PLACE;
                 },
                 () -> {
                     if (FLOWER_BED_HIT.isPresent()) {
                         return FLOWER_BED_HIT.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_HIT;
+                    return SoundEvents.FLOWERING_AZALEA_HIT;
                 },
                 () -> {
                     if (FLOWER_BED_FALL.isPresent()) {
                         return FLOWER_BED_FALL.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_FALL;
+                    return SoundEvents.FLOWERING_AZALEA_FALL;
                 }
         );
     }
 
-    public static com.kingodogo.buildscape.block.CustomSoundType VINE_SOUNDS() {
-        return new com.kingodogo.buildscape.block.CustomSoundType(
+    public static CustomSoundType VINE_SOUNDS() {
+        return new CustomSoundType(
                 0.9f,
                 0.8f,
                 0.15f,
@@ -378,16 +380,16 @@ public class ModSounds {
                 0.5f,
                 0.5f,
                 0.75f,
-                () -> net.minecraft.sounds.SoundEvents.VINE_BREAK,
-                () -> net.minecraft.sounds.SoundEvents.VINE_STEP,
-                () -> net.minecraft.sounds.SoundEvents.VINE_PLACE,
-                () -> net.minecraft.sounds.SoundEvents.VINE_HIT,
-                () -> net.minecraft.sounds.SoundEvents.VINE_FALL
+                () -> SoundEvents.VINE_BREAK,
+                () -> SoundEvents.VINE_STEP,
+                () -> SoundEvents.VINE_PLACE,
+                () -> SoundEvents.VINE_HIT,
+                () -> SoundEvents.VINE_FALL
         );
     }
 
-    public static com.kingodogo.buildscape.block.CustomSoundType AZALEA_SOUNDS() {
-        return new com.kingodogo.buildscape.block.CustomSoundType(
+    public static CustomSoundType AZALEA_SOUNDS() {
+        return new CustomSoundType(
                 1.0f,
                 1.0f,
                 1.0f,
@@ -398,11 +400,11 @@ public class ModSounds {
                 1.0f,
                 1.0f,
                 1.0f,
-                () -> net.minecraft.sounds.SoundEvents.AZALEA_BREAK,
-                () -> net.minecraft.sounds.SoundEvents.AZALEA_STEP,
-                () -> net.minecraft.sounds.SoundEvents.AZALEA_PLACE,
-                () -> net.minecraft.sounds.SoundEvents.AZALEA_HIT,
-                () -> net.minecraft.sounds.SoundEvents.AZALEA_FALL
+                () -> SoundEvents.AZALEA_BREAK,
+                () -> SoundEvents.AZALEA_STEP,
+                () -> SoundEvents.AZALEA_PLACE,
+                () -> SoundEvents.AZALEA_HIT,
+                () -> SoundEvents.AZALEA_FALL
         );
     }
 
@@ -413,31 +415,31 @@ public class ModSounds {
                     if (MANGROVE_ROOTS_BREAK.isPresent()) {
                         return MANGROVE_ROOTS_BREAK.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_BREAK;
+                    return SoundEvents.WOOD_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
                     if (MANGROVE_ROOTS_STEP.isPresent()) {
                         return MANGROVE_ROOTS_STEP.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_STEP;
+                    return SoundEvents.WOOD_STEP;
                 };
                 Supplier<SoundEvent> placeSound = () -> {
                     if (MANGROVE_ROOTS_PLACE.isPresent()) {
                         return MANGROVE_ROOTS_PLACE.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_PLACE;
+                    return SoundEvents.WOOD_PLACE;
                 };
                 Supplier<SoundEvent> hitSound = () -> {
                     if (MANGROVE_ROOTS_HIT.isPresent()) {
                         return MANGROVE_ROOTS_HIT.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_HIT;
+                    return SoundEvents.WOOD_HIT;
                 };
                 Supplier<SoundEvent> fallSound = () -> {
                     if (MANGROVE_ROOTS_FALL.isPresent()) {
                         return MANGROVE_ROOTS_FALL.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_FALL;
+                    return SoundEvents.WOOD_FALL;
                 };
 
                 mangroveRootsSounds = new ForgeSoundType(
@@ -457,11 +459,11 @@ public class ModSounds {
                 return new ForgeSoundType(
                         1f,
                         1f,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_BREAK,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_STEP
+                        () -> SoundEvents.WOOD_BREAK,
+                        () -> SoundEvents.WOOD_STEP,
+                        () -> SoundEvents.WOOD_STEP,
+                        () -> SoundEvents.WOOD_STEP,
+                        () -> SoundEvents.WOOD_STEP
                 );
             }
         }
@@ -475,31 +477,31 @@ public class ModSounds {
                     if (MUDDY_MANGROVE_ROOTS_BREAK.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_BREAK.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_BREAK;
+                    return SoundEvents.WOOD_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
                     if (MUDDY_MANGROVE_ROOTS_STEP.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_STEP.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_STEP;
+                    return SoundEvents.WOOD_STEP;
                 };
                 Supplier<SoundEvent> placeSound = () -> {
                     if (MUDDY_MANGROVE_ROOTS_PLACE.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_PLACE.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_PLACE;
+                    return SoundEvents.WOOD_PLACE;
                 };
                 Supplier<SoundEvent> hitSound = () -> {
                     if (MUDDY_MANGROVE_ROOTS_HIT.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_HIT.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_HIT;
+                    return SoundEvents.WOOD_HIT;
                 };
                 Supplier<SoundEvent> fallSound = () -> {
                     if (MUDDY_MANGROVE_ROOTS_FALL.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_FALL.get();
                     }
-                    return net.minecraft.sounds.SoundEvents.WOOD_FALL;
+                    return SoundEvents.WOOD_FALL;
                 };
 
                 muddyMangroveRootsSounds = new ForgeSoundType(
@@ -519,11 +521,11 @@ public class ModSounds {
                 return new ForgeSoundType(
                         1f,
                         1f,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_BREAK,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_STEP,
-                        () -> net.minecraft.sounds.SoundEvents.WOOD_STEP
+                        () -> SoundEvents.WOOD_BREAK,
+                        () -> SoundEvents.WOOD_STEP,
+                        () -> SoundEvents.WOOD_STEP,
+                        () -> SoundEvents.WOOD_STEP,
+                        () -> SoundEvents.WOOD_STEP
                 );
             }
         }

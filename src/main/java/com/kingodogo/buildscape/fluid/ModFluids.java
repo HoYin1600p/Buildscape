@@ -4,21 +4,26 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import javax.annotation.Nullable;
+
 public class ModFluids {
     /** The still experience fluid, or null while its registry object is not present. */
-    @javax.annotation.Nullable
+    @Nullable
     public static Fluid experienceStillOrNull() {
         return EXPERIENCE_STILL.isPresent() ? EXPERIENCE_STILL.get() : null;
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     private static Fluid experienceFlowingOrNull() {
         return EXPERIENCE_FLOWING.isPresent() ? EXPERIENCE_FLOWING.get() : null;
     }
@@ -40,8 +45,8 @@ public class ModFluids {
     }
 
     public static boolean cannotMix(Fluid first, Fluid second) {
-        return (isExperience(first) && net.minecraft.world.level.material.Fluids.LAVA.isSame(second))
-                || (isExperience(second) && net.minecraft.world.level.material.Fluids.LAVA.isSame(first));
+        return (isExperience(first) && Fluids.LAVA.isSame(second))
+                || (isExperience(second) && Fluids.LAVA.isSame(first));
     }
 
     public static final DeferredRegister<Fluid> FLUIDS =
@@ -64,6 +69,6 @@ public class ModFluids {
                     new ResourceLocation(BuildScape.MODID, "fluid/experience_still"),
                     new ResourceLocation(BuildScape.MODID, "fluid/experience_flow")
             ).luminosity(15).density(1000).viscosity(1000)
-    ).bucket(() -> (net.minecraft.world.item.BucketItem) ModItems.EXPERIENCE_BUCKET.get())
-     .block(() -> (net.minecraft.world.level.block.LiquidBlock) ModBlocks.EXPERIENCE_BLOCK.get());
+    ).bucket(() -> (BucketItem) ModItems.EXPERIENCE_BUCKET.get())
+     .block(() -> (LiquidBlock) ModBlocks.EXPERIENCE_BLOCK.get());
 }

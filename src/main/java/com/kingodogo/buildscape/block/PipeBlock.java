@@ -2,8 +2,11 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -83,7 +86,7 @@ public class PipeBlock extends RotatedPillarBlock {
     }
 
     @Override
-    public void setPlacedBy(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide) {
             notifyNeighbors(level, pos);
@@ -91,7 +94,7 @@ public class PipeBlock extends RotatedPillarBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             super.onRemove(state, level, pos, newState, isMoving);
             if (!level.isClientSide) {
@@ -102,7 +105,7 @@ public class PipeBlock extends RotatedPillarBlock {
         }
     }
 
-    private void notifyNeighbors(net.minecraft.world.level.Level level, BlockPos pos) {
+    private void notifyNeighbors(Level level, BlockPos pos) {
         for (Direction dir : Direction.values()) {
             BlockPos neighborPos = pos.relative(dir);
             BlockState neighborState = level.getBlockState(neighborPos);

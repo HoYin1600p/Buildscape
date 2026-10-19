@@ -6,6 +6,7 @@ import com.kingodogo.buildscape.pipe.transport.BubbleColumnHandler;
 import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import com.kingodogo.buildscape.pipe.transport.WaterPipeTransport;
+import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -20,17 +21,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.LiquidBlockContainer;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -55,9 +58,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 
 public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterloggedBlock, EntityBlock {
     public static final ThreadLocal<Fluid> PLACED_FLUID = new ThreadLocal<>();
@@ -203,7 +207,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         if (state.getBlock() instanceof HollowPipeBlock && be instanceof HollowLogBlockEntity hollowBe) {
             PipeFlowState flow = hollowBe.getPipeFlowState();
             if (flow != null && flow.hasFluid()) {
-                return com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess.fluidById(flow.getFluidId());
+                return WorldPipeTopologyAccess.fluidById(flow.getFluidId());
             }
         }
         return Fluids.EMPTY;
@@ -402,7 +406,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     static boolean trySpreadToWorld(LevelAccessor level, BlockPos pos, Fluid fluid, int dist,
                                    @Nullable Set<Direction> allowedDirections,
-                                   java.util.function.Predicate<Direction> openEndpoint) {
+                                   Predicate<Direction> openEndpoint) {
         if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY) return false;
         boolean spread = false;
         int outflowAmount = WaterPipeTransport.MAX_HORIZONTAL_FLOW - dist;
@@ -434,14 +438,14 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     @Nullable
     private static BlockState spillState(BlockGetter level, BlockPos pos, Fluid fluid, int amount, boolean falling) {
         if (amount <= 0 || amount > 8 || !(fluid instanceof FlowingFluid flowing)) return null;
-        if (level instanceof net.minecraft.world.level.LevelReader reader && !reader.hasChunkAt(pos)) return null;
+        if (level instanceof LevelReader reader && !reader.hasChunkAt(pos)) return null;
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock) return null;
         if (state.getFluidState().isSource()) return null;
         Fluid existing = state.getFluidState().getType();
         if (existing != Fluids.EMPTY && !fluid.isSame(existing) && ModFluids.cannotMix(fluid, existing)) return null;
         // Outlets emit flowing fluid; vanilla waterlogging requires a source.
-        if (state.getBlock() instanceof net.minecraft.world.level.block.LiquidBlockContainer) return null;
+        if (state.getBlock() instanceof LiquidBlockContainer) return null;
         if (!state.isAir() && !state.canBeReplaced(fluid) && !(state.getBlock() instanceof LiquidBlock)) return null;
         BlockState target = flowing.getFlowing(amount, falling).createLegacyBlock();
         return target.isAir() || target.equals(state) ? null : target;
@@ -462,7 +466,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         if (be instanceof HollowLogBlockEntity hollowBe) {
             PipeFlowState flow = hollowBe.getPipeFlowState();
             if (flow != null && flow.hasFluid()) {
-                Fluid fluid = com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess.fluidById(flow.getFluidId());
+                Fluid fluid = WorldPipeTopologyAccess.fluidById(flow.getFluidId());
                 if (trySpreadToWorld(level, pos, state, fluid, flow.getDistance(), flow.getFlowDirections())) {
                     level.scheduleTick(pos, this, fluid.getTickDelay(level));
                 }
@@ -498,7 +502,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     @Override
-    public boolean isLadder(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos, LivingEntity entity) {
+    public boolean isLadder(BlockState state, LevelReader level, BlockPos pos, LivingEntity entity) {
         return hasVerticalChannel(state);
     }
 
@@ -702,7 +706,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         if (level.getBlockEntity(pos) instanceof HollowLogBlockEntity hollowBe) {
             PipeFlowState flow = hollowBe.getPipeFlowState();
             if (flow != null && flow.hasFluid()) {
-                Fluid fluid = com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess.fluidById(flow.getFluidId());
+                Fluid fluid = WorldPipeTopologyAccess.fluidById(flow.getFluidId());
                 if (fluid instanceof FlowingFluid) level.scheduleTick(pos, this, fluid.getTickDelay(level));
             }
         }

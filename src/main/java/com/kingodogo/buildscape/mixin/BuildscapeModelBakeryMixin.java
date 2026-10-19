@@ -218,7 +218,7 @@ public abstract class BuildscapeModelBakeryMixin {
 
         long startedAt = System.nanoTime();
         bakedCache = new ConcurrentHashMap<>(bakedCache);
-        java.util.Set<ResourceLocation> completed = ConcurrentHashMap.newKeySet();
+        Set<ResourceLocation> completed = ConcurrentHashMap.newKeySet();
         AtomicInteger fallbackCount = new AtomicInteger();
 
         BuildscapeStartupWork.forEachIndex(candidates.size(), index -> {

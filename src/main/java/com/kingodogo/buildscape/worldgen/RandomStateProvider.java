@@ -2,14 +2,14 @@ package com.kingodogo.buildscape.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
+
+import java.util.List;
+import java.util.Random;
 
 public class RandomStateProvider extends BlockStateProvider {
 
@@ -38,7 +38,7 @@ public class RandomStateProvider extends BlockStateProvider {
     @Override
     public BlockState getState(Random random, BlockPos pos) {
         if (states.isEmpty()) {
-            return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            return Blocks.AIR.defaultBlockState();
         }
         return states.get(random.nextInt(states.size()));
     }

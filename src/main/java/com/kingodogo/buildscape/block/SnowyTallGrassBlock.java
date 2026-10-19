@@ -1,26 +1,31 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.List;
 
 public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarmland {
 
@@ -30,7 +35,7 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
     }
 
     @Override
-    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HALF, ON_FARMLAND);
     }
 
@@ -53,7 +58,7 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
                 state.is(BlockTags.DIRT) ||
                         state.is(Blocks.FARMLAND) ||
                         state.is(Blocks.SNOW_BLOCK) ||
-                        state.is(com.kingodogo.buildscape.block.ModBlocks.SNOW_BRICKS.get())
+                        state.is(ModBlocks.SNOW_BRICKS.get())
         );
     }
 
@@ -80,7 +85,7 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
     }
 
     @Override
-    public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
         BlockState updatedState = super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
         if (!updatedState.isAir()) {
             BlockPos basePos = updatedState.getValue(HALF) == DoubleBlockHalf.UPPER ? pos.below() : pos;
@@ -101,7 +106,7 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
         LootContext ctx = builder
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK
+                        LootContextParamSets.BLOCK
                 );
         ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
 
@@ -110,7 +115,7 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
                 return Collections.singletonList(new ItemStack(this));
             }
             if (
-                    net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
+                    EnchantmentHelper.getItemEnchantmentLevel(
                             Enchantments.SILK_TOUCH,
                             tool
                     ) >

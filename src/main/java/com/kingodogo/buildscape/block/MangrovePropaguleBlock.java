@@ -1,12 +1,13 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModBlocks;
-
-import java.util.List;
-import java.util.Random;
-
+import com.kingodogo.buildscape.worldgen.ModConfiguredFeatures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Player;
@@ -26,12 +27,20 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 public class MangrovePropaguleBlock
         extends BushBlock
@@ -332,41 +341,41 @@ public class MangrovePropaguleBlock
             }
         }
         String variant =
-                com.kingodogo.buildscape.worldgen.ModConfiguredFeatures.getRandomMangroveTreeVariant(
+                ModConfiguredFeatures.getRandomMangroveTreeVariant(
                         random
                 );
-        net.minecraft.resources.ResourceLocation featureLocation =
-                com.kingodogo.buildscape.worldgen.ModConfiguredFeatures.getMangroveTreeResourceLocation(
+        ResourceLocation featureLocation =
+                ModConfiguredFeatures.getMangroveTreeResourceLocation(
                         variant
                 );
-        java.util.Optional<
+        Optional<
                 ? extends net.minecraft.core.Holder<
-                        ? extends net.minecraft.world.level.levelgen.feature.ConfiguredFeature<
+                        ? extends ConfiguredFeature<
                                 ?,
                                 ?
                                 >
                         >
                 > featureHolder = level
                 .registryAccess()
-                .registry(net.minecraft.core.Registry.CONFIGURED_FEATURE_REGISTRY)
+                .registry(Registry.CONFIGURED_FEATURE_REGISTRY)
                 .flatMap(registry ->
                         registry.getHolder(
-                                net.minecraft.resources.ResourceKey.create(
-                                        net.minecraft.core.Registry.CONFIGURED_FEATURE_REGISTRY,
+                                ResourceKey.create(
+                                        Registry.CONFIGURED_FEATURE_REGISTRY,
                                         featureLocation
                                 )
                         )
                 );
 
         if (featureHolder.isPresent()) {
-            net.minecraft.world.level.levelgen.feature.ConfiguredFeature<
+            ConfiguredFeature<
                     ?,
                     ?
                     > feature = featureHolder.get().value();
 
             if (
                     feature.feature() ==
-                            net.minecraft.world.level.levelgen.feature.Feature.TREE
+                            Feature.TREE
             ) {
                 BlockPos belowPos = pos.below();
                 BlockState belowState = level.getBlockState(belowPos);
@@ -375,13 +384,13 @@ public class MangrovePropaguleBlock
                 }
                 level.setBlock(pos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
                 @SuppressWarnings("unchecked")
-                net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration treeConfig =
-                        (net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration) feature.config();
-                net.minecraft.world.level.levelgen.feature.FeaturePlaceContext<
-                        net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration
+                TreeConfiguration treeConfig =
+                        (TreeConfiguration) feature.config();
+                FeaturePlaceContext<
+                        TreeConfiguration
                         > placeContext =
-                        new net.minecraft.world.level.levelgen.feature.FeaturePlaceContext<>(
-                                java.util.Optional.empty(),
+                        new FeaturePlaceContext<>(
+                                Optional.empty(),
                                 level,
                                 level.getChunkSource().getGenerator(),
                                 random,
@@ -389,14 +398,14 @@ public class MangrovePropaguleBlock
                                 treeConfig
                         );
                 boolean success =
-                        net.minecraft.world.level.levelgen.feature.Feature.TREE.place(
+                        Feature.TREE.place(
                                 placeContext
                         );
                 if (!success) {
                     level.setBlock(pos, state, Block.UPDATE_ALL);
                 }
             } else {
-                com.kingodogo.buildscape.BuildScape.getLogger()
+                BuildScape.getLogger()
                         .warn(
                                 "Mangrove tree feature {} is not a tree feature!",
                                 featureLocation
@@ -404,7 +413,7 @@ public class MangrovePropaguleBlock
                 level.setBlock(pos, state, 4);
             }
         } else {
-            com.kingodogo.buildscape.BuildScape.getLogger()
+            BuildScape.getLogger()
                     .warn(
                             "Mangrove tree feature {} not found in registry! Cannot grow tree.",
                             featureLocation

@@ -1,7 +1,13 @@
 package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.command.FireworkTestCommand;
+import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
+import com.kingodogo.buildscape.trophy.Trophies;
+import com.kingodogo.buildscape.trophy.TrophyDefinition;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -27,16 +33,16 @@ public class ModCreativeModeTab {
 
         private boolean isCustomFireworkVariant(ItemStack stack) {
             if (stack.is(Items.FIREWORK_STAR)) {
-                net.minecraft.nbt.CompoundTag explosion = stack.getTagElement("Explosion");
+                CompoundTag explosion = stack.getTagElement("Explosion");
                 return explosion != null
-                        && com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.isCustomShape(explosion.getByte("Type"));
+                        && CustomFireworkShapeRegistry.isCustomShape(explosion.getByte("Type"));
             }
             if (stack.is(Items.FIREWORK_ROCKET)) {
-                net.minecraft.nbt.CompoundTag fireworks = stack.getTagElement("Fireworks");
+                CompoundTag fireworks = stack.getTagElement("Fireworks");
                 if (fireworks == null || !fireworks.contains("Explosions", 9)) return false;
-                net.minecraft.nbt.ListTag explosions = fireworks.getList("Explosions", 10);
+                ListTag explosions = fireworks.getList("Explosions", 10);
                 for (int i = 0; i < explosions.size(); i++) {
-                    if (com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.isCustomShape(
+                    if (CustomFireworkShapeRegistry.isCustomShape(
                             explosions.getCompound(i).getByte("Type"))) {
                         return true;
                     }
@@ -2461,86 +2467,86 @@ public class ModCreativeModeTab {
             items.add(new ItemStack(ModItems.MUSIC_DISC_BUILDER.get()));
 
             ItemStack cakeStar = new ItemStack(Items.FIREWORK_STAR);
-            net.minecraft.nbt.CompoundTag cakeExp = cakeStar.getOrCreateTagElement("Explosion");
-            cakeExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CAKE_ID);
+            CompoundTag cakeExp = cakeStar.getOrCreateTagElement("Explosion");
+            cakeExp.putByte("Type", CustomFireworkShapeRegistry.CAKE_ID);
             cakeExp.putIntArray("Colors", new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55});
             items.add(cakeStar);
 
             ItemStack crownStar = new ItemStack(Items.FIREWORK_STAR);
-            net.minecraft.nbt.CompoundTag crownExp = crownStar.getOrCreateTagElement("Explosion");
-            crownExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CROWN_ID);
+            CompoundTag crownExp = crownStar.getOrCreateTagElement("Explosion");
+            crownExp.putByte("Type", CustomFireworkShapeRegistry.CROWN_ID);
             crownExp.putIntArray("Colors", new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF});
             items.add(crownStar);
 
             ItemStack trophyStar = new ItemStack(Items.FIREWORK_STAR);
-            net.minecraft.nbt.CompoundTag trophyExp = trophyStar.getOrCreateTagElement("Explosion");
-            trophyExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.TROPHY_ID);
+            CompoundTag trophyExp = trophyStar.getOrCreateTagElement("Explosion");
+            trophyExp.putByte("Type", CustomFireworkShapeRegistry.TROPHY_ID);
             trophyExp.putIntArray("Colors", new int[]{0xFFD700, 0xFFFF88, 0x00FFFF});
             items.add(trophyStar);
 
             ItemStack treeStar = new ItemStack(Items.FIREWORK_STAR);
-            net.minecraft.nbt.CompoundTag treeExp = treeStar.getOrCreateTagElement("Explosion");
-            treeExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID);
+            CompoundTag treeExp = treeStar.getOrCreateTagElement("Explosion");
+            treeExp.putByte("Type", CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID);
             treeExp.putIntArray("Colors", new int[]{0x227733, 0xFF3030, 0xFFD700});
             items.add(treeStar);
 
             ItemStack presentsStar = new ItemStack(Items.FIREWORK_STAR);
-            net.minecraft.nbt.CompoundTag presentsExp = presentsStar.getOrCreateTagElement("Explosion");
-            presentsExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.PRESENTS_ID);
+            CompoundTag presentsExp = presentsStar.getOrCreateTagElement("Explosion");
+            presentsExp.putByte("Type", CustomFireworkShapeRegistry.PRESENTS_ID);
             presentsExp.putIntArray("Colors", new int[]{0xFF2233, 0xFFD700});
             items.add(presentsStar);
 
             ItemStack candyCaneStar = new ItemStack(Items.FIREWORK_STAR);
-            net.minecraft.nbt.CompoundTag candyCaneExp = candyCaneStar.getOrCreateTagElement("Explosion");
-            candyCaneExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CANDY_CANE_ID);
+            CompoundTag candyCaneExp = candyCaneStar.getOrCreateTagElement("Explosion");
+            candyCaneExp.putByte("Type", CustomFireworkShapeRegistry.CANDY_CANE_ID);
             candyCaneExp.putIntArray("Colors", new int[]{0xFF0033});
             items.add(candyCaneStar);
 
             ItemStack snowflakeStar = new ItemStack(Items.FIREWORK_STAR);
-            net.minecraft.nbt.CompoundTag snowflakeExp = snowflakeStar.getOrCreateTagElement("Explosion");
-            snowflakeExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.SNOWFLAKE_ID);
+            CompoundTag snowflakeExp = snowflakeStar.getOrCreateTagElement("Explosion");
+            snowflakeExp.putByte("Type", CustomFireworkShapeRegistry.SNOWFLAKE_ID);
             snowflakeExp.putIntArray("Colors", new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF});
             items.add(snowflakeStar);
 
-            items.add(com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem.createDefaultStack());
+            items.add(InfinitePhoenixFireworkStarItem.createDefaultStack());
 
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CAKE_ID,
+            items.add(FireworkTestCommand.createCustomFireworkRocket(
+                    CustomFireworkShapeRegistry.CAKE_ID,
                     new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55}
             ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CROWN_ID,
+            items.add(FireworkTestCommand.createCustomFireworkRocket(
+                    CustomFireworkShapeRegistry.CROWN_ID,
                     new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF}
             ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.TROPHY_ID,
+            items.add(FireworkTestCommand.createCustomFireworkRocket(
+                    CustomFireworkShapeRegistry.TROPHY_ID,
                     new int[]{0xFFD700, 0xFFFF88, 0x00FFFF}
             ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID,
+            items.add(FireworkTestCommand.createCustomFireworkRocket(
+                    CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID,
                     new int[]{0x227733, 0xFF3030, 0xFFD700}
             ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.PRESENTS_ID,
+            items.add(FireworkTestCommand.createCustomFireworkRocket(
+                    CustomFireworkShapeRegistry.PRESENTS_ID,
                     new int[]{0xFF2233, 0xFFD700}
             ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CANDY_CANE_ID,
+            items.add(FireworkTestCommand.createCustomFireworkRocket(
+                    CustomFireworkShapeRegistry.CANDY_CANE_ID,
                     new int[]{0xFF0033}
             ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.PHOENIX_ID,
+            items.add(FireworkTestCommand.createCustomFireworkRocket(
+                    CustomFireworkShapeRegistry.PHOENIX_ID,
                     new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00}
             ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.SNOWFLAKE_ID,
+            items.add(FireworkTestCommand.createCustomFireworkRocket(
+                    CustomFireworkShapeRegistry.SNOWFLAKE_ID,
                     new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF}
             ));
 
             items.add(new ItemStack(ModItems.EXPERIENCE_BUCKET.get()));
             items.add(new ItemStack(ModItems.WANDERING_HOMEMAKER_SPAWN_EGG.get()));
             items.add(new ItemStack(ModItems.FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG.get()));
-            for (com.kingodogo.buildscape.trophy.TrophyDefinition trophyDef : com.kingodogo.buildscape.trophy.Trophies.getAll()) {
+            for (TrophyDefinition trophyDef : Trophies.getAll()) {
                 if (trophyDef.getItem() != null) {
                     items.add(new ItemStack(trophyDef.getItem()));
                 }

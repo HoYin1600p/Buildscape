@@ -1,18 +1,20 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.block.copper.BuildscapeWeatheringCopper;
-
 import com.kingodogo.buildscape.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+
+import java.util.Random;
 
 public abstract class CopperBulbBlock extends Block {
 
@@ -43,7 +45,7 @@ public abstract class CopperBulbBlock extends Block {
     }
 
     @Override
-    public void randomTick(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, java.util.Random random) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
         if (this instanceof BuildscapeWeatheringCopper copper) {
             copper.onRandomTick(state, level, pos, random);
         }
@@ -93,7 +95,7 @@ public abstract class CopperBulbBlock extends Block {
     @Override
     public void neighborChanged(
             BlockState state,
-            net.minecraft.world.level.Level level,
+            Level level,
             BlockPos pos,
             Block block,
             BlockPos fromPos,
@@ -122,7 +124,7 @@ public abstract class CopperBulbBlock extends Block {
     @Override
     public void onPlace(
             BlockState state,
-            net.minecraft.world.level.Level level,
+            Level level,
             BlockPos pos,
             BlockState oldState,
             boolean isMoving
@@ -145,7 +147,7 @@ public abstract class CopperBulbBlock extends Block {
     @Override
     public int getAnalogOutputSignal(
             BlockState state,
-            net.minecraft.world.level.Level level,
+            Level level,
             BlockPos pos
     ) {
         return state.getValue(LIT) ? 15 : 0;

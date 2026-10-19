@@ -7,6 +7,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -76,7 +77,7 @@ public class BubbleColumnHandler {
             return;
         }
 
-        boolean isItem = entity instanceof net.minecraft.world.entity.item.ItemEntity;
+        boolean isItem = entity instanceof ItemEntity;
         double pushStrength = isItem ? 0.07D : 0.03D;
 
         double newX = delta.x * (isItem ? 0.85D : 0.95D) + flowX * pushStrength;

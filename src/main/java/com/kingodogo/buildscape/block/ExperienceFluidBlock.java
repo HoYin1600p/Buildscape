@@ -9,9 +9,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class ExperienceFluidBlock extends LiquidBlock {
-    public ExperienceFluidBlock(java.util.function.Supplier<? extends FlowingFluid> fluid, BlockBehaviour.Properties properties) {
+    public ExperienceFluidBlock(Supplier<? extends FlowingFluid> fluid, BlockBehaviour.Properties properties) {
         super(fluid, properties);
     }
 

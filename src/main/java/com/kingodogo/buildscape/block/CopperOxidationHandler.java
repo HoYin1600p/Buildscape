@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.block.copper.CopperTransitions;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -206,7 +208,7 @@ public class CopperOxidationHandler {
                 || state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER);
     }
 
-    public static BlockState getToolModifiedState(BlockState state, net.minecraftforge.common.ToolAction action) {
+    public static BlockState getToolModifiedState(BlockState state, ToolAction action) {
         init();
         Block target = action == ToolActions.AXE_SCRAPE ? STAGES.previous(state.getBlock())
                 : action == ToolActions.AXE_WAX_OFF ? STAGES.unwaxed(state.getBlock()) : null;
@@ -227,7 +229,7 @@ public class CopperOxidationHandler {
                 if (!level.isClientSide) {
                     setBlockStateOrDoor(level, pos, state, nextState.getBlock());
                     if (level.getBlockState(pos).getBlock() != nextState.getBlock()) return false;
-                    ((ServerLevel) level).sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE,
+                    ((ServerLevel) level).sendParticles(ParticleTypes.SMOKE,
                             pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
                             8, 0.25D, 0.25D, 0.25D, 0.05D);
                     if (!player.getAbilities().instabuild) {

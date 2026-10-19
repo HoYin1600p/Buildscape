@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class FamilyExpander {
 
@@ -113,7 +114,7 @@ public class FamilyExpander {
         if (spec != null) {
             generated.add(spec);
         } else {
-            java.util.Map<String, String> keys = java.util.Map.of("X", inputItem);
+            Map<String, String> keys = Map.of("X", inputItem);
             generated.add(new RecipeIR.RecipeSpec(
                     recipeId, defaultType, "", defaultPattern, keys, List.of(inputItem), baseItem,
                     new RecipeIR.ResultSpec(outputItem, defaultCount, null), 200, 0.1f
@@ -130,7 +131,7 @@ public class FamilyExpander {
             String outputItem,
             int count
     ) {
-        java.util.Map<String, String> keys = java.util.Map.of("W", mainItem, "#", stickItem);
+        Map<String, String> keys = Map.of("W", mainItem, "#", stickItem);
         generated.add(new RecipeIR.RecipeSpec(
                 recipeId, "shaped", "", pattern, keys, List.of(), mainItem,
                 new RecipeIR.ResultSpec(outputItem, count, null), 200, 0.1f
@@ -145,7 +146,7 @@ public class FamilyExpander {
             int count
     ) {
         generated.add(new RecipeIR.RecipeSpec(
-                recipeId, "stonecutting", "", List.of(), java.util.Map.of(), List.of(), baseItem,
+                recipeId, "stonecutting", "", List.of(), Map.of(), List.of(), baseItem,
                 new RecipeIR.ResultSpec(outputItem, count, null), 0, 0.0f
         ));
     }

@@ -1,7 +1,11 @@
 package com.kingodogo.buildscape.config;
 
+import com.kingodogo.buildscape.block.PillarBlock;
+import com.kingodogo.buildscape.block.PillarBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class PillarResetHandler {
@@ -19,22 +23,22 @@ public class PillarResetHandler {
 
             server.execute(() -> {
                 try {
-                    for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+                    for (ServerLevel level : server.getAllLevels()) {
                         if (level.dimension().location().toString().equals(dimension)) {
                             if (!level.isLoaded(pos)) {
                                 return;
                             }
 
-                            net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
-                            if (blockEntity instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomBE) {
-                                net.minecraft.core.BlockPos bottomPos = bottomBE.findStackBottom();
+                            BlockEntity blockEntity = level.getBlockEntity(pos);
+                            if (blockEntity instanceof PillarBlockEntity bottomBE) {
+                                BlockPos bottomPos = bottomBE.findStackBottom();
 
-                                net.minecraft.core.BlockPos current = bottomPos;
+                                BlockPos current = bottomPos;
                                 int resetCount = 0;
 
-                                while (level.getBlockState(current).getBlock() instanceof com.kingodogo.buildscape.block.PillarBlock) {
-                                    net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(current);
-                                    if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
+                                while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
+                                    BlockEntity be = level.getBlockEntity(current);
+                                    if (be instanceof PillarBlockEntity pillarBE) {
                                         resetPillarBlockEntity(pillarBE);
                                         resetCount++;
                                     }
@@ -55,7 +59,7 @@ public class PillarResetHandler {
         }
     }
 
-    private static void resetPillarBlockEntity(com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
+    private static void resetPillarBlockEntity(PillarBlockEntity pillarBE) {
         if (pillarBE == null) {
             return;
         }

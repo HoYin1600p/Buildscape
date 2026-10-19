@@ -8,9 +8,11 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 
 import javax.annotation.Nullable;
 
@@ -71,9 +73,9 @@ public class FestiveStockingBlockEntity
             ItemStack stack,
             @Nullable Direction direction
     ) {
-        if (stack.getItem() instanceof net.minecraft.world.item.BlockItem) {
-            net.minecraft.world.item.BlockItem blockItem =
-                    (net.minecraft.world.item.BlockItem) stack.getItem();
+        if (stack.getItem() instanceof BlockItem) {
+            BlockItem blockItem =
+                    (BlockItem) stack.getItem();
             if (blockItem.getBlock() instanceof FestiveStockingBlock) {
                 return false;
             }
@@ -131,7 +133,7 @@ public class FestiveStockingBlockEntity
         if (level != null && !level.isClientSide) {
             level.gameEvent(
                     null,
-                    net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE,
+                    GameEvent.BLOCK_CHANGE,
                     worldPosition
             );
             level.sendBlockUpdated(
@@ -162,7 +164,7 @@ public class FestiveStockingBlockEntity
             if (level != null && !level.isClientSide) {
                 level.gameEvent(
                         null,
-                        net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE,
+                        GameEvent.BLOCK_CHANGE,
                         worldPosition
                 );
                 level.sendBlockUpdated(

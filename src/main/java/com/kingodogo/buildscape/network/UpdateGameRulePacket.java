@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.world.ModGameRules;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,7 +37,7 @@ public class UpdateGameRulePacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null || !EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.WORLD_RULES)) {
+            if (player == null || !EditGuard.require(player, ConfigSetting.WORLD_RULES)) {
                 return;
             }
 

@@ -1,9 +1,11 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -139,7 +141,7 @@ public class UpdatePillarDataPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null || !EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_EDIT)) return;
+            if (player == null || !EditGuard.require(player, ConfigSetting.PILLAR_EDIT)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             PillarIdManager.PillarData data = manager.getPillarData(pillarId);
@@ -196,7 +198,7 @@ public class UpdatePillarDataPacket {
         ctx.get().setPacketHandled(true);
     }
 
-    private void updateBlockEntity(net.minecraft.server.MinecraftServer server, PillarIdManager.PillarData data) {
+    private void updateBlockEntity(MinecraftServer server, PillarIdManager.PillarData data) {
         if (server == null || !server.isRunning()) {
             return;
         }

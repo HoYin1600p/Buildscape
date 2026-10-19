@@ -3,19 +3,24 @@ package com.kingodogo.buildscape.event;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.animal.SnowGolem;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,7 +68,7 @@ public class FrostRoseDropHandler {
     }
 
     @SubscribeEvent
-    public static void onServerStopping(net.minecraftforge.event.server.ServerStoppingEvent event) {
+    public static void onServerStopping(ServerStoppingEvent event) {
         trackedDeaths.clear();
     }
 
@@ -72,7 +77,7 @@ public class FrostRoseDropHandler {
         if (event.phase != TickEvent.Phase.END) return;
         if (trackedDeaths.isEmpty()) return;
 
-        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) {
             trackedDeaths.clear();
             return;
@@ -115,14 +120,14 @@ public class FrostRoseDropHandler {
     }
 
     private static class TrackedDeath {
-        final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
+        final ResourceKey<Level> dimension;
         final BlockPos pos;
         final double x, y, z;
         final SnowGolem golem;
         boolean dropPending = true;
         int ticksRemaining;
 
-        TrackedDeath(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension, BlockPos pos, double x, double y, double z, SnowGolem golem, int ticks) {
+        TrackedDeath(ResourceKey<Level> dimension, BlockPos pos, double x, double y, double z, SnowGolem golem, int ticks) {
             this.dimension = dimension;
             this.pos = pos;
             this.x = x;

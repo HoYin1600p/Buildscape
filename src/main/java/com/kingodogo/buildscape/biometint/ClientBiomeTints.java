@@ -6,6 +6,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ColorResolver;
@@ -16,10 +17,10 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
 public class ClientBiomeTints {
@@ -61,8 +62,8 @@ public class ClientBiomeTints {
                 && resolver != BiomeColors.WATER_COLOR_RESOLVER) return resolver.getColor(original, x, z);
         State current = state;
         if (current.level == Minecraft.getInstance().level && !current.chunks.isEmpty()) {
-            int blockX = net.minecraft.util.Mth.floor(x);
-            int blockZ = net.minecraft.util.Mth.floor(z);
+            int blockX = Mth.floor(x);
+            int blockZ = Mth.floor(z);
             Map<Integer, Biome> columns = current.chunks.get(ChunkPos.asLong(blockX >> 4, blockZ >> 4));
             if (columns != null) original = columns.getOrDefault(BiomeTintData.columnIndex(blockX, blockZ), original);
         }

@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -8,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -20,10 +23,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.Random;
 import javax.annotation.Nullable;
 
 public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
@@ -39,7 +45,7 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
     protected static final VoxelShape SHAPE = Shapes.join(
             Shapes.block(),
             INSIDE,
-            net.minecraft.world.phys.shapes.BooleanOp.ONLY_FIRST
+            BooleanOp.ONLY_FIRST
     );
 
     public IcicleCauldronBlock(BlockBehaviour.Properties properties) {
@@ -94,7 +100,7 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
 
             boolean isIcicleBlock =
                     heldItem.getItem() ==
-                            com.kingodogo.buildscape.item.ModItems.ICICLE_BLOCK.get();
+                            ModItems.ICICLE_BLOCK.get();
             if (isIcicleBlock && storedIcicle.isEmpty()) {
                 if (!level.isClientSide) {
                     cauldronEntity.setStoredIcicle(heldItem.copy().split(1));
@@ -139,8 +145,8 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
     }
 
     @Override
-    public void tick(BlockState state, net.minecraft.server.level.ServerLevel level,
-                     BlockPos pos, java.util.Random random) {
+    public void tick(BlockState state, ServerLevel level,
+                     BlockPos pos, Random random) {
         if (level.getBlockEntity(pos) instanceof IcicleCauldronBlockEntity cauldronEntity) {
             cauldronEntity.convertToRegularCauldron();
         }
@@ -197,12 +203,12 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
     }
 
     @Override
-    public net.minecraft.world.item.ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
-        return new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CAULDRON);
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+        return new ItemStack(Items.CAULDRON);
     }
 
     @Override
-    public net.minecraft.world.item.ItemStack getCloneItemStack(BlockState state, net.minecraft.world.phys.HitResult target, net.minecraft.world.level.BlockGetter level, BlockPos pos, Player player) {
-        return new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CAULDRON);
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+        return new ItemStack(Items.CAULDRON);
     }
 }

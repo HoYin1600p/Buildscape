@@ -2,6 +2,8 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -10,6 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -31,7 +34,7 @@ public class WoolLayersBlock extends SnowLayerBlock {
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         if (
                 level.getFluidState(pos).getType() ==
-                        net.minecraft.world.level.material.Fluids.WATER
+                        Fluids.WATER
         ) {
             return false;
         }
@@ -72,10 +75,10 @@ public class WoolLayersBlock extends SnowLayerBlock {
             }
         }
 
-        net.minecraft.world.item.Item heldItem = context.getItemInHand().getItem();
-        if (heldItem instanceof net.minecraft.world.item.BlockItem) {
-            net.minecraft.world.level.block.Block heldBlock =
-                    ((net.minecraft.world.item.BlockItem) heldItem).getBlock();
+        Item heldItem = context.getItemInHand().getItem();
+        if (heldItem instanceof BlockItem) {
+            Block heldBlock =
+                    ((BlockItem) heldItem).getBlock();
             if (heldBlock instanceof WoolLayersBlock && heldBlock != this) {
                 return false;
             }

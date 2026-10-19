@@ -2,18 +2,18 @@ package com.kingodogo.buildscape.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.List;
-import java.util.Random;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
+
+import java.util.List;
+import java.util.Random;
+import java.util.function.BiConsumer;
 
 public class MangroveLeaveVineDecorator extends TreeDecorator {
 
@@ -52,7 +52,7 @@ public class MangroveLeaveVineDecorator extends TreeDecorator {
                 BlockPos belowPos = pos.below();
                 BlockState vine = Blocks.VINE.defaultBlockState().setValue(VineBlock.UP, true);
                 if (level.isStateAtPosition(belowPos, BlockState::isAir)
-                        && level instanceof net.minecraft.world.level.LevelReader reader
+                        && level instanceof LevelReader reader
                         && vine.canSurvive(reader, belowPos)) {
                     blockSetter.accept(belowPos, vine);
                 }

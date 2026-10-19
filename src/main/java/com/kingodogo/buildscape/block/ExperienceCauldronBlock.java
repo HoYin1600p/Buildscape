@@ -3,11 +3,16 @@ package com.kingodogo.buildscape.block;
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.HitResult;
 
 import java.util.Map;
 import java.util.Random;
@@ -30,12 +35,12 @@ public class ExperienceCauldronBlock extends LayeredCauldronBlock {
     }
 
     @Override
-    public net.minecraft.world.item.ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
-        return new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CAULDRON);
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+        return new ItemStack(Items.CAULDRON);
     }
 
     @Override
-    public net.minecraft.world.item.ItemStack getCloneItemStack(BlockState state, net.minecraft.world.phys.HitResult target, net.minecraft.world.level.BlockGetter level, BlockPos pos, net.minecraft.world.entity.player.Player player) {
-        return new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CAULDRON);
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+        return new ItemStack(Items.CAULDRON);
     }
 }

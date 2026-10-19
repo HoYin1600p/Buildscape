@@ -1,8 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import javax.annotation.Nullable;
-import javax.annotation.Nonnull;
-
+import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -12,6 +10,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -19,6 +18,9 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class IcicleCauldronBlockEntity
         extends BlockEntity
@@ -68,7 +70,7 @@ public class IcicleCauldronBlockEntity
                 && level.getBlockEntity(worldPosition) == this && storedIcicle.isEmpty()) {
             level.setBlock(
                     worldPosition,
-                    net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState(),
+                    Blocks.CAULDRON.defaultBlockState(),
                     3
             );
         }
@@ -94,7 +96,7 @@ public class IcicleCauldronBlockEntity
         }
         if (
                 stack.getItem() !=
-                        com.kingodogo.buildscape.item.ModItems.ICICLE_BLOCK.get()
+                        ModItems.ICICLE_BLOCK.get()
         ) {
             return false;
         }

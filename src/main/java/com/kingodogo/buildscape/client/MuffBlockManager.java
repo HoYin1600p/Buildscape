@@ -6,6 +6,7 @@ import com.kingodogo.buildscape.block.MuffBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
@@ -42,7 +43,7 @@ public class MuffBlockManager {
 
         SoundInstance sound = event.getSound();
         if (sound.isRelative()) return;
-        if (sound.getSource() == net.minecraft.sounds.SoundSource.PLAYERS || sound.getSource() == net.minecraft.sounds.SoundSource.MASTER) {
+        if (sound.getSource() == SoundSource.PLAYERS || sound.getSource() == SoundSource.MASTER) {
             return;
         }
         double sx = sound.getX();

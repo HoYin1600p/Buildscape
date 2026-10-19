@@ -1,18 +1,233 @@
 package com.kingodogo.buildscape;
 
+import com.kingodogo.buildscape.block.CloverBlock;
+import com.kingodogo.buildscape.block.CopperOxidationHandler;
+import com.kingodogo.buildscape.block.CopperRodHandler;
+import com.kingodogo.buildscape.block.CreakingHeartBlock;
+import com.kingodogo.buildscape.block.CustomSoundType;
+import com.kingodogo.buildscape.block.GlowLightsBlockEntity;
+import com.kingodogo.buildscape.block.HangingMossBlock;
+import com.kingodogo.buildscape.block.HazeBushBlock;
+import com.kingodogo.buildscape.block.LogStrippingHandler;
+import com.kingodogo.buildscape.block.ModBlockEntities;
+import com.kingodogo.buildscape.block.ModBlockProperties;
 import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.block.ModWoodTypes;
+import com.kingodogo.buildscape.block.OrnamentBlock;
+import com.kingodogo.buildscape.block.PetalBlock;
+import com.kingodogo.buildscape.block.PottedHazeBushBlock;
+import com.kingodogo.buildscape.block.RoseVinesBlock;
+import com.kingodogo.buildscape.block.SculkCatalystHandler;
+import com.kingodogo.buildscape.block.StringLightBlock;
+import com.kingodogo.buildscape.block.sculk.SculkBreakExperience;
+import com.kingodogo.buildscape.client.BuildscapeRenderLayers;
+import com.kingodogo.buildscape.client.ClientEvents;
+import com.kingodogo.buildscape.client.DryFoliageColor;
+import com.kingodogo.buildscape.client.ModKeyBinds;
+import com.kingodogo.buildscape.client.model.TintedLeafHedgeModel;
+import com.kingodogo.buildscape.client.model.WanderingHomemakerModel;
+import com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer;
+import com.kingodogo.buildscape.client.renderer.CopperChestRenderer;
+import com.kingodogo.buildscape.client.renderer.DecoratedPotBlockEntityRenderer;
+import com.kingodogo.buildscape.client.renderer.FallingIcicleRenderer;
+import com.kingodogo.buildscape.client.renderer.FestiveStockingBlockEntityRenderer;
+import com.kingodogo.buildscape.client.renderer.FestiveWanderingHomemakerRenderer;
+import com.kingodogo.buildscape.client.renderer.GlassJarBlockEntityRenderer;
+import com.kingodogo.buildscape.client.renderer.HollowLogBlockEntityRenderer;
+import com.kingodogo.buildscape.client.renderer.IcicleCauldronBlockEntityRenderer;
+import com.kingodogo.buildscape.client.renderer.MangroveBoatRenderer;
+import com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer;
+import com.kingodogo.buildscape.client.renderer.PoplarBoatRenderer;
+import com.kingodogo.buildscape.client.renderer.ShelfRenderer;
+import com.kingodogo.buildscape.client.renderer.TrappedDecoratedPotBlockEntityRenderer;
+import com.kingodogo.buildscape.client.renderer.WanderingHomemakerRenderer;
+import com.kingodogo.buildscape.client.screen.BuildersPouchScreen;
+import com.kingodogo.buildscape.client.screen.BuildersWorkbenchScreen;
+import com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData;
+import com.kingodogo.buildscape.client.workbench.ClientBlockColorCatalog;
+import com.kingodogo.buildscape.command.FireworkTestCommand;
+import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.cosmetics.CosmeticManager;
+import com.kingodogo.buildscape.entity.ModEntities;
+import com.kingodogo.buildscape.fluid.ModFluids;
+import com.kingodogo.buildscape.item.BiomeBrushItem;
+import com.kingodogo.buildscape.item.HazeBushItem;
 import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.network.ModMenuTypes;
+import com.kingodogo.buildscape.network.ModMessages;
+import com.kingodogo.buildscape.network.SyncConfigPacket;
+import com.kingodogo.buildscape.network.SyncGameRulesPacket;
+import com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket;
+import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
+import com.kingodogo.buildscape.particle.BubbleParticle;
+import com.kingodogo.buildscape.particle.CakeParticle;
+import com.kingodogo.buildscape.particle.CascadeParticle;
+import com.kingodogo.buildscape.particle.CherryParticle;
+import com.kingodogo.buildscape.particle.ColoredSmokeParticle;
+import com.kingodogo.buildscape.particle.ConfettiParticle;
+import com.kingodogo.buildscape.particle.FireflyParticle;
+import com.kingodogo.buildscape.particle.GeyserBaseParticle;
+import com.kingodogo.buildscape.particle.GeyserEruptionParticle;
+import com.kingodogo.buildscape.particle.GeyserPlumeParticle;
+import com.kingodogo.buildscape.particle.HazeParticle;
+import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.particle.NoxiousGasParticle;
+import com.kingodogo.buildscape.particle.PillarSparkleParticle;
+import com.kingodogo.buildscape.particle.SnowflakeParticle;
+import com.kingodogo.buildscape.particle.SnowflakeStillParticle;
+import com.kingodogo.buildscape.particle.SulfurBubbleParticle;
+import com.kingodogo.buildscape.particle.TintableHeartParticle;
+import com.kingodogo.buildscape.particle.TintedDripParticle;
+import com.kingodogo.buildscape.particle.TintedSporeParticle;
+import com.kingodogo.buildscape.particle.TrailNoteParticle;
+import com.kingodogo.buildscape.particle.XpParticle;
+import com.kingodogo.buildscape.recipe.ModRecipeSerializers;
+import com.kingodogo.buildscape.sound.ModSounds;
+import com.kingodogo.buildscape.stat.ModStats;
+import com.kingodogo.buildscape.trophy.Trophies;
+import com.kingodogo.buildscape.util.GoldenDandelionGrowth;
+import com.kingodogo.buildscape.world.ModGameRules;
+import com.kingodogo.buildscape.worldgen.ModBlockStateProviderTypes;
+import com.kingodogo.buildscape.worldgen.ModConfiguredFeatures;
+import com.kingodogo.buildscape.worldgen.ModFoliagePlacerTypes;
+import com.kingodogo.buildscape.worldgen.ModPlacementModifiers;
+import com.kingodogo.buildscape.worldgen.ModTreeDecoratorTypes;
+import com.kingodogo.buildscape.worldgen.ModTrunkPlacerTypes;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.item.ItemColors;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.NoopRenderer;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
+import net.minecraft.core.Registry;
+import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Ghast;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.LargeFireball;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.FoliageColor;
+import net.minecraft.world.level.GrassColor;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ComposterBlock;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.FlowerPotBlock;
+import net.minecraft.world.level.block.GlowLichenBlock;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.VineBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.DispenserBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityMobGriefingEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.minecraftforge.event.entity.player.BonemealEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
+import net.minecraftforge.event.village.WandererTradesEvent;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mod(BuildScape.MODID)
 public class BuildScape {
@@ -20,14 +235,14 @@ public class BuildScape {
     public static final String MODID = "buildscape";
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static final java.util.Map<net.minecraft.world.item.Item, net.minecraft.core.cauldron.CauldronInteraction> EXPERIENCE_CAULDRON_INTERACTIONS = net.minecraft.core.cauldron.CauldronInteraction.newInteractionMap();
+    public static final Map<Item, CauldronInteraction> EXPERIENCE_CAULDRON_INTERACTIONS = CauldronInteraction.newInteractionMap();
 
     public static Logger getLogger() {
         return LOGGER;
     }
 
 
-    private static final java.util.concurrent.ExecutorService ASYNC_POOL = java.util.concurrent.Executors
+    private static final ExecutorService ASYNC_POOL = Executors
             .newCachedThreadPool(r -> {
                 Thread t = new Thread(r, "BuildScape-Async");
                 t.setDaemon(true);
@@ -36,7 +251,7 @@ public class BuildScape {
     private static final int PILLAR_SAVE_INTERVAL = 600;
     private static final int PILLAR_BACKUP_INTERVAL = 6000;
     private static final int RECOVERY_DELAY_TICKS = 600;
-    private static final java.util.concurrent.atomic.AtomicBoolean CONFIG_CALLBACK_REGISTERED = new java.util.concurrent.atomic.AtomicBoolean();
+    private static final AtomicBoolean CONFIG_CALLBACK_REGISTERED = new AtomicBoolean();
     private static boolean serverFullyInitialized = false;
     private static int pillarSaveTickCounter = 0;
     private static int pillarBackupTickCounter = 0;
@@ -47,31 +262,31 @@ public class BuildScape {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
 
-        com.kingodogo.buildscape.sound.ModSounds.SOUND_EVENTS.register(modEventBus);
-        com.kingodogo.buildscape.trophy.Trophies.init();
+        ModSounds.SOUND_EVENTS.register(modEventBus);
+        Trophies.init();
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
-        com.kingodogo.buildscape.fluid.ModFluids.FLUIDS.register(modEventBus);
-        com.kingodogo.buildscape.particle.ModParticles.PARTICLES.register(
+        ModFluids.FLUIDS.register(modEventBus);
+        ModParticles.PARTICLES.register(
                 modEventBus);
-        com.kingodogo.buildscape.block.ModBlockEntities.BLOCK_ENTITIES.register(
+        ModBlockEntities.BLOCK_ENTITIES.register(
                 modEventBus);
-        com.kingodogo.buildscape.entity.ModEntities.ENTITIES.register(modEventBus);
-        com.kingodogo.buildscape.recipe.ModRecipeSerializers.RECIPE_SERIALIZERS.register(
+        ModEntities.ENTITIES.register(modEventBus);
+        ModRecipeSerializers.RECIPE_SERIALIZERS.register(
                 modEventBus);
-        com.kingodogo.buildscape.network.ModMenuTypes.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
 
-        com.kingodogo.buildscape.worldgen.ModBlockStateProviderTypes.BLOCK_STATE_PROVIDER_TYPES.register(
+        ModBlockStateProviderTypes.BLOCK_STATE_PROVIDER_TYPES.register(
                 modEventBus);
-        com.kingodogo.buildscape.worldgen.ModTrunkPlacerTypes.TRUNK_PLACER_TYPES.register(
+        ModTrunkPlacerTypes.TRUNK_PLACER_TYPES.register(
                 modEventBus);
-        com.kingodogo.buildscape.worldgen.ModFoliagePlacerTypes.FOLIAGE_PLACER_TYPES.register(
+        ModFoliagePlacerTypes.FOLIAGE_PLACER_TYPES.register(
                 modEventBus);
-        com.kingodogo.buildscape.worldgen.ModTreeDecoratorTypes.TREE_DECORATOR_TYPES.register(
+        ModTreeDecoratorTypes.TREE_DECORATOR_TYPES.register(
                 modEventBus);
-        com.kingodogo.buildscape.worldgen.ModConfiguredFeatures.CONFIGURED_FEATURES.register(
+        ModConfiguredFeatures.CONFIGURED_FEATURES.register(
                 modEventBus);
-        com.kingodogo.buildscape.worldgen.ModPlacementModifiers.PLACEMENT_MODIFIERS.register(
+        ModPlacementModifiers.PLACEMENT_MODIFIERS.register(
                 modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -81,18 +296,18 @@ public class BuildScape {
         return serverFullyInitialized;
     }
 
-    public static java.util.concurrent.ExecutorService getAsyncPool() {
+    public static ExecutorService getAsyncPool() {
         return ASYNC_POOL;
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
 
         event.enqueueWork(() -> {
-            com.kingodogo.buildscape.world.ModGameRules.register();
-            com.kingodogo.buildscape.stat.ModStats.registerStats();
-            com.kingodogo.buildscape.network.ModMessages.register();
+            ModGameRules.register();
+            ModStats.registerStats();
+            ModMessages.register();
             if (CONFIG_CALLBACK_REGISTERED.compareAndSet(false, true)) {
-                com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback(
+                PillarParticleConfig.addConfigReloadCallback(
                         BuildScape::onPillarConfigReload);
             }
             // Potion and cake stack sizes are decided per world by the isWaterbottleStack / isCakeStack
@@ -100,16 +315,16 @@ public class BuildScape {
             // /give and other Item-level callers add single items that merge under those rules.
 
             try {
-                java.util.Map<net.minecraft.sounds.SoundEvent, net.minecraft.world.item.RecordItem> recordMap =
-                        net.minecraftforge.fml.util.ObfuscationReflectionHelper.getPrivateValue(
-                                net.minecraft.world.item.RecordItem.class, null, "f_43032_");
+                Map<SoundEvent, RecordItem> recordMap =
+                        ObfuscationReflectionHelper.getPrivateValue(
+                                RecordItem.class, null, "f_43032_");
                 if (recordMap != null) {
-                    recordMap.put(com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_CELEBRATION.get(),
-                            (net.minecraft.world.item.RecordItem) ModItems.MUSIC_DISC_CELEBRATION.get());
-                    recordMap.put(com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_SNOWFALL.get(),
-                            (net.minecraft.world.item.RecordItem) ModItems.MUSIC_DISC_SNOWFALL.get());
-                    recordMap.put(com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_BUILDER.get(),
-                            (net.minecraft.world.item.RecordItem) ModItems.MUSIC_DISC_BUILDER.get());
+                    recordMap.put(ModSounds.MUSIC_DISC_CELEBRATION.get(),
+                            (RecordItem) ModItems.MUSIC_DISC_CELEBRATION.get());
+                    recordMap.put(ModSounds.MUSIC_DISC_SNOWFALL.get(),
+                            (RecordItem) ModItems.MUSIC_DISC_SNOWFALL.get());
+                    recordMap.put(ModSounds.MUSIC_DISC_BUILDER.get(),
+                            (RecordItem) ModItems.MUSIC_DISC_BUILDER.get());
                 }
             } catch (Exception e) {
                 LOGGER.error("Failed to register custom records into RecordItem.BY_NAME", e);
@@ -117,23 +332,23 @@ public class BuildScape {
         });
 
         event.enqueueWork(() -> {
-            for (net.minecraftforge.registries.RegistryObject<net.minecraft.world.item.Item> entry : ModItems.ITEMS.getEntries()) {
+            for (RegistryObject<Item> entry : ModItems.ITEMS.getEntries()) {
                 String path = entry.getId().getPath();
                 if (path.endsWith("_vertical_slab")) {
                     String base = path.substring(0, path.length() - "_vertical_slab".length());
-                    net.minecraft.resources.ResourceLocation vanillaBlockId = new net.minecraft.resources.ResourceLocation("minecraft", base);
-                    net.minecraft.resources.ResourceLocation vanillaSlabId = new net.minecraft.resources.ResourceLocation("minecraft", base + "_slab");
-                    boolean isVanilla = net.minecraftforge.registries.ForgeRegistries.ITEMS.containsKey(vanillaBlockId)
-                            || net.minecraftforge.registries.ForgeRegistries.ITEMS.containsKey(vanillaSlabId);
+                    ResourceLocation vanillaBlockId = new ResourceLocation("minecraft", base);
+                    ResourceLocation vanillaSlabId = new ResourceLocation("minecraft", base + "_slab");
+                    boolean isVanilla = ForgeRegistries.ITEMS.containsKey(vanillaBlockId)
+                            || ForgeRegistries.ITEMS.containsKey(vanillaSlabId);
 
                     if (isVanilla) {
-                        net.minecraft.world.item.CreativeModeTab targetTab = net.minecraft.world.item.CreativeModeTab.TAB_BUILDING_BLOCKS;
+                        CreativeModeTab targetTab = CreativeModeTab.TAB_BUILDING_BLOCKS;
                         if (base.endsWith("_wool") || base.equals("crying_obsidian") || base.equals("tinted_glass")) {
-                            targetTab = net.minecraft.world.item.CreativeModeTab.TAB_DECORATIONS;
+                            targetTab = CreativeModeTab.TAB_DECORATIONS;
                         }
                         try {
-                            net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
-                                    net.minecraft.world.item.Item.class, entry.get(), targetTab, "f_41377_");
+                            ObfuscationReflectionHelper.setPrivateValue(
+                                    Item.class, entry.get(), targetTab, "f_41377_");
                         } catch (Exception e) {
                             LOGGER.error("Failed to change creative tab for vertical slab: " + path, e);
                         }
@@ -143,26 +358,26 @@ public class BuildScape {
         });
 
         event.enqueueWork(() -> {
-            net.minecraft.world.level.block.DispenserBlock.registerBehavior(
-                    com.kingodogo.buildscape.item.ModItems.BOTTLE_OF_MIST.get(),
-                    new net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior() {
+            DispenserBlock.registerBehavior(
+                    ModItems.BOTTLE_OF_MIST.get(),
+                    new AbstractProjectileDispenseBehavior() {
                         @Override
-                        protected net.minecraft.world.entity.projectile.Projectile getProjectile(net.minecraft.world.level.Level level, net.minecraft.core.Position pos, net.minecraft.world.item.ItemStack stack) {
+                        protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
                             return null;
                         }
 
                         @Override
-                        public net.minecraft.world.item.ItemStack execute(net.minecraft.core.BlockSource source, net.minecraft.world.item.ItemStack stack) {
-                            net.minecraft.world.level.Level level = source.getLevel();
-                            net.minecraft.core.Direction facing = source.getBlockState().getValue(net.minecraft.world.level.block.DispenserBlock.FACING);
-                            net.minecraft.core.BlockPos pos = source.getPos().relative(facing);
+                        public ItemStack execute(BlockSource source, ItemStack stack) {
+                            Level level = source.getLevel();
+                            Direction facing = source.getBlockState().getValue(DispenserBlock.FACING);
+                            BlockPos pos = source.getPos().relative(facing);
 
                             double cx = pos.getX() + 0.5 + facing.getStepX() * 0.5;
                             double cy = pos.getY() + 0.5 + facing.getStepY() * 0.5;
                             double cz = pos.getZ() + 0.5 + facing.getStepZ() * 0.5;
 
-                            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                                java.util.Random rand = new java.util.Random();
+                            if (level instanceof ServerLevel serverLevel) {
+                                Random rand = new Random();
                                 for (int i = 0; i < 40; i++) {
                                     double x = cx + (rand.nextDouble() - 0.5) * 2.0;
                                     double y = cy + (rand.nextDouble() - 0.5);
@@ -173,37 +388,37 @@ public class BuildScape {
                                     double zSpeed = (rand.nextDouble() - 0.5) * 0.2;
 
                                     serverLevel.sendParticles(
-                                            com.kingodogo.buildscape.particle.ModParticles.CASCADE.get(),
+                                            ModParticles.CASCADE.get(),
                                             x, y, z, 1, xSpeed, ySpeed, zSpeed, 0.0);
                                 }
                             }
 
-                            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRE_EXTINGUISH,
-                                    net.minecraft.sounds.SoundSource.BLOCKS, 0.1f, 0.1f);
+                            level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH,
+                                    SoundSource.BLOCKS, 0.1f, 0.1f);
 
                             return stack;
                         }
                     }
             );
 
-            net.minecraft.world.level.block.DispenserBlock.registerBehavior(
-                    com.kingodogo.buildscape.item.ModItems.CONFETTI_ITEM.get(),
-                    new net.minecraft.core.dispenser.DefaultDispenseItemBehavior() {
+            DispenserBlock.registerBehavior(
+                    ModItems.CONFETTI_ITEM.get(),
+                    new DefaultDispenseItemBehavior() {
                         @Override
-                        protected net.minecraft.world.item.ItemStack execute(net.minecraft.core.BlockSource source, net.minecraft.world.item.ItemStack stack) {
-                            net.minecraft.world.level.Level level = source.getLevel();
-                            net.minecraft.core.Direction facing = source.getBlockState().getValue(net.minecraft.world.level.block.DispenserBlock.FACING);
-                            net.minecraft.core.BlockPos pos = source.getPos().relative(facing);
+                        protected ItemStack execute(BlockSource source, ItemStack stack) {
+                            Level level = source.getLevel();
+                            Direction facing = source.getBlockState().getValue(DispenserBlock.FACING);
+                            BlockPos pos = source.getPos().relative(facing);
 
                             double startX = pos.getX() + 0.5;
                             double startY = pos.getY() + 0.5;
                             double startZ = pos.getZ() + 0.5;
 
                             int slotIndex = 4;
-                            if (source.getEntity() instanceof net.minecraft.world.level.block.entity.DispenserBlockEntity dispenser) {
+                            if (source.getEntity() instanceof DispenserBlockEntity dispenser) {
                                 int matchSlot = -1;
                                 for (int i = 0; i < dispenser.getContainerSize(); i++) {
-                                    net.minecraft.world.item.ItemStack itemInSlot = dispenser.getItem(i);
+                                    ItemStack itemInSlot = dispenser.getItem(i);
                                     if (itemInSlot == stack) {
                                         matchSlot = i;
                                         break;
@@ -225,7 +440,7 @@ public class BuildScape {
                             double rightX = 0.0, rightY = 0.0, rightZ = 0.0;
 
                             if (facing.getAxis().isHorizontal()) {
-                                net.minecraft.core.Direction rightDir = facing.getClockWise();
+                                Direction rightDir = facing.getClockWise();
                                 rightX = rightDir.getStepX();
                                 rightY = 0.0;
                                 rightZ = rightDir.getStepZ();
@@ -246,8 +461,8 @@ public class BuildScape {
                                 dirZ /= len;
                             }
 
-                            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                                 java.util.Random rand = level.random;
+                            if (level instanceof ServerLevel serverLevel) {
+                                 Random rand = level.random;
                                  int burstLevel = 1;
                                  if (stack.hasTag() && stack.getTag().contains("BurstLevel")) {
                                      burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
@@ -269,17 +484,17 @@ public class BuildScape {
                                      double pz = startZ + (rand.nextDouble() - 0.5D) * 0.15D;
 
                                      serverLevel.sendParticles(
-                                             (net.minecraft.core.particles.SimpleParticleType) com.kingodogo.buildscape.particle.ModParticles.CONFETTI.get(),
+                                             (SimpleParticleType) ModParticles.CONFETTI.get(),
                                              px, py, pz, 0, vx, vy, vz, 1.0D
                                      );
                                  }
 
                                 level.playSound(null, pos,
-                                        net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_BLAST,
-                                        net.minecraft.sounds.SoundSource.BLOCKS, 0.8F, 1.4F);
+                                        SoundEvents.FIREWORK_ROCKET_BLAST,
+                                        SoundSource.BLOCKS, 0.8F, 1.4F);
                                 level.playSound(null, pos,
-                                        net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_TWINKLE,
-                                        net.minecraft.sounds.SoundSource.BLOCKS, 0.6F, 1.6F);
+                                        SoundEvents.FIREWORK_ROCKET_TWINKLE,
+                                        SoundSource.BLOCKS, 0.6F, 1.6F);
                             }
 
                             stack.shrink(1);
@@ -290,18 +505,18 @@ public class BuildScape {
         });
 
         event.enqueueWork(() -> {
-            com.kingodogo.buildscape.block.CopperRodHandler.registerPoi();
-            com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS();
-            com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS();
-            com.kingodogo.buildscape.sound.ModSounds.MANGROVE_ROOTS_SOUNDS();
-            com.kingodogo.buildscape.sound.ModSounds.MUDDY_MANGROVE_ROOTS_SOUNDS();
+            CopperRodHandler.registerPoi();
+            ModSounds.COPPER_GRATE_SOUNDS();
+            ModSounds.COPPER_BULB_SOUNDS();
+            ModSounds.MANGROVE_ROOTS_SOUNDS();
+            ModSounds.MUDDY_MANGROVE_ROOTS_SOUNDS();
 
-            com.kingodogo.buildscape.config.PillarParticleConfig.get();
+            PillarParticleConfig.get();
 
-            com.kingodogo.buildscape.block.ModWoodTypes.MANGROVE.getClass();
-            com.kingodogo.buildscape.block.ModWoodTypes.BAMBOO.getClass();
+            ModWoodTypes.MANGROVE.getClass();
+            ModWoodTypes.BAMBOO.getClass();
 
-            net.minecraft.world.level.block.FlowerPotBlock vanillaPot = (net.minecraft.world.level.block.FlowerPotBlock) net.minecraft.world.level.block.Blocks.FLOWER_POT;
+            FlowerPotBlock vanillaPot = (FlowerPotBlock) Blocks.FLOWER_POT;
             vanillaPot.addPlant(ModBlocks.CLOSED_EYEBLOSSOM.getId(), ModBlocks.POTTED_CLOSED_EYEBLOSSOM);
             vanillaPot.addPlant(ModBlocks.OPEN_EYEBLOSSOM.getId(), ModBlocks.POTTED_OPEN_EYEBLOSSOM);
             vanillaPot.addPlant(ModBlocks.GOLDEN_DANDELION.getId(), ModBlocks.POTTED_GOLDEN_DANDELION);
@@ -335,129 +550,129 @@ public class BuildScape {
             vanillaPot.addPlant(ModBlocks.SNOWY_LARGE_FERN.getId(), ModBlocks.POTTED_SNOWY_LARGE_FERN);
 
 
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_ROSE_VINES.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.RED_ROSE_VINES.get(),
                     0.5f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLACK_ROSE_VINES.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.BLACK_ROSE_VINES.get(),
                     0.5f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_ROSE_VINES.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_ROSE_VINES.get(),
                     0.5f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.WHITE_ROSE_VINES.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.WHITE_ROSE_VINES.get(),
                     0.5f);
 
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.FROST_ROSE.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.FROST_ROSE.get(),
                     0.65f);
 
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_MONETS.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.RED_MONETS.get(),
                     0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_MONETS.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_MONETS.get(),
                     0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_MONETS.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_MONETS.get(),
                     0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.LIGHT_BLUE_MONETS.get(), 0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PINK_MONETS.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.PINK_MONETS.get(),
                     0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.YELLOW_MONETS.get(),
-                    0.65f);
-
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_PETAL.get(),
-                    0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_PETAL.get(),
-                    0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.ORANGE_PETAL.get(),
-                    0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PINK_PETAL.get(),
-                    0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_PETAL.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.YELLOW_MONETS.get(),
                     0.65f);
 
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES.put(ModItems.RED_PETAL.get(),
+                    0.65f);
+            ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_PETAL.get(),
+                    0.65f);
+            ComposterBlock.COMPOSTABLES.put(ModItems.ORANGE_PETAL.get(),
+                    0.65f);
+            ComposterBlock.COMPOSTABLES.put(ModItems.PINK_PETAL.get(),
+                    0.65f);
+            ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_PETAL.get(),
+                    0.65f);
+
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.RED_SPORE_BLOSSOM.get(), 0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.CYAN_SPORE_BLOSSOM.get(), 0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.BLUE_SPORE_BLOSSOM.get(), 0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.PURPLE_SPORE_BLOSSOM.get(), 0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.ORANGE_SPORE_BLOSSOM.get(), 0.65f);
 
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_SHORT_GRASS.get(), 0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_TALL_GRASS.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_TALL_GRASS.get(),
                     0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_FERN.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_FERN.get(),
                     0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_LARGE_FERN.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_LARGE_FERN.get(),
                     0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_BUSH.get(),
-                    0.3f);
-
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.MANGROVE_LEAVES.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_BUSH.get(),
                     0.3f);
 
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_LEAVES.get(),
+            ComposterBlock.COMPOSTABLES.put(ModItems.MANGROVE_LEAVES.get(),
                     0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_OAK_LEAVES.get(),
+
+            ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_LEAVES.get(),
                     0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_OAK_LEAVES.get(),
+                    0.3f);
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_SPRUCE_LEAVES.get(), 0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_BIRCH_LEAVES.get(), 0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_JUNGLE_LEAVES.get(), 0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_ACACIA_LEAVES.get(), 0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_DARK_OAK_LEAVES.get(), 0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_MANGROVE_LEAVES.get(), 0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_AZALEA_LEAVES.get(), 0.3f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.SNOWY_FLOWERING_AZALEA_LEAVES.get(), 0.3f);
 
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.BROWN_MUSHROOM_SHELVES.get(), 0.65f);
-            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
+            ComposterBlock.COMPOSTABLES
                     .put(ModItems.RED_MUSHROOM_SHELVES.get(), 0.65f);
 
-            net.minecraft.core.cauldron.CauldronInteraction.EMPTY.put(ModItems.EXPERIENCE_BUCKET.get(), (state, level, pos, player, hand, stack) -> {
+            CauldronInteraction.EMPTY.put(ModItems.EXPERIENCE_BUCKET.get(), (state, level, pos, player, hand, stack) -> {
                 if (!level.isClientSide) {
-                    player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
-                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 3));
-                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BUCKET_EMPTY, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                    player.awardStat(Stats.FILL_CAULDRON);
+                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3));
+                    level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                     if (!player.getAbilities().instabuild) {
-                        player.setItemInHand(hand, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BUCKET));
+                        player.setItemInHand(hand, new ItemStack(Items.BUCKET));
                     }
                 }
-                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.sidedSuccess(level.isClientSide);
             });
 
-            net.minecraft.core.cauldron.CauldronInteraction.EMPTY.put(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
+            CauldronInteraction.EMPTY.put(Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
                 if (!level.isClientSide) {
-                    player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
-                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 1));
-                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BOTTLE_EMPTY, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                    player.awardStat(Stats.FILL_CAULDRON);
+                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 1));
+                    level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
-                        net.minecraft.world.item.ItemStack returnStack = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE);
+                        ItemStack returnStack = new ItemStack(Items.GLASS_BOTTLE);
                         if (!player.getInventory().add(returnStack)) {
                             player.drop(returnStack, false);
                         }
                     }
                 }
-                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.sidedSuccess(level.isClientSide);
             });
 
-            EXPERIENCE_CAULDRON_INTERACTIONS.put(net.minecraft.world.item.Items.BUCKET, (state, level, pos, player, hand, stack) -> {
-                int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
+            EXPERIENCE_CAULDRON_INTERACTIONS.put(Items.BUCKET, (state, level, pos, player, hand, stack) -> {
+                int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
                 if (cauldronLevel == 3) {
                     if (!level.isClientSide) {
-                        player.awardStat(net.minecraft.stats.Stats.USE_CAULDRON);
-                        level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState());
-                        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BUCKET_FILL, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
-                        net.minecraft.world.item.ItemStack filledBucket = new net.minecraft.world.item.ItemStack(ModItems.EXPERIENCE_BUCKET.get());
+                        player.awardStat(Stats.USE_CAULDRON);
+                        level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
+                        level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+                        ItemStack filledBucket = new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
                         if (!player.getAbilities().instabuild) {
                             stack.shrink(1);
                             if (stack.isEmpty()) {
@@ -469,22 +684,22 @@ public class BuildScape {
                             }
                         }
                     }
-                    return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
-                return net.minecraft.world.InteractionResult.PASS;
+                return InteractionResult.PASS;
             });
 
-            EXPERIENCE_CAULDRON_INTERACTIONS.put(net.minecraft.world.item.Items.GLASS_BOTTLE, (state, level, pos, player, hand, stack) -> {
+            EXPERIENCE_CAULDRON_INTERACTIONS.put(Items.GLASS_BOTTLE, (state, level, pos, player, hand, stack) -> {
                 if (!level.isClientSide) {
-                    player.awardStat(net.minecraft.stats.Stats.USE_CAULDRON);
-                    int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
+                    player.awardStat(Stats.USE_CAULDRON);
+                    int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
                     if (cauldronLevel > 1) {
-                        level.setBlockAndUpdate(pos, state.setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, cauldronLevel - 1));
+                        level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, cauldronLevel - 1));
                     } else {
-                        level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState());
+                        level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
                     }
-                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BOTTLE_FILL, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
-                    net.minecraft.world.item.ItemStack filledBottle = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE);
+                    level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    ItemStack filledBottle = new ItemStack(Items.EXPERIENCE_BOTTLE);
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
                         if (stack.isEmpty()) {
@@ -496,43 +711,43 @@ public class BuildScape {
                         }
                     }
                 }
-                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                return InteractionResult.sidedSuccess(level.isClientSide);
             });
 
-            EXPERIENCE_CAULDRON_INTERACTIONS.put(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
-                int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
+            EXPERIENCE_CAULDRON_INTERACTIONS.put(Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
+                int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
                 if (cauldronLevel < 3) {
                     if (!level.isClientSide) {
-                        player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
-                        level.setBlockAndUpdate(pos, state.setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, cauldronLevel + 1));
-                        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BOTTLE_EMPTY, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                        player.awardStat(Stats.FILL_CAULDRON);
+                        level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, cauldronLevel + 1));
+                        level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                         if (!player.getAbilities().instabuild) {
                             stack.shrink(1);
-                            net.minecraft.world.item.ItemStack returnStack = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE);
+                            ItemStack returnStack = new ItemStack(Items.GLASS_BOTTLE);
                             if (!player.getInventory().add(returnStack)) {
                                 player.drop(returnStack, false);
                             }
                         }
                     }
-                    return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
-                return net.minecraft.world.InteractionResult.PASS;
+                return InteractionResult.PASS;
             });
 
             EXPERIENCE_CAULDRON_INTERACTIONS.put(ModItems.EXPERIENCE_BUCKET.get(), (state, level, pos, player, hand, stack) -> {
-                int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
+                int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
                 if (cauldronLevel < 3) {
                     if (!level.isClientSide) {
-                        player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
-                        level.setBlockAndUpdate(pos, state.setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 3));
-                        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BUCKET_EMPTY, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                        player.awardStat(Stats.FILL_CAULDRON);
+                        level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, 3));
+                        level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                         if (!player.getAbilities().instabuild) {
-                            player.setItemInHand(hand, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BUCKET));
+                            player.setItemInHand(hand, new ItemStack(Items.BUCKET));
                         }
                     }
-                    return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
-                return net.minecraft.world.InteractionResult.PASS;
+                return InteractionResult.PASS;
             });
         });
     }
@@ -541,14 +756,14 @@ public class BuildScape {
         if (isRemote) {
             return;
         }
-        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null || !server.isRunning()) {
             return;
         }
-        server.execute(() -> com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                net.minecraftforge.network.PacketDistributor.ALL.noArg(),
-                new com.kingodogo.buildscape.network.SyncConfigPacket(
-                        com.kingodogo.buildscape.config.PillarParticleConfig.getServerConfig())));
+        server.execute(() -> ModMessages.INSTANCE.send(
+                PacketDistributor.ALL.noArg(),
+                new SyncConfigPacket(
+                        PillarParticleConfig.getServerConfig())));
     }
 
     @SubscribeEvent
@@ -560,45 +775,45 @@ public class BuildScape {
         recoveryDelayTicks = 0;
         recoveryAttempted = false;
 
-        com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
+        PillarIdManager.resetWorldCache();
     }
 
 
     @SubscribeEvent
-    public void onRegisterCommands(net.minecraftforge.event.RegisterCommandsEvent event) {
-        com.kingodogo.buildscape.command.FireworkTestCommand.register(event.getDispatcher());
-        com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> buildscapeCommand = com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
+    public void onRegisterCommands(RegisterCommandsEvent event) {
+        FireworkTestCommand.register(event.getDispatcher());
+        LiteralArgumentBuilder<CommandSourceStack> buildscapeCommand = LiteralArgumentBuilder.<CommandSourceStack>literal(
                         "buildscape")
-                .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal(
                                 "recover")
-                        .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
+                        .then(LiteralArgumentBuilder.<CommandSourceStack>literal(
                                         "PillarData")
                                 .requires(source -> source.hasPermission(2))
                                 .executes(context -> {
-                                    net.minecraft.commands.CommandSourceStack source = context
+                                    CommandSourceStack source = context
                                             .getSource();
-                                    net.minecraft.server.MinecraftServer server = source
+                                    MinecraftServer server = source
                                             .getServer();
 
                                     if (server == null || !server.isRunning()) {
                                         source.sendFailure(
-                                                new net.minecraft.network.chat.TextComponent(
+                                                new TextComponent(
                                                         "Server is not running"));
                                         return 0;
                                     }
 
-                                    com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
+                                    PillarIdManager manager = PillarIdManager
                                             .get();
 
                                     if (manager == null) {
                                         source.sendFailure(
-                                                new net.minecraft.network.chat.TextComponent(
+                                                new TextComponent(
                                                         "PillarIdManager is not available"));
                                         return 0;
                                     }
 
                                     source.sendSuccess(
-                                            new net.minecraft.network.chat.TextComponent(
+                                            new TextComponent(
                                                     "Starting pillar recovery..."),
                                             true);
 
@@ -607,12 +822,12 @@ public class BuildScape {
                                             manager.recoverPillarsFromWorld(
                                                     server, false);
                                             source.sendSuccess(
-                                                    new net.minecraft.network.chat.TextComponent(
+                                                    new TextComponent(
                                                             "Pillar recovery completed. Check console for details."),
                                                     true);
                                         } catch (Exception e) {
                                             source.sendFailure(
-                                                    new net.minecraft.network.chat.TextComponent(
+                                                    new TextComponent(
                                                             "Error during recovery: "
                                                                     + e.getMessage()));
                                             e.printStackTrace();
@@ -621,12 +836,12 @@ public class BuildScape {
 
                                     return 1;
                                 })))
-                .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("cosmatics")
-                        .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("UNLOCK")
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("cosmatics")
+                        .then(LiteralArgumentBuilder.<CommandSourceStack>literal("UNLOCK")
                                 .requires(source -> source.hasPermission(2))
                                 .executes(context -> {
-                                    com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().setDevUnlockAll(true);
-                                    context.getSource().sendSuccess(new net.minecraft.network.chat.TextComponent("All cosmetics unlocked for development!"), true);
+                                    CosmeticManager.getInstance().setDevUnlockAll(true);
+                                    context.getSource().sendSuccess(new TextComponent("All cosmetics unlocked for development!"), true);
                                     return 1;
                                 })
                         )
@@ -637,18 +852,18 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onServerStarted(
-            net.minecraftforge.event.server.ServerStartedEvent event) {
-        com.kingodogo.buildscape.config.PillarIdManager.get().load();
+            ServerStartedEvent event) {
+        PillarIdManager.get().load();
     }
 
     @SubscribeEvent
     public void onServerStopped(
-            net.minecraftforge.event.server.ServerStoppedEvent event) {
+            ServerStoppedEvent event) {
 
         try {
-            net.minecraft.server.MinecraftServer server = event.getServer();
+            MinecraftServer server = event.getServer();
             if (server != null) {
-                com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
+                PillarIdManager manager = PillarIdManager
                         .get();
                 if (manager != null && manager.hasLoaded()) {
                     manager.savePeriodic(true);
@@ -664,38 +879,38 @@ public class BuildScape {
         recoveryDelayTicks = 0;
         recoveryAttempted = false;
 
-        com.kingodogo.buildscape.config.PillarIdManager.fullReset();
+        PillarIdManager.fullReset();
     }
 
     @SubscribeEvent
     public void onPlayerJoin(
-            net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-            com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
+            PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
+            PillarIdManager manager = PillarIdManager
                     .get();
             if (!manager.hasLoaded() && !manager.isLoadInProgress()) {
                 manager.load();
             }
 
-            com.kingodogo.buildscape.config.PillarParticleConfig serverConfig = com.kingodogo.buildscape.config.PillarParticleConfig
+            PillarParticleConfig serverConfig = PillarParticleConfig
                     .getServerConfig();
-            com.kingodogo.buildscape.network.SyncConfigPacket configPacket = new com.kingodogo.buildscape.network.SyncConfigPacket(
+            SyncConfigPacket configPacket = new SyncConfigPacket(
                     serverConfig);
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
+            ModMessages.INSTANCE.send(
+                    PacketDistributor.PLAYER.with(() -> serverPlayer),
                     configPacket);
 
-            net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server != null && server.isRunning()) {
-                com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
-                    new com.kingodogo.buildscape.network.SyncGameRulesPacket(
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY),
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING),
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING),
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING),
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.IS_CAKE_STACK),
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.IS_WATER_BOTTLE_STACK)
+                ModMessages.INSTANCE.send(
+                    PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new SyncGameRulesPacket(
+                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY),
+                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.DISABLE_ENDERMAN_GRIEFING),
+                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING),
+                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING),
+                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.IS_CAKE_STACK),
+                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.IS_WATER_BOTTLE_STACK)
                     )
                 );
 
@@ -703,38 +918,38 @@ public class BuildScape {
 
                 long cooldown = serverPlayer.getPersistentData().contains("WanderingHomemakerCooldownRealTime")
                         ? serverPlayer.getPersistentData().getLong("WanderingHomemakerCooldownRealTime") : 0L;
-                com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                        net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
-                        new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldown));
+                ModMessages.INSTANCE.send(
+                        PacketDistributor.PLAYER.with(() -> serverPlayer),
+                        new SyncHomemakerCooldownPacket(cooldown));
             }
 
         }
     }
 
     @SubscribeEvent
-    public void onMobGriefing(net.minecraftforge.event.entity.EntityMobGriefingEvent event) {
-        net.minecraft.world.entity.Entity entity = event.getEntity();
+    public void onMobGriefing(EntityMobGriefingEvent event) {
+        Entity entity = event.getEntity();
         if (entity != null && entity.level != null) {
-            if (entity instanceof net.minecraft.world.entity.monster.EnderMan) {
-                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING)) {
+            if (entity instanceof EnderMan) {
+                if (entity.level.getGameRules().getBoolean(ModGameRules.DISABLE_ENDERMAN_GRIEFING)) {
                     event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
                 }
-            } else if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
-                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING)) {
+            } else if (entity instanceof Creeper) {
+                if (entity.level.getGameRules().getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING)) {
                     event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
                 }
-            } else if (entity instanceof net.minecraft.world.entity.monster.Ghast ||
-                       entity instanceof net.minecraft.world.entity.projectile.LargeFireball) {
-                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)) {
+            } else if (entity instanceof Ghast ||
+                       entity instanceof LargeFireball) {
+                if (entity.level.getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING)) {
                     event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
                 }
             }
         }
     }
 
-    private void schedulePillarIdSync(net.minecraft.server.MinecraftServer server,
-                                      net.minecraft.server.level.ServerPlayer player,
-                                      com.kingodogo.buildscape.config.PillarIdManager manager,
+    private void schedulePillarIdSync(MinecraftServer server,
+                                      ServerPlayer player,
+                                      PillarIdManager manager,
                                       int attempt) {
         final int MAX_ATTEMPTS = 10;
         final int RETRY_DELAY_MS = 500;
@@ -763,10 +978,10 @@ public class BuildScape {
         }
     }
 
-    private void sendPillarIdsToPlayer(net.minecraft.server.level.ServerPlayer player,
-                                       com.kingodogo.buildscape.config.PillarIdManager manager) {
+    private void sendPillarIdsToPlayer(ServerPlayer player,
+                                       PillarIdManager manager) {
         try {
-            com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToPlayer(
+            SyncPillarIdsPacket.sendToPlayer(
                     player, manager.getAllPillarDataForSync());
         } catch (Exception e) {
             LOGGER.error("BuildScape: Error sending pillar IDs to player: " + e.getMessage());
@@ -775,26 +990,26 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onPlayerChangedDimension(
-            net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent event) {
-        if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
             long cooldown = serverPlayer.getPersistentData().contains("WanderingHomemakerCooldownRealTime")
                     ? serverPlayer.getPersistentData().getLong("WanderingHomemakerCooldownRealTime") : 0L;
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
-                    new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldown));
+            ModMessages.INSTANCE.send(
+                    PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new SyncHomemakerCooldownPacket(cooldown));
         }
     }
 
     @SubscribeEvent
     public void onWorldUnload(
-            net.minecraftforge.event.world.WorldEvent.Unload event) {
-        if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel) {
+            WorldEvent.Unload event) {
+        if (event.getWorld() instanceof ServerLevel) {
 
             try {
-                net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
+                MinecraftServer server = ServerLifecycleHooks
                         .getCurrentServer();
                 if (server != null) {
-                    com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
+                    PillarIdManager manager = PillarIdManager
                             .get();
                     if (manager != null && manager.hasLoaded()) {
                         manager.savePeriodic(true);
@@ -811,18 +1026,18 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onServerTick(
-            net.minecraftforge.event.TickEvent.ServerTickEvent event) {
-        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) {
+            TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) {
             return;
         }
 
-        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
+        MinecraftServer server = ServerLifecycleHooks
                 .getCurrentServer();
         if (server == null || !server.isRunning()) {
             return;
         }
 
-        com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.get();
         if (!serverFullyInitialized) {
             if (manager.hasLoaded()) {
                 serverFullyInitialized = true;
@@ -852,7 +1067,7 @@ public class BuildScape {
             return;
         }
 
-        com.kingodogo.buildscape.config.PillarIdManager.checkAndRunScheduledRecovery();
+        PillarIdManager.checkAndRunScheduledRecovery();
 
         recoveryDelayTicks++;
         if (recoveryDelayTicks >= RECOVERY_DELAY_TICKS
@@ -868,74 +1083,74 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onWandererTrades(
-            net.minecraftforge.event.village.WandererTradesEvent event) {
+            WandererTradesEvent event) {
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 5),
-                        new net.minecraft.world.item.ItemStack(com.kingodogo.buildscape.item.ModItems.MANGROVE_PROPAGULE.get(), 1),
+                        new ItemStack(ModItems.MANGROVE_PROPAGULE.get(), 1),
                         8,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.POPLAR_SAPLING.get(), 2),
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(Items.EMERALD, 1),
+                        new ItemStack(ModItems.POPLAR_SAPLING.get(), 2),
                         8,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.CHERRY_SAPLING.get(), 2),
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(Items.EMERALD, 1),
+                        new ItemStack(ModItems.CHERRY_SAPLING.get(), 2),
                         8,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.PALE_OAK_SAPLING.get(), 2),
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(Items.EMERALD, 1),
+                        new ItemStack(ModItems.PALE_OAK_SAPLING.get(), 2),
                         8,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.RED_MONETS.get(), 1),
+                        new ItemStack(ModItems.RED_MONETS.get(), 1),
                         6,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.BLUE_MONETS.get(), 1),
+                        new ItemStack(ModItems.BLUE_MONETS.get(), 1),
                         6,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.PURPLE_MONETS.get(),
                                 1),
                         6,
@@ -944,11 +1159,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.LIGHT_BLUE_MONETS.get(),
                                 1),
                         6,
@@ -957,22 +1172,22 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.PINK_MONETS.get(), 1),
+                        new ItemStack(ModItems.PINK_MONETS.get(), 1),
                         6,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.YELLOW_MONETS.get(),
                                 1),
                         6,
@@ -981,22 +1196,22 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.CLOVER.get(), 4),
+                        new ItemStack(ModItems.CLOVER.get(), 4),
                         6,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.RED_ROSE_VINES.get(),
                                 1),
                         6,
@@ -1005,11 +1220,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.BLACK_ROSE_VINES.get(),
                                 1),
                         6,
@@ -1018,11 +1233,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.BLUE_ROSE_VINES.get(),
                                 1),
                         6,
@@ -1031,11 +1246,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.WHITE_ROSE_VINES.get(),
                                 1),
                         6,
@@ -1044,11 +1259,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.SNOWY_GRASS_BLOCK.get(),
                                 1),
                         2,
@@ -1056,11 +1271,11 @@ public class BuildScape {
                         0.05f));
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.RED_SPORE_BLOSSOM.get(),
                                 1),
                         6,
@@ -1069,11 +1284,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.CYAN_SPORE_BLOSSOM.get(),
                                 1),
                         6,
@@ -1082,11 +1297,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.BLUE_SPORE_BLOSSOM.get(),
                                 1),
                         6,
@@ -1095,11 +1310,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.PURPLE_SPORE_BLOSSOM.get(),
                                 1),
                         6,
@@ -1108,11 +1323,11 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(
+                        new ItemStack(
                                 ModItems.ORANGE_SPORE_BLOSSOM.get(),
                                 1),
                         6,
@@ -1121,44 +1336,44 @@ public class BuildScape {
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.ICICLE.get(), 2),
+                        new ItemStack(ModItems.ICICLE.get(), 2),
                         6,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.SULFUR_SPIKE.get(), 2),
+                        new ItemStack(ModItems.SULFUR_SPIKE.get(), 2),
                         6,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.SULFUR.get(), 1),
+                        new ItemStack(ModItems.SULFUR.get(), 1),
                         8,
                         1,
                         0.05f));
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(
-                                net.minecraft.world.item.Items.EMERALD,
+                .add((trader, rand) -> new MerchantOffer(
+                        new ItemStack(
+                                Items.EMERALD,
                                 1),
-                        new net.minecraft.world.item.ItemStack(ModItems.CINNABAR.get(), 1),
+                        new ItemStack(ModItems.CINNABAR.get(), 1),
                         8,
                         1,
                         0.05f));
@@ -1167,9 +1382,9 @@ public class BuildScape {
                 .getRareTrades()
                 .add((trader, rand) -> {
                     if (rand.nextInt(5000) == 0) {
-                        return new net.minecraft.world.item.trading.MerchantOffer(
-                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
-                                new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
+                        return new MerchantOffer(
+                                new ItemStack(Items.DIAMOND, 12),
+                                new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
                                 1,
                                 1,
                                 0.0f
@@ -1181,25 +1396,25 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onLeftClickBlock(
-            net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock event) {
-        net.minecraft.world.level.block.state.BlockState state = event
+            PlayerInteractEvent.LeftClickBlock event) {
+        BlockState state = event
                 .getWorld()
                 .getBlockState(event.getPos());
-        net.minecraft.world.level.block.Block block = state.getBlock();
+        Block block = state.getBlock();
 
-        if (block instanceof com.kingodogo.buildscape.block.PetalBlock
-                || block instanceof com.kingodogo.buildscape.block.CloverBlock
-                || block instanceof com.kingodogo.buildscape.block.RoseVinesBlock) {
+        if (block instanceof PetalBlock
+                || block instanceof CloverBlock
+                || block instanceof RoseVinesBlock) {
             if (block.getSoundType(
-                    state) instanceof com.kingodogo.buildscape.block.CustomSoundType customSound) {
-                net.minecraft.core.BlockPos pos = event.getPos();
-                net.minecraft.world.level.Level level = event.getWorld();
+                    state) instanceof CustomSoundType customSound) {
+                BlockPos pos = event.getPos();
+                Level level = event.getWorld();
 
                 level.playSound(
                         null,
                         pos,
                         block.getSoundType(state).getHitSound(),
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundSource.BLOCKS,
                         customSound.getHitVolume(),
                         customSound.getHitPitch());
             }
@@ -1208,34 +1423,34 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onRightClickBlock(
-            net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
-        net.minecraft.world.level.block.state.BlockState state = event
+            PlayerInteractEvent.RightClickBlock event) {
+        BlockState state = event
                 .getWorld()
                 .getBlockState(event.getPos());
-        net.minecraft.world.item.ItemStack heldItem = event
+        ItemStack heldItem = event
                 .getPlayer()
                 .getItemInHand(event.getHand());
 
-        if (com.kingodogo.buildscape.block.CopperOxidationHandler.handleRightClick(event)) {
+        if (CopperOxidationHandler.handleRightClick(event)) {
             return;
         }
 
-        if (state.is(net.minecraft.world.level.block.Blocks.FLOWER_POT) && !event.getPlayer().isSecondaryUseActive()) {
-            if (heldItem.getItem() instanceof com.kingodogo.buildscape.item.HazeBushItem && com.kingodogo.buildscape.item.HazeBushItem.isDrained(heldItem)) {
-                if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem blockItem && blockItem.getBlock() instanceof com.kingodogo.buildscape.block.HazeBushBlock bushBlock) {
-                    net.minecraft.world.item.DyeColor color = bushBlock.getColor();
-                    net.minecraftforge.registries.RegistryObject<net.minecraft.world.level.block.Block> pottedObj = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color);
+        if (state.is(Blocks.FLOWER_POT) && !event.getPlayer().isSecondaryUseActive()) {
+            if (heldItem.getItem() instanceof HazeBushItem && HazeBushItem.isDrained(heldItem)) {
+                if (heldItem.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof HazeBushBlock bushBlock) {
+                    DyeColor color = bushBlock.getColor();
+                    RegistryObject<Block> pottedObj = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color);
                     if (pottedObj != null) {
                         if (!event.getWorld().isClientSide) {
-                            net.minecraft.world.level.block.state.BlockState newState = pottedObj.get().defaultBlockState().setValue(com.kingodogo.buildscape.block.PottedHazeBushBlock.HAS_HAZE, false);
+                            BlockState newState = pottedObj.get().defaultBlockState().setValue(PottedHazeBushBlock.HAS_HAZE, false);
                             event.getWorld().setBlock(event.getPos(), newState, 3);
-                            event.getPlayer().awardStat(net.minecraft.stats.Stats.POT_FLOWER);
+                            event.getPlayer().awardStat(Stats.POT_FLOWER);
                             if (!event.getPlayer().getAbilities().instabuild) {
                                 heldItem.shrink(1);
                             }
-                            event.getWorld().gameEvent(event.getPlayer(), net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE, event.getPos());
+                            event.getWorld().gameEvent(event.getPlayer(), GameEvent.BLOCK_CHANGE, event.getPos());
                         }
-                        event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(event.getWorld().isClientSide));
+                        event.setCancellationResult(InteractionResult.sidedSuccess(event.getWorld().isClientSide));
                         event.setCanceled(true);
                         return;
                     }
@@ -1243,17 +1458,17 @@ public class BuildScape {
             }
         }
 
-        if (state.getBlock() instanceof net.minecraft.world.level.block.VineBlock) {
-            if (heldItem.is(net.minecraft.world.item.Items.SHEARS)) {
-                if (state.hasProperty(com.kingodogo.buildscape.block.ModBlockProperties.SHEARED)) {
-                    if (!state.getValue(com.kingodogo.buildscape.block.ModBlockProperties.SHEARED)) {
+        if (state.getBlock() instanceof VineBlock) {
+            if (heldItem.is(Items.SHEARS)) {
+                if (state.hasProperty(ModBlockProperties.SHEARED)) {
+                    if (!state.getValue(ModBlockProperties.SHEARED)) {
                         if (!event.getWorld().isClientSide) {
-                            event.getWorld().setBlockAndUpdate(event.getPos(), state.setValue(com.kingodogo.buildscape.block.ModBlockProperties.SHEARED, true));
-                            event.getWorld().playSound(null, event.getPos(), net.minecraft.sounds.SoundEvents.GROWING_PLANT_CROP, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
-                            event.getWorld().gameEvent(event.getPlayer(), net.minecraft.world.level.gameevent.GameEvent.SHEAR, event.getPos());
+                            event.getWorld().setBlockAndUpdate(event.getPos(), state.setValue(ModBlockProperties.SHEARED, true));
+                            event.getWorld().playSound(null, event.getPos(), SoundEvents.GROWING_PLANT_CROP, SoundSource.BLOCKS, 1.0F, 1.0F);
+                            event.getWorld().gameEvent(event.getPlayer(), GameEvent.SHEAR, event.getPos());
                             heldItem.hurtAndBreak(1, event.getPlayer(), (p) -> p.broadcastBreakEvent(event.getHand()));
                         }
-                        event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(event.getWorld().isClientSide));
+                        event.setCancellationResult(InteractionResult.sidedSuccess(event.getWorld().isClientSide));
                         event.setCanceled(true);
                         return;
                     }
@@ -1263,28 +1478,28 @@ public class BuildScape {
 
 
         if (state.getBlock() == ModBlocks.BAMBOO_BLOCK.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
-            net.minecraft.core.BlockPos pos = event.getPos();
-            net.minecraft.world.level.Level level = event.getWorld();
-            net.minecraft.world.entity.player.Player player = event.getPlayer();
+                && heldItem.getItem() instanceof AxeItem) {
+            BlockPos pos = event.getPos();
+            Level level = event.getWorld();
+            Player player = event.getPlayer();
 
-            net.minecraft.core.Direction.Axis axis = state.getValue(
-                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
+            Direction.Axis axis = state.getValue(
+                    RotatedPillarBlock.AXIS);
 
             level.setBlock(
                     pos,
                     ModBlocks.STRIPPED_BAMBOO_BLOCK.get()
                             .defaultBlockState()
                             .setValue(
-                                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
+                                    RotatedPillarBlock.AXIS,
                                     axis),
                     11);
 
             level.playSound(
                     null,
                     pos,
-                    net.minecraft.sounds.SoundEvents.AXE_STRIP,
-                    net.minecraft.sounds.SoundSource.BLOCKS,
+                    SoundEvents.AXE_STRIP,
+                    SoundSource.BLOCKS,
                     1.0f,
                     1.0f);
 
@@ -1294,33 +1509,33 @@ public class BuildScape {
 
             event.setCanceled(true);
             event.setCancellationResult(
-                    net.minecraft.world.InteractionResult.SUCCESS);
+                    InteractionResult.SUCCESS);
             return;
         }
 
         if (state.getBlock() == ModBlocks.MANGROVE_LOG.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
-            net.minecraft.core.BlockPos pos = event.getPos();
-            net.minecraft.world.level.Level level = event.getWorld();
-            net.minecraft.world.entity.player.Player player = event.getPlayer();
+                && heldItem.getItem() instanceof AxeItem) {
+            BlockPos pos = event.getPos();
+            Level level = event.getWorld();
+            Player player = event.getPlayer();
 
-            net.minecraft.core.Direction.Axis axis = state.getValue(
-                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
+            Direction.Axis axis = state.getValue(
+                    RotatedPillarBlock.AXIS);
 
             level.setBlock(
                     pos,
                     ModBlocks.STRIPPED_MANGROVE_LOG.get()
                             .defaultBlockState()
                             .setValue(
-                                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
+                                    RotatedPillarBlock.AXIS,
                                     axis),
                     11);
 
             level.playSound(
                     null,
                     pos,
-                    net.minecraft.sounds.SoundEvents.AXE_STRIP,
-                    net.minecraft.sounds.SoundSource.BLOCKS,
+                    SoundEvents.AXE_STRIP,
+                    SoundSource.BLOCKS,
                     1.0f,
                     1.0f);
 
@@ -1330,33 +1545,33 @@ public class BuildScape {
 
             event.setCanceled(true);
             event.setCancellationResult(
-                    net.minecraft.world.InteractionResult.SUCCESS);
+                    InteractionResult.SUCCESS);
             return;
         }
 
         if (state.getBlock() == ModBlocks.MANGROVE_WOOD.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
-            net.minecraft.core.BlockPos pos = event.getPos();
-            net.minecraft.world.level.Level level = event.getWorld();
-            net.minecraft.world.entity.player.Player player = event.getPlayer();
+                && heldItem.getItem() instanceof AxeItem) {
+            BlockPos pos = event.getPos();
+            Level level = event.getWorld();
+            Player player = event.getPlayer();
 
-            net.minecraft.core.Direction.Axis axis = state.getValue(
-                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
+            Direction.Axis axis = state.getValue(
+                    RotatedPillarBlock.AXIS);
 
             level.setBlock(
                     pos,
                     ModBlocks.STRIPPED_MANGROVE_WOOD.get()
                             .defaultBlockState()
                             .setValue(
-                                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
+                                    RotatedPillarBlock.AXIS,
                                     axis),
                     11);
 
             level.playSound(
                     null,
                     pos,
-                    net.minecraft.sounds.SoundEvents.AXE_STRIP,
-                    net.minecraft.sounds.SoundSource.BLOCKS,
+                    SoundEvents.AXE_STRIP,
+                    SoundSource.BLOCKS,
                     1.0f,
                     1.0f);
 
@@ -1366,26 +1581,26 @@ public class BuildScape {
 
             event.setCanceled(true);
             event.setCancellationResult(
-                    net.minecraft.world.InteractionResult.SUCCESS);
+                    InteractionResult.SUCCESS);
             return;
         }
 
-        if (com.kingodogo.buildscape.block.LogStrippingHandler.handleAxeStrip(event)) {
+        if (LogStrippingHandler.handleAxeStrip(event)) {
             return;
         }
 
-        if (state.getBlock() == net.minecraft.world.level.block.Blocks.DIRT
-                && heldItem.getItem() == net.minecraft.world.item.Items.POTION) {
-            if (net.minecraft.world.item.alchemy.PotionUtils
-                    .getPotion(heldItem) == net.minecraft.world.item.alchemy.Potions.WATER) {
-                net.minecraft.core.BlockPos pos = event.getPos();
-                net.minecraft.world.level.Level level = event.getWorld();
-                net.minecraft.world.entity.player.Player player = event.getPlayer();
+        if (state.getBlock() == Blocks.DIRT
+                && heldItem.getItem() == Items.POTION) {
+            if (PotionUtils
+                    .getPotion(heldItem) == Potions.WATER) {
+                BlockPos pos = event.getPos();
+                Level level = event.getWorld();
+                Player player = event.getPlayer();
 
                 if (level.isClientSide) {
                     spawnSplashParticles(level, pos);
                     event.setCanceled(true);
-                    event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
+                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
                     return;
                 }
 
@@ -1394,15 +1609,15 @@ public class BuildScape {
                 level.playSound(
                         null,
                         pos,
-                        net.minecraft.sounds.SoundEvents.BOTTLE_EMPTY,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.BOTTLE_EMPTY,
+                        SoundSource.BLOCKS,
                         1.0f,
                         1.0f);
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
-                    net.minecraft.world.item.ItemStack emptyBottle = new net.minecraft.world.item.ItemStack(
-                            net.minecraft.world.item.Items.GLASS_BOTTLE);
+                    ItemStack emptyBottle = new ItemStack(
+                            Items.GLASS_BOTTLE);
                     if (heldItem.isEmpty()) {
                         player.setItemInHand(event.getHand(), emptyBottle);
                     } else if (!player.getInventory().add(emptyBottle)) {
@@ -1414,7 +1629,7 @@ public class BuildScape {
 
                 event.setCanceled(true);
                 event.setCancellationResult(
-                        net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
+                        InteractionResult.sidedSuccess(level.isClientSide));
             }
         }
     }
@@ -1422,17 +1637,17 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onItemCrafted(
-            net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent event) {
-        net.minecraft.world.item.ItemStack crafted = event.getCrafting();
+            PlayerEvent.ItemCraftedEvent event) {
+        ItemStack crafted = event.getCrafting();
 
-        if (crafted.getItem() == net.minecraft.world.item.Items.SUSPICIOUS_STEW) {
+        if (crafted.getItem() == Items.SUSPICIOUS_STEW) {
             boolean hasFrostRose = false;
 
-            net.minecraft.world.Container inventory = event.getInventory();
-            if (inventory instanceof net.minecraft.world.inventory.CraftingContainer container) {
+            Container inventory = event.getInventory();
+            if (inventory instanceof CraftingContainer container) {
 
                 for (int i = 0; i < container.getContainerSize(); i++) {
-                    net.minecraft.world.item.ItemStack stack = container.getItem(i);
+                    ItemStack stack = container.getItem(i);
                     if (stack.getItem() == ModItems.FROST_ROSE.get()) {
                         hasFrostRose = true;
                         break;
@@ -1441,7 +1656,7 @@ public class BuildScape {
             }
 
             if (hasFrostRose) {
-                net.minecraft.nbt.CompoundTag nbt = crafted.getOrCreateTag();
+                CompoundTag nbt = crafted.getOrCreateTag();
                 nbt.putInt("FrostRoseStew", 1);
             }
         }
@@ -1449,20 +1664,20 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onItemUseFinish(
-            net.minecraftforge.event.entity.living.LivingEntityUseItemEvent.Finish event) {
-        if (!(event.getEntity() instanceof net.minecraft.world.entity.player.Player player)) {
+            LivingEntityUseItemEvent.Finish event) {
+        if (!(event.getEntity() instanceof Player player)) {
             return;
         }
 
-        net.minecraft.world.item.ItemStack itemStack = event.getItem();
+        ItemStack itemStack = event.getItem();
 
-        if (itemStack.getItem() == net.minecraft.world.item.Items.SUSPICIOUS_STEW) {
-            net.minecraft.nbt.CompoundTag nbt = itemStack.getTag();
+        if (itemStack.getItem() == Items.SUSPICIOUS_STEW) {
+            CompoundTag nbt = itemStack.getTag();
             if (nbt != null
                     && nbt.contains("FrostRoseStew")
                     && nbt.getInt("FrostRoseStew") == 1) {
                 if (!player.level.isClientSide) {
-                    net.minecraft.nbt.CompoundTag playerData = player.getPersistentData();
+                    CompoundTag playerData = player.getPersistentData();
                     playerData.putInt("FrostRoseStewDamageTicks", 120);
                 }
             }
@@ -1471,32 +1686,32 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onPlayerTick(
-            net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
-        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) {
+            TickEvent.PlayerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) {
             return;
         }
 
-        net.minecraft.world.entity.player.Player player = event.player;
+        Player player = event.player;
         if (player.level.isClientSide) {
             return;
         }
 
-        net.minecraft.nbt.CompoundTag playerData = player.getPersistentData();
+        CompoundTag playerData = player.getPersistentData();
         if (playerData.contains("FrostRoseStewDamageTicks")) {
             int ticksRemaining = playerData.getInt("FrostRoseStewDamageTicks");
 
             if (ticksRemaining > 0) {
                 if (ticksRemaining % 20 == 0 && player.isAlive()) {
-                    net.minecraft.world.damagesource.DamageSource freezeDamage = net.minecraft.world.damagesource.DamageSource.GENERIC;
+                    DamageSource freezeDamage = DamageSource.GENERIC;
                     player.hurt(freezeDamage, 1.0F);
 
-                    net.minecraft.world.level.Level level = player.level;
-                    net.minecraft.core.BlockPos playerPos = player.blockPosition();
+                    Level level = player.level;
+                    BlockPos playerPos = player.blockPosition();
                     level.playSound(
                             null,
                             playerPos,
-                            net.minecraft.sounds.SoundEvents.POWDER_SNOW_STEP,
-                            net.minecraft.sounds.SoundSource.PLAYERS,
+                            SoundEvents.POWDER_SNOW_STEP,
+                            SoundSource.PLAYERS,
                             0.5f,
                             1.0f);
 
@@ -1516,11 +1731,11 @@ public class BuildScape {
     }
 
     private void spawnSplashParticles(
-            net.minecraft.world.level.Level level,
-            net.minecraft.core.BlockPos pos) {
-        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            Level level,
+            BlockPos pos) {
+        if (level instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(
-                    net.minecraft.core.particles.ParticleTypes.SPLASH,
+                    ParticleTypes.SPLASH,
                     pos.getX() + 0.5,
                     pos.getY() + 1.0,
                     pos.getZ() + 0.5,
@@ -1538,7 +1753,7 @@ public class BuildScape {
                 double vy = level.random.nextDouble() * 0.1;
                 double vz = (level.random.nextDouble() - 0.5) * 0.1;
                 level.addParticle(
-                        net.minecraft.core.particles.ParticleTypes.SPLASH,
+                        ParticleTypes.SPLASH,
                         x,
                         y,
                         z,
@@ -1554,47 +1769,47 @@ public class BuildScape {
 
         @SubscribeEvent
         public static void onRegisterClientReloadListeners(
-                net.minecraftforge.client.event.RegisterClientReloadListenersEvent event) {
-            net.minecraft.server.packs.resources.ResourceManagerReloadListener listener = resourceManager ->
-                    com.kingodogo.buildscape.client.workbench.ClientBlockColorCatalog.invalidate();
+                RegisterClientReloadListenersEvent event) {
+            ResourceManagerReloadListener listener = resourceManager ->
+                    ClientBlockColorCatalog.invalidate();
             event.registerReloadListener(listener);
         }
 
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(() -> {
-                com.kingodogo.buildscape.block.ModWoodTypes.MANGROVE.getClass();
-                com.kingodogo.buildscape.block.ModWoodTypes.BAMBOO.getClass();
+                ModWoodTypes.MANGROVE.getClass();
+                ModWoodTypes.BAMBOO.getClass();
             });
 
 
             event.enqueueWork(() -> {
-                com.kingodogo.buildscape.client.ModKeyBinds.register();
+                ModKeyBinds.register();
             });
 
             event.enqueueWork(() -> {
-                com.kingodogo.buildscape.client.ClientEvents.initializeConfigCallback();
+                ClientEvents.initializeConfigCallback();
             });
 
             event.enqueueWork(() -> {
-                net.minecraftforge.client.MinecraftForgeClient.registerTooltipComponentFactory(
-                        com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData.class,
+                MinecraftForgeClient.registerTooltipComponentFactory(
+                        ShulkerBoxTooltipData.class,
                         data -> data
                 );
             });
 
             event.enqueueWork(() -> {
-                com.kingodogo.buildscape.client.BuildscapeRenderLayers.register();
+                BuildscapeRenderLayers.register();
             });
 
             event.enqueueWork(() -> {
-                net.minecraft.client.gui.screens.MenuScreens.register(
-                        com.kingodogo.buildscape.network.ModMenuTypes.BUILDERS_WORKBENCH_MENU.get(),
-                        com.kingodogo.buildscape.client.screen.BuildersWorkbenchScreen::new
+                MenuScreens.register(
+                        ModMenuTypes.BUILDERS_WORKBENCH_MENU.get(),
+                        BuildersWorkbenchScreen::new
                 );
-                net.minecraft.client.gui.screens.MenuScreens.register(
-                        com.kingodogo.buildscape.network.ModMenuTypes.BUILDERS_POUCH_MENU.get(),
-                        com.kingodogo.buildscape.client.screen.BuildersPouchScreen::new
+                MenuScreens.register(
+                        ModMenuTypes.BUILDERS_POUCH_MENU.get(),
+                        BuildersPouchScreen::new
                 );
 
 
@@ -1608,87 +1823,85 @@ public class BuildScape {
 
 
 
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.PILLAR_BLOCK_ENTITY
+                BlockEntityRenderers.register(
+                        ModBlockEntities.PILLAR_BLOCK_ENTITY
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer::new);
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.DECORATED_POT_BLOCK_ENTITY
+                        PillarBlockEntityRenderer::new);
+                BlockEntityRenderers.register(
+                        ModBlockEntities.DECORATED_POT_BLOCK_ENTITY
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.DecoratedPotBlockEntityRenderer::new);
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.TRAPPED_DECORATED_POT_BLOCK_ENTITY
+                        DecoratedPotBlockEntityRenderer::new);
+                BlockEntityRenderers.register(
+                        ModBlockEntities.TRAPPED_DECORATED_POT_BLOCK_ENTITY
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.TrappedDecoratedPotBlockEntityRenderer::new);
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.ICICLE_CAULDRON_BLOCK_ENTITY
+                        TrappedDecoratedPotBlockEntityRenderer::new);
+                BlockEntityRenderers.register(
+                        ModBlockEntities.ICICLE_CAULDRON_BLOCK_ENTITY
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.IcicleCauldronBlockEntityRenderer::new);
+                        IcicleCauldronBlockEntityRenderer::new);
 
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.FESTIVE_STOCKING_BLOCK_ENTITY
+                BlockEntityRenderers.register(
+                        ModBlockEntities.FESTIVE_STOCKING_BLOCK_ENTITY
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.FestiveStockingBlockEntityRenderer::new);
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.GLASS_JAR_BLOCK_ENTITY
+                        FestiveStockingBlockEntityRenderer::new);
+                BlockEntityRenderers.register(
+                        ModBlockEntities.GLASS_JAR_BLOCK_ENTITY
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.GlassJarBlockEntityRenderer::new);
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.COPPER_CHEST
+                        GlassJarBlockEntityRenderer::new);
+                BlockEntityRenderers.register(
+                        ModBlockEntities.COPPER_CHEST
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.CopperChestRenderer::new);
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.SHELF
+                        CopperChestRenderer::new);
+                BlockEntityRenderers.register(
+                        ModBlockEntities.SHELF
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.ShelfRenderer::new);
+                        ShelfRenderer::new);
 
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY
+                BlockEntityRenderers.register(
+                        ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY
                                 .get(),
-                        net.minecraft.client.renderer.blockentity.SignRenderer::new);
+                        SignRenderer::new);
 
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY
+                BlockEntityRenderers.register(
+                        ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY
                                 .get(),
-                        net.minecraft.client.renderer.blockentity.SignRenderer::new);
+                        SignRenderer::new);
 
-                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY
+                BlockEntityRenderers.register(
+                        ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY
                                 .get(),
-                        com.kingodogo.buildscape.client.renderer.HollowLogBlockEntityRenderer::new);
+                        HollowLogBlockEntityRenderer::new);
 
-                net.minecraft.client.renderer.entity.EntityRenderers.register(
-                        com.kingodogo.buildscape.entity.ModEntities.FALLING_ICICLE.get(),
-                        com.kingodogo.buildscape.client.renderer.FallingIcicleRenderer::new);
+                EntityRenderers.register(
+                        ModEntities.FALLING_ICICLE.get(),
+                        FallingIcicleRenderer::new);
 
-                net.minecraft.client.renderer.entity.EntityRenderers.register(
-                        com.kingodogo.buildscape.entity.ModEntities.MANGROVE_BOAT.get(),
-                        com.kingodogo.buildscape.client.renderer.MangroveBoatRenderer::new);
+                EntityRenderers.register(
+                        ModEntities.MANGROVE_BOAT.get(),
+                        MangroveBoatRenderer::new);
 
-                net.minecraft.client.renderer.entity.EntityRenderers.register(
-                        com.kingodogo.buildscape.entity.ModEntities.POPLAR_BOAT.get(),
-                        com.kingodogo.buildscape.client.renderer.PoplarBoatRenderer::new);
+                EntityRenderers.register(
+                        ModEntities.POPLAR_BOAT.get(),
+                        PoplarBoatRenderer::new);
 
-                net.minecraft.client.renderer.entity.EntityRenderers.register(
-                        com.kingodogo.buildscape.entity.ModEntities.COLORED_ITEM_FRAME.get(),
-                        com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer::new);
+                EntityRenderers.register(
+                        ModEntities.COLORED_ITEM_FRAME.get(),
+                        ColoredItemFrameRenderer::new);
 
-                net.minecraft.client.renderer.entity.EntityRenderers.register(
-                        com.kingodogo.buildscape.entity.ModEntities.SEAT_ENTITY.get(),
-                        net.minecraft.client.renderer.entity.NoopRenderer::new);
+                EntityRenderers.register(
+                        ModEntities.SEAT_ENTITY.get(),
+                        NoopRenderer::new);
 
-                net.minecraft.client.renderer.entity.EntityRenderers.register(
-                        com.kingodogo.buildscape.entity.ModEntities.FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.entity.NoopRenderer::new);
+                EntityRenderers.register(
+                        ModEntities.FESTIVE_STOCKING.get(),
+                        NoopRenderer::new);
 
-                net.minecraft.client.renderer.entity.EntityRenderers.register(
-                        com.kingodogo.buildscape.entity.ModEntities.WANDERING_HOMEMAKER.get(),
-                        com.kingodogo.buildscape.client.renderer.WanderingHomemakerRenderer::new);
-                net.minecraft.client.renderer.entity.EntityRenderers.register(
-                        com.kingodogo.buildscape.entity.ModEntities.FESTIVE_WANDERING_HOMEMAKER.get(),
-                        com.kingodogo.buildscape.client.renderer.FestiveWanderingHomemakerRenderer::new);
-
-
+                EntityRenderers.register(
+                        ModEntities.WANDERING_HOMEMAKER.get(),
+                        WanderingHomemakerRenderer::new);
+                EntityRenderers.register(
+                        ModEntities.FESTIVE_WANDERING_HOMEMAKER.get(),
+                        FestiveWanderingHomemakerRenderer::new);
 
 
 
@@ -1709,7 +1922,9 @@ public class BuildScape {
 
 
 
-                net.minecraft.client.color.block.BlockColors blockColors = net.minecraft.client.Minecraft
+
+
+                BlockColors blockColors = Minecraft
                         .getInstance().getBlockColors();
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -1717,7 +1932,7 @@ public class BuildScape {
                                 return 0x7FA832;
                             }
                             if (tintIndex == 1) {
-                                if (reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                if (reader instanceof LevelReader levelReader) {
                                     return levelReader
                                             .getBiome(pos)
                                             .value()
@@ -1736,7 +1951,7 @@ public class BuildScape {
                                 return 0x7FA832;
                             }
                             if (tintIndex == 1) {
-                                if (reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                if (reader instanceof LevelReader levelReader) {
                                     return levelReader
                                             .getBiome(pos)
                                             .value()
@@ -1760,10 +1975,10 @@ public class BuildScape {
                             }
 
                             if (state.hasProperty(
-                                    com.kingodogo.buildscape.block.OrnamentBlock.STRING_COLOR)) {
-                                com.kingodogo.buildscape.block.OrnamentBlock.StringColor stringColor = state
+                                    OrnamentBlock.STRING_COLOR)) {
+                                OrnamentBlock.StringColor stringColor = state
                                         .getValue(
-                                                com.kingodogo.buildscape.block.OrnamentBlock.STRING_COLOR);
+                                                OrnamentBlock.STRING_COLOR);
                                 return stringColor.getColor();
                             }
 
@@ -1795,10 +2010,10 @@ public class BuildScape {
                             }
 
                             if (state.hasProperty(
-                                    com.kingodogo.buildscape.block.StringLightBlock.STRING_COLOR)) {
-                                com.kingodogo.buildscape.block.StringLightBlock.StringColor stringColor = state
+                                    StringLightBlock.STRING_COLOR)) {
+                                StringLightBlock.StringColor stringColor = state
                                         .getValue(
-                                                com.kingodogo.buildscape.block.StringLightBlock.STRING_COLOR);
+                                                StringLightBlock.STRING_COLOR);
                                 return stringColor.getColor();
                             }
 
@@ -1830,7 +2045,7 @@ public class BuildScape {
 
                             if (reader != null
                                     && pos != null
-                                    && reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                    && reader instanceof LevelReader levelReader) {
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -1850,9 +2065,9 @@ public class BuildScape {
                         (state, reader, pos, tintIndex) -> {
                             if (tintIndex != 0) return -1;
                             if (reader != null && pos != null) {
-                                return net.minecraft.client.renderer.BiomeColors.getAverageFoliageColor(reader, pos);
+                                return BiomeColors.getAverageFoliageColor(reader, pos);
                             }
-                            return net.minecraft.world.level.FoliageColor.getDefaultColor();
+                            return FoliageColor.getDefaultColor();
                         },
                         ModBlocks.BUSH.get());
 
@@ -1860,9 +2075,9 @@ public class BuildScape {
                         (state, reader, pos, tintIndex) -> {
                             if (tintIndex != 0) return -1;
                             if (reader != null && pos != null) {
-                                return com.kingodogo.buildscape.client.DryFoliageColor.getDryFoliageColor(reader, pos);
+                                return DryFoliageColor.getDryFoliageColor(reader, pos);
                             }
-                            return com.kingodogo.buildscape.client.DryFoliageColor.getDefaultColor();
+                            return DryFoliageColor.getDefaultColor();
                         },
                         ModBlocks.LEAF_LITTER.get());
 
@@ -1870,9 +2085,9 @@ public class BuildScape {
                         (state, reader, pos, tintIndex) -> {
                             if (tintIndex == 1 || tintIndex == 0) {
                                 if (reader != null && pos != null) {
-                                    return net.minecraft.client.renderer.BiomeColors.getAverageFoliageColor(reader, pos);
+                                    return BiomeColors.getAverageFoliageColor(reader, pos);
                                 }
-                                return net.minecraft.world.level.FoliageColor.getDefaultColor();
+                                return FoliageColor.getDefaultColor();
                             }
                             return -1;
                         },
@@ -1962,7 +2177,7 @@ public class BuildScape {
                             }
                             if (reader != null
                                     && pos != null
-                                    && reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                    && reader instanceof LevelReader levelReader) {
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -1978,7 +2193,7 @@ public class BuildScape {
                             }
                             if (reader != null
                                     && pos != null
-                                    && reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                    && reader instanceof LevelReader levelReader) {
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -1992,7 +2207,7 @@ public class BuildScape {
                                 return -1;
                             }
                             if (reader != null && pos != null) {
-                                return net.minecraft.client.renderer.BiomeColors.getAverageWaterColor(reader, pos);
+                                return BiomeColors.getAverageWaterColor(reader, pos);
                             }
                             return 0x3F76E4;
                         },
@@ -2005,7 +2220,7 @@ public class BuildScape {
                                 return -1;
                             }
                             if (reader != null && pos != null) {
-                                return net.minecraft.client.renderer.BiomeColors.getAverageWaterColor(reader, pos);
+                                return BiomeColors.getAverageWaterColor(reader, pos);
                             }
                             return 0x3F76E4;
                         },
@@ -2019,10 +2234,10 @@ public class BuildScape {
                             }
 
                             if (reader != null && pos != null) {
-                                net.minecraft.world.level.block.entity.BlockEntity be = reader
+                                BlockEntity be = reader
                                         .getBlockEntity(pos);
-                                if (be instanceof com.kingodogo.buildscape.block.GlowLightsBlockEntity glowBE) {
-                                    java.util.List<String> dyeColors = glowBE
+                                if (be instanceof GlowLightsBlockEntity glowBE) {
+                                    List<String> dyeColors = glowBE
                                             .getDyeColors();
                                     if (dyeColors != null && !dyeColors.isEmpty()) {
                                         int hash = pos.hashCode()
@@ -2057,17 +2272,17 @@ public class BuildScape {
                         (state, reader, pos, tintIndex) -> {
                             if (tintIndex == 0) {
                                 if (reader != null && pos != null) {
-                                    return net.minecraft.client.renderer.BiomeColors.getAverageGrassColor(reader, pos);
+                                    return BiomeColors.getAverageGrassColor(reader, pos);
                                 }
-                                return net.minecraft.world.level.GrassColor.get(0.5D, 1.0D);
+                                return GrassColor.get(0.5D, 1.0D);
                             }
                             return -1;
                         },
-                        net.minecraft.world.level.block.Blocks.COMPOSTER);
+                        Blocks.COMPOSTER);
 
-                net.minecraft.client.color.item.ItemColors itemColors = net.minecraft.client.Minecraft
+                ItemColors itemColors = Minecraft
                         .getInstance().getItemColors();
-                net.minecraft.client.color.item.ItemColors vanillaItemColors = net.minecraft.client.Minecraft
+                ItemColors vanillaItemColors = Minecraft
                         .getInstance().getItemColors();
 
                 itemColors.register(
@@ -2078,7 +2293,7 @@ public class BuildScape {
                 itemColors.register(
                         (stack, tintIndex) -> {
                             if (tintIndex != 1) return -1;
-                            net.minecraft.nbt.CompoundTag tag = stack.getTagElement("Explosion");
+                            CompoundTag tag = stack.getTagElement("Explosion");
                             int[] colors = tag != null ? tag.getIntArray("Colors") : null;
                             if (colors != null && colors.length > 0) {
                                 if (colors.length == 1) return colors[0];
@@ -2105,41 +2320,41 @@ public class BuildScape {
                             if (tintIndex != 0) {
                                 return -1;
                             }
-                            net.minecraft.world.item.Item item = stack.getItem();
-                            if (item instanceof net.minecraft.world.item.BlockItem) {
-                                net.minecraft.world.level.block.Block block = ((net.minecraft.world.item.BlockItem) item)
+                            Item item = stack.getItem();
+                            if (item instanceof BlockItem) {
+                                Block block = ((BlockItem) item)
                                         .getBlock();
 
                                 int color = -1;
                                 if (block == ModBlocks.LEAF_LITTER.get()) {
-                                    color = com.kingodogo.buildscape.client.DryFoliageColor.getDefaultColor();
+                                    color = DryFoliageColor.getDefaultColor();
                                 } else if (block == ModBlocks.BUSH.get()
                                         || block == ModBlocks.OAK_LEAF_HEDGE.get()
                                         || block == ModBlocks.OAK_LEAF_LAYERS.get()) {
                                     color = vanillaItemColors.getColor(
-                                            new net.minecraft.world.item.ItemStack(
-                                                    net.minecraft.world.item.Items.OAK_LEAVES),
+                                            new ItemStack(
+                                                    Items.OAK_LEAVES),
                                             0);
                                 } else if (block == ModBlocks.JUNGLE_LEAF_HEDGE.get()
                                         || block == ModBlocks.JUNGLE_LEAF_LAYERS
                                         .get()) {
                                     color = vanillaItemColors.getColor(
-                                            new net.minecraft.world.item.ItemStack(
-                                                    net.minecraft.world.item.Items.JUNGLE_LEAVES),
+                                            new ItemStack(
+                                                    Items.JUNGLE_LEAVES),
                                             0);
                                 } else if (block == ModBlocks.ACACIA_LEAF_HEDGE.get()
                                         || block == ModBlocks.ACACIA_LEAF_LAYERS
                                         .get()) {
                                     color = vanillaItemColors.getColor(
-                                            new net.minecraft.world.item.ItemStack(
-                                                    net.minecraft.world.item.Items.ACACIA_LEAVES),
+                                            new ItemStack(
+                                                    Items.ACACIA_LEAVES),
                                             0);
                                 } else if (block == ModBlocks.DARK_OAK_LEAF_HEDGE.get()
                                         || block == ModBlocks.DARK_OAK_LEAF_LAYERS
                                         .get()) {
                                     color = vanillaItemColors.getColor(
-                                            new net.minecraft.world.item.ItemStack(
-                                                    net.minecraft.world.item.Items.DARK_OAK_LEAVES),
+                                            new ItemStack(
+                                                    Items.DARK_OAK_LEAVES),
                                             0);
                                 } else if (block == ModBlocks.SPRUCE_LEAF_HEDGE.get()
                                         || block == ModBlocks.SPRUCE_LEAF_LAYERS
@@ -2207,16 +2422,16 @@ public class BuildScape {
                             if (tintIndex != 1) {
                                 return -1;
                             }
-                            if (stack.getItem() instanceof com.kingodogo.buildscape.item.BiomeBrushItem brush) {
+                            if (stack.getItem() instanceof BiomeBrushItem brush) {
                                 String biomeStr = brush.getCapturedBiome(stack);
                                 if (biomeStr != null && !biomeStr.isEmpty()) {
-                                    net.minecraft.resources.ResourceLocation biomeKey = net.minecraft.resources.ResourceLocation.tryParse(biomeStr);
+                                    ResourceLocation biomeKey = ResourceLocation.tryParse(biomeStr);
                                     if (biomeKey != null) {
-                                        net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
+                                        ClientLevel level = Minecraft.getInstance().level;
                                         if (level != null) {
-                                            java.util.Optional<? extends net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome>> registryOpt = level.registryAccess().registry(net.minecraft.core.Registry.BIOME_REGISTRY);
+                                            Optional<? extends Registry<Biome>> registryOpt = level.registryAccess().registry(Registry.BIOME_REGISTRY);
                                             if (registryOpt.isPresent()) {
-                                                net.minecraft.world.level.biome.Biome biome = registryOpt.get().get(biomeKey);
+                                                Biome biome = registryOpt.get().get(biomeKey);
                                                 if (biome != null) {
                                                     return biome.getFoliageColor();
                                                 }
@@ -2235,187 +2450,187 @@ public class BuildScape {
         }
 
         @SubscribeEvent
-        public static void registerLayerDefinitions(net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions event) {
-            event.registerLayerDefinition(com.kingodogo.buildscape.client.model.WanderingHomemakerModel.LAYER_LOCATION, com.kingodogo.buildscape.client.model.WanderingHomemakerModel::createBodyLayer);
+        public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+            event.registerLayerDefinition(WanderingHomemakerModel.LAYER_LOCATION, WanderingHomemakerModel::createBodyLayer);
         }
 
         @SubscribeEvent
-        public static void onModelRegistry(net.minecraftforge.client.event.ModelRegistryEvent event) {
-            net.minecraftforge.client.model.ForgeModelBakery.addSpecialModel(
-                    new net.minecraft.resources.ResourceLocation(BuildScape.MODID, "block/stringlight_frame")
+        public static void onModelRegistry(ModelRegistryEvent event) {
+            ForgeModelBakery.addSpecialModel(
+                    new ResourceLocation(BuildScape.MODID, "block/stringlight_frame")
             );
         }
 
         @SubscribeEvent
         public static void onModelBake(
-                net.minecraftforge.client.event.ModelBakeEvent event) {
-            java.util.Set<net.minecraft.resources.ResourceLocation> leafHedgeModels = new java.util.HashSet<>();
+                ModelBakeEvent event) {
+            Set<ResourceLocation> leafHedgeModels = new HashSet<>();
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/oak_leaf_hedge_post"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/oak_leaf_hedge_side"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/oak_leaf_hedge_side_tall"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/oak_leaf_hedge_inventory"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/spruce_leaf_hedge_post"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/spruce_leaf_hedge_side"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/spruce_leaf_hedge_side_tall"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/spruce_leaf_hedge_inventory"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/birch_leaf_hedge_post"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/birch_leaf_hedge_side"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/birch_leaf_hedge_side_tall"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/birch_leaf_hedge_inventory"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/jungle_leaf_hedge_post"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/jungle_leaf_hedge_side"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/jungle_leaf_hedge_side_tall"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/jungle_leaf_hedge_inventory"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/acacia_leaf_hedge_post"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/acacia_leaf_hedge_side"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/acacia_leaf_hedge_side_tall"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/acacia_leaf_hedge_inventory"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/dark_oak_leaf_hedge_post"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/dark_oak_leaf_hedge_side"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/dark_oak_leaf_hedge_side_tall"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/dark_oak_leaf_hedge_inventory"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/azalea_leaf_hedge_post"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/azalea_leaf_hedge_side"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/azalea_leaf_hedge_side_tall"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/azalea_leaf_hedge_inventory"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/flowering_azalea_leaf_hedge_post"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/flowering_azalea_leaf_hedge_side"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/flowering_azalea_leaf_hedge_side_tall"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "block/flowering_azalea_leaf_hedge_inventory"));
 
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "item/oak_leaf_hedge"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "item/spruce_leaf_hedge"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "item/birch_leaf_hedge"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "item/jungle_leaf_hedge"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "item/acacia_leaf_hedge"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "item/dark_oak_leaf_hedge"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "item/azalea_leaf_hedge"));
             leafHedgeModels.add(
-                    new net.minecraft.resources.ResourceLocation(
+                    new ResourceLocation(
                             BuildScape.MODID,
                             "item/flowering_azalea_leaf_hedge"));
 
             int wrappedCount = 0;
             int notFoundCount = 0;
-            for (net.minecraft.resources.ResourceLocation modelLocation : leafHedgeModels) {
-                net.minecraft.client.resources.model.BakedModel originalModel = event
+            for (ResourceLocation modelLocation : leafHedgeModels) {
+                BakedModel originalModel = event
                         .getModelRegistry()
                         .get(modelLocation);
                 if (originalModel != null) {
@@ -2423,7 +2638,7 @@ public class BuildScape {
                             .getModelRegistry()
                             .put(
                                     modelLocation,
-                                    new com.kingodogo.buildscape.client.model.TintedLeafHedgeModel(
+                                    new TintedLeafHedgeModel(
                                             originalModel));
                     wrappedCount++;
                 } else {
@@ -2440,235 +2655,235 @@ public class BuildScape {
 
         @SubscribeEvent
         public static void registerFactories(
-                net.minecraftforge.client.event.ParticleFactoryRegisterEvent event) {
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.GLOW_LIME_SPARKLE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.PillarSparkleParticle.Provider(
+                ParticleFactoryRegisterEvent event) {
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.GLOW_LIME_SPARKLE.get(),
+                    sprites -> new PillarSparkleParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.TINTED_DRIP_FALL.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.TintedDripParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.TINTED_DRIP_FALL.get(),
+                    sprites -> new TintedDripParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.TINTED_SPORE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.TintedSporeParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.TINTED_SPORE.get(),
+                    sprites -> new TintedSporeParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.SNOWFLAKE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.SnowflakeParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.SNOWFLAKE.get(),
+                    sprites -> new SnowflakeParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.SNOWFLAKE_STILL.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.SnowflakeStillParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.SNOWFLAKE_STILL.get(),
+                    sprites -> new SnowflakeStillParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.CONFETTI.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.ConfettiParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.CONFETTI.get(),
+                    sprites -> new ConfettiParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.BUBBLE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.BubbleParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.BUBBLE.get(),
+                    sprites -> new BubbleParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.TRAIL_NOTE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.TrailNoteParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.TRAIL_NOTE.get(),
+                    sprites -> new TrailNoteParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.COLORED_SMOKE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.ColoredSmokeParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.COLORED_SMOKE.get(),
+                    sprites -> new ColoredSmokeParticle.Provider(
                             sprites));
 
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.TINTABLE_HEART.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.TintableHeartParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.TINTABLE_HEART.get(),
+                    sprites -> new TintableHeartParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.CAKE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.CakeParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.CAKE.get(),
+                    sprites -> new CakeParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.CHERRY.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.CherryParticle.Provider(
+            Minecraft.getInstance().particleEngine.register(
+                    ModParticles.CHERRY.get(),
+                    sprites -> new CherryParticle.Provider(
                             sprites));
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.CASCADE.get(),
+                            ModParticles.CASCADE.get(),
                             sprites ->
-                                    new com.kingodogo.buildscape.particle.CascadeParticle.Provider(
+                                    new CascadeParticle.Provider(
                                             sprites
                                     )
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.NOXIOUS_GAS.get(),
+                            ModParticles.NOXIOUS_GAS.get(),
                             sprites ->
-                                    new com.kingodogo.buildscape.particle.NoxiousGasParticle.Provider(
+                                    new NoxiousGasParticle.Provider(
                                             sprites
                                     )
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.FIREFLY.get(),
+                            ModParticles.FIREFLY.get(),
                             sprites ->
-                                    new com.kingodogo.buildscape.particle.FireflyParticle.Provider(
+                                    new FireflyParticle.Provider(
                                             sprites
                                     )
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.HAZE.get(),
+                            ModParticles.HAZE.get(),
                             sprites ->
-                                    new com.kingodogo.buildscape.particle.HazeParticle.Provider(
+                                    new HazeParticle.Provider(
                                             sprites
                                     )
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.SULFUR_BUBBLES.get(),
-                            com.kingodogo.buildscape.particle.SulfurBubbleParticle.Provider::new
+                            ModParticles.SULFUR_BUBBLES.get(),
+                            SulfurBubbleParticle.Provider::new
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.GEYSER.get(),
-                            new com.kingodogo.buildscape.particle.GeyserEruptionParticle.Provider()
+                            ModParticles.GEYSER.get(),
+                            new GeyserEruptionParticle.Provider()
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.GEYSER_BASE.get(),
-                            com.kingodogo.buildscape.particle.GeyserBaseParticle.Provider::new
+                            ModParticles.GEYSER_BASE.get(),
+                            GeyserBaseParticle.Provider::new
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.GEYSER_POOF.get(),
-                            com.kingodogo.buildscape.particle.GeyserBaseParticle.Provider::new
+                            ModParticles.GEYSER_POOF.get(),
+                            GeyserBaseParticle.Provider::new
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.GEYSER_PLUME.get(),
-                            com.kingodogo.buildscape.particle.GeyserPlumeParticle.Provider::new
+                            ModParticles.GEYSER_PLUME.get(),
+                            GeyserPlumeParticle.Provider::new
                     );
 
-            net.minecraft.client.Minecraft.getInstance()
+            Minecraft.getInstance()
                     .particleEngine.register(
-                            com.kingodogo.buildscape.particle.ModParticles.XP_PARTICLE.get(),
-                            sprites -> new com.kingodogo.buildscape.particle.XpParticle.Provider(sprites)
+                            ModParticles.XP_PARTICLE.get(),
+                            sprites -> new XpParticle.Provider(sprites)
                     );
         }
     }
 
     @SubscribeEvent
-    public void onEntityInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
-        if (event.getTarget() instanceof net.minecraft.world.entity.AgeableMob mob
-                && !(event.getTarget() instanceof net.minecraft.world.entity.monster.Monster)) {
-            net.minecraft.world.item.ItemStack held = event.getItemStack();
+    public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        if (event.getTarget() instanceof AgeableMob mob
+                && !(event.getTarget() instanceof Monster)) {
+            ItemStack held = event.getItemStack();
             if (held.is(ModItems.GOLDEN_DANDELION.get())) {
-                boolean isFrozen = com.kingodogo.buildscape.util.GoldenDandelionGrowth.isFrozen(mob);
-                if (!com.kingodogo.buildscape.util.GoldenDandelionGrowth.canToggle(mob.isBaby(), isFrozen)) {
+                boolean isFrozen = GoldenDandelionGrowth.isFrozen(mob);
+                if (!GoldenDandelionGrowth.canToggle(mob.isBaby(), isFrozen)) {
                     return;
                 }
-                net.minecraft.world.level.Level level = event.getWorld();
+                Level level = event.getWorld();
                 if (!level.isClientSide) {
                     if (!isFrozen) {
-                        if (!com.kingodogo.buildscape.util.GoldenDandelionGrowth.setFrozen(mob, true)) {
+                        if (!GoldenDandelionGrowth.setFrozen(mob, true)) {
                             return;
                         }
-                        ((net.minecraft.server.level.ServerLevel) level).sendParticles(
-                                net.minecraft.core.particles.ParticleTypes.WAX_OFF,
+                        ((ServerLevel) level).sendParticles(
+                                ParticleTypes.WAX_OFF,
                                 mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
                                 12, 0.3D, 0.3D, 0.3D, 0.05D);
                         level.playSound(null, mob.blockPosition(),
-                                net.minecraft.sounds.SoundEvents.HONEYCOMB_WAX_ON,
-                                net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+                                SoundEvents.HONEYCOMB_WAX_ON,
+                                SoundSource.NEUTRAL, 1.0F, 1.0F);
                     } else {
-                        com.kingodogo.buildscape.util.GoldenDandelionGrowth.setFrozen(mob, false);
-                        ((net.minecraft.server.level.ServerLevel) level).sendParticles(
-                                net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER,
+                        GoldenDandelionGrowth.setFrozen(mob, false);
+                        ((ServerLevel) level).sendParticles(
+                                ParticleTypes.HAPPY_VILLAGER,
                                 mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
                                 12, 0.3D, 0.3D, 0.3D, 0.05D);
                         level.playSound(null, mob.blockPosition(),
-                                net.minecraft.sounds.SoundEvents.VILLAGER_YES,
-                                net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+                                SoundEvents.VILLAGER_YES,
+                                SoundSource.NEUTRAL, 1.0F, 1.0F);
                     }
                     if (!event.getPlayer().getAbilities().instabuild) {
                         held.shrink(1);
                     }
                 }
                 event.setCanceled(true);
-                event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                event.setCancellationResult(InteractionResult.SUCCESS);
             }
         }
     }
 
     @SubscribeEvent
-    public void onLivingUpdate(net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent event) {
-        net.minecraft.world.entity.LivingEntity living = event.getEntityLiving();
-        net.minecraft.world.level.material.FluidState fluid = living.level.getFluidState(living.blockPosition());
-        if (com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid.getType())) {
+    public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
+        LivingEntity living = event.getEntityLiving();
+        FluidState fluid = living.level.getFluidState(living.blockPosition());
+        if (ModFluids.isExperience(fluid.getType())) {
             if (living.isSwimming() || living.isInWater()) {
-                net.minecraft.world.phys.Vec3 delta = living.getDeltaMovement();
+                Vec3 delta = living.getDeltaMovement();
                 living.setDeltaMovement(delta.x * 1.175D, delta.y * 1.06D, delta.z * 1.175D);
             }
         }
     }
 
-    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
-    public void onSculkDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
-        com.kingodogo.buildscape.block.SculkCatalystHandler.onDeath(event);
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onSculkDeath(LivingDeathEvent event) {
+        SculkCatalystHandler.onDeath(event);
     }
 
-    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
-    public void onSculkExperienceDrop(net.minecraftforge.event.entity.living.LivingExperienceDropEvent event) {
-        com.kingodogo.buildscape.block.SculkCatalystHandler.onExperienceDrop(event);
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onSculkExperienceDrop(LivingExperienceDropEvent event) {
+        SculkCatalystHandler.onExperienceDrop(event);
     }
 
     @SubscribeEvent
-    public void onSculkBlockBreak(net.minecraftforge.event.world.BlockEvent.BreakEvent event) {
+    public void onSculkBlockBreak(BlockEvent.BreakEvent event) {
         if (event.getPlayer() != null && !event.getPlayer().isCreative()) {
-            net.minecraft.world.level.block.state.BlockState state = event.getState();
-            net.minecraft.resources.ResourceLocation key = state.getBlock().getRegistryName();
+            BlockState state = event.getState();
+            ResourceLocation key = state.getBlock().getRegistryName();
             if (key == null || !"buildscape".equals(key.getNamespace())) {
                 return;
             }
-            int experience = com.kingodogo.buildscape.block.sculk.SculkBreakExperience.forBlock(key.getPath());
+            int experience = SculkBreakExperience.forBlock(key.getPath());
             if (experience < 0) {
                 return;
             }
-            net.minecraft.world.item.ItemStack tool = event.getPlayer().getMainHandItem();
-            int silkTouch = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, tool);
-            event.setExpToDrop(com.kingodogo.buildscape.block.sculk.SculkBreakExperience.withTool(experience, silkTouch));
+            ItemStack tool = event.getPlayer().getMainHandItem();
+            int silkTouch = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool);
+            event.setExpToDrop(SculkBreakExperience.withTool(experience, silkTouch));
         }
     }
 
     @SubscribeEvent
-    public void onBackportBonemealRightClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
-        net.minecraft.world.item.ItemStack held = event.getItemStack();
-        if (held.is(net.minecraft.world.item.Items.BONE_MEAL)) {
-            net.minecraft.world.level.Level level = event.getWorld();
-            net.minecraft.core.BlockPos pos = event.getPos();
-            net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos);
+    public void onBackportBonemealRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        ItemStack held = event.getItemStack();
+        if (held.is(Items.BONE_MEAL)) {
+            Level level = event.getWorld();
+            BlockPos pos = event.getPos();
+            BlockState state = level.getBlockState(pos);
 
-            if (state.is(net.minecraft.world.level.block.Blocks.CACTUS) && event.getFace() == net.minecraft.core.Direction.UP) {
-                net.minecraft.core.BlockPos above = pos.above();
+            if (state.is(Blocks.CACTUS) && event.getFace() == Direction.UP) {
+                BlockPos above = pos.above();
                 if (level.isEmptyBlock(above)) {
                     if (!level.isClientSide) {
                         level.setBlock(above, ModBlocks.CACTUS_FLOWER.get().defaultBlockState(), 3);
@@ -2676,13 +2891,13 @@ public class BuildScape {
                         if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
                     }
                     event.setCanceled(true);
-                    event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                    event.setCancellationResult(InteractionResult.SUCCESS);
                     return;
                 }
             }
 
-            if ((state.is(net.minecraft.world.level.block.Blocks.SAND) || state.is(net.minecraft.world.level.block.Blocks.RED_SAND)) && event.getFace() == net.minecraft.core.Direction.UP) {
-                net.minecraft.core.BlockPos above = pos.above();
+            if ((state.is(Blocks.SAND) || state.is(Blocks.RED_SAND)) && event.getFace() == Direction.UP) {
+                BlockPos above = pos.above();
                 if (level.isEmptyBlock(above)) {
                     if (!level.isClientSide) {
                         level.setBlock(above, ModBlocks.DRY_GRASS.get().defaultBlockState(), 3);
@@ -2690,13 +2905,13 @@ public class BuildScape {
                         if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
                     }
                     event.setCanceled(true);
-                    event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                    event.setCancellationResult(InteractionResult.SUCCESS);
                     return;
                 }
             }
 
-            if (state.is(net.minecraft.world.level.block.Blocks.PODZOL) && event.getFace() == net.minecraft.core.Direction.UP) {
-                net.minecraft.core.BlockPos above = pos.above();
+            if (state.is(Blocks.PODZOL) && event.getFace() == Direction.UP) {
+                BlockPos above = pos.above();
                 if (level.isEmptyBlock(above)) {
                     if (!level.isClientSide) {
                         level.setBlock(above, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
@@ -2704,40 +2919,40 @@ public class BuildScape {
                         if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
                     }
                     event.setCanceled(true);
-                    event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
+                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
                     return;
                 } else {
-                    java.util.List<net.minecraft.core.BlockPos> validPositions = new java.util.ArrayList<>();
+                    List<BlockPos> validPositions = new ArrayList<>();
                     for (int dx = -1; dx <= 1; dx++) {
                         for (int dz = -1; dz <= 1; dz++) {
                             if (dx == 0 && dz == 0) continue;
-                            net.minecraft.core.BlockPos nearbyGround = pos.offset(dx, 0, dz);
-                            net.minecraft.core.BlockPos nearbyAbove = nearbyGround.above();
-                            if (level.getBlockState(nearbyGround).is(net.minecraft.world.level.block.Blocks.PODZOL) && level.isEmptyBlock(nearbyAbove)) {
+                            BlockPos nearbyGround = pos.offset(dx, 0, dz);
+                            BlockPos nearbyAbove = nearbyGround.above();
+                            if (level.getBlockState(nearbyGround).is(Blocks.PODZOL) && level.isEmptyBlock(nearbyAbove)) {
                                 validPositions.add(nearbyAbove);
                             }
                         }
                     }
                     if (!validPositions.isEmpty()) {
                         if (!level.isClientSide) {
-                            net.minecraft.core.BlockPos target = validPositions.get(level.random.nextInt(validPositions.size()));
+                            BlockPos target = validPositions.get(level.random.nextInt(validPositions.size()));
                             level.setBlock(target, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
                             level.levelEvent(2005, pos, 0);
                             if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
                         }
                         event.setCanceled(true);
-                        event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
+                        event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
                         return;
                     }
                 }
             }
 
-            if (state.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
+            if (state.is(Blocks.GRASS_BLOCK) && event.getFace() == Direction.UP) {
                 if (!level.isClientSide) {
-                    final net.minecraft.core.BlockPos finalPos = pos;
-                    ((net.minecraft.server.level.ServerLevel) level).getServer().execute(() -> {
-                        net.minecraft.core.BlockPos.betweenClosedStream(finalPos.offset(-3, -1, -3), finalPos.offset(3, 1, 3)).forEach(checkPos -> {
-                            if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
+                    final BlockPos finalPos = pos;
+                    ((ServerLevel) level).getServer().execute(() -> {
+                        BlockPos.betweenClosedStream(finalPos.offset(-3, -1, -3), finalPos.offset(3, 1, 3)).forEach(checkPos -> {
+                            if (level.getBlockState(checkPos).is(Blocks.GRASS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
                                 if (level.random.nextFloat() < 0.05F) {
                                     level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(), 3);
                                 }
@@ -2747,22 +2962,22 @@ public class BuildScape {
                 }
             }
 
-            if (state.is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
+            if (state.is(Blocks.MOSS_BLOCK) && event.getFace() == Direction.UP) {
                 if (!level.isClientSide) {
-                    final net.minecraft.core.BlockPos finalMossPos = pos;
-                    ((net.minecraft.server.level.ServerLevel) level).getServer().execute(() -> {
-                        net.minecraft.core.BlockPos.betweenClosedStream(finalMossPos.offset(-3, -1, -3), finalMossPos.offset(3, 1, 3)).forEach(checkPos -> {
-                            if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
+                    final BlockPos finalMossPos = pos;
+                    ((ServerLevel) level).getServer().execute(() -> {
+                        BlockPos.betweenClosedStream(finalMossPos.offset(-3, -1, -3), finalMossPos.offset(3, 1, 3)).forEach(checkPos -> {
+                            if (level.getBlockState(checkPos).is(Blocks.MOSS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
                                 float roll = level.random.nextFloat();
                                 if (roll < 0.10F) {
                                     level.setBlock(checkPos.above(), ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
                                 } else if (roll < 0.15F) {
-                                    net.minecraft.world.level.block.state.BlockState saplingState = ModBlocks.CHERRY_SAPLING.get().defaultBlockState();
+                                    BlockState saplingState = ModBlocks.CHERRY_SAPLING.get().defaultBlockState();
                                     if (saplingState.canSurvive(level, checkPos.above())) {
                                         level.setBlock(checkPos.above(), saplingState, 3);
                                     }
                                 } else if (roll < 0.20F) {
-                                    net.minecraft.world.level.block.state.BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState();
+                                    BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState();
                                     if (propaguleState.canSurvive(level, checkPos.above())) {
                                         level.setBlock(checkPos.above(), propaguleState, 3);
                                     }
@@ -2774,36 +2989,36 @@ public class BuildScape {
             }
 
             if (state.is(ModBlocks.PALE_OAK_LEAVES.get())) {
-                net.minecraft.core.BlockPos targetPos = pos.below();
+                BlockPos targetPos = pos.below();
                 while (level.getBlockState(targetPos).is(ModBlocks.PALE_HANGING_MOSS.get())) {
                     targetPos = targetPos.below();
                 }
                 if (level.isEmptyBlock(targetPos)) {
                     if (!level.isClientSide) {
-                        level.setBlock(targetPos, ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState().setValue(com.kingodogo.buildscape.block.HangingMossBlock.TIP, true), 3);
+                        level.setBlock(targetPos, ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState().setValue(HangingMossBlock.TIP, true), 3);
                         level.levelEvent(2005, pos, 0);
                         if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
                     }
                     event.setCanceled(true);
-                    event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                    event.setCancellationResult(InteractionResult.SUCCESS);
                     return;
                 }
             }
 
             if (state.is(ModBlocks.CREAKING_HEART.get())) {
                 if (!level.isClientSide) {
-                    if (state.getBlock() instanceof com.kingodogo.buildscape.block.CreakingHeartBlock heart) {
-                        level.setBlock(pos, state.setValue(com.kingodogo.buildscape.block.CreakingHeartBlock.ACTIVE, true), 3);
+                    if (state.getBlock() instanceof CreakingHeartBlock heart) {
+                        level.setBlock(pos, state.setValue(CreakingHeartBlock.ACTIVE, true), 3);
                         level.scheduleTick(pos, heart, 40);
                     }
-                    java.util.List<net.minecraft.core.Direction> directions = new java.util.ArrayList<>(java.util.List.of(net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.WEST, net.minecraft.core.Direction.UP, net.minecraft.core.Direction.DOWN));
-                    java.util.Collections.shuffle(directions, level.random);
+                    List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN));
+                    Collections.shuffle(directions, level.random);
                     int spawned = 0;
-                    for (net.minecraft.core.Direction dir : directions) {
-                        net.minecraft.core.BlockPos adjPos = pos.relative(dir);
-                        net.minecraft.core.Direction attachFace = dir.getOpposite();
-                        net.minecraft.world.level.block.state.properties.BooleanProperty faceProp = net.minecraft.world.level.block.GlowLichenBlock.getFaceProperty(attachFace);
-                        net.minecraft.world.level.block.state.BlockState adjState = level.getBlockState(adjPos);
+                    for (Direction dir : directions) {
+                        BlockPos adjPos = pos.relative(dir);
+                        Direction attachFace = dir.getOpposite();
+                        BooleanProperty faceProp = GlowLichenBlock.getFaceProperty(attachFace);
+                        BlockState adjState = level.getBlockState(adjPos);
 
                         if (adjState.is(ModBlocks.RESIN_CLUMP.get())) {
                             if (!adjState.getValue(faceProp)) {
@@ -2811,7 +3026,7 @@ public class BuildScape {
                                 spawned++;
                             }
                         } else if (adjState.isAir()) {
-                            net.minecraft.world.level.block.state.BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
+                            BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
                             level.setBlock(adjPos, newState, 3);
                             spawned++;
                         }
@@ -2821,32 +3036,32 @@ public class BuildScape {
                     if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
                 }
                 event.setCanceled(true);
-                event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                event.setCancellationResult(InteractionResult.SUCCESS);
                 return;
             }
 
             if (state.is(ModBlocks.TALL_DRY_GRASS.get())) {
                 if (!level.isClientSide) {
-                    net.minecraft.world.entity.item.ItemEntity item = new net.minecraft.world.entity.item.ItemEntity(
+                    ItemEntity item = new ItemEntity(
                             level, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
-                            new net.minecraft.world.item.ItemStack(ModItems.DRY_GRASS.get(), 1));
+                            new ItemStack(ModItems.DRY_GRASS.get(), 1));
                     level.addFreshEntity(item);
                     level.levelEvent(2005, pos, 0);
                     if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
                 }
                 event.setCanceled(true);
-                event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                event.setCancellationResult(InteractionResult.SUCCESS);
                 return;
             }
         }
     }
 
     @SubscribeEvent
-    public void onBonemealEvent(net.minecraftforge.event.entity.player.BonemealEvent event) {
-        if (event.getBlock().is(net.minecraft.world.level.block.Blocks.PODZOL)) {
-            net.minecraft.world.level.Level level = event.getWorld();
-            net.minecraft.core.BlockPos pos = event.getPos();
-            net.minecraft.core.BlockPos above = pos.above();
+    public void onBonemealEvent(BonemealEvent event) {
+        if (event.getBlock().is(Blocks.PODZOL)) {
+            Level level = event.getWorld();
+            BlockPos pos = event.getPos();
+            BlockPos above = pos.above();
             if (level.isEmptyBlock(above)) {
                 if (!level.isClientSide) {
                     level.setBlock(above, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);

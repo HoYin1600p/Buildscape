@@ -1,11 +1,17 @@
 package com.kingodogo.buildscape.config;
 
+import com.google.gson.JsonObject;
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraftforge.fml.loading.FMLPaths;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /** Resolves config directories under the loader config directory, migrating the old relative location. */
@@ -65,7 +71,7 @@ public final class ConfigPaths {
             if (destination.getParent() != null) {
                 Files.createDirectories(destination.getParent());
             }
-            try (java.io.InputStream input = BuildScape.class.getResourceAsStream(resourcePath)) {
+            try (InputStream input = BuildScape.class.getResourceAsStream(resourcePath)) {
                 if (input != null) {
                     Files.copy(input, destination);
                     return true;
@@ -78,24 +84,24 @@ public final class ConfigPaths {
     }
 
     /** Loads default items from bundled JSON template resources without modifying any files on disk. */
-    public static java.util.Set<String> loadDefaultItems(boolean vaultLoaded) {
+    public static Set<String> loadDefaultItems(boolean vaultLoaded) {
         String template = vaultLoaded ? "/data/buildscape/config/vault_pillar_items.json" : "/data/buildscape/config/vanilla_pillar_items.json";
-        try (java.io.InputStream input = BuildScape.class.getResourceAsStream(template)) {
+        try (InputStream input = BuildScape.class.getResourceAsStream(template)) {
             if (input != null) {
-                String json = new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+                String json = new String(input.readAllBytes(), StandardCharsets.UTF_8);
                 return PillarParticleConfig.parseItems(json);
             }
         } catch (Exception e) {
             BuildScape.LOGGER.warn("ConfigPaths: failed to load default items from template " + template, e);
         }
-        return java.util.Collections.emptySet();
+        return Collections.emptySet();
     }
 
-    static com.google.gson.JsonObject loadItemsTemplate(String name) throws IOException {
+    static JsonObject loadItemsTemplate(String name) throws IOException {
         String resource = "/data/buildscape/config/" + name + ".json";
-        try (java.io.InputStream input = BuildScape.class.getResourceAsStream(resource)) {
+        try (InputStream input = BuildScape.class.getResourceAsStream(resource)) {
             if (input == null) throw new IOException("Missing config template: " + resource);
-            String source = new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            String source = new String(input.readAllBytes(), StandardCharsets.UTF_8);
             return ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(source));
         }
     }

@@ -1,15 +1,18 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GlowLightsBlockEntity extends BlockEntity {
 
@@ -69,9 +72,9 @@ public class GlowLightsBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        net.minecraft.nbt.ListTag colorsList = new net.minecraft.nbt.ListTag();
+        ListTag colorsList = new ListTag();
         for (String color : dyeColors) {
-            colorsList.add(net.minecraft.nbt.StringTag.valueOf(color));
+            colorsList.add(StringTag.valueOf(color));
         }
         tag.put("DyeColors", colorsList);
     }
@@ -80,10 +83,10 @@ public class GlowLightsBlockEntity extends BlockEntity {
     public void load(CompoundTag tag) {
         super.load(tag);
         dyeColors.clear();
-        if (tag.contains("DyeColors", net.minecraft.nbt.Tag.TAG_LIST)) {
-            net.minecraft.nbt.ListTag colorsList = tag.getList(
+        if (tag.contains("DyeColors", Tag.TAG_LIST)) {
+            ListTag colorsList = tag.getList(
                     "DyeColors",
-                    net.minecraft.nbt.Tag.TAG_STRING
+                    Tag.TAG_STRING
             );
             for (int i = 0; i < colorsList.size(); i++) {
                 String color = colorsList.getString(i);

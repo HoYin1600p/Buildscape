@@ -1,13 +1,16 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -16,6 +19,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
@@ -24,10 +28,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DiodeBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.Validate;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 
 public class ColoredItemFrameEntity extends HangingEntity {
@@ -246,7 +254,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
             if (!this.level.isClientSide) {
                 this.dropItem(source.getEntity(), false);
                 this.playSound(SoundEvents.ITEM_FRAME_REMOVE_ITEM, 1.0F, 1.0F);
-                this.gameEvent(net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE, source.getEntity());
+                this.gameEvent(GameEvent.BLOCK_CHANGE, source.getEntity());
             }
             return true;
         } else {
@@ -377,11 +385,11 @@ public class ColoredItemFrameEntity extends HangingEntity {
         else if (tag.contains("ITEM", 8)) {
             String itemId = tag.getString("ITEM");
             try {
-                net.minecraft.resources.ResourceLocation itemLocation =
-                        new net.minecraft.resources.ResourceLocation(itemId);
-                net.minecraft.world.item.Item item =
-                        net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemLocation);
-                if (item != null && item != net.minecraft.world.item.Items.AIR) {
+                ResourceLocation itemLocation =
+                        new ResourceLocation(itemId);
+                Item item =
+                        ForgeRegistries.ITEMS.getValue(itemLocation);
+                if (item != null && item != Items.AIR) {
                     ItemStack itemstack = new ItemStack(item);
                     this.setItem(itemstack, false);
                 }
@@ -407,9 +415,9 @@ public class ColoredItemFrameEntity extends HangingEntity {
         }
 
         if (tag.contains("COLORS", 9)) {
-            net.minecraft.nbt.ListTag colorList = tag.getList("COLORS", 8);
+            ListTag colorList = tag.getList("COLORS", 8);
             if (colorList.size() > 0) {
-                java.util.List<String> colors = new java.util.ArrayList<>();
+                List<String> colors = new ArrayList<>();
                 for (int i = 0; i < colorList.size(); i++) {
                     colors.add(colorList.getString(i));
                 }
@@ -445,8 +453,8 @@ public class ColoredItemFrameEntity extends HangingEntity {
         boolean hasCustomData = false;
 
         if (!displayedItem.isEmpty()) {
-            net.minecraft.resources.ResourceLocation itemId =
-                    net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
+            ResourceLocation itemId =
+                    ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
             if (itemId != null) {
                 tag.putString("ITEM", itemId.toString());
                 hasCustomData = true;
@@ -460,7 +468,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
         }
 
         if (persistentData.contains("BuildScapeParticleColors", 9)) {
-            net.minecraft.nbt.ListTag colorList = persistentData.getList("BuildScapeParticleColors", 8);
+            ListTag colorList = persistentData.getList("BuildScapeParticleColors", 8);
             if (colorList.size() > 0) {
                 tag.put("COLORS", colorList.copy());
                 hasCustomData = true;
@@ -481,41 +489,41 @@ public class ColoredItemFrameEntity extends HangingEntity {
     private ItemStack getFrameItemForColor(String color) {
         switch (color) {
             case "black":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.BLACK_ITEM_FRAME.get());
+                return new ItemStack(ModItems.BLACK_ITEM_FRAME.get());
             case "blue":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.BLUE_ITEM_FRAME.get());
+                return new ItemStack(ModItems.BLUE_ITEM_FRAME.get());
             case "brown":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.BROWN_ITEM_FRAME.get());
+                return new ItemStack(ModItems.BROWN_ITEM_FRAME.get());
             case "cyan":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.CYAN_ITEM_FRAME.get());
+                return new ItemStack(ModItems.CYAN_ITEM_FRAME.get());
             case "gray":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.GRAY_ITEM_FRAME.get());
+                return new ItemStack(ModItems.GRAY_ITEM_FRAME.get());
             case "green":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.GREEN_ITEM_FRAME.get());
+                return new ItemStack(ModItems.GREEN_ITEM_FRAME.get());
             case "light_blue":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.LIGHT_BLUE_ITEM_FRAME.get());
+                return new ItemStack(ModItems.LIGHT_BLUE_ITEM_FRAME.get());
             case "light_gray":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.LIGHT_GRAY_ITEM_FRAME.get());
+                return new ItemStack(ModItems.LIGHT_GRAY_ITEM_FRAME.get());
             case "lime":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.LIME_ITEM_FRAME.get());
+                return new ItemStack(ModItems.LIME_ITEM_FRAME.get());
             case "magenta":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.MAGENTA_ITEM_FRAME.get());
+                return new ItemStack(ModItems.MAGENTA_ITEM_FRAME.get());
             case "orange":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.ORANGE_ITEM_FRAME.get());
+                return new ItemStack(ModItems.ORANGE_ITEM_FRAME.get());
             case "pink":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.PINK_ITEM_FRAME.get());
+                return new ItemStack(ModItems.PINK_ITEM_FRAME.get());
             case "purple":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.PURPLE_ITEM_FRAME.get());
+                return new ItemStack(ModItems.PURPLE_ITEM_FRAME.get());
             case "red":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.RED_ITEM_FRAME.get());
+                return new ItemStack(ModItems.RED_ITEM_FRAME.get());
             case "white":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.WHITE_ITEM_FRAME.get());
+                return new ItemStack(ModItems.WHITE_ITEM_FRAME.get());
             case "yellow":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.YELLOW_ITEM_FRAME.get());
+                return new ItemStack(ModItems.YELLOW_ITEM_FRAME.get());
             case "invisible":
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.INVISIBLE_ITEM_FRAME.get());
+                return new ItemStack(ModItems.INVISIBLE_ITEM_FRAME.get());
             default:
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.WHITE_ITEM_FRAME.get());
+                return new ItemStack(ModItems.WHITE_ITEM_FRAME.get());
         }
     }
 }

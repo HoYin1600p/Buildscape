@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.recipe.framework.compiler;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.kingodogo.buildscape.recipe.framework.util.PatternBounds;
+import com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -98,7 +99,7 @@ public class RecipeCacheGenerator {
             Path sourceFile = sourceDirectory.resolve(category + ".json");
             if (Files.isRegularFile(sourceFile)) {
                 rawCategoryData.put(category, Files.readAllBytes(sourceFile));
-                com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter.validateJson(
+                RecipePackFormatter.validateJson(
                         Files.readString(sourceFile, StandardCharsets.UTF_8));
                 try (Reader reader = Files.newBufferedReader(sourceFile, StandardCharsets.UTF_8)) {
                     cycles.addCategory(StreamingRecipeParser.parseCategory(category, reader));

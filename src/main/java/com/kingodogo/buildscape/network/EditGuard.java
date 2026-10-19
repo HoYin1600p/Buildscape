@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
@@ -73,7 +74,7 @@ public final class EditGuard {
                 if (manager.hasLoaded()) SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());
             }
         } catch (RuntimeException e) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Unable to resync {} after a refused edit", player.getGameProfile().getName(), e);
+            BuildScape.LOGGER.warn("Unable to resync {} after a refused edit", player.getGameProfile().getName(), e);
         }
     }
 }

@@ -1,11 +1,10 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.item.ModItems;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -26,6 +25,8 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.List;
 
 public class LeafLayersBlock
         extends SnowLayerBlock
@@ -90,10 +91,10 @@ public class LeafLayersBlock
             }
         }
 
-        net.minecraft.world.item.Item heldItem = context.getItemInHand().getItem();
-        if (heldItem instanceof net.minecraft.world.item.BlockItem) {
-            net.minecraft.world.level.block.Block heldBlock =
-                    ((net.minecraft.world.item.BlockItem) heldItem).getBlock();
+        Item heldItem = context.getItemInHand().getItem();
+        if (heldItem instanceof BlockItem) {
+            Block heldBlock =
+                    ((BlockItem) heldItem).getBlock();
 
             if (heldBlock instanceof LeafLayersBlock && heldBlock != this) {
                 return false;

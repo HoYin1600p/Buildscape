@@ -2,10 +2,16 @@ package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.biometint.SyncBiomeTintPacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
+
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ModMessages {
 
@@ -70,9 +76,9 @@ public class ModMessages {
             Class<T> type,
             int id,
             NetworkDirection direction,
-            java.util.function.BiConsumer<T, net.minecraft.network.FriendlyByteBuf> encoder,
-            java.util.function.Function<net.minecraft.network.FriendlyByteBuf, T> decoder,
-            java.util.function.BiConsumer<T, java.util.function.Supplier<net.minecraftforge.network.NetworkEvent.Context>> consumer
+            BiConsumer<T, FriendlyByteBuf> encoder,
+            Function<FriendlyByteBuf, T> decoder,
+            BiConsumer<T, Supplier<NetworkEvent.Context>> consumer
     ) {
         INSTANCE.messageBuilder(type, id, direction)
                 .encoder(encoder)

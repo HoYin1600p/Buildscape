@@ -11,8 +11,12 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+
+import java.util.Random;
 
 public class ShapelessDurabilityRecipe extends ShapelessRecipe {
 
@@ -48,12 +52,12 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
             if (!stack.isEmpty()) {
                 if ((stack.isDamageableItem() || stack.getMaxDamage() > 0) && !(stack.getItem() instanceof ArmorItem)) {
                     ItemStack damagedStack = stack.copy();
-                    int unbreakingLevel = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
-                            net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, damagedStack
+                    int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(
+                            Enchantments.UNBREAKING, damagedStack
                     );
                     boolean shouldDamage = true;
                     if (unbreakingLevel > 0) {
-                        java.util.Random random = new java.util.Random();
+                        Random random = new Random();
                         if (random.nextFloat() >= (1.0f / (unbreakingLevel + 1.0f))) {
                             shouldDamage = false;
                         }

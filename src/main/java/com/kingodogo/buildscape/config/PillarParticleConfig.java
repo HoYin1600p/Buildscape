@@ -2,24 +2,38 @@ package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.network.SyncConfigPacket;
+import com.kingodogo.buildscape.network.UpdateConfigPacket;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 public class PillarParticleConfig {
     public static final int CONFIG_PERMISSION_LEVEL = 4;
@@ -39,7 +53,7 @@ public class PillarParticleConfig {
     public static EditPermissionMode parseEditPermissionMode(String value) {
         if (value == null) return EditPermissionMode.STRICT;
         try {
-            return EditPermissionMode.valueOf(value.trim().toUpperCase(java.util.Locale.ROOT));
+            return EditPermissionMode.valueOf(value.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ignored) {
             return EditPermissionMode.STRICT;
         }
@@ -57,7 +71,7 @@ public class PillarParticleConfig {
         };
     }
 
-    public static boolean canPlayerEdit(net.minecraft.world.entity.player.Player player, EditPermissionMode mode, EditScope scope) {
+    public static boolean canPlayerEdit(Player player, EditPermissionMode mode, EditScope scope) {
         int permissionLevel = player != null && player.hasPermissions(CONFIG_PERMISSION_LEVEL) ? CONFIG_PERMISSION_LEVEL
                 : player != null && player.hasPermissions(2) ? 2 : 0;
         return canEdit(mode, permissionLevel, scope);
@@ -83,7 +97,7 @@ public class PillarParticleConfig {
     private static PillarParticleConfig INSTANCE;
 
     private static PillarParticleConfig SERVER_CONFIG = null;
-    private static final Set<String> WARNED_INVALID_ITEMS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final Set<String> WARNED_INVALID_ITEMS = ConcurrentHashMap.newKeySet();
 
     private long lastLoadedProperties = 0L;
     private long lastFileSizeProperties = 0L;
@@ -94,7 +108,7 @@ public class PillarParticleConfig {
     private static Thread watchThread = null;
     private static final AtomicBoolean watcherInitialized = new AtomicBoolean(
             false);
-    private static final List<java.util.function.Consumer<Boolean>> configReloadCallbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static final List<Consumer<Boolean>> configReloadCallbacks = new CopyOnWriteArrayList<>();
     private static long lastNotifyTime = 0;
 
     private static volatile PillarParticleConfig SNAPSHOT = null;
@@ -111,12 +125,12 @@ public class PillarParticleConfig {
     private static volatile long lastStatCheckTime = 0L;
     private static final long STAT_CHECK_INTERVAL_MS = 2000L;
 
-    public static void addConfigReloadCallback(java.util.function.Consumer<Boolean> callback) {
+    public static void addConfigReloadCallback(Consumer<Boolean> callback) {
         configReloadCallbacks.add(callback);
     }
 
     private static void notifyCallbacks(boolean isRemote) {
-        for (java.util.function.Consumer<Boolean> callback : configReloadCallbacks) {
+        for (Consumer<Boolean> callback : configReloadCallbacks) {
             try {
                 callback.accept(isRemote);
             } catch (Exception e) {
@@ -126,7 +140,7 @@ public class PillarParticleConfig {
         clearMatchCache();
     }
 
-    public volatile Set<String> items = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    public volatile Set<String> items = ConcurrentHashMap.newKeySet();
     private boolean itemsLoaded;
     private boolean itemsFileUnreadable;
     private transient boolean itemsReadOnly;
@@ -150,7 +164,7 @@ public class PillarParticleConfig {
     }
 
     public synchronized void replaceItems(Collection<String> updatedItems) {
-        Set<String> replacement = java.util.concurrent.ConcurrentHashMap.newKeySet();
+        Set<String> replacement = ConcurrentHashMap.newKeySet();
         replacement.addAll(updatedItems);
         for (String item : replacement) {
             if (!isValidItemId(item) && WARNED_INVALID_ITEMS.add(item)) {
@@ -194,7 +208,7 @@ public class PillarParticleConfig {
         }
     }
 
-    private static final java.util.concurrent.ConcurrentHashMap<net.minecraft.world.item.Item, Boolean> MATCH_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Item, Boolean> MATCH_CACHE = new ConcurrentHashMap<>();
 
     private static void clearMatchCache() {
         MATCH_CACHE.clear();
@@ -306,7 +320,7 @@ public class PillarParticleConfig {
     }
 
     public static void setServerConfig(
-            com.kingodogo.buildscape.network.SyncConfigPacket packet) {
+            SyncConfigPacket packet) {
         SERVER_CONFIG = new PillarParticleConfig();
         SERVER_CONFIG.remote = true;
         SERVER_CONFIG.itemsReadOnly = packet.itemsReadOnly;
@@ -459,12 +473,12 @@ public class PillarParticleConfig {
     @OnlyIn(Dist.CLIENT)
     private static final class ClientConnectionState {
         private static boolean hasLocalServer() {
-            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+            Minecraft minecraft = Minecraft.getInstance();
             return minecraft != null && minecraft.hasSingleplayerServer();
         }
 
         private static boolean isConnected() {
-            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+            Minecraft minecraft = Minecraft.getInstance();
             return minecraft.getConnection() != null && minecraft.level != null;
         }
     }
@@ -734,7 +748,7 @@ public class PillarParticleConfig {
     }
 
     private synchronized void loadItemsInternal() {
-        loadItemsInternal(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+        loadItemsInternal(ModList.get().isLoaded("the_vault"));
     }
 
     synchronized void loadItemsInternal(boolean vaultLoaded) {
@@ -793,12 +807,12 @@ public class PillarParticleConfig {
         }
     }
 
-    static JsonObject mergeDefaultItems(JsonObject document, boolean vaultLoaded) throws java.io.IOException {
+    static JsonObject mergeDefaultItems(JsonObject document, boolean vaultLoaded) throws IOException {
         JsonObject defaults = ConfigPaths.loadItemsTemplate(vaultLoaded ? "vault_pillar_items" : "vanilla_pillar_items");
         int defaultsVersion = defaults.get("defaults_version").getAsInt();
         Set<String> offered = new HashSet<>();
         if (document.has("offered_defaults")) {
-            if (!document.get("offered_defaults").isJsonArray()) throw new java.io.IOException("Invalid offered defaults");
+            if (!document.get("offered_defaults").isJsonArray()) throw new IOException("Invalid offered defaults");
             for (JsonElement entry : document.getAsJsonArray("offered_defaults")) offered.add(entry.getAsString());
         } else if (document.has("defaults_version") && document.get("defaults_version").getAsInt() >= defaultsVersion) {
             // Current files may have been hand-edited before offered defaults were recorded.
@@ -832,7 +846,7 @@ public class PillarParticleConfig {
         return item.startsWith("the_vault:") || item.startsWith("#the_vault:");
     }
 
-    private static boolean isLegacyItems(JsonObject document) throws java.io.IOException {
+    private static boolean isLegacyItems(JsonObject document) throws IOException {
         if (document == null || document.has("offered_defaults")) return false;
         if (document.has("defaults_version")) return document.get("defaults_version").getAsInt() <= 405;
         Set<String> existing = new HashSet<>();
@@ -855,10 +869,10 @@ public class PillarParticleConfig {
     }
 
     static Set<String> parseItems(String content, String source) {
-        com.google.gson.JsonObject root;
+        JsonObject root;
         try {
-            root = GSON.fromJson(ConfigLayoutIO.itemsJson(content), com.google.gson.JsonObject.class);
-        } catch (java.io.IOException e) {
+            root = GSON.fromJson(ConfigLayoutIO.itemsJson(content), JsonObject.class);
+        } catch (IOException e) {
             throw new IllegalArgumentException("Invalid items config " + source, e);
         }
         if (root == null || !root.has("items") || !root.get("items").isJsonArray()) {
@@ -866,7 +880,7 @@ public class PillarParticleConfig {
         }
         Set<String> parsed = new HashSet<>();
         boolean skippedEntries = false;
-        for (com.google.gson.JsonElement item : root.getAsJsonArray("items")) {
+        for (JsonElement item : root.getAsJsonArray("items")) {
             if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) {
                 skippedEntries = true;
                 continue;
@@ -959,7 +973,7 @@ public class PillarParticleConfig {
     }
 
     private boolean matchesUncached(ItemStack stack) {
-        ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(
                 stack.getItem());
         if (id != null && items.contains(id.toString())) {
             return true;
@@ -970,8 +984,8 @@ public class PillarParticleConfig {
                 String tagString = itemOrTag.substring(1);
                 try {
                     ResourceLocation tagLocation = new ResourceLocation(tagString);
-                    net.minecraft.tags.TagKey<net.minecraft.world.item.Item> tagKey = net.minecraft.tags.TagKey.create(
-                            net.minecraft.core.Registry.ITEM_REGISTRY,
+                    TagKey<Item> tagKey = TagKey.create(
+                            Registry.ITEM_REGISTRY,
                             tagLocation);
 
                     if (stack.getItem().builtInRegistryHolder().is(tagKey)) {
@@ -992,11 +1006,11 @@ public class PillarParticleConfig {
         }
         clearMatchCache();
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
-            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> {
-                        if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
-                            com.kingodogo.buildscape.network.UpdateConfigPacket.send(this);
+                        if (Minecraft.getInstance().player != null &&
+                                Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
+                            UpdateConfigPacket.send(this);
                         }
                     });
             return;
@@ -1006,7 +1020,7 @@ public class PillarParticleConfig {
 
     public synchronized boolean saveItemsToDisk() {
         if (remote) return false;
-        return saveItemsToDisk(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+        return saveItemsToDisk(ModList.get().isLoaded("the_vault"));
     }
 
     synchronized boolean saveItemsToDisk(boolean vaultLoaded) {
@@ -1052,11 +1066,11 @@ public class PillarParticleConfig {
             return;
         }
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
-            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> {
-                        if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
-                            com.kingodogo.buildscape.network.UpdateConfigPacket.send(this);
+                        if (Minecraft.getInstance().player != null &&
+                                Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
+                            UpdateConfigPacket.send(this);
                         }
                     });
             return;
@@ -1185,7 +1199,7 @@ public class PillarParticleConfig {
                         || !ConfigLayoutIO.isWritable(itemsFile.toPath());
             }
             return (!properties || canEditProperties()) && (!items || canEditItems());
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             BuildScape.LOGGER.warn("Unable to check server config protection", e);
             return false;
         }
@@ -1204,7 +1218,7 @@ public class PillarParticleConfig {
         values.addProperty("pattern_intensity", pattern_intensity);
         values.addProperty("use_pattern", use_pattern);
         values.addProperty("particle_density", particle_density);
-        values.addProperty("edit_permission_mode", edit_permission_mode != null ? edit_permission_mode.name().toLowerCase(java.util.Locale.ROOT) : "strict");
+        values.addProperty("edit_permission_mode", edit_permission_mode != null ? edit_permission_mode.name().toLowerCase(Locale.ROOT) : "strict");
         return values;
     }
 
@@ -1214,7 +1228,7 @@ public class PillarParticleConfig {
                 + "  // Right-click a pillar with dyes to override config colors for that pillar (up to 5 dyes).\n"
                 + "  // Dye colors cycle in application order; break and replace the pillar to reset them.\n"
                 + "  // Config colors cycle from the first color through max_particle_color.\n");
-        java.util.Set<String> written = new java.util.HashSet<>();
+        Set<String> written = new HashSet<>();
         appendProperties(text, values, written, "Visuals", new String[][]{
                 {"particle_color", "Hexadecimal particle color palette (up to 7 colors)"},
                 {"max_particle_color", "Maximum number of colors to use from particle_color (1-7)"},
@@ -1231,7 +1245,7 @@ public class PillarParticleConfig {
                 {"particle_density", "Number of particles spawned per tick when use_pattern = false"}});
         boolean otherHeading = false;
         // Sort unknown keys as well, so output remains stable regardless of input key order.
-        for (String key : new java.util.TreeSet<>(values.keySet())) {
+        for (String key : new TreeSet<>(values.keySet())) {
             if (!written.contains(key)) {
                 if (!otherHeading) {
                     text.append("\n  // --- Other ---\n");

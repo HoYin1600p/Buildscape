@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -8,6 +9,7 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -22,7 +24,9 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 
+import java.util.List;
 import javax.annotation.Nullable;
 
 public class FestiveStockingEntity extends HangingEntity {
@@ -170,7 +174,7 @@ public class FestiveStockingEntity extends HangingEntity {
             d8 /= 32.0D;
 
             this.setBoundingBox(
-                    new net.minecraft.world.phys.AABB(
+                    new AABB(
                             d0 - d6,
                             d1 - d7,
                             d2 - d8,
@@ -376,7 +380,7 @@ public class FestiveStockingEntity extends HangingEntity {
             ) {
                 return false;
             } else {
-                java.util.List<Entity> entities =
+                List<Entity> entities =
                         this.level.getEntities(this, this.getBoundingBox());
                 for (Entity entity : entities) {
                     if (entity instanceof HangingEntity && entity != this) {
@@ -415,7 +419,7 @@ public class FestiveStockingEntity extends HangingEntity {
         }
     }
 
-    private net.minecraft.sounds.SoundEvent getRemoveItemSound() {
+    private SoundEvent getRemoveItemSound() {
         return SoundEvents.ITEM_FRAME_REMOVE_ITEM;
     }
 
@@ -436,71 +440,71 @@ public class FestiveStockingEntity extends HangingEntity {
         switch (color) {
             case "black":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.BLACK_FESTIVE_STOCKING.get()
+                        ModItems.BLACK_FESTIVE_STOCKING.get()
                 );
             case "blue":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.BLUE_FESTIVE_STOCKING.get()
+                        ModItems.BLUE_FESTIVE_STOCKING.get()
                 );
             case "brown":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.BROWN_FESTIVE_STOCKING.get()
+                        ModItems.BROWN_FESTIVE_STOCKING.get()
                 );
             case "cyan":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.CYAN_FESTIVE_STOCKING.get()
+                        ModItems.CYAN_FESTIVE_STOCKING.get()
                 );
             case "gray":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.GRAY_FESTIVE_STOCKING.get()
+                        ModItems.GRAY_FESTIVE_STOCKING.get()
                 );
             case "green":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.GREEN_FESTIVE_STOCKING.get()
+                        ModItems.GREEN_FESTIVE_STOCKING.get()
                 );
             case "light_blue":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.LIGHT_BLUE_FESTIVE_STOCKING.get()
+                        ModItems.LIGHT_BLUE_FESTIVE_STOCKING.get()
                 );
             case "light_gray":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.LIGHT_GRAY_FESTIVE_STOCKING.get()
+                        ModItems.LIGHT_GRAY_FESTIVE_STOCKING.get()
                 );
             case "lime":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.LIME_FESTIVE_STOCKING.get()
+                        ModItems.LIME_FESTIVE_STOCKING.get()
                 );
             case "magenta":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.MAGENTA_FESTIVE_STOCKING.get()
+                        ModItems.MAGENTA_FESTIVE_STOCKING.get()
                 );
             case "orange":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.ORANGE_FESTIVE_STOCKING.get()
+                        ModItems.ORANGE_FESTIVE_STOCKING.get()
                 );
             case "pink":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.PINK_FESTIVE_STOCKING.get()
+                        ModItems.PINK_FESTIVE_STOCKING.get()
                 );
             case "purple":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.PURPLE_FESTIVE_STOCKING.get()
+                        ModItems.PURPLE_FESTIVE_STOCKING.get()
                 );
             case "red":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.RED_FESTIVE_STOCKING.get()
+                        ModItems.RED_FESTIVE_STOCKING.get()
                 );
             case "white":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.WHITE_FESTIVE_STOCKING.get()
+                        ModItems.WHITE_FESTIVE_STOCKING.get()
                 );
             case "yellow":
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.YELLOW_FESTIVE_STOCKING.get()
+                        ModItems.YELLOW_FESTIVE_STOCKING.get()
                 );
             default:
                 return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.FESTIVE_STOCKING.get()
+                        ModItems.FESTIVE_STOCKING.get()
                 );
         }
     }

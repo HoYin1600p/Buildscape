@@ -1,5 +1,8 @@
 package com.kingodogo.buildscape.recipe.framework.parser;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
@@ -329,11 +332,11 @@ public class StreamingRecipeParser {
     }
 
     private static RecipeIR.RecipeSpec parseRecipeSpec(JsonReader reader, String defaultType) throws IOException {
-        com.google.gson.JsonElement jsonElement = com.google.gson.JsonParser.parseReader(reader);
+        JsonElement jsonElement = JsonParser.parseReader(reader);
         if (!jsonElement.isJsonObject()) {
             return new RecipeIR.RecipeSpec(null, defaultType, "", List.of(), Map.of(), List.of(), null, null, 200, 0.1f, null);
         }
-        com.google.gson.JsonObject json = jsonElement.getAsJsonObject();
+        JsonObject json = jsonElement.getAsJsonObject();
         String rawJson = json.toString();
 
         String id = json.has("id") ? json.get("id").getAsString() : null;
@@ -341,34 +344,34 @@ public class StreamingRecipeParser {
         String group = json.has("group") ? json.get("group").getAsString() : "";
         List<String> pattern = new ArrayList<>();
         if (json.has("pattern") && json.get("pattern").isJsonArray()) {
-            for (com.google.gson.JsonElement el : json.getAsJsonArray("pattern")) {
+            for (JsonElement el : json.getAsJsonArray("pattern")) {
                 pattern.add(el.getAsString());
             }
         }
         Map<String, String> keys = new HashMap<>();
         if (json.has("keys") && json.get("keys").isJsonObject()) {
-            for (Map.Entry<String, com.google.gson.JsonElement> e : json.getAsJsonObject("keys").entrySet()) {
+            for (Map.Entry<String, JsonElement> e : json.getAsJsonObject("keys").entrySet()) {
                 keys.put(e.getKey(), e.getValue().getAsString());
             }
         } else if (json.has("key") && json.get("key").isJsonObject()) {
-            for (Map.Entry<String, com.google.gson.JsonElement> e : json.getAsJsonObject("key").entrySet()) {
+            for (Map.Entry<String, JsonElement> e : json.getAsJsonObject("key").entrySet()) {
                 keys.put(e.getKey(), e.getValue().toString());
             }
         }
         List<String> ingredients = new ArrayList<>();
         if (json.has("ingredients") && json.get("ingredients").isJsonArray()) {
-            for (com.google.gson.JsonElement el : json.getAsJsonArray("ingredients")) {
+            for (JsonElement el : json.getAsJsonArray("ingredients")) {
                 ingredients.add(el.getAsString());
             }
         }
         String input = json.has("input") ? json.get("input").getAsString() : null;
         RecipeIR.ResultSpec result = null;
         if (json.has("result")) {
-            com.google.gson.JsonElement resEl = json.get("result");
+            JsonElement resEl = json.get("result");
             if (resEl.isJsonPrimitive()) {
                 result = new RecipeIR.ResultSpec(resEl.getAsString(), 1, null);
             } else if (resEl.isJsonObject()) {
-                com.google.gson.JsonObject resObj = resEl.getAsJsonObject();
+                JsonObject resObj = resEl.getAsJsonObject();
                 String item = resObj.has("item") ? resObj.get("item").getAsString() : null;
                 int count = resObj.has("count") ? resObj.get("count").getAsInt() : 1;
                 String nbt = resObj.has("nbt") ? resObj.get("nbt").toString() : null;
@@ -395,7 +398,7 @@ public class StreamingRecipeParser {
                 switch (key) {
                     case "item" -> item = reader.nextString();
                     case "count" -> count = reader.nextInt();
-                    case "nbt" -> nbt = com.google.gson.JsonParser.parseReader(reader).toString();
+                    case "nbt" -> nbt = JsonParser.parseReader(reader).toString();
                     default -> reader.skipValue();
                 }
             }

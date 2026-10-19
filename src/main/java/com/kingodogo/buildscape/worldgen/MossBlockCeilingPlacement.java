@@ -1,15 +1,17 @@
 package com.kingodogo.buildscape.worldgen;
 
 import com.mojang.serialization.Codec;
-
-import java.util.Random;
-import java.util.stream.Stream;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
+
+import java.util.Random;
+import java.util.stream.Stream;
 
 public class MossBlockCeilingPlacement extends PlacementModifier {
 
@@ -28,7 +30,7 @@ public class MossBlockCeilingPlacement extends PlacementModifier {
             Random random,
             BlockPos pos
     ) {
-        net.minecraft.world.level.WorldGenLevel level = context.getLevel();
+        WorldGenLevel level = context.getLevel();
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
         for (int y = pos.getY(); y < pos.getY() + 64; y++) {
@@ -37,11 +39,11 @@ public class MossBlockCeilingPlacement extends PlacementModifier {
             if (
                     level
                             .getBlockState(mutablePos)
-                            .is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK)
+                            .is(Blocks.MOSS_BLOCK)
             ) {
                 BlockPos placePos = mutablePos.below();
                 if (level.getBlockState(placePos).isAir()) {
-                    net.minecraft.world.level.block.state.BlockState mossState =
+                    BlockState mossState =
                             level.getBlockState(mutablePos);
                     if (mossState.isFaceSturdy(level, mutablePos, Direction.DOWN)) {
                         return Stream.of(placePos);

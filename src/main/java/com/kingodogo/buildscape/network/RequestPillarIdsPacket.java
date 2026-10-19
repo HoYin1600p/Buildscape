@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -49,7 +50,7 @@ public class RequestPillarIdsPacket {
             try {
                 SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());
             } catch (RuntimeException e) {
-                com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to send pillar data to {}", player.getGameProfile().getName(), e);
+                BuildScape.LOGGER.error("Unable to send pillar data to {}", player.getGameProfile().getName(), e);
             }
         });
         ctx.get().setPacketHandled(true);

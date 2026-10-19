@@ -3,9 +3,10 @@ package com.kingodogo.buildscape.event;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -19,7 +20,7 @@ public class PillarRegistrySaveEvents {
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load event) {
         if (event.getWorld() instanceof ServerLevel
-                && event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk) {
+                && event.getChunk() instanceof LevelChunk chunk) {
             PillarIdManager.get().trackLoadedChunk(chunk, true);
         }
     }
@@ -27,7 +28,7 @@ public class PillarRegistrySaveEvents {
     @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
         if (event.getWorld() instanceof ServerLevel
-                && event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk) {
+                && event.getChunk() instanceof LevelChunk chunk) {
             PillarIdManager.get().trackLoadedChunk(chunk, false);
         }
     }

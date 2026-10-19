@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,7 +49,7 @@ public class RemovePillarPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
-            if (!EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_EDIT)) return;
+            if (!EditGuard.require(player, ConfigSetting.PILLAR_EDIT)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             boolean changed = manager.removePillars(pillarIds);

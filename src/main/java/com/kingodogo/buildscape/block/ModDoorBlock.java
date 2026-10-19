@@ -1,13 +1,14 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootContext;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ModDoorBlock extends DoorBlock {
 
@@ -16,7 +17,7 @@ public class ModDoorBlock extends DoorBlock {
     }
 
     @Override
-    public List<net.minecraft.world.item.ItemStack> getDrops(
+    public List<ItemStack> getDrops(
             BlockState state,
             LootContext.Builder builder
     ) {

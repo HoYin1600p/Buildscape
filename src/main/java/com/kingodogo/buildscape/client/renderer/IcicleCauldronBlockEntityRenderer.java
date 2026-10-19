@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,10 +65,10 @@ public class IcicleCauldronBlockEntityRenderer
         ItemStack storedIcicle = blockEntity.getStoredIcicle();
         if (
                 !storedIcicle.isEmpty() &&
-                        storedIcicle.getItem() instanceof net.minecraft.world.item.BlockItem
+                        storedIcicle.getItem() instanceof BlockItem
         ) {
-            net.minecraft.world.item.BlockItem blockItem =
-                    (net.minecraft.world.item.BlockItem) storedIcicle.getItem();
+            BlockItem blockItem =
+                    (BlockItem) storedIcicle.getItem();
             BlockState icicleBlockState = blockItem.getBlock().defaultBlockState();
 
             poseStack.pushPose();

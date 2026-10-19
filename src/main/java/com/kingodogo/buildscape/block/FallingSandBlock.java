@@ -1,12 +1,15 @@
 package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.RegistryObject;
+
+import java.util.Random;
 
 public class FallingSandBlock extends Block {
 
@@ -35,9 +38,9 @@ public class FallingSandBlock extends Block {
     ) {
         if (
                 !level.isClientSide &&
-                        level instanceof net.minecraft.server.level.ServerLevel
+                        level instanceof ServerLevel
         ) {
-            ((net.minecraft.server.level.ServerLevel) level).scheduleTick(
+            ((ServerLevel) level).scheduleTick(
                     pos,
                     this,
                     this.getDelayAfterPlace()
@@ -56,9 +59,9 @@ public class FallingSandBlock extends Block {
     ) {
         if (
                 !level.isClientSide &&
-                        level instanceof net.minecraft.server.level.ServerLevel
+                        level instanceof ServerLevel
         ) {
-            ((net.minecraft.server.level.ServerLevel) level).scheduleTick(
+            ((ServerLevel) level).scheduleTick(
                     pos,
                     this,
                     this.getDelayAfterPlace()
@@ -69,9 +72,9 @@ public class FallingSandBlock extends Block {
     @Override
     public void tick(
             BlockState state,
-            net.minecraft.server.level.ServerLevel level,
+            ServerLevel level,
             BlockPos pos,
-            java.util.Random random
+            Random random
     ) {
         if (isFree(level, pos)) {
             FallingBlockEntity.fall(level, pos, state);

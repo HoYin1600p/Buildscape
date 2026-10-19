@@ -53,7 +53,7 @@ public class ModParticles {
             PARTICLES.register("sulfur_bubbles", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<ParticleType<GeyserParticleOptions>> GEYSER =
-            PARTICLES.register("geyser", () -> new net.minecraft.core.particles.ParticleType<GeyserParticleOptions>(true, GeyserParticleOptions.DESERIALIZER) {
+            PARTICLES.register("geyser", () -> new ParticleType<GeyserParticleOptions>(true, GeyserParticleOptions.DESERIALIZER) {
                 @Override
                 public com.mojang.serialization.Codec<GeyserParticleOptions> codec() {
                     return GeyserParticleOptions.CODEC;
@@ -61,7 +61,7 @@ public class ModParticles {
             });
 
     public static final RegistryObject<ParticleType<GeyserBaseParticleOptions>> GEYSER_BASE =
-            PARTICLES.register("geyser_base", () -> new net.minecraft.core.particles.ParticleType<GeyserBaseParticleOptions>(true, GeyserBaseParticleOptions.DESERIALIZER) {
+            PARTICLES.register("geyser_base", () -> new ParticleType<GeyserBaseParticleOptions>(true, GeyserBaseParticleOptions.DESERIALIZER) {
                 @Override
                 public com.mojang.serialization.Codec<GeyserBaseParticleOptions> codec() {
                     return GeyserBaseParticleOptions.CODEC;
@@ -69,7 +69,7 @@ public class ModParticles {
             });
 
     public static final RegistryObject<ParticleType<GeyserBaseParticleOptions>> GEYSER_POOF =
-            PARTICLES.register("geyser_poof", () -> new net.minecraft.core.particles.ParticleType<GeyserBaseParticleOptions>(true, GeyserBaseParticleOptions.DESERIALIZER) {
+            PARTICLES.register("geyser_poof", () -> new ParticleType<GeyserBaseParticleOptions>(true, GeyserBaseParticleOptions.DESERIALIZER) {
                 @Override
                 public com.mojang.serialization.Codec<GeyserBaseParticleOptions> codec() {
                     return GeyserBaseParticleOptions.CODEC;
@@ -77,13 +77,13 @@ public class ModParticles {
             });
 
     public static final RegistryObject<ParticleType<GeyserParticleOptions>> GEYSER_PLUME =
-            PARTICLES.register("geyser_plume", () -> new net.minecraft.core.particles.ParticleType<GeyserParticleOptions>(true, GeyserParticleOptions.DESERIALIZER) {
+            PARTICLES.register("geyser_plume", () -> new ParticleType<GeyserParticleOptions>(true, GeyserParticleOptions.DESERIALIZER) {
                 @Override
                 public com.mojang.serialization.Codec<GeyserParticleOptions> codec() {
                     return GeyserParticleOptions.CODEC;
                 }
             });
 
-    public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> XP_PARTICLE =
-            PARTICLES.register("xp_particle", () -> new net.minecraft.core.particles.SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> XP_PARTICLE =
+            PARTICLES.register("xp_particle", () -> new SimpleParticleType(false));
 }

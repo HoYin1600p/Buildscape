@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.pipe.transport;
 
+import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -106,7 +107,7 @@ public class HollowPipeTransportManager {
             ASYNC_NETWORKS.incrementAndGet();
             CompletableFuture.supplyAsync(
                             () -> WaterPipeTransport.INSTANCE.calculatePreparedNetwork(prepared),
-                            com.kingodogo.buildscape.BuildScape.getAsyncPool())
+                            BuildScape.getAsyncPool())
                     .whenComplete((states, error) -> {
                         ASYNC_NETWORKS.decrementAndGet();
                         COMPLETED.add(new CompletedJob(job, states, error));

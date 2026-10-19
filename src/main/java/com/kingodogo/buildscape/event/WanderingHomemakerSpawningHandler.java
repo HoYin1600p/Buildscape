@@ -3,21 +3,29 @@ package com.kingodogo.buildscape.event;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.*;
 import com.kingodogo.buildscape.entity.ModEntities;
+import com.kingodogo.buildscape.network.ModMessages;
+import com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -82,7 +90,7 @@ public class WanderingHomemakerSpawningHandler {
         if (player.getPersistentData().hasUUID("WanderingHomemakerUUID")) {
             UUID uuid = player.getPersistentData().getUUID("WanderingHomemakerUUID");
             for (ServerLevel sl : level.getServer().getAllLevels()) {
-                net.minecraft.world.entity.Entity entity = sl.getEntity(uuid);
+                Entity entity = sl.getEntity(uuid);
                 if (entity != null && entity.isAlive()) {
                     return true;
                 }
@@ -94,7 +102,7 @@ public class WanderingHomemakerSpawningHandler {
     @SubscribeEvent
     public static void onBlockPlaced(BlockEvent.EntityPlaceEvent event) {
         if (event.isCanceled()) return;
-        net.minecraft.world.level.LevelAccessor worldAccessor = event.getWorld();
+        LevelAccessor worldAccessor = event.getWorld();
         if (!(worldAccessor instanceof ServerLevel level)) return;
         if (!(event.getEntity() instanceof Player player)) return;
 
@@ -115,16 +123,16 @@ public class WanderingHomemakerSpawningHandler {
             }
 
             if (player.getPersistentData().hasUUID("WanderingHomemakerUUID")) {
-                java.util.UUID oldUuid = player.getPersistentData().getUUID("WanderingHomemakerUUID");
+                UUID oldUuid = player.getPersistentData().getUUID("WanderingHomemakerUUID");
                 for (ServerLevel sl : level.getServer().getAllLevels()) {
-                    net.minecraft.world.entity.Entity oldEntity = sl.getEntity(oldUuid);
+                    Entity oldEntity = sl.getEntity(oldUuid);
                     if (oldEntity != null && oldEntity.isAlive()) {
                         oldEntity.discard();
                     }
                 }
             }
 
-            java.time.LocalDate today = java.time.LocalDate.now();
+            LocalDate today = LocalDate.now();
             int month = today.getMonthValue();
             int day = today.getDayOfMonth();
 
@@ -137,7 +145,7 @@ public class WanderingHomemakerSpawningHandler {
                 }
             }
 
-            net.minecraft.world.entity.npc.WanderingTrader homemaker = spawnFestive ?
+            WanderingTrader homemaker = spawnFestive ?
                     ModEntities.FESTIVE_WANDERING_HOMEMAKER.get().create(level) :
                     ModEntities.WANDERING_HOMEMAKER.get().create(level);
             if (homemaker != null) {
@@ -163,10 +171,10 @@ public class WanderingHomemakerSpawningHandler {
                 player.getPersistentData().putLong("WanderingHomemakerCooldownRealTime", cooldownEnd);
                 player.getPersistentData().putUUID("WanderingHomemakerUUID", homemaker.getUUID());
 
-                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                    com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldownEnd)
+                if (player instanceof ServerPlayer serverPlayer) {
+                    ModMessages.INSTANCE.send(
+                            PacketDistributor.PLAYER.with(() -> serverPlayer),
+                            new SyncHomemakerCooldownPacket(cooldownEnd)
                     );
                 }
             }

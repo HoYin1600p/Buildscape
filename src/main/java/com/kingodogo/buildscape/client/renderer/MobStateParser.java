@@ -1,7 +1,10 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -327,12 +330,12 @@ public class MobStateParser {
             return null;
         }
 
-        net.minecraft.nbt.CompoundTag tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag == null || !tag.contains("display", 10)) {
             return null;
         }
 
-        net.minecraft.nbt.CompoundTag displayTag = tag.getCompound("display");
+        CompoundTag displayTag = tag.getCompound("display");
         if (!displayTag.contains("Name", 8)) {
             return null;
         }
@@ -343,16 +346,16 @@ public class MobStateParser {
         }
 
         try {
-            net.minecraft.network.chat.Component nameComponent =
-                    net.minecraft.network.chat.Component.Serializer.fromJson(nameJson);
+            Component nameComponent =
+                    Component.Serializer.fromJson(nameJson);
             if (nameComponent != null) {
                 String displayName = nameComponent.getString();
                 if (displayName != null && !displayName.isEmpty()) {
-                    return net.minecraft.ChatFormatting.stripFormatting(displayName.trim());
+                    return ChatFormatting.stripFormatting(displayName.trim());
                 }
             }
         } catch (Exception e) {
-            return net.minecraft.ChatFormatting.stripFormatting(nameJson.trim());
+            return ChatFormatting.stripFormatting(nameJson.trim());
         }
 
         return null;

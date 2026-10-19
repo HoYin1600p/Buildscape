@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.GlowLichenBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,6 +18,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class CreakingHeartBlock extends RotatedPillarBlock {
@@ -59,14 +63,14 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
     }
 
     private void spawnResinOnHeart(Level level, BlockPos pos) {
-        java.util.List<Direction> directions = new java.util.ArrayList<>(java.util.List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN));
-        java.util.Collections.shuffle(directions, level.random);
+        List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN));
+        Collections.shuffle(directions, level.random);
 
         int spawned = 0;
         for (Direction dir : directions) {
             BlockPos adjPos = pos.relative(dir);
             Direction attachFace = dir.getOpposite();
-            BooleanProperty faceProp = net.minecraft.world.level.block.GlowLichenBlock.getFaceProperty(attachFace);
+            BooleanProperty faceProp = GlowLichenBlock.getFaceProperty(attachFace);
             BlockState adjState = level.getBlockState(adjPos);
 
             if (adjState.is(ModBlocks.RESIN_CLUMP.get())) {

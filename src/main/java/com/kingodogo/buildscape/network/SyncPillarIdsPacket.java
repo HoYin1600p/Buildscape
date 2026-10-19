@@ -1,17 +1,25 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import com.kingodogo.buildscape.config.PillarIdManager;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,10 +126,10 @@ public class SyncPillarIdsPacket {
             }
         }
         if (skipped > 0) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Skipped {} invalid pillar sync entries", skipped);
+            BuildScape.LOGGER.warn("Skipped {} invalid pillar sync entries", skipped);
         }
         if (snapshot.size() > MAX_BUFFERED_ENTRIES) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Pillar sync exceeds the {} entry limit", MAX_BUFFERED_ENTRIES);
+            BuildScape.LOGGER.warn("Pillar sync exceeds the {} entry limit", MAX_BUFFERED_ENTRIES);
             return List.of();
         }
         int chunkCount = (int) Math.max(1L, (snapshot.size() + (long) PILLARS_PER_CHUNK - 1) / PILLARS_PER_CHUNK);
@@ -176,7 +184,7 @@ public class SyncPillarIdsPacket {
 
         PillarIdManager.getClient().replaceFromServerSync(complete);
         try {
-            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.onPillarsSynced();
+            BuildScapeConfigScreen.onPillarsSynced();
         } catch (Throwable ignored) {}
     }
 
@@ -190,12 +198,12 @@ public class SyncPillarIdsPacket {
         }
     }
 
-    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-            modid = com.kingodogo.buildscape.BuildScape.MODID, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(
+            modid = BuildScape.MODID, value = Dist.CLIENT)
     public static final class ClientEvents {
-        @net.minecraftforge.eventbus.api.SubscribeEvent
-        public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
-            if (event.phase == net.minecraftforge.event.TickEvent.Phase.END) {
+        @SubscribeEvent
+        public static void onClientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase == TickEvent.Phase.END) {
                 expireClientState();
             }
         }
@@ -232,7 +240,7 @@ public class SyncPillarIdsPacket {
     }
 
     public static boolean canEncode(PillarIdManager.PillarData data) {
-        io.netty.buffer.ByteBuf scratch = io.netty.buffer.Unpooled.buffer();
+        ByteBuf scratch = Unpooled.buffer();
         try {
             writePillarData(new FriendlyByteBuf(scratch), data);
             return true;
@@ -255,7 +263,7 @@ public class SyncPillarIdsPacket {
         buf.writeLong(data.createdTime);
         buf.writeLong(data.modifiedTime);
 
-        List<String> colors = data.dyeColors != null ? data.dyeColors : java.util.Collections.emptyList();
+        List<String> colors = data.dyeColors != null ? data.dyeColors : Collections.emptyList();
         NetworkPacketLimits.checkCount(colors.size(), NetworkPacketLimits.MAX_DYE_COLORS, "pillar color");
         buf.writeInt(colors.size());
         for (String color : colors) {

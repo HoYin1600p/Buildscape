@@ -12,12 +12,13 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public abstract class PipeFluidTransport {
 
     public abstract Fluid getFluidType();
 
-    public abstract java.util.Set<BlockPos> recalculateNetwork(Level level, BlockPos startPos);
+    public abstract Set<BlockPos> recalculateNetwork(Level level, BlockPos startPos);
 
     public static boolean isHollowPipe(BlockState state) {
         return state != null && state.getBlock() instanceof HollowPipeBlock;

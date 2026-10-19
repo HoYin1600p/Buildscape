@@ -11,13 +11,32 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.entity.animal.Bee;
+import net.minecraft.world.entity.animal.Cat;
+import net.minecraft.world.entity.animal.Fox;
+import net.minecraft.world.entity.animal.PolarBear;
+import net.minecraft.world.entity.animal.Rabbit;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.monster.Vex;
+import net.minecraft.world.entity.monster.Zoglin;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -113,7 +132,7 @@ public class MobPillarRenderer {
 
     private static Entity createEntity(EntityType<?> entityType, Level level, BlockPos pos, MobState state) {
         CompoundTag nbt = new CompoundTag();
-        nbt.putString("id", net.minecraftforge.registries.ForgeRegistries.ENTITIES.getKey(entityType).toString());
+        nbt.putString("id", ForgeRegistries.ENTITIES.getKey(entityType).toString());
 
         applyVariantToNBT(nbt, entityType, state);
 
@@ -192,29 +211,29 @@ public class MobPillarRenderer {
             if (state.baby) {
                 boolean handled = false;
 
-                if (livingEntity instanceof net.minecraft.world.entity.AgeableMob) {
-                    ((net.minecraft.world.entity.AgeableMob) livingEntity).setBaby(true);
+                if (livingEntity instanceof AgeableMob) {
+                    ((AgeableMob) livingEntity).setBaby(true);
                     handled = true;
                 }
 
-                if (!handled && livingEntity instanceof net.minecraft.world.entity.monster.Zombie) {
-                    ((net.minecraft.world.entity.monster.Zombie) livingEntity).setBaby(true);
+                if (!handled && livingEntity instanceof Zombie) {
+                    ((Zombie) livingEntity).setBaby(true);
                     handled = true;
                 }
 
-                if (!handled && livingEntity instanceof net.minecraft.world.entity.monster.Zoglin) {
-                    ((net.minecraft.world.entity.monster.Zoglin) livingEntity).setBaby(true);
+                if (!handled && livingEntity instanceof Zoglin) {
+                    ((Zoglin) livingEntity).setBaby(true);
                     handled = true;
                 }
 
-                if (!handled && livingEntity instanceof net.minecraft.world.entity.Mob mob) {
+                if (!handled && livingEntity instanceof Mob mob) {
                     mob.setBaby(true);
                     handled = true;
                 }
 
                 if (!handled) {
                     try {
-                        java.lang.reflect.Method setIsBaby = livingEntity.getClass().getMethod("setIsBaby", boolean.class);
+                        Method setIsBaby = livingEntity.getClass().getMethod("setIsBaby", boolean.class);
                         setIsBaby.invoke(livingEntity, true);
                     } catch (Exception ignored) {
                     }
@@ -229,7 +248,7 @@ public class MobPillarRenderer {
     }
 
     private static void applyEntitySpecificStates(Entity entity, MobState state) {
-        if (entity instanceof net.minecraft.world.entity.animal.Bee bee) {
+        if (entity instanceof Bee bee) {
             if (state.angry) {
                 bee.setRemainingPersistentAngerTime(999999);
             } else {
@@ -237,7 +256,7 @@ public class MobPillarRenderer {
             }
         }
 
-        if (entity instanceof net.minecraft.world.entity.animal.Wolf wolf) {
+        if (entity instanceof Wolf wolf) {
             if (state.angry) {
                 wolf.setRemainingPersistentAngerTime(999999);
             }
@@ -249,7 +268,7 @@ public class MobPillarRenderer {
             }
         }
 
-        if (entity instanceof net.minecraft.world.entity.animal.Cat cat) {
+        if (entity instanceof Cat cat) {
             if (state.tamed) {
                 cat.setTame(true);
             }
@@ -258,42 +277,42 @@ public class MobPillarRenderer {
             }
         }
 
-        if (entity instanceof net.minecraft.world.entity.animal.Fox fox) {
+        if (entity instanceof Fox fox) {
             if (state.sitting) {
                 fox.setSitting(true);
             }
         }
 
-        if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
+        if (entity instanceof Creeper) {
             if (state.charged || state.powered) {
             }
         }
 
-        if (entity instanceof net.minecraft.world.entity.animal.Sheep sheep) {
+        if (entity instanceof Sheep sheep) {
             if (state.sheared) {
                 sheep.setSheared(true);
             }
         }
 
-        if (entity instanceof net.minecraft.world.entity.ambient.Bat bat) {
+        if (entity instanceof Bat bat) {
             bat.setResting(state.parsedStates.contains("hanging") || state.parsedStates.contains("roosting"));
         }
 
-        if (entity instanceof net.minecraft.world.entity.animal.PolarBear bear) {
+        if (entity instanceof PolarBear bear) {
             bear.setStanding(state.parsedStates.contains("standing") || state.parsedStates.contains("rearing"));
         }
 
-        if (entity instanceof net.minecraft.world.entity.monster.EnderMan enderman) {
+        if (entity instanceof EnderMan enderman) {
             if (state.parsedStates.contains("screaming") || state.parsedStates.contains("staring")) {
                 enderman.setTarget(Minecraft.getInstance().player);
             }
         }
 
-        if (entity instanceof net.minecraft.world.entity.monster.Spider spider) {
+        if (entity instanceof Spider spider) {
             spider.setClimbing(state.parsedStates.contains("climbing"));
         }
 
-        if (entity instanceof net.minecraft.world.entity.monster.Vex vex) {
+        if (entity instanceof Vex vex) {
             if (state.parsedStates.contains("charging")) {
                 vex.setIsCharging(true);
             }
@@ -776,7 +795,7 @@ public class MobPillarRenderer {
         float scale;
 
         if (state.parsedStates.contains("giant") || state.parsedStates.contains("huge")) {
-            if (entity instanceof net.minecraft.world.entity.animal.Rabbit) {
+            if (entity instanceof Rabbit) {
                 scale = 1.8f;
             } else if (entityHeight > 6.0f) {
                 scale = 0.4f;
@@ -787,9 +806,9 @@ public class MobPillarRenderer {
             scale = 0.9f;
         } else if (state.parsedStates.contains("medium")) {
             scale = 0.7f;
-        } else if (state.parsedStates.contains("small") && (entity instanceof net.minecraft.world.entity.monster.Slime || entity instanceof net.minecraft.world.entity.monster.MagmaCube)) {
+        } else if (state.parsedStates.contains("small") && (entity instanceof Slime || entity instanceof MagmaCube)) {
             scale = 0.8f;
-        } else if (state.parsedStates.contains("tiny") && (entity instanceof net.minecraft.world.entity.monster.Slime || entity instanceof net.minecraft.world.entity.monster.MagmaCube)) {
+        } else if (state.parsedStates.contains("tiny") && (entity instanceof Slime || entity instanceof MagmaCube)) {
             scale = 1.0f;
         } else {
             float targetSize = state.baby ? 0.45f : 0.8f;

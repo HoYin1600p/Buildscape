@@ -2,6 +2,9 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +18,9 @@ import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
@@ -62,13 +68,13 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
     }
 
     @Override
-    public net.minecraft.world.phys.shapes.VoxelShape getVisualShape(
+    public VoxelShape getVisualShape(
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            net.minecraft.world.phys.shapes.CollisionContext context
+            CollisionContext context
     ) {
-        return net.minecraft.world.phys.shapes.Shapes.empty();
+        return Shapes.empty();
     }
 
     @Override
@@ -122,7 +128,7 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
 
             if (newName != null) {
                 Block newBlock = ForgeRegistries.BLOCKS.getValue(
-                        new net.minecraft.resources.ResourceLocation("buildscape", newName)
+                        new ResourceLocation("buildscape", newName)
                 );
                 if (newBlock != null && newBlock != this) {
                     if (!level.isClientSide) {
@@ -145,8 +151,8 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
                         level.playSound(
                                 null,
                                 pos,
-                                net.minecraft.sounds.SoundEvents.DYE_USE,
-                                net.minecraft.sounds.SoundSource.BLOCKS,
+                                SoundEvents.DYE_USE,
+                                SoundSource.BLOCKS,
                                 1.0f,
                                 1.0f
                         );

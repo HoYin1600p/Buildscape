@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -66,7 +67,7 @@ public class PillarOverlayHandler {
                 if (ItemFrameParticleHandler.hasCustomColors(itemFrame)) {
                     renderItemFrameOverlay(event.getMatrixStack(), mc, itemFrame);
                 }
-            } else if (entityHit.getEntity() instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
+            } else if (entityHit.getEntity() instanceof ColoredItemFrameEntity coloredFrame) {
                 List<String> colors = ItemFrameParticleHandler.getParticleColorsColored(coloredFrame);
                 if (!colors.isEmpty()) {
                     String frameId = ItemFrameParticleHandler.getFrameIdColored(coloredFrame);

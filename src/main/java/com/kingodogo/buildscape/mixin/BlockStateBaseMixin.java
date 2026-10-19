@@ -2,25 +2,31 @@ package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.block.PlanterHelper;
 import com.kingodogo.buildscape.block.PlanterHelper.PlanterType;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.BambooBlock;
+import net.minecraft.world.level.block.BambooSaplingBlock;
+import net.minecraft.world.level.block.BigDripleafBlock;
+import net.minecraft.world.level.block.BigDripleafStemBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.IPlantable;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public class BlockStateBaseMixin {
@@ -38,13 +44,13 @@ public class BlockStateBaseMixin {
         }
     }
 
-    private static boolean buildscape$isPlanterPlant(net.minecraft.world.level.block.Block block) {
-        return block instanceof net.minecraft.world.level.block.BushBlock
-                || block instanceof net.minecraftforge.common.IPlantable
-                || block instanceof net.minecraft.world.level.block.BambooBlock
-                || block instanceof net.minecraft.world.level.block.BambooSaplingBlock
-                || block instanceof net.minecraft.world.level.block.BigDripleafBlock
-                || block instanceof net.minecraft.world.level.block.BigDripleafStemBlock;
+    private static boolean buildscape$isPlanterPlant(Block block) {
+        return block instanceof BushBlock
+                || block instanceof IPlantable
+                || block instanceof BambooBlock
+                || block instanceof BambooSaplingBlock
+                || block instanceof BigDripleafBlock
+                || block instanceof BigDripleafStemBlock;
     }
 
     @Inject(method = "onRemove", at = @At("HEAD"))

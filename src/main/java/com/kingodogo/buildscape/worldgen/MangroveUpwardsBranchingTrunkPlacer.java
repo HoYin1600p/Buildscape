@@ -7,9 +7,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelSimulatedReader;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
 
@@ -77,7 +79,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
         int elevationShift = -1;
-        for (net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator decorator : config.decorators) {
+        for (TreeDecorator decorator : config.decorators) {
             if (decorator instanceof MangroveRootDecorator roots) {
                 elevationShift = roots.sampleTrunkOffset(random);
                 break;
@@ -174,7 +176,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
                                            BiConsumer<BlockPos, BlockState> blockSetter,
                                            Random random, BlockPos pos, TreeConfiguration config) {
         return level.isStateAtPosition(pos, state -> state.isAir()
-                || state.is(net.minecraft.world.level.block.Blocks.WATER))
+                || state.is(Blocks.WATER))
                 && placeLog(level, blockSetter, random, pos, config);
     }
 }

@@ -9,10 +9,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -27,6 +30,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -311,9 +316,9 @@ public class RoseVinesBlock extends VineBlock {
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        net.minecraft.world.item.Item heldItem = context.getItemInHand().getItem();
-        if (heldItem instanceof net.minecraft.world.item.BlockItem) {
-            net.minecraft.world.level.block.Block heldBlock = ((net.minecraft.world.item.BlockItem) heldItem)
+        Item heldItem = context.getItemInHand().getItem();
+        if (heldItem instanceof BlockItem) {
+            Block heldBlock = ((BlockItem) heldItem)
                     .getBlock();
 
             if (!(heldBlock instanceof RoseVinesBlock)) {
@@ -416,7 +421,7 @@ public class RoseVinesBlock extends VineBlock {
             BlockState oldState,
             boolean isMoving) {
         if (!oldState.is(state.getBlock()) &&
-                this.getSoundType(state) instanceof com.kingodogo.buildscape.block.CustomSoundType customSound) {
+                this.getSoundType(state) instanceof CustomSoundType customSound) {
             level.playSound(
                     null,
                     pos,
@@ -434,18 +439,18 @@ public class RoseVinesBlock extends VineBlock {
             LootContext.Builder builder) {
         LootContext ctx = builder
                 .withParameter(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_STATE,
+                        LootContextParams.BLOCK_STATE,
                         state)
                 .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK);
+                        LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(
-                net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL);
+                LootContextParams.TOOL);
 
         if (tool != null && !tool.isEmpty()) {
             if (tool.getItem() instanceof ShearsItem) {
                 return Collections.singletonList(new ItemStack(this));
             }
-            if (net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
+            if (EnchantmentHelper.getItemEnchantmentLevel(
                     Enchantments.SILK_TOUCH,
                     tool) > 0) {
                 return Collections.singletonList(new ItemStack(this));
@@ -477,7 +482,7 @@ public class RoseVinesBlock extends VineBlock {
         }
 
         if (block instanceof RoseVinesBlock ||
-                block instanceof net.minecraft.world.level.block.VineBlock) {
+                block instanceof VineBlock) {
             return true;
         }
 

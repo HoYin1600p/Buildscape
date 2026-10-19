@@ -1,12 +1,21 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.network.ActionBarMessagePacket;
+import com.kingodogo.buildscape.network.ModMessages;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -24,6 +33,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.network.PacketDistributor;
 
 public class StringLightBlock
         extends AbstractGlassBlock
@@ -188,7 +198,7 @@ public class StringLightBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            net.minecraft.core.Direction side
+            Direction side
     ) {
         return (
                 adjacentBlockState.is(this) ||
@@ -254,22 +264,22 @@ public class StringLightBlock
                 level.playSound(
                         null,
                         pos,
-                        net.minecraft.sounds.SoundEvents.DYE_USE,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
+                        SoundEvents.DYE_USE,
+                        SoundSource.BLOCKS,
                         1.0f,
                         1.0f
                 );
-                net.minecraft.network.chat.TextComponent message =
-                        new net.minecraft.network.chat.TextComponent(
+                TextComponent message =
+                        new TextComponent(
                                 "String colored: " + dyeColor.getDisplayName()
                         );
-                message.withStyle(net.minecraft.ChatFormatting.GREEN);
-                if (player instanceof net.minecraft.server.level.ServerPlayer) {
-                    com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
-                                    (net.minecraft.server.level.ServerPlayer) player
+                message.withStyle(ChatFormatting.GREEN);
+                if (player instanceof ServerPlayer) {
+                    ModMessages.INSTANCE.send(
+                            PacketDistributor.PLAYER.with(() ->
+                                    (ServerPlayer) player
                             ),
-                            new com.kingodogo.buildscape.network.ActionBarMessagePacket(message)
+                            new ActionBarMessagePacket(message)
                     );
                 }
                 return InteractionResult.SUCCESS;
@@ -283,20 +293,20 @@ public class StringLightBlock
                 null,
                 pos,
                 currentLit
-                        ? net.minecraft.sounds.SoundEvents.STONE_BUTTON_CLICK_OFF
-                        : net.minecraft.sounds.SoundEvents.STONE_BUTTON_CLICK_ON,
-                net.minecraft.sounds.SoundSource.BLOCKS,
+                        ? SoundEvents.STONE_BUTTON_CLICK_OFF
+                        : SoundEvents.STONE_BUTTON_CLICK_ON,
+                SoundSource.BLOCKS,
                 0.3f,
                 1.0f
         );
-        net.minecraft.network.chat.TextComponent message =
-                new net.minecraft.network.chat.TextComponent(
+        TextComponent message =
+                new TextComponent(
                         newLit ? "Turned On" : "Turned Off"
                 );
         message.withStyle(
                 newLit
-                        ? net.minecraft.ChatFormatting.GREEN
-                        : net.minecraft.ChatFormatting.RED
+                        ? ChatFormatting.GREEN
+                        : ChatFormatting.RED
         );
         player.displayClientMessage(message, true);
         return InteractionResult.SUCCESS;
@@ -306,38 +316,38 @@ public class StringLightBlock
         if (stack == null || stack.isEmpty()) {
             return null;
         }
-        net.minecraft.world.item.Item item = stack.getItem();
-        if (item == net.minecraft.world.item.Items.WHITE_DYE) {
+        Item item = stack.getItem();
+        if (item == Items.WHITE_DYE) {
             return StringColor.WHITE;
-        } else if (item == net.minecraft.world.item.Items.ORANGE_DYE) {
+        } else if (item == Items.ORANGE_DYE) {
             return StringColor.ORANGE;
-        } else if (item == net.minecraft.world.item.Items.MAGENTA_DYE) {
+        } else if (item == Items.MAGENTA_DYE) {
             return StringColor.MAGENTA;
-        } else if (item == net.minecraft.world.item.Items.LIGHT_BLUE_DYE) {
+        } else if (item == Items.LIGHT_BLUE_DYE) {
             return StringColor.LIGHT_BLUE;
-        } else if (item == net.minecraft.world.item.Items.YELLOW_DYE) {
+        } else if (item == Items.YELLOW_DYE) {
             return StringColor.YELLOW;
-        } else if (item == net.minecraft.world.item.Items.LIME_DYE) {
+        } else if (item == Items.LIME_DYE) {
             return StringColor.LIME;
-        } else if (item == net.minecraft.world.item.Items.PINK_DYE) {
+        } else if (item == Items.PINK_DYE) {
             return StringColor.PINK;
-        } else if (item == net.minecraft.world.item.Items.GRAY_DYE) {
+        } else if (item == Items.GRAY_DYE) {
             return StringColor.GRAY;
-        } else if (item == net.minecraft.world.item.Items.LIGHT_GRAY_DYE) {
+        } else if (item == Items.LIGHT_GRAY_DYE) {
             return StringColor.LIGHT_GRAY;
-        } else if (item == net.minecraft.world.item.Items.CYAN_DYE) {
+        } else if (item == Items.CYAN_DYE) {
             return StringColor.CYAN;
-        } else if (item == net.minecraft.world.item.Items.PURPLE_DYE) {
+        } else if (item == Items.PURPLE_DYE) {
             return StringColor.PURPLE;
-        } else if (item == net.minecraft.world.item.Items.BLUE_DYE) {
+        } else if (item == Items.BLUE_DYE) {
             return StringColor.BLUE;
-        } else if (item == net.minecraft.world.item.Items.BROWN_DYE) {
+        } else if (item == Items.BROWN_DYE) {
             return StringColor.BROWN;
-        } else if (item == net.minecraft.world.item.Items.GREEN_DYE) {
+        } else if (item == Items.GREEN_DYE) {
             return StringColor.GREEN;
-        } else if (item == net.minecraft.world.item.Items.RED_DYE) {
+        } else if (item == Items.RED_DYE) {
             return StringColor.RED;
-        } else if (item == net.minecraft.world.item.Items.BLACK_DYE) {
+        } else if (item == Items.BLACK_DYE) {
             return StringColor.BLACK;
         }
         return null;

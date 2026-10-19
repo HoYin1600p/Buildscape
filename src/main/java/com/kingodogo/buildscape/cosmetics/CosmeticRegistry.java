@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
@@ -148,7 +149,7 @@ public class CosmeticRegistry {
         CosmeticInfo info = parseCosmeticId(cosmeticId);
         if (info != null) {
             if (info.type.equals("particle")) {
-                result = new ItemStack(net.minecraft.world.item.Items.NETHER_STAR);
+                result = new ItemStack(Items.NETHER_STAR);
             } else if (info.type.equals("pets") || cosmeticId.contains("/pets/")) {
                 return null;
             } else if (info.type.equals("wings") || cosmeticId.contains("/wings/")) {
@@ -163,7 +164,7 @@ public class CosmeticRegistry {
                     if (item != null) {
                         result = new ItemStack(item);
                     } else {
-                        result = new ItemStack(net.minecraft.world.item.Items.FEATHER);
+                        result = new ItemStack(Items.FEATHER);
                     }
                 }
             } else {

@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -10,6 +11,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -46,7 +48,7 @@ public class CascadeBlock extends Block implements EntityBlock, SimpleWaterlogge
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
         return this.defaultBlockState().setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
     }
@@ -82,7 +84,7 @@ public class CascadeBlock extends Block implements EntityBlock, SimpleWaterlogge
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean canBeReplaced(BlockState state, net.minecraft.world.item.context.BlockPlaceContext context) {
+    public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         return false;
     }
 
@@ -127,7 +129,7 @@ public class CascadeBlock extends Block implements EntityBlock, SimpleWaterlogge
                 if (!level.isClientSide) {
                     int newLevel = be.cycleParticleLevel();
                     int percentage = newLevel * 20;
-                    player.displayClientMessage(new net.minecraft.network.chat.TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
+                    player.displayClientMessage(new TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
                     float pitch = 0.6f + (newLevel * 0.16f);
                     level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.5f, pitch);
                 }

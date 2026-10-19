@@ -1,8 +1,10 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.HollowLogBlock;
 import com.kingodogo.buildscape.block.HollowLogBlockEntity;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
+import com.kingodogo.buildscape.fluid.ModFluids;
 import com.kingodogo.buildscape.pipe.transport.BubbleColumnState;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -30,11 +32,20 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = com.kingodogo.buildscape.BuildScape.MODID, value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
 public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowLogBlockEntity> {
 
     private static final ResourceLocation LAVA_FLOW = new ResourceLocation("minecraft", "block/lava_flow");
@@ -44,9 +55,9 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
     private static final ResourceLocation EXPERIENCE_FLOW = new ResourceLocation("buildscape", "fluid/experience_flow");
     private static final ResourceLocation EXPERIENCE_STILL = new ResourceLocation("buildscape", "fluid/experience_still");
 
-    private static final java.util.Map<ResourceLocation, TextureAtlasSprite> FLUID_SPRITES = new java.util.HashMap<>();
-    private static final java.util.Map<BlockState, BakedModel> DECORATION_MODELS = new java.util.IdentityHashMap<>();
-    private static final java.util.Map<HollowLogBlockEntity, FluidRenderCache> FLUID_CACHE = new java.util.WeakHashMap<>();
+    private static final Map<ResourceLocation, TextureAtlasSprite> FLUID_SPRITES = new HashMap<>();
+    private static final Map<BlockState, BakedModel> DECORATION_MODELS = new IdentityHashMap<>();
+    private static final Map<HollowLogBlockEntity, FluidRenderCache> FLUID_CACHE = new WeakHashMap<>();
 
     private static final class FluidRenderCache {
         long tick = Long.MIN_VALUE;
@@ -78,18 +89,18 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         return cache.waterColor;
     }
 
-    @net.minecraftforge.eventbus.api.SubscribeEvent
-    public static void onWorldUnload(net.minecraftforge.event.world.WorldEvent.Unload event) {
+    @SubscribeEvent
+    public static void onWorldUnload(WorldEvent.Unload event) {
         if (event.getWorld().isClientSide()) FLUID_CACHE.clear();
     }
 
-    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-            modid = com.kingodogo.buildscape.BuildScape.MODID,
-            bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD,
-            value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+    @Mod.EventBusSubscriber(
+            modid = BuildScape.MODID,
+            bus = Mod.EventBusSubscriber.Bus.MOD,
+            value = Dist.CLIENT)
     public static final class ReloadEvents {
-        @net.minecraftforge.eventbus.api.SubscribeEvent
-        public static void onTextureStitch(net.minecraftforge.client.event.TextureStitchEvent.Post event) {
+        @SubscribeEvent
+        public static void onTextureStitch(TextureStitchEvent.Post event) {
             FLUID_SPRITES.clear();
             DECORATION_MODELS.clear();
             FLUID_CACHE.clear();
@@ -184,7 +195,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         Fluid fluid = HollowPipeBlock.getContainedFluid(state, blockEntity);
         boolean hasWater = fluid != null && fluid.isSame(Fluids.WATER);
         boolean hasLava = (fluid == Fluids.LAVA) || (state.hasProperty(HollowPipeBlock.LAVA_LOGGED) && state.getValue(HollowPipeBlock.LAVA_LOGGED));
-        boolean hasXp = com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid);
+        boolean hasXp = ModFluids.isExperience(fluid);
 
         if (fluid == null || fluid == Fluids.EMPTY) {
             if (hasWater) {
@@ -744,7 +755,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
                     ? WATER_FLOW
                     : WATER_STILL;
-        } else if (com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid)) {
+        } else if (ModFluids.isExperience(fluid)) {
             texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
                     ? EXPERIENCE_FLOW
                     : EXPERIENCE_STILL;
@@ -762,7 +773,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         if (fluid == Fluids.WATER) {
             color = waterColor(level, pos, cache);
             color |= 0xFF000000;
-        } else if (fluid == Fluids.LAVA || com.kingodogo.buildscape.fluid.ModFluids.isExperienceStill(fluid)) {
+        } else if (fluid == Fluids.LAVA || ModFluids.isExperienceStill(fluid)) {
             color = 0xFFFFFFFF;
         } else {
             color = (level != null && pos != null) ? fluid.getAttributes().getColor(level, pos) : fluid.getAttributes().getColor();

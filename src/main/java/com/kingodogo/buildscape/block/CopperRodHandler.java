@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LightningRodBlock;
 import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.GameData;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,7 @@ public class CopperRodHandler {
 
     public static void registerPoi() {
         try {
-            Map<BlockState, PoiType> poiMap = net.minecraftforge.registries.GameData.getBlockStatePointOfInterestTypeMap();
+            Map<BlockState, PoiType> poiMap = GameData.getBlockStatePointOfInterestTypeMap();
             Set<BlockState> newStates = new HashSet<>(PoiType.LIGHTNING_ROD.getBlockStates());
 
             for (Supplier<Block> rodSupplier : ROD_SUPPLIERS) {

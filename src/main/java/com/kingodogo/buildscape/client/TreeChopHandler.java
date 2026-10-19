@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.client;
 
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.TreeChopPacket;
 import com.kingodogo.buildscape.util.TreeChopTraversal;
@@ -19,9 +21,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.DrawSelectionEvent;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -29,7 +34,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(
-        modid = com.kingodogo.buildscape.BuildScape.MODID,
+        modid = BuildScape.MODID,
         bus = Mod.EventBusSubscriber.Bus.FORGE,
         value = Dist.CLIENT
 )
@@ -63,7 +68,7 @@ public class TreeChopHandler {
 
         if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild()
                 || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
-                || !com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
+                || !CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
             resetTarget(mc, player);
             return;
         }
@@ -112,14 +117,14 @@ public class TreeChopHandler {
     }
 
     @SubscribeEvent
-    public static void onRenderGameOverlay(net.minecraftforge.client.event.RenderGameOverlayEvent.Post event) {
-        if (event.getType() != net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType.TEXT) return;
+    public static void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
+        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT) return;
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null || mc.level == null) return;
         if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild() || !player.isShiftKeyDown()) return;
-        if (!com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
+        if (!CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
             return;
 
         HitResult hit = mc.hitResult;
@@ -152,7 +157,7 @@ public class TreeChopHandler {
         if (player == null || mc.level == null) return;
 
         if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild() || !player.isShiftKeyDown()) return;
-        if (!com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
+        if (!CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
             return;
 
         HitResult target = event.getTarget();
@@ -204,7 +209,7 @@ public class TreeChopHandler {
         if (mc.player == null || mc.level == null) return;
 
         if (mc.player.isCreative() && mc.player.hasPermissions(2) && mc.player.mayBuild() && mc.player.isShiftKeyDown() &&
-                com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID())) {
+                CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID())) {
             HitResult hit = mc.hitResult;
             if (hit != null && hit.getType() == HitResult.Type.BLOCK) {
                 BlockHitResult blockHit = (BlockHitResult) hit;
@@ -237,13 +242,13 @@ public class TreeChopHandler {
     }
 
     @SubscribeEvent
-    public static void onLogout(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent event) {
+    public static void onLogout(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         clearSelection();
         cachedLevel = null;
     }
 
     @SubscribeEvent
-    public static void onWorldUnload(net.minecraftforge.event.world.WorldEvent.Unload event) {
+    public static void onWorldUnload(WorldEvent.Unload event) {
         if (event.getWorld() == cachedLevel) {
             clearSelection();
             cachedLevel = null;

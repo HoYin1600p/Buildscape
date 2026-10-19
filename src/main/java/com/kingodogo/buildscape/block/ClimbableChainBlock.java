@@ -2,7 +2,9 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
@@ -17,7 +19,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -160,12 +164,12 @@ public class ClimbableChainBlock
     ) {
         if (
                 context instanceof
-                        net.minecraft.world.phys.shapes.EntityCollisionContext entityContext
+                        EntityCollisionContext entityContext
         ) {
-            net.minecraft.world.entity.Entity entity = entityContext.getEntity();
+            Entity entity = entityContext.getEntity();
             if (
                     entity != null &&
-                            !(entity instanceof net.minecraft.world.entity.player.Player)
+                            !(entity instanceof Player)
             ) {
                 return Shapes.empty();
             }
@@ -201,7 +205,7 @@ public class ClimbableChainBlock
             LivingEntity entity
     ) {
         return (
-                entity instanceof net.minecraft.world.entity.player.Player &&
+                entity instanceof Player &&
                         state.getValue(AXIS) == Direction.Axis.Y
         );
     }
@@ -211,7 +215,7 @@ public class ClimbableChainBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            net.minecraft.world.level.pathfinder.PathComputationType type
+            PathComputationType type
     ) {
         return true;
     }

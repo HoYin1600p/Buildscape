@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -13,8 +14,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class FestiveStockingItem extends BlockItem {
 
@@ -75,7 +76,7 @@ public class FestiveStockingItem extends BlockItem {
     protected boolean updateCustomBlockEntityTag(
             BlockPos pos,
             Level level,
-            @Nullable net.minecraft.world.entity.player.Player player,
+            @Nullable Player player,
             ItemStack stack,
             BlockState state
     ) {
@@ -87,8 +88,8 @@ public class FestiveStockingItem extends BlockItem {
             if (tag != null && tag.contains("StoredItem", 10)) {
                 CompoundTag storedTag = tag.getCompound("StoredItem");
                 if (!storedTag.isEmpty()) {
-                    net.minecraft.world.item.ItemStack storedItem =
-                            net.minecraft.world.item.ItemStack.of(storedTag);
+                    ItemStack storedItem =
+                            ItemStack.of(storedTag);
                     stockingEntity.setStoredItem(storedItem, true);
                 }
             }

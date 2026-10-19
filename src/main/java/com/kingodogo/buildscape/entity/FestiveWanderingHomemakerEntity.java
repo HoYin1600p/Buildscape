@@ -3,6 +3,9 @@ package com.kingodogo.buildscape.entity;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -11,6 +14,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,11 +27,11 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         super(type, level);
     }
 
-    public static net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder createAttributes() {
-        return net.minecraft.world.entity.Mob.createMobAttributes()
-                .add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, 0.5D)
-                .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, 20.0D)
-                .add(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE, 16.0D);
+    public static AttributeSupplier.Builder createAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.5D)
+                .add(Attributes.MAX_HEALTH, 20.0D)
+                .add(Attributes.FOLLOW_RANGE, 16.0D);
     }
 
     @Override
@@ -158,7 +162,7 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
             offers.add(list.get(j));
         }
 
-        java.time.LocalDate today = java.time.LocalDate.now();
+        LocalDate today = LocalDate.now();
         int month = today.getMonthValue();
         int day = today.getDayOfMonth();
         int rareChance = (month == 12 && day == 25) ? 15 : 250;

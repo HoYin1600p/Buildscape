@@ -14,7 +14,7 @@ public class ModStairBlock extends StairBlock {
 
     @SuppressWarnings("unused")
     private final RegistryObject<?> dropItem;
-    private final net.minecraft.world.level.block.Block baseBlock;
+    private final Block baseBlock;
 
     public ModStairBlock(
             BlockState baseState,
@@ -101,7 +101,7 @@ public class ModStairBlock extends StairBlock {
         return 2.0f;
     }
 
-    public net.minecraft.world.level.block.Block getBaseBlock() {
+    public Block getBaseBlock() {
         return this.baseBlock;
     }
 

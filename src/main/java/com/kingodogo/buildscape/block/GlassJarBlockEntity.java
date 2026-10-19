@@ -1,19 +1,24 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.HoneyBottleItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.LingeringPotionItem;
 import net.minecraft.world.item.MilkBucketItem;
 import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.SplashPotionItem;
 import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -49,7 +54,7 @@ public class GlassJarBlockEntity extends BlockEntity {
 
     public static boolean isXpLiquid(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
-        return stack.is(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE) || stack.is(com.kingodogo.buildscape.item.ModItems.EXPERIENCE_BUCKET.get());
+        return stack.is(Items.EXPERIENCE_BOTTLE) || stack.is(ModItems.EXPERIENCE_BUCKET.get());
     }
 
     public static int getLiquidCap(ItemStack stack) {
@@ -65,16 +70,16 @@ public class GlassJarBlockEntity extends BlockEntity {
     public ItemStack getBucketRepresentation() {
         if (!hasLiquid()) return ItemStack.EMPTY;
         if (isXpLiquid(storedLiquidItem)) {
-            return new ItemStack(com.kingodogo.buildscape.item.ModItems.EXPERIENCE_BUCKET.get());
+            return new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
         }
         if (isPlainWater(storedLiquidItem)) {
-            return new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET);
+            return new ItemStack(Items.WATER_BUCKET);
         }
-        if (storedLiquidItem.is(net.minecraft.world.item.Items.LAVA_BUCKET)) {
-            return new ItemStack(net.minecraft.world.item.Items.LAVA_BUCKET);
+        if (storedLiquidItem.is(Items.LAVA_BUCKET)) {
+            return new ItemStack(Items.LAVA_BUCKET);
         }
-        if (storedLiquidItem.is(net.minecraft.world.item.Items.MILK_BUCKET)) {
-            return new ItemStack(net.minecraft.world.item.Items.MILK_BUCKET);
+        if (storedLiquidItem.is(Items.MILK_BUCKET)) {
+            return new ItemStack(Items.MILK_BUCKET);
         }
         if (storedLiquidItem.getItem() instanceof BucketItem || storedLiquidItem.getItem() instanceof MilkBucketItem) {
             ItemStack copy = storedLiquidItem.copy();
@@ -87,13 +92,13 @@ public class GlassJarBlockEntity extends BlockEntity {
     public ItemStack getBottleRepresentation() {
         if (!hasLiquid()) return ItemStack.EMPTY;
         if (isXpLiquid(storedLiquidItem)) {
-            return new ItemStack(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE);
+            return new ItemStack(Items.EXPERIENCE_BOTTLE);
         }
         if (isPlainWater(storedLiquidItem)) {
-            return PotionUtils.setPotion(new ItemStack(net.minecraft.world.item.Items.POTION), net.minecraft.world.item.alchemy.Potions.WATER);
+            return PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER);
         }
-        if (storedLiquidItem.is(net.minecraft.world.item.Items.HONEY_BOTTLE)) {
-            return new ItemStack(net.minecraft.world.item.Items.HONEY_BOTTLE);
+        if (storedLiquidItem.is(Items.HONEY_BOTTLE)) {
+            return new ItemStack(Items.HONEY_BOTTLE);
         }
         if (storedLiquidItem.getItem() instanceof PotionItem || storedLiquidItem.getItem() instanceof HoneyBottleItem) {
             ItemStack copy = storedLiquidItem.copy();
@@ -132,7 +137,7 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (stack == null || stack.isEmpty()) {
             return false;
         }
-        net.minecraft.world.item.Item item = stack.getItem();
+        Item item = stack.getItem();
 
         if (item instanceof MobBucketItem) {
             return false;
@@ -146,7 +151,7 @@ public class GlassJarBlockEntity extends BlockEntity {
             return false;
         }
 
-        if (stack.is(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE)) {
+        if (stack.is(Items.EXPERIENCE_BOTTLE)) {
             return true;
         }
 
@@ -158,9 +163,9 @@ public class GlassJarBlockEntity extends BlockEntity {
     }
 
     private static boolean isPlainWater(ItemStack stack) {
-        return stack.is(net.minecraft.world.item.Items.WATER_BUCKET)
+        return stack.is(Items.WATER_BUCKET)
                 || (stack.getItem() instanceof PotionItem
-                && PotionUtils.getPotion(stack) == net.minecraft.world.item.alchemy.Potions.WATER
+                && PotionUtils.getPotion(stack) == Potions.WATER
                 && (stack.getTag() == null || (!stack.getTag().contains("CustomPotionEffects")
                 && !stack.getTag().contains("CustomPotionColor"))));
     }
@@ -231,7 +236,7 @@ public class GlassJarBlockEntity extends BlockEntity {
             triggerWobble();
             sync();
             return true;
-        } else if (stack.getItem() instanceof PotionItem || stack.getItem() instanceof HoneyBottleItem || stack.is(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE)) {
+        } else if (stack.getItem() instanceof PotionItem || stack.getItem() instanceof HoneyBottleItem || stack.is(Items.EXPERIENCE_BOTTLE)) {
             if (isEmpty() || !hasLiquid()) {
                 storedLiquidItem = stack.copy();
                 storedLiquidItem.setCount(1);
@@ -379,7 +384,7 @@ public class GlassJarBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void onDataPacket(net.minecraft.network.Connection net, ClientboundBlockEntityDataPacket pkt) {
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         CompoundTag tag = pkt.getTag();
         if (tag != null) {
             load(tag);

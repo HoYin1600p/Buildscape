@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.item;
 
+import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -9,8 +10,8 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class MistBlockItem extends BlockItem {
     public MistBlockItem(Block block, Properties properties) {
@@ -19,7 +20,7 @@ public class MistBlockItem extends BlockItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        if (this.getBlock() == com.kingodogo.buildscape.block.ModBlocks.CASCADE_BLOCK_NO_MIST.get()) {
+        if (this.getBlock() == ModBlocks.CASCADE_BLOCK_NO_MIST.get()) {
             tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block_no_mist.info").withStyle(ChatFormatting.GRAY));
             tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block.tune").withStyle(ChatFormatting.GRAY));
             tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block_no_mist.obtain").withStyle(ChatFormatting.GRAY));

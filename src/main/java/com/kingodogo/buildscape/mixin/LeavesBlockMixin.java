@@ -21,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Random;
+
 @Mixin(LeavesBlock.class)
 public abstract class LeavesBlockMixin extends Block implements SimpleWaterloggedBlock {
 
@@ -66,7 +68,7 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            java.util.Random random,
+            Random random,
             CallbackInfo ci
     ) {
         if (level.getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY)) {

@@ -5,12 +5,20 @@ import com.kingodogo.buildscape.block.HazeBushBlock;
 import com.kingodogo.buildscape.block.PottedHazeBushBlock;
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.ChunkEvent;
@@ -19,6 +27,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.*;
+import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber(
         modid = BuildScape.MODID,
@@ -112,16 +121,16 @@ public class HazeBushParticleHandler {
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) return;
-        if (mc.options.particles == net.minecraft.client.ParticleStatus.MINIMAL) return;
+        if (mc.options.particles == ParticleStatus.MINIMAL) return;
         if (POSITIONS_BY_CHUNK.isEmpty()) return;
 
         Level level = mc.level;
         BlockPos playerPos = mc.player.blockPosition();
 
-        net.minecraft.world.phys.Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
+        Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
         double maxDistSq = (double) HAZE_PARTICLE_RANGE * HAZE_PARTICLE_RANGE;
         double minDistSq = (double) VANILLA_TICK_RANGE * VANILLA_TICK_RANGE;
-        float chance = (mc.options.particles == net.minecraft.client.ParticleStatus.DECREASED) ? 0.08F : 0.20F;
+        float chance = (mc.options.particles == ParticleStatus.DECREASED) ? 0.08F : 0.20F;
 
         for (Iterator<Map.Entry<Long, Set<BlockPos>>> chunkIt = POSITIONS_BY_CHUNK.entrySet().iterator(); chunkIt.hasNext();) {
             Map.Entry<Long, Set<BlockPos>> entry = chunkIt.next();
@@ -152,7 +161,7 @@ public class HazeBushParticleHandler {
                 if (!hasHaze || rgb == null) continue;
 
                 if (RANDOM.nextFloat() < chance) {
-                    net.minecraft.world.phys.Vec3 particlePos = findHazeParticlePos(level, pos, RANDOM);
+                    Vec3 particlePos = findHazeParticlePos(level, pos, RANDOM);
                     if (particlePos != null) {
                         level.addAlwaysVisibleParticle(ModParticles.HAZE.get(), false, particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1], rgb[2]);
                     }
@@ -161,24 +170,24 @@ public class HazeBushParticleHandler {
         }
     }
 
-    @javax.annotation.Nullable
-    public static net.minecraft.world.phys.Vec3 findHazeParticlePos(Level level, BlockPos bushPos, Random random) {
+    @Nullable
+    public static Vec3 findHazeParticlePos(Level level, BlockPos bushPos, Random random) {
         for (int attempt = 0; attempt < 3; attempt++) {
             double offsetX = (random.nextDouble() - 0.5D) * 5.0D;
             double offsetZ = (random.nextDouble() - 0.5D) * 5.0D;
             double px = bushPos.getX() + 0.5D + offsetX;
             double pz = bushPos.getZ() + 0.5D + offsetZ;
 
-            int blockX = net.minecraft.util.Mth.floor(px);
-            int blockZ = net.minecraft.util.Mth.floor(pz);
+            int blockX = Mth.floor(px);
+            int blockZ = Mth.floor(pz);
 
             double floorY = Double.NaN;
             for (int y = bushPos.getY() + 1; y >= bushPos.getY() - 1; y--) {
                 BlockPos checkPos = new BlockPos(blockX, y, blockZ);
                 BlockState state = level.getBlockState(checkPos);
-                net.minecraft.world.phys.shapes.VoxelShape shape = state.getCollisionShape(level, checkPos);
+                VoxelShape shape = state.getCollisionShape(level, checkPos);
                 if (!shape.isEmpty()) {
-                    floorY = y + shape.max(net.minecraft.core.Direction.Axis.Y);
+                    floorY = y + shape.max(Direction.Axis.Y);
                     break;
                 }
             }
@@ -189,26 +198,26 @@ public class HazeBushParticleHandler {
 
             double py = floorY + 0.02D + random.nextDouble() * 0.30D;
 
-            BlockPos particleBlockPos = new BlockPos(blockX, net.minecraft.util.Mth.floor(py), blockZ);
+            BlockPos particleBlockPos = new BlockPos(blockX, Mth.floor(py), blockZ);
             BlockState pState = level.getBlockState(particleBlockPos);
             if (pState.isSolidRender(level, particleBlockPos)) {
                 continue;
             }
-            net.minecraft.world.phys.shapes.VoxelShape pShape = pState.getCollisionShape(level, particleBlockPos);
+            VoxelShape pShape = pState.getCollisionShape(level, particleBlockPos);
             if (!pShape.isEmpty() && pShape.bounds().move(particleBlockPos).contains(px, py, pz)) {
                 continue;
             }
 
-            net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(bushPos.getX() + 0.5D, bushPos.getY() + 0.4D, bushPos.getZ() + 0.5D);
-            net.minecraft.world.phys.Vec3 end = new net.minecraft.world.phys.Vec3(px, py + 0.05D, pz);
-            net.minecraft.world.phys.BlockHitResult hit = level.clip(new net.minecraft.world.level.ClipContext(start, end, net.minecraft.world.level.ClipContext.Block.COLLIDER, net.minecraft.world.level.ClipContext.Fluid.NONE, null));
-            if (hit.getType() != net.minecraft.world.phys.HitResult.Type.MISS) {
+            Vec3 start = new Vec3(bushPos.getX() + 0.5D, bushPos.getY() + 0.4D, bushPos.getZ() + 0.5D);
+            Vec3 end = new Vec3(px, py + 0.05D, pz);
+            BlockHitResult hit = level.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+            if (hit.getType() != HitResult.Type.MISS) {
                 if (hit.getBlockPos().getX() != blockX || hit.getBlockPos().getZ() != blockZ) {
                     continue;
                 }
             }
 
-            return new net.minecraft.world.phys.Vec3(px, py, pz);
+            return new Vec3(px, py, pz);
         }
         return null;
     }

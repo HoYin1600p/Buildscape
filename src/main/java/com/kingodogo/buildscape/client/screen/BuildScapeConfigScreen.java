@@ -418,6 +418,8 @@ public class BuildScapeConfigScreen extends Screen {
     private int selectedPresetIndex = 0;
     // Edits wait here and go to the server together, three seconds after the last one or when the screen closes.
     private final ConfigUploadBatch uploadBatch = new ConfigUploadBatch();
+    // The same wait for the pillar detail counters: one pending packet per pillar, the latest values win.
+    private final PillarUploadBatch<UpdatePillarDataPacket> pillarUploadBatch = new PillarUploadBatch<>();
     private final ParticleRange.Migration rangeMigration = new ParticleRange.Migration();
     private String headerNotice = null;
     private long headerNoticeUntil = 0L;
@@ -674,6 +676,10 @@ public class BuildScapeConfigScreen extends Screen {
             isPillarSwitching = true;
         }
 
+        // The pillar left behind gets its latest values sent before the new one is shown.
+        for (UpdatePillarDataPacket packet : pillarUploadBatch.takeAllExcept(pillarId)) {
+            sendPillarPacket(packet);
+        }
         selectedPillarDetailId = pillarId;
         closingPillarDetailId = null;
         openSidePanel(SidePanelType.PILLAR_DETAIL);
@@ -1008,13 +1014,18 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
-    /** The server config arrived: show its selections, not what was clicked before it answered. */
+    /**
+     * The server config arrived: show its selections, not what was clicked before it answered. Edits still
+     * waiting to be uploaded are laid back over it so another player's save does not discard them.
+     */
     public void onServerConfigSynced() {
+        uploadBatch.reapply(PillarParticleConfig.get());
         rebuildActiveItemsCache();
     }
 
     /** The server refused an edit from this screen: show the same X feedback as a locally refused click. */
-    public void onServerRefusal(EditRefusedPacket.Reason reason) {
+    public void onServerRefusal(EditRefusedPacket.Reason reason, ConfigSetting setting) {
+        uploadBatch.dropRefused(setting);
         readOnlyDeniedAt = System.currentTimeMillis();
         readOnlyDeniedX = rawMouseX;
         readOnlyDeniedY = rawMouseY;
@@ -1230,6 +1241,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     @Override
     protected void init() {
+        uploadBatch.rebaseIfIdle(PillarParticleConfig.get());
         super.init();
         init(this.minecraft, this.width, this.height, this::addRenderableWidget, this::removeWidget);
     }
@@ -1273,6 +1285,13 @@ public class BuildScapeConfigScreen extends Screen {
     public void tick() {
         if (uploadBatch.isDue(System.currentTimeMillis())) {
             flushConfigUpload();
+        }
+        // Counter clicks go out when their pillar's wait ends, or once its detail panel is no longer selected.
+        for (UpdatePillarDataPacket packet : pillarUploadBatch.takeDue(System.currentTimeMillis())) {
+            sendPillarPacket(packet);
+        }
+        for (UpdatePillarDataPacket packet : pillarUploadBatch.takeAllExcept(selectedPillarDetailId)) {
+            sendPillarPacket(packet);
         }
         if (availableItems.isEmpty() && itemsCached) {
             cacheAvailableItems();
@@ -1593,13 +1612,38 @@ public class BuildScapeConfigScreen extends Screen {
 
     /** Records an edit of one setting group; the upload follows {@link ConfigUploadBatch#DELAY_MS} after the last edit. */
     private void queueConfigUpload(ConfigSetting setting) {
-        uploadBatch.edited(setting, System.currentTimeMillis());
+        uploadBatch.edited(setting, PillarParticleConfig.get(), System.currentTimeMillis());
+    }
+
+    /** Holds the pillar's latest values; they are sent {@link PillarUploadBatch#DELAY_MS} after its last edit. */
+    private void queuePillarUpload(PillarIdManager.PillarData data) {
+        pillarUploadBatch.edited(data.id, new UpdatePillarDataPacket(data), System.currentTimeMillis());
+    }
+
+    /** The Save Pillar button: sends the pillar now, with anything it still had waiting. */
+    private void sendPillarUploadNow(PillarIdManager.PillarData data) {
+        pillarUploadBatch.take(data.id);
+        sendPillarPacket(new UpdatePillarDataPacket(data));
+    }
+
+    /** Sends every waiting pillar edit: the screen is closing. */
+    private void flushPillarUploads() {
+        for (UpdatePillarDataPacket packet : pillarUploadBatch.takeAll()) {
+            sendPillarPacket(packet);
+        }
+    }
+
+    private void sendPillarPacket(UpdatePillarDataPacket packet) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.getConnection() == null) return;
+        ModMessages.INSTANCE.sendToServer(packet);
     }
 
     /** Sends the queued edits now: the wait ran out, or the screen is closing. */
     private void flushConfigUpload() {
         if (!uploadBatch.hasPending()) return;
         Set<ConfigSetting> changed = uploadBatch.take();
+        uploadBatch.rebase(PillarParticleConfig.get());
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.getConnection() == null) return;
         persistServerConfig(PillarParticleConfig.get(), changed);
@@ -5391,7 +5435,7 @@ public class BuildScapeConfigScreen extends Screen {
         int saveX = x + w - saveW - 6;
         if (mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH) {
             PillarIdManager.getClient().saveAllPillars();
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            sendPillarUploadNow(data);
             return true;
         }
 
@@ -5419,7 +5463,7 @@ public class BuildScapeConfigScreen extends Screen {
             boolean cur = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
             data.use_pattern = !cur;
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         rY += rowH + rowGap;
@@ -5437,7 +5481,7 @@ public class BuildScapeConfigScreen extends Screen {
             }
             data.pattern = PARTICLE_PATTERNS[(idx + pillarPatStep + PARTICLE_PATTERNS.length) % PARTICLE_PATTERNS.length];
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         rY += rowH + rowGap;
@@ -5450,7 +5494,7 @@ public class BuildScapeConfigScreen extends Screen {
             if (next == null) return true;
             data.pattern_speed = next;
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         rY += rowH + rowGap;
@@ -5463,7 +5507,7 @@ public class BuildScapeConfigScreen extends Screen {
             if (next == null) return true;
             data.pattern_spread = next;
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         rY += rowH + rowGap;
@@ -5476,7 +5520,7 @@ public class BuildScapeConfigScreen extends Screen {
             if (next == null) return true;
             data.pattern_intensity = next;
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         rY += rowH + rowGap;
@@ -5495,7 +5539,7 @@ public class BuildScapeConfigScreen extends Screen {
                 data.dyeColors = new ArrayList<>(colors);
             }
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
 
@@ -5533,7 +5577,7 @@ public class BuildScapeConfigScreen extends Screen {
         int saveBtnW = font.width("✓ Save Pillar") + 16;
         if (checkButtonClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH, saveBtnW)) {
             PillarIdManager.getClient().saveAllPillars();
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            sendPillarUploadNow(data);
             return true;
         }
 
@@ -5633,7 +5677,7 @@ public class BuildScapeConfigScreen extends Screen {
                     }
                     data.dyeColors.set(editingColorIndex, hexString);
                     PillarIdManager.getClient().updatePillarData(data);
-                    ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+                    queuePillarUpload(data);
                 }
             } else {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
@@ -5896,7 +5940,7 @@ public class BuildScapeConfigScreen extends Screen {
             boolean cur = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
             data.use_pattern = !cur;
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         curY += rowH + rowGap;
@@ -5914,7 +5958,7 @@ public class BuildScapeConfigScreen extends Screen {
             }
             data.pattern = PARTICLE_PATTERNS[(idx + 1) % PARTICLE_PATTERNS.length];
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         curY += rowH + rowGap;
@@ -5928,7 +5972,7 @@ public class BuildScapeConfigScreen extends Screen {
             if (next == null) return true;
             data.pattern_speed = next;
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         curY += rowH + rowGap;
@@ -5942,7 +5986,7 @@ public class BuildScapeConfigScreen extends Screen {
             if (next == null) return true;
             data.pattern_spread = next;
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         curY += rowH + rowGap;
@@ -5956,7 +6000,7 @@ public class BuildScapeConfigScreen extends Screen {
             if (next == null) return true;
             data.pattern_intensity = next;
             PillarIdManager.getClient().updatePillarData(data);
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            queuePillarUpload(data);
             return true;
         }
         curY += rowH + rowGap;
@@ -5979,14 +6023,14 @@ public class BuildScapeConfigScreen extends Screen {
                 data.max_particle_color = Math.max(1, maxColors - 1);
                 if (data.dyeColors == null) data.dyeColors = new ArrayList<>(colors);
                 PillarIdManager.getClient().updatePillarData(data);
-                ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+                queuePillarUpload(data);
                 return true;
             } else if (mouseX >= counterX + counterW - stepW && mouseX <= counterX + counterW) {
                 if (!requireConfigModificationAccess()) return true;
                 data.max_particle_color = Math.min(7, maxColors + 1);
                 if (data.dyeColors == null) data.dyeColors = new ArrayList<>(colors);
                 PillarIdManager.getClient().updatePillarData(data);
-                ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+                queuePillarUpload(data);
                 return true;
             }
         }
@@ -6022,7 +6066,7 @@ public class BuildScapeConfigScreen extends Screen {
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             PillarIdManager.getClient().saveAllPillars();
-            ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+            sendPillarUploadNow(data);
             return true;
         }
         curY += btnH + rowGap;
@@ -6131,7 +6175,7 @@ public class BuildScapeConfigScreen extends Screen {
                     }
                     data.dyeColors.set(editingColorIndex, hexString);
                     PillarIdManager.getClient().updatePillarData(data);
-                    ModMessages.INSTANCE.sendToServer(new UpdatePillarDataPacket(data));
+                    queuePillarUpload(data);
                 }
             } else {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
@@ -6561,6 +6605,7 @@ public class BuildScapeConfigScreen extends Screen {
     @Override
     public void removed() {
         flushConfigUpload();
+        flushPillarUploads();
         super.removed();
     }
 

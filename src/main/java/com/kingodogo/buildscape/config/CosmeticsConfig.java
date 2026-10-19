@@ -19,6 +19,8 @@ import java.util.UUID;
 
 public class CosmeticsConfig {
     private static final Gson GSON = Json.PRETTY;
+    /** Key and file-name part for settings that belong to no player. */
+    public static final String GLOBAL_SCOPE = "global";
     private static CosmeticsConfig INSTANCE;
     private final Path dataDirectory;
     private final Path legacyConfigDirectory;
@@ -62,7 +64,7 @@ public class CosmeticsConfig {
     }
 
     private File getPlayerFile(UUID playerUuid) {
-        String fileName = (playerUuid != null ? playerUuid.toString() : "global") + "-cosmetic.dat";
+        String fileName = (playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE) + "-cosmetic.dat";
         return new File(getDataDir(), fileName);
     }
 
@@ -145,7 +147,7 @@ public class CosmeticsConfig {
             }
 
             UUID uuid = null;
-            if (!key.equals("global")) {
+            if (!key.equals(GLOBAL_SCOPE)) {
                 try { uuid = UUID.fromString(key); } catch (Exception ignored) {}
             }
 
@@ -184,7 +186,7 @@ public class CosmeticsConfig {
 
     private void loadPlayer(UUID playerUuid) {
         File file = getPlayerFile(playerUuid);
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
 
         if (!file.exists()) {
             playerCosmetics.putIfAbsent(uuidStr, null);
@@ -252,7 +254,7 @@ public class CosmeticsConfig {
 
     private void savePlayer(UUID playerUuid) {
         File file = getPlayerFile(playerUuid);
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
 
         Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
         Map<String, String> colors = playerCosmeticColors.get(uuidStr);
@@ -318,20 +320,20 @@ public class CosmeticsConfig {
     }
 
     public Map<Integer, String> getEquippedCosmetics(UUID playerUuid) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
         Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
         return cosmetics != null ? new HashMap<>(cosmetics) : new HashMap<>();
     }
 
     public void setEquippedCosmetics(UUID playerUuid, Map<Integer, String> cosmeticsBySlot) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         playerCosmetics.put(uuidStr, new HashMap<>(cosmeticsBySlot));
         savePlayer(playerUuid);
     }
 
     public void equipCosmetic(UUID playerUuid, int slotIndex, String cosmeticId) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
 
         updateMap(playerCosmetics.computeIfAbsent(uuidStr, k -> new HashMap<>()), slotIndex, cosmeticId);
@@ -345,7 +347,7 @@ public class CosmeticsConfig {
     }
 
     public void unequipCosmetic(UUID playerUuid, int slotIndex) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
 
         Map<Integer, String> playerMap = playerCosmetics.get(uuidStr);
@@ -357,18 +359,18 @@ public class CosmeticsConfig {
 
     public String getCosmeticColor(UUID playerUuid, String cosmeticId) {
         if (cosmeticId == null) return null;
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
         Map<String, String> colors = playerCosmeticColors.get(uuidStr);
         if (colors != null && colors.containsKey(cosmeticId)) return colors.get(cosmeticId);
-        if (!playerCosmeticColors.containsKey("global")) loadPlayer(null);
-        Map<String, String> globalColors = playerCosmeticColors.get("global");
+        if (!playerCosmeticColors.containsKey(GLOBAL_SCOPE)) loadPlayer(null);
+        Map<String, String> globalColors = playerCosmeticColors.get(GLOBAL_SCOPE);
         return globalColors != null ? globalColors.get(cosmeticId) : null;
     }
 
     public void setCosmeticColor(UUID playerUuid, String cosmeticId, String hexColor) {
         if (cosmeticId == null) return;
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
 
         Map<String, String> colors = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
@@ -381,25 +383,25 @@ public class CosmeticsConfig {
     }
 
     public boolean getCreativeTreeBreaker(UUID playerUuid) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         if (!playerCreativeTreeBreaker.containsKey(uuidStr)) loadPlayer(playerUuid);
         return playerCreativeTreeBreaker.getOrDefault(uuidStr, false);
     }
 
     public void setCreativeTreeBreaker(UUID playerUuid, boolean enabled) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         playerCreativeTreeBreaker.put(uuidStr, enabled);
         savePlayer(playerUuid);
     }
 
     public boolean getShulkerPreview(UUID playerUuid) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         if (!playerShulkerPreview.containsKey(uuidStr)) loadPlayer(playerUuid);
         return playerShulkerPreview.getOrDefault(uuidStr, true);
     }
 
     public void setShulkerPreview(UUID playerUuid, boolean enabled) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         playerShulkerPreview.put(uuidStr, enabled);
         savePlayer(playerUuid);
     }

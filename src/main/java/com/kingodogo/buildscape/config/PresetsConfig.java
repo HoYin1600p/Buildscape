@@ -46,8 +46,10 @@ public class PresetsConfig {
     private final Map<String, JsonElement> preservedPresets = new HashMap<>();
     private boolean fileUnreadable;
     private String lastEditFailure = "";
-    private String lastAppliedPreset = "default";
+    private String lastAppliedPreset = DEFAULT_PRESET_KEY;
     private static final String UNNAMED_PRESET_KEY = "_unnamed";
+    private static final String DEFAULT_PRESET_KEY = "default";
+    private static final String LAST_APPLIED_KEY = "_lastApplied";
     /** Custom preset slots besides Default; null reads the buildscape.cfg setting. */
     private transient Integer customSlotsOverride;
 
@@ -71,7 +73,7 @@ public class PresetsConfig {
             Map<String, Preset> loadedPresets = parsePresets(loaded, skippedEntries);
             Map<String, JsonElement> preserved = new HashMap<>();
             for (Map.Entry<String, JsonElement> entry : loaded.entrySet()) {
-                if (entry.getKey().equals("_lastApplied") || entry.getKey().equals(UNNAMED_PRESET_KEY)) continue;
+                if (entry.getKey().equals(LAST_APPLIED_KEY) || entry.getKey().equals(UNNAMED_PRESET_KEY)) continue;
                 Preset preset = loadedPresets.get(entry.getKey());
                 boolean partial = preset == null;
                 if (preset != null) {
@@ -84,10 +86,10 @@ public class PresetsConfig {
             if (skippedEntries[0]) {
                 PillarParticleConfig.backupUnreadableFile(file);
             }
-            String loadedLastApplied = "default";
-            if (loaded.has("_lastApplied") && loaded.get("_lastApplied").isJsonPrimitive()
-                    && loaded.get("_lastApplied").getAsJsonPrimitive().isString()) {
-                loadedLastApplied = loaded.get("_lastApplied").getAsString();
+            String loadedLastApplied = DEFAULT_PRESET_KEY;
+            if (loaded.has(LAST_APPLIED_KEY) && loaded.get(LAST_APPLIED_KEY).isJsonPrimitive()
+                    && loaded.get(LAST_APPLIED_KEY).getAsJsonPrimitive().isString()) {
+                loadedLastApplied = loaded.get(LAST_APPLIED_KEY).getAsString();
             }
             presets = loadedPresets;
             preservedPresets.clear();
@@ -105,12 +107,12 @@ public class PresetsConfig {
             return;
         }
 
-        if (!presets.containsKey("default")) {
-            presets.put("default", new Preset("Default", getDefaultItems()));
+        if (!presets.containsKey(DEFAULT_PRESET_KEY)) {
+            presets.put(DEFAULT_PRESET_KEY, new Preset("Default", getDefaultItems()));
         }
 
         if (lastAppliedPreset == null || lastAppliedPreset.isEmpty()) {
-            lastAppliedPreset = "default";
+            lastAppliedPreset = DEFAULT_PRESET_KEY;
         }
     }
 
@@ -131,7 +133,7 @@ public class PresetsConfig {
     public int getCustomPresetCount() {
         int count = 0;
         for (String k : getPresetKeys()) {
-            if (!k.equals("default") && !k.equals(UNNAMED_PRESET_KEY)) count++;
+            if (!k.equals(DEFAULT_PRESET_KEY) && !k.equals(UNNAMED_PRESET_KEY)) count++;
         }
         return count;
     }
@@ -158,7 +160,7 @@ public class PresetsConfig {
         }
         Map<String, Preset> parsed = new HashMap<>();
         for (Map.Entry<String, JsonElement> entry : loaded.entrySet()) {
-            if (!entry.getKey().equals("_lastApplied") && !entry.getKey().equals(UNNAMED_PRESET_KEY)) {
+            if (!entry.getKey().equals(LAST_APPLIED_KEY) && !entry.getKey().equals(UNNAMED_PRESET_KEY)) {
                 try {
                     JsonElement value = entry.getValue();
                     if (!value.isJsonObject() || !value.getAsJsonObject().has("items")
@@ -214,7 +216,7 @@ public class PresetsConfig {
                             toSave.put(entry.getKey(), entry.getValue());
                         }
                     }
-                    toSave.put("_lastApplied", lastAppliedPreset);
+                    toSave.put(LAST_APPLIED_KEY, lastAppliedPreset);
                     toSave.putAll(preservedPresets);
                     GSON.toJson(toSave, writer);
                 }
@@ -230,7 +232,7 @@ public class PresetsConfig {
     public void applyPresetOnStartup() {
         PillarParticleConfig itemConfig = PillarParticleConfig.get();
         if (itemConfig.items.isEmpty()) {
-            applyPreset("default");
+            applyPreset(DEFAULT_PRESET_KEY);
         }
     }
 
@@ -239,7 +241,7 @@ public class PresetsConfig {
         preservedPresets.clear();
 
         Preset defaultPreset = new Preset("Default", getDefaultItems());
-        presets.put("default", defaultPreset);
+        presets.put(DEFAULT_PRESET_KEY, defaultPreset);
     }
 
     private Set<String> getDefaultItems() {
@@ -254,8 +256,8 @@ public class PresetsConfig {
 
     public List<String> getPresetKeys() {
         List<String> keys = new ArrayList<>();
-        if (presets.containsKey("default")) {
-            keys.add("default");
+        if (presets.containsKey(DEFAULT_PRESET_KEY)) {
+            keys.add(DEFAULT_PRESET_KEY);
         }
         if (presets.containsKey(UNNAMED_PRESET_KEY)) {
             keys.add(UNNAMED_PRESET_KEY);
@@ -263,7 +265,7 @@ public class PresetsConfig {
         Set<String> allKeys = new HashSet<>(presets.keySet());
         allKeys.addAll(preservedPresets.keySet());
         List<String> sortedKeys = new ArrayList<>(allKeys);
-        sortedKeys.remove("default");
+        sortedKeys.remove(DEFAULT_PRESET_KEY);
         sortedKeys.remove(UNNAMED_PRESET_KEY);
         sortedKeys.sort(String::compareTo);
 
@@ -272,7 +274,7 @@ public class PresetsConfig {
     }
 
     public boolean savePreset(String key, String name, Set<String> items) {
-        if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
+        if (key.equals(DEFAULT_PRESET_KEY) || key.equals(UNNAMED_PRESET_KEY)) {
             lastEditFailure = "reserved";
             return false;
         }
@@ -324,7 +326,7 @@ public class PresetsConfig {
     }
 
     public boolean deletePreset(String key) {
-        if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
+        if (key.equals(DEFAULT_PRESET_KEY) || key.equals(UNNAMED_PRESET_KEY)) {
             lastEditFailure = "reserved";
             return false;
         }
@@ -336,7 +338,7 @@ public class PresetsConfig {
         JsonElement preserved = preservedPresets.remove(key);
         if (previous != null || preserved != null) {
             String previousLastApplied = lastAppliedPreset;
-            if (key.equals(lastAppliedPreset)) lastAppliedPreset = "default";
+            if (key.equals(lastAppliedPreset)) lastAppliedPreset = DEFAULT_PRESET_KEY;
             if (saveToDisk()) return true;
             lastAppliedPreset = previousLastApplied;
             if (previous != null) presets.put(key, previous);
@@ -391,8 +393,8 @@ public class PresetsConfig {
         } else if (lastAppliedPreset != null && presets.containsKey(lastAppliedPreset)) {
             applyPreset(lastAppliedPreset);
         } else {
-            applyPreset("default");
-            lastAppliedPreset = "default";
+            applyPreset(DEFAULT_PRESET_KEY);
+            lastAppliedPreset = DEFAULT_PRESET_KEY;
             save();
         }
     }

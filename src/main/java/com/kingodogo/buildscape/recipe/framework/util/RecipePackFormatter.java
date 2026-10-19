@@ -1,13 +1,13 @@
 package com.kingodogo.buildscape.recipe.framework.util;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import com.kingodogo.buildscape.core.io.Json;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -25,14 +25,9 @@ import java.util.stream.Stream;
 // Formats BDRE recipe JSON files into compact format single-line recipe entries.
 public class RecipePackFormatter {
 
-    private static final Gson PRETTY_GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .create();
+    private static final Gson PRETTY_GSON = Json.PRETTY_NO_HTML_ESCAPING;
 
-    private static final Gson COMPACT_GSON = new GsonBuilder()
-            .disableHtmlEscaping()
-            .create();
+    private static final Gson COMPACT_GSON = Json.COMPACT_NO_HTML_ESCAPING;
 
     private static final Set<String> PRETTY_TOP_LEVEL_KEYS = Set.of(
             "_comment",

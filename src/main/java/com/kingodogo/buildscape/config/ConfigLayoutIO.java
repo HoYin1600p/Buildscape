@@ -10,6 +10,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.core.io.AtomicFiles;
+import com.kingodogo.buildscape.core.io.Json;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -34,7 +35,7 @@ import java.util.TreeMap;
 
 /** Lossless layout migration: validate first, back up once, then replace a complete file. */
 final class ConfigLayoutIO {
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = Json.PLAIN;
     private static final Map<Path, FailedMigration> failedMigrations = new LinkedHashMap<>();
     private record FailedMigration(byte[] bytes, String text) { }
     private ConfigLayoutIO() { }

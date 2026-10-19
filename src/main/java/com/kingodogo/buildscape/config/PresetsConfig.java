@@ -1,11 +1,11 @@
 package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.core.io.AtomicFiles;
+import com.kingodogo.buildscape.core.io.Json;
 import net.minecraftforge.fml.ModList;
 
 import java.io.File;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class PresetsConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static final Gson GSON = Json.PRETTY_WITH_NULLS;
     private static final String PRESETS_FILE_NAME = "pillar-presets.json";
     private static PresetsConfig INSTANCE;
     private final transient Path configDirectory;

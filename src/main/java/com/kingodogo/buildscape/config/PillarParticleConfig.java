@@ -1,11 +1,11 @@
 package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.network.SyncConfigPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
 import net.minecraft.client.Minecraft;
@@ -89,9 +89,7 @@ public class PillarParticleConfig {
     public EditPermissionMode edit_permission_mode = EditPermissionMode.STRICT;
 
 
-    private static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+    private static final Gson GSON = Json.PRETTY;
     private static final String PROPERTIES_FILE_NAME = "pillar-properties.json";
     private static final String ITEMS_FILE_NAME = "pillar-items.json";
     private static PillarParticleConfig INSTANCE;

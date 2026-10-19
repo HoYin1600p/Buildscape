@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.network;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.core.io.Json;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 public class UpdateAllPillarIdsPacket {
 
-    private static final Gson GSON = new GsonBuilder().create();
+    private static final Gson GSON = Json.PLAIN;
     private final List<PillarIdManager.PillarData> pillarDataList;
 
     public UpdateAllPillarIdsPacket(Map<String, PillarIdManager.PillarData> dataMap) {

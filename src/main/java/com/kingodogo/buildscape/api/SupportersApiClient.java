@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.api;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.api.model.*;
+import com.kingodogo.buildscape.core.io.Json;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -29,9 +29,7 @@ public class SupportersApiClient {
             .connectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
             .build();
 
-        this.gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+        this.gson = Json.PRETTY;
     }
 
     private static final SupportersApiClient INSTANCE = new SupportersApiClient();

@@ -1,12 +1,12 @@
 package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.core.io.AtomicFiles;
+import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
@@ -48,9 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PillarIdManager {
 
-    private static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+    private static final Gson GSON = Json.PRETTY;
     private static final String FILE_NAME = "pillar-ids.dat";
     private static final String BACKUP_FILE_NAME = "pillar-ids.bak.dat";
     private static final String FOLDER_NAME = "buildscape";

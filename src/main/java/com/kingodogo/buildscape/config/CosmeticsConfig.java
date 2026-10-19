@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.core.io.AtomicFiles;
+import com.kingodogo.buildscape.core.io.Json;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CosmeticsConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = Json.PRETTY;
     private static CosmeticsConfig INSTANCE;
     private final Path dataDirectory;
     private final Path legacyConfigDirectory;

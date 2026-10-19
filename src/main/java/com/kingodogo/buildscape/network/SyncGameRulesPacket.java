@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.world.ModGameRules;
-import net.minecraft.client.Minecraft;
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -50,24 +49,10 @@ public class SyncGameRulesPacket {
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.level != null) {
-                    mc.level.getGameRules().getRule(ModGameRules.FAST_LEAF_DECAY).set(fastLeafDecay, null);
-                    mc.level.getGameRules().getRule(ModGameRules.DISABLE_ENDERMAN_GRIEFING).set(disableEndermanGriefing, null);
-                    mc.level.getGameRules().getRule(ModGameRules.DISABLE_CREEPER_GRIEFING).set(disableCreeperGriefing, null);
-                    mc.level.getGameRules().getRule(ModGameRules.DISABLE_GHAST_GRIEFING).set(disableGhastGriefing, null);
-                    mc.level.getGameRules().getRule(ModGameRules.IS_CAKE_STACK).set(cakeStacking, null);
-                    mc.level.getGameRules().getRule(ModGameRules.IS_WATER_BOTTLE_STACK).set(waterBottleStacking, null);
-                    ModGameRules.setClientStackingRules(cakeStacking, waterBottleStacking);
-                    ModGameRules.clientFastLeafDecay = fastLeafDecay;
-                    ModGameRules.clientDisableEndermanGriefing = disableEndermanGriefing;
-                    ModGameRules.clientDisableCreeperGriefing = disableCreeperGriefing;
-                    ModGameRules.clientDisableGhastGriefing = disableGhastGriefing;
-                }
-            });
-        });
+        context.enqueueWork(() ->
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.applyGameRules(
+                        fastLeafDecay, disableEndermanGriefing, disableCreeperGriefing, disableGhastGriefing,
+                        cakeStacking, waterBottleStacking)));
         context.setPacketHandled(true);
     }
 }

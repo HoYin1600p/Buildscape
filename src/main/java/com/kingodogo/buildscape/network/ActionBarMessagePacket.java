@@ -6,8 +6,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.network.NetworkEvent;
+
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 
 public class ActionBarMessagePacket {
 
@@ -30,17 +31,8 @@ public class ActionBarMessagePacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandler.handleActionBarMessage(this));
-        });
+        ctx.get().enqueueWork(() ->
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.showActionBar(this.message)));
         ctx.get().setPacketHandled(true);
-    }
-
-    private static class ClientPacketHandler {
-        private static void handleActionBarMessage(ActionBarMessagePacket packet) {
-            if (Minecraft.getInstance().player != null) {
-                Minecraft.getInstance().player.displayClientMessage(packet.message, true);
-            }
-        }
     }
 }

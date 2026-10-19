@@ -1,10 +1,8 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -164,22 +162,8 @@ public class SyncConfigPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx
-                .get()
-                .enqueueWork(() -> {
-                    DistExecutor.unsafeRunWhenOn(
-                            Dist.CLIENT,
-                            () ->
-                                    () -> {
-                                        PillarParticleConfig.setServerConfig(this);
-                                        Screen screen =
-                                                Minecraft.getInstance().screen;
-                                        if (screen instanceof BuildScapeConfigScreen open) {
-                                            open.onServerConfigSynced();
-                                        }
-                                    }
-                    );
-                });
+        ctx.get().enqueueWork(() ->
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.applyServerConfig(this)));
         ctx.get().setPacketHandled(true);
     }
 }

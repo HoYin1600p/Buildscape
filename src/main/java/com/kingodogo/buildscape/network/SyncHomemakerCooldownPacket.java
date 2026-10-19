@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.client.HomemakerCooldownTracker;
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -29,9 +29,8 @@ public class SyncHomemakerCooldownPacket {
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> HomemakerCooldownTracker.cooldownEndTime = this.cooldownTime);
-        });
+        context.enqueueWork(() ->
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.setHomemakerCooldown(this.cooldownTime)));
         context.setPacketHandled(true);
     }
 }

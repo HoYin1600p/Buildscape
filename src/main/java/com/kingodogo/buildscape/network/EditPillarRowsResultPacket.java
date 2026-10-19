@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -40,13 +40,7 @@ public class EditPillarRowsResultPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> applyClient()));
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.pillarsSynced()));
         ctx.get().setPacketHandled(true);
-    }
-
-    private void applyClient() {
-        try {
-            BuildScapeConfigScreen.onPillarsSynced();
-        } catch (Throwable ignored) {}
     }
 }

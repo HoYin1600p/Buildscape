@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -182,10 +182,7 @@ public class SyncPillarIdsPacket {
             return;
         }
 
-        PillarIdManager.getClient().replaceFromServerSync(complete);
-        try {
-            BuildScapeConfigScreen.onPillarsSynced();
-        } catch (Throwable ignored) {}
+        ClientPacketHandlers.replacePillarsFromServer(complete);
     }
 
     private static void expireClientState() {

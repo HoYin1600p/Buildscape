@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.client.ConfettiBurstClient;
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -48,7 +48,7 @@ public class ConfettiBurstPacket {
 
     public static void handle(ConfettiBurstPacket msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                ConfettiBurstClient.spawn(
+                ClientPacketHandlers.spawnConfettiBurst(
                         msg.x, msg.y, msg.z, msg.lookX, msg.lookY, msg.lookZ, msg.burstLevel, msg.seed)));
         ctx.get().setPacketHandled(true);
     }

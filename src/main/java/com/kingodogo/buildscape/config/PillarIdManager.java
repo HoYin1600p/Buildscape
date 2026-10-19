@@ -629,6 +629,26 @@ public class PillarIdManager {
         data.max_particle_color = null;
     }
 
+    /**
+     * Clears the particle overrides of the given pillars. A frame keeps its pattern and colours in the
+     * entity, so a reset frame is recorded like a frame removed in the screen: loaded frames are cleared
+     * now and unloaded ones are cleared when they load, instead of copying the old values back in.
+     */
+    public boolean resetPillars(Collection<String> pillarIds) {
+        if (pillarIds == null) return false;
+        boolean changed = false;
+        Set<String> frames = new LinkedHashSet<>();
+        for (String id : pillarIds) {
+            PillarData existing = id == null ? null : pillarData.get(id);
+            if (existing == null) continue;
+            clearPillarOverrides(existing);
+            if (serverAuthoritative && isItemFrameData(existing)) frames.add(id);
+            changed = true;
+        }
+        if (!frames.isEmpty()) removePillars(frames, true);
+        return changed;
+    }
+
     public boolean removePillars(Collection<String> pillarIds) {
         return removePillars(pillarIds, true);
     }

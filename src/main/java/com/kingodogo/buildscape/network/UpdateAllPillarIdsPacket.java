@@ -61,8 +61,7 @@ public class UpdateAllPillarIdsPacket {
         NetworkEvent.Context context = ctx.get();
         context.enqueueWork(() -> {
             ServerPlayer serverPlayer = context.getSender();
-            if (serverPlayer == null || !PillarParticleConfig.canPlayerEdit(serverPlayer,
-                    PillarParticleConfig.getServerConfig().edit_permission_mode, PillarParticleConfig.EditScope.GENERAL)) {
+            if (serverPlayer == null || !EditGuard.require(serverPlayer, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_BULK)) {
                 return;
             }
 

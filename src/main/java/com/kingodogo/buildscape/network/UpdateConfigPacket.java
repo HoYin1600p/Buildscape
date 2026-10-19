@@ -42,7 +42,7 @@ public class UpdateConfigPacket {
     }
 
     public static List<UpdateConfigPacket> split(PillarParticleConfig config) {
-        return split(config, java.util.EnumSet.allOf(ConfigSetting.class));
+        return split(config, ConfigSetting.uploadable());
     }
 
     public static List<UpdateConfigPacket> split(PillarParticleConfig config, java.util.Set<ConfigSetting> settings) {

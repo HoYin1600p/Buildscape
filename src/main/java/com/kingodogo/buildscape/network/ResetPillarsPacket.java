@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarIdManager;
-import com.kingodogo.buildscape.config.PillarParticleConfig;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -43,24 +43,12 @@ public class ResetPillarsPacket {
         NetworkEvent.Context context = ctx.get();
         context.enqueueWork(() -> {
             ServerPlayer serverPlayer = context.getSender();
-            if (serverPlayer == null || !PillarParticleConfig.canPlayerEdit(serverPlayer,
-                    PillarParticleConfig.getServerConfig().edit_permission_mode, PillarParticleConfig.EditScope.LIMITED)) {
+            if (serverPlayer == null || !EditGuard.require(serverPlayer, ConfigSetting.PILLAR_EDIT)) {
                 return;
             }
 
             PillarIdManager manager = PillarIdManager.get();
-            boolean changed = false;
-
-            for (String id : packet.pillarIds) {
-                if (id == null) continue;
-                PillarIdManager.PillarData existing = manager.getPillarData(id);
-                if (existing != null) {
-                    PillarIdManager.clearPillarOverrides(existing);
-                    changed = true;
-                }
-            }
-
-            if (changed) {
+            if (manager.resetPillars(packet.pillarIds)) {
                 manager.saveImmediate();
                 manager.syncAllLoadedPillars(serverPlayer.getServer());
                 SyncPillarIdsPacket.sendToAll(manager.getAllPillarDataForSync());

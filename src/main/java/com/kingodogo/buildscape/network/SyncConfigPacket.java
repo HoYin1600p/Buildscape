@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 public class SyncConfigPacket {
     // Present only for assembled uploads; server-to-client sync always contains all settings.
     public java.util.Set<com.kingodogo.buildscape.config.ConfigSetting> uploadSettings =
-            java.util.EnumSet.allOf(com.kingodogo.buildscape.config.ConfigSetting.class);
+            com.kingodogo.buildscape.config.ConfigSetting.uploadable();
     public static final double MIN_PARTICLE_RATE = NetworkPacketLimits.MIN_PARTICLE_RATE;
     public static final double MAX_PARTICLE_SPEED = NetworkPacketLimits.MAX_PARTICLE_SPEED;
     public static final double MAX_PARTICLE_SPREAD = NetworkPacketLimits.MAX_PARTICLE_SPREAD;
@@ -168,6 +168,11 @@ public class SyncConfigPacket {
                             () ->
                                     () -> {
                                         PillarParticleConfig.setServerConfig(this);
+                                        net.minecraft.client.gui.screens.Screen screen =
+                                                net.minecraft.client.Minecraft.getInstance().screen;
+                                        if (screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen open) {
+                                            open.onServerConfigSynced();
+                                        }
                                     }
                     );
                 });

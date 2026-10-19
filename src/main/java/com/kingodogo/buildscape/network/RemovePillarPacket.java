@@ -48,9 +48,7 @@ public class RemovePillarPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
-            if (!com.kingodogo.buildscape.config.PillarParticleConfig.canPlayerEdit(player,
-                    com.kingodogo.buildscape.config.PillarParticleConfig.getServerConfig().edit_permission_mode,
-                    com.kingodogo.buildscape.config.PillarParticleConfig.EditScope.LIMITED)) return;
+            if (!EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_EDIT)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             boolean changed = manager.removePillars(pillarIds);

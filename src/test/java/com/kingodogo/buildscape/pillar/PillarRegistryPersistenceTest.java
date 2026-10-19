@@ -308,6 +308,63 @@ public class PillarRegistryPersistenceTest {
         assertTrue(removedFrame(manager, "Frame" + (maximum + 1), Direction.NORTH));
     }
 
+    @Test
+    public void resetFramesAreClearedWhenTheyLoadAfterARestart() throws Exception {
+        for (String type : new String[]{"minecraft:item_frame", "buildscape:white_item_frame"}) {
+            PillarIdManager manager = manager();
+            PillarIdManager.PillarData data = frame("OldFrameId", "north", 10);
+            data.pillarType = type;
+            data.dyeColors = new java.util.ArrayList<>(List.of("#123456"));
+            load(manager, Map.of("OldFrameId", data));
+            CompoundTag unloadedFrame = frameTag("OldFrameId");
+
+            assertTrue(manager.resetPillars(List.of("OldFrameId")));
+            assertNull(manager.getPillarData("OldFrameId"));
+            assertNull(manager.getIdForPosition("minecraft:overworld:0:0:0:north"));
+            assertTrue(removedFrame(manager, "OldFrameId", Direction.NORTH));
+
+            manager = restart(manager);
+            assertFalse(type, prepareFrame(manager, unloadedFrame, Direction.NORTH));
+            assertEquals(type, Set.of("OtherModData"), unloadedFrame.getAllKeys());
+            assertTrue(manager.getAllPillarIds().isEmpty());
+        }
+    }
+
+    @Test
+    public void resetFrameStillAllowsANewFrameAtTheSameFace() throws Exception {
+        PillarIdManager manager = manager();
+        load(manager, Map.of("OldFrameId", frame("OldFrameId", "north", 10)));
+        assertTrue(manager.resetPillars(List.of("OldFrameId")));
+        CompoundTag replacement = frameTag("NewFrameId");
+        CompoundTag expected = replacement.copy();
+        assertTrue(prepareFrame(manager, replacement, Direction.NORTH));
+        assertEquals(expected, replacement);
+    }
+
+    @Test
+    public void resetKeepsPillarBlocksListedAndOnlyClearsTheirOverrides() throws Exception {
+        PillarIdManager manager = manager();
+        PillarIdManager.PillarData pillar = new PillarIdManager.PillarData();
+        pillar.id = "S-P1";
+        pillar.dimension = "minecraft:overworld";
+        pillar.pattern = "spiral";
+        pillar.max_particle_color = 3;
+        pillar.dyeColors = new java.util.ArrayList<>(List.of("#123456"));
+        load(manager, Map.of("S-P1", pillar, "I-F1", frame("I-F1", "north", 10)));
+
+        assertTrue(manager.resetPillars(java.util.Arrays.asList("S-P1", null, "Unknown")));
+        PillarIdManager.PillarData reset = manager.getPillarData("S-P1");
+        assertNotNull(reset);
+        assertNull(reset.pattern);
+        assertNull(reset.max_particle_color);
+        assertTrue(reset.dyeColors.isEmpty());
+        assertNotNull(manager.getPillarData("I-F1"));
+        assertFalse(removedFrame(manager, "I-F1", Direction.NORTH));
+
+        assertFalse(manager.resetPillars(List.of("Unknown")));
+        assertFalse(manager.resetPillars(null));
+    }
+
     private static CompoundTag frameTag(String id) {
         CompoundTag tag = new CompoundTag();
         tag.putString("BuildScapeFrameId", id);

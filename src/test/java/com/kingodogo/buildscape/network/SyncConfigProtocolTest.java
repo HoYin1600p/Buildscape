@@ -92,7 +92,7 @@ public class SyncConfigProtocolTest {
         config.pattern = "spiral";
         config.edit_permission_mode = PillarParticleConfig.EditPermissionMode.OPEN;
         config.replaceItems(Set.of("minecraft:stick"));
-        for (ConfigSetting setting : ConfigSetting.values()) {
+        for (ConfigSetting setting : ConfigSetting.uploadable()) {
             ConfigAssembly assembly = new ConfigAssembly();
             SyncConfigPacket decoded = null;
             for (UpdateConfigPacket packet : UpdateConfigPacket.split(config, java.util.EnumSet.of(setting))) {

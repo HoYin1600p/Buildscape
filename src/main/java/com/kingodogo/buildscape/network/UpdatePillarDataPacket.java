@@ -140,8 +140,7 @@ public class UpdatePillarDataPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null || !PillarParticleConfig.canPlayerEdit(player,
-                    PillarParticleConfig.getServerConfig().edit_permission_mode, PillarParticleConfig.EditScope.LIMITED)) return;
+            if (player == null || !EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_EDIT)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             PillarIdManager.PillarData data = manager.getPillarData(pillarId);

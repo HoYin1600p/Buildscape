@@ -28,7 +28,7 @@ public class ConfigSettingPermissionsTest {
     public void everyModeAndLevelUsesTheSameSettingRules() {
         for (PillarParticleConfig.EditPermissionMode mode : PillarParticleConfig.EditPermissionMode.values()) {
             for (int level : new int[]{0, 2, 4}) {
-                for (ConfigSetting setting : ConfigSetting.values()) {
+                for (ConfigSetting setting : ConfigSetting.uploadable()) {
                     boolean expected = level == 4 || setting != ConfigSetting.POLICY
                             && (mode == PillarParticleConfig.EditPermissionMode.OPEN
                             || mode == PillarParticleConfig.EditPermissionMode.STANDARD && level == 2
@@ -38,6 +38,50 @@ public class ConfigSettingPermissionsTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void pillarAndWorldOperationsHaveOneRulePerModeAndLevel() {
+        Object[][] table = {
+                // mode, level, pillar edit, pillar bulk, world rules
+                {PillarParticleConfig.EditPermissionMode.STRICT, 0, false, false, false},
+                {PillarParticleConfig.EditPermissionMode.STRICT, 2, false, false, false},
+                {PillarParticleConfig.EditPermissionMode.STRICT, 4, true, true, true},
+                {PillarParticleConfig.EditPermissionMode.STANDARD, 0, false, false, false},
+                {PillarParticleConfig.EditPermissionMode.STANDARD, 2, true, false, false},
+                {PillarParticleConfig.EditPermissionMode.STANDARD, 4, true, true, true},
+                {PillarParticleConfig.EditPermissionMode.OPEN, 0, true, true, true},
+                {PillarParticleConfig.EditPermissionMode.OPEN, 2, true, true, true},
+                {PillarParticleConfig.EditPermissionMode.OPEN, 4, true, true, true},
+        };
+        for (Object[] row : table) {
+            PillarParticleConfig.EditPermissionMode mode = (PillarParticleConfig.EditPermissionMode) row[0];
+            int level = (Integer) row[1];
+            String where = mode + "/" + level;
+            assertEquals(where, row[2], ConfigSetting.PILLAR_EDIT.canEdit(mode, level));
+            assertEquals(where, row[3], ConfigSetting.PILLAR_BULK.canEdit(mode, level));
+            assertEquals(where, row[4], ConfigSetting.WORLD_RULES.canEdit(mode, level));
+        }
+    }
+
+    @Test
+    public void operationsOutsideTheUploadPacketsNeverEnterUploadsOrMasks() {
+        assertEquals(EnumSet.of(ConfigSetting.ITEMS, ConfigSetting.COLORS, ConfigSetting.PARTICLES, ConfigSetting.POLICY),
+                ConfigSetting.uploadable());
+        for (PillarParticleConfig.EditPermissionMode mode : PillarParticleConfig.EditPermissionMode.values()) {
+            assertTrue(ConfigSetting.uploadable().containsAll(ConfigSetting.allowed(mode, 4)));
+        }
+        assertEquals(15, ConfigSetting.mask(ConfigSetting.uploadable()));
+        assertEquals(ConfigSetting.uploadable(), ConfigSetting.fromMask(15));
+        try {
+            ConfigSetting.fromMask(16);
+            fail("a mask bit for a non-upload operation must be refused");
+        } catch (IllegalArgumentException expected) {
+            // expected
+        }
+        assertEquals(0, ConfigSetting.permissionLevel(false, false));
+        assertEquals(2, ConfigSetting.permissionLevel(true, false));
+        assertEquals(4, ConfigSetting.permissionLevel(true, true));
     }
 
     @Test

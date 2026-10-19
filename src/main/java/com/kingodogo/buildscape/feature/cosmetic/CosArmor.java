@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.cosmetics;
+package com.kingodogo.buildscape.feature.cosmetic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -7,17 +7,15 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-public abstract class CosChest<T extends Entity> extends EntityModel<T> {
+import java.util.Map;
 
-    protected final ModelPart body;
-    protected final ModelPart leftArm;
-    protected final ModelPart rightArm;
+public abstract class CosArmor<T extends Entity> extends EntityModel<T> {
+
+    protected final Map<String, ModelPart> parts;
     protected final ResourceLocation texture;
 
-    public CosChest(ModelPart body, ModelPart leftArm, ModelPart rightArm, ResourceLocation texture) {
-        this.body = body;
-        this.leftArm = leftArm;
-        this.rightArm = rightArm;
+    public CosArmor(Map<String, ModelPart> parts, ResourceLocation texture) {
+        this.parts = parts;
         this.texture = texture;
     }
 
@@ -31,10 +29,15 @@ public abstract class CosChest<T extends Entity> extends EntityModel<T> {
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        leftArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        rightArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        for (ModelPart part : parts.values()) {
+            part.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        }
     }
+
+    public Map<String, ModelPart> getParts() {
+        return parts;
+    }
+
 
     public void applyTransform(PoseStack poseStack) {
     }

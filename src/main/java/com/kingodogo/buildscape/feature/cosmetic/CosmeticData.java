@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.api.model;
+package com.kingodogo.buildscape.feature.cosmetic;
 
 import java.util.List;
 import java.util.Map;

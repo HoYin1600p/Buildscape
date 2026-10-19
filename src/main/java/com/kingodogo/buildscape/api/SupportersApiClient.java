@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.api.model.*;
 import com.kingodogo.buildscape.core.io.Json;
+import com.kingodogo.buildscape.feature.cosmetic.CosmeticData;
 
 import java.net.URI;
 import java.net.http.HttpClient;

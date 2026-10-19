@@ -1,7 +1,7 @@
-package com.kingodogo.buildscape.api;
+package com.kingodogo.buildscape.feature.cosmetic;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.api.model.CosmeticData;
+import com.kingodogo.buildscape.api.SupportersApiClient;
 import net.minecraft.client.Minecraft;
 
 import java.util.UUID;

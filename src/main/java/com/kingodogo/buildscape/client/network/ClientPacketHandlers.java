@@ -6,7 +6,7 @@ import com.kingodogo.buildscape.client.HomemakerCooldownTracker;
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
+import com.kingodogo.buildscape.feature.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import com.kingodogo.buildscape.network.EditRefusedPacket;
 import com.kingodogo.buildscape.network.SyncConfigPacket;

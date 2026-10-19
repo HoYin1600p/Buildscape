@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.cosmetics;
+package com.kingodogo.buildscape.feature.cosmetic;
 
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.resources.ResourceLocation;

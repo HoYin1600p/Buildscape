@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.cosmetic.sign;
+package com.kingodogo.buildscape.feature.cosmetic.sign;
 
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.SyncSignFramePacket;

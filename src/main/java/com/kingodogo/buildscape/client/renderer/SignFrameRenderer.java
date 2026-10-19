@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
-import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
+import com.kingodogo.buildscape.feature.cosmetic.sign.SignFrameAttachment;
+import com.kingodogo.buildscape.feature.cosmetic.sign.SignFrameType;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;

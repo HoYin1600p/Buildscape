@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.cosmetics;
+package com.kingodogo.buildscape.feature.cosmetic;
 
 import java.util.HashMap;
 import java.util.HashSet;

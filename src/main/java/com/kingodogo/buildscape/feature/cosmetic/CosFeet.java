@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.cosmetics;
+package com.kingodogo.buildscape.feature.cosmetic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.cosmetics;
+package com.kingodogo.buildscape.feature.cosmetic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -7,13 +7,17 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-public abstract class CosHead<T extends Entity> extends EntityModel<T> {
+public abstract class CosChest<T extends Entity> extends EntityModel<T> {
 
-    protected final ModelPart root;
+    protected final ModelPart body;
+    protected final ModelPart leftArm;
+    protected final ModelPart rightArm;
     protected final ResourceLocation texture;
 
-    public CosHead(ModelPart root, ResourceLocation texture) {
-        this.root = root;
+    public CosChest(ModelPart body, ModelPart leftArm, ModelPart rightArm, ResourceLocation texture) {
+        this.body = body;
+        this.leftArm = leftArm;
+        this.rightArm = rightArm;
         this.texture = texture;
     }
 
@@ -27,7 +31,9 @@ public abstract class CosHead<T extends Entity> extends EntityModel<T> {
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        root.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        leftArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        rightArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
     public void applyTransform(PoseStack poseStack) {

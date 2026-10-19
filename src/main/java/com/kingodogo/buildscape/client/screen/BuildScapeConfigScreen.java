@@ -10,7 +10,6 @@ import com.kingodogo.buildscape.network.EditRefusedPacket;
 import com.kingodogo.buildscape.network.RemovePillarPacket;
 import com.kingodogo.buildscape.network.RequestPillarIdsPacket;
 import com.kingodogo.buildscape.network.ResetPillarsPacket;
-import com.kingodogo.buildscape.network.UpdateAllPillarIdsPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
 import com.kingodogo.buildscape.network.UpdateGameRulePacket;
 import com.kingodogo.buildscape.network.UpdatePillarDataPacket;
@@ -34,7 +33,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -244,8 +242,6 @@ public class BuildScapeConfigScreen extends Screen {
     static final ResourceLocation TOGGLE_OFF_TEXTURE = new ResourceLocation("buildscape", "textures/client/ui/toggle_off.png");
     static final ResourceLocation TOGGLE_OFF_TINT_TEXTURE = new ResourceLocation("buildscape", "textures/client/ui/toggle_off_tint.png");
 
-    static final ResourceLocation ICON_SUN_TEXTURE = new ResourceLocation("buildscape", "textures/client/ui/icon_sun.png");
-    static final ResourceLocation ICON_MOON_TEXTURE = new ResourceLocation("buildscape", "textures/client/ui/icon_moon.png");
 
     static final ResourceLocation LINK_WEBSITE_TEXTURE = new ResourceLocation("buildscape", "textures/client/ui/link_website.png");
     static final ResourceLocation LINK_BUGS_TEXTURE = new ResourceLocation("buildscape", "textures/client/ui/link_bugs.png");
@@ -618,9 +614,8 @@ public class BuildScapeConfigScreen extends Screen {
     private static final Map<String, Boolean> toggleLastStateMap = new HashMap<>();
 
     private float getThemeTargetPos(ConfigThemes.Theme theme) {
-        if (theme == null || "dark".equals(theme.id)) return 0.0f;
-        if ("light".equals(theme.id)) return 1.0f;
-        return 0.5f; // Standby (custom themes)
+        if (theme != null && "light".equals(theme.id)) return 1.0f;
+        return 0.0f; // 2-stage toggle: Moon on 0.0f for Dark and all other custom themes
     }
 
     private float navAnimProgress = 0.0f; // 0.0 = collapsed, 1.0 = expanded
@@ -2201,12 +2196,12 @@ public class BuildScapeConfigScreen extends Screen {
         int versionTagX = headerX + headerW - tagW - 28;
         drawText(poseStackOrGraphics, font, versionTag, versionTagX, headerY + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
-        // 3-Stage Theme Toggle Button (Dark -> Standby -> Light)
+        // 2-Stage Theme Toggle Button (Dark 🌙 <-> Light ☀️)
         int themeToggleW = 44;
         int themeToggleH = 16;
         int themeToggleX = versionTagX - themeToggleW - 10;
         int themeToggleY = headerY + (headerH - themeToggleH) / 2;
-        renderHeaderThemeToggle(poseStackOrGraphics, themeToggleX, themeToggleY, themeToggleW, themeToggleH, effMouseX, effMouseY, alpha);
+        renderHeaderThemeToggle(poseStackOrGraphics, font, themeToggleX, themeToggleY, themeToggleW, themeToggleH, effMouseX, effMouseY, alpha);
 
         drawTopCrestBadge(poseStackOrGraphics, font, frameX, frameY, frameW, alpha);
 
@@ -2276,7 +2271,7 @@ public class BuildScapeConfigScreen extends Screen {
                                         int navX, int navY, int navW, int navH,
                                         int contentX, int contentY, int contentW, int contentH, float alpha) {
         // 1. Outer Chassis Body & Metallic Border Frame
-        drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, true, alpha);
+        drawBaseFrameBorder(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, true, alpha);
 
         // 2. Header Bar Basin
         drawBeveledComponent(poseStackOrGraphics, headerX, headerY, headerW, headerH, COLOR_HEADER_BG, alpha);
@@ -3386,7 +3381,7 @@ public class BuildScapeConfigScreen extends Screen {
         int modalX = (effW - modalW) / 2;
         int modalY = (effH - modalH) / 2;
 
-        drawVaultHuntersFrame(poseStackOrGraphics, modalX, modalY, modalW, modalH, COLOR_PANEL_BG, alpha);
+        drawBaseFrameBorder(poseStackOrGraphics, modalX, modalY, modalW, modalH, COLOR_PANEL_BG, alpha);
 
         int headH = 24;
         fill(poseStackOrGraphics, modalX + 7, modalY + 7, modalX + modalW - 7, modalY + headH, applyAlpha(COLOR_HEADER_BG, alpha));
@@ -3479,11 +3474,11 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     // Shared border and bevel rendering.
-    private void drawVaultHuntersFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
-        drawVaultHuntersFrame(poseStackOrGraphics, x, y, w, h, bgRgb, false, alpha);
+    private void drawBaseFrameBorder(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
+        drawBaseFrameBorder(poseStackOrGraphics, x, y, w, h, bgRgb, false, alpha);
     }
 
-    private void drawVaultHuntersFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, boolean hasCrestNotch, float alpha) {
+    private void drawBaseFrameBorder(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, boolean hasCrestNotch, float alpha) {
         // 1. Outer Chassis Body Fill (Solid metallic chassis backing)
         fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
@@ -3796,67 +3791,76 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     private void drawInlinePresetsTab(Object poseStackOrGraphics, int btnX, int btnY, int btnW, int btnH, boolean hover, boolean active, float alpha) {
+        // 1. Chassis Body Fill (Matches main panel frame chassis base)
+        fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + btnH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
+        int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
+        int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
-        // 1. Button Background Fill
-        int bgCol;
-        if (active) {
-            bgCol = currentTheme.isLight() ? 0xFFBAE6FD : 0xFF1B2B3E;
-        } else if (hover) {
-            bgCol = COLOR_BTN_BG_HOVER;
-        } else {
-            bgCol = COLOR_BTN_BG;
-        }
-        fill(poseStackOrGraphics, btnX + 1, btnY + 1, btnX + btnW - 1, btnY + btnH - 1, applyAlpha(bgCol, alpha));
-
-        // 2. Multi-tier Metallic Vault Hunters Bevel:
-        // Outermost 1px Black Border
+        // 2. Outermost 1px Black Border (Matches main panel frame)
         fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + 1, black);
         fill(poseStackOrGraphics, btnX, btnY + btnH - 1, btnX + btnW, btnY + btnH, black);
         fill(poseStackOrGraphics, btnX, btnY, btnX + 1, btnY + btnH, black);
         fill(poseStackOrGraphics, btnX + btnW - 1, btnY, btnX + btnW, btnY + btnH, black);
 
-        // Top & Left Metallic Gradient Highlight
-        int startCol = active ? COLOR_BEVEL_HIGHLIGHT : (hover ? COLOR_BORDER_GRADIENT_START : COLOR_BTN_BORDER);
-        int endCol = active ? COLOR_BORDER_SHADOW : (hover ? COLOR_BORDER_GRADIENT_END : COLOR_BEVEL_SHADOW);
-        drawHorizontalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 2, startCol, endCol, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnH - 2, startCol, endCol, alpha);
-
-        // Bottom & Right Deep Shadow
+        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
+        drawHorizontalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        drawVerticalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
         fill(poseStackOrGraphics, btnX + 1, btnY + btnH - 2, btnX + btnW - 1, btnY + btnH - 1, shadow);
         fill(poseStackOrGraphics, btnX + btnW - 2, btnY + 1, btnX + btnW - 1, btnY + btnH - 1, shadow);
 
-        // Active State Accent Glow
+        // 4. Outer Chassis Band (Offset 2, exactly matches main frame chassis band)
+        fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + btnW - 2, btnY + 3, band);
+        fill(poseStackOrGraphics, btnX + 2, btnY + btnH - 3, btnX + btnW - 2, btnY + btnH - 2, band);
+        fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + 3, btnY + btnH - 2, band);
+        fill(poseStackOrGraphics, btnX + btnW - 3, btnY + 2, btnX + btnW - 2, btnY + btnH - 2, band);
+
+        // 5. Stepped Bevel Ridge & Groove (Offset 3, matching main frame stepped bevel)
+        fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + btnW - 3, btnY + 4, bevelShadow);
+        fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + 4, btnY + btnH - 3, bevelShadow);
+        fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnX + btnW - 3, btnY + btnH - 3, bevelHighlight);
+        fill(poseStackOrGraphics, btnX + btnW - 4, btnY + 3, btnX + btnW - 3, btnY + btnH - 3, bevelHighlight);
+
+        // 6. Inner Face Plate (Offset 4)
+        int faceX = btnX + 4;
+        int faceY = btnY + 4;
+        int faceW = btnW - 8;
+        int faceH = btnH - 8;
+
+        int bgCol = active ? (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE)
+                : (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG);
+        fill(poseStackOrGraphics, faceX, faceY, faceX + faceW, faceY + faceH, applyAlpha(bgCol, alpha));
+
+        // Active / Hover Accent Framing
         if (active) {
-            int glowAlpha = (int) (255 * (hover ? 0.85f : 0.65f) * alpha);
-            int accentCol = (glowAlpha << 24) | (COLOR_ACCENT & 0x00FFFFFF);
-            drawBorder(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 2, btnH - 2, accentCol);
+            int accentGlow = applyAlpha(COLOR_ACCENT, (hover ? 0.90f : 0.70f) * alpha);
+            drawBorder(poseStackOrGraphics, faceX, faceY, faceW, faceH, accentGlow);
+        } else if (hover) {
+            int hoverGlow = applyAlpha(COLOR_ROW_BORDER_HOVER, alpha * 0.75f);
+            drawBorder(poseStackOrGraphics, faceX, faceY, faceW, faceH, hoverGlow);
         }
 
-        // 3. 3-Slider Equalizer Icon (Clean tracks & beveled hardware knobs)
+        // 7. 3-Slider Equalizer Icon (Theme-unified tracks and beveled knobs)
         int cx = btnX + btnW / 2;
         int cy = btnY + btnH / 2;
 
-        int trkCol = applyAlpha(active ? (currentTheme.isLight() ? 0xFF0284C7 : 0xFF38BDF8)
-                : (hover ? (currentTheme.isLight() ? 0xFF64748B : 0xFF94A3B8)
-                : (currentTheme.isLight() ? 0xFF94A3B8 : COLOR_CHASSIS_BAND)), alpha);
-
-        int knobBase = active ? COLOR_ACCENT
-                : (hover ? COLOR_ACCENT
-                : (currentTheme.isLight() ? 0xFF334155 : COLOR_TEXT_WHITE));
+        int trkCol = applyAlpha(active ? COLOR_ACCENT : (hover ? COLOR_ROW_BORDER_HOVER : COLOR_CHASSIS_BAND), alpha);
+        int knobBase = active ? COLOR_ACCENT : (hover ? COLOR_ACCENT : COLOR_TEXT_WHITE);
         int knobCol = applyAlpha(knobBase, alpha);
-        int knobHl = applyAlpha(0xFFFFFFFF, alpha * (active ? 0.90f : 0.65f));
-        int knobShadow = applyAlpha(0xFF000000, alpha * 0.45f);
+        int knobHl = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha * (active ? 0.95f : 0.75f));
+        int knobShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha * 0.65f);
 
-        // Track 1 (Top, cy - 5)
-        fill(poseStackOrGraphics, cx - 7, cy - 5, cx + 7, cy - 4, trkCol);
-        // Knob 1 (Left: cx - 5 to cx - 2, cy - 7 to cy - 2)
-        fill(poseStackOrGraphics, cx - 5, cy - 7, cx - 2, cy - 2, knobCol);
-        fill(poseStackOrGraphics, cx - 5, cy - 7, cx - 2, cy - 6, knobHl);
-        fill(poseStackOrGraphics, cx - 5, cy - 6, cx - 4, cy - 2, knobHl);
-        fill(poseStackOrGraphics, cx - 3, cy - 6, cx - 2, cy - 2, knobShadow);
-        fill(poseStackOrGraphics, cx - 5, cy - 3, cx - 2, cy - 2, knobShadow);
+        // Track 1 (Top, cy - 4)
+        fill(poseStackOrGraphics, cx - 7, cy - 4, cx + 7, cy - 3, trkCol);
+        // Knob 1 (Left: cx - 5 to cx - 2, cy - 6 to cy - 1)
+        fill(poseStackOrGraphics, cx - 5, cy - 6, cx - 2, cy - 1, knobCol);
+        fill(poseStackOrGraphics, cx - 5, cy - 6, cx - 2, cy - 5, knobHl);
+        fill(poseStackOrGraphics, cx - 5, cy - 5, cx - 4, cy - 1, knobHl);
+        fill(poseStackOrGraphics, cx - 3, cy - 5, cx - 2, cy - 1, knobShadow);
+        fill(poseStackOrGraphics, cx - 5, cy - 2, cx - 2, cy - 1, knobShadow);
 
         // Track 2 (Middle, cy)
         fill(poseStackOrGraphics, cx - 7, cy, cx + 7, cy + 1, trkCol);
@@ -3867,14 +3871,14 @@ public class BuildScapeConfigScreen extends Screen {
         fill(poseStackOrGraphics, cx + 4, cy - 1, cx + 5, cy + 3, knobShadow);
         fill(poseStackOrGraphics, cx + 2, cy + 2, cx + 5, cy + 3, knobShadow);
 
-        // Track 3 (Bottom, cy + 5)
-        fill(poseStackOrGraphics, cx - 7, cy + 5, cx + 7, cy + 6, trkCol);
-        // Knob 3 (Center: cx - 2 to cx + 1, cy + 3 to cy + 8)
-        fill(poseStackOrGraphics, cx - 2, cy + 3, cx + 1, cy + 8, knobCol);
-        fill(poseStackOrGraphics, cx - 2, cy + 3, cx + 1, cy + 4, knobHl);
-        fill(poseStackOrGraphics, cx - 2, cy + 4, cx - 1, cy + 8, knobHl);
-        fill(poseStackOrGraphics, cx, cy + 4, cx + 1, cy + 8, knobShadow);
-        fill(poseStackOrGraphics, cx - 2, cy + 7, cx + 1, cy + 8, knobShadow);
+        // Track 3 (Bottom, cy + 4)
+        fill(poseStackOrGraphics, cx - 7, cy + 4, cx + 7, cy + 5, trkCol);
+        // Knob 3 (Center: cx - 2 to cx + 1, cy + 2 to cy + 7)
+        fill(poseStackOrGraphics, cx - 2, cy + 2, cx + 1, cy + 7, knobCol);
+        fill(poseStackOrGraphics, cx - 2, cy + 2, cx + 1, cy + 3, knobHl);
+        fill(poseStackOrGraphics, cx - 2, cy + 3, cx - 1, cy + 7, knobHl);
+        fill(poseStackOrGraphics, cx, cy + 3, cx + 1, cy + 7, knobShadow);
+        fill(poseStackOrGraphics, cx - 2, cy + 6, cx + 1, cy + 7, knobShadow);
     }
 
     private void drawPresetsSideTab(Object poseStackOrGraphics, Font font, int frameRight, int tabY, int mouseX, int mouseY, float alpha) {
@@ -3947,7 +3951,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
-    private void renderHeaderThemeToggle(Object poseStackOrGraphics, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+    private void renderHeaderThemeToggle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         float target = getThemeTargetPos(currentTheme);
         if (themeToggleAnimPos < 0.0f) {
             themeToggleAnimPos = target;
@@ -3972,96 +3976,53 @@ public class BuildScapeConfigScreen extends Screen {
         float pos = Math.max(0.0f, Math.min(1.0f, themeToggleAnimPos));
         boolean hover = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
 
-        // 1. Interpolate Track Background Color & Border
-        int darkTrack = 0xFF111422;
-        int darkBorder = 0xFF334155;
-        int lightTrack = 0xFF38BDF8;
-        int lightBorder = 0xFFF59E0B;
-        int standbyTrack = lerpColor(COLOR_PANEL_BG, COLOR_ACCENT, 0.35f);
-        int standbyBorder = COLOR_ACCENT;
-
-        int trackBg;
-        int trackBorder;
-        if (pos <= 0.5f) {
-            float f = pos / 0.5f;
-            trackBg = lerpColor(darkTrack, standbyTrack, f);
-            trackBorder = lerpColor(darkBorder, standbyBorder, f);
-        } else {
-            float f = (pos - 0.5f) / 0.5f;
-            trackBg = lerpColor(standbyTrack, lightTrack, f);
-            trackBorder = lerpColor(standbyBorder, lightBorder, f);
-        }
-
-        if (hover) {
-            trackBorder = COLOR_ACCENT_GLOW;
-        }
-
+        // 1. Unified Track (matched to current theme slot colors, no random color patches)
+        int trackBg = COLOR_SLOT_BG;
+        int trackBorder = hover ? COLOR_ROW_BORDER_HOVER : COLOR_SLOT_BORDER;
         renderRoundedPill(poseStackOrGraphics, x, y, w, h, trackBg, trackBorder, alpha);
 
-        // 2. Track Background Elements
-        // Moon background icon on left
-        int moonAlpha = (int) (255 * Math.max(0.35f, 1.0f - pos * 0.70f) * alpha);
-        if (moonAlpha > 5) {
-            drawTintedTexture(poseStackOrGraphics, ICON_MOON_TEXTURE, x + 3, y + 3, 10, 10, 0, 0, 16, 16, 16, 16, 0xFFFFFFFF, (float) moonAlpha / 255.0f);
-        }
-
-        // Sun background icon on right
-        int sunAlpha = (int) (255 * Math.max(0.35f, 0.30f + pos * 0.70f) * alpha);
-        if (sunAlpha > 5) {
-            drawTintedTexture(poseStackOrGraphics, ICON_SUN_TEXTURE, x + w - 13, y + 3, 10, 10, 0, 0, 16, 16, 16, 16, 0xFFFFFFFF, (float) sunAlpha / 255.0f);
-        }
-
-        // Center: Standby indicator dots (subtly visible when in or near standby)
-        float standbyAlpha = Math.max(0.0f, 1.0f - Math.abs(pos - 0.5f) * 4.0f) * alpha;
-        if (standbyAlpha > 0.05f) {
-            int dotCol = applyAlpha(COLOR_TEXT_WHITE, standbyAlpha * 0.75f);
-            int midX = x + w / 2;
-            fill(poseStackOrGraphics, midX - 1, y + 4, midX + 1, y + 6, dotCol);
-            fill(poseStackOrGraphics, midX - 1, y + 7, midX + 1, y + 9, dotCol);
-            fill(poseStackOrGraphics, midX - 1, y + 10, midX + 1, y + 12, dotCol);
-        }
-
-        // 3. Sliding Rounded Knob
+        // 2. Sliding Rounded Knob (matched to current theme button colors)
         int knobSize = 12;
         int knobTravel = w - knobSize - 4;
         int knobX = (int) Math.round(x + 2 + pos * knobTravel);
         int knobY = y + 2;
 
-        int knobBg;
-        int knobBorder;
-        if (pos < 0.35f) {
-            knobBg = 0xFF1E293B; // Dark mode: midnight slate disc (high contrast with glowing moon and track)
-            knobBorder = 0xFF475569;
-        } else if (pos > 0.65f) {
-            knobBg = 0xFFFEF3C7; // Light mode: warm sunny amber-cream disc
-            knobBorder = 0xFFD97706;
-        } else {
-            knobBg = COLOR_ACCENT; // Standby: active theme palette accent
-            knobBorder = currentTheme.isLight() ? 0xFF0F172A : 0xFFFFFFFF;
-        }
-
+        int knobBg = hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG;
+        int knobBorder = hover ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER;
         renderRoundedKnob(poseStackOrGraphics, knobX, knobY, knobSize, knobBg, knobBorder, alpha);
 
-        // Knob Icon (Smoothly transitions between Moon, Standby accent, and Sun)
-        if (pos < 0.35f) {
-            drawTintedTexture(poseStackOrGraphics, ICON_MOON_TEXTURE, knobX + 2, knobY + 2, 8, 8, 0, 0, 16, 16, 16, 16, 0xFFFFFFFF, alpha);
-        } else if (pos > 0.65f) {
-            drawTintedTexture(poseStackOrGraphics, ICON_SUN_TEXTURE, knobX + 2, knobY + 2, 8, 8, 0, 0, 16, 16, 16, 16, 0xFFFFFFFF, alpha);
-        } else {
-            int icCol = applyAlpha(currentTheme.isLight() ? 0xFF0F172A : 0xFFFFFFFF, alpha);
-            fill(poseStackOrGraphics, knobX + 4, knobY + 4, knobX + 8, knobY + 8, icCol);
-            fill(poseStackOrGraphics, knobX + 5, knobY + 3, knobX + 7, knobY + 9, icCol);
-            fill(poseStackOrGraphics, knobX + 3, knobY + 5, knobX + 9, knobY + 7, icCol);
+        // 3. Plain text symbols for Moon and Sun (standard BMP unicode in Minecraft font, no surrogate pairs or VS16)
+        String moonEmoji = "\u263E"; // ☾
+        String sunEmoji = "\u2600";  // ☀
+        int textY = y + 4;
+
+        int leftX = x + 2 + knobSize / 2;
+        int rightX = x + w - 2 - knobSize / 2;
+
+        // Ambient unselected emoji on the inactive side of the track
+        if (pos > 0.25f) {
+            int moonDimCol = applyAlpha(COLOR_TEXT_MUTED, alpha * Math.min(1.0f, pos) * 0.45f);
+            drawCenteredText(poseStackOrGraphics, font, moonEmoji, leftX, textY, moonDimCol);
         }
+        if (pos < 0.75f) {
+            int sunDimCol = applyAlpha(COLOR_TEXT_MUTED, alpha * Math.min(1.0f, 1.0f - pos) * 0.45f);
+            drawCenteredText(poseStackOrGraphics, font, sunEmoji, rightX, textY, sunDimCol);
+        }
+
+        // Active emoji directly centered on the sliding knob
+        int knobCenterX = knobX + knobSize / 2;
+        String activeEmoji = pos < 0.5f ? moonEmoji : sunEmoji;
+        int activeCol = applyAlpha(COLOR_TEXT_WHITE, alpha);
+        drawCenteredText(poseStackOrGraphics, font, activeEmoji, knobCenterX, textY, activeCol);
 
         if (hover) {
             List<Component> tip = new ArrayList<>();
-            if ("dark".equals(currentTheme.id)) {
-                tip.add(ComponentHelper.literal("Theme: Dark Mode §7(Click for Light)"));
-            } else if ("light".equals(currentTheme.id)) {
+            if ("light".equals(currentTheme.id)) {
                 tip.add(ComponentHelper.literal("Theme: Light Mode §7(Click for Dark)"));
+            } else if ("dark".equals(currentTheme.id)) {
+                tip.add(ComponentHelper.literal("Theme: Dark Mode §7(Click for Light)"));
             } else {
-                tip.add(ComponentHelper.literal("Theme: " + currentTheme.displayName + " §e[Standby]§7 (Click to switch)"));
+                tip.add(ComponentHelper.literal("Theme: " + currentTheme.displayName + " §7(Click for Light)"));
             }
             deferredTooltip = tip;
             deferredTooltipX = rawMouseX + 12;
@@ -4115,21 +4076,13 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void handleHeaderThemeToggleClick(double mouseX, int toggleX, int toggleW) {
         float mid = toggleX + toggleW / 2.0f;
-        boolean isPureDark = "dark".equals(currentTheme.id);
-        boolean isPureLight = "light".equals(currentTheme.id);
-
+        boolean isLight = currentTheme != null && "light".equals(currentTheme.id);
         if (mouseX < mid) {
-            if (isPureDark) {
-                applyTheme(ConfigThemes.LIGHT);
-            } else {
-                applyTheme(ConfigThemes.DARK);
-            }
+            // Clicked Moon / Dark side
+            applyTheme(isLight ? ConfigThemes.DARK : ConfigThemes.LIGHT);
         } else {
-            if (isPureLight) {
-                applyTheme(ConfigThemes.DARK);
-            } else {
-                applyTheme(ConfigThemes.LIGHT);
-            }
+            // Clicked Sun / Light side
+            applyTheme(isLight ? ConfigThemes.DARK : ConfigThemes.LIGHT);
         }
         themeToggleAnimStartTime = System.currentTimeMillis();
         themeToggleAnimFrom = themeToggleAnimPos;

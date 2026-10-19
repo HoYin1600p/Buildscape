@@ -1,17 +1,17 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.AshenKingPillarBlock;
 import com.kingodogo.buildscape.block.CascadeBlock;
 import com.kingodogo.buildscape.block.CascadeBlockNoMist;
 import com.kingodogo.buildscape.block.FrostRoseBlock;
 import com.kingodogo.buildscape.block.MuffBlock;
-import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.SmokeVentBlock;
 import com.kingodogo.buildscape.block.SteelBoltBlock;
 import com.kingodogo.buildscape.block.WeatheringBoltBlock;
 import com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity;
 import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
+import com.kingodogo.buildscape.feature.pillar.AshenKingPillarBlock;
+import com.kingodogo.buildscape.feature.pillar.PillarBlock;
 import com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;

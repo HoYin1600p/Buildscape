@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.event;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.*;
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.feature.pillar.PillarBlock;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket;
 import com.kingodogo.buildscape.registry.ModEntities;

@@ -1,7 +1,6 @@
-package com.kingodogo.buildscape.event;
+package com.kingodogo.buildscape.feature.pillar;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.config.PillarIdManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.server.ServerStoppingEvent;

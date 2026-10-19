@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.pillar;
+package com.kingodogo.buildscape.feature.pillar;
 
-import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
 import com.kingodogo.buildscape.network.EditPillarRowsResultPacket;
 import com.kingodogo.buildscape.network.RemovePillarPacket;

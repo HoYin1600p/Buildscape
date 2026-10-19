@@ -1,10 +1,9 @@
-package com.kingodogo.buildscape.config;
+package com.kingodogo.buildscape.feature.pillar;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.PillarBlock;
-import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.io.AtomicFiles;

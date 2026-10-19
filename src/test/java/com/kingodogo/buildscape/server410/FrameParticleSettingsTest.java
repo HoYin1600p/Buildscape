@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.server410;
 
-import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import org.junit.Test;
 
 import java.lang.reflect.Method;

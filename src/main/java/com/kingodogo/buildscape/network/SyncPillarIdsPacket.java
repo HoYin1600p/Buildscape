@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
-import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;

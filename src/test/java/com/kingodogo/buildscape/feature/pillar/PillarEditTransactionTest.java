@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.pillar;
+package com.kingodogo.buildscape.feature.pillar;
 
-import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
 import net.minecraft.core.BlockPos;
 import org.junit.Test;

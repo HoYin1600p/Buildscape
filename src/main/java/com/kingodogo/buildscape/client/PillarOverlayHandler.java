@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.PillarBlock;
-import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.feature.pillar.PillarBlock;
+import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;

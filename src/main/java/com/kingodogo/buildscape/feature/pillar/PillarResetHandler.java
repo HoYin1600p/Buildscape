@@ -1,7 +1,5 @@
-package com.kingodogo.buildscape.config;
+package com.kingodogo.buildscape.feature.pillar;
 
-import com.kingodogo.buildscape.block.PillarBlock;
-import com.kingodogo.buildscape.block.PillarBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;

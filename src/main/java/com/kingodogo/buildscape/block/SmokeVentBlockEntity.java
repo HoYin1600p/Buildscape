@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.feature.pillar.PillarPart;
 import com.kingodogo.buildscape.particle.SmokeColorRegistry;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import com.kingodogo.buildscape.registry.ModParticles;

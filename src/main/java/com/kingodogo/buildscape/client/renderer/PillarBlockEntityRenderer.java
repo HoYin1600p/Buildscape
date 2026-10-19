@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.AshenKingPillarBlock;
-import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.feature.pillar.AshenKingPillarBlock;
+import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.ChatFormatting;

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.server410;
+package com.kingodogo.buildscape.feature.pillar;
 
 import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
 import io.netty.buffer.Unpooled;

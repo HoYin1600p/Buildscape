@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.ConfigSetting;
-import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;

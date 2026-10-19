@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.AshenKingPillarBlock;
 import com.kingodogo.buildscape.block.BigBookBlock;
 import com.kingodogo.buildscape.block.BigCandleBlock;
 import com.kingodogo.buildscape.block.BigOrnamentBlock;
@@ -81,7 +80,6 @@ import com.kingodogo.buildscape.block.OrnamentBlock;
 import com.kingodogo.buildscape.block.OxidizedCopperBulbBlock;
 import com.kingodogo.buildscape.block.PackedIcicleBlock;
 import com.kingodogo.buildscape.block.PetalBlock;
-import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.PipeBlock;
 import com.kingodogo.buildscape.block.PointedIcicleBlock;
 import com.kingodogo.buildscape.block.PotentSulfurBlock;
@@ -132,6 +130,8 @@ import com.kingodogo.buildscape.block.WeatheringTrapdoorBlock;
 import com.kingodogo.buildscape.block.WeatheringVerticalSlabBlock;
 import com.kingodogo.buildscape.block.WoolLayersBlock;
 import com.kingodogo.buildscape.block.copper.WeatheringCopperBlocks;
+import com.kingodogo.buildscape.feature.pillar.AshenKingPillarBlock;
+import com.kingodogo.buildscape.feature.pillar.PillarBlock;
 import com.kingodogo.buildscape.worldgen.CherryTreeGrower;
 import com.kingodogo.buildscape.worldgen.PaleOakTreeGrower;
 import com.kingodogo.buildscape.worldgen.PoplarTreeGrower;

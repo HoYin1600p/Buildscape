@@ -1,12 +1,12 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import com.kingodogo.buildscape.particle.PillarSparkleParticle;
 import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.ChatFormatting;

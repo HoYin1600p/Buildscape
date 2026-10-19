@@ -2,8 +2,8 @@ package com.kingodogo.buildscape.network;
 
 import com.google.gson.Gson;
 import com.kingodogo.buildscape.config.ConfigSetting;
-import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.core.io.Json;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;

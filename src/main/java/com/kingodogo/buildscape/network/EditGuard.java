@@ -2,8 +2,8 @@ package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.ConfigSetting;
-import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import com.kingodogo.buildscape.world.ModGameRules;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;

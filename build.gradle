@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         mavenCentral()
     }
@@ -48,34 +47,24 @@ if (heapMiB(devClientMinHeap) > heapMiB(devClientMaxHeap)) {
 def devRegistryLogging = providers.gradleProperty('dev_registry_logging').getOrElse('false').toBoolean()
 
 minecraft {
-
-
     mappings channel: mapping_channel, version: mapping_version
-
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-
     runs {
-
         configureEach {
             workingDirectory project.file('run')
 
-
             // Registry debug dumps are expensive for the large block catalogue; enable when diagnosing registration.
             if (devRegistryLogging) property 'forge.logging.markers', 'REGISTRIES'
-
 
             property 'forge.logging.console.level', 'info'
         }
 
         client {
-
             property 'forge.enabledGameTestNamespaces', mod_id
 
-
             args '--username', 'Dev'
-
 
             jvmArgs "-Xmx${devClientMaxHeap}", "-Xms${devClientMinHeap}", '-XX:+UseG1GC'
         }
@@ -84,19 +73,15 @@ minecraft {
             property 'forge.enabledGameTestNamespaces', mod_id
             args '--nogui'
 
-
             jvmArgs '-Xmx4G', '-Xms2G'
         }
-
 
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
 
         data {
-
             workingDirectory project.file('run-data')
-
 
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
         }
@@ -106,12 +91,8 @@ minecraft {
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
 
-
     config "${mod_id}.mixins.json"
-
-
 }
-
 
 sourceSets {
     main {
@@ -138,25 +119,18 @@ if (!rendererApiCoordinates.containsKey(rendererApi)) {
 }
 
 dependencies {
-
-
     testImplementation 'junit:junit:4.13.2'
 
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
 
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.7.1.255")
 
     compileOnly fg.deobf(rendererApiCoordinates[rendererApi])
 
-
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
 
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
 }
-
-
 
 tasks.named('processResources', ProcessResources).configure {
     dependsOn 'syncBundledRecipeCache'
@@ -171,14 +145,12 @@ tasks.named('processResources', ProcessResources).configure {
 
     inputs.properties replaceProperties
 
-
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     exclude '**/*.refmap.json'
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
-
 }
 
 tasks.register('verifyDevLaunch') {
@@ -205,7 +177,6 @@ tasks.named('compileJava', JavaCompile).configure {
     outputs.cacheIf { false }
 }
 
-
 tasks.named('jar', Jar).configure {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
@@ -223,9 +194,7 @@ tasks.named('jar', Jar).configure {
     exclude { it.path.startsWith('.') || it.path.contains('..') }
 
     finalizedBy 'reobfJar'
-
 }
-
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
@@ -277,7 +246,6 @@ tasks.register('runCopperRodLogicTests', JavaExec) {
     mainClass = 'com.kingodogo.buildscape.block.CopperRodLogicTest'
 }
 
-
 tasks.register('runHazeBushResourcesTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.kingodogo.buildscape.block.HazeBushResourcesTest'
@@ -306,6 +274,16 @@ tasks.register('runPatternBoundsTests', JavaExec) {
 tasks.register('runRecipePackFormatterTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatterTest'
+}
+
+tasks.register('runSmokeColorRegistryTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.client.particle.SmokeColorRegistryTest'
+}
+
+tasks.register('runCopperTransitionsTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.copper.CopperTransitionsTest'
 }
 
 tasks.register('syncBundledRecipeCache', JavaExec) {
@@ -366,5 +344,6 @@ tasks.named('check').configure {
             'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests', 'runMangroveLeafSupportTests',
             'runEyeblossomTransitionTests', 'runCopperRodLogicTests', 'runHazeBushResourcesTests',
             'runParticleColorSlotsTests', 'runStairModelTests', 'runPatternBoundsTests',
-            'runRecipePackFormatterTests', 'verifyBundledRecipeCache', 'checkRecipePackFormat'
+            'runRecipePackFormatterTests', 'runSmokeColorRegistryTests', 'runCopperTransitionsTests',
+            'verifyBundledRecipeCache', 'checkRecipePackFormat'
 }

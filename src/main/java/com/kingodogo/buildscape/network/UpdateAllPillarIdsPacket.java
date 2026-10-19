@@ -3,7 +3,6 @@ package com.kingodogo.buildscape.network;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.config.PillarIdManager;
-import com.kingodogo.buildscape.config.PillarParticleConfig;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;

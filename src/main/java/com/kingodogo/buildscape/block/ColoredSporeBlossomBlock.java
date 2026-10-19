@@ -5,7 +5,6 @@ import com.mojang.math.Vector3f;
 import java.util.Random;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SporeBlossomBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;

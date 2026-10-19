@@ -3,7 +3,6 @@ package com.kingodogo.buildscape.event;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.*;
 import com.kingodogo.buildscape.entity.ModEntities;
-import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -19,9 +18,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)

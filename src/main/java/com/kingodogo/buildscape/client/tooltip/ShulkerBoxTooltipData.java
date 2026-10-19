@@ -17,7 +17,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 

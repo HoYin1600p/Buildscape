@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.util.*;

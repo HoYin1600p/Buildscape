@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class PipeBlock extends RotatedPillarBlock {
     public static final BooleanProperty CONNECTED_NEG = BooleanProperty.create("connected_neg");

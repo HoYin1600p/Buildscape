@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.client.model;
 
-import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;

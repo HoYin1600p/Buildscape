@@ -3,7 +3,6 @@ package com.kingodogo.buildscape.block;
 import java.util.function.Supplier;
 
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraftforge.common.util.ForgeSoundType;
 
 public class CustomSoundType extends ForgeSoundType {

@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.entity.MangroveBoatEntity;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.model.BoatModel;
 import net.minecraft.client.model.geom.ModelLayers;

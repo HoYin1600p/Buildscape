@@ -254,15 +254,6 @@ public class LargeChainBlock
     }
 
     @Override
-    public boolean propagatesSkylightDown(
-            BlockState state,
-            BlockGetter reader,
-            BlockPos pos
-    ) {
-        return true;
-    }
-
-    @Override
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,

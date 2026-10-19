@@ -114,15 +114,6 @@ public class MangroveRootsBlock
     }
 
     @Override
-    public boolean propagatesSkylightDown(
-            BlockState state,
-            BlockGetter reader,
-            BlockPos pos
-    ) {
-        return true;
-    }
-
-    @Override
     public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
         return 0;
     }

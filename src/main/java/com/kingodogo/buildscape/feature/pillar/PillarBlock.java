@@ -1096,15 +1096,6 @@ public class PillarBlock
     }
 
     @Override
-    public boolean propagatesSkylightDown(
-            BlockState state,
-            BlockGetter reader,
-            BlockPos pos
-    ) {
-        return true;
-    }
-
-    @Override
     public boolean useShapeForLightOcclusion(BlockState state) {
         return false;
     }

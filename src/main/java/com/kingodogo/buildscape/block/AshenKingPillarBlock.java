@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
@@ -15,9 +16,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -357,39 +356,10 @@ public class AshenKingPillarBlock extends PillarBlock {
     private Map.Entry<String, String> getDyeColorAndName(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return null;
 
-        Item item = stack.getItem();
-        if (item == Items.WHITE_DYE)
-            return new AbstractMap.SimpleEntry<>("#E8FEFD", "White");
-        else if (item == Items.ORANGE_DYE)
-            return new AbstractMap.SimpleEntry<>("#FF5C00", "Orange");
-        else if (item == Items.MAGENTA_DYE)
-            return new AbstractMap.SimpleEntry<>("#FF00FF", "Magenta");
-        else if (item == Items.LIGHT_BLUE_DYE)
-            return new AbstractMap.SimpleEntry<>("#3CDFFF", "Light Blue");
-        else if (item == Items.YELLOW_DYE)
-            return new AbstractMap.SimpleEntry<>("#FFFF00", "Yellow");
-        else if (item == Items.LIME_DYE)
-            return new AbstractMap.SimpleEntry<>("#BFFE00", "Lime");
-        else if (item == Items.PINK_DYE)
-            return new AbstractMap.SimpleEntry<>("#F686B7", "Pink");
-        else if (item == Items.GRAY_DYE)
-            return new AbstractMap.SimpleEntry<>("#232526", "Gray");
-        else if (item == Items.LIGHT_GRAY_DYE)
-            return new AbstractMap.SimpleEntry<>("#B1B8C5", "Light Gray");
-        else if (item == Items.CYAN_DYE)
-            return new AbstractMap.SimpleEntry<>("#00FFFF", "Cyan");
-        else if (item == Items.PURPLE_DYE)
-            return new AbstractMap.SimpleEntry<>("#AB87FF", "Purple");
-        else if (item == Items.BLUE_DYE)
-            return new AbstractMap.SimpleEntry<>("#1919EA", "Blue");
-        else if (item == Items.BROWN_DYE)
-            return new AbstractMap.SimpleEntry<>("#411900", "Brown");
-        else if (item == Items.GREEN_DYE)
-            return new AbstractMap.SimpleEntry<>("#39FF14", "Green");
-        else if (item == Items.RED_DYE)
-            return new AbstractMap.SimpleEntry<>("#FF0000", "Red");
-        else if (item == Items.BLACK_DYE)
-            return new AbstractMap.SimpleEntry<>("#07010C", "Black");
+        DyeColors dye = DyeColors.fromDyeItem(stack.getItem());
+        if (dye != null) {
+            return new AbstractMap.SimpleEntry<>(dye.hex(), dye.displayName());
+        }
 
         return null;
     }

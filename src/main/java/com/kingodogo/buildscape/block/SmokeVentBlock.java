@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
@@ -14,7 +15,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -357,24 +357,10 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     private Map.Entry<String, String> getDyeColorAndName(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return null;
 
-        Item item = stack.getItem();
-
-        if (item == Items.WHITE_DYE) return Map.entry("#E8FEFD", "White");
-        else if (item == Items.ORANGE_DYE) return Map.entry("#FF5C00", "Orange");
-        else if (item == Items.MAGENTA_DYE) return Map.entry("#FF00FF", "Magenta");
-        else if (item == Items.LIGHT_BLUE_DYE) return Map.entry("#3CDFFF", "Light Blue");
-        else if (item == Items.YELLOW_DYE) return Map.entry("#FFFF00", "Yellow");
-        else if (item == Items.LIME_DYE) return Map.entry("#BFFE00", "Lime");
-        else if (item == Items.PINK_DYE) return Map.entry("#F686B7", "Pink");
-        else if (item == Items.GRAY_DYE) return Map.entry("#232526", "Gray");
-        else if (item == Items.LIGHT_GRAY_DYE) return Map.entry("#B1B8C5", "Light Gray");
-        else if (item == Items.CYAN_DYE) return Map.entry("#00FFFF", "Cyan");
-        else if (item == Items.PURPLE_DYE) return Map.entry("#AB87FF", "Purple");
-        else if (item == Items.BLUE_DYE) return Map.entry("#1919EA", "Blue");
-        else if (item == Items.BROWN_DYE) return Map.entry("#411900", "Brown");
-        else if (item == Items.GREEN_DYE) return Map.entry("#39FF14", "Green");
-        else if (item == Items.RED_DYE) return Map.entry("#FF0000", "Red");
-        else if (item == Items.BLACK_DYE) return Map.entry("#07010C", "Black");
+        DyeColors dye = DyeColors.fromDyeItem(stack.getItem());
+        if (dye != null) {
+            return Map.entry(dye.hex(), dye.displayName());
+        }
 
         return null;
     }

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.util.BeaconScanContext;
@@ -119,44 +120,40 @@ public class OrnamentBlock
     }
 
     public enum StringColor implements StringRepresentable {
-        WHITE("white", 0xE8FEFD, "White"),
-        ORANGE("orange", 0xFF5C00, "Orange"),
-        MAGENTA("magenta", 0xFF00FF, "Magenta"),
-        LIGHT_BLUE("light_blue", 0x3CDFFF, "Light Blue"),
-        YELLOW("yellow", 0xFFFF00, "Yellow"),
-        LIME("lime", 0xBFFE00, "Lime"),
-        PINK("pink", 0xF686B7, "Pink"),
-        GRAY("gray", 0x232526, "Gray"),
-        LIGHT_GRAY("light_gray", 0xB1B8C5, "Light Gray"),
-        CYAN("cyan", 0x00FFFF, "Cyan"),
-        PURPLE("purple", 0xAB87FF, "Purple"),
-        BLUE("blue", 0x1919EA, "Blue"),
-        BROWN("brown", 0x411900, "Brown"),
-        GREEN("green", 0x39FF14, "Green"),
-        RED("red", 0xFF0000, "Red"),
-        BLACK("black", 0x07010C, "Black");
+        WHITE(DyeColors.WHITE),
+        ORANGE(DyeColors.ORANGE),
+        MAGENTA(DyeColors.MAGENTA),
+        LIGHT_BLUE(DyeColors.LIGHT_BLUE),
+        YELLOW(DyeColors.YELLOW),
+        LIME(DyeColors.LIME),
+        PINK(DyeColors.PINK),
+        GRAY(DyeColors.GRAY),
+        LIGHT_GRAY(DyeColors.LIGHT_GRAY),
+        CYAN(DyeColors.CYAN),
+        PURPLE(DyeColors.PURPLE),
+        BLUE(DyeColors.BLUE),
+        BROWN(DyeColors.BROWN),
+        GREEN(DyeColors.GREEN),
+        RED(DyeColors.RED),
+        BLACK(DyeColors.BLACK);
 
-        private final String name;
-        private final int color;
-        private final String displayName;
+        private final DyeColors dye;
 
-        StringColor(String name, int color, String displayName) {
-            this.name = name;
-            this.color = color;
-            this.displayName = displayName;
+        StringColor(DyeColors dye) {
+            this.dye = dye;
         }
 
         @Override
         public String getSerializedName() {
-            return this.name;
+            return dye.serializedName();
         }
 
         public int getColor() {
-            return color;
+            return dye.rgb();
         }
 
         public String getDisplayName() {
-            return displayName;
+            return dye.displayName();
         }
     }
 

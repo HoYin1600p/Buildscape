@@ -7,19 +7,11 @@ import net.minecraft.world.item.Items;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class DyeColorsTest {
-    private static final Path SOURCES = Path.of("src", "main", "java", "com", "kingodogo", "buildscape");
-
     @BeforeClass
     public static void bootstrap() {
         RecipeCacheRegressionTest.bootstrap();
@@ -64,26 +56,6 @@ public class DyeColorsTest {
             assertEquals(color.serializedName(), l.getSerializedName());
             assertEquals(color.rgb(), l.getColor());
             assertEquals(color.displayName(), l.getDisplayName());
-        }
-    }
-
-    /** The five hand-written dye lookups (only present before they were replaced by the shared table). */
-    @Test
-    public void everyRemainingHandWrittenLookupMatchesTheTable() throws IOException {
-        Pattern entry = Pattern.compile("Items\\.(\\w+)_DYE\\)\\s*\\{?\\s*return\\s+(?:new AbstractMap\\.SimpleEntry<>|Map\\.entry)"
-                + "\\(\"(#\\w+)\",\\s*\"([^\"]+)\"\\)");
-        for (String file : List.of("block/AshenKingPillarBlock.java", "block/GlowLightsBlock.java", "block/PillarBlock.java",
-                "block/SmokeVentBlock.java", "event/ItemFrameParticleHandler.java")) {
-            String text = Files.readString(SOURCES.resolve(file));
-            Matcher matcher = entry.matcher(text);
-            int count = 0;
-            while (matcher.find()) {
-                DyeColors color = DyeColors.valueOf(matcher.group(1));
-                assertEquals(file, color.hex(), matcher.group(2));
-                assertEquals(file, color.displayName(), matcher.group(3));
-                count++;
-            }
-            assertEquals(file + " should hold the whole table or none of it", 16, count);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.OpenBushBlock;
 import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class PetalBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
+public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, BonemealableBlock {
 
     public static final IntegerProperty FLOWER_AMOUNT = IntegerProperty.create(
             "flower_amount",
@@ -492,15 +493,6 @@ public class PetalBlock extends BushBlock implements SinksOnFarmland, Bonemealab
             BlockPos pos
     ) {
         return true;
-    }
-
-    @Override
-    public float getShadeBrightness(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return 1.0F;
     }
 
     @Override

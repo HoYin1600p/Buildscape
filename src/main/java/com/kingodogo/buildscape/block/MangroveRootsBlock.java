@@ -18,10 +18,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.kingodogo.buildscape.core.WaterloggedRotatedPillarBlock;
+import com.kingodogo.buildscape.core.OpenWaterloggedRotatedPillarBlock;
 
 public class MangroveRootsBlock
-        extends WaterloggedRotatedPillarBlock
+        extends OpenWaterloggedRotatedPillarBlock
         implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
@@ -111,15 +111,6 @@ public class MangroveRootsBlock
             CollisionContext context
     ) {
         return Shapes.empty();
-    }
-
-    @Override
-    public float getShadeBrightness(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return 1.0F;
     }
 
     @Override

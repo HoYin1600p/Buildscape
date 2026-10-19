@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.core.OpenBushBlock;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.core.BlockPos;
@@ -21,7 +22,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.WeakHashMap;
 
-public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
+public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, BonemealableBlock {
 
     protected static final VoxelShape SHAPE = Block.box(
             5.0D,
@@ -252,15 +252,6 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
             CollisionContext context
     ) {
         return Shapes.empty();
-    }
-
-    @Override
-    public float getShadeBrightness(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return 1.0F;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.OpenBushBlock;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.worldgen.ModConfiguredFeatures;
 import net.minecraft.core.BlockPos;
@@ -19,7 +20,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,7 +43,7 @@ import java.util.Optional;
 import java.util.Random;
 
 public class MangrovePropaguleBlock
-        extends BushBlock
+        extends OpenBushBlock
         implements SinksOnFarmland, BonemealableBlock, SimpleWaterloggedBlock {
 
     public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 4);
@@ -514,15 +514,6 @@ public class MangrovePropaguleBlock
             CollisionContext context
     ) {
         return Shapes.empty();
-    }
-
-    @Override
-    public float getShadeBrightness(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return 1.0F;
     }
 
     @Override

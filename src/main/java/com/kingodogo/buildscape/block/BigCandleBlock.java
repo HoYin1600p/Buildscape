@@ -38,9 +38,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.List;
 import java.util.Random;
 
-import com.kingodogo.buildscape.core.WaterloggedBlock;
+import com.kingodogo.buildscape.core.OpenWaterloggedBlock;
 
-public class BigCandleBlock extends WaterloggedBlock implements SimpleWaterloggedBlock {
+public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
             BlockStateProperties.WATERLOGGED;
@@ -309,15 +309,6 @@ public class BigCandleBlock extends WaterloggedBlock implements SimpleWaterlogge
             BlockPos pos
     ) {
         return true;
-    }
-
-    @Override
-    public float getShadeBrightness(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return 1.0F;
     }
 
     @Override

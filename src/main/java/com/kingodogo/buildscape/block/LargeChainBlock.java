@@ -25,10 +25,10 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.kingodogo.buildscape.core.WaterloggedRotatedPillarBlock;
+import com.kingodogo.buildscape.core.OpenWaterloggedRotatedPillarBlock;
 
 public class LargeChainBlock
-        extends WaterloggedRotatedPillarBlock
+        extends OpenWaterloggedRotatedPillarBlock
         implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
@@ -260,15 +260,6 @@ public class LargeChainBlock
             BlockPos pos
     ) {
         return true;
-    }
-
-    @Override
-    public float getShadeBrightness(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return 1.0F;
     }
 
     @Override

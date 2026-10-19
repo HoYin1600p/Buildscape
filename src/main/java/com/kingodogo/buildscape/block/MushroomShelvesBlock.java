@@ -22,10 +22,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.kingodogo.buildscape.core.WaterloggedBlock;
+import com.kingodogo.buildscape.core.OpenWaterloggedBlock;
 
 public class MushroomShelvesBlock
-        extends WaterloggedBlock
+        extends OpenWaterloggedBlock
         implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
@@ -157,15 +157,6 @@ public class MushroomShelvesBlock
             CollisionContext context
     ) {
         return Shapes.empty();
-    }
-
-    @Override
-    public float getShadeBrightness(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return 1.0F;
     }
 
     @Override

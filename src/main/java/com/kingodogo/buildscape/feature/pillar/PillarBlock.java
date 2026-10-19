@@ -5,8 +5,8 @@ import com.kingodogo.buildscape.advancement.AdvancementGrants;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.core.OpenWaterloggedBlock;
 import com.kingodogo.buildscape.core.ParticlePatterns;
-import com.kingodogo.buildscape.core.WaterloggedBlock;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
@@ -64,7 +64,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 public class PillarBlock
-        extends WaterloggedBlock
+        extends OpenWaterloggedBlock
         implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
@@ -1102,15 +1102,6 @@ public class PillarBlock
             BlockPos pos
     ) {
         return true;
-    }
-
-    @Override
-    public float getShadeBrightness(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        return 1.0F;
     }
 
     @Override

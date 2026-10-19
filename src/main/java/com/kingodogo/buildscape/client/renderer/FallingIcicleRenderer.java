@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.entity.FallingIcicleEntity;
+import com.kingodogo.buildscape.feature.icicle.FallingIcicleEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;

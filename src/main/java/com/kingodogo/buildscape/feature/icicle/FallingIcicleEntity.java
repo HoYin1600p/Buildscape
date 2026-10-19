@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.entity;
+package com.kingodogo.buildscape.feature.icicle;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

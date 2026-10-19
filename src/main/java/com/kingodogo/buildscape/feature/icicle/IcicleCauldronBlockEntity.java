@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.icicle;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.registry.ModBlockEntities;

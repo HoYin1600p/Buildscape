@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.icicle;
 
 import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.core.BlockPos;

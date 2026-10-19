@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.IcicleCauldronBlockEntity;
+import com.kingodogo.buildscape.feature.icicle.IcicleCauldronBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;

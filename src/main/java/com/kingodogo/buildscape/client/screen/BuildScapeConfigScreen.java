@@ -5868,7 +5868,6 @@ public class BuildScapeConfigScreen extends Screen {
         }
         if (saved) {
             selectedPresetIndex = presetsCfg.getPresets().size() - 1;
-            rememberPreset(newKey);
             presetNameInput = "";
             presetNameFocused = false;
             presetNameSelected = false;

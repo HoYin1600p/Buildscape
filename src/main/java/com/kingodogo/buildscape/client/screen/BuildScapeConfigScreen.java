@@ -470,9 +470,6 @@ public class BuildScapeConfigScreen extends Screen {
     private long readOnlyDeniedAt = -1L;
     private int readOnlyDeniedX = 0;
     private int readOnlyDeniedY = 0;
-    // A refusal from the server: render() clears the deferred tooltip each frame, so it is kept here.
-    private Component serverRefusalTooltip = null;
-    private long serverRefusalAt = -1L;
 
     // Color picker state.
     private boolean showColorModal = false;
@@ -1010,22 +1007,11 @@ public class BuildScapeConfigScreen extends Screen {
         rebuildActiveItemsCache();
     }
 
-    /** The server refused an edit from this screen: show it like a locally refused click, at the pointer. */
+    /** The server refused an edit from this screen: show the same X feedback as a locally refused click. */
     public void onServerRefusal(EditRefusedPacket.Reason reason) {
-        serverRefusalTooltip = serverRefusalText(reason);
-        serverRefusalAt = System.currentTimeMillis();
-        readOnlyDeniedAt = serverRefusalAt;
+        readOnlyDeniedAt = System.currentTimeMillis();
         readOnlyDeniedX = rawMouseX;
         readOnlyDeniedY = rawMouseY;
-    }
-
-    static Component serverRefusalText(EditRefusedPacket.Reason reason) {
-        switch (reason) {
-            case POLICY_LEVEL: return refusalText(PillarParticleConfig.EditScope.POLICY, false, true);
-            case READ_ONLY: return refusalText(null, true, false);
-            case INVALID: return ComponentHelper.literal("The server refused invalid or incomplete data.");
-            default: return refusalText(PillarParticleConfig.EditScope.GENERAL, false, true);
-        }
     }
 
     private void loadRegisteredTags() {
@@ -1919,15 +1905,6 @@ public class BuildScapeConfigScreen extends Screen {
             deferredTooltip.add(hoveredRefusalTooltip);
             deferredTooltipX = rawMouseX + 12;
             deferredTooltipY = rawMouseY;
-        }
-        if (serverRefusalTooltip != null) {
-            if (readOnlyFeedbackAlpha(System.currentTimeMillis(), serverRefusalAt) > 0.0F) {
-                deferredTooltip = Collections.singletonList(serverRefusalTooltip);
-                deferredTooltipX = readOnlyDeniedX + 12;
-                deferredTooltipY = readOnlyDeniedY;
-            } else {
-                serverRefusalTooltip = null;
-            }
         }
         if (deferredTooltip != null && !deferredTooltip.isEmpty()) {
             renderComponentTooltip(poseStackOrGraphics, deferredTooltip, deferredTooltipX, deferredTooltipY);

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.advancement.AdvancementEvents;
 import com.kingodogo.buildscape.core.DyeColors;
-import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.feature.pillar.PillarPart;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;

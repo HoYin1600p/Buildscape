@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.advancement.AdvancementEvents;
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.item.HammerItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;

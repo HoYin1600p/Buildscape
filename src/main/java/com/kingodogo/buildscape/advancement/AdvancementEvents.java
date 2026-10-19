@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.event;
+package com.kingodogo.buildscape.advancement;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.CascadeBlock;

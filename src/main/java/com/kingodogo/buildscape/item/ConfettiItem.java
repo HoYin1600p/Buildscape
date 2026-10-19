@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.item;
 
+import com.kingodogo.buildscape.advancement.AdvancementEvents;
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ConfettiBurstPacket;
 import com.kingodogo.buildscape.network.ModMessages;
 import net.minecraft.ChatFormatting;

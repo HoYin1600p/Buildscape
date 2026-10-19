@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.feature.pillar;
 
+import com.kingodogo.buildscape.advancement.AdvancementEvents;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.core.ParticlePatterns;
-import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
 import net.minecraft.ChatFormatting;

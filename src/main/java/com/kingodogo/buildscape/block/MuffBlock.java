@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.event.AdvancementEvents;
+import com.kingodogo.buildscape.advancement.AdvancementEvents;
 import com.kingodogo.buildscape.registry.ModStats;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;

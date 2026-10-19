@@ -57,7 +57,7 @@ public abstract class LevelMixin {
     private static boolean checkFluidOrBlock(Level level, BlockPos pos) {
         FluidState fluidState = level.getFluidState(pos);
         if (fluidState != null && !fluidState.isEmpty()) {
-            if (fluidState.getType() == ModFluids.EXPERIENCE_STILL.get() || fluidState.getType() == ModFluids.EXPERIENCE_FLOWING.get()) {
+            if (ModFluids.isExperience(fluidState.getType())) {
                 return true;
             }
         }

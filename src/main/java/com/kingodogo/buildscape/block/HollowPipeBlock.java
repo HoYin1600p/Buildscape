@@ -181,7 +181,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             if ("water".equals(ft)) return Fluids.WATER;
             if ("lava".equals(ft)) return Fluids.LAVA;
             if ("experience".equals(ft) || "buildscape:experience_still".equals(ft) || "buildscape:experience".equals(ft)) {
-                return ModFluids.EXPERIENCE_STILL.get();
+                Fluid xp = ModFluids.experienceStillOrNull();
+                if (xp != null) return xp;
             }
             if (!"none".equals(ft) && !ft.isEmpty()) {
                 ResourceLocation loc = ResourceLocation.tryParse(ft);
@@ -219,7 +220,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     public static ItemStack getFilledBucketForFluid(Fluid fluid) {
         if (fluid == Fluids.WATER) return new ItemStack(Items.WATER_BUCKET);
         if (fluid == Fluids.LAVA) return new ItemStack(Items.LAVA_BUCKET);
-        if (fluid == ModFluids.EXPERIENCE_STILL.get() || fluid == ModFluids.EXPERIENCE_FLOWING.get()) {
+        if (ModFluids.isExperience(fluid)) {
             return new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
         }
         Item bucket = fluid.getBucket();

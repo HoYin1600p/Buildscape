@@ -1,8 +1,8 @@
-package com.kingodogo.buildscape.api;
+package com.kingodogo.buildscape.feature.cosmetic.api;
 
-import com.kingodogo.buildscape.api.model.SupporterStatus;
-import com.kingodogo.buildscape.api.model.TiersResponse;
 import com.kingodogo.buildscape.feature.cosmetic.CosmeticData;
+import com.kingodogo.buildscape.feature.cosmetic.api.model.SupporterStatus;
+import com.kingodogo.buildscape.feature.cosmetic.api.model.TiersResponse;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,10 +1,13 @@
-package com.kingodogo.buildscape.api;
+package com.kingodogo.buildscape.feature.cosmetic.api;
 
 import com.google.gson.Gson;
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.api.model.*;
+import com.kingodogo.buildscape.feature.cosmetic.api.model.*;
 import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.feature.cosmetic.CosmeticData;
+import com.kingodogo.buildscape.feature.cosmetic.api.model.ApiResponse;
+import com.kingodogo.buildscape.feature.cosmetic.api.model.SupporterStatus;
+import com.kingodogo.buildscape.feature.cosmetic.api.model.TiersResponse;
 
 import java.net.URI;
 import java.net.http.HttpClient;

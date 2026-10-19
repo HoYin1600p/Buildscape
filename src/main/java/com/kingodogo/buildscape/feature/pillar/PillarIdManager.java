@@ -9,7 +9,6 @@ import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.io.AtomicFiles;
 import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
-import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
 import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
 import net.minecraft.core.BlockPos;

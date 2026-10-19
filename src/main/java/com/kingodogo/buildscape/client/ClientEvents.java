@@ -6,7 +6,7 @@ import com.kingodogo.buildscape.block.LeafHedgeBlock;
 import com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer;
 import com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler;
 import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import com.kingodogo.buildscape.network.SyncPillarIdsPacket;

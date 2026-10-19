@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.api.model;
+package com.kingodogo.buildscape.feature.cosmetic.api.model;
 
 public class MembershipTier {
     private String id;

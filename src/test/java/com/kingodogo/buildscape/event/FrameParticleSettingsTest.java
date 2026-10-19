@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import org.junit.Test;
 

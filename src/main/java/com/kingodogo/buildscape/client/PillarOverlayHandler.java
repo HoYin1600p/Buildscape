@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
-import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler;
 import com.kingodogo.buildscape.feature.pillar.PillarBlock;
 import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;

@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.client.HomemakerCooldownTracker;
 import com.kingodogo.buildscape.feature.biome.BiomeBrushItem;
 import com.kingodogo.buildscape.feature.copper.CopperChestItem;
 import com.kingodogo.buildscape.feature.firework.InfinitePhoenixFireworkStarItem;
+import com.kingodogo.buildscape.feature.homemaker.HomemakerCooldownTracker;
 import com.kingodogo.buildscape.item.BigOrnamentTemplateItem;
 import com.kingodogo.buildscape.item.BottleOfMistItem;
 import com.kingodogo.buildscape.item.BuildersPouchItem;

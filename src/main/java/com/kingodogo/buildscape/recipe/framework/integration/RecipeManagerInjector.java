@@ -8,6 +8,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -103,9 +104,11 @@ public final class RecipeManagerInjector {
             }
         }
 
-        Map<T, Map<K, R>> immutableByType = new HashMap<>();
-        byType.forEach((recipeType, recipes) -> immutableByType.put(recipeType, Map.copyOf(recipes)));
-        return new Indexes<>(Map.copyOf(immutableByType), Map.copyOf(byName));
+        // Keep insertion order like vanilla's ImmutableMap: recipe lookup returns the first match, and
+        // Map.copyOf iterates in a per-JVM random order, so overlapping recipes would win differently per launch.
+        Map<T, Map<K, R>> immutableByType = new LinkedHashMap<>();
+        byType.forEach((recipeType, recipes) -> immutableByType.put(recipeType, Collections.unmodifiableMap(recipes)));
+        return new Indexes<>(Collections.unmodifiableMap(immutableByType), Collections.unmodifiableMap(byName));
     }
 
     static Map<ResourceLocation, Recipe<?>> mergeById(

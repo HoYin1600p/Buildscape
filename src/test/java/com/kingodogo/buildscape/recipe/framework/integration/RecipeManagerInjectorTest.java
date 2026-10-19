@@ -63,7 +63,28 @@ public final class RecipeManagerInjectorTest {
         require(withDisabled.byName().get(addedPlain.id()) == addedPlain, "Enabled recipe was not injected");
         require(withDisabled.byName().get(vanillaPlain.id()) == vanillaPlain, "Existing recipe was lost");
 
-        System.out.println("Recipe manager injection: 12 checks passed.");
+        // Iteration order decides which of two matching recipes wins, so it must be insertion order:
+        // existing recipes first, in their order, then the injected ones.
+        java.util.LinkedHashMap<String, PlainRecipe> orderedExisting = new java.util.LinkedHashMap<>();
+        List<String> expectedOrder = new java.util.ArrayList<>();
+        for (int i = 0; i < 40; i++) {
+            PlainRecipe recipe = new PlainRecipe("crafting", "pack:r" + (39 - i));
+            orderedExisting.put(recipe.id(), recipe);
+            expectedOrder.add(recipe.id());
+        }
+        List<PlainRecipe> injected = new java.util.ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            injected.add(new PlainRecipe("crafting", "buildscape:n" + (9 - i)));
+            expectedOrder.add("buildscape:n" + (9 - i));
+        }
+        RecipeManagerInjector.Indexes<String, String, PlainRecipe> ordered = RecipeManagerInjector.mergeIndexesGeneric(
+                Map.of("crafting", orderedExisting), orderedExisting, injected, PlainRecipe::type, PlainRecipe::id);
+        require(new java.util.ArrayList<>(ordered.byName().keySet()).equals(expectedOrder),
+                "Named recipe index lost insertion order");
+        require(new java.util.ArrayList<>(ordered.byType().get("crafting").keySet()).equals(expectedOrder),
+                "Typed recipe index lost insertion order");
+
+        System.out.println("Recipe manager injection: 14 checks passed.");
     }
 
     private static void require(boolean condition, String message) {

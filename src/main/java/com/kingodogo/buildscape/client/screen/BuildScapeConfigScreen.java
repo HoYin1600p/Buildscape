@@ -1025,7 +1025,8 @@ public class BuildScapeConfigScreen extends Screen {
 
     /** The server refused an edit from this screen: show the same X feedback as a locally refused click. */
     public void onServerRefusal(EditRefusedPacket.Reason reason, ConfigSetting setting) {
-        uploadBatch.dropRefused(setting);
+        uploadBatch.refuse(setting, PillarParticleConfig.get());
+        rebuildActiveItemsCache();
         readOnlyDeniedAt = System.currentTimeMillis();
         readOnlyDeniedX = rawMouseX;
         readOnlyDeniedY = rawMouseY;
@@ -1658,7 +1659,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
         if (!uploadBatch.hasPending()) return;
         Set<ConfigSetting> changed = uploadBatch.take();
-        uploadBatch.rebase(config);
+        uploadBatch.measureFrom(config);
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.getConnection() == null) return;
         persistServerConfig(config, changed);

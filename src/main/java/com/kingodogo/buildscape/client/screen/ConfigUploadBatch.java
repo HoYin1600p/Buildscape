@@ -25,6 +25,11 @@ import java.util.function.Function;
  * is handled by {@link #reapply}, which lays only those edits back over it, so the other player's changes to
  * everything else, in the same group too, stay. If both players edited the same field, slot or item, the local
  * pending edit wins on this client and the server keeps whichever upload reaches it last.
+ *
+ * <p>An upload that went out stays "in flight" until the server answers. The server answers with a snapshot and,
+ * when it refuses, a refusal after it. The last state the server confirmed is kept apart from the baseline (which
+ * after a send is the sent values), and a refusal restores the refused fields from that confirmed state, leaving
+ * fields edited again since as they are.
  */
 final class ConfigUploadBatch {
     static final long DELAY_MS = 3000L;
@@ -76,17 +81,59 @@ final class ConfigUploadBatch {
     private List<String> colorList;
     private final Set<String> itemsAdded = new HashSet<>();
     private final Set<String> itemsRemoved = new HashSet<>();
+    /** What the next edits are measured against: the server state, or the sent values while an upload is out. */
     private Baseline baseline;
+    /** The last state the server confirmed (the first one seen, or the last snapshot). Refused values return to it. */
+    private Baseline authoritative;
     private long lastEditAt;
+    private final InFlight inFlight = new InFlight();
 
-    /** Takes {@code config} as the server state the next edits are measured against. */
+    /** What was sent and has not been answered yet: refused edits are found again from it. */
+    private static final class InFlight {
+        final Set<ConfigSetting> groups = EnumSet.noneOf(ConfigSetting.class);
+        final Set<Field> fields = EnumSet.noneOf(Field.class);
+        final Set<Integer> colorSlots = new HashSet<>();
+        boolean colorList;
+        final Set<String> itemsAdded = new HashSet<>();
+        final Set<String> itemsRemoved = new HashSet<>();
+
+        void clear() {
+            groups.clear();
+            fields.clear();
+            colorSlots.clear();
+            colorList = false;
+            itemsAdded.clear();
+            itemsRemoved.clear();
+        }
+    }
+
+    /** Takes {@code config} as the server state: the next edits are measured against it and refusals restore it. */
     void rebase(PillarParticleConfig config) {
+        baseline = new Baseline(config);
+        authoritative = baseline;
+    }
+
+    /**
+     * {@link #rebase} unless edits are waiting, which are still measured against the older state. While an upload
+     * is unanswered {@code config} holds its unconfirmed values, so only the baseline moves, never the server state.
+     */
+    void rebaseIfIdle(PillarParticleConfig config) {
+        if (!groups.isEmpty()) return;
+        if (inFlight.groups.isEmpty() || authoritative == null) {
+            rebase(config);
+        } else {
+            baseline = new Baseline(config);
+        }
+    }
+
+    /** The upload went out with {@code config}'s values: later edits are measured against them, not the server state. */
+    void measureFrom(PillarParticleConfig config) {
         baseline = new Baseline(config);
     }
 
-    /** {@link #rebase} unless edits are waiting, which are still measured against the older state. */
-    void rebaseIfIdle(PillarParticleConfig config) {
-        if (groups.isEmpty()) rebase(config);
+    /** The groups sent and not answered yet. */
+    Set<ConfigSetting> inFlightSettings() {
+        return inFlight.groups.isEmpty() ? EnumSet.noneOf(ConfigSetting.class) : EnumSet.copyOf(inFlight.groups);
     }
 
     /** Records that {@code setting} was just edited in {@code config}, and which of its values differ from the baseline. */
@@ -148,6 +195,8 @@ final class ConfigUploadBatch {
      */
     void reapply(PillarParticleConfig config) {
         rebase(config);
+        // The snapshot is the server's answer to whatever was sent: accepted values are in it, refused ones are not.
+        inFlight.clear();
         for (Map.Entry<Field, Object> edit : fieldEdits.entrySet()) {
             edit.getKey().write.accept(config, edit.getValue());
         }
@@ -181,12 +230,12 @@ final class ConfigUploadBatch {
      */
     void revert(ConfigSetting setting, PillarParticleConfig config) {
         if (setting == null) return;
-        if (baseline != null) {
+        if (authoritative != null) {
             for (Field field : fieldEdits.keySet()) {
-                if (field.group == setting) field.write.accept(config, baseline.fields.get(field));
+                if (field.group == setting) field.write.accept(config, authoritative.fields.get(field));
             }
             if (setting == ConfigSetting.COLORS && (colorList != null || !colorSlots.isEmpty())) {
-                config.particle_color = new ArrayList<>(baseline.colors);
+                config.particle_color = new ArrayList<>(authoritative.colors);
             }
             if (setting == ConfigSetting.ITEMS && (!itemsAdded.isEmpty() || !itemsRemoved.isEmpty())) {
                 List<String> restored = new ArrayList<>(config.items);
@@ -197,11 +246,76 @@ final class ConfigUploadBatch {
                 config.replaceItems(restored);
             }
         }
-        dropRefused(setting);
+        dropPending(setting);
     }
 
-    /** The server refused an upload: drop the refused group (all of them when it names none) so its state shows. */
-    void dropRefused(ConfigSetting setting) {
+    /**
+     * The server refused the upload that is out ({@code setting} names its group, null means all of it): put the
+     * server's values back into {@code config} for every field, colour slot and item that upload carried, except
+     * those edited again since (still waiting, with their timer). The refusal normally comes after a snapshot that
+     * already shows the server state; this makes the result the same when it comes first or without one.
+     */
+    void refuse(ConfigSetting setting, PillarParticleConfig config) {
+        Set<ConfigSetting> targets = EnumSet.noneOf(ConfigSetting.class);
+        for (ConfigSetting group : inFlight.groups) {
+            if (setting == null || group == setting) targets.add(group);
+        }
+        if (authoritative != null) {
+            for (Field field : inFlight.fields) {
+                if (targets.contains(field.group) && !fieldEdits.containsKey(field)) {
+                    field.write.accept(config, authoritative.fields.get(field));
+                }
+            }
+            if (targets.contains(ConfigSetting.COLORS)) restoreColors(config);
+            if (targets.contains(ConfigSetting.ITEMS)) {
+                List<String> restored = new ArrayList<>(config.items);
+                for (String item : inFlight.itemsAdded) {
+                    if (!authoritative.items.contains(item) && !itemsAdded.contains(item)) restored.remove(item);
+                }
+                for (String item : inFlight.itemsRemoved) {
+                    if (authoritative.items.contains(item) && !itemsRemoved.contains(item) && !restored.contains(item)) {
+                        restored.add(item);
+                    }
+                }
+                config.replaceItems(restored);
+            }
+        }
+        // Fields of a target group that were not newly edited are settled; the rest keep waiting for their upload.
+        inFlight.groups.removeAll(targets);
+        inFlight.fields.removeIf(field -> targets.contains(field.group));
+        if (targets.contains(ConfigSetting.COLORS)) {
+            inFlight.colorSlots.clear();
+            inFlight.colorList = false;
+        }
+        if (targets.contains(ConfigSetting.ITEMS)) {
+            inFlight.itemsAdded.clear();
+            inFlight.itemsRemoved.clear();
+        }
+    }
+
+    private void restoreColors(PillarParticleConfig config) {
+        if (!inFlight.colorList && inFlight.colorSlots.isEmpty()) return;
+        // A newer edit that replaced the whole list wins as it is.
+        if (colorList != null) return;
+        List<String> restored;
+        if (inFlight.colorList) {
+            restored = new ArrayList<>(authoritative.colors);
+            for (Map.Entry<Integer, String> slot : colorSlots.entrySet()) {
+                if (slot.getKey() < restored.size()) restored.set(slot.getKey(), slot.getValue());
+            }
+        } else {
+            restored = new ArrayList<>(config.particle_color);
+            for (int slot : inFlight.colorSlots) {
+                if (slot < restored.size() && slot < authoritative.colors.size() && !colorSlots.containsKey(slot)) {
+                    restored.set(slot, authoritative.colors.get(slot));
+                }
+            }
+        }
+        config.particle_color = restored;
+    }
+
+    /** Forgets the waiting edits of {@code setting} (all of them when it is null). */
+    private void dropPending(ConfigSetting setting) {
         if (setting == null) {
             groups.clear();
             fieldEdits.clear();
@@ -222,11 +336,17 @@ final class ConfigUploadBatch {
         }
     }
 
-    /** The changed groups, and forgets them and their edits. */
+    /** The changed groups; they and their edits move from waiting to sent-and-unanswered. */
     Set<ConfigSetting> take() {
         EnumSet<ConfigSetting> taken = EnumSet.noneOf(ConfigSetting.class);
         taken.addAll(groups);
-        dropRefused(null);
+        inFlight.groups.addAll(groups);
+        inFlight.fields.addAll(fieldEdits.keySet());
+        inFlight.colorSlots.addAll(colorSlots.keySet());
+        if (colorList != null) inFlight.colorList = true;
+        inFlight.itemsAdded.addAll(itemsAdded);
+        inFlight.itemsRemoved.addAll(itemsRemoved);
+        dropPending(null);
         return taken;
     }
 }

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin;
+package com.kingodogo.buildscape.mixin.accessor;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;

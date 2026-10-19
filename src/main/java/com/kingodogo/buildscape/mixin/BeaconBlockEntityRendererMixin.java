@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.mixin.accessor.BeaconRendererInvoker;
 import com.kingodogo.buildscape.util.BeaconBeamScanState;
 import com.kingodogo.buildscape.util.BeaconScanContext;
 import com.mojang.blaze3d.vertex.PoseStack;

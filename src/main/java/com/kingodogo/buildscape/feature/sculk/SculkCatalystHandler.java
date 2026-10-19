@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.feature.sculk;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.mixin.LivingEntityExperienceAccessor;
+import com.kingodogo.buildscape.mixin.accessor.LivingEntityExperienceAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.recipe.framework.integration;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.mixin.RecipeManagerAccessor;
+import com.kingodogo.buildscape.mixin.accessor.RecipeManagerAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;

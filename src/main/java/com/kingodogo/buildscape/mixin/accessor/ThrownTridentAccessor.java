@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin;
+package com.kingodogo.buildscape.mixin.accessor;
 
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.ItemStack;

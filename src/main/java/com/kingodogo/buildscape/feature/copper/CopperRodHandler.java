@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.feature.copper;
 
 import com.google.common.collect.ImmutableSet;
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.mixin.PoiTypeAccessor;
+import com.kingodogo.buildscape.mixin.accessor.PoiTypeAccessor;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.village.poi.PoiType;

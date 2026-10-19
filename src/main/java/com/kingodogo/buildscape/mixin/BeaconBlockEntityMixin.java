@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.mixin.accessor.BeaconBlockEntityAccessor;
 import com.kingodogo.buildscape.util.BeaconBeamHeightAccessor;
 import com.kingodogo.buildscape.util.BeaconBeamScanState;
 import com.kingodogo.buildscape.util.BeaconScanContext;

@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.mixin.EntityAccessor;
-import com.kingodogo.buildscape.mixin.PillarEntityRenderDispatcherInvoker;
+import com.kingodogo.buildscape.mixin.accessor.EntityAccessor;
+import com.kingodogo.buildscape.mixin.accessor.PillarEntityRenderDispatcherInvoker;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;

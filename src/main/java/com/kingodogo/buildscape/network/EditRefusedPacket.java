@@ -63,7 +63,7 @@ public class EditRefusedPacket {
         private static void handle(EditRefusedPacket packet) {
             net.minecraft.client.gui.screens.Screen screen = net.minecraft.client.Minecraft.getInstance().screen;
             if (screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen open) {
-                open.onServerRefusal(packet.reason);
+                open.onServerRefusal(packet.reason, packet.setting());
             }
         }
     }

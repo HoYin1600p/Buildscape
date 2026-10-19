@@ -12,8 +12,31 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class ModFluids {
+    /** The still experience fluid, or null while its registry object is not present. */
+    @javax.annotation.Nullable
+    public static Fluid experienceStillOrNull() {
+        return EXPERIENCE_STILL.isPresent() ? EXPERIENCE_STILL.get() : null;
+    }
+
+    @javax.annotation.Nullable
+    private static Fluid experienceFlowingOrNull() {
+        return EXPERIENCE_FLOWING.isPresent() ? EXPERIENCE_FLOWING.get() : null;
+    }
+
+    /** Never throws: false when the registry objects are not present. */
     public static boolean isExperience(Fluid fluid) {
-        return fluid == EXPERIENCE_STILL.get() || fluid == EXPERIENCE_FLOWING.get();
+        return ExperienceFluidMatch.matches(fluid, experienceStillOrNull(), experienceFlowingOrNull());
+    }
+
+    /** Exactly the still experience fluid; false when it is not present. */
+    public static boolean isExperienceStill(Fluid fluid) {
+        return ExperienceFluidMatch.matches(fluid, experienceStillOrNull());
+    }
+
+    /** Same fluid as still experience (Fluid#isSame); false when it is not present. */
+    public static boolean isExperienceSame(Fluid fluid) {
+        Fluid still = experienceStillOrNull();
+        return fluid != null && still != null && fluid.isSame(still);
     }
 
     public static boolean cannotMix(Fluid first, Fluid second) {

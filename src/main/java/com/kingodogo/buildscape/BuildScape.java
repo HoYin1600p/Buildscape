@@ -695,8 +695,7 @@ public class BuildScape {
                         serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING),
                         serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING),
                         serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.IS_CAKE_STACK),
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.IS_WATER_BOTTLE_STACK),
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.BIOME_BRUSH_CLEARS_SELECTION)
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.IS_WATER_BOTTLE_STACK)
                     )
                 );
 
@@ -2624,7 +2623,7 @@ public class BuildScape {
     public void onLivingUpdate(net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent event) {
         net.minecraft.world.entity.LivingEntity living = event.getEntityLiving();
         net.minecraft.world.level.material.FluidState fluid = living.level.getFluidState(living.blockPosition());
-        if (fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get() || fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get()) {
+        if (com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid.getType())) {
             if (living.isSwimming() || living.isInWater()) {
                 net.minecraft.world.phys.Vec3 delta = living.getDeltaMovement();
                 living.setDeltaMovement(delta.x * 1.175D, delta.y * 1.06D, delta.z * 1.175D);

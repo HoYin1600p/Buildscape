@@ -184,8 +184,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         Fluid fluid = HollowPipeBlock.getContainedFluid(state, blockEntity);
         boolean hasWater = fluid != null && fluid.isSame(Fluids.WATER);
         boolean hasLava = (fluid == Fluids.LAVA) || (state.hasProperty(HollowPipeBlock.LAVA_LOGGED) && state.getValue(HollowPipeBlock.LAVA_LOGGED));
-        boolean hasXp = (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get()
-                || fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get());
+        boolean hasXp = com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid);
 
         if (fluid == null || fluid == Fluids.EMPTY) {
             if (hasWater) {
@@ -745,7 +744,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
                     ? WATER_FLOW
                     : WATER_STILL;
-        } else if (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get() || fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get()) {
+        } else if (com.kingodogo.buildscape.fluid.ModFluids.isExperience(fluid)) {
             texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
                     ? EXPERIENCE_FLOW
                     : EXPERIENCE_STILL;
@@ -763,7 +762,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         if (fluid == Fluids.WATER) {
             color = waterColor(level, pos, cache);
             color |= 0xFF000000;
-        } else if (fluid == Fluids.LAVA || fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get()) {
+        } else if (fluid == Fluids.LAVA || com.kingodogo.buildscape.fluid.ModFluids.isExperienceStill(fluid)) {
             color = 0xFFFFFFFF;
         } else {
             color = (level != null && pos != null) ? fluid.getAttributes().getColor(level, pos) : fluid.getAttributes().getColor();

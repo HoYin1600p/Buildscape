@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.config.ConfigSetting;
+import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -83,13 +84,13 @@ public class ParticleRangeTest {
         ConfigUploadBatch batch = new ConfigUploadBatch();
         assertFalse(batch.hasPending());
         assertFalse(batch.isDue(1_000_000L));
-        batch.edited(ConfigSetting.PARTICLES, 1000L);
+        batch.edited(ConfigSetting.PARTICLES, new PillarParticleConfig(), 1000L);
         assertFalse(batch.isDue(1000L + ConfigUploadBatch.DELAY_MS - 1));
         // Another edit restarts the wait.
-        batch.edited(ConfigSetting.PARTICLES, 3500L);
+        batch.edited(ConfigSetting.PARTICLES, new PillarParticleConfig(), 3500L);
         assertFalse(batch.isDue(1000L + ConfigUploadBatch.DELAY_MS));
         assertFalse(batch.isDue(3500L + ConfigUploadBatch.DELAY_MS - 1));
-        batch.edited(ConfigSetting.ITEMS, 4000L);
+        batch.edited(ConfigSetting.ITEMS, new PillarParticleConfig(), 4000L);
         assertTrue(batch.isDue(4000L + ConfigUploadBatch.DELAY_MS));
         assertEquals(Set.of(ConfigSetting.PARTICLES, ConfigSetting.ITEMS), batch.take());
         assertFalse(batch.hasPending());

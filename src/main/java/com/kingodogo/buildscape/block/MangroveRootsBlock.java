@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.kingodogo.buildscape.core.OpenWaterloggedRotatedPillarBlock;
@@ -101,16 +100,6 @@ public class MangroveRootsBlock
             CollisionContext context
     ) {
         return SHAPE;
-    }
-
-    @Override
-    public VoxelShape getVisualShape(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos,
-            CollisionContext context
-    ) {
-        return Shapes.empty();
     }
 
     @Override

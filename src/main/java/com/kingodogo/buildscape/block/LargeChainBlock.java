@@ -211,16 +211,6 @@ public class LargeChainBlock
     }
 
     @Override
-    public VoxelShape getVisualShape(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos,
-            CollisionContext context
-    ) {
-        return Shapes.empty();
-    }
-
-    @Override
     public boolean isLadder(
             BlockState state,
             LevelReader level,

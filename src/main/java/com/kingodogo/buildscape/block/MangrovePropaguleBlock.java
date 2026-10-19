@@ -35,7 +35,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
@@ -504,16 +503,6 @@ public class MangrovePropaguleBlock
                         state.getMaterial().isSolid() &&
                         !state.getMaterial().isReplaceable()
         );
-    }
-
-    @Override
-    public VoxelShape getVisualShape(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos,
-            CollisionContext context
-    ) {
-        return Shapes.empty();
     }
 
     @Override

@@ -245,16 +245,6 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
     }
 
     @Override
-    public VoxelShape getVisualShape(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos,
-            CollisionContext context
-    ) {
-        return Shapes.empty();
-    }
-
-    @Override
     public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
         return 0;
     }

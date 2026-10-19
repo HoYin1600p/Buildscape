@@ -467,16 +467,6 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
     }
 
     @Override
-    public VoxelShape getVisualShape(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos,
-            CollisionContext context
-    ) {
-        return Shapes.empty();
-    }
-
-    @Override
     public boolean useShapeForLightOcclusion(BlockState state) {
         return false;
     }

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.stat;
+package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.core.Registry;

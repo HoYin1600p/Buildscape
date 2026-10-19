@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
 
 public class GlowLightsBlockEntity extends BlockEntity {
 

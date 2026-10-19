@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;

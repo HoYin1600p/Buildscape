@@ -1,7 +1,8 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.block.copper.CopperTransitions;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;

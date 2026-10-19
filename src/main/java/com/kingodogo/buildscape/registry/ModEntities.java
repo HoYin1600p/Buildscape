@@ -1,6 +1,14 @@
-package com.kingodogo.buildscape.entity;
+package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
+import com.kingodogo.buildscape.entity.FallingIcicleEntity;
+import com.kingodogo.buildscape.entity.FestiveStockingEntity;
+import com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity;
+import com.kingodogo.buildscape.entity.MangroveBoatEntity;
+import com.kingodogo.buildscape.entity.PoplarBoatEntity;
+import com.kingodogo.buildscape.entity.SeatEntity;
+import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;

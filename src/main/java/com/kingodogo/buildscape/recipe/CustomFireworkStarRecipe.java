@@ -1,10 +1,11 @@
 package com.kingodogo.buildscape.recipe;
 
-import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
 import com.kingodogo.buildscape.item.FestiveStockingItem;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.ModRecipeSerializers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;

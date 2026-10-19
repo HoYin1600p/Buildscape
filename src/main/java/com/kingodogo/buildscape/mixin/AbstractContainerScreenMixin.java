@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.menu.GhostFilterMenu;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.kingodogo.buildscape.util.GhostFilterMenu;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

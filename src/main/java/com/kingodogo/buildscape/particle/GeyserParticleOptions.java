@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.particle;
 
+import com.kingodogo.buildscape.registry.ModParticles;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;

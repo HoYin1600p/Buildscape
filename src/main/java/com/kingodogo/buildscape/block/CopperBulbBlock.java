@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.block.copper.BuildscapeWeatheringCopper;
-import com.kingodogo.buildscape.sound.ModSounds;
+import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;

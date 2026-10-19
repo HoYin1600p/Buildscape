@@ -2,8 +2,9 @@ package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.client.HazeBushParticleHandler;
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.item.ModItems;
-import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.BlockPos;

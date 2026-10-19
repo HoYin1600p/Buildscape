@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.recipe.framework;
 
 import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
-import com.kingodogo.buildscape.recipe.framework.compiler.StonecuttingCycleValidator;
-import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
 import com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver;
+import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
+import com.kingodogo.buildscape.recipe.framework.compiler.StonecuttingCycleValidator;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;

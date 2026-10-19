@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.sound;
+package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.CustomSoundType;

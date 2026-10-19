@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.worldgen.ModConfiguredFeatures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

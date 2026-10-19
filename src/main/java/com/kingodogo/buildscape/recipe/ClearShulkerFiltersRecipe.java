@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.recipe;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.BuildersPouchItem;
+import com.kingodogo.buildscape.registry.ModRecipeSerializers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;

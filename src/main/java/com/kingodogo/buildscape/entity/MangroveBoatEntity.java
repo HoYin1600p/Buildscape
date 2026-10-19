@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.entity;
 
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModEntities;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;

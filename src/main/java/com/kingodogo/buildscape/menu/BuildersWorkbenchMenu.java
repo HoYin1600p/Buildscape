@@ -1,6 +1,7 @@
-package com.kingodogo.buildscape.network;
+package com.kingodogo.buildscape.menu;
 
 import com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity;
+import com.kingodogo.buildscape.registry.ModMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;

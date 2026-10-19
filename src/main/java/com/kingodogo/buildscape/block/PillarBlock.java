@@ -9,6 +9,7 @@ import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.event.AdvancementEvents;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

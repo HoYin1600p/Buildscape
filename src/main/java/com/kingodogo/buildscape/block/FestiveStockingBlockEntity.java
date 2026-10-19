@@ -17,6 +17,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import javax.annotation.Nullable;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
 
 public class FestiveStockingBlockEntity
         extends BlockEntity

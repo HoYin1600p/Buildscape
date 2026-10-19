@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

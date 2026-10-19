@@ -1,14 +1,14 @@
 package com.kingodogo.buildscape.snapshot;
 
-import com.kingodogo.buildscape.block.ModBlockEntities;
-import com.kingodogo.buildscape.block.ModBlocks;
-import com.kingodogo.buildscape.entity.ModEntities;
-import com.kingodogo.buildscape.fluid.ModFluids;
-import com.kingodogo.buildscape.item.ModItems;
-import com.kingodogo.buildscape.network.ModMenuTypes;
-import com.kingodogo.buildscape.particle.ModParticles;
-import com.kingodogo.buildscape.recipe.ModRecipeSerializers;
-import com.kingodogo.buildscape.sound.ModSounds;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.ModEntities;
+import com.kingodogo.buildscape.registry.ModFluids;
+import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.ModMenuTypes;
+import com.kingodogo.buildscape.registry.ModParticles;
+import com.kingodogo.buildscape.registry.ModRecipeSerializers;
+import com.kingodogo.buildscape.registry.ModSounds;
 import com.kingodogo.buildscape.worldgen.ModBlockStateProviderTypes;
 import com.kingodogo.buildscape.worldgen.ModConfiguredFeatures;
 import com.kingodogo.buildscape.worldgen.ModFoliagePlacerTypes;

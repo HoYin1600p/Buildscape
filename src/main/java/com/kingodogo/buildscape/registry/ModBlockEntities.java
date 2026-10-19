@@ -1,6 +1,24 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.block.BambooSignBlockEntity;
+import com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity;
+import com.kingodogo.buildscape.block.CascadeBlockEntity;
+import com.kingodogo.buildscape.block.CopperChestBlockEntity;
+import com.kingodogo.buildscape.block.DecoratedPotBlockEntity;
+import com.kingodogo.buildscape.block.FestiveStockingBlockEntity;
+import com.kingodogo.buildscape.block.GlassJarBlockEntity;
+import com.kingodogo.buildscape.block.GlowLightsBlockEntity;
+import com.kingodogo.buildscape.block.HollowLogBlockEntity;
+import com.kingodogo.buildscape.block.IcicleCauldronBlockEntity;
+import com.kingodogo.buildscape.block.MangroveSignBlockEntity;
+import com.kingodogo.buildscape.block.MuffBlockEntity;
+import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.block.PotentSulfurBlockEntity;
+import com.kingodogo.buildscape.block.SculkCatalystBlockEntity;
+import com.kingodogo.buildscape.block.ShelfBlockEntity;
+import com.kingodogo.buildscape.block.SmokeVentBlockEntity;
+import com.kingodogo.buildscape.block.TrappedDecoratedPotBlockEntity;
 import com.kingodogo.buildscape.trophy.Trophies;
 import com.kingodogo.buildscape.trophy.TrophyBlockEntity;
 import com.kingodogo.buildscape.trophy.TrophyDefinition;

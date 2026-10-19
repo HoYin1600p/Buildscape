@@ -2,7 +2,8 @@ package com.kingodogo.buildscape.entity;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModEntities;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

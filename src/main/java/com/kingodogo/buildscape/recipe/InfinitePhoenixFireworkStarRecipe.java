@@ -2,7 +2,8 @@ package com.kingodogo.buildscape.recipe;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.ModRecipeSerializers;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

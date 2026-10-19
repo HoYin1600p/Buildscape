@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.config.ConfigSetting;
+import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;

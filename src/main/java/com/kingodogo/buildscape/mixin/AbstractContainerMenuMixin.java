@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.util.GhostFilterMenu;
+import com.kingodogo.buildscape.menu.GhostFilterMenu;
 import com.kingodogo.buildscape.util.StonecutterMenuExtension;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;

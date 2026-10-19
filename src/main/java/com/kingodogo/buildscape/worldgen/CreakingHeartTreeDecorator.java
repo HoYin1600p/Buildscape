@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.worldgen;
 
-import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelSimulatedReader;

@@ -1,6 +1,8 @@
-package com.kingodogo.buildscape.particle;
+package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.particle.GeyserBaseParticleOptions;
+import com.kingodogo.buildscape.particle.GeyserParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.registries.DeferredRegister;

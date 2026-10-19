@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.ModBlocks;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidget;

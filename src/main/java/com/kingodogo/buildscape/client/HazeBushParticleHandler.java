@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.client;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.HazeBushBlock;
 import com.kingodogo.buildscape.block.PottedHazeBushBlock;
-import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.BlockPos;

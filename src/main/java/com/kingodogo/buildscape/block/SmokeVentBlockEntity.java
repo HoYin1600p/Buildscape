@@ -1,8 +1,9 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.SmokeColorRegistry;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
+import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;

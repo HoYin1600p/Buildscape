@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.util.FestiveGlintHelper;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;

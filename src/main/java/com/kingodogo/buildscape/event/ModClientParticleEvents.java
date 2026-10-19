@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.particle.FireflyParticle;
-import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.FlameParticle;
 import net.minecraftforge.api.distmarker.Dist;

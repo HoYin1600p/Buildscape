@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.RegistryObject;

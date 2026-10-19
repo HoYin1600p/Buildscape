@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.block.PlanterHelper;
 import com.kingodogo.buildscape.block.PlanterHelper.PlanterType;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;

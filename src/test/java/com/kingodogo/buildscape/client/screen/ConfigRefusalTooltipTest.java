@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.client.screen;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.junit.BeforeClass;

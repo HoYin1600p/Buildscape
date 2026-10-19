@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.block.FestiveStockingBlockEntity;
-import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

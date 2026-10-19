@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.trophy;
 
-import com.kingodogo.buildscape.block.ModBlockEntities;
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;

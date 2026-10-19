@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.performance;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 

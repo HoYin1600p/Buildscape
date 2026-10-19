@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.cosmetic.sign;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;

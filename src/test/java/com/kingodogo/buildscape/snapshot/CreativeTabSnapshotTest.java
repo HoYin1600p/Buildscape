@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.snapshot;
 
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import org.junit.BeforeClass;
 import org.junit.Test;

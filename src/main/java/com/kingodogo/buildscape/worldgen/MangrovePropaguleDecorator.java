@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.worldgen;
 
 import com.kingodogo.buildscape.block.MangrovePropaguleBlock;
-import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;

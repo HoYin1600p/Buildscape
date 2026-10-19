@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.entity;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;

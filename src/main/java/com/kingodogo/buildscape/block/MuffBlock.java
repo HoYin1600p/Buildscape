@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.event.AdvancementEvents;
-import com.kingodogo.buildscape.stat.ModStats;
+import com.kingodogo.buildscape.registry.ModStats;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.TranslatableComponent;

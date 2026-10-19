@@ -2,8 +2,10 @@ package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.particle.GeyserParticleOptions;
-import com.kingodogo.buildscape.particle.ModParticles;
-import com.kingodogo.buildscape.sound.ModSounds;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.ModParticles;
+import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

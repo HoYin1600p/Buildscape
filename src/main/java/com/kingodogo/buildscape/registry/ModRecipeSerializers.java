@@ -1,6 +1,13 @@
-package com.kingodogo.buildscape.recipe;
+package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe;
+import com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe;
+import com.kingodogo.buildscape.recipe.CustomFireworkStarRecipe;
+import com.kingodogo.buildscape.recipe.HazeBushDyeRecipe;
+import com.kingodogo.buildscape.recipe.InfinitePhoenixFireworkStarRecipe;
+import com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe;
+import com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;

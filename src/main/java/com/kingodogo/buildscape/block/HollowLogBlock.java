@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.item.HazeBushItem;
 import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.util;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;

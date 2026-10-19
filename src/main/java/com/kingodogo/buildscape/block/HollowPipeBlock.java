@@ -1,12 +1,13 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.fluid.ModFluids;
-import com.kingodogo.buildscape.item.ModItems;
 import com.kingodogo.buildscape.pipe.transport.BubbleColumnHandler;
 import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import com.kingodogo.buildscape.pipe.transport.WaterPipeTransport;
 import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
+import com.kingodogo.buildscape.registry.ModBlockEntities;
+import com.kingodogo.buildscape.registry.ModFluids;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;

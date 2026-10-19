@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.block.MuffBlock;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;

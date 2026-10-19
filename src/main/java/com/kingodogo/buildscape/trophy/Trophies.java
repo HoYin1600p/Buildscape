@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.trophy;
 
-import com.kingodogo.buildscape.block.ModBlocks;
-import com.kingodogo.buildscape.item.ModCreativeModeTab;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.ModCreativeModeTab;
+import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;

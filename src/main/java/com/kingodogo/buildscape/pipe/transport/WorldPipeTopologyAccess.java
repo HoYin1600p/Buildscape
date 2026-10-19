@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.pipe.transport;
 
 import com.kingodogo.buildscape.block.HollowLogBlock;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
-import com.kingodogo.buildscape.fluid.ModFluids;
+import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;

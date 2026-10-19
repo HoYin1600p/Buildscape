@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.util;
+package com.kingodogo.buildscape.menu;
 
 import net.minecraft.world.item.Item;
 

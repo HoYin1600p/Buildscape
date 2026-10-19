@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.block.sculk;
 
-import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.block.SculkVeinBlock;
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.sound.ModSounds;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;

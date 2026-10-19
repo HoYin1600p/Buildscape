@@ -1,8 +1,7 @@
-package com.kingodogo.buildscape.fluid;
+package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModBlocks;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.fluid.ExperienceFluidMatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.block.LiquidBlock;

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.particle;
 
+import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.NoRenderParticle;
 import net.minecraft.client.particle.Particle;

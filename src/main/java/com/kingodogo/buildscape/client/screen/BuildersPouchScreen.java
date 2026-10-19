@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.client.screen.workbench.WbRenderer;
-import com.kingodogo.buildscape.network.BuildersPouchMenu;
+import com.kingodogo.buildscape.menu.BuildersPouchMenu;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

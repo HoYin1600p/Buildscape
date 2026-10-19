@@ -1,7 +1,8 @@
 package com.kingodogo.buildscape.recipe;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.ModRecipeSerializers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;

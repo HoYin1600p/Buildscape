@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.copper;
 
-import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.block.copper.CopperTransitions;
+import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -21,7 +21,22 @@ public class SyncConfigProtocolTest {
 
     @Test
     public void protocolVersionPinsTheCurrentPacketLayout() {
-        assertEquals("12",ModMessages.PROTOCOL_VERSION);
+        assertEquals("12", ModMessages.PROTOCOL_VERSION);
+    }
+
+    @Test
+    public void syncGameRulesPacketCarriesSixRules() {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        new SyncGameRulesPacket(true, false, true, false, true, false).encode(buf);
+        assertEquals(6, buf.readableBytes());
+        SyncGameRulesPacket decoded = SyncGameRulesPacket.decode(buf);
+        assertTrue(decoded.fastLeafDecay);
+        assertFalse(decoded.disableEndermanGriefing);
+        assertTrue(decoded.disableCreeperGriefing);
+        assertFalse(decoded.disableGhastGriefing);
+        assertTrue(decoded.cakeStacking);
+        assertFalse(decoded.waterBottleStacking);
+        assertEquals(0, buf.readableBytes());
     }
 
     @Test

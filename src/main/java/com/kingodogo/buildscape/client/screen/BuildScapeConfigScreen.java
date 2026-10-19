@@ -2279,7 +2279,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
         int count = switch (tabId) {
             case "particles" -> 12;
-            case "world" -> 11;
+            case "world" -> 10;
             case "system" -> 0;
             case "links" -> CONFIG_LINKS.size();
             default -> 0;
@@ -3014,7 +3014,6 @@ public class BuildScapeConfigScreen extends Screen {
         boolean ghastGrief = level != null ? getGameRuleBoolean(level, ModGameRules.DISABLE_GHAST_GRIEFING, ModGameRules.clientDisableGhastGriefing) : ModGameRules.clientDisableGhastGriefing;
         boolean cakeStack = level != null ? getGameRuleBoolean(level, ModGameRules.IS_CAKE_STACK, ModGameRules.clientCakeStacking) : ModGameRules.clientCakeStacking;
         boolean waterStack = level != null ? getGameRuleBoolean(level, ModGameRules.IS_WATER_BOTTLE_STACK, ModGameRules.clientWaterBottleStacking) : ModGameRules.clientWaterBottleStacking;
-        boolean brushClears = level != null ? getGameRuleBoolean(level, ModGameRules.BIOME_BRUSH_CLEARS_SELECTION, ModGameRules.clientBiomeBrushClearsSelection) : ModGameRules.clientBiomeBrushClearsSelection;
 
         int curY = startY;
 
@@ -3046,9 +3045,6 @@ public class BuildScapeConfigScreen extends Screen {
         curY += h + gap;
 
         renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Water Bottle Stacking", "Allow water bottles to stack up to 16 in player inventories.", waterStack, mouseX, mouseY, alpha);
-        curY += h + gap;
-
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Biome Brush Clears Selection", "Sneak + left-click with the Biome Brush also clears both corners, not only the biome.", brushClears, mouseX, mouseY, alpha);
     }
 
     private void renderSectionDivider(Object poseStackOrGraphics, Font font, int x, int y, int w, String label, float alpha) {
@@ -5149,16 +5145,6 @@ public class BuildScapeConfigScreen extends Screen {
                     boolean cur = level != null ? getGameRuleBoolean(level, ModGameRules.IS_WATER_BOTTLE_STACK, ModGameRules.clientWaterBottleStacking) : ModGameRules.clientWaterBottleStacking;
                     ModGameRules.clientWaterBottleStacking = !cur;
                     ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("isWaterbottleStack", !cur));
-                    return true;
-                }
-                curY += h + gap;
-
-                // Row 8: Biome Brush Clears Selection
-                if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                    if (!requireConfigModificationAccess()) return true;
-                    boolean cur = level != null ? getGameRuleBoolean(level, ModGameRules.BIOME_BRUSH_CLEARS_SELECTION, ModGameRules.clientBiomeBrushClearsSelection) : ModGameRules.clientBiomeBrushClearsSelection;
-                    ModGameRules.clientBiomeBrushClearsSelection = !cur;
-                    ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("biomeBrushClearsSelection", !cur));
                     return true;
                 }
             }

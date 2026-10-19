@@ -124,14 +124,13 @@ public class BiomeBrushItem extends Item {
 
 
     public void clearCapturedBiome(ItemStack stack, Player player) {
-        CompoundTag tag = stack.getTag();
-        if (tag != null) {
-            tag.remove(KEY_BIOME);
-        }
+        boolean clearSelection = com.kingodogo.buildscape.world.ModGameRules.biomeBrushClearsSelection();
+        BiomeBrushClear.apply(stack.getTag(), clearSelection);
+        String messageKey = BiomeBrushClear.messageKey(clearSelection);
         if (player.level.isClientSide()) {
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cleared").withStyle(ChatFormatting.YELLOW), true);
+            player.displayClientMessage(new TranslatableComponent(messageKey).withStyle(ChatFormatting.YELLOW), true);
         } else {
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cleared").withStyle(ChatFormatting.YELLOW), true);
+            player.displayClientMessage(new TranslatableComponent(messageKey).withStyle(ChatFormatting.YELLOW), true);
             player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WOOL_BREAK, SoundSource.PLAYERS, 1.0f, 1.2f);
         }
     }
@@ -360,6 +359,8 @@ public class BiomeBrushItem extends Item {
         tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.desc1").withStyle(ChatFormatting.GRAY));
         tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.desc2").withStyle(ChatFormatting.GRAY));
         tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.desc3").withStyle(ChatFormatting.AQUA));
+        tooltip.add(new TranslatableComponent(BiomeBrushClear.tooltipKey(
+                com.kingodogo.buildscape.world.ModGameRules.biomeBrushClearsSelection())).withStyle(ChatFormatting.GRAY));
 
         super.appendHoverText(stack, level, tooltip, flag);
     }

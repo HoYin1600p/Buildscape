@@ -21,7 +21,7 @@ public class SyncConfigProtocolTest {
 
     @Test
     public void protocolVersionPinsTheCurrentPacketLayout() {
-        assertEquals("11", ModMessages.PROTOCOL_VERSION);
+        assertEquals("12",ModMessages.PROTOCOL_VERSION);
     }
 
     @Test

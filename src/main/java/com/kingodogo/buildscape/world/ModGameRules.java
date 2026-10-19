@@ -18,8 +18,10 @@ public class ModGameRules {
     public static GameRules.Key<GameRules.BooleanValue> DISABLE_GHAST_GRIEFING;
     public static GameRules.Key<GameRules.BooleanValue> IS_CAKE_STACK;
     public static GameRules.Key<GameRules.BooleanValue> IS_WATER_BOTTLE_STACK;
+    public static GameRules.Key<GameRules.BooleanValue> BIOME_BRUSH_CLEARS_SELECTION;
 
     public static volatile boolean clientFastLeafDecay = false;
+    public static volatile boolean clientBiomeBrushClearsSelection = false;
     public static volatile boolean clientDisableEndermanGriefing = false;
     public static volatile boolean clientDisableCreeperGriefing = false;
     public static volatile boolean clientDisableGhastGriefing = false;
@@ -44,7 +46,8 @@ public class ModGameRules {
                                 server.getGameRules().getBoolean(DISABLE_CREEPER_GRIEFING),
                                 server.getGameRules().getBoolean(DISABLE_GHAST_GRIEFING),
                                 server.getGameRules().getBoolean(IS_CAKE_STACK),
-                                server.getGameRules().getBoolean(IS_WATER_BOTTLE_STACK)
+                                server.getGameRules().getBoolean(IS_WATER_BOTTLE_STACK),
+                                server.getGameRules().getBoolean(BIOME_BRUSH_CLEARS_SELECTION)
                         )
                 );
             }
@@ -98,6 +101,21 @@ public class ModGameRules {
                 GameRules.Category.MISC,
                 waterBottleStackingType
         );
+
+        // Default false: sneak + left-click clears only the captured biome.
+        BIOME_BRUSH_CLEARS_SELECTION = GameRules.register(
+                "biomeBrushClearsSelection",
+                GameRules.Category.MISC,
+                booleanType
+        );
+    }
+
+    public static boolean biomeBrushClearsSelection() {
+        MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server != null && server.overworld() != null) {
+            return server.getGameRules().getBoolean(BIOME_BRUSH_CLEARS_SELECTION);
+        }
+        return clientBiomeBrushClearsSelection;
     }
 
     public static boolean isCakeStackingEnabled() {

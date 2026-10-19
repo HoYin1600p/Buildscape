@@ -67,7 +67,8 @@ public final class EditGuard {
                         rules.getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING),
                         rules.getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING),
                         rules.getBoolean(ModGameRules.IS_CAKE_STACK),
-                        rules.getBoolean(ModGameRules.IS_WATER_BOTTLE_STACK)));
+                        rules.getBoolean(ModGameRules.IS_WATER_BOTTLE_STACK),
+                        rules.getBoolean(ModGameRules.BIOME_BRUSH_CLEARS_SELECTION)));
             } else if (setting == ConfigSetting.PILLAR_EDIT || setting == ConfigSetting.PILLAR_BULK) {
                 PillarIdManager manager = PillarIdManager.get();
                 if (manager.hasLoaded()) SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());

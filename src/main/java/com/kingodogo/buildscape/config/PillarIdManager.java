@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.core.io.AtomicFiles;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
@@ -39,11 +40,9 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -1535,12 +1534,7 @@ public class PillarIdManager {
                 }
             }
 
-            try {
-                Files.move(tempFile.toPath(), file.toPath(),
-                        StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException exception) {
-                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
+            AtomicFiles.moveReplacing(tempFile.toPath(), file.toPath());
             return true;
         } catch (Exception e) {
             BuildScape.LOGGER.error("Error saving pillar data to {}", file.getAbsolutePath(), e);

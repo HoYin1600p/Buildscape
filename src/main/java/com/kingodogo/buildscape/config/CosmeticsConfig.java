@@ -3,13 +3,12 @@ package com.kingodogo.buildscape.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.io.AtomicFiles;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -287,25 +286,12 @@ public class CosmeticsConfig {
             nbt.putBoolean("shulker_preview", shulkerPreview);
         }
 
-        Path temporary = null;
         try {
-            temporary = Files.createTempFile(file.getParentFile().toPath(), file.getName(), ".tmp");
-            NbtIo.writeCompressed(nbt, temporary.toFile());
-            try {
-                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
+            AtomicFiles.write(file.toPath(), file.getName(),
+                    temporary -> NbtIo.writeCompressed(nbt, temporary.toFile()),
+                    e -> BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr, e));
         } catch (Exception e) {
             BuildScape.getLogger().error("CosmeticsConfig: Failed to write data for {}", uuidStr, e);
-        } finally {
-            if (temporary != null) {
-                try {
-                    Files.deleteIfExists(temporary);
-                } catch (IOException e) {
-                    BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr, e);
-                }
-            }
         }
     }
 

@@ -5,17 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.io.AtomicFiles;
 import net.minecraftforge.fml.ModList;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -202,7 +199,6 @@ public class PresetsConfig {
             BuildScape.getLogger().error("Not overwriting unreadable presets {}", file);
             return false;
         }
-        Path temporary = null;
         try {
             if (file.exists() && ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                 fileUnreadable = true;
@@ -210,40 +206,24 @@ public class PresetsConfig {
                 BuildScape.getLogger().warn("Not overwriting replacement-decoded presets {}", file);
                 return false;
             }
-            File parentDir = file.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-            temporary = Files.createTempFile(parentDir.toPath(), PRESETS_FILE_NAME, ".tmp");
-            try (FileWriter writer = new FileWriter(temporary.toFile(), StandardCharsets.UTF_8)) {
-                Map<String, Object> toSave = new HashMap<>();
-                for (Map.Entry<String, Preset> entry : presets.entrySet()) {
-                    if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
-                        toSave.put(entry.getKey(), entry.getValue());
+            AtomicFiles.write(file.toPath(), PRESETS_FILE_NAME, temporary -> {
+                try (FileWriter writer = new FileWriter(temporary.toFile(), StandardCharsets.UTF_8)) {
+                    Map<String, Object> toSave = new HashMap<>();
+                    for (Map.Entry<String, Preset> entry : presets.entrySet()) {
+                        if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
+                            toSave.put(entry.getKey(), entry.getValue());
+                        }
                     }
+                    toSave.put("_lastApplied", lastAppliedPreset);
+                    toSave.putAll(preservedPresets);
+                    GSON.toJson(toSave, writer);
                 }
-                toSave.put("_lastApplied", lastAppliedPreset);
-                toSave.putAll(preservedPresets);
-                GSON.toJson(toSave, writer);
-            }
-            try {
-                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
+            }, e -> BuildScape.getLogger().warn("Failed to remove temporary presets file", e));
             lastEditFailure = "";
             return true;
         } catch (Exception e) {
             BuildScape.getLogger().error("Failed to save presets {}", file, e);
             return false;
-        } finally {
-            if (temporary != null) {
-                try {
-                    Files.deleteIfExists(temporary);
-                } catch (IOException e) {
-                    BuildScape.getLogger().warn("Failed to remove temporary presets file", e);
-                }
-            }
         }
     }
 

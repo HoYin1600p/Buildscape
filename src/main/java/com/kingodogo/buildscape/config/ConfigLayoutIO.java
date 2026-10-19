@@ -9,6 +9,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.io.AtomicFiles;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -18,11 +19,9 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.DosFileAttributeView;
 import java.util.ArrayList;
@@ -541,17 +540,6 @@ final class ConfigLayoutIO {
     }
 
     private static void replace(Path file, String text) throws IOException {
-        Files.createDirectories(file.getParent());
-        Path temporary = Files.createTempFile(file.getParent(), file.getFileName().toString(), ".tmp");
-        try {
-            Files.writeString(temporary, text, StandardCharsets.UTF_8);
-            try {
-                Files.move(temporary, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING);
-            }
-        } finally {
-            Files.deleteIfExists(temporary);
-        }
+        AtomicFiles.write(file, temporary -> Files.writeString(temporary, text, StandardCharsets.UTF_8));
     }
 }

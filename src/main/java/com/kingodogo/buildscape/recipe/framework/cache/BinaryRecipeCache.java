@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.recipe.framework.cache;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.io.AtomicFiles;
 import com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe;
 import com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe;
 import com.kingodogo.buildscape.recipe.HazeBushDyeRecipe;
@@ -36,10 +37,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -157,37 +156,19 @@ public class BinaryRecipeCache {
 
     public static void saveCacheToFile(Path targetFile, String hash, List<Recipe<?>> recipes) throws IOException {
         byte[] fullCacheData = serializeCache(hash, recipes);
-        writeAtomically(targetFile, fullCacheData);
+        AtomicFiles.write(targetFile, fullCacheData);
     }
 
     public static void saveCache(String hash, List<Recipe<?>> recipes) {
         try {
             byte[] fullCacheData = serializeCache(hash, recipes);
-            writeAtomically(getCacheDir().resolve("recipes.bscb"), fullCacheData);
+            AtomicFiles.write(getCacheDir().resolve("recipes.bscb"), fullCacheData);
             BuildScape.LOGGER.info("BDRE Binary Cache saved successfully ({} recipes).", recipes.size());
         } catch (IOException e) {
             BuildScape.LOGGER.error("Failed to write BDRE Binary Cache", e);
         }
     }
 
-    private static void writeAtomically(Path targetFile, byte[] data) throws IOException {
-        Path parent = targetFile.toAbsolutePath().getParent();
-        if (parent == null) {
-            throw new IOException("Cache target has no parent directory: " + targetFile);
-        }
-        Files.createDirectories(parent);
-        Path temporaryFile = Files.createTempFile(parent, targetFile.getFileName().toString(), ".tmp");
-        try {
-            Files.write(temporaryFile, data);
-            try {
-                Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-        } finally {
-            Files.deleteIfExists(temporaryFile);
-        }
-    }
 
     public static List<Recipe<?>> loadCache(String expectedHash) {
         Path cacheFile = getCacheDir().resolve("recipes.bscb");

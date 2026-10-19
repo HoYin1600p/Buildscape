@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.recipe.framework.compiler;
 
+import com.kingodogo.buildscape.core.io.AtomicFiles;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.kingodogo.buildscape.recipe.framework.util.PatternBounds;
@@ -15,10 +16,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -419,24 +418,6 @@ public class RecipeCacheGenerator {
         return runtimeCategories;
     }
 
-    public static void writeAtomically(Path targetFile, byte[] data) throws IOException {
-        Path parent = targetFile.toAbsolutePath().getParent();
-        if (parent == null) {
-            throw new IOException("Target has no parent directory: " + targetFile);
-        }
-        Files.createDirectories(parent);
-        Path temporaryFile = Files.createTempFile(parent, targetFile.getFileName().toString(), ".tmp");
-        try {
-            Files.write(temporaryFile, data);
-            try {
-                Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-        } finally {
-            Files.deleteIfExists(temporaryFile);
-        }
-    }
 
     public static void main(String[] args) throws Exception {
         Path sourceDir = args.length > 0 ? Path.of(args[0]) : Path.of("src/main/resources/data/buildscape/recipes_pack");
@@ -467,13 +448,13 @@ public class RecipeCacheGenerator {
         } else {
             // Compile binary cache from JSON sources only when sources or hash changed
             cacheBytes = generateCache(sourceDir);
-            writeAtomically(targetBundledCache, cacheBytes);
+            AtomicFiles.write(targetBundledCache, cacheBytes);
             System.out.println("Generated bundled binary recipe cache: " + targetBundledCache.toAbsolutePath() + " (" + cacheBytes.length + " bytes)");
         }
 
         if (targetLocalCache != null && !localValid) {
             try {
-                writeAtomically(targetLocalCache, cacheBytes);
+                AtomicFiles.write(targetLocalCache, cacheBytes);
                 System.out.println("Synchronized local runtime cache: " + targetLocalCache.toAbsolutePath());
             } catch (Exception e) {
                 System.out.println("Note: Local runtime cache directory not present or skipped: " + e.getMessage());

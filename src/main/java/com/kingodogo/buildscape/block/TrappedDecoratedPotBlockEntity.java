@@ -3,25 +3,22 @@ package com.kingodogo.buildscape.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 import javax.annotation.Nullable;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 
 public class TrappedDecoratedPotBlockEntity
-        extends BlockEntity
+        extends SyncedBlockEntity
         implements WorldlyContainer {
 
     private ItemStack storedItem = ItemStack.EMPTY;
@@ -218,10 +215,5 @@ public class TrappedDecoratedPotBlockEntity
         tag.putLong(NbtKeys.WOBBLE_START_TICK, wobbleStartedAtTick);
         tag.putString(NbtKeys.LAST_WOBBLE_STYLE, lastWobbleStyle.name());
         return tag;
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
     }
 }

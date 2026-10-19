@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.feature.pillar.PillarPart;
 import com.kingodogo.buildscape.particle.SmokeColorRegistry;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
@@ -8,17 +9,13 @@ import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.Level;
 
 import java.util.Locale;
 import java.util.Random;
 
-public class SmokeVentBlockEntity extends BlockEntity {
+public class SmokeVentBlockEntity extends SyncedBlockEntity {
 
     private String smokeColor = null;
     private boolean active = true;
@@ -112,10 +109,5 @@ public class SmokeVentBlockEntity extends BlockEntity {
         CompoundTag tag = super.getUpdateTag();
         saveAdditional(tag);
         return tag;
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
     }
 }

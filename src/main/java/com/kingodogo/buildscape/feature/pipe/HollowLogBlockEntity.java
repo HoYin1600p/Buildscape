@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.feature.pipe;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.feature.pipe.transport.HollowPipeTransportManager;
 import com.kingodogo.buildscape.feature.pipe.transport.PipeFlowState;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
@@ -9,9 +10,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -19,13 +17,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
-import javax.annotation.Nullable;
 
-public class HollowLogBlockEntity extends BlockEntity {
+public class HollowLogBlockEntity extends SyncedBlockEntity {
     private BlockState decorationState = Blocks.AIR.defaultBlockState();
     private BlockState glassCoverNeg = Blocks.AIR.defaultBlockState();
     private BlockState glassCoverPos = Blocks.AIR.defaultBlockState();
@@ -291,11 +287,5 @@ public class HollowLogBlockEntity extends BlockEntity {
         CompoundTag tag = new CompoundTag();
         saveAdditional(tag);
         return tag;
-    }
-
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
     }
 }

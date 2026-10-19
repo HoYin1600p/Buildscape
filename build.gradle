@@ -243,7 +243,7 @@ tasks.register('runMangroveLeafSupportTests', JavaExec) {
 
 tasks.register('runCopperRodLogicTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.block.CopperRodLogicTest'
+    mainClass = 'com.kingodogo.buildscape.feature.copper.CopperRodLogicTest'
 }
 
 tasks.register('runHazeBushResourcesTests', JavaExec) {
@@ -283,7 +283,7 @@ tasks.register('runSmokeColorRegistryTests', JavaExec) {
 
 tasks.register('runCopperTransitionsTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.copper.CopperTransitionsTest'
+    mainClass = 'com.kingodogo.buildscape.feature.copper.CopperTransitionsTest'
 }
 
 tasks.register('syncBundledRecipeCache', JavaExec) {

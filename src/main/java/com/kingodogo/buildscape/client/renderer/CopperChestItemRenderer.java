@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.CopperChestBlockEntity;
+import com.kingodogo.buildscape.feature.copper.CopperChestBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;

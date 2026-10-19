@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.copper;
+package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.copper.CopperTransitions;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import org.junit.BeforeClass;
@@ -24,7 +23,7 @@ public class CopperRegistryMappingTest {
         RegistryTestSupport.bootstrap();
     }
 
-    private static final Path BLOCK_SOURCE = Path.of("src/main/java/com/kingodogo/buildscape/block");
+    private static final Path BLOCK_SOURCE = Path.of("src/main/java/com/kingodogo/buildscape/feature/copper");
     private static final String[] AGES = {"", "exposed_", "weathered_", "oxidized_"};
 
     @Test
@@ -89,7 +88,7 @@ public class CopperRegistryMappingTest {
         String handler = Files.readString(BLOCK_SOURCE.resolve("CopperOxidationHandler.java"));
         assertTrue(Pattern.compile("getNextOxidationState\\(BlockState state\\)\\s*\\{\\s*"
                 + "return getNext\\(state\\)\\.orElse\\(null\\);\\s*}").matcher(handler).find());
-        String weathering = Files.readString(BLOCK_SOURCE.resolve("copper/BuildscapeWeatheringCopper.java"));
+        String weathering = Files.readString(BLOCK_SOURCE.resolve("BuildscapeWeatheringCopper.java"));
         assertTrue(Pattern.compile("getNext\\(BlockState state\\)\\s*\\{\\s*"
                 + "return CopperOxidationHandler\\.getNext\\(state\\);\\s*}").matcher(weathering).find());
     }

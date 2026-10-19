@@ -1,6 +1,6 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.copper.CopperTransitions;
+import com.kingodogo.buildscape.block.EyeblossomBlock;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;

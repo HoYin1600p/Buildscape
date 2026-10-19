@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.block.copper;
+package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.CopperOxidationHandler;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ToolAction;

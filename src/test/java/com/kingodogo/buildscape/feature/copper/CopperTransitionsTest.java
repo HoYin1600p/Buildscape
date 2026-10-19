@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.copper;
+package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.copper.CopperTransitions;
 
 public final class CopperTransitionsTest {
     private CopperTransitionsTest() {

@@ -1,10 +1,5 @@
-package com.kingodogo.buildscape.block.copper;
+package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.CopperChestBlock;
-import com.kingodogo.buildscape.block.ExposedCopperBulbBlock;
-import com.kingodogo.buildscape.block.FreshCopperBulbBlock;
-import com.kingodogo.buildscape.block.OxidizedCopperBulbBlock;
-import com.kingodogo.buildscape.block.WeatheredCopperBulbBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 

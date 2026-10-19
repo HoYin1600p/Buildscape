@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block.copper;
+package com.kingodogo.buildscape.feature.copper;
 
 import java.util.IdentityHashMap;
 import java.util.Map;

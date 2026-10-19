@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.copper;
 
 import com.google.common.collect.ImmutableSet;
 import com.kingodogo.buildscape.BuildScape;

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.copper;
 
 import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.core.BlockPos;

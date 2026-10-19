@@ -1,6 +1,5 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.copper.BuildscapeWeatheringCopper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

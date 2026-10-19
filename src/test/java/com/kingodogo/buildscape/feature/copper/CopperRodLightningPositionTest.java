@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.rod;
+package com.kingodogo.buildscape.feature.copper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;

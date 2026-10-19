@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.item;
+package com.kingodogo.buildscape.feature.copper;
 
 import com.kingodogo.buildscape.client.renderer.CopperChestItemRenderer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;

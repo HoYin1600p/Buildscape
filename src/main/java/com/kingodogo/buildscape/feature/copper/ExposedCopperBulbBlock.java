@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.copper;
 
 public class ExposedCopperBulbBlock extends CopperBulbBlock {
 

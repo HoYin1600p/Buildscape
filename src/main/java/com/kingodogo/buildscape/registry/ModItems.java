@@ -2,13 +2,13 @@ package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.HomemakerCooldownTracker;
+import com.kingodogo.buildscape.feature.copper.CopperChestItem;
 import com.kingodogo.buildscape.item.BigOrnamentTemplateItem;
 import com.kingodogo.buildscape.item.BiomeBrushItem;
 import com.kingodogo.buildscape.item.BottleOfMistItem;
 import com.kingodogo.buildscape.item.BuildersPouchItem;
 import com.kingodogo.buildscape.item.ColoredItemFrameItem;
 import com.kingodogo.buildscape.item.ConfettiItem;
-import com.kingodogo.buildscape.item.CopperChestItem;
 import com.kingodogo.buildscape.item.ExperienceBucketItem;
 import com.kingodogo.buildscape.item.FestiveGlintShardItem;
 import com.kingodogo.buildscape.item.FestiveStarItem;

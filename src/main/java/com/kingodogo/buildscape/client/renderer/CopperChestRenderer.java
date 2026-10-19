@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.CopperChestBlockEntity;
+import com.kingodogo.buildscape.feature.copper.CopperChestBlockEntity;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;

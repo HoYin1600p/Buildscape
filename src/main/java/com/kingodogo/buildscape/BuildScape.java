@@ -1,8 +1,6 @@
 package com.kingodogo.buildscape;
 
 import com.kingodogo.buildscape.block.CloverBlock;
-import com.kingodogo.buildscape.block.CopperOxidationHandler;
-import com.kingodogo.buildscape.block.CopperRodHandler;
 import com.kingodogo.buildscape.block.CreakingHeartBlock;
 import com.kingodogo.buildscape.block.CustomSoundType;
 import com.kingodogo.buildscape.block.GlowLightsBlockEntity;
@@ -47,6 +45,8 @@ import com.kingodogo.buildscape.command.FireworkTestCommand;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
+import com.kingodogo.buildscape.feature.copper.CopperOxidationHandler;
+import com.kingodogo.buildscape.feature.copper.CopperRodHandler;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import com.kingodogo.buildscape.item.BiomeBrushItem;
 import com.kingodogo.buildscape.item.HazeBushItem;

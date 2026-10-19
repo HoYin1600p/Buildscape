@@ -153,7 +153,7 @@ public class ShulkerBoxTooltipData implements TooltipComponent, ClientTooltipCom
                             itemRenderer.renderAndDecorateItem(mc.player, filter, itemX, itemY, index);
                         }
                     } catch (Throwable itemError) {
-                        BuildScape.getLogger().debug("ShulkerBoxTooltipData: Error rendering item slot " + index, itemError);
+                        BuildScape.getLogger().debug("ShulkerBoxTooltipData: Error rendering item slot {}", index, itemError);
                     } finally {
                         itemRenderer.blitOffset = prevBlit;
                     }

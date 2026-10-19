@@ -403,7 +403,7 @@ public class PillarBlockEntityRenderer
     private static void logRenderFailure(ItemStack stack, Exception e) {
         String key = String.valueOf(ForgeRegistries.ITEMS.getKey(stack.getItem()));
         if (loggedRenderFailures.add(key)) {
-            BuildScape.LOGGER.warn("BuildScape: failed to render {} on a pillar", key, e);
+            BuildScape.LOGGER.warn("Failed to render {} on a pillar", key, e);
         }
     }
     private AABB getOrCalculateBounds(BakedModel model) {

@@ -88,7 +88,7 @@ public class CosmeticsConfig {
                             Files.move(oldFile.toPath(), oldFile.toPath().resolveSibling(oldFile.getName() + ".migrated"));
                         }
                     } catch (Exception e) {
-                        BuildScape.getLogger().error("CosmeticsConfig: Failed to relocate " + oldFile.getName(), e);
+                        BuildScape.getLogger().error("CosmeticsConfig: Failed to relocate {}", oldFile.getName(), e);
                     }
                 }
             }
@@ -122,7 +122,7 @@ public class CosmeticsConfig {
                         }
                     }
                 } catch (Exception e) {
-                    BuildScape.getLogger().warn("Unable to retain legacy cosmetics backup: " + legacyPath, e);
+                    BuildScape.getLogger().warn("Unable to retain legacy cosmetics backup: {}", legacyPath, e);
                 }
             }
         }
@@ -201,7 +201,7 @@ public class CosmeticsConfig {
                 if (playerUuid != null && nbt.hasUUID("player_uuid")) {
                     UUID storedUuid = nbt.getUUID("player_uuid");
                     if (!storedUuid.equals(playerUuid)) {
-                        BuildScape.getLogger().error("CosmeticsConfig: SECURITY MISMATCH for " + file.getName());
+                        BuildScape.getLogger().error("CosmeticsConfig: SECURITY MISMATCH for {}", file.getName());
                         PillarParticleConfig.backupUnreadableFile(file);
                         playerCosmetics.putIfAbsent(uuidStr, null);
                         playerCosmeticColors.putIfAbsent(uuidStr, null);
@@ -242,7 +242,7 @@ public class CosmeticsConfig {
                 }
             }
         } catch (Exception e) {
-            BuildScape.getLogger().error("CosmeticsConfig: Failed to read data for " + uuidStr, e);
+            BuildScape.getLogger().error("CosmeticsConfig: Failed to read data for {}", uuidStr, e);
             PillarParticleConfig.backupUnreadableFile(file);
             playerCosmetics.putIfAbsent(uuidStr, null);
             playerCosmeticColors.putIfAbsent(uuidStr, null);
@@ -297,13 +297,13 @@ public class CosmeticsConfig {
                 Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
-            BuildScape.getLogger().error("CosmeticsConfig: Failed to write data for " + uuidStr, e);
+            BuildScape.getLogger().error("CosmeticsConfig: Failed to write data for {}", uuidStr, e);
         } finally {
             if (temporary != null) {
                 try {
                     Files.deleteIfExists(temporary);
                 } catch (IOException e) {
-                    BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for " + uuidStr, e);
+                    BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr, e);
                 }
             }
         }

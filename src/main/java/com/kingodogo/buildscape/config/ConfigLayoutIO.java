@@ -68,8 +68,7 @@ final class ConfigLayoutIO {
                 replace(file, text);
             } catch (IOException | SecurityException e) {
                 failedMigrations.put(key, new FailedMigration(bytes.clone(), text));
-                BuildScape.getLogger().warn(
-                        "Unable to migrate legacy config; keeping it read-only: " + file, e);
+                BuildScape.getLogger().warn("Unable to migrate legacy config; keeping it read-only: {}", file, e);
                 return text;
             }
             BuildScape.getLogger().info(
@@ -127,10 +126,9 @@ final class ConfigLayoutIO {
         try {
             if (!Files.exists(backup)) Files.copy(file, backup);
         } catch (IOException e) {
-            BuildScape.getLogger().warn("Unable to back up unreadable config " + file, e);
+            BuildScape.getLogger().warn("Unable to back up unreadable config {}", file, e);
         }
-        BuildScape.getLogger().warn(
-                "Config contains invalid encoding or replacement characters; keeping it read-only: " + file);
+        BuildScape.getLogger().warn("Config contains invalid encoding or replacement characters; keeping it read-only: {}", file);
         return true;
     }
 

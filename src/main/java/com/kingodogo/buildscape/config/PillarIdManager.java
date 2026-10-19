@@ -912,21 +912,14 @@ public class PillarIdManager {
                 try {
                     loadFileAsync(server);
                 } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error in async file load: " + e.getMessage()
-                    );
-                    e.printStackTrace();
+                    BuildScape.LOGGER.error("Error in async file load", e);
                     hasLoaded = true;
                 } finally {
                     loadInProgress = false;
                 }
             });
         } catch (Throwable t) {
-            System.err.println(
-                    "BuildScape: Critical error in load() - will recover from world later: " +
-                            t.getMessage()
-            );
-            t.printStackTrace();
+            BuildScape.LOGGER.error("Critical error in load() - will recover from world later", t);
             loadInProgress = false;
             hasLoaded = true;
             pillarData.clear();
@@ -1041,11 +1034,7 @@ public class PillarIdManager {
             processLoadedData(loadedData, server, sourceFile);
 
         } catch (Throwable t) {
-            System.err.println(
-                    "BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
-                            t.getMessage()
-            );
-            t.printStackTrace();
+            BuildScape.LOGGER.error("Critical error in loadFileAsync() - will recover after world is fully loaded", t);
             fileWasDeleted = true;
             pillarData.clear();
             lastLoadedTime = 0L;
@@ -1244,18 +1233,12 @@ public class PillarIdManager {
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error scanning chunks to clear pillar IDs: " +
-                                    e.getMessage()
-                    );
+                    BuildScape.LOGGER.error("Error scanning chunks to clear pillar IDs: {}", e.getMessage());
                 }
             }
 
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error clearing pillar IDs from world: " + e.getMessage()
-            );
-            e.printStackTrace();
+            BuildScape.LOGGER.error("Error clearing pillar IDs from world", e);
         }
 
         return clearedCount;
@@ -1440,17 +1423,13 @@ public class PillarIdManager {
                                 pillarData.put(pillarId, data);
                                 recoveredCount++;
                             } catch (Exception e) {
-                                System.err.println(
-                                        "BuildScape: Error processing pillar: " + e.getMessage()
-                                );
+                                BuildScape.LOGGER.error("Error processing pillar: {}", e.getMessage());
                                 skippedCount++;
                             }
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error scanning chunks for pillars: " + e.getMessage()
-                    );
+                    BuildScape.LOGGER.error("Error scanning chunks for pillars: {}", e.getMessage());
                     skippedCount++;
                 }
             }
@@ -1466,10 +1445,7 @@ public class PillarIdManager {
             }
 
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error during pillar recovery: " + e.getMessage()
-            );
-            e.printStackTrace();
+            BuildScape.LOGGER.error("Error during pillar recovery", e);
         } finally {
             recoveryInProgress = false;
         }
@@ -1567,8 +1543,7 @@ public class PillarIdManager {
             }
             return true;
         } catch (Exception e) {
-            BuildScape.LOGGER.error(
-                    "BuildScape: Error saving pillar data to " + file.getAbsolutePath(), e);
+            BuildScape.LOGGER.error("Error saving pillar data to {}", file.getAbsolutePath(), e);
             return false;
         }
     }
@@ -1640,21 +1615,13 @@ public class PillarIdManager {
                             syncedCount++;
                         }
                     } catch (Exception e) {
-                        System.err.println(
-                                "BuildScape: Error syncing pillar " +
-                                        (data != null ? data.id : "unknown") +
-                                        ": " +
-                                        e.getMessage()
-                        );
+                        BuildScape.LOGGER.error("Error syncing pillar {}: {}", (data != null ? data.id : "unknown"), e.getMessage());
                     }
                 }
             }
 
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error in syncAllLoadedPillars: " + e.getMessage()
-            );
-            e.printStackTrace();
+            BuildScape.LOGGER.error("Error in syncAllLoadedPillars", e);
         }
     }
 
@@ -1680,7 +1647,7 @@ public class PillarIdManager {
 
             saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
         } catch (Throwable t) {
-            System.err.println("BuildScape: Error saving backup file: " + t.getMessage());
+            BuildScape.LOGGER.error("Error saving backup file: {}", t.getMessage());
         }
     }
 
@@ -1833,11 +1800,9 @@ public class PillarIdManager {
                         }
                     } catch (Exception e) {
                         preservedCount++;
-                        System.err.println(
-                                "BuildScape: Error syncing colors from NBT for pillar " +
-                                        (data != null ? data.id : "unknown") +
-                                        ": " + e.getMessage()
-                        );
+                        BuildScape.LOGGER.error("Error syncing colors from NBT for pillar {}: {}",
+                                (data != null ? data.id : "unknown"),
+                                e.getMessage());
                     }
                 }
             }
@@ -1847,10 +1812,7 @@ public class PillarIdManager {
             } else if (preservedCount > 0) {
             }
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error in syncColorsFromNBTToManager: " + e.getMessage()
-            );
-            e.printStackTrace();
+            BuildScape.LOGGER.error("Error in syncColorsFromNBTToManager", e);
         }
     }
 
@@ -1919,11 +1881,9 @@ public class PillarIdManager {
                             }
                         }
                     } catch (Exception e) {
-                        System.err.println(
-                                "BuildScape: Error loading colors from NBT for pillar " +
-                                        (data != null ? data.id : "unknown") +
-                                        ": " + e.getMessage()
-                        );
+                        BuildScape.LOGGER.error("Error loading colors from NBT for pillar {}: {}",
+                                (data != null ? data.id : "unknown"),
+                                e.getMessage());
                     }
                 }
             }
@@ -1933,10 +1893,7 @@ public class PillarIdManager {
             } else {
             }
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error in loadColorsFromNBT: " + e.getMessage()
-            );
-            e.printStackTrace();
+            BuildScape.LOGGER.error("Error in loadColorsFromNBT", e);
         }
     }
 

@@ -134,7 +134,7 @@ public class PillarParticleConfig {
             try {
                 callback.accept(isRemote);
             } catch (Exception e) {
-                e.printStackTrace();
+                BuildScape.LOGGER.error("Config reload callback failed", e);
             }
         }
         clearMatchCache();
@@ -168,7 +168,7 @@ public class PillarParticleConfig {
         replacement.addAll(updatedItems);
         for (String item : replacement) {
             if (!isValidItemId(item) && WARNED_INVALID_ITEMS.add(item)) {
-                BuildScape.LOGGER.warn("Invalid configured item or tag retained without applying it: " + item);
+                BuildScape.LOGGER.warn("Invalid configured item or tag retained without applying it: {}", item);
             }
         }
         items = replacement;
@@ -204,7 +204,7 @@ public class PillarParticleConfig {
                 Files.copy(file.toPath(), backup);
             }
         } catch (Exception e) {
-            BuildScape.LOGGER.error("Unable to back up unreadable config " + file, e);
+            BuildScape.LOGGER.error("Unable to back up unreadable config {}", file, e);
         }
     }
 
@@ -458,7 +458,7 @@ public class PillarParticleConfig {
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         } catch (Exception e) {
-                            BuildScape.LOGGER.error("Error in config file watcher: " + e.getMessage());
+                            BuildScape.LOGGER.error("Error in config file watcher: {}", e.getMessage());
                         }
                     },
                     "BuildScape-ConfigWatcher");
@@ -800,7 +800,7 @@ public class PillarParticleConfig {
         } catch (Exception e) {
             itemsFileUnreadable = true;
             backupUnreadableFile(file);
-            BuildScape.LOGGER.error("Unable to load items config " + file + "; keeping the last good item list", e);
+            BuildScape.LOGGER.error("Unable to load items config {}; keeping the last good item list", file, e);
         } finally {
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
@@ -888,7 +888,7 @@ public class PillarParticleConfig {
             parsed.add(item.getAsString());
         }
         if (skippedEntries) {
-            BuildScape.LOGGER.warn("Skipped non-string entries in items array from " + source);
+            BuildScape.LOGGER.warn("Skipped non-string entries in items array from {}", source);
         }
         return parsed;
     }
@@ -1027,7 +1027,7 @@ public class PillarParticleConfig {
         if (remote) return false;
         clearMatchCache();
         if (itemsFileUnreadable || itemsReadOnly) {
-            BuildScape.LOGGER.warn("Not saving read-only items config; unreadable/legacy file kept as-is: " + getItemsFile());
+            BuildScape.LOGGER.warn("Not saving read-only items config; unreadable/legacy file kept as-is: {}", getItemsFile());
             return false;
         }
         File file = getItemsFile();
@@ -1055,7 +1055,7 @@ public class PillarParticleConfig {
             lastFileSizeItems = file.length();
             return true;
         } catch (Exception e) {
-            BuildScape.LOGGER.error("Error saving items config: " + e.getMessage());
+            BuildScape.LOGGER.error("Error saving items config: {}", e.getMessage());
             return false;
         }
     }
@@ -1081,7 +1081,7 @@ public class PillarParticleConfig {
     public synchronized boolean savePropertiesToDisk() {
         if (remote) return false;
         if (propertiesReadOnly) {
-            BuildScape.LOGGER.warn("Not saving read-only pillar properties; unreadable/legacy file kept as-is: " + getPropertiesFile());
+            BuildScape.LOGGER.warn("Not saving read-only pillar properties; unreadable/legacy file kept as-is: {}", getPropertiesFile());
             return false;
         }
         File file = getPropertiesFile();
@@ -1091,7 +1091,7 @@ public class PillarParticleConfig {
                 String source = ConfigLayoutIO.readText(file.toPath());
                 if (ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                     propertiesReadOnly = true;
-                    BuildScape.LOGGER.warn("Not saving read-only pillar properties; replacement-decoded file kept as-is: " + file);
+                    BuildScape.LOGGER.warn("Not saving read-only pillar properties; replacement-decoded file kept as-is: {}", file);
                     return false;
                 }
                 JsonObject original = ConfigLayoutIO.readProperties(source);

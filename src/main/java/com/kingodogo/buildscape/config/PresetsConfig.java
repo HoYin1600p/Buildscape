@@ -101,8 +101,7 @@ public class PresetsConfig {
         } catch (Exception e) {
             fileUnreadable = true;
             PillarParticleConfig.backupUnreadableFile(file);
-            BuildScape.getLogger().error(
-                    "Failed to load presets " + file + "; keeping the last good presets", e);
+            BuildScape.getLogger().error("Failed to load presets {}; keeping the last good presets", file, e);
             if (presets.isEmpty()) {
                 initializeDefaults();
             }
@@ -184,8 +183,7 @@ public class PresetsConfig {
                     parsed.put(entry.getKey(), new Preset(name, items));
                 } catch (RuntimeException e) {
                     skippedEntries[0] = true;
-                    BuildScape.getLogger().warn(
-                            "Skipped malformed preset " + entry.getKey() + " in " + PRESETS_FILE_NAME, e);
+                    BuildScape.getLogger().warn("Skipped malformed preset {} in {}", entry.getKey(), PRESETS_FILE_NAME, e);
                 }
             }
         }
@@ -201,7 +199,7 @@ public class PresetsConfig {
         File file = getPresetsFile();
         if (fileUnreadable) {
             lastEditFailure = "unreadable";
-            BuildScape.getLogger().error("Not overwriting unreadable presets " + file);
+            BuildScape.getLogger().error("Not overwriting unreadable presets {}", file);
             return false;
         }
         Path temporary = null;
@@ -209,7 +207,7 @@ public class PresetsConfig {
             if (file.exists() && ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                 fileUnreadable = true;
                 lastEditFailure = "unreadable";
-                BuildScape.getLogger().warn("Not overwriting replacement-decoded presets " + file);
+                BuildScape.getLogger().warn("Not overwriting replacement-decoded presets {}", file);
                 return false;
             }
             File parentDir = file.getParentFile();
@@ -236,7 +234,7 @@ public class PresetsConfig {
             lastEditFailure = "";
             return true;
         } catch (Exception e) {
-            BuildScape.getLogger().error("Failed to save presets " + file, e);
+            BuildScape.getLogger().error("Failed to save presets {}", file, e);
             return false;
         } finally {
             if (temporary != null) {

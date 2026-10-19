@@ -105,7 +105,7 @@ public class BuildersPouchTooltipData implements TooltipComponent, ClientTooltip
                         itemRenderer.renderAndDecorateItem(mc.player, filter, itemX, itemY, col);
                     }
                 } catch (Throwable itemError) {
-                    BuildScape.getLogger().debug("BuildersPouchTooltipData: Error rendering item slot " + col, itemError);
+                    BuildScape.getLogger().debug("BuildersPouchTooltipData: Error rendering item slot {}", col, itemError);
                 } finally {
                     itemRenderer.blitOffset = prevBlit;
                 }

@@ -102,8 +102,7 @@ public class MobStateParser {
 
 
         } catch (Exception e) {
-            System.err.println("[BuildScape] Failed to load states: " + e.getMessage());
-            e.printStackTrace();
+            BuildScape.LOGGER.error("Failed to load states", e);
             addUniversalStates();
             statesLoaded = true;
         }

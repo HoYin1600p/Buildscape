@@ -227,7 +227,7 @@ public class UpdateConfigPacket {
                 data = assembly.accept(this);
             } catch (Exception e) {
                 ServerPendingHolder.PENDING.remove(player);
-                BuildScape.LOGGER.warn("Rejected config update from " + player.getUUID(), e);
+                BuildScape.LOGGER.warn("Rejected config update from {}", player.getUUID(), e);
                 player.displayClientMessage(new TextComponent(
                         "BuildScape: Config update refused because it contains invalid or incomplete data.")
                         .withStyle(ChatFormatting.RED), false);

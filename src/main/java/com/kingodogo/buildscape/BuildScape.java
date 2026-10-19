@@ -350,7 +350,7 @@ public class BuildScape {
                             ObfuscationReflectionHelper.setPrivateValue(
                                     Item.class, entry.get(), targetTab, "f_41377_");
                         } catch (Exception e) {
-                            LOGGER.error("Failed to change creative tab for vertical slab: " + path, e);
+                            LOGGER.error("Failed to change creative tab for vertical slab: {}", path, e);
                         }
                     }
                 }
@@ -830,7 +830,7 @@ public class BuildScape {
                                                     new TextComponent(
                                                             "Error during recovery: "
                                                                     + e.getMessage()));
-                                            e.printStackTrace();
+                                            LOGGER.error("Error during pillar recovery command", e);
                                         }
                                     });
 
@@ -870,7 +870,7 @@ public class BuildScape {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("BuildScape: Error saving pillar data on server stop: " + e.getMessage());
+            LOGGER.error("Error saving pillar data on server stop: {}", e.getMessage());
         }
 
         serverFullyInitialized = false;
@@ -984,7 +984,7 @@ public class BuildScape {
             SyncPillarIdsPacket.sendToPlayer(
                     player, manager.getAllPillarDataForSync());
         } catch (Exception e) {
-            LOGGER.error("BuildScape: Error sending pillar IDs to player: " + e.getMessage());
+            LOGGER.error("Error sending pillar IDs to player: {}", e.getMessage());
         }
     }
 
@@ -1016,9 +1016,7 @@ public class BuildScape {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error("BuildScape: Error syncing/saving colors before world unload: "
-                        + e.getMessage());
-                e.printStackTrace();
+                LOGGER.error("Error syncing/saving colors before world unload", e);
             }
 
         }

@@ -138,7 +138,7 @@ public abstract class ScreenMixin {
                 poseStack.popPose();
             }
         } catch (Throwable t) {
-            BuildScape.getLogger().debug("BuildScape: Suppressed error during custom tooltip rendering", t);
+            BuildScape.getLogger().debug("Suppressed error during custom tooltip rendering", t);
         } finally {
             buildscape$isRenderingCustomTooltip = false;
         }

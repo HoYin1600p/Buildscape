@@ -46,7 +46,7 @@ public final class ConfigPaths {
                 migrate(legacy, target);
             }
         } catch (IOException e) {
-            BuildScape.LOGGER.error("ConfigPaths: failed to prepare " + target, e);
+            BuildScape.LOGGER.error("ConfigPaths: failed to prepare {}", target, e);
         }
         return target;
     }
@@ -78,7 +78,7 @@ public final class ConfigPaths {
                 }
             }
         } catch (IOException e) {
-            BuildScape.LOGGER.warn("ConfigPaths: failed to copy template " + resourcePath + " to " + destination, e);
+            BuildScape.LOGGER.warn("ConfigPaths: failed to copy template {} to {}", resourcePath, destination, e);
         }
         return false;
     }
@@ -92,7 +92,7 @@ public final class ConfigPaths {
                 return PillarParticleConfig.parseItems(json);
             }
         } catch (Exception e) {
-            BuildScape.LOGGER.warn("ConfigPaths: failed to load default items from template " + template, e);
+            BuildScape.LOGGER.warn("ConfigPaths: failed to load default items from template {}", template, e);
         }
         return Collections.emptySet();
     }

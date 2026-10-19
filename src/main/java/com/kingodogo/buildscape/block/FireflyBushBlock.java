@@ -34,7 +34,7 @@ public class FireflyBushBlock extends BushBlock {
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
-        boolean isNight = !level.isDay();
+        boolean isNight = FireflyNight.isNight(level);
         boolean noSkylight = level.getBrightness(LightLayer.SKY, pos) == 0;
         if (!(isNight || noSkylight) || random.nextFloat() >= 0.70F) {
             return;

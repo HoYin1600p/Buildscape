@@ -6,6 +6,7 @@ import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.config.PresetsConfig;
+import com.kingodogo.buildscape.network.EditRefusedPacket;
 import com.kingodogo.buildscape.network.RemovePillarPacket;
 import com.kingodogo.buildscape.network.RequestPillarIdsPacket;
 import com.kingodogo.buildscape.network.ResetPillarsPacket;
@@ -469,6 +470,9 @@ public class BuildScapeConfigScreen extends Screen {
     private long readOnlyDeniedAt = -1L;
     private int readOnlyDeniedX = 0;
     private int readOnlyDeniedY = 0;
+    // A refusal from the server: render() clears the deferred tooltip each frame, so it is kept here.
+    private Component serverRefusalTooltip = null;
+    private long serverRefusalAt = -1L;
 
     // Color picker state.
     private boolean showColorModal = false;
@@ -1004,6 +1008,24 @@ public class BuildScapeConfigScreen extends Screen {
     /** The server config arrived: show its selections, not what was clicked before it answered. */
     public void onServerConfigSynced() {
         rebuildActiveItemsCache();
+    }
+
+    /** The server refused an edit from this screen: show it like a locally refused click, at the pointer. */
+    public void onServerRefusal(EditRefusedPacket.Reason reason) {
+        serverRefusalTooltip = serverRefusalText(reason);
+        serverRefusalAt = System.currentTimeMillis();
+        readOnlyDeniedAt = serverRefusalAt;
+        readOnlyDeniedX = rawMouseX;
+        readOnlyDeniedY = rawMouseY;
+    }
+
+    static Component serverRefusalText(EditRefusedPacket.Reason reason) {
+        switch (reason) {
+            case POLICY_LEVEL: return refusalText(PillarParticleConfig.EditScope.POLICY, false, true);
+            case READ_ONLY: return refusalText(null, true, false);
+            case INVALID: return ComponentHelper.literal("The server refused invalid or incomplete data.");
+            default: return refusalText(PillarParticleConfig.EditScope.GENERAL, false, true);
+        }
     }
 
     private void loadRegisteredTags() {
@@ -1897,6 +1919,15 @@ public class BuildScapeConfigScreen extends Screen {
             deferredTooltip.add(hoveredRefusalTooltip);
             deferredTooltipX = rawMouseX + 12;
             deferredTooltipY = rawMouseY;
+        }
+        if (serverRefusalTooltip != null) {
+            if (readOnlyFeedbackAlpha(System.currentTimeMillis(), serverRefusalAt) > 0.0F) {
+                deferredTooltip = Collections.singletonList(serverRefusalTooltip);
+                deferredTooltipX = readOnlyDeniedX + 12;
+                deferredTooltipY = readOnlyDeniedY;
+            } else {
+                serverRefusalTooltip = null;
+            }
         }
         if (deferredTooltip != null && !deferredTooltip.isEmpty()) {
             renderComponentTooltip(poseStackOrGraphics, deferredTooltip, deferredTooltipX, deferredTooltipY);

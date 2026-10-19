@@ -32,7 +32,21 @@ public final class EditGuard {
         if (allows(player, setting)) return true;
         player.displayClientMessage(new TextComponent(refusalText(setting)).withStyle(ChatFormatting.RED), false);
         resync(player, setting);
+        refuse(player, setting == ConfigSetting.POLICY ? EditRefusedPacket.Reason.POLICY_LEVEL
+                : EditRefusedPacket.Reason.LOCKED, setting);
         return false;
+    }
+
+    /** Lets the sender's open config screen show the refusal next to the pointer. */
+    static void refuse(ServerPlayer player, EditRefusedPacket.Reason reason, ConfigSetting setting) {
+        ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new EditRefusedPacket(reason, setting));
+    }
+
+    /** The screen feedback for a refusal text returned by the config upload. */
+    static EditRefusedPacket.Reason reasonFor(String refusalText) {
+        if (refusalText.contains("read-only")) return EditRefusedPacket.Reason.READ_ONLY;
+        if (refusalText.contains("locked")) return EditRefusedPacket.Reason.LOCKED;
+        return EditRefusedPacket.Reason.INVALID;
     }
 
     static String refusalText(ConfigSetting setting) {

@@ -21,7 +21,31 @@ public class SyncConfigProtocolTest {
 
     @Test
     public void protocolVersionPinsTheCurrentPacketLayout() {
-        assertEquals("10", ModMessages.PROTOCOL_VERSION);
+        assertEquals("11", ModMessages.PROTOCOL_VERSION);
+    }
+
+    @Test
+    public void editRefusedPacketRoundTrips() {
+        for (EditRefusedPacket.Reason reason : EditRefusedPacket.Reason.values()) {
+            for (ConfigSetting setting : new ConfigSetting[] {null, ConfigSetting.ITEMS, ConfigSetting.WORLD_RULES}) {
+                FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+                new EditRefusedPacket(reason, setting).encode(buf);
+                EditRefusedPacket decoded = EditRefusedPacket.decode(buf);
+                assertEquals(reason, decoded.reason);
+                assertEquals(setting, decoded.setting());
+                assertEquals(0, buf.readableBytes());
+            }
+        }
+    }
+
+    @Test
+    public void uploadRefusalTextsMapToScreenReasons() {
+        assertEquals(EditRefusedPacket.Reason.LOCKED,
+                EditGuard.reasonFor("BuildScape: This setting is locked by the server edit policy."));
+        assertEquals(EditRefusedPacket.Reason.READ_ONLY,
+                EditGuard.reasonFor("BuildScape: Changes refused because the server config is read-only. Check the server log."));
+        assertEquals(EditRefusedPacket.Reason.INVALID,
+                EditGuard.reasonFor("BuildScape: Invalid item or tag refused: x"));
     }
 
     @Test

@@ -206,6 +206,7 @@ public class UpdateConfigPacket {
                     serverConfig.edit_permission_mode, permissionLevel);
             if (assembly == null) {
                 ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                EditGuard.refuse(player, EditRefusedPacket.Reason.LOCKED, null);
                 return;
             }
             SyncConfigPacket data;
@@ -218,6 +219,7 @@ public class UpdateConfigPacket {
                         "BuildScape: Config update refused because it contains invalid or incomplete data.")
                         .withStyle(net.minecraft.ChatFormatting.RED), false);
                 ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                EditGuard.refuse(player, EditRefusedPacket.Reason.INVALID, null);
                 return;
             }
             if (data == null) {
@@ -232,6 +234,7 @@ public class UpdateConfigPacket {
                 player.displayClientMessage(new net.minecraft.network.chat.TextComponent(refusal)
                         .withStyle(net.minecraft.ChatFormatting.RED), false);
                 ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                EditGuard.refuse(player, EditGuard.reasonFor(refusal), null);
             }
             if (data.uploadSettings.isEmpty()) {
                 if (refusal == null) {

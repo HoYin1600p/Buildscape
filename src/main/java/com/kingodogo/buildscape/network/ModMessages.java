@@ -9,7 +9,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class ModMessages {
 
-    static final String PROTOCOL_VERSION = "10";
+    static final String PROTOCOL_VERSION = "11";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BuildScape.MODID, "main"),
             () -> PROTOCOL_VERSION,
@@ -62,6 +62,8 @@ public class ModMessages {
                 UpdateAllPillarIdsPacket::encode, UpdateAllPillarIdsPacket::decode, UpdateAllPillarIdsPacket::handle);
         register(ResetPillarsPacket.class, 22, NetworkDirection.PLAY_TO_SERVER,
                 ResetPillarsPacket::encode, ResetPillarsPacket::decode, ResetPillarsPacket::handle);
+        register(EditRefusedPacket.class, 23, NetworkDirection.PLAY_TO_CLIENT,
+                EditRefusedPacket::encode, EditRefusedPacket::decode, EditRefusedPacket::handle);
     }
 
     private static <T> void register(

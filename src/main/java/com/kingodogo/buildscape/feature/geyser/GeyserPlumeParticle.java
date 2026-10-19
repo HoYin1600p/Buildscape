@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.particle;
+package com.kingodogo.buildscape.feature.geyser;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;

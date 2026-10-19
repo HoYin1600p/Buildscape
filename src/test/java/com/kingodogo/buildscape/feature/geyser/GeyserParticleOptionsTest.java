@@ -1,8 +1,6 @@
-package com.kingodogo.buildscape.client410;
+package com.kingodogo.buildscape.feature.geyser;
 
 import com.google.gson.JsonObject;
-import com.kingodogo.buildscape.particle.GeyserBaseParticleOptions;
-import com.kingodogo.buildscape.particle.GeyserParticleOptions;
 import com.mojang.brigadier.StringReader;
 import com.mojang.serialization.JsonOps;
 import io.netty.buffer.Unpooled;

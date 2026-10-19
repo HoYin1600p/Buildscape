@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.geyser;
 
 import java.util.function.IntPredicate;
 

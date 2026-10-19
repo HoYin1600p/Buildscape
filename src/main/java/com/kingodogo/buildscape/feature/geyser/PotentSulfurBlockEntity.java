@@ -1,7 +1,6 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.feature.geyser;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.particle.GeyserParticleOptions;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModParticles;

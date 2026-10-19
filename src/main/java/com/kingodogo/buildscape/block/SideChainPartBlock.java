@@ -12,199 +12,199 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
 public interface SideChainPartBlock {
-   SideChainPart getSideChainPart(final BlockState state);
+    SideChainPart getSideChainPart(final BlockState state);
 
-   BlockState setSideChainPart(final BlockState state, final SideChainPart newPart);
+    BlockState setSideChainPart(final BlockState state, final SideChainPart newPart);
 
-   Direction getFacing(final BlockState state);
+    Direction getFacing(final BlockState state);
 
-   boolean isConnectable(final BlockState state);
+    boolean isConnectable(final BlockState state);
 
-   int getMaxChainLength();
+    int getMaxChainLength();
 
-   default List<BlockPos> getAllBlocksConnectedTo(final LevelAccessor level, final BlockPos pos) {
-      BlockState state = level.getBlockState(pos);
-      if (!this.isConnectable(state)) {
-         return List.of();
-      } else {
-         SideChainPartBlock.Neighbors neighbors = this.getNeighbors(level, pos, this.getFacing(state));
-         LinkedList<BlockPos> results = new LinkedList<>();
-         results.add(pos);
-         this.addBlocksConnectingTowards(neighbors::left, SideChainPart.LEFT, results::addFirst);
-         this.addBlocksConnectingTowards(neighbors::right, SideChainPart.RIGHT, results::addLast);
-         return results;
-      }
-   }
-
-   private void addBlocksConnectingTowards(final IntFunction<SideChainPartBlock.Neighbor> getNeighbor, final SideChainPart endPart, final Consumer<BlockPos> accumulator) {
-      for(int steps = 1; steps < this.getMaxChainLength(); ++steps) {
-         SideChainPartBlock.Neighbor neighbor = getNeighbor.apply(steps);
-         if (neighbor.connectsTowards(endPart)) {
-            accumulator.accept(neighbor.pos());
-         }
-
-         if (neighbor.isUnconnectableOrChainEnd()) {
-            break;
-         }
-      }
-   }
-
-   default void updateNeighborsAfterPoweringDown(final LevelAccessor level, final BlockPos pos, final BlockState state) {
-      SideChainPartBlock.Neighbors neighbors = this.getNeighbors(level, pos, this.getFacing(state));
-      neighbors.left().disconnectFromRight();
-      neighbors.right().disconnectFromLeft();
-   }
-
-   default void updateSelfAndNeighborsOnPoweringUp(final LevelAccessor level, final BlockPos pos, final BlockState state, final BlockState oldState) {
-      if (this.isConnectable(state)) {
-         if (!this.isBeingUpdatedByNeighbor(state, oldState)) {
+    default List<BlockPos> getAllBlocksConnectedTo(final LevelAccessor level, final BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (!this.isConnectable(state)) {
+            return List.of();
+        } else {
             SideChainPartBlock.Neighbors neighbors = this.getNeighbors(level, pos, this.getFacing(state));
-            SideChainPart newPartForSelf = SideChainPart.UNCONNECTED;
-            int existingChainOnTheLeft = neighbors.left().isConnectable() ? this.getAllBlocksConnectedTo(level, neighbors.left().pos()).size() : 0;
-            int existingChainOnTheRight = neighbors.right().isConnectable() ? this.getAllBlocksConnectedTo(level, neighbors.right().pos()).size() : 0;
-            int currentChainLength = 1;
-            if (this.canConnect(existingChainOnTheLeft, currentChainLength)) {
-               newPartForSelf = newPartForSelf.whenConnectedToTheLeft();
-               neighbors.left().connectToTheRight();
-               currentChainLength += existingChainOnTheLeft;
+            LinkedList<BlockPos> results = new LinkedList<>();
+            results.add(pos);
+            this.addBlocksConnectingTowards(neighbors::left, SideChainPart.LEFT, results::addFirst);
+            this.addBlocksConnectingTowards(neighbors::right, SideChainPart.RIGHT, results::addLast);
+            return results;
+        }
+    }
+
+    private void addBlocksConnectingTowards(final IntFunction<SideChainPartBlock.Neighbor> getNeighbor, final SideChainPart endPart, final Consumer<BlockPos> accumulator) {
+        for(int steps = 1; steps < this.getMaxChainLength(); ++steps) {
+            SideChainPartBlock.Neighbor neighbor = getNeighbor.apply(steps);
+            if (neighbor.connectsTowards(endPart)) {
+                accumulator.accept(neighbor.pos());
             }
 
-            if (this.canConnect(existingChainOnTheRight, currentChainLength)) {
-               newPartForSelf = newPartForSelf.whenConnectedToTheRight();
-               neighbors.right().connectToTheLeft();
+            if (neighbor.isUnconnectableOrChainEnd()) {
+                break;
             }
+        }
+    }
 
-            this.setPart(level, pos, newPartForSelf);
-         }
-      }
-   }
+    default void updateNeighborsAfterPoweringDown(final LevelAccessor level, final BlockPos pos, final BlockState state) {
+        SideChainPartBlock.Neighbors neighbors = this.getNeighbors(level, pos, this.getFacing(state));
+        neighbors.left().disconnectFromRight();
+        neighbors.right().disconnectFromLeft();
+    }
 
-   private boolean canConnect(final int newBlocksToConnectTo, final int currentChainLength) {
-      return newBlocksToConnectTo > 0 && currentChainLength + newBlocksToConnectTo <= this.getMaxChainLength();
-   }
+    default void updateSelfAndNeighborsOnPoweringUp(final LevelAccessor level, final BlockPos pos, final BlockState state, final BlockState oldState) {
+        if (this.isConnectable(state)) {
+            if (!this.isBeingUpdatedByNeighbor(state, oldState)) {
+                SideChainPartBlock.Neighbors neighbors = this.getNeighbors(level, pos, this.getFacing(state));
+                SideChainPart newPartForSelf = SideChainPart.UNCONNECTED;
+                int existingChainOnTheLeft = neighbors.left().isConnectable() ? this.getAllBlocksConnectedTo(level, neighbors.left().pos()).size() : 0;
+                int existingChainOnTheRight = neighbors.right().isConnectable() ? this.getAllBlocksConnectedTo(level, neighbors.right().pos()).size() : 0;
+                int currentChainLength = 1;
+                if (this.canConnect(existingChainOnTheLeft, currentChainLength)) {
+                    newPartForSelf = newPartForSelf.whenConnectedToTheLeft();
+                    neighbors.left().connectToTheRight();
+                    currentChainLength += existingChainOnTheLeft;
+                }
 
-   private boolean isBeingUpdatedByNeighbor(final BlockState state, final BlockState oldState) {
-      boolean isGettingConnected = this.getSideChainPart(state).isConnected();
-      boolean hasBeenConnectedBefore = this.isConnectable(oldState) && this.getSideChainPart(oldState).isConnected();
-      return isGettingConnected || hasBeenConnectedBefore;
-   }
+                if (this.canConnect(existingChainOnTheRight, currentChainLength)) {
+                    newPartForSelf = newPartForSelf.whenConnectedToTheRight();
+                    neighbors.right().connectToTheLeft();
+                }
 
-   private SideChainPartBlock.Neighbors getNeighbors(final LevelAccessor level, final BlockPos center, final Direction facing) {
-      return new SideChainPartBlock.Neighbors(this, level, facing, center, new HashMap<>());
-   }
+                this.setPart(level, pos, newPartForSelf);
+            }
+        }
+    }
 
-   default void setPart(final LevelAccessor level, final BlockPos pos, final SideChainPart newPart) {
-      BlockState state = level.getBlockState(pos);
-      if (this.getSideChainPart(state) != newPart) {
-         level.setBlock(pos, this.setSideChainPart(state, newPart), 3);
-      }
-   }
+    private boolean canConnect(final int newBlocksToConnectTo, final int currentChainLength) {
+        return newBlocksToConnectTo > 0 && currentChainLength + newBlocksToConnectTo <= this.getMaxChainLength();
+    }
 
-   public static record EmptyNeighbor(BlockPos pos) implements SideChainPartBlock.Neighbor {
-      @Override
-      public boolean isConnectable() {
-         return false;
-      }
+    private boolean isBeingUpdatedByNeighbor(final BlockState state, final BlockState oldState) {
+        boolean isGettingConnected = this.getSideChainPart(state).isConnected();
+        boolean hasBeenConnectedBefore = this.isConnectable(oldState) && this.getSideChainPart(oldState).isConnected();
+        return isGettingConnected || hasBeenConnectedBefore;
+    }
 
-      @Override
-      public boolean isUnconnectableOrChainEnd() {
-         return true;
-      }
+    private SideChainPartBlock.Neighbors getNeighbors(final LevelAccessor level, final BlockPos center, final Direction facing) {
+        return new SideChainPartBlock.Neighbors(this, level, facing, center, new HashMap<>());
+    }
 
-      @Override
-      public boolean connectsTowards(final SideChainPart endPart) {
-         return false;
-      }
-   }
+    default void setPart(final LevelAccessor level, final BlockPos pos, final SideChainPart newPart) {
+        BlockState state = level.getBlockState(pos);
+        if (this.getSideChainPart(state) != newPart) {
+            level.setBlock(pos, this.setSideChainPart(state, newPart), 3);
+        }
+    }
 
-   public interface Neighbor {
-      BlockPos pos();
+    public record EmptyNeighbor(BlockPos pos) implements SideChainPartBlock.Neighbor {
+        @Override
+        public boolean isConnectable() {
+            return false;
+        }
 
-      boolean isConnectable();
+        @Override
+        public boolean isUnconnectableOrChainEnd() {
+            return true;
+        }
 
-      boolean isUnconnectableOrChainEnd();
+        @Override
+        public boolean connectsTowards(final SideChainPart endPart) {
+            return false;
+        }
+    }
 
-      boolean connectsTowards(final SideChainPart endPart);
+    public interface Neighbor {
+        BlockPos pos();
 
-      default void connectToTheRight() {
-      }
+        boolean isConnectable();
 
-      default void connectToTheLeft() {
-      }
+        boolean isUnconnectableOrChainEnd();
 
-      default void disconnectFromRight() {
-      }
+        boolean connectsTowards(final SideChainPart endPart);
 
-      default void disconnectFromLeft() {
-      }
-   }
+        default void connectToTheRight() {
+        }
 
-   public static record Neighbors(SideChainPartBlock block, LevelAccessor level, Direction facing, BlockPos center, Map<BlockPos, SideChainPartBlock.Neighbor> cache) {
-      private boolean isConnectableToThisBlock(final BlockState neighbor) {
-         return this.block.isConnectable(neighbor) && this.block.getFacing(neighbor) == this.facing;
-      }
+        default void connectToTheLeft() {
+        }
 
-      private SideChainPartBlock.Neighbor createNewNeighbor(final BlockPos pos) {
-         BlockState neighbor = this.level.getBlockState(pos);
-         SideChainPart part = this.isConnectableToThisBlock(neighbor) ? this.block.getSideChainPart(neighbor) : null;
-         return part == null ? new SideChainPartBlock.EmptyNeighbor(pos) : new SideChainPartBlock.SideChainNeighbor(this.level, this.block, pos, part);
-      }
+        default void disconnectFromRight() {
+        }
 
-      private SideChainPartBlock.Neighbor getOrCreateNeighbor(final Direction dir, final Integer steps) {
-         return this.cache.computeIfAbsent(this.center.relative(dir, steps), this::createNewNeighbor);
-      }
+        default void disconnectFromLeft() {
+        }
+    }
 
-      public SideChainPartBlock.Neighbor left(final int steps) {
-         return this.getOrCreateNeighbor(this.facing.getClockWise(), steps);
-      }
+    public record Neighbors(SideChainPartBlock block, LevelAccessor level, Direction facing, BlockPos center, Map<BlockPos, SideChainPartBlock.Neighbor> cache) {
+        private boolean isConnectableToThisBlock(final BlockState neighbor) {
+            return this.block.isConnectable(neighbor) && this.block.getFacing(neighbor) == this.facing;
+        }
 
-      public SideChainPartBlock.Neighbor right(final int steps) {
-         return this.getOrCreateNeighbor(this.facing.getCounterClockWise(), steps);
-      }
+        private SideChainPartBlock.Neighbor createNewNeighbor(final BlockPos pos) {
+            BlockState neighbor = this.level.getBlockState(pos);
+            SideChainPart part = this.isConnectableToThisBlock(neighbor) ? this.block.getSideChainPart(neighbor) : null;
+            return part == null ? new SideChainPartBlock.EmptyNeighbor(pos) : new SideChainPartBlock.SideChainNeighbor(this.level, this.block, pos, part);
+        }
 
-      public SideChainPartBlock.Neighbor left() {
-         return this.left(1);
-      }
+        private SideChainPartBlock.Neighbor getOrCreateNeighbor(final Direction dir, final Integer steps) {
+            return this.cache.computeIfAbsent(this.center.relative(dir, steps), this::createNewNeighbor);
+        }
 
-      public SideChainPartBlock.Neighbor right() {
-         return this.right(1);
-      }
-   }
+        public SideChainPartBlock.Neighbor left(final int steps) {
+            return this.getOrCreateNeighbor(this.facing.getClockWise(), steps);
+        }
 
-   public static record SideChainNeighbor(LevelAccessor level, SideChainPartBlock block, BlockPos pos, SideChainPart part) implements SideChainPartBlock.Neighbor {
-      @Override
-      public boolean isConnectable() {
-         return true;
-      }
+        public SideChainPartBlock.Neighbor right(final int steps) {
+            return this.getOrCreateNeighbor(this.facing.getCounterClockWise(), steps);
+        }
 
-      @Override
-      public boolean isUnconnectableOrChainEnd() {
-         return this.part.isChainEnd();
-      }
+        public SideChainPartBlock.Neighbor left() {
+            return this.left(1);
+        }
 
-      @Override
-      public boolean connectsTowards(final SideChainPart endPart) {
-         return this.part.isConnectionTowards(endPart);
-      }
+        public SideChainPartBlock.Neighbor right() {
+            return this.right(1);
+        }
+    }
 
-      @Override
-      public void connectToTheRight() {
-         this.block.setPart(this.level, this.pos, this.part.whenConnectedToTheRight());
-      }
+    public record SideChainNeighbor(LevelAccessor level, SideChainPartBlock block, BlockPos pos, SideChainPart part) implements SideChainPartBlock.Neighbor {
+        @Override
+        public boolean isConnectable() {
+            return true;
+        }
 
-      @Override
-      public void connectToTheLeft() {
-         this.block.setPart(this.level, this.pos, this.part.whenConnectedToTheLeft());
-      }
+        @Override
+        public boolean isUnconnectableOrChainEnd() {
+            return this.part.isChainEnd();
+        }
 
-      @Override
-      public void disconnectFromRight() {
-         this.block.setPart(this.level, this.pos, this.part.whenDisconnectedFromTheRight());
-      }
+        @Override
+        public boolean connectsTowards(final SideChainPart endPart) {
+            return this.part.isConnectionTowards(endPart);
+        }
 
-      @Override
-      public void disconnectFromLeft() {
-         this.block.setPart(this.level, this.pos, this.part.whenDisconnectedFromTheLeft());
-      }
-   }
+        @Override
+        public void connectToTheRight() {
+            this.block.setPart(this.level, this.pos, this.part.whenConnectedToTheRight());
+        }
+
+        @Override
+        public void connectToTheLeft() {
+            this.block.setPart(this.level, this.pos, this.part.whenConnectedToTheLeft());
+        }
+
+        @Override
+        public void disconnectFromRight() {
+            this.block.setPart(this.level, this.pos, this.part.whenDisconnectedFromTheRight());
+        }
+
+        @Override
+        public void disconnectFromLeft() {
+            this.block.setPart(this.level, this.pos, this.part.whenDisconnectedFromTheLeft());
+        }
+    }
 }

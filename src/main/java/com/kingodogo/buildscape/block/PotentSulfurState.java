@@ -3,25 +3,25 @@ package com.kingodogo.buildscape.block;
 import net.minecraft.util.StringRepresentable;
 
 public enum PotentSulfurState implements StringRepresentable {
-   DRY("dry"),
-   WET("wet"),
-   DORMANT("dormant"),
-   ERUPTING("erupting"),
-   CONTINUOUS("continuous");
+    DRY("dry"),
+    WET("wet"),
+    DORMANT("dormant"),
+    ERUPTING("erupting"),
+    CONTINUOUS("continuous");
 
-   private final String name;
+    private final String name;
 
-   private PotentSulfurState(final String name) {
-      this.name = name;
-   }
+    private PotentSulfurState(final String name) {
+        this.name = name;
+    }
 
-   @Override
-   public String toString() {
-      return this.name;
-   }
+    @Override
+    public String toString() {
+        return this.name;
+    }
 
-   @Override
-   public String getSerializedName() {
-      return this.name;
-   }
+    @Override
+    public String getSerializedName() {
+        return this.name;
+    }
 }

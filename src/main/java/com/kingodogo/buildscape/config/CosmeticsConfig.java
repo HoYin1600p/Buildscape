@@ -161,7 +161,7 @@ public class CosmeticsConfig {
             if (!key.equals(GLOBAL_SCOPE)) {
                 try {
                     uuid = UUID.fromString(key);
-                } catch (Exception ignored) {
+                } catch (IllegalArgumentException ignored) {
                     // the key is not a UUID; the entry stays without an owner
                 }
             }
@@ -184,7 +184,7 @@ public class CosmeticsConfig {
                             if (cosEntry.getValue() instanceof String) {
                                 cosmetics.put(slot, (String) cosEntry.getValue());
                             }
-                        } catch (Exception ignored) {
+                        } catch (NumberFormatException ignored) {
                             // skip entries whose slot key is not a number
                         }
                     }
@@ -241,7 +241,7 @@ public class CosmeticsConfig {
                     for (String key : equipped.getAllKeys()) {
                         try {
                             cosmetics.put(Integer.parseInt(key), equipped.getString(key));
-                        } catch (Exception ignored) {
+                        } catch (NumberFormatException ignored) {
                             // skip entries whose slot key is not a number
                         }
                     }

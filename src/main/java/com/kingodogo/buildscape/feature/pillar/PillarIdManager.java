@@ -528,6 +528,7 @@ public class PillarIdManager {
                 }
             });
         } catch (Throwable t) {
+            // top-level guard: a failed load or save must not take the server down
             BuildScape.LOGGER.error("Critical error in load() - will recover from world later", t);
             loadInProgress = false;
             hasLoaded = true;
@@ -638,6 +639,7 @@ public class PillarIdManager {
             processLoadedData(loadedData, server, sourceFile);
 
         } catch (Throwable t) {
+            // top-level guard: a failed load or save must not take the server down
             BuildScape.LOGGER.error("Critical error in loadFileAsync() - will recover after world is fully loaded", t);
             fileWasDeleted = true;
             registry.pillarData.clear();
@@ -724,6 +726,7 @@ public class PillarIdManager {
             syncDirty = true;
             return true;
         } catch (Throwable t) {
+            // top-level guard: a failed load or save must not take the server down
             BuildScape.LOGGER.error("Unable to save pillar data", t);
             return false;
         }
@@ -821,6 +824,7 @@ public class PillarIdManager {
 
             saveToFile(PillarStore.getBackupDataFile(), PillarStore.BACKUP_FILE_NAME);
         } catch (Throwable t) {
+            // top-level guard: a failed load or save must not take the server down
             BuildScape.LOGGER.error("Error saving backup file", t);
         }
     }

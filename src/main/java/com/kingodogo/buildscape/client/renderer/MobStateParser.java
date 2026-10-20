@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.core.NbtKeys;
+import java.io.IOException;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -40,7 +41,7 @@ public class MobStateParser {
                         .getResourceManager()
                         .getResource(statesFile)
                         .getInputStream();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 BuildScape.LOGGER.error("Could not find mob_states.txt resource.");
             }
 

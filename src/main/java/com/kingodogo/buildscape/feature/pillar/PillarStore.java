@@ -110,6 +110,7 @@ final class PillarStore {
             }
             return dir;
         } catch (Throwable t) {
+            // top-level guard: fall back to a safe folder whatever fails
             return new File(".");
         }
     }

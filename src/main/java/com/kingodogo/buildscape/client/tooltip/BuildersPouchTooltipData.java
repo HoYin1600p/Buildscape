@@ -106,6 +106,7 @@ public class BuildersPouchTooltipData implements TooltipComponent, ClientTooltip
                         itemRenderer.renderAndDecorateItem(mc.player, filter, itemX, itemY, col);
                     }
                 } catch (Throwable itemError) {
+                    // render guard: one failing item must not break the tooltip
                     BuildScape.getLogger().debug("BuildersPouchTooltipData: Error rendering item slot {}", col,
                             itemError);
                 } finally {
@@ -113,6 +114,7 @@ public class BuildersPouchTooltipData implements TooltipComponent, ClientTooltip
                 }
             }
         } catch (Throwable t) {
+            // render guard: a tooltip error must never crash the client
             BuildScape.getLogger().debug("BuildersPouchTooltipData: Error in renderImage", t);
         }
     }

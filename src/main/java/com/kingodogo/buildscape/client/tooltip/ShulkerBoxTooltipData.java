@@ -157,6 +157,7 @@ public class ShulkerBoxTooltipData implements TooltipComponent, ClientTooltipCom
                             itemRenderer.renderAndDecorateItem(mc.player, filter, itemX, itemY, index);
                         }
                     } catch (Throwable itemError) {
+                        // render guard: one failing item must not break the tooltip
                         BuildScape.getLogger().debug("ShulkerBoxTooltipData: Error rendering item slot {}", index,
                                 itemError);
                     } finally {
@@ -165,6 +166,7 @@ public class ShulkerBoxTooltipData implements TooltipComponent, ClientTooltipCom
                 }
             }
         } catch (Throwable t) {
+            // render guard: a tooltip error must never crash the client
             BuildScape.getLogger().debug("ShulkerBoxTooltipData: Error in renderImage", t);
         }
     }

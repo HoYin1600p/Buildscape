@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.feature.cosmetic.api;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.feature.cosmetic.CosmeticData;
@@ -108,7 +109,7 @@ public class SupportersApiClient {
 
                     try {
                         return gson.fromJson(body, responseClass);
-                    } catch (Exception e) {
+                    } catch (JsonParseException e) {
                         BuildScape.getLogger().error("Failed to parse JSON response", e);
                         throw new ApiException("Failed to parse response: " + e.getMessage(), e);
                     }
@@ -155,7 +156,7 @@ public class SupportersApiClient {
 
                     try {
                         return gson.fromJson(bodyStr, responseClass);
-                    } catch (Exception e) {
+                    } catch (JsonParseException e) {
                         BuildScape.getLogger().error("Failed to parse JSON response", e);
                         throw new ApiException("Failed to parse response: " + e.getMessage(), e);
                     }

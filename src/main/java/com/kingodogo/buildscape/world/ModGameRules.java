@@ -32,6 +32,7 @@ public class ModGameRules {
             register(ObfuscationReflectionHelper.findMethod(GameRules.BooleanValue.class, "m_46252_", boolean.class,
                     BiConsumer.class));
         } catch (Exception e) {
+            // reflection on private vanilla members
             throw new RuntimeException("Failed to register gamerules", e);
         }
     }

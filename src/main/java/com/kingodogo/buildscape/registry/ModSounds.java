@@ -137,7 +137,8 @@ public class ModSounds {
                         if (COPPER_GRATE_BREAK != null && COPPER_GRATE_BREAK.isPresent()) {
                             return COPPER_GRATE_BREAK.get();
                         }
-                    } catch (Throwable ignored) {
+                    } catch (RuntimeException ignored) {
+                        // RegistryObject not bound yet; use the vanilla fallback sound
                     }
                     return SoundEvents.COPPER_BREAK;
                 };
@@ -146,7 +147,8 @@ public class ModSounds {
                         if (COPPER_GRATE_STEP != null && COPPER_GRATE_STEP.isPresent()) {
                             return COPPER_GRATE_STEP.get();
                         }
-                    } catch (Throwable ignored) {
+                    } catch (RuntimeException ignored) {
+                        // RegistryObject not bound yet; use the vanilla fallback sound
                     }
                     return SoundEvents.COPPER_STEP;
                 };
@@ -182,7 +184,8 @@ public class ModSounds {
                         if (COPPER_BULB_BREAK != null && COPPER_BULB_BREAK.isPresent()) {
                             return COPPER_BULB_BREAK.get();
                         }
-                    } catch (Throwable ignored) {
+                    } catch (RuntimeException ignored) {
+                        // RegistryObject not bound yet; use the vanilla fallback sound
                     }
                     return SoundEvents.COPPER_BREAK;
                 };
@@ -191,7 +194,8 @@ public class ModSounds {
                         if (COPPER_BULB_STEP != null && COPPER_BULB_STEP.isPresent()) {
                             return COPPER_BULB_STEP.get();
                         }
-                    } catch (Throwable ignored) {
+                    } catch (RuntimeException ignored) {
+                        // RegistryObject not bound yet; use the vanilla fallback sound
                     }
                     return SoundEvents.COPPER_STEP;
                 };
@@ -200,7 +204,8 @@ public class ModSounds {
                         if (COPPER_BULB_PLACE != null && COPPER_BULB_PLACE.isPresent()) {
                             return COPPER_BULB_PLACE.get();
                         }
-                    } catch (Throwable ignored) {
+                    } catch (RuntimeException ignored) {
+                        // RegistryObject not bound yet; use the vanilla fallback sound
                     }
                     return SoundEvents.COPPER_STEP;
                 };

@@ -133,6 +133,7 @@ public class PresetsConfig {
         try {
             return BuildscapeClientConfig.get().getMaxCustomPresets();
         } catch (Throwable e) {
+            // the client config can be unavailable, for example in tests, including as a linkage error
             return BuildscapeClientConfig.DEFAULT_CUSTOM_PRESETS;
         }
     }

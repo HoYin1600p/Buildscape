@@ -26,6 +26,7 @@ public final class ConfigPaths {
                 return FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable t) {
+            // FMLPaths can be unavailable, for example in tests, including as a linkage error
             BuildScape.LOGGER.debug("Platform config directory unavailable, using legacy location", t);
         }
         return LEGACY_ROOT;

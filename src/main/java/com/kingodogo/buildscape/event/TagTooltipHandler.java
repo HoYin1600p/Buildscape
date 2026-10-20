@@ -43,6 +43,7 @@ public class TagTooltipHandler {
             }
             return CosmeticsConfig.get().getShulkerPreview(null);
         } catch (Throwable t) {
+            // client config can be unavailable, including as a linkage error; default to showing the preview
             return true;
         }
     }
@@ -103,6 +104,7 @@ public class TagTooltipHandler {
                 }
             }
         } catch (Throwable t) {
+            // render guard: a tooltip error must never crash the client
             BuildScape.getLogger().debug("TagTooltipHandler: Suppressed tooltip error", t);
         }
     }
@@ -153,6 +155,7 @@ public class TagTooltipHandler {
                 }
             }
         } catch (Throwable t) {
+            // render guard: a tooltip error must never crash the client
             BuildScape.getLogger().debug("TagTooltipHandler: Error reading shulker tooltip data", t);
         }
         return null;
@@ -190,6 +193,7 @@ public class TagTooltipHandler {
                 return new BuildersPouchTooltipData(filterStacks, realStacks);
             }
         } catch (Throwable t) {
+            // render guard: a tooltip error must never crash the client
             BuildScape.getLogger().debug("TagTooltipHandler: Error reading builder pouch tooltip data", t);
         }
         return null;

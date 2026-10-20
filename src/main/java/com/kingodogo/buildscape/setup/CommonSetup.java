@@ -111,6 +111,7 @@ public final class CommonSetup {
                         (RecordItem) ModItems.MUSIC_DISC_BUILDER.get());
             }
         } catch (Exception e) {
+            // reflection on private vanilla members
             BuildScape.LOGGER.error("Failed to register custom records into RecordItem.BY_NAME", e);
         }
     }
@@ -134,6 +135,7 @@ public final class CommonSetup {
                         ObfuscationReflectionHelper.setPrivateValue(
                                 Item.class, entry.get(), targetTab, "f_41377_");
                     } catch (Exception e) {
+                        // reflection on private vanilla members
                         BuildScape.LOGGER.error("Failed to change creative tab for vertical slab: {}", path, e);
                     }
                 }

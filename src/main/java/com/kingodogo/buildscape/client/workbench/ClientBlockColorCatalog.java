@@ -111,6 +111,7 @@ public final class ClientBlockColorCatalog {
                     colors.size(), spriteCache.size(), elapsedMs);
             return true;
         } catch (Throwable error) {
+            // block and tint providers run arbitrary mod code; a failure only disables this catalog
             synchronized (ClientBlockColorCatalog.class) {
                 failed = true;
             }

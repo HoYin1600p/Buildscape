@@ -145,6 +145,7 @@ public class BuildScapeRecipeCompiler {
                                     return compiled;
                                 }
                             } catch (Throwable t) {
+                                // recipe serializers and conditions run mod code; a bad recipe is skipped
                                 BuildScape.LOGGER.debug("BDRE Compiler: inner recipe {} did not compile", innerId, t);
                             }
                         }
@@ -152,6 +153,7 @@ public class BuildScapeRecipeCompiler {
                     return null;
                 }
             } catch (Throwable t) {
+                // recipe serializers and conditions run mod code; a bad recipe is skipped
                 return null;
             }
         }
@@ -267,6 +269,7 @@ public class BuildScapeRecipeCompiler {
         try {
             return CraftingHelper.processConditions(json, "conditions");
         } catch (Throwable t) {
+            // recipe serializers and conditions run mod code; a bad recipe is skipped
             BuildScape.LOGGER.warn("BDRE Compiler: Could not evaluate conditions of recipe {}; skipping it.", recipeId,
                     t);
             return false;

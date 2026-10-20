@@ -29,6 +29,7 @@ public class ClientAdvancementEvents {
             }
             return (AdvancementTab) selectedTabField.get(screen);
         } catch (Exception e) {
+            // reflection on a private vanilla field; any failure ends further lookups
             selectedTabLookupFailed = true;
             return null;
         }

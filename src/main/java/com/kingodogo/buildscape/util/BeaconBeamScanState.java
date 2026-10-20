@@ -1,34 +1,32 @@
 package com.kingodogo.buildscape.util;
 
 public final class BeaconBeamScanState {
-    public static final int UNLIMITED = 1024;
-
-    private int confirmedHeight = UNLIMITED;
-    private int pendingHeight = UNLIMITED;
+    private boolean confirmedStopped;
+    private boolean pendingStopped;
     private boolean scanning;
 
-    public int confirmedHeight() {
-        return this.confirmedHeight;
+    public boolean confirmedStopped() {
+        return this.confirmedStopped;
     }
 
-    public int pendingHeight() {
-        return this.pendingHeight;
+    public boolean pendingStopped() {
+        return this.pendingStopped;
     }
 
     public void beginScan() {
-        this.pendingHeight = UNLIMITED;
+        this.pendingStopped = false;
         this.scanning = true;
     }
 
-    public void markBlocked(int height) {
+    public void markStopped() {
         if (this.scanning) {
-            this.pendingHeight = Math.min(this.pendingHeight, Math.max(0, height));
+            this.pendingStopped = true;
         }
     }
 
     public void completeScan() {
         if (this.scanning) {
-            this.confirmedHeight = this.pendingHeight;
+            this.confirmedStopped = this.pendingStopped;
             this.scanning = false;
         }
     }

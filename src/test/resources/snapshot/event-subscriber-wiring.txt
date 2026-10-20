@@ -148,8 +148,6 @@ com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader bus=FORGE dist=
   onAddReloadListeners(net.minecraftforge.event.AddReloadListenerEvent) NORMAL
 com.kingodogo.buildscape.registry.ModEntities bus=MOD dist=CLIENT,DEDICATED_SERVER
   registerAttributes(net.minecraftforge.event.entity.EntityAttributeCreationEvent) NORMAL
-com.kingodogo.buildscape.util.BeaconScanContext$ClientEvents bus=FORGE dist=CLIENT
-  onClientTick(net.minecraftforge.event.TickEvent$ClientTickEvent) NORMAL
 com.kingodogo.buildscape.worldgen.ModBiomeModifications bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onBiomeLoading(net.minecraftforge.event.world.BiomeLoadingEvent) NORMAL
 com.kingodogo.buildscape.worldgen.ModConfiguredFeatures bus=MOD dist=CLIENT,DEDICATED_SERVER

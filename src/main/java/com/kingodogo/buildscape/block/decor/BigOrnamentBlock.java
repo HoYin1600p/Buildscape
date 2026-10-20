@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.block.decor;
 
 import com.kingodogo.buildscape.core.WaterloggedGlassBlock;
-import com.kingodogo.buildscape.util.BeaconScanContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -95,8 +94,7 @@ public class BigOrnamentBlock extends WaterloggedGlassBlock implements SimpleWat
             BlockPos pos,
             BlockPos beaconPos) {
         if (this.isTinted) {
-            BeaconScanContext.markBlocking(level, pos, beaconPos);
-            return new float[]{1.0F, 1.0F, 1.0F};
+            return null;
         }
         int color = state.getMapColor(level, pos).col;
         return new float[]{

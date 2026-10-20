@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.registry.blocks;
 
 import com.kingodogo.buildscape.block.BigCandleBlock;
 import com.kingodogo.buildscape.block.BigOrnamentBlock;
-import com.kingodogo.buildscape.block.ClimbableChainBlock;
 import com.kingodogo.buildscape.block.CloverBlock;
 import com.kingodogo.buildscape.block.ColoredSporeBlossomBlock;
 import com.kingodogo.buildscape.block.FestiveLampBlock;
@@ -10,12 +9,13 @@ import com.kingodogo.buildscape.block.FestiveStockingBlock;
 import com.kingodogo.buildscape.block.FrostRoseBlock;
 import com.kingodogo.buildscape.block.GlowLightsBlock;
 import com.kingodogo.buildscape.block.IceCrystalBlock;
-import com.kingodogo.buildscape.block.LargeChainBlock;
 import com.kingodogo.buildscape.block.MangroveLeavesBlock;
 import com.kingodogo.buildscape.block.MangrovePropaguleBlock;
 import com.kingodogo.buildscape.block.MangroveRootsBlock;
 import com.kingodogo.buildscape.block.ModBlock;
+import com.kingodogo.buildscape.block.ModButtonBlock;
 import com.kingodogo.buildscape.block.ModDoorBlock;
+import com.kingodogo.buildscape.block.ModPressurePlateBlock;
 import com.kingodogo.buildscape.block.ModStairBlock;
 import com.kingodogo.buildscape.block.ModStandingSignBlock;
 import com.kingodogo.buildscape.block.ModTrapdoorBlock;
@@ -25,7 +25,7 @@ import com.kingodogo.buildscape.block.MonetFlowerBlock;
 import com.kingodogo.buildscape.block.MulticolorGlowLightsBlock;
 import com.kingodogo.buildscape.block.OrnamentBlock;
 import com.kingodogo.buildscape.block.PetalBlock;
-import com.kingodogo.buildscape.block.RoseVinesBlock;
+import com.kingodogo.buildscape.block.SilkTouchOnlyGlassBlock;
 import com.kingodogo.buildscape.block.SnowyBushBlock;
 import com.kingodogo.buildscape.block.SnowyFernBlock;
 import com.kingodogo.buildscape.block.SnowyGrassBlock;
@@ -36,7 +36,10 @@ import com.kingodogo.buildscape.block.SnowyTallGrassBlock;
 import com.kingodogo.buildscape.block.StarBlock;
 import com.kingodogo.buildscape.block.SteelBoltBlock;
 import com.kingodogo.buildscape.block.StringLightBlock;
-import com.kingodogo.buildscape.feature.copper.WeatheringClimbableChainBlock;
+import com.kingodogo.buildscape.block.VerticalSlabBlock;
+import com.kingodogo.buildscape.block.WaterloggableGrateBlock;
+import com.kingodogo.buildscape.feature.copper.ModCopperDoorBlock;
+import com.kingodogo.buildscape.feature.copper.ModCopperTrapdoorBlock;
 import com.kingodogo.buildscape.feature.icicle.IcicleBlock;
 import com.kingodogo.buildscape.feature.icicle.IcicleCauldronBlock;
 import com.kingodogo.buildscape.feature.icicle.PackedIcicleBlock;
@@ -52,6 +55,7 @@ import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.WoodButtonBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -60,221 +64,25 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.registries.RegistryObject;
 
-import static com.kingodogo.buildscape.registry.ModBlocks.BLOCKS;
+import static com.kingodogo.buildscape.registry.blocks.BlocksRegister.BLOCKS;
 
-/** Part of the blocks registrations; see {@code ModBlocks}. */
-public final class BlocksPart04 {
+/**
+ * The blocks YELLOW_MONETS through FACTORY_LIGHT_GRAY_GLASS of the registry, part 4 of 12, in registration order.
+ * Named for its dominant families (decor, steel, light); the neighbouring families that share a run of the order
+ * with them are registered here too, because the registration order must not change.
+ * Load order: {@link WoodBlocks#init()} runs first (see the static block), so every holder registers in order whichever is touched first.
+ */
+public final class DecorBlocks {
 
-    private BlocksPart04() {}
+    private DecorBlocks() {}
 
-    /** Forces this class to load so its registrations run in the order {@code ModBlocks} calls it. */
+    /** Forces this class to load, which registers its blocks. */
     public static void init() {}
 
-    public static final RegistryObject<Block> EMERALD_CHAIN = BLOCKS.register(
-            "emerald_chain",
-            () -> new ClimbableChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.EMERALD)
-                            .strength(5.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> ANCIENT_STEEL_CHAIN = BLOCKS.register("ancient_steel_chain",
-            () -> new ClimbableChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY)
-                            .strength(5.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> NETHERITE_CHAIN = BLOCKS.register(
-            "netherite_chain",
-            () -> new ClimbableChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK)
-                            .strength(50.0f, 1200.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> LARGE_IRON_CHAIN = BLOCKS.register(
-            "large_iron_chain",
-            () -> new LargeChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
-                            .strength(5.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> LARGE_GOLD_CHAIN = BLOCKS.register(
-            "large_gold_chain",
-            () -> new LargeChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.GOLD)
-                            .strength(3.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> LARGE_DIAMOND_CHAIN = BLOCKS.register("large_diamond_chain",
-            () -> new LargeChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.DIAMOND)
-                            .strength(5.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> LARGE_EMERALD_CHAIN = BLOCKS.register("large_emerald_chain",
-            () -> new LargeChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.EMERALD)
-                            .strength(5.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> LARGE_ANCIENT_STEEL_CHAIN = BLOCKS
-            .register("large_ancient_steel_chain", () -> new LargeChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY)
-                            .strength(5.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> LARGE_NETHERITE_CHAIN = BLOCKS.register("large_netherite_chain",
-            () -> new LargeChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK)
-                            .strength(50.0f, 1200.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> COPPER_CHAIN = BLOCKS.register(
-            "copper_chain",
-            () -> new WeatheringClimbableChainBlock(
-                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_ORANGE)
-                            .strength(3.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> EXPOSED_COPPER_CHAIN = BLOCKS.register("exposed_copper_chain",
-            () -> new WeatheringClimbableChainBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.METAL,
-                            MaterialColor.TERRACOTTA_ORANGE)
-                            .strength(3.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> WEATHERED_COPPER_CHAIN = BLOCKS.register("weathered_copper_chain",
-            () -> new WeatheringClimbableChainBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.METAL,
-                            MaterialColor.WARPED_WART_BLOCK)
-                            .strength(3.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> OXIDIZED_COPPER_CHAIN = BLOCKS.register("oxidized_copper_chain",
-            () -> new WeatheringClimbableChainBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.METAL,
-                            MaterialColor.WARPED_NYLIUM)
-                            .strength(3.0f, 6.0f)
-                            .requiresCorrectToolForDrops()
-                            .sound(SoundType.CHAIN)
-                            .noOcclusion()
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> RED_ROSE_VINES = BLOCKS.register(
-            "red_rose_vines",
-            () -> new RoseVinesBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.REPLACEABLE_PLANT,
-                            MaterialColor.COLOR_RED)
-                            .strength(0.2f)
-                            .sound(ModSounds.VINE_SOUNDS())
-                            .noCollission()
-                            .noOcclusion()));
-    public static final RegistryObject<Block> BLACK_ROSE_VINES = BLOCKS.register(
-            "black_rose_vines",
-            () -> new RoseVinesBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.REPLACEABLE_PLANT,
-                            MaterialColor.COLOR_BLACK)
-                            .strength(0.2f)
-                            .sound(ModSounds.VINE_SOUNDS())
-                            .noCollission()
-                            .noOcclusion()));
-    public static final RegistryObject<Block> BLUE_ROSE_VINES = BLOCKS.register(
-            "blue_rose_vines",
-            () -> new RoseVinesBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.REPLACEABLE_PLANT,
-                            MaterialColor.COLOR_BLUE)
-                            .strength(0.2f)
-                            .sound(ModSounds.VINE_SOUNDS())
-                            .noCollission()
-                            .noOcclusion()));
-    public static final RegistryObject<Block> WHITE_ROSE_VINES = BLOCKS.register(
-            "white_rose_vines",
-            () -> new RoseVinesBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.REPLACEABLE_PLANT,
-                            MaterialColor.SNOW)
-                            .strength(0.2f)
-                            .sound(ModSounds.VINE_SOUNDS())
-                            .noCollission()
-                            .noOcclusion()));
-    public static final RegistryObject<Block> RED_MONETS = BLOCKS.register(
-            "red_monets",
-            () -> new MonetFlowerBlock(
-                    BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_RED)
-                            .noCollission()
-                            .instabreak()
-                            .sound(SoundType.GRASS)));
-    public static final RegistryObject<Block> BLUE_MONETS = BLOCKS.register(
-            "blue_monets",
-            () -> new MonetFlowerBlock(
-                    BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_BLUE)
-                            .noCollission()
-                            .instabreak()
-                            .sound(SoundType.GRASS)));
-    public static final RegistryObject<Block> PURPLE_MONETS = BLOCKS.register(
-            "purple_monets",
-            () -> new MonetFlowerBlock(
-                    BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_PURPLE)
-                            .noCollission()
-                            .instabreak()
-                            .sound(SoundType.GRASS)));
-    public static final RegistryObject<Block> LIGHT_BLUE_MONETS = BLOCKS.register(
-            "light_blue_monets",
-            () -> new MonetFlowerBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.PLANT,
-                            MaterialColor.COLOR_LIGHT_BLUE)
-                            .noCollission()
-                            .instabreak()
-                            .sound(SoundType.GRASS)));
-    public static final RegistryObject<Block> PINK_MONETS = BLOCKS.register(
-            "pink_monets",
-            () -> new MonetFlowerBlock(
-                    BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_PINK)
-                            .noCollission()
-                            .instabreak()
-                            .sound(SoundType.GRASS)));
+    static {
+        WoodBlocks.init();
+    }
+
     public static final RegistryObject<Block> YELLOW_MONETS = BLOCKS.register(
             "yellow_monets",
             () -> new MonetFlowerBlock(
@@ -1629,4 +1437,559 @@ public final class BlocksPart04 {
             "steel_bolts",
             () -> new SteelBoltBlock(
                     BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+
+    public static final RegistryObject<Block> STEEL_DOOR = BLOCKS.register(
+            "steel_door",
+            () -> new ModCopperDoorBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.STEEL_BLOCK.get()).noOcclusion()));
+    public static final RegistryObject<Block> STEEL_TRAPDOOR = BLOCKS.register(
+            "steel_trapdoor",
+            () -> new ModCopperTrapdoorBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.STEEL_BLOCK.get()).noOcclusion()));
+    public static final RegistryObject<Block> STEEL_BUTTON = BLOCKS.register(
+            "steel_button",
+            () -> new ModButtonBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.STEEL_BLOCK.get()).noCollission().strength(0.5f)));
+    public static final RegistryObject<Block> STEEL_PRESSURE_PLATE = BLOCKS.register(
+            "steel_pressure_plate",
+            () -> new ModPressurePlateBlock(
+                    150,
+                    BlockBehaviour.Properties.copy(DecorBlocks.STEEL_BLOCK.get()).noCollission().strength(0.5f)));
+
+    public static final RegistryObject<Block> SCRAPED_STEEL_SLAB = BLOCKS.register(
+            "scraped_steel_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.SCRAPED_STEEL.get())));
+    public static final RegistryObject<Block> SCRAPED_STEEL_VERTICAL_SLAB = BLOCKS.register(
+            "scraped_steel_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    DecorBlocks.SCRAPED_STEEL.get(),
+                    BlockBehaviour.Properties.copy(SCRAPED_STEEL_SLAB.get())));
+
+    public static final RegistryObject<Block> RUSTIC_SCRAPED_STEEL_SLAB = BLOCKS.register(
+            "rustic_scraped_steel_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.RUSTIC_SCRAPED_STEEL.get())));
+    public static final RegistryObject<Block> RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB = BLOCKS.register(
+            "rustic_scraped_steel_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    DecorBlocks.RUSTIC_SCRAPED_STEEL.get(),
+                    BlockBehaviour.Properties.copy(RUSTIC_SCRAPED_STEEL_SLAB.get())));
+
+    public static final RegistryObject<Block> STACKED_STEEL_SLAB = BLOCKS.register(
+            "stacked_steel_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.STACKED_STEEL.get())));
+    public static final RegistryObject<Block> STACKED_STEEL_VERTICAL_SLAB = BLOCKS.register(
+            "stacked_steel_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    DecorBlocks.STACKED_STEEL.get(),
+                    BlockBehaviour.Properties.copy(STACKED_STEEL_SLAB.get())));
+    public static final RegistryObject<Block> STACKED_STEEL_STAIRS = BLOCKS.register(
+            "stacked_steel_stairs",
+            () -> new ModStairBlock(
+                    DecorBlocks.STACKED_STEEL.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(DecorBlocks.STACKED_STEEL.get())));
+
+    public static final RegistryObject<Block> STEEL_PANELS_SLAB = BLOCKS.register(
+            "steel_panels_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.STEEL_PANELS.get())));
+    public static final RegistryObject<Block> STEEL_PANELS_VERTICAL_SLAB = BLOCKS.register(
+            "steel_panels_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    DecorBlocks.STEEL_PANELS.get(),
+                    BlockBehaviour.Properties.copy(STEEL_PANELS_SLAB.get())));
+    public static final RegistryObject<Block> STEEL_PANELS_STAIRS = BLOCKS.register(
+            "steel_panels_stairs",
+            () -> new ModStairBlock(
+                    DecorBlocks.STEEL_PANELS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(DecorBlocks.STEEL_PANELS.get())));
+
+    public static final RegistryObject<Block> CROSSED_STEEL_PANELS_SLAB = BLOCKS.register(
+            "crossed_steel_panels_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.CROSSED_STEEL_PANELS.get())));
+    public static final RegistryObject<Block> CROSSED_STEEL_PANELS_VERTICAL_SLAB = BLOCKS.register(
+            "crossed_steel_panels_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    DecorBlocks.CROSSED_STEEL_PANELS.get(),
+                    BlockBehaviour.Properties.copy(CROSSED_STEEL_PANELS_SLAB.get())));
+
+    public static final RegistryObject<Block> STEEL_MESH_BLOCK_SLAB = BLOCKS.register(
+            "steel_mesh_block_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.copy(DecorBlocks.STEEL_MESH_BLOCK.get())));
+    public static final RegistryObject<Block> STEEL_MESH_BLOCK_VERTICAL_SLAB = BLOCKS.register(
+            "steel_mesh_block_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    DecorBlocks.STEEL_MESH_BLOCK.get(),
+                    BlockBehaviour.Properties.copy(STEEL_MESH_BLOCK_SLAB.get())));
+    public static final RegistryObject<Block> STEEL_MESH_BLOCK_STAIRS = BLOCKS.register(
+            "steel_mesh_block_stairs",
+            () -> new ModStairBlock(
+                    DecorBlocks.STEEL_MESH_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(DecorBlocks.STEEL_MESH_BLOCK.get())));
+    public static final RegistryObject<Block> STEEL_BLOCK_STAIRS = BLOCKS.register(
+            "steel_block_stairs",
+            () -> new ModStairBlock(
+                    DecorBlocks.STEEL_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> PRESSED_STEEL = BLOCKS.register(
+            "pressed_steel",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> PRESSED_STEEL_STAIRS = BLOCKS.register(
+            "pressed_steel_stairs",
+            () -> new ModStairBlock(
+                    PRESSED_STEEL.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CUT_STEEL = BLOCKS.register(
+            "cut_steel",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CUT_STEEL_STAIRS = BLOCKS.register(
+            "cut_steel_stairs",
+            () -> new ModStairBlock(
+                    CUT_STEEL.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> POLISHED_STEEL = BLOCKS.register(
+            "polished_steel",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> POLISHED_STEEL_STAIRS = BLOCKS.register(
+            "polished_steel_stairs",
+            () -> new ModStairBlock(
+                    POLISHED_STEEL.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> FACTORY_STEEL_PANEL = BLOCKS.register(
+            "factory_steel_panel",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> STEEL_CASING = BLOCKS.register(
+            "steel_casing",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> STEEL_TRIM = BLOCKS.register(
+            "steel_trim",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> STEEL_PILLAR = BLOCKS.register(
+            "steel_pillar",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> BOLTED_STEEL_PILLAR = BLOCKS.register(
+            "bolted_steel_pillar",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> STEEL_GRATE = BLOCKS.register(
+            "steel_grate",
+            () -> new WaterloggableGrateBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(ModSounds.COPPER_GRATE_SOUNDS())
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> STEEL_FAN = BLOCKS.register(
+            "steel_fan",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> STEEL_BLOCK_SLAB = BLOCKS.register(
+            "steel_block_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> STEEL_BLOCK_WALL = BLOCKS.register(
+            "steel_block_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> POLISHED_STEEL_SLAB = BLOCKS.register(
+            "polished_steel_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> POLISHED_STEEL_WALL = BLOCKS.register(
+            "polished_steel_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> PRESSED_STEEL_SLAB = BLOCKS.register(
+            "pressed_steel_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> PRESSED_STEEL_WALL = BLOCKS.register(
+            "pressed_steel_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CUT_STEEL_SLAB = BLOCKS.register(
+            "cut_steel_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CUT_STEEL_WALL = BLOCKS.register(
+            "cut_steel_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_BLACK = BLOCKS.register(
+            "caution_black",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_BLACK_STAIRS = BLOCKS.register(
+            "caution_black_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_BLACK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_BLUE = BLOCKS.register(
+            "caution_blue",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLUE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_BLUE_STAIRS = BLOCKS.register(
+            "caution_blue_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_BLUE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLUE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_FACTORY = BLOCKS.register(
+            "caution_factory",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_FACTORY_STAIRS = BLOCKS.register(
+            "caution_factory_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_FACTORY.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_RED = BLOCKS.register(
+            "caution_red",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_RED)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_RED_STAIRS = BLOCKS.register(
+            "caution_red_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_RED.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_RED)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> FRAMED_CAUTION = BLOCKS.register(
+            "framed_caution",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> FRAMED_CAUTION_STAIRS = BLOCKS.register(
+            "framed_caution_stairs",
+            () -> new StairBlock(
+                    () -> FRAMED_CAUTION.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_WHITE = BLOCKS.register(
+            "caution_white",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.SNOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_WHITE_STAIRS = BLOCKS.register(
+            "caution_white_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_WHITE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.SNOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_LIME = BLOCKS.register(
+            "caution_lime",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_LIME_STAIRS = BLOCKS.register(
+            "caution_lime_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_LIME.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_PINK = BLOCKS.register(
+            "caution_pink",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_PINK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_PINK_STAIRS = BLOCKS.register(
+            "caution_pink_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_PINK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_PINK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_YELLOW = BLOCKS.register(
+            "caution_yellow",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_YELLOW_STAIRS = BLOCKS.register(
+            "caution_yellow_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_YELLOW.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_CANDY = BLOCKS.register(
+            "caution_candy",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_RED)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_CANDY_STAIRS = BLOCKS.register(
+            "caution_candy_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_CANDY.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_RED)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_COTTONCANDY = BLOCKS.register(
+            "caution_cottoncandy",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_PINK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_COTTONCANDY_STAIRS = BLOCKS.register(
+            "caution_cottoncandy_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_COTTONCANDY.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_PINK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_MINTCANDY = BLOCKS.register(
+            "caution_mintcandy",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_MINTCANDY_STAIRS = BLOCKS.register(
+            "caution_mintcandy_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_MINTCANDY.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_CITRUSCANDY = BLOCKS.register(
+            "caution_citruscandy",
+            () -> new RotatedPillarBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_ORANGE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_CITRUSCANDY_STAIRS = BLOCKS.register(
+            "caution_citruscandy_stairs",
+            () -> new StairBlock(
+                    () -> CAUTION_CITRUSCANDY.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_ORANGE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_BLACK_SLAB = BLOCKS.register(
+            "caution_black_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_BLUE_SLAB = BLOCKS.register(
+            "caution_blue_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLUE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_FACTORY_SLAB = BLOCKS.register(
+            "caution_factory_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_RED_SLAB = BLOCKS.register(
+            "caution_red_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_RED)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> FRAMED_CAUTION_SLAB = BLOCKS.register(
+            "framed_caution_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_WHITE_SLAB = BLOCKS.register(
+            "caution_white_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.SNOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_LIME_SLAB = BLOCKS.register(
+            "caution_lime_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_PINK_SLAB = BLOCKS.register(
+            "caution_pink_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_PINK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_YELLOW_SLAB = BLOCKS.register(
+            "caution_yellow_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_CANDY_SLAB = BLOCKS.register(
+            "caution_candy_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_RED)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_COTTONCANDY_SLAB = BLOCKS.register(
+            "caution_cottoncandy_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_PINK)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_MINTCANDY_SLAB = BLOCKS.register(
+            "caution_mintcandy_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> CAUTION_CITRUSCANDY_SLAB = BLOCKS.register(
+            "caution_citruscandy_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_ORANGE)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> FACTORY_WHITE_GLASS = BLOCKS.register(
+            "factory_white_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.SNOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_LIGHT_GRAY_GLASS = BLOCKS.register(
+            "factory_light_gray_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
 }

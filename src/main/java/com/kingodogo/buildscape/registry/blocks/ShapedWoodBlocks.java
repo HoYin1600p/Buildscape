@@ -1,7 +1,10 @@
 package com.kingodogo.buildscape.registry.blocks;
 
+import com.kingodogo.buildscape.block.BigBookBlock;
+import com.kingodogo.buildscape.block.CherryTreeGrower;
 import com.kingodogo.buildscape.block.ColoredMossBlock;
 import com.kingodogo.buildscape.block.ColoredMossLayersBlock;
+import com.kingodogo.buildscape.block.CushionBlock;
 import com.kingodogo.buildscape.block.LogSlabBlock;
 import com.kingodogo.buildscape.block.ModDoorBlock;
 import com.kingodogo.buildscape.block.ModSlabBlock;
@@ -10,17 +13,17 @@ import com.kingodogo.buildscape.block.ModTrapdoorBlock;
 import com.kingodogo.buildscape.block.ModWallBlock;
 import com.kingodogo.buildscape.block.MossOverlayBlock;
 import com.kingodogo.buildscape.block.MuffBlock;
+import com.kingodogo.buildscape.block.PaleOakTreeGrower;
 import com.kingodogo.buildscape.block.PoplarTreeGrower;
-import com.kingodogo.buildscape.block.SoftFabricBlock;
-import com.kingodogo.buildscape.block.SpoolBlock;
+import com.kingodogo.buildscape.block.StrawBedBlock;
 import com.kingodogo.buildscape.block.VerticalSlabBlock;
+import com.kingodogo.buildscape.block.WallpaperFlatBlock;
 import com.kingodogo.buildscape.feature.copper.WeatheringVerticalSlabBlock;
-import com.kingodogo.buildscape.feature.geyser.PotentSulfurBlock;
-import com.kingodogo.buildscape.feature.geyser.SulfurSpikeBlock;
 import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CarpetBlock;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -29,6 +32,8 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.WoodButtonBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -36,167 +41,30 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.registries.RegistryObject;
 
-import static com.kingodogo.buildscape.registry.ModBlocks.BLOCKS;
+import static com.kingodogo.buildscape.registry.blocks.BlocksRegister.BLOCKS;
 
-/** Part of the blocks registrations; see {@code ModBlocks}. */
-public final class BlocksPart08 {
+/**
+ * The blocks CINNABAR_BRICKS_SLAB through PALE_MOSS_CARPET of the registry, part 8 of 12, in registration order.
+ * Named for its dominant families (wood, wool, stone); the neighbouring families that share a run of the order
+ * with them are registered here too, because the registration order must not change.
+ * Load order: {@link ShapedStoneBlocks#init()} runs first (see the static block), so every holder registers in order whichever is touched first.
+ */
+public final class ShapedWoodBlocks {
 
-    private BlocksPart08() {}
+    private ShapedWoodBlocks() {}
 
-    /** Forces this class to load so its registrations run in the order {@code ModBlocks} calls it. */
+    /** Forces this class to load, which registers its blocks. */
     public static void init() {}
 
-    public static final RegistryObject<Block> ASHPEN_LOG_VERTICAL_SLAB = BLOCKS.register("ashpen_log_vertical_slab",
-            () -> new VerticalSlabBlock(
-                    BlocksPart07.ASHPEN_LOG.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart07.ASHPEN_LOG_SLAB.get())));
-    public static final RegistryObject<Block> ASHPEN_WOOD_VERTICAL_SLAB = BLOCKS.register(
-            "ashpen_wood_vertical_slab",
-            () -> new VerticalSlabBlock(
-                    BlocksPart07.ASHPEN_WOOD.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart07.ASHPEN_WOOD_SLAB.get())));
+    static {
+        ShapedStoneBlocks.init();
+    }
 
-    public static final RegistryObject<Block> BLACK_DYE_SACK = BLOCKS.register("black_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL)));
-    public static final RegistryObject<Block> BLUE_DYE_SACK = BLOCKS.register("blue_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.BLUE_WOOL)));
-    public static final RegistryObject<Block> BROWN_DYE_SACK = BLOCKS.register("brown_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.BROWN_WOOL)));
-    public static final RegistryObject<Block> CYAN_DYE_SACK = BLOCKS.register("cyan_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.CYAN_WOOL)));
-    public static final RegistryObject<Block> GRAY_DYE_SACK = BLOCKS.register("gray_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.GRAY_WOOL)));
-    public static final RegistryObject<Block> GREEN_DYE_SACK = BLOCKS.register("green_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.GREEN_WOOL)));
-    public static final RegistryObject<Block> LIGHT_BLUE_DYE_SACK = BLOCKS.register("light_blue_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_WOOL)));
-    public static final RegistryObject<Block> LIGHT_GRAY_DYE_SACK = BLOCKS.register("light_gray_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_WOOL)));
-    public static final RegistryObject<Block> LIME_DYE_SACK = BLOCKS.register("lime_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.LIME_WOOL)));
-    public static final RegistryObject<Block> MAGENTA_DYE_SACK = BLOCKS.register("magenta_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.MAGENTA_WOOL)));
-    public static final RegistryObject<Block> ORANGE_DYE_SACK = BLOCKS.register("orange_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.ORANGE_WOOL)));
-    public static final RegistryObject<Block> PINK_DYE_SACK = BLOCKS.register("pink_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.PINK_WOOL)));
-    public static final RegistryObject<Block> PURPLE_DYE_SACK = BLOCKS.register("purple_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.PURPLE_WOOL)));
-    public static final RegistryObject<Block> RED_DYE_SACK = BLOCKS.register("red_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.RED_WOOL)));
-    public static final RegistryObject<Block> WHITE_DYE_SACK = BLOCKS.register("white_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)));
-    public static final RegistryObject<Block> YELLOW_DYE_SACK = BLOCKS.register("yellow_dye_sack",
-            () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.YELLOW_WOOL)));
-    public static final RegistryObject<Block> GLOW_INK_SACK = BLOCKS.register("glow_ink_sack",
-            () -> new SoftFabricBlock(
-                    BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL).lightLevel(state -> 7)));
-
-    public static final RegistryObject<Block> SPOOL = BLOCKS.register("spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)));
-    public static final RegistryObject<Block> GLOWING_SPOOL = BLOCKS.register("glowing_spool",
-            () -> new SpoolBlock(
-                    BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL).lightLevel(state -> 7)));
-    public static final RegistryObject<Block> BLACK_SPOOL = BLOCKS.register("black_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL)));
-    public static final RegistryObject<Block> BLUE_SPOOL = BLOCKS.register("blue_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.BLUE_WOOL)));
-    public static final RegistryObject<Block> BROWN_SPOOL = BLOCKS.register("brown_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.BROWN_WOOL)));
-    public static final RegistryObject<Block> CYAN_SPOOL = BLOCKS.register("cyan_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.CYAN_WOOL)));
-    public static final RegistryObject<Block> GRAY_SPOOL = BLOCKS.register("gray_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.GRAY_WOOL)));
-    public static final RegistryObject<Block> GREEN_SPOOL = BLOCKS.register("green_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.GREEN_WOOL)));
-    public static final RegistryObject<Block> LIGHT_BLUE_SPOOL = BLOCKS.register("light_blue_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_WOOL)));
-    public static final RegistryObject<Block> LIGHT_GRAY_SPOOL = BLOCKS.register("light_gray_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_WOOL)));
-    public static final RegistryObject<Block> LIME_SPOOL = BLOCKS.register("lime_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.LIME_WOOL)));
-    public static final RegistryObject<Block> MAGENTA_SPOOL = BLOCKS.register("magenta_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.MAGENTA_WOOL)));
-    public static final RegistryObject<Block> ORANGE_SPOOL = BLOCKS.register("orange_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.ORANGE_WOOL)));
-    public static final RegistryObject<Block> PINK_SPOOL = BLOCKS.register("pink_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.PINK_WOOL)));
-    public static final RegistryObject<Block> PURPLE_SPOOL = BLOCKS.register("purple_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.PURPLE_WOOL)));
-    public static final RegistryObject<Block> RED_SPOOL = BLOCKS.register("red_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.RED_WOOL)));
-    public static final RegistryObject<Block> WHITE_SPOOL = BLOCKS.register("white_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)));
-    public static final RegistryObject<Block> YELLOW_SPOOL = BLOCKS.register("yellow_spool",
-            () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.YELLOW_WOOL)));
-
-    public static final RegistryObject<Block> SULFUR = BLOCKS.register("sulfur",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE)));
-    public static final RegistryObject<Block> POLISHED_SULFUR = BLOCKS.register("polished_sulfur",
-            () -> new Block(BlockBehaviour.Properties.copy(SULFUR.get())));
-    public static final RegistryObject<Block> CHISELED_SULFUR = BLOCKS.register("chiseled_sulfur",
-            () -> new Block(BlockBehaviour.Properties.copy(SULFUR.get())));
-    public static final RegistryObject<Block> SULFUR_BRICKS = BLOCKS.register("sulfur_bricks",
-            () -> new Block(BlockBehaviour.Properties.copy(SULFUR.get())));
-    public static final RegistryObject<Block> SULFUR_STAIRS = BLOCKS.register("sulfur_stairs",
-            () -> new ModStairBlock(SULFUR.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(SULFUR.get())));
-    public static final RegistryObject<Block> SULFUR_SLAB = BLOCKS.register("sulfur_slab",
-            () -> new ModSlabBlock(SULFUR.get(), BlockBehaviour.Properties.copy(SULFUR.get())));
-    public static final RegistryObject<Block> SULFUR_WALL = BLOCKS.register("sulfur_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.copy(SULFUR.get())));
-    public static final RegistryObject<Block> POLISHED_SULFUR_STAIRS = BLOCKS.register("polished_sulfur_stairs",
-            () -> new ModStairBlock(POLISHED_SULFUR.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(POLISHED_SULFUR.get())));
-    public static final RegistryObject<Block> POLISHED_SULFUR_SLAB = BLOCKS.register("polished_sulfur_slab",
-            () -> new ModSlabBlock(POLISHED_SULFUR.get(),
-                    BlockBehaviour.Properties.copy(POLISHED_SULFUR.get())));
-    public static final RegistryObject<Block> POLISHED_SULFUR_WALL = BLOCKS.register("polished_sulfur_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.copy(POLISHED_SULFUR.get())));
-    public static final RegistryObject<Block> SULFUR_BRICKS_STAIRS = BLOCKS.register("sulfur_bricks_stairs",
-            () -> new ModStairBlock(SULFUR_BRICKS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(SULFUR_BRICKS.get())));
-    public static final RegistryObject<Block> SULFUR_BRICKS_SLAB = BLOCKS.register("sulfur_bricks_slab",
-            () -> new ModSlabBlock(SULFUR_BRICKS.get(),
-                    BlockBehaviour.Properties.copy(SULFUR_BRICKS.get())));
-    public static final RegistryObject<Block> SULFUR_BRICKS_WALL = BLOCKS.register("sulfur_bricks_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.copy(SULFUR_BRICKS.get())));
-    public static final RegistryObject<Block> SULFUR_SPIKE = BLOCKS.register("sulfur_spike",
-            () -> new SulfurSpikeBlock(BlockBehaviour.Properties.copy(Blocks.POINTED_DRIPSTONE)));
-    public static final RegistryObject<Block> POTENT_SULFUR = BLOCKS.register("potent_sulfur",
-            () -> new PotentSulfurBlock(BlockBehaviour.Properties.copy(Blocks.STONE)));
-
-    public static final RegistryObject<Block> CINNABAR = BLOCKS.register("cinnabar",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE)));
-    public static final RegistryObject<Block> POLISHED_CINNABAR = BLOCKS.register("polished_cinnabar",
-            () -> new Block(BlockBehaviour.Properties.copy(CINNABAR.get())));
-    public static final RegistryObject<Block> CHISELED_CINNABAR = BLOCKS.register("chiseled_cinnabar",
-            () -> new Block(BlockBehaviour.Properties.copy(CINNABAR.get())));
-    public static final RegistryObject<Block> CINNABAR_BRICKS = BLOCKS.register("cinnabar_bricks",
-            () -> new Block(BlockBehaviour.Properties.copy(CINNABAR.get())));
-    public static final RegistryObject<Block> CINNABAR_STAIRS = BLOCKS.register("cinnabar_stairs",
-            () -> new ModStairBlock(CINNABAR.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(CINNABAR.get())));
-    public static final RegistryObject<Block> CINNABAR_SLAB = BLOCKS.register("cinnabar_slab",
-            () -> new ModSlabBlock(CINNABAR.get(), BlockBehaviour.Properties.copy(CINNABAR.get())));
-    public static final RegistryObject<Block> CINNABAR_WALL = BLOCKS.register("cinnabar_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.copy(CINNABAR.get())));
-    public static final RegistryObject<Block> POLISHED_CINNABAR_STAIRS = BLOCKS.register("polished_cinnabar_stairs",
-            () -> new ModStairBlock(POLISHED_CINNABAR.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(POLISHED_CINNABAR.get())));
-    public static final RegistryObject<Block> POLISHED_CINNABAR_SLAB = BLOCKS.register("polished_cinnabar_slab",
-            () -> new ModSlabBlock(POLISHED_CINNABAR.get(),
-                    BlockBehaviour.Properties.copy(POLISHED_CINNABAR.get())));
-    public static final RegistryObject<Block> POLISHED_CINNABAR_WALL = BLOCKS.register("polished_cinnabar_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.copy(POLISHED_CINNABAR.get())));
-    public static final RegistryObject<Block> CINNABAR_BRICKS_STAIRS = BLOCKS.register("cinnabar_bricks_stairs",
-            () -> new ModStairBlock(CINNABAR_BRICKS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(CINNABAR_BRICKS.get())));
     public static final RegistryObject<Block> CINNABAR_BRICKS_SLAB = BLOCKS.register("cinnabar_bricks_slab",
-            () -> new ModSlabBlock(CINNABAR_BRICKS.get(),
-                    BlockBehaviour.Properties.copy(CINNABAR_BRICKS.get())));
+            () -> new ModSlabBlock(ShapedStoneBlocks.CINNABAR_BRICKS.get(),
+                    BlockBehaviour.Properties.copy(ShapedStoneBlocks.CINNABAR_BRICKS.get())));
     public static final RegistryObject<Block> CINNABAR_BRICKS_WALL = BLOCKS.register("cinnabar_bricks_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.copy(CINNABAR_BRICKS.get())));
+            () -> new ModWallBlock(BlockBehaviour.Properties.copy(ShapedStoneBlocks.CINNABAR_BRICKS.get())));
 
     public static final RegistryObject<Block> POPLAR_LOG = BLOCKS.register("poplar_log",
             () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
@@ -389,10 +257,10 @@ public final class BlocksPart08 {
             () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
     public static final RegistryObject<Block> RED_MOSS_LAYERS = BLOCKS.register("red_moss_layers",
             () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                    () -> ModItems.RED_MOSS_LAYERS.get(), () -> BlocksPart08.RED_MOSS_BLOCK.get()));
+                    () -> ModItems.RED_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.RED_MOSS_BLOCK.get()));
     public static final RegistryObject<Block> RED_MOSS_BLOCK = BLOCKS.register("red_moss_block",
             () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK), RED_MOSS_CARPET,
-                    RED_MOSS_OVERLAY, RED_MOSS_LAYERS, () -> POPLAR_SAPLING.get(), () -> BlocksPart09.RED_BUSH.get()));
+                    RED_MOSS_OVERLAY, RED_MOSS_LAYERS, () -> POPLAR_SAPLING.get(), () -> CopperBlocks.RED_BUSH.get()));
     public static final RegistryObject<Block> RED_MOSS_BLOCK_SLAB = BLOCKS.register("red_moss_block_slab",
             () -> new ModSlabBlock(RED_MOSS_BLOCK.get(),
                     BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
@@ -406,11 +274,11 @@ public final class BlocksPart08 {
             () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
     public static final RegistryObject<Block> ORANGE_MOSS_LAYERS = BLOCKS.register("orange_moss_layers",
             () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                    () -> ModItems.ORANGE_MOSS_LAYERS.get(), () -> BlocksPart08.ORANGE_MOSS_BLOCK.get()));
+                    () -> ModItems.ORANGE_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.ORANGE_MOSS_BLOCK.get()));
     public static final RegistryObject<Block> ORANGE_MOSS_BLOCK = BLOCKS.register("orange_moss_block",
             () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
                     ORANGE_MOSS_CARPET, ORANGE_MOSS_OVERLAY, ORANGE_MOSS_LAYERS, () -> POPLAR_SAPLING.get(),
-                    () -> BlocksPart09.RED_BUSH.get()));
+                    () -> CopperBlocks.RED_BUSH.get()));
     public static final RegistryObject<Block> ORANGE_MOSS_BLOCK_SLAB = BLOCKS.register("orange_moss_block_slab",
             () -> new ModSlabBlock(ORANGE_MOSS_BLOCK.get(),
                     BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
@@ -424,11 +292,11 @@ public final class BlocksPart08 {
             () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
     public static final RegistryObject<Block> YELLOW_MOSS_LAYERS = BLOCKS.register("yellow_moss_layers",
             () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                    () -> ModItems.YELLOW_MOSS_LAYERS.get(), () -> BlocksPart08.YELLOW_MOSS_BLOCK.get()));
+                    () -> ModItems.YELLOW_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.YELLOW_MOSS_BLOCK.get()));
     public static final RegistryObject<Block> YELLOW_MOSS_BLOCK = BLOCKS.register("yellow_moss_block",
             () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
                     YELLOW_MOSS_CARPET, YELLOW_MOSS_OVERLAY, YELLOW_MOSS_LAYERS, () -> POPLAR_SAPLING.get(),
-                    () -> BlocksPart09.RED_BUSH.get()));
+                    () -> CopperBlocks.RED_BUSH.get()));
     public static final RegistryObject<Block> YELLOW_MOSS_BLOCK_SLAB = BLOCKS.register("yellow_moss_block_slab",
             () -> new ModSlabBlock(YELLOW_MOSS_BLOCK.get(),
                     BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
@@ -567,42 +435,42 @@ public final class BlocksPart08 {
                     BlockBehaviour.Properties.copy(TUFF_BRICK_SLAB.get())));
     public static final RegistryObject<Block> SULFUR_VERTICAL_SLAB = BLOCKS.register("sulfur_vertical_slab",
             () -> new VerticalSlabBlock(
-                    SULFUR.get(),
-                    BlockBehaviour.Properties.copy(SULFUR_SLAB.get())));
+                    ShapedStoneBlocks.SULFUR.get(),
+                    BlockBehaviour.Properties.copy(ShapedStoneBlocks.SULFUR_SLAB.get())));
     public static final RegistryObject<Block> POLISHED_SULFUR_VERTICAL_SLAB = BLOCKS.register(
             "polished_sulfur_vertical_slab",
             () -> new VerticalSlabBlock(
-                    POLISHED_SULFUR.get(),
-                    BlockBehaviour.Properties.copy(POLISHED_SULFUR_SLAB.get())));
+                    ShapedStoneBlocks.POLISHED_SULFUR.get(),
+                    BlockBehaviour.Properties.copy(ShapedStoneBlocks.POLISHED_SULFUR_SLAB.get())));
     public static final RegistryObject<Block> SULFUR_BRICKS_VERTICAL_SLAB = BLOCKS.register(
             "sulfur_bricks_vertical_slab",
             () -> new VerticalSlabBlock(
-                    SULFUR_BRICKS.get(),
-                    BlockBehaviour.Properties.copy(SULFUR_BRICKS_SLAB.get())));
+                    ShapedStoneBlocks.SULFUR_BRICKS.get(),
+                    BlockBehaviour.Properties.copy(ShapedStoneBlocks.SULFUR_BRICKS_SLAB.get())));
     public static final RegistryObject<Block> CINNABAR_VERTICAL_SLAB = BLOCKS.register("cinnabar_vertical_slab",
             () -> new VerticalSlabBlock(
-                    CINNABAR.get(),
-                    BlockBehaviour.Properties.copy(CINNABAR_SLAB.get())));
+                    ShapedStoneBlocks.CINNABAR.get(),
+                    BlockBehaviour.Properties.copy(ShapedStoneBlocks.CINNABAR_SLAB.get())));
     public static final RegistryObject<Block> POLISHED_CINNABAR_VERTICAL_SLAB = BLOCKS.register(
             "polished_cinnabar_vertical_slab",
             () -> new VerticalSlabBlock(
-                    POLISHED_CINNABAR.get(),
-                    BlockBehaviour.Properties.copy(POLISHED_CINNABAR_SLAB.get())));
+                    ShapedStoneBlocks.POLISHED_CINNABAR.get(),
+                    BlockBehaviour.Properties.copy(ShapedStoneBlocks.POLISHED_CINNABAR_SLAB.get())));
     public static final RegistryObject<Block> CINNABAR_BRICKS_VERTICAL_SLAB = BLOCKS.register(
             "cinnabar_bricks_vertical_slab",
             () -> new VerticalSlabBlock(
-                    CINNABAR_BRICKS.get(),
+                    ShapedStoneBlocks.CINNABAR_BRICKS.get(),
                     BlockBehaviour.Properties.copy(CINNABAR_BRICKS_SLAB.get())));
     public static final RegistryObject<Block> STRIPPED_ASHPEN_LOG_VERTICAL_SLAB = BLOCKS.register(
             "stripped_ashpen_log_vertical_slab",
             () -> new VerticalSlabBlock(
-                    BlocksPart07.STRIPPED_ASHPEN_LOG.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart07.STRIPPED_ASHPEN_LOG_SLAB.get())));
+                    ShapedStoneBlocks.STRIPPED_ASHPEN_LOG.get(),
+                    BlockBehaviour.Properties.copy(ShapedStoneBlocks.STRIPPED_ASHPEN_LOG_SLAB.get())));
     public static final RegistryObject<Block> STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB = BLOCKS.register(
             "stripped_ashpen_wood_vertical_slab",
             () -> new VerticalSlabBlock(
-                    BlocksPart07.STRIPPED_ASHPEN_WOOD.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart07.STRIPPED_ASHPEN_WOOD_SLAB.get())));
+                    ShapedStoneBlocks.STRIPPED_ASHPEN_WOOD.get(),
+                    BlockBehaviour.Properties.copy(ShapedStoneBlocks.STRIPPED_ASHPEN_WOOD_SLAB.get())));
     public static final RegistryObject<Block> POPLAR_VERTICAL_SLAB = BLOCKS.register("poplar_vertical_slab",
             () -> new VerticalSlabBlock(
                     POPLAR_PLANKS.get(),
@@ -1548,4 +1416,253 @@ public final class BlocksPart08 {
             () -> new VerticalSlabBlock(
                     Blocks.AIR,
                     BlockBehaviour.Properties.copy(RED_WALLPAPER_SLAB.get())));
+
+    public static final RegistryObject<Block> BLACK_WALLPAPER_SLAB = BLOCKS.register(
+            "black_wallpaper_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLACK)
+                            .strength(0.8F)
+                            .sound(SoundType.WOOL)));
+    public static final RegistryObject<Block> BLACK_WALLPAPER_VERTICAL_SLAB = BLOCKS.register(
+            "black_wallpaper_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.AIR,
+                    BlockBehaviour.Properties.copy(BLACK_WALLPAPER_SLAB.get())));
+
+    public static final RegistryObject<Block> WHITE_WALLPAPER_FLAT = BLOCKS.register("white_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.SNOW)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> ORANGE_WALLPAPER_FLAT = BLOCKS.register("orange_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_ORANGE)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> MAGENTA_WALLPAPER_FLAT = BLOCKS.register("magenta_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_MAGENTA)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_BLUE_WALLPAPER_FLAT = BLOCKS.register("light_blue_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_LIGHT_BLUE)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> YELLOW_WALLPAPER_FLAT = BLOCKS.register("yellow_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_YELLOW)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> LIME_WALLPAPER_FLAT = BLOCKS.register("lime_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_LIGHT_GREEN)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> PINK_WALLPAPER_FLAT = BLOCKS.register("pink_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PINK)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> GRAY_WALLPAPER_FLAT = BLOCKS.register("gray_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GRAY)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_GRAY_WALLPAPER_FLAT = BLOCKS.register("light_gray_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_LIGHT_GRAY)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> CYAN_WALLPAPER_FLAT = BLOCKS.register("cyan_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_CYAN)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> PURPLE_WALLPAPER_FLAT = BLOCKS.register("purple_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PURPLE)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> BLUE_WALLPAPER_FLAT = BLOCKS.register("blue_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLUE)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> BROWN_WALLPAPER_FLAT = BLOCKS.register("brown_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BROWN)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> GREEN_WALLPAPER_FLAT = BLOCKS.register("green_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GREEN)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> RED_WALLPAPER_FLAT = BLOCKS.register("red_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_RED)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+    public static final RegistryObject<Block> BLACK_WALLPAPER_FLAT = BLOCKS.register("black_wallpaper_flat",
+            () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLACK)
+                    .strength(0.8F).sound(SoundType.WOOL).noOcclusion()));
+
+    public static final RegistryObject<Block> WHITE_CUSHION = BLOCKS.register("white_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> ORANGE_CUSHION = BLOCKS.register("orange_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.ORANGE_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> MAGENTA_CUSHION = BLOCKS.register("magenta_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.MAGENTA_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_BLUE_CUSHION = BLOCKS.register("light_blue_cushion",
+            () -> new CushionBlock(
+                    BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> YELLOW_CUSHION = BLOCKS.register("yellow_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.YELLOW_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> LIME_CUSHION = BLOCKS.register("lime_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIME_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> PINK_CUSHION = BLOCKS.register("pink_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.PINK_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> GRAY_CUSHION = BLOCKS.register("gray_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.GRAY_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_GRAY_CUSHION = BLOCKS.register("light_gray_cushion",
+            () -> new CushionBlock(
+                    BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> CYAN_CUSHION = BLOCKS.register("cyan_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.CYAN_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> PURPLE_CUSHION = BLOCKS.register("purple_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.PURPLE_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> BLUE_CUSHION = BLOCKS.register("blue_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BLUE_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> BROWN_CUSHION = BLOCKS.register("brown_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BROWN_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> GREEN_CUSHION = BLOCKS.register("green_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.GREEN_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> RED_CUSHION = BLOCKS.register("red_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.RED_WOOL).strength(0.4F).noOcclusion()));
+    public static final RegistryObject<Block> BLACK_CUSHION = BLOCKS.register("black_cushion",
+            () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL).strength(0.4F).noOcclusion()));
+
+    public static final RegistryObject<Block> STRAW_BED = BLOCKS.register("straw_bed",
+            () -> new StrawBedBlock(BlockBehaviour.Properties.copy(Blocks.HAY_BLOCK).noOcclusion()));
+
+    public static final RegistryObject<Block> BIG_BOOK = BLOCKS.register("big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> GLOWING_BIG_BOOK = BLOCKS.register("glowing_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF).lightLevel(s -> 15)));
+    public static final RegistryObject<Block> WHITE_BIG_BOOK = BLOCKS.register("white_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> ORANGE_BIG_BOOK = BLOCKS.register("orange_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> MAGENTA_BIG_BOOK = BLOCKS.register("magenta_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> LIGHT_BLUE_BIG_BOOK = BLOCKS.register("light_blue_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> YELLOW_BIG_BOOK = BLOCKS.register("yellow_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> LIME_BIG_BOOK = BLOCKS.register("lime_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> PINK_BIG_BOOK = BLOCKS.register("pink_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> GRAY_BIG_BOOK = BLOCKS.register("gray_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> LIGHT_GRAY_BIG_BOOK = BLOCKS.register("light_gray_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> CYAN_BIG_BOOK = BLOCKS.register("cyan_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> PURPLE_BIG_BOOK = BLOCKS.register("purple_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> BLUE_BIG_BOOK = BLOCKS.register("blue_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> BROWN_BIG_BOOK = BLOCKS.register("brown_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> GREEN_BIG_BOOK = BLOCKS.register("green_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> RED_BIG_BOOK = BLOCKS.register("red_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+    public static final RegistryObject<Block> BLACK_BIG_BOOK = BLOCKS.register("black_big_book",
+            () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+
+    public static final RegistryObject<Block> PALE_OAK_LOG = BLOCKS.register("pale_oak_log",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
+    public static final RegistryObject<Block> STRIPPED_PALE_OAK_LOG = BLOCKS.register("stripped_pale_oak_log",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
+    public static final RegistryObject<Block> PALE_OAK_WOOD = BLOCKS.register("pale_oak_wood",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD)));
+    public static final RegistryObject<Block> STRIPPED_PALE_OAK_WOOD = BLOCKS.register("stripped_pale_oak_wood",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD)));
+    public static final RegistryObject<Block> PALE_OAK_PLANKS = BLOCKS.register("pale_oak_planks",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+    public static final RegistryObject<Block> PALE_OAK_STAIRS = BLOCKS.register("pale_oak_stairs",
+            () -> new StairBlock(() -> PALE_OAK_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(Blocks.OAK_STAIRS)));
+    public static final RegistryObject<Block> PALE_OAK_SLAB = BLOCKS.register("pale_oak_slab",
+            () -> new ModSlabBlock(PALE_OAK_PLANKS.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> PALE_OAK_VERTICAL_SLAB = BLOCKS.register("pale_oak_vertical_slab",
+            () -> new VerticalSlabBlock(PALE_OAK_PLANKS.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> PALE_OAK_FENCE = BLOCKS.register("pale_oak_fence",
+            () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE)));
+    public static final RegistryObject<Block> PALE_OAK_FENCE_GATE = BLOCKS.register("pale_oak_fence_gate",
+            () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE_GATE)));
+    public static final RegistryObject<Block> PALE_OAK_DOOR = BLOCKS.register("pale_oak_door",
+            () -> new DoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR)));
+    public static final RegistryObject<Block> PALE_OAK_TRAPDOOR = BLOCKS.register("pale_oak_trapdoor",
+            () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_TRAPDOOR)));
+    public static final RegistryObject<Block> PALE_OAK_BUTTON = BLOCKS.register("pale_oak_button",
+            () -> new WoodButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON)));
+    public static final RegistryObject<Block> PALE_OAK_PRESSURE_PLATE = BLOCKS.register("pale_oak_pressure_plate",
+            () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING,
+                    BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE)));
+    public static final RegistryObject<Block> PALE_OAK_LEAVES = BLOCKS.register("pale_oak_leaves",
+            () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
+    public static final RegistryObject<Block> PALE_OAK_SAPLING = BLOCKS.register("pale_oak_sapling",
+            () -> new SaplingBlock(new PaleOakTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+
+    public static final RegistryObject<Block> PALE_OAK_LOG_SLAB = BLOCKS.register("pale_oak_log_slab",
+            () -> new LogSlabBlock(PALE_OAK_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> PALE_OAK_LOG_VERTICAL_SLAB = BLOCKS.register("pale_oak_log_vertical_slab",
+            () -> new VerticalSlabBlock(PALE_OAK_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> STRIPPED_PALE_OAK_LOG_SLAB = BLOCKS.register("stripped_pale_oak_log_slab",
+            () -> new LogSlabBlock(STRIPPED_PALE_OAK_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB = BLOCKS.register(
+            "stripped_pale_oak_log_vertical_slab",
+            () -> new VerticalSlabBlock(STRIPPED_PALE_OAK_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> PALE_OAK_WOOD_SLAB = BLOCKS.register("pale_oak_wood_slab",
+            () -> new LogSlabBlock(PALE_OAK_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> PALE_OAK_WOOD_VERTICAL_SLAB = BLOCKS.register(
+            "pale_oak_wood_vertical_slab",
+            () -> new VerticalSlabBlock(PALE_OAK_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> STRIPPED_PALE_OAK_WOOD_SLAB = BLOCKS.register(
+            "stripped_pale_oak_wood_slab",
+            () -> new LogSlabBlock(STRIPPED_PALE_OAK_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB = BLOCKS.register(
+            "stripped_pale_oak_wood_vertical_slab",
+            () -> new VerticalSlabBlock(STRIPPED_PALE_OAK_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+
+    public static final RegistryObject<Block> CHERRY_LOG = BLOCKS.register("cherry_log",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
+    public static final RegistryObject<Block> STRIPPED_CHERRY_LOG = BLOCKS.register("stripped_cherry_log",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
+    public static final RegistryObject<Block> CHERRY_WOOD = BLOCKS.register("cherry_wood",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD)));
+    public static final RegistryObject<Block> STRIPPED_CHERRY_WOOD = BLOCKS.register("stripped_cherry_wood",
+            () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD)));
+    public static final RegistryObject<Block> CHERRY_PLANKS = BLOCKS.register("cherry_planks",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+    public static final RegistryObject<Block> CHERRY_STAIRS = BLOCKS.register("cherry_stairs",
+            () -> new ModStairBlock(CHERRY_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(Blocks.OAK_STAIRS)));
+    public static final RegistryObject<Block> CHERRY_SLAB = BLOCKS.register("cherry_slab",
+            () -> new ModSlabBlock(CHERRY_PLANKS.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> CHERRY_VERTICAL_SLAB = BLOCKS.register("cherry_vertical_slab",
+            () -> new VerticalSlabBlock(CHERRY_PLANKS.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> CHERRY_FENCE = BLOCKS.register("cherry_fence",
+            () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE)));
+    public static final RegistryObject<Block> CHERRY_FENCE_GATE = BLOCKS.register("cherry_fence_gate",
+            () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE_GATE)));
+    public static final RegistryObject<Block> CHERRY_DOOR = BLOCKS.register("cherry_door",
+            () -> new DoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR)));
+    public static final RegistryObject<Block> CHERRY_TRAPDOOR = BLOCKS.register("cherry_trapdoor",
+            () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_TRAPDOOR)));
+    public static final RegistryObject<Block> CHERRY_BUTTON = BLOCKS.register("cherry_button",
+            () -> new WoodButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON)));
+    public static final RegistryObject<Block> CHERRY_PRESSURE_PLATE = BLOCKS.register("cherry_pressure_plate",
+            () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING,
+                    BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE)));
+    public static final RegistryObject<Block> CHERRY_LEAVES = BLOCKS.register("cherry_leaves",
+            () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
+    public static final RegistryObject<Block> CHERRY_SAPLING = BLOCKS.register("cherry_sapling",
+            () -> new SaplingBlock(new CherryTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+
+    public static final RegistryObject<Block> CHERRY_LOG_SLAB = BLOCKS.register("cherry_log_slab",
+            () -> new LogSlabBlock(CHERRY_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> CHERRY_LOG_VERTICAL_SLAB = BLOCKS.register("cherry_log_vertical_slab",
+            () -> new VerticalSlabBlock(CHERRY_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> STRIPPED_CHERRY_LOG_SLAB = BLOCKS.register("stripped_cherry_log_slab",
+            () -> new LogSlabBlock(STRIPPED_CHERRY_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> STRIPPED_CHERRY_LOG_VERTICAL_SLAB = BLOCKS.register(
+            "stripped_cherry_log_vertical_slab",
+            () -> new VerticalSlabBlock(STRIPPED_CHERRY_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> CHERRY_WOOD_SLAB = BLOCKS.register("cherry_wood_slab",
+            () -> new LogSlabBlock(CHERRY_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> CHERRY_WOOD_VERTICAL_SLAB = BLOCKS.register("cherry_wood_vertical_slab",
+            () -> new VerticalSlabBlock(CHERRY_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> STRIPPED_CHERRY_WOOD_SLAB = BLOCKS.register("stripped_cherry_wood_slab",
+            () -> new LogSlabBlock(STRIPPED_CHERRY_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+    public static final RegistryObject<Block> STRIPPED_CHERRY_WOOD_VERTICAL_SLAB = BLOCKS.register(
+            "stripped_cherry_wood_vertical_slab",
+            () -> new VerticalSlabBlock(STRIPPED_CHERRY_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+
+    public static final RegistryObject<Block> PALE_MOSS_CARPET = BLOCKS.register("pale_moss_carpet",
+            () -> new CarpetBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
 }

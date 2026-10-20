@@ -1,7 +1,9 @@
 package com.kingodogo.buildscape.registry.blocks;
 
 import com.kingodogo.buildscape.block.ClimbableChainBlock;
+import com.kingodogo.buildscape.block.DecoratedPotBlock;
 import com.kingodogo.buildscape.block.HayBaleSlabBlock;
+import com.kingodogo.buildscape.block.LargeChainBlock;
 import com.kingodogo.buildscape.block.LeafHedgeBlock;
 import com.kingodogo.buildscape.block.LeafLayersBlock;
 import com.kingodogo.buildscape.block.LogSlabBlock;
@@ -12,6 +14,11 @@ import com.kingodogo.buildscape.block.ModDoorBlock;
 import com.kingodogo.buildscape.block.ModStairBlock;
 import com.kingodogo.buildscape.block.ModTrapdoorBlock;
 import com.kingodogo.buildscape.block.ModWoodTypes;
+import com.kingodogo.buildscape.block.MonetFlowerBlock;
+import com.kingodogo.buildscape.block.RoseVinesBlock;
+import com.kingodogo.buildscape.block.TrappedDecoratedPotBlock;
+import com.kingodogo.buildscape.block.WoolLayersBlock;
+import com.kingodogo.buildscape.feature.copper.WeatheringClimbableChainBlock;
 import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.world.level.block.Block;
@@ -30,15 +37,292 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.registries.RegistryObject;
 
-import static com.kingodogo.buildscape.registry.ModBlocks.BLOCKS;
+import static com.kingodogo.buildscape.registry.blocks.BlocksRegister.BLOCKS;
 
-/** Part of the blocks registrations; see {@code ModBlocks}. */
-public final class BlocksPart03 {
+/**
+ * The blocks GRAY_DECORATED_POT through PINK_MONETS of the registry, part 3 of 12, in registration order.
+ * Named for its dominant families (wood, foliage, decor); the neighbouring families that share a run of the order
+ * with them are registered here too, because the registration order must not change.
+ * Load order: {@link StoneBlocks#init()} runs first (see the static block), so every holder registers in order whichever is touched first.
+ */
+public final class WoodBlocks {
 
-    private BlocksPart03() {}
+    private WoodBlocks() {}
 
-    /** Forces this class to load so its registrations run in the order {@code ModBlocks} calls it. */
+    /** Forces this class to load, which registers its blocks. */
     public static void init() {}
+
+    static {
+        StoneBlocks.init();
+    }
+
+    public static final RegistryObject<Block> GRAY_DECORATED_POT = BLOCKS.register("gray_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> GREEN_DECORATED_POT = BLOCKS.register("green_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> LIGHT_BLUE_DECORATED_POT = BLOCKS.register("light_blue_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> LIGHT_GRAY_DECORATED_POT = BLOCKS.register("light_gray_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> LIME_DECORATED_POT = BLOCKS.register("lime_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> MAGENTA_DECORATED_POT = BLOCKS.register("magenta_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> ORANGE_DECORATED_POT = BLOCKS.register("orange_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> PINK_DECORATED_POT = BLOCKS.register("pink_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> PURPLE_DECORATED_POT = BLOCKS.register("purple_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> RED_DECORATED_POT = BLOCKS.register(
+            "red_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> WHITE_DECORATED_POT = BLOCKS.register("white_decorated_pot",
+            () -> new DecoratedPotBlock());
+    public static final RegistryObject<Block> YELLOW_DECORATED_POT = BLOCKS.register("yellow_decorated_pot",
+            () -> new DecoratedPotBlock());
+
+    public static final RegistryObject<Block> TRAPPED_DECORATED_POT = BLOCKS.register("trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> BLACK_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "black_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> BLUE_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "blue_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> BROWN_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "brown_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> CYAN_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "cyan_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> GRAY_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "gray_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> GREEN_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "green_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> LIGHT_BLUE_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "light_blue_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> LIGHT_GRAY_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "light_gray_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> LIME_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "lime_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> MAGENTA_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "magenta_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> ORANGE_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "orange_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> PINK_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "pink_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> PURPLE_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "purple_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> RED_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "red_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> WHITE_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "white_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+    public static final RegistryObject<Block> YELLOW_TRAPPED_DECORATED_POT = BLOCKS.register(
+            "yellow_trapped_decorated_pot",
+            () -> new TrappedDecoratedPotBlock());
+
+    public static final RegistryObject<Block> BLACK_CARPET_LAYERS = BLOCKS.register("black_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLACK)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "black"));
+    public static final RegistryObject<Block> BLUE_CARPET_LAYERS = BLOCKS.register("blue_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLUE)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "blue"));
+    public static final RegistryObject<Block> BROWN_CARPET_LAYERS = BLOCKS.register("brown_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BROWN)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "brown"));
+    public static final RegistryObject<Block> CYAN_CARPET_LAYERS = BLOCKS.register("cyan_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_CYAN)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "cyan"));
+    public static final RegistryObject<Block> GRAY_CARPET_LAYERS = BLOCKS.register("gray_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GRAY)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "gray"));
+    public static final RegistryObject<Block> GREEN_CARPET_LAYERS = BLOCKS.register("green_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GREEN)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "green"));
+    public static final RegistryObject<Block> LIGHT_BLUE_CARPET_LAYERS = BLOCKS.register("light_blue_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.WOOL,
+                            MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "light_blue"));
+    public static final RegistryObject<Block> LIGHT_GRAY_CARPET_LAYERS = BLOCKS.register("light_gray_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.WOOL,
+                            MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "light_gray"));
+    public static final RegistryObject<Block> LIME_CARPET_LAYERS = BLOCKS.register("lime_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.WOOL,
+                            MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "lime"));
+    public static final RegistryObject<Block> MAGENTA_CARPET_LAYERS = BLOCKS.register("magenta_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_MAGENTA)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "magenta"));
+    public static final RegistryObject<Block> ORANGE_CARPET_LAYERS = BLOCKS.register("orange_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_ORANGE)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "orange"));
+    public static final RegistryObject<Block> PINK_CARPET_LAYERS = BLOCKS.register("pink_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PINK)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "pink"));
+    public static final RegistryObject<Block> PURPLE_CARPET_LAYERS = BLOCKS.register("purple_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PURPLE)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "purple"));
+    public static final RegistryObject<Block> RED_CARPET_LAYERS = BLOCKS.register(
+            "red_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_RED)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "red"));
+    public static final RegistryObject<Block> WHITE_CARPET_LAYERS = BLOCKS.register("white_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.SNOW)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "white"));
+    public static final RegistryObject<Block> YELLOW_CARPET_LAYERS = BLOCKS.register("yellow_carpet_layers",
+            () -> new WoolLayersBlock(
+                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_YELLOW)
+                            .strength(0.1f)
+                            .sound(SoundType.WOOL)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "yellow"));
+
+    public static final RegistryObject<Block> OAK_LEAF_LAYERS = BLOCKS.register(
+            "oak_leaf_layers",
+            () -> new LeafLayersBlock(
+                    BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.PLANT)
+                            .strength(0.2f)
+                            .sound(SoundType.GRASS)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "oak"));
+
+    public static final RegistryObject<Block> SPRUCE_LEAF_LAYERS = BLOCKS.register("spruce_leaf_layers",
+            () -> new LeafLayersBlock(
+                    BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.PODZOL)
+                            .strength(0.2f)
+                            .sound(SoundType.GRASS)
+                            .noOcclusion()
+                            .isRedstoneConductor((state, reader, pos) -> false)
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false),
+                    "spruce"));
 
     public static final RegistryObject<Block> BIRCH_LEAF_LAYERS = BLOCKS.register(
             "birch_leaf_layers",
@@ -1543,4 +1827,210 @@ public final class BlocksPart03 {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false)));
+
+    public static final RegistryObject<Block> EMERALD_CHAIN = BLOCKS.register(
+            "emerald_chain",
+            () -> new ClimbableChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.EMERALD)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> ANCIENT_STEEL_CHAIN = BLOCKS.register("ancient_steel_chain",
+            () -> new ClimbableChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> NETHERITE_CHAIN = BLOCKS.register(
+            "netherite_chain",
+            () -> new ClimbableChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK)
+                            .strength(50.0f, 1200.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> LARGE_IRON_CHAIN = BLOCKS.register(
+            "large_iron_chain",
+            () -> new LargeChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> LARGE_GOLD_CHAIN = BLOCKS.register(
+            "large_gold_chain",
+            () -> new LargeChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.GOLD)
+                            .strength(3.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> LARGE_DIAMOND_CHAIN = BLOCKS.register("large_diamond_chain",
+            () -> new LargeChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.DIAMOND)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> LARGE_EMERALD_CHAIN = BLOCKS.register("large_emerald_chain",
+            () -> new LargeChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.EMERALD)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> LARGE_ANCIENT_STEEL_CHAIN = BLOCKS
+            .register("large_ancient_steel_chain", () -> new LargeChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY)
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> LARGE_NETHERITE_CHAIN = BLOCKS.register("large_netherite_chain",
+            () -> new LargeChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK)
+                            .strength(50.0f, 1200.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> COPPER_CHAIN = BLOCKS.register(
+            "copper_chain",
+            () -> new WeatheringClimbableChainBlock(
+                    BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_ORANGE)
+                            .strength(3.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> EXPOSED_COPPER_CHAIN = BLOCKS.register("exposed_copper_chain",
+            () -> new WeatheringClimbableChainBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.METAL,
+                            MaterialColor.TERRACOTTA_ORANGE)
+                            .strength(3.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> WEATHERED_COPPER_CHAIN = BLOCKS.register("weathered_copper_chain",
+            () -> new WeatheringClimbableChainBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.METAL,
+                            MaterialColor.WARPED_WART_BLOCK)
+                            .strength(3.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> OXIDIZED_COPPER_CHAIN = BLOCKS.register("oxidized_copper_chain",
+            () -> new WeatheringClimbableChainBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.METAL,
+                            MaterialColor.WARPED_NYLIUM)
+                            .strength(3.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.CHAIN)
+                            .noOcclusion()
+                            .isSuffocating((state, reader, pos) -> false)
+                            .isViewBlocking((state, reader, pos) -> false)));
+    public static final RegistryObject<Block> RED_ROSE_VINES = BLOCKS.register(
+            "red_rose_vines",
+            () -> new RoseVinesBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.REPLACEABLE_PLANT,
+                            MaterialColor.COLOR_RED)
+                            .strength(0.2f)
+                            .sound(ModSounds.VINE_SOUNDS())
+                            .noCollission()
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BLACK_ROSE_VINES = BLOCKS.register(
+            "black_rose_vines",
+            () -> new RoseVinesBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.REPLACEABLE_PLANT,
+                            MaterialColor.COLOR_BLACK)
+                            .strength(0.2f)
+                            .sound(ModSounds.VINE_SOUNDS())
+                            .noCollission()
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BLUE_ROSE_VINES = BLOCKS.register(
+            "blue_rose_vines",
+            () -> new RoseVinesBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.REPLACEABLE_PLANT,
+                            MaterialColor.COLOR_BLUE)
+                            .strength(0.2f)
+                            .sound(ModSounds.VINE_SOUNDS())
+                            .noCollission()
+                            .noOcclusion()));
+    public static final RegistryObject<Block> WHITE_ROSE_VINES = BLOCKS.register(
+            "white_rose_vines",
+            () -> new RoseVinesBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.REPLACEABLE_PLANT,
+                            MaterialColor.SNOW)
+                            .strength(0.2f)
+                            .sound(ModSounds.VINE_SOUNDS())
+                            .noCollission()
+                            .noOcclusion()));
+    public static final RegistryObject<Block> RED_MONETS = BLOCKS.register(
+            "red_monets",
+            () -> new MonetFlowerBlock(
+                    BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_RED)
+                            .noCollission()
+                            .instabreak()
+                            .sound(SoundType.GRASS)));
+    public static final RegistryObject<Block> BLUE_MONETS = BLOCKS.register(
+            "blue_monets",
+            () -> new MonetFlowerBlock(
+                    BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_BLUE)
+                            .noCollission()
+                            .instabreak()
+                            .sound(SoundType.GRASS)));
+    public static final RegistryObject<Block> PURPLE_MONETS = BLOCKS.register(
+            "purple_monets",
+            () -> new MonetFlowerBlock(
+                    BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_PURPLE)
+                            .noCollission()
+                            .instabreak()
+                            .sound(SoundType.GRASS)));
+    public static final RegistryObject<Block> LIGHT_BLUE_MONETS = BLOCKS.register(
+            "light_blue_monets",
+            () -> new MonetFlowerBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.PLANT,
+                            MaterialColor.COLOR_LIGHT_BLUE)
+                            .noCollission()
+                            .instabreak()
+                            .sound(SoundType.GRASS)));
+    public static final RegistryObject<Block> PINK_MONETS = BLOCKS.register(
+            "pink_monets",
+            () -> new MonetFlowerBlock(
+                    BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_PINK)
+                            .noCollission()
+                            .instabreak()
+                            .sound(SoundType.GRASS)));
 }

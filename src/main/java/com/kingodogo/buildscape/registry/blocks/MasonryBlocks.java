@@ -6,13 +6,15 @@ import com.kingodogo.buildscape.block.ModBlock;
 import com.kingodogo.buildscape.block.ModSlabBlock;
 import com.kingodogo.buildscape.block.ModStairBlock;
 import com.kingodogo.buildscape.block.ModWallBlock;
+import com.kingodogo.buildscape.block.SilkTouchOnlyGlassBlock;
+import com.kingodogo.buildscape.block.SilkTouchOnlyPaneBlock;
 import com.kingodogo.buildscape.block.SmokeVentBlock;
-import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneLampBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -20,15 +22,976 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.registries.RegistryObject;
 
-import static com.kingodogo.buildscape.registry.ModBlocks.BLOCKS;
+import static com.kingodogo.buildscape.registry.blocks.BlocksRegister.BLOCKS;
 
-/** Part of the blocks registrations; see {@code ModBlocks}. */
-public final class BlocksPart06 {
+/**
+ * The blocks FACTORY_GRAY_GLASS through YELLOW_FACTORY_MESH_STAIRS of the registry, part 5 of 12, in registration order.
+ * Named for its dominant families (stone, light, glass); the neighbouring families that share a run of the order
+ * with them are registered here too, because the registration order must not change.
+ * Load order: {@link DecorBlocks#init()} runs first (see the static block), so every holder registers in order whichever is touched first.
+ */
+public final class MasonryBlocks {
 
-    private BlocksPart06() {}
+    private MasonryBlocks() {}
 
-    /** Forces this class to load so its registrations run in the order {@code ModBlocks} calls it. */
+    /** Forces this class to load, which registers its blocks. */
     public static void init() {}
+
+    static {
+        DecorBlocks.init();
+    }
+
+    public static final RegistryObject<Block> FACTORY_GRAY_GLASS = BLOCKS.register(
+            "factory_gray_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_BLACK_GLASS = BLOCKS.register(
+            "factory_black_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLACK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_BROWN_GLASS = BLOCKS.register(
+            "factory_brown_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BROWN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_RED_GLASS = BLOCKS.register(
+            "factory_red_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_RED)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_ORANGE_GLASS = BLOCKS.register(
+            "factory_orange_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_ORANGE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_YELLOW_GLASS = BLOCKS.register(
+            "factory_yellow_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_YELLOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_LIME_GLASS = BLOCKS.register(
+            "factory_lime_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_GREEN_GLASS = BLOCKS.register(
+            "factory_green_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_CYAN_GLASS = BLOCKS.register(
+            "factory_cyan_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_CYAN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_LIGHT_BLUE_GLASS = BLOCKS.register(
+            "factory_light_blue_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_BLUE_GLASS = BLOCKS.register(
+            "factory_blue_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_PURPLE_GLASS = BLOCKS.register(
+            "factory_purple_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PURPLE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_MAGENTA_GLASS = BLOCKS.register(
+            "factory_magenta_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_MAGENTA)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_PINK_GLASS = BLOCKS.register(
+            "factory_pink_glass",
+            () -> new SilkTouchOnlyGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PINK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_WHITE_GLASS_PANE = BLOCKS.register(
+            "factory_white_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.SNOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_LIGHT_GRAY_GLASS_PANE = BLOCKS.register(
+            "factory_light_gray_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_GRAY_GLASS_PANE = BLOCKS.register(
+            "factory_gray_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_BLACK_GLASS_PANE = BLOCKS.register(
+            "factory_black_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLACK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_BROWN_GLASS_PANE = BLOCKS.register(
+            "factory_brown_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BROWN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_RED_GLASS_PANE = BLOCKS.register(
+            "factory_red_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_RED)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_ORANGE_GLASS_PANE = BLOCKS.register(
+            "factory_orange_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_ORANGE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_YELLOW_GLASS_PANE = BLOCKS.register(
+            "factory_yellow_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_YELLOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_LIME_GLASS_PANE = BLOCKS.register(
+            "factory_lime_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_GREEN_GLASS_PANE = BLOCKS.register(
+            "factory_green_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_CYAN_GLASS_PANE = BLOCKS.register(
+            "factory_cyan_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_CYAN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_LIGHT_BLUE_GLASS_PANE = BLOCKS.register(
+            "factory_light_blue_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_BLUE_GLASS_PANE = BLOCKS.register(
+            "factory_blue_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_PURPLE_GLASS_PANE = BLOCKS.register(
+            "factory_purple_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PURPLE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_MAGENTA_GLASS_PANE = BLOCKS.register(
+            "factory_magenta_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_MAGENTA)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> FACTORY_PINK_GLASS_PANE = BLOCKS.register(
+            "factory_pink_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PINK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> WHITE_STAINED_BRICKS = BLOCKS.register(
+            "white_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "white_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> WHITE_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_BRICKS = BLOCKS.register(
+            "light_gray_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "light_gray_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> LIGHT_GRAY_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GRAY_STAINED_BRICKS = BLOCKS.register(
+            "gray_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GRAY_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "gray_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> GRAY_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_STAINED_BRICKS = BLOCKS.register(
+            "black_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "black_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> BLACK_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BROWN_STAINED_BRICKS = BLOCKS.register(
+            "brown_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BROWN_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "brown_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> BROWN_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_STAINED_BRICKS = BLOCKS.register(
+            "red_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "red_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> RED_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_STAINED_BRICKS = BLOCKS.register(
+            "orange_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "orange_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> ORANGE_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_STAINED_BRICKS = BLOCKS.register(
+            "yellow_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "yellow_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> YELLOW_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIME_STAINED_BRICKS = BLOCKS.register(
+            "lime_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIME_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "lime_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> LIME_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_STAINED_BRICKS = BLOCKS.register(
+            "green_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "green_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> GREEN_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> CYAN_STAINED_BRICKS = BLOCKS.register(
+            "cyan_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> CYAN_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "cyan_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> CYAN_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_BRICKS = BLOCKS.register(
+            "light_blue_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "light_blue_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> LIGHT_BLUE_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_STAINED_BRICKS = BLOCKS.register(
+            "blue_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "blue_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> BLUE_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PURPLE_STAINED_BRICKS = BLOCKS.register(
+            "purple_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PURPLE_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "purple_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> PURPLE_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> MAGENTA_STAINED_BRICKS = BLOCKS.register(
+            "magenta_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> MAGENTA_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "magenta_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> MAGENTA_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_STAINED_BRICKS = BLOCKS.register(
+            "pink_stained_bricks",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final RegistryObject<Block> WHITE_STAINED_BRICK_TILES = BLOCKS.register(
+            "white_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_BRICK_TILES = BLOCKS.register(
+            "light_gray_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.METAL)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GRAY_STAINED_BRICK_TILES = BLOCKS.register(
+            "gray_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_STAINED_BRICK_TILES = BLOCKS.register(
+            "black_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BROWN_STAINED_BRICK_TILES = BLOCKS.register(
+            "brown_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_STAINED_BRICK_TILES = BLOCKS.register(
+            "red_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_STAINED_BRICK_TILES = BLOCKS.register(
+            "orange_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_STAINED_BRICK_TILES = BLOCKS.register(
+            "yellow_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIME_STAINED_BRICK_TILES = BLOCKS.register(
+            "lime_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_STAINED_BRICK_TILES = BLOCKS.register(
+            "green_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> CYAN_STAINED_BRICK_TILES = BLOCKS.register(
+            "cyan_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_BRICK_TILES = BLOCKS.register(
+            "light_blue_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_STAINED_BRICK_TILES = BLOCKS.register(
+            "blue_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PURPLE_STAINED_BRICK_TILES = BLOCKS.register(
+            "purple_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> MAGENTA_STAINED_BRICK_TILES = BLOCKS.register(
+            "magenta_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_STAINED_BRICK_TILES = BLOCKS.register(
+            "pink_stained_brick_tiles",
+            () -> new Block(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "white_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "white_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> WHITE_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "white_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "light_gray_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.METAL)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "light_gray_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> LIGHT_GRAY_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.METAL)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "light_gray_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.METAL)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GRAY_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "gray_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GRAY_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "gray_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> GRAY_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GRAY_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "gray_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "black_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "black_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> BLACK_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "black_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BROWN_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "brown_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BROWN_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "brown_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> BROWN_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BROWN_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "brown_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "red_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "red_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> RED_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "red_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "orange_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "orange_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> ORANGE_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "orange_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "yellow_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "yellow_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> YELLOW_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "yellow_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIME_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "lime_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIME_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "lime_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> LIME_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIME_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "lime_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "green_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "green_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> GREEN_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "green_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> CYAN_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "cyan_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> CYAN_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "cyan_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> CYAN_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> CYAN_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "cyan_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "light_blue_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "light_blue_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> LIGHT_BLUE_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "light_blue_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "blue_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "blue_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> BLUE_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "blue_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PURPLE_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "purple_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PURPLE_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "purple_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> PURPLE_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PURPLE_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "purple_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> MAGENTA_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "magenta_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> MAGENTA_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "magenta_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> MAGENTA_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> MAGENTA_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "magenta_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_STAINED_BRICK_TILES_SLAB = BLOCKS.register(
+            "pink_stained_brick_tiles_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_STAINED_BRICK_TILES_STAIRS = BLOCKS.register(
+            "pink_stained_brick_tiles_stairs",
+            () -> new StairBlock(
+                    () -> PINK_STAINED_BRICK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_STAINED_BRICK_TILES_WALL = BLOCKS.register(
+            "pink_stained_brick_tiles_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+
+    public static final RegistryObject<Block> PINK_STAINED_BRICKS_STAIRS = BLOCKS.register(
+            "pink_stained_bricks_stairs",
+            () -> new StairBlock(
+                    () -> PINK_STAINED_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_STAINED_BRICKS_SLAB = BLOCKS.register(
+            "white_stained_bricks_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_BRICKS_SLAB = BLOCKS.register(
+            "light_gray_stained_bricks_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GRAY_STAINED_BRICKS_SLAB = BLOCKS.register(
+            "gray_stained_bricks_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_STAINED_BRICKS_SLAB = BLOCKS.register(
+            "black_stained_bricks_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BROWN_STAINED_BRICKS_SLAB = BLOCKS.register(
+            "brown_stained_bricks_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                            .strength(2.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
 
     public static final RegistryObject<Block> RED_STAINED_BRICKS_SLAB = BLOCKS.register(
             "red_stained_bricks_slab",
@@ -1012,530 +1975,4 @@ public final class BlocksPart06 {
                             .strength(3.0f, 6.0f).requiresCorrectToolForDrops()
                             .noOcclusion()
                             .sound(SoundType.COPPER)));
-    public static final RegistryObject<Block> YELLOW_FACTORY_MESH_SLAB = BLOCKS.register("yellow_factory_mesh_slab",
-            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY)
-                    .strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion()
-                    .sound(SoundType.COPPER)));
-    public static final RegistryObject<Block> YELLOW_FACTORY_MESH_WALL = BLOCKS.register("yellow_factory_mesh_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY)
-                    .strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion()
-                    .sound(SoundType.COPPER)));
-    public static final RegistryObject<Block> PACKED_MUD = BLOCKS.register("packed_mud",
-            () -> new ModBlock(BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.DIRT)
-                    .strength(1.0f).sound(ModSounds.PACKED_MUD_SOUNDS())));
-    public static final RegistryObject<Block> PACKED_MUD_STAIRS = BLOCKS.register("packed_mud_stairs",
-            () -> new ModStairBlock(PACKED_MUD.get().defaultBlockState(),
-                    BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.DIRT).strength(1.0f)
-                            .sound(ModSounds.PACKED_MUD_SOUNDS())));
-    public static final RegistryObject<Block> PACKED_MUD_SLAB = BLOCKS.register("packed_mud_slab",
-            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.DIRT)
-                    .strength(1.0f).sound(ModSounds.PACKED_MUD_SOUNDS())));
-    public static final RegistryObject<Block> PACKED_MUD_WALL = BLOCKS.register("packed_mud_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.DIRT)
-                    .strength(1.0f).sound(ModSounds.PACKED_MUD_SOUNDS())));
-
-    public static final RegistryObject<Block> MUD_BRICKS = BLOCKS.register("mud_bricks",
-            () -> new ModBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIRT)
-                    .strength(1.5f, 3.0f).requiresCorrectToolForDrops()
-                    .sound(ModSounds.MUD_BRICKS_SOUNDS())));
-    public static final RegistryObject<Block> MUD_BRICK_STAIRS = BLOCKS.register("mud_brick_stairs",
-            () -> new ModStairBlock(MUD_BRICKS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIRT)
-                            .strength(1.5f, 3.0f).requiresCorrectToolForDrops()
-                            .sound(ModSounds.MUD_BRICKS_SOUNDS())));
-    public static final RegistryObject<Block> MUD_BRICK_SLAB = BLOCKS.register("mud_brick_slab",
-            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIRT)
-                    .strength(1.5f, 3.0f).requiresCorrectToolForDrops()
-                    .sound(ModSounds.MUD_BRICKS_SOUNDS())));
-    public static final RegistryObject<Block> MUD_BRICK_WALL = BLOCKS.register("mud_brick_wall",
-            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIRT)
-                    .strength(1.5f, 3.0f).requiresCorrectToolForDrops()
-                    .sound(ModSounds.MUD_BRICKS_SOUNDS())));
-
-    public static final RegistryObject<Block> GLASS_SLAB = BLOCKS.register(
-            "glass_slab",
-            () -> new ModSlabBlock(Blocks.GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.GLASS)));
-    public static final RegistryObject<Block> WHITE_STAINED_GLASS_SLAB = BLOCKS.register(
-            "white_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.WHITE_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.WHITE_STAINED_GLASS)));
-    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_GLASS_SLAB = BLOCKS.register(
-            "light_gray_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.LIGHT_GRAY_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_STAINED_GLASS)));
-    public static final RegistryObject<Block> GRAY_STAINED_GLASS_SLAB = BLOCKS.register(
-            "gray_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.GRAY_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.GRAY_STAINED_GLASS)));
-    public static final RegistryObject<Block> BLACK_STAINED_GLASS_SLAB = BLOCKS.register(
-            "black_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.BLACK_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.BLACK_STAINED_GLASS)));
-    public static final RegistryObject<Block> BROWN_STAINED_GLASS_SLAB = BLOCKS.register(
-            "brown_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.BROWN_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.BROWN_STAINED_GLASS)));
-    public static final RegistryObject<Block> RED_STAINED_GLASS_SLAB = BLOCKS.register(
-            "red_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.RED_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.RED_STAINED_GLASS)));
-    public static final RegistryObject<Block> ORANGE_STAINED_GLASS_SLAB = BLOCKS.register(
-            "orange_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.ORANGE_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.ORANGE_STAINED_GLASS)));
-    public static final RegistryObject<Block> YELLOW_STAINED_GLASS_SLAB = BLOCKS.register(
-            "yellow_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.YELLOW_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.YELLOW_STAINED_GLASS)));
-    public static final RegistryObject<Block> LIME_STAINED_GLASS_SLAB = BLOCKS.register(
-            "lime_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.LIME_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.LIME_STAINED_GLASS)));
-    public static final RegistryObject<Block> GREEN_STAINED_GLASS_SLAB = BLOCKS.register(
-            "green_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.GREEN_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.GREEN_STAINED_GLASS)));
-    public static final RegistryObject<Block> CYAN_STAINED_GLASS_SLAB = BLOCKS.register(
-            "cyan_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.CYAN_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.CYAN_STAINED_GLASS)));
-    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_GLASS_SLAB = BLOCKS.register(
-            "light_blue_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.LIGHT_BLUE_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_STAINED_GLASS)));
-    public static final RegistryObject<Block> BLUE_STAINED_GLASS_SLAB = BLOCKS.register(
-            "blue_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.BLUE_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.BLUE_STAINED_GLASS)));
-    public static final RegistryObject<Block> PURPLE_STAINED_GLASS_SLAB = BLOCKS.register(
-            "purple_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.PURPLE_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.PURPLE_STAINED_GLASS)));
-    public static final RegistryObject<Block> MAGENTA_STAINED_GLASS_SLAB = BLOCKS.register(
-            "magenta_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.MAGENTA_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.MAGENTA_STAINED_GLASS)));
-    public static final RegistryObject<Block> PINK_STAINED_GLASS_SLAB = BLOCKS.register(
-            "pink_stained_glass_slab",
-            () -> new ModSlabBlock(Blocks.PINK_STAINED_GLASS,
-                    BlockBehaviour.Properties.copy(Blocks.PINK_STAINED_GLASS)));
-    public static final RegistryObject<Block> GLASS_STAIRS = BLOCKS.register(
-            "glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.GLASS)));
-    public static final RegistryObject<Block> WHITE_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "white_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.WHITE_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.WHITE_STAINED_GLASS)));
-    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "light_gray_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.LIGHT_GRAY_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_STAINED_GLASS)));
-    public static final RegistryObject<Block> GRAY_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "gray_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.GRAY_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.GRAY_STAINED_GLASS)));
-    public static final RegistryObject<Block> BLACK_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "black_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.BLACK_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.BLACK_STAINED_GLASS)));
-    public static final RegistryObject<Block> BROWN_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "brown_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.BROWN_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.BROWN_STAINED_GLASS)));
-    public static final RegistryObject<Block> RED_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "red_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.RED_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.RED_STAINED_GLASS)));
-    public static final RegistryObject<Block> ORANGE_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "orange_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.ORANGE_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.ORANGE_STAINED_GLASS)));
-    public static final RegistryObject<Block> YELLOW_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "yellow_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.YELLOW_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.YELLOW_STAINED_GLASS)));
-    public static final RegistryObject<Block> LIME_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "lime_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.LIME_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.LIME_STAINED_GLASS)));
-    public static final RegistryObject<Block> GREEN_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "green_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.GREEN_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.GREEN_STAINED_GLASS)));
-    public static final RegistryObject<Block> CYAN_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "cyan_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.CYAN_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.CYAN_STAINED_GLASS)));
-    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "light_blue_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_STAINED_GLASS)));
-    public static final RegistryObject<Block> BLUE_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "blue_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.BLUE_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.BLUE_STAINED_GLASS)));
-    public static final RegistryObject<Block> PURPLE_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "purple_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.PURPLE_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.PURPLE_STAINED_GLASS)));
-    public static final RegistryObject<Block> MAGENTA_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "magenta_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.MAGENTA_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.MAGENTA_STAINED_GLASS)));
-    public static final RegistryObject<Block> PINK_STAINED_GLASS_STAIRS = BLOCKS.register(
-            "pink_stained_glass_stairs",
-            () -> new ModStairBlock(
-                    Blocks.PINK_STAINED_GLASS.defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.PINK_STAINED_GLASS)));
-    public static final RegistryObject<Block> WHITE_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "white_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.WHITE_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.WHITE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> WHITE_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "white_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.WHITE_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.WHITE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "light_gray_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.LIGHT_GRAY_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.LIGHT_GRAY_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "light_gray_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.LIGHT_GRAY_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.LIGHT_GRAY_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> GRAY_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "gray_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.GRAY_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.GRAY_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> GRAY_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "gray_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.GRAY_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.GRAY_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> BLACK_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "black_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.BLACK_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BLACK_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> BLACK_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "black_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.BLACK_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BLACK_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> BROWN_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "brown_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.BROWN_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BROWN_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> BROWN_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "brown_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.BROWN_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BROWN_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> RED_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "red_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.RED_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.RED_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> RED_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "red_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.RED_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.RED_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> ORANGE_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "orange_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.ORANGE_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.ORANGE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> ORANGE_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "orange_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.ORANGE_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.ORANGE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> YELLOW_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "yellow_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.YELLOW_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.YELLOW_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> YELLOW_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "yellow_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.YELLOW_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.YELLOW_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> LIME_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "lime_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.LIME_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.LIME_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> LIME_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "lime_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.LIME_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.LIME_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> GREEN_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "green_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.GREEN_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.GREEN_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> GREEN_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "green_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.GREEN_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.GREEN_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> CYAN_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "cyan_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.CYAN_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.CYAN_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> CYAN_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "cyan_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.CYAN_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.CYAN_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> LIGHT_BLUE_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "light_blue_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.LIGHT_BLUE_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.LIGHT_BLUE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> LIGHT_BLUE_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "light_blue_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.LIGHT_BLUE_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.LIGHT_BLUE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> BLUE_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "blue_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.BLUE_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BLUE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> BLUE_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "blue_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.BLUE_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BLUE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> PURPLE_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "purple_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.PURPLE_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.PURPLE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> PURPLE_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "purple_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.PURPLE_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.PURPLE_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> MAGENTA_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "magenta_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.MAGENTA_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.MAGENTA_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> MAGENTA_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "magenta_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.MAGENTA_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.MAGENTA_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> PINK_MOSAIC_GLASS_SLAB = BLOCKS.register(
-            "pink_mosaic_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.PINK_MOSAIC_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.PINK_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> PINK_MOSAIC_GLASS_STAIRS = BLOCKS.register(
-            "pink_mosaic_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.PINK_MOSAIC_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.PINK_MOSAIC_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_WHITE_GLASS_SLAB = BLOCKS.register(
-            "factory_white_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_WHITE_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_WHITE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_WHITE_GLASS_STAIRS = BLOCKS.register(
-            "factory_white_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_WHITE_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_WHITE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_LIGHT_GRAY_GLASS_SLAB = BLOCKS.register(
-            "factory_light_gray_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_LIGHT_GRAY_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_LIGHT_GRAY_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_LIGHT_GRAY_GLASS_STAIRS = BLOCKS.register(
-            "factory_light_gray_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_LIGHT_GRAY_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_LIGHT_GRAY_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_GRAY_GLASS_SLAB = BLOCKS.register(
-            "factory_gray_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_GRAY_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_GRAY_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_GRAY_GLASS_STAIRS = BLOCKS.register(
-            "factory_gray_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_GRAY_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_GRAY_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_BLACK_GLASS_SLAB = BLOCKS.register(
-            "factory_black_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_BLACK_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_BLACK_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_BLACK_GLASS_STAIRS = BLOCKS.register(
-            "factory_black_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_BLACK_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_BLACK_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_BROWN_GLASS_SLAB = BLOCKS.register(
-            "factory_brown_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_BROWN_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_BROWN_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_BROWN_GLASS_STAIRS = BLOCKS.register(
-            "factory_brown_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_BROWN_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_BROWN_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_RED_GLASS_SLAB = BLOCKS.register(
-            "factory_red_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_RED_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_RED_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_RED_GLASS_STAIRS = BLOCKS.register(
-            "factory_red_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_RED_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_RED_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_ORANGE_GLASS_SLAB = BLOCKS.register(
-            "factory_orange_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_ORANGE_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_ORANGE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_ORANGE_GLASS_STAIRS = BLOCKS.register(
-            "factory_orange_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_ORANGE_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_ORANGE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_YELLOW_GLASS_SLAB = BLOCKS.register(
-            "factory_yellow_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_YELLOW_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_YELLOW_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_YELLOW_GLASS_STAIRS = BLOCKS.register(
-            "factory_yellow_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_YELLOW_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_YELLOW_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_LIME_GLASS_SLAB = BLOCKS.register(
-            "factory_lime_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_LIME_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_LIME_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_LIME_GLASS_STAIRS = BLOCKS.register(
-            "factory_lime_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_LIME_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_LIME_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_GREEN_GLASS_SLAB = BLOCKS.register(
-            "factory_green_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_GREEN_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_GREEN_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_GREEN_GLASS_STAIRS = BLOCKS.register(
-            "factory_green_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_GREEN_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_GREEN_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_CYAN_GLASS_SLAB = BLOCKS.register(
-            "factory_cyan_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_CYAN_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_CYAN_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_CYAN_GLASS_STAIRS = BLOCKS.register(
-            "factory_cyan_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_CYAN_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_CYAN_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_LIGHT_BLUE_GLASS_SLAB = BLOCKS.register(
-            "factory_light_blue_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_LIGHT_BLUE_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_LIGHT_BLUE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_LIGHT_BLUE_GLASS_STAIRS = BLOCKS.register(
-            "factory_light_blue_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_LIGHT_BLUE_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_LIGHT_BLUE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_BLUE_GLASS_SLAB = BLOCKS.register(
-            "factory_blue_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_BLUE_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_BLUE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_BLUE_GLASS_STAIRS = BLOCKS.register(
-            "factory_blue_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_BLUE_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_BLUE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_PURPLE_GLASS_SLAB = BLOCKS.register(
-            "factory_purple_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_PURPLE_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_PURPLE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_PURPLE_GLASS_STAIRS = BLOCKS.register(
-            "factory_purple_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_PURPLE_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_PURPLE_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_MAGENTA_GLASS_SLAB = BLOCKS.register(
-            "factory_magenta_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_MAGENTA_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_MAGENTA_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_MAGENTA_GLASS_STAIRS = BLOCKS.register(
-            "factory_magenta_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_MAGENTA_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_MAGENTA_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_PINK_GLASS_SLAB = BLOCKS.register(
-            "factory_pink_glass_slab",
-            () -> new ModSlabBlock(BlocksPart05.FACTORY_PINK_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_PINK_GLASS.get())));
-    public static final RegistryObject<Block> FACTORY_PINK_GLASS_STAIRS = BLOCKS.register(
-            "factory_pink_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart05.FACTORY_PINK_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart05.FACTORY_PINK_GLASS.get())));
-    public static final RegistryObject<Block> WHITE_GLAZED_GLASS_SLAB = BLOCKS.register(
-            "white_glazed_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.WHITE_GLAZED_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.WHITE_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> WHITE_GLAZED_GLASS_STAIRS = BLOCKS.register(
-            "white_glazed_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.WHITE_GLAZED_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.WHITE_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_GLAZED_GLASS_SLAB = BLOCKS.register(
-            "light_gray_glazed_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.LIGHT_GRAY_GLAZED_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.LIGHT_GRAY_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_GLAZED_GLASS_STAIRS = BLOCKS.register(
-            "light_gray_glazed_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.LIGHT_GRAY_GLAZED_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.LIGHT_GRAY_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> GRAY_GLAZED_GLASS_SLAB = BLOCKS.register(
-            "gray_glazed_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.GRAY_GLAZED_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.GRAY_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> GRAY_GLAZED_GLASS_STAIRS = BLOCKS.register(
-            "gray_glazed_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.GRAY_GLAZED_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.GRAY_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> BLACK_GLAZED_GLASS_SLAB = BLOCKS.register(
-            "black_glazed_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.BLACK_GLAZED_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BLACK_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> BLACK_GLAZED_GLASS_STAIRS = BLOCKS.register(
-            "black_glazed_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.BLACK_GLAZED_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BLACK_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> BROWN_GLAZED_GLASS_SLAB = BLOCKS.register(
-            "brown_glazed_glass_slab",
-            () -> new ModSlabBlock(BlocksPart01.BROWN_GLAZED_GLASS.get(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BROWN_GLAZED_GLASS.get())));
-    public static final RegistryObject<Block> BROWN_GLAZED_GLASS_STAIRS = BLOCKS.register(
-            "brown_glazed_glass_stairs",
-            () -> new ModStairBlock(
-                    BlocksPart01.BROWN_GLAZED_GLASS.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BlocksPart01.BROWN_GLAZED_GLASS.get())));
 }

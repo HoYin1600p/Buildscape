@@ -8,13 +8,11 @@ import com.kingodogo.buildscape.block.ModStairBlock;
 import com.kingodogo.buildscape.block.ModTrapdoorBlock;
 import com.kingodogo.buildscape.block.ShelfBlock;
 import com.kingodogo.buildscape.block.VerticalSlabBlock;
-import com.kingodogo.buildscape.block.WaterloggableGrateBlock;
 import com.kingodogo.buildscape.feature.pipe.HollowLogBlock;
 import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.PressurePlateBlock;
-import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.WallBlock;
@@ -24,619 +22,25 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.registries.RegistryObject;
 
-import static com.kingodogo.buildscape.registry.ModBlocks.BLOCKS;
+import static com.kingodogo.buildscape.registry.blocks.BlocksRegister.BLOCKS;
 
-/** Part of the blocks registrations; see {@code ModBlocks}. */
-public final class BlocksPart10 {
+/**
+ * The blocks STRIPPED_HOLLOW_OAK_LOG through EXPERIENCE_CAULDRON of the registry, part 12 of 12, in registration order.
+ * Named for its dominant families (cardboard, wood, decor); the neighbouring families that share a run of the order
+ * with them are registered here too, because the registration order must not change.
+ * Load order: {@link SteelBlocks#init()} runs first (see the static block), so every holder registers in order whichever is touched first.
+ */
+public final class CardboardBlocks {
 
-    private BlocksPart10() {}
+    private CardboardBlocks() {}
 
-    /** Forces this class to load so its registrations run in the order {@code ModBlocks} calls it. */
+    /** Forces this class to load, which registers its blocks. */
     public static void init() {}
 
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_CUT_STEEL = BLOCKS.register(
-            "light_gray_flaming_cut_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB = BLOCKS.register(
-            "light_gray_flaming_cut_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "light_gray_flaming_cut_steel_vertical_slab",
-            () -> new VerticalSlabBlock(LIGHT_GRAY_FLAMING_CUT_STEEL.get(),
-                    BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS = BLOCKS.register(
-            "light_gray_flaming_cut_steel_stairs",
-            () -> new ModStairBlock(LIGHT_GRAY_FLAMING_CUT_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_CUT_STEEL_WALL = BLOCKS.register(
-            "light_gray_flaming_cut_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_POLISHED_STEEL = BLOCKS.register(
-            "light_gray_flaming_polished_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB = BLOCKS.register(
-            "light_gray_flaming_polished_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "light_gray_flaming_polished_steel_vertical_slab",
-            () -> new VerticalSlabBlock(LIGHT_GRAY_FLAMING_POLISHED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS = BLOCKS.register(
-            "light_gray_flaming_polished_steel_stairs",
-            () -> new ModStairBlock(LIGHT_GRAY_FLAMING_POLISHED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL = BLOCKS.register(
-            "light_gray_flaming_polished_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_PRESSED_STEEL = BLOCKS.register(
-            "light_gray_flaming_pressed_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB = BLOCKS.register(
-            "light_gray_flaming_pressed_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "light_gray_flaming_pressed_steel_vertical_slab",
-            () -> new VerticalSlabBlock(LIGHT_GRAY_FLAMING_PRESSED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS = BLOCKS.register(
-            "light_gray_flaming_pressed_steel_stairs",
-            () -> new ModStairBlock(LIGHT_GRAY_FLAMING_PRESSED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL = BLOCKS.register(
-            "light_gray_flaming_pressed_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(LIGHT_GRAY_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_STEEL_CASING = BLOCKS.register(
-            "light_gray_flaming_steel_casing",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_STEEL_GRATE = BLOCKS.register(
-            "light_gray_flaming_steel_grate",
-            () -> new WaterloggableGrateBlock(BlocksPart09.flamingSteelProperties().noOcclusion()
-                    .isRedstoneConductor((state, reader, pos) -> false).isSuffocating((state, reader, pos) -> false)
-                    .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_STEEL_PILLAR = BLOCKS.register(
-            "light_gray_flaming_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register(
-            "light_gray_flaming_bolted_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> CYAN_FLAMING_STEEL_BLOCK = BLOCKS.register("cyan_flaming_steel_block",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> CYAN_FLAMING_STEEL_BLOCK_SLAB = BLOCKS.register(
-            "cyan_flaming_steel_block_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(CYAN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = BLOCKS.register(
-            "cyan_flaming_steel_block_vertical_slab",
-            () -> new VerticalSlabBlock(CYAN_FLAMING_STEEL_BLOCK.get(),
-                    BlockBehaviour.Properties.copy(CYAN_FLAMING_STEEL_BLOCK_SLAB.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_STEEL_BLOCK_STAIRS = BLOCKS.register(
-            "cyan_flaming_steel_block_stairs",
-            () -> new ModStairBlock(CYAN_FLAMING_STEEL_BLOCK.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(CYAN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_STEEL_BLOCK_WALL = BLOCKS.register(
-            "cyan_flaming_steel_block_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(CYAN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_CUT_STEEL = BLOCKS.register("cyan_flaming_cut_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> CYAN_FLAMING_CUT_STEEL_SLAB = BLOCKS.register(
-            "cyan_flaming_cut_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(CYAN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "cyan_flaming_cut_steel_vertical_slab",
-            () -> new VerticalSlabBlock(CYAN_FLAMING_CUT_STEEL.get(),
-                    BlockBehaviour.Properties.copy(CYAN_FLAMING_CUT_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_CUT_STEEL_STAIRS = BLOCKS.register(
-            "cyan_flaming_cut_steel_stairs",
-            () -> new ModStairBlock(CYAN_FLAMING_CUT_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(CYAN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_CUT_STEEL_WALL = BLOCKS.register(
-            "cyan_flaming_cut_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(CYAN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_POLISHED_STEEL = BLOCKS.register(
-            "cyan_flaming_polished_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> CYAN_FLAMING_POLISHED_STEEL_SLAB = BLOCKS.register(
-            "cyan_flaming_polished_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(CYAN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "cyan_flaming_polished_steel_vertical_slab",
-            () -> new VerticalSlabBlock(CYAN_FLAMING_POLISHED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(CYAN_FLAMING_POLISHED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_POLISHED_STEEL_STAIRS = BLOCKS.register(
-            "cyan_flaming_polished_steel_stairs",
-            () -> new ModStairBlock(CYAN_FLAMING_POLISHED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(CYAN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_POLISHED_STEEL_WALL = BLOCKS.register(
-            "cyan_flaming_polished_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(CYAN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_PRESSED_STEEL = BLOCKS.register("cyan_flaming_pressed_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> CYAN_FLAMING_PRESSED_STEEL_SLAB = BLOCKS.register(
-            "cyan_flaming_pressed_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(CYAN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "cyan_flaming_pressed_steel_vertical_slab",
-            () -> new VerticalSlabBlock(CYAN_FLAMING_PRESSED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(CYAN_FLAMING_PRESSED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_PRESSED_STEEL_STAIRS = BLOCKS.register(
-            "cyan_flaming_pressed_steel_stairs",
-            () -> new ModStairBlock(CYAN_FLAMING_PRESSED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(CYAN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_PRESSED_STEEL_WALL = BLOCKS.register(
-            "cyan_flaming_pressed_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(CYAN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> CYAN_FLAMING_STEEL_CASING = BLOCKS.register("cyan_flaming_steel_casing",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> CYAN_FLAMING_STEEL_GRATE = BLOCKS.register("cyan_flaming_steel_grate",
-            () -> new WaterloggableGrateBlock(BlocksPart09.flamingSteelProperties().noOcclusion()
-                    .isRedstoneConductor((state, reader, pos) -> false).isSuffocating((state, reader, pos) -> false)
-                    .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> CYAN_FLAMING_STEEL_PILLAR = BLOCKS.register("cyan_flaming_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> CYAN_FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register(
-            "cyan_flaming_bolted_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> PURPLE_FLAMING_STEEL_BLOCK = BLOCKS.register("purple_flaming_steel_block",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> PURPLE_FLAMING_STEEL_BLOCK_SLAB = BLOCKS.register(
-            "purple_flaming_steel_block_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(PURPLE_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = BLOCKS.register(
-            "purple_flaming_steel_block_vertical_slab",
-            () -> new VerticalSlabBlock(PURPLE_FLAMING_STEEL_BLOCK.get(),
-                    BlockBehaviour.Properties.copy(PURPLE_FLAMING_STEEL_BLOCK_SLAB.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_STEEL_BLOCK_STAIRS = BLOCKS.register(
-            "purple_flaming_steel_block_stairs",
-            () -> new ModStairBlock(PURPLE_FLAMING_STEEL_BLOCK.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(PURPLE_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_STEEL_BLOCK_WALL = BLOCKS.register(
-            "purple_flaming_steel_block_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(PURPLE_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_CUT_STEEL = BLOCKS.register("purple_flaming_cut_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> PURPLE_FLAMING_CUT_STEEL_SLAB = BLOCKS.register(
-            "purple_flaming_cut_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(PURPLE_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "purple_flaming_cut_steel_vertical_slab",
-            () -> new VerticalSlabBlock(PURPLE_FLAMING_CUT_STEEL.get(),
-                    BlockBehaviour.Properties.copy(PURPLE_FLAMING_CUT_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_CUT_STEEL_STAIRS = BLOCKS.register(
-            "purple_flaming_cut_steel_stairs",
-            () -> new ModStairBlock(PURPLE_FLAMING_CUT_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(PURPLE_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_CUT_STEEL_WALL = BLOCKS.register(
-            "purple_flaming_cut_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(PURPLE_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_POLISHED_STEEL = BLOCKS.register(
-            "purple_flaming_polished_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> PURPLE_FLAMING_POLISHED_STEEL_SLAB = BLOCKS.register(
-            "purple_flaming_polished_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(PURPLE_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "purple_flaming_polished_steel_vertical_slab",
-            () -> new VerticalSlabBlock(PURPLE_FLAMING_POLISHED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(PURPLE_FLAMING_POLISHED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_POLISHED_STEEL_STAIRS = BLOCKS.register(
-            "purple_flaming_polished_steel_stairs",
-            () -> new ModStairBlock(PURPLE_FLAMING_POLISHED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(PURPLE_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_POLISHED_STEEL_WALL = BLOCKS.register(
-            "purple_flaming_polished_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(PURPLE_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_PRESSED_STEEL = BLOCKS.register(
-            "purple_flaming_pressed_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> PURPLE_FLAMING_PRESSED_STEEL_SLAB = BLOCKS.register(
-            "purple_flaming_pressed_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(PURPLE_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "purple_flaming_pressed_steel_vertical_slab",
-            () -> new VerticalSlabBlock(PURPLE_FLAMING_PRESSED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(PURPLE_FLAMING_PRESSED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_PRESSED_STEEL_STAIRS = BLOCKS.register(
-            "purple_flaming_pressed_steel_stairs",
-            () -> new ModStairBlock(PURPLE_FLAMING_PRESSED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(PURPLE_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_PRESSED_STEEL_WALL = BLOCKS.register(
-            "purple_flaming_pressed_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(PURPLE_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> PURPLE_FLAMING_STEEL_CASING = BLOCKS.register(
-            "purple_flaming_steel_casing",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> PURPLE_FLAMING_STEEL_GRATE = BLOCKS.register("purple_flaming_steel_grate",
-            () -> new WaterloggableGrateBlock(BlocksPart09.flamingSteelProperties().noOcclusion()
-                    .isRedstoneConductor((state, reader, pos) -> false).isSuffocating((state, reader, pos) -> false)
-                    .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> PURPLE_FLAMING_STEEL_PILLAR = BLOCKS.register(
-            "purple_flaming_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> PURPLE_FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register(
-            "purple_flaming_bolted_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLUE_FLAMING_STEEL_BLOCK = BLOCKS.register("blue_flaming_steel_block",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLUE_FLAMING_STEEL_BLOCK_SLAB = BLOCKS.register(
-            "blue_flaming_steel_block_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BLUE_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = BLOCKS.register(
-            "blue_flaming_steel_block_vertical_slab",
-            () -> new VerticalSlabBlock(BLUE_FLAMING_STEEL_BLOCK.get(),
-                    BlockBehaviour.Properties.copy(BLUE_FLAMING_STEEL_BLOCK_SLAB.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_STEEL_BLOCK_STAIRS = BLOCKS.register(
-            "blue_flaming_steel_block_stairs",
-            () -> new ModStairBlock(BLUE_FLAMING_STEEL_BLOCK.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BLUE_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_STEEL_BLOCK_WALL = BLOCKS.register(
-            "blue_flaming_steel_block_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BLUE_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_CUT_STEEL = BLOCKS.register("blue_flaming_cut_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLUE_FLAMING_CUT_STEEL_SLAB = BLOCKS.register(
-            "blue_flaming_cut_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BLUE_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "blue_flaming_cut_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BLUE_FLAMING_CUT_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BLUE_FLAMING_CUT_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_CUT_STEEL_STAIRS = BLOCKS.register(
-            "blue_flaming_cut_steel_stairs",
-            () -> new ModStairBlock(BLUE_FLAMING_CUT_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BLUE_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_CUT_STEEL_WALL = BLOCKS.register(
-            "blue_flaming_cut_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BLUE_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_POLISHED_STEEL = BLOCKS.register(
-            "blue_flaming_polished_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLUE_FLAMING_POLISHED_STEEL_SLAB = BLOCKS.register(
-            "blue_flaming_polished_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BLUE_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "blue_flaming_polished_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BLUE_FLAMING_POLISHED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BLUE_FLAMING_POLISHED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_POLISHED_STEEL_STAIRS = BLOCKS.register(
-            "blue_flaming_polished_steel_stairs",
-            () -> new ModStairBlock(BLUE_FLAMING_POLISHED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BLUE_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_POLISHED_STEEL_WALL = BLOCKS.register(
-            "blue_flaming_polished_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BLUE_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_PRESSED_STEEL = BLOCKS.register("blue_flaming_pressed_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLUE_FLAMING_PRESSED_STEEL_SLAB = BLOCKS.register(
-            "blue_flaming_pressed_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BLUE_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "blue_flaming_pressed_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BLUE_FLAMING_PRESSED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BLUE_FLAMING_PRESSED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_PRESSED_STEEL_STAIRS = BLOCKS.register(
-            "blue_flaming_pressed_steel_stairs",
-            () -> new ModStairBlock(BLUE_FLAMING_PRESSED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BLUE_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_PRESSED_STEEL_WALL = BLOCKS.register(
-            "blue_flaming_pressed_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BLUE_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BLUE_FLAMING_STEEL_CASING = BLOCKS.register("blue_flaming_steel_casing",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLUE_FLAMING_STEEL_GRATE = BLOCKS.register("blue_flaming_steel_grate",
-            () -> new WaterloggableGrateBlock(BlocksPart09.flamingSteelProperties().noOcclusion()
-                    .isRedstoneConductor((state, reader, pos) -> false).isSuffocating((state, reader, pos) -> false)
-                    .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> BLUE_FLAMING_STEEL_PILLAR = BLOCKS.register("blue_flaming_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLUE_FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register(
-            "blue_flaming_bolted_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BROWN_FLAMING_STEEL_BLOCK = BLOCKS.register("brown_flaming_steel_block",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BROWN_FLAMING_STEEL_BLOCK_SLAB = BLOCKS.register(
-            "brown_flaming_steel_block_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BROWN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = BLOCKS.register(
-            "brown_flaming_steel_block_vertical_slab",
-            () -> new VerticalSlabBlock(BROWN_FLAMING_STEEL_BLOCK.get(),
-                    BlockBehaviour.Properties.copy(BROWN_FLAMING_STEEL_BLOCK_SLAB.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_STEEL_BLOCK_STAIRS = BLOCKS.register(
-            "brown_flaming_steel_block_stairs",
-            () -> new ModStairBlock(BROWN_FLAMING_STEEL_BLOCK.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BROWN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_STEEL_BLOCK_WALL = BLOCKS.register(
-            "brown_flaming_steel_block_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BROWN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_CUT_STEEL = BLOCKS.register("brown_flaming_cut_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BROWN_FLAMING_CUT_STEEL_SLAB = BLOCKS.register(
-            "brown_flaming_cut_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BROWN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "brown_flaming_cut_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BROWN_FLAMING_CUT_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BROWN_FLAMING_CUT_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_CUT_STEEL_STAIRS = BLOCKS.register(
-            "brown_flaming_cut_steel_stairs",
-            () -> new ModStairBlock(BROWN_FLAMING_CUT_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BROWN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_CUT_STEEL_WALL = BLOCKS.register(
-            "brown_flaming_cut_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BROWN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_POLISHED_STEEL = BLOCKS.register(
-            "brown_flaming_polished_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BROWN_FLAMING_POLISHED_STEEL_SLAB = BLOCKS.register(
-            "brown_flaming_polished_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BROWN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "brown_flaming_polished_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BROWN_FLAMING_POLISHED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BROWN_FLAMING_POLISHED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_POLISHED_STEEL_STAIRS = BLOCKS.register(
-            "brown_flaming_polished_steel_stairs",
-            () -> new ModStairBlock(BROWN_FLAMING_POLISHED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BROWN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_POLISHED_STEEL_WALL = BLOCKS.register(
-            "brown_flaming_polished_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BROWN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_PRESSED_STEEL = BLOCKS.register(
-            "brown_flaming_pressed_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BROWN_FLAMING_PRESSED_STEEL_SLAB = BLOCKS.register(
-            "brown_flaming_pressed_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BROWN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "brown_flaming_pressed_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BROWN_FLAMING_PRESSED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BROWN_FLAMING_PRESSED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_PRESSED_STEEL_STAIRS = BLOCKS.register(
-            "brown_flaming_pressed_steel_stairs",
-            () -> new ModStairBlock(BROWN_FLAMING_PRESSED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BROWN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_PRESSED_STEEL_WALL = BLOCKS.register(
-            "brown_flaming_pressed_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BROWN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BROWN_FLAMING_STEEL_CASING = BLOCKS.register("brown_flaming_steel_casing",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BROWN_FLAMING_STEEL_GRATE = BLOCKS.register("brown_flaming_steel_grate",
-            () -> new WaterloggableGrateBlock(BlocksPart09.flamingSteelProperties().noOcclusion()
-                    .isRedstoneConductor((state, reader, pos) -> false).isSuffocating((state, reader, pos) -> false)
-                    .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> BROWN_FLAMING_STEEL_PILLAR = BLOCKS.register("brown_flaming_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BROWN_FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register(
-            "brown_flaming_bolted_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> GREEN_FLAMING_STEEL_BLOCK = BLOCKS.register("green_flaming_steel_block",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> GREEN_FLAMING_STEEL_BLOCK_SLAB = BLOCKS.register(
-            "green_flaming_steel_block_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(GREEN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = BLOCKS.register(
-            "green_flaming_steel_block_vertical_slab",
-            () -> new VerticalSlabBlock(GREEN_FLAMING_STEEL_BLOCK.get(),
-                    BlockBehaviour.Properties.copy(GREEN_FLAMING_STEEL_BLOCK_SLAB.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_STEEL_BLOCK_STAIRS = BLOCKS.register(
-            "green_flaming_steel_block_stairs",
-            () -> new ModStairBlock(GREEN_FLAMING_STEEL_BLOCK.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(GREEN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_STEEL_BLOCK_WALL = BLOCKS.register(
-            "green_flaming_steel_block_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(GREEN_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_CUT_STEEL = BLOCKS.register("green_flaming_cut_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> GREEN_FLAMING_CUT_STEEL_SLAB = BLOCKS.register(
-            "green_flaming_cut_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(GREEN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "green_flaming_cut_steel_vertical_slab",
-            () -> new VerticalSlabBlock(GREEN_FLAMING_CUT_STEEL.get(),
-                    BlockBehaviour.Properties.copy(GREEN_FLAMING_CUT_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_CUT_STEEL_STAIRS = BLOCKS.register(
-            "green_flaming_cut_steel_stairs",
-            () -> new ModStairBlock(GREEN_FLAMING_CUT_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(GREEN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_CUT_STEEL_WALL = BLOCKS.register(
-            "green_flaming_cut_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(GREEN_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_POLISHED_STEEL = BLOCKS.register(
-            "green_flaming_polished_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> GREEN_FLAMING_POLISHED_STEEL_SLAB = BLOCKS.register(
-            "green_flaming_polished_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(GREEN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "green_flaming_polished_steel_vertical_slab",
-            () -> new VerticalSlabBlock(GREEN_FLAMING_POLISHED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(GREEN_FLAMING_POLISHED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_POLISHED_STEEL_STAIRS = BLOCKS.register(
-            "green_flaming_polished_steel_stairs",
-            () -> new ModStairBlock(GREEN_FLAMING_POLISHED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(GREEN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_POLISHED_STEEL_WALL = BLOCKS.register(
-            "green_flaming_polished_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(GREEN_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_PRESSED_STEEL = BLOCKS.register(
-            "green_flaming_pressed_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> GREEN_FLAMING_PRESSED_STEEL_SLAB = BLOCKS.register(
-            "green_flaming_pressed_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(GREEN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "green_flaming_pressed_steel_vertical_slab",
-            () -> new VerticalSlabBlock(GREEN_FLAMING_PRESSED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(GREEN_FLAMING_PRESSED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_PRESSED_STEEL_STAIRS = BLOCKS.register(
-            "green_flaming_pressed_steel_stairs",
-            () -> new ModStairBlock(GREEN_FLAMING_PRESSED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(GREEN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_PRESSED_STEEL_WALL = BLOCKS.register(
-            "green_flaming_pressed_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(GREEN_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> GREEN_FLAMING_STEEL_CASING = BLOCKS.register("green_flaming_steel_casing",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> GREEN_FLAMING_STEEL_GRATE = BLOCKS.register("green_flaming_steel_grate",
-            () -> new WaterloggableGrateBlock(BlocksPart09.flamingSteelProperties().noOcclusion()
-                    .isRedstoneConductor((state, reader, pos) -> false).isSuffocating((state, reader, pos) -> false)
-                    .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> GREEN_FLAMING_STEEL_PILLAR = BLOCKS.register("green_flaming_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> GREEN_FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register(
-            "green_flaming_bolted_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> RED_FLAMING_STEEL_BLOCK = BLOCKS.register("red_flaming_steel_block",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> RED_FLAMING_STEEL_BLOCK_SLAB = BLOCKS.register(
-            "red_flaming_steel_block_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(RED_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = BLOCKS.register(
-            "red_flaming_steel_block_vertical_slab",
-            () -> new VerticalSlabBlock(RED_FLAMING_STEEL_BLOCK.get(),
-                    BlockBehaviour.Properties.copy(RED_FLAMING_STEEL_BLOCK_SLAB.get())));
-    public static final RegistryObject<Block> RED_FLAMING_STEEL_BLOCK_STAIRS = BLOCKS.register(
-            "red_flaming_steel_block_stairs",
-            () -> new ModStairBlock(RED_FLAMING_STEEL_BLOCK.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(RED_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> RED_FLAMING_STEEL_BLOCK_WALL = BLOCKS.register(
-            "red_flaming_steel_block_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(RED_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> RED_FLAMING_CUT_STEEL = BLOCKS.register("red_flaming_cut_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> RED_FLAMING_CUT_STEEL_SLAB = BLOCKS.register("red_flaming_cut_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(RED_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_CUT_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "red_flaming_cut_steel_vertical_slab",
-            () -> new VerticalSlabBlock(RED_FLAMING_CUT_STEEL.get(),
-                    BlockBehaviour.Properties.copy(RED_FLAMING_CUT_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> RED_FLAMING_CUT_STEEL_STAIRS = BLOCKS.register(
-            "red_flaming_cut_steel_stairs",
-            () -> new ModStairBlock(RED_FLAMING_CUT_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(RED_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_CUT_STEEL_WALL = BLOCKS.register("red_flaming_cut_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(RED_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_POLISHED_STEEL = BLOCKS.register("red_flaming_polished_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> RED_FLAMING_POLISHED_STEEL_SLAB = BLOCKS.register(
-            "red_flaming_polished_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(RED_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "red_flaming_polished_steel_vertical_slab",
-            () -> new VerticalSlabBlock(RED_FLAMING_POLISHED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(RED_FLAMING_POLISHED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> RED_FLAMING_POLISHED_STEEL_STAIRS = BLOCKS.register(
-            "red_flaming_polished_steel_stairs",
-            () -> new ModStairBlock(RED_FLAMING_POLISHED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(RED_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_POLISHED_STEEL_WALL = BLOCKS.register(
-            "red_flaming_polished_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(RED_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_PRESSED_STEEL = BLOCKS.register("red_flaming_pressed_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> RED_FLAMING_PRESSED_STEEL_SLAB = BLOCKS.register(
-            "red_flaming_pressed_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(RED_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "red_flaming_pressed_steel_vertical_slab",
-            () -> new VerticalSlabBlock(RED_FLAMING_PRESSED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(RED_FLAMING_PRESSED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> RED_FLAMING_PRESSED_STEEL_STAIRS = BLOCKS.register(
-            "red_flaming_pressed_steel_stairs",
-            () -> new ModStairBlock(RED_FLAMING_PRESSED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(RED_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_PRESSED_STEEL_WALL = BLOCKS.register(
-            "red_flaming_pressed_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(RED_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> RED_FLAMING_STEEL_CASING = BLOCKS.register("red_flaming_steel_casing",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> RED_FLAMING_STEEL_GRATE = BLOCKS.register("red_flaming_steel_grate",
-            () -> new WaterloggableGrateBlock(BlocksPart09.flamingSteelProperties().noOcclusion()
-                    .isRedstoneConductor((state, reader, pos) -> false).isSuffocating((state, reader, pos) -> false)
-                    .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> RED_FLAMING_STEEL_PILLAR = BLOCKS.register("red_flaming_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> RED_FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register(
-            "red_flaming_bolted_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLACK_FLAMING_STEEL_BLOCK = BLOCKS.register("black_flaming_steel_block",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLACK_FLAMING_STEEL_BLOCK_SLAB = BLOCKS.register(
-            "black_flaming_steel_block_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BLACK_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = BLOCKS.register(
-            "black_flaming_steel_block_vertical_slab",
-            () -> new VerticalSlabBlock(BLACK_FLAMING_STEEL_BLOCK.get(),
-                    BlockBehaviour.Properties.copy(BLACK_FLAMING_STEEL_BLOCK_SLAB.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_STEEL_BLOCK_STAIRS = BLOCKS.register(
-            "black_flaming_steel_block_stairs",
-            () -> new ModStairBlock(BLACK_FLAMING_STEEL_BLOCK.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BLACK_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_STEEL_BLOCK_WALL = BLOCKS.register(
-            "black_flaming_steel_block_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BLACK_FLAMING_STEEL_BLOCK.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_CUT_STEEL = BLOCKS.register("black_flaming_cut_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLACK_FLAMING_CUT_STEEL_SLAB = BLOCKS.register(
-            "black_flaming_cut_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BLACK_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "black_flaming_cut_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BLACK_FLAMING_CUT_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BLACK_FLAMING_CUT_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_CUT_STEEL_STAIRS = BLOCKS.register(
-            "black_flaming_cut_steel_stairs",
-            () -> new ModStairBlock(BLACK_FLAMING_CUT_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BLACK_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_CUT_STEEL_WALL = BLOCKS.register(
-            "black_flaming_cut_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BLACK_FLAMING_CUT_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_POLISHED_STEEL = BLOCKS.register(
-            "black_flaming_polished_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLACK_FLAMING_POLISHED_STEEL_SLAB = BLOCKS.register(
-            "black_flaming_polished_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BLACK_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "black_flaming_polished_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BLACK_FLAMING_POLISHED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BLACK_FLAMING_POLISHED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_POLISHED_STEEL_STAIRS = BLOCKS.register(
-            "black_flaming_polished_steel_stairs",
-            () -> new ModStairBlock(BLACK_FLAMING_POLISHED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BLACK_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_POLISHED_STEEL_WALL = BLOCKS.register(
-            "black_flaming_polished_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BLACK_FLAMING_POLISHED_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_PRESSED_STEEL = BLOCKS.register(
-            "black_flaming_pressed_steel",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLACK_FLAMING_PRESSED_STEEL_SLAB = BLOCKS.register(
-            "black_flaming_pressed_steel_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(BLACK_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = BLOCKS.register(
-            "black_flaming_pressed_steel_vertical_slab",
-            () -> new VerticalSlabBlock(BLACK_FLAMING_PRESSED_STEEL.get(),
-                    BlockBehaviour.Properties.copy(BLACK_FLAMING_PRESSED_STEEL_SLAB.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_PRESSED_STEEL_STAIRS = BLOCKS.register(
-            "black_flaming_pressed_steel_stairs",
-            () -> new ModStairBlock(BLACK_FLAMING_PRESSED_STEEL.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(BLACK_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_PRESSED_STEEL_WALL = BLOCKS.register(
-            "black_flaming_pressed_steel_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(BLACK_FLAMING_PRESSED_STEEL.get())));
-    public static final RegistryObject<Block> BLACK_FLAMING_STEEL_CASING = BLOCKS.register("black_flaming_steel_casing",
-            () -> new Block(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLACK_FLAMING_STEEL_GRATE = BLOCKS.register("black_flaming_steel_grate",
-            () -> new WaterloggableGrateBlock(BlocksPart09.flamingSteelProperties().noOcclusion()
-                    .isRedstoneConductor((state, reader, pos) -> false).isSuffocating((state, reader, pos) -> false)
-                    .isViewBlocking((state, reader, pos) -> false)));
-    public static final RegistryObject<Block> BLACK_FLAMING_STEEL_PILLAR = BLOCKS.register("black_flaming_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
-    public static final RegistryObject<Block> BLACK_FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register(
-            "black_flaming_bolted_steel_pillar",
-            () -> new RotatedPillarBlock(BlocksPart09.flamingSteelProperties()));
+    static {
+        SteelBlocks.init();
+    }
 
-    public static final RegistryObject<Block> HOLLOW_OAK_LOG = BLOCKS.register("hollow_oak_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
     public static final RegistryObject<Block> STRIPPED_HOLLOW_OAK_LOG = BLOCKS.register("stripped_hollow_oak_log",
             () -> new HollowLogBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
     public static final RegistryObject<Block> HOLLOW_SPRUCE_LOG = BLOCKS.register("hollow_spruce_log",
@@ -671,27 +75,27 @@ public final class BlocksPart10 {
             "stripped_hollow_warped_stem",
             () -> new HollowLogBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_WARPED_STEM)));
     public static final RegistryObject<Block> HOLLOW_MANGROVE_LOG = BLOCKS.register("hollow_mangrove_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart04.MANGROVE_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(DecorBlocks.MANGROVE_LOG.get())));
     public static final RegistryObject<Block> STRIPPED_HOLLOW_MANGROVE_LOG = BLOCKS.register(
             "stripped_hollow_mangrove_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart04.STRIPPED_MANGROVE_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(DecorBlocks.STRIPPED_MANGROVE_LOG.get())));
     public static final RegistryObject<Block> HOLLOW_ASHPEN_LOG = BLOCKS.register("hollow_ashpen_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart07.ASHPEN_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(ShapedStoneBlocks.ASHPEN_LOG.get())));
     public static final RegistryObject<Block> STRIPPED_HOLLOW_ASHPEN_LOG = BLOCKS.register("stripped_hollow_ashpen_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart07.STRIPPED_ASHPEN_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(ShapedStoneBlocks.STRIPPED_ASHPEN_LOG.get())));
     public static final RegistryObject<Block> HOLLOW_POPLAR_LOG = BLOCKS.register("hollow_poplar_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart08.POPLAR_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(ShapedWoodBlocks.POPLAR_LOG.get())));
     public static final RegistryObject<Block> STRIPPED_HOLLOW_POPLAR_LOG = BLOCKS.register("stripped_hollow_poplar_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart08.STRIPPED_POPLAR_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(ShapedWoodBlocks.STRIPPED_POPLAR_LOG.get())));
     public static final RegistryObject<Block> HOLLOW_PALE_OAK_LOG = BLOCKS.register("hollow_pale_oak_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart09.PALE_OAK_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(ShapedWoodBlocks.PALE_OAK_LOG.get())));
     public static final RegistryObject<Block> STRIPPED_HOLLOW_PALE_OAK_LOG = BLOCKS.register(
             "stripped_hollow_pale_oak_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart09.STRIPPED_PALE_OAK_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(ShapedWoodBlocks.STRIPPED_PALE_OAK_LOG.get())));
     public static final RegistryObject<Block> HOLLOW_CHERRY_LOG = BLOCKS.register("hollow_cherry_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart09.CHERRY_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(ShapedWoodBlocks.CHERRY_LOG.get())));
     public static final RegistryObject<Block> STRIPPED_HOLLOW_CHERRY_LOG = BLOCKS.register("stripped_hollow_cherry_log",
-            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(BlocksPart09.STRIPPED_CHERRY_LOG.get())));
+            () -> new HollowLogBlock(BlockBehaviour.Properties.copy(ShapedWoodBlocks.STRIPPED_CHERRY_LOG.get())));
 
     public static final RegistryObject<Block> CARDBOARD_BLOCK = BLOCKS.register("cardboard_block",
             () -> new ModBlock(
@@ -1486,25 +890,25 @@ public final class BlocksPart10 {
             () -> new ShelfBlock(BlockBehaviour.Properties.copy(Blocks.DARK_OAK_PLANKS).strength(2.0f, 3.0f)));
     public static final RegistryObject<Block> MANGROVE_SHELF = BLOCKS.register("mangrove_shelf",
             () -> new ShelfBlock(
-                    BlockBehaviour.Properties.copy(BlocksPart04.MANGROVE_PLANKS.get()).strength(2.0f, 3.0f)));
+                    BlockBehaviour.Properties.copy(DecorBlocks.MANGROVE_PLANKS.get()).strength(2.0f, 3.0f)));
     public static final RegistryObject<Block> CHERRY_SHELF = BLOCKS.register("cherry_shelf",
             () -> new ShelfBlock(
-                    BlockBehaviour.Properties.copy(BlocksPart09.CHERRY_PLANKS.get()).strength(2.0f, 3.0f)));
+                    BlockBehaviour.Properties.copy(ShapedWoodBlocks.CHERRY_PLANKS.get()).strength(2.0f, 3.0f)));
     public static final RegistryObject<Block> CRIMSON_SHELF = BLOCKS.register("crimson_shelf",
             () -> new ShelfBlock(BlockBehaviour.Properties.copy(Blocks.CRIMSON_PLANKS).strength(2.0f, 3.0f)));
     public static final RegistryObject<Block> WARPED_SHELF = BLOCKS.register("warped_shelf",
             () -> new ShelfBlock(BlockBehaviour.Properties.copy(Blocks.WARPED_PLANKS).strength(2.0f, 3.0f)));
     public static final RegistryObject<Block> BAMBOO_SHELF = BLOCKS.register("bamboo_shelf",
-            () -> new ShelfBlock(BlockBehaviour.Properties.copy(BlocksPart03.BAMBOO_BLOCK.get()).strength(2.0f, 3.0f)));
+            () -> new ShelfBlock(BlockBehaviour.Properties.copy(WoodBlocks.BAMBOO_BLOCK.get()).strength(2.0f, 3.0f)));
     public static final RegistryObject<Block> STRIPPED_BAMBOO_SHELF = BLOCKS.register("stripped_bamboo_shelf",
             () -> new ShelfBlock(
-                    BlockBehaviour.Properties.copy(BlocksPart03.STRIPPED_BAMBOO_BLOCK.get()).strength(2.0f, 3.0f)));
+                    BlockBehaviour.Properties.copy(WoodBlocks.STRIPPED_BAMBOO_BLOCK.get()).strength(2.0f, 3.0f)));
     public static final RegistryObject<Block> PALE_OAK_SHELF = BLOCKS.register("pale_oak_shelf",
             () -> new ShelfBlock(
-                    BlockBehaviour.Properties.copy(BlocksPart09.PALE_OAK_PLANKS.get()).strength(2.0f, 3.0f)));
+                    BlockBehaviour.Properties.copy(ShapedWoodBlocks.PALE_OAK_PLANKS.get()).strength(2.0f, 3.0f)));
     public static final RegistryObject<Block> POPLAR_SHELF = BLOCKS.register("poplar_shelf",
             () -> new ShelfBlock(
-                    BlockBehaviour.Properties.copy(BlocksPart08.POPLAR_PLANKS.get()).strength(2.0f, 3.0f)));
+                    BlockBehaviour.Properties.copy(ShapedWoodBlocks.POPLAR_PLANKS.get()).strength(2.0f, 3.0f)));
 
     public static final RegistryObject<Block> EXPERIENCE_BLOCK = BLOCKS.register("experience_liquid",
             () -> new ExperienceFluidBlock(

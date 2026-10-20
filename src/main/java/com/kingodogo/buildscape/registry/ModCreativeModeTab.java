@@ -7,9 +7,7 @@ import com.kingodogo.buildscape.feature.firework.FireworkTestCommand;
 import com.kingodogo.buildscape.feature.firework.InfinitePhoenixFireworkStarItem;
 import com.kingodogo.buildscape.feature.trophy.Trophies;
 import com.kingodogo.buildscape.feature.trophy.TrophyDefinition;
-import com.kingodogo.buildscape.registry.tab.TabOrder1;
-import com.kingodogo.buildscape.registry.tab.TabOrder2;
-import com.kingodogo.buildscape.registry.tab.TabOrder3;
+import com.kingodogo.buildscape.registry.tab.TabOrder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -276,12 +274,11 @@ public class ModCreativeModeTab {
         }
 
         private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
-            addOrdered(items, TabOrder1.ITEMS);
-            addOrdered(items, TabOrder2.ITEMS);
+            addOrdered(items, TabOrder.BEFORE_FIREWORKS);
             addFireworkItems(items);
-            addOrdered(items, TabOrder2.AFTER_FIREWORKS);
+            addOrdered(items, TabOrder.AFTER_FIREWORKS);
             addTrophyItems(items);
-            addOrdered(items, TabOrder3.ITEMS);
+            addOrdered(items, TabOrder.AFTER_TROPHIES);
         }
 
         private static void addOrdered(@NotNull NonNullList<ItemStack> items,

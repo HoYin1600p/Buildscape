@@ -1,13 +1,9 @@
 package com.kingodogo.buildscape.registry.items;
 
-import com.kingodogo.buildscape.feature.biome.BiomeBrushItem;
 import com.kingodogo.buildscape.feature.firework.InfinitePhoenixFireworkStarItem;
-import com.kingodogo.buildscape.feature.pipe.WrenchItem;
-import com.kingodogo.buildscape.item.BuildersPouchItem;
+import com.kingodogo.buildscape.item.BottleOfMistItem;
 import com.kingodogo.buildscape.item.ColoredItemFrameItem;
 import com.kingodogo.buildscape.item.ConfettiItem;
-import com.kingodogo.buildscape.item.HammerItem;
-import com.kingodogo.buildscape.item.MangroveBoatItem;
 import com.kingodogo.buildscape.item.MistBlockItem;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModCreativeModeTab;
@@ -16,463 +12,34 @@ import javax.annotation.Nullable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SignItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.RegistryObject;
 
-import static com.kingodogo.buildscape.registry.ModItems.ITEMS;
-import static com.kingodogo.buildscape.registry.ModItems.createBlockItemProperties;
-import static com.kingodogo.buildscape.registry.ModItems.registerBlockItem;
+import static com.kingodogo.buildscape.registry.items.ItemsRegister.ITEMS;
+import static com.kingodogo.buildscape.registry.items.ItemsRegister.createBlockItemProperties;
+import static com.kingodogo.buildscape.registry.items.ItemsRegister.registerBlockItem;
 
-/** Part of the items registrations; see {@code ModItems}. */
-public final class ItemsPart02 {
+/**
+ * The items MULTICOLOR_GLOW_LIGHTS through ANCIENT_ASHEN_SCROLL of the registry, part 3 of 8, in registration order.
+ * Named for its dominant families (stone, decor, steel); the neighbouring families that share a run of the order
+ * with them are registered here too, because the registration order must not change.
+ * Load order: {@link WoodItems#init()} runs first (see the static block), so every holder registers in order whichever is touched first.
+ */
+public final class MasonryItems {
 
-    private ItemsPart02() {}
+    private MasonryItems() {}
 
-    /** Forces this class to load so its registrations run in the order {@code ModItems} calls it. */
+    /** Forces this class to load, which registers its items. */
     public static void init() {}
 
-    public static final RegistryObject<Item> LIME_ASHPEN_PLANKS = registerBlockItem("ashpen_lime_planks",
-            ModBlocks.LIME_ASHPEN_PLANKS);
-    public static final RegistryObject<Item> LIME_ASHPEN_STAIRS = registerBlockItem("ashpen_lime_stairs",
-            ModBlocks.LIME_ASHPEN_STAIRS);
-    public static final RegistryObject<Item> LIME_ASHPEN_SLAB = registerBlockItem("ashpen_lime_slab",
-            ModBlocks.LIME_ASHPEN_SLAB);
-    public static final RegistryObject<Item> LIME_ASHPEN_FENCE = registerBlockItem("ashpen_lime_fence",
-            ModBlocks.LIME_ASHPEN_FENCE);
-    public static final RegistryObject<Item> LIME_ASHPEN_FENCE_GATE = registerBlockItem("ashpen_lime_fence_gate",
-            ModBlocks.LIME_ASHPEN_FENCE_GATE);
-    public static final RegistryObject<Item> LIME_ASHPEN_PRESSURE_PLATE = registerBlockItem(
-            "ashpen_lime_pressure_plate", ModBlocks.LIME_ASHPEN_PRESSURE_PLATE);
-    public static final RegistryObject<Item> LIME_ASHPEN_BUTTON = registerBlockItem("ashpen_lime_button",
-            ModBlocks.LIME_ASHPEN_BUTTON);
-    public static final RegistryObject<Item> MAGENTA_ASHPEN_PLANKS = registerBlockItem("ashpen_magenta_planks",
-            ModBlocks.MAGENTA_ASHPEN_PLANKS);
-    public static final RegistryObject<Item> MAGENTA_ASHPEN_STAIRS = registerBlockItem("ashpen_magenta_stairs",
-            ModBlocks.MAGENTA_ASHPEN_STAIRS);
-    public static final RegistryObject<Item> MAGENTA_ASHPEN_SLAB = registerBlockItem("ashpen_magenta_slab",
-            ModBlocks.MAGENTA_ASHPEN_SLAB);
-    public static final RegistryObject<Item> MAGENTA_ASHPEN_FENCE = registerBlockItem("ashpen_magenta_fence",
-            ModBlocks.MAGENTA_ASHPEN_FENCE);
-    public static final RegistryObject<Item> MAGENTA_ASHPEN_FENCE_GATE = registerBlockItem("ashpen_magenta_fence_gate",
-            ModBlocks.MAGENTA_ASHPEN_FENCE_GATE);
-    public static final RegistryObject<Item> MAGENTA_ASHPEN_PRESSURE_PLATE = registerBlockItem(
-            "ashpen_magenta_pressure_plate", ModBlocks.MAGENTA_ASHPEN_PRESSURE_PLATE);
-    public static final RegistryObject<Item> MAGENTA_ASHPEN_BUTTON = registerBlockItem("ashpen_magenta_button",
-            ModBlocks.MAGENTA_ASHPEN_BUTTON);
-    public static final RegistryObject<Item> ORANGE_ASHPEN_PLANKS = registerBlockItem("ashpen_orange_planks",
-            ModBlocks.ORANGE_ASHPEN_PLANKS);
-    public static final RegistryObject<Item> ORANGE_ASHPEN_STAIRS = registerBlockItem("ashpen_orange_stairs",
-            ModBlocks.ORANGE_ASHPEN_STAIRS);
-    public static final RegistryObject<Item> ORANGE_ASHPEN_SLAB = registerBlockItem("ashpen_orange_slab",
-            ModBlocks.ORANGE_ASHPEN_SLAB);
-    public static final RegistryObject<Item> ORANGE_ASHPEN_FENCE = registerBlockItem("ashpen_orange_fence",
-            ModBlocks.ORANGE_ASHPEN_FENCE);
-    public static final RegistryObject<Item> ORANGE_ASHPEN_FENCE_GATE = registerBlockItem("ashpen_orange_fence_gate",
-            ModBlocks.ORANGE_ASHPEN_FENCE_GATE);
-    public static final RegistryObject<Item> ORANGE_ASHPEN_PRESSURE_PLATE = registerBlockItem(
-            "ashpen_orange_pressure_plate", ModBlocks.ORANGE_ASHPEN_PRESSURE_PLATE);
-    public static final RegistryObject<Item> ORANGE_ASHPEN_BUTTON = registerBlockItem("ashpen_orange_button",
-            ModBlocks.ORANGE_ASHPEN_BUTTON);
-    public static final RegistryObject<Item> PINK_ASHPEN_PLANKS = registerBlockItem("ashpen_pink_planks",
-            ModBlocks.PINK_ASHPEN_PLANKS);
-    public static final RegistryObject<Item> PINK_ASHPEN_STAIRS = registerBlockItem("ashpen_pink_stairs",
-            ModBlocks.PINK_ASHPEN_STAIRS);
-    public static final RegistryObject<Item> PINK_ASHPEN_SLAB = registerBlockItem("ashpen_pink_slab",
-            ModBlocks.PINK_ASHPEN_SLAB);
-    public static final RegistryObject<Item> PINK_ASHPEN_FENCE = registerBlockItem("ashpen_pink_fence",
-            ModBlocks.PINK_ASHPEN_FENCE);
-    public static final RegistryObject<Item> PINK_ASHPEN_FENCE_GATE = registerBlockItem("ashpen_pink_fence_gate",
-            ModBlocks.PINK_ASHPEN_FENCE_GATE);
-    public static final RegistryObject<Item> PINK_ASHPEN_PRESSURE_PLATE = registerBlockItem(
-            "ashpen_pink_pressure_plate", ModBlocks.PINK_ASHPEN_PRESSURE_PLATE);
-    public static final RegistryObject<Item> PINK_ASHPEN_BUTTON = registerBlockItem("ashpen_pink_button",
-            ModBlocks.PINK_ASHPEN_BUTTON);
-    public static final RegistryObject<Item> PURPLE_ASHPEN_PLANKS = registerBlockItem("ashpen_purple_planks",
-            ModBlocks.PURPLE_ASHPEN_PLANKS);
-    public static final RegistryObject<Item> PURPLE_ASHPEN_STAIRS = registerBlockItem("ashpen_purple_stairs",
-            ModBlocks.PURPLE_ASHPEN_STAIRS);
-    public static final RegistryObject<Item> PURPLE_ASHPEN_SLAB = registerBlockItem("ashpen_purple_slab",
-            ModBlocks.PURPLE_ASHPEN_SLAB);
-    public static final RegistryObject<Item> PURPLE_ASHPEN_FENCE = registerBlockItem("ashpen_purple_fence",
-            ModBlocks.PURPLE_ASHPEN_FENCE);
-    public static final RegistryObject<Item> PURPLE_ASHPEN_FENCE_GATE = registerBlockItem("ashpen_purple_fence_gate",
-            ModBlocks.PURPLE_ASHPEN_FENCE_GATE);
-    public static final RegistryObject<Item> PURPLE_ASHPEN_PRESSURE_PLATE = registerBlockItem(
-            "ashpen_purple_pressure_plate", ModBlocks.PURPLE_ASHPEN_PRESSURE_PLATE);
-    public static final RegistryObject<Item> PURPLE_ASHPEN_BUTTON = registerBlockItem("ashpen_purple_button",
-            ModBlocks.PURPLE_ASHPEN_BUTTON);
-    public static final RegistryObject<Item> RED_ASHPEN_PLANKS = registerBlockItem("ashpen_red_planks",
-            ModBlocks.RED_ASHPEN_PLANKS);
-    public static final RegistryObject<Item> RED_ASHPEN_STAIRS = registerBlockItem("ashpen_red_stairs",
-            ModBlocks.RED_ASHPEN_STAIRS);
-    public static final RegistryObject<Item> RED_ASHPEN_SLAB = registerBlockItem("ashpen_red_slab",
-            ModBlocks.RED_ASHPEN_SLAB);
-    public static final RegistryObject<Item> RED_ASHPEN_FENCE = registerBlockItem("ashpen_red_fence",
-            ModBlocks.RED_ASHPEN_FENCE);
-    public static final RegistryObject<Item> RED_ASHPEN_FENCE_GATE = registerBlockItem("ashpen_red_fence_gate",
-            ModBlocks.RED_ASHPEN_FENCE_GATE);
-    public static final RegistryObject<Item> RED_ASHPEN_PRESSURE_PLATE = registerBlockItem("ashpen_red_pressure_plate",
-            ModBlocks.RED_ASHPEN_PRESSURE_PLATE);
-    public static final RegistryObject<Item> RED_ASHPEN_BUTTON = registerBlockItem("ashpen_red_button",
-            ModBlocks.RED_ASHPEN_BUTTON);
-    public static final RegistryObject<Item> YELLOW_ASHPEN_PLANKS = registerBlockItem("ashpen_yellow_planks",
-            ModBlocks.YELLOW_ASHPEN_PLANKS);
-    public static final RegistryObject<Item> YELLOW_ASHPEN_STAIRS = registerBlockItem("ashpen_yellow_stairs",
-            ModBlocks.YELLOW_ASHPEN_STAIRS);
-    public static final RegistryObject<Item> YELLOW_ASHPEN_SLAB = registerBlockItem("ashpen_yellow_slab",
-            ModBlocks.YELLOW_ASHPEN_SLAB);
-    public static final RegistryObject<Item> YELLOW_ASHPEN_FENCE = registerBlockItem("ashpen_yellow_fence",
-            ModBlocks.YELLOW_ASHPEN_FENCE);
-    public static final RegistryObject<Item> YELLOW_ASHPEN_FENCE_GATE = registerBlockItem("ashpen_yellow_fence_gate",
-            ModBlocks.YELLOW_ASHPEN_FENCE_GATE);
-    public static final RegistryObject<Item> YELLOW_ASHPEN_PRESSURE_PLATE = registerBlockItem(
-            "ashpen_yellow_pressure_plate", ModBlocks.YELLOW_ASHPEN_PRESSURE_PLATE);
-    public static final RegistryObject<Item> YELLOW_ASHPEN_BUTTON = registerBlockItem("ashpen_yellow_button",
-            ModBlocks.YELLOW_ASHPEN_BUTTON);
-    public static final RegistryObject<Item> RED_ROSE_VINES = registerBlockItem("red_rose_vines",
-            ModBlocks.RED_ROSE_VINES);
-    public static final RegistryObject<Item> BLACK_ROSE_VINES = registerBlockItem("black_rose_vines",
-            ModBlocks.BLACK_ROSE_VINES);
-    public static final RegistryObject<Item> BLUE_ROSE_VINES = registerBlockItem("blue_rose_vines",
-            ModBlocks.BLUE_ROSE_VINES);
-    public static final RegistryObject<Item> WHITE_ROSE_VINES = registerBlockItem("white_rose_vines",
-            ModBlocks.WHITE_ROSE_VINES);
-    public static final RegistryObject<Item> RED_MONETS = registerBlockItem("red_monets", ModBlocks.RED_MONETS);
-    public static final RegistryObject<Item> BLUE_MONETS = registerBlockItem("blue_monets", ModBlocks.BLUE_MONETS);
-    public static final RegistryObject<Item> PURPLE_MONETS = registerBlockItem("purple_monets",
-            ModBlocks.PURPLE_MONETS);
-    public static final RegistryObject<Item> LIGHT_BLUE_MONETS = registerBlockItem("light_blue_monets",
-            ModBlocks.LIGHT_BLUE_MONETS);
-    public static final RegistryObject<Item> PINK_MONETS = registerBlockItem("pink_monets", ModBlocks.PINK_MONETS);
-    public static final RegistryObject<Item> YELLOW_MONETS = registerBlockItem("yellow_monets",
-            ModBlocks.YELLOW_MONETS);
-    public static final RegistryObject<Item> CLOVER = registerBlockItem("clover", ModBlocks.CLOVER);
-    public static final RegistryObject<Item> RED_PETAL = registerBlockItem("red_petal", ModBlocks.RED_PETAL);
-    public static final RegistryObject<Item> BLUE_PETAL = registerBlockItem("blue_petal", ModBlocks.BLUE_PETAL);
-    public static final RegistryObject<Item> ORANGE_PETAL = registerBlockItem("orange_petal", ModBlocks.ORANGE_PETAL);
-    public static final RegistryObject<Item> PINK_PETAL = registerBlockItem("pink_petal", ModBlocks.PINK_PETAL);
-    public static final RegistryObject<Item> PURPLE_PETAL = registerBlockItem("purple_petal", ModBlocks.PURPLE_PETAL);
-    public static final RegistryObject<Item> RED_SPORE_BLOSSOM = registerBlockItem("red_spore_blossom",
-            ModBlocks.RED_SPORE_BLOSSOM);
-    public static final RegistryObject<Item> CYAN_SPORE_BLOSSOM = registerBlockItem("cyan_spore_blossom",
-            ModBlocks.CYAN_SPORE_BLOSSOM);
-    public static final RegistryObject<Item> BLUE_SPORE_BLOSSOM = registerBlockItem("blue_spore_blossom",
-            ModBlocks.BLUE_SPORE_BLOSSOM);
-    public static final RegistryObject<Item> PURPLE_SPORE_BLOSSOM = registerBlockItem("purple_spore_blossom",
-            ModBlocks.PURPLE_SPORE_BLOSSOM);
-    public static final RegistryObject<Item> ORANGE_SPORE_BLOSSOM = registerBlockItem("orange_spore_blossom",
-            ModBlocks.ORANGE_SPORE_BLOSSOM);
-    public static final RegistryObject<Item> BIG_CANDLE = registerBlockItem("big_candle", ModBlocks.BIG_CANDLE);
-    public static final RegistryObject<Item> BIG_WHITE_CANDLE = registerBlockItem("big_white_candle",
-            ModBlocks.BIG_WHITE_CANDLE);
-    public static final RegistryObject<Item> BIG_ORANGE_CANDLE = registerBlockItem("big_orange_candle",
-            ModBlocks.BIG_ORANGE_CANDLE);
-    public static final RegistryObject<Item> BIG_MAGENTA_CANDLE = registerBlockItem("big_magenta_candle",
-            ModBlocks.BIG_MAGENTA_CANDLE);
-    public static final RegistryObject<Item> BIG_LIGHT_BLUE_CANDLE = registerBlockItem("big_light_blue_candle",
-            ModBlocks.BIG_LIGHT_BLUE_CANDLE);
-    public static final RegistryObject<Item> BIG_YELLOW_CANDLE = registerBlockItem("big_yellow_candle",
-            ModBlocks.BIG_YELLOW_CANDLE);
-    public static final RegistryObject<Item> BIG_LIME_CANDLE = registerBlockItem("big_lime_candle",
-            ModBlocks.BIG_LIME_CANDLE);
-    public static final RegistryObject<Item> BIG_PINK_CANDLE = registerBlockItem("big_pink_candle",
-            ModBlocks.BIG_PINK_CANDLE);
-    public static final RegistryObject<Item> BIG_GRAY_CANDLE = registerBlockItem("big_gray_candle",
-            ModBlocks.BIG_GRAY_CANDLE);
-    public static final RegistryObject<Item> BIG_LIGHT_GRAY_CANDLE = registerBlockItem("big_light_gray_candle",
-            ModBlocks.BIG_LIGHT_GRAY_CANDLE);
-    public static final RegistryObject<Item> BIG_CYAN_CANDLE = registerBlockItem("big_cyan_candle",
-            ModBlocks.BIG_CYAN_CANDLE);
-    public static final RegistryObject<Item> BIG_PURPLE_CANDLE = registerBlockItem("big_purple_candle",
-            ModBlocks.BIG_PURPLE_CANDLE);
-    public static final RegistryObject<Item> BIG_BLUE_CANDLE = registerBlockItem("big_blue_candle",
-            ModBlocks.BIG_BLUE_CANDLE);
-    public static final RegistryObject<Item> BIG_BROWN_CANDLE = registerBlockItem("big_brown_candle",
-            ModBlocks.BIG_BROWN_CANDLE);
-    public static final RegistryObject<Item> BIG_GREEN_CANDLE = registerBlockItem("big_green_candle",
-            ModBlocks.BIG_GREEN_CANDLE);
-    public static final RegistryObject<Item> BIG_RED_CANDLE = registerBlockItem("big_red_candle",
-            ModBlocks.BIG_RED_CANDLE);
-    public static final RegistryObject<Item> BIG_BLACK_CANDLE = registerBlockItem("big_black_candle",
-            ModBlocks.BIG_BLACK_CANDLE);
-    public static final RegistryObject<Item> BIG_AMETHYST_CANDLE = registerBlockItem("big_amethyst_candle",
-            ModBlocks.BIG_AMETHYST_CANDLE);
-    public static final RegistryObject<Item> BIG_SCULK_CANDLE = registerBlockItem("big_sculk_candle",
-            ModBlocks.BIG_SCULK_CANDLE);
-    public static final RegistryObject<Item> WHITE_ORNAMENT = registerBlockItem("white_ornament",
-            ModBlocks.WHITE_ORNAMENT);
-    public static final RegistryObject<Item> ORANGE_ORNAMENT = registerBlockItem("orange_ornament",
-            ModBlocks.ORANGE_ORNAMENT);
-    public static final RegistryObject<Item> MAGENTA_ORNAMENT = registerBlockItem("magenta_ornament",
-            ModBlocks.MAGENTA_ORNAMENT);
-    public static final RegistryObject<Item> LIGHT_BLUE_ORNAMENT = registerBlockItem("light_blue_ornament",
-            ModBlocks.LIGHT_BLUE_ORNAMENT);
-    public static final RegistryObject<Item> YELLOW_ORNAMENT = registerBlockItem("yellow_ornament",
-            ModBlocks.YELLOW_ORNAMENT);
-    public static final RegistryObject<Item> LIME_ORNAMENT = registerBlockItem("lime_ornament",
-            ModBlocks.LIME_ORNAMENT);
-    public static final RegistryObject<Item> PINK_ORNAMENT = registerBlockItem("pink_ornament",
-            ModBlocks.PINK_ORNAMENT);
-    public static final RegistryObject<Item> GRAY_ORNAMENT = registerBlockItem("gray_ornament",
-            ModBlocks.GRAY_ORNAMENT);
-    public static final RegistryObject<Item> LIGHT_GRAY_ORNAMENT = registerBlockItem("light_gray_ornament",
-            ModBlocks.LIGHT_GRAY_ORNAMENT);
-    public static final RegistryObject<Item> CYAN_ORNAMENT = registerBlockItem("cyan_ornament",
-            ModBlocks.CYAN_ORNAMENT);
-    public static final RegistryObject<Item> PURPLE_ORNAMENT = registerBlockItem("purple_ornament",
-            ModBlocks.PURPLE_ORNAMENT);
-    public static final RegistryObject<Item> BLUE_ORNAMENT = registerBlockItem("blue_ornament",
-            ModBlocks.BLUE_ORNAMENT);
-    public static final RegistryObject<Item> BROWN_ORNAMENT = registerBlockItem("brown_ornament",
-            ModBlocks.BROWN_ORNAMENT);
-    public static final RegistryObject<Item> GREEN_ORNAMENT = registerBlockItem("green_ornament",
-            ModBlocks.GREEN_ORNAMENT);
-    public static final RegistryObject<Item> RED_ORNAMENT = registerBlockItem("red_ornament", ModBlocks.RED_ORNAMENT);
-    public static final RegistryObject<Item> BLACK_ORNAMENT = registerBlockItem("black_ornament",
-            ModBlocks.BLACK_ORNAMENT);
-    public static final RegistryObject<Item> GLASS_ORNAMENT = registerBlockItem("glass_ornament",
-            ModBlocks.GLASS_ORNAMENT);
-    public static final RegistryObject<Item> TINTED_GLASS_ORNAMENT = registerBlockItem("tinted_glass_ornament",
-            ModBlocks.TINTED_GLASS_ORNAMENT);
-    public static final RegistryObject<Item> WHITE_STRING_LIGHT = registerBlockItem("white_string_light",
-            ModBlocks.WHITE_STRING_LIGHT);
-    public static final RegistryObject<Item> ORANGE_STRING_LIGHT = registerBlockItem("orange_string_light",
-            ModBlocks.ORANGE_STRING_LIGHT);
-    public static final RegistryObject<Item> MAGENTA_STRING_LIGHT = registerBlockItem("magenta_string_light",
-            ModBlocks.MAGENTA_STRING_LIGHT);
-    public static final RegistryObject<Item> LIGHT_BLUE_STRING_LIGHT = registerBlockItem("light_blue_string_light",
-            ModBlocks.LIGHT_BLUE_STRING_LIGHT);
-    public static final RegistryObject<Item> YELLOW_STRING_LIGHT = registerBlockItem("yellow_string_light",
-            ModBlocks.YELLOW_STRING_LIGHT);
-    public static final RegistryObject<Item> LIME_STRING_LIGHT = registerBlockItem("lime_string_light",
-            ModBlocks.LIME_STRING_LIGHT);
-    public static final RegistryObject<Item> PINK_STRING_LIGHT = registerBlockItem("pink_string_light",
-            ModBlocks.PINK_STRING_LIGHT);
-    public static final RegistryObject<Item> GRAY_STRING_LIGHT = registerBlockItem("gray_string_light",
-            ModBlocks.GRAY_STRING_LIGHT);
-    public static final RegistryObject<Item> LIGHT_GRAY_STRING_LIGHT = registerBlockItem("light_gray_string_light",
-            ModBlocks.LIGHT_GRAY_STRING_LIGHT);
-    public static final RegistryObject<Item> CYAN_STRING_LIGHT = registerBlockItem("cyan_string_light",
-            ModBlocks.CYAN_STRING_LIGHT);
-    public static final RegistryObject<Item> PURPLE_STRING_LIGHT = registerBlockItem("purple_string_light",
-            ModBlocks.PURPLE_STRING_LIGHT);
-    public static final RegistryObject<Item> BLUE_STRING_LIGHT = registerBlockItem("blue_string_light",
-            ModBlocks.BLUE_STRING_LIGHT);
-    public static final RegistryObject<Item> BROWN_STRING_LIGHT = registerBlockItem("brown_string_light",
-            ModBlocks.BROWN_STRING_LIGHT);
-    public static final RegistryObject<Item> GREEN_STRING_LIGHT = registerBlockItem("green_string_light",
-            ModBlocks.GREEN_STRING_LIGHT);
-    public static final RegistryObject<Item> RED_STRING_LIGHT = registerBlockItem("red_string_light",
-            ModBlocks.RED_STRING_LIGHT);
-    public static final RegistryObject<Item> BLACK_STRING_LIGHT = registerBlockItem("black_string_light",
-            ModBlocks.BLACK_STRING_LIGHT);
-    public static final RegistryObject<Item> MULTICOLOR_STRING_LIGHT = registerBlockItem("multicolor_string_light",
-            ModBlocks.MULTICOLOR_STRING_LIGHT);
-    public static final RegistryObject<Item> WHITE_STAR = registerBlockItem("white_star", ModBlocks.WHITE_STAR);
-    public static final RegistryObject<Item> ORANGE_STAR = registerBlockItem("orange_star", ModBlocks.ORANGE_STAR);
-    public static final RegistryObject<Item> MAGENTA_STAR = registerBlockItem("magenta_star", ModBlocks.MAGENTA_STAR);
-    public static final RegistryObject<Item> LIGHT_BLUE_STAR = registerBlockItem("light_blue_star",
-            ModBlocks.LIGHT_BLUE_STAR);
-    public static final RegistryObject<Item> YELLOW_STAR = registerBlockItem("yellow_star", ModBlocks.YELLOW_STAR);
-    public static final RegistryObject<Item> LIME_STAR = registerBlockItem("lime_star", ModBlocks.LIME_STAR);
-    public static final RegistryObject<Item> PINK_STAR = registerBlockItem("pink_star", ModBlocks.PINK_STAR);
-    public static final RegistryObject<Item> GRAY_STAR = registerBlockItem("gray_star", ModBlocks.GRAY_STAR);
-    public static final RegistryObject<Item> LIGHT_GRAY_STAR = registerBlockItem("light_gray_star",
-            ModBlocks.LIGHT_GRAY_STAR);
-    public static final RegistryObject<Item> CYAN_STAR = registerBlockItem("cyan_star", ModBlocks.CYAN_STAR);
-    public static final RegistryObject<Item> PURPLE_STAR = registerBlockItem("purple_star", ModBlocks.PURPLE_STAR);
-    public static final RegistryObject<Item> BLUE_STAR = registerBlockItem("blue_star", ModBlocks.BLUE_STAR);
-    public static final RegistryObject<Item> BROWN_STAR = registerBlockItem("brown_star", ModBlocks.BROWN_STAR);
-    public static final RegistryObject<Item> GREEN_STAR = registerBlockItem("green_star", ModBlocks.GREEN_STAR);
-    public static final RegistryObject<Item> RED_STAR = registerBlockItem("red_star", ModBlocks.RED_STAR);
-    public static final RegistryObject<Item> BLACK_STAR = registerBlockItem("black_star", ModBlocks.BLACK_STAR);
-    public static final RegistryObject<Item> GLOW_STAR = registerBlockItem("glow_star", ModBlocks.GLOW_STAR);
+    static {
+        WoodItems.init();
+    }
 
-    public static final RegistryObject<Item> SNOWY_LEAVES = ITEMS.register(
-            "snowy_leaves",
-            () -> new BlockItem(ModBlocks.SNOWY_LEAVES.get(), new Item.Properties()));
-    public static final RegistryObject<Item> SNOWY_OAK_LEAVES = registerBlockItem("snowy_oak_leaves",
-            ModBlocks.SNOWY_OAK_LEAVES);
-    public static final RegistryObject<Item> SNOWY_SPRUCE_LEAVES = registerBlockItem("snowy_spruce_leaves",
-            ModBlocks.SNOWY_SPRUCE_LEAVES);
-    public static final RegistryObject<Item> SNOWY_BIRCH_LEAVES = registerBlockItem("snowy_birch_leaves",
-            ModBlocks.SNOWY_BIRCH_LEAVES);
-    public static final RegistryObject<Item> SNOWY_JUNGLE_LEAVES = registerBlockItem("snowy_jungle_leaves",
-            ModBlocks.SNOWY_JUNGLE_LEAVES);
-    public static final RegistryObject<Item> SNOWY_ACACIA_LEAVES = registerBlockItem("snowy_acacia_leaves",
-            ModBlocks.SNOWY_ACACIA_LEAVES);
-    public static final RegistryObject<Item> SNOWY_DARK_OAK_LEAVES = registerBlockItem("snowy_dark_oak_leaves",
-            ModBlocks.SNOWY_DARK_OAK_LEAVES);
-    public static final RegistryObject<Item> SNOWY_MANGROVE_LEAVES = registerBlockItem("snowy_mangrove_leaves",
-            ModBlocks.SNOWY_MANGROVE_LEAVES);
-    public static final RegistryObject<Item> SNOWY_AZALEA_LEAVES = registerBlockItem("snowy_azalea_leaves",
-            ModBlocks.SNOWY_AZALEA_LEAVES);
-    public static final RegistryObject<Item> SNOWY_FLOWERING_AZALEA_LEAVES = registerBlockItem(
-            "snowy_flowering_azalea_leaves", ModBlocks.SNOWY_FLOWERING_AZALEA_LEAVES);
-    public static final RegistryObject<Item> SNOWY_CHERRY_LEAVES = registerBlockItem("snowy_cherry_leaves",
-            ModBlocks.SNOWY_CHERRY_LEAVES);
-    public static final RegistryObject<Item> SNOWY_PALE_OAK_LEAVES = registerBlockItem("snowy_pale_oak_leaves",
-            ModBlocks.SNOWY_PALE_OAK_LEAVES);
-    public static final RegistryObject<Item> SNOWY_ORANGE_POPLAR_LEAVES = registerBlockItem(
-            "snowy_orange_poplar_leaves", ModBlocks.SNOWY_ORANGE_POPLAR_LEAVES);
-    public static final RegistryObject<Item> SNOWY_RED_POPLAR_LEAVES = registerBlockItem("snowy_red_poplar_leaves",
-            ModBlocks.SNOWY_RED_POPLAR_LEAVES);
-    public static final RegistryObject<Item> SNOWY_YELLOW_POPLAR_LEAVES = registerBlockItem(
-            "snowy_yellow_poplar_leaves", ModBlocks.SNOWY_YELLOW_POPLAR_LEAVES);
-    public static final RegistryObject<Item> SNOWY_SHORT_GRASS = registerBlockItem("snowy_short_grass",
-            ModBlocks.SNOWY_SHORT_GRASS);
-    public static final RegistryObject<Item> SNOWY_TALL_GRASS = registerBlockItem("snowy_tall_grass",
-            ModBlocks.SNOWY_TALL_GRASS);
-    public static final RegistryObject<Item> SNOWY_FERN = registerBlockItem("snowy_fern", ModBlocks.SNOWY_FERN);
-    public static final RegistryObject<Item> SNOWY_LARGE_FERN = registerBlockItem("snowy_large_fern",
-            ModBlocks.SNOWY_LARGE_FERN);
-    public static final RegistryObject<Item> SNOWY_BUSH = registerBlockItem("snowy_bush", ModBlocks.SNOWY_BUSH);
-    public static final RegistryObject<Item> SNOW_BRICKS = registerBlockItem("snow_bricks", ModBlocks.SNOW_BRICKS);
-    public static final RegistryObject<Item> SNOW_BRICKS_STAIRS = registerBlockItem("snow_bricks_stairs",
-            ModBlocks.SNOW_BRICKS_STAIRS);
-    public static final RegistryObject<Item> SNOW_BRICKS_SLAB = registerBlockItem("snow_bricks_slab",
-            ModBlocks.SNOW_BRICKS_SLAB);
-    public static final RegistryObject<Item> SNOW_BRICKS_WALL = registerBlockItem("snow_bricks_wall",
-            ModBlocks.SNOW_BRICKS_WALL);
-    public static final RegistryObject<Item> SNOWY_GRASS_BLOCK = registerBlockItem("snowy_grass_block",
-            ModBlocks.SNOWY_GRASS_BLOCK);
-    public static final RegistryObject<Item> SNOWY_GRASS_BLOCK_STAIRS = registerBlockItem("snowy_grass_block_stairs",
-            ModBlocks.SNOWY_GRASS_BLOCK_STAIRS);
-    public static final RegistryObject<Item> SNOWY_GRASS_BLOCK_SLAB = registerBlockItem("snowy_grass_block_slab",
-            ModBlocks.SNOWY_GRASS_BLOCK_SLAB);
-    public static final RegistryObject<Item> ICICLE = registerBlockItem("icicle", ModBlocks.ICICLE);
-    public static final RegistryObject<Item> ICICLE_BLOCK = registerBlockItem("icicle_block", ModBlocks.ICICLE_BLOCK);
-    public static final RegistryObject<Item> PACKED_ICICLE_BLOCK = registerBlockItem("packed_icicle_block",
-            ModBlocks.PACKED_ICICLE_BLOCK);
-    public static final RegistryObject<Item> ICE_CRYSTAL = registerBlockItem("ice_crystal", ModBlocks.ICE_CRYSTAL);
-
-    public static final RegistryObject<Item> COPPER_NUGGET = ITEMS.register(
-            "copper_nugget",
-            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register(
-            "steel_ingot",
-            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-    public static final RegistryObject<Item> STEEL_NUGGET = ITEMS.register(
-            "steel_nugget",
-            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> WRENCH = ITEMS.register(
-            "wrench",
-            () -> new WrenchItem(new Item.Properties().stacksTo(1).tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> IRON_HAMMER = ITEMS.register(
-            "iron_hammer",
-            () -> new HammerItem(HammerItem.HammerTier.IRON,
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> DIAMOND_HAMMER = ITEMS.register(
-            "diamond_hammer",
-            () -> new HammerItem(HammerItem.HammerTier.DIAMOND,
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> NETHERITE_HAMMER = ITEMS.register(
-            "netherite_hammer",
-            () -> new HammerItem(HammerItem.HammerTier.NETHERITE,
-                    new Item.Properties().fireResistant().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> COPPER_BIOME_BRUSH = ITEMS.register(
-            "copper_biome_brush",
-            () -> new BiomeBrushItem(BiomeBrushItem.BiomeBrushTier.COPPER,
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> DIAMOND_BIOME_BRUSH = ITEMS.register(
-            "diamond_biome_brush",
-            () -> new BiomeBrushItem(BiomeBrushItem.BiomeBrushTier.DIAMOND,
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> NETHERITE_BIOME_BRUSH = ITEMS.register(
-            "netherite_biome_brush",
-            () -> new BiomeBrushItem(BiomeBrushItem.BiomeBrushTier.NETHERITE,
-                    new Item.Properties().fireResistant().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-
-    public static final RegistryObject<Item> BUILDERS_WORKBENCH = ITEMS.register(
-            "builders_workbench",
-            () -> new BlockItem(
-                    ModBlocks.BUILDERS_WORKBENCH.get(),
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(64)));
-
-    public static final RegistryObject<Item> BUILDERS_POUCH = ITEMS.register(
-            "builders_pouch",
-            () -> new BuildersPouchItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
-    public static final RegistryObject<Item> SNOW_STAIRS = registerBlockItem("snow_stairs", ModBlocks.SNOW_STAIRS);
-    public static final RegistryObject<Item> SNOW_SLAB = registerBlockItem("snow_slab", ModBlocks.SNOW_SLAB);
-    public static final RegistryObject<Item> MANGROVE_LOG = registerBlockItem("mangrove_log", ModBlocks.MANGROVE_LOG);
-    public static final RegistryObject<Item> STRIPPED_MANGROVE_LOG = registerBlockItem("stripped_mangrove_log",
-            ModBlocks.STRIPPED_MANGROVE_LOG);
-    public static final RegistryObject<Item> MANGROVE_WOOD = registerBlockItem("mangrove_wood",
-            ModBlocks.MANGROVE_WOOD);
-    public static final RegistryObject<Item> STRIPPED_MANGROVE_WOOD = registerBlockItem("stripped_mangrove_wood",
-            ModBlocks.STRIPPED_MANGROVE_WOOD);
-    public static final RegistryObject<Item> MANGROVE_LEAVES = registerBlockItem("mangrove_leaves",
-            ModBlocks.MANGROVE_LEAVES);
-    public static final RegistryObject<Item> MANGROVE_ROOTS = registerBlockItem("mangrove_roots",
-            ModBlocks.MANGROVE_ROOTS);
-    public static final RegistryObject<Item> MUDDY_MANGROVE_ROOTS = registerBlockItem("muddy_mangrove_roots",
-            ModBlocks.MUDDY_MANGROVE_ROOTS);
-    public static final RegistryObject<Item> MANGROVE_PROPAGULE = registerBlockItem("mangrove_propagule",
-            ModBlocks.MANGROVE_PROPAGULE);
-    public static final RegistryObject<Item> MANGROVE_PLANKS = registerBlockItem("mangrove_planks",
-            ModBlocks.MANGROVE_PLANKS);
-    public static final RegistryObject<Item> MANGROVE_SLAB = registerBlockItem("mangrove_slab",
-            ModBlocks.MANGROVE_SLAB);
-    public static final RegistryObject<Item> MANGROVE_STAIRS = registerBlockItem("mangrove_stairs",
-            ModBlocks.MANGROVE_STAIRS);
-    public static final RegistryObject<Item> MANGROVE_FENCE = registerBlockItem("mangrove_fence",
-            ModBlocks.MANGROVE_FENCE);
-    public static final RegistryObject<Item> MANGROVE_FENCE_GATE = registerBlockItem("mangrove_fence_gate",
-            ModBlocks.MANGROVE_FENCE_GATE);
-    public static final RegistryObject<Item> MANGROVE_DOOR = registerBlockItem("mangrove_door",
-            ModBlocks.MANGROVE_DOOR);
-    public static final RegistryObject<Item> MANGROVE_TRAPDOOR = registerBlockItem("mangrove_trapdoor",
-            ModBlocks.MANGROVE_TRAPDOOR);
-    public static final RegistryObject<Item> MANGROVE_BUTTON = registerBlockItem("mangrove_button",
-            ModBlocks.MANGROVE_BUTTON);
-    public static final RegistryObject<Item> MANGROVE_PRESSURE_PLATE = registerBlockItem("mangrove_pressure_plate",
-            ModBlocks.MANGROVE_PRESSURE_PLATE);
-
-    public static final RegistryObject<Item> MANGROVE_SIGN = ITEMS.register(
-            "mangrove_sign",
-            () -> new SignItem(
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16),
-                    ModBlocks.MANGROVE_SIGN.get(),
-                    ModBlocks.MANGROVE_WALL_SIGN.get()));
-
-    public static final RegistryObject<Item> BAMBOO_SIGN = ITEMS.register(
-            "bamboo_sign",
-            () -> new SignItem(
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16),
-                    ModBlocks.BAMBOO_SIGN.get(),
-                    ModBlocks.BAMBOO_WALL_SIGN.get()));
-
-    public static final RegistryObject<Item> MANGROVE_BOAT = ITEMS.register(
-            "mangrove_boat",
-            () -> new MangroveBoatItem(
-                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1)));
-    public static final RegistryObject<Item> FESTIVE_LAMP = registerBlockItem("festive_lamp", ModBlocks.FESTIVE_LAMP);
-
-    public static final RegistryObject<Item> FROST_ROSE = ITEMS.register(
-            "frost_rose",
-            () -> new BlockItem(ModBlocks.FROST_ROSE.get(), createBlockItemProperties()) {
-                @Override
-                public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip,
-                        TooltipFlag flag) {
-                    tooltip.add(new TextComponent("Obtained when a Wither kills a Snow Golem")
-                            .withStyle(ChatFormatting.DARK_AQUA));
-                }
-            });
-    public static final RegistryObject<Item> GLOW_LIGHTS = registerBlockItem("glow_lights", ModBlocks.GLOW_LIGHTS);
     public static final RegistryObject<Item> MULTICOLOR_GLOW_LIGHTS = registerBlockItem("multicolor_glow_lights",
             ModBlocks.MULTICOLOR_GLOW_LIGHTS);
 
@@ -1238,4 +805,142 @@ public final class ItemsPart02 {
     public static final RegistryObject<Item> CASCADE_BLOCK = ITEMS.register(
             "cascade_block",
             () -> new MistBlockItem(ModBlocks.CASCADE_BLOCK.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> CASCADE_BLOCK_NO_MIST = ITEMS.register(
+            "cascade_block_no_mist",
+            () -> new MistBlockItem(ModBlocks.CASCADE_BLOCK_NO_MIST.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> BOTTLE_OF_MIST = ITEMS.register(
+            "bottle_of_mist",
+            () -> new BottleOfMistItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(64)));
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH = registerBlockItem("black_factory_mesh",
+            ModBlocks.BLACK_FACTORY_MESH);
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH_STAIRS = registerBlockItem("black_factory_mesh_stairs",
+            ModBlocks.BLACK_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH_SLAB = registerBlockItem("black_factory_mesh_slab",
+            ModBlocks.BLACK_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH_WALL = registerBlockItem("black_factory_mesh_wall",
+            ModBlocks.BLACK_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH = registerBlockItem("blue_factory_mesh",
+            ModBlocks.BLUE_FACTORY_MESH);
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH_STAIRS = registerBlockItem("blue_factory_mesh_stairs",
+            ModBlocks.BLUE_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH_SLAB = registerBlockItem("blue_factory_mesh_slab",
+            ModBlocks.BLUE_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH_WALL = registerBlockItem("blue_factory_mesh_wall",
+            ModBlocks.BLUE_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH = registerBlockItem("brown_factory_mesh",
+            ModBlocks.BROWN_FACTORY_MESH);
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH_STAIRS = registerBlockItem("brown_factory_mesh_stairs",
+            ModBlocks.BROWN_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH_SLAB = registerBlockItem("brown_factory_mesh_slab",
+            ModBlocks.BROWN_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH_WALL = registerBlockItem("brown_factory_mesh_wall",
+            ModBlocks.BROWN_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH = registerBlockItem("gray_factory_mesh",
+            ModBlocks.GRAY_FACTORY_MESH);
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH_STAIRS = registerBlockItem("gray_factory_mesh_stairs",
+            ModBlocks.GRAY_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH_SLAB = registerBlockItem("gray_factory_mesh_slab",
+            ModBlocks.GRAY_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH_WALL = registerBlockItem("gray_factory_mesh_wall",
+            ModBlocks.GRAY_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH = registerBlockItem("green_factory_mesh",
+            ModBlocks.GREEN_FACTORY_MESH);
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH_STAIRS = registerBlockItem("green_factory_mesh_stairs",
+            ModBlocks.GREEN_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH_SLAB = registerBlockItem("green_factory_mesh_slab",
+            ModBlocks.GREEN_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH_WALL = registerBlockItem("green_factory_mesh_wall",
+            ModBlocks.GREEN_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH = registerBlockItem("light_gray_factory_mesh",
+            ModBlocks.LIGHT_GRAY_FACTORY_MESH);
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_STAIRS = registerBlockItem(
+            "light_gray_factory_mesh_stairs", ModBlocks.LIGHT_GRAY_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_SLAB = registerBlockItem(
+            "light_gray_factory_mesh_slab", ModBlocks.LIGHT_GRAY_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_WALL = registerBlockItem(
+            "light_gray_factory_mesh_wall", ModBlocks.LIGHT_GRAY_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> LIME_FACTORY_MESH = registerBlockItem("lime_factory_mesh",
+            ModBlocks.LIME_FACTORY_MESH);
+    public static final RegistryObject<Item> LIME_FACTORY_MESH_STAIRS = registerBlockItem("lime_factory_mesh_stairs",
+            ModBlocks.LIME_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> LIME_FACTORY_MESH_SLAB = registerBlockItem("lime_factory_mesh_slab",
+            ModBlocks.LIME_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> LIME_FACTORY_MESH_WALL = registerBlockItem("lime_factory_mesh_wall",
+            ModBlocks.LIME_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH = registerBlockItem("orange_factory_mesh",
+            ModBlocks.ORANGE_FACTORY_MESH);
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH_STAIRS = registerBlockItem(
+            "orange_factory_mesh_stairs", ModBlocks.ORANGE_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH_SLAB = registerBlockItem("orange_factory_mesh_slab",
+            ModBlocks.ORANGE_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH_WALL = registerBlockItem("orange_factory_mesh_wall",
+            ModBlocks.ORANGE_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> RED_FACTORY_MESH = registerBlockItem("red_factory_mesh",
+            ModBlocks.RED_FACTORY_MESH);
+    public static final RegistryObject<Item> RED_FACTORY_MESH_STAIRS = registerBlockItem("red_factory_mesh_stairs",
+            ModBlocks.RED_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> RED_FACTORY_MESH_SLAB = registerBlockItem("red_factory_mesh_slab",
+            ModBlocks.RED_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> RED_FACTORY_MESH_WALL = registerBlockItem("red_factory_mesh_wall",
+            ModBlocks.RED_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH = registerBlockItem("yellow_factory_mesh",
+            ModBlocks.YELLOW_FACTORY_MESH);
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH_STAIRS = registerBlockItem(
+            "yellow_factory_mesh_stairs", ModBlocks.YELLOW_FACTORY_MESH_STAIRS);
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH_SLAB = registerBlockItem("yellow_factory_mesh_slab",
+            ModBlocks.YELLOW_FACTORY_MESH_SLAB);
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH_WALL = registerBlockItem("yellow_factory_mesh_wall",
+            ModBlocks.YELLOW_FACTORY_MESH_WALL);
+    public static final RegistryObject<Item> PACKED_MUD = registerBlockItem("packed_mud", ModBlocks.PACKED_MUD);
+    public static final RegistryObject<Item> PACKED_MUD_STAIRS = registerBlockItem("packed_mud_stairs",
+            ModBlocks.PACKED_MUD_STAIRS);
+    public static final RegistryObject<Item> PACKED_MUD_SLAB = registerBlockItem("packed_mud_slab",
+            ModBlocks.PACKED_MUD_SLAB);
+    public static final RegistryObject<Item> PACKED_MUD_WALL = registerBlockItem("packed_mud_wall",
+            ModBlocks.PACKED_MUD_WALL);
+    public static final RegistryObject<Item> MUD_BRICKS = registerBlockItem("mud_bricks", ModBlocks.MUD_BRICKS);
+    public static final RegistryObject<Item> MUD_BRICK_STAIRS = registerBlockItem("mud_brick_stairs",
+            ModBlocks.MUD_BRICK_STAIRS);
+    public static final RegistryObject<Item> MUD_BRICK_SLAB = registerBlockItem("mud_brick_slab",
+            ModBlocks.MUD_BRICK_SLAB);
+    public static final RegistryObject<Item> MUD_BRICK_WALL = registerBlockItem("mud_brick_wall",
+            ModBlocks.MUD_BRICK_WALL);
+
+    public static final RegistryObject<Item> ANCIENT_ASHEN_SCROLL = ITEMS.register("ancient_ashen_scroll",
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).durability(28)) {
+                @Override
+                public boolean isEnchantable(ItemStack stack) {
+                    return false;
+                }
+
+                @Override
+                public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+                    return false;
+                }
+
+                @Override
+                public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip,
+                        TooltipFlag flag) {
+                    tooltip.add(new TextComponent("Found rarely in ")
+                            .withStyle(ChatFormatting.GRAY)
+                            .append(new TextComponent("End Cities")
+                                    .withStyle(ChatFormatting.AQUA))
+                            .append(new TextComponent(" & ")
+                                    .withStyle(ChatFormatting.GRAY))
+                            .append(new TextComponent("Woodland Mansions")
+                                    .withStyle(ChatFormatting.AQUA))
+                            .append(new TextComponent(", also if")
+                                    .withStyle(ChatFormatting.GRAY)));
+                    tooltip.add(new TextComponent("you are lucky a ")
+                            .withStyle(ChatFormatting.GRAY)
+                            .append(new TextComponent("Wandering Trader")
+                                    .withStyle(ChatFormatting.AQUA))
+                            .append(new TextComponent(" might trade")
+                                    .withStyle(ChatFormatting.GRAY)));
+                    tooltip.add(new TextComponent("it for a sweet price.")
+                            .withStyle(ChatFormatting.GRAY));
+                }
+            });
 }

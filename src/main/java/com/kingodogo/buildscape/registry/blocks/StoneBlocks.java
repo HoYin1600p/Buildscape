@@ -2,19 +2,19 @@ package com.kingodogo.buildscape.registry.blocks;
 
 import com.kingodogo.buildscape.block.BoneDiceBlock;
 import com.kingodogo.buildscape.block.DecoratedPotBlock;
-import com.kingodogo.buildscape.block.LeafLayersBlock;
+import com.kingodogo.buildscape.block.GlazedGlassBlock;
 import com.kingodogo.buildscape.block.ModBlock;
 import com.kingodogo.buildscape.block.ModSlabBlock;
 import com.kingodogo.buildscape.block.ModStairBlock;
 import com.kingodogo.buildscape.block.MossLayersBlock;
 import com.kingodogo.buildscape.block.MossOverlayBlock;
+import com.kingodogo.buildscape.block.MudSlabBlock;
 import com.kingodogo.buildscape.block.MushroomShelvesBlock;
 import com.kingodogo.buildscape.block.SilkTouchOnlyPaneBlock;
 import com.kingodogo.buildscape.block.SnowOverlayBlock;
-import com.kingodogo.buildscape.block.TrappedDecoratedPotBlock;
-import com.kingodogo.buildscape.block.WoolLayersBlock;
 import com.kingodogo.buildscape.feature.pillar.AshenKingPillarBlock;
 import com.kingodogo.buildscape.feature.pillar.PillarBlock;
+import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -26,15 +26,648 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.registries.RegistryObject;
 
-import static com.kingodogo.buildscape.registry.ModBlocks.BLOCKS;
+import static com.kingodogo.buildscape.registry.blocks.BlocksRegister.BLOCKS;
 
-/** Part of the blocks registrations; see {@code ModBlocks}. */
-public final class BlocksPart02 {
+/**
+ * The blocks MUD_STAIRS through CYAN_DECORATED_POT of the registry, part 2 of 12, in registration order.
+ * Named for its dominant families (stone, glass, decor); the neighbouring families that share a run of the order
+ * with them are registered here too, because the registration order must not change.
+ * Load order: {@link SandstoneBlocks#init()} runs first (see the static block), so every holder registers in order whichever is touched first.
+ */
+public final class StoneBlocks {
 
-    private BlocksPart02() {}
+    private StoneBlocks() {}
 
-    /** Forces this class to load so its registrations run in the order {@code ModBlocks} calls it. */
+    /** Forces this class to load, which registers its blocks. */
     public static void init() {}
+
+    static {
+        SandstoneBlocks.init();
+    }
+
+    public static final RegistryObject<Block> MUD_STAIRS = BLOCKS.register("mud_stairs",
+            () -> new ModStairBlock(SandstoneBlocks.MUD.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SandstoneBlocks.MUD.get())));
+    public static final RegistryObject<Block> MUD_SLAB = BLOCKS.register(
+            "mud_slab",
+            () -> new MudSlabBlock(
+                    BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.COLOR_BROWN)
+                            .strength(0.5f)
+                            .sound(ModSounds.MUD_SOUNDS())));
+    public static final RegistryObject<Block> BLACK_SMOOTH_SANDSTONE = BLOCKS.register("black_smooth_sandstone",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_SMOOTH_SANDSTONE_STAIRS = BLOCKS
+            .register("black_smooth_sandstone_stairs", () -> new ModStairBlock(
+                    BLACK_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_SMOOTH_SANDSTONE = BLOCKS.register("blue_smooth_sandstone",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_SMOOTH_SANDSTONE_STAIRS = BLOCKS
+            .register("blue_smooth_sandstone_stairs", () -> new ModStairBlock(
+                    BLUE_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_SMOOTH_SANDSTONE = BLOCKS.register("green_smooth_sandstone",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_SMOOTH_SANDSTONE_STAIRS = BLOCKS
+            .register("green_smooth_sandstone_stairs", () -> new ModStairBlock(
+                    GREEN_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_SMOOTH_SANDSTONE = BLOCKS.register("orange_smooth_sandstone",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_SMOOTH_SANDSTONE_STAIRS = BLOCKS
+            .register("orange_smooth_sandstone_stairs", () -> new ModStairBlock(
+                    ORANGE_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_SMOOTH_SANDSTONE = BLOCKS.register("pink_smooth_sandstone",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_SMOOTH_SANDSTONE_STAIRS = BLOCKS
+            .register("pink_smooth_sandstone_stairs", () -> new ModStairBlock(
+                    PINK_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_SMOOTH_SANDSTONE = BLOCKS.register("red_smooth_sandstone",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_SMOOTH_SANDSTONE_STAIRS = BLOCKS
+            .register("red_smooth_sandstone_stairs", () -> new ModStairBlock(
+                    RED_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_SMOOTH_SANDSTONE = BLOCKS.register("white_smooth_sandstone",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_SMOOTH_SANDSTONE_STAIRS = BLOCKS
+            .register("white_smooth_sandstone_stairs", () -> new ModStairBlock(
+                    WHITE_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_SMOOTH_SANDSTONE = BLOCKS.register("yellow_smooth_sandstone",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_SMOOTH_SANDSTONE_STAIRS = BLOCKS
+            .register("yellow_smooth_sandstone_stairs", () -> new ModStairBlock(
+                    YELLOW_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_MOSAIC_GLASS_PANE = BLOCKS.register("black_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLACK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BLUE_MOSAIC_GLASS_PANE = BLOCKS.register("blue_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BROWN_MOSAIC_GLASS_PANE = BLOCKS.register("brown_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BROWN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> CYAN_MOSAIC_GLASS_PANE = BLOCKS.register("cyan_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_CYAN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> GRAY_MOSAIC_GLASS_PANE = BLOCKS.register("gray_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> GREEN_MOSAIC_GLASS_PANE = BLOCKS.register("green_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_BLUE_MOSAIC_GLASS_PANE = BLOCKS
+            .register("light_blue_mosaic_glass_pane", () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_GRAY_MOSAIC_GLASS_PANE = BLOCKS
+            .register("light_gray_mosaic_glass_pane", () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIME_MOSAIC_GLASS_PANE = BLOCKS.register("lime_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> MAGENTA_MOSAIC_GLASS_PANE = BLOCKS
+            .register("magenta_mosaic_glass_pane", () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_MAGENTA)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> ORANGE_MOSAIC_GLASS_PANE = BLOCKS.register("orange_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_ORANGE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> PINK_MOSAIC_GLASS_PANE = BLOCKS.register("pink_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PINK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> PURPLE_MOSAIC_GLASS_PANE = BLOCKS.register("purple_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PURPLE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> RED_MOSAIC_GLASS_PANE = BLOCKS.register("red_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_RED)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> WHITE_MOSAIC_GLASS_PANE = BLOCKS.register("white_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.SNOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> YELLOW_MOSAIC_GLASS_PANE = BLOCKS.register("yellow_mosaic_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_YELLOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BLACK_GLAZED_GLASS = BLOCKS.register("black_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLACK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BLUE_GLAZED_GLASS = BLOCKS.register(
+            "blue_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BROWN_GLAZED_GLASS = BLOCKS.register("brown_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BROWN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> CYAN_GLAZED_GLASS = BLOCKS.register(
+            "cyan_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_CYAN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> GRAY_GLAZED_GLASS = BLOCKS.register(
+            "gray_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> GREEN_GLAZED_GLASS = BLOCKS.register("green_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_BLUE_GLAZED_GLASS = BLOCKS.register("light_blue_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_GRAY_GLAZED_GLASS = BLOCKS.register("light_gray_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIME_GLAZED_GLASS = BLOCKS.register(
+            "lime_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> MAGENTA_GLAZED_GLASS = BLOCKS.register("magenta_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_MAGENTA)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> ORANGE_GLAZED_GLASS = BLOCKS.register("orange_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_ORANGE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> PINK_GLAZED_GLASS = BLOCKS.register(
+            "pink_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PINK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> PURPLE_GLAZED_GLASS = BLOCKS.register("purple_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PURPLE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> RED_GLAZED_GLASS = BLOCKS.register(
+            "red_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_RED)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> WHITE_GLAZED_GLASS = BLOCKS.register("white_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.SNOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> YELLOW_GLAZED_GLASS = BLOCKS.register("yellow_glazed_glass",
+            () -> new GlazedGlassBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_YELLOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BLACK_GLAZED_GLASS_PANE = BLOCKS.register("black_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLACK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BLUE_GLAZED_GLASS_PANE = BLOCKS.register("blue_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BROWN_GLAZED_GLASS_PANE = BLOCKS.register("brown_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BROWN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> CYAN_GLAZED_GLASS_PANE = BLOCKS.register("cyan_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_CYAN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> GRAY_GLAZED_GLASS_PANE = BLOCKS.register("gray_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> GREEN_GLAZED_GLASS_PANE = BLOCKS.register("green_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_BLUE_GLAZED_GLASS_PANE = BLOCKS
+            .register("light_blue_glazed_glass_pane", () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIGHT_GRAY_GLAZED_GLASS_PANE = BLOCKS
+            .register("light_gray_glazed_glass_pane", () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> LIME_GLAZED_GLASS_PANE = BLOCKS.register("lime_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> MAGENTA_GLAZED_GLASS_PANE = BLOCKS
+            .register("magenta_glazed_glass_pane", () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(
+                            Material.GLASS,
+                            MaterialColor.COLOR_MAGENTA)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> ORANGE_GLAZED_GLASS_PANE = BLOCKS.register("orange_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_ORANGE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> PINK_GLAZED_GLASS_PANE = BLOCKS.register("pink_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PINK)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> PURPLE_GLAZED_GLASS_PANE = BLOCKS.register("purple_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PURPLE)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> RED_GLAZED_GLASS_PANE = BLOCKS.register("red_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_RED)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> WHITE_GLAZED_GLASS_PANE = BLOCKS.register("white_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.SNOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> YELLOW_GLAZED_GLASS_PANE = BLOCKS.register("yellow_glazed_glass_pane",
+            () -> new SilkTouchOnlyPaneBlock(
+                    BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_YELLOW)
+                            .strength(0.3f)
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()));
+    public static final RegistryObject<Block> BLACK_SANDSTONE_SLAB = BLOCKS.register("black_sandstone_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_SANDSTONE_SLAB = BLOCKS.register("blue_sandstone_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_SANDSTONE_SLAB = BLOCKS.register("green_sandstone_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_SANDSTONE_SLAB = BLOCKS.register("orange_sandstone_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_SANDSTONE_SLAB = BLOCKS.register("pink_sandstone_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_SANDSTONE_SLAB = BLOCKS.register("red_sandstone_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_SANDSTONE_SLAB = BLOCKS.register("white_sandstone_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_SANDSTONE_SLAB = BLOCKS.register("yellow_sandstone_slab",
+            () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_SANDSTONE_WALL = BLOCKS.register("black_sandstone_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_SANDSTONE_WALL = BLOCKS.register("blue_sandstone_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_SANDSTONE_WALL = BLOCKS.register("green_sandstone_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_SANDSTONE_WALL = BLOCKS.register("orange_sandstone_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_SANDSTONE_WALL = BLOCKS.register("pink_sandstone_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_SANDSTONE_WALL = BLOCKS.register("red_sandstone_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_SANDSTONE_WALL = BLOCKS.register("white_sandstone_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_SANDSTONE_WALL = BLOCKS.register("yellow_sandstone_wall",
+            () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_SMOOTH_SANDSTONE_SLAB = BLOCKS
+            .register("black_smooth_sandstone_slab", () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_SMOOTH_SANDSTONE_SLAB = BLOCKS
+            .register("blue_smooth_sandstone_slab", () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_SMOOTH_SANDSTONE_SLAB = BLOCKS
+            .register("green_smooth_sandstone_slab", () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_SMOOTH_SANDSTONE_SLAB = BLOCKS
+            .register("orange_smooth_sandstone_slab", () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_SMOOTH_SANDSTONE_SLAB = BLOCKS
+            .register("pink_smooth_sandstone_slab", () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_SMOOTH_SANDSTONE_SLAB = BLOCKS
+            .register("red_smooth_sandstone_slab", () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_SMOOTH_SANDSTONE_SLAB = BLOCKS
+            .register("white_smooth_sandstone_slab", () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_SMOOTH_SANDSTONE_SLAB = BLOCKS
+            .register("yellow_smooth_sandstone_slab", () -> new SlabBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> WHITE_SMOOTH_SANDSTONE_WALL = BLOCKS
+            .register("white_smooth_sandstone_wall", () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLACK_SMOOTH_SANDSTONE_WALL = BLOCKS
+            .register("black_smooth_sandstone_wall", () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> RED_SMOOTH_SANDSTONE_WALL = BLOCKS
+            .register("red_smooth_sandstone_wall", () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> ORANGE_SMOOTH_SANDSTONE_WALL = BLOCKS
+            .register("orange_smooth_sandstone_wall", () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> YELLOW_SMOOTH_SANDSTONE_WALL = BLOCKS
+            .register("yellow_smooth_sandstone_wall", () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> GREEN_SMOOTH_SANDSTONE_WALL = BLOCKS
+            .register("green_smooth_sandstone_wall", () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> BLUE_SMOOTH_SANDSTONE_WALL = BLOCKS
+            .register("blue_smooth_sandstone_wall", () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
+    public static final RegistryObject<Block> PINK_SMOOTH_SANDSTONE_WALL = BLOCKS
+            .register("pink_smooth_sandstone_wall", () -> new WallBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(0.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)));
 
     public static final RegistryObject<Block> SMOOTH_SANDSTONE_WALL = BLOCKS.register("smooth_sandstone_wall",
             () -> new WallBlock(
@@ -1317,271 +1950,4 @@ public final class BlocksPart02 {
             () -> new DecoratedPotBlock());
     public static final RegistryObject<Block> CYAN_DECORATED_POT = BLOCKS.register("cyan_decorated_pot",
             () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> GRAY_DECORATED_POT = BLOCKS.register("gray_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> GREEN_DECORATED_POT = BLOCKS.register("green_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> LIGHT_BLUE_DECORATED_POT = BLOCKS.register("light_blue_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> LIGHT_GRAY_DECORATED_POT = BLOCKS.register("light_gray_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> LIME_DECORATED_POT = BLOCKS.register("lime_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> MAGENTA_DECORATED_POT = BLOCKS.register("magenta_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> ORANGE_DECORATED_POT = BLOCKS.register("orange_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> PINK_DECORATED_POT = BLOCKS.register("pink_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> PURPLE_DECORATED_POT = BLOCKS.register("purple_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> RED_DECORATED_POT = BLOCKS.register(
-            "red_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> WHITE_DECORATED_POT = BLOCKS.register("white_decorated_pot",
-            () -> new DecoratedPotBlock());
-    public static final RegistryObject<Block> YELLOW_DECORATED_POT = BLOCKS.register("yellow_decorated_pot",
-            () -> new DecoratedPotBlock());
-
-    public static final RegistryObject<Block> TRAPPED_DECORATED_POT = BLOCKS.register("trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> BLACK_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "black_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> BLUE_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "blue_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> BROWN_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "brown_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> CYAN_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "cyan_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> GRAY_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "gray_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> GREEN_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "green_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> LIGHT_BLUE_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "light_blue_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> LIGHT_GRAY_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "light_gray_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> LIME_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "lime_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> MAGENTA_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "magenta_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> ORANGE_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "orange_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> PINK_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "pink_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> PURPLE_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "purple_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> RED_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "red_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> WHITE_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "white_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-    public static final RegistryObject<Block> YELLOW_TRAPPED_DECORATED_POT = BLOCKS.register(
-            "yellow_trapped_decorated_pot",
-            () -> new TrappedDecoratedPotBlock());
-
-    public static final RegistryObject<Block> BLACK_CARPET_LAYERS = BLOCKS.register("black_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLACK)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "black"));
-    public static final RegistryObject<Block> BLUE_CARPET_LAYERS = BLOCKS.register("blue_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLUE)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "blue"));
-    public static final RegistryObject<Block> BROWN_CARPET_LAYERS = BLOCKS.register("brown_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BROWN)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "brown"));
-    public static final RegistryObject<Block> CYAN_CARPET_LAYERS = BLOCKS.register("cyan_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_CYAN)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "cyan"));
-    public static final RegistryObject<Block> GRAY_CARPET_LAYERS = BLOCKS.register("gray_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GRAY)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "gray"));
-    public static final RegistryObject<Block> GREEN_CARPET_LAYERS = BLOCKS.register("green_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GREEN)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "green"));
-    public static final RegistryObject<Block> LIGHT_BLUE_CARPET_LAYERS = BLOCKS.register("light_blue_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.WOOL,
-                            MaterialColor.COLOR_LIGHT_BLUE)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "light_blue"));
-    public static final RegistryObject<Block> LIGHT_GRAY_CARPET_LAYERS = BLOCKS.register("light_gray_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.WOOL,
-                            MaterialColor.COLOR_LIGHT_GRAY)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "light_gray"));
-    public static final RegistryObject<Block> LIME_CARPET_LAYERS = BLOCKS.register("lime_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(
-                            Material.WOOL,
-                            MaterialColor.COLOR_LIGHT_GREEN)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "lime"));
-    public static final RegistryObject<Block> MAGENTA_CARPET_LAYERS = BLOCKS.register("magenta_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_MAGENTA)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "magenta"));
-    public static final RegistryObject<Block> ORANGE_CARPET_LAYERS = BLOCKS.register("orange_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_ORANGE)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "orange"));
-    public static final RegistryObject<Block> PINK_CARPET_LAYERS = BLOCKS.register("pink_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PINK)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "pink"));
-    public static final RegistryObject<Block> PURPLE_CARPET_LAYERS = BLOCKS.register("purple_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PURPLE)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "purple"));
-    public static final RegistryObject<Block> RED_CARPET_LAYERS = BLOCKS.register(
-            "red_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_RED)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "red"));
-    public static final RegistryObject<Block> WHITE_CARPET_LAYERS = BLOCKS.register("white_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.SNOW)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "white"));
-    public static final RegistryObject<Block> YELLOW_CARPET_LAYERS = BLOCKS.register("yellow_carpet_layers",
-            () -> new WoolLayersBlock(
-                    BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_YELLOW)
-                            .strength(0.1f)
-                            .sound(SoundType.WOOL)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "yellow"));
-
-    public static final RegistryObject<Block> OAK_LEAF_LAYERS = BLOCKS.register(
-            "oak_leaf_layers",
-            () -> new LeafLayersBlock(
-                    BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.PLANT)
-                            .strength(0.2f)
-                            .sound(SoundType.GRASS)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "oak"));
-
-    public static final RegistryObject<Block> SPRUCE_LEAF_LAYERS = BLOCKS.register("spruce_leaf_layers",
-            () -> new LeafLayersBlock(
-                    BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.PODZOL)
-                            .strength(0.2f)
-                            .sound(SoundType.GRASS)
-                            .noOcclusion()
-                            .isRedstoneConductor((state, reader, pos) -> false)
-                            .isSuffocating((state, reader, pos) -> false)
-                            .isViewBlocking((state, reader, pos) -> false),
-                    "spruce"));
 }

@@ -1,0 +1,5 @@
+# Commits that only change layout. Use: git config blame.ignoreRevsFile .git-blame-ignore-revs
+# Add braces to every brace-less if/else/for/while body
+fd416c45e7afcffa090a4fb84c0998df9c5d52d2
+# Format all Java sources with the Eclipse formatter
+082c5766cc01e35b44b91a103711da88d7e08444

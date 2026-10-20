@@ -285,6 +285,7 @@ public class BuildScapeConfigScreen extends Screen {
     public static int getNavIndicatorAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
     public static int getTabTransitionAnimMs() { return Math.max(1, (int) (240 * getAnimSpeedMultiplier())); }
     public static int getSidePanelAnimMs() { return Math.max(1, (int) (280 * getAnimSpeedMultiplier())); }
+    public static int getPillarRemovalAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
 
     public static float easeOutSine(float t) {
         float clamped = Math.min(1.0f, Math.max(0.0f, t));
@@ -468,6 +469,161 @@ public class BuildScapeConfigScreen extends Screen {
     private long lastPillarRefreshCheck = 0L;
     private long lastPillarRowClickTime = 0L;
     private String lastPillarRowClickId = null;
+
+    // Animated pillar row removal & shift state
+    static float calculatePillarRowShift(float startOffset, long startTime, int durationMs, long now) {
+        if (durationMs <= 0 || now >= startTime + durationMs) return 0.0f;
+        if (now <= startTime) return startOffset;
+        float progress = (now - startTime) / (float) durationMs;
+        return startOffset * (1.0f - easeOutCubic(progress));
+    }
+
+    static int calculatePillarRemovalSlideX(int colX, int slideDistance, long startTime, int durationMs, long now) {
+        if (durationMs <= 0 || now <= startTime) return colX;
+        float progress = Math.min(1.0f, Math.max(0.0f, (now - startTime) / (float) durationMs));
+        return colX + (int) (slideDistance * easeOutSine(progress));
+    }
+
+    static float calculatePillarRemovalAlpha(float baseAlpha, long startTime, int durationMs, long now) {
+        if (durationMs <= 0 || now >= startTime + durationMs) return 0.0f;
+        if (now <= startTime) return baseAlpha;
+        float progress = Math.min(1.0f, Math.max(0.0f, (now - startTime) / (float) durationMs));
+        return baseAlpha * (1.0f - progress);
+    }
+
+    private static class PillarRowShiftAnim {
+        final float startOffset;
+        final long startTime;
+        final int durationMs;
+
+        PillarRowShiftAnim(float startOffset, long startTime, int durationMs) {
+            this.startOffset = startOffset;
+            this.startTime = startTime;
+            this.durationMs = durationMs;
+        }
+
+        float getCurrentOffset(long now) {
+            return calculatePillarRowShift(startOffset, startTime, durationMs, now);
+        }
+
+        boolean isFinished(long now) {
+            return now >= startTime + durationMs;
+        }
+    }
+
+    private static class PillarRemovalEntry {
+        final PillarIdManager.PillarData data;
+        final float contentY;
+        final long startTime;
+        final int durationMs;
+
+        PillarRemovalEntry(PillarIdManager.PillarData data, float contentY, long startTime, int durationMs) {
+            this.data = data;
+            this.contentY = contentY;
+            this.startTime = startTime;
+            this.durationMs = durationMs;
+        }
+
+        float getProgress(long now) {
+            if (durationMs <= 0) return 1.0f;
+            float progress = (now - startTime) / (float) durationMs;
+            return Math.min(1.0f, Math.max(0.0f, progress));
+        }
+
+        int getSlideX(int colX, int slideDistance, long now) {
+            return calculatePillarRemovalSlideX(colX, slideDistance, startTime, durationMs, now);
+        }
+
+        float getRemovalAlpha(float baseAlpha, long now) {
+            return calculatePillarRemovalAlpha(baseAlpha, startTime, durationMs, now);
+        }
+
+        boolean isFinished(long now) {
+            return now >= startTime + durationMs;
+        }
+    }
+
+    private final Map<String, PillarRowShiftAnim> pillarRowShiftAnims = new HashMap<>();
+    private final Map<String, PillarRemovalEntry> activePillarRemovals = new HashMap<>();
+
+    private float getPillarRowVisualY(String id, int index, int rowStep, long now) {
+        float offset = 0.0f;
+        PillarRowShiftAnim anim = pillarRowShiftAnims.get(id);
+        if (anim != null) {
+            if (anim.isFinished(now)) {
+                pillarRowShiftAnims.remove(id);
+            } else {
+                offset = anim.getCurrentOffset(now);
+            }
+        }
+        return index * rowStep + offset;
+    }
+
+    private void triggerPillarRemovals(Collection<String> idsToRemove, List<PillarIdManager.PillarData> currentList) {
+        if (idsToRemove == null || idsToRemove.isEmpty()) return;
+        long now = System.currentTimeMillis();
+        int durationMs = getPillarRemovalAnimMs();
+        int rowStep = 24 + 2; // rowH + rowGap
+
+        // 1. Snapshot the visual positions of ALL currently displayed rows before removal.
+        Map<String, Float> visualYBeforeRemoval = new HashMap<>();
+        Map<String, PillarIdManager.PillarData> dataById = new HashMap<>();
+        for (int r = 0; r < currentList.size(); r++) {
+            PillarIdManager.PillarData data = currentList.get(r);
+            if (data.id != null) {
+                float visualY = getPillarRowVisualY(data.id, r, rowStep, now);
+                visualYBeforeRemoval.put(data.id, visualY);
+                dataById.put(data.id, data);
+            }
+        }
+
+        Set<String> toRemoveSet = new HashSet<>(idsToRemove);
+
+        // 2. Queue removed rows into activePillarRemovals so they animate sliding right & fading out
+        for (String id : toRemoveSet) {
+            PillarIdManager.PillarData data = dataById.get(id);
+            if (data == null) {
+                data = PillarIdManager.getClient().getPillarData(id);
+            }
+            float curVisualY = visualYBeforeRemoval.getOrDefault(id, 0.0f);
+            if (data != null) {
+                activePillarRemovals.put(id, new PillarRemovalEntry(data, curVisualY, now, durationMs));
+            }
+            PillarIdManager.getClient().removePillarData(id);
+            selectedPillarIds.remove(id);
+            pillarRowShiftAnims.remove(id);
+            if (Objects.equals(selectedPillarDetailId, id) && sidePanelType == SidePanelType.PILLAR_DETAIL) {
+                closeSidePanel();
+            }
+        }
+
+        // 3. For all surviving rows, compute their new target positions and animate them smoothly upward
+        List<PillarIdManager.PillarData> surviving = new ArrayList<>(PillarIdManager.getClient().getAllData());
+        surviving.sort(Comparator.comparing(d -> d.id != null ? d.id : ""));
+
+        for (int r = 0; r < surviving.size(); r++) {
+            PillarIdManager.PillarData sData = surviving.get(r);
+            if (sData.id == null) continue;
+            float newTargetY = r * rowStep;
+            float prevVisualY = visualYBeforeRemoval.getOrDefault(sData.id, newTargetY);
+            float diff = prevVisualY - newTargetY;
+            if (Math.abs(diff) > 0.5f) {
+                pillarRowShiftAnims.put(sData.id, new PillarRowShiftAnim(diff, now, durationMs));
+            } else {
+                pillarRowShiftAnims.remove(sData.id);
+            }
+        }
+
+        // 4. Send network packets to the server
+        List<String> idList = new ArrayList<>(toRemoveSet);
+        if (idList.size() == 1) {
+            ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(idList.get(0)));
+        } else if (idList.size() > 1) {
+            for (List<String> batch : removalBatches(idList)) {
+                ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(batch));
+            }
+        }
+    }
 
     // Cached tab view state.
     private final TabCacheManager tabCache = new TabCacheManager();
@@ -1384,6 +1540,8 @@ public class BuildScapeConfigScreen extends Screen {
 
     public void init(Minecraft mc, int width, int height, Consumer<AbstractWidget> addWidget, Consumer<GuiEventListener> removeWidget) {
         currentInstance = this;
+        this.pillarRowShiftAnims.clear();
+        this.activePillarRemovals.clear();
         this.openStartTime = 0L;
         this.isOpening = true;
         this.openProgress = 0.0f;
@@ -3075,134 +3233,188 @@ public class BuildScapeConfigScreen extends Screen {
 
         int rowH = 24;
         int rowGap = 2;
-        int totalContentHeight = Math.max(1, pillarList.size()) * (rowH + rowGap) + 4;
+        int effectiveRowCount = pillarList.size();
+        for (PillarRemovalEntry rem : activePillarRemovals.values()) {
+            int remIdx = (int) (rem.contentY / (rowH + rowGap)) + 1;
+            if (remIdx > effectiveRowCount) {
+                effectiveRowCount = remIdx;
+            }
+        }
+        int totalContentHeight = Math.max(1, effectiveRowCount) * (rowH + rowGap) + 4;
         maxScroll = Math.max(0, totalContentHeight - viewportH);
         scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
 
         int startY = viewportY + 2 - (int) scrollOffset;
 
-        enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
+        int scissorWidth = (scrollbarTrackX - 2) - (x + 4);
+        enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, scissorWidth, viewportH);
 
-        if (pillarList.isEmpty()) {
+        long now = System.currentTimeMillis();
+
+        if (pillarList.isEmpty() && activePillarRemovals.isEmpty()) {
             int emptyY = startY + 8;
             drawBeveledButton(poseStackOrGraphics, colX, emptyY, availW, 36, COLOR_ROW_BG, false, false, alpha);
             drawCenteredText(poseStackOrGraphics, font, "No placed pillars found in world.", colX + availW / 2, emptyY + 8, applyAlpha(COLOR_TEXT_SILVER, alpha));
             drawCenteredText(poseStackOrGraphics, font, "Place and customize pillar columns to synchronize their IDs.", colX + availW / 2, emptyY + 20, applyAlpha(COLOR_TEXT_MUTED, alpha));
         } else {
+            // 1. Render surviving rows (smoothly shifted vertically into place)
             int[] visible = ConfigRenderWork.visibleRows(viewportY - startY, viewportH, rowH + rowGap, pillarList.size());
-            for (int r = visible[0]; r < visible[1]; r++) {
+            int visibleStart = Math.max(0, visible[0] - 2);
+            int visibleEnd = Math.min(pillarList.size(), visible[1] + 3);
+
+            for (int r = visibleStart; r < visibleEnd; r++) {
                 PillarIdManager.PillarData data = pillarList.get(r);
-                int rowY = startY + r * (rowH + rowGap);
+                float visualY = getPillarRowVisualY(data.id, r, rowH + rowGap, now);
+                int rowY = startY + (int) visualY;
                 if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;
 
                 boolean isSelected = selectedPillarIds.contains(data.id);
                 boolean isEditingInSidePanel = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PILLAR_DETAIL && Objects.equals(selectedPillarDetailId, data.id);
-                boolean hover = mouseX >= colX && mouseX <= colX + availW && mouseY >= rowY && mouseY <= rowY + rowH &&
-                        mouseY >= viewportY && mouseY <= viewportY + viewportH;
 
-                int rowBg = isEditingInSidePanel ? (currentTheme.isLight() ? 0xFFDCFCE7 : 0xFF1C2C22) : (isSelected ? (currentTheme.isLight() ? 0xFFF0FDF4 : 0xFF16241A) : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG));
-                drawBeveledButton(poseStackOrGraphics, colX, rowY, availW, rowH, rowBg, hover, isSelected || isEditingInSidePanel, alpha);
+                renderSinglePillarRow(poseStackOrGraphics, font, colX, rowY, availW, rowH,
+                        chkW, chkBoxSize, gap, idColW, iconColW, colorsColW, dimColW, coordsColW, actionsColW,
+                        data, isSelected, isEditingInSidePanel, true, mouseX, mouseY, alpha);
+            }
 
-                // Row Checkbox
-                int rChkX = colX + (chkW - chkBoxSize) / 2;
-                int rChkY = rowY + (rowH - chkBoxSize) / 2;
-                drawBeveledButton(poseStackOrGraphics, rChkX, rChkY, chkBoxSize, chkBoxSize, COLOR_SLOT_BG, hover, isSelected, alpha);
-                if (isSelected) {
-                    fill(poseStackOrGraphics, rChkX + 2, rChkY + 2, rChkX + chkBoxSize - 2, rChkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
-                }
-
-                int rcX = colX + chkW + gap;
-
-                // ID Column (clickable to open detail!)
-                String idText = data.id != null ? data.id : "unknown";
-                int idTextCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
-                drawText(poseStackOrGraphics, font, font.plainSubstrByWidth(idText, idColW - 4), rcX + 2, rowY + 8, applyAlpha(idTextCol, alpha));
-                rcX += idColW + gap;
-
-                // ITEM Column (Pillar Type + Displayed Item icons side by side)
-                ItemStack pillarTypeStack = getItemStackFromId(data.pillarType);
-                ItemStack dispStack = getItemStackFromId(data.displayedItem);
-                int iconY = rowY + (rowH - 16) / 2;
-                int iconStartX = rcX + (iconColW - 36) / 2;
-
-                if (!pillarTypeStack.isEmpty() || !dispStack.isEmpty()) {
-                    if (!pillarTypeStack.isEmpty()) {
-                        renderGuiItem(poseStackOrGraphics, pillarTypeStack, iconStartX, iconY);
+            // 2. Render removing rows (sliding right and fading out)
+            if (!activePillarRemovals.isEmpty()) {
+                List<String> finished = new ArrayList<>();
+                for (Map.Entry<String, PillarRemovalEntry> entry : activePillarRemovals.entrySet()) {
+                    PillarRemovalEntry rem = entry.getValue();
+                    if (rem.isFinished(now)) {
+                        finished.add(entry.getKey());
+                        continue;
                     }
-                    if (!dispStack.isEmpty()) {
-                        renderGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY);
+                    float progress = rem.getProgress(now);
+                    int rowY = startY + (int) rem.contentY;
+                    if (rowY + rowH < viewportY || rowY > viewportY + viewportH) {
+                        continue;
                     }
-                } else {
-                    drawCenteredText(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                    // Slide to the right across the table
+                    int rowX = rem.getSlideX(colX, availW, now);
+                    float remAlpha = rem.getRemovalAlpha(alpha, now);
+                    if (remAlpha <= 0.01f) continue;
+
+                    renderSinglePillarRow(poseStackOrGraphics, font, rowX, rowY, availW, rowH,
+                            chkW, chkBoxSize, gap, idColW, iconColW, colorsColW, dimColW, coordsColW, actionsColW,
+                            rem.data, false, false, false, mouseX, mouseY, remAlpha);
                 }
-                rcX += iconColW + gap;
-
-                // COLORS Column (Consistent same-sized mini swatches)
-                List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : PillarParticleConfig.get().particle_color;
-                int numSwatches = Math.min(7, colors != null ? colors.size() : 0);
-                if (numSwatches > 0) {
-                    int swSize = 7;
-                    int swGap = 2;
-                    int totalSwW = numSwatches * swSize + (numSwatches - 1) * swGap;
-                    int swStartX = rcX + (colorsColW - totalSwW) / 2;
-                    int swY = rowY + (rowH - swSize) / 2;
-                    for (int s = 0; s < numSwatches; s++) {
-                        int swX = swStartX + s * (swSize + swGap);
-                        int colInt = 0xFFFFFFFF;
-                        try {
-                            String hex = colors.get(s).replace("#", "");
-                            colInt = 0xFF000000 | Integer.parseInt(hex, 16);
-                        } catch (Exception ignored) {}
-                        fill(poseStackOrGraphics, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, alpha));
-                        drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(0xFF000000, alpha));
-                    }
-                } else {
-                    drawCenteredText(poseStackOrGraphics, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                for (String finishedId : finished) {
+                    activePillarRemovals.remove(finishedId);
                 }
-                rcX += colorsColW + gap;
-
-                // DIMENSION Column
-                String dimName = formatDimensionName(data.dimension);
-                drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
-                rcX += dimColW + gap;
-
-                // COORDINATES Column (colored X, Y, Z)
-                String coordsStr = String.format("%d %d %d", data.x, data.y, data.z);
-                int coordTextW = font.width(coordsStr);
-                int cX = rcX + (coordsColW - coordTextW) / 2;
-                String xStr = String.valueOf(data.x);
-                String yStr = String.valueOf(data.y);
-                String zStr = String.valueOf(data.z);
-                drawText(poseStackOrGraphics, font, xStr, cX, rowY + 8, applyAlpha(0xFFFF5555, alpha));
-                int xW = font.width(xStr + " ");
-                drawText(poseStackOrGraphics, font, yStr, cX + xW, rowY + 8, applyAlpha(0xFF5599FF, alpha));
-                int yW = font.width(yStr + " ");
-                drawText(poseStackOrGraphics, font, zStr, cX + xW + yW, rowY + 8, applyAlpha(0xFF55FF55, alpha));
-                rcX += coordsColW + gap;
-
-                // ACTIONS Column ([ ✎ Edit ] and [ ✕ ])
-                int actH = 13;
-                int actY = rowY + (rowH - actH) / 2;
-
-                int editW = 34;
-                int editX = rcX + 2;
-                boolean hoverEdit = mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH;
-                drawBeveledButton(poseStackOrGraphics, editX, actY, editW, actH, hoverEdit ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverEdit, false, alpha);
-                drawCenteredText(poseStackOrGraphics, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-
-                int delW = 16;
-                int delX = editX + editW + 4;
-                boolean hoverDel = mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH;
-                int delBg = hoverDel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
-                drawBeveledButton(poseStackOrGraphics, delX, actY, delW, actH, delBg, hoverDel, false, alpha);
-                int delTextCol = hoverDel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
-                drawCenteredText(poseStackOrGraphics, font, "✕", delX + delW / 2, actY + 2, applyAlpha(delTextCol, alpha));
             }
         }
 
         disableGuiScissor(poseStackOrGraphics);
 
         renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
+    }
+
+    private void renderSinglePillarRow(Object poseStackOrGraphics, Font font, int rowX, int rowY, int availW, int rowH,
+                                       int chkW, int chkBoxSize, int gap,
+                                       int idColW, int iconColW, int colorsColW, int dimColW, int coordsColW, int actionsColW,
+                                       PillarIdManager.PillarData data, boolean isSelected, boolean isEditingInSidePanel,
+                                       boolean isInteractive, int mouseX, int mouseY, float alpha) {
+        boolean hover = isInteractive && mouseX >= rowX && mouseX <= rowX + availW && mouseY >= rowY && mouseY <= rowY + rowH;
+        int rowBg = isEditingInSidePanel ? (currentTheme.isLight() ? 0xFFDCFCE7 : 0xFF1C2C22) : (isSelected ? (currentTheme.isLight() ? 0xFFF0FDF4 : 0xFF16241A) : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG));
+        drawBeveledButton(poseStackOrGraphics, rowX, rowY, availW, rowH, rowBg, hover, isSelected || isEditingInSidePanel, alpha);
+
+        // Row Checkbox
+        int rChkX = rowX + (chkW - chkBoxSize) / 2;
+        int rChkY = rowY + (rowH - chkBoxSize) / 2;
+        drawBeveledButton(poseStackOrGraphics, rChkX, rChkY, chkBoxSize, chkBoxSize, COLOR_SLOT_BG, hover, isSelected, alpha);
+        if (isSelected) {
+            fill(poseStackOrGraphics, rChkX + 2, rChkY + 2, rChkX + chkBoxSize - 2, rChkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
+        }
+
+        int rcX = rowX + chkW + gap;
+
+        // ID Column (clickable to open detail!)
+        String idText = data.id != null ? data.id : "unknown";
+        int idTextCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
+        drawText(poseStackOrGraphics, font, font.plainSubstrByWidth(idText, idColW - 4), rcX + 2, rowY + 8, applyAlpha(idTextCol, alpha));
+        rcX += idColW + gap;
+
+        // ITEM Column (Pillar Type + Displayed Item icons side by side)
+        ItemStack pillarTypeStack = getItemStackFromId(data.pillarType);
+        ItemStack dispStack = getItemStackFromId(data.displayedItem);
+        int iconY = rowY + (rowH - 16) / 2;
+        int iconStartX = rcX + (iconColW - 36) / 2;
+
+        if (!pillarTypeStack.isEmpty() || !dispStack.isEmpty()) {
+            if (alpha >= 0.05f) {
+                if (!pillarTypeStack.isEmpty()) {
+                    renderGuiItem(poseStackOrGraphics, pillarTypeStack, iconStartX, iconY);
+                }
+                if (!dispStack.isEmpty()) {
+                    renderGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY);
+                }
+            }
+        } else {
+            drawCenteredText(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        }
+        rcX += iconColW + gap;
+
+        // COLORS Column (Consistent same-sized mini swatches)
+        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : PillarParticleConfig.get().particle_color;
+        int numSwatches = Math.min(7, colors != null ? colors.size() : 0);
+        if (numSwatches > 0) {
+            int swSize = 7;
+            int swGap = 2;
+            int totalSwW = numSwatches * swSize + (numSwatches - 1) * swGap;
+            int swStartX = rcX + (colorsColW - totalSwW) / 2;
+            int swY = rowY + (rowH - swSize) / 2;
+            for (int s = 0; s < numSwatches; s++) {
+                int swX = swStartX + s * (swSize + swGap);
+                int colInt = 0xFFFFFFFF;
+                try {
+                    String hex = colors.get(s).replace("#", "");
+                    colInt = 0xFF000000 | Integer.parseInt(hex, 16);
+                } catch (Exception ignored) {}
+                fill(poseStackOrGraphics, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, alpha));
+                drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(0xFF000000, alpha));
+            }
+        } else {
+            drawCenteredText(poseStackOrGraphics, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        }
+        rcX += colorsColW + gap;
+
+        // DIMENSION Column
+        String dimName = formatDimensionName(data.dimension);
+        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        rcX += dimColW + gap;
+
+        // COORDINATES Column (colored X, Y, Z)
+        String coordsStr = String.format("%d %d %d", data.x, data.y, data.z);
+        int coordTextW = font.width(coordsStr);
+        int cX = rcX + (coordsColW - coordTextW) / 2;
+        String xStr = String.valueOf(data.x);
+        String yStr = String.valueOf(data.y);
+        String zStr = String.valueOf(data.z);
+        drawText(poseStackOrGraphics, font, xStr, cX, rowY + 8, applyAlpha(0xFFFF5555, alpha));
+        int xW = font.width(xStr + " ");
+        drawText(poseStackOrGraphics, font, yStr, cX + xW, rowY + 8, applyAlpha(0xFF5599FF, alpha));
+        int yW = font.width(yStr + " ");
+        drawText(poseStackOrGraphics, font, zStr, cX + xW + yW, rowY + 8, applyAlpha(0xFF55FF55, alpha));
+        rcX += coordsColW + gap;
+
+        // ACTIONS Column ([ ✎ Edit ] and [ ✕ ])
+        int actH = 13;
+        int actY = rowY + (rowH - actH) / 2;
+
+        int editW = 34;
+        int editX = rcX + 2;
+        boolean hoverEdit = isInteractive && mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH;
+        drawBeveledButton(poseStackOrGraphics, editX, actY, editW, actH, hoverEdit ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverEdit, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+
+        int delW = 16;
+        int delX = editX + editW + 4;
+        boolean hoverDel = isInteractive && mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH;
+        int delBg = hoverDel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
+        drawBeveledButton(poseStackOrGraphics, delX, actY, delW, actH, delBg, hoverDel, false, alpha);
+        int delTextCol = hoverDel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
+        drawCenteredText(poseStackOrGraphics, font, "✕", delX + delW / 2, actY + 2, applyAlpha(delTextCol, alpha));
     }
 
     // Per-pillar customization view.
@@ -6052,14 +6264,7 @@ public class BuildScapeConfigScreen extends Screen {
         if (!selectedPillarIds.isEmpty() && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             if (!confirmDestructiveAction("remove:selected")) return true;
-            List<String> ids = new ArrayList<>(selectedPillarIds);
-            for (String id : ids) {
-                PillarIdManager.getClient().removePillarData(id);
-            }
-            for (List<String> batch : removalBatches(ids)) {
-                ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(batch));
-            }
-            selectedPillarIds.clear();
+            triggerPillarRemovals(new ArrayList<>(selectedPillarIds), pillarList);
             return true;
         }
 
@@ -6073,13 +6278,9 @@ public class BuildScapeConfigScreen extends Screen {
             for (PillarIdManager.PillarData data : pillarList) {
                 if (data.id != null) {
                     ids.add(data.id);
-                    PillarIdManager.getClient().removePillarData(data.id);
                 }
             }
-            for (List<String> batch : removalBatches(ids)) {
-                ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(batch));
-            }
-            selectedPillarIds.clear();
+            triggerPillarRemovals(ids, pillarList);
             return true;
         }
 
@@ -6141,9 +6342,11 @@ public class BuildScapeConfigScreen extends Screen {
         int rowGap = 2;
         int startY = viewportY + 2 - (int) scrollOffset;
 
+        long clickTime = System.currentTimeMillis();
         for (int r = 0; r < pillarList.size(); r++) {
             PillarIdManager.PillarData data = pillarList.get(r);
-            int rowY = startY + r * (rowH + rowGap);
+            float visualY = getPillarRowVisualY(data.id, r, rowH + rowGap, clickTime);
+            int rowY = startY + (int) visualY;
             if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;
 
             if (mouseX >= colX && mouseX <= colX + availW && mouseY >= rowY && mouseY <= rowY + rowH) {
@@ -6173,12 +6376,7 @@ public class BuildScapeConfigScreen extends Screen {
 
                 if (mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH) {
                     if (!requireConfigModificationAccess()) return true;
-                    PillarIdManager.getClient().removePillarData(data.id);
-                    ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(data.id));
-                    selectedPillarIds.remove(data.id);
-                    if (Objects.equals(selectedPillarDetailId, data.id) && sidePanelType == SidePanelType.PILLAR_DETAIL) {
-                        closeSidePanel();
-                    }
+                    triggerPillarRemovals(Collections.singletonList(data.id), pillarList);
                     return true;
                 }
 

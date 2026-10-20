@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.block.building;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
+import com.kingodogo.buildscape.registry.blocks.StoneBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -57,7 +59,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
     private static boolean isSnowySetting(LevelReader level, BlockPos pos) {
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
-        return aboveState.is(Blocks.SNOW) || aboveState.is(ModBlocks.SNOW_OVERLAY.get());
+        return aboveState.is(Blocks.SNOW) || aboveState.is(StoneBlocks.SNOW_OVERLAY.get());
     }
 
     @Override
@@ -115,7 +117,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
         if (!canBeGrass(state, level, pos)) {
-            BlockState dirtSlabState = ModBlocks.DIRT_SLAB.get().defaultBlockState()
+            BlockState dirtSlabState = SandstoneBlocks.DIRT_SLAB.get().defaultBlockState()
                     .setValue(TYPE, state.getValue(TYPE))
                     .setValue(WATERLOGGED, state.getValue(WATERLOGGED));
             level.setBlockAndUpdate(pos, dirtSlabState);
@@ -131,7 +133,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
 
                 BlockState targetState = level.getBlockState(targetPos);
 
-                if (targetState.is(ModBlocks.DIRT_SLAB.get()) && canPropagate(state, level, targetPos)) {
+                if (targetState.is(SandstoneBlocks.DIRT_SLAB.get()) && canPropagate(state, level, targetPos)) {
                     BlockState grassSlabState = this.defaultBlockState()
                             .setValue(TYPE, targetState.getValue(TYPE))
                             .setValue(WATERLOGGED, targetState.getValue(WATERLOGGED))
@@ -158,7 +160,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
                 return Collections.singletonList(new ItemStack(this, count));
             }
         }
-        return Collections.singletonList(new ItemStack(ModBlocks.DIRT_SLAB.get(), count));
+        return Collections.singletonList(new ItemStack(SandstoneBlocks.DIRT_SLAB.get(), count));
     }
 
     @Override
@@ -210,8 +212,8 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
         BlockPos abovePos = pos.above();
         BlockState foliageState = Blocks.GRASS.defaultBlockState();
         if (random.nextInt(8) == 0) {
-            foliageState = state.is(ModBlocks.SNOWY_GRASS_BLOCK_SLAB.get())
-                    ? ModBlocks.SNOWY_SHORT_GRASS.get().defaultBlockState()
+            foliageState = state.is(DecorBlocks.SNOWY_GRASS_BLOCK_SLAB.get())
+                    ? DecorBlocks.SNOWY_SHORT_GRASS.get().defaultBlockState()
                     : Blocks.GRASS.defaultBlockState();
         }
         if (foliageState.canSurvive(level, abovePos)) {

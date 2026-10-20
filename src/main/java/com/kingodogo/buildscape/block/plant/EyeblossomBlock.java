@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -78,8 +78,8 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
         }
 
         BlockState replacement = (night
-                ? ModBlocks.OPEN_EYEBLOSSOM.get()
-                : ModBlocks.CLOSED_EYEBLOSSOM.get())
+                ? CopperBlocks.OPEN_EYEBLOSSOM.get()
+                : CopperBlocks.CLOSED_EYEBLOSSOM.get())
                 .defaultBlockState()
                 .setValue(WAXED, false);
         level.setBlock(pos, replacement, 3);

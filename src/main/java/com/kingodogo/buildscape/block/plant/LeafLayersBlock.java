@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
@@ -229,65 +229,65 @@ public class LeafLayersBlock
         int layerCount = state.getValue(LAYERS);
         return switch (leafType) {
             case "oak" -> List.of(
-                    new ItemStack(ModItems.OAK_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.OAK_LEAF_LAYERS.get(), layerCount));
             case "spruce" -> List.of(
-                    new ItemStack(ModItems.SPRUCE_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SPRUCE_LEAF_LAYERS.get(), layerCount));
             case "birch" -> List.of(
-                    new ItemStack(ModItems.BIRCH_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.BIRCH_LEAF_LAYERS.get(), layerCount));
             case "jungle" -> List.of(
-                    new ItemStack(ModItems.JUNGLE_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.JUNGLE_LEAF_LAYERS.get(), layerCount));
             case "acacia" -> List.of(
-                    new ItemStack(ModItems.ACACIA_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.ACACIA_LEAF_LAYERS.get(), layerCount));
             case "dark_oak" -> List.of(
-                    new ItemStack(ModItems.DARK_OAK_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.DARK_OAK_LEAF_LAYERS.get(), layerCount));
             case "azalea" -> List.of(
-                    new ItemStack(ModItems.AZALEA_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.AZALEA_LEAF_LAYERS.get(), layerCount));
             case "flowering_azalea" -> List.of(
-                    new ItemStack(ModItems.FLOWERING_AZALEA_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.FLOWERING_AZALEA_LEAF_LAYERS.get(), layerCount));
             case "snowy_oak" -> List.of(
-                    new ItemStack(ModItems.SNOWY_OAK_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_OAK_LEAF_LAYERS.get(), layerCount));
             case "snowy_spruce" -> List.of(
-                    new ItemStack(ModItems.SNOWY_SPRUCE_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_SPRUCE_LEAF_LAYERS.get(), layerCount));
             case "snowy_birch" -> List.of(
-                    new ItemStack(ModItems.SNOWY_BIRCH_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_BIRCH_LEAF_LAYERS.get(), layerCount));
             case "snowy_jungle" -> List.of(
-                    new ItemStack(ModItems.SNOWY_JUNGLE_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_JUNGLE_LEAF_LAYERS.get(), layerCount));
             case "snowy_acacia" -> List.of(
-                    new ItemStack(ModItems.SNOWY_ACACIA_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_ACACIA_LEAF_LAYERS.get(), layerCount));
             case "snowy_dark_oak" -> List.of(
-                    new ItemStack(ModItems.SNOWY_DARK_OAK_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_DARK_OAK_LEAF_LAYERS.get(), layerCount));
             case "snowy_mangrove" -> List.of(
-                    new ItemStack(ModItems.SNOWY_MANGROVE_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_MANGROVE_LEAF_LAYERS.get(), layerCount));
             case "snowy_azalea" -> List.of(
-                    new ItemStack(ModItems.SNOWY_AZALEA_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_AZALEA_LEAF_LAYERS.get(), layerCount));
             case "snowy_flowering_azalea" -> List.of(
                     new ItemStack(
-                            ModItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get(),
+                            WoodItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get(),
                             layerCount));
             case "mangrove" -> List.of(
-                    new ItemStack(ModItems.MANGROVE_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.MANGROVE_LEAF_LAYERS.get(), layerCount));
             case "orange_poplar" -> List.of(
-                    new ItemStack(ModItems.ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "red_poplar" -> List.of(
-                    new ItemStack(ModItems.RED_POPLAR_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.RED_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "yellow_poplar" -> List.of(
-                    new ItemStack(ModItems.YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "cherry" -> List.of(
-                    new ItemStack(ModItems.CHERRY_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.CHERRY_LEAF_LAYERS.get(), layerCount));
             case "pale_oak" -> List.of(
-                    new ItemStack(ModItems.PALE_OAK_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.PALE_OAK_LEAF_LAYERS.get(), layerCount));
             case "snowy_cherry" -> List.of(
-                    new ItemStack(ModItems.SNOWY_CHERRY_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_CHERRY_LEAF_LAYERS.get(), layerCount));
             case "snowy_pale_oak" -> List.of(
-                    new ItemStack(ModItems.SNOWY_PALE_OAK_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_PALE_OAK_LEAF_LAYERS.get(), layerCount));
             case "snowy_orange_poplar" -> List.of(
-                    new ItemStack(ModItems.SNOWY_ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "snowy_red_poplar" -> List.of(
-                    new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_RED_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "snowy_yellow_poplar" -> List.of(
-                    new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount));
             default -> List.of(
-                    new ItemStack(ModItems.OAK_LEAF_LAYERS.get(), layerCount));
+                    new ItemStack(WoodItems.OAK_LEAF_LAYERS.get(), layerCount));
         };
     }
 

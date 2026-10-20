@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.feature.sculk;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModSounds;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -76,7 +76,7 @@ public final class SculkSpreader {
     }
 
     private static boolean hasSubstrate(ServerLevel level, BlockPos pos, BlockState state) {
-        if (!state.is(ModBlocks.SCULK_VEIN.get())) {
+        if (!state.is(CopperBlocks.SCULK_VEIN.get())) {
             return false;
         }
         for (Direction face : Direction.values()) {
@@ -91,7 +91,7 @@ public final class SculkSpreader {
 
     private static boolean convertSubstrate(ServerLevel level, BlockPos pos, Random random) {
         BlockState state = level.getBlockState(pos);
-        if (!state.is(ModBlocks.SCULK_VEIN.get())) {
+        if (!state.is(CopperBlocks.SCULK_VEIN.get())) {
             return false;
         }
         List<Direction> faces = Arrays.asList(Direction.values());
@@ -100,7 +100,7 @@ public final class SculkSpreader {
             BlockPos target = pos.relative(face);
             if (state.getValue(GlowLichenBlock.getFaceProperty(face)) && level.hasChunkAt(target)
                     && level.getBlockState(target).is(REPLACEABLE)
-                    && level.setBlock(target, ModBlocks.SCULK.get().defaultBlockState(), 3)) {
+                    && level.setBlock(target, CopperBlocks.SCULK.get().defaultBlockState(), 3)) {
                 level.playSound(null, target, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                 for (Direction direction : Direction.values()) {
                     SculkVeinBlock.regrow(level, target.relative(direction));
@@ -121,7 +121,8 @@ public final class SculkSpreader {
                 return false;
             }
             BlockState state = level.getBlockState(check);
-            if ((state.is(ModBlocks.SCULK_SENSOR.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get())) && ++nearby > 2) {
+            if ((state.is(CopperBlocks.SCULK_SENSOR.get()) || state.is(CopperBlocks.SCULK_SHRIEKER.get()))
+                    && ++nearby > 2) {
                 return false;
             }
         }
@@ -142,7 +143,7 @@ public final class SculkSpreader {
                         continue;
                     }
                     BlockState state = level.getBlockState(target);
-                    if (!state.is(ModBlocks.SCULK.get()) && !state.is(ModBlocks.SCULK_VEIN.get())) {
+                    if (!state.is(CopperBlocks.SCULK.get()) && !state.is(CopperBlocks.SCULK_VEIN.get())) {
                         continue;
                     }
                     if (distance == 2) {
@@ -224,11 +225,11 @@ public final class SculkSpreader {
             Random random = level.random;
             BlockState state = level.getBlockState(pos);
             boolean spreadVeins = false;
-            if (!state.is(ModBlocks.SCULK.get()) && !state.is(ModBlocks.SCULK_VEIN.get())) {
+            if (!state.is(CopperBlocks.SCULK.get()) && !state.is(CopperBlocks.SCULK_VEIN.get())) {
                 spreadVeins = SculkVeinBlock.regrow(level, pos);
                 state = level.getBlockState(pos);
             }
-            if (state.is(ModBlocks.SCULK_VEIN.get())) {
+            if (state.is(CopperBlocks.SCULK_VEIN.get())) {
                 spreadVeins |= SculkVeinBlock.spread(level, pos, random);
                 if (spreadVeins) {
                     level.playSound(null, pos, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -238,13 +239,13 @@ public final class SculkSpreader {
                 } else if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
                     charge /= 2;
                 }
-            } else if (state.is(ModBlocks.SCULK.get())) {
+            } else if (state.is(CopperBlocks.SCULK.get())) {
                 if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
                     if (pos.distSqr(origin) > NO_GROWTH_RADIUS * NO_GROWTH_RADIUS && canPlaceGrowth(level, pos)) {
                         if (random.nextInt(GROWTH_COST) < charge) {
                             Block growth = random.nextInt(11) == 0
-                                    ? ModBlocks.SCULK_SHRIEKER.get()
-                                    : ModBlocks.SCULK_SENSOR.get();
+                                    ? CopperBlocks.SCULK_SHRIEKER.get()
+                                    : CopperBlocks.SCULK_SENSOR.get();
                             if (level.setBlock(pos.above(), growth.defaultBlockState(), 3)) {
                                 level.playSound(null, pos, ModSounds.SCULK_CHARGE.get(), SoundSource.BLOCKS, 1.0F,
                                         1.0F);

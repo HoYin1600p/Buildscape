@@ -2,7 +2,10 @@ package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.block.plant.PlanterHelper;
 import com.kingodogo.buildscape.block.plant.PlanterHelper.PlanterType;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -72,25 +75,25 @@ public abstract class ComposterBlockMixin extends Block {
                         newType = PlanterType.DIRT;
                     } else if (block == Blocks.COARSE_DIRT) {
                         newType = PlanterType.COARSE_DIRT;
-                    } else if (block == ModBlocks.MUD.get()) {
+                    } else if (block == SandstoneBlocks.MUD.get()) {
                         newType = PlanterType.MUD;
                     } else if (block == Blocks.MOSS_BLOCK) {
                         newType = PlanterType.MOSS_BLOCK;
                     } else if (block == Blocks.ROOTED_DIRT) {
                         newType = PlanterType.ROOTED_DIRT;
-                    } else if (block == ModBlocks.RED_MOSS_BLOCK.get()) {
+                    } else if (block == ShapedWoodBlocks.RED_MOSS_BLOCK.get()) {
                         newType = PlanterType.RED_MOSS_BLOCK;
-                    } else if (block == ModBlocks.YELLOW_MOSS_BLOCK.get()) {
+                    } else if (block == ShapedWoodBlocks.YELLOW_MOSS_BLOCK.get()) {
                         newType = PlanterType.YELLOW_MOSS_BLOCK;
-                    } else if (block == ModBlocks.ORANGE_MOSS_BLOCK.get()) {
+                    } else if (block == ShapedWoodBlocks.ORANGE_MOSS_BLOCK.get()) {
                         newType = PlanterType.ORANGE_MOSS_BLOCK;
-                    } else if (block == ModBlocks.PALE_MOSS_BLOCK.get()) {
+                    } else if (block == CopperBlocks.PALE_MOSS_BLOCK.get()) {
                         newType = PlanterType.PALE_MOSS_BLOCK;
-                    } else if (block == ModBlocks.MUDDY_MANGROVE_ROOTS.get()) {
+                    } else if (block == DecorBlocks.MUDDY_MANGROVE_ROOTS.get()) {
                         newType = PlanterType.MUDDY_MANGROVE_ROOTS;
                     } else if (block == Blocks.GRASS_BLOCK) {
                         newType = PlanterType.GRASS_BLOCK;
-                    } else if (block == ModBlocks.SNOWY_GRASS_BLOCK.get()) {
+                    } else if (block == DecorBlocks.SNOWY_GRASS_BLOCK.get()) {
                         newType = PlanterType.SNOWY_GRASS_BLOCK;
                     } else if (block == Blocks.MYCELIUM) {
                         newType = PlanterType.MYCELIUM;

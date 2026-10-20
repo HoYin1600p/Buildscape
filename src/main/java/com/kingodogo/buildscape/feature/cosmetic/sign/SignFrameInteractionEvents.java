@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.feature.cosmetic.sign;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -70,7 +70,7 @@ public class SignFrameInteractionEvents {
             return;
         }
 
-        if (heldItem.is(ModItems.STRINGLIGHT_FRAME.get())) {
+        if (heldItem.is(CardboardItems.STRINGLIGHT_FRAME.get())) {
             if (!signHasFrame) {
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.SUCCESS);

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -91,7 +92,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
         }
 
         if (level.getMaxLocalRawBrightness(pos.above()) >= 9) {
-            BlockState snowyGrassState = ModBlocks.SNOWY_GRASS_BLOCK.get()
+            BlockState snowyGrassState = DecorBlocks.SNOWY_GRASS_BLOCK.get()
                     .defaultBlockState();
 
             for (int i = 0; i < 4; ++i) {
@@ -102,8 +103,9 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
 
                 BlockState targetState = level.getBlockState(targetPos);
 
-                if (targetState.is(ModBlocks.DIRT_SLAB.get()) && canPropagate(snowyGrassState, level, targetPos)) {
-                    BlockState grassSlabState = ModBlocks.SNOWY_GRASS_BLOCK_SLAB.get().defaultBlockState()
+                if (targetState.is(SandstoneBlocks.DIRT_SLAB.get())
+                        && canPropagate(snowyGrassState, level, targetPos)) {
+                    BlockState grassSlabState = DecorBlocks.SNOWY_GRASS_BLOCK_SLAB.get().defaultBlockState()
                             .setValue(SlabBlock.TYPE, targetState.getValue(SlabBlock.TYPE))
                             .setValue(SlabBlock.WATERLOGGED, targetState.getValue(SlabBlock.WATERLOGGED));
                     level.setBlockAndUpdate(targetPos, grassSlabState);
@@ -258,17 +260,17 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
     private Block getRandomSnowyFoliage(Random random) {
         int roll = random.nextInt(100);
         if (roll < 50) {
-            return ModBlocks.SNOWY_SHORT_GRASS.get();
+            return DecorBlocks.SNOWY_SHORT_GRASS.get();
         } else if (roll < 70) {
-            return ModBlocks.SNOWY_BUSH.get();
+            return DecorBlocks.SNOWY_BUSH.get();
         } else if (roll < 85) {
-            return ModBlocks.SNOWY_FERN.get();
+            return DecorBlocks.SNOWY_FERN.get();
         } else if (roll < 90) {
-            return ModBlocks.SNOWY_TALL_GRASS.get();
+            return DecorBlocks.SNOWY_TALL_GRASS.get();
         } else if (roll < 95) {
-            return ModBlocks.SNOWY_LARGE_FERN.get();
+            return DecorBlocks.SNOWY_LARGE_FERN.get();
         } else {
-            return ModBlocks.SNOWY_SHORT_GRASS.get();
+            return DecorBlocks.SNOWY_SHORT_GRASS.get();
         }
     }
 }

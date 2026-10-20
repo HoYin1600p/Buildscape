@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.client.feature.muff;
 
 import com.kingodogo.buildscape.block.decor.MuffBlock;
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
@@ -65,7 +65,7 @@ public class MuffBlockManager {
 
         for (BlockPos pos : ACTIVE_MUFFS) {
             BlockState state = mc.level.getBlockState(pos);
-            if (state.is(ModBlocks.MUFF_BLOCK.get())) {
+            if (state.is(ShapedWoodBlocks.MUFF_BLOCK.get())) {
                 if (state.getValue(MuffBlock.POWERED)) {
                     int radius = state.getValue(MuffBlock.RADIUS);
                     double dx = Math.abs((double) pos.getX() + 0.5 - sx);

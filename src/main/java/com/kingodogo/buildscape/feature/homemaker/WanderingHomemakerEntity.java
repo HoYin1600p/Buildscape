@@ -1,7 +1,10 @@
 package com.kingodogo.buildscape.feature.homemaker;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CopperItems;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
+import com.kingodogo.buildscape.registry.items.ShapedWoodItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -64,129 +67,167 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         offers.clear();
 
         List<MerchantOffer> list = new ArrayList<>();
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MANGROVE_PROPAGULE.get(), 5),
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.MANGROVE_PROPAGULE.get(), 5),
+                        8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ShapedWoodItems.POPLAR_SAPLING.get(), 4), 8,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ShapedWoodItems.CHERRY_SAPLING.get(), 4), 8,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ShapedWoodItems.PALE_OAK_SAPLING.get(), 4),
                 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.POPLAR_SAPLING.get(), 4), 8,
-                1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CHERRY_SAPLING.get(), 4), 8,
-                1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PALE_OAK_SAPLING.get(), 4),
-                8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_MONETS.get(), 2), 6, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.RED_MONETS.get(), 2), 6, 1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_MONETS.get(), 2), 6, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.BLUE_MONETS.get(), 2), 6, 1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_MONETS.get(), 2), 6,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.PURPLE_MONETS.get(), 2), 6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIGHT_BLUE_MONETS.get(), 2),
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.LIGHT_BLUE_MONETS.get(), 2),
                 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PINK_MONETS.get(), 2), 6, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.PINK_MONETS.get(), 2), 6, 1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.YELLOW_MONETS.get(), 2), 6,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.YELLOW_MONETS.get(), 2), 6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOVER.get(), 7), 6, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.CLOVER.get(), 7), 6, 1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_ROSE_VINES.get(), 2), 6,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.RED_ROSE_VINES.get(), 2), 6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLACK_ROSE_VINES.get(), 2),
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.BLACK_ROSE_VINES.get(), 2),
                 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_ROSE_VINES.get(), 2), 6,
-                1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WHITE_ROSE_VINES.get(), 2),
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.BLUE_ROSE_VINES.get(), 2), 6,
+                        1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.WHITE_ROSE_VINES.get(), 2),
                 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SNOWY_GRASS_BLOCK.get(), 2),
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.SNOWY_GRASS_BLOCK.get(), 2),
                 2, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_SPORE_BLOSSOM.get(), 2),
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.RED_SPORE_BLOSSOM.get(), 2),
                 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CYAN_SPORE_BLOSSOM.get(), 2),
-                6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_SPORE_BLOSSOM.get(), 2),
-                6, 1, 0.05f));
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.CYAN_SPORE_BLOSSOM.get(), 2),
+                        6, 1, 0.05f));
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.BLUE_SPORE_BLOSSOM.get(), 2),
+                        6, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
-                new ItemStack(ModItems.PURPLE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
+                new ItemStack(WoodItems.PURPLE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
-                new ItemStack(ModItems.ORANGE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ICICLE.get(), 32), 8, 1,
+                new ItemStack(WoodItems.ORANGE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(WoodItems.ICICLE.get(), 32), 8, 1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR_SPIKE.get(), 32), 8,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ShapedWoodItems.SULFUR_SPIKE.get(), 32), 8,
                 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
-                new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get(), 4), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR.get(), 4), 8, 1,
+                new ItemStack(WoodItems.PACKED_ICICLE_BLOCK.get(), 4), 8, 1, 0.05f));
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ShapedWoodItems.SULFUR.get(), 4), 8, 1,
+                        0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ShapedWoodItems.CINNABAR.get(), 2), 8,
+                1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CINNABAR.get(), 2), 8, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.WILDFLOWERS.get(), 4), 6,
+                1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WILDFLOWERS.get(), 4), 6, 1,
-                0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LEAF_LITTER.get(), 4), 6, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.LEAF_LITTER.get(), 4), 6,
+                1,
                 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.DRY_GRASS.get(), 6), 8, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.DRY_GRASS.get(), 6), 8, 1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.TALL_DRY_GRASS.get(), 6), 8,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.TALL_DRY_GRASS.get(), 6),
+                8,
                 1, 0.05f));
         list.add(
-                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BUSH.get(), 6), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CACTUS_FLOWER.get(), 6), 8,
-                1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_BUSH.get(), 6), 8, 1,
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.BUSH.get(), 6), 8, 1,
+                        0.05f));
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.CACTUS_FLOWER.get(), 6), 8,
+                        1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.RED_BUSH.get(), 6), 8, 1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.FIREFLY_BUSH.get(), 6), 8, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.FIREFLY_BUSH.get(), 6), 8,
+                1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.OPEN_EYEBLOSSOM.get(), 6), 8,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.OPEN_EYEBLOSSOM.get(), 6),
+                8,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get(), 6),
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(CopperItems.CLOSED_EYEBLOSSOM.get(), 6),
                 8, 1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ORANGE_HAZE_BUSH.get(), 6),
-                6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MAGENTA_HAZE_BUSH.get(), 6),
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.ORANGE_HAZE_BUSH.get(), 6),
+                        6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(CopperItems.MAGENTA_HAZE_BUSH.get(), 6),
                 6, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
-                new ItemStack(ModItems.LIGHT_BLUE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.YELLOW_HAZE_BUSH.get(), 6),
-                6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIME_HAZE_BUSH.get(), 6), 6,
+                new ItemStack(CopperItems.LIGHT_BLUE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.YELLOW_HAZE_BUSH.get(), 6),
+                        6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.LIME_HAZE_BUSH.get(), 6),
+                6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PINK_HAZE_BUSH.get(), 6), 6,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.PINK_HAZE_BUSH.get(), 6),
+                6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GRAY_HAZE_BUSH.get(), 6), 6,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.GRAY_HAZE_BUSH.get(), 6),
+                6,
                 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
-                new ItemStack(ModItems.LIGHT_GRAY_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CYAN_HAZE_BUSH.get(), 6), 6,
+                new ItemStack(CopperItems.LIGHT_GRAY_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.CYAN_HAZE_BUSH.get(), 6),
+                6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_HAZE_BUSH.get(), 6),
-                6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_HAZE_BUSH.get(), 6), 6,
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.PURPLE_HAZE_BUSH.get(), 6),
+                        6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.BLUE_HAZE_BUSH.get(), 6),
+                6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BROWN_HAZE_BUSH.get(), 6), 6,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.BROWN_HAZE_BUSH.get(), 6),
+                6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GREEN_HAZE_BUSH.get(), 6), 6,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.GREEN_HAZE_BUSH.get(), 6),
+                6,
                 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_HAZE_BUSH.get(), 6), 6,
-                1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLACK_HAZE_BUSH.get(), 6), 6,
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.RED_HAZE_BUSH.get(), 6), 6,
+                        1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.BLACK_HAZE_BUSH.get(), 6),
+                6,
                 1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SCULK_CATALYST.get(), 2), 3,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.SCULK_CATALYST.get(), 2),
+                3,
                 1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MUFF_BLOCK.get(), 2), 4, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ShapedWoodItems.MUFF_BLOCK.get(), 2),
+                4, 1,
                 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BOTTLE_OF_MIST.get(), 16), 4,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(MasonryItems.BOTTLE_OF_MIST.get(), 16), 4,
                 1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CONFETTI_ITEM.get(), 32), 6,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(MasonryItems.CONFETTI_ITEM.get(), 32),
+                6,
                 1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_CLUMP.get(), 16), 8, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.RESIN_CLUMP.get(), 16), 8,
+                1,
                 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_BLOCK.get(), 16), 8, 1,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.RESIN_BLOCK.get(), 16), 8,
+                1,
                 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CREAKING_HEART.get(), 2), 2,
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(CopperItems.CREAKING_HEART.get(), 2),
+                2,
                 1, 0.05f));
 
         Collections.shuffle(list, this.random);
@@ -196,7 +237,7 @@ public class WanderingHomemakerEntity extends WanderingTrader {
 
         if (this.random.nextInt(5000) == 0) {
             offers.add(new MerchantOffer(new ItemStack(Items.DIAMOND, 12),
-                    new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1), 1, 1, 0.0f));
+                    new ItemStack(MasonryItems.ANCIENT_ASHEN_SCROLL.get(), 1), 1, 1, 0.0f));
         }
     }
 }

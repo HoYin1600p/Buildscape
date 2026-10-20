@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.feature.copper;
 import com.google.common.collect.ImmutableSet;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.mixin.accessor.PoiTypeAccessor;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.Level;
@@ -23,14 +23,14 @@ import java.util.function.Supplier;
 public class CopperRodHandler {
 
     private static final List<Supplier<Block>> ROD_SUPPLIERS = List.of(
-            ModBlocks.COPPER_ROD,
-            ModBlocks.WAXED_COPPER_ROD,
-            ModBlocks.EXPOSED_COPPER_ROD,
-            ModBlocks.WAXED_EXPOSED_COPPER_ROD,
-            ModBlocks.WEATHERED_COPPER_ROD,
-            ModBlocks.WAXED_WEATHERED_COPPER_ROD,
-            ModBlocks.OXIDIZED_COPPER_ROD,
-            ModBlocks.WAXED_OXIDIZED_COPPER_ROD);
+            CopperBlocks.COPPER_ROD,
+            CopperBlocks.WAXED_COPPER_ROD,
+            CopperBlocks.EXPOSED_COPPER_ROD,
+            CopperBlocks.WAXED_EXPOSED_COPPER_ROD,
+            CopperBlocks.WEATHERED_COPPER_ROD,
+            CopperBlocks.WAXED_WEATHERED_COPPER_ROD,
+            CopperBlocks.OXIDIZED_COPPER_ROD,
+            CopperBlocks.WAXED_OXIDIZED_COPPER_ROD);
 
     public static void registerPoi() {
         try {
@@ -84,10 +84,10 @@ public class CopperRodHandler {
 
     private static void deoxidizeRod(Level level, BlockPos pos, BlockState state) {
         Block block = state.getBlock();
-        Block cleanRod = ModBlocks.COPPER_ROD.get();
-        if (block == ModBlocks.EXPOSED_COPPER_ROD.get()
-                || block == ModBlocks.WEATHERED_COPPER_ROD.get()
-                || block == ModBlocks.OXIDIZED_COPPER_ROD.get()) {
+        Block cleanRod = CopperBlocks.COPPER_ROD.get();
+        if (block == CopperBlocks.EXPOSED_COPPER_ROD.get()
+                || block == CopperBlocks.WEATHERED_COPPER_ROD.get()
+                || block == CopperBlocks.OXIDIZED_COPPER_ROD.get()) {
             CopperOxidationHandler.setBlockStateOrDoor(level, pos, state, cleanRod);
         }
     }

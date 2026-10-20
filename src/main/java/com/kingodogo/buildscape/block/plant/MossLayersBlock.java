@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.StoneItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -191,7 +191,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             LootContext.Builder builder) {
         int layerCount = state.getValue(LAYERS);
 
-        return List.of(new ItemStack(ModItems.MOSS_LAYERS.get(), layerCount));
+        return List.of(new ItemStack(StoneItems.MOSS_LAYERS.get(), layerCount));
     }
 
 }

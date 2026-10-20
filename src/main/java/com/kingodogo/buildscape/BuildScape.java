@@ -10,10 +10,10 @@ import com.kingodogo.buildscape.event.SculkEvents;
 import com.kingodogo.buildscape.event.WandererTradeEvents;
 import com.kingodogo.buildscape.feature.trophy.Trophies;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
 import com.kingodogo.buildscape.registry.ModEntities;
 import com.kingodogo.buildscape.registry.ModFluids;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.ItemsRegister;
 import com.kingodogo.buildscape.registry.ModMenuTypes;
 import com.kingodogo.buildscape.registry.ModParticles;
 import com.kingodogo.buildscape.registry.ModRecipeSerializers;
@@ -42,8 +42,8 @@ import java.util.concurrent.Executors;
 
 /**
  * Mod entry point (both sides). The constructor registers every deferred register on the mod event bus, the common
- * setup listener and the server-side event handler classes. Block and item holders load through {@code ModBlocks} and
- * {@code ModItems}, which keeps their registration order fixed.
+ * setup listener and the server-side event handler classes. Block and item holders load through {@code BlocksRegister}
+ * and {@code ItemsRegister}, which keeps their registration order fixed.
  */
 @Mod(BuildScape.MODID)
 public class BuildScape {
@@ -68,8 +68,8 @@ public class BuildScape {
 
         ModSounds.SOUND_EVENTS.register(modEventBus);
         Trophies.init();
-        ModBlocks.BLOCKS.register(modEventBus);
-        ModItems.ITEMS.register(modEventBus);
+        BlocksRegister.blocks().register(modEventBus);
+        ItemsRegister.items().register(modEventBus);
         ModFluids.FLUIDS.register(modEventBus);
         ModParticles.PARTICLES.register(
                 modEventBus);

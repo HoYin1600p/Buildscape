@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.WeatheringCopper;
@@ -29,12 +29,12 @@ public class CopperRegistryMappingTest {
     @BeforeClass
     public static void bootstrap() {
         RegistryTestSupport.bootstrap();
-        copperBlocks = RegistryTestSupport.bind(ModBlocks.BLOCKS, path -> path.contains("copper"));
+        copperBlocks = RegistryTestSupport.bind(BlocksRegister.blocks(), path -> path.contains("copper"));
     }
 
     @AfterClass
     public static void unbind() {
-        RegistryTestSupport.unbind(ModBlocks.BLOCKS, path -> path.contains("copper"));
+        RegistryTestSupport.unbind(BlocksRegister.blocks(), path -> path.contains("copper"));
     }
 
     private static boolean isOutsideWeatheringChains(String id) {

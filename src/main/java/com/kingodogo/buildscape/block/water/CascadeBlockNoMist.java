@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block.water;
 
 import com.kingodogo.buildscape.core.WaterloggedBlock;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.MasonryBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -69,7 +69,7 @@ public class CascadeBlockNoMist extends WaterloggedBlock implements EntityBlock,
     @Override
     @SuppressWarnings("deprecation")
     public boolean skipRendering(BlockState state, BlockState adjacentState, Direction direction) {
-        return adjacentState.is(this) || adjacentState.is(ModBlocks.CASCADE_BLOCK.get())
+        return adjacentState.is(this) || adjacentState.is(MasonryBlocks.CASCADE_BLOCK.get())
                 || super.skipRendering(state, adjacentState, direction);
     }
 

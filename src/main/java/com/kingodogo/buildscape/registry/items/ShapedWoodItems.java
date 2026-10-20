@@ -2,8 +2,10 @@ package com.kingodogo.buildscape.registry.items;
 
 import com.kingodogo.buildscape.item.MuffBlockItem;
 import com.kingodogo.buildscape.item.PoplarBoatItem;
-import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModCreativeModeTab;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedStoneBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
 import net.minecraft.world.item.BedItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
@@ -31,1063 +33,1092 @@ public final class ShapedWoodItems {
     }
 
     public static final RegistryObject<Item> SPRUCE_LOG_VERTICAL_SLAB = registerBlockItem("spruce_log_vertical_slab",
-            ModBlocks.SPRUCE_LOG_VERTICAL_SLAB);
+            ShapedStoneBlocks.SPRUCE_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_spruce_log_vertical_slab", ModBlocks.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB);
+            "stripped_spruce_log_vertical_slab", ShapedStoneBlocks.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> BIRCH_LOG_VERTICAL_SLAB = registerBlockItem("birch_log_vertical_slab",
-            ModBlocks.BIRCH_LOG_VERTICAL_SLAB);
+            ShapedStoneBlocks.BIRCH_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_BIRCH_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_birch_log_vertical_slab", ModBlocks.STRIPPED_BIRCH_LOG_VERTICAL_SLAB);
+            "stripped_birch_log_vertical_slab", ShapedStoneBlocks.STRIPPED_BIRCH_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> JUNGLE_LOG_VERTICAL_SLAB = registerBlockItem("jungle_log_vertical_slab",
-            ModBlocks.JUNGLE_LOG_VERTICAL_SLAB);
+            ShapedStoneBlocks.JUNGLE_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_JUNGLE_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_jungle_log_vertical_slab", ModBlocks.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB);
+            "stripped_jungle_log_vertical_slab", ShapedStoneBlocks.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> ACACIA_LOG_VERTICAL_SLAB = registerBlockItem("acacia_log_vertical_slab",
-            ModBlocks.ACACIA_LOG_VERTICAL_SLAB);
+            ShapedStoneBlocks.ACACIA_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_ACACIA_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_acacia_log_vertical_slab", ModBlocks.STRIPPED_ACACIA_LOG_VERTICAL_SLAB);
+            "stripped_acacia_log_vertical_slab", ShapedStoneBlocks.STRIPPED_ACACIA_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> DARK_OAK_LOG_VERTICAL_SLAB = registerBlockItem(
-            "dark_oak_log_vertical_slab", ModBlocks.DARK_OAK_LOG_VERTICAL_SLAB);
+            "dark_oak_log_vertical_slab", ShapedStoneBlocks.DARK_OAK_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_dark_oak_log_vertical_slab", ModBlocks.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB);
+            "stripped_dark_oak_log_vertical_slab", ShapedStoneBlocks.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> CRIMSON_STEM_VERTICAL_SLAB = registerBlockItem(
-            "crimson_stem_vertical_slab", ModBlocks.CRIMSON_STEM_VERTICAL_SLAB);
+            "crimson_stem_vertical_slab", ShapedStoneBlocks.CRIMSON_STEM_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_CRIMSON_STEM_VERTICAL_SLAB = registerBlockItem(
-            "stripped_crimson_stem_vertical_slab", ModBlocks.STRIPPED_CRIMSON_STEM_VERTICAL_SLAB);
+            "stripped_crimson_stem_vertical_slab", ShapedStoneBlocks.STRIPPED_CRIMSON_STEM_VERTICAL_SLAB);
     public static final RegistryObject<Item> WARPED_STEM_VERTICAL_SLAB = registerBlockItem("warped_stem_vertical_slab",
-            ModBlocks.WARPED_STEM_VERTICAL_SLAB);
+            ShapedStoneBlocks.WARPED_STEM_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_WARPED_STEM_VERTICAL_SLAB = registerBlockItem(
-            "stripped_warped_stem_vertical_slab", ModBlocks.STRIPPED_WARPED_STEM_VERTICAL_SLAB);
+            "stripped_warped_stem_vertical_slab", ShapedStoneBlocks.STRIPPED_WARPED_STEM_VERTICAL_SLAB);
     public static final RegistryObject<Item> MANGROVE_LOG_VERTICAL_SLAB = registerBlockItem(
-            "mangrove_log_vertical_slab", ModBlocks.MANGROVE_LOG_VERTICAL_SLAB);
+            "mangrove_log_vertical_slab", ShapedStoneBlocks.MANGROVE_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_MANGROVE_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_mangrove_log_vertical_slab", ModBlocks.STRIPPED_MANGROVE_LOG_VERTICAL_SLAB);
+            "stripped_mangrove_log_vertical_slab", ShapedStoneBlocks.STRIPPED_MANGROVE_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> ASHPEN_LOG_VERTICAL_SLAB = registerBlockItem("ashpen_log_vertical_slab",
-            ModBlocks.ASHPEN_LOG_VERTICAL_SLAB);
+            ShapedStoneBlocks.ASHPEN_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> ASHPEN_WOOD_VERTICAL_SLAB = registerBlockItem("ashpen_wood_vertical_slab",
-            ModBlocks.ASHPEN_WOOD_VERTICAL_SLAB);
+            ShapedStoneBlocks.ASHPEN_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_ASHPEN_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_ashpen_log_vertical_slab", ModBlocks.STRIPPED_ASHPEN_LOG_VERTICAL_SLAB);
+            "stripped_ashpen_log_vertical_slab", ShapedWoodBlocks.STRIPPED_ASHPEN_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_ashpen_wood_vertical_slab", ModBlocks.STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB);
-    public static final RegistryObject<Item> SPOOL = registerBlockItem("spool", ModBlocks.SPOOL);
+            "stripped_ashpen_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB);
+    public static final RegistryObject<Item> SPOOL = registerBlockItem("spool", ShapedStoneBlocks.SPOOL);
     public static final RegistryObject<Item> GLOWING_SPOOL = registerBlockItem("glowing_spool",
-            ModBlocks.GLOWING_SPOOL);
-    public static final RegistryObject<Item> WHITE_SPOOL = registerBlockItem("white_spool", ModBlocks.WHITE_SPOOL);
+            ShapedStoneBlocks.GLOWING_SPOOL);
+    public static final RegistryObject<Item> WHITE_SPOOL = registerBlockItem("white_spool",
+            ShapedStoneBlocks.WHITE_SPOOL);
     public static final RegistryObject<Item> LIGHT_GRAY_SPOOL = registerBlockItem("light_gray_spool",
-            ModBlocks.LIGHT_GRAY_SPOOL);
-    public static final RegistryObject<Item> GRAY_SPOOL = registerBlockItem("gray_spool", ModBlocks.GRAY_SPOOL);
-    public static final RegistryObject<Item> BLACK_SPOOL = registerBlockItem("black_spool", ModBlocks.BLACK_SPOOL);
-    public static final RegistryObject<Item> BROWN_SPOOL = registerBlockItem("brown_spool", ModBlocks.BROWN_SPOOL);
-    public static final RegistryObject<Item> RED_SPOOL = registerBlockItem("red_spool", ModBlocks.RED_SPOOL);
-    public static final RegistryObject<Item> ORANGE_SPOOL = registerBlockItem("orange_spool", ModBlocks.ORANGE_SPOOL);
-    public static final RegistryObject<Item> YELLOW_SPOOL = registerBlockItem("yellow_spool", ModBlocks.YELLOW_SPOOL);
-    public static final RegistryObject<Item> LIME_SPOOL = registerBlockItem("lime_spool", ModBlocks.LIME_SPOOL);
-    public static final RegistryObject<Item> GREEN_SPOOL = registerBlockItem("green_spool", ModBlocks.GREEN_SPOOL);
-    public static final RegistryObject<Item> CYAN_SPOOL = registerBlockItem("cyan_spool", ModBlocks.CYAN_SPOOL);
+            ShapedStoneBlocks.LIGHT_GRAY_SPOOL);
+    public static final RegistryObject<Item> GRAY_SPOOL = registerBlockItem("gray_spool", ShapedStoneBlocks.GRAY_SPOOL);
+    public static final RegistryObject<Item> BLACK_SPOOL = registerBlockItem("black_spool",
+            ShapedStoneBlocks.BLACK_SPOOL);
+    public static final RegistryObject<Item> BROWN_SPOOL = registerBlockItem("brown_spool",
+            ShapedStoneBlocks.BROWN_SPOOL);
+    public static final RegistryObject<Item> RED_SPOOL = registerBlockItem("red_spool", ShapedStoneBlocks.RED_SPOOL);
+    public static final RegistryObject<Item> ORANGE_SPOOL = registerBlockItem("orange_spool",
+            ShapedStoneBlocks.ORANGE_SPOOL);
+    public static final RegistryObject<Item> YELLOW_SPOOL = registerBlockItem("yellow_spool",
+            ShapedStoneBlocks.YELLOW_SPOOL);
+    public static final RegistryObject<Item> LIME_SPOOL = registerBlockItem("lime_spool", ShapedStoneBlocks.LIME_SPOOL);
+    public static final RegistryObject<Item> GREEN_SPOOL = registerBlockItem("green_spool",
+            ShapedStoneBlocks.GREEN_SPOOL);
+    public static final RegistryObject<Item> CYAN_SPOOL = registerBlockItem("cyan_spool", ShapedStoneBlocks.CYAN_SPOOL);
     public static final RegistryObject<Item> LIGHT_BLUE_SPOOL = registerBlockItem("light_blue_spool",
-            ModBlocks.LIGHT_BLUE_SPOOL);
-    public static final RegistryObject<Item> BLUE_SPOOL = registerBlockItem("blue_spool", ModBlocks.BLUE_SPOOL);
-    public static final RegistryObject<Item> PURPLE_SPOOL = registerBlockItem("purple_spool", ModBlocks.PURPLE_SPOOL);
+            ShapedStoneBlocks.LIGHT_BLUE_SPOOL);
+    public static final RegistryObject<Item> BLUE_SPOOL = registerBlockItem("blue_spool", ShapedStoneBlocks.BLUE_SPOOL);
+    public static final RegistryObject<Item> PURPLE_SPOOL = registerBlockItem("purple_spool",
+            ShapedStoneBlocks.PURPLE_SPOOL);
     public static final RegistryObject<Item> MAGENTA_SPOOL = registerBlockItem("magenta_spool",
-            ModBlocks.MAGENTA_SPOOL);
-    public static final RegistryObject<Item> PINK_SPOOL = registerBlockItem("pink_spool", ModBlocks.PINK_SPOOL);
+            ShapedStoneBlocks.MAGENTA_SPOOL);
+    public static final RegistryObject<Item> PINK_SPOOL = registerBlockItem("pink_spool", ShapedStoneBlocks.PINK_SPOOL);
     public static final RegistryObject<Item> WHITE_DYE_SACK = registerBlockItem("white_dye_sack",
-            ModBlocks.WHITE_DYE_SACK);
+            ShapedStoneBlocks.WHITE_DYE_SACK);
     public static final RegistryObject<Item> LIGHT_GRAY_DYE_SACK = registerBlockItem("light_gray_dye_sack",
-            ModBlocks.LIGHT_GRAY_DYE_SACK);
+            ShapedStoneBlocks.LIGHT_GRAY_DYE_SACK);
     public static final RegistryObject<Item> GRAY_DYE_SACK = registerBlockItem("gray_dye_sack",
-            ModBlocks.GRAY_DYE_SACK);
+            ShapedStoneBlocks.GRAY_DYE_SACK);
     public static final RegistryObject<Item> BLACK_DYE_SACK = registerBlockItem("black_dye_sack",
-            ModBlocks.BLACK_DYE_SACK);
+            ShapedStoneBlocks.BLACK_DYE_SACK);
     public static final RegistryObject<Item> BROWN_DYE_SACK = registerBlockItem("brown_dye_sack",
-            ModBlocks.BROWN_DYE_SACK);
-    public static final RegistryObject<Item> RED_DYE_SACK = registerBlockItem("red_dye_sack", ModBlocks.RED_DYE_SACK);
+            ShapedStoneBlocks.BROWN_DYE_SACK);
+    public static final RegistryObject<Item> RED_DYE_SACK = registerBlockItem("red_dye_sack",
+            ShapedStoneBlocks.RED_DYE_SACK);
     public static final RegistryObject<Item> ORANGE_DYE_SACK = registerBlockItem("orange_dye_sack",
-            ModBlocks.ORANGE_DYE_SACK);
+            ShapedStoneBlocks.ORANGE_DYE_SACK);
     public static final RegistryObject<Item> YELLOW_DYE_SACK = registerBlockItem("yellow_dye_sack",
-            ModBlocks.YELLOW_DYE_SACK);
+            ShapedStoneBlocks.YELLOW_DYE_SACK);
     public static final RegistryObject<Item> LIME_DYE_SACK = registerBlockItem("lime_dye_sack",
-            ModBlocks.LIME_DYE_SACK);
+            ShapedStoneBlocks.LIME_DYE_SACK);
     public static final RegistryObject<Item> GREEN_DYE_SACK = registerBlockItem("green_dye_sack",
-            ModBlocks.GREEN_DYE_SACK);
+            ShapedStoneBlocks.GREEN_DYE_SACK);
     public static final RegistryObject<Item> CYAN_DYE_SACK = registerBlockItem("cyan_dye_sack",
-            ModBlocks.CYAN_DYE_SACK);
+            ShapedStoneBlocks.CYAN_DYE_SACK);
     public static final RegistryObject<Item> LIGHT_BLUE_DYE_SACK = registerBlockItem("light_blue_dye_sack",
-            ModBlocks.LIGHT_BLUE_DYE_SACK);
+            ShapedStoneBlocks.LIGHT_BLUE_DYE_SACK);
     public static final RegistryObject<Item> BLUE_DYE_SACK = registerBlockItem("blue_dye_sack",
-            ModBlocks.BLUE_DYE_SACK);
+            ShapedStoneBlocks.BLUE_DYE_SACK);
     public static final RegistryObject<Item> PURPLE_DYE_SACK = registerBlockItem("purple_dye_sack",
-            ModBlocks.PURPLE_DYE_SACK);
+            ShapedStoneBlocks.PURPLE_DYE_SACK);
     public static final RegistryObject<Item> MAGENTA_DYE_SACK = registerBlockItem("magenta_dye_sack",
-            ModBlocks.MAGENTA_DYE_SACK);
+            ShapedStoneBlocks.MAGENTA_DYE_SACK);
     public static final RegistryObject<Item> PINK_DYE_SACK = registerBlockItem("pink_dye_sack",
-            ModBlocks.PINK_DYE_SACK);
+            ShapedStoneBlocks.PINK_DYE_SACK);
     public static final RegistryObject<Item> GLOW_INK_SACK = registerBlockItem("glow_ink_sack",
-            ModBlocks.GLOW_INK_SACK);
+            ShapedStoneBlocks.GLOW_INK_SACK);
     public static final RegistryObject<Item> RED_MOSS_BLOCK = registerBlockItem("red_moss_block",
-            ModBlocks.RED_MOSS_BLOCK);
+            ShapedWoodBlocks.RED_MOSS_BLOCK);
     public static final RegistryObject<Item> RED_MOSS_BLOCK_SLAB = registerBlockItem("red_moss_block_slab",
-            ModBlocks.RED_MOSS_BLOCK_SLAB);
+            ShapedWoodBlocks.RED_MOSS_BLOCK_SLAB);
     public static final RegistryObject<Item> RED_MOSS_BLOCK_STAIRS = registerBlockItem("red_moss_block_stairs",
-            ModBlocks.RED_MOSS_BLOCK_STAIRS);
+            ShapedWoodBlocks.RED_MOSS_BLOCK_STAIRS);
     public static final RegistryObject<Item> RED_MOSS_LAYERS = registerBlockItem("red_moss_layers",
-            ModBlocks.RED_MOSS_LAYERS);
+            ShapedWoodBlocks.RED_MOSS_LAYERS);
     public static final RegistryObject<Item> RED_MOSS_CARPET = registerBlockItem("red_moss_carpet",
-            ModBlocks.RED_MOSS_CARPET);
+            ShapedWoodBlocks.RED_MOSS_CARPET);
     public static final RegistryObject<Item> RED_MOSS_OVERLAY = registerBlockItem("red_moss_overlay",
-            ModBlocks.RED_MOSS_OVERLAY);
+            ShapedWoodBlocks.RED_MOSS_OVERLAY);
     public static final RegistryObject<Item> ORANGE_MOSS_BLOCK = registerBlockItem("orange_moss_block",
-            ModBlocks.ORANGE_MOSS_BLOCK);
+            ShapedWoodBlocks.ORANGE_MOSS_BLOCK);
     public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_SLAB = registerBlockItem("orange_moss_block_slab",
-            ModBlocks.ORANGE_MOSS_BLOCK_SLAB);
+            ShapedWoodBlocks.ORANGE_MOSS_BLOCK_SLAB);
     public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_STAIRS = registerBlockItem("orange_moss_block_stairs",
-            ModBlocks.ORANGE_MOSS_BLOCK_STAIRS);
+            ShapedWoodBlocks.ORANGE_MOSS_BLOCK_STAIRS);
     public static final RegistryObject<Item> ORANGE_MOSS_LAYERS = registerBlockItem("orange_moss_layers",
-            ModBlocks.ORANGE_MOSS_LAYERS);
+            ShapedWoodBlocks.ORANGE_MOSS_LAYERS);
     public static final RegistryObject<Item> ORANGE_MOSS_CARPET = registerBlockItem("orange_moss_carpet",
-            ModBlocks.ORANGE_MOSS_CARPET);
+            ShapedWoodBlocks.ORANGE_MOSS_CARPET);
     public static final RegistryObject<Item> ORANGE_MOSS_OVERLAY = registerBlockItem("orange_moss_overlay",
-            ModBlocks.ORANGE_MOSS_OVERLAY);
+            ShapedWoodBlocks.ORANGE_MOSS_OVERLAY);
     public static final RegistryObject<Item> YELLOW_MOSS_BLOCK = registerBlockItem("yellow_moss_block",
-            ModBlocks.YELLOW_MOSS_BLOCK);
+            ShapedWoodBlocks.YELLOW_MOSS_BLOCK);
     public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_SLAB = registerBlockItem("yellow_moss_block_slab",
-            ModBlocks.YELLOW_MOSS_BLOCK_SLAB);
+            ShapedWoodBlocks.YELLOW_MOSS_BLOCK_SLAB);
     public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_STAIRS = registerBlockItem("yellow_moss_block_stairs",
-            ModBlocks.YELLOW_MOSS_BLOCK_STAIRS);
+            ShapedWoodBlocks.YELLOW_MOSS_BLOCK_STAIRS);
     public static final RegistryObject<Item> YELLOW_MOSS_LAYERS = registerBlockItem("yellow_moss_layers",
-            ModBlocks.YELLOW_MOSS_LAYERS);
+            ShapedWoodBlocks.YELLOW_MOSS_LAYERS);
     public static final RegistryObject<Item> YELLOW_MOSS_CARPET = registerBlockItem("yellow_moss_carpet",
-            ModBlocks.YELLOW_MOSS_CARPET);
+            ShapedWoodBlocks.YELLOW_MOSS_CARPET);
     public static final RegistryObject<Item> YELLOW_MOSS_OVERLAY = registerBlockItem("yellow_moss_overlay",
-            ModBlocks.YELLOW_MOSS_OVERLAY);
-    public static final RegistryObject<Item> TUFF_SLAB = registerBlockItem("tuff_slab", ModBlocks.TUFF_SLAB);
-    public static final RegistryObject<Item> TUFF_STAIRS = registerBlockItem("tuff_stairs", ModBlocks.TUFF_STAIRS);
-    public static final RegistryObject<Item> TUFF_WALL = registerBlockItem("tuff_wall", ModBlocks.TUFF_WALL);
+            ShapedWoodBlocks.YELLOW_MOSS_OVERLAY);
+    public static final RegistryObject<Item> TUFF_SLAB = registerBlockItem("tuff_slab", ShapedWoodBlocks.TUFF_SLAB);
+    public static final RegistryObject<Item> TUFF_STAIRS = registerBlockItem("tuff_stairs",
+            ShapedWoodBlocks.TUFF_STAIRS);
+    public static final RegistryObject<Item> TUFF_WALL = registerBlockItem("tuff_wall", ShapedWoodBlocks.TUFF_WALL);
     public static final RegistryObject<Item> POLISHED_TUFF = registerBlockItem("polished_tuff",
-            ModBlocks.POLISHED_TUFF);
+            ShapedWoodBlocks.POLISHED_TUFF);
     public static final RegistryObject<Item> POLISHED_TUFF_SLAB = registerBlockItem("polished_tuff_slab",
-            ModBlocks.POLISHED_TUFF_SLAB);
+            ShapedWoodBlocks.POLISHED_TUFF_SLAB);
     public static final RegistryObject<Item> POLISHED_TUFF_STAIRS = registerBlockItem("polished_tuff_stairs",
-            ModBlocks.POLISHED_TUFF_STAIRS);
+            ShapedWoodBlocks.POLISHED_TUFF_STAIRS);
     public static final RegistryObject<Item> POLISHED_TUFF_WALL = registerBlockItem("polished_tuff_wall",
-            ModBlocks.POLISHED_TUFF_WALL);
+            ShapedWoodBlocks.POLISHED_TUFF_WALL);
     public static final RegistryObject<Item> CHISELED_TUFF = registerBlockItem("chiseled_tuff",
-            ModBlocks.CHISELED_TUFF);
-    public static final RegistryObject<Item> TUFF_BRICKS = registerBlockItem("tuff_bricks", ModBlocks.TUFF_BRICKS);
+            ShapedWoodBlocks.CHISELED_TUFF);
+    public static final RegistryObject<Item> TUFF_BRICKS = registerBlockItem("tuff_bricks",
+            ShapedWoodBlocks.TUFF_BRICKS);
     public static final RegistryObject<Item> TUFF_BRICK_SLAB = registerBlockItem("tuff_brick_slab",
-            ModBlocks.TUFF_BRICK_SLAB);
+            ShapedWoodBlocks.TUFF_BRICK_SLAB);
     public static final RegistryObject<Item> TUFF_BRICK_STAIRS = registerBlockItem("tuff_brick_stairs",
-            ModBlocks.TUFF_BRICK_STAIRS);
+            ShapedWoodBlocks.TUFF_BRICK_STAIRS);
     public static final RegistryObject<Item> TUFF_BRICK_WALL = registerBlockItem("tuff_brick_wall",
-            ModBlocks.TUFF_BRICK_WALL);
+            ShapedWoodBlocks.TUFF_BRICK_WALL);
     public static final RegistryObject<Item> CHISELED_TUFF_BRICKS = registerBlockItem("chiseled_tuff_bricks",
-            ModBlocks.CHISELED_TUFF_BRICKS);
+            ShapedWoodBlocks.CHISELED_TUFF_BRICKS);
     public static final RegistryObject<Item> WHITE_WOOL_SLAB = registerBlockItem("white_wool_slab",
-            ModBlocks.WHITE_WOOL_SLAB);
+            ShapedWoodBlocks.WHITE_WOOL_SLAB);
     public static final RegistryObject<Item> WHITE_WOOL_STAIRS = registerBlockItem("white_wool_stairs",
-            ModBlocks.WHITE_WOOL_STAIRS);
+            ShapedWoodBlocks.WHITE_WOOL_STAIRS);
     public static final RegistryObject<Item> WHITE_WOOL_WALL = registerBlockItem("white_wool_wall",
-            ModBlocks.WHITE_WOOL_WALL);
+            ShapedWoodBlocks.WHITE_WOOL_WALL);
     public static final RegistryObject<Item> ORANGE_WOOL_SLAB = registerBlockItem("orange_wool_slab",
-            ModBlocks.ORANGE_WOOL_SLAB);
+            ShapedWoodBlocks.ORANGE_WOOL_SLAB);
     public static final RegistryObject<Item> ORANGE_WOOL_STAIRS = registerBlockItem("orange_wool_stairs",
-            ModBlocks.ORANGE_WOOL_STAIRS);
+            ShapedWoodBlocks.ORANGE_WOOL_STAIRS);
     public static final RegistryObject<Item> ORANGE_WOOL_WALL = registerBlockItem("orange_wool_wall",
-            ModBlocks.ORANGE_WOOL_WALL);
+            ShapedWoodBlocks.ORANGE_WOOL_WALL);
     public static final RegistryObject<Item> MAGENTA_WOOL_SLAB = registerBlockItem("magenta_wool_slab",
-            ModBlocks.MAGENTA_WOOL_SLAB);
+            ShapedWoodBlocks.MAGENTA_WOOL_SLAB);
     public static final RegistryObject<Item> MAGENTA_WOOL_STAIRS = registerBlockItem("magenta_wool_stairs",
-            ModBlocks.MAGENTA_WOOL_STAIRS);
+            ShapedWoodBlocks.MAGENTA_WOOL_STAIRS);
     public static final RegistryObject<Item> MAGENTA_WOOL_WALL = registerBlockItem("magenta_wool_wall",
-            ModBlocks.MAGENTA_WOOL_WALL);
+            ShapedWoodBlocks.MAGENTA_WOOL_WALL);
     public static final RegistryObject<Item> LIGHT_BLUE_WOOL_SLAB = registerBlockItem("light_blue_wool_slab",
-            ModBlocks.LIGHT_BLUE_WOOL_SLAB);
+            ShapedWoodBlocks.LIGHT_BLUE_WOOL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_WOOL_STAIRS = registerBlockItem("light_blue_wool_stairs",
-            ModBlocks.LIGHT_BLUE_WOOL_STAIRS);
+            ShapedWoodBlocks.LIGHT_BLUE_WOOL_STAIRS);
     public static final RegistryObject<Item> LIGHT_BLUE_WOOL_WALL = registerBlockItem("light_blue_wool_wall",
-            ModBlocks.LIGHT_BLUE_WOOL_WALL);
+            ShapedWoodBlocks.LIGHT_BLUE_WOOL_WALL);
     public static final RegistryObject<Item> YELLOW_WOOL_SLAB = registerBlockItem("yellow_wool_slab",
-            ModBlocks.YELLOW_WOOL_SLAB);
+            ShapedWoodBlocks.YELLOW_WOOL_SLAB);
     public static final RegistryObject<Item> YELLOW_WOOL_STAIRS = registerBlockItem("yellow_wool_stairs",
-            ModBlocks.YELLOW_WOOL_STAIRS);
+            ShapedWoodBlocks.YELLOW_WOOL_STAIRS);
     public static final RegistryObject<Item> YELLOW_WOOL_WALL = registerBlockItem("yellow_wool_wall",
-            ModBlocks.YELLOW_WOOL_WALL);
+            ShapedWoodBlocks.YELLOW_WOOL_WALL);
     public static final RegistryObject<Item> LIME_WOOL_SLAB = registerBlockItem("lime_wool_slab",
-            ModBlocks.LIME_WOOL_SLAB);
+            ShapedWoodBlocks.LIME_WOOL_SLAB);
     public static final RegistryObject<Item> LIME_WOOL_STAIRS = registerBlockItem("lime_wool_stairs",
-            ModBlocks.LIME_WOOL_STAIRS);
+            ShapedWoodBlocks.LIME_WOOL_STAIRS);
     public static final RegistryObject<Item> LIME_WOOL_WALL = registerBlockItem("lime_wool_wall",
-            ModBlocks.LIME_WOOL_WALL);
+            ShapedWoodBlocks.LIME_WOOL_WALL);
     public static final RegistryObject<Item> PINK_WOOL_SLAB = registerBlockItem("pink_wool_slab",
-            ModBlocks.PINK_WOOL_SLAB);
+            ShapedWoodBlocks.PINK_WOOL_SLAB);
     public static final RegistryObject<Item> PINK_WOOL_STAIRS = registerBlockItem("pink_wool_stairs",
-            ModBlocks.PINK_WOOL_STAIRS);
+            ShapedWoodBlocks.PINK_WOOL_STAIRS);
     public static final RegistryObject<Item> PINK_WOOL_WALL = registerBlockItem("pink_wool_wall",
-            ModBlocks.PINK_WOOL_WALL);
+            ShapedWoodBlocks.PINK_WOOL_WALL);
     public static final RegistryObject<Item> GRAY_WOOL_SLAB = registerBlockItem("gray_wool_slab",
-            ModBlocks.GRAY_WOOL_SLAB);
+            ShapedWoodBlocks.GRAY_WOOL_SLAB);
     public static final RegistryObject<Item> GRAY_WOOL_STAIRS = registerBlockItem("gray_wool_stairs",
-            ModBlocks.GRAY_WOOL_STAIRS);
+            ShapedWoodBlocks.GRAY_WOOL_STAIRS);
     public static final RegistryObject<Item> GRAY_WOOL_WALL = registerBlockItem("gray_wool_wall",
-            ModBlocks.GRAY_WOOL_WALL);
+            ShapedWoodBlocks.GRAY_WOOL_WALL);
     public static final RegistryObject<Item> LIGHT_GRAY_WOOL_SLAB = registerBlockItem("light_gray_wool_slab",
-            ModBlocks.LIGHT_GRAY_WOOL_SLAB);
+            ShapedWoodBlocks.LIGHT_GRAY_WOOL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_WOOL_STAIRS = registerBlockItem("light_gray_wool_stairs",
-            ModBlocks.LIGHT_GRAY_WOOL_STAIRS);
+            ShapedWoodBlocks.LIGHT_GRAY_WOOL_STAIRS);
     public static final RegistryObject<Item> LIGHT_GRAY_WOOL_WALL = registerBlockItem("light_gray_wool_wall",
-            ModBlocks.LIGHT_GRAY_WOOL_WALL);
+            ShapedWoodBlocks.LIGHT_GRAY_WOOL_WALL);
     public static final RegistryObject<Item> CYAN_WOOL_SLAB = registerBlockItem("cyan_wool_slab",
-            ModBlocks.CYAN_WOOL_SLAB);
+            ShapedWoodBlocks.CYAN_WOOL_SLAB);
     public static final RegistryObject<Item> CYAN_WOOL_STAIRS = registerBlockItem("cyan_wool_stairs",
-            ModBlocks.CYAN_WOOL_STAIRS);
+            ShapedWoodBlocks.CYAN_WOOL_STAIRS);
     public static final RegistryObject<Item> CYAN_WOOL_WALL = registerBlockItem("cyan_wool_wall",
-            ModBlocks.CYAN_WOOL_WALL);
+            ShapedWoodBlocks.CYAN_WOOL_WALL);
     public static final RegistryObject<Item> PURPLE_WOOL_SLAB = registerBlockItem("purple_wool_slab",
-            ModBlocks.PURPLE_WOOL_SLAB);
+            ShapedWoodBlocks.PURPLE_WOOL_SLAB);
     public static final RegistryObject<Item> PURPLE_WOOL_STAIRS = registerBlockItem("purple_wool_stairs",
-            ModBlocks.PURPLE_WOOL_STAIRS);
+            ShapedWoodBlocks.PURPLE_WOOL_STAIRS);
     public static final RegistryObject<Item> PURPLE_WOOL_WALL = registerBlockItem("purple_wool_wall",
-            ModBlocks.PURPLE_WOOL_WALL);
+            ShapedWoodBlocks.PURPLE_WOOL_WALL);
     public static final RegistryObject<Item> BLUE_WOOL_SLAB = registerBlockItem("blue_wool_slab",
-            ModBlocks.BLUE_WOOL_SLAB);
+            ShapedWoodBlocks.BLUE_WOOL_SLAB);
     public static final RegistryObject<Item> BLUE_WOOL_STAIRS = registerBlockItem("blue_wool_stairs",
-            ModBlocks.BLUE_WOOL_STAIRS);
+            ShapedWoodBlocks.BLUE_WOOL_STAIRS);
     public static final RegistryObject<Item> BLUE_WOOL_WALL = registerBlockItem("blue_wool_wall",
-            ModBlocks.BLUE_WOOL_WALL);
+            ShapedWoodBlocks.BLUE_WOOL_WALL);
     public static final RegistryObject<Item> BROWN_WOOL_SLAB = registerBlockItem("brown_wool_slab",
-            ModBlocks.BROWN_WOOL_SLAB);
+            ShapedWoodBlocks.BROWN_WOOL_SLAB);
     public static final RegistryObject<Item> BROWN_WOOL_STAIRS = registerBlockItem("brown_wool_stairs",
-            ModBlocks.BROWN_WOOL_STAIRS);
+            ShapedWoodBlocks.BROWN_WOOL_STAIRS);
     public static final RegistryObject<Item> BROWN_WOOL_WALL = registerBlockItem("brown_wool_wall",
-            ModBlocks.BROWN_WOOL_WALL);
+            ShapedWoodBlocks.BROWN_WOOL_WALL);
     public static final RegistryObject<Item> GREEN_WOOL_SLAB = registerBlockItem("green_wool_slab",
-            ModBlocks.GREEN_WOOL_SLAB);
+            ShapedWoodBlocks.GREEN_WOOL_SLAB);
     public static final RegistryObject<Item> GREEN_WOOL_STAIRS = registerBlockItem("green_wool_stairs",
-            ModBlocks.GREEN_WOOL_STAIRS);
+            ShapedWoodBlocks.GREEN_WOOL_STAIRS);
     public static final RegistryObject<Item> GREEN_WOOL_WALL = registerBlockItem("green_wool_wall",
-            ModBlocks.GREEN_WOOL_WALL);
+            ShapedWoodBlocks.GREEN_WOOL_WALL);
     public static final RegistryObject<Item> RED_WOOL_SLAB = registerBlockItem("red_wool_slab",
-            ModBlocks.RED_WOOL_SLAB);
+            ShapedWoodBlocks.RED_WOOL_SLAB);
     public static final RegistryObject<Item> RED_WOOL_STAIRS = registerBlockItem("red_wool_stairs",
-            ModBlocks.RED_WOOL_STAIRS);
+            ShapedWoodBlocks.RED_WOOL_STAIRS);
     public static final RegistryObject<Item> RED_WOOL_WALL = registerBlockItem("red_wool_wall",
-            ModBlocks.RED_WOOL_WALL);
+            ShapedWoodBlocks.RED_WOOL_WALL);
     public static final RegistryObject<Item> BLACK_WOOL_SLAB = registerBlockItem("black_wool_slab",
-            ModBlocks.BLACK_WOOL_SLAB);
+            ShapedWoodBlocks.BLACK_WOOL_SLAB);
     public static final RegistryObject<Item> BLACK_WOOL_STAIRS = registerBlockItem("black_wool_stairs",
-            ModBlocks.BLACK_WOOL_STAIRS);
+            ShapedWoodBlocks.BLACK_WOOL_STAIRS);
     public static final RegistryObject<Item> BLACK_WOOL_WALL = registerBlockItem("black_wool_wall",
-            ModBlocks.BLACK_WOOL_WALL);
-    public static final RegistryObject<Item> POPLAR_LOG = registerBlockItem("poplar_log", ModBlocks.POPLAR_LOG);
+            ShapedWoodBlocks.BLACK_WOOL_WALL);
+    public static final RegistryObject<Item> POPLAR_LOG = registerBlockItem("poplar_log", ShapedWoodBlocks.POPLAR_LOG);
     public static final RegistryObject<Item> POPLAR_PLANKS = registerBlockItem("poplar_planks",
-            ModBlocks.POPLAR_PLANKS);
+            ShapedWoodBlocks.POPLAR_PLANKS);
     public static final RegistryObject<Item> POPLAR_SAPLING = registerBlockItem("poplar_sapling",
-            ModBlocks.POPLAR_SAPLING);
+            ShapedWoodBlocks.POPLAR_SAPLING);
     public static final RegistryObject<Item> POPLAR_BUTTON = registerBlockItem("poplar_button",
-            ModBlocks.POPLAR_BUTTON);
-    public static final RegistryObject<Item> POPLAR_DOOR = registerBlockItem("poplar_door", ModBlocks.POPLAR_DOOR);
-    public static final RegistryObject<Item> POPLAR_FENCE = registerBlockItem("poplar_fence", ModBlocks.POPLAR_FENCE);
+            ShapedWoodBlocks.POPLAR_BUTTON);
+    public static final RegistryObject<Item> POPLAR_DOOR = registerBlockItem("poplar_door",
+            ShapedWoodBlocks.POPLAR_DOOR);
+    public static final RegistryObject<Item> POPLAR_FENCE = registerBlockItem("poplar_fence",
+            ShapedWoodBlocks.POPLAR_FENCE);
     public static final RegistryObject<Item> POPLAR_FENCE_GATE = registerBlockItem("poplar_fence_gate",
-            ModBlocks.POPLAR_FENCE_GATE);
+            ShapedWoodBlocks.POPLAR_FENCE_GATE);
     public static final RegistryObject<Item> POPLAR_LOG_SLAB = registerBlockItem("poplar_log_slab",
-            ModBlocks.POPLAR_LOG_SLAB);
+            ShapedWoodBlocks.POPLAR_LOG_SLAB);
     public static final RegistryObject<Item> POPLAR_LOG_STAIRS = registerBlockItem("poplar_log_stairs",
-            ModBlocks.POPLAR_LOG_STAIRS);
+            ShapedWoodBlocks.POPLAR_LOG_STAIRS);
     public static final RegistryObject<Item> POPLAR_LOG_WALL = registerBlockItem("poplar_log_wall",
-            ModBlocks.POPLAR_LOG_WALL);
+            ShapedWoodBlocks.POPLAR_LOG_WALL);
     public static final RegistryObject<Item> POPLAR_PRESSURE_PLATE = registerBlockItem("poplar_pressure_plate",
-            ModBlocks.POPLAR_PRESSURE_PLATE);
-    public static final RegistryObject<Item> POPLAR_SLAB = registerBlockItem("poplar_slab", ModBlocks.POPLAR_SLAB);
+            ShapedWoodBlocks.POPLAR_PRESSURE_PLATE);
+    public static final RegistryObject<Item> POPLAR_SLAB = registerBlockItem("poplar_slab",
+            ShapedWoodBlocks.POPLAR_SLAB);
     public static final RegistryObject<Item> POPLAR_STAIRS = registerBlockItem("poplar_stairs",
-            ModBlocks.POPLAR_STAIRS);
+            ShapedWoodBlocks.POPLAR_STAIRS);
     public static final RegistryObject<Item> POPLAR_TRAPDOOR = registerBlockItem("poplar_trapdoor",
-            ModBlocks.POPLAR_TRAPDOOR);
-    public static final RegistryObject<Item> POPLAR_WOOD = registerBlockItem("poplar_wood", ModBlocks.POPLAR_WOOD);
+            ShapedWoodBlocks.POPLAR_TRAPDOOR);
+    public static final RegistryObject<Item> POPLAR_WOOD = registerBlockItem("poplar_wood",
+            ShapedWoodBlocks.POPLAR_WOOD);
     public static final RegistryObject<Item> POPLAR_WOOD_SLAB = registerBlockItem("poplar_wood_slab",
-            ModBlocks.POPLAR_WOOD_SLAB);
+            ShapedWoodBlocks.POPLAR_WOOD_SLAB);
     public static final RegistryObject<Item> POPLAR_WOOD_STAIRS = registerBlockItem("poplar_wood_stairs",
-            ModBlocks.POPLAR_WOOD_STAIRS);
+            ShapedWoodBlocks.POPLAR_WOOD_STAIRS);
     public static final RegistryObject<Item> STRIPPED_POPLAR_LOG = registerBlockItem("stripped_poplar_log",
-            ModBlocks.STRIPPED_POPLAR_LOG);
+            ShapedWoodBlocks.STRIPPED_POPLAR_LOG);
     public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_SLAB = registerBlockItem("stripped_poplar_log_slab",
-            ModBlocks.STRIPPED_POPLAR_LOG_SLAB);
+            ShapedWoodBlocks.STRIPPED_POPLAR_LOG_SLAB);
     public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_STAIRS = registerBlockItem(
-            "stripped_poplar_log_stairs", ModBlocks.STRIPPED_POPLAR_LOG_STAIRS);
+            "stripped_poplar_log_stairs", ShapedWoodBlocks.STRIPPED_POPLAR_LOG_STAIRS);
     public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_WALL = registerBlockItem("stripped_poplar_log_wall",
-            ModBlocks.STRIPPED_POPLAR_LOG_WALL);
+            ShapedWoodBlocks.STRIPPED_POPLAR_LOG_WALL);
     public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD = registerBlockItem("stripped_poplar_wood",
-            ModBlocks.STRIPPED_POPLAR_WOOD);
+            ShapedWoodBlocks.STRIPPED_POPLAR_WOOD);
     public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD_SLAB = registerBlockItem("stripped_poplar_wood_slab",
-            ModBlocks.STRIPPED_POPLAR_WOOD_SLAB);
+            ShapedWoodBlocks.STRIPPED_POPLAR_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD_STAIRS = registerBlockItem(
-            "stripped_poplar_wood_stairs", ModBlocks.STRIPPED_POPLAR_WOOD_STAIRS);
+            "stripped_poplar_wood_stairs", ShapedWoodBlocks.STRIPPED_POPLAR_WOOD_STAIRS);
     public static final RegistryObject<Item> POPLAR_BOAT = ITEMS.register("poplar_boat",
             () -> new PoplarBoatItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1)));
     public static final RegistryObject<Item> ORANGE_POPLAR_LEAVES = registerBlockItem("orange_poplar_leaves",
-            ModBlocks.ORANGE_POPLAR_LEAVES);
+            ShapedWoodBlocks.ORANGE_POPLAR_LEAVES);
     public static final RegistryObject<Item> RED_POPLAR_LEAVES = registerBlockItem("red_poplar_leaves",
-            ModBlocks.RED_POPLAR_LEAVES);
+            ShapedWoodBlocks.RED_POPLAR_LEAVES);
     public static final RegistryObject<Item> YELLOW_POPLAR_LEAVES = registerBlockItem("yellow_poplar_leaves",
-            ModBlocks.YELLOW_POPLAR_LEAVES);
-    public static final RegistryObject<Item> CINNABAR = registerBlockItem("cinnabar", ModBlocks.CINNABAR);
+            ShapedWoodBlocks.YELLOW_POPLAR_LEAVES);
+    public static final RegistryObject<Item> CINNABAR = registerBlockItem("cinnabar", ShapedStoneBlocks.CINNABAR);
     public static final RegistryObject<Item> POLISHED_CINNABAR = registerBlockItem("polished_cinnabar",
-            ModBlocks.POLISHED_CINNABAR);
+            ShapedStoneBlocks.POLISHED_CINNABAR);
     public static final RegistryObject<Item> CINNABAR_SLAB = registerBlockItem("cinnabar_slab",
-            ModBlocks.CINNABAR_SLAB);
+            ShapedStoneBlocks.CINNABAR_SLAB);
     public static final RegistryObject<Item> CINNABAR_STAIRS = registerBlockItem("cinnabar_stairs",
-            ModBlocks.CINNABAR_STAIRS);
+            ShapedStoneBlocks.CINNABAR_STAIRS);
     public static final RegistryObject<Item> CINNABAR_WALL = registerBlockItem("cinnabar_wall",
-            ModBlocks.CINNABAR_WALL);
+            ShapedStoneBlocks.CINNABAR_WALL);
     public static final RegistryObject<Item> POLISHED_CINNABAR_SLAB = registerBlockItem("polished_cinnabar_slab",
-            ModBlocks.POLISHED_CINNABAR_SLAB);
+            ShapedStoneBlocks.POLISHED_CINNABAR_SLAB);
     public static final RegistryObject<Item> POLISHED_CINNABAR_STAIRS = registerBlockItem("polished_cinnabar_stairs",
-            ModBlocks.POLISHED_CINNABAR_STAIRS);
+            ShapedStoneBlocks.POLISHED_CINNABAR_STAIRS);
     public static final RegistryObject<Item> POLISHED_CINNABAR_WALL = registerBlockItem("polished_cinnabar_wall",
-            ModBlocks.POLISHED_CINNABAR_WALL);
+            ShapedStoneBlocks.POLISHED_CINNABAR_WALL);
     public static final RegistryObject<Item> CINNABAR_BRICKS = registerBlockItem("cinnabar_bricks",
-            ModBlocks.CINNABAR_BRICKS);
+            ShapedStoneBlocks.CINNABAR_BRICKS);
     public static final RegistryObject<Item> CINNABAR_BRICKS_SLAB = registerBlockItem("cinnabar_bricks_slab",
-            ModBlocks.CINNABAR_BRICKS_SLAB);
+            ShapedWoodBlocks.CINNABAR_BRICKS_SLAB);
     public static final RegistryObject<Item> CINNABAR_BRICKS_STAIRS = registerBlockItem("cinnabar_bricks_stairs",
-            ModBlocks.CINNABAR_BRICKS_STAIRS);
+            ShapedStoneBlocks.CINNABAR_BRICKS_STAIRS);
     public static final RegistryObject<Item> CINNABAR_BRICKS_WALL = registerBlockItem("cinnabar_bricks_wall",
-            ModBlocks.CINNABAR_BRICKS_WALL);
+            ShapedWoodBlocks.CINNABAR_BRICKS_WALL);
     public static final RegistryObject<Item> CHISELED_CINNABAR = registerBlockItem("chiseled_cinnabar",
-            ModBlocks.CHISELED_CINNABAR);
-    public static final RegistryObject<Item> SULFUR = registerBlockItem("sulfur", ModBlocks.SULFUR);
+            ShapedStoneBlocks.CHISELED_CINNABAR);
+    public static final RegistryObject<Item> SULFUR = registerBlockItem("sulfur", ShapedStoneBlocks.SULFUR);
     public static final RegistryObject<Item> POLISHED_SULFUR = registerBlockItem("polished_sulfur",
-            ModBlocks.POLISHED_SULFUR);
-    public static final RegistryObject<Item> SULFUR_SLAB = registerBlockItem("sulfur_slab", ModBlocks.SULFUR_SLAB);
+            ShapedStoneBlocks.POLISHED_SULFUR);
+    public static final RegistryObject<Item> SULFUR_SLAB = registerBlockItem("sulfur_slab",
+            ShapedStoneBlocks.SULFUR_SLAB);
     public static final RegistryObject<Item> SULFUR_STAIRS = registerBlockItem("sulfur_stairs",
-            ModBlocks.SULFUR_STAIRS);
-    public static final RegistryObject<Item> SULFUR_WALL = registerBlockItem("sulfur_wall", ModBlocks.SULFUR_WALL);
+            ShapedStoneBlocks.SULFUR_STAIRS);
+    public static final RegistryObject<Item> SULFUR_WALL = registerBlockItem("sulfur_wall",
+            ShapedStoneBlocks.SULFUR_WALL);
     public static final RegistryObject<Item> POLISHED_SULFUR_SLAB = registerBlockItem("polished_sulfur_slab",
-            ModBlocks.POLISHED_SULFUR_SLAB);
+            ShapedStoneBlocks.POLISHED_SULFUR_SLAB);
     public static final RegistryObject<Item> POLISHED_SULFUR_STAIRS = registerBlockItem("polished_sulfur_stairs",
-            ModBlocks.POLISHED_SULFUR_STAIRS);
+            ShapedStoneBlocks.POLISHED_SULFUR_STAIRS);
     public static final RegistryObject<Item> POLISHED_SULFUR_WALL = registerBlockItem("polished_sulfur_wall",
-            ModBlocks.POLISHED_SULFUR_WALL);
+            ShapedStoneBlocks.POLISHED_SULFUR_WALL);
     public static final RegistryObject<Item> SULFUR_BRICKS = registerBlockItem("sulfur_bricks",
-            ModBlocks.SULFUR_BRICKS);
+            ShapedStoneBlocks.SULFUR_BRICKS);
     public static final RegistryObject<Item> SULFUR_BRICKS_SLAB = registerBlockItem("sulfur_bricks_slab",
-            ModBlocks.SULFUR_BRICKS_SLAB);
+            ShapedStoneBlocks.SULFUR_BRICKS_SLAB);
     public static final RegistryObject<Item> SULFUR_BRICKS_STAIRS = registerBlockItem("sulfur_bricks_stairs",
-            ModBlocks.SULFUR_BRICKS_STAIRS);
+            ShapedStoneBlocks.SULFUR_BRICKS_STAIRS);
     public static final RegistryObject<Item> SULFUR_BRICKS_WALL = registerBlockItem("sulfur_bricks_wall",
-            ModBlocks.SULFUR_BRICKS_WALL);
+            ShapedStoneBlocks.SULFUR_BRICKS_WALL);
     public static final RegistryObject<Item> CHISELED_SULFUR = registerBlockItem("chiseled_sulfur",
-            ModBlocks.CHISELED_SULFUR);
+            ShapedStoneBlocks.CHISELED_SULFUR);
     public static final RegistryObject<Item> POTENT_SULFUR = registerBlockItem("potent_sulfur",
-            ModBlocks.POTENT_SULFUR);
-    public static final RegistryObject<Item> SULFUR_SPIKE = registerBlockItem("sulfur_spike", ModBlocks.SULFUR_SPIKE);
+            ShapedStoneBlocks.POTENT_SULFUR);
+    public static final RegistryObject<Item> SULFUR_SPIKE = registerBlockItem("sulfur_spike",
+            ShapedStoneBlocks.SULFUR_SPIKE);
     public static final RegistryObject<Item> WHITE_WOOL_VERTICAL_SLAB = registerBlockItem("white_wool_vertical_slab",
-            ModBlocks.WHITE_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.WHITE_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> ORANGE_WOOL_VERTICAL_SLAB = registerBlockItem("orange_wool_vertical_slab",
-            ModBlocks.ORANGE_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.ORANGE_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> MAGENTA_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "magenta_wool_vertical_slab", ModBlocks.MAGENTA_WOOL_VERTICAL_SLAB);
+            "magenta_wool_vertical_slab", ShapedWoodBlocks.MAGENTA_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "light_blue_wool_vertical_slab", ModBlocks.LIGHT_BLUE_WOOL_VERTICAL_SLAB);
+            "light_blue_wool_vertical_slab", ShapedWoodBlocks.LIGHT_BLUE_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_WOOL_VERTICAL_SLAB = registerBlockItem("yellow_wool_vertical_slab",
-            ModBlocks.YELLOW_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.YELLOW_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIME_WOOL_VERTICAL_SLAB = registerBlockItem("lime_wool_vertical_slab",
-            ModBlocks.LIME_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.LIME_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PINK_WOOL_VERTICAL_SLAB = registerBlockItem("pink_wool_vertical_slab",
-            ModBlocks.PINK_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.PINK_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRAY_WOOL_VERTICAL_SLAB = registerBlockItem("gray_wool_vertical_slab",
-            ModBlocks.GRAY_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.GRAY_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "light_gray_wool_vertical_slab", ModBlocks.LIGHT_GRAY_WOOL_VERTICAL_SLAB);
+            "light_gray_wool_vertical_slab", ShapedWoodBlocks.LIGHT_GRAY_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> CYAN_WOOL_VERTICAL_SLAB = registerBlockItem("cyan_wool_vertical_slab",
-            ModBlocks.CYAN_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.CYAN_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPLE_WOOL_VERTICAL_SLAB = registerBlockItem("purple_wool_vertical_slab",
-            ModBlocks.PURPLE_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.PURPLE_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLUE_WOOL_VERTICAL_SLAB = registerBlockItem("blue_wool_vertical_slab",
-            ModBlocks.BLUE_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.BLUE_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BROWN_WOOL_VERTICAL_SLAB = registerBlockItem("brown_wool_vertical_slab",
-            ModBlocks.BROWN_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.BROWN_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GREEN_WOOL_VERTICAL_SLAB = registerBlockItem("green_wool_vertical_slab",
-            ModBlocks.GREEN_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.GREEN_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_WOOL_VERTICAL_SLAB = registerBlockItem("red_wool_vertical_slab",
-            ModBlocks.RED_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.RED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACK_WOOL_VERTICAL_SLAB = registerBlockItem("black_wool_vertical_slab",
-            ModBlocks.BLACK_WOOL_VERTICAL_SLAB);
+            ShapedWoodBlocks.BLACK_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_MOSS_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "red_moss_block_vertical_slab", ModBlocks.RED_MOSS_BLOCK_VERTICAL_SLAB);
+            "red_moss_block_vertical_slab", ShapedWoodBlocks.RED_MOSS_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "orange_moss_block_vertical_slab", ModBlocks.ORANGE_MOSS_BLOCK_VERTICAL_SLAB);
+            "orange_moss_block_vertical_slab", ShapedWoodBlocks.ORANGE_MOSS_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "yellow_moss_block_vertical_slab", ModBlocks.YELLOW_MOSS_BLOCK_VERTICAL_SLAB);
+            "yellow_moss_block_vertical_slab", ShapedWoodBlocks.YELLOW_MOSS_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> TUFF_VERTICAL_SLAB = registerBlockItem("tuff_vertical_slab",
-            ModBlocks.TUFF_VERTICAL_SLAB);
+            ShapedWoodBlocks.TUFF_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_TUFF_VERTICAL_SLAB = registerBlockItem(
-            "polished_tuff_vertical_slab", ModBlocks.POLISHED_TUFF_VERTICAL_SLAB);
+            "polished_tuff_vertical_slab", ShapedWoodBlocks.POLISHED_TUFF_VERTICAL_SLAB);
     public static final RegistryObject<Item> TUFF_BRICK_VERTICAL_SLAB = registerBlockItem("tuff_brick_vertical_slab",
-            ModBlocks.TUFF_BRICK_VERTICAL_SLAB);
+            ShapedWoodBlocks.TUFF_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> SULFUR_VERTICAL_SLAB = registerBlockItem("sulfur_vertical_slab",
-            ModBlocks.SULFUR_VERTICAL_SLAB);
+            ShapedWoodBlocks.SULFUR_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_SULFUR_VERTICAL_SLAB = registerBlockItem(
-            "polished_sulfur_vertical_slab", ModBlocks.POLISHED_SULFUR_VERTICAL_SLAB);
+            "polished_sulfur_vertical_slab", ShapedWoodBlocks.POLISHED_SULFUR_VERTICAL_SLAB);
     public static final RegistryObject<Item> SULFUR_BRICKS_VERTICAL_SLAB = registerBlockItem(
-            "sulfur_bricks_vertical_slab", ModBlocks.SULFUR_BRICKS_VERTICAL_SLAB);
+            "sulfur_bricks_vertical_slab", ShapedWoodBlocks.SULFUR_BRICKS_VERTICAL_SLAB);
     public static final RegistryObject<Item> CINNABAR_VERTICAL_SLAB = registerBlockItem("cinnabar_vertical_slab",
-            ModBlocks.CINNABAR_VERTICAL_SLAB);
+            ShapedWoodBlocks.CINNABAR_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_CINNABAR_VERTICAL_SLAB = registerBlockItem(
-            "polished_cinnabar_vertical_slab", ModBlocks.POLISHED_CINNABAR_VERTICAL_SLAB);
+            "polished_cinnabar_vertical_slab", ShapedWoodBlocks.POLISHED_CINNABAR_VERTICAL_SLAB);
     public static final RegistryObject<Item> CINNABAR_BRICKS_VERTICAL_SLAB = registerBlockItem(
-            "cinnabar_bricks_vertical_slab", ModBlocks.CINNABAR_BRICKS_VERTICAL_SLAB);
+            "cinnabar_bricks_vertical_slab", ShapedWoodBlocks.CINNABAR_BRICKS_VERTICAL_SLAB);
     public static final RegistryObject<Item> POPLAR_VERTICAL_SLAB = registerBlockItem("poplar_vertical_slab",
-            ModBlocks.POPLAR_VERTICAL_SLAB);
+            ShapedWoodBlocks.POPLAR_VERTICAL_SLAB);
     public static final RegistryObject<Item> POPLAR_LOG_VERTICAL_SLAB = registerBlockItem("poplar_log_vertical_slab",
-            ModBlocks.POPLAR_LOG_VERTICAL_SLAB);
+            ShapedWoodBlocks.POPLAR_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_poplar_log_vertical_slab", ModBlocks.STRIPPED_POPLAR_LOG_VERTICAL_SLAB);
+            "stripped_poplar_log_vertical_slab", ShapedWoodBlocks.STRIPPED_POPLAR_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> POPLAR_WOOD_VERTICAL_SLAB = registerBlockItem("poplar_wood_vertical_slab",
-            ModBlocks.POPLAR_WOOD_VERTICAL_SLAB);
+            ShapedWoodBlocks.POPLAR_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_poplar_wood_vertical_slab", ModBlocks.STRIPPED_POPLAR_WOOD_VERTICAL_SLAB);
+            "stripped_poplar_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_POPLAR_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> OAK_VERTICAL_SLAB = registerBlockItem("oak_vertical_slab",
-            ModBlocks.OAK_VERTICAL_SLAB);
+            ShapedWoodBlocks.OAK_VERTICAL_SLAB);
     public static final RegistryObject<Item> SPRUCE_VERTICAL_SLAB = registerBlockItem("spruce_vertical_slab",
-            ModBlocks.SPRUCE_VERTICAL_SLAB);
+            ShapedWoodBlocks.SPRUCE_VERTICAL_SLAB);
     public static final RegistryObject<Item> BIRCH_VERTICAL_SLAB = registerBlockItem("birch_vertical_slab",
-            ModBlocks.BIRCH_VERTICAL_SLAB);
+            ShapedWoodBlocks.BIRCH_VERTICAL_SLAB);
     public static final RegistryObject<Item> JUNGLE_VERTICAL_SLAB = registerBlockItem("jungle_vertical_slab",
-            ModBlocks.JUNGLE_VERTICAL_SLAB);
+            ShapedWoodBlocks.JUNGLE_VERTICAL_SLAB);
     public static final RegistryObject<Item> ACACIA_VERTICAL_SLAB = registerBlockItem("acacia_vertical_slab",
-            ModBlocks.ACACIA_VERTICAL_SLAB);
+            ShapedWoodBlocks.ACACIA_VERTICAL_SLAB);
     public static final RegistryObject<Item> DARK_OAK_VERTICAL_SLAB = registerBlockItem("dark_oak_vertical_slab",
-            ModBlocks.DARK_OAK_VERTICAL_SLAB);
+            ShapedWoodBlocks.DARK_OAK_VERTICAL_SLAB);
     public static final RegistryObject<Item> CRIMSON_VERTICAL_SLAB = registerBlockItem("crimson_vertical_slab",
-            ModBlocks.CRIMSON_VERTICAL_SLAB);
+            ShapedWoodBlocks.CRIMSON_VERTICAL_SLAB);
     public static final RegistryObject<Item> WARPED_VERTICAL_SLAB = registerBlockItem("warped_vertical_slab",
-            ModBlocks.WARPED_VERTICAL_SLAB);
+            ShapedWoodBlocks.WARPED_VERTICAL_SLAB);
     public static final RegistryObject<Item> STONE_VERTICAL_SLAB = registerBlockItem("stone_vertical_slab",
-            ModBlocks.STONE_VERTICAL_SLAB);
+            ShapedWoodBlocks.STONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> SMOOTH_STONE_VERTICAL_SLAB = registerBlockItem(
-            "smooth_stone_vertical_slab", ModBlocks.SMOOTH_STONE_VERTICAL_SLAB);
+            "smooth_stone_vertical_slab", ShapedWoodBlocks.SMOOTH_STONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRANITE_VERTICAL_SLAB = registerBlockItem("granite_vertical_slab",
-            ModBlocks.GRANITE_VERTICAL_SLAB);
+            ShapedWoodBlocks.GRANITE_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_GRANITE_VERTICAL_SLAB = registerBlockItem(
-            "polished_granite_vertical_slab", ModBlocks.POLISHED_GRANITE_VERTICAL_SLAB);
+            "polished_granite_vertical_slab", ShapedWoodBlocks.POLISHED_GRANITE_VERTICAL_SLAB);
     public static final RegistryObject<Item> DIORITE_VERTICAL_SLAB = registerBlockItem("diorite_vertical_slab",
-            ModBlocks.DIORITE_VERTICAL_SLAB);
+            ShapedWoodBlocks.DIORITE_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_DIORITE_VERTICAL_SLAB = registerBlockItem(
-            "polished_diorite_vertical_slab", ModBlocks.POLISHED_DIORITE_VERTICAL_SLAB);
+            "polished_diorite_vertical_slab", ShapedWoodBlocks.POLISHED_DIORITE_VERTICAL_SLAB);
     public static final RegistryObject<Item> ANDESITE_VERTICAL_SLAB = registerBlockItem("andesite_vertical_slab",
-            ModBlocks.ANDESITE_VERTICAL_SLAB);
+            ShapedWoodBlocks.ANDESITE_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_ANDESITE_VERTICAL_SLAB = registerBlockItem(
-            "polished_andesite_vertical_slab", ModBlocks.POLISHED_ANDESITE_VERTICAL_SLAB);
+            "polished_andesite_vertical_slab", ShapedWoodBlocks.POLISHED_ANDESITE_VERTICAL_SLAB);
     public static final RegistryObject<Item> COBBLESTONE_VERTICAL_SLAB = registerBlockItem("cobblestone_vertical_slab",
-            ModBlocks.COBBLESTONE_VERTICAL_SLAB);
+            ShapedWoodBlocks.COBBLESTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> MOSSY_COBBLESTONE_VERTICAL_SLAB = registerBlockItem(
-            "mossy_cobblestone_vertical_slab", ModBlocks.MOSSY_COBBLESTONE_VERTICAL_SLAB);
+            "mossy_cobblestone_vertical_slab", ShapedWoodBlocks.MOSSY_COBBLESTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> STONE_BRICK_VERTICAL_SLAB = registerBlockItem("stone_brick_vertical_slab",
-            ModBlocks.STONE_BRICK_VERTICAL_SLAB);
+            ShapedWoodBlocks.STONE_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> MOSSY_STONE_BRICK_VERTICAL_SLAB = registerBlockItem(
-            "mossy_stone_brick_vertical_slab", ModBlocks.MOSSY_STONE_BRICK_VERTICAL_SLAB);
+            "mossy_stone_brick_vertical_slab", ShapedWoodBlocks.MOSSY_STONE_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> NETHER_BRICK_VERTICAL_SLAB = registerBlockItem(
-            "nether_brick_vertical_slab", ModBlocks.NETHER_BRICK_VERTICAL_SLAB);
+            "nether_brick_vertical_slab", ShapedWoodBlocks.NETHER_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_NETHER_BRICK_VERTICAL_SLAB = registerBlockItem(
-            "red_nether_brick_vertical_slab", ModBlocks.RED_NETHER_BRICK_VERTICAL_SLAB);
+            "red_nether_brick_vertical_slab", ShapedWoodBlocks.RED_NETHER_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> OAK_LOG_STAIRS = registerBlockItem("oak_log_stairs",
-            ModBlocks.OAK_LOG_STAIRS);
+            ShapedWoodBlocks.OAK_LOG_STAIRS);
     public static final RegistryObject<Item> CUT_COPPER_VERTICAL_SLAB = registerBlockItem("cut_copper_vertical_slab",
-            ModBlocks.CUT_COPPER_VERTICAL_SLAB);
+            ShapedWoodBlocks.CUT_COPPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> EXPOSED_CUT_COPPER_VERTICAL_SLAB = registerBlockItem(
-            "exposed_cut_copper_vertical_slab", ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB);
+            "exposed_cut_copper_vertical_slab", ShapedWoodBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> WEATHERED_CUT_COPPER_VERTICAL_SLAB = registerBlockItem(
-            "weathered_cut_copper_vertical_slab", ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB);
+            "weathered_cut_copper_vertical_slab", ShapedWoodBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> OXIDIZED_CUT_COPPER_VERTICAL_SLAB = registerBlockItem(
-            "oxidized_cut_copper_vertical_slab", ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            "oxidized_cut_copper_vertical_slab", ShapedWoodBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> WAXED_CUT_COPPER_VERTICAL_SLAB = registerBlockItem(
-            "waxed_cut_copper_vertical_slab", ModBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
+            "waxed_cut_copper_vertical_slab", ShapedWoodBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB = registerBlockItem(
-            "waxed_exposed_cut_copper_vertical_slab", ModBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
+            "waxed_exposed_cut_copper_vertical_slab", ShapedWoodBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB = registerBlockItem(
-            "waxed_weathered_cut_copper_vertical_slab", ModBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
+            "waxed_weathered_cut_copper_vertical_slab", ShapedWoodBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB = registerBlockItem(
-            "waxed_oxidized_cut_copper_vertical_slab", ModBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            "waxed_oxidized_cut_copper_vertical_slab", ShapedWoodBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> COBBLED_DEEPSLATE_VERTICAL_SLAB = registerBlockItem(
-            "cobbled_deepslate_vertical_slab", ModBlocks.COBBLED_DEEPSLATE_VERTICAL_SLAB);
+            "cobbled_deepslate_vertical_slab", ShapedWoodBlocks.COBBLED_DEEPSLATE_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_DEEPSLATE_VERTICAL_SLAB = registerBlockItem(
-            "polished_deepslate_vertical_slab", ModBlocks.POLISHED_DEEPSLATE_VERTICAL_SLAB);
+            "polished_deepslate_vertical_slab", ShapedWoodBlocks.POLISHED_DEEPSLATE_VERTICAL_SLAB);
     public static final RegistryObject<Item> DEEPSLATE_BRICK_VERTICAL_SLAB = registerBlockItem(
-            "deepslate_brick_vertical_slab", ModBlocks.DEEPSLATE_BRICK_VERTICAL_SLAB);
+            "deepslate_brick_vertical_slab", ShapedWoodBlocks.DEEPSLATE_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> DEEPSLATE_TILE_VERTICAL_SLAB = registerBlockItem(
-            "deepslate_tile_vertical_slab", ModBlocks.DEEPSLATE_TILE_VERTICAL_SLAB);
+            "deepslate_tile_vertical_slab", ShapedWoodBlocks.DEEPSLATE_TILE_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACKSTONE_VERTICAL_SLAB = registerBlockItem("blackstone_vertical_slab",
-            ModBlocks.BLACKSTONE_VERTICAL_SLAB);
+            ShapedWoodBlocks.BLACKSTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_BLACKSTONE_VERTICAL_SLAB = registerBlockItem(
-            "polished_blackstone_vertical_slab", ModBlocks.POLISHED_BLACKSTONE_VERTICAL_SLAB);
+            "polished_blackstone_vertical_slab", ShapedWoodBlocks.POLISHED_BLACKSTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> POLISHED_BLACKSTONE_BRICK_VERTICAL_SLAB = registerBlockItem(
-            "polished_blackstone_brick_vertical_slab", ModBlocks.POLISHED_BLACKSTONE_BRICK_VERTICAL_SLAB);
+            "polished_blackstone_brick_vertical_slab", ShapedWoodBlocks.POLISHED_BLACKSTONE_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> PRISMARINE_VERTICAL_SLAB = registerBlockItem("prismarine_vertical_slab",
-            ModBlocks.PRISMARINE_VERTICAL_SLAB);
+            ShapedWoodBlocks.PRISMARINE_VERTICAL_SLAB);
     public static final RegistryObject<Item> PRISMARINE_BRICK_VERTICAL_SLAB = registerBlockItem(
-            "prismarine_brick_vertical_slab", ModBlocks.PRISMARINE_BRICK_VERTICAL_SLAB);
+            "prismarine_brick_vertical_slab", ShapedWoodBlocks.PRISMARINE_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> DARK_PRISMARINE_VERTICAL_SLAB = registerBlockItem(
-            "dark_prismarine_vertical_slab", ModBlocks.DARK_PRISMARINE_VERTICAL_SLAB);
+            "dark_prismarine_vertical_slab", ShapedWoodBlocks.DARK_PRISMARINE_VERTICAL_SLAB);
     public static final RegistryObject<Item> BRICK_VERTICAL_SLAB = registerBlockItem("brick_vertical_slab",
-            ModBlocks.BRICK_VERTICAL_SLAB);
+            ShapedWoodBlocks.BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> END_STONE_BRICK_VERTICAL_SLAB = registerBlockItem(
-            "end_stone_brick_vertical_slab", ModBlocks.END_STONE_BRICK_VERTICAL_SLAB);
+            "end_stone_brick_vertical_slab", ShapedWoodBlocks.END_STONE_BRICK_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPUR_VERTICAL_SLAB = registerBlockItem("purpur_vertical_slab",
-            ModBlocks.PURPUR_VERTICAL_SLAB);
+            ShapedWoodBlocks.PURPUR_VERTICAL_SLAB);
 
     public static final RegistryObject<Item> QUARTZ_VERTICAL_SLAB = registerBlockItem("quartz_vertical_slab",
-            ModBlocks.QUARTZ_VERTICAL_SLAB);
+            ShapedWoodBlocks.QUARTZ_VERTICAL_SLAB);
     public static final RegistryObject<Item> SMOOTH_QUARTZ_VERTICAL_SLAB = registerBlockItem(
-            "smooth_quartz_vertical_slab", ModBlocks.SMOOTH_QUARTZ_VERTICAL_SLAB);
+            "smooth_quartz_vertical_slab", ShapedWoodBlocks.SMOOTH_QUARTZ_VERTICAL_SLAB);
     public static final RegistryObject<Item> TERRACOTTA_SLAB = registerBlockItem("terracotta_slab",
-            ModBlocks.TERRACOTTA_SLAB);
+            ShapedWoodBlocks.TERRACOTTA_SLAB);
     public static final RegistryObject<Item> TERRACOTTA_STAIRS = registerBlockItem("terracotta_stairs",
-            ModBlocks.TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> TERRACOTTA_VERTICAL_SLAB = registerBlockItem("terracotta_vertical_slab",
-            ModBlocks.TERRACOTTA_VERTICAL_SLAB);
+            ShapedWoodBlocks.TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> WHITE_TERRACOTTA_SLAB = registerBlockItem("white_terracotta_slab",
-            ModBlocks.WHITE_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.WHITE_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> WHITE_TERRACOTTA_STAIRS = registerBlockItem("white_terracotta_stairs",
-            ModBlocks.WHITE_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.WHITE_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> WHITE_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "white_terracotta_vertical_slab", ModBlocks.WHITE_TERRACOTTA_VERTICAL_SLAB);
+            "white_terracotta_vertical_slab", ShapedWoodBlocks.WHITE_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> ORANGE_TERRACOTTA_SLAB = registerBlockItem("orange_terracotta_slab",
-            ModBlocks.ORANGE_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.ORANGE_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> ORANGE_TERRACOTTA_STAIRS = registerBlockItem("orange_terracotta_stairs",
-            ModBlocks.ORANGE_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.ORANGE_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> ORANGE_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "orange_terracotta_vertical_slab", ModBlocks.ORANGE_TERRACOTTA_VERTICAL_SLAB);
+            "orange_terracotta_vertical_slab", ShapedWoodBlocks.ORANGE_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> MAGENTA_TERRACOTTA_SLAB = registerBlockItem("magenta_terracotta_slab",
-            ModBlocks.MAGENTA_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.MAGENTA_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> MAGENTA_TERRACOTTA_STAIRS = registerBlockItem("magenta_terracotta_stairs",
-            ModBlocks.MAGENTA_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.MAGENTA_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> MAGENTA_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "magenta_terracotta_vertical_slab", ModBlocks.MAGENTA_TERRACOTTA_VERTICAL_SLAB);
+            "magenta_terracotta_vertical_slab", ShapedWoodBlocks.MAGENTA_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_TERRACOTTA_SLAB = registerBlockItem(
-            "light_blue_terracotta_slab", ModBlocks.LIGHT_BLUE_TERRACOTTA_SLAB);
+            "light_blue_terracotta_slab", ShapedWoodBlocks.LIGHT_BLUE_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_TERRACOTTA_STAIRS = registerBlockItem(
-            "light_blue_terracotta_stairs", ModBlocks.LIGHT_BLUE_TERRACOTTA_STAIRS);
+            "light_blue_terracotta_stairs", ShapedWoodBlocks.LIGHT_BLUE_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> LIGHT_BLUE_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "light_blue_terracotta_vertical_slab", ModBlocks.LIGHT_BLUE_TERRACOTTA_VERTICAL_SLAB);
+            "light_blue_terracotta_vertical_slab", ShapedWoodBlocks.LIGHT_BLUE_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_TERRACOTTA_SLAB = registerBlockItem("yellow_terracotta_slab",
-            ModBlocks.YELLOW_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.YELLOW_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> YELLOW_TERRACOTTA_STAIRS = registerBlockItem("yellow_terracotta_stairs",
-            ModBlocks.YELLOW_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.YELLOW_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> YELLOW_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "yellow_terracotta_vertical_slab", ModBlocks.YELLOW_TERRACOTTA_VERTICAL_SLAB);
+            "yellow_terracotta_vertical_slab", ShapedWoodBlocks.YELLOW_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIME_TERRACOTTA_SLAB = registerBlockItem("lime_terracotta_slab",
-            ModBlocks.LIME_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.LIME_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> LIME_TERRACOTTA_STAIRS = registerBlockItem("lime_terracotta_stairs",
-            ModBlocks.LIME_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.LIME_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> LIME_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "lime_terracotta_vertical_slab", ModBlocks.LIME_TERRACOTTA_VERTICAL_SLAB);
+            "lime_terracotta_vertical_slab", ShapedWoodBlocks.LIME_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> PINK_TERRACOTTA_SLAB = registerBlockItem("pink_terracotta_slab",
-            ModBlocks.PINK_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.PINK_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> PINK_TERRACOTTA_STAIRS = registerBlockItem("pink_terracotta_stairs",
-            ModBlocks.PINK_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.PINK_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> PINK_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "pink_terracotta_vertical_slab", ModBlocks.PINK_TERRACOTTA_VERTICAL_SLAB);
+            "pink_terracotta_vertical_slab", ShapedWoodBlocks.PINK_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRAY_TERRACOTTA_SLAB = registerBlockItem("gray_terracotta_slab",
-            ModBlocks.GRAY_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.GRAY_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> GRAY_TERRACOTTA_STAIRS = registerBlockItem("gray_terracotta_stairs",
-            ModBlocks.GRAY_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.GRAY_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> GRAY_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "gray_terracotta_vertical_slab", ModBlocks.GRAY_TERRACOTTA_VERTICAL_SLAB);
+            "gray_terracotta_vertical_slab", ShapedWoodBlocks.GRAY_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_TERRACOTTA_SLAB = registerBlockItem(
-            "light_gray_terracotta_slab", ModBlocks.LIGHT_GRAY_TERRACOTTA_SLAB);
+            "light_gray_terracotta_slab", ShapedWoodBlocks.LIGHT_GRAY_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_TERRACOTTA_STAIRS = registerBlockItem(
-            "light_gray_terracotta_stairs", ModBlocks.LIGHT_GRAY_TERRACOTTA_STAIRS);
+            "light_gray_terracotta_stairs", ShapedWoodBlocks.LIGHT_GRAY_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> LIGHT_GRAY_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "light_gray_terracotta_vertical_slab", ModBlocks.LIGHT_GRAY_TERRACOTTA_VERTICAL_SLAB);
+            "light_gray_terracotta_vertical_slab", ShapedWoodBlocks.LIGHT_GRAY_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> CYAN_TERRACOTTA_SLAB = registerBlockItem("cyan_terracotta_slab",
-            ModBlocks.CYAN_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.CYAN_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> CYAN_TERRACOTTA_STAIRS = registerBlockItem("cyan_terracotta_stairs",
-            ModBlocks.CYAN_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.CYAN_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> CYAN_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "cyan_terracotta_vertical_slab", ModBlocks.CYAN_TERRACOTTA_VERTICAL_SLAB);
+            "cyan_terracotta_vertical_slab", ShapedWoodBlocks.CYAN_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPLE_TERRACOTTA_SLAB = registerBlockItem("purple_terracotta_slab",
-            ModBlocks.PURPLE_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.PURPLE_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> PURPLE_TERRACOTTA_STAIRS = registerBlockItem("purple_terracotta_stairs",
-            ModBlocks.PURPLE_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.PURPLE_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> PURPLE_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "purple_terracotta_vertical_slab", ModBlocks.PURPLE_TERRACOTTA_VERTICAL_SLAB);
+            "purple_terracotta_vertical_slab", ShapedWoodBlocks.PURPLE_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLUE_TERRACOTTA_SLAB = registerBlockItem("blue_terracotta_slab",
-            ModBlocks.BLUE_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.BLUE_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> BLUE_TERRACOTTA_STAIRS = registerBlockItem("blue_terracotta_stairs",
-            ModBlocks.BLUE_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.BLUE_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> BLUE_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "blue_terracotta_vertical_slab", ModBlocks.BLUE_TERRACOTTA_VERTICAL_SLAB);
+            "blue_terracotta_vertical_slab", ShapedWoodBlocks.BLUE_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> BROWN_TERRACOTTA_SLAB = registerBlockItem("brown_terracotta_slab",
-            ModBlocks.BROWN_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.BROWN_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> BROWN_TERRACOTTA_STAIRS = registerBlockItem("brown_terracotta_stairs",
-            ModBlocks.BROWN_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.BROWN_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> BROWN_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "brown_terracotta_vertical_slab", ModBlocks.BROWN_TERRACOTTA_VERTICAL_SLAB);
+            "brown_terracotta_vertical_slab", ShapedWoodBlocks.BROWN_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> GREEN_TERRACOTTA_SLAB = registerBlockItem("green_terracotta_slab",
-            ModBlocks.GREEN_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.GREEN_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> GREEN_TERRACOTTA_STAIRS = registerBlockItem("green_terracotta_stairs",
-            ModBlocks.GREEN_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.GREEN_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> GREEN_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "green_terracotta_vertical_slab", ModBlocks.GREEN_TERRACOTTA_VERTICAL_SLAB);
+            "green_terracotta_vertical_slab", ShapedWoodBlocks.GREEN_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_TERRACOTTA_SLAB = registerBlockItem("red_terracotta_slab",
-            ModBlocks.RED_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.RED_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> RED_TERRACOTTA_STAIRS = registerBlockItem("red_terracotta_stairs",
-            ModBlocks.RED_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.RED_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> RED_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "red_terracotta_vertical_slab", ModBlocks.RED_TERRACOTTA_VERTICAL_SLAB);
+            "red_terracotta_vertical_slab", ShapedWoodBlocks.RED_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACK_TERRACOTTA_SLAB = registerBlockItem("black_terracotta_slab",
-            ModBlocks.BLACK_TERRACOTTA_SLAB);
+            ShapedWoodBlocks.BLACK_TERRACOTTA_SLAB);
     public static final RegistryObject<Item> BLACK_TERRACOTTA_STAIRS = registerBlockItem("black_terracotta_stairs",
-            ModBlocks.BLACK_TERRACOTTA_STAIRS);
+            ShapedWoodBlocks.BLACK_TERRACOTTA_STAIRS);
     public static final RegistryObject<Item> BLACK_TERRACOTTA_VERTICAL_SLAB = registerBlockItem(
-            "black_terracotta_vertical_slab", ModBlocks.BLACK_TERRACOTTA_VERTICAL_SLAB);
+            "black_terracotta_vertical_slab", ShapedWoodBlocks.BLACK_TERRACOTTA_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_OAK_LOG_STAIRS = registerBlockItem("stripped_oak_log_stairs",
-            ModBlocks.STRIPPED_OAK_LOG_STAIRS);
+            ShapedWoodBlocks.STRIPPED_OAK_LOG_STAIRS);
     public static final RegistryObject<Item> SPRUCE_LOG_STAIRS = registerBlockItem("spruce_log_stairs",
-            ModBlocks.SPRUCE_LOG_STAIRS);
+            ShapedWoodBlocks.SPRUCE_LOG_STAIRS);
     public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_STAIRS = registerBlockItem(
-            "stripped_spruce_log_stairs", ModBlocks.STRIPPED_SPRUCE_LOG_STAIRS);
+            "stripped_spruce_log_stairs", ShapedWoodBlocks.STRIPPED_SPRUCE_LOG_STAIRS);
     public static final RegistryObject<Item> BIRCH_LOG_STAIRS = registerBlockItem("birch_log_stairs",
-            ModBlocks.BIRCH_LOG_STAIRS);
+            ShapedWoodBlocks.BIRCH_LOG_STAIRS);
     public static final RegistryObject<Item> STRIPPED_BIRCH_LOG_STAIRS = registerBlockItem("stripped_birch_log_stairs",
-            ModBlocks.STRIPPED_BIRCH_LOG_STAIRS);
+            ShapedWoodBlocks.STRIPPED_BIRCH_LOG_STAIRS);
     public static final RegistryObject<Item> JUNGLE_LOG_STAIRS = registerBlockItem("jungle_log_stairs",
-            ModBlocks.JUNGLE_LOG_STAIRS);
+            ShapedWoodBlocks.JUNGLE_LOG_STAIRS);
     public static final RegistryObject<Item> STRIPPED_JUNGLE_LOG_STAIRS = registerBlockItem(
-            "stripped_jungle_log_stairs", ModBlocks.STRIPPED_JUNGLE_LOG_STAIRS);
+            "stripped_jungle_log_stairs", ShapedWoodBlocks.STRIPPED_JUNGLE_LOG_STAIRS);
     public static final RegistryObject<Item> ACACIA_LOG_STAIRS = registerBlockItem("acacia_log_stairs",
-            ModBlocks.ACACIA_LOG_STAIRS);
+            ShapedWoodBlocks.ACACIA_LOG_STAIRS);
     public static final RegistryObject<Item> STRIPPED_ACACIA_LOG_STAIRS = registerBlockItem(
-            "stripped_acacia_log_stairs", ModBlocks.STRIPPED_ACACIA_LOG_STAIRS);
+            "stripped_acacia_log_stairs", ShapedWoodBlocks.STRIPPED_ACACIA_LOG_STAIRS);
     public static final RegistryObject<Item> DARK_OAK_LOG_STAIRS = registerBlockItem("dark_oak_log_stairs",
-            ModBlocks.DARK_OAK_LOG_STAIRS);
+            ShapedWoodBlocks.DARK_OAK_LOG_STAIRS);
     public static final RegistryObject<Item> STRIPPED_DARK_OAK_LOG_STAIRS = registerBlockItem(
-            "stripped_dark_oak_log_stairs", ModBlocks.STRIPPED_DARK_OAK_LOG_STAIRS);
+            "stripped_dark_oak_log_stairs", ShapedWoodBlocks.STRIPPED_DARK_OAK_LOG_STAIRS);
     public static final RegistryObject<Item> CRIMSON_STEM_STAIRS = registerBlockItem("crimson_stem_stairs",
-            ModBlocks.CRIMSON_STEM_STAIRS);
+            ShapedWoodBlocks.CRIMSON_STEM_STAIRS);
     public static final RegistryObject<Item> STRIPPED_CRIMSON_STEM_STAIRS = registerBlockItem(
-            "stripped_crimson_stem_stairs", ModBlocks.STRIPPED_CRIMSON_STEM_STAIRS);
+            "stripped_crimson_stem_stairs", ShapedWoodBlocks.STRIPPED_CRIMSON_STEM_STAIRS);
     public static final RegistryObject<Item> WARPED_STEM_STAIRS = registerBlockItem("warped_stem_stairs",
-            ModBlocks.WARPED_STEM_STAIRS);
+            ShapedWoodBlocks.WARPED_STEM_STAIRS);
     public static final RegistryObject<Item> STRIPPED_WARPED_STEM_STAIRS = registerBlockItem(
-            "stripped_warped_stem_stairs", ModBlocks.STRIPPED_WARPED_STEM_STAIRS);
+            "stripped_warped_stem_stairs", ShapedWoodBlocks.STRIPPED_WARPED_STEM_STAIRS);
     public static final RegistryObject<Item> ACACIA_WOOD_SLAB = registerBlockItem("acacia_wood_slab",
-            ModBlocks.ACACIA_WOOD_SLAB);
+            ShapedWoodBlocks.ACACIA_WOOD_SLAB);
     public static final RegistryObject<Item> ACACIA_WOOD_STAIRS = registerBlockItem("acacia_wood_stairs",
-            ModBlocks.ACACIA_WOOD_STAIRS);
+            ShapedWoodBlocks.ACACIA_WOOD_STAIRS);
     public static final RegistryObject<Item> ACACIA_WOOD_VERTICAL_SLAB = registerBlockItem("acacia_wood_vertical_slab",
-            ModBlocks.ACACIA_WOOD_VERTICAL_SLAB);
+            ShapedWoodBlocks.ACACIA_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> AMETHYST_BLOCK_STAIRS = registerBlockItem("amethyst_block_stairs",
-            ModBlocks.AMETHYST_BLOCK_STAIRS);
+            ShapedWoodBlocks.AMETHYST_BLOCK_STAIRS);
     public static final RegistryObject<Item> BIRCH_WOOD_SLAB = registerBlockItem("birch_wood_slab",
-            ModBlocks.BIRCH_WOOD_SLAB);
+            ShapedWoodBlocks.BIRCH_WOOD_SLAB);
     public static final RegistryObject<Item> BIRCH_WOOD_STAIRS = registerBlockItem("birch_wood_stairs",
-            ModBlocks.BIRCH_WOOD_STAIRS);
+            ShapedWoodBlocks.BIRCH_WOOD_STAIRS);
     public static final RegistryObject<Item> BIRCH_WOOD_VERTICAL_SLAB = registerBlockItem("birch_wood_vertical_slab",
-            ModBlocks.BIRCH_WOOD_VERTICAL_SLAB);
+            ShapedWoodBlocks.BIRCH_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> CRIMSON_HYPHAE_SLAB = registerBlockItem("crimson_hyphae_slab",
-            ModBlocks.CRIMSON_HYPHAE_SLAB);
+            ShapedWoodBlocks.CRIMSON_HYPHAE_SLAB);
     public static final RegistryObject<Item> CRIMSON_HYPHAE_STAIRS = registerBlockItem("crimson_hyphae_stairs",
-            ModBlocks.CRIMSON_HYPHAE_STAIRS);
+            ShapedWoodBlocks.CRIMSON_HYPHAE_STAIRS);
     public static final RegistryObject<Item> CRIMSON_HYPHAE_VERTICAL_SLAB = registerBlockItem(
-            "crimson_hyphae_vertical_slab", ModBlocks.CRIMSON_HYPHAE_VERTICAL_SLAB);
+            "crimson_hyphae_vertical_slab", ShapedWoodBlocks.CRIMSON_HYPHAE_VERTICAL_SLAB);
     public static final RegistryObject<Item> CRYING_OBSIDIAN_SLAB = registerBlockItem("crying_obsidian_slab",
-            ModBlocks.CRYING_OBSIDIAN_SLAB);
+            ShapedWoodBlocks.CRYING_OBSIDIAN_SLAB);
     public static final RegistryObject<Item> CRYING_OBSIDIAN_STAIRS = registerBlockItem("crying_obsidian_stairs",
-            ModBlocks.CRYING_OBSIDIAN_STAIRS);
+            ShapedWoodBlocks.CRYING_OBSIDIAN_STAIRS);
     public static final RegistryObject<Item> CRYING_OBSIDIAN_VERTICAL_SLAB = registerBlockItem(
-            "crying_obsidian_vertical_slab", ModBlocks.CRYING_OBSIDIAN_VERTICAL_SLAB);
+            "crying_obsidian_vertical_slab", ShapedWoodBlocks.CRYING_OBSIDIAN_VERTICAL_SLAB);
     public static final RegistryObject<Item> CUT_RED_SANDSTONE_STAIRS = registerBlockItem("cut_red_sandstone_stairs",
-            ModBlocks.CUT_RED_SANDSTONE_STAIRS);
+            ShapedWoodBlocks.CUT_RED_SANDSTONE_STAIRS);
     public static final RegistryObject<Item> CUT_RED_SANDSTONE_VERTICAL_SLAB = registerBlockItem(
-            "cut_red_sandstone_vertical_slab", ModBlocks.CUT_RED_SANDSTONE_VERTICAL_SLAB);
+            "cut_red_sandstone_vertical_slab", ShapedWoodBlocks.CUT_RED_SANDSTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> CUT_SANDSTONE_STAIRS = registerBlockItem("cut_sandstone_stairs",
-            ModBlocks.CUT_SANDSTONE_STAIRS);
+            ShapedWoodBlocks.CUT_SANDSTONE_STAIRS);
     public static final RegistryObject<Item> CUT_SANDSTONE_VERTICAL_SLAB = registerBlockItem(
-            "cut_sandstone_vertical_slab", ModBlocks.CUT_SANDSTONE_VERTICAL_SLAB);
+            "cut_sandstone_vertical_slab", ShapedWoodBlocks.CUT_SANDSTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> DARK_OAK_WOOD_SLAB = registerBlockItem("dark_oak_wood_slab",
-            ModBlocks.DARK_OAK_WOOD_SLAB);
+            ShapedWoodBlocks.DARK_OAK_WOOD_SLAB);
     public static final RegistryObject<Item> DARK_OAK_WOOD_STAIRS = registerBlockItem("dark_oak_wood_stairs",
-            ModBlocks.DARK_OAK_WOOD_STAIRS);
+            ShapedWoodBlocks.DARK_OAK_WOOD_STAIRS);
     public static final RegistryObject<Item> DARK_OAK_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "dark_oak_wood_vertical_slab", ModBlocks.DARK_OAK_WOOD_VERTICAL_SLAB);
-    public static final RegistryObject<Item> DIRT_STAIRS = registerBlockItem("dirt_stairs", ModBlocks.DIRT_STAIRS);
+            "dark_oak_wood_vertical_slab", ShapedWoodBlocks.DARK_OAK_WOOD_VERTICAL_SLAB);
+    public static final RegistryObject<Item> DIRT_STAIRS = registerBlockItem("dirt_stairs",
+            ShapedWoodBlocks.DIRT_STAIRS);
     public static final RegistryObject<Item> JUNGLE_WOOD_SLAB = registerBlockItem("jungle_wood_slab",
-            ModBlocks.JUNGLE_WOOD_SLAB);
+            ShapedWoodBlocks.JUNGLE_WOOD_SLAB);
     public static final RegistryObject<Item> JUNGLE_WOOD_STAIRS = registerBlockItem("jungle_wood_stairs",
-            ModBlocks.JUNGLE_WOOD_STAIRS);
+            ShapedWoodBlocks.JUNGLE_WOOD_STAIRS);
     public static final RegistryObject<Item> JUNGLE_WOOD_VERTICAL_SLAB = registerBlockItem("jungle_wood_vertical_slab",
-            ModBlocks.JUNGLE_WOOD_VERTICAL_SLAB);
+            ShapedWoodBlocks.JUNGLE_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> MOSS_BLOCK_STAIRS = registerBlockItem("moss_block_stairs",
-            ModBlocks.MOSS_BLOCK_STAIRS);
+            ShapedWoodBlocks.MOSS_BLOCK_STAIRS);
     public static final RegistryObject<Item> MYCELIUM_STAIRS = registerBlockItem("mycelium_stairs",
-            ModBlocks.MYCELIUM_STAIRS);
+            ShapedWoodBlocks.MYCELIUM_STAIRS);
     public static final RegistryObject<Item> OAK_WOOD_SLAB = registerBlockItem("oak_wood_slab",
-            ModBlocks.OAK_WOOD_SLAB);
+            ShapedWoodBlocks.OAK_WOOD_SLAB);
     public static final RegistryObject<Item> OAK_WOOD_STAIRS = registerBlockItem("oak_wood_stairs",
-            ModBlocks.OAK_WOOD_STAIRS);
+            ShapedWoodBlocks.OAK_WOOD_STAIRS);
     public static final RegistryObject<Item> OAK_WOOD_VERTICAL_SLAB = registerBlockItem("oak_wood_vertical_slab",
-            ModBlocks.OAK_WOOD_VERTICAL_SLAB);
+            ShapedWoodBlocks.OAK_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> PODZOL_STAIRS = registerBlockItem("podzol_stairs",
-            ModBlocks.PODZOL_STAIRS);
+            ShapedWoodBlocks.PODZOL_STAIRS);
     public static final RegistryObject<Item> SANDSTONE_VERTICAL_SLAB = registerBlockItem("sandstone_vertical_slab",
-            ModBlocks.SANDSTONE_VERTICAL_SLAB);
+            ShapedWoodBlocks.SANDSTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> SMOOTH_RED_SANDSTONE_VERTICAL_SLAB = registerBlockItem(
-            "smooth_red_sandstone_vertical_slab", ModBlocks.SMOOTH_RED_SANDSTONE_VERTICAL_SLAB);
+            "smooth_red_sandstone_vertical_slab", ShapedWoodBlocks.SMOOTH_RED_SANDSTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> SMOOTH_SANDSTONE_VERTICAL_SLAB = registerBlockItem(
-            "smooth_sandstone_vertical_slab", ModBlocks.SMOOTH_SANDSTONE_VERTICAL_SLAB);
+            "smooth_sandstone_vertical_slab", ShapedWoodBlocks.SMOOTH_SANDSTONE_VERTICAL_SLAB);
     public static final RegistryObject<Item> SPRUCE_WOOD_SLAB = registerBlockItem("spruce_wood_slab",
-            ModBlocks.SPRUCE_WOOD_SLAB);
+            ShapedWoodBlocks.SPRUCE_WOOD_SLAB);
     public static final RegistryObject<Item> SPRUCE_WOOD_STAIRS = registerBlockItem("spruce_wood_stairs",
-            ModBlocks.SPRUCE_WOOD_STAIRS);
+            ShapedWoodBlocks.SPRUCE_WOOD_STAIRS);
     public static final RegistryObject<Item> SPRUCE_WOOD_VERTICAL_SLAB = registerBlockItem("spruce_wood_vertical_slab",
-            ModBlocks.SPRUCE_WOOD_VERTICAL_SLAB);
+            ShapedWoodBlocks.SPRUCE_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_ACACIA_WOOD_SLAB = registerBlockItem("stripped_acacia_wood_slab",
-            ModBlocks.STRIPPED_ACACIA_WOOD_SLAB);
+            ShapedWoodBlocks.STRIPPED_ACACIA_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_ACACIA_WOOD_STAIRS = registerBlockItem(
-            "stripped_acacia_wood_stairs", ModBlocks.STRIPPED_ACACIA_WOOD_STAIRS);
+            "stripped_acacia_wood_stairs", ShapedWoodBlocks.STRIPPED_ACACIA_WOOD_STAIRS);
     public static final RegistryObject<Item> STRIPPED_ACACIA_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_acacia_wood_vertical_slab", ModBlocks.STRIPPED_ACACIA_WOOD_VERTICAL_SLAB);
+            "stripped_acacia_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_ACACIA_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_BIRCH_WOOD_SLAB = registerBlockItem("stripped_birch_wood_slab",
-            ModBlocks.STRIPPED_BIRCH_WOOD_SLAB);
+            ShapedWoodBlocks.STRIPPED_BIRCH_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_BIRCH_WOOD_STAIRS = registerBlockItem(
-            "stripped_birch_wood_stairs", ModBlocks.STRIPPED_BIRCH_WOOD_STAIRS);
+            "stripped_birch_wood_stairs", ShapedWoodBlocks.STRIPPED_BIRCH_WOOD_STAIRS);
     public static final RegistryObject<Item> STRIPPED_BIRCH_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_birch_wood_vertical_slab", ModBlocks.STRIPPED_BIRCH_WOOD_VERTICAL_SLAB);
+            "stripped_birch_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_BIRCH_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_CRIMSON_HYPHAE_SLAB = registerBlockItem(
-            "stripped_crimson_hyphae_slab", ModBlocks.STRIPPED_CRIMSON_HYPHAE_SLAB);
+            "stripped_crimson_hyphae_slab", ShapedWoodBlocks.STRIPPED_CRIMSON_HYPHAE_SLAB);
     public static final RegistryObject<Item> STRIPPED_CRIMSON_HYPHAE_STAIRS = registerBlockItem(
-            "stripped_crimson_hyphae_stairs", ModBlocks.STRIPPED_CRIMSON_HYPHAE_STAIRS);
+            "stripped_crimson_hyphae_stairs", ShapedWoodBlocks.STRIPPED_CRIMSON_HYPHAE_STAIRS);
     public static final RegistryObject<Item> STRIPPED_CRIMSON_HYPHAE_VERTICAL_SLAB = registerBlockItem(
-            "stripped_crimson_hyphae_vertical_slab", ModBlocks.STRIPPED_CRIMSON_HYPHAE_VERTICAL_SLAB);
+            "stripped_crimson_hyphae_vertical_slab", ShapedWoodBlocks.STRIPPED_CRIMSON_HYPHAE_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_DARK_OAK_WOOD_SLAB = registerBlockItem(
-            "stripped_dark_oak_wood_slab", ModBlocks.STRIPPED_DARK_OAK_WOOD_SLAB);
+            "stripped_dark_oak_wood_slab", ShapedWoodBlocks.STRIPPED_DARK_OAK_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_DARK_OAK_WOOD_STAIRS = registerBlockItem(
-            "stripped_dark_oak_wood_stairs", ModBlocks.STRIPPED_DARK_OAK_WOOD_STAIRS);
+            "stripped_dark_oak_wood_stairs", ShapedWoodBlocks.STRIPPED_DARK_OAK_WOOD_STAIRS);
     public static final RegistryObject<Item> STRIPPED_DARK_OAK_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_dark_oak_wood_vertical_slab", ModBlocks.STRIPPED_DARK_OAK_WOOD_VERTICAL_SLAB);
+            "stripped_dark_oak_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_DARK_OAK_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_JUNGLE_WOOD_SLAB = registerBlockItem("stripped_jungle_wood_slab",
-            ModBlocks.STRIPPED_JUNGLE_WOOD_SLAB);
+            ShapedWoodBlocks.STRIPPED_JUNGLE_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_JUNGLE_WOOD_STAIRS = registerBlockItem(
-            "stripped_jungle_wood_stairs", ModBlocks.STRIPPED_JUNGLE_WOOD_STAIRS);
+            "stripped_jungle_wood_stairs", ShapedWoodBlocks.STRIPPED_JUNGLE_WOOD_STAIRS);
     public static final RegistryObject<Item> STRIPPED_JUNGLE_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_jungle_wood_vertical_slab", ModBlocks.STRIPPED_JUNGLE_WOOD_VERTICAL_SLAB);
+            "stripped_jungle_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_JUNGLE_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_OAK_WOOD_SLAB = registerBlockItem("stripped_oak_wood_slab",
-            ModBlocks.STRIPPED_OAK_WOOD_SLAB);
+            ShapedWoodBlocks.STRIPPED_OAK_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_OAK_WOOD_STAIRS = registerBlockItem("stripped_oak_wood_stairs",
-            ModBlocks.STRIPPED_OAK_WOOD_STAIRS);
+            ShapedWoodBlocks.STRIPPED_OAK_WOOD_STAIRS);
     public static final RegistryObject<Item> STRIPPED_OAK_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_oak_wood_vertical_slab", ModBlocks.STRIPPED_OAK_WOOD_VERTICAL_SLAB);
+            "stripped_oak_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_OAK_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_SPRUCE_WOOD_SLAB = registerBlockItem("stripped_spruce_wood_slab",
-            ModBlocks.STRIPPED_SPRUCE_WOOD_SLAB);
+            ShapedWoodBlocks.STRIPPED_SPRUCE_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_SPRUCE_WOOD_STAIRS = registerBlockItem(
-            "stripped_spruce_wood_stairs", ModBlocks.STRIPPED_SPRUCE_WOOD_STAIRS);
+            "stripped_spruce_wood_stairs", ShapedWoodBlocks.STRIPPED_SPRUCE_WOOD_STAIRS);
     public static final RegistryObject<Item> STRIPPED_SPRUCE_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_spruce_wood_vertical_slab", ModBlocks.STRIPPED_SPRUCE_WOOD_VERTICAL_SLAB);
+            "stripped_spruce_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_SPRUCE_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_WARPED_HYPHAE_SLAB = registerBlockItem(
-            "stripped_warped_hyphae_slab", ModBlocks.STRIPPED_WARPED_HYPHAE_SLAB);
+            "stripped_warped_hyphae_slab", ShapedWoodBlocks.STRIPPED_WARPED_HYPHAE_SLAB);
     public static final RegistryObject<Item> STRIPPED_WARPED_HYPHAE_STAIRS = registerBlockItem(
-            "stripped_warped_hyphae_stairs", ModBlocks.STRIPPED_WARPED_HYPHAE_STAIRS);
+            "stripped_warped_hyphae_stairs", ShapedWoodBlocks.STRIPPED_WARPED_HYPHAE_STAIRS);
     public static final RegistryObject<Item> STRIPPED_WARPED_HYPHAE_VERTICAL_SLAB = registerBlockItem(
-            "stripped_warped_hyphae_vertical_slab", ModBlocks.STRIPPED_WARPED_HYPHAE_VERTICAL_SLAB);
+            "stripped_warped_hyphae_vertical_slab", ShapedWoodBlocks.STRIPPED_WARPED_HYPHAE_VERTICAL_SLAB);
     public static final RegistryObject<Item> TINTED_GLASS_SLAB = registerBlockItem("tinted_glass_slab",
-            ModBlocks.TINTED_GLASS_SLAB);
+            ShapedWoodBlocks.TINTED_GLASS_SLAB);
     public static final RegistryObject<Item> TINTED_GLASS_STAIRS = registerBlockItem("tinted_glass_stairs",
-            ModBlocks.TINTED_GLASS_STAIRS);
+            ShapedWoodBlocks.TINTED_GLASS_STAIRS);
     public static final RegistryObject<Item> TINTED_GLASS_VERTICAL_SLAB = registerBlockItem(
-            "tinted_glass_vertical_slab", ModBlocks.TINTED_GLASS_VERTICAL_SLAB);
+            "tinted_glass_vertical_slab", ShapedWoodBlocks.TINTED_GLASS_VERTICAL_SLAB);
     public static final RegistryObject<Item> WARPED_HYPHAE_SLAB = registerBlockItem("warped_hyphae_slab",
-            ModBlocks.WARPED_HYPHAE_SLAB);
+            ShapedWoodBlocks.WARPED_HYPHAE_SLAB);
     public static final RegistryObject<Item> WARPED_HYPHAE_STAIRS = registerBlockItem("warped_hyphae_stairs",
-            ModBlocks.WARPED_HYPHAE_STAIRS);
+            ShapedWoodBlocks.WARPED_HYPHAE_STAIRS);
     public static final RegistryObject<Item> WARPED_HYPHAE_VERTICAL_SLAB = registerBlockItem(
-            "warped_hyphae_vertical_slab", ModBlocks.WARPED_HYPHAE_VERTICAL_SLAB);
+            "warped_hyphae_vertical_slab", ShapedWoodBlocks.WARPED_HYPHAE_VERTICAL_SLAB);
     public static final RegistryObject<Item> MUFF_BLOCK = ITEMS.register("muff_block",
-            () -> new MuffBlockItem(ModBlocks.MUFF_BLOCK.get(), createBlockItemProperties()));
+            () -> new MuffBlockItem(ShapedWoodBlocks.MUFF_BLOCK.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WHITE_WALLPAPER = registerBlockItem("white_wallpaper",
-            ModBlocks.WHITE_WALLPAPER);
+            ShapedWoodBlocks.WHITE_WALLPAPER);
     public static final RegistryObject<Item> ORANGE_WALLPAPER = registerBlockItem("orange_wallpaper",
-            ModBlocks.ORANGE_WALLPAPER);
+            ShapedWoodBlocks.ORANGE_WALLPAPER);
     public static final RegistryObject<Item> MAGENTA_WALLPAPER = registerBlockItem("magenta_wallpaper",
-            ModBlocks.MAGENTA_WALLPAPER);
+            ShapedWoodBlocks.MAGENTA_WALLPAPER);
     public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER = registerBlockItem("light_blue_wallpaper",
-            ModBlocks.LIGHT_BLUE_WALLPAPER);
+            ShapedWoodBlocks.LIGHT_BLUE_WALLPAPER);
     public static final RegistryObject<Item> YELLOW_WALLPAPER = registerBlockItem("yellow_wallpaper",
-            ModBlocks.YELLOW_WALLPAPER);
+            ShapedWoodBlocks.YELLOW_WALLPAPER);
     public static final RegistryObject<Item> LIME_WALLPAPER = registerBlockItem("lime_wallpaper",
-            ModBlocks.LIME_WALLPAPER);
+            ShapedWoodBlocks.LIME_WALLPAPER);
     public static final RegistryObject<Item> PINK_WALLPAPER = registerBlockItem("pink_wallpaper",
-            ModBlocks.PINK_WALLPAPER);
+            ShapedWoodBlocks.PINK_WALLPAPER);
     public static final RegistryObject<Item> GRAY_WALLPAPER = registerBlockItem("gray_wallpaper",
-            ModBlocks.GRAY_WALLPAPER);
+            ShapedWoodBlocks.GRAY_WALLPAPER);
     public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER = registerBlockItem("light_gray_wallpaper",
-            ModBlocks.LIGHT_GRAY_WALLPAPER);
+            ShapedWoodBlocks.LIGHT_GRAY_WALLPAPER);
     public static final RegistryObject<Item> CYAN_WALLPAPER = registerBlockItem("cyan_wallpaper",
-            ModBlocks.CYAN_WALLPAPER);
+            ShapedWoodBlocks.CYAN_WALLPAPER);
     public static final RegistryObject<Item> PURPLE_WALLPAPER = registerBlockItem("purple_wallpaper",
-            ModBlocks.PURPLE_WALLPAPER);
+            ShapedWoodBlocks.PURPLE_WALLPAPER);
     public static final RegistryObject<Item> BLUE_WALLPAPER = registerBlockItem("blue_wallpaper",
-            ModBlocks.BLUE_WALLPAPER);
+            ShapedWoodBlocks.BLUE_WALLPAPER);
     public static final RegistryObject<Item> BROWN_WALLPAPER = registerBlockItem("brown_wallpaper",
-            ModBlocks.BROWN_WALLPAPER);
+            ShapedWoodBlocks.BROWN_WALLPAPER);
     public static final RegistryObject<Item> GREEN_WALLPAPER = registerBlockItem("green_wallpaper",
-            ModBlocks.GREEN_WALLPAPER);
+            ShapedWoodBlocks.GREEN_WALLPAPER);
     public static final RegistryObject<Item> RED_WALLPAPER = registerBlockItem("red_wallpaper",
-            ModBlocks.RED_WALLPAPER);
+            ShapedWoodBlocks.RED_WALLPAPER);
     public static final RegistryObject<Item> BLACK_WALLPAPER = registerBlockItem("black_wallpaper",
-            ModBlocks.BLACK_WALLPAPER);
+            ShapedWoodBlocks.BLACK_WALLPAPER);
     public static final RegistryObject<Item> WHITE_WALLPAPER_SLAB = registerBlockItem("white_wallpaper_slab",
-            ModBlocks.WHITE_WALLPAPER_SLAB);
+            ShapedWoodBlocks.WHITE_WALLPAPER_SLAB);
     public static final RegistryObject<Item> WHITE_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "white_wallpaper_vertical_slab", ModBlocks.WHITE_WALLPAPER_VERTICAL_SLAB);
+            "white_wallpaper_vertical_slab", ShapedWoodBlocks.WHITE_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> ORANGE_WALLPAPER_SLAB = registerBlockItem("orange_wallpaper_slab",
-            ModBlocks.ORANGE_WALLPAPER_SLAB);
+            ShapedWoodBlocks.ORANGE_WALLPAPER_SLAB);
     public static final RegistryObject<Item> ORANGE_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "orange_wallpaper_vertical_slab", ModBlocks.ORANGE_WALLPAPER_VERTICAL_SLAB);
+            "orange_wallpaper_vertical_slab", ShapedWoodBlocks.ORANGE_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> MAGENTA_WALLPAPER_SLAB = registerBlockItem("magenta_wallpaper_slab",
-            ModBlocks.MAGENTA_WALLPAPER_SLAB);
+            ShapedWoodBlocks.MAGENTA_WALLPAPER_SLAB);
     public static final RegistryObject<Item> MAGENTA_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "magenta_wallpaper_vertical_slab", ModBlocks.MAGENTA_WALLPAPER_VERTICAL_SLAB);
+            "magenta_wallpaper_vertical_slab", ShapedWoodBlocks.MAGENTA_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_SLAB = registerBlockItem("light_blue_wallpaper_slab",
-            ModBlocks.LIGHT_BLUE_WALLPAPER_SLAB);
+            ShapedWoodBlocks.LIGHT_BLUE_WALLPAPER_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "light_blue_wallpaper_vertical_slab", ModBlocks.LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB);
+            "light_blue_wallpaper_vertical_slab", ShapedWoodBlocks.LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_WALLPAPER_SLAB = registerBlockItem("yellow_wallpaper_slab",
-            ModBlocks.YELLOW_WALLPAPER_SLAB);
+            ShapedWoodBlocks.YELLOW_WALLPAPER_SLAB);
     public static final RegistryObject<Item> YELLOW_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "yellow_wallpaper_vertical_slab", ModBlocks.YELLOW_WALLPAPER_VERTICAL_SLAB);
+            "yellow_wallpaper_vertical_slab", ShapedWoodBlocks.YELLOW_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIME_WALLPAPER_SLAB = registerBlockItem("lime_wallpaper_slab",
-            ModBlocks.LIME_WALLPAPER_SLAB);
+            ShapedWoodBlocks.LIME_WALLPAPER_SLAB);
     public static final RegistryObject<Item> LIME_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "lime_wallpaper_vertical_slab", ModBlocks.LIME_WALLPAPER_VERTICAL_SLAB);
+            "lime_wallpaper_vertical_slab", ShapedWoodBlocks.LIME_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> PINK_WALLPAPER_SLAB = registerBlockItem("pink_wallpaper_slab",
-            ModBlocks.PINK_WALLPAPER_SLAB);
+            ShapedWoodBlocks.PINK_WALLPAPER_SLAB);
     public static final RegistryObject<Item> PINK_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "pink_wallpaper_vertical_slab", ModBlocks.PINK_WALLPAPER_VERTICAL_SLAB);
+            "pink_wallpaper_vertical_slab", ShapedWoodBlocks.PINK_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRAY_WALLPAPER_SLAB = registerBlockItem("gray_wallpaper_slab",
-            ModBlocks.GRAY_WALLPAPER_SLAB);
+            ShapedWoodBlocks.GRAY_WALLPAPER_SLAB);
     public static final RegistryObject<Item> GRAY_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "gray_wallpaper_vertical_slab", ModBlocks.GRAY_WALLPAPER_VERTICAL_SLAB);
+            "gray_wallpaper_vertical_slab", ShapedWoodBlocks.GRAY_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_SLAB = registerBlockItem("light_gray_wallpaper_slab",
-            ModBlocks.LIGHT_GRAY_WALLPAPER_SLAB);
+            ShapedWoodBlocks.LIGHT_GRAY_WALLPAPER_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "light_gray_wallpaper_vertical_slab", ModBlocks.LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB);
+            "light_gray_wallpaper_vertical_slab", ShapedWoodBlocks.LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> CYAN_WALLPAPER_SLAB = registerBlockItem("cyan_wallpaper_slab",
-            ModBlocks.CYAN_WALLPAPER_SLAB);
+            ShapedWoodBlocks.CYAN_WALLPAPER_SLAB);
     public static final RegistryObject<Item> CYAN_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "cyan_wallpaper_vertical_slab", ModBlocks.CYAN_WALLPAPER_VERTICAL_SLAB);
+            "cyan_wallpaper_vertical_slab", ShapedWoodBlocks.CYAN_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPLE_WALLPAPER_SLAB = registerBlockItem("purple_wallpaper_slab",
-            ModBlocks.PURPLE_WALLPAPER_SLAB);
+            ShapedWoodBlocks.PURPLE_WALLPAPER_SLAB);
     public static final RegistryObject<Item> PURPLE_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "purple_wallpaper_vertical_slab", ModBlocks.PURPLE_WALLPAPER_VERTICAL_SLAB);
+            "purple_wallpaper_vertical_slab", ShapedWoodBlocks.PURPLE_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLUE_WALLPAPER_SLAB = registerBlockItem("blue_wallpaper_slab",
-            ModBlocks.BLUE_WALLPAPER_SLAB);
+            ShapedWoodBlocks.BLUE_WALLPAPER_SLAB);
     public static final RegistryObject<Item> BLUE_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "blue_wallpaper_vertical_slab", ModBlocks.BLUE_WALLPAPER_VERTICAL_SLAB);
+            "blue_wallpaper_vertical_slab", ShapedWoodBlocks.BLUE_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> BROWN_WALLPAPER_SLAB = registerBlockItem("brown_wallpaper_slab",
-            ModBlocks.BROWN_WALLPAPER_SLAB);
+            ShapedWoodBlocks.BROWN_WALLPAPER_SLAB);
     public static final RegistryObject<Item> BROWN_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "brown_wallpaper_vertical_slab", ModBlocks.BROWN_WALLPAPER_VERTICAL_SLAB);
+            "brown_wallpaper_vertical_slab", ShapedWoodBlocks.BROWN_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> GREEN_WALLPAPER_SLAB = registerBlockItem("green_wallpaper_slab",
-            ModBlocks.GREEN_WALLPAPER_SLAB);
+            ShapedWoodBlocks.GREEN_WALLPAPER_SLAB);
     public static final RegistryObject<Item> GREEN_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "green_wallpaper_vertical_slab", ModBlocks.GREEN_WALLPAPER_VERTICAL_SLAB);
+            "green_wallpaper_vertical_slab", ShapedWoodBlocks.GREEN_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_WALLPAPER_SLAB = registerBlockItem("red_wallpaper_slab",
-            ModBlocks.RED_WALLPAPER_SLAB);
+            ShapedWoodBlocks.RED_WALLPAPER_SLAB);
     public static final RegistryObject<Item> RED_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "red_wallpaper_vertical_slab", ModBlocks.RED_WALLPAPER_VERTICAL_SLAB);
+            "red_wallpaper_vertical_slab", ShapedWoodBlocks.RED_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACK_WALLPAPER_SLAB = registerBlockItem("black_wallpaper_slab",
-            ModBlocks.BLACK_WALLPAPER_SLAB);
+            ShapedWoodBlocks.BLACK_WALLPAPER_SLAB);
     public static final RegistryObject<Item> BLACK_WALLPAPER_VERTICAL_SLAB = registerBlockItem(
-            "black_wallpaper_vertical_slab", ModBlocks.BLACK_WALLPAPER_VERTICAL_SLAB);
+            "black_wallpaper_vertical_slab", ShapedWoodBlocks.BLACK_WALLPAPER_VERTICAL_SLAB);
     public static final RegistryObject<Item> WHITE_WALLPAPER_FLAT = registerBlockItem("white_wallpaper_flat",
-            ModBlocks.WHITE_WALLPAPER_FLAT);
+            ShapedWoodBlocks.WHITE_WALLPAPER_FLAT);
     public static final RegistryObject<Item> ORANGE_WALLPAPER_FLAT = registerBlockItem("orange_wallpaper_flat",
-            ModBlocks.ORANGE_WALLPAPER_FLAT);
+            ShapedWoodBlocks.ORANGE_WALLPAPER_FLAT);
     public static final RegistryObject<Item> MAGENTA_WALLPAPER_FLAT = registerBlockItem("magenta_wallpaper_flat",
-            ModBlocks.MAGENTA_WALLPAPER_FLAT);
+            ShapedWoodBlocks.MAGENTA_WALLPAPER_FLAT);
     public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_FLAT = registerBlockItem("light_blue_wallpaper_flat",
-            ModBlocks.LIGHT_BLUE_WALLPAPER_FLAT);
+            ShapedWoodBlocks.LIGHT_BLUE_WALLPAPER_FLAT);
     public static final RegistryObject<Item> YELLOW_WALLPAPER_FLAT = registerBlockItem("yellow_wallpaper_flat",
-            ModBlocks.YELLOW_WALLPAPER_FLAT);
+            ShapedWoodBlocks.YELLOW_WALLPAPER_FLAT);
     public static final RegistryObject<Item> LIME_WALLPAPER_FLAT = registerBlockItem("lime_wallpaper_flat",
-            ModBlocks.LIME_WALLPAPER_FLAT);
+            ShapedWoodBlocks.LIME_WALLPAPER_FLAT);
     public static final RegistryObject<Item> PINK_WALLPAPER_FLAT = registerBlockItem("pink_wallpaper_flat",
-            ModBlocks.PINK_WALLPAPER_FLAT);
+            ShapedWoodBlocks.PINK_WALLPAPER_FLAT);
     public static final RegistryObject<Item> GRAY_WALLPAPER_FLAT = registerBlockItem("gray_wallpaper_flat",
-            ModBlocks.GRAY_WALLPAPER_FLAT);
+            ShapedWoodBlocks.GRAY_WALLPAPER_FLAT);
     public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_FLAT = registerBlockItem("light_gray_wallpaper_flat",
-            ModBlocks.LIGHT_GRAY_WALLPAPER_FLAT);
+            ShapedWoodBlocks.LIGHT_GRAY_WALLPAPER_FLAT);
     public static final RegistryObject<Item> CYAN_WALLPAPER_FLAT = registerBlockItem("cyan_wallpaper_flat",
-            ModBlocks.CYAN_WALLPAPER_FLAT);
+            ShapedWoodBlocks.CYAN_WALLPAPER_FLAT);
     public static final RegistryObject<Item> PURPLE_WALLPAPER_FLAT = registerBlockItem("purple_wallpaper_flat",
-            ModBlocks.PURPLE_WALLPAPER_FLAT);
+            ShapedWoodBlocks.PURPLE_WALLPAPER_FLAT);
     public static final RegistryObject<Item> BLUE_WALLPAPER_FLAT = registerBlockItem("blue_wallpaper_flat",
-            ModBlocks.BLUE_WALLPAPER_FLAT);
+            ShapedWoodBlocks.BLUE_WALLPAPER_FLAT);
     public static final RegistryObject<Item> BROWN_WALLPAPER_FLAT = registerBlockItem("brown_wallpaper_flat",
-            ModBlocks.BROWN_WALLPAPER_FLAT);
+            ShapedWoodBlocks.BROWN_WALLPAPER_FLAT);
     public static final RegistryObject<Item> GREEN_WALLPAPER_FLAT = registerBlockItem("green_wallpaper_flat",
-            ModBlocks.GREEN_WALLPAPER_FLAT);
+            ShapedWoodBlocks.GREEN_WALLPAPER_FLAT);
     public static final RegistryObject<Item> RED_WALLPAPER_FLAT = registerBlockItem("red_wallpaper_flat",
-            ModBlocks.RED_WALLPAPER_FLAT);
+            ShapedWoodBlocks.RED_WALLPAPER_FLAT);
     public static final RegistryObject<Item> BLACK_WALLPAPER_FLAT = registerBlockItem("black_wallpaper_flat",
-            ModBlocks.BLACK_WALLPAPER_FLAT);
+            ShapedWoodBlocks.BLACK_WALLPAPER_FLAT);
     public static final RegistryObject<Item> WHITE_CUSHION = registerBlockItem("white_cushion",
-            ModBlocks.WHITE_CUSHION);
+            ShapedWoodBlocks.WHITE_CUSHION);
     public static final RegistryObject<Item> ORANGE_CUSHION = registerBlockItem("orange_cushion",
-            ModBlocks.ORANGE_CUSHION);
+            ShapedWoodBlocks.ORANGE_CUSHION);
     public static final RegistryObject<Item> MAGENTA_CUSHION = registerBlockItem("magenta_cushion",
-            ModBlocks.MAGENTA_CUSHION);
+            ShapedWoodBlocks.MAGENTA_CUSHION);
     public static final RegistryObject<Item> LIGHT_BLUE_CUSHION = registerBlockItem("light_blue_cushion",
-            ModBlocks.LIGHT_BLUE_CUSHION);
+            ShapedWoodBlocks.LIGHT_BLUE_CUSHION);
     public static final RegistryObject<Item> YELLOW_CUSHION = registerBlockItem("yellow_cushion",
-            ModBlocks.YELLOW_CUSHION);
-    public static final RegistryObject<Item> LIME_CUSHION = registerBlockItem("lime_cushion", ModBlocks.LIME_CUSHION);
-    public static final RegistryObject<Item> PINK_CUSHION = registerBlockItem("pink_cushion", ModBlocks.PINK_CUSHION);
-    public static final RegistryObject<Item> GRAY_CUSHION = registerBlockItem("gray_cushion", ModBlocks.GRAY_CUSHION);
+            ShapedWoodBlocks.YELLOW_CUSHION);
+    public static final RegistryObject<Item> LIME_CUSHION = registerBlockItem("lime_cushion",
+            ShapedWoodBlocks.LIME_CUSHION);
+    public static final RegistryObject<Item> PINK_CUSHION = registerBlockItem("pink_cushion",
+            ShapedWoodBlocks.PINK_CUSHION);
+    public static final RegistryObject<Item> GRAY_CUSHION = registerBlockItem("gray_cushion",
+            ShapedWoodBlocks.GRAY_CUSHION);
     public static final RegistryObject<Item> LIGHT_GRAY_CUSHION = registerBlockItem("light_gray_cushion",
-            ModBlocks.LIGHT_GRAY_CUSHION);
-    public static final RegistryObject<Item> CYAN_CUSHION = registerBlockItem("cyan_cushion", ModBlocks.CYAN_CUSHION);
+            ShapedWoodBlocks.LIGHT_GRAY_CUSHION);
+    public static final RegistryObject<Item> CYAN_CUSHION = registerBlockItem("cyan_cushion",
+            ShapedWoodBlocks.CYAN_CUSHION);
     public static final RegistryObject<Item> PURPLE_CUSHION = registerBlockItem("purple_cushion",
-            ModBlocks.PURPLE_CUSHION);
-    public static final RegistryObject<Item> BLUE_CUSHION = registerBlockItem("blue_cushion", ModBlocks.BLUE_CUSHION);
+            ShapedWoodBlocks.PURPLE_CUSHION);
+    public static final RegistryObject<Item> BLUE_CUSHION = registerBlockItem("blue_cushion",
+            ShapedWoodBlocks.BLUE_CUSHION);
     public static final RegistryObject<Item> BROWN_CUSHION = registerBlockItem("brown_cushion",
-            ModBlocks.BROWN_CUSHION);
+            ShapedWoodBlocks.BROWN_CUSHION);
     public static final RegistryObject<Item> GREEN_CUSHION = registerBlockItem("green_cushion",
-            ModBlocks.GREEN_CUSHION);
-    public static final RegistryObject<Item> RED_CUSHION = registerBlockItem("red_cushion", ModBlocks.RED_CUSHION);
+            ShapedWoodBlocks.GREEN_CUSHION);
+    public static final RegistryObject<Item> RED_CUSHION = registerBlockItem("red_cushion",
+            ShapedWoodBlocks.RED_CUSHION);
     public static final RegistryObject<Item> BLACK_CUSHION = registerBlockItem("black_cushion",
-            ModBlocks.BLACK_CUSHION);
+            ShapedWoodBlocks.BLACK_CUSHION);
 
     public static final RegistryObject<Item> STRAW_BED = ITEMS.register("straw_bed",
-            () -> new BedItem(ModBlocks.STRAW_BED.get(),
+            () -> new BedItem(ShapedWoodBlocks.STRAW_BED.get(),
                     new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16)));
-    public static final RegistryObject<Item> BIG_BOOK = registerBlockItem("big_book", ModBlocks.BIG_BOOK);
+    public static final RegistryObject<Item> BIG_BOOK = registerBlockItem("big_book", ShapedWoodBlocks.BIG_BOOK);
     public static final RegistryObject<Item> GLOWING_BIG_BOOK = registerBlockItem("glowing_big_book",
-            ModBlocks.GLOWING_BIG_BOOK);
+            ShapedWoodBlocks.GLOWING_BIG_BOOK);
     public static final RegistryObject<Item> WHITE_BIG_BOOK = registerBlockItem("white_big_book",
-            ModBlocks.WHITE_BIG_BOOK);
+            ShapedWoodBlocks.WHITE_BIG_BOOK);
     public static final RegistryObject<Item> ORANGE_BIG_BOOK = registerBlockItem("orange_big_book",
-            ModBlocks.ORANGE_BIG_BOOK);
+            ShapedWoodBlocks.ORANGE_BIG_BOOK);
     public static final RegistryObject<Item> MAGENTA_BIG_BOOK = registerBlockItem("magenta_big_book",
-            ModBlocks.MAGENTA_BIG_BOOK);
+            ShapedWoodBlocks.MAGENTA_BIG_BOOK);
     public static final RegistryObject<Item> LIGHT_BLUE_BIG_BOOK = registerBlockItem("light_blue_big_book",
-            ModBlocks.LIGHT_BLUE_BIG_BOOK);
+            ShapedWoodBlocks.LIGHT_BLUE_BIG_BOOK);
     public static final RegistryObject<Item> YELLOW_BIG_BOOK = registerBlockItem("yellow_big_book",
-            ModBlocks.YELLOW_BIG_BOOK);
+            ShapedWoodBlocks.YELLOW_BIG_BOOK);
     public static final RegistryObject<Item> LIME_BIG_BOOK = registerBlockItem("lime_big_book",
-            ModBlocks.LIME_BIG_BOOK);
+            ShapedWoodBlocks.LIME_BIG_BOOK);
     public static final RegistryObject<Item> PINK_BIG_BOOK = registerBlockItem("pink_big_book",
-            ModBlocks.PINK_BIG_BOOK);
+            ShapedWoodBlocks.PINK_BIG_BOOK);
     public static final RegistryObject<Item> GRAY_BIG_BOOK = registerBlockItem("gray_big_book",
-            ModBlocks.GRAY_BIG_BOOK);
+            ShapedWoodBlocks.GRAY_BIG_BOOK);
     public static final RegistryObject<Item> LIGHT_GRAY_BIG_BOOK = registerBlockItem("light_gray_big_book",
-            ModBlocks.LIGHT_GRAY_BIG_BOOK);
+            ShapedWoodBlocks.LIGHT_GRAY_BIG_BOOK);
     public static final RegistryObject<Item> CYAN_BIG_BOOK = registerBlockItem("cyan_big_book",
-            ModBlocks.CYAN_BIG_BOOK);
+            ShapedWoodBlocks.CYAN_BIG_BOOK);
     public static final RegistryObject<Item> PURPLE_BIG_BOOK = registerBlockItem("purple_big_book",
-            ModBlocks.PURPLE_BIG_BOOK);
+            ShapedWoodBlocks.PURPLE_BIG_BOOK);
     public static final RegistryObject<Item> BLUE_BIG_BOOK = registerBlockItem("blue_big_book",
-            ModBlocks.BLUE_BIG_BOOK);
+            ShapedWoodBlocks.BLUE_BIG_BOOK);
     public static final RegistryObject<Item> BROWN_BIG_BOOK = registerBlockItem("brown_big_book",
-            ModBlocks.BROWN_BIG_BOOK);
+            ShapedWoodBlocks.BROWN_BIG_BOOK);
     public static final RegistryObject<Item> GREEN_BIG_BOOK = registerBlockItem("green_big_book",
-            ModBlocks.GREEN_BIG_BOOK);
-    public static final RegistryObject<Item> RED_BIG_BOOK = registerBlockItem("red_big_book", ModBlocks.RED_BIG_BOOK);
+            ShapedWoodBlocks.GREEN_BIG_BOOK);
+    public static final RegistryObject<Item> RED_BIG_BOOK = registerBlockItem("red_big_book",
+            ShapedWoodBlocks.RED_BIG_BOOK);
     public static final RegistryObject<Item> BLACK_BIG_BOOK = registerBlockItem("black_big_book",
-            ModBlocks.BLACK_BIG_BOOK);
-    public static final RegistryObject<Item> PALE_OAK_LOG = registerBlockItem("pale_oak_log", ModBlocks.PALE_OAK_LOG);
+            ShapedWoodBlocks.BLACK_BIG_BOOK);
+    public static final RegistryObject<Item> PALE_OAK_LOG = registerBlockItem("pale_oak_log",
+            ShapedWoodBlocks.PALE_OAK_LOG);
     public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG = registerBlockItem("stripped_pale_oak_log",
-            ModBlocks.STRIPPED_PALE_OAK_LOG);
+            ShapedWoodBlocks.STRIPPED_PALE_OAK_LOG);
     public static final RegistryObject<Item> PALE_OAK_WOOD = registerBlockItem("pale_oak_wood",
-            ModBlocks.PALE_OAK_WOOD);
+            ShapedWoodBlocks.PALE_OAK_WOOD);
     public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD = registerBlockItem("stripped_pale_oak_wood",
-            ModBlocks.STRIPPED_PALE_OAK_WOOD);
+            ShapedWoodBlocks.STRIPPED_PALE_OAK_WOOD);
     public static final RegistryObject<Item> PALE_OAK_PLANKS = registerBlockItem("pale_oak_planks",
-            ModBlocks.PALE_OAK_PLANKS);
+            ShapedWoodBlocks.PALE_OAK_PLANKS);
     public static final RegistryObject<Item> PALE_OAK_STAIRS = registerBlockItem("pale_oak_stairs",
-            ModBlocks.PALE_OAK_STAIRS);
+            ShapedWoodBlocks.PALE_OAK_STAIRS);
     public static final RegistryObject<Item> PALE_OAK_SLAB = registerBlockItem("pale_oak_slab",
-            ModBlocks.PALE_OAK_SLAB);
+            ShapedWoodBlocks.PALE_OAK_SLAB);
     public static final RegistryObject<Item> PALE_OAK_VERTICAL_SLAB = registerBlockItem("pale_oak_vertical_slab",
-            ModBlocks.PALE_OAK_VERTICAL_SLAB);
+            ShapedWoodBlocks.PALE_OAK_VERTICAL_SLAB);
     public static final RegistryObject<Item> PALE_OAK_FENCE = registerBlockItem("pale_oak_fence",
-            ModBlocks.PALE_OAK_FENCE);
+            ShapedWoodBlocks.PALE_OAK_FENCE);
     public static final RegistryObject<Item> PALE_OAK_FENCE_GATE = registerBlockItem("pale_oak_fence_gate",
-            ModBlocks.PALE_OAK_FENCE_GATE);
+            ShapedWoodBlocks.PALE_OAK_FENCE_GATE);
     public static final RegistryObject<Item> PALE_OAK_DOOR = ITEMS.register("pale_oak_door",
-            () -> new DoubleHighBlockItem(ModBlocks.PALE_OAK_DOOR.get(), createBlockItemProperties()));
+            () -> new DoubleHighBlockItem(ShapedWoodBlocks.PALE_OAK_DOOR.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> PALE_OAK_TRAPDOOR = registerBlockItem("pale_oak_trapdoor",
-            ModBlocks.PALE_OAK_TRAPDOOR);
+            ShapedWoodBlocks.PALE_OAK_TRAPDOOR);
     public static final RegistryObject<Item> PALE_OAK_BUTTON = registerBlockItem("pale_oak_button",
-            ModBlocks.PALE_OAK_BUTTON);
+            ShapedWoodBlocks.PALE_OAK_BUTTON);
     public static final RegistryObject<Item> PALE_OAK_PRESSURE_PLATE = registerBlockItem("pale_oak_pressure_plate",
-            ModBlocks.PALE_OAK_PRESSURE_PLATE);
+            ShapedWoodBlocks.PALE_OAK_PRESSURE_PLATE);
     public static final RegistryObject<Item> PALE_OAK_LEAVES = registerBlockItem("pale_oak_leaves",
-            ModBlocks.PALE_OAK_LEAVES);
+            ShapedWoodBlocks.PALE_OAK_LEAVES);
     public static final RegistryObject<Item> PALE_OAK_SAPLING = registerBlockItem("pale_oak_sapling",
-            ModBlocks.PALE_OAK_SAPLING);
+            ShapedWoodBlocks.PALE_OAK_SAPLING);
     public static final RegistryObject<Item> PALE_OAK_LOG_SLAB = registerBlockItem("pale_oak_log_slab",
-            ModBlocks.PALE_OAK_LOG_SLAB);
+            ShapedWoodBlocks.PALE_OAK_LOG_SLAB);
     public static final RegistryObject<Item> PALE_OAK_LOG_VERTICAL_SLAB = registerBlockItem(
-            "pale_oak_log_vertical_slab", ModBlocks.PALE_OAK_LOG_VERTICAL_SLAB);
+            "pale_oak_log_vertical_slab", ShapedWoodBlocks.PALE_OAK_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG_SLAB = registerBlockItem(
-            "stripped_pale_oak_log_slab", ModBlocks.STRIPPED_PALE_OAK_LOG_SLAB);
+            "stripped_pale_oak_log_slab", ShapedWoodBlocks.STRIPPED_PALE_OAK_LOG_SLAB);
     public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_pale_oak_log_vertical_slab", ModBlocks.STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB);
+            "stripped_pale_oak_log_vertical_slab", ShapedWoodBlocks.STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> PALE_OAK_WOOD_SLAB = registerBlockItem("pale_oak_wood_slab",
-            ModBlocks.PALE_OAK_WOOD_SLAB);
+            ShapedWoodBlocks.PALE_OAK_WOOD_SLAB);
     public static final RegistryObject<Item> PALE_OAK_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "pale_oak_wood_vertical_slab", ModBlocks.PALE_OAK_WOOD_VERTICAL_SLAB);
+            "pale_oak_wood_vertical_slab", ShapedWoodBlocks.PALE_OAK_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_SLAB = registerBlockItem(
-            "stripped_pale_oak_wood_slab", ModBlocks.STRIPPED_PALE_OAK_WOOD_SLAB);
+            "stripped_pale_oak_wood_slab", ShapedWoodBlocks.STRIPPED_PALE_OAK_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_pale_oak_wood_vertical_slab", ModBlocks.STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB);
-    public static final RegistryObject<Item> CHERRY_LOG = registerBlockItem("cherry_log", ModBlocks.CHERRY_LOG);
+            "stripped_pale_oak_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB);
+    public static final RegistryObject<Item> CHERRY_LOG = registerBlockItem("cherry_log", ShapedWoodBlocks.CHERRY_LOG);
     public static final RegistryObject<Item> STRIPPED_CHERRY_LOG = registerBlockItem("stripped_cherry_log",
-            ModBlocks.STRIPPED_CHERRY_LOG);
-    public static final RegistryObject<Item> CHERRY_WOOD = registerBlockItem("cherry_wood", ModBlocks.CHERRY_WOOD);
+            ShapedWoodBlocks.STRIPPED_CHERRY_LOG);
+    public static final RegistryObject<Item> CHERRY_WOOD = registerBlockItem("cherry_wood",
+            ShapedWoodBlocks.CHERRY_WOOD);
     public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD = registerBlockItem("stripped_cherry_wood",
-            ModBlocks.STRIPPED_CHERRY_WOOD);
+            ShapedWoodBlocks.STRIPPED_CHERRY_WOOD);
     public static final RegistryObject<Item> CHERRY_PLANKS = registerBlockItem("cherry_planks",
-            ModBlocks.CHERRY_PLANKS);
+            ShapedWoodBlocks.CHERRY_PLANKS);
     public static final RegistryObject<Item> CHERRY_STAIRS = registerBlockItem("cherry_stairs",
-            ModBlocks.CHERRY_STAIRS);
-    public static final RegistryObject<Item> CHERRY_SLAB = registerBlockItem("cherry_slab", ModBlocks.CHERRY_SLAB);
+            ShapedWoodBlocks.CHERRY_STAIRS);
+    public static final RegistryObject<Item> CHERRY_SLAB = registerBlockItem("cherry_slab",
+            ShapedWoodBlocks.CHERRY_SLAB);
     public static final RegistryObject<Item> CHERRY_VERTICAL_SLAB = registerBlockItem("cherry_vertical_slab",
-            ModBlocks.CHERRY_VERTICAL_SLAB);
-    public static final RegistryObject<Item> CHERRY_FENCE = registerBlockItem("cherry_fence", ModBlocks.CHERRY_FENCE);
+            ShapedWoodBlocks.CHERRY_VERTICAL_SLAB);
+    public static final RegistryObject<Item> CHERRY_FENCE = registerBlockItem("cherry_fence",
+            ShapedWoodBlocks.CHERRY_FENCE);
     public static final RegistryObject<Item> CHERRY_FENCE_GATE = registerBlockItem("cherry_fence_gate",
-            ModBlocks.CHERRY_FENCE_GATE);
+            ShapedWoodBlocks.CHERRY_FENCE_GATE);
     public static final RegistryObject<Item> CHERRY_DOOR = ITEMS.register("cherry_door",
-            () -> new DoubleHighBlockItem(ModBlocks.CHERRY_DOOR.get(), createBlockItemProperties()));
+            () -> new DoubleHighBlockItem(ShapedWoodBlocks.CHERRY_DOOR.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> CHERRY_TRAPDOOR = registerBlockItem("cherry_trapdoor",
-            ModBlocks.CHERRY_TRAPDOOR);
+            ShapedWoodBlocks.CHERRY_TRAPDOOR);
     public static final RegistryObject<Item> CHERRY_BUTTON = registerBlockItem("cherry_button",
-            ModBlocks.CHERRY_BUTTON);
+            ShapedWoodBlocks.CHERRY_BUTTON);
     public static final RegistryObject<Item> CHERRY_PRESSURE_PLATE = registerBlockItem("cherry_pressure_plate",
-            ModBlocks.CHERRY_PRESSURE_PLATE);
+            ShapedWoodBlocks.CHERRY_PRESSURE_PLATE);
     public static final RegistryObject<Item> CHERRY_LEAVES = registerBlockItem("cherry_leaves",
-            ModBlocks.CHERRY_LEAVES);
+            ShapedWoodBlocks.CHERRY_LEAVES);
     public static final RegistryObject<Item> CHERRY_SAPLING = registerBlockItem("cherry_sapling",
-            ModBlocks.CHERRY_SAPLING);
+            ShapedWoodBlocks.CHERRY_SAPLING);
     public static final RegistryObject<Item> CHERRY_LOG_SLAB = registerBlockItem("cherry_log_slab",
-            ModBlocks.CHERRY_LOG_SLAB);
+            ShapedWoodBlocks.CHERRY_LOG_SLAB);
     public static final RegistryObject<Item> CHERRY_LOG_VERTICAL_SLAB = registerBlockItem("cherry_log_vertical_slab",
-            ModBlocks.CHERRY_LOG_VERTICAL_SLAB);
+            ShapedWoodBlocks.CHERRY_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_CHERRY_LOG_SLAB = registerBlockItem("stripped_cherry_log_slab",
-            ModBlocks.STRIPPED_CHERRY_LOG_SLAB);
+            ShapedWoodBlocks.STRIPPED_CHERRY_LOG_SLAB);
     public static final RegistryObject<Item> STRIPPED_CHERRY_LOG_VERTICAL_SLAB = registerBlockItem(
-            "stripped_cherry_log_vertical_slab", ModBlocks.STRIPPED_CHERRY_LOG_VERTICAL_SLAB);
+            "stripped_cherry_log_vertical_slab", ShapedWoodBlocks.STRIPPED_CHERRY_LOG_VERTICAL_SLAB);
     public static final RegistryObject<Item> CHERRY_WOOD_SLAB = registerBlockItem("cherry_wood_slab",
-            ModBlocks.CHERRY_WOOD_SLAB);
+            ShapedWoodBlocks.CHERRY_WOOD_SLAB);
     public static final RegistryObject<Item> CHERRY_WOOD_VERTICAL_SLAB = registerBlockItem("cherry_wood_vertical_slab",
-            ModBlocks.CHERRY_WOOD_VERTICAL_SLAB);
+            ShapedWoodBlocks.CHERRY_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_SLAB = registerBlockItem("stripped_cherry_wood_slab",
-            ModBlocks.STRIPPED_CHERRY_WOOD_SLAB);
+            ShapedWoodBlocks.STRIPPED_CHERRY_WOOD_SLAB);
     public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_VERTICAL_SLAB = registerBlockItem(
-            "stripped_cherry_wood_vertical_slab", ModBlocks.STRIPPED_CHERRY_WOOD_VERTICAL_SLAB);
+            "stripped_cherry_wood_vertical_slab", ShapedWoodBlocks.STRIPPED_CHERRY_WOOD_VERTICAL_SLAB);
     public static final RegistryObject<Item> PALE_MOSS_BLOCK = registerBlockItem("pale_moss_block",
-            ModBlocks.PALE_MOSS_BLOCK);
+            CopperBlocks.PALE_MOSS_BLOCK);
 }

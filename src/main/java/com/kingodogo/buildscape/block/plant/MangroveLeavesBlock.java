@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -53,7 +53,7 @@ public class MangroveLeavesBlock
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
 
-        if (belowState.is(ModBlocks.MANGROVE_PROPAGULE.get()) &&
+        if (belowState.is(DecorBlocks.MANGROVE_PROPAGULE.get()) &&
                 belowState.getValue(MangrovePropaguleBlock.HANGING)) {
             int currentAge = belowState.getValue(MangrovePropaguleBlock.AGE);
             return currentAge < 3;
@@ -80,7 +80,7 @@ public class MangroveLeavesBlock
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
 
-        if (belowState.is(ModBlocks.MANGROVE_PROPAGULE.get()) &&
+        if (belowState.is(DecorBlocks.MANGROVE_PROPAGULE.get()) &&
                 belowState.getValue(MangrovePropaguleBlock.HANGING)) {
             int currentAge = belowState.getValue(MangrovePropaguleBlock.AGE);
             if (currentAge < 3) {
@@ -93,7 +93,7 @@ public class MangroveLeavesBlock
         }
 
         if (belowState.isAir() || belowState.is(Blocks.WATER)) {
-            BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get()
+            BlockState propaguleState = DecorBlocks.MANGROVE_PROPAGULE.get()
                     .defaultBlockState()
                     .setValue(MangrovePropaguleBlock.AGE, 0)
                     .setValue(MangrovePropaguleBlock.HANGING, true);

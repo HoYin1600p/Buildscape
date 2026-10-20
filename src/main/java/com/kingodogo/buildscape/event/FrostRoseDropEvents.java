@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -118,7 +118,7 @@ public class FrostRoseDropEvents {
                 }
                 level.addFreshEntity(new ItemEntity(level,
                         death.pos.getX() + 0.5, death.pos.getY() + 0.5, death.pos.getZ() + 0.5,
-                        new ItemStack(ModBlocks.FROST_ROSE.get())));
+                        new ItemStack(DecorBlocks.FROST_ROSE.get())));
                 death.dropPending = false;
             }
 

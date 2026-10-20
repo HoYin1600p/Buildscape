@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -17,7 +17,7 @@ public class BaseCoralPlantTypeBlockMixin {
 
     @Inject(method = "canSurvive", at = @At("HEAD"), cancellable = true)
     private void onCanSurvive(BlockState state, LevelReader level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (level.getBlockState(pos.below()).is(ModBlocks.MUD.get())) {
+        if (level.getBlockState(pos.below()).is(SandstoneBlocks.MUD.get())) {
             cir.setReturnValue(true);
         }
     }
@@ -26,7 +26,7 @@ public class BaseCoralPlantTypeBlockMixin {
     private static void onScanForWater(BlockState state, BlockGetter level, BlockPos pos,
             CallbackInfoReturnable<Boolean> cir) {
         for (Direction dir : Direction.values()) {
-            if (level.getBlockState(pos.relative(dir)).is(ModBlocks.MUD.get())) {
+            if (level.getBlockState(pos.relative(dir)).is(SandstoneBlocks.MUD.get())) {
                 cir.setReturnValue(true);
                 return;
             }

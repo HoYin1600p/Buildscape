@@ -56,8 +56,9 @@ import com.kingodogo.buildscape.feature.copper.WeatheringVerticalSlabBlock;
 import com.kingodogo.buildscape.feature.sculk.SculkCatalystBlock;
 import com.kingodogo.buildscape.feature.sculk.SculkVeinBlock;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
-import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModSounds;
+import com.kingodogo.buildscape.registry.items.CopperItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import java.util.EnumMap;
 import java.util.Map;
 import net.minecraft.world.effect.MobEffects;
@@ -100,7 +101,7 @@ public final class CopperBlocks {
             () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
     public static final RegistryObject<Block> PALE_MOSS_LAYERS = BLOCKS.register("pale_moss_layers",
             () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                    () -> ModItems.PALE_MOSS_LAYERS.get(), () -> CopperBlocks.PALE_MOSS_BLOCK.get()));
+                    () -> CopperItems.PALE_MOSS_LAYERS.get(), () -> CopperBlocks.PALE_MOSS_BLOCK.get()));
     public static final RegistryObject<Block> PALE_MOSS_BLOCK = BLOCKS.register("pale_moss_block",
             () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
                     ShapedWoodBlocks.PALE_MOSS_CARPET,
@@ -871,7 +872,7 @@ public final class CopperBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_ORANGE_POPLAR_LEAF_HEDGE));
+                    WoodItems.SNOWY_ORANGE_POPLAR_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_RED_POPLAR_LEAF_HEDGE = BLOCKS.register(
             "snowy_red_poplar_leaf_hedge",
@@ -882,7 +883,7 @@ public final class CopperBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_RED_POPLAR_LEAF_HEDGE));
+                    WoodItems.SNOWY_RED_POPLAR_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_YELLOW_POPLAR_LEAF_HEDGE = BLOCKS.register(
             "snowy_yellow_poplar_leaf_hedge",
@@ -893,7 +894,7 @@ public final class CopperBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_YELLOW_POPLAR_LEAF_HEDGE));
+                    WoodItems.SNOWY_YELLOW_POPLAR_LEAF_HEDGE));
 
     public static final RegistryObject<Block> ACACIA_LADDER = BLOCKS.register("acacia_ladder",
             () -> new LadderBlock(BlockBehaviour.Properties.copy(Blocks.LADDER)));

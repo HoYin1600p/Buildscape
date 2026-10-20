@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.feature.cosmetic.sign;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 public enum SignFrameType {
     NONE("", () -> null, null),
-    STRINGLIGHT("stringlight", () -> ModItems.STRINGLIGHT_FRAME.get(),
+    STRINGLIGHT("stringlight", () -> CardboardItems.STRINGLIGHT_FRAME.get(),
             new ResourceLocation(BuildScape.MODID, "block/stringlight_frame"));
 
     private final String id;

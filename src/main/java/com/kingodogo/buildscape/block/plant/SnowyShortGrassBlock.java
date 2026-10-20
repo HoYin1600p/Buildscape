@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -85,7 +85,7 @@ public class SnowyShortGrassBlock
         return (state.is(BlockTags.DIRT) ||
                 state.is(Blocks.FARMLAND) ||
                 state.is(Blocks.SNOW_BLOCK) ||
-                state.is(ModBlocks.SNOW_BRICKS.get()));
+                state.is(DecorBlocks.SNOW_BRICKS.get()));
     }
 
     @Override
@@ -173,7 +173,7 @@ public class SnowyShortGrassBlock
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
-            BlockState tallGrassState = ModBlocks.SNOWY_TALL_GRASS.get()
+            BlockState tallGrassState = DecorBlocks.SNOWY_TALL_GRASS.get()
                     .defaultBlockState()
                     .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
             if (tallGrassState.canSurvive(level, pos)) {

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.feature.geyser;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedStoneBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -689,10 +689,10 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
     private boolean isSulfurSpikeSourceBlock(BlockState state) {
         Block block = state.getBlock();
-        return (block == ModBlocks.SULFUR.get() ||
-                block == ModBlocks.POLISHED_SULFUR.get() ||
-                block == ModBlocks.CHISELED_SULFUR.get() ||
-                block == ModBlocks.SULFUR_BRICKS.get());
+        return (block == ShapedStoneBlocks.SULFUR.get() ||
+                block == ShapedStoneBlocks.POLISHED_SULFUR.get() ||
+                block == ShapedStoneBlocks.CHISELED_SULFUR.get() ||
+                block == ShapedStoneBlocks.SULFUR_BRICKS.get());
     }
 
     @Override

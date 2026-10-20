@@ -2,7 +2,8 @@ package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.registry.ModFluids;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CopperItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import com.kingodogo.buildscape.util.GoldenDandelionGrowth;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -45,7 +46,7 @@ public class PlayerEvents {
 
                 for (int i = 0; i < container.getContainerSize(); i++) {
                     ItemStack stack = container.getItem(i);
-                    if (stack.getItem() == ModItems.FROST_ROSE.get()) {
+                    if (stack.getItem() == WoodItems.FROST_ROSE.get()) {
                         hasFrostRose = true;
                         break;
                     }
@@ -132,7 +133,7 @@ public class PlayerEvents {
         if (event.getTarget() instanceof AgeableMob mob
                 && !(event.getTarget() instanceof Monster)) {
             ItemStack held = event.getItemStack();
-            if (held.is(ModItems.GOLDEN_DANDELION.get())) {
+            if (held.is(CopperItems.GOLDEN_DANDELION.get())) {
                 boolean isFrozen = GoldenDandelionGrowth.isFrozen(mob);
                 if (!GoldenDandelionGrowth.canToggle(mob.isBaby(), isFrozen)) {
                     return;

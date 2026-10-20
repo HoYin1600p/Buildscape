@@ -16,9 +16,9 @@ import com.kingodogo.buildscape.feature.pillar.AshenKingPillarBlock;
 import com.kingodogo.buildscape.feature.pillar.PillarBlock;
 import com.kingodogo.buildscape.feature.trophy.Trophies;
 import com.kingodogo.buildscape.feature.trophy.TrophyBlockItem;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModStats;
+import com.kingodogo.buildscape.registry.blocks.StoneBlocks;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -59,9 +59,9 @@ public class AdvancementEvents {
         }
         ItemStack stack = new ItemStack(item, count);
         if (item instanceof TrophyBlockItem
-                || item == ModItems.GOLDEN_JAR.get() || item == ModItems.FESTIVE_STAR.get()
-                || item == ModItems.GOLDEN_JAR_PATTERN.get() || item == ModItems.FESTIVE_STAR_PATTERN.get()
-                || item == ModItems.STRINGLIGHT_FRAME_PATTERN.get()) {
+                || item == CardboardItems.GOLDEN_JAR.get() || item == CardboardItems.FESTIVE_STAR.get()
+                || item == CardboardItems.GOLDEN_JAR_PATTERN.get() || item == CardboardItems.FESTIVE_STAR_PATTERN.get()
+                || item == CardboardItems.STRINGLIGHT_FRAME_PATTERN.get()) {
             CompoundTag tag = stack.getOrCreateTag();
             tag.putString("ObtainedBy", player.getScoreboardName());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -87,20 +87,23 @@ public class AdvancementEvents {
 
                     switch (path) {
                         case "put_it_on_display" ->
-                            giveItemReward(serverPlayer, ModBlocks.ASHENKING_GOLD_PILLAR.get().asItem(), 1);
+                            giveItemReward(serverPlayer, StoneBlocks.ASHENKING_GOLD_PILLAR.get().asItem(), 1);
                         case "columnist" ->
-                            giveItemReward(serverPlayer, ModBlocks.ASHENKING_EMERALD_PILLAR.get().asItem(), 1);
+                            giveItemReward(serverPlayer, StoneBlocks.ASHENKING_EMERALD_PILLAR.get().asItem(), 1);
                         case "art_collector" ->
-                            giveItemReward(serverPlayer, ModBlocks.ASHENKING_DIAMOND_PILLAR.get().asItem(), 1);
+                            giveItemReward(serverPlayer, StoneBlocks.ASHENKING_DIAMOND_PILLAR.get().asItem(), 1);
                         case "buildscape_museum" ->
-                            giveItemReward(serverPlayer, ModBlocks.ASHENKING_NETHERITE_PILLAR.get().asItem(), 1);
-                        case "ornamental" -> giveItemReward(serverPlayer, ModItems.BIG_ORNAMENT_TEMPLATE.get(), 1);
-                        case "jar_ring_display" -> giveItemReward(serverPlayer, ModItems.GOLDEN_JAR_PATTERN.get(), 1);
+                            giveItemReward(serverPlayer, StoneBlocks.ASHENKING_NETHERITE_PILLAR.get().asItem(), 1);
+                        case "ornamental" ->
+                            giveItemReward(serverPlayer, CardboardItems.BIG_ORNAMENT_TEMPLATE.get(), 1);
+                        case "jar_ring_display" ->
+                            giveItemReward(serverPlayer, CardboardItems.GOLDEN_JAR_PATTERN.get(), 1);
                         case "christmas_every_day" ->
-                            giveItemReward(serverPlayer, ModItems.MUSIC_DISC_SNOWFALL.get(), 1);
-                        case "light_em_up" -> giveItemReward(serverPlayer, ModItems.STRINGLIGHT_FRAME_PATTERN.get(), 1);
+                            giveItemReward(serverPlayer, CardboardItems.MUSIC_DISC_SNOWFALL.get(), 1);
+                        case "light_em_up" ->
+                            giveItemReward(serverPlayer, CardboardItems.STRINGLIGHT_FRAME_PATTERN.get(), 1);
                         case "santas_little_helper" ->
-                            giveItemReward(serverPlayer, ModItems.FESTIVE_STAR_PATTERN.get(), 1);
+                            giveItemReward(serverPlayer, CardboardItems.FESTIVE_STAR_PATTERN.get(), 1);
                         case "grand_celebration" -> {
                             ItemStack reward = InfinitePhoenixFireworkStarItem.createDefaultStack();
                             if (!serverPlayer.getInventory().add(reward)) {
@@ -108,11 +111,11 @@ public class AdvancementEvents {
                             }
                         }
                         case "celebrate_in_style" ->
-                            giveItemReward(serverPlayer, ModItems.MUSIC_DISC_CELEBRATION.get(), 1);
+                            giveItemReward(serverPlayer, CardboardItems.MUSIC_DISC_CELEBRATION.get(), 1);
                         case "a_very_buildscape_christmas" ->
-                            giveItemReward(serverPlayer, ModItems.FESTIVE_GLINT_SHARD.get(), 1);
+                            giveItemReward(serverPlayer, CardboardItems.FESTIVE_GLINT_SHARD.get(), 1);
                         case "a_full_buildscape_cube" ->
-                            giveItemReward(serverPlayer, ModItems.MUSIC_DISC_BUILDER.get(), 1);
+                            giveItemReward(serverPlayer, CardboardItems.MUSIC_DISC_BUILDER.get(), 1);
                         default -> {
                         }
                     }

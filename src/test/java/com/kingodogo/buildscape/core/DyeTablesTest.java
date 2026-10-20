@@ -5,8 +5,8 @@ import com.kingodogo.buildscape.client.renderer.MobPillarRenderer;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.entity.FestiveStockingEntity;
 import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleEvents;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
+import com.kingodogo.buildscape.registry.items.ItemsRegister;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -50,15 +50,15 @@ public class DyeTablesTest {
     @BeforeClass
     public static void bootstrap() {
         RegistryTestSupport.bootstrap();
-        stockingBlocks = RegistryTestSupport.bind(ModBlocks.BLOCKS, path -> path.endsWith("festive_stocking"));
-        stockingItems = RegistryTestSupport.bind(ModItems.ITEMS, path -> path.endsWith("festive_stocking"));
-        frameItems = RegistryTestSupport.bind(ModItems.ITEMS, path -> path.endsWith("item_frame"));
+        stockingBlocks = RegistryTestSupport.bind(BlocksRegister.blocks(), path -> path.endsWith("festive_stocking"));
+        stockingItems = RegistryTestSupport.bind(ItemsRegister.items(), path -> path.endsWith("festive_stocking"));
+        frameItems = RegistryTestSupport.bind(ItemsRegister.items(), path -> path.endsWith("item_frame"));
     }
 
     @AfterClass
     public static void unbind() {
-        RegistryTestSupport.unbind(ModBlocks.BLOCKS, path -> path.endsWith("festive_stocking"));
-        RegistryTestSupport.unbind(ModItems.ITEMS,
+        RegistryTestSupport.unbind(BlocksRegister.blocks(), path -> path.endsWith("festive_stocking"));
+        RegistryTestSupport.unbind(ItemsRegister.items(),
                 path -> path.endsWith("festive_stocking") || path.endsWith("item_frame"));
     }
 

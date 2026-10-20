@@ -2,6 +2,8 @@ package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.fluid.ExperienceFluidMatch;
+import com.kingodogo.buildscape.registry.blocks.CardboardBlocks;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -70,6 +72,6 @@ public class ModFluids {
                     new ResourceLocation(BuildScape.MODID, "fluid/experience_still"),
                     new ResourceLocation(BuildScape.MODID, "fluid/experience_flow")).luminosity(15).density(1000)
                     .viscosity(1000))
-            .bucket(() -> (BucketItem) ModItems.EXPERIENCE_BUCKET.get())
-            .block(() -> (LiquidBlock) ModBlocks.EXPERIENCE_BLOCK.get());
+            .bucket(() -> (BucketItem) CardboardItems.EXPERIENCE_BUCKET.get())
+            .block(() -> (LiquidBlock) CardboardBlocks.EXPERIENCE_BLOCK.get());
 }

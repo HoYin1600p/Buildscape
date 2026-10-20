@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.util;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -69,8 +69,8 @@ public final class BeaconScanContext {
         for (int y = beaconPos.getY() + 1; y <= top; y++) {
             scanPos.set(beaconPos.getX(), y, beaconPos.getZ());
             BlockState state = level.getBlockState(scanPos);
-            if (state.is(ModBlocks.TINTED_GLASS_ORNAMENT.get())
-                    || state.is(ModBlocks.BIG_TINTED_GLASS_ORNAMENT.get())) {
+            if (state.is(DecorBlocks.TINTED_GLASS_ORNAMENT.get())
+                    || state.is(DecorBlocks.BIG_TINTED_GLASS_ORNAMENT.get())) {
                 return y - beaconPos.getY();
             }
         }

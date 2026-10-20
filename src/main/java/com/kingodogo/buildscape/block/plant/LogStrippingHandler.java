@@ -1,7 +1,12 @@
 package com.kingodogo.buildscape.block.plant;
 
 import com.kingodogo.buildscape.feature.pipe.HollowLogBlockEntity;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CardboardBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedStoneBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
+import com.kingodogo.buildscape.registry.blocks.SteelBlocks;
+import com.kingodogo.buildscape.registry.blocks.WoodBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -29,78 +34,81 @@ public class LogStrippingHandler {
             return;
         }
 
-        registerPair(ModBlocks.POPLAR_LOG, ModBlocks.STRIPPED_POPLAR_LOG);
-        registerPair(ModBlocks.POPLAR_WOOD, ModBlocks.STRIPPED_POPLAR_WOOD);
-        registerPair(ModBlocks.POPLAR_LOG_SLAB, ModBlocks.STRIPPED_POPLAR_LOG_SLAB);
-        registerPair(ModBlocks.POPLAR_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_POPLAR_LOG_VERTICAL_SLAB);
+        registerPair(ShapedWoodBlocks.POPLAR_LOG, ShapedWoodBlocks.STRIPPED_POPLAR_LOG);
+        registerPair(ShapedWoodBlocks.POPLAR_WOOD, ShapedWoodBlocks.STRIPPED_POPLAR_WOOD);
+        registerPair(ShapedWoodBlocks.POPLAR_LOG_SLAB, ShapedWoodBlocks.STRIPPED_POPLAR_LOG_SLAB);
+        registerPair(ShapedWoodBlocks.POPLAR_LOG_VERTICAL_SLAB, ShapedWoodBlocks.STRIPPED_POPLAR_LOG_VERTICAL_SLAB);
 
-        registerPair(ModBlocks.ASHPEN_LOG, ModBlocks.STRIPPED_ASHPEN_LOG);
-        registerPair(ModBlocks.ASHPEN_WOOD, ModBlocks.STRIPPED_ASHPEN_WOOD);
-        registerPair(ModBlocks.ASHPEN_LOG_SLAB, ModBlocks.STRIPPED_ASHPEN_LOG_SLAB);
-        registerPair(ModBlocks.ASHPEN_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_ASHPEN_LOG_VERTICAL_SLAB);
-        registerPair(ModBlocks.ASHPEN_WOOD_SLAB, ModBlocks.STRIPPED_ASHPEN_WOOD_SLAB);
-        registerPair(ModBlocks.ASHPEN_WOOD_VERTICAL_SLAB, ModBlocks.STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB);
+        registerPair(ShapedStoneBlocks.ASHPEN_LOG, ShapedStoneBlocks.STRIPPED_ASHPEN_LOG);
+        registerPair(ShapedStoneBlocks.ASHPEN_WOOD, ShapedStoneBlocks.STRIPPED_ASHPEN_WOOD);
+        registerPair(ShapedStoneBlocks.ASHPEN_LOG_SLAB, ShapedStoneBlocks.STRIPPED_ASHPEN_LOG_SLAB);
+        registerPair(ShapedStoneBlocks.ASHPEN_LOG_VERTICAL_SLAB, ShapedWoodBlocks.STRIPPED_ASHPEN_LOG_VERTICAL_SLAB);
+        registerPair(ShapedStoneBlocks.ASHPEN_WOOD_SLAB, ShapedStoneBlocks.STRIPPED_ASHPEN_WOOD_SLAB);
+        registerPair(ShapedStoneBlocks.ASHPEN_WOOD_VERTICAL_SLAB, ShapedWoodBlocks.STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB);
 
-        registerPair(ModBlocks.PALE_OAK_LOG, ModBlocks.STRIPPED_PALE_OAK_LOG);
-        registerPair(ModBlocks.PALE_OAK_WOOD, ModBlocks.STRIPPED_PALE_OAK_WOOD);
-        registerPair(ModBlocks.PALE_OAK_LOG_SLAB, ModBlocks.STRIPPED_PALE_OAK_LOG_SLAB);
-        registerPair(ModBlocks.PALE_OAK_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB);
-        registerPair(ModBlocks.PALE_OAK_WOOD_SLAB, ModBlocks.STRIPPED_PALE_OAK_WOOD_SLAB);
-        registerPair(ModBlocks.PALE_OAK_WOOD_VERTICAL_SLAB, ModBlocks.STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB);
+        registerPair(ShapedWoodBlocks.PALE_OAK_LOG, ShapedWoodBlocks.STRIPPED_PALE_OAK_LOG);
+        registerPair(ShapedWoodBlocks.PALE_OAK_WOOD, ShapedWoodBlocks.STRIPPED_PALE_OAK_WOOD);
+        registerPair(ShapedWoodBlocks.PALE_OAK_LOG_SLAB, ShapedWoodBlocks.STRIPPED_PALE_OAK_LOG_SLAB);
+        registerPair(ShapedWoodBlocks.PALE_OAK_LOG_VERTICAL_SLAB, ShapedWoodBlocks.STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB);
+        registerPair(ShapedWoodBlocks.PALE_OAK_WOOD_SLAB, ShapedWoodBlocks.STRIPPED_PALE_OAK_WOOD_SLAB);
+        registerPair(ShapedWoodBlocks.PALE_OAK_WOOD_VERTICAL_SLAB,
+                ShapedWoodBlocks.STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB);
 
-        registerPair(ModBlocks.CHERRY_LOG, ModBlocks.STRIPPED_CHERRY_LOG);
-        registerPair(ModBlocks.CHERRY_WOOD, ModBlocks.STRIPPED_CHERRY_WOOD);
-        registerPair(ModBlocks.CHERRY_LOG_SLAB, ModBlocks.STRIPPED_CHERRY_LOG_SLAB);
-        registerPair(ModBlocks.CHERRY_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_CHERRY_LOG_VERTICAL_SLAB);
-        registerPair(ModBlocks.CHERRY_WOOD_SLAB, ModBlocks.STRIPPED_CHERRY_WOOD_SLAB);
-        registerPair(ModBlocks.CHERRY_WOOD_VERTICAL_SLAB, ModBlocks.STRIPPED_CHERRY_WOOD_VERTICAL_SLAB);
+        registerPair(ShapedWoodBlocks.CHERRY_LOG, ShapedWoodBlocks.STRIPPED_CHERRY_LOG);
+        registerPair(ShapedWoodBlocks.CHERRY_WOOD, ShapedWoodBlocks.STRIPPED_CHERRY_WOOD);
+        registerPair(ShapedWoodBlocks.CHERRY_LOG_SLAB, ShapedWoodBlocks.STRIPPED_CHERRY_LOG_SLAB);
+        registerPair(ShapedWoodBlocks.CHERRY_LOG_VERTICAL_SLAB, ShapedWoodBlocks.STRIPPED_CHERRY_LOG_VERTICAL_SLAB);
+        registerPair(ShapedWoodBlocks.CHERRY_WOOD_SLAB, ShapedWoodBlocks.STRIPPED_CHERRY_WOOD_SLAB);
+        registerPair(ShapedWoodBlocks.CHERRY_WOOD_VERTICAL_SLAB, ShapedWoodBlocks.STRIPPED_CHERRY_WOOD_VERTICAL_SLAB);
 
-        registerPair(ModBlocks.MANGROVE_LOG, ModBlocks.STRIPPED_MANGROVE_LOG);
-        registerPair(ModBlocks.MANGROVE_WOOD, ModBlocks.STRIPPED_MANGROVE_WOOD);
-        registerPair(ModBlocks.MANGROVE_LOG_SLAB, ModBlocks.STRIPPED_MANGROVE_LOG_SLAB);
-        registerPair(ModBlocks.MANGROVE_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_MANGROVE_LOG_VERTICAL_SLAB);
+        registerPair(DecorBlocks.MANGROVE_LOG, DecorBlocks.STRIPPED_MANGROVE_LOG);
+        registerPair(DecorBlocks.MANGROVE_WOOD, DecorBlocks.STRIPPED_MANGROVE_WOOD);
+        registerPair(ShapedStoneBlocks.MANGROVE_LOG_SLAB, ShapedStoneBlocks.STRIPPED_MANGROVE_LOG_SLAB);
+        registerPair(ShapedStoneBlocks.MANGROVE_LOG_VERTICAL_SLAB,
+                ShapedStoneBlocks.STRIPPED_MANGROVE_LOG_VERTICAL_SLAB);
 
-        registerPair(ModBlocks.BAMBOO_BLOCK, ModBlocks.STRIPPED_BAMBOO_BLOCK);
+        registerPair(WoodBlocks.BAMBOO_BLOCK, WoodBlocks.STRIPPED_BAMBOO_BLOCK);
 
-        registerPair(ModBlocks.OAK_LOG_SLAB, ModBlocks.STRIPPED_OAK_LOG_SLAB);
-        registerPair(ModBlocks.SPRUCE_LOG_SLAB, ModBlocks.STRIPPED_SPRUCE_LOG_SLAB);
-        registerPair(ModBlocks.BIRCH_LOG_SLAB, ModBlocks.STRIPPED_BIRCH_LOG_SLAB);
-        registerPair(ModBlocks.JUNGLE_LOG_SLAB, ModBlocks.STRIPPED_JUNGLE_LOG_SLAB);
-        registerPair(ModBlocks.ACACIA_LOG_SLAB, ModBlocks.STRIPPED_ACACIA_LOG_SLAB);
-        registerPair(ModBlocks.DARK_OAK_LOG_SLAB, ModBlocks.STRIPPED_DARK_OAK_LOG_SLAB);
+        registerPair(ShapedStoneBlocks.OAK_LOG_SLAB, ShapedStoneBlocks.STRIPPED_OAK_LOG_SLAB);
+        registerPair(ShapedStoneBlocks.SPRUCE_LOG_SLAB, ShapedStoneBlocks.STRIPPED_SPRUCE_LOG_SLAB);
+        registerPair(ShapedStoneBlocks.BIRCH_LOG_SLAB, ShapedStoneBlocks.STRIPPED_BIRCH_LOG_SLAB);
+        registerPair(ShapedStoneBlocks.JUNGLE_LOG_SLAB, ShapedStoneBlocks.STRIPPED_JUNGLE_LOG_SLAB);
+        registerPair(ShapedStoneBlocks.ACACIA_LOG_SLAB, ShapedStoneBlocks.STRIPPED_ACACIA_LOG_SLAB);
+        registerPair(ShapedStoneBlocks.DARK_OAK_LOG_SLAB, ShapedStoneBlocks.STRIPPED_DARK_OAK_LOG_SLAB);
 
-        registerPair(ModBlocks.OAK_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_OAK_LOG_VERTICAL_SLAB);
-        registerPair(ModBlocks.SPRUCE_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB);
-        registerPair(ModBlocks.BIRCH_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_BIRCH_LOG_VERTICAL_SLAB);
-        registerPair(ModBlocks.JUNGLE_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB);
-        registerPair(ModBlocks.ACACIA_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_ACACIA_LOG_VERTICAL_SLAB);
-        registerPair(ModBlocks.DARK_OAK_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB);
+        registerPair(ShapedStoneBlocks.OAK_LOG_VERTICAL_SLAB, ShapedStoneBlocks.STRIPPED_OAK_LOG_VERTICAL_SLAB);
+        registerPair(ShapedStoneBlocks.SPRUCE_LOG_VERTICAL_SLAB, ShapedStoneBlocks.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB);
+        registerPair(ShapedStoneBlocks.BIRCH_LOG_VERTICAL_SLAB, ShapedStoneBlocks.STRIPPED_BIRCH_LOG_VERTICAL_SLAB);
+        registerPair(ShapedStoneBlocks.JUNGLE_LOG_VERTICAL_SLAB, ShapedStoneBlocks.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB);
+        registerPair(ShapedStoneBlocks.ACACIA_LOG_VERTICAL_SLAB, ShapedStoneBlocks.STRIPPED_ACACIA_LOG_VERTICAL_SLAB);
+        registerPair(ShapedStoneBlocks.DARK_OAK_LOG_VERTICAL_SLAB,
+                ShapedStoneBlocks.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB);
 
-        registerPair(ModBlocks.OAK_WOOD_WALL, ModBlocks.STRIPPED_OAK_WOOD_WALL);
-        registerPair(ModBlocks.SPRUCE_WOOD_WALL, ModBlocks.STRIPPED_SPRUCE_WOOD_WALL);
-        registerPair(ModBlocks.BIRCH_WOOD_WALL, ModBlocks.STRIPPED_BIRCH_WOOD_WALL);
-        registerPair(ModBlocks.DARK_OAK_WOOD_WALL, ModBlocks.STRIPPED_DARK_OAK_WOOD_WALL);
-        registerPair(ModBlocks.JUNGLE_WOOD_WALL, ModBlocks.STRIPPED_JUNGLE_WOOD_WALL);
-        registerPair(ModBlocks.ACACIA_WOOD_WALL, ModBlocks.STRIPPED_ACACIA_WOOD_WALL);
-        registerPair(ModBlocks.MANGROVE_WOOD_WALL, ModBlocks.STRIPPED_MANGROVE_WOOD_WALL);
-        registerPair(ModBlocks.BAMBOO_BLOCK_WALL, ModBlocks.STRIPPED_BAMBOO_BLOCK_WALL);
-        registerPair(ModBlocks.CHERRY_WOOD_WALL, ModBlocks.STRIPPED_CHERRY_WOOD_WALL);
-        registerPair(ModBlocks.PALE_OAK_WOOD_WALL, ModBlocks.STRIPPED_PALE_OAK_WOOD_WALL);
-        registerPair(ModBlocks.ASHPEN_WOOD_WALL, ModBlocks.STRIPPED_ASHPEN_WOOD_WALL);
+        registerPair(WoodBlocks.OAK_WOOD_WALL, WoodBlocks.STRIPPED_OAK_WOOD_WALL);
+        registerPair(WoodBlocks.SPRUCE_WOOD_WALL, WoodBlocks.STRIPPED_SPRUCE_WOOD_WALL);
+        registerPair(WoodBlocks.BIRCH_WOOD_WALL, WoodBlocks.STRIPPED_BIRCH_WOOD_WALL);
+        registerPair(WoodBlocks.DARK_OAK_WOOD_WALL, WoodBlocks.STRIPPED_DARK_OAK_WOOD_WALL);
+        registerPair(WoodBlocks.JUNGLE_WOOD_WALL, WoodBlocks.STRIPPED_JUNGLE_WOOD_WALL);
+        registerPair(WoodBlocks.ACACIA_WOOD_WALL, WoodBlocks.STRIPPED_ACACIA_WOOD_WALL);
+        registerPair(WoodBlocks.MANGROVE_WOOD_WALL, WoodBlocks.STRIPPED_MANGROVE_WOOD_WALL);
+        registerPair(WoodBlocks.BAMBOO_BLOCK_WALL, WoodBlocks.STRIPPED_BAMBOO_BLOCK_WALL);
+        registerPair(WoodBlocks.CHERRY_WOOD_WALL, WoodBlocks.STRIPPED_CHERRY_WOOD_WALL);
+        registerPair(WoodBlocks.PALE_OAK_WOOD_WALL, WoodBlocks.STRIPPED_PALE_OAK_WOOD_WALL);
+        registerPair(WoodBlocks.ASHPEN_WOOD_WALL, WoodBlocks.STRIPPED_ASHPEN_WOOD_WALL);
 
-        registerPair(ModBlocks.HOLLOW_OAK_LOG, ModBlocks.STRIPPED_HOLLOW_OAK_LOG);
-        registerPair(ModBlocks.HOLLOW_SPRUCE_LOG, ModBlocks.STRIPPED_HOLLOW_SPRUCE_LOG);
-        registerPair(ModBlocks.HOLLOW_BIRCH_LOG, ModBlocks.STRIPPED_HOLLOW_BIRCH_LOG);
-        registerPair(ModBlocks.HOLLOW_JUNGLE_LOG, ModBlocks.STRIPPED_HOLLOW_JUNGLE_LOG);
-        registerPair(ModBlocks.HOLLOW_ACACIA_LOG, ModBlocks.STRIPPED_HOLLOW_ACACIA_LOG);
-        registerPair(ModBlocks.HOLLOW_DARK_OAK_LOG, ModBlocks.STRIPPED_HOLLOW_DARK_OAK_LOG);
-        registerPair(ModBlocks.HOLLOW_CRIMSON_STEM, ModBlocks.STRIPPED_HOLLOW_CRIMSON_STEM);
-        registerPair(ModBlocks.HOLLOW_WARPED_STEM, ModBlocks.STRIPPED_HOLLOW_WARPED_STEM);
-        registerPair(ModBlocks.HOLLOW_MANGROVE_LOG, ModBlocks.STRIPPED_HOLLOW_MANGROVE_LOG);
-        registerPair(ModBlocks.HOLLOW_ASHPEN_LOG, ModBlocks.STRIPPED_HOLLOW_ASHPEN_LOG);
-        registerPair(ModBlocks.HOLLOW_POPLAR_LOG, ModBlocks.STRIPPED_HOLLOW_POPLAR_LOG);
-        registerPair(ModBlocks.HOLLOW_PALE_OAK_LOG, ModBlocks.STRIPPED_HOLLOW_PALE_OAK_LOG);
-        registerPair(ModBlocks.HOLLOW_CHERRY_LOG, ModBlocks.STRIPPED_HOLLOW_CHERRY_LOG);
+        registerPair(SteelBlocks.HOLLOW_OAK_LOG, CardboardBlocks.STRIPPED_HOLLOW_OAK_LOG);
+        registerPair(CardboardBlocks.HOLLOW_SPRUCE_LOG, CardboardBlocks.STRIPPED_HOLLOW_SPRUCE_LOG);
+        registerPair(CardboardBlocks.HOLLOW_BIRCH_LOG, CardboardBlocks.STRIPPED_HOLLOW_BIRCH_LOG);
+        registerPair(CardboardBlocks.HOLLOW_JUNGLE_LOG, CardboardBlocks.STRIPPED_HOLLOW_JUNGLE_LOG);
+        registerPair(CardboardBlocks.HOLLOW_ACACIA_LOG, CardboardBlocks.STRIPPED_HOLLOW_ACACIA_LOG);
+        registerPair(CardboardBlocks.HOLLOW_DARK_OAK_LOG, CardboardBlocks.STRIPPED_HOLLOW_DARK_OAK_LOG);
+        registerPair(CardboardBlocks.HOLLOW_CRIMSON_STEM, CardboardBlocks.STRIPPED_HOLLOW_CRIMSON_STEM);
+        registerPair(CardboardBlocks.HOLLOW_WARPED_STEM, CardboardBlocks.STRIPPED_HOLLOW_WARPED_STEM);
+        registerPair(CardboardBlocks.HOLLOW_MANGROVE_LOG, CardboardBlocks.STRIPPED_HOLLOW_MANGROVE_LOG);
+        registerPair(CardboardBlocks.HOLLOW_ASHPEN_LOG, CardboardBlocks.STRIPPED_HOLLOW_ASHPEN_LOG);
+        registerPair(CardboardBlocks.HOLLOW_POPLAR_LOG, CardboardBlocks.STRIPPED_HOLLOW_POPLAR_LOG);
+        registerPair(CardboardBlocks.HOLLOW_PALE_OAK_LOG, CardboardBlocks.STRIPPED_HOLLOW_PALE_OAK_LOG);
+        registerPair(CardboardBlocks.HOLLOW_CHERRY_LOG, CardboardBlocks.STRIPPED_HOLLOW_CHERRY_LOG);
     }
 
     private static void registerPair(Supplier<Block> unstripped, Supplier<Block> stripped) {

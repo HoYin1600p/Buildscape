@@ -2,8 +2,8 @@ package com.kingodogo.buildscape.block.water;
 
 import com.kingodogo.buildscape.core.WaterloggedBlock;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.blocks.MasonryBlocks;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -74,7 +74,7 @@ public class CascadeBlock extends WaterloggedBlock implements EntityBlock, Simpl
     @Override
     @SuppressWarnings("deprecation")
     public boolean skipRendering(BlockState state, BlockState adjacentState, Direction direction) {
-        return adjacentState.is(this) || adjacentState.is(ModBlocks.CASCADE_BLOCK_NO_MIST.get())
+        return adjacentState.is(this) || adjacentState.is(MasonryBlocks.CASCADE_BLOCK_NO_MIST.get())
                 || super.skipRendering(state, adjacentState, direction);
     }
 
@@ -103,14 +103,14 @@ public class CascadeBlock extends WaterloggedBlock implements EntityBlock, Simpl
 
         if (heldItem.is(Items.GLASS_BOTTLE)) {
             if (!level.isClientSide) {
-                BlockState nextState = ModBlocks.CASCADE_BLOCK_NO_MIST.get().defaultBlockState()
+                BlockState nextState = MasonryBlocks.CASCADE_BLOCK_NO_MIST.get().defaultBlockState()
                         .setValue(WATERLOGGED, state.getValue(WATERLOGGED));
                 level.setBlock(pos, nextState, 3);
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
                 }
-                ItemStack mistBottle = new ItemStack(ModItems.BOTTLE_OF_MIST.get());
+                ItemStack mistBottle = new ItemStack(MasonryItems.BOTTLE_OF_MIST.get());
                 if (!player.getInventory().add(mistBottle)) {
                     player.drop(mistBottle, false);
                 }

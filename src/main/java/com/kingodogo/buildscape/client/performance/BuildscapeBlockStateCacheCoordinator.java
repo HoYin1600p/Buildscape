@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.performance;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -22,7 +22,7 @@ public final class BuildscapeBlockStateCacheCoordinator {
     public static synchronized void begin() {
         PENDING_STATES.clear();
         Set<Block> blocks = Collections.newSetFromMap(new IdentityHashMap<>());
-        ModBlocks.BLOCKS.getEntries().stream()
+        BlocksRegister.blocks().getEntries().stream()
                 .filter(entry -> entry.isPresent())
                 .forEach(entry -> blocks.add(entry.get()));
         buildscapeBlocks = blocks;

@@ -1,7 +1,9 @@
 package com.kingodogo.buildscape.registry.items;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModCreativeModeTab;
+import com.kingodogo.buildscape.registry.blocks.CardboardBlocks;
+import com.kingodogo.buildscape.registry.blocks.SteelBlocks;
+import com.kingodogo.buildscape.registry.blocks.WoolBlocks;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.RegistryObject;
@@ -28,967 +30,969 @@ public final class SteelItems {
     }
 
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL = registerBlockItem("magenta_layered_wool",
-            ModBlocks.MAGENTA_LAYERED_WOOL);
+            WoolBlocks.MAGENTA_LAYERED_WOOL);
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL = registerBlockItem("light_blue_layered_wool",
-            ModBlocks.LIGHT_BLUE_LAYERED_WOOL);
+            WoolBlocks.LIGHT_BLUE_LAYERED_WOOL);
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL = registerBlockItem("yellow_layered_wool",
-            ModBlocks.YELLOW_LAYERED_WOOL);
+            WoolBlocks.YELLOW_LAYERED_WOOL);
     public static final RegistryObject<Item> LIME_LAYERED_WOOL = registerBlockItem("lime_layered_wool",
-            ModBlocks.LIME_LAYERED_WOOL);
+            WoolBlocks.LIME_LAYERED_WOOL);
     public static final RegistryObject<Item> PINK_LAYERED_WOOL = registerBlockItem("pink_layered_wool",
-            ModBlocks.PINK_LAYERED_WOOL);
+            WoolBlocks.PINK_LAYERED_WOOL);
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL = registerBlockItem("gray_layered_wool",
-            ModBlocks.GRAY_LAYERED_WOOL);
+            WoolBlocks.GRAY_LAYERED_WOOL);
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL = registerBlockItem("light_gray_layered_wool",
-            ModBlocks.LIGHT_GRAY_LAYERED_WOOL);
+            WoolBlocks.LIGHT_GRAY_LAYERED_WOOL);
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL = registerBlockItem("cyan_layered_wool",
-            ModBlocks.CYAN_LAYERED_WOOL);
+            WoolBlocks.CYAN_LAYERED_WOOL);
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL = registerBlockItem("purple_layered_wool",
-            ModBlocks.PURPLE_LAYERED_WOOL);
+            WoolBlocks.PURPLE_LAYERED_WOOL);
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL = registerBlockItem("blue_layered_wool",
-            ModBlocks.BLUE_LAYERED_WOOL);
+            WoolBlocks.BLUE_LAYERED_WOOL);
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL = registerBlockItem("brown_layered_wool",
-            ModBlocks.BROWN_LAYERED_WOOL);
+            WoolBlocks.BROWN_LAYERED_WOOL);
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL = registerBlockItem("green_layered_wool",
-            ModBlocks.GREEN_LAYERED_WOOL);
+            WoolBlocks.GREEN_LAYERED_WOOL);
     public static final RegistryObject<Item> RED_LAYERED_WOOL = registerBlockItem("red_layered_wool",
-            ModBlocks.RED_LAYERED_WOOL);
+            WoolBlocks.RED_LAYERED_WOOL);
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL = registerBlockItem("black_layered_wool",
-            ModBlocks.BLACK_LAYERED_WOOL);
+            WoolBlocks.BLACK_LAYERED_WOOL);
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_SLAB = registerBlockItem("white_layered_wool_slab",
-            ModBlocks.WHITE_LAYERED_WOOL_SLAB);
+            WoolBlocks.WHITE_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_STAIRS = registerBlockItem("white_layered_wool_stairs",
-            ModBlocks.WHITE_LAYERED_WOOL_STAIRS);
+            WoolBlocks.WHITE_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_WALL = registerBlockItem("white_layered_wool_wall",
-            ModBlocks.WHITE_LAYERED_WOOL_WALL);
+            WoolBlocks.WHITE_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_CARPET = registerBlockItem("white_layered_wool_carpet",
-            ModBlocks.WHITE_LAYERED_WOOL_CARPET);
+            WoolBlocks.WHITE_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_LAYERS = registerBlockItem("white_layered_wool_layers",
-            ModBlocks.WHITE_LAYERED_WOOL_LAYERS);
+            WoolBlocks.WHITE_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "white_layered_wool_vertical_slab", ModBlocks.WHITE_LAYERED_WOOL_VERTICAL_SLAB);
+            "white_layered_wool_vertical_slab", WoolBlocks.WHITE_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_SLAB = registerBlockItem("orange_layered_wool_slab",
-            ModBlocks.ORANGE_LAYERED_WOOL_SLAB);
+            WoolBlocks.ORANGE_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_STAIRS = registerBlockItem(
-            "orange_layered_wool_stairs", ModBlocks.ORANGE_LAYERED_WOOL_STAIRS);
+            "orange_layered_wool_stairs", WoolBlocks.ORANGE_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_WALL = registerBlockItem("orange_layered_wool_wall",
-            ModBlocks.ORANGE_LAYERED_WOOL_WALL);
+            WoolBlocks.ORANGE_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_CARPET = registerBlockItem(
-            "orange_layered_wool_carpet", ModBlocks.ORANGE_LAYERED_WOOL_CARPET);
+            "orange_layered_wool_carpet", WoolBlocks.ORANGE_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_LAYERS = registerBlockItem(
-            "orange_layered_wool_layers", ModBlocks.ORANGE_LAYERED_WOOL_LAYERS);
+            "orange_layered_wool_layers", WoolBlocks.ORANGE_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "orange_layered_wool_vertical_slab", ModBlocks.ORANGE_LAYERED_WOOL_VERTICAL_SLAB);
+            "orange_layered_wool_vertical_slab", WoolBlocks.ORANGE_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_SLAB = registerBlockItem("magenta_layered_wool_slab",
-            ModBlocks.MAGENTA_LAYERED_WOOL_SLAB);
+            WoolBlocks.MAGENTA_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_STAIRS = registerBlockItem(
-            "magenta_layered_wool_stairs", ModBlocks.MAGENTA_LAYERED_WOOL_STAIRS);
+            "magenta_layered_wool_stairs", WoolBlocks.MAGENTA_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_WALL = registerBlockItem("magenta_layered_wool_wall",
-            ModBlocks.MAGENTA_LAYERED_WOOL_WALL);
+            WoolBlocks.MAGENTA_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_CARPET = registerBlockItem(
-            "magenta_layered_wool_carpet", ModBlocks.MAGENTA_LAYERED_WOOL_CARPET);
+            "magenta_layered_wool_carpet", WoolBlocks.MAGENTA_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_LAYERS = registerBlockItem(
-            "magenta_layered_wool_layers", ModBlocks.MAGENTA_LAYERED_WOOL_LAYERS);
+            "magenta_layered_wool_layers", WoolBlocks.MAGENTA_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "magenta_layered_wool_vertical_slab", ModBlocks.MAGENTA_LAYERED_WOOL_VERTICAL_SLAB);
+            "magenta_layered_wool_vertical_slab", WoolBlocks.MAGENTA_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_SLAB = registerBlockItem(
-            "light_blue_layered_wool_slab", ModBlocks.LIGHT_BLUE_LAYERED_WOOL_SLAB);
+            "light_blue_layered_wool_slab", WoolBlocks.LIGHT_BLUE_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_STAIRS = registerBlockItem(
-            "light_blue_layered_wool_stairs", ModBlocks.LIGHT_BLUE_LAYERED_WOOL_STAIRS);
+            "light_blue_layered_wool_stairs", WoolBlocks.LIGHT_BLUE_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_WALL = registerBlockItem(
-            "light_blue_layered_wool_wall", ModBlocks.LIGHT_BLUE_LAYERED_WOOL_WALL);
+            "light_blue_layered_wool_wall", WoolBlocks.LIGHT_BLUE_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_CARPET = registerBlockItem(
-            "light_blue_layered_wool_carpet", ModBlocks.LIGHT_BLUE_LAYERED_WOOL_CARPET);
+            "light_blue_layered_wool_carpet", WoolBlocks.LIGHT_BLUE_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_LAYERS = registerBlockItem(
-            "light_blue_layered_wool_layers", ModBlocks.LIGHT_BLUE_LAYERED_WOOL_LAYERS);
+            "light_blue_layered_wool_layers", WoolBlocks.LIGHT_BLUE_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "light_blue_layered_wool_vertical_slab", ModBlocks.LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB);
+            "light_blue_layered_wool_vertical_slab", WoolBlocks.LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_SLAB = registerBlockItem("yellow_layered_wool_slab",
-            ModBlocks.YELLOW_LAYERED_WOOL_SLAB);
+            WoolBlocks.YELLOW_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_STAIRS = registerBlockItem(
-            "yellow_layered_wool_stairs", ModBlocks.YELLOW_LAYERED_WOOL_STAIRS);
+            "yellow_layered_wool_stairs", WoolBlocks.YELLOW_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_WALL = registerBlockItem("yellow_layered_wool_wall",
-            ModBlocks.YELLOW_LAYERED_WOOL_WALL);
+            WoolBlocks.YELLOW_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_CARPET = registerBlockItem(
-            "yellow_layered_wool_carpet", ModBlocks.YELLOW_LAYERED_WOOL_CARPET);
+            "yellow_layered_wool_carpet", WoolBlocks.YELLOW_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_LAYERS = registerBlockItem(
-            "yellow_layered_wool_layers", ModBlocks.YELLOW_LAYERED_WOOL_LAYERS);
+            "yellow_layered_wool_layers", WoolBlocks.YELLOW_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "yellow_layered_wool_vertical_slab", ModBlocks.YELLOW_LAYERED_WOOL_VERTICAL_SLAB);
+            "yellow_layered_wool_vertical_slab", WoolBlocks.YELLOW_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_SLAB = registerBlockItem("lime_layered_wool_slab",
-            ModBlocks.LIME_LAYERED_WOOL_SLAB);
+            WoolBlocks.LIME_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_STAIRS = registerBlockItem("lime_layered_wool_stairs",
-            ModBlocks.LIME_LAYERED_WOOL_STAIRS);
+            WoolBlocks.LIME_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_WALL = registerBlockItem("lime_layered_wool_wall",
-            ModBlocks.LIME_LAYERED_WOOL_WALL);
+            WoolBlocks.LIME_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_CARPET = registerBlockItem("lime_layered_wool_carpet",
-            ModBlocks.LIME_LAYERED_WOOL_CARPET);
+            WoolBlocks.LIME_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_LAYERS = registerBlockItem("lime_layered_wool_layers",
-            ModBlocks.LIME_LAYERED_WOOL_LAYERS);
+            WoolBlocks.LIME_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "lime_layered_wool_vertical_slab", ModBlocks.LIME_LAYERED_WOOL_VERTICAL_SLAB);
+            "lime_layered_wool_vertical_slab", WoolBlocks.LIME_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_SLAB = registerBlockItem("pink_layered_wool_slab",
-            ModBlocks.PINK_LAYERED_WOOL_SLAB);
+            WoolBlocks.PINK_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_STAIRS = registerBlockItem("pink_layered_wool_stairs",
-            ModBlocks.PINK_LAYERED_WOOL_STAIRS);
+            WoolBlocks.PINK_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_WALL = registerBlockItem("pink_layered_wool_wall",
-            ModBlocks.PINK_LAYERED_WOOL_WALL);
+            WoolBlocks.PINK_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_CARPET = registerBlockItem("pink_layered_wool_carpet",
-            ModBlocks.PINK_LAYERED_WOOL_CARPET);
+            WoolBlocks.PINK_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_LAYERS = registerBlockItem("pink_layered_wool_layers",
-            ModBlocks.PINK_LAYERED_WOOL_LAYERS);
+            WoolBlocks.PINK_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "pink_layered_wool_vertical_slab", ModBlocks.PINK_LAYERED_WOOL_VERTICAL_SLAB);
+            "pink_layered_wool_vertical_slab", WoolBlocks.PINK_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_SLAB = registerBlockItem("gray_layered_wool_slab",
-            ModBlocks.GRAY_LAYERED_WOOL_SLAB);
+            WoolBlocks.GRAY_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_STAIRS = registerBlockItem("gray_layered_wool_stairs",
-            ModBlocks.GRAY_LAYERED_WOOL_STAIRS);
+            WoolBlocks.GRAY_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_WALL = registerBlockItem("gray_layered_wool_wall",
-            ModBlocks.GRAY_LAYERED_WOOL_WALL);
+            WoolBlocks.GRAY_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_CARPET = registerBlockItem("gray_layered_wool_carpet",
-            ModBlocks.GRAY_LAYERED_WOOL_CARPET);
+            WoolBlocks.GRAY_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_LAYERS = registerBlockItem("gray_layered_wool_layers",
-            ModBlocks.GRAY_LAYERED_WOOL_LAYERS);
+            WoolBlocks.GRAY_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "gray_layered_wool_vertical_slab", ModBlocks.GRAY_LAYERED_WOOL_VERTICAL_SLAB);
+            "gray_layered_wool_vertical_slab", WoolBlocks.GRAY_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_SLAB = registerBlockItem(
-            "light_gray_layered_wool_slab", ModBlocks.LIGHT_GRAY_LAYERED_WOOL_SLAB);
+            "light_gray_layered_wool_slab", WoolBlocks.LIGHT_GRAY_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_STAIRS = registerBlockItem(
-            "light_gray_layered_wool_stairs", ModBlocks.LIGHT_GRAY_LAYERED_WOOL_STAIRS);
+            "light_gray_layered_wool_stairs", WoolBlocks.LIGHT_GRAY_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_WALL = registerBlockItem(
-            "light_gray_layered_wool_wall", ModBlocks.LIGHT_GRAY_LAYERED_WOOL_WALL);
+            "light_gray_layered_wool_wall", WoolBlocks.LIGHT_GRAY_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_CARPET = registerBlockItem(
-            "light_gray_layered_wool_carpet", ModBlocks.LIGHT_GRAY_LAYERED_WOOL_CARPET);
+            "light_gray_layered_wool_carpet", WoolBlocks.LIGHT_GRAY_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_LAYERS = registerBlockItem(
-            "light_gray_layered_wool_layers", ModBlocks.LIGHT_GRAY_LAYERED_WOOL_LAYERS);
+            "light_gray_layered_wool_layers", WoolBlocks.LIGHT_GRAY_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "light_gray_layered_wool_vertical_slab", ModBlocks.LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB);
+            "light_gray_layered_wool_vertical_slab", WoolBlocks.LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_SLAB = registerBlockItem("cyan_layered_wool_slab",
-            ModBlocks.CYAN_LAYERED_WOOL_SLAB);
+            WoolBlocks.CYAN_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_STAIRS = registerBlockItem("cyan_layered_wool_stairs",
-            ModBlocks.CYAN_LAYERED_WOOL_STAIRS);
+            WoolBlocks.CYAN_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_WALL = registerBlockItem("cyan_layered_wool_wall",
-            ModBlocks.CYAN_LAYERED_WOOL_WALL);
+            WoolBlocks.CYAN_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_CARPET = registerBlockItem("cyan_layered_wool_carpet",
-            ModBlocks.CYAN_LAYERED_WOOL_CARPET);
+            WoolBlocks.CYAN_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_LAYERS = registerBlockItem("cyan_layered_wool_layers",
-            ModBlocks.CYAN_LAYERED_WOOL_LAYERS);
+            WoolBlocks.CYAN_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "cyan_layered_wool_vertical_slab", ModBlocks.CYAN_LAYERED_WOOL_VERTICAL_SLAB);
+            "cyan_layered_wool_vertical_slab", WoolBlocks.CYAN_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_SLAB = registerBlockItem("purple_layered_wool_slab",
-            ModBlocks.PURPLE_LAYERED_WOOL_SLAB);
+            WoolBlocks.PURPLE_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_STAIRS = registerBlockItem(
-            "purple_layered_wool_stairs", ModBlocks.PURPLE_LAYERED_WOOL_STAIRS);
+            "purple_layered_wool_stairs", WoolBlocks.PURPLE_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_WALL = registerBlockItem("purple_layered_wool_wall",
-            ModBlocks.PURPLE_LAYERED_WOOL_WALL);
+            WoolBlocks.PURPLE_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_CARPET = registerBlockItem(
-            "purple_layered_wool_carpet", ModBlocks.PURPLE_LAYERED_WOOL_CARPET);
+            "purple_layered_wool_carpet", WoolBlocks.PURPLE_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_LAYERS = registerBlockItem(
-            "purple_layered_wool_layers", ModBlocks.PURPLE_LAYERED_WOOL_LAYERS);
+            "purple_layered_wool_layers", WoolBlocks.PURPLE_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "purple_layered_wool_vertical_slab", ModBlocks.PURPLE_LAYERED_WOOL_VERTICAL_SLAB);
+            "purple_layered_wool_vertical_slab", WoolBlocks.PURPLE_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_SLAB = registerBlockItem("blue_layered_wool_slab",
-            ModBlocks.BLUE_LAYERED_WOOL_SLAB);
+            WoolBlocks.BLUE_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_STAIRS = registerBlockItem("blue_layered_wool_stairs",
-            ModBlocks.BLUE_LAYERED_WOOL_STAIRS);
+            WoolBlocks.BLUE_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_WALL = registerBlockItem("blue_layered_wool_wall",
-            ModBlocks.BLUE_LAYERED_WOOL_WALL);
+            WoolBlocks.BLUE_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_CARPET = registerBlockItem("blue_layered_wool_carpet",
-            ModBlocks.BLUE_LAYERED_WOOL_CARPET);
+            WoolBlocks.BLUE_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_LAYERS = registerBlockItem("blue_layered_wool_layers",
-            ModBlocks.BLUE_LAYERED_WOOL_LAYERS);
+            WoolBlocks.BLUE_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "blue_layered_wool_vertical_slab", ModBlocks.BLUE_LAYERED_WOOL_VERTICAL_SLAB);
+            "blue_layered_wool_vertical_slab", WoolBlocks.BLUE_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_SLAB = registerBlockItem("brown_layered_wool_slab",
-            ModBlocks.BROWN_LAYERED_WOOL_SLAB);
+            WoolBlocks.BROWN_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_STAIRS = registerBlockItem("brown_layered_wool_stairs",
-            ModBlocks.BROWN_LAYERED_WOOL_STAIRS);
+            WoolBlocks.BROWN_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_WALL = registerBlockItem("brown_layered_wool_wall",
-            ModBlocks.BROWN_LAYERED_WOOL_WALL);
+            WoolBlocks.BROWN_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_CARPET = registerBlockItem("brown_layered_wool_carpet",
-            ModBlocks.BROWN_LAYERED_WOOL_CARPET);
+            WoolBlocks.BROWN_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_LAYERS = registerBlockItem("brown_layered_wool_layers",
-            ModBlocks.BROWN_LAYERED_WOOL_LAYERS);
+            WoolBlocks.BROWN_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "brown_layered_wool_vertical_slab", ModBlocks.BROWN_LAYERED_WOOL_VERTICAL_SLAB);
+            "brown_layered_wool_vertical_slab", WoolBlocks.BROWN_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_SLAB = registerBlockItem("green_layered_wool_slab",
-            ModBlocks.GREEN_LAYERED_WOOL_SLAB);
+            WoolBlocks.GREEN_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_STAIRS = registerBlockItem("green_layered_wool_stairs",
-            ModBlocks.GREEN_LAYERED_WOOL_STAIRS);
+            WoolBlocks.GREEN_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_WALL = registerBlockItem("green_layered_wool_wall",
-            ModBlocks.GREEN_LAYERED_WOOL_WALL);
+            WoolBlocks.GREEN_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_CARPET = registerBlockItem("green_layered_wool_carpet",
-            ModBlocks.GREEN_LAYERED_WOOL_CARPET);
+            WoolBlocks.GREEN_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_LAYERS = registerBlockItem("green_layered_wool_layers",
-            ModBlocks.GREEN_LAYERED_WOOL_LAYERS);
+            WoolBlocks.GREEN_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "green_layered_wool_vertical_slab", ModBlocks.GREEN_LAYERED_WOOL_VERTICAL_SLAB);
+            "green_layered_wool_vertical_slab", WoolBlocks.GREEN_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_LAYERED_WOOL_SLAB = registerBlockItem("red_layered_wool_slab",
-            ModBlocks.RED_LAYERED_WOOL_SLAB);
+            WoolBlocks.RED_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> RED_LAYERED_WOOL_STAIRS = registerBlockItem("red_layered_wool_stairs",
-            ModBlocks.RED_LAYERED_WOOL_STAIRS);
+            WoolBlocks.RED_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> RED_LAYERED_WOOL_WALL = registerBlockItem("red_layered_wool_wall",
-            ModBlocks.RED_LAYERED_WOOL_WALL);
+            WoolBlocks.RED_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> RED_LAYERED_WOOL_CARPET = registerBlockItem("red_layered_wool_carpet",
-            ModBlocks.RED_LAYERED_WOOL_CARPET);
+            WoolBlocks.RED_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> RED_LAYERED_WOOL_LAYERS = registerBlockItem("red_layered_wool_layers",
-            ModBlocks.RED_LAYERED_WOOL_LAYERS);
+            WoolBlocks.RED_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> RED_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "red_layered_wool_vertical_slab", ModBlocks.RED_LAYERED_WOOL_VERTICAL_SLAB);
+            "red_layered_wool_vertical_slab", WoolBlocks.RED_LAYERED_WOOL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_SLAB = registerBlockItem("black_layered_wool_slab",
-            ModBlocks.BLACK_LAYERED_WOOL_SLAB);
+            WoolBlocks.BLACK_LAYERED_WOOL_SLAB);
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_STAIRS = registerBlockItem("black_layered_wool_stairs",
-            ModBlocks.BLACK_LAYERED_WOOL_STAIRS);
+            WoolBlocks.BLACK_LAYERED_WOOL_STAIRS);
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_WALL = registerBlockItem("black_layered_wool_wall",
-            ModBlocks.BLACK_LAYERED_WOOL_WALL);
+            WoolBlocks.BLACK_LAYERED_WOOL_WALL);
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_CARPET = registerBlockItem("black_layered_wool_carpet",
-            ModBlocks.BLACK_LAYERED_WOOL_CARPET);
+            WoolBlocks.BLACK_LAYERED_WOOL_CARPET);
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_LAYERS = registerBlockItem("black_layered_wool_layers",
-            ModBlocks.BLACK_LAYERED_WOOL_LAYERS);
+            WoolBlocks.BLACK_LAYERED_WOOL_LAYERS);
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_VERTICAL_SLAB = registerBlockItem(
-            "black_layered_wool_vertical_slab", ModBlocks.BLACK_LAYERED_WOOL_VERTICAL_SLAB);
+            "black_layered_wool_vertical_slab", WoolBlocks.BLACK_LAYERED_WOOL_VERTICAL_SLAB);
 
     public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("flaming_steel_ingot",
             () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
     public static final RegistryObject<Item> FLAMING_STEEL_NUGGET = ITEMS.register("flaming_steel_nugget",
             () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK = registerBlockItem("flaming_steel_block",
-            ModBlocks.FLAMING_STEEL_BLOCK);
+            WoolBlocks.FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_SLAB = registerBlockItem("flaming_steel_block_slab",
-            ModBlocks.FLAMING_STEEL_BLOCK_SLAB);
+            SteelBlocks.FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "flaming_steel_block_vertical_slab", ModBlocks.FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "flaming_steel_block_vertical_slab", SteelBlocks.FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "flaming_steel_block_stairs", ModBlocks.FLAMING_STEEL_BLOCK_STAIRS);
+            "flaming_steel_block_stairs", SteelBlocks.FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_WALL = registerBlockItem("flaming_steel_block_wall",
-            ModBlocks.FLAMING_STEEL_BLOCK_WALL);
+            SteelBlocks.FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> FLAMING_CUT_STEEL = registerBlockItem("flaming_cut_steel",
-            ModBlocks.FLAMING_CUT_STEEL);
+            SteelBlocks.FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> FLAMING_CUT_STEEL_SLAB = registerBlockItem("flaming_cut_steel_slab",
-            ModBlocks.FLAMING_CUT_STEEL_SLAB);
+            SteelBlocks.FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "flaming_cut_steel_vertical_slab", ModBlocks.FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "flaming_cut_steel_vertical_slab", SteelBlocks.FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> FLAMING_CUT_STEEL_STAIRS = registerBlockItem("flaming_cut_steel_stairs",
-            ModBlocks.FLAMING_CUT_STEEL_STAIRS);
+            SteelBlocks.FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> FLAMING_CUT_STEEL_WALL = registerBlockItem("flaming_cut_steel_wall",
-            ModBlocks.FLAMING_CUT_STEEL_WALL);
+            SteelBlocks.FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL = registerBlockItem("flaming_polished_steel",
-            ModBlocks.FLAMING_POLISHED_STEEL);
+            SteelBlocks.FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "flaming_polished_steel_slab", ModBlocks.FLAMING_POLISHED_STEEL_SLAB);
+            "flaming_polished_steel_slab", SteelBlocks.FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "flaming_polished_steel_vertical_slab", ModBlocks.FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "flaming_polished_steel_vertical_slab", SteelBlocks.FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "flaming_polished_steel_stairs", ModBlocks.FLAMING_POLISHED_STEEL_STAIRS);
+            "flaming_polished_steel_stairs", SteelBlocks.FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "flaming_polished_steel_wall", ModBlocks.FLAMING_POLISHED_STEEL_WALL);
+            "flaming_polished_steel_wall", SteelBlocks.FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL = registerBlockItem("flaming_pressed_steel",
-            ModBlocks.FLAMING_PRESSED_STEEL);
+            SteelBlocks.FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "flaming_pressed_steel_slab", ModBlocks.FLAMING_PRESSED_STEEL_SLAB);
+            "flaming_pressed_steel_slab", SteelBlocks.FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "flaming_pressed_steel_vertical_slab", ModBlocks.FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "flaming_pressed_steel_vertical_slab", SteelBlocks.FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "flaming_pressed_steel_stairs", ModBlocks.FLAMING_PRESSED_STEEL_STAIRS);
+            "flaming_pressed_steel_stairs", SteelBlocks.FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "flaming_pressed_steel_wall", ModBlocks.FLAMING_PRESSED_STEEL_WALL);
+            "flaming_pressed_steel_wall", SteelBlocks.FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> FLAMING_STEEL_CASING = registerBlockItem("flaming_steel_casing",
-            ModBlocks.FLAMING_STEEL_CASING);
+            SteelBlocks.FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> FLAMING_STEEL_GRATE = registerBlockItem("flaming_steel_grate",
-            ModBlocks.FLAMING_STEEL_GRATE);
+            SteelBlocks.FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> FLAMING_STEEL_PILLAR = registerBlockItem("flaming_steel_pillar",
-            ModBlocks.FLAMING_STEEL_PILLAR);
+            SteelBlocks.FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "flaming_bolted_steel_pillar", ModBlocks.FLAMING_BOLTED_STEEL_PILLAR);
+            "flaming_bolted_steel_pillar", SteelBlocks.FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> FLAMING_STEEL_BOLTS = registerBlockItem("flaming_steel_bolts",
-            ModBlocks.FLAMING_STEEL_BOLTS);
+            SteelBlocks.FLAMING_STEEL_BOLTS);
     public static final RegistryObject<Item> FLAMING_STEEL_DOOR = ITEMS.register("flaming_steel_door",
-            () -> new DoubleHighBlockItem(ModBlocks.FLAMING_STEEL_DOOR.get(), createBlockItemProperties()));
+            () -> new DoubleHighBlockItem(SteelBlocks.FLAMING_STEEL_DOOR.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> FLAMING_STEEL_TRAPDOOR = registerBlockItem("flaming_steel_trapdoor",
-            ModBlocks.FLAMING_STEEL_TRAPDOOR);
+            SteelBlocks.FLAMING_STEEL_TRAPDOOR);
     public static final RegistryObject<Item> FLAMING_STEEL_BUTTON = registerBlockItem("flaming_steel_button",
-            ModBlocks.FLAMING_STEEL_BUTTON);
+            SteelBlocks.FLAMING_STEEL_BUTTON);
     public static final RegistryObject<Item> FLAMING_STEEL_PRESSURE_PLATE = registerBlockItem(
-            "flaming_steel_pressure_plate", ModBlocks.FLAMING_STEEL_PRESSURE_PLATE);
+            "flaming_steel_pressure_plate", SteelBlocks.FLAMING_STEEL_PRESSURE_PLATE);
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK = registerBlockItem(
-            "magenta_flaming_steel_block", ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK);
+            "magenta_flaming_steel_block", SteelBlocks.MAGENTA_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "magenta_flaming_steel_block_slab", ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK_SLAB);
+            "magenta_flaming_steel_block_slab", SteelBlocks.MAGENTA_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "magenta_flaming_steel_block_vertical_slab", ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "magenta_flaming_steel_block_vertical_slab", SteelBlocks.MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "magenta_flaming_steel_block_stairs", ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK_STAIRS);
+            "magenta_flaming_steel_block_stairs", SteelBlocks.MAGENTA_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "magenta_flaming_steel_block_wall", ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK_WALL);
+            "magenta_flaming_steel_block_wall", SteelBlocks.MAGENTA_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL = registerBlockItem("magenta_flaming_cut_steel",
-            ModBlocks.MAGENTA_FLAMING_CUT_STEEL);
+            SteelBlocks.MAGENTA_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "magenta_flaming_cut_steel_slab", ModBlocks.MAGENTA_FLAMING_CUT_STEEL_SLAB);
+            "magenta_flaming_cut_steel_slab", SteelBlocks.MAGENTA_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "magenta_flaming_cut_steel_vertical_slab", ModBlocks.MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "magenta_flaming_cut_steel_vertical_slab", SteelBlocks.MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "magenta_flaming_cut_steel_stairs", ModBlocks.MAGENTA_FLAMING_CUT_STEEL_STAIRS);
+            "magenta_flaming_cut_steel_stairs", SteelBlocks.MAGENTA_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "magenta_flaming_cut_steel_wall", ModBlocks.MAGENTA_FLAMING_CUT_STEEL_WALL);
+            "magenta_flaming_cut_steel_wall", SteelBlocks.MAGENTA_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "magenta_flaming_polished_steel", ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL);
+            "magenta_flaming_polished_steel", SteelBlocks.MAGENTA_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "magenta_flaming_polished_steel_slab", ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL_SLAB);
+            "magenta_flaming_polished_steel_slab", SteelBlocks.MAGENTA_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "magenta_flaming_polished_steel_vertical_slab", ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "magenta_flaming_polished_steel_vertical_slab", SteelBlocks.MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "magenta_flaming_polished_steel_stairs", ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL_STAIRS);
+            "magenta_flaming_polished_steel_stairs", SteelBlocks.MAGENTA_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "magenta_flaming_polished_steel_wall", ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL_WALL);
+            "magenta_flaming_polished_steel_wall", SteelBlocks.MAGENTA_FLAMING_POLISHED_STEEL_WALL);
 
     public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "magenta_flaming_pressed_steel", ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL);
+            "magenta_flaming_pressed_steel", SteelBlocks.MAGENTA_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "magenta_flaming_pressed_steel_slab", ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL_SLAB);
+            "magenta_flaming_pressed_steel_slab", SteelBlocks.MAGENTA_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "magenta_flaming_pressed_steel_vertical_slab", ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "magenta_flaming_pressed_steel_vertical_slab", SteelBlocks.MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "magenta_flaming_pressed_steel_stairs", ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL_STAIRS);
+            "magenta_flaming_pressed_steel_stairs", SteelBlocks.MAGENTA_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "magenta_flaming_pressed_steel_wall", ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL_WALL);
+            "magenta_flaming_pressed_steel_wall", SteelBlocks.MAGENTA_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_CASING = registerBlockItem(
-            "magenta_flaming_steel_casing", ModBlocks.MAGENTA_FLAMING_STEEL_CASING);
+            "magenta_flaming_steel_casing", SteelBlocks.MAGENTA_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_GRATE = registerBlockItem(
-            "magenta_flaming_steel_grate", ModBlocks.MAGENTA_FLAMING_STEEL_GRATE);
+            "magenta_flaming_steel_grate", SteelBlocks.MAGENTA_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_PILLAR = registerBlockItem(
-            "magenta_flaming_steel_pillar", ModBlocks.MAGENTA_FLAMING_STEEL_PILLAR);
+            "magenta_flaming_steel_pillar", SteelBlocks.MAGENTA_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> MAGENTA_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "magenta_flaming_bolted_steel_pillar", ModBlocks.MAGENTA_FLAMING_BOLTED_STEEL_PILLAR);
+            "magenta_flaming_bolted_steel_pillar", SteelBlocks.MAGENTA_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK = registerBlockItem(
-            "light_blue_flaming_steel_block", ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK);
+            "light_blue_flaming_steel_block", SteelBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "light_blue_flaming_steel_block_slab", ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB);
+            "light_blue_flaming_steel_block_slab", SteelBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "light_blue_flaming_steel_block_vertical_slab", ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "light_blue_flaming_steel_block_vertical_slab", SteelBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "light_blue_flaming_steel_block_stairs", ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS);
+            "light_blue_flaming_steel_block_stairs", SteelBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "light_blue_flaming_steel_block_wall", ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL);
+            "light_blue_flaming_steel_block_wall", SteelBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL = registerBlockItem(
-            "light_blue_flaming_cut_steel", ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL);
+            "light_blue_flaming_cut_steel", SteelBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "light_blue_flaming_cut_steel_slab", ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB);
+            "light_blue_flaming_cut_steel_slab", SteelBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "light_blue_flaming_cut_steel_vertical_slab", ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "light_blue_flaming_cut_steel_vertical_slab", SteelBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "light_blue_flaming_cut_steel_stairs", ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS);
+            "light_blue_flaming_cut_steel_stairs", SteelBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "light_blue_flaming_cut_steel_wall", ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_WALL);
+            "light_blue_flaming_cut_steel_wall", SteelBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "light_blue_flaming_polished_steel", ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL);
+            "light_blue_flaming_polished_steel", SteelBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "light_blue_flaming_polished_steel_slab", ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB);
+            "light_blue_flaming_polished_steel_slab", SteelBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
             "light_blue_flaming_polished_steel_vertical_slab",
-            ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            SteelBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "light_blue_flaming_polished_steel_stairs", ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS);
+            "light_blue_flaming_polished_steel_stairs", SteelBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "light_blue_flaming_polished_steel_wall", ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL);
+            "light_blue_flaming_polished_steel_wall", SteelBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "light_blue_flaming_pressed_steel", ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL);
+            "light_blue_flaming_pressed_steel", SteelBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "light_blue_flaming_pressed_steel_slab", ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB);
+            "light_blue_flaming_pressed_steel_slab", SteelBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "light_blue_flaming_pressed_steel_vertical_slab", ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "light_blue_flaming_pressed_steel_vertical_slab",
+            SteelBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "light_blue_flaming_pressed_steel_stairs", ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS);
+            "light_blue_flaming_pressed_steel_stairs", SteelBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "light_blue_flaming_pressed_steel_wall", ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL);
+            "light_blue_flaming_pressed_steel_wall", SteelBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_CASING = registerBlockItem(
-            "light_blue_flaming_steel_casing", ModBlocks.LIGHT_BLUE_FLAMING_STEEL_CASING);
+            "light_blue_flaming_steel_casing", SteelBlocks.LIGHT_BLUE_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_GRATE = registerBlockItem(
-            "light_blue_flaming_steel_grate", ModBlocks.LIGHT_BLUE_FLAMING_STEEL_GRATE);
+            "light_blue_flaming_steel_grate", SteelBlocks.LIGHT_BLUE_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_PILLAR = registerBlockItem(
-            "light_blue_flaming_steel_pillar", ModBlocks.LIGHT_BLUE_FLAMING_STEEL_PILLAR);
+            "light_blue_flaming_steel_pillar", SteelBlocks.LIGHT_BLUE_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "light_blue_flaming_bolted_steel_pillar", ModBlocks.LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR);
+            "light_blue_flaming_bolted_steel_pillar", SteelBlocks.LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK = registerBlockItem(
-            "yellow_flaming_steel_block", ModBlocks.YELLOW_FLAMING_STEEL_BLOCK);
+            "yellow_flaming_steel_block", SteelBlocks.YELLOW_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "yellow_flaming_steel_block_slab", ModBlocks.YELLOW_FLAMING_STEEL_BLOCK_SLAB);
+            "yellow_flaming_steel_block_slab", SteelBlocks.YELLOW_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "yellow_flaming_steel_block_vertical_slab", ModBlocks.YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "yellow_flaming_steel_block_vertical_slab", SteelBlocks.YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "yellow_flaming_steel_block_stairs", ModBlocks.YELLOW_FLAMING_STEEL_BLOCK_STAIRS);
+            "yellow_flaming_steel_block_stairs", SteelBlocks.YELLOW_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "yellow_flaming_steel_block_wall", ModBlocks.YELLOW_FLAMING_STEEL_BLOCK_WALL);
+            "yellow_flaming_steel_block_wall", SteelBlocks.YELLOW_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL = registerBlockItem("yellow_flaming_cut_steel",
-            ModBlocks.YELLOW_FLAMING_CUT_STEEL);
+            SteelBlocks.YELLOW_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "yellow_flaming_cut_steel_slab", ModBlocks.YELLOW_FLAMING_CUT_STEEL_SLAB);
+            "yellow_flaming_cut_steel_slab", SteelBlocks.YELLOW_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "yellow_flaming_cut_steel_vertical_slab", ModBlocks.YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "yellow_flaming_cut_steel_vertical_slab", SteelBlocks.YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "yellow_flaming_cut_steel_stairs", ModBlocks.YELLOW_FLAMING_CUT_STEEL_STAIRS);
+            "yellow_flaming_cut_steel_stairs", SteelBlocks.YELLOW_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "yellow_flaming_cut_steel_wall", ModBlocks.YELLOW_FLAMING_CUT_STEEL_WALL);
+            "yellow_flaming_cut_steel_wall", SteelBlocks.YELLOW_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "yellow_flaming_polished_steel", ModBlocks.YELLOW_FLAMING_POLISHED_STEEL);
+            "yellow_flaming_polished_steel", SteelBlocks.YELLOW_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "yellow_flaming_polished_steel_slab", ModBlocks.YELLOW_FLAMING_POLISHED_STEEL_SLAB);
+            "yellow_flaming_polished_steel_slab", SteelBlocks.YELLOW_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "yellow_flaming_polished_steel_vertical_slab", ModBlocks.YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "yellow_flaming_polished_steel_vertical_slab", SteelBlocks.YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "yellow_flaming_polished_steel_stairs", ModBlocks.YELLOW_FLAMING_POLISHED_STEEL_STAIRS);
+            "yellow_flaming_polished_steel_stairs", SteelBlocks.YELLOW_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "yellow_flaming_polished_steel_wall", ModBlocks.YELLOW_FLAMING_POLISHED_STEEL_WALL);
+            "yellow_flaming_polished_steel_wall", SteelBlocks.YELLOW_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "yellow_flaming_pressed_steel", ModBlocks.YELLOW_FLAMING_PRESSED_STEEL);
+            "yellow_flaming_pressed_steel", SteelBlocks.YELLOW_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "yellow_flaming_pressed_steel_slab", ModBlocks.YELLOW_FLAMING_PRESSED_STEEL_SLAB);
+            "yellow_flaming_pressed_steel_slab", SteelBlocks.YELLOW_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "yellow_flaming_pressed_steel_vertical_slab", ModBlocks.YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "yellow_flaming_pressed_steel_vertical_slab", SteelBlocks.YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "yellow_flaming_pressed_steel_stairs", ModBlocks.YELLOW_FLAMING_PRESSED_STEEL_STAIRS);
+            "yellow_flaming_pressed_steel_stairs", SteelBlocks.YELLOW_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "yellow_flaming_pressed_steel_wall", ModBlocks.YELLOW_FLAMING_PRESSED_STEEL_WALL);
+            "yellow_flaming_pressed_steel_wall", SteelBlocks.YELLOW_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_CASING = registerBlockItem(
-            "yellow_flaming_steel_casing", ModBlocks.YELLOW_FLAMING_STEEL_CASING);
+            "yellow_flaming_steel_casing", SteelBlocks.YELLOW_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_GRATE = registerBlockItem(
-            "yellow_flaming_steel_grate", ModBlocks.YELLOW_FLAMING_STEEL_GRATE);
+            "yellow_flaming_steel_grate", SteelBlocks.YELLOW_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_PILLAR = registerBlockItem(
-            "yellow_flaming_steel_pillar", ModBlocks.YELLOW_FLAMING_STEEL_PILLAR);
+            "yellow_flaming_steel_pillar", SteelBlocks.YELLOW_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> YELLOW_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "yellow_flaming_bolted_steel_pillar", ModBlocks.YELLOW_FLAMING_BOLTED_STEEL_PILLAR);
+            "yellow_flaming_bolted_steel_pillar", SteelBlocks.YELLOW_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK = registerBlockItem("lime_flaming_steel_block",
-            ModBlocks.LIME_FLAMING_STEEL_BLOCK);
+            SteelBlocks.LIME_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "lime_flaming_steel_block_slab", ModBlocks.LIME_FLAMING_STEEL_BLOCK_SLAB);
+            "lime_flaming_steel_block_slab", SteelBlocks.LIME_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "lime_flaming_steel_block_vertical_slab", ModBlocks.LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "lime_flaming_steel_block_vertical_slab", SteelBlocks.LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "lime_flaming_steel_block_stairs", ModBlocks.LIME_FLAMING_STEEL_BLOCK_STAIRS);
+            "lime_flaming_steel_block_stairs", SteelBlocks.LIME_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "lime_flaming_steel_block_wall", ModBlocks.LIME_FLAMING_STEEL_BLOCK_WALL);
+            "lime_flaming_steel_block_wall", SteelBlocks.LIME_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL = registerBlockItem("lime_flaming_cut_steel",
-            ModBlocks.LIME_FLAMING_CUT_STEEL);
+            SteelBlocks.LIME_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "lime_flaming_cut_steel_slab", ModBlocks.LIME_FLAMING_CUT_STEEL_SLAB);
+            "lime_flaming_cut_steel_slab", SteelBlocks.LIME_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "lime_flaming_cut_steel_vertical_slab", ModBlocks.LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "lime_flaming_cut_steel_vertical_slab", SteelBlocks.LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "lime_flaming_cut_steel_stairs", ModBlocks.LIME_FLAMING_CUT_STEEL_STAIRS);
+            "lime_flaming_cut_steel_stairs", SteelBlocks.LIME_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "lime_flaming_cut_steel_wall", ModBlocks.LIME_FLAMING_CUT_STEEL_WALL);
+            "lime_flaming_cut_steel_wall", SteelBlocks.LIME_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "lime_flaming_polished_steel", ModBlocks.LIME_FLAMING_POLISHED_STEEL);
+            "lime_flaming_polished_steel", SteelBlocks.LIME_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "lime_flaming_polished_steel_slab", ModBlocks.LIME_FLAMING_POLISHED_STEEL_SLAB);
+            "lime_flaming_polished_steel_slab", SteelBlocks.LIME_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "lime_flaming_polished_steel_vertical_slab", ModBlocks.LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "lime_flaming_polished_steel_vertical_slab", SteelBlocks.LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "lime_flaming_polished_steel_stairs", ModBlocks.LIME_FLAMING_POLISHED_STEEL_STAIRS);
+            "lime_flaming_polished_steel_stairs", SteelBlocks.LIME_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "lime_flaming_polished_steel_wall", ModBlocks.LIME_FLAMING_POLISHED_STEEL_WALL);
+            "lime_flaming_polished_steel_wall", SteelBlocks.LIME_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "lime_flaming_pressed_steel", ModBlocks.LIME_FLAMING_PRESSED_STEEL);
+            "lime_flaming_pressed_steel", SteelBlocks.LIME_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "lime_flaming_pressed_steel_slab", ModBlocks.LIME_FLAMING_PRESSED_STEEL_SLAB);
+            "lime_flaming_pressed_steel_slab", SteelBlocks.LIME_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "lime_flaming_pressed_steel_vertical_slab", ModBlocks.LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "lime_flaming_pressed_steel_vertical_slab", SteelBlocks.LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "lime_flaming_pressed_steel_stairs", ModBlocks.LIME_FLAMING_PRESSED_STEEL_STAIRS);
+            "lime_flaming_pressed_steel_stairs", SteelBlocks.LIME_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "lime_flaming_pressed_steel_wall", ModBlocks.LIME_FLAMING_PRESSED_STEEL_WALL);
+            "lime_flaming_pressed_steel_wall", SteelBlocks.LIME_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_CASING = registerBlockItem("lime_flaming_steel_casing",
-            ModBlocks.LIME_FLAMING_STEEL_CASING);
+            SteelBlocks.LIME_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_GRATE = registerBlockItem("lime_flaming_steel_grate",
-            ModBlocks.LIME_FLAMING_STEEL_GRATE);
+            SteelBlocks.LIME_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_PILLAR = registerBlockItem("lime_flaming_steel_pillar",
-            ModBlocks.LIME_FLAMING_STEEL_PILLAR);
+            SteelBlocks.LIME_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> LIME_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "lime_flaming_bolted_steel_pillar", ModBlocks.LIME_FLAMING_BOLTED_STEEL_PILLAR);
+            "lime_flaming_bolted_steel_pillar", SteelBlocks.LIME_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK = registerBlockItem("pink_flaming_steel_block",
-            ModBlocks.PINK_FLAMING_STEEL_BLOCK);
+            SteelBlocks.PINK_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "pink_flaming_steel_block_slab", ModBlocks.PINK_FLAMING_STEEL_BLOCK_SLAB);
+            "pink_flaming_steel_block_slab", SteelBlocks.PINK_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "pink_flaming_steel_block_vertical_slab", ModBlocks.PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "pink_flaming_steel_block_vertical_slab", SteelBlocks.PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "pink_flaming_steel_block_stairs", ModBlocks.PINK_FLAMING_STEEL_BLOCK_STAIRS);
+            "pink_flaming_steel_block_stairs", SteelBlocks.PINK_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "pink_flaming_steel_block_wall", ModBlocks.PINK_FLAMING_STEEL_BLOCK_WALL);
+            "pink_flaming_steel_block_wall", SteelBlocks.PINK_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL = registerBlockItem("pink_flaming_cut_steel",
-            ModBlocks.PINK_FLAMING_CUT_STEEL);
+            SteelBlocks.PINK_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "pink_flaming_cut_steel_slab", ModBlocks.PINK_FLAMING_CUT_STEEL_SLAB);
+            "pink_flaming_cut_steel_slab", SteelBlocks.PINK_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "pink_flaming_cut_steel_vertical_slab", ModBlocks.PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "pink_flaming_cut_steel_vertical_slab", SteelBlocks.PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "pink_flaming_cut_steel_stairs", ModBlocks.PINK_FLAMING_CUT_STEEL_STAIRS);
+            "pink_flaming_cut_steel_stairs", SteelBlocks.PINK_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "pink_flaming_cut_steel_wall", ModBlocks.PINK_FLAMING_CUT_STEEL_WALL);
+            "pink_flaming_cut_steel_wall", SteelBlocks.PINK_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "pink_flaming_polished_steel", ModBlocks.PINK_FLAMING_POLISHED_STEEL);
+            "pink_flaming_polished_steel", SteelBlocks.PINK_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "pink_flaming_polished_steel_slab", ModBlocks.PINK_FLAMING_POLISHED_STEEL_SLAB);
+            "pink_flaming_polished_steel_slab", SteelBlocks.PINK_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "pink_flaming_polished_steel_vertical_slab", ModBlocks.PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "pink_flaming_polished_steel_vertical_slab", SteelBlocks.PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "pink_flaming_polished_steel_stairs", ModBlocks.PINK_FLAMING_POLISHED_STEEL_STAIRS);
+            "pink_flaming_polished_steel_stairs", SteelBlocks.PINK_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "pink_flaming_polished_steel_wall", ModBlocks.PINK_FLAMING_POLISHED_STEEL_WALL);
+            "pink_flaming_polished_steel_wall", SteelBlocks.PINK_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "pink_flaming_pressed_steel", ModBlocks.PINK_FLAMING_PRESSED_STEEL);
+            "pink_flaming_pressed_steel", SteelBlocks.PINK_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "pink_flaming_pressed_steel_slab", ModBlocks.PINK_FLAMING_PRESSED_STEEL_SLAB);
+            "pink_flaming_pressed_steel_slab", SteelBlocks.PINK_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "pink_flaming_pressed_steel_vertical_slab", ModBlocks.PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "pink_flaming_pressed_steel_vertical_slab", SteelBlocks.PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "pink_flaming_pressed_steel_stairs", ModBlocks.PINK_FLAMING_PRESSED_STEEL_STAIRS);
+            "pink_flaming_pressed_steel_stairs", SteelBlocks.PINK_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "pink_flaming_pressed_steel_wall", ModBlocks.PINK_FLAMING_PRESSED_STEEL_WALL);
+            "pink_flaming_pressed_steel_wall", SteelBlocks.PINK_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_CASING = registerBlockItem("pink_flaming_steel_casing",
-            ModBlocks.PINK_FLAMING_STEEL_CASING);
+            SteelBlocks.PINK_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_GRATE = registerBlockItem("pink_flaming_steel_grate",
-            ModBlocks.PINK_FLAMING_STEEL_GRATE);
+            SteelBlocks.PINK_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_PILLAR = registerBlockItem("pink_flaming_steel_pillar",
-            ModBlocks.PINK_FLAMING_STEEL_PILLAR);
+            SteelBlocks.PINK_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> PINK_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "pink_flaming_bolted_steel_pillar", ModBlocks.PINK_FLAMING_BOLTED_STEEL_PILLAR);
+            "pink_flaming_bolted_steel_pillar", SteelBlocks.PINK_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK = registerBlockItem("gray_flaming_steel_block",
-            ModBlocks.GRAY_FLAMING_STEEL_BLOCK);
+            SteelBlocks.GRAY_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "gray_flaming_steel_block_slab", ModBlocks.GRAY_FLAMING_STEEL_BLOCK_SLAB);
+            "gray_flaming_steel_block_slab", SteelBlocks.GRAY_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "gray_flaming_steel_block_vertical_slab", ModBlocks.GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "gray_flaming_steel_block_vertical_slab", SteelBlocks.GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "gray_flaming_steel_block_stairs", ModBlocks.GRAY_FLAMING_STEEL_BLOCK_STAIRS);
+            "gray_flaming_steel_block_stairs", SteelBlocks.GRAY_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "gray_flaming_steel_block_wall", ModBlocks.GRAY_FLAMING_STEEL_BLOCK_WALL);
+            "gray_flaming_steel_block_wall", SteelBlocks.GRAY_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL = registerBlockItem("gray_flaming_cut_steel",
-            ModBlocks.GRAY_FLAMING_CUT_STEEL);
+            SteelBlocks.GRAY_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "gray_flaming_cut_steel_slab", ModBlocks.GRAY_FLAMING_CUT_STEEL_SLAB);
+            "gray_flaming_cut_steel_slab", SteelBlocks.GRAY_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "gray_flaming_cut_steel_vertical_slab", ModBlocks.GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "gray_flaming_cut_steel_vertical_slab", SteelBlocks.GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "gray_flaming_cut_steel_stairs", ModBlocks.GRAY_FLAMING_CUT_STEEL_STAIRS);
+            "gray_flaming_cut_steel_stairs", SteelBlocks.GRAY_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "gray_flaming_cut_steel_wall", ModBlocks.GRAY_FLAMING_CUT_STEEL_WALL);
+            "gray_flaming_cut_steel_wall", SteelBlocks.GRAY_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "gray_flaming_polished_steel", ModBlocks.GRAY_FLAMING_POLISHED_STEEL);
+            "gray_flaming_polished_steel", SteelBlocks.GRAY_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "gray_flaming_polished_steel_slab", ModBlocks.GRAY_FLAMING_POLISHED_STEEL_SLAB);
+            "gray_flaming_polished_steel_slab", SteelBlocks.GRAY_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "gray_flaming_polished_steel_vertical_slab", ModBlocks.GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "gray_flaming_polished_steel_vertical_slab", SteelBlocks.GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "gray_flaming_polished_steel_stairs", ModBlocks.GRAY_FLAMING_POLISHED_STEEL_STAIRS);
+            "gray_flaming_polished_steel_stairs", SteelBlocks.GRAY_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "gray_flaming_polished_steel_wall", ModBlocks.GRAY_FLAMING_POLISHED_STEEL_WALL);
+            "gray_flaming_polished_steel_wall", SteelBlocks.GRAY_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "gray_flaming_pressed_steel", ModBlocks.GRAY_FLAMING_PRESSED_STEEL);
+            "gray_flaming_pressed_steel", SteelBlocks.GRAY_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "gray_flaming_pressed_steel_slab", ModBlocks.GRAY_FLAMING_PRESSED_STEEL_SLAB);
+            "gray_flaming_pressed_steel_slab", SteelBlocks.GRAY_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "gray_flaming_pressed_steel_vertical_slab", ModBlocks.GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "gray_flaming_pressed_steel_vertical_slab", SteelBlocks.GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "gray_flaming_pressed_steel_stairs", ModBlocks.GRAY_FLAMING_PRESSED_STEEL_STAIRS);
+            "gray_flaming_pressed_steel_stairs", SteelBlocks.GRAY_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "gray_flaming_pressed_steel_wall", ModBlocks.GRAY_FLAMING_PRESSED_STEEL_WALL);
+            "gray_flaming_pressed_steel_wall", SteelBlocks.GRAY_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_CASING = registerBlockItem("gray_flaming_steel_casing",
-            ModBlocks.GRAY_FLAMING_STEEL_CASING);
+            SteelBlocks.GRAY_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_GRATE = registerBlockItem("gray_flaming_steel_grate",
-            ModBlocks.GRAY_FLAMING_STEEL_GRATE);
+            SteelBlocks.GRAY_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_PILLAR = registerBlockItem("gray_flaming_steel_pillar",
-            ModBlocks.GRAY_FLAMING_STEEL_PILLAR);
+            SteelBlocks.GRAY_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> GRAY_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "gray_flaming_bolted_steel_pillar", ModBlocks.GRAY_FLAMING_BOLTED_STEEL_PILLAR);
+            "gray_flaming_bolted_steel_pillar", SteelBlocks.GRAY_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK = registerBlockItem(
-            "light_gray_flaming_steel_block", ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK);
+            "light_gray_flaming_steel_block", SteelBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "light_gray_flaming_steel_block_slab", ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB);
+            "light_gray_flaming_steel_block_slab", SteelBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "light_gray_flaming_steel_block_vertical_slab", ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "light_gray_flaming_steel_block_vertical_slab", SteelBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "light_gray_flaming_steel_block_stairs", ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS);
+            "light_gray_flaming_steel_block_stairs", SteelBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "light_gray_flaming_steel_block_wall", ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL);
+            "light_gray_flaming_steel_block_wall", SteelBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL = registerBlockItem(
-            "light_gray_flaming_cut_steel", ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL);
+            "light_gray_flaming_cut_steel", SteelBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "light_gray_flaming_cut_steel_slab", ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB);
+            "light_gray_flaming_cut_steel_slab", SteelBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "light_gray_flaming_cut_steel_vertical_slab", ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "light_gray_flaming_cut_steel_vertical_slab", SteelBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "light_gray_flaming_cut_steel_stairs", ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS);
+            "light_gray_flaming_cut_steel_stairs", SteelBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "light_gray_flaming_cut_steel_wall", ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_WALL);
+            "light_gray_flaming_cut_steel_wall", SteelBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "light_gray_flaming_polished_steel", ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL);
+            "light_gray_flaming_polished_steel", SteelBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "light_gray_flaming_polished_steel_slab", ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB);
+            "light_gray_flaming_polished_steel_slab", SteelBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
             "light_gray_flaming_polished_steel_vertical_slab",
-            ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            SteelBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "light_gray_flaming_polished_steel_stairs", ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS);
+            "light_gray_flaming_polished_steel_stairs", SteelBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "light_gray_flaming_polished_steel_wall", ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL);
+            "light_gray_flaming_polished_steel_wall", SteelBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "light_gray_flaming_pressed_steel", ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL);
+            "light_gray_flaming_pressed_steel", SteelBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "light_gray_flaming_pressed_steel_slab", ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB);
+            "light_gray_flaming_pressed_steel_slab", SteelBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "light_gray_flaming_pressed_steel_vertical_slab", ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "light_gray_flaming_pressed_steel_vertical_slab",
+            SteelBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "light_gray_flaming_pressed_steel_stairs", ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS);
+            "light_gray_flaming_pressed_steel_stairs", SteelBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "light_gray_flaming_pressed_steel_wall", ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL);
+            "light_gray_flaming_pressed_steel_wall", SteelBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_CASING = registerBlockItem(
-            "light_gray_flaming_steel_casing", ModBlocks.LIGHT_GRAY_FLAMING_STEEL_CASING);
+            "light_gray_flaming_steel_casing", SteelBlocks.LIGHT_GRAY_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_GRATE = registerBlockItem(
-            "light_gray_flaming_steel_grate", ModBlocks.LIGHT_GRAY_FLAMING_STEEL_GRATE);
+            "light_gray_flaming_steel_grate", SteelBlocks.LIGHT_GRAY_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_PILLAR = registerBlockItem(
-            "light_gray_flaming_steel_pillar", ModBlocks.LIGHT_GRAY_FLAMING_STEEL_PILLAR);
+            "light_gray_flaming_steel_pillar", SteelBlocks.LIGHT_GRAY_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "light_gray_flaming_bolted_steel_pillar", ModBlocks.LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR);
+            "light_gray_flaming_bolted_steel_pillar", SteelBlocks.LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK = registerBlockItem("cyan_flaming_steel_block",
-            ModBlocks.CYAN_FLAMING_STEEL_BLOCK);
+            SteelBlocks.CYAN_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "cyan_flaming_steel_block_slab", ModBlocks.CYAN_FLAMING_STEEL_BLOCK_SLAB);
+            "cyan_flaming_steel_block_slab", SteelBlocks.CYAN_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "cyan_flaming_steel_block_vertical_slab", ModBlocks.CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "cyan_flaming_steel_block_vertical_slab", SteelBlocks.CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "cyan_flaming_steel_block_stairs", ModBlocks.CYAN_FLAMING_STEEL_BLOCK_STAIRS);
+            "cyan_flaming_steel_block_stairs", SteelBlocks.CYAN_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "cyan_flaming_steel_block_wall", ModBlocks.CYAN_FLAMING_STEEL_BLOCK_WALL);
+            "cyan_flaming_steel_block_wall", SteelBlocks.CYAN_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL = registerBlockItem("cyan_flaming_cut_steel",
-            ModBlocks.CYAN_FLAMING_CUT_STEEL);
+            SteelBlocks.CYAN_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "cyan_flaming_cut_steel_slab", ModBlocks.CYAN_FLAMING_CUT_STEEL_SLAB);
+            "cyan_flaming_cut_steel_slab", SteelBlocks.CYAN_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "cyan_flaming_cut_steel_vertical_slab", ModBlocks.CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "cyan_flaming_cut_steel_vertical_slab", SteelBlocks.CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "cyan_flaming_cut_steel_stairs", ModBlocks.CYAN_FLAMING_CUT_STEEL_STAIRS);
+            "cyan_flaming_cut_steel_stairs", SteelBlocks.CYAN_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "cyan_flaming_cut_steel_wall", ModBlocks.CYAN_FLAMING_CUT_STEEL_WALL);
+            "cyan_flaming_cut_steel_wall", SteelBlocks.CYAN_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "cyan_flaming_polished_steel", ModBlocks.CYAN_FLAMING_POLISHED_STEEL);
+            "cyan_flaming_polished_steel", SteelBlocks.CYAN_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "cyan_flaming_polished_steel_slab", ModBlocks.CYAN_FLAMING_POLISHED_STEEL_SLAB);
+            "cyan_flaming_polished_steel_slab", SteelBlocks.CYAN_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "cyan_flaming_polished_steel_vertical_slab", ModBlocks.CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "cyan_flaming_polished_steel_vertical_slab", SteelBlocks.CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "cyan_flaming_polished_steel_stairs", ModBlocks.CYAN_FLAMING_POLISHED_STEEL_STAIRS);
+            "cyan_flaming_polished_steel_stairs", SteelBlocks.CYAN_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "cyan_flaming_polished_steel_wall", ModBlocks.CYAN_FLAMING_POLISHED_STEEL_WALL);
+            "cyan_flaming_polished_steel_wall", SteelBlocks.CYAN_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "cyan_flaming_pressed_steel", ModBlocks.CYAN_FLAMING_PRESSED_STEEL);
+            "cyan_flaming_pressed_steel", SteelBlocks.CYAN_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "cyan_flaming_pressed_steel_slab", ModBlocks.CYAN_FLAMING_PRESSED_STEEL_SLAB);
+            "cyan_flaming_pressed_steel_slab", SteelBlocks.CYAN_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "cyan_flaming_pressed_steel_vertical_slab", ModBlocks.CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "cyan_flaming_pressed_steel_vertical_slab", SteelBlocks.CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "cyan_flaming_pressed_steel_stairs", ModBlocks.CYAN_FLAMING_PRESSED_STEEL_STAIRS);
+            "cyan_flaming_pressed_steel_stairs", SteelBlocks.CYAN_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "cyan_flaming_pressed_steel_wall", ModBlocks.CYAN_FLAMING_PRESSED_STEEL_WALL);
+            "cyan_flaming_pressed_steel_wall", SteelBlocks.CYAN_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_CASING = registerBlockItem("cyan_flaming_steel_casing",
-            ModBlocks.CYAN_FLAMING_STEEL_CASING);
+            SteelBlocks.CYAN_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_GRATE = registerBlockItem("cyan_flaming_steel_grate",
-            ModBlocks.CYAN_FLAMING_STEEL_GRATE);
+            SteelBlocks.CYAN_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_PILLAR = registerBlockItem("cyan_flaming_steel_pillar",
-            ModBlocks.CYAN_FLAMING_STEEL_PILLAR);
+            SteelBlocks.CYAN_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> CYAN_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "cyan_flaming_bolted_steel_pillar", ModBlocks.CYAN_FLAMING_BOLTED_STEEL_PILLAR);
+            "cyan_flaming_bolted_steel_pillar", SteelBlocks.CYAN_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK = registerBlockItem(
-            "purple_flaming_steel_block", ModBlocks.PURPLE_FLAMING_STEEL_BLOCK);
+            "purple_flaming_steel_block", SteelBlocks.PURPLE_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "purple_flaming_steel_block_slab", ModBlocks.PURPLE_FLAMING_STEEL_BLOCK_SLAB);
+            "purple_flaming_steel_block_slab", SteelBlocks.PURPLE_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "purple_flaming_steel_block_vertical_slab", ModBlocks.PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "purple_flaming_steel_block_vertical_slab", SteelBlocks.PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "purple_flaming_steel_block_stairs", ModBlocks.PURPLE_FLAMING_STEEL_BLOCK_STAIRS);
+            "purple_flaming_steel_block_stairs", SteelBlocks.PURPLE_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "purple_flaming_steel_block_wall", ModBlocks.PURPLE_FLAMING_STEEL_BLOCK_WALL);
+            "purple_flaming_steel_block_wall", SteelBlocks.PURPLE_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL = registerBlockItem("purple_flaming_cut_steel",
-            ModBlocks.PURPLE_FLAMING_CUT_STEEL);
+            SteelBlocks.PURPLE_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "purple_flaming_cut_steel_slab", ModBlocks.PURPLE_FLAMING_CUT_STEEL_SLAB);
+            "purple_flaming_cut_steel_slab", SteelBlocks.PURPLE_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "purple_flaming_cut_steel_vertical_slab", ModBlocks.PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "purple_flaming_cut_steel_vertical_slab", SteelBlocks.PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "purple_flaming_cut_steel_stairs", ModBlocks.PURPLE_FLAMING_CUT_STEEL_STAIRS);
+            "purple_flaming_cut_steel_stairs", SteelBlocks.PURPLE_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "purple_flaming_cut_steel_wall", ModBlocks.PURPLE_FLAMING_CUT_STEEL_WALL);
+            "purple_flaming_cut_steel_wall", SteelBlocks.PURPLE_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "purple_flaming_polished_steel", ModBlocks.PURPLE_FLAMING_POLISHED_STEEL);
+            "purple_flaming_polished_steel", SteelBlocks.PURPLE_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "purple_flaming_polished_steel_slab", ModBlocks.PURPLE_FLAMING_POLISHED_STEEL_SLAB);
+            "purple_flaming_polished_steel_slab", SteelBlocks.PURPLE_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "purple_flaming_polished_steel_vertical_slab", ModBlocks.PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "purple_flaming_polished_steel_vertical_slab", SteelBlocks.PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "purple_flaming_polished_steel_stairs", ModBlocks.PURPLE_FLAMING_POLISHED_STEEL_STAIRS);
+            "purple_flaming_polished_steel_stairs", SteelBlocks.PURPLE_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "purple_flaming_polished_steel_wall", ModBlocks.PURPLE_FLAMING_POLISHED_STEEL_WALL);
+            "purple_flaming_polished_steel_wall", SteelBlocks.PURPLE_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "purple_flaming_pressed_steel", ModBlocks.PURPLE_FLAMING_PRESSED_STEEL);
+            "purple_flaming_pressed_steel", SteelBlocks.PURPLE_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "purple_flaming_pressed_steel_slab", ModBlocks.PURPLE_FLAMING_PRESSED_STEEL_SLAB);
+            "purple_flaming_pressed_steel_slab", SteelBlocks.PURPLE_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "purple_flaming_pressed_steel_vertical_slab", ModBlocks.PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "purple_flaming_pressed_steel_vertical_slab", SteelBlocks.PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "purple_flaming_pressed_steel_stairs", ModBlocks.PURPLE_FLAMING_PRESSED_STEEL_STAIRS);
+            "purple_flaming_pressed_steel_stairs", SteelBlocks.PURPLE_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "purple_flaming_pressed_steel_wall", ModBlocks.PURPLE_FLAMING_PRESSED_STEEL_WALL);
+            "purple_flaming_pressed_steel_wall", SteelBlocks.PURPLE_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_CASING = registerBlockItem(
-            "purple_flaming_steel_casing", ModBlocks.PURPLE_FLAMING_STEEL_CASING);
+            "purple_flaming_steel_casing", SteelBlocks.PURPLE_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_GRATE = registerBlockItem(
-            "purple_flaming_steel_grate", ModBlocks.PURPLE_FLAMING_STEEL_GRATE);
+            "purple_flaming_steel_grate", SteelBlocks.PURPLE_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_PILLAR = registerBlockItem(
-            "purple_flaming_steel_pillar", ModBlocks.PURPLE_FLAMING_STEEL_PILLAR);
+            "purple_flaming_steel_pillar", SteelBlocks.PURPLE_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> PURPLE_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "purple_flaming_bolted_steel_pillar", ModBlocks.PURPLE_FLAMING_BOLTED_STEEL_PILLAR);
+            "purple_flaming_bolted_steel_pillar", SteelBlocks.PURPLE_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK = registerBlockItem("blue_flaming_steel_block",
-            ModBlocks.BLUE_FLAMING_STEEL_BLOCK);
+            SteelBlocks.BLUE_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "blue_flaming_steel_block_slab", ModBlocks.BLUE_FLAMING_STEEL_BLOCK_SLAB);
+            "blue_flaming_steel_block_slab", SteelBlocks.BLUE_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "blue_flaming_steel_block_vertical_slab", ModBlocks.BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "blue_flaming_steel_block_vertical_slab", SteelBlocks.BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "blue_flaming_steel_block_stairs", ModBlocks.BLUE_FLAMING_STEEL_BLOCK_STAIRS);
+            "blue_flaming_steel_block_stairs", SteelBlocks.BLUE_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "blue_flaming_steel_block_wall", ModBlocks.BLUE_FLAMING_STEEL_BLOCK_WALL);
+            "blue_flaming_steel_block_wall", SteelBlocks.BLUE_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL = registerBlockItem("blue_flaming_cut_steel",
-            ModBlocks.BLUE_FLAMING_CUT_STEEL);
+            SteelBlocks.BLUE_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "blue_flaming_cut_steel_slab", ModBlocks.BLUE_FLAMING_CUT_STEEL_SLAB);
+            "blue_flaming_cut_steel_slab", SteelBlocks.BLUE_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "blue_flaming_cut_steel_vertical_slab", ModBlocks.BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "blue_flaming_cut_steel_vertical_slab", SteelBlocks.BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "blue_flaming_cut_steel_stairs", ModBlocks.BLUE_FLAMING_CUT_STEEL_STAIRS);
+            "blue_flaming_cut_steel_stairs", SteelBlocks.BLUE_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "blue_flaming_cut_steel_wall", ModBlocks.BLUE_FLAMING_CUT_STEEL_WALL);
+            "blue_flaming_cut_steel_wall", SteelBlocks.BLUE_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "blue_flaming_polished_steel", ModBlocks.BLUE_FLAMING_POLISHED_STEEL);
+            "blue_flaming_polished_steel", SteelBlocks.BLUE_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "blue_flaming_polished_steel_slab", ModBlocks.BLUE_FLAMING_POLISHED_STEEL_SLAB);
+            "blue_flaming_polished_steel_slab", SteelBlocks.BLUE_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "blue_flaming_polished_steel_vertical_slab", ModBlocks.BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "blue_flaming_polished_steel_vertical_slab", SteelBlocks.BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "blue_flaming_polished_steel_stairs", ModBlocks.BLUE_FLAMING_POLISHED_STEEL_STAIRS);
+            "blue_flaming_polished_steel_stairs", SteelBlocks.BLUE_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "blue_flaming_polished_steel_wall", ModBlocks.BLUE_FLAMING_POLISHED_STEEL_WALL);
+            "blue_flaming_polished_steel_wall", SteelBlocks.BLUE_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "blue_flaming_pressed_steel", ModBlocks.BLUE_FLAMING_PRESSED_STEEL);
+            "blue_flaming_pressed_steel", SteelBlocks.BLUE_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "blue_flaming_pressed_steel_slab", ModBlocks.BLUE_FLAMING_PRESSED_STEEL_SLAB);
+            "blue_flaming_pressed_steel_slab", SteelBlocks.BLUE_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "blue_flaming_pressed_steel_vertical_slab", ModBlocks.BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "blue_flaming_pressed_steel_vertical_slab", SteelBlocks.BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "blue_flaming_pressed_steel_stairs", ModBlocks.BLUE_FLAMING_PRESSED_STEEL_STAIRS);
+            "blue_flaming_pressed_steel_stairs", SteelBlocks.BLUE_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "blue_flaming_pressed_steel_wall", ModBlocks.BLUE_FLAMING_PRESSED_STEEL_WALL);
+            "blue_flaming_pressed_steel_wall", SteelBlocks.BLUE_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_CASING = registerBlockItem("blue_flaming_steel_casing",
-            ModBlocks.BLUE_FLAMING_STEEL_CASING);
+            SteelBlocks.BLUE_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_GRATE = registerBlockItem("blue_flaming_steel_grate",
-            ModBlocks.BLUE_FLAMING_STEEL_GRATE);
+            SteelBlocks.BLUE_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_PILLAR = registerBlockItem("blue_flaming_steel_pillar",
-            ModBlocks.BLUE_FLAMING_STEEL_PILLAR);
+            SteelBlocks.BLUE_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> BLUE_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "blue_flaming_bolted_steel_pillar", ModBlocks.BLUE_FLAMING_BOLTED_STEEL_PILLAR);
+            "blue_flaming_bolted_steel_pillar", SteelBlocks.BLUE_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK = registerBlockItem("brown_flaming_steel_block",
-            ModBlocks.BROWN_FLAMING_STEEL_BLOCK);
+            SteelBlocks.BROWN_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "brown_flaming_steel_block_slab", ModBlocks.BROWN_FLAMING_STEEL_BLOCK_SLAB);
+            "brown_flaming_steel_block_slab", SteelBlocks.BROWN_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "brown_flaming_steel_block_vertical_slab", ModBlocks.BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "brown_flaming_steel_block_vertical_slab", SteelBlocks.BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "brown_flaming_steel_block_stairs", ModBlocks.BROWN_FLAMING_STEEL_BLOCK_STAIRS);
+            "brown_flaming_steel_block_stairs", SteelBlocks.BROWN_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "brown_flaming_steel_block_wall", ModBlocks.BROWN_FLAMING_STEEL_BLOCK_WALL);
+            "brown_flaming_steel_block_wall", SteelBlocks.BROWN_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL = registerBlockItem("brown_flaming_cut_steel",
-            ModBlocks.BROWN_FLAMING_CUT_STEEL);
+            SteelBlocks.BROWN_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "brown_flaming_cut_steel_slab", ModBlocks.BROWN_FLAMING_CUT_STEEL_SLAB);
+            "brown_flaming_cut_steel_slab", SteelBlocks.BROWN_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "brown_flaming_cut_steel_vertical_slab", ModBlocks.BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "brown_flaming_cut_steel_vertical_slab", SteelBlocks.BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "brown_flaming_cut_steel_stairs", ModBlocks.BROWN_FLAMING_CUT_STEEL_STAIRS);
+            "brown_flaming_cut_steel_stairs", SteelBlocks.BROWN_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "brown_flaming_cut_steel_wall", ModBlocks.BROWN_FLAMING_CUT_STEEL_WALL);
+            "brown_flaming_cut_steel_wall", SteelBlocks.BROWN_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "brown_flaming_polished_steel", ModBlocks.BROWN_FLAMING_POLISHED_STEEL);
+            "brown_flaming_polished_steel", SteelBlocks.BROWN_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "brown_flaming_polished_steel_slab", ModBlocks.BROWN_FLAMING_POLISHED_STEEL_SLAB);
+            "brown_flaming_polished_steel_slab", SteelBlocks.BROWN_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "brown_flaming_polished_steel_vertical_slab", ModBlocks.BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "brown_flaming_polished_steel_vertical_slab", SteelBlocks.BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "brown_flaming_polished_steel_stairs", ModBlocks.BROWN_FLAMING_POLISHED_STEEL_STAIRS);
+            "brown_flaming_polished_steel_stairs", SteelBlocks.BROWN_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "brown_flaming_polished_steel_wall", ModBlocks.BROWN_FLAMING_POLISHED_STEEL_WALL);
+            "brown_flaming_polished_steel_wall", SteelBlocks.BROWN_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "brown_flaming_pressed_steel", ModBlocks.BROWN_FLAMING_PRESSED_STEEL);
+            "brown_flaming_pressed_steel", SteelBlocks.BROWN_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "brown_flaming_pressed_steel_slab", ModBlocks.BROWN_FLAMING_PRESSED_STEEL_SLAB);
+            "brown_flaming_pressed_steel_slab", SteelBlocks.BROWN_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "brown_flaming_pressed_steel_vertical_slab", ModBlocks.BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "brown_flaming_pressed_steel_vertical_slab", SteelBlocks.BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "brown_flaming_pressed_steel_stairs", ModBlocks.BROWN_FLAMING_PRESSED_STEEL_STAIRS);
+            "brown_flaming_pressed_steel_stairs", SteelBlocks.BROWN_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "brown_flaming_pressed_steel_wall", ModBlocks.BROWN_FLAMING_PRESSED_STEEL_WALL);
+            "brown_flaming_pressed_steel_wall", SteelBlocks.BROWN_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_CASING = registerBlockItem(
-            "brown_flaming_steel_casing", ModBlocks.BROWN_FLAMING_STEEL_CASING);
+            "brown_flaming_steel_casing", SteelBlocks.BROWN_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_GRATE = registerBlockItem("brown_flaming_steel_grate",
-            ModBlocks.BROWN_FLAMING_STEEL_GRATE);
+            SteelBlocks.BROWN_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_PILLAR = registerBlockItem(
-            "brown_flaming_steel_pillar", ModBlocks.BROWN_FLAMING_STEEL_PILLAR);
+            "brown_flaming_steel_pillar", SteelBlocks.BROWN_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> BROWN_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "brown_flaming_bolted_steel_pillar", ModBlocks.BROWN_FLAMING_BOLTED_STEEL_PILLAR);
+            "brown_flaming_bolted_steel_pillar", SteelBlocks.BROWN_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK = registerBlockItem("green_flaming_steel_block",
-            ModBlocks.GREEN_FLAMING_STEEL_BLOCK);
+            SteelBlocks.GREEN_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "green_flaming_steel_block_slab", ModBlocks.GREEN_FLAMING_STEEL_BLOCK_SLAB);
+            "green_flaming_steel_block_slab", SteelBlocks.GREEN_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "green_flaming_steel_block_vertical_slab", ModBlocks.GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "green_flaming_steel_block_vertical_slab", SteelBlocks.GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "green_flaming_steel_block_stairs", ModBlocks.GREEN_FLAMING_STEEL_BLOCK_STAIRS);
+            "green_flaming_steel_block_stairs", SteelBlocks.GREEN_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "green_flaming_steel_block_wall", ModBlocks.GREEN_FLAMING_STEEL_BLOCK_WALL);
+            "green_flaming_steel_block_wall", SteelBlocks.GREEN_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL = registerBlockItem("green_flaming_cut_steel",
-            ModBlocks.GREEN_FLAMING_CUT_STEEL);
+            SteelBlocks.GREEN_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "green_flaming_cut_steel_slab", ModBlocks.GREEN_FLAMING_CUT_STEEL_SLAB);
+            "green_flaming_cut_steel_slab", SteelBlocks.GREEN_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "green_flaming_cut_steel_vertical_slab", ModBlocks.GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "green_flaming_cut_steel_vertical_slab", SteelBlocks.GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "green_flaming_cut_steel_stairs", ModBlocks.GREEN_FLAMING_CUT_STEEL_STAIRS);
+            "green_flaming_cut_steel_stairs", SteelBlocks.GREEN_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "green_flaming_cut_steel_wall", ModBlocks.GREEN_FLAMING_CUT_STEEL_WALL);
+            "green_flaming_cut_steel_wall", SteelBlocks.GREEN_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "green_flaming_polished_steel", ModBlocks.GREEN_FLAMING_POLISHED_STEEL);
+            "green_flaming_polished_steel", SteelBlocks.GREEN_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "green_flaming_polished_steel_slab", ModBlocks.GREEN_FLAMING_POLISHED_STEEL_SLAB);
+            "green_flaming_polished_steel_slab", SteelBlocks.GREEN_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "green_flaming_polished_steel_vertical_slab", ModBlocks.GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "green_flaming_polished_steel_vertical_slab", SteelBlocks.GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "green_flaming_polished_steel_stairs", ModBlocks.GREEN_FLAMING_POLISHED_STEEL_STAIRS);
+            "green_flaming_polished_steel_stairs", SteelBlocks.GREEN_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "green_flaming_polished_steel_wall", ModBlocks.GREEN_FLAMING_POLISHED_STEEL_WALL);
+            "green_flaming_polished_steel_wall", SteelBlocks.GREEN_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "green_flaming_pressed_steel", ModBlocks.GREEN_FLAMING_PRESSED_STEEL);
+            "green_flaming_pressed_steel", SteelBlocks.GREEN_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "green_flaming_pressed_steel_slab", ModBlocks.GREEN_FLAMING_PRESSED_STEEL_SLAB);
+            "green_flaming_pressed_steel_slab", SteelBlocks.GREEN_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "green_flaming_pressed_steel_vertical_slab", ModBlocks.GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "green_flaming_pressed_steel_vertical_slab", SteelBlocks.GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "green_flaming_pressed_steel_stairs", ModBlocks.GREEN_FLAMING_PRESSED_STEEL_STAIRS);
+            "green_flaming_pressed_steel_stairs", SteelBlocks.GREEN_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "green_flaming_pressed_steel_wall", ModBlocks.GREEN_FLAMING_PRESSED_STEEL_WALL);
+            "green_flaming_pressed_steel_wall", SteelBlocks.GREEN_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_CASING = registerBlockItem(
-            "green_flaming_steel_casing", ModBlocks.GREEN_FLAMING_STEEL_CASING);
+            "green_flaming_steel_casing", SteelBlocks.GREEN_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_GRATE = registerBlockItem("green_flaming_steel_grate",
-            ModBlocks.GREEN_FLAMING_STEEL_GRATE);
+            SteelBlocks.GREEN_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_PILLAR = registerBlockItem(
-            "green_flaming_steel_pillar", ModBlocks.GREEN_FLAMING_STEEL_PILLAR);
+            "green_flaming_steel_pillar", SteelBlocks.GREEN_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> GREEN_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "green_flaming_bolted_steel_pillar", ModBlocks.GREEN_FLAMING_BOLTED_STEEL_PILLAR);
+            "green_flaming_bolted_steel_pillar", SteelBlocks.GREEN_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK = registerBlockItem("red_flaming_steel_block",
-            ModBlocks.RED_FLAMING_STEEL_BLOCK);
+            SteelBlocks.RED_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "red_flaming_steel_block_slab", ModBlocks.RED_FLAMING_STEEL_BLOCK_SLAB);
+            "red_flaming_steel_block_slab", SteelBlocks.RED_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "red_flaming_steel_block_vertical_slab", ModBlocks.RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "red_flaming_steel_block_vertical_slab", SteelBlocks.RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "red_flaming_steel_block_stairs", ModBlocks.RED_FLAMING_STEEL_BLOCK_STAIRS);
+            "red_flaming_steel_block_stairs", SteelBlocks.RED_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "red_flaming_steel_block_wall", ModBlocks.RED_FLAMING_STEEL_BLOCK_WALL);
+            "red_flaming_steel_block_wall", SteelBlocks.RED_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL = registerBlockItem("red_flaming_cut_steel",
-            ModBlocks.RED_FLAMING_CUT_STEEL);
+            SteelBlocks.RED_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "red_flaming_cut_steel_slab", ModBlocks.RED_FLAMING_CUT_STEEL_SLAB);
+            "red_flaming_cut_steel_slab", SteelBlocks.RED_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "red_flaming_cut_steel_vertical_slab", ModBlocks.RED_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "red_flaming_cut_steel_vertical_slab", SteelBlocks.RED_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "red_flaming_cut_steel_stairs", ModBlocks.RED_FLAMING_CUT_STEEL_STAIRS);
+            "red_flaming_cut_steel_stairs", SteelBlocks.RED_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "red_flaming_cut_steel_wall", ModBlocks.RED_FLAMING_CUT_STEEL_WALL);
+            "red_flaming_cut_steel_wall", SteelBlocks.RED_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "red_flaming_polished_steel", ModBlocks.RED_FLAMING_POLISHED_STEEL);
+            "red_flaming_polished_steel", SteelBlocks.RED_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "red_flaming_polished_steel_slab", ModBlocks.RED_FLAMING_POLISHED_STEEL_SLAB);
+            "red_flaming_polished_steel_slab", SteelBlocks.RED_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "red_flaming_polished_steel_vertical_slab", ModBlocks.RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "red_flaming_polished_steel_vertical_slab", SteelBlocks.RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "red_flaming_polished_steel_stairs", ModBlocks.RED_FLAMING_POLISHED_STEEL_STAIRS);
+            "red_flaming_polished_steel_stairs", SteelBlocks.RED_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "red_flaming_polished_steel_wall", ModBlocks.RED_FLAMING_POLISHED_STEEL_WALL);
+            "red_flaming_polished_steel_wall", SteelBlocks.RED_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL = registerBlockItem("red_flaming_pressed_steel",
-            ModBlocks.RED_FLAMING_PRESSED_STEEL);
+            SteelBlocks.RED_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "red_flaming_pressed_steel_slab", ModBlocks.RED_FLAMING_PRESSED_STEEL_SLAB);
+            "red_flaming_pressed_steel_slab", SteelBlocks.RED_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "red_flaming_pressed_steel_vertical_slab", ModBlocks.RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "red_flaming_pressed_steel_vertical_slab", SteelBlocks.RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "red_flaming_pressed_steel_stairs", ModBlocks.RED_FLAMING_PRESSED_STEEL_STAIRS);
+            "red_flaming_pressed_steel_stairs", SteelBlocks.RED_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "red_flaming_pressed_steel_wall", ModBlocks.RED_FLAMING_PRESSED_STEEL_WALL);
+            "red_flaming_pressed_steel_wall", SteelBlocks.RED_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> RED_FLAMING_STEEL_CASING = registerBlockItem("red_flaming_steel_casing",
-            ModBlocks.RED_FLAMING_STEEL_CASING);
+            SteelBlocks.RED_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> RED_FLAMING_STEEL_GRATE = registerBlockItem("red_flaming_steel_grate",
-            ModBlocks.RED_FLAMING_STEEL_GRATE);
+            SteelBlocks.RED_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> RED_FLAMING_STEEL_PILLAR = registerBlockItem("red_flaming_steel_pillar",
-            ModBlocks.RED_FLAMING_STEEL_PILLAR);
+            SteelBlocks.RED_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> RED_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "red_flaming_bolted_steel_pillar", ModBlocks.RED_FLAMING_BOLTED_STEEL_PILLAR);
+            "red_flaming_bolted_steel_pillar", SteelBlocks.RED_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK = registerBlockItem("black_flaming_steel_block",
-            ModBlocks.BLACK_FLAMING_STEEL_BLOCK);
+            SteelBlocks.BLACK_FLAMING_STEEL_BLOCK);
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_SLAB = registerBlockItem(
-            "black_flaming_steel_block_slab", ModBlocks.BLACK_FLAMING_STEEL_BLOCK_SLAB);
+            "black_flaming_steel_block_slab", SteelBlocks.BLACK_FLAMING_STEEL_BLOCK_SLAB);
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = registerBlockItem(
-            "black_flaming_steel_block_vertical_slab", ModBlocks.BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
+            "black_flaming_steel_block_vertical_slab", SteelBlocks.BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_STAIRS = registerBlockItem(
-            "black_flaming_steel_block_stairs", ModBlocks.BLACK_FLAMING_STEEL_BLOCK_STAIRS);
+            "black_flaming_steel_block_stairs", SteelBlocks.BLACK_FLAMING_STEEL_BLOCK_STAIRS);
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_WALL = registerBlockItem(
-            "black_flaming_steel_block_wall", ModBlocks.BLACK_FLAMING_STEEL_BLOCK_WALL);
+            "black_flaming_steel_block_wall", SteelBlocks.BLACK_FLAMING_STEEL_BLOCK_WALL);
     public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL = registerBlockItem("black_flaming_cut_steel",
-            ModBlocks.BLACK_FLAMING_CUT_STEEL);
+            SteelBlocks.BLACK_FLAMING_CUT_STEEL);
     public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_SLAB = registerBlockItem(
-            "black_flaming_cut_steel_slab", ModBlocks.BLACK_FLAMING_CUT_STEEL_SLAB);
+            "black_flaming_cut_steel_slab", SteelBlocks.BLACK_FLAMING_CUT_STEEL_SLAB);
     public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "black_flaming_cut_steel_vertical_slab", ModBlocks.BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB);
+            "black_flaming_cut_steel_vertical_slab", SteelBlocks.BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_STAIRS = registerBlockItem(
-            "black_flaming_cut_steel_stairs", ModBlocks.BLACK_FLAMING_CUT_STEEL_STAIRS);
+            "black_flaming_cut_steel_stairs", SteelBlocks.BLACK_FLAMING_CUT_STEEL_STAIRS);
     public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_WALL = registerBlockItem(
-            "black_flaming_cut_steel_wall", ModBlocks.BLACK_FLAMING_CUT_STEEL_WALL);
+            "black_flaming_cut_steel_wall", SteelBlocks.BLACK_FLAMING_CUT_STEEL_WALL);
     public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL = registerBlockItem(
-            "black_flaming_polished_steel", ModBlocks.BLACK_FLAMING_POLISHED_STEEL);
+            "black_flaming_polished_steel", SteelBlocks.BLACK_FLAMING_POLISHED_STEEL);
     public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_SLAB = registerBlockItem(
-            "black_flaming_polished_steel_slab", ModBlocks.BLACK_FLAMING_POLISHED_STEEL_SLAB);
+            "black_flaming_polished_steel_slab", SteelBlocks.BLACK_FLAMING_POLISHED_STEEL_SLAB);
     public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "black_flaming_polished_steel_vertical_slab", ModBlocks.BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
+            "black_flaming_polished_steel_vertical_slab", SteelBlocks.BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_STAIRS = registerBlockItem(
-            "black_flaming_polished_steel_stairs", ModBlocks.BLACK_FLAMING_POLISHED_STEEL_STAIRS);
+            "black_flaming_polished_steel_stairs", SteelBlocks.BLACK_FLAMING_POLISHED_STEEL_STAIRS);
     public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_WALL = registerBlockItem(
-            "black_flaming_polished_steel_wall", ModBlocks.BLACK_FLAMING_POLISHED_STEEL_WALL);
+            "black_flaming_polished_steel_wall", SteelBlocks.BLACK_FLAMING_POLISHED_STEEL_WALL);
     public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL = registerBlockItem(
-            "black_flaming_pressed_steel", ModBlocks.BLACK_FLAMING_PRESSED_STEEL);
+            "black_flaming_pressed_steel", SteelBlocks.BLACK_FLAMING_PRESSED_STEEL);
     public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_SLAB = registerBlockItem(
-            "black_flaming_pressed_steel_slab", ModBlocks.BLACK_FLAMING_PRESSED_STEEL_SLAB);
+            "black_flaming_pressed_steel_slab", SteelBlocks.BLACK_FLAMING_PRESSED_STEEL_SLAB);
     public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = registerBlockItem(
-            "black_flaming_pressed_steel_vertical_slab", ModBlocks.BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
+            "black_flaming_pressed_steel_vertical_slab", SteelBlocks.BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB);
     public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_STAIRS = registerBlockItem(
-            "black_flaming_pressed_steel_stairs", ModBlocks.BLACK_FLAMING_PRESSED_STEEL_STAIRS);
+            "black_flaming_pressed_steel_stairs", SteelBlocks.BLACK_FLAMING_PRESSED_STEEL_STAIRS);
     public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_WALL = registerBlockItem(
-            "black_flaming_pressed_steel_wall", ModBlocks.BLACK_FLAMING_PRESSED_STEEL_WALL);
+            "black_flaming_pressed_steel_wall", SteelBlocks.BLACK_FLAMING_PRESSED_STEEL_WALL);
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_CASING = registerBlockItem(
-            "black_flaming_steel_casing", ModBlocks.BLACK_FLAMING_STEEL_CASING);
+            "black_flaming_steel_casing", SteelBlocks.BLACK_FLAMING_STEEL_CASING);
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_GRATE = registerBlockItem("black_flaming_steel_grate",
-            ModBlocks.BLACK_FLAMING_STEEL_GRATE);
+            SteelBlocks.BLACK_FLAMING_STEEL_GRATE);
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_PILLAR = registerBlockItem(
-            "black_flaming_steel_pillar", ModBlocks.BLACK_FLAMING_STEEL_PILLAR);
+            "black_flaming_steel_pillar", SteelBlocks.BLACK_FLAMING_STEEL_PILLAR);
     public static final RegistryObject<Item> BLACK_FLAMING_BOLTED_STEEL_PILLAR = registerBlockItem(
-            "black_flaming_bolted_steel_pillar", ModBlocks.BLACK_FLAMING_BOLTED_STEEL_PILLAR);
+            "black_flaming_bolted_steel_pillar", SteelBlocks.BLACK_FLAMING_BOLTED_STEEL_PILLAR);
     public static final RegistryObject<Item> HOLLOW_OAK_LOG = registerBlockItem("hollow_oak_log",
-            ModBlocks.HOLLOW_OAK_LOG);
+            SteelBlocks.HOLLOW_OAK_LOG);
     public static final RegistryObject<Item> STRIPPED_HOLLOW_OAK_LOG = registerBlockItem("stripped_hollow_oak_log",
-            ModBlocks.STRIPPED_HOLLOW_OAK_LOG);
+            CardboardBlocks.STRIPPED_HOLLOW_OAK_LOG);
     public static final RegistryObject<Item> HOLLOW_SPRUCE_LOG = registerBlockItem("hollow_spruce_log",
-            ModBlocks.HOLLOW_SPRUCE_LOG);
+            CardboardBlocks.HOLLOW_SPRUCE_LOG);
 }

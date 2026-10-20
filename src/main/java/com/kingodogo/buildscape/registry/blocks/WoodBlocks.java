@@ -19,8 +19,8 @@ import com.kingodogo.buildscape.block.plant.RoseVinesBlock;
 import com.kingodogo.buildscape.block.storage.TrappedDecoratedPotBlock;
 import com.kingodogo.buildscape.block.decor.WoolLayersBlock;
 import com.kingodogo.buildscape.feature.copper.WeatheringClimbableChainBlock;
-import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModSounds;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FenceBlock;
@@ -591,7 +591,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.OAK_LEAF_HEDGE));
+                    WoodItems.OAK_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SPRUCE_LEAF_HEDGE = BLOCKS.register(
             "spruce_leaf_hedge",
@@ -602,7 +602,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SPRUCE_LEAF_HEDGE));
+                    WoodItems.SPRUCE_LEAF_HEDGE));
 
     public static final RegistryObject<Block> BIRCH_LEAF_HEDGE = BLOCKS.register(
             "birch_leaf_hedge",
@@ -613,7 +613,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.BIRCH_LEAF_HEDGE));
+                    WoodItems.BIRCH_LEAF_HEDGE));
 
     public static final RegistryObject<Block> JUNGLE_LEAF_HEDGE = BLOCKS.register(
             "jungle_leaf_hedge",
@@ -624,7 +624,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.JUNGLE_LEAF_HEDGE));
+                    WoodItems.JUNGLE_LEAF_HEDGE));
 
     public static final RegistryObject<Block> ACACIA_LEAF_HEDGE = BLOCKS.register(
             "acacia_leaf_hedge",
@@ -635,7 +635,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.ACACIA_LEAF_HEDGE));
+                    WoodItems.ACACIA_LEAF_HEDGE));
 
     public static final RegistryObject<Block> DARK_OAK_LEAF_HEDGE = BLOCKS.register("dark_oak_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -645,7 +645,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.DARK_OAK_LEAF_HEDGE));
+                    WoodItems.DARK_OAK_LEAF_HEDGE));
 
     public static final RegistryObject<Block> AZALEA_LEAF_HEDGE = BLOCKS.register(
             "azalea_leaf_hedge",
@@ -656,7 +656,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.AZALEA_LEAF_HEDGE));
+                    WoodItems.AZALEA_LEAF_HEDGE));
 
     public static final RegistryObject<Block> FLOWERING_AZALEA_LEAF_HEDGE = BLOCKS
             .register("flowering_azalea_leaf_hedge", () -> new LeafHedgeBlock(
@@ -666,7 +666,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.FLOWERING_AZALEA_LEAF_HEDGE));
+                    WoodItems.FLOWERING_AZALEA_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_OAK_LEAF_HEDGE = BLOCKS.register("snowy_oak_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -676,7 +676,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_OAK_LEAF_HEDGE));
+                    WoodItems.SNOWY_OAK_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_SPRUCE_LEAF_HEDGE = BLOCKS.register("snowy_spruce_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -686,7 +686,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_SPRUCE_LEAF_HEDGE));
+                    WoodItems.SNOWY_SPRUCE_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_BIRCH_LEAF_HEDGE = BLOCKS.register("snowy_birch_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -696,7 +696,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_BIRCH_LEAF_HEDGE));
+                    WoodItems.SNOWY_BIRCH_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_JUNGLE_LEAF_HEDGE = BLOCKS.register("snowy_jungle_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -706,7 +706,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_JUNGLE_LEAF_HEDGE));
+                    WoodItems.SNOWY_JUNGLE_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_ACACIA_LEAF_HEDGE = BLOCKS.register("snowy_acacia_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -716,7 +716,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_ACACIA_LEAF_HEDGE));
+                    WoodItems.SNOWY_ACACIA_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_DARK_OAK_LEAF_HEDGE = BLOCKS
             .register("snowy_dark_oak_leaf_hedge", () -> new LeafHedgeBlock(
@@ -726,7 +726,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_DARK_OAK_LEAF_HEDGE));
+                    WoodItems.SNOWY_DARK_OAK_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_MANGROVE_LEAF_HEDGE = BLOCKS
             .register("snowy_mangrove_leaf_hedge", () -> new LeafHedgeBlock(
@@ -736,7 +736,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_MANGROVE_LEAF_HEDGE));
+                    WoodItems.SNOWY_MANGROVE_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_AZALEA_LEAF_HEDGE = BLOCKS.register("snowy_azalea_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -746,7 +746,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_AZALEA_LEAF_HEDGE));
+                    WoodItems.SNOWY_AZALEA_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_FLOWERING_AZALEA_LEAF_HEDGE = BLOCKS
             .register("snowy_flowering_azalea_leaf_hedge", () -> new LeafHedgeBlock(
@@ -756,7 +756,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE));
+                    WoodItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE));
 
     public static final RegistryObject<Block> MANGROVE_LEAF_HEDGE = BLOCKS.register("mangrove_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -766,7 +766,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.MANGROVE_LEAF_HEDGE));
+                    WoodItems.MANGROVE_LEAF_HEDGE));
 
     public static final RegistryObject<Block> ORANGE_POPLAR_LEAF_HEDGE = BLOCKS.register("orange_poplar_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -776,7 +776,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.ORANGE_POPLAR_LEAF_HEDGE));
+                    WoodItems.ORANGE_POPLAR_LEAF_HEDGE));
 
     public static final RegistryObject<Block> RED_POPLAR_LEAF_HEDGE = BLOCKS.register("red_poplar_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -786,7 +786,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.RED_POPLAR_LEAF_HEDGE));
+                    WoodItems.RED_POPLAR_LEAF_HEDGE));
 
     public static final RegistryObject<Block> YELLOW_POPLAR_LEAF_HEDGE = BLOCKS.register("yellow_poplar_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -796,7 +796,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.YELLOW_POPLAR_LEAF_HEDGE));
+                    WoodItems.YELLOW_POPLAR_LEAF_HEDGE));
 
     public static final RegistryObject<Block> CHERRY_LEAF_HEDGE = BLOCKS.register("cherry_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -806,7 +806,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.CHERRY_LEAF_HEDGE));
+                    WoodItems.CHERRY_LEAF_HEDGE));
 
     public static final RegistryObject<Block> PALE_OAK_LEAF_HEDGE = BLOCKS.register("pale_oak_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -816,7 +816,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.PALE_OAK_LEAF_HEDGE));
+                    WoodItems.PALE_OAK_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_CHERRY_LEAF_HEDGE = BLOCKS.register("snowy_cherry_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -826,7 +826,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_CHERRY_LEAF_HEDGE));
+                    WoodItems.SNOWY_CHERRY_LEAF_HEDGE));
 
     public static final RegistryObject<Block> SNOWY_PALE_OAK_LEAF_HEDGE = BLOCKS.register("snowy_pale_oak_leaf_hedge",
             () -> new LeafHedgeBlock(
@@ -836,7 +836,7 @@ public final class WoodBlocks {
                             .noOcclusion()
                             .isSuffocating((state, reader, pos) -> false)
                             .isViewBlocking((state, reader, pos) -> false),
-                    ModItems.SNOWY_PALE_OAK_LEAF_HEDGE));
+                    WoodItems.SNOWY_PALE_OAK_LEAF_HEDGE));
 
     public static final RegistryObject<Block> HAY_BALE_SLAB = BLOCKS.register(
             "hay_bale_slab",

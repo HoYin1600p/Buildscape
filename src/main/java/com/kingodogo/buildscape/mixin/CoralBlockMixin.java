@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -15,7 +15,7 @@ public class CoralBlockMixin {
     @Inject(method = "scanForWater", at = @At("HEAD"), cancellable = true)
     private void onScanForWater(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         for (Direction dir : Direction.values()) {
-            if (level.getBlockState(pos.relative(dir)).is(ModBlocks.MUD.get())) {
+            if (level.getBlockState(pos.relative(dir)).is(SandstoneBlocks.MUD.get())) {
                 cir.setReturnValue(true);
                 return;
             }

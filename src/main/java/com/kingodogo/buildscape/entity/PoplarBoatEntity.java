@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.entity;
 
 import com.kingodogo.buildscape.registry.ModEntities;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.ShapedWoodItems;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
@@ -29,6 +29,6 @@ public class PoplarBoatEntity extends Boat {
 
     @Override
     public Item getDropItem() {
-        return ModItems.POPLAR_BOAT.get();
+        return ShapedWoodItems.POPLAR_BOAT.get();
     }
 }

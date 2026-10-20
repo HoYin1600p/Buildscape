@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.recipe;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModRecipeSerializers;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +28,7 @@ public class ConfettiConfigureRecipe extends CustomRecipe {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty()) {
-                if (stack.is(ModItems.CONFETTI_ITEM.get())) {
+                if (stack.is(MasonryItems.CONFETTI_ITEM.get())) {
                     confettiCount++;
                 } else if (stack.is(Items.GUNPOWDER)) {
                     gunpowderCount++;
@@ -49,7 +49,7 @@ public class ConfettiConfigureRecipe extends CustomRecipe {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty()) {
-                if (stack.is(ModItems.CONFETTI_ITEM.get())) {
+                if (stack.is(MasonryItems.CONFETTI_ITEM.get())) {
                     confettiStack = stack;
                 } else if (stack.is(Items.GUNPOWDER)) {
                     gunpowderCount++;

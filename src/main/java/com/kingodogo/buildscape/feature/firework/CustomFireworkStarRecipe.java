@@ -2,9 +2,9 @@ package com.kingodogo.buildscape.feature.firework;
 
 import com.kingodogo.buildscape.block.decor.FestiveStockingItem;
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModRecipeSerializers;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -81,7 +81,7 @@ public class CustomFireworkStarRecipe extends CustomRecipe {
                     shapeId = CustomFireworkShapeRegistry.PRESENTS_ID;
                 } else if (stack.is(Items.SUGAR_CANE) || stack.is(Items.SUGAR)) {
                     shapeId = CustomFireworkShapeRegistry.CANDY_CANE_ID;
-                } else if (stack.is(ModItems.FROST_ROSE.get()) || stack.is(ModBlocks.FROST_ROSE.get().asItem())) {
+                } else if (stack.is(WoodItems.FROST_ROSE.get()) || stack.is(DecorBlocks.FROST_ROSE.get().asItem())) {
                     shapeId = CustomFireworkShapeRegistry.SNOWFLAKE_ID;
                     isFixedPalette = true;
                 } else if (stack.getItem() instanceof DyeItem dye) {
@@ -135,7 +135,7 @@ public class CustomFireworkStarRecipe extends CustomRecipe {
     private static boolean isFixedPaletteShapeItem(ItemStack stack) {
         return stack.is(Items.CAKE) || stack.is(Items.GOLD_INGOT) || stack.is(Items.SUNFLOWER)
                 || stack.is(Items.SPRUCE_SAPLING)
-                || stack.is(ModItems.FROST_ROSE.get()) || stack.is(ModBlocks.FROST_ROSE.get().asItem());
+                || stack.is(WoodItems.FROST_ROSE.get()) || stack.is(DecorBlocks.FROST_ROSE.get().asItem());
     }
 
     private static boolean isDyeableShapeItem(ItemStack stack) {

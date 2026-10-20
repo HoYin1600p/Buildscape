@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.DataSlot;
@@ -31,7 +31,8 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 
     @Inject(method = "mayPickup", at = @At("HEAD"), cancellable = true)
     private void buildscape$mayPickupZeroCost(Player player, boolean hasStack, CallbackInfoReturnable<Boolean> cir) {
-        if (hasStack && this.cost.get() == 0 && this.inputSlots.getItem(1).is(ModItems.FESTIVE_GLINT_SHARD.get())) {
+        if (hasStack && this.cost.get() == 0
+                && this.inputSlots.getItem(1).is(CardboardItems.FESTIVE_GLINT_SHARD.get())) {
             cir.setReturnValue(true);
         }
     }
@@ -39,7 +40,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
     @Inject(method = "onTake", at = @At("HEAD"))
     private void buildscape$preserveShardHead(Player player, ItemStack stack, CallbackInfo ci) {
         ItemStack rightSlot = this.inputSlots.getItem(1);
-        if (!rightSlot.isEmpty() && rightSlot.is(ModItems.FESTIVE_GLINT_SHARD.get())) {
+        if (!rightSlot.isEmpty() && rightSlot.is(CardboardItems.FESTIVE_GLINT_SHARD.get())) {
             this.buildscape$savedShard = rightSlot.copy();
         } else {
             this.buildscape$savedShard = ItemStack.EMPTY;

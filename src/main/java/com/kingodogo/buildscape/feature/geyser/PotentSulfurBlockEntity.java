@@ -3,9 +3,9 @@ package com.kingodogo.buildscape.feature.geyser;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
-import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModParticles;
 import com.kingodogo.buildscape.registry.ModSounds;
+import com.kingodogo.buildscape.registry.blocks.ShapedStoneBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -223,7 +223,7 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
         return GeyserLiftRules.unobstructedTop(pos.getY(), y -> {
             testPos.setY(y);
             BlockState testState = level.getBlockState(testPos);
-            return !testState.is(ModBlocks.POTENT_SULFUR.get())
+            return !testState.is(ShapedStoneBlocks.POTENT_SULFUR.get())
                     && isGeyserPassableBlock(testState, level, testPos, CollisionContext.empty());
         });
     }

@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.feature.firework;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModRecipeSerializers;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -33,7 +33,7 @@ public class InfinitePhoenixFireworkStarRecipe extends CustomRecipe {
                     gunpowderCount++;
                 } else if (stack.is(Items.PAPER)) {
                     paperCount++;
-                } else if (stack.is(ModItems.INFINITE_PHOENIX_FIREWORK_STAR.get())) {
+                } else if (stack.is(MasonryItems.INFINITE_PHOENIX_FIREWORK_STAR.get())) {
                     starCount++;
                 } else {
                     return false;
@@ -54,7 +54,7 @@ public class InfinitePhoenixFireworkStarRecipe extends CustomRecipe {
             if (!stack.isEmpty()) {
                 if (stack.is(Items.GUNPOWDER)) {
                     flight++;
-                } else if (stack.is(ModItems.INFINITE_PHOENIX_FIREWORK_STAR.get())) {
+                } else if (stack.is(MasonryItems.INFINITE_PHOENIX_FIREWORK_STAR.get())) {
                     starStack = stack;
                 }
             }
@@ -92,7 +92,7 @@ public class InfinitePhoenixFireworkStarRecipe extends CustomRecipe {
         NonNullList<ItemStack> remaining = NonNullList.withSize(container.getContainerSize(), ItemStack.EMPTY);
         for (int i = 0; i < remaining.size(); ++i) {
             ItemStack stack = container.getItem(i);
-            if (!stack.isEmpty() && stack.is(ModItems.INFINITE_PHOENIX_FIREWORK_STAR.get())) {
+            if (!stack.isEmpty() && stack.is(MasonryItems.INFINITE_PHOENIX_FIREWORK_STAR.get())) {
                 remaining.set(i, stack.copy());
             }
         }

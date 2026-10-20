@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
@@ -44,6 +44,6 @@ public class DryGrassBlock extends BushBlock implements BonemealableBlock {
 
     @Override
     public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {
-        level.setBlock(pos, ModBlocks.TALL_DRY_GRASS.get().defaultBlockState(), 3);
+        level.setBlock(pos, CopperBlocks.TALL_DRY_GRASS.get().defaultBlockState(), 3);
     }
 }

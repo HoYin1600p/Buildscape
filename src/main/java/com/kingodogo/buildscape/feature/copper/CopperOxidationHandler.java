@@ -1,8 +1,14 @@
 package com.kingodogo.buildscape.feature.copper;
 
 import com.kingodogo.buildscape.block.plant.EyeblossomBlock;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedStoneBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
+import com.kingodogo.buildscape.registry.blocks.StoneBlocks;
+import com.kingodogo.buildscape.registry.blocks.WoodBlocks;
+import com.kingodogo.buildscape.registry.blocks.WoolBlocks;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -51,171 +57,188 @@ public class CopperOxidationHandler {
             if (initialized) {
                 return;
             }
-            registerChain(ModBlocks.CHISELED_COPPER, ModBlocks.EXPOSED_CHISELED_COPPER,
-                    ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.OXIDIZED_CHISELED_COPPER);
-            registerWaxPair(ModBlocks.CHISELED_COPPER, ModBlocks.WAXED_CHISELED_COPPER);
-            registerWaxPair(ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WAXED_EXPOSED_CHISELED_COPPER);
-            registerWaxPair(ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.WAXED_WEATHERED_CHISELED_COPPER);
-            registerWaxPair(ModBlocks.OXIDIZED_CHISELED_COPPER, ModBlocks.WAXED_OXIDIZED_CHISELED_COPPER);
+            registerChain(CopperBlocks.CHISELED_COPPER, CopperBlocks.EXPOSED_CHISELED_COPPER,
+                    CopperBlocks.WEATHERED_CHISELED_COPPER, CopperBlocks.OXIDIZED_CHISELED_COPPER);
+            registerWaxPair(CopperBlocks.CHISELED_COPPER, CopperBlocks.WAXED_CHISELED_COPPER);
+            registerWaxPair(CopperBlocks.EXPOSED_CHISELED_COPPER, CopperBlocks.WAXED_EXPOSED_CHISELED_COPPER);
+            registerWaxPair(CopperBlocks.WEATHERED_CHISELED_COPPER, CopperBlocks.WAXED_WEATHERED_CHISELED_COPPER);
+            registerWaxPair(CopperBlocks.OXIDIZED_CHISELED_COPPER, CopperBlocks.WAXED_OXIDIZED_CHISELED_COPPER);
 
-            registerChain(ModBlocks.COPPER_GRATE, ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WEATHERED_COPPER_GRATE,
-                    ModBlocks.OXIDIZED_COPPER_GRATE);
-            registerWaxPair(ModBlocks.COPPER_GRATE, ModBlocks.WAXED_COPPER_GRATE);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WAXED_EXPOSED_COPPER_GRATE);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.WAXED_WEATHERED_COPPER_GRATE);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_GRATE, ModBlocks.WAXED_OXIDIZED_COPPER_GRATE);
+            registerChain(CopperBlocks.COPPER_GRATE, CopperBlocks.EXPOSED_COPPER_GRATE,
+                    CopperBlocks.WEATHERED_COPPER_GRATE,
+                    CopperBlocks.OXIDIZED_COPPER_GRATE);
+            registerWaxPair(CopperBlocks.COPPER_GRATE, CopperBlocks.WAXED_COPPER_GRATE);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_GRATE, CopperBlocks.WAXED_EXPOSED_COPPER_GRATE);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_GRATE, CopperBlocks.WAXED_WEATHERED_COPPER_GRATE);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_GRATE, CopperBlocks.WAXED_OXIDIZED_COPPER_GRATE);
 
-            registerChain(ModBlocks.COPPER_BULB, ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WEATHERED_COPPER_BULB,
-                    ModBlocks.OXIDIZED_COPPER_BULB);
-            registerWaxPair(ModBlocks.COPPER_BULB, ModBlocks.WAXED_COPPER_BULB);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WAXED_EXPOSED_COPPER_BULB);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.WAXED_WEATHERED_COPPER_BULB);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_BULB, ModBlocks.WAXED_OXIDIZED_COPPER_BULB);
+            registerChain(CopperBlocks.COPPER_BULB, CopperBlocks.EXPOSED_COPPER_BULB,
+                    CopperBlocks.WEATHERED_COPPER_BULB,
+                    CopperBlocks.OXIDIZED_COPPER_BULB);
+            registerWaxPair(CopperBlocks.COPPER_BULB, CopperBlocks.WAXED_COPPER_BULB);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_BULB, CopperBlocks.WAXED_EXPOSED_COPPER_BULB);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_BULB, CopperBlocks.WAXED_WEATHERED_COPPER_BULB);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_BULB, CopperBlocks.WAXED_OXIDIZED_COPPER_BULB);
 
-            registerChain(ModBlocks.COPPER_ROD, ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WEATHERED_COPPER_ROD,
-                    ModBlocks.OXIDIZED_COPPER_ROD);
-            registerWaxPair(ModBlocks.COPPER_ROD, ModBlocks.WAXED_COPPER_ROD);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WAXED_EXPOSED_COPPER_ROD);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.WAXED_WEATHERED_COPPER_ROD);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_ROD, ModBlocks.WAXED_OXIDIZED_COPPER_ROD);
+            registerChain(CopperBlocks.COPPER_ROD, CopperBlocks.EXPOSED_COPPER_ROD, CopperBlocks.WEATHERED_COPPER_ROD,
+                    CopperBlocks.OXIDIZED_COPPER_ROD);
+            registerWaxPair(CopperBlocks.COPPER_ROD, CopperBlocks.WAXED_COPPER_ROD);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_ROD, CopperBlocks.WAXED_EXPOSED_COPPER_ROD);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_ROD, CopperBlocks.WAXED_WEATHERED_COPPER_ROD);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_ROD, CopperBlocks.WAXED_OXIDIZED_COPPER_ROD);
 
-            registerChain(ModBlocks.COPPER_LANTERN, ModBlocks.EXPOSED_COPPER_LANTERN,
-                    ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.OXIDIZED_COPPER_LANTERN);
-            registerWaxPair(ModBlocks.COPPER_LANTERN, ModBlocks.WAXED_COPPER_LANTERN);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WAXED_EXPOSED_COPPER_LANTERN);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.WAXED_WEATHERED_COPPER_LANTERN);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_LANTERN, ModBlocks.WAXED_OXIDIZED_COPPER_LANTERN);
+            registerChain(CopperBlocks.COPPER_LANTERN, CopperBlocks.EXPOSED_COPPER_LANTERN,
+                    CopperBlocks.WEATHERED_COPPER_LANTERN, CopperBlocks.OXIDIZED_COPPER_LANTERN);
+            registerWaxPair(CopperBlocks.COPPER_LANTERN, CopperBlocks.WAXED_COPPER_LANTERN);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_LANTERN, CopperBlocks.WAXED_EXPOSED_COPPER_LANTERN);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_LANTERN, CopperBlocks.WAXED_WEATHERED_COPPER_LANTERN);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_LANTERN, CopperBlocks.WAXED_OXIDIZED_COPPER_LANTERN);
 
-            registerChain(ModBlocks.COPPER_DOOR, ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WEATHERED_COPPER_DOOR,
-                    ModBlocks.OXIDIZED_COPPER_DOOR);
-            registerWaxPair(ModBlocks.COPPER_DOOR, ModBlocks.WAXED_COPPER_DOOR);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WAXED_EXPOSED_COPPER_DOOR);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.WAXED_WEATHERED_COPPER_DOOR);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_DOOR, ModBlocks.WAXED_OXIDIZED_COPPER_DOOR);
+            registerChain(CopperBlocks.COPPER_DOOR, CopperBlocks.EXPOSED_COPPER_DOOR,
+                    CopperBlocks.WEATHERED_COPPER_DOOR,
+                    CopperBlocks.OXIDIZED_COPPER_DOOR);
+            registerWaxPair(CopperBlocks.COPPER_DOOR, CopperBlocks.WAXED_COPPER_DOOR);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_DOOR, CopperBlocks.WAXED_EXPOSED_COPPER_DOOR);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_DOOR, CopperBlocks.WAXED_WEATHERED_COPPER_DOOR);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_DOOR, CopperBlocks.WAXED_OXIDIZED_COPPER_DOOR);
 
-            registerChain(ModBlocks.COPPER_TRAPDOOR, ModBlocks.EXPOSED_COPPER_TRAPDOOR,
-                    ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.OXIDIZED_COPPER_TRAPDOOR);
-            registerWaxPair(ModBlocks.COPPER_TRAPDOOR, ModBlocks.WAXED_COPPER_TRAPDOOR);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WAXED_EXPOSED_COPPER_TRAPDOOR);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.WAXED_WEATHERED_COPPER_TRAPDOOR);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_TRAPDOOR, ModBlocks.WAXED_OXIDIZED_COPPER_TRAPDOOR);
+            registerChain(CopperBlocks.COPPER_TRAPDOOR, CopperBlocks.EXPOSED_COPPER_TRAPDOOR,
+                    CopperBlocks.WEATHERED_COPPER_TRAPDOOR, CopperBlocks.OXIDIZED_COPPER_TRAPDOOR);
+            registerWaxPair(CopperBlocks.COPPER_TRAPDOOR, CopperBlocks.WAXED_COPPER_TRAPDOOR);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_TRAPDOOR, CopperBlocks.WAXED_EXPOSED_COPPER_TRAPDOOR);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_TRAPDOOR, CopperBlocks.WAXED_WEATHERED_COPPER_TRAPDOOR);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_TRAPDOOR, CopperBlocks.WAXED_OXIDIZED_COPPER_TRAPDOOR);
 
-            registerChain(ModBlocks.COPPER_BARS, ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WEATHERED_COPPER_BARS,
-                    ModBlocks.OXIDIZED_COPPER_BARS);
-            registerWaxPair(ModBlocks.COPPER_BARS, ModBlocks.WAXED_COPPER_BARS);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WAXED_EXPOSED_COPPER_BARS);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.WAXED_WEATHERED_COPPER_BARS);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_BARS, ModBlocks.WAXED_OXIDIZED_COPPER_BARS);
+            registerChain(CopperBlocks.COPPER_BARS, CopperBlocks.EXPOSED_COPPER_BARS,
+                    CopperBlocks.WEATHERED_COPPER_BARS,
+                    CopperBlocks.OXIDIZED_COPPER_BARS);
+            registerWaxPair(CopperBlocks.COPPER_BARS, CopperBlocks.WAXED_COPPER_BARS);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_BARS, CopperBlocks.WAXED_EXPOSED_COPPER_BARS);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_BARS, CopperBlocks.WAXED_WEATHERED_COPPER_BARS);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_BARS, CopperBlocks.WAXED_OXIDIZED_COPPER_BARS);
 
-            registerChain(ModBlocks.COPPER_MESH, ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WEATHERED_COPPER_MESH,
-                    ModBlocks.OXIDIZED_COPPER_MESH);
-            registerWaxPair(ModBlocks.COPPER_MESH, ModBlocks.WAXED_COPPER_MESH);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WAXED_EXPOSED_COPPER_MESH);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.WAXED_WEATHERED_COPPER_MESH);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_MESH, ModBlocks.WAXED_OXIDIZED_COPPER_MESH);
+            registerChain(CopperBlocks.COPPER_MESH, CopperBlocks.EXPOSED_COPPER_MESH,
+                    CopperBlocks.WEATHERED_COPPER_MESH,
+                    CopperBlocks.OXIDIZED_COPPER_MESH);
+            registerWaxPair(CopperBlocks.COPPER_MESH, CopperBlocks.WAXED_COPPER_MESH);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_MESH, CopperBlocks.WAXED_EXPOSED_COPPER_MESH);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_MESH, CopperBlocks.WAXED_WEATHERED_COPPER_MESH);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_MESH, CopperBlocks.WAXED_OXIDIZED_COPPER_MESH);
 
-            registerChain(ModBlocks.COPPER_BOLTS, ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WEATHERED_COPPER_BOLTS,
-                    ModBlocks.OXIDIZED_COPPER_BOLTS);
-            registerWaxPair(ModBlocks.COPPER_BOLTS, ModBlocks.WAXED_COPPER_BOLTS);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WAXED_EXPOSED_COPPER_BOLTS);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.WAXED_WEATHERED_COPPER_BOLTS);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_BOLTS, ModBlocks.WAXED_OXIDIZED_COPPER_BOLTS);
+            registerChain(CopperBlocks.COPPER_BOLTS, CopperBlocks.EXPOSED_COPPER_BOLTS,
+                    CopperBlocks.WEATHERED_COPPER_BOLTS,
+                    CopperBlocks.OXIDIZED_COPPER_BOLTS);
+            registerWaxPair(CopperBlocks.COPPER_BOLTS, CopperBlocks.WAXED_COPPER_BOLTS);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_BOLTS, CopperBlocks.WAXED_EXPOSED_COPPER_BOLTS);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_BOLTS, CopperBlocks.WAXED_WEATHERED_COPPER_BOLTS);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_BOLTS, CopperBlocks.WAXED_OXIDIZED_COPPER_BOLTS);
 
-            registerChain(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerChain(ShapedWoodBlocks.CUT_COPPER_VERTICAL_SLAB, ShapedWoodBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB,
+                    ShapedWoodBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB,
+                    ShapedWoodBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ShapedWoodBlocks.CUT_COPPER_VERTICAL_SLAB, ShapedWoodBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ShapedWoodBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB,
+                    ShapedWoodBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ShapedWoodBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB,
+                    ShapedWoodBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ShapedWoodBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB,
+                    ShapedWoodBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
 
-            registerChain(ModBlocks.COPPER_BUTTON, ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WEATHERED_COPPER_BUTTON,
-                    ModBlocks.OXIDIZED_COPPER_BUTTON);
-            registerWaxPair(ModBlocks.COPPER_BUTTON, ModBlocks.WAXED_COPPER_BUTTON);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WAXED_EXPOSED_COPPER_BUTTON);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.WAXED_WEATHERED_COPPER_BUTTON);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_BUTTON, ModBlocks.WAXED_OXIDIZED_COPPER_BUTTON);
+            registerChain(CopperBlocks.COPPER_BUTTON, CopperBlocks.EXPOSED_COPPER_BUTTON,
+                    CopperBlocks.WEATHERED_COPPER_BUTTON,
+                    CopperBlocks.OXIDIZED_COPPER_BUTTON);
+            registerWaxPair(CopperBlocks.COPPER_BUTTON, CopperBlocks.WAXED_COPPER_BUTTON);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_BUTTON, CopperBlocks.WAXED_EXPOSED_COPPER_BUTTON);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_BUTTON, CopperBlocks.WAXED_WEATHERED_COPPER_BUTTON);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_BUTTON, CopperBlocks.WAXED_OXIDIZED_COPPER_BUTTON);
 
-            registerChain(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE,
-                    ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE);
-            registerWaxPair(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.WAXED_COPPER_PRESSURE_PLATE);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE);
+            registerChain(CopperBlocks.COPPER_PRESSURE_PLATE, CopperBlocks.EXPOSED_COPPER_PRESSURE_PLATE,
+                    CopperBlocks.WEATHERED_COPPER_PRESSURE_PLATE, CopperBlocks.OXIDIZED_COPPER_PRESSURE_PLATE);
+            registerWaxPair(CopperBlocks.COPPER_PRESSURE_PLATE, CopperBlocks.WAXED_COPPER_PRESSURE_PLATE);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_PRESSURE_PLATE,
+                    CopperBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_PRESSURE_PLATE,
+                    CopperBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_PRESSURE_PLATE,
+                    CopperBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE);
 
-            registerChain(ModBlocks.COPPER_CHEST, ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WEATHERED_COPPER_CHEST,
-                    ModBlocks.OXIDIZED_COPPER_CHEST);
-            registerWaxPair(ModBlocks.COPPER_CHEST, ModBlocks.WAXED_COPPER_CHEST);
-            registerWaxPair(ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WAXED_EXPOSED_COPPER_CHEST);
-            registerWaxPair(ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.WAXED_WEATHERED_COPPER_CHEST);
-            registerWaxPair(ModBlocks.OXIDIZED_COPPER_CHEST, ModBlocks.WAXED_OXIDIZED_COPPER_CHEST);
+            registerChain(CopperBlocks.COPPER_CHEST, CopperBlocks.EXPOSED_COPPER_CHEST,
+                    CopperBlocks.WEATHERED_COPPER_CHEST,
+                    CopperBlocks.OXIDIZED_COPPER_CHEST);
+            registerWaxPair(CopperBlocks.COPPER_CHEST, CopperBlocks.WAXED_COPPER_CHEST);
+            registerWaxPair(CopperBlocks.EXPOSED_COPPER_CHEST, CopperBlocks.WAXED_EXPOSED_COPPER_CHEST);
+            registerWaxPair(CopperBlocks.WEATHERED_COPPER_CHEST, CopperBlocks.WAXED_WEATHERED_COPPER_CHEST);
+            registerWaxPair(CopperBlocks.OXIDIZED_COPPER_CHEST, CopperBlocks.WAXED_OXIDIZED_COPPER_CHEST);
 
-            registerChain(ModBlocks.COPPER_CHAIN, ModBlocks.EXPOSED_COPPER_CHAIN, ModBlocks.WEATHERED_COPPER_CHAIN,
-                    ModBlocks.OXIDIZED_COPPER_CHAIN);
+            registerChain(WoodBlocks.COPPER_CHAIN, WoodBlocks.EXPOSED_COPPER_CHAIN, WoodBlocks.WEATHERED_COPPER_CHAIN,
+                    WoodBlocks.OXIDIZED_COPPER_CHAIN);
 
-            registerChain(ModBlocks.LARGE_COPPER_CHAIN, ModBlocks.LARGE_EXPOSED_COPPER_CHAIN,
-                    ModBlocks.LARGE_WEATHERED_COPPER_CHAIN, ModBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
+            registerChain(CopperBlocks.LARGE_COPPER_CHAIN, CopperBlocks.LARGE_EXPOSED_COPPER_CHAIN,
+                    WoolBlocks.LARGE_WEATHERED_COPPER_CHAIN, WoolBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
 
-            registerChain(ModBlocks.SLIT_COPPER, ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WEATHERED_SLIT_COPPER,
-                    ModBlocks.OXIDIZED_SLIT_COPPER);
-            registerWaxPair(ModBlocks.SLIT_COPPER, ModBlocks.WAXED_SLIT_COPPER);
-            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WAXED_EXPOSED_SLIT_COPPER);
-            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.WAXED_WEATHERED_SLIT_COPPER);
-            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER);
+            registerChain(CopperBlocks.SLIT_COPPER, CopperBlocks.EXPOSED_SLIT_COPPER,
+                    CopperBlocks.WEATHERED_SLIT_COPPER,
+                    CopperBlocks.OXIDIZED_SLIT_COPPER);
+            registerWaxPair(CopperBlocks.SLIT_COPPER, CopperBlocks.WAXED_SLIT_COPPER);
+            registerWaxPair(CopperBlocks.EXPOSED_SLIT_COPPER, CopperBlocks.WAXED_EXPOSED_SLIT_COPPER);
+            registerWaxPair(CopperBlocks.WEATHERED_SLIT_COPPER, CopperBlocks.WAXED_WEATHERED_SLIT_COPPER);
+            registerWaxPair(CopperBlocks.OXIDIZED_SLIT_COPPER, CopperBlocks.WAXED_OXIDIZED_SLIT_COPPER);
 
-            registerChain(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.EXPOSED_SLIT_COPPER_STAIRS,
-                    ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS);
-            registerWaxPair(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.WAXED_SLIT_COPPER_STAIRS);
-            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_STAIRS);
-            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_STAIRS);
-            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_STAIRS);
+            registerChain(CopperBlocks.SLIT_COPPER_STAIRS, CopperBlocks.EXPOSED_SLIT_COPPER_STAIRS,
+                    CopperBlocks.WEATHERED_SLIT_COPPER_STAIRS, CopperBlocks.OXIDIZED_SLIT_COPPER_STAIRS);
+            registerWaxPair(CopperBlocks.SLIT_COPPER_STAIRS, CopperBlocks.WAXED_SLIT_COPPER_STAIRS);
+            registerWaxPair(CopperBlocks.EXPOSED_SLIT_COPPER_STAIRS, CopperBlocks.WAXED_EXPOSED_SLIT_COPPER_STAIRS);
+            registerWaxPair(CopperBlocks.WEATHERED_SLIT_COPPER_STAIRS, CopperBlocks.WAXED_WEATHERED_SLIT_COPPER_STAIRS);
+            registerWaxPair(CopperBlocks.OXIDIZED_SLIT_COPPER_STAIRS, CopperBlocks.WAXED_OXIDIZED_SLIT_COPPER_STAIRS);
 
-            registerChain(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_SLAB,
-                    ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_SLAB);
-            registerWaxPair(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.WAXED_SLIT_COPPER_SLAB);
-            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_SLAB);
-            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_SLAB);
-            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_SLAB);
+            registerChain(CopperBlocks.SLIT_COPPER_SLAB, CopperBlocks.EXPOSED_SLIT_COPPER_SLAB,
+                    CopperBlocks.WEATHERED_SLIT_COPPER_SLAB, CopperBlocks.OXIDIZED_SLIT_COPPER_SLAB);
+            registerWaxPair(CopperBlocks.SLIT_COPPER_SLAB, CopperBlocks.WAXED_SLIT_COPPER_SLAB);
+            registerWaxPair(CopperBlocks.EXPOSED_SLIT_COPPER_SLAB, CopperBlocks.WAXED_EXPOSED_SLIT_COPPER_SLAB);
+            registerWaxPair(CopperBlocks.WEATHERED_SLIT_COPPER_SLAB, CopperBlocks.WAXED_WEATHERED_SLIT_COPPER_SLAB);
+            registerWaxPair(CopperBlocks.OXIDIZED_SLIT_COPPER_SLAB, CopperBlocks.WAXED_OXIDIZED_SLIT_COPPER_SLAB);
 
-            registerChain(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_SLIT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
+            registerChain(CopperBlocks.SLIT_COPPER_VERTICAL_SLAB, CopperBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB,
+                    CopperBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, CopperBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(CopperBlocks.SLIT_COPPER_VERTICAL_SLAB, CopperBlocks.WAXED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(CopperBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB,
+                    CopperBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(CopperBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB,
+                    CopperBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(CopperBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB,
+                    CopperBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
 
-            registerChain(ModBlocks.BIT_CHISELED_COPPER, ModBlocks.BIT_EXPOSED_CHISELED_COPPER,
-                    ModBlocks.BIT_WEATHERED_CHISELED_COPPER, ModBlocks.BIT_OXIDIZED_CHISELED_COPPER);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK, ModBlocks.BIT_EXPOSED_COPPER_BLOCK,
-                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK_STAIRS, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_STAIRS,
-                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK_STAIRS, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_STAIRS);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK_SLAB, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_SLAB,
-                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK_SLAB, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_SLAB);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK_WALL, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_WALL,
-                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK_WALL, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_WALL);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK_VERTICAL_SLAB, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB,
-                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB,
-                    ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB);
-            registerChain(ModBlocks.BIT_CUT_COPPER, ModBlocks.BIT_EXPOSED_CUT_COPPER,
-                    ModBlocks.BIT_WEATHERED_CUT_COPPER, ModBlocks.BIT_OXIDIZED_CUT_COPPER);
-            registerChain(ModBlocks.BIT_CUT_COPPER_STAIRS, ModBlocks.BIT_EXPOSED_CUT_COPPER_STAIRS,
-                    ModBlocks.BIT_WEATHERED_CUT_COPPER_STAIRS, ModBlocks.BIT_OXIDIZED_CUT_COPPER_STAIRS);
-            registerChain(ModBlocks.BIT_CUT_COPPER_SLAB, ModBlocks.BIT_EXPOSED_CUT_COPPER_SLAB,
-                    ModBlocks.BIT_WEATHERED_CUT_COPPER_SLAB, ModBlocks.BIT_OXIDIZED_CUT_COPPER_SLAB);
-            registerChain(ModBlocks.BIT_CUT_COPPER_WALL, ModBlocks.BIT_EXPOSED_CUT_COPPER_WALL,
-                    ModBlocks.BIT_WEATHERED_CUT_COPPER_WALL, ModBlocks.BIT_OXIDIZED_CUT_COPPER_WALL);
-            registerChain(ModBlocks.BIT_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB,
-                    ModBlocks.BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
-            registerChain(ModBlocks.BIT_COPPER_BULB, ModBlocks.BIT_EXPOSED_COPPER_BULB,
-                    ModBlocks.BIT_WEATHERED_COPPER_BULB, ModBlocks.BIT_OXIDIZED_COPPER_BULB);
-            registerChain(ModBlocks.BIT_COPPER_GRATE, ModBlocks.BIT_EXPOSED_COPPER_GRATE,
-                    ModBlocks.BIT_WEATHERED_COPPER_GRATE, ModBlocks.BIT_OXIDIZED_COPPER_GRATE);
+            registerChain(SandstoneBlocks.BIT_CHISELED_COPPER, SandstoneBlocks.BIT_EXPOSED_CHISELED_COPPER,
+                    SandstoneBlocks.BIT_WEATHERED_CHISELED_COPPER, SandstoneBlocks.BIT_OXIDIZED_CHISELED_COPPER);
+            registerChain(SandstoneBlocks.BIT_COPPER_BLOCK, SandstoneBlocks.BIT_EXPOSED_COPPER_BLOCK,
+                    SandstoneBlocks.BIT_WEATHERED_COPPER_BLOCK, SandstoneBlocks.BIT_OXIDIZED_COPPER_BLOCK);
+            registerChain(SandstoneBlocks.BIT_COPPER_BLOCK_STAIRS, SandstoneBlocks.BIT_EXPOSED_COPPER_BLOCK_STAIRS,
+                    SandstoneBlocks.BIT_WEATHERED_COPPER_BLOCK_STAIRS,
+                    SandstoneBlocks.BIT_OXIDIZED_COPPER_BLOCK_STAIRS);
+            registerChain(StoneBlocks.BIT_COPPER_BLOCK_SLAB, StoneBlocks.BIT_EXPOSED_COPPER_BLOCK_SLAB,
+                    StoneBlocks.BIT_WEATHERED_COPPER_BLOCK_SLAB, StoneBlocks.BIT_OXIDIZED_COPPER_BLOCK_SLAB);
+            registerChain(StoneBlocks.BIT_COPPER_BLOCK_WALL, StoneBlocks.BIT_EXPOSED_COPPER_BLOCK_WALL,
+                    StoneBlocks.BIT_WEATHERED_COPPER_BLOCK_WALL, StoneBlocks.BIT_OXIDIZED_COPPER_BLOCK_WALL);
+            registerChain(ShapedStoneBlocks.BIT_COPPER_BLOCK_VERTICAL_SLAB,
+                    ShapedStoneBlocks.BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB,
+                    ShapedStoneBlocks.BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB,
+                    ShapedStoneBlocks.BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB);
+            registerChain(SandstoneBlocks.BIT_CUT_COPPER, SandstoneBlocks.BIT_EXPOSED_CUT_COPPER,
+                    SandstoneBlocks.BIT_WEATHERED_CUT_COPPER, SandstoneBlocks.BIT_OXIDIZED_CUT_COPPER);
+            registerChain(SandstoneBlocks.BIT_CUT_COPPER_STAIRS, SandstoneBlocks.BIT_EXPOSED_CUT_COPPER_STAIRS,
+                    SandstoneBlocks.BIT_WEATHERED_CUT_COPPER_STAIRS, SandstoneBlocks.BIT_OXIDIZED_CUT_COPPER_STAIRS);
+            registerChain(StoneBlocks.BIT_CUT_COPPER_SLAB, StoneBlocks.BIT_EXPOSED_CUT_COPPER_SLAB,
+                    StoneBlocks.BIT_WEATHERED_CUT_COPPER_SLAB, StoneBlocks.BIT_OXIDIZED_CUT_COPPER_SLAB);
+            registerChain(StoneBlocks.BIT_CUT_COPPER_WALL, StoneBlocks.BIT_EXPOSED_CUT_COPPER_WALL,
+                    StoneBlocks.BIT_WEATHERED_CUT_COPPER_WALL, StoneBlocks.BIT_OXIDIZED_CUT_COPPER_WALL);
+            registerChain(ShapedStoneBlocks.BIT_CUT_COPPER_VERTICAL_SLAB,
+                    ShapedStoneBlocks.BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB,
+                    ShapedStoneBlocks.BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB,
+                    ShapedStoneBlocks.BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerChain(SandstoneBlocks.BIT_COPPER_BULB, SandstoneBlocks.BIT_EXPOSED_COPPER_BULB,
+                    SandstoneBlocks.BIT_WEATHERED_COPPER_BULB, SandstoneBlocks.BIT_OXIDIZED_COPPER_BULB);
+            registerChain(SandstoneBlocks.BIT_COPPER_GRATE, SandstoneBlocks.BIT_EXPOSED_COPPER_GRATE,
+                    SandstoneBlocks.BIT_WEATHERED_COPPER_GRATE, SandstoneBlocks.BIT_OXIDIZED_COPPER_GRATE);
             initialized = true;
         }
     }
@@ -270,7 +293,7 @@ public class CopperOxidationHandler {
         ItemStack held = event.getItemStack();
         Player player = event.getPlayer();
 
-        if (held.is(ModItems.BOTTLE_OF_MIST.get())) {
+        if (held.is(MasonryItems.BOTTLE_OF_MIST.get())) {
             BlockState nextState = getNextOxidationState(state);
             if (nextState != null && nextState.getBlock() != block) {
                 if (!level.isClientSide) {

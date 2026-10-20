@@ -4,7 +4,7 @@ import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.RegistryObject;
@@ -80,7 +80,7 @@ public class ToolSpeedTagsTest extends BootstrappedGameTest {
             if (!name.matches("[a-z_]+_carpet_layers")) {
                 continue;
             }
-            Block block = RegistryTestSupport.create(ModBlocks.BLOCKS, name);
+            Block block = RegistryTestSupport.create(BlocksRegister.blocks(), name);
             assertTrue(name, block instanceof WoolLayersBlock);
             assertEquals(name, 0.1f, block.defaultDestroyTime(), 0.0f);
             assertFalse(name, wool.contains("buildscape:" + name));
@@ -91,7 +91,7 @@ public class ToolSpeedTagsTest extends BootstrappedGameTest {
 
     private static Set<String> registeredNames() {
         Set<String> names = new HashSet<>();
-        for (RegistryObject<Block> entry : ModBlocks.BLOCKS.getEntries()) {
+        for (RegistryObject<Block> entry : BlocksRegister.blocks().getEntries()) {
             names.add(entry.getId().getPath());
         }
         return names;

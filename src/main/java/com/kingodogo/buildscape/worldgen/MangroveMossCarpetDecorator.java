@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.worldgen;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.StoneBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -65,9 +66,9 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
                     boolean isRoot = level.isStateAtPosition(
                             checkPos,
                             state -> state.is(
-                                    ModBlocks.MANGROVE_ROOTS.get()) ||
+                                    DecorBlocks.MANGROVE_ROOTS.get()) ||
                                     state.is(
-                                            ModBlocks.MUDDY_MANGROVE_ROOTS.get()));
+                                            DecorBlocks.MUDDY_MANGROVE_ROOTS.get()));
 
                     if (isRoot) {
                         BlockPos abovePos = checkPos.above();
@@ -76,7 +77,7 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
                             if (level.isStateAtPosition(abovePos, state -> state.isAir())) {
                                 blockSetter.accept(
                                         abovePos,
-                                        ModBlocks.MOSS_OVERLAY.get()
+                                        StoneBlocks.MOSS_OVERLAY.get()
                                                 .defaultBlockState());
                             }
                         }

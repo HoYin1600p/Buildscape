@@ -2,10 +2,10 @@ package com.kingodogo.buildscape.snapshot;
 
 import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
 import com.kingodogo.buildscape.registry.ModEntities;
 import com.kingodogo.buildscape.registry.ModFluids;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.ItemsRegister;
 import com.kingodogo.buildscape.registry.ModMenuTypes;
 import com.kingodogo.buildscape.registry.ModParticles;
 import com.kingodogo.buildscape.registry.ModRecipeSerializers;
@@ -33,12 +33,12 @@ public class RegistryNamesSnapshotTest extends BootstrappedGameTest {
 
     @Test
     public void blocks() throws IOException {
-        check("blocks", ModBlocks.BLOCKS);
+        check("blocks", BlocksRegister.blocks());
     }
 
     @Test
     public void items() throws IOException {
-        check("items", ModItems.ITEMS);
+        check("items", ItemsRegister.items());
     }
 
     @Test

@@ -19,7 +19,7 @@ import com.kingodogo.buildscape.block.decor.StrawBedBlock;
 import com.kingodogo.buildscape.block.building.VerticalSlabBlock;
 import com.kingodogo.buildscape.block.decor.WallpaperFlatBlock;
 import com.kingodogo.buildscape.feature.copper.WeatheringVerticalSlabBlock;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.ShapedWoodItems;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CarpetBlock;
@@ -257,7 +257,7 @@ public final class ShapedWoodBlocks {
             () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
     public static final RegistryObject<Block> RED_MOSS_LAYERS = BLOCKS.register("red_moss_layers",
             () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                    () -> ModItems.RED_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.RED_MOSS_BLOCK.get()));
+                    () -> ShapedWoodItems.RED_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.RED_MOSS_BLOCK.get()));
     public static final RegistryObject<Block> RED_MOSS_BLOCK = BLOCKS.register("red_moss_block",
             () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK), RED_MOSS_CARPET,
                     RED_MOSS_OVERLAY, RED_MOSS_LAYERS, () -> POPLAR_SAPLING.get(), () -> CopperBlocks.RED_BUSH.get()));
@@ -274,7 +274,7 @@ public final class ShapedWoodBlocks {
             () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
     public static final RegistryObject<Block> ORANGE_MOSS_LAYERS = BLOCKS.register("orange_moss_layers",
             () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                    () -> ModItems.ORANGE_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.ORANGE_MOSS_BLOCK.get()));
+                    () -> ShapedWoodItems.ORANGE_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.ORANGE_MOSS_BLOCK.get()));
     public static final RegistryObject<Block> ORANGE_MOSS_BLOCK = BLOCKS.register("orange_moss_block",
             () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
                     ORANGE_MOSS_CARPET, ORANGE_MOSS_OVERLAY, ORANGE_MOSS_LAYERS, () -> POPLAR_SAPLING.get(),
@@ -292,7 +292,7 @@ public final class ShapedWoodBlocks {
             () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
     public static final RegistryObject<Block> YELLOW_MOSS_LAYERS = BLOCKS.register("yellow_moss_layers",
             () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
-                    () -> ModItems.YELLOW_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.YELLOW_MOSS_BLOCK.get()));
+                    () -> ShapedWoodItems.YELLOW_MOSS_LAYERS.get(), () -> ShapedWoodBlocks.YELLOW_MOSS_BLOCK.get()));
     public static final RegistryObject<Block> YELLOW_MOSS_BLOCK = BLOCKS.register("yellow_moss_block",
             () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
                     YELLOW_MOSS_CARPET, YELLOW_MOSS_OVERLAY, YELLOW_MOSS_LAYERS, () -> POPLAR_SAPLING.get(),

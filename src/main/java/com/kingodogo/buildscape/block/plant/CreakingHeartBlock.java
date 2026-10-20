@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -77,13 +77,13 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
             BooleanProperty faceProp = GlowLichenBlock.getFaceProperty(attachFace);
             BlockState adjState = level.getBlockState(adjPos);
 
-            if (adjState.is(ModBlocks.RESIN_CLUMP.get())) {
+            if (adjState.is(CopperBlocks.RESIN_CLUMP.get())) {
                 if (!adjState.getValue(faceProp)) {
                     level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
                     spawned++;
                 }
             } else if (adjState.isAir()) {
-                BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
+                BlockState newState = CopperBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
                 level.setBlock(adjPos, newState, 3);
                 spawned++;
             }

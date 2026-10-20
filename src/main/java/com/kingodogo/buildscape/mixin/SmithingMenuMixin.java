@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ItemCombinerMenu;
 import net.minecraft.world.inventory.SmithingMenu;
@@ -24,7 +24,7 @@ public abstract class SmithingMenuMixin extends ItemCombinerMenu {
     @Inject(method = "onTake", at = @At("HEAD"))
     private void buildscape$preserveTemplateHead(Player player, ItemStack stack, CallbackInfo ci) {
         ItemStack rightSlot = this.inputSlots.getItem(1);
-        if (rightSlot.is(ModItems.BIG_ORNAMENT_TEMPLATE.get())) {
+        if (rightSlot.is(CardboardItems.BIG_ORNAMENT_TEMPLATE.get())) {
             this.buildscape$savedTemplate = rightSlot.copy();
         } else {
             this.buildscape$savedTemplate = ItemStack.EMPTY;

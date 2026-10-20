@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.worldgen;
 
 import com.kingodogo.buildscape.block.plant.MangrovePropaguleBlock;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -119,7 +119,7 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
 
                 if (canPlace) {
                     int age = random.nextInt(5);
-                    BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get()
+                    BlockState propaguleState = DecorBlocks.MANGROVE_PROPAGULE.get()
                             .defaultBlockState()
                             .setValue(
                                     MangrovePropaguleBlock.AGE,

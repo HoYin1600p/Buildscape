@@ -12,8 +12,12 @@ import com.kingodogo.buildscape.block.plant.PottedHazeBushBlock;
 import com.kingodogo.buildscape.block.plant.RoseVinesBlock;
 import com.kingodogo.buildscape.feature.copper.CopperOxidationHandler;
 import com.kingodogo.buildscape.item.HazeBushItem;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
+import com.kingodogo.buildscape.registry.blocks.WoodBlocks;
+import com.kingodogo.buildscape.registry.items.CopperItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -101,21 +105,21 @@ public class BlockInteractionEvents {
             return;
         }
 
-        if (state.getBlock() == ModBlocks.BAMBOO_BLOCK.get()
+        if (state.getBlock() == WoodBlocks.BAMBOO_BLOCK.get()
                 && heldItem.getItem() instanceof AxeItem) {
-            stripWithAxe(event, state, heldItem, ModBlocks.STRIPPED_BAMBOO_BLOCK.get());
+            stripWithAxe(event, state, heldItem, WoodBlocks.STRIPPED_BAMBOO_BLOCK.get());
             return;
         }
 
-        if (state.getBlock() == ModBlocks.MANGROVE_LOG.get()
+        if (state.getBlock() == DecorBlocks.MANGROVE_LOG.get()
                 && heldItem.getItem() instanceof AxeItem) {
-            stripWithAxe(event, state, heldItem, ModBlocks.STRIPPED_MANGROVE_LOG.get());
+            stripWithAxe(event, state, heldItem, DecorBlocks.STRIPPED_MANGROVE_LOG.get());
             return;
         }
 
-        if (state.getBlock() == ModBlocks.MANGROVE_WOOD.get()
+        if (state.getBlock() == DecorBlocks.MANGROVE_WOOD.get()
                 && heldItem.getItem() instanceof AxeItem) {
-            stripWithAxe(event, state, heldItem, ModBlocks.STRIPPED_MANGROVE_WOOD.get());
+            stripWithAxe(event, state, heldItem, DecorBlocks.STRIPPED_MANGROVE_WOOD.get());
             return;
         }
 
@@ -136,7 +140,7 @@ public class BlockInteractionEvents {
             if (heldItem.getItem() instanceof BlockItem blockItem
                     && blockItem.getBlock() instanceof HazeBushBlock bushBlock) {
                 DyeColor color = bushBlock.getColor();
-                RegistryObject<Block> pottedObj = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color);
+                RegistryObject<Block> pottedObj = CopperBlocks.POTTED_COLORED_HAZE_BUSHES.get(color);
                 if (pottedObj != null) {
                     if (!event.getWorld().isClientSide) {
                         BlockState newState = pottedObj.get().defaultBlockState()
@@ -227,7 +231,7 @@ public class BlockInteractionEvents {
             return;
         }
 
-        level.setBlock(pos, ModBlocks.MUD.get().defaultBlockState(), 3);
+        level.setBlock(pos, SandstoneBlocks.MUD.get().defaultBlockState(), 3);
 
         level.playSound(
                 null,
@@ -268,12 +272,12 @@ public class BlockInteractionEvents {
 
         // Handlers that return true have consumed the click and ended the event; the others fall through.
         if (state.is(Blocks.CACTUS) && event.getFace() == Direction.UP
-                && plantOnTop(event, held, level, pos, ModBlocks.CACTUS_FLOWER, InteractionResult.SUCCESS)) {
+                && plantOnTop(event, held, level, pos, CopperBlocks.CACTUS_FLOWER, InteractionResult.SUCCESS)) {
             return;
         }
 
         if ((state.is(Blocks.SAND) || state.is(Blocks.RED_SAND)) && event.getFace() == Direction.UP
-                && plantOnTop(event, held, level, pos, ModBlocks.DRY_GRASS, InteractionResult.SUCCESS)) {
+                && plantOnTop(event, held, level, pos, CopperBlocks.DRY_GRASS, InteractionResult.SUCCESS)) {
             return;
         }
 
@@ -289,16 +293,16 @@ public class BlockInteractionEvents {
             scatterPlantsAroundMoss(level, pos);
         }
 
-        if (state.is(ModBlocks.PALE_OAK_LEAVES.get()) && hangPaleMoss(event, held, level, pos)) {
+        if (state.is(ShapedWoodBlocks.PALE_OAK_LEAVES.get()) && hangPaleMoss(event, held, level, pos)) {
             return;
         }
 
-        if (state.is(ModBlocks.CREAKING_HEART.get())) {
+        if (state.is(CopperBlocks.CREAKING_HEART.get())) {
             activateCreakingHeart(event, held, level, pos, state);
             return;
         }
 
-        if (state.is(ModBlocks.TALL_DRY_GRASS.get())) {
+        if (state.is(CopperBlocks.TALL_DRY_GRASS.get())) {
             dropDryGrass(event, held, level, pos);
             return;
         }
@@ -342,7 +346,7 @@ public class BlockInteractionEvents {
     private static boolean bonemealPodzol(
             PlayerInteractEvent.RightClickBlock event, ItemStack held, Level level, BlockPos pos) {
         if (plantOnTop(
-                event, held, level, pos, ModBlocks.WHITE_HAZE_BUSH,
+                event, held, level, pos, CopperBlocks.WHITE_HAZE_BUSH,
                 InteractionResult.sidedSuccess(level.isClientSide))) {
             return true;
         }
@@ -365,7 +369,7 @@ public class BlockInteractionEvents {
         }
         if (!level.isClientSide) {
             BlockPos target = validPositions.get(level.random.nextInt(validPositions.size()));
-            level.setBlock(target, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
+            level.setBlock(target, CopperBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
             consumeBoneMeal(event, held, level, pos);
         }
         cancelWith(event, InteractionResult.sidedSuccess(level.isClientSide));
@@ -384,7 +388,7 @@ public class BlockInteractionEvents {
                         if (level.getBlockState(checkPos).is(Blocks.GRASS_BLOCK)
                                 && level.isEmptyBlock(checkPos.above())) {
                             if (level.random.nextFloat() < 0.05F) {
-                                level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(), 3);
+                                level.setBlock(checkPos.above(), CopperBlocks.BUSH.get().defaultBlockState(), 3);
                             }
                         }
                     });
@@ -404,14 +408,15 @@ public class BlockInteractionEvents {
                                 && level.isEmptyBlock(checkPos.above())) {
                             float roll = level.random.nextFloat();
                             if (roll < 0.10F) {
-                                level.setBlock(checkPos.above(), ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
+                                level.setBlock(checkPos.above(), CopperBlocks.FIREFLY_BUSH.get().defaultBlockState(),
+                                        3);
                             } else if (roll < 0.15F) {
-                                BlockState saplingState = ModBlocks.CHERRY_SAPLING.get().defaultBlockState();
+                                BlockState saplingState = ShapedWoodBlocks.CHERRY_SAPLING.get().defaultBlockState();
                                 if (saplingState.canSurvive(level, checkPos.above())) {
                                     level.setBlock(checkPos.above(), saplingState, 3);
                                 }
                             } else if (roll < 0.20F) {
-                                BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState();
+                                BlockState propaguleState = DecorBlocks.MANGROVE_PROPAGULE.get().defaultBlockState();
                                 if (propaguleState.canSurvive(level, checkPos.above())) {
                                     level.setBlock(checkPos.above(), propaguleState, 3);
                                 }
@@ -425,7 +430,7 @@ public class BlockInteractionEvents {
     private static boolean hangPaleMoss(
             PlayerInteractEvent.RightClickBlock event, ItemStack held, Level level, BlockPos pos) {
         BlockPos targetPos = pos.below();
-        while (level.getBlockState(targetPos).is(ModBlocks.PALE_HANGING_MOSS.get())) {
+        while (level.getBlockState(targetPos).is(CopperBlocks.PALE_HANGING_MOSS.get())) {
             targetPos = targetPos.below();
         }
         if (!level.isEmptyBlock(targetPos)) {
@@ -434,7 +439,7 @@ public class BlockInteractionEvents {
         if (!level.isClientSide) {
             level.setBlock(
                     targetPos,
-                    ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState().setValue(HangingMossBlock.TIP, true),
+                    CopperBlocks.PALE_HANGING_MOSS.get().defaultBlockState().setValue(HangingMossBlock.TIP, true),
                     3);
             consumeBoneMeal(event, held, level, pos);
         }
@@ -461,13 +466,13 @@ public class BlockInteractionEvents {
                 BooleanProperty faceProp = GlowLichenBlock.getFaceProperty(attachFace);
                 BlockState adjState = level.getBlockState(adjPos);
 
-                if (adjState.is(ModBlocks.RESIN_CLUMP.get())) {
+                if (adjState.is(CopperBlocks.RESIN_CLUMP.get())) {
                     if (!adjState.getValue(faceProp)) {
                         level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
                         spawned++;
                     }
                 } else if (adjState.isAir()) {
-                    BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
+                    BlockState newState = CopperBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
                     level.setBlock(adjPos, newState, 3);
                     spawned++;
                 }
@@ -489,7 +494,7 @@ public class BlockInteractionEvents {
                     pos.getX() + 0.5,
                     pos.getY() + 0.5,
                     pos.getZ() + 0.5,
-                    new ItemStack(ModItems.DRY_GRASS.get(), 1));
+                    new ItemStack(CopperItems.DRY_GRASS.get(), 1));
             level.addFreshEntity(item);
             consumeBoneMeal(event, held, level, pos);
         }
@@ -504,7 +509,7 @@ public class BlockInteractionEvents {
             BlockPos above = pos.above();
             if (level.isEmptyBlock(above)) {
                 if (!level.isClientSide) {
-                    level.setBlock(above, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
+                    level.setBlock(above, CopperBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
                 }
                 event.setResult(net.minecraftforge.eventbus.api.Event.Result.ALLOW);
             }

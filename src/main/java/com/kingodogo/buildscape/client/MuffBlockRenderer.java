@@ -3,8 +3,8 @@ package com.kingodogo.buildscape.client;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.decor.MuffBlock;
 import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
+import com.kingodogo.buildscape.registry.items.ShapedWoodItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;
@@ -40,7 +40,7 @@ public class MuffBlockRenderer {
             return;
         }
 
-        if (!mc.player.getOffhandItem().is(ModItems.MUFF_BLOCK.get())) {
+        if (!mc.player.getOffhandItem().is(ShapedWoodItems.MUFF_BLOCK.get())) {
             return;
         }
 
@@ -79,7 +79,7 @@ public class MuffBlockRenderer {
             }
 
             BlockState state = level.getBlockState(pos);
-            if (state.is(ModBlocks.MUFF_BLOCK.get())) {
+            if (state.is(ShapedWoodBlocks.MUFF_BLOCK.get())) {
                 int radius = state.getValue(MuffBlock.RADIUS);
                 double cx = pos.getX() + 0.5 + offsetX;
                 double cy = pos.getY() + 0.5 + offsetY;

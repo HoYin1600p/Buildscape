@@ -7,6 +7,7 @@ import com.kingodogo.buildscape.feature.firework.FireworkTestCommand;
 import com.kingodogo.buildscape.feature.firework.InfinitePhoenixFireworkStarItem;
 import com.kingodogo.buildscape.feature.trophy.Trophies;
 import com.kingodogo.buildscape.feature.trophy.TrophyDefinition;
+import com.kingodogo.buildscape.registry.items.StoneItems;
 import com.kingodogo.buildscape.registry.tab.TabOrder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -38,7 +39,7 @@ public class ModCreativeModeTab {
 
     /** The item shown as the tab icon. A method, not a field, so the item holder loads when it is first used. */
     public static RegistryObject<Item> iconItem() {
-        return ModItems.BIT_OXIDIZED_COPPER_BLOCK;
+        return StoneItems.BIT_OXIDIZED_COPPER_BLOCK;
     }
 
     public static final CreativeModeTab BUILDSCAPE_TAB = new CreativeModeTab(BuildScape.MODID) {

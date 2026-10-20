@@ -1,7 +1,8 @@
 package com.kingodogo.buildscape.worldgen;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
@@ -120,12 +121,12 @@ public class ModBiomeModifications {
                                             new ArrayList<Block>() {
                                                 {
                                                     add(Blocks.GRASS_BLOCK);
-                                                    add(ModBlocks.MUD.get());
+                                                    add(SandstoneBlocks.MUD.get());
                                                 }
                                             })),
                             BlockPredicateFilter.forPredicate(
                                     BlockPredicate.wouldSurvive(
-                                            ModBlocks.MANGROVE_PROPAGULE.get()
+                                            DecorBlocks.MANGROVE_PROPAGULE.get()
                                                     .defaultBlockState(),
                                             BlockPos.ZERO)),
                             BiomeFilter.biome()));
@@ -235,12 +236,12 @@ public class ModBiomeModifications {
                                                 new ArrayList<Block>() {
                                                     {
                                                         add(Blocks.GRASS_BLOCK);
-                                                        add(ModBlocks.MUD.get());
+                                                        add(SandstoneBlocks.MUD.get());
                                                     }
                                                 })),
                                 BlockPredicateFilter.forPredicate(
                                         BlockPredicate.wouldSurvive(
-                                                ModBlocks.CLOVER.get()
+                                                DecorBlocks.CLOVER.get()
                                                         .defaultBlockState(),
                                                 BlockPos.ZERO)),
                                 BiomeFilter.biome()));

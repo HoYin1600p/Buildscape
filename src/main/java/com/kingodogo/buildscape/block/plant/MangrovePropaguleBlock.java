@@ -2,7 +2,8 @@ package com.kingodogo.buildscape.block.plant;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.core.OpenBushBlock;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
 import com.kingodogo.buildscape.worldgen.ModConfiguredFeatures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -143,7 +144,7 @@ public class MangrovePropaguleBlock
         FluidState fluidstate = level.getFluidState(pos);
 
         boolean hanging = aboveState.is(BlockTags.LEAVES) ||
-                aboveState.is(ModBlocks.MANGROVE_LEAVES.get());
+                aboveState.is(DecorBlocks.MANGROVE_LEAVES.get());
 
         return this.defaultBlockState()
                 .setValue(HANGING, hanging)
@@ -158,16 +159,16 @@ public class MangrovePropaguleBlock
         if (state.getValue(HANGING)) {
             BlockState aboveState = level.getBlockState(pos.above());
             return (aboveState.is(BlockTags.LEAVES) ||
-                    aboveState.is(ModBlocks.MANGROVE_LEAVES.get()));
+                    aboveState.is(DecorBlocks.MANGROVE_LEAVES.get()));
         } else {
             BlockPos belowPos = pos.below();
             BlockState belowState = level.getBlockState(belowPos);
             return ((belowState.is(BlockTags.DIRT) && !belowState.is(Blocks.DIRT_PATH)) ||
                     belowState.is(Blocks.FARMLAND) ||
                     belowState.is(Blocks.MOSS_BLOCK) ||
-                    belowState.is(ModBlocks.MUD.get()) ||
+                    belowState.is(SandstoneBlocks.MUD.get()) ||
                     belowState.is(Blocks.CLAY) ||
-                    belowState.is(ModBlocks.MUDDY_MANGROVE_ROOTS.get()));
+                    belowState.is(DecorBlocks.MUDDY_MANGROVE_ROOTS.get()));
         }
     }
 
@@ -187,7 +188,7 @@ public class MangrovePropaguleBlock
             if (direction == Direction.UP) {
                 BlockState aboveState = level.getBlockState(pos.above());
                 if (!aboveState.is(BlockTags.LEAVES) &&
-                        !aboveState.is(ModBlocks.MANGROVE_LEAVES.get())) {
+                        !aboveState.is(DecorBlocks.MANGROVE_LEAVES.get())) {
                     return Blocks.AIR.defaultBlockState();
                 }
             }
@@ -432,17 +433,17 @@ public class MangrovePropaguleBlock
     private boolean isLogOrWood(BlockState state) {
         return (state.is(BlockTags.LOGS) ||
                 state.is(BlockTags.PLANKS) ||
-                state.getBlock() == ModBlocks.MANGROVE_LOG.get() ||
-                state.getBlock() == ModBlocks.MANGROVE_WOOD.get() ||
-                state.getBlock() == ModBlocks.STRIPPED_MANGROVE_LOG.get() ||
-                state.getBlock() == ModBlocks.STRIPPED_MANGROVE_WOOD.get());
+                state.getBlock() == DecorBlocks.MANGROVE_LOG.get() ||
+                state.getBlock() == DecorBlocks.MANGROVE_WOOD.get() ||
+                state.getBlock() == DecorBlocks.STRIPPED_MANGROVE_LOG.get() ||
+                state.getBlock() == DecorBlocks.STRIPPED_MANGROVE_WOOD.get());
     }
 
     private boolean isSolidBlock(
             BlockGetter level,
             BlockPos pos,
             BlockState state) {
-        if (state.is(ModBlocks.MUD.get())) {
+        if (state.is(SandstoneBlocks.MUD.get())) {
             return false;
         }
         return (state.isFaceSturdy(level, pos, Direction.UP) &&

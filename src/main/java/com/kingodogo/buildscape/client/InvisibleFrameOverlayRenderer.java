@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;
@@ -49,8 +49,8 @@ public class InvisibleFrameOverlayRenderer {
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
         boolean holdingInvisibleFrame = (!mainHand.isEmpty()
-                && mainHand.getItem() == ModItems.INVISIBLE_ITEM_FRAME.get()) ||
-                (!offHand.isEmpty() && offHand.getItem() == ModItems.INVISIBLE_ITEM_FRAME.get());
+                && mainHand.getItem() == MasonryItems.INVISIBLE_ITEM_FRAME.get()) ||
+                (!offHand.isEmpty() && offHand.getItem() == MasonryItems.INVISIBLE_ITEM_FRAME.get());
 
         if (!holdingInvisibleFrame) {
             return;

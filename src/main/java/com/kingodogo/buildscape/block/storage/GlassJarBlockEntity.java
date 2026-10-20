@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.block.storage;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
@@ -56,7 +56,7 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
         if (stack == null || stack.isEmpty()) {
             return false;
         }
-        return stack.is(Items.EXPERIENCE_BOTTLE) || stack.is(ModItems.EXPERIENCE_BUCKET.get());
+        return stack.is(Items.EXPERIENCE_BOTTLE) || stack.is(CardboardItems.EXPERIENCE_BUCKET.get());
     }
 
     public static int getLiquidCap(ItemStack stack) {
@@ -76,7 +76,7 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
             return ItemStack.EMPTY;
         }
         if (isXpLiquid(storedLiquidItem)) {
-            return new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
+            return new ItemStack(CardboardItems.EXPERIENCE_BUCKET.get());
         }
         if (isPlainWater(storedLiquidItem)) {
             return new ItemStack(Items.WATER_BUCKET);

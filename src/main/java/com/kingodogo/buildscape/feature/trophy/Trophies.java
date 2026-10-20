@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.feature.trophy;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
 import com.kingodogo.buildscape.registry.ModCreativeModeTab;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.ItemsRegister;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
@@ -204,12 +204,12 @@ public class Trophies {
             BY_ADVANCEMENT.put(definition.getAssociatedAdvancement(), definition);
         }
 
-        RegistryObject<TrophyBlock> blockObj = ModBlocks.BLOCKS.register(
+        RegistryObject<TrophyBlock> blockObj = BlocksRegister.blocks().register(
                 definition.getId(),
                 () -> new TrophyBlock(definition));
         definition.setBlockRegistryObject(blockObj);
 
-        RegistryObject<Item> itemObj = ModItems.ITEMS.register(
+        RegistryObject<Item> itemObj = ItemsRegister.items().register(
                 definition.getId(),
                 () -> new TrophyBlockItem(blockObj.get(), definition,
                         new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1)));

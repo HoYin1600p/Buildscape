@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -85,8 +85,8 @@ public class RotateBlockPacket {
 
             ItemStack mainHand = player.getMainHandItem();
             ItemStack offHand = player.getOffhandItem();
-            boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
-                    (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
+            boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == WoodItems.WRENCH.get()) ||
+                    (!offHand.isEmpty() && offHand.getItem() == WoodItems.WRENCH.get());
             if (!hasWrench) {
                 return;
             }

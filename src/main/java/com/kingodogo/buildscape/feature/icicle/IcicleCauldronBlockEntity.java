@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.feature.icicle;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -92,7 +92,7 @@ public class IcicleCauldronBlockEntity
         if (direction != Direction.UP) {
             return false;
         }
-        if (stack.getItem() != ModItems.ICICLE_BLOCK.get()) {
+        if (stack.getItem() != WoodItems.ICICLE_BLOCK.get()) {
             return false;
         }
         return storedIcicle.isEmpty();

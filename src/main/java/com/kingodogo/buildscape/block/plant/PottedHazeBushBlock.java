@@ -3,8 +3,8 @@ package com.kingodogo.buildscape.block.plant;
 import com.kingodogo.buildscape.core.ClientHooks;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.feature.pipe.HollowLogBlock;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -89,7 +89,7 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
                     held.shrink(1);
                 }
 
-                ItemStack bottleOfMist = new ItemStack(ModItems.BOTTLE_OF_MIST.get());
+                ItemStack bottleOfMist = new ItemStack(MasonryItems.BOTTLE_OF_MIST.get());
                 if (held.isEmpty()) {
                     player.setItemInHand(hand, bottleOfMist);
                 } else {
@@ -105,7 +105,7 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             DyeColor dyeColor = dyeItem.getDyeColor();
             if (this.color != dyeColor) {
                 if (!level.isClientSide) {
-                    RegistryObject<Block> targetBlock = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(dyeColor);
+                    RegistryObject<Block> targetBlock = CopperBlocks.POTTED_COLORED_HAZE_BUSHES.get(dyeColor);
                     if (targetBlock != null) {
                         boolean hadHaze = state.getValue(HAS_HAZE);
                         level.setBlock(pos, targetBlock.get().defaultBlockState().setValue(HAS_HAZE, hadHaze), 3);
@@ -119,7 +119,7 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             }
         }
 
-        if (held.is(ModItems.BOTTLE_OF_MIST.get()) && !state.getValue(HAS_HAZE)) {
+        if (held.is(MasonryItems.BOTTLE_OF_MIST.get()) && !state.getValue(HAS_HAZE)) {
             if (!level.isClientSide) {
                 level.setBlock(pos, state.setValue(HAS_HAZE, true), 3);
 

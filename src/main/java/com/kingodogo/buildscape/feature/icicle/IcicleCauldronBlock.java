@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.feature.icicle;
 
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -91,7 +91,7 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
             ItemStack heldItem = player.getItemInHand(hand);
             ItemStack storedIcicle = cauldronEntity.getStoredIcicle();
 
-            boolean isIcicleBlock = heldItem.getItem() == ModItems.ICICLE_BLOCK.get();
+            boolean isIcicleBlock = heldItem.getItem() == WoodItems.ICICLE_BLOCK.get();
             if (isIcicleBlock && storedIcicle.isEmpty()) {
                 if (!level.isClientSide) {
                     cauldronEntity.setStoredIcicle(heldItem.copy().split(1));

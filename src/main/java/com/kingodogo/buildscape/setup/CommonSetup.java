@@ -7,11 +7,19 @@ import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.feature.copper.CopperRodHandler;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.SyncConfigPacket;
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.ItemsRegister;
 import com.kingodogo.buildscape.registry.ModParticles;
 import com.kingodogo.buildscape.registry.ModSounds;
 import com.kingodogo.buildscape.registry.ModStats;
+import com.kingodogo.buildscape.registry.blocks.CardboardBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
+import com.kingodogo.buildscape.registry.blocks.WoodBlocks;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
+import com.kingodogo.buildscape.registry.items.StoneItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import com.kingodogo.buildscape.world.ModGameRules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
@@ -103,11 +111,11 @@ public final class CommonSetup {
                     RecordItem.class, null, "f_43032_");
             if (recordMap != null) {
                 recordMap.put(ModSounds.MUSIC_DISC_CELEBRATION.get(),
-                        (RecordItem) ModItems.MUSIC_DISC_CELEBRATION.get());
+                        (RecordItem) CardboardItems.MUSIC_DISC_CELEBRATION.get());
                 recordMap.put(ModSounds.MUSIC_DISC_SNOWFALL.get(),
-                        (RecordItem) ModItems.MUSIC_DISC_SNOWFALL.get());
+                        (RecordItem) CardboardItems.MUSIC_DISC_SNOWFALL.get());
                 recordMap.put(ModSounds.MUSIC_DISC_BUILDER.get(),
-                        (RecordItem) ModItems.MUSIC_DISC_BUILDER.get());
+                        (RecordItem) CardboardItems.MUSIC_DISC_BUILDER.get());
             }
         } catch (Exception e) {
             // reflection on private vanilla members
@@ -116,7 +124,7 @@ public final class CommonSetup {
     }
 
     private static void moveVerticalSlabsToVanillaTabs() {
-        for (RegistryObject<Item> entry : ModItems.ITEMS.getEntries()) {
+        for (RegistryObject<Item> entry : ItemsRegister.items().getEntries()) {
             String path = entry.getId().getPath();
             if (path.endsWith("_vertical_slab")) {
                 String base = path.substring(0, path.length() - "_vertical_slab".length());
@@ -144,7 +152,7 @@ public final class CommonSetup {
 
     private static void registerDispenserBehaviours() {
         DispenserBlock.registerBehavior(
-                ModItems.BOTTLE_OF_MIST.get(),
+                MasonryItems.BOTTLE_OF_MIST.get(),
                 new AbstractProjectileDispenseBehavior() {
                     @Override
                     protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
@@ -186,7 +194,7 @@ public final class CommonSetup {
                 });
 
         DispenserBlock.registerBehavior(
-                ModItems.CONFETTI_ITEM.get(),
+                MasonryItems.CONFETTI_ITEM.get(),
                 new DefaultDispenseItemBehavior() {
                     @Override
                     protected ItemStack execute(BlockSource source, ItemStack stack) {
@@ -303,134 +311,134 @@ public final class CommonSetup {
 
     private static void registerFlowerPots() {
         FlowerPotBlock vanillaPot = (FlowerPotBlock) Blocks.FLOWER_POT;
-        vanillaPot.addPlant(ModBlocks.CLOSED_EYEBLOSSOM.getId(), ModBlocks.POTTED_CLOSED_EYEBLOSSOM);
-        vanillaPot.addPlant(ModBlocks.OPEN_EYEBLOSSOM.getId(), ModBlocks.POTTED_OPEN_EYEBLOSSOM);
-        vanillaPot.addPlant(ModBlocks.GOLDEN_DANDELION.getId(), ModBlocks.POTTED_GOLDEN_DANDELION);
-        vanillaPot.addPlant(ModBlocks.CACTUS_FLOWER.getId(), ModBlocks.POTTED_CACTUS_FLOWER);
-        vanillaPot.addPlant(ModBlocks.BUSH.getId(), ModBlocks.POTTED_BUSH);
-        vanillaPot.addPlant(ModBlocks.RED_BUSH.getId(), ModBlocks.POTTED_RED_BUSH);
-        ModBlocks.COLORED_HAZE_BUSHES.forEach((color, bush) -> {
-            vanillaPot.addPlant(bush.getId(), ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color));
+        vanillaPot.addPlant(CopperBlocks.CLOSED_EYEBLOSSOM.getId(), CopperBlocks.POTTED_CLOSED_EYEBLOSSOM);
+        vanillaPot.addPlant(CopperBlocks.OPEN_EYEBLOSSOM.getId(), CopperBlocks.POTTED_OPEN_EYEBLOSSOM);
+        vanillaPot.addPlant(CopperBlocks.GOLDEN_DANDELION.getId(), CopperBlocks.POTTED_GOLDEN_DANDELION);
+        vanillaPot.addPlant(CopperBlocks.CACTUS_FLOWER.getId(), CopperBlocks.POTTED_CACTUS_FLOWER);
+        vanillaPot.addPlant(CopperBlocks.BUSH.getId(), CopperBlocks.POTTED_BUSH);
+        vanillaPot.addPlant(CopperBlocks.RED_BUSH.getId(), CopperBlocks.POTTED_RED_BUSH);
+        CopperBlocks.COLORED_HAZE_BUSHES.forEach((color, bush) -> {
+            vanillaPot.addPlant(bush.getId(), CopperBlocks.POTTED_COLORED_HAZE_BUSHES.get(color));
         });
-        vanillaPot.addPlant(ModBlocks.FIREFLY_BUSH.getId(), ModBlocks.POTTED_FIREFLY_BUSH);
-        vanillaPot.addPlant(ModBlocks.DRY_GRASS.getId(), ModBlocks.POTTED_DRY_GRASS);
-        vanillaPot.addPlant(ModBlocks.FROST_ROSE.getId(), ModBlocks.POTTED_FROST_ROSE);
-        vanillaPot.addPlant(ModBlocks.RED_MONETS.getId(), ModBlocks.POTTED_RED_MONETS);
-        vanillaPot.addPlant(ModBlocks.BLUE_MONETS.getId(), ModBlocks.POTTED_BLUE_MONETS);
-        vanillaPot.addPlant(ModBlocks.PURPLE_MONETS.getId(), ModBlocks.POTTED_PURPLE_MONETS);
-        vanillaPot.addPlant(ModBlocks.LIGHT_BLUE_MONETS.getId(), ModBlocks.POTTED_LIGHT_BLUE_MONETS);
-        vanillaPot.addPlant(ModBlocks.PINK_MONETS.getId(), ModBlocks.POTTED_PINK_MONETS);
-        vanillaPot.addPlant(ModBlocks.YELLOW_MONETS.getId(), ModBlocks.POTTED_YELLOW_MONETS);
-        vanillaPot.addPlant(ModBlocks.POPLAR_SAPLING.getId(), ModBlocks.POTTED_POPLAR_SAPLING);
-        vanillaPot.addPlant(ModBlocks.PALE_OAK_SAPLING.getId(), ModBlocks.POTTED_PALE_OAK_SAPLING);
-        vanillaPot.addPlant(ModBlocks.CHERRY_SAPLING.getId(), ModBlocks.POTTED_CHERRY_SAPLING);
-        vanillaPot.addPlant(ModBlocks.MANGROVE_PROPAGULE.getId(), ModBlocks.POTTED_MANGROVE_PROPAGULE);
-        vanillaPot.addPlant(ModBlocks.WILDFLOWERS.getId(), ModBlocks.POTTED_WILDFLOWERS);
-        vanillaPot.addPlant(ModBlocks.CLOVER.getId(), ModBlocks.POTTED_CLOVER);
-        vanillaPot.addPlant(ModBlocks.LEAF_LITTER.getId(), ModBlocks.POTTED_LEAF_LITTER);
-        vanillaPot.addPlant(ModBlocks.TALL_DRY_GRASS.getId(), ModBlocks.POTTED_TALL_DRY_GRASS);
-        vanillaPot.addPlant(ModBlocks.SNOWY_BUSH.getId(), ModBlocks.POTTED_SNOWY_BUSH);
-        vanillaPot.addPlant(ModBlocks.SNOWY_SHORT_GRASS.getId(), ModBlocks.POTTED_SNOWY_SHORT_GRASS);
-        vanillaPot.addPlant(ModBlocks.SNOWY_TALL_GRASS.getId(), ModBlocks.POTTED_SNOWY_TALL_GRASS);
-        vanillaPot.addPlant(ModBlocks.SNOWY_FERN.getId(), ModBlocks.POTTED_SNOWY_FERN);
-        vanillaPot.addPlant(ModBlocks.SNOWY_LARGE_FERN.getId(), ModBlocks.POTTED_SNOWY_LARGE_FERN);
+        vanillaPot.addPlant(CopperBlocks.FIREFLY_BUSH.getId(), CopperBlocks.POTTED_FIREFLY_BUSH);
+        vanillaPot.addPlant(CopperBlocks.DRY_GRASS.getId(), CopperBlocks.POTTED_DRY_GRASS);
+        vanillaPot.addPlant(DecorBlocks.FROST_ROSE.getId(), CopperBlocks.POTTED_FROST_ROSE);
+        vanillaPot.addPlant(WoodBlocks.RED_MONETS.getId(), CopperBlocks.POTTED_RED_MONETS);
+        vanillaPot.addPlant(WoodBlocks.BLUE_MONETS.getId(), CopperBlocks.POTTED_BLUE_MONETS);
+        vanillaPot.addPlant(WoodBlocks.PURPLE_MONETS.getId(), CopperBlocks.POTTED_PURPLE_MONETS);
+        vanillaPot.addPlant(WoodBlocks.LIGHT_BLUE_MONETS.getId(), CopperBlocks.POTTED_LIGHT_BLUE_MONETS);
+        vanillaPot.addPlant(WoodBlocks.PINK_MONETS.getId(), CopperBlocks.POTTED_PINK_MONETS);
+        vanillaPot.addPlant(DecorBlocks.YELLOW_MONETS.getId(), CopperBlocks.POTTED_YELLOW_MONETS);
+        vanillaPot.addPlant(ShapedWoodBlocks.POPLAR_SAPLING.getId(), CopperBlocks.POTTED_POPLAR_SAPLING);
+        vanillaPot.addPlant(ShapedWoodBlocks.PALE_OAK_SAPLING.getId(), CopperBlocks.POTTED_PALE_OAK_SAPLING);
+        vanillaPot.addPlant(ShapedWoodBlocks.CHERRY_SAPLING.getId(), CopperBlocks.POTTED_CHERRY_SAPLING);
+        vanillaPot.addPlant(DecorBlocks.MANGROVE_PROPAGULE.getId(), CopperBlocks.POTTED_MANGROVE_PROPAGULE);
+        vanillaPot.addPlant(CopperBlocks.WILDFLOWERS.getId(), CopperBlocks.POTTED_WILDFLOWERS);
+        vanillaPot.addPlant(DecorBlocks.CLOVER.getId(), CopperBlocks.POTTED_CLOVER);
+        vanillaPot.addPlant(CopperBlocks.LEAF_LITTER.getId(), CopperBlocks.POTTED_LEAF_LITTER);
+        vanillaPot.addPlant(CopperBlocks.TALL_DRY_GRASS.getId(), CopperBlocks.POTTED_TALL_DRY_GRASS);
+        vanillaPot.addPlant(DecorBlocks.SNOWY_BUSH.getId(), CopperBlocks.POTTED_SNOWY_BUSH);
+        vanillaPot.addPlant(DecorBlocks.SNOWY_SHORT_GRASS.getId(), CopperBlocks.POTTED_SNOWY_SHORT_GRASS);
+        vanillaPot.addPlant(DecorBlocks.SNOWY_TALL_GRASS.getId(), CopperBlocks.POTTED_SNOWY_TALL_GRASS);
+        vanillaPot.addPlant(DecorBlocks.SNOWY_FERN.getId(), CopperBlocks.POTTED_SNOWY_FERN);
+        vanillaPot.addPlant(DecorBlocks.SNOWY_LARGE_FERN.getId(), CopperBlocks.POTTED_SNOWY_LARGE_FERN);
     }
 
     private static void registerCompostables() {
-        ComposterBlock.COMPOSTABLES.put(ModItems.RED_ROSE_VINES.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.RED_ROSE_VINES.get(),
                 0.5f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.BLACK_ROSE_VINES.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.BLACK_ROSE_VINES.get(),
                 0.5f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_ROSE_VINES.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.BLUE_ROSE_VINES.get(),
                 0.5f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.WHITE_ROSE_VINES.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.WHITE_ROSE_VINES.get(),
                 0.5f);
 
-        ComposterBlock.COMPOSTABLES.put(ModItems.FROST_ROSE.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.FROST_ROSE.get(),
                 0.65f);
 
-        ComposterBlock.COMPOSTABLES.put(ModItems.RED_MONETS.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.RED_MONETS.get(),
                 0.65f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_MONETS.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.BLUE_MONETS.get(),
                 0.65f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_MONETS.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.PURPLE_MONETS.get(),
                 0.65f);
         ComposterBlock.COMPOSTABLES
-                .put(ModItems.LIGHT_BLUE_MONETS.get(), 0.65f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.PINK_MONETS.get(),
+                .put(WoodItems.LIGHT_BLUE_MONETS.get(), 0.65f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.PINK_MONETS.get(),
                 0.65f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.YELLOW_MONETS.get(),
-                0.65f);
-
-        ComposterBlock.COMPOSTABLES.put(ModItems.RED_PETAL.get(),
-                0.65f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_PETAL.get(),
-                0.65f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.ORANGE_PETAL.get(),
-                0.65f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.PINK_PETAL.get(),
-                0.65f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_PETAL.get(),
+        ComposterBlock.COMPOSTABLES.put(WoodItems.YELLOW_MONETS.get(),
                 0.65f);
 
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.RED_SPORE_BLOSSOM.get(), 0.65f);
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.CYAN_SPORE_BLOSSOM.get(), 0.65f);
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.BLUE_SPORE_BLOSSOM.get(), 0.65f);
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.PURPLE_SPORE_BLOSSOM.get(), 0.65f);
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.ORANGE_SPORE_BLOSSOM.get(), 0.65f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.RED_PETAL.get(),
+                0.65f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.BLUE_PETAL.get(),
+                0.65f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.ORANGE_PETAL.get(),
+                0.65f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.PINK_PETAL.get(),
+                0.65f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.PURPLE_PETAL.get(),
+                0.65f);
 
         ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_SHORT_GRASS.get(), 0.3f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_TALL_GRASS.get(),
-                0.3f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_FERN.get(),
-                0.3f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_LARGE_FERN.get(),
-                0.3f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_BUSH.get(),
-                0.3f);
-
-        ComposterBlock.COMPOSTABLES.put(ModItems.MANGROVE_LEAVES.get(),
-                0.3f);
-
-        ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_LEAVES.get(),
-                0.3f);
-        ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_OAK_LEAVES.get(),
-                0.3f);
+                .put(WoodItems.RED_SPORE_BLOSSOM.get(), 0.65f);
         ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_SPRUCE_LEAVES.get(), 0.3f);
+                .put(WoodItems.CYAN_SPORE_BLOSSOM.get(), 0.65f);
         ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_BIRCH_LEAVES.get(), 0.3f);
+                .put(WoodItems.BLUE_SPORE_BLOSSOM.get(), 0.65f);
         ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_JUNGLE_LEAVES.get(), 0.3f);
+                .put(WoodItems.PURPLE_SPORE_BLOSSOM.get(), 0.65f);
         ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_ACACIA_LEAVES.get(), 0.3f);
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_DARK_OAK_LEAVES.get(), 0.3f);
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_MANGROVE_LEAVES.get(), 0.3f);
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_AZALEA_LEAVES.get(), 0.3f);
-        ComposterBlock.COMPOSTABLES
-                .put(ModItems.SNOWY_FLOWERING_AZALEA_LEAVES.get(), 0.3f);
+                .put(WoodItems.ORANGE_SPORE_BLOSSOM.get(), 0.65f);
 
         ComposterBlock.COMPOSTABLES
-                .put(ModItems.BROWN_MUSHROOM_SHELVES.get(), 0.65f);
+                .put(WoodItems.SNOWY_SHORT_GRASS.get(), 0.3f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.SNOWY_TALL_GRASS.get(),
+                0.3f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.SNOWY_FERN.get(),
+                0.3f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.SNOWY_LARGE_FERN.get(),
+                0.3f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.SNOWY_BUSH.get(),
+                0.3f);
+
+        ComposterBlock.COMPOSTABLES.put(WoodItems.MANGROVE_LEAVES.get(),
+                0.3f);
+
+        ComposterBlock.COMPOSTABLES.put(WoodItems.SNOWY_LEAVES.get(),
+                0.3f);
+        ComposterBlock.COMPOSTABLES.put(WoodItems.SNOWY_OAK_LEAVES.get(),
+                0.3f);
         ComposterBlock.COMPOSTABLES
-                .put(ModItems.RED_MUSHROOM_SHELVES.get(), 0.65f);
+                .put(WoodItems.SNOWY_SPRUCE_LEAVES.get(), 0.3f);
+        ComposterBlock.COMPOSTABLES
+                .put(WoodItems.SNOWY_BIRCH_LEAVES.get(), 0.3f);
+        ComposterBlock.COMPOSTABLES
+                .put(WoodItems.SNOWY_JUNGLE_LEAVES.get(), 0.3f);
+        ComposterBlock.COMPOSTABLES
+                .put(WoodItems.SNOWY_ACACIA_LEAVES.get(), 0.3f);
+        ComposterBlock.COMPOSTABLES
+                .put(WoodItems.SNOWY_DARK_OAK_LEAVES.get(), 0.3f);
+        ComposterBlock.COMPOSTABLES
+                .put(WoodItems.SNOWY_MANGROVE_LEAVES.get(), 0.3f);
+        ComposterBlock.COMPOSTABLES
+                .put(WoodItems.SNOWY_AZALEA_LEAVES.get(), 0.3f);
+        ComposterBlock.COMPOSTABLES
+                .put(WoodItems.SNOWY_FLOWERING_AZALEA_LEAVES.get(), 0.3f);
+
+        ComposterBlock.COMPOSTABLES
+                .put(StoneItems.BROWN_MUSHROOM_SHELVES.get(), 0.65f);
+        ComposterBlock.COMPOSTABLES
+                .put(StoneItems.RED_MUSHROOM_SHELVES.get(), 0.65f);
     }
 
     private static void registerCauldronInteractions() {
-        CauldronInteraction.EMPTY.put(ModItems.EXPERIENCE_BUCKET.get(),
+        CauldronInteraction.EMPTY.put(CardboardItems.EXPERIENCE_BUCKET.get(),
                 (state, level, pos, player, hand, stack) -> {
                     if (!level.isClientSide) {
                         player.awardStat(Stats.FILL_CAULDRON);
-                        level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState()
+                        level.setBlockAndUpdate(pos, CardboardBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState()
                                 .setValue(LayeredCauldronBlock.LEVEL, 3));
                         level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                         if (!player.getAbilities().instabuild) {
@@ -443,7 +451,7 @@ public final class CommonSetup {
         CauldronInteraction.EMPTY.put(Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
             if (!level.isClientSide) {
                 player.awardStat(Stats.FILL_CAULDRON);
-                level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState()
+                level.setBlockAndUpdate(pos, CardboardBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState()
                         .setValue(LayeredCauldronBlock.LEVEL, 1));
                 level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                 if (!player.getAbilities().instabuild) {
@@ -464,7 +472,7 @@ public final class CommonSetup {
                     player.awardStat(Stats.USE_CAULDRON);
                     level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
                     level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    ItemStack filledBucket = new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
+                    ItemStack filledBucket = new ItemStack(CardboardItems.EXPERIENCE_BUCKET.get());
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
                         if (stack.isEmpty()) {
@@ -528,7 +536,7 @@ public final class CommonSetup {
                     return InteractionResult.PASS;
                 });
 
-        BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS.put(ModItems.EXPERIENCE_BUCKET.get(),
+        BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS.put(CardboardItems.EXPERIENCE_BUCKET.get(),
                 (state, level, pos, player, hand, stack) -> {
                     int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
                     if (cauldronLevel < 3) {

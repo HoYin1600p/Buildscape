@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.registry.tab;
 
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
+import com.kingodogo.buildscape.registry.items.CopperItems;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,9 +27,9 @@ public final class TabOrder {
 
     /** Entries that follow the firework stars and rockets and precede the trophies. */
     public static final List<Supplier<? extends ItemLike>> AFTER_FIREWORKS = List.<Supplier<? extends ItemLike>>of(
-            ModItems.EXPERIENCE_BUCKET,
-            ModItems.WANDERING_HOMEMAKER_SPAWN_EGG,
-            ModItems.FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG);
+            CardboardItems.EXPERIENCE_BUCKET,
+            CopperItems.WANDERING_HOMEMAKER_SPAWN_EGG,
+            CopperItems.FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG);
 
     /** Everything after the trophies. */
     public static final List<Supplier<? extends ItemLike>> AFTER_TROPHIES = join(

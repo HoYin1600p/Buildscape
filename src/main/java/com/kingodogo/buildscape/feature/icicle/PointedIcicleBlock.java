@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.feature.icicle;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -825,7 +825,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
 
         BlockState icicleBlockState = level.getBlockState(icicleBlockPos);
         Block icicleBlock = icicleBlockState.getBlock();
-        boolean isPackedIcicleBlock = icicleBlock == ModBlocks.PACKED_ICICLE_BLOCK.get() ||
+        boolean isPackedIcicleBlock = icicleBlock == DecorBlocks.PACKED_ICICLE_BLOCK.get() ||
                 icicleBlock instanceof PackedIcicleBlock ||
                 icicleBlock == Blocks.PACKED_ICE;
 
@@ -842,12 +842,12 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         if (random.nextInt(10) == 0) {
             level.setBlock(
                     cauldronPos,
-                    ModBlocks.ICICLE_CAULDRON.get().defaultBlockState(),
+                    DecorBlocks.ICICLE_CAULDRON.get().defaultBlockState(),
                     3);
 
             BlockEntity blockEntity = level.getBlockEntity(cauldronPos);
             if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
-                Item icicleItem = ModItems.PACKED_ICICLE_BLOCK.get();
+                Item icicleItem = WoodItems.PACKED_ICICLE_BLOCK.get();
                 cauldronEntity.setStoredIcicle(
                         new ItemStack(icicleItem, 1));
             }
@@ -882,7 +882,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         BlockState attachmentState = level.getBlockState(attachmentPos);
         Block attachmentBlock = attachmentState.getBlock();
 
-        boolean validAttachment = attachmentBlock == ModBlocks.ICICLE_BLOCK.get() ||
+        boolean validAttachment = attachmentBlock == DecorBlocks.ICICLE_BLOCK.get() ||
                 attachmentBlock instanceof IcicleBlock;
 
         if (!validAttachment) {
@@ -991,7 +991,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         BlockState attachmentState = level.getBlockState(attachmentPos);
         Block attachmentBlock = attachmentState.getBlock();
 
-        boolean validAttachment = attachmentBlock == ModBlocks.ICICLE_BLOCK.get() ||
+        boolean validAttachment = attachmentBlock == DecorBlocks.ICICLE_BLOCK.get() ||
                 attachmentBlock instanceof IcicleBlock;
 
         if (!validAttachment) {
@@ -1026,8 +1026,8 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
 
     private boolean isIcicleSourceBlock(BlockState state) {
         Block block = state.getBlock();
-        return (block == ModBlocks.ICICLE_BLOCK.get() || block instanceof IcicleBlock ||
-                block == ModBlocks.PACKED_ICICLE_BLOCK.get() || block instanceof PackedIcicleBlock ||
+        return (block == DecorBlocks.ICICLE_BLOCK.get() || block instanceof IcicleBlock ||
+                block == DecorBlocks.PACKED_ICICLE_BLOCK.get() || block instanceof PackedIcicleBlock ||
                 block == Blocks.ICE || block == Blocks.PACKED_ICE || block == Blocks.BLUE_ICE);
     }
 

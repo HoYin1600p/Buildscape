@@ -4,7 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.RotateBlockPacket;
 import com.kingodogo.buildscape.network.RotateBlockPacket.ArrowDirection;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
@@ -46,8 +46,8 @@ public class WrenchClientEvents {
 
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
-        boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
-                (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
+        boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == WoodItems.WRENCH.get()) ||
+                (!offHand.isEmpty() && offHand.getItem() == WoodItems.WRENCH.get());
         if (!hasWrench) {
             return;
         }
@@ -123,8 +123,8 @@ public class WrenchClientEvents {
 
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
-        boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
-                (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
+        boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == WoodItems.WRENCH.get()) ||
+                (!offHand.isEmpty() && offHand.getItem() == WoodItems.WRENCH.get());
         if (!hasWrench) {
             return;
         }

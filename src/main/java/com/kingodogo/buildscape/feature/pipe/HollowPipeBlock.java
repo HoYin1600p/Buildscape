@@ -7,7 +7,8 @@ import com.kingodogo.buildscape.feature.pipe.transport.WaterPipeTransport;
 import com.kingodogo.buildscape.feature.pipe.transport.WorldPipeTopologyAccess;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import com.kingodogo.buildscape.registry.ModFluids;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.CardboardItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -254,7 +255,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             return new ItemStack(Items.LAVA_BUCKET);
         }
         if (ModFluids.isExperience(fluid)) {
-            return new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
+            return new ItemStack(CardboardItems.EXPERIENCE_BUCKET.get());
         }
         Item bucket = fluid.getBucket();
         if (bucket != null && bucket != Items.AIR) {
@@ -287,7 +288,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         Fluid containedFluid = getContainedFluid(state, be);
         Direction hitFace = hit.getDirection();
 
-        if (held.is(ModItems.WRENCH.get())) {
+        if (held.is(WoodItems.WRENCH.get())) {
             if (!player.isShiftKeyDown()) {
                 return InteractionResult.PASS;
             }

@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.block.plant;
 
 import com.kingodogo.buildscape.core.OpenBushBlock;
-import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModParticles;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -102,7 +102,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
                 state.is(Blocks.SNOW) ||
                 state.is(Blocks.SNOW_BLOCK) ||
                 state.is(Blocks.POWDER_SNOW) ||
-                state.is(ModBlocks.SNOW_BRICKS.get()));
+                state.is(DecorBlocks.SNOW_BRICKS.get()));
     }
 
     @Override

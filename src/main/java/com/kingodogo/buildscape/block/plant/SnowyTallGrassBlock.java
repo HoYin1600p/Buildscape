@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
@@ -58,7 +58,7 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
         return (state.is(BlockTags.DIRT) ||
                 state.is(Blocks.FARMLAND) ||
                 state.is(Blocks.SNOW_BLOCK) ||
-                state.is(ModBlocks.SNOW_BRICKS.get()));
+                state.is(DecorBlocks.SNOW_BRICKS.get()));
     }
 
     @Override

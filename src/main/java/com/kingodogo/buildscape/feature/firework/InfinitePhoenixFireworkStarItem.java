@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.feature.firework;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -22,7 +22,7 @@ public class InfinitePhoenixFireworkStarItem extends FireworkStarItem {
     }
 
     public static ItemStack createDefaultStack() {
-        ItemStack stack = new ItemStack(ModItems.INFINITE_PHOENIX_FIREWORK_STAR.get());
+        ItemStack stack = new ItemStack(MasonryItems.INFINITE_PHOENIX_FIREWORK_STAR.get());
         CompoundTag explosionTag = stack.getOrCreateTagElement(NbtKeys.EXPLOSION);
         explosionTag.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.PHOENIX_ID);
         explosionTag.putIntArray(NbtKeys.COLORS, new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00});

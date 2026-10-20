@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.MasonryBlocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -20,7 +20,7 @@ public class MistBlockItem extends BlockItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        if (this.getBlock() == ModBlocks.CASCADE_BLOCK_NO_MIST.get()) {
+        if (this.getBlock() == MasonryBlocks.CASCADE_BLOCK_NO_MIST.get()) {
             tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block_no_mist.info")
                     .withStyle(ChatFormatting.GRAY));
             tooltip.add(

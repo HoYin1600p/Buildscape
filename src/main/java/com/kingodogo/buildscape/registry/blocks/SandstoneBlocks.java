@@ -12,8 +12,8 @@ import com.kingodogo.buildscape.feature.copper.ExposedCopperBulbBlock;
 import com.kingodogo.buildscape.feature.copper.FreshCopperBulbBlock;
 import com.kingodogo.buildscape.feature.copper.OxidizedCopperBulbBlock;
 import com.kingodogo.buildscape.feature.copper.WeatheredCopperBulbBlock;
-import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModSounds;
+import com.kingodogo.buildscape.registry.items.StoneItems;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -115,7 +115,7 @@ public final class SandstoneBlocks {
                             .strength(0.8f)
                             .requiresCorrectToolForDrops()
                             .sound(SoundType.STONE),
-                    ModItems.BLACK_SANDSTONE_STAIRS));
+                    StoneItems.BLACK_SANDSTONE_STAIRS));
     public static final RegistryObject<Block> BLUE_SANDSTONE = BLOCKS.register(
             "blue_sandstone",
             () -> new ModBlock(
@@ -221,7 +221,7 @@ public final class SandstoneBlocks {
                             .strength(0.75f)
                             .requiresCorrectToolForDrops()
                             .sound(SoundType.CALCITE),
-                    ModItems.BLACK_TILES));
+                    StoneItems.BLACK_TILES));
     public static final RegistryObject<Block> BLACK_TILES_STAIRS = BLOCKS.register("black_tiles_stairs",
             () -> new ModStairBlock(
                     BLACK_TILES.get().defaultBlockState(),

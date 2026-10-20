@@ -1,6 +1,11 @@
 package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.core.DyeColors;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.items.ItemsRegister;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
@@ -17,11 +22,11 @@ import java.util.function.Supplier;
  * {@link DyeColors} instead of by a hand-written 16-way switch in every class that needs one.
  */
 public final class DyeVariants {
-    private static final Map<DyeColors, Supplier<Block>> STOCKING_BLOCKS = byColor(ModBlocks.BLOCKS,
+    private static final Map<DyeColors, Supplier<Block>> STOCKING_BLOCKS = byColor(BlocksRegister.blocks(),
             "_festive_stocking");
-    private static final Map<DyeColors, Supplier<Item>> STOCKING_ITEMS = byColor(ModItems.ITEMS,
+    private static final Map<DyeColors, Supplier<Item>> STOCKING_ITEMS = byColor(ItemsRegister.items(),
             "_festive_stocking");
-    private static final Map<DyeColors, Supplier<Item>> ITEM_FRAMES = byColor(ModItems.ITEMS, "_item_frame");
+    private static final Map<DyeColors, Supplier<Item>> ITEM_FRAMES = byColor(ItemsRegister.items(), "_item_frame");
 
     private DyeVariants() {}
 
@@ -41,21 +46,21 @@ public final class DyeVariants {
     /** The festive stocking block of a colour name; the plain stocking for null or any other name. */
     public static Block festiveStockingBlock(String color) {
         DyeColors dye = DyeColors.fromName(color);
-        return (dye == null ? ModBlocks.FESTIVE_STOCKING : STOCKING_BLOCKS.get(dye)).get();
+        return (dye == null ? DecorBlocks.FESTIVE_STOCKING : STOCKING_BLOCKS.get(dye)).get();
     }
 
     /** The festive stocking item of a colour name; the plain stocking for any other name. */
     public static Item festiveStockingItem(String color) {
         DyeColors dye = DyeColors.fromName(color);
-        return (dye == null ? ModItems.FESTIVE_STOCKING : STOCKING_ITEMS.get(dye)).get();
+        return (dye == null ? WoodItems.FESTIVE_STOCKING : STOCKING_ITEMS.get(dye)).get();
     }
 
     /** The coloured item frame item of a colour name, {@code invisible} included; white for any other name. */
     public static Item itemFrameItem(String color) {
         if ("invisible".equals(color)) {
-            return ModItems.INVISIBLE_ITEM_FRAME.get();
+            return MasonryItems.INVISIBLE_ITEM_FRAME.get();
         }
         DyeColors dye = DyeColors.fromName(color);
-        return (dye == null ? ModItems.WHITE_ITEM_FRAME : ITEM_FRAMES.get(dye)).get();
+        return (dye == null ? MasonryItems.WHITE_ITEM_FRAME : ITEM_FRAMES.get(dye)).get();
     }
 }

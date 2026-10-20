@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.feature.sculk;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -34,7 +34,7 @@ public class SculkVeinBlock extends GlowLichenBlock {
 
     public static boolean spread(ServerLevel level, BlockPos pos, Random random) {
         BlockState state = level.getBlockState(pos);
-        if (!state.is(ModBlocks.SCULK_VEIN.get())) {
+        if (!state.is(CopperBlocks.SCULK_VEIN.get())) {
             return false;
         }
         List<Direction> faces = Arrays.asList(Direction.values());
@@ -71,19 +71,19 @@ public class SculkVeinBlock extends GlowLichenBlock {
             return false;
         }
         BlockState state = level.getBlockState(pos);
-        if (!state.isAir() && !state.is(Blocks.WATER) && !state.is(ModBlocks.SCULK_VEIN.get())) {
+        if (!state.isAir() && !state.is(Blocks.WATER) && !state.is(CopperBlocks.SCULK_VEIN.get())) {
             return false;
         }
         BlockState support = level.getBlockState(supportPos);
-        if (support.is(ModBlocks.SCULK.get()) || support.is(ModBlocks.SCULK_CATALYST.get())
-                || support.is(ModBlocks.SCULK_SENSOR.get()) || support.is(ModBlocks.SCULK_SHRIEKER.get())
+        if (support.is(CopperBlocks.SCULK.get()) || support.is(CopperBlocks.SCULK_CATALYST.get())
+                || support.is(CopperBlocks.SCULK_SENSOR.get()) || support.is(CopperBlocks.SCULK_SHRIEKER.get())
                 || support.is(Blocks.MOVING_PISTON)
                 || !support.isFaceSturdy(level, supportPos, face.getOpposite())) {
             return false;
         }
-        BlockState vein = state.is(ModBlocks.SCULK_VEIN.get())
+        BlockState vein = state.is(CopperBlocks.SCULK_VEIN.get())
                 ? state
-                : ModBlocks.SCULK_VEIN.get().defaultBlockState()
+                : CopperBlocks.SCULK_VEIN.get().defaultBlockState()
                         .setValue(BlockStateProperties.WATERLOGGED, state.getFluidState().is(Fluids.WATER));
         BooleanProperty property = getFaceProperty(face);
         return !vein.getValue(property) && level.setBlock(pos, vein.setValue(property, true), 3);
@@ -91,7 +91,7 @@ public class SculkVeinBlock extends GlowLichenBlock {
 
     public static void discharge(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        if (!state.is(ModBlocks.SCULK_VEIN.get())) {
+        if (!state.is(CopperBlocks.SCULK_VEIN.get())) {
             return;
         }
         BlockState remaining = state;
@@ -99,7 +99,7 @@ public class SculkVeinBlock extends GlowLichenBlock {
         for (Direction face : Direction.values()) {
             BooleanProperty property = getFaceProperty(face);
             if (remaining.getValue(property) && level.hasChunkAt(pos.relative(face))
-                    && level.getBlockState(pos.relative(face)).is(ModBlocks.SCULK.get())) {
+                    && level.getBlockState(pos.relative(face)).is(CopperBlocks.SCULK.get())) {
                 remaining = remaining.setValue(property, false);
             }
             anyFace |= remaining.getValue(property);

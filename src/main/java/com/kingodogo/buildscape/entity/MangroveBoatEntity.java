@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.entity;
 
 import com.kingodogo.buildscape.registry.ModEntities;
-import com.kingodogo.buildscape.registry.ModItems;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
@@ -29,6 +29,6 @@ public class MangroveBoatEntity extends Boat {
 
     @Override
     public Item getDropItem() {
-        return ModItems.MANGROVE_BOAT.get();
+        return WoodItems.MANGROVE_BOAT.get();
     }
 }

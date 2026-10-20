@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModSounds;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -348,7 +348,7 @@ public class CloverBlock extends BushBlock implements SinksOnFarmland, Bonemeala
             BlockHitResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
 
-        if (itemStack.getItem() == ModItems.CLOVER.get()) {
+        if (itemStack.getItem() == WoodItems.CLOVER.get()) {
             int currentAmount = state.getValue(FLOWER_AMOUNT);
             if (currentAmount < 4) {
                 if (!level.isClientSide) {
@@ -405,7 +405,7 @@ public class CloverBlock extends BushBlock implements SinksOnFarmland, Bonemeala
             level.setBlock(pos, state.setValue(FLOWER_AMOUNT, currentStage + 1), 3);
         } else {
             ItemStack cloverStack = new ItemStack(
-                    ModItems.CLOVER.get(),
+                    WoodItems.CLOVER.get(),
                     1);
             ItemEntity itemEntity = new ItemEntity(
                     level,
@@ -424,6 +424,6 @@ public class CloverBlock extends BushBlock implements SinksOnFarmland, Bonemeala
             LootContext.Builder builder) {
         int stage = state.getValue(FLOWER_AMOUNT);
         return Collections.singletonList(
-                new ItemStack(ModItems.CLOVER.get(), stage));
+                new ItemStack(WoodItems.CLOVER.get(), stage));
     }
 }

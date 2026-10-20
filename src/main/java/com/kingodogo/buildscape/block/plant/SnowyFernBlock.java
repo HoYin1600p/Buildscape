@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -80,7 +80,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
         return (state.is(BlockTags.DIRT) ||
                 state.is(Blocks.FARMLAND) ||
                 state.is(Blocks.SNOW_BLOCK) ||
-                state.is(ModBlocks.SNOW_BRICKS.get()));
+                state.is(DecorBlocks.SNOW_BRICKS.get()));
     }
 
     @Override
@@ -168,7 +168,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
-            BlockState largeFernState = ModBlocks.SNOWY_LARGE_FERN.get()
+            BlockState largeFernState = DecorBlocks.SNOWY_LARGE_FERN.get()
                     .defaultBlockState()
                     .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
             if (largeFernState.canSurvive(level, pos)) {

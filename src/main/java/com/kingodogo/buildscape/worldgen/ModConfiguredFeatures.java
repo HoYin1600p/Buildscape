@@ -5,7 +5,10 @@ import com.kingodogo.buildscape.block.plant.CloverBlock;
 import com.kingodogo.buildscape.block.plant.LeafLitterBlock;
 import com.kingodogo.buildscape.block.plant.PetalBlock;
 import com.kingodogo.buildscape.block.plant.WildflowersBlock;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
+import com.kingodogo.buildscape.registry.blocks.WoodBlocks;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -74,57 +77,57 @@ public class ModConfiguredFeatures {
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_MONETS = CONFIGURED_FEATURES.register("red_monets",
             () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createMonetConfiguration(ModBlocks.RED_MONETS.get())));
+                    createMonetConfiguration(WoodBlocks.RED_MONETS.get())));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_MONETS = CONFIGURED_FEATURES
             .register("blue_monets", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createMonetConfiguration(ModBlocks.BLUE_MONETS.get())));
+                    createMonetConfiguration(WoodBlocks.BLUE_MONETS.get())));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_MONETS = CONFIGURED_FEATURES
             .register("purple_monets", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createMonetConfiguration(ModBlocks.PURPLE_MONETS.get())));
+                    createMonetConfiguration(WoodBlocks.PURPLE_MONETS.get())));
     public static final RegistryObject<ConfiguredFeature<?, ?>> LIGHT_BLUE_MONETS = CONFIGURED_FEATURES
             .register("light_blue_monets", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createMonetConfiguration(ModBlocks.LIGHT_BLUE_MONETS.get())));
+                    createMonetConfiguration(WoodBlocks.LIGHT_BLUE_MONETS.get())));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_MONETS = CONFIGURED_FEATURES
             .register("pink_monets", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createMonetConfiguration(ModBlocks.PINK_MONETS.get())));
+                    createMonetConfiguration(WoodBlocks.PINK_MONETS.get())));
     public static final RegistryObject<ConfiguredFeature<?, ?>> YELLOW_MONETS = CONFIGURED_FEATURES
             .register("yellow_monets", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createMonetConfiguration(ModBlocks.YELLOW_MONETS.get())));
+                    createMonetConfiguration(DecorBlocks.YELLOW_MONETS.get())));
 
     @Deprecated
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETALS = CONFIGURED_FEATURES.register("red_petals",
             () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfigurationWithRandomStates(ModBlocks.RED_PETAL.get())));
+                    createPetalConfigurationWithRandomStates(DecorBlocks.RED_PETAL.get())));
 
     @Deprecated
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETALS = CONFIGURED_FEATURES
             .register("blue_petals", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfigurationWithRandomStates(ModBlocks.BLUE_PETAL.get())));
+                    createPetalConfigurationWithRandomStates(DecorBlocks.BLUE_PETAL.get())));
 
     @Deprecated
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETALS = CONFIGURED_FEATURES
             .register("orange_petals", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfigurationWithRandomStates(ModBlocks.ORANGE_PETAL.get())));
+                    createPetalConfigurationWithRandomStates(DecorBlocks.ORANGE_PETAL.get())));
 
     @Deprecated
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETALS = CONFIGURED_FEATURES
             .register("pink_petals", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfigurationWithRandomStates(ModBlocks.PINK_PETAL.get())));
+                    createPetalConfigurationWithRandomStates(DecorBlocks.PINK_PETAL.get())));
 
     @Deprecated
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETALS = CONFIGURED_FEATURES
             .register("purple_petals", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfigurationWithRandomStates(ModBlocks.PURPLE_PETAL.get())));
+                    createPetalConfigurationWithRandomStates(DecorBlocks.PURPLE_PETAL.get())));
 
     public static final RegistryObject<ConfiguredFeature<?, ?>> ALL_PETALS = CONFIGURED_FEATURES.register("all_petals",
             () -> new ConfiguredFeature<>(
@@ -134,421 +137,421 @@ public class ModConfiguredFeatures {
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_1_N = CONFIGURED_FEATURES
             .register("red_petal_1_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 1, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 1, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_1_S = CONFIGURED_FEATURES
             .register("red_petal_1_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 1, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 1, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_1_E = CONFIGURED_FEATURES
             .register("red_petal_1_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 1, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 1, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_1_W = CONFIGURED_FEATURES
             .register("red_petal_1_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 1, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 1, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_2_N = CONFIGURED_FEATURES
             .register("red_petal_2_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 2, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 2, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_2_S = CONFIGURED_FEATURES
             .register("red_petal_2_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 2, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 2, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_2_E = CONFIGURED_FEATURES
             .register("red_petal_2_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 2, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 2, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_2_W = CONFIGURED_FEATURES
             .register("red_petal_2_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 2, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 2, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_3_N = CONFIGURED_FEATURES
             .register("red_petal_3_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 3, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 3, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_3_S = CONFIGURED_FEATURES
             .register("red_petal_3_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 3, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 3, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_3_E = CONFIGURED_FEATURES
             .register("red_petal_3_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 3, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 3, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_3_W = CONFIGURED_FEATURES
             .register("red_petal_3_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 3, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 3, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_4_N = CONFIGURED_FEATURES
             .register("red_petal_4_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 4, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 4, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_4_S = CONFIGURED_FEATURES
             .register("red_petal_4_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 4, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 4, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_4_E = CONFIGURED_FEATURES
             .register("red_petal_4_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 4, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 4, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_PETAL_4_W = CONFIGURED_FEATURES
             .register("red_petal_4_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.RED_PETAL.get(), 4, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.RED_PETAL.get(), 4, Direction.WEST)));
 
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_1_N = CONFIGURED_FEATURES
             .register("blue_petal_1_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 1, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 1, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_1_S = CONFIGURED_FEATURES
             .register("blue_petal_1_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 1, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 1, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_1_E = CONFIGURED_FEATURES
             .register("blue_petal_1_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 1, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 1, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_1_W = CONFIGURED_FEATURES
             .register("blue_petal_1_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 1, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 1, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_2_N = CONFIGURED_FEATURES
             .register("blue_petal_2_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 2, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 2, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_2_S = CONFIGURED_FEATURES
             .register("blue_petal_2_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 2, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 2, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_2_E = CONFIGURED_FEATURES
             .register("blue_petal_2_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 2, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 2, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_2_W = CONFIGURED_FEATURES
             .register("blue_petal_2_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 2, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 2, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_3_N = CONFIGURED_FEATURES
             .register("blue_petal_3_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 3, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 3, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_3_S = CONFIGURED_FEATURES
             .register("blue_petal_3_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 3, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 3, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_3_E = CONFIGURED_FEATURES
             .register("blue_petal_3_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 3, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 3, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_3_W = CONFIGURED_FEATURES
             .register("blue_petal_3_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 3, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 3, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_4_N = CONFIGURED_FEATURES
             .register("blue_petal_4_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 4, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 4, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_4_S = CONFIGURED_FEATURES
             .register("blue_petal_4_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 4, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 4, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_4_E = CONFIGURED_FEATURES
             .register("blue_petal_4_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 4, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 4, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> BLUE_PETAL_4_W = CONFIGURED_FEATURES
             .register("blue_petal_4_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 4, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.BLUE_PETAL.get(), 4, Direction.WEST)));
 
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_1_N = CONFIGURED_FEATURES
             .register("orange_petal_1_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             1,
                             Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_1_S = CONFIGURED_FEATURES
             .register("orange_petal_1_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             1,
                             Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_1_E = CONFIGURED_FEATURES
             .register("orange_petal_1_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             1,
                             Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_1_W = CONFIGURED_FEATURES
             .register("orange_petal_1_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             1,
                             Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_2_N = CONFIGURED_FEATURES
             .register("orange_petal_2_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             2,
                             Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_2_S = CONFIGURED_FEATURES
             .register("orange_petal_2_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             2,
                             Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_2_E = CONFIGURED_FEATURES
             .register("orange_petal_2_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             2,
                             Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_2_W = CONFIGURED_FEATURES
             .register("orange_petal_2_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             2,
                             Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_3_N = CONFIGURED_FEATURES
             .register("orange_petal_3_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             3,
                             Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_3_S = CONFIGURED_FEATURES
             .register("orange_petal_3_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             3,
                             Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_3_E = CONFIGURED_FEATURES
             .register("orange_petal_3_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             3,
                             Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_3_W = CONFIGURED_FEATURES
             .register("orange_petal_3_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             3,
                             Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_4_N = CONFIGURED_FEATURES
             .register("orange_petal_4_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             4,
                             Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_4_S = CONFIGURED_FEATURES
             .register("orange_petal_4_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             4,
                             Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_4_E = CONFIGURED_FEATURES
             .register("orange_petal_4_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             4,
                             Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> ORANGE_PETAL_4_W = CONFIGURED_FEATURES
             .register("orange_petal_4_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.ORANGE_PETAL.get(),
+                            DecorBlocks.ORANGE_PETAL.get(),
                             4,
                             Direction.WEST)));
 
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_1_N = CONFIGURED_FEATURES
             .register("pink_petal_1_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 1, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 1, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_1_S = CONFIGURED_FEATURES
             .register("pink_petal_1_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 1, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 1, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_1_E = CONFIGURED_FEATURES
             .register("pink_petal_1_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 1, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 1, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_1_W = CONFIGURED_FEATURES
             .register("pink_petal_1_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 1, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 1, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_2_N = CONFIGURED_FEATURES
             .register("pink_petal_2_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 2, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 2, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_2_S = CONFIGURED_FEATURES
             .register("pink_petal_2_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 2, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 2, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_2_E = CONFIGURED_FEATURES
             .register("pink_petal_2_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 2, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 2, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_2_W = CONFIGURED_FEATURES
             .register("pink_petal_2_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 2, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 2, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_3_N = CONFIGURED_FEATURES
             .register("pink_petal_3_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 3, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 3, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_3_S = CONFIGURED_FEATURES
             .register("pink_petal_3_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 3, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 3, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_3_E = CONFIGURED_FEATURES
             .register("pink_petal_3_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 3, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 3, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_3_W = CONFIGURED_FEATURES
             .register("pink_petal_3_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 3, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 3, Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_4_N = CONFIGURED_FEATURES
             .register("pink_petal_4_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 4, Direction.NORTH)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 4, Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_4_S = CONFIGURED_FEATURES
             .register("pink_petal_4_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 4, Direction.SOUTH)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 4, Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_4_E = CONFIGURED_FEATURES
             .register("pink_petal_4_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 4, Direction.EAST)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 4, Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PINK_PETAL_4_W = CONFIGURED_FEATURES
             .register("pink_petal_4_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 4, Direction.WEST)));
+                    createPetalConfiguration(DecorBlocks.PINK_PETAL.get(), 4, Direction.WEST)));
 
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_N = CONFIGURED_FEATURES
             .register("purple_petal_1_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             1,
                             Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_S = CONFIGURED_FEATURES
             .register("purple_petal_1_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             1,
                             Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_E = CONFIGURED_FEATURES
             .register("purple_petal_1_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             1,
                             Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_W = CONFIGURED_FEATURES
             .register("purple_petal_1_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             1,
                             Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_2_N = CONFIGURED_FEATURES
             .register("purple_petal_2_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             2,
                             Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_2_S = CONFIGURED_FEATURES
             .register("purple_petal_2_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             2,
                             Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_2_E = CONFIGURED_FEATURES
             .register("purple_petal_2_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             2,
                             Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_2_W = CONFIGURED_FEATURES
             .register("purple_petal_2_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             2,
                             Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_3_N = CONFIGURED_FEATURES
             .register("purple_petal_3_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             3,
                             Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_3_S = CONFIGURED_FEATURES
             .register("purple_petal_3_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             3,
                             Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_3_E = CONFIGURED_FEATURES
             .register("purple_petal_3_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             3,
                             Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_3_W = CONFIGURED_FEATURES
             .register("purple_petal_3_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             3,
                             Direction.WEST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_4_N = CONFIGURED_FEATURES
             .register("purple_petal_4_n", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             4,
                             Direction.NORTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_4_S = CONFIGURED_FEATURES
             .register("purple_petal_4_s", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             4,
                             Direction.SOUTH)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_4_E = CONFIGURED_FEATURES
             .register("purple_petal_4_e", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             4,
                             Direction.EAST)));
     public static final RegistryObject<ConfiguredFeature<?, ?>> PURPLE_PETAL_4_W = CONFIGURED_FEATURES
             .register("purple_petal_4_w", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createPetalConfiguration(
-                            ModBlocks.PURPLE_PETAL.get(),
+                            DecorBlocks.PURPLE_PETAL.get(),
                             4,
                             Direction.WEST)));
 
@@ -620,13 +623,13 @@ public class ModConfiguredFeatures {
     public static final RegistryObject<ConfiguredFeature<?, ?>> CLOVER = CONFIGURED_FEATURES.register("clover",
             () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
-                    createCloverConfigurationWithRandomStates(ModBlocks.CLOVER.get())));
+                    createCloverConfigurationWithRandomStates(DecorBlocks.CLOVER.get())));
 
     public static final RegistryObject<ConfiguredFeature<?, ?>> WILDFLOWERS = CONFIGURED_FEATURES
             .register("wildflowers", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createFlowerPatchConfiguration(
-                            ModBlocks.WILDFLOWERS.get(),
+                            CopperBlocks.WILDFLOWERS.get(),
                             WildflowersBlock.FLOWER_AMOUNT,
                             WildflowersBlock.FACING)));
 
@@ -634,7 +637,7 @@ public class ModConfiguredFeatures {
             .register("leaf_litter", () -> new ConfiguredFeature<>(
                     Feature.RANDOM_PATCH,
                     createFlowerPatchConfiguration(
-                            ModBlocks.LEAF_LITTER.get(),
+                            CopperBlocks.LEAF_LITTER.get(),
                             LeafLitterBlock.FLOWER_AMOUNT,
                             LeafLitterBlock.FACING)));
 
@@ -770,11 +773,11 @@ public class ModConfiguredFeatures {
         List<BlockState> states = new ArrayList<>();
 
         Block[] petalBlocks = {
-                ModBlocks.RED_PETAL.get(),
-                ModBlocks.BLUE_PETAL.get(),
-                ModBlocks.ORANGE_PETAL.get(),
-                ModBlocks.PINK_PETAL.get(),
-                ModBlocks.PURPLE_PETAL.get(),
+                DecorBlocks.RED_PETAL.get(),
+                DecorBlocks.BLUE_PETAL.get(),
+                DecorBlocks.ORANGE_PETAL.get(),
+                DecorBlocks.PINK_PETAL.get(),
+                DecorBlocks.PURPLE_PETAL.get(),
         };
 
         Direction[] facings = {
@@ -908,7 +911,7 @@ public class ModConfiguredFeatures {
     private static RandomPatchConfiguration createCloverConfiguration(
             int flowerAmount,
             Direction facing) {
-        BlockState state = ModBlocks.CLOVER.get().defaultBlockState();
+        BlockState state = DecorBlocks.CLOVER.get().defaultBlockState();
         IntegerProperty FLOWER_AMOUNT = CloverBlock.FLOWER_AMOUNT;
         DirectionProperty FACING_PROP = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -933,17 +936,17 @@ public class ModConfiguredFeatures {
     private static SimpleBlockConfiguration createColoredSporeBlossomConfiguration() {
         return new SimpleBlockConfiguration(
                 BlockStateProvider.simple(
-                        ModBlocks.RED_SPORE_BLOSSOM.get().defaultBlockState()));
+                        DecorBlocks.RED_SPORE_BLOSSOM.get().defaultBlockState()));
     }
 
     private static SimpleBlockConfiguration createAllColoredSporeBlossomConfiguration() {
         List<BlockState> states = new ArrayList<>();
 
-        states.add(ModBlocks.RED_SPORE_BLOSSOM.get().defaultBlockState());
-        states.add(ModBlocks.CYAN_SPORE_BLOSSOM.get().defaultBlockState());
-        states.add(ModBlocks.BLUE_SPORE_BLOSSOM.get().defaultBlockState());
-        states.add(ModBlocks.PURPLE_SPORE_BLOSSOM.get().defaultBlockState());
-        states.add(ModBlocks.ORANGE_SPORE_BLOSSOM.get().defaultBlockState());
+        states.add(DecorBlocks.RED_SPORE_BLOSSOM.get().defaultBlockState());
+        states.add(DecorBlocks.CYAN_SPORE_BLOSSOM.get().defaultBlockState());
+        states.add(DecorBlocks.BLUE_SPORE_BLOSSOM.get().defaultBlockState());
+        states.add(DecorBlocks.PURPLE_SPORE_BLOSSOM.get().defaultBlockState());
+        states.add(DecorBlocks.ORANGE_SPORE_BLOSSOM.get().defaultBlockState());
 
         RandomStateProvider stateProvider = new RandomStateProvider(states);
 
@@ -953,7 +956,7 @@ public class ModConfiguredFeatures {
     private static SimpleBlockConfiguration createMangrovePropaguleConfiguration() {
         return new SimpleBlockConfiguration(
                 BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState()));
+                        DecorBlocks.MANGROVE_PROPAGULE.get().defaultBlockState()));
     }
 
     private static RandomPatchConfiguration createMangrovePropagulePatchConfiguration(
@@ -962,7 +965,7 @@ public class ModConfiguredFeatures {
                 Feature.SIMPLE_BLOCK,
                 new SimpleBlockConfiguration(
                         BlockStateProvider.simple(
-                                ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState())));
+                                DecorBlocks.MANGROVE_PROPAGULE.get().defaultBlockState())));
 
         PlacedFeature placedFeature = new PlacedFeature(
                 Holder.direct(simpleBlockFeature),
@@ -981,7 +984,7 @@ public class ModConfiguredFeatures {
     private static TreeConfiguration createMangroveTreeConfiguration() {
         return new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_LOG.get().defaultBlockState()),
+                        DecorBlocks.MANGROVE_LOG.get().defaultBlockState()),
                 new MangroveUpwardsBranchingTrunkPlacer(
                         2,
                         1,
@@ -990,7 +993,7 @@ public class ModConfiguredFeatures {
                         0.5F,
                         UniformInt.of(0, 1)),
                 BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_LEAVES.get().defaultBlockState()),
+                        DecorBlocks.MANGROVE_LEAVES.get().defaultBlockState()),
                 new MangroveRandomSpreadFoliagePlacer(
                         ConstantInt.of(3),
                         ConstantInt.of(0),
@@ -1019,7 +1022,7 @@ public class ModConfiguredFeatures {
     private static TreeConfiguration createTallMangroveTreeConfiguration() {
         return new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_LOG.get().defaultBlockState()),
+                        DecorBlocks.MANGROVE_LOG.get().defaultBlockState()),
                 new MangroveUpwardsBranchingTrunkPlacer(
                         4,
                         1,
@@ -1028,7 +1031,7 @@ public class ModConfiguredFeatures {
                         0.5F,
                         UniformInt.of(0, 1)),
                 BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_LEAVES.get().defaultBlockState()),
+                        DecorBlocks.MANGROVE_LEAVES.get().defaultBlockState()),
                 new MangroveRandomSpreadFoliagePlacer(
                         ConstantInt.of(3),
                         ConstantInt.of(0),
@@ -1069,16 +1072,16 @@ public class ModConfiguredFeatures {
     private static TreeConfiguration createPoplarTreeConfiguration() {
         return new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider.simple(
-                        ModBlocks.POPLAR_LOG.get().defaultBlockState()),
+                        ShapedWoodBlocks.POPLAR_LOG.get().defaultBlockState()),
                 new StraightTrunkPlacer(
                         4,
                         2,
                         0),
                 new WeightedStateProvider(
                         SimpleWeightedRandomList.<BlockState>builder()
-                                .add(ModBlocks.RED_POPLAR_LEAVES.get().defaultBlockState(), 1)
-                                .add(ModBlocks.ORANGE_POPLAR_LEAVES.get().defaultBlockState(), 1)
-                                .add(ModBlocks.YELLOW_POPLAR_LEAVES.get().defaultBlockState(), 1)),
+                                .add(ShapedWoodBlocks.RED_POPLAR_LEAVES.get().defaultBlockState(), 1)
+                                .add(ShapedWoodBlocks.ORANGE_POPLAR_LEAVES.get().defaultBlockState(), 1)
+                                .add(ShapedWoodBlocks.YELLOW_POPLAR_LEAVES.get().defaultBlockState(), 1)),
                 new BlobFoliagePlacer(
                         ConstantInt.of(2),
                         ConstantInt.of(0),
@@ -1090,9 +1093,9 @@ public class ModConfiguredFeatures {
 
     private static TreeConfiguration createPaleOakTreeConfiguration() {
         return new TreeConfiguration.TreeConfigurationBuilder(
-                BlockStateProvider.simple(ModBlocks.PALE_OAK_LOG.get().defaultBlockState()),
+                BlockStateProvider.simple(ShapedWoodBlocks.PALE_OAK_LOG.get().defaultBlockState()),
                 new StraightTrunkPlacer(5, 2, 1),
-                BlockStateProvider.simple(ModBlocks.PALE_OAK_LEAVES.get().defaultBlockState()),
+                BlockStateProvider.simple(ShapedWoodBlocks.PALE_OAK_LEAVES.get().defaultBlockState()),
                 new BlobFoliagePlacer(
                         ConstantInt.of(2),
                         ConstantInt.of(0),
@@ -1105,9 +1108,9 @@ public class ModConfiguredFeatures {
 
     private static TreeConfiguration createCherryTreeConfiguration() {
         return new TreeConfiguration.TreeConfigurationBuilder(
-                BlockStateProvider.simple(ModBlocks.CHERRY_LOG.get().defaultBlockState()),
+                BlockStateProvider.simple(ShapedWoodBlocks.CHERRY_LOG.get().defaultBlockState()),
                 new StraightTrunkPlacer(4, 2, 0),
-                BlockStateProvider.simple(ModBlocks.CHERRY_LEAVES.get().defaultBlockState()),
+                BlockStateProvider.simple(ShapedWoodBlocks.CHERRY_LEAVES.get().defaultBlockState()),
                 new BlobFoliagePlacer(
                         ConstantInt.of(2),
                         ConstantInt.of(0),

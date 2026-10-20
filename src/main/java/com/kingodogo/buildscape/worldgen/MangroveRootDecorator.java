@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.worldgen;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -166,10 +166,10 @@ public class MangroveRootDecorator extends TreeDecorator {
                         state.is(Blocks.CLAY);
                 boolean isTreeBlock = state.is(BlockTags.LOGS) ||
                         state.is(
-                                ModBlocks.MANGROVE_ROOTS.get())
+                                DecorBlocks.MANGROVE_ROOTS.get())
                         ||
                         state.is(
-                                ModBlocks.MUDDY_MANGROVE_ROOTS.get());
+                                DecorBlocks.MUDDY_MANGROVE_ROOTS.get());
                 return (isTerrainBlock &&
                         !isTreeBlock &&
                         state.getMaterial().isSolid() &&
@@ -195,9 +195,9 @@ public class MangroveRootDecorator extends TreeDecorator {
                 return false;
             }
             if (state.is(
-                    ModBlocks.MANGROVE_ROOTS.get()) ||
+                    DecorBlocks.MANGROVE_ROOTS.get()) ||
                     state.is(
-                            ModBlocks.MUDDY_MANGROVE_ROOTS.get())) {
+                            DecorBlocks.MUDDY_MANGROVE_ROOTS.get())) {
                 return true;
             }
             return state.isAir() || state.is(Blocks.WATER);
@@ -207,7 +207,7 @@ public class MangroveRootDecorator extends TreeDecorator {
             return;
         }
 
-        BlockState rootState = ModBlocks.MANGROVE_ROOTS.get()
+        BlockState rootState = DecorBlocks.MANGROVE_ROOTS.get()
                 .defaultBlockState()
                 .setValue(
                         RotatedPillarBlock.AXIS,

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block.plant;
 
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -32,7 +32,7 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
 
     public ColoredMossBlock(Properties properties, Supplier<Block> carpet, Supplier<Block> overlay,
             Supplier<Block> layers) {
-        this(properties, carpet, overlay, layers, () -> ModBlocks.POPLAR_SAPLING.get(), null);
+        this(properties, carpet, overlay, layers, () -> ShapedWoodBlocks.POPLAR_SAPLING.get(), null);
     }
 
     public ColoredMossBlock(Properties properties, Supplier<Block> carpet, Supplier<Block> overlay,

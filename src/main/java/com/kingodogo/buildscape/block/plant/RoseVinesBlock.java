@@ -125,13 +125,10 @@ public class RoseVinesBlock extends VineBlock {
             return null;
         }
 
-        if (isExistingVine &&
-                !(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
-            if (blockState.getBlock() == this) {
-                BooleanProperty property = getPropertyForFace(attachDirection);
-                if (blockState.hasProperty(property) && blockState.getValue(property)) {
-                    return null;
-                }
+        if (isExistingVine && blockState.getBlock() == this) {
+            BooleanProperty property = getPropertyForFace(attachDirection);
+            if (blockState.hasProperty(property) && blockState.getValue(property)) {
+                return null;
             }
         }
 
@@ -139,112 +136,16 @@ public class RoseVinesBlock extends VineBlock {
             BlockPos originalPos = clickedPos.relative(clickedFace.getOpposite());
             BlockState originalState = context.getLevel().getBlockState(originalPos);
             if (originalState.getBlock() instanceof RoseVinesBlock) {
-                Direction attachToVine = clickedFace.getOpposite();
-                BooleanProperty attachProperty = getPropertyForFace(attachToVine);
-
-                if (originalState.hasProperty(attachProperty) &&
-                        originalState.getValue(attachProperty)) {
-                    return null;
-                }
-
-                BlockState state = this.defaultBlockState();
-                if (state.hasProperty(attachProperty)) {
-                    state = state.setValue(attachProperty, true);
-                }
-                return state;
+                return placeAgainstVine(originalState, clickedFace);
             }
         }
 
         if (clickedFace == Direction.UP) {
-            BlockState state;
-            if (isExistingVine) {
-                if (blockState.getBlock() == this) {
-                    state = blockState;
-                } else {
-                    state = this.defaultBlockState();
-                    if (blockState.hasProperty(UP)) {
-                        state = state.setValue(
-                                UP,
-                                blockState.getValue(UP));
-                    }
-                    if (blockState.hasProperty(DOWN)) {
-                        state = state.setValue(
-                                DOWN,
-                                blockState.getValue(DOWN));
-                    }
-                    if (blockState.hasProperty(NORTH)) {
-                        state = state.setValue(
-                                NORTH,
-                                blockState.getValue(NORTH));
-                    }
-                    if (blockState.hasProperty(SOUTH)) {
-                        state = state.setValue(
-                                SOUTH,
-                                blockState.getValue(SOUTH));
-                    }
-                    if (blockState.hasProperty(EAST)) {
-                        state = state.setValue(
-                                EAST,
-                                blockState.getValue(EAST));
-                    }
-                    if (blockState.hasProperty(WEST)) {
-                        state = state.setValue(
-                                WEST,
-                                blockState.getValue(WEST));
-                    }
-                }
-            } else {
-                state = this.defaultBlockState();
-            }
-
-            state = state.setValue(DOWN, true);
-            return state;
+            return existingOrDefaultState(blockState, isExistingVine).setValue(DOWN, true);
         }
 
         if (clickedFace == Direction.DOWN) {
-            BlockState state;
-            if (isExistingVine) {
-                if (blockState.getBlock() == this) {
-                    state = blockState;
-                } else {
-                    state = this.defaultBlockState();
-                    if (blockState.hasProperty(UP)) {
-                        state = state.setValue(
-                                UP,
-                                blockState.getValue(UP));
-                    }
-                    if (blockState.hasProperty(DOWN)) {
-                        state = state.setValue(
-                                DOWN,
-                                blockState.getValue(DOWN));
-                    }
-                    if (blockState.hasProperty(NORTH)) {
-                        state = state.setValue(
-                                NORTH,
-                                blockState.getValue(NORTH));
-                    }
-                    if (blockState.hasProperty(SOUTH)) {
-                        state = state.setValue(
-                                SOUTH,
-                                blockState.getValue(SOUTH));
-                    }
-                    if (blockState.hasProperty(EAST)) {
-                        state = state.setValue(
-                                EAST,
-                                blockState.getValue(EAST));
-                    }
-                    if (blockState.hasProperty(WEST)) {
-                        state = state.setValue(
-                                WEST,
-                                blockState.getValue(WEST));
-                    }
-                }
-            } else {
-                state = this.defaultBlockState();
-            }
-
-            state = state.setValue(UP, true);
-            return state;
+            return existingOrDefaultState(blockState, isExistingVine).setValue(UP, true);
         }
 
         BlockState state;
@@ -256,41 +157,7 @@ public class RoseVinesBlock extends VineBlock {
                 }
             }
 
-            if (blockState.getBlock() == this) {
-                state = blockState;
-            } else {
-                state = this.defaultBlockState();
-                if (blockState.hasProperty(UP)) {
-                    state = state.setValue(
-                            UP,
-                            blockState.getValue(UP));
-                }
-                if (blockState.hasProperty(DOWN)) {
-                    state = state.setValue(
-                            DOWN,
-                            blockState.getValue(DOWN));
-                }
-                if (blockState.hasProperty(NORTH)) {
-                    state = state.setValue(
-                            NORTH,
-                            blockState.getValue(NORTH));
-                }
-                if (blockState.hasProperty(SOUTH)) {
-                    state = state.setValue(
-                            SOUTH,
-                            blockState.getValue(SOUTH));
-                }
-                if (blockState.hasProperty(EAST)) {
-                    state = state.setValue(
-                            EAST,
-                            blockState.getValue(EAST));
-                }
-                if (blockState.hasProperty(WEST)) {
-                    state = state.setValue(
-                            WEST,
-                            blockState.getValue(WEST));
-                }
-            }
+            state = existingOrDefaultState(blockState, true);
 
             BooleanProperty property = getPropertyForFace(attachDirection);
             if (state.hasProperty(property)) {
@@ -312,6 +179,40 @@ public class RoseVinesBlock extends VineBlock {
             }
         }
 
+        return state;
+    }
+
+    /** Placing into an empty position against a neighbouring rose vine; null when that face is already taken. */
+    private BlockState placeAgainstVine(BlockState originalState, Direction clickedFace) {
+        Direction attachToVine = clickedFace.getOpposite();
+        BooleanProperty attachProperty = getPropertyForFace(attachToVine);
+
+        if (originalState.hasProperty(attachProperty) &&
+                originalState.getValue(attachProperty)) {
+            return null;
+        }
+
+        BlockState state = this.defaultBlockState();
+        if (state.hasProperty(attachProperty)) {
+            state = state.setValue(attachProperty, true);
+        }
+        return state;
+    }
+
+    /** The clicked vine itself when it is this block, a copy of its faces onto this block otherwise. */
+    private BlockState existingOrDefaultState(BlockState blockState, boolean isExistingVine) {
+        if (!isExistingVine) {
+            return this.defaultBlockState();
+        }
+        if (blockState.getBlock() == this) {
+            return blockState;
+        }
+        BlockState state = this.defaultBlockState();
+        for (BooleanProperty face : new BooleanProperty[]{UP, DOWN, NORTH, SOUTH, EAST, WEST}) {
+            if (blockState.hasProperty(face)) {
+                state = state.setValue(face, blockState.getValue(face));
+            }
+        }
         return state;
     }
 

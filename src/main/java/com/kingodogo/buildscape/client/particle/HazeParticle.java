@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.client.particle;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
@@ -16,9 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class HazeParticle extends TextureSheetParticle {
@@ -76,36 +76,23 @@ public class HazeParticle extends TextureSheetParticle {
                 Mth.ceil((this.baseSize * 1.2 * Math.sqrt(2.0) + 0.02) / CELL_SIZE));
         this.maskMin = -(radius + 0.5F) * CELL_SIZE;
         this.mask = createMask(level, radius);
+        if (this.mask.rectangles().isEmpty()) {
+            this.remove();
+        }
 
         this.setSpriteFromAge(sprites);
     }
 
     private HazeMask createMask(ClientLevel level, int radius) {
-        Map<BlockPos, List<AABB>> shapes = new HashMap<>();
+        Long2ObjectMap<List<AABB>> shapes = new Long2ObjectOpenHashMap<>();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         int gridSize = radius * 2 + 1;
-        int blockY = Mth.floor(this.y);
         return HazeMask.compute(gridSize, gridSize, radius, radius, (cellX, cellZ) -> {
             double minX = this.originX + this.maskMin + cellX * CELL_SIZE;
             double minZ = this.originZ + this.maskMin + cellZ * CELL_SIZE;
             double maxX = minX + CELL_SIZE;
             double maxZ = minZ + CELL_SIZE;
-            for (int by = blockY - 1; by <= blockY + 1; by++) {
-                for (int bx = Mth.floor(minX); bx <= Mth.floor(maxX); bx++) {
-                    for (int bz = Mth.floor(minZ); bz <= Mth.floor(maxZ); bz++) {
-                        BlockPos pos = new BlockPos(bx, by, bz);
-                        List<AABB> boxes = shapes.computeIfAbsent(pos,
-                                key -> level.getBlockState(key).getCollisionShape(level, key).toAabbs());
-                        for (AABB box : boxes) {
-                            if (box.maxX + bx > minX && box.minX + bx < maxX
-                                    && box.maxZ + bz > minZ && box.minZ + bz < maxZ
-                                    && HazeMask.blocksHeight(box.minY + by, box.maxY + by, this.y)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
+            return HazeMask.blocksCell(level, pos, shapes, minX, minZ, maxX, maxZ, this.y);
         });
     }
 

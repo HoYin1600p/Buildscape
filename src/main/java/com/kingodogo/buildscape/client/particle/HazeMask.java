@@ -1,10 +1,16 @@
 package com.kingodogo.buildscape.client.particle;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.phys.AABB;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-/** A fixed grid of free cells visible from the particle's centre. No world access is needed here. */
+/** A fixed grid of free cells visible from the particle's centre. */
 public final class HazeMask {
 
     public static final int MAX_GRID_SIZE = 32;
@@ -30,14 +36,10 @@ public final class HazeMask {
         }
 
         boolean[] occupied = new boolean[width * height];
-        List<Integer> obstacles = new ArrayList<>();
         for (int z = 0; z < height; z++) {
             for (int x = 0; x < width; x++) {
                 int index = z * width + x;
                 occupied[index] = blocked.test(x, z);
-                if (occupied[index]) {
-                    obstacles.add(index);
-                }
             }
         }
 
@@ -68,13 +70,28 @@ public final class HazeMask {
             }
         }
 
+        // Only the boundary of the flood-filled region can cast a new shadow. Any ray reaching an
+        // interior obstacle must first cross a boundary obstacle. Use the fill before shadowing:
+        // removing partly shadowed cells does not make their neighbouring obstacles redundant.
+        int[] obstacles = queue;
+        int obstacleCount = 0;
+        for (int index = 0; index < occupied.length; index++) {
+            if (occupied[index] && ((index % width > 0 && visible[index - 1])
+                    || (index % width + 1 < width && visible[index + 1])
+                    || (index >= width && visible[index - width])
+                    || (index + width < visible.length && visible[index + width]))) {
+                obstacles[obstacleCount++] = index;
+            }
+        }
+
         // Flood fill alone can walk around an isolated pane. Reject its shadow too, including cells
         // only partly shadowed, so the edge of a rendered cell cannot leak beyond the obstacle.
         for (int index = 0; index < visible.length; index++) {
             if (!visible[index]) {
                 continue;
             }
-            for (int obstacle : obstacles) {
+            for (int i = 0; i < obstacleCount; i++) {
+                int obstacle = obstacles[i];
                 if (blocksView(centreX + 0.5, centreZ + 0.5, index % width, index / width,
                         obstacle % width, obstacle / width)) {
                     visible[index] = false;
@@ -83,6 +100,34 @@ public final class HazeMask {
             }
         }
         return new HazeMask(width, height, visible);
+    }
+
+    static boolean blocksCell(BlockGetter level, BlockPos.MutableBlockPos pos,
+            Long2ObjectMap<List<AABB>> shapes, double minX, double minZ, double maxX, double maxZ,
+            double hazeY) {
+        int blockY = Mth.floor(hazeY);
+        // The layer below can contain tall fence/wall collision. The layer above cannot reach down.
+        for (int by = blockY - 1; by <= blockY; by++) {
+            for (int bx = Mth.floor(minX); bx <= Mth.floor(maxX); bx++) {
+                for (int bz = Mth.floor(minZ); bz <= Mth.floor(maxZ); bz++) {
+                    pos.set(bx, by, bz);
+                    long key = BlockPos.asLong(bx, by, bz);
+                    List<AABB> boxes = shapes.get(key);
+                    if (boxes == null) {
+                        boxes = level.getBlockState(pos).getCollisionShape(level, pos).toAabbs();
+                        shapes.put(key, boxes);
+                    }
+                    for (AABB box : boxes) {
+                        if (box.maxX + bx > minX && box.minX + bx < maxX
+                                && box.maxZ + bz > minZ && box.minZ + bz < maxZ
+                                && blocksHeight(box.minY + by, box.maxY + by, hazeY)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private static boolean blocksView(double sourceX, double sourceZ, int x, int z, int blockX, int blockZ) {

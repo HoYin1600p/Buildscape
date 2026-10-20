@@ -52,6 +52,51 @@ public class SyncConfigPacketLimitsTest extends BootstrappedGameTest {
         assertEquals(Set.of("minecraft:stick", "#forge:gems", longItem), config.items);
     }
 
+    @Test
+    public void multibytePatternOverByteLimitEncodesWithRing() {
+        PillarParticleConfig config = normalConfig();
+        String longPattern = "\u00e9".repeat(33);
+        config.pattern = longPattern;
+        config.replaceItems(Set.of("minecraft:stick", "#forge:gems"));
+
+        SyncConfigPacket decoded = roundTrip(new SyncConfigPacket(config));
+
+        assertEquals(ParticlePatterns.RING, decoded.pattern);
+        assertEquals(config.items, decoded.items);
+        assertUnchangedSettings(config, decoded);
+        assertEquals(longPattern, config.pattern);
+    }
+
+    @Test
+    public void multibyteItemOverByteLimitIsDroppedDuringRoundTrip() {
+        PillarParticleConfig config = normalConfig();
+        String longItem = "minecraft:" + "\u00e9".repeat(129);
+        config.replaceItems(Set.of("minecraft:stick", "#forge:gems", longItem));
+
+        SyncConfigPacket decoded = roundTrip(new SyncConfigPacket(config));
+
+        assertEquals(ParticlePatterns.SPIRAL, decoded.pattern);
+        assertEquals(Set.of("minecraft:stick", "#forge:gems"), decoded.items);
+        assertFalse(decoded.items.contains(longItem));
+        assertUnchangedSettings(config, decoded);
+        assertEquals(Set.of("minecraft:stick", "#forge:gems", longItem), config.items);
+    }
+
+    @Test
+    public void multibytePatternAtByteLimitIsPreservedDuringRoundTrip() {
+        PillarParticleConfig config = normalConfig();
+        String pattern = "\u00e9".repeat(32);
+        config.pattern = pattern;
+        config.replaceItems(Set.of("minecraft:stick", "#forge:gems"));
+
+        SyncConfigPacket decoded = roundTrip(new SyncConfigPacket(config));
+
+        assertEquals(pattern, decoded.pattern);
+        assertEquals(config.items, decoded.items);
+        assertUnchangedSettings(config, decoded);
+        assertEquals(pattern, config.pattern);
+    }
+
     private static PillarParticleConfig normalConfig() {
         PillarParticleConfig config = new PillarParticleConfig();
         config.particle_speed = 0.37;

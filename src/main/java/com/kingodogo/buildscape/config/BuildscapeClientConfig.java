@@ -86,6 +86,7 @@ public class BuildscapeClientConfig {
                 configDir = FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable ignored) {
+            // FMLPaths is not ready yet; configDir stays null and the caller handles that
         }
         if (configDir == null) {
             configDir = ConfigPaths.root();
@@ -105,6 +106,7 @@ public class BuildscapeClientConfig {
                 configDir = FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable ignored) {
+            // FMLPaths is not ready yet; configDir stays null and the caller handles that
         }
         if (configDir == null) {
             configDir = ConfigPaths.root();
@@ -138,6 +140,7 @@ public class BuildscapeClientConfig {
                     try {
                         values.putAll(ConfigLayoutIO.readEntries(line));
                     } catch (IOException ignored) {
+                        // skip this unreadable line; the remaining lines are still read
                     }
                 }
             }

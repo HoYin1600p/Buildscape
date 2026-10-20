@@ -157,6 +157,7 @@ public class ArmorPillarRenderer {
         try {
             armorStand.readAdditionalSaveData(nbt);
         } catch (Exception e) {
+            // a partly applied NBT is fine for the display stand
         }
     }
 

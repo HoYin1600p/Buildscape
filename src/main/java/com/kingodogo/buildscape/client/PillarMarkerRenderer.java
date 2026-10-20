@@ -94,6 +94,7 @@ public class PillarMarkerRenderer {
                 renderPillarStackBoundingBox(poseStack, bufferSource, cameraPos, bottomPos, topPos, marked);
             }
         } catch (Exception e) {
+            // the marker box is cosmetic and drawn every frame; skip it rather than log per frame
         }
     }
 

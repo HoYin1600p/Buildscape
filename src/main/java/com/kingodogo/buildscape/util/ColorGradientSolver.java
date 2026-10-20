@@ -554,6 +554,7 @@ public final class ColorGradientSolver {
                 return ShapeFamily.FULL_BLOCK;
             }
         } catch (RuntimeException ignored) {
+            // block cannot build its default state here; no shape family
         }
         return null;
     }

@@ -172,6 +172,7 @@ public final class ClientBlockColorCatalog {
                         tint = resolved & 0xFFFFFF;
                     }
                 } catch (RuntimeException ignored) {
+                    // some tint providers need a real level; keep the untinted colour
                 }
             }
             SpriteKey key = new SpriteKey(sprite.getName(), tint);

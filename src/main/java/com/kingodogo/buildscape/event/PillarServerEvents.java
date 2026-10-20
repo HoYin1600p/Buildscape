@@ -158,6 +158,7 @@ public class PillarServerEvents {
                 try {
                     Thread.sleep(RETRY_DELAY_MS);
                 } catch (InterruptedException ignored) {
+                    // interrupted while waiting; retry the sync now
                 }
                 schedulePillarIdSync(server, player, manager, attempt + 1);
             });

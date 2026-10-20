@@ -1029,6 +1029,7 @@ public class PillarParticleConfig {
                         return true;
                     }
                 } catch (Exception e) {
+                    // invalid tag id; treat it as not matching
                 }
             }
         }

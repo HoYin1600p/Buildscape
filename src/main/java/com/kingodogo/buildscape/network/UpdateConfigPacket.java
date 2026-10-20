@@ -339,7 +339,8 @@ public class UpdateConfigPacket {
                                 pillarBE.syncFromData(pData);
                                 level.sendBlockUpdated(pos, pillarBE.getBlockState(), pillarBE.getBlockState(), 3);
                             }
-                        } catch (Exception ignored) {
+                        } catch (Exception e) {
+                            BuildScape.LOGGER.debug("Unable to sync pillar block entity for {}", pData.id, e);
                         }
                     }
                 }

@@ -270,6 +270,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
                 manager.load();
                 manager.registerPillar(this);
             } catch (Exception e) {
+                BuildScape.LOGGER.warn("Unable to register pillar at {} on load", worldPosition, e);
             }
         }
     }

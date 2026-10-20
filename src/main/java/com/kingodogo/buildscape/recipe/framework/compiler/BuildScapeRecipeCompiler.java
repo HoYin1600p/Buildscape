@@ -144,7 +144,8 @@ public class BuildScapeRecipeCompiler {
                                 if (compiled != null) {
                                     return compiled;
                                 }
-                            } catch (Throwable ignored) {
+                            } catch (Throwable t) {
+                                BuildScape.LOGGER.debug("BDRE Compiler: inner recipe {} did not compile", innerId, t);
                             }
                         }
                     }

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.feature.pillar;
 
+import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -51,9 +52,11 @@ public class PillarResetHandler {
                         }
                     }
                 } catch (Exception e) {
+                    BuildScape.LOGGER.warn("Unable to reset the pillar stack at {}", pos, e);
                 }
             });
         } catch (Exception e) {
+            BuildScape.LOGGER.warn("Unable to schedule the pillar reset", e);
         }
     }
 

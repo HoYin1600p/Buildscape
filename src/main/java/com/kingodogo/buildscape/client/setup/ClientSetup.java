@@ -553,6 +553,7 @@ public class ClientSetup {
                                         return color | 0xFF000000;
                                     }
                                 } catch (NumberFormatException e) {
+                                    // malformed tint colour code; fall through to the default tint
                                 }
                             }
                         }

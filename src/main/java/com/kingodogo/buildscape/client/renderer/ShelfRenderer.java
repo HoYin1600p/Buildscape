@@ -140,6 +140,7 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
             this.itemRenderer.renderStatic(stack, ItemTransforms.TransformType.NONE, LightTexture.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, new PoseStack(), collector, seed);
         } catch (Exception exception) {
+            // items that cannot be rendered statically leave the bounds empty
         }
 
         float[] bounds = collector.result();

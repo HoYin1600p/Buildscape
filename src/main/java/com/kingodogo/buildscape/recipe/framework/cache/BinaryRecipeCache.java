@@ -65,6 +65,7 @@ public class BinaryRecipeCache {
                 }
             }
         } catch (Throwable ignored) {
+            // registry not ready; fall back to air
         }
         return Items.AIR;
     }
@@ -81,6 +82,7 @@ public class BinaryRecipeCache {
                 }
             }
         } catch (Throwable ignored) {
+            // registry not ready; fall back to minecraft:air
         }
         return new ResourceLocation("minecraft", "air");
     }
@@ -245,6 +247,7 @@ public class BinaryRecipeCache {
                                 itemCache[i] = item;
                             }
                         } catch (Exception ignored) {
+                            // unreadable id; leave this slot uncached
                         }
                     }
                 }
@@ -535,6 +538,7 @@ public class BinaryRecipeCache {
             try {
                 jsonStr = ing.toJson().toString();
             } catch (Exception ignored) {
+                // an ingredient without JSON is stored as empty
             }
         }
         out.writeInt(getStringIndex(jsonStr, stringPool, stringMap));

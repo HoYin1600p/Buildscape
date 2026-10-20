@@ -314,6 +314,7 @@ final class PillarStack {
                 return topPillar;
             }
         } catch (Exception ignored) {
+            // the stack walk failed; this pillar counts as its own top
         }
         return self;
     }

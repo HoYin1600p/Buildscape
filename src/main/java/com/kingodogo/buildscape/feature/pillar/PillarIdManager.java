@@ -985,7 +985,8 @@ public class PillarIdManager {
                     facing = Direction.byName(data.facing);
                 }
                 positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                BuildScape.LOGGER.debug("Skipped position index for pillar {}", data.id, e);
             }
         }
     }

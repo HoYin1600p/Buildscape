@@ -61,9 +61,11 @@ final class PillarStore {
                         cachedWorldSaveDir = buildscapeDir;
                     }
                 } catch (Exception e) {
+                    BuildScape.LOGGER.warn("Unable to create the world data folder", e);
                 }
             }
         } catch (Throwable t) {
+            // best-effort cache refresh; getDataDir falls back to the config folder
         }
     }
 
@@ -94,6 +96,7 @@ final class PillarStore {
                         return buildscapeDir;
                     }
                 } catch (Exception e) {
+                    BuildScape.LOGGER.warn("Unable to create the world data folder, falling back to the config folder", e);
                 }
             }
 
@@ -167,6 +170,7 @@ final class PillarStore {
                     FileChannel channel = fos.getChannel();
                     channel.force(true);
                 } catch (Exception forceEx) {
+                    // force() is best effort; the data was already flushed
                 }
             }
 

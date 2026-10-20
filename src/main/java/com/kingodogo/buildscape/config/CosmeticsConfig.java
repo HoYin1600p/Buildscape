@@ -112,7 +112,8 @@ public class CosmeticsConfig {
                     processLegacyJsonMap(loaded);
                 }
                 loadedSuccessfully = true;
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                BuildScape.getLogger().warn("CosmeticsConfig: Unable to read the legacy JSON cosmetics", e);
             }
 
             if (loadedSuccessfully) {
@@ -161,6 +162,7 @@ public class CosmeticsConfig {
                 try {
                     uuid = UUID.fromString(key);
                 } catch (Exception ignored) {
+                    // the key is not a UUID; the entry stays without an owner
                 }
             }
 
@@ -183,6 +185,7 @@ public class CosmeticsConfig {
                                 cosmetics.put(slot, (String) cosEntry.getValue());
                             }
                         } catch (Exception ignored) {
+                            // skip entries whose slot key is not a number
                         }
                     }
                 }
@@ -239,6 +242,7 @@ public class CosmeticsConfig {
                         try {
                             cosmetics.put(Integer.parseInt(key), equipped.getString(key));
                         } catch (Exception ignored) {
+                            // skip entries whose slot key is not a number
                         }
                     }
                 }
@@ -334,7 +338,8 @@ public class CosmeticsConfig {
                 if (nbt.contains(NbtKeys.COLOR_PICKER_Y)) {
                     colorPickerY = nbt.getInt(NbtKeys.COLOR_PICKER_Y);
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                BuildScape.getLogger().debug("CosmeticsConfig: Unable to read the colour picker position", e);
             }
         }
     }
@@ -351,7 +356,8 @@ public class CosmeticsConfig {
 
         try {
             NbtIo.writeCompressed(nbt, file);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            BuildScape.getLogger().warn("CosmeticsConfig: Unable to write the cosmetics file", e);
         }
     }
 

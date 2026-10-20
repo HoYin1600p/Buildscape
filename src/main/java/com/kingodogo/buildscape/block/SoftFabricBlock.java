@@ -76,6 +76,7 @@ public class SoftFabricBlock extends Block {
                 float[] rgb = dyeColor.getTextureDiffuseColors();
                 return new Vector3f(rgb[0], rgb[1], rgb[2]);
             } catch (IllegalArgumentException e) {
+                // not a dye colour name; fall through to the default colour
             }
         }
         return null;

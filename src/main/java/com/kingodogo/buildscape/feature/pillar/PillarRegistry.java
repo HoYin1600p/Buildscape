@@ -241,7 +241,8 @@ final class PillarRegistry {
             }
             try {
                 indexPosition(data);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                BuildScape.LOGGER.debug("Skipped position index for pillar {}", data.id, e);
             }
         }
     }

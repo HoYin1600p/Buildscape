@@ -116,6 +116,7 @@ final class PillarEntityNbt {
                                 self.particleColors.add(color.toUpperCase(Locale.ROOT));
                             }
                         } catch (Exception e) {
+                            // skip a malformed colour entry
                         }
                     }
                     if (self.particleColors.isEmpty()) {

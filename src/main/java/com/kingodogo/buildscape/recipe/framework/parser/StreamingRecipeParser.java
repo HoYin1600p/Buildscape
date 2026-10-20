@@ -279,6 +279,7 @@ public class StreamingRecipeParser {
                     try {
                         count = Integer.parseInt(reader.nextString());
                     } catch (NumberFormatException ignored) {
+                        // non-numeric count; keep the default count
                     }
                     numIndex++;
                 } else {

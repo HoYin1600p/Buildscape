@@ -389,6 +389,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
                     this.setItem(itemstack, false);
                 }
             } catch (Exception e) {
+                // unknown or malformed item id; leave the frame empty
             }
         }
 

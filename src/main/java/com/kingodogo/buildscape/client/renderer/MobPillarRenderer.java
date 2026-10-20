@@ -227,6 +227,7 @@ public class MobPillarRenderer {
                         Method setIsBaby = livingEntity.getClass().getMethod("setIsBaby", boolean.class);
                         setIsBaby.invoke(livingEntity, true);
                     } catch (Exception ignored) {
+                        // this entity has no setIsBaby method; it stays an adult
                     }
                 }
             }
@@ -699,6 +700,7 @@ public class MobPillarRenderer {
                 entity.load(nbt);
             }
         } catch (Exception e) {
+            // the variant is cosmetic; keep the entity as it is
         }
     }
 

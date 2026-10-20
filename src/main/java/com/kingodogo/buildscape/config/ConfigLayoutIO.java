@@ -114,6 +114,7 @@ final class ConfigLayoutIO {
             try {
                 legacy = Charset.forName(nativeEncoding);
             } catch (IllegalArgumentException ignored) {
+                // unknown charset name; keep the platform default
             }
         }
         return legacy.equals(StandardCharsets.UTF_8) ? Charset.forName("windows-1252") : legacy;

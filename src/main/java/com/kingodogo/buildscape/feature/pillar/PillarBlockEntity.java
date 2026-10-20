@@ -1,17 +1,21 @@
 package com.kingodogo.buildscape.feature.pillar;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.client.PillarClientParticles;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.SyncedBlockEntity;
-import com.kingodogo.buildscape.particle.PillarSparkleParticle;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
-import com.kingodogo.buildscape.registry.ModParticles;
-import net.minecraft.client.Minecraft;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -33,14 +37,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class PillarBlockEntity extends SyncedBlockEntity {
 
@@ -160,7 +156,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
             PillarBlockEntity be
     ) {
         if (level == null || !level.isClientSide) return;
-        if (!ClientParticleHelper.isWithinRange(pos)) return;
+        if (!PillarClientParticles.isWithinRange(pos)) return;
         if (!be.hasDisplayItem()) return;
 
         long time = level.getGameTime();
@@ -175,7 +171,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
             pattern = cfg.pattern != null ? cfg.pattern : ParticlePatterns.RING;
         }
         if (ParticlePatterns.NONE.equals(pattern)) return;
-        ParticleSettings settings = new ParticleSettings(
+        PillarParticleSettings settings = new PillarParticleSettings(
                 pattern,
                 be.usePattern != null ? be.usePattern : cfg.use_pattern,
                 be.patternSpeed != null ? be.patternSpeed : cfg.pattern_speed,
@@ -187,8 +183,8 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         int baseCount = cfg.particle_density;
         int count = (int) Math.min(64L, Math.max(
                 0L,
-                settings.usePattern
-                        ? Math.round(baseCount * settings.intensity)
+                settings.usePattern()
+                        ? Math.round(baseCount * settings.intensity())
                         : baseCount
         ));
         if (count == 0) return;
@@ -199,7 +195,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         double centerY = pos.getY() + (isAshenKing ? 0.75 : 1.0);
         double centerZ = pos.getZ() + 0.5;
 
-        ClientParticleHelper.spawnParticles(
+        PillarClientParticles.spawnParticles(
                 level,
                 pos,
                 be,
@@ -237,116 +233,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
 
     public ItemStack getDisplayedItem() {
         return displayedItem;
-    }
-
-    private static ParticleSpawnData calculateParticleData(
-            ParticleSettings settings,
-            PillarParticleConfig cfg,
-            long time,
-            int i,
-            int count,
-            Random rand) {
-        double sx, sy, sz, vx, vy, vz;
-        float size = 1.0f;
-
-        if (settings.usePattern) {
-            String pattern = settings.pattern;
-            double speed = settings.speed * settings.intensity;
-            double spread = settings.spread;
-
-            switch (pattern) {
-                case ParticlePatterns.BEAM:
-                    sx = (rand.nextDouble() - 0.5) * spread * 0.3;
-                    sy = 0.0;
-                    sz = (rand.nextDouble() - 0.5) * spread * 0.3;
-                    vx = (rand.nextDouble() - 0.5) * speed * 0.2;
-                    vy = speed * (0.8 + rand.nextDouble() * 0.4);
-                    vz = (rand.nextDouble() - 0.5) * speed * 0.2;
-                    break;
-                case ParticlePatterns.SPIRAL:
-                    double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
-                    double radius = spread * 0.5;
-                    sx = Math.cos(angle) * radius;
-                    sy = 0.0;
-                    sz = Math.sin(angle) * radius;
-                    vx = Math.cos(angle) * speed * 0.3;
-                    vy = speed * 0.6;
-                    vz = Math.sin(angle) * speed * 0.3;
-                    break;
-                case ParticlePatterns.FOUNTAIN:
-                    double fAngle = rand.nextDouble() * 2.0 * Math.PI;
-                    double fRadius = rand.nextDouble() * spread;
-                    sx = Math.cos(fAngle) * fRadius;
-                    sy = rand.nextDouble() * spread * 0.5;
-                    sz = Math.sin(fAngle) * fRadius;
-                    vx = Math.cos(fAngle) * speed * 0.5;
-                    vy = speed * 0.3 - rand.nextDouble() * speed * 0.2;
-                    vz = Math.sin(fAngle) * speed * 0.5;
-                    break;
-                case ParticlePatterns.PULSE:
-                    double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
-                    double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
-                    double pAngle = rand.nextDouble() * 2.0 * Math.PI;
-                    sx = Math.cos(pAngle) * pulseRadius;
-                    sy = (rand.nextDouble() - 0.5) * spread * 0.5;
-                    sz = Math.sin(pAngle) * pulseRadius;
-                    vx = Math.cos(pAngle) * speed * Math.sin(pulsePhase);
-                    vy = speed * 0.2;
-                    vz = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
-                    break;
-                case ParticlePatterns.RING:
-                    double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
-                    double rRadius = spread * 0.8;
-                    sx = Math.cos(rAngle) * rRadius;
-                    sy = (rand.nextDouble() - 0.5) * spread * 0.3;
-                    sz = Math.sin(rAngle) * rRadius;
-                    vx = Math.cos(rAngle + Math.PI / 2) * speed * 0.4;
-                    vy = speed * 0.3;
-                    vz = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
-                    break;
-                case ParticlePatterns.BURST:
-                    double bAngle = rand.nextDouble() * 2.0 * Math.PI;
-                    double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.5;
-                    sx = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.3;
-                    sy = Math.sin(bElevation) * spread * 0.3;
-                    sz = Math.sin(bAngle) * Math.cos(bElevation) * spread * 0.3;
-                    vx = Math.cos(bAngle) * Math.cos(bElevation) * speed;
-                    vy = Math.sin(bElevation) * speed;
-                    vz = Math.sin(bAngle) * Math.cos(bElevation) * speed;
-                    size = 0.5f;
-                    break;
-                case ParticlePatterns.SNOWFLAKE:
-                    double sfAngle = rand.nextDouble() * 2.0 * Math.PI;
-                    double sfRadius = rand.nextDouble() * spread;
-                    sx = Math.cos(sfAngle) * sfRadius;
-                    sy = 2.0;
-                    sz = Math.sin(sfAngle) * sfRadius;
-                    vx = (rand.nextDouble() - 0.5) * speed * 0.1;
-                    vy = -speed * 0.3;
-                    vz = (rand.nextDouble() - 0.5) * speed * 0.1;
-                    size = 0.3f;
-                    break;
-                default:
-                    sx = (rand.nextDouble() - 0.5) * spread;
-                    sy = rand.nextDouble() * spread;
-                    sz = (rand.nextDouble() - 0.5) * spread;
-                    vx = (rand.nextDouble() - 0.5) * speed;
-                    vy = rand.nextDouble() * speed;
-                    vz = (rand.nextDouble() - 0.5) * speed;
-                    break;
-            }
-        } else {
-            double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
-            double rRadius = cfg.particle_spread * 0.8;
-            sx = Math.cos(rAngle) * rRadius;
-            sy = (rand.nextDouble() - 0.5) * cfg.particle_spread * 0.3;
-            sz = Math.sin(rAngle) * rRadius;
-            vx = Math.cos(rAngle + Math.PI / 2) * cfg.particle_speed * 0.4;
-            vy = cfg.particle_speed * 0.3;
-            vz = Math.sin(rAngle + Math.PI / 2) * cfg.particle_speed * 0.4;
-        }
-
-        return new ParticleSpawnData(sx, sy, sz, vx, vy, vz, size);
     }
 
     public void syncPatternFromManager() {
@@ -1082,7 +968,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return null;
     }
 
-    String getParticleColor(PillarParticleConfig cfg) {
+    public String getParticleColor(PillarParticleConfig cfg) {
         if (particleColors != null && !particleColors.isEmpty()) {
             int numColors = particleColors.size();
             int colorIndex = particleColorCounter % numColors;
@@ -1826,120 +1712,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
-    private static class ClientParticleHelper {
-
-        private static boolean isWithinRange(BlockPos pos) {
-            Minecraft mc = Minecraft.getInstance();
-            return mc != null && mc.gameRenderer.getMainCamera().getPosition().distanceToSqr(
-                    pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 32.0D * 32.0D;
-        }
-
-        private static void spawnParticles(
-                Level level,
-                BlockPos pos,
-                PillarBlockEntity be,
-                PillarParticleConfig cfg,
-                ParticleSettings settings,
-                long time,
-                int count,
-                Random rand,
-                double centerX,
-                double centerY,
-                double centerZ) {
-
-            boolean isSnowflake = ParticlePatterns.SNOWFLAKE.equals(settings.pattern);
-            SimpleParticleType particleType = isSnowflake ? ModParticles.SNOWFLAKE.get()
-                    : ModParticles.GLOW_LIME_SPARKLE.get();
-
-            Minecraft mc = Minecraft.getInstance();
-            if (mc == null || mc.particleEngine == null) {
-                for (int i = 0; i < count; i++) {
-                    ParticleSpawnData data = calculateParticleData(
-                            settings,
-                            cfg,
-                            time,
-                            i,
-                            count,
-                            rand);
-                    if (data == null)
-                        continue;
-
-                    double particleX = centerX + data.sx;
-                    double particleY = centerY + data.sy;
-                    double particleZ = centerZ + data.sz;
-
-                    if (!isSnowflake) {
-                        String colorCode = be.getParticleColor(cfg);
-                        PillarSparkleParticle.queueColor(
-                                particleX,
-                                particleY,
-                                particleZ,
-                                colorCode);
-                        if (data.size != 1.0f) {
-                            PillarSparkleParticle.queueSize(
-                                    particleX,
-                                    particleY,
-                                    particleZ,
-                                    data.size);
-                        }
-                    }
-
-                    level.addParticle(
-                            particleType,
-                            particleX,
-                            particleY,
-                            particleZ,
-                            data.vx,
-                            data.vy,
-                            data.vz);
-                }
-                return;
-            }
-
-            for (int i = 0; i < count; i++) {
-                ParticleSpawnData data = calculateParticleData(
-                        settings,
-                        cfg,
-                        time,
-                        i,
-                        count,
-                        rand);
-                if (data == null)
-                    continue;
-
-                double particleX = centerX + data.sx;
-                double particleY = centerY + data.sy;
-                double particleZ = centerZ + data.sz;
-
-                if (!isSnowflake) {
-                    String colorCode = be.getParticleColor(cfg);
-
-                    PillarSparkleParticle.queueColor(
-                            particleX,
-                            particleY,
-                            particleZ,
-                            colorCode);
-                    if (data.size != 1.0f) {
-                        PillarSparkleParticle.queueSize(
-                                particleX,
-                                particleY,
-                                particleZ,
-                                data.size);
-                    }
-                }
-
-                level.addParticle(
-                        particleType,
-                        particleX,
-                        particleY,
-                        particleZ,
-                        data.vx,
-                        data.vy,
-                        data.vz);
-            }
-        }
-    }
-
     private boolean needsManagerSync = false;
 
     @Override
@@ -1949,14 +1721,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         if (needsManagerSync) {
             needsManagerSync = false;
         }
-    }
-
-    private record ParticleSettings(String pattern, boolean usePattern, double speed, double spread, double intensity) {
-
-    }
-
-    private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {
-
     }
 
     @Override

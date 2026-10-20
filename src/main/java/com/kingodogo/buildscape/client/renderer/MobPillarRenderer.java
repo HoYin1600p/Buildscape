@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.mixin.accessor.EntityAccessor;
 import com.kingodogo.buildscape.mixin.accessor.PillarEntityRenderDispatcherInvoker;
@@ -52,25 +53,10 @@ public class MobPillarRenderer {
     private static final Map<String, Integer> DYE_COLORS = new HashMap<>();
 
     static {
-    }
-
-    static {
-        DYE_COLORS.put("white", 0);
-        DYE_COLORS.put("orange", 1);
-        DYE_COLORS.put("magenta", 2);
-        DYE_COLORS.put("light_blue", 3);
-        DYE_COLORS.put("yellow", 4);
-        DYE_COLORS.put("lime", 5);
-        DYE_COLORS.put("pink", 6);
-        DYE_COLORS.put("gray", 7);
-        DYE_COLORS.put("light_gray", 8);
-        DYE_COLORS.put("cyan", 9);
-        DYE_COLORS.put("purple", 10);
-        DYE_COLORS.put("blue", 11);
-        DYE_COLORS.put("brown", 12);
-        DYE_COLORS.put("green", 13);
-        DYE_COLORS.put("red", 14);
-        DYE_COLORS.put("black", 15);
+        // Insertion order is the vanilla colour order; getDyeColor() returns the first match in map order.
+        for (DyeColors color : DyeColors.values()) {
+            DYE_COLORS.put(color.serializedName(), color.ordinal());
+        }
     }
 
     public static void renderMob(

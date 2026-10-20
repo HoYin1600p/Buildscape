@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.core.NbtKeys;
-import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.registry.DyeVariants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -27,45 +27,7 @@ public class FestiveStockingItem extends BlockItem {
     }
 
     private static Block getBlockForColor(String color) {
-        if (color == null) {
-            return ModBlocks.FESTIVE_STOCKING.get();
-        }
-        switch (color) {
-            case "black" :
-                return ModBlocks.BLACK_FESTIVE_STOCKING.get();
-            case "blue" :
-                return ModBlocks.BLUE_FESTIVE_STOCKING.get();
-            case "brown" :
-                return ModBlocks.BROWN_FESTIVE_STOCKING.get();
-            case "cyan" :
-                return ModBlocks.CYAN_FESTIVE_STOCKING.get();
-            case "gray" :
-                return ModBlocks.GRAY_FESTIVE_STOCKING.get();
-            case "green" :
-                return ModBlocks.GREEN_FESTIVE_STOCKING.get();
-            case "light_blue" :
-                return ModBlocks.LIGHT_BLUE_FESTIVE_STOCKING.get();
-            case "light_gray" :
-                return ModBlocks.LIGHT_GRAY_FESTIVE_STOCKING.get();
-            case "lime" :
-                return ModBlocks.LIME_FESTIVE_STOCKING.get();
-            case "magenta" :
-                return ModBlocks.MAGENTA_FESTIVE_STOCKING.get();
-            case "orange" :
-                return ModBlocks.ORANGE_FESTIVE_STOCKING.get();
-            case "pink" :
-                return ModBlocks.PINK_FESTIVE_STOCKING.get();
-            case "purple" :
-                return ModBlocks.PURPLE_FESTIVE_STOCKING.get();
-            case "red" :
-                return ModBlocks.RED_FESTIVE_STOCKING.get();
-            case "white" :
-                return ModBlocks.WHITE_FESTIVE_STOCKING.get();
-            case "yellow" :
-                return ModBlocks.YELLOW_FESTIVE_STOCKING.get();
-            default :
-                return ModBlocks.FESTIVE_STOCKING.get();
-        }
+        return DyeVariants.festiveStockingBlock(color);
     }
 
     public String getColorVariant() {

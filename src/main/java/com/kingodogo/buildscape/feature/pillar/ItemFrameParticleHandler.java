@@ -838,44 +838,12 @@ public class ItemFrameParticleHandler {
         if (colorName == null || colorName.isEmpty()) {
             return "W";
         }
-        switch (colorName.toLowerCase(Locale.ROOT)) {
-            case "white" :
-                return "W";
-            case "orange" :
-                return "O";
-            case "magenta" :
-                return "M";
-            case "light_blue" :
-                return "LB";
-            case "yellow" :
-                return "Y";
-            case "lime" :
-                return "L";
-            case "pink" :
-                return "P";
-            case "gray" :
-                return "GR";
-            case "light_gray" :
-                return "LG";
-            case "cyan" :
-                return "C";
-            case "purple" :
-                return "PU";
-            case "blue" :
-                return "B";
-            case "brown" :
-                return "BR";
-            case "green" :
-                return "G";
-            case "red" :
-                return "R";
-            case "black" :
-                return "BL";
-            case "invisible" :
-                return "I";
-            default :
-                return "W";
+        String name = colorName.toLowerCase(Locale.ROOT);
+        DyeColors dye = DyeColors.fromName(name);
+        if (dye != null) {
+            return dye.shortCode();
         }
+        return name.equals("invisible") ? "I" : "W";
     }
 
     public static void clearCaches(int entityId) {

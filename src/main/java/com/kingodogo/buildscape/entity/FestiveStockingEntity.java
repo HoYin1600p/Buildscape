@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.entity;
 
 import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.registry.DyeVariants;
 import com.kingodogo.buildscape.registry.ModEntities;
-import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -419,58 +419,6 @@ public class FestiveStockingEntity extends HangingEntity {
     }
 
     private ItemStack getStockingItemForColor(String color) {
-        switch (color) {
-            case "black" :
-                return new ItemStack(
-                        ModItems.BLACK_FESTIVE_STOCKING.get());
-            case "blue" :
-                return new ItemStack(
-                        ModItems.BLUE_FESTIVE_STOCKING.get());
-            case "brown" :
-                return new ItemStack(
-                        ModItems.BROWN_FESTIVE_STOCKING.get());
-            case "cyan" :
-                return new ItemStack(
-                        ModItems.CYAN_FESTIVE_STOCKING.get());
-            case "gray" :
-                return new ItemStack(
-                        ModItems.GRAY_FESTIVE_STOCKING.get());
-            case "green" :
-                return new ItemStack(
-                        ModItems.GREEN_FESTIVE_STOCKING.get());
-            case "light_blue" :
-                return new ItemStack(
-                        ModItems.LIGHT_BLUE_FESTIVE_STOCKING.get());
-            case "light_gray" :
-                return new ItemStack(
-                        ModItems.LIGHT_GRAY_FESTIVE_STOCKING.get());
-            case "lime" :
-                return new ItemStack(
-                        ModItems.LIME_FESTIVE_STOCKING.get());
-            case "magenta" :
-                return new ItemStack(
-                        ModItems.MAGENTA_FESTIVE_STOCKING.get());
-            case "orange" :
-                return new ItemStack(
-                        ModItems.ORANGE_FESTIVE_STOCKING.get());
-            case "pink" :
-                return new ItemStack(
-                        ModItems.PINK_FESTIVE_STOCKING.get());
-            case "purple" :
-                return new ItemStack(
-                        ModItems.PURPLE_FESTIVE_STOCKING.get());
-            case "red" :
-                return new ItemStack(
-                        ModItems.RED_FESTIVE_STOCKING.get());
-            case "white" :
-                return new ItemStack(
-                        ModItems.WHITE_FESTIVE_STOCKING.get());
-            case "yellow" :
-                return new ItemStack(
-                        ModItems.YELLOW_FESTIVE_STOCKING.get());
-            default :
-                return new ItemStack(
-                        ModItems.FESTIVE_STOCKING.get());
-        }
+        return new ItemStack(DyeVariants.festiveStockingItem(color));
     }
 }

@@ -2,8 +2,8 @@ package com.kingodogo.buildscape.entity;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
+import com.kingodogo.buildscape.registry.DyeVariants;
 import com.kingodogo.buildscape.registry.ModEntities;
-import com.kingodogo.buildscape.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -487,43 +487,6 @@ public class ColoredItemFrameEntity extends HangingEntity {
     }
 
     private ItemStack getFrameItemForColor(String color) {
-        switch (color) {
-            case "black" :
-                return new ItemStack(ModItems.BLACK_ITEM_FRAME.get());
-            case "blue" :
-                return new ItemStack(ModItems.BLUE_ITEM_FRAME.get());
-            case "brown" :
-                return new ItemStack(ModItems.BROWN_ITEM_FRAME.get());
-            case "cyan" :
-                return new ItemStack(ModItems.CYAN_ITEM_FRAME.get());
-            case "gray" :
-                return new ItemStack(ModItems.GRAY_ITEM_FRAME.get());
-            case "green" :
-                return new ItemStack(ModItems.GREEN_ITEM_FRAME.get());
-            case "light_blue" :
-                return new ItemStack(ModItems.LIGHT_BLUE_ITEM_FRAME.get());
-            case "light_gray" :
-                return new ItemStack(ModItems.LIGHT_GRAY_ITEM_FRAME.get());
-            case "lime" :
-                return new ItemStack(ModItems.LIME_ITEM_FRAME.get());
-            case "magenta" :
-                return new ItemStack(ModItems.MAGENTA_ITEM_FRAME.get());
-            case "orange" :
-                return new ItemStack(ModItems.ORANGE_ITEM_FRAME.get());
-            case "pink" :
-                return new ItemStack(ModItems.PINK_ITEM_FRAME.get());
-            case "purple" :
-                return new ItemStack(ModItems.PURPLE_ITEM_FRAME.get());
-            case "red" :
-                return new ItemStack(ModItems.RED_ITEM_FRAME.get());
-            case "white" :
-                return new ItemStack(ModItems.WHITE_ITEM_FRAME.get());
-            case "yellow" :
-                return new ItemStack(ModItems.YELLOW_ITEM_FRAME.get());
-            case "invisible" :
-                return new ItemStack(ModItems.INVISIBLE_ITEM_FRAME.get());
-            default :
-                return new ItemStack(ModItems.WHITE_ITEM_FRAME.get());
-        }
+        return new ItemStack(DyeVariants.itemFrameItem(color));
     }
 }

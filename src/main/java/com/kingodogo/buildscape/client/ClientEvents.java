@@ -7,7 +7,7 @@ import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
 import com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer;
 import com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleEvents;
 import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
@@ -233,7 +233,7 @@ public class ClientEvents {
             PillarBlockEntityRenderer.clearEntityCache();
             ArmorPillarRenderer.clearAllCaches();
             TintedDripParticle.clearColorCache();
-            ItemFrameParticleHandler.clearCaches();
+            ItemFrameParticleEvents.clearCaches();
             MuffBlockManager.clear();
         } catch (Exception e) {
             // cache clearers touch several renderer caches; one failure must not block the world unload

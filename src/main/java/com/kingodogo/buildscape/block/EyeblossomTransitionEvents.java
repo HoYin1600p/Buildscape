@@ -22,10 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public final class EyeblossomTransitionHandler {
+public final class EyeblossomTransitionEvents {
     private static final Map<ServerLevel, Tracker> TRACKERS = new IdentityHashMap<>();
 
-    private EyeblossomTransitionHandler() {}
+    private EyeblossomTransitionEvents() {}
 
     static boolean shouldTransition(boolean currentlyOpen, boolean waxed, boolean night) {
         return !waxed && currentlyOpen != night;

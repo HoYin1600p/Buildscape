@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.mixin;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData;
 import com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData;
-import com.kingodogo.buildscape.event.TagTooltipHandler;
+import com.kingodogo.buildscape.event.TagTooltipEvents;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -59,7 +59,7 @@ public abstract class ScreenMixin {
             return;
         }
 
-        if (!TagTooltipHandler.isShulkerPreviewEnabled()) {
+        if (!TagTooltipEvents.isShulkerPreviewEnabled()) {
             return;
         }
 
@@ -72,12 +72,12 @@ public abstract class ScreenMixin {
             buildscape$isRenderingCustomTooltip = true;
 
             ClientTooltipComponent customComponent = null;
-            ShulkerBoxTooltipData shulkerData = TagTooltipHandler
+            ShulkerBoxTooltipData shulkerData = TagTooltipEvents
                     .getShulkerTooltipData(this.buildscape$currentHoverStack);
             if (shulkerData != null) {
                 customComponent = shulkerData;
             } else {
-                BuildersPouchTooltipData pouchData = TagTooltipHandler
+                BuildersPouchTooltipData pouchData = TagTooltipEvents
                         .getBuildersPouchTooltipData(this.buildscape$currentHoverStack);
                 if (pouchData != null) {
                     customComponent = pouchData;

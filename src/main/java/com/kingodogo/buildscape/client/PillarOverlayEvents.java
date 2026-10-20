@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
-import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleEvents;
 import com.kingodogo.buildscape.feature.pillar.PillarBlock;
 import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -60,17 +60,17 @@ public class PillarOverlayEvents {
             if (entityHit.getEntity() instanceof ItemFrame) {
                 ItemFrame itemFrame = (ItemFrame) entityHit.getEntity();
 
-                if (ItemFrameParticleHandler.hasCustomColors(itemFrame)) {
+                if (ItemFrameParticleEvents.hasCustomColors(itemFrame)) {
                     renderItemFrameOverlay(event.getMatrixStack(), mc, itemFrame);
                 }
             } else if (entityHit.getEntity() instanceof ColoredItemFrameEntity coloredFrame) {
-                List<String> colors = ItemFrameParticleHandler.getParticleColorsColored(coloredFrame);
+                List<String> colors = ItemFrameParticleEvents.getParticleColorsColored(coloredFrame);
                 if (!colors.isEmpty()) {
-                    String frameId = ItemFrameParticleHandler.getFrameIdColored(coloredFrame);
+                    String frameId = ItemFrameParticleEvents.getFrameIdColored(coloredFrame);
                     renderOverlay(event.getMatrixStack(), mc.font,
                             mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(),
                             frameId != null ? frameId : "Unknown", colors,
-                            ItemFrameParticleHandler.MAX_DYE_COLORS);
+                            ItemFrameParticleEvents.MAX_DYE_COLORS);
                 }
             }
             return;
@@ -117,8 +117,8 @@ public class PillarOverlayEvents {
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-        String frameId = ItemFrameParticleHandler.getFrameId(itemFrame);
-        List<String> colors = ItemFrameParticleHandler.getParticleColors(itemFrame);
+        String frameId = ItemFrameParticleEvents.getFrameId(itemFrame);
+        List<String> colors = ItemFrameParticleEvents.getParticleColors(itemFrame);
 
         if (frameId == null && (colors == null || colors.isEmpty())) {
             return;
@@ -131,7 +131,7 @@ public class PillarOverlayEvents {
                 screenHeight,
                 frameId != null ? frameId : "Unknown",
                 colors,
-                ItemFrameParticleHandler.MAX_DYE_COLORS);
+                ItemFrameParticleEvents.MAX_DYE_COLORS);
     }
 
     private static void renderPillarOverlay(

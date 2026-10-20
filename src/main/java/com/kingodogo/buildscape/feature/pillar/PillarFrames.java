@@ -171,7 +171,7 @@ final class PillarFrames {
         if (immediate) {
             if (m.registry.isRemovedFrame(frame.getPersistentData().getString(NbtKeys.BUILD_SCAPE_FRAME_ID),
                     PillarIdManager.getDimensionKey(frame.level), frame.blockPosition(), facing)) {
-                ItemFrameParticleHandler.reassignFrameId(frame);
+                ItemFrameParticleEvents.reassignFrameId(frame);
             }
             return true;
         }
@@ -207,7 +207,7 @@ final class PillarFrames {
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID);
 
-        String pattern = ItemFrameParticleHandler.getParticlePattern(frame);
+        String pattern = ItemFrameParticleEvents.getParticlePattern(frame);
         List<String> colors = new ArrayList<>();
         if (dataTag.contains(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS)) {
             ListTag colorList = dataTag.getList(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS, 8);
@@ -220,7 +220,7 @@ final class PillarFrames {
             if (!PillarRegistry.hasFrameParticleData(pattern, colors)) {
                 return;
             }
-            id = ItemFrameParticleHandler.getFrameId(frame);
+            id = ItemFrameParticleEvents.getFrameId(frame);
         }
 
         String dimension = PillarIdManager.getDimensionKey(frame.level);
@@ -235,7 +235,7 @@ final class PillarFrames {
             return;
         }
         if (existing != null && !PillarRegistry.isSameFrameLocation(existing, dimension, pos, facing)) {
-            id = ItemFrameParticleHandler.reassignFrameId(frame);
+            id = ItemFrameParticleEvents.reassignFrameId(frame);
             existing = null;
         }
         if (applyPendingFrameEdit(m, existing, dataTag, immediate)) {
@@ -318,7 +318,7 @@ final class PillarFrames {
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID);
 
-        String pattern = ItemFrameParticleHandler.getParticlePatternColored(frame);
+        String pattern = ItemFrameParticleEvents.getParticlePatternColored(frame);
         List<String> colors = new ArrayList<>();
         if (dataTag.contains(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS)) {
             ListTag colorList = dataTag.getList(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS, 8);
@@ -331,7 +331,7 @@ final class PillarFrames {
             if (!PillarRegistry.hasFrameParticleData(pattern, colors)) {
                 return;
             }
-            id = ItemFrameParticleHandler.getFrameIdColored(frame);
+            id = ItemFrameParticleEvents.getFrameIdColored(frame);
         }
 
         String dimension = PillarIdManager.getDimensionKey(frame.level);
@@ -346,7 +346,7 @@ final class PillarFrames {
             return;
         }
         if (existing != null && !PillarRegistry.isSameFrameLocation(existing, dimension, pos, facing)) {
-            id = ItemFrameParticleHandler.reassignFrameId(frame);
+            id = ItemFrameParticleEvents.reassignFrameId(frame);
             existing = null;
         }
         if (applyPendingFrameEdit(m, existing, dataTag, immediate)) {

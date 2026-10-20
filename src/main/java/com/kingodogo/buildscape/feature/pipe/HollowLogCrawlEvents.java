@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = "buildscape", bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class HollowLogCrawlHandler {
+public class HollowLogCrawlEvents {
 
     public static boolean USE_FORCED_SWIM_POSE = false;
 

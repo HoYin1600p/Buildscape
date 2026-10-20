@@ -33,7 +33,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class TagTooltipHandler {
+public class TagTooltipEvents {
 
     public static boolean isShulkerPreviewEnabled() {
         try {
@@ -105,7 +105,7 @@ public class TagTooltipHandler {
             }
         } catch (Throwable t) {
             // render guard: a tooltip error must never crash the client
-            BuildScape.LOGGER.debug("TagTooltipHandler: Suppressed tooltip error", t);
+            BuildScape.LOGGER.debug("TagTooltipEvents: Suppressed tooltip error", t);
         }
     }
 
@@ -156,7 +156,7 @@ public class TagTooltipHandler {
             }
         } catch (Throwable t) {
             // render guard: a tooltip error must never crash the client
-            BuildScape.LOGGER.debug("TagTooltipHandler: Error reading shulker tooltip data", t);
+            BuildScape.LOGGER.debug("TagTooltipEvents: Error reading shulker tooltip data", t);
         }
         return null;
     }
@@ -194,7 +194,7 @@ public class TagTooltipHandler {
             }
         } catch (Throwable t) {
             // render guard: a tooltip error must never crash the client
-            BuildScape.LOGGER.debug("TagTooltipHandler: Error reading builder pouch tooltip data", t);
+            BuildScape.LOGGER.debug("TagTooltipEvents: Error reading builder pouch tooltip data", t);
         }
         return null;
     }

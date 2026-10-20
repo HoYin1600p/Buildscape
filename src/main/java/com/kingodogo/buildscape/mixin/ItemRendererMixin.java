@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
+import com.kingodogo.buildscape.client.renderer.FestiveGlintEvents;
 import com.kingodogo.buildscape.client.renderer.FestiveRenderTypes;
 import com.kingodogo.buildscape.client.renderer.TransparentMultiBufferSource;
 import com.kingodogo.buildscape.core.NbtKeys;
@@ -42,20 +42,20 @@ public class ItemRendererMixin {
     private void buildscape$pushCurrentStack(ItemStack stack, ItemTransforms.TransformType transformType,
             boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight,
             int combinedOverlay, BakedModel model, CallbackInfo ci) {
-        FestiveGlintHandler.push(stack);
+        FestiveGlintEvents.push(stack);
     }
 
     @Inject(method = "render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/renderer/block/model/ItemTransforms$TransformType;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V", at = @At("RETURN"))
     private void buildscape$popCurrentStack(ItemStack stack, ItemTransforms.TransformType transformType,
             boolean leftHand, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight,
             int combinedOverlay, BakedModel model, CallbackInfo ci) {
-        FestiveGlintHandler.pop();
+        FestiveGlintEvents.pop();
     }
 
     @Inject(method = "getFoilBufferDirect", at = @At("HEAD"), cancellable = true)
     private static void buildscape$getFestiveFoilBufferDirect(MultiBufferSource bufferSource, RenderType renderType,
             boolean noEntity, boolean withFoil, CallbackInfoReturnable<VertexConsumer> cir) {
-        if (withFoil && FestiveGlintHandler.isCurrentFestive()) {
+        if (withFoil && FestiveGlintEvents.isCurrentFestive()) {
             cir.setReturnValue(
                     Minecraft.useShaderTransparency() && renderType == Sheets.translucentItemSheet()
                             ? VertexMultiConsumer.create(
@@ -72,7 +72,7 @@ public class ItemRendererMixin {
     @Inject(method = "getFoilBuffer", at = @At("HEAD"), cancellable = true)
     private static void buildscape$getFestiveFoilBuffer(MultiBufferSource bufferSource, RenderType renderType,
             boolean isItem, boolean withFoil, CallbackInfoReturnable<VertexConsumer> cir) {
-        if (withFoil && FestiveGlintHandler.isCurrentFestive()) {
+        if (withFoil && FestiveGlintEvents.isCurrentFestive()) {
             cir.setReturnValue(
                     Minecraft.useShaderTransparency() && renderType == Sheets.translucentItemSheet()
                             ? VertexMultiConsumer.create(
@@ -89,7 +89,7 @@ public class ItemRendererMixin {
     @Inject(method = "getArmorFoilBuffer", at = @At("HEAD"), cancellable = true)
     private static void buildscape$getFestiveArmorFoilBuffer(MultiBufferSource bufferSource, RenderType renderType,
             boolean isItem, boolean withFoil, CallbackInfoReturnable<VertexConsumer> cir) {
-        if (withFoil && FestiveGlintHandler.isCurrentFestive()) {
+        if (withFoil && FestiveGlintEvents.isCurrentFestive()) {
             cir.setReturnValue(
                     VertexMultiConsumer.create(
                             bufferSource.getBuffer(isItem
@@ -102,7 +102,7 @@ public class ItemRendererMixin {
     @Inject(method = "getCompassFoilBuffer", at = @At("HEAD"), cancellable = true)
     private static void buildscape$getFestiveCompassFoilBuffer(MultiBufferSource bufferSource, RenderType renderType,
             PoseStack.Pose pose, CallbackInfoReturnable<VertexConsumer> cir) {
-        if (FestiveGlintHandler.isCurrentFestive()) {
+        if (FestiveGlintEvents.isCurrentFestive()) {
             cir.setReturnValue(
                     VertexMultiConsumer.create(
                             new SheetedDecalTextureGenerator(bufferSource.getBuffer(FestiveRenderTypes.festiveGlint()),
@@ -114,7 +114,7 @@ public class ItemRendererMixin {
     @Inject(method = "getCompassFoilBufferDirect", at = @At("HEAD"), cancellable = true)
     private static void buildscape$getFestiveCompassFoilBufferDirect(MultiBufferSource bufferSource,
             RenderType renderType, PoseStack.Pose pose, CallbackInfoReturnable<VertexConsumer> cir) {
-        if (FestiveGlintHandler.isCurrentFestive()) {
+        if (FestiveGlintEvents.isCurrentFestive()) {
             cir.setReturnValue(
                     VertexMultiConsumer.create(
                             new SheetedDecalTextureGenerator(

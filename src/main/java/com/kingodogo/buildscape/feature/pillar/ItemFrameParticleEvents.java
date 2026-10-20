@@ -51,7 +51,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * entries whose frame no longer exists.
  */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ItemFrameParticleHandler {
+public class ItemFrameParticleEvents {
 
     private static final String PARTICLE_PATTERN_KEY = "BuildScapeParticlePattern";
     private static final String PARTICLE_ENABLED_KEY = "BuildScapeParticleEnabled";

@@ -4,7 +4,7 @@ import com.kingodogo.buildscape.block.FestiveStockingItem;
 import com.kingodogo.buildscape.client.renderer.MobPillarRenderer;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.entity.FestiveStockingEntity;
-import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleEvents;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  * enum.
  */
 public class DyeTablesTest {
-    /** Item frame id colour codes as the old switch in ItemFrameParticleHandler spelled them. */
+    /** Item frame id colour codes as the old switch in ItemFrameParticleEvents spelled them. */
     private static final Map<String, String> OLD_CODES = new LinkedHashMap<>();
 
     static {
@@ -75,7 +75,7 @@ public class DyeTablesTest {
 
     @Test
     public void itemFrameColourCodesMatchTheOldSwitch() throws ReflectiveOperationException {
-        Method code = ItemFrameParticleHandler.class.getDeclaredMethod("getColorCode", String.class);
+        Method code = ItemFrameParticleEvents.class.getDeclaredMethod("getColorCode", String.class);
         code.setAccessible(true);
         for (DyeColors color : DyeColors.values()) {
             String expected = OLD_CODES.get(color.serializedName());

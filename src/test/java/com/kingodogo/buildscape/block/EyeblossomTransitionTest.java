@@ -20,7 +20,7 @@ public final class EyeblossomTransitionTest {
             boolean night,
             boolean expected,
             String description) {
-        boolean actual = EyeblossomTransitionHandler.shouldTransition(currentlyOpen, waxed, night);
+        boolean actual = EyeblossomTransitionEvents.shouldTransition(currentlyOpen, waxed, night);
         if (actual != expected) {
             throw new AssertionError(description + ": expected " + expected + ", got " + actual);
         }

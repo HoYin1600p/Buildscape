@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
+import com.kingodogo.buildscape.client.renderer.FestiveGlintEvents;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,13 +19,13 @@ public class ElytraLayerMixin<T extends LivingEntity, M extends EntityModel<T>> 
     private void buildscape$pushElytraStack(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight,
             T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
             float netHeadYaw, float headPitch, CallbackInfo ci) {
-        FestiveGlintHandler.push(livingEntity.getItemBySlot(EquipmentSlot.CHEST));
+        FestiveGlintEvents.push(livingEntity.getItemBySlot(EquipmentSlot.CHEST));
     }
 
     @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V", at = @At("RETURN"))
     private void buildscape$popElytraStack(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight,
             T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
             float netHeadYaw, float headPitch, CallbackInfo ci) {
-        FestiveGlintHandler.pop();
+        FestiveGlintEvents.pop();
     }
 }

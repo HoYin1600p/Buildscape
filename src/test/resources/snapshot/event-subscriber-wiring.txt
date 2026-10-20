@@ -1,6 +1,6 @@
 com.kingodogo.buildscape.block.CascadeWaterManager bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onWorldUnload(net.minecraftforge.event.world.WorldEvent$Unload) NORMAL
-com.kingodogo.buildscape.block.EyeblossomTransitionHandler bus=FORGE dist=CLIENT,DEDICATED_SERVER
+com.kingodogo.buildscape.block.EyeblossomTransitionEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onChunkLoad(net.minecraftforge.event.world.ChunkEvent$Load) NORMAL
   onChunkUnload(net.minecraftforge.event.world.ChunkEvent$Unload) NORMAL
   onWorldTick(net.minecraftforge.event.TickEvent$WorldTickEvent) NORMAL
@@ -47,7 +47,7 @@ com.kingodogo.buildscape.client.event.ClientFluidEvents bus=FORGE dist=CLIENT
 com.kingodogo.buildscape.client.feature.biome.ClientBiomeTints bus=FORGE dist=CLIENT
   onChunkUnload(net.minecraftforge.event.world.ChunkEvent$Unload) NORMAL
   onWorldUnload(net.minecraftforge.event.world.WorldEvent$Unload) NORMAL
-com.kingodogo.buildscape.client.feature.hazebush.HazeBushParticleHandler bus=FORGE dist=CLIENT
+com.kingodogo.buildscape.client.feature.hazebush.HazeBushParticleEvents bus=FORGE dist=CLIENT
   onChunkLoad(net.minecraftforge.event.world.ChunkEvent$Load) NORMAL
   onChunkUnload(net.minecraftforge.event.world.ChunkEvent$Unload) NORMAL
   onClientTick(net.minecraftforge.event.TickEvent$ClientTickEvent) NORMAL
@@ -62,7 +62,7 @@ com.kingodogo.buildscape.client.particle.ParticleCacheEvents bus=FORGE dist=CLIE
   onWorldUnload(net.minecraftforge.event.world.WorldEvent$Unload) NORMAL
 com.kingodogo.buildscape.client.renderer.CopperChestItemRenderer bus=FORGE dist=CLIENT
   onLogout(net.minecraftforge.client.event.ClientPlayerNetworkEvent$LoggedOutEvent) NORMAL
-com.kingodogo.buildscape.client.renderer.FestiveGlintHandler bus=FORGE dist=CLIENT
+com.kingodogo.buildscape.client.renderer.FestiveGlintEvents bus=FORGE dist=CLIENT
   onRenderTick(net.minecraftforge.event.TickEvent$RenderTickEvent) NORMAL
 com.kingodogo.buildscape.client.renderer.HollowLogBlockEntityRenderer bus=FORGE dist=CLIENT
   onWorldUnload(net.minecraftforge.event.world.WorldEvent$Unload) NORMAL
@@ -106,7 +106,7 @@ com.kingodogo.buildscape.event.ModClientParticleEvents bus=MOD dist=CLIENT
 com.kingodogo.buildscape.event.StrawBedEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onPlayerSetSpawn(net.minecraftforge.event.entity.player.PlayerSetSpawnEvent) NORMAL
   onPlayerWakeUp(net.minecraftforge.event.entity.player.PlayerWakeUpEvent) NORMAL
-com.kingodogo.buildscape.event.TagTooltipHandler bus=FORGE dist=CLIENT
+com.kingodogo.buildscape.event.TagTooltipEvents bus=FORGE dist=CLIENT
   onItemTooltip(net.minecraftforge.event.entity.player.ItemTooltipEvent) LOWEST
 com.kingodogo.buildscape.feature.biome.BiomeBrushEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onLeftClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent$LeftClickBlock) NORMAL
@@ -121,7 +121,7 @@ com.kingodogo.buildscape.feature.cosmetic.sign.SignFrameInteractionEvents bus=FO
 com.kingodogo.buildscape.feature.homemaker.WanderingHomemakerSpawningEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onBlockPlaced(net.minecraftforge.event.world.BlockEvent$EntityPlaceEvent) NORMAL
   onPlayerClone(net.minecraftforge.event.entity.player.PlayerEvent$Clone) NORMAL
-com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler bus=FORGE dist=CLIENT,DEDICATED_SERVER
+com.kingodogo.buildscape.feature.pillar.ItemFrameParticleEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onEntityInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent$EntityInteract) NORMAL
   onEntityJoinLevel(net.minecraftforge.event.entity.EntityJoinWorldEvent) NORMAL
   onEntityLeaveLevel(net.minecraftforge.event.entity.EntityLeaveWorldEvent) NORMAL
@@ -131,7 +131,7 @@ com.kingodogo.buildscape.feature.pillar.PillarRegistrySaveEvents bus=FORGE dist=
   onChunkUnload(net.minecraftforge.event.world.ChunkEvent$Unload) NORMAL
   onServerStopping(net.minecraftforge.event.server.ServerStoppingEvent) NORMAL
   onWorldSave(net.minecraftforge.event.world.WorldEvent$Save) NORMAL
-com.kingodogo.buildscape.feature.pipe.HollowLogCrawlHandler bus=FORGE dist=CLIENT,DEDICATED_SERVER
+com.kingodogo.buildscape.feature.pipe.HollowLogCrawlEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onEntitySize(net.minecraftforge.event.entity.EntityEvent$Size) NORMAL
   onPlayerLoggedOut(net.minecraftforge.event.entity.player.PlayerEvent$PlayerLoggedOutEvent) NORMAL
   onPlayerTick(net.minecraftforge.event.TickEvent$PlayerTickEvent) NORMAL

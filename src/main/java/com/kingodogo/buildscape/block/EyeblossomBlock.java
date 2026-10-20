@@ -50,7 +50,7 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
 
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-        EyeblossomTransitionHandler.track(level, pos);
+        EyeblossomTransitionEvents.track(level, pos);
         synchronizeWithTime(level, pos, state, false);
     }
 
@@ -58,7 +58,7 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         if (level instanceof ServerLevel serverLevel) {
-            EyeblossomTransitionHandler.track(serverLevel, pos);
+            EyeblossomTransitionEvents.track(serverLevel, pos);
             serverLevel.scheduleTick(pos, this, 1);
         }
     }
@@ -66,14 +66,14 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (level instanceof ServerLevel serverLevel && !(newState.getBlock() instanceof EyeblossomBlock)) {
-            EyeblossomTransitionHandler.untrack(serverLevel, pos);
+            EyeblossomTransitionEvents.untrack(serverLevel, pos);
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
     void synchronizeWithTime(ServerLevel level, BlockPos pos, BlockState state, boolean playSound) {
         boolean night = level.isNight();
-        if (!EyeblossomTransitionHandler.shouldTransition(isOpen, state.getValue(WAXED), night)) {
+        if (!EyeblossomTransitionEvents.shouldTransition(isOpen, state.getValue(WAXED), night)) {
             return;
         }
 

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler;
+import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleEvents;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import org.junit.Test;
 
@@ -47,7 +47,7 @@ public class FrameParticleSettingsTest {
     }
 
     private static Object resolve(PillarIdManager.PillarData data, PillarParticleConfig cfg) throws Exception {
-        Method method = ItemFrameParticleHandler.class.getDeclaredMethod("resolveFrameSettings",
+        Method method = ItemFrameParticleEvents.class.getDeclaredMethod("resolveFrameSettings",
                 PillarIdManager.PillarData.class, String.class, PillarParticleConfig.class);
         method.setAccessible(true);
         return method.invoke(null, data, "default", cfg);

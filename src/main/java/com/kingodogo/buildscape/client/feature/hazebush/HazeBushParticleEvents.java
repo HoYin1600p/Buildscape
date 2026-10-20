@@ -36,7 +36,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class HazeBushParticleHandler {
+public class HazeBushParticleEvents {
 
     private static final Map<Long, Set<BlockPos>> POSITIONS_BY_CHUNK = new HashMap<>();
     private static final Random RANDOM = new Random();

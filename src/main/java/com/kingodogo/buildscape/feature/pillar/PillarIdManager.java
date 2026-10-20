@@ -988,7 +988,7 @@ public class PillarIdManager {
             }
         }
         rebuildPositionIndex();
-        ItemFrameParticleHandler.clearClientCaches();
+        ItemFrameParticleEvents.clearClientCaches();
         hasLoaded = true;
         isServerSynced = true;
     }
@@ -996,7 +996,7 @@ public class PillarIdManager {
     public void clearForServerSync() {
         registry.pillarData.clear();
         positionIndex.clear();
-        ItemFrameParticleHandler.clearClientCaches();
+        ItemFrameParticleEvents.clearClientCaches();
         hasLoaded = false;
     }
 

@@ -65,12 +65,6 @@ public class TabCacheManager {
         }
     }
 
-    public void markAllDirty() {
-        for (TabViewState state : tabs.values()) {
-            state.isDirty = true;
-        }
-    }
-
     public void clear() {
         tabs.clear();
     }

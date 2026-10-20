@@ -210,10 +210,6 @@ public class ConfigBackgrounds {
         BUILT_IN_IDS = Collections.unmodifiableList(ids);
     }
 
-    static List<String> getBuiltInBackgroundIds() {
-        return BUILT_IN_IDS;
-    }
-
     private static final Set<String> REGISTERED_BACKGROUND_IDS = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final Set<String> LOADING_BACKGROUND_IDS = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private static final java.util.concurrent.atomic.AtomicBoolean SCANNING = new java.util.concurrent.atomic.AtomicBoolean();
@@ -389,10 +385,6 @@ public class ConfigBackgrounds {
         return BACKGROUNDS.get(activeBackgroundIndex);
     }
 
-    public static int getActiveBackgroundIndex() {
-        return activeBackgroundIndex;
-    }
-
     public static Background cycleNextBackground() {
         getAllBackgrounds();
         activeBackgroundIndex = (activeBackgroundIndex + 1) % BACKGROUNDS.size();
@@ -411,15 +403,6 @@ public class ConfigBackgrounds {
             BuildscapeClientConfig.get().setUiBackground(bg.id);
         } catch (Exception ignored) {}
         return bg;
-    }
-
-    public static void setBackgroundIndex(int index) {
-        if (index >= 0 && index < BACKGROUNDS.size()) {
-            activeBackgroundIndex = index;
-            try {
-                BuildscapeClientConfig.get().setUiBackground(BACKGROUNDS.get(index).id);
-            } catch (Exception ignored) {}
-        }
     }
 
     public static void setBackgroundById(String id) {

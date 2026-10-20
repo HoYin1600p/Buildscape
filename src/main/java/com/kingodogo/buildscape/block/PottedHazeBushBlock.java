@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.client.feature.hazebush.HazeBushParticleEvents;
+import com.kingodogo.buildscape.core.ClientHooks;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.feature.pipe.HollowLogBlock;
 import com.kingodogo.buildscape.registry.ModBlocks;
@@ -70,7 +70,7 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             return;
         }
 
-        HazeBushParticleEvents.animateTick(level, pos, random, this.color);
+        ClientHooks.get().hazeBushAnimateTick(level, pos, random, this.color);
     }
 
     @Override

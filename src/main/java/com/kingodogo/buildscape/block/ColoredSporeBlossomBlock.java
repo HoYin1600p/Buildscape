@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.client.particle.TintedDripParticle;
+import com.kingodogo.buildscape.core.ClientHooks;
 import com.kingodogo.buildscape.registry.ModParticles;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
@@ -58,7 +58,7 @@ public class ColoredSporeBlossomBlock
                     double fallSpeed = -0.007 - random.nextDouble() * 0.006;
 
                     if (level.isClientSide) {
-                        TintedDripParticle.registerColorForPosition(
+                        ClientHooks.get().registerTintedDripColor(
                                 spawnX,
                                 centerY,
                                 spawnZ,
@@ -90,7 +90,7 @@ public class ColoredSporeBlossomBlock
                     double velocityZ = (random.nextDouble() - 0.5) * 0.04;
 
                     if (level.isClientSide) {
-                        TintedDripParticle.registerColorForPosition(
+                        ClientHooks.get().registerTintedDripColor(
                                 spreadX,
                                 spreadY,
                                 spreadZ,

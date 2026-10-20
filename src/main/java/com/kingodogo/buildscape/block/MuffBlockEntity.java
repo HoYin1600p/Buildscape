@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
+import com.kingodogo.buildscape.core.ClientHooks;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -40,11 +40,11 @@ public class MuffBlockEntity extends BlockEntity {
 
     private static class ClientHandler {
         private static void register(BlockPos pos) {
-            MuffBlockManager.register(pos);
+            ClientHooks.get().registerMuffBlock(pos);
         }
 
         private static void unregister(BlockPos pos) {
-            MuffBlockManager.unregister(pos);
+            ClientHooks.get().unregisterMuffBlock(pos);
         }
     }
 }

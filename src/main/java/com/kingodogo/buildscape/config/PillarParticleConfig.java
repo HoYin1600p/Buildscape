@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.client.network.ClientConfigHooks;
+import com.kingodogo.buildscape.core.ClientHooks;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.network.SyncConfigPacket;
@@ -282,7 +282,7 @@ public class PillarParticleConfig {
         if (now - connectedCacheTime < CONNECTED_CACHE_TTL_MS) {
             return cachedConnectedToServer;
         }
-        boolean result = ClientConfigHooks.isConnected();
+        boolean result = ClientHooks.get().isConnectedToServer();
         cachedConnectedToServer = result;
         connectedCacheTime = now;
         return result;
@@ -1082,7 +1082,7 @@ public class PillarParticleConfig {
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> {
-                        if (ClientConfigHooks.canUploadConfig()) {
+                        if (ClientHooks.get().canUploadConfig()) {
                             UpdateConfigPacket.send(this);
                         }
                     });
@@ -1148,7 +1148,7 @@ public class PillarParticleConfig {
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> {
-                        if (ClientConfigHooks.canUploadConfig()) {
+                        if (ClientHooks.get().canUploadConfig()) {
                             UpdateConfigPacket.send(this);
                         }
                     });
@@ -1258,14 +1258,14 @@ public class PillarParticleConfig {
     }
 
     public boolean canEditItems() {
-        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConfigHooks.hasLocalServer()) {
+        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientHooks.get().hasLocalServer()) {
             return getLocalConfig().canEditItems();
         }
         return !itemsFileUnreadable && !itemsReadOnly;
     }
 
     public boolean canEditProperties() {
-        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConfigHooks.hasLocalServer()) {
+        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientHooks.get().hasLocalServer()) {
             return getLocalConfig().canEditProperties();
         }
         return !propertiesReadOnly;

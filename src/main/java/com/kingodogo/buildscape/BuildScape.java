@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape;
 
+import com.kingodogo.buildscape.client.setup.ClientHooksImpl;
 import com.kingodogo.buildscape.event.BlockInteractionEvents;
 import com.kingodogo.buildscape.event.MobGriefingEvents;
 import com.kingodogo.buildscape.event.ModCommandEvents;
@@ -26,8 +27,10 @@ import com.kingodogo.buildscape.worldgen.ModTreeDecoratorTypes;
 import com.kingodogo.buildscape.worldgen.ModTrunkPlacerTypes;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -59,6 +62,7 @@ public class BuildScape {
             });
 
     public BuildScape() {
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientHooksImpl::install);
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(CommonSetup::onCommonSetup);
 

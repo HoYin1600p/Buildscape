@@ -7,3 +7,5 @@ fd416c45e7afcffa090a4fb84c0998df9c5d52d2
 11cb92b4d6763afe77b0e5b4c48ad16c9da06aff
 # Formatter: no space before the colon of case and default
 066e4df4c0d17173822c97f578e5003240b815ca
+# Spotless format of the tidied sources (format only)
+6c475892a10a8602eadb0abf8c8a26f6a946cd39

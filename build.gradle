@@ -131,11 +131,10 @@ tasks.named('processResources', ProcessResources).configure {
     }
 }
 
-// Formatting: `gradlew spotlessApply` rewrites, `gradlew spotlessCheck` verifies. Deliberately not part of `check`
-// (enforceCheck = false) so a stray indent never fails a release build; run it before committing.
+// Formatting: `gradlew spotlessApply` rewrites, `gradlew spotlessCheck` verifies, and `check` (so `build`) fails on format drift.
 // The config screen package is excluded while it is under separate development.
 spotless {
-    enforceCheck = false
+    enforceCheck = true
     lineEndings = com.diffplug.spotless.LineEnding.UNIX
     java {
         target 'src/main/java/**/*.java', 'src/test/java/**/*.java'

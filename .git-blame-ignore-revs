@@ -3,3 +3,5 @@
 fd416c45e7afcffa090a4fb84c0998df9c5d52d2
 # Format all Java sources with the Eclipse formatter
 082c5766cc01e35b44b91a103711da88d7e08444
+# Re-lay out enum constants one per line
+11cb92b4d6763afe77b0e5b4c48ad16c9da06aff

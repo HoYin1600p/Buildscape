@@ -18,7 +18,8 @@ public class BuildersPouchTooltipData implements TooltipComponent, ClientTooltip
     private static final ResourceLocation TEXTURE = new ResourceLocation(BuildScape.MODID,
             "textures/gui/shulker_box_tooltip.png");
 
-    public static final int COLOR_GOLD = 0xFBC02D;
+    /** Multiplied over the grey frame texture, this renders close to the pouch's main blue (#004576). */
+    public static final int COLOR_POUCH_BLUE = 0x0076D8;
 
     public static float[] hexToRgb(int hex) {
         float r = ((hex >> 16) & 0xFF) / 255.0f;
@@ -62,7 +63,7 @@ public class BuildersPouchTooltipData implements TooltipComponent, ClientTooltip
             int height = getHeight();
 
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            float[] tint = hexToRgb(COLOR_GOLD);
+            float[] tint = hexToRgb(COLOR_POUCH_BLUE);
             RenderSystem.setShaderColor(tint[0], tint[1], tint[2], 1.0F);
             RenderSystem.setShaderTexture(0, TEXTURE);
 

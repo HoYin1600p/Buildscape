@@ -69,7 +69,9 @@ public class SyncConfigPacket {
         this.particle_lifetime = clamp(config.particle_lifetime, 1, NetworkPacketLimits.MAX_PARTICLE_LIFETIME);
         this.particle_density = clamp(config.particle_density, 0, NetworkPacketLimits.MAX_PARTICLE_DENSITY);
         this.use_pattern = config.use_pattern;
-        this.pattern = config.pattern != null ? config.pattern : ParticlePatterns.RING;
+        this.pattern = config.pattern != null && config.pattern.length() <= NetworkPacketLimits.MAX_PATTERN_LENGTH
+                ? config.pattern
+                : ParticlePatterns.RING;
         this.pattern_speed = NetworkPacketLimits.clamp(config.pattern_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
         this.pattern_spread = NetworkPacketLimits.clamp(config.pattern_spread,
@@ -84,6 +86,7 @@ public class SyncConfigPacket {
                 : PillarParticleConfig.EditPermissionMode.STRICT;
         this.items = new HashSet<>(
                 config.items != null ? config.items : new HashSet<>());
+        this.items.removeIf(item -> item != null && item.length() > NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH);
         this.itemsReadOnly = !config.canEditItems();
         this.propertiesReadOnly = !config.canEditProperties();
     }

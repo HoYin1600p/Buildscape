@@ -48,8 +48,11 @@ public class AdvancementGrants {
                 continue;
             }
 
-            Advancement reqAdv = serverPlayer.getServer().getAdvancements()
-                    .getAdvancement(new ResourceLocation("buildscape", criterion));
+            ResourceLocation id = ResourceLocation.tryParse("buildscape:" + criterion);
+            if (id == null) {
+                continue;
+            }
+            Advancement reqAdv = serverPlayer.getServer().getAdvancements().getAdvancement(id);
             if (reqAdv != null) {
                 AdvancementProgress reqProgress = serverPlayer.getAdvancements().getOrStartProgress(reqAdv);
                 if (reqProgress.isDone()) {

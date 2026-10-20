@@ -278,154 +278,109 @@ public class FestiveStockingBlock
         if (be instanceof FestiveStockingBlockEntity stockingEntity) {
             ItemStack heldItem = player.getItemInHand(hand);
 
-            if (heldItem.isEmpty() &&
-                    !player.isShiftKeyDown() &&
-                    !stockingEntity.isEmpty()) {
-                if (!level.isClientSide) {
-                    ItemStack stored = stockingEntity.getStoredItem().copy();
-                    stockingEntity.setStoredItem(ItemStack.EMPTY, true);
-
-                    if (!player.getInventory().add(stored)) {
-                        ItemEntity itemEntity = new ItemEntity(
-                                level,
-                                pos.getX() + 0.5,
-                                pos.getY() + 0.5,
-                                pos.getZ() + 0.5,
-                                stored);
-                        itemEntity.setDefaultPickUpDelay();
-                        level.addFreshEntity(itemEntity);
-                    }
-                    level.playSound(
-                            null,
-                            pos,
-                            SoundEvents.ITEM_FRAME_REMOVE_ITEM,
-                            SoundSource.BLOCKS,
-                            0.5f,
-                            1.0f);
-                    level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+            if (heldItem.isEmpty() && !player.isShiftKeyDown() && !stockingEntity.isEmpty()) {
+                return takeStoredItem(level, pos, player, stockingEntity);
             }
 
             if (heldItem.isEmpty() && player.isShiftKeyDown()) {
-                if (!level.isClientSide) {
-                    boolean currentFlipped = state.getValue(FLIPPED);
-                    level.setBlock(pos, state.setValue(FLIPPED, !currentFlipped), 3);
-                    level.playSound(
-                            null,
-                            pos,
-                            SoundEvents.ITEM_FRAME_ROTATE_ITEM,
-                            SoundSource.BLOCKS,
-                            1.0f,
-                            1.0f);
-                    level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return flipStocking(state, level, pos, player);
             }
 
-            if (player.isShiftKeyDown() &&
-                    !heldItem.isEmpty() &&
-                    !stockingEntity.isEmpty()) {
-                if (!level.isClientSide) {
-                    ItemStack stored = stockingEntity.getStoredItem().copy();
-                    stockingEntity.setStoredItem(ItemStack.EMPTY, true);
-
-                    if (!player.getInventory().add(stored)) {
-                        ItemEntity itemEntity = new ItemEntity(
-                                level,
-                                pos.getX() + 0.5,
-                                pos.getY() + 0.5,
-                                pos.getZ() + 0.5,
-                                stored);
-                        itemEntity.setDefaultPickUpDelay();
-                        level.addFreshEntity(itemEntity);
-                    }
-                    level.playSound(
-                            null,
-                            pos,
-                            SoundEvents.ITEM_FRAME_REMOVE_ITEM,
-                            SoundSource.BLOCKS,
-                            0.5f,
-                            1.0f);
-                    level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+            if (player.isShiftKeyDown() && !heldItem.isEmpty() && !stockingEntity.isEmpty()) {
+                return takeStoredItem(level, pos, player, stockingEntity);
             }
 
             if (!heldItem.isEmpty()) {
-                if (heldItem.getItem() instanceof BlockItem) {
-                    BlockItem blockItem = (BlockItem) heldItem.getItem();
-                    if (blockItem.getBlock() instanceof FestiveStockingBlock) {
-                        return InteractionResult.PASS;
-                    }
-                }
-
-                ItemStack stored = stockingEntity.getStoredItem();
-
-                if (stored.isEmpty()) {
-                    if (!level.isClientSide) {
-                        ItemStack toStore = heldItem.copy();
-                        int maxStack = toStore.getMaxStackSize();
-                        int toTake = player.isShiftKeyDown()
-                                ? Math.min(heldItem.getCount(), maxStack)
-                                : 1;
-                        toStore.setCount(toTake);
-                        stockingEntity.setStoredItem(toStore, true);
-                        heldItem.shrink(toTake);
-                        if (heldItem.isEmpty()) {
-                            player.setItemInHand(hand, ItemStack.EMPTY);
-                        }
-                        level.playSound(
-                                null,
-                                pos,
-                                ModSounds.DECORATED_POT_INSERT_ITEM.get(),
-                                SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f);
-                        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                } else if (ItemStack.isSameItemSameTags(stored, heldItem) &&
-                        stored.getCount() < stored.getMaxStackSize()) {
-                    if (!level.isClientSide) {
-                        int maxStack = stored.getMaxStackSize();
-                        int spaceAvailable = maxStack - stored.getCount();
-                        int toAdd = player.isShiftKeyDown()
-                                ? Math.min(heldItem.getCount(), spaceAvailable)
-                                : 1;
-                        int canAdd = Math.min(toAdd, spaceAvailable);
-                        stored.grow(canAdd);
-                        stockingEntity.setStoredItem(stored, true);
-                        heldItem.shrink(canAdd);
-                        if (heldItem.isEmpty()) {
-                            player.setItemInHand(hand, ItemStack.EMPTY);
-                        }
-                        level.playSound(
-                                null,
-                                pos,
-                                ModSounds.DECORATED_POT_INSERT_ITEM.get(),
-                                SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f);
-                        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                } else {
-                    if (!level.isClientSide) {
-                        level.playSound(
-                                null,
-                                pos,
-                                ModSounds.DECORATED_POT_INSERT_FAIL.get(),
-                                SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                }
+                return insertHeldItem(level, pos, player, hand, heldItem, stockingEntity);
             }
         }
 
         return InteractionResult.PASS;
+    }
+
+    /** Gives the stored item to the player, or drops it when the inventory is full. */
+    private static InteractionResult takeStoredItem(
+            Level level, BlockPos pos, Player player, FestiveStockingBlockEntity stockingEntity) {
+        if (!level.isClientSide) {
+            ItemStack stored = stockingEntity.getStoredItem().copy();
+            stockingEntity.setStoredItem(ItemStack.EMPTY, true);
+
+            if (!player.getInventory().add(stored)) {
+                ItemEntity itemEntity = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                        stored);
+                itemEntity.setDefaultPickUpDelay();
+                level.addFreshEntity(itemEntity);
+            }
+            level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.5f, 1.0f);
+            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** Sneaking with an empty hand: turns the stocking around. */
+    private static InteractionResult flipStocking(BlockState state, Level level, BlockPos pos, Player player) {
+        if (!level.isClientSide) {
+            boolean currentFlipped = state.getValue(FLIPPED);
+            level.setBlock(pos, state.setValue(FLIPPED, !currentFlipped), 3);
+            level.playSound(null, pos, SoundEvents.ITEM_FRAME_ROTATE_ITEM, SoundSource.BLOCKS, 1.0f, 1.0f);
+            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** A non-empty hand: PASS for another stocking, otherwise stores items or plays the failure sound. */
+    private static InteractionResult insertHeldItem(
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            ItemStack heldItem,
+            FestiveStockingBlockEntity stockingEntity) {
+        if (heldItem.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof FestiveStockingBlock) {
+            return InteractionResult.PASS;
+        }
+
+        ItemStack stored = stockingEntity.getStoredItem();
+
+        if (stored.isEmpty()) {
+            if (!level.isClientSide) {
+                ItemStack toStore = heldItem.copy();
+                int maxStack = toStore.getMaxStackSize();
+                int toTake = player.isShiftKeyDown() ? Math.min(heldItem.getCount(), maxStack) : 1;
+                toStore.setCount(toTake);
+                stockingEntity.setStoredItem(toStore, true);
+                heldItem.shrink(toTake);
+                finishInsert(level, pos, player, hand, heldItem);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < stored.getMaxStackSize()) {
+            if (!level.isClientSide) {
+                int maxStack = stored.getMaxStackSize();
+                int spaceAvailable = maxStack - stored.getCount();
+                int toAdd = player.isShiftKeyDown() ? Math.min(heldItem.getCount(), spaceAvailable) : 1;
+                int canAdd = Math.min(toAdd, spaceAvailable);
+                stored.grow(canAdd);
+                stockingEntity.setStoredItem(stored, true);
+                heldItem.shrink(canAdd);
+                finishInsert(level, pos, player, hand, heldItem);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        } else {
+            if (!level.isClientSide) {
+                level.playSound(null, pos, ModSounds.DECORATED_POT_INSERT_FAIL.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+    }
+
+    /** Clears an emptied hand and plays the insert sound and game event. */
+    private static void finishInsert(Level level, BlockPos pos, Player player, InteractionHand hand,
+            ItemStack heldItem) {
+        if (heldItem.isEmpty()) {
+            player.setItemInHand(hand, ItemStack.EMPTY);
+        }
+        level.playSound(null, pos, ModSounds.DECORATED_POT_INSERT_ITEM.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
+        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
     }
 
     @Override

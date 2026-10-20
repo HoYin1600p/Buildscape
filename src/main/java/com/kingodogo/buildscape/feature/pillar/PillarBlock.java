@@ -636,187 +636,150 @@ public class PillarBlock
         ItemStack heldItem = player.getItemInHand(hand);
 
         if (!heldItem.isEmpty()) {
-            Map.Entry<String, String> dyeInfo = getDyeColorAndName(
-                    heldItem);
-            if (dyeInfo != null) {
-                if (stackHasAnyItem(level, pos)) {
-                    String dyeColor = dyeInfo.getKey();
-                    String dyeName = dyeInfo.getValue();
-
-                    if (!pillarBE.canAddMoreColors()) {
-                        TextComponent message = new TextComponent(
-                                "Pillar already has " +
-                                        PillarBlockEntity.MAX_DYE_COLORS +
-                                        " colors! Break and replace to reset.");
-                        message.withStyle(ChatFormatting.RED);
-                        if (player instanceof ServerPlayer) {
-                            ModMessages.INSTANCE.send(
-                                    PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
-                                    new ActionBarMessagePacket(
-                                            message));
-                        }
-                        return InteractionResult.CONSUME;
-                    }
-
-                    boolean added = pillarBE.addParticleColor(dyeColor);
-                    if (!added) {
-                        return InteractionResult.PASS;
-                    }
-
-                    if (!player.getAbilities().instabuild) {
-                        heldItem.shrink(1);
-                    }
-
-                    level.playSound(
-                            null,
-                            pos,
-                            SoundEvents.DYE_USE,
-                            SoundSource.BLOCKS,
-                            1.0f,
-                            1.0f);
-
-                    String pillarId = pillarBE.getPillarId();
-                    int colorCount = pillarBE.getDyeColorCount();
-
-                    String progressText = " (" + colorCount + "/" + PillarBlockEntity.MAX_DYE_COLORS + ")";
-                    TextComponent message;
-                    if (pillarId != null) {
-                        message = new TextComponent(
-                                "[" + pillarId + "] Dyed " + dyeName + progressText);
-                    } else {
-                        message = new TextComponent(
-                                "Pillar Dyed " + dyeName + progressText);
-                    }
-
-                    if (player instanceof ServerPlayer) {
-                        ModMessages.INSTANCE.send(
-                                PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
-                                new ActionBarMessagePacket(
-                                        message));
-                    }
-
-                    return InteractionResult.SUCCESS;
-                }
+            InteractionResult dyed = tryDyeParticles(level, pos, player, heldItem, pillarBE);
+            if (dyed != null) {
+                return dyed;
             }
         }
 
         if (player.isShiftKeyDown()) {
-            ItemStack displayedItem = pillarBE.getDisplayedItem();
-            boolean isSpawnEgg = !displayedItem.isEmpty() &&
-                    displayedItem.getItem() instanceof SpawnEggItem;
-
-            if (isSpawnEgg) {
-                pillarBE.rotateFacing();
-                float facingYaw = pillarBE.getFacingYaw();
-
-                String direction = getDirectionName(facingYaw);
-                TextComponent message = new TextComponent(
-                        "Mob facing: " + direction);
-                message.withStyle(ChatFormatting.GREEN);
-                player.displayClientMessage(message, true);
-
-                level.playSound(
-                        null,
-                        pos,
-                        SoundEvents.UI_BUTTON_CLICK,
-                        SoundSource.BLOCKS,
-                        0.5f,
-                        1.0f);
-                return InteractionResult.SUCCESS;
-            } else {
-                pillarBE.cycleParticlePattern();
-                String pattern = pillarBE.getParticlePattern();
-                if (pattern == null) {
-                    pattern = PillarParticleConfig.get().pattern;
-                }
-
-                ChatFormatting color = getPatternColor(pattern);
-
-                TextComponent patternText = (TextComponent) new TextComponent(
-                        pattern).withStyle(color);
-                player.displayClientMessage(patternText, true);
-
-                level.playSound(
-                        null,
-                        pos,
-                        SoundEvents.UI_BUTTON_CLICK,
-                        SoundSource.BLOCKS,
-                        0.5f,
-                        1.0f);
-                return InteractionResult.SUCCESS;
-            }
+            return rotateOrCyclePattern(level, pos, player, pillarBE);
         }
 
         BlockPos topBlockPos = findTopBlock(level, pos);
         if (!topBlockPos.equals(pos)) {
-            BlockEntity topEntity = level.getBlockEntity(topBlockPos);
-            if (topEntity instanceof PillarBlockEntity topPillarBE) {
-                if (heldItem.isEmpty() && topPillarBE.hasDisplayItem()) {
-                    ItemStack displayedItem = topPillarBE.getDisplayedItem();
-                    if (!displayedItem.isEmpty()) {
-                        topPillarBE.setDisplayedItem(ItemStack.EMPTY);
-                        level.sendBlockUpdated(
-                                topBlockPos,
-                                level.getBlockState(topBlockPos),
-                                level.getBlockState(topBlockPos),
-                                3);
-                        ItemEntity itemEntity = new ItemEntity(
-                                level,
-                                pos.getX() + 0.5,
-                                pos.getY() + 1.0,
-                                pos.getZ() + 0.5,
-                                displayedItem.copy());
-                        itemEntity.setDefaultPickUpDelay();
-                        level.addFreshEntity(itemEntity);
-                        level.playSound(
-                                null,
-                                pos,
-                                SoundEvents.ITEM_FRAME_REMOVE_ITEM,
-                                SoundSource.BLOCKS,
-                                1.0f,
-                                1.0f);
-                        return InteractionResult.SUCCESS;
-                    }
-                }
-                return handleItemInteraction(
-                        topPillarBE,
-                        level,
-                        topBlockPos,
-                        player,
-                        hand);
-            }
-            return InteractionResult.PASS;
+            return interactWithStackTop(level, pos, topBlockPos, player, hand, heldItem);
         }
 
-        if (heldItem.isEmpty() && pillarBE.hasDisplayItem()) {
-            ItemStack displayedItem = pillarBE.getDisplayedItem();
-            if (!displayedItem.isEmpty()) {
-                pillarBE.setDisplayedItem(ItemStack.EMPTY);
-                level.sendBlockUpdated(
-                        pos,
-                        level.getBlockState(pos),
-                        level.getBlockState(pos),
-                        3);
-                ItemEntity itemEntity = new ItemEntity(
-                        level,
-                        pos.getX() + 0.5,
-                        pos.getY() + 1.0,
-                        pos.getZ() + 0.5,
-                        displayedItem.copy());
-                itemEntity.setDefaultPickUpDelay();
-                level.addFreshEntity(itemEntity);
-                level.playSound(
-                        null,
-                        pos,
-                        SoundEvents.ITEM_FRAME_REMOVE_ITEM,
-                        SoundSource.BLOCKS,
-                        1.0f,
-                        1.0f);
-                return InteractionResult.SUCCESS;
-            }
+        InteractionResult taken = tryTakeDisplayedItem(level, pos, pos, heldItem, pillarBE);
+        if (taken != null) {
+            return taken;
         }
 
         return handleItemInteraction(pillarBE, level, pos, player, hand);
+    }
+
+    /** A held dye adds a particle colour; null when the item is no dye or the stack holds no item yet. */
+    private InteractionResult tryDyeParticles(
+            Level level, BlockPos pos, Player player, ItemStack heldItem, PillarBlockEntity pillarBE) {
+        Map.Entry<String, String> dyeInfo = getDyeColorAndName(heldItem);
+        if (dyeInfo == null || !stackHasAnyItem(level, pos)) {
+            return null;
+        }
+        String dyeColor = dyeInfo.getKey();
+        String dyeName = dyeInfo.getValue();
+
+        if (!pillarBE.canAddMoreColors()) {
+            TextComponent message = new TextComponent(
+                    "Pillar already has " + PillarBlockEntity.MAX_DYE_COLORS + " colors! Break and replace to reset.");
+            message.withStyle(ChatFormatting.RED);
+            if (player instanceof ServerPlayer) {
+                ModMessages.INSTANCE.send(
+                        PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                        new ActionBarMessagePacket(message));
+            }
+            return InteractionResult.CONSUME;
+        }
+
+        boolean added = pillarBE.addParticleColor(dyeColor);
+        if (!added) {
+            return InteractionResult.PASS;
+        }
+
+        if (!player.getAbilities().instabuild) {
+            heldItem.shrink(1);
+        }
+
+        level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.0f);
+
+        String pillarId = pillarBE.getPillarId();
+        int colorCount = pillarBE.getDyeColorCount();
+
+        String progressText = " (" + colorCount + "/" + PillarBlockEntity.MAX_DYE_COLORS + ")";
+        TextComponent message;
+        if (pillarId != null) {
+            message = new TextComponent("[" + pillarId + "] Dyed " + dyeName + progressText);
+        } else {
+            message = new TextComponent("Pillar Dyed " + dyeName + progressText);
+        }
+
+        if (player instanceof ServerPlayer) {
+            ModMessages.INSTANCE.send(
+                    PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new ActionBarMessagePacket(message));
+        }
+
+        return InteractionResult.SUCCESS;
+    }
+
+    /** Sneaking: turns a displayed mob (spawn egg), otherwise cycles the particle pattern. */
+    private InteractionResult rotateOrCyclePattern(
+            Level level, BlockPos pos, Player player, PillarBlockEntity pillarBE) {
+        ItemStack displayedItem = pillarBE.getDisplayedItem();
+        boolean isSpawnEgg = !displayedItem.isEmpty() && displayedItem.getItem() instanceof SpawnEggItem;
+
+        if (isSpawnEgg) {
+            pillarBE.rotateFacing();
+            float facingYaw = pillarBE.getFacingYaw();
+
+            String direction = getDirectionName(facingYaw);
+            TextComponent message = new TextComponent("Mob facing: " + direction);
+            message.withStyle(ChatFormatting.GREEN);
+            player.displayClientMessage(message, true);
+
+            level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK, SoundSource.BLOCKS, 0.5f, 1.0f);
+            return InteractionResult.SUCCESS;
+        } else {
+            pillarBE.cycleParticlePattern();
+            String pattern = pillarBE.getParticlePattern();
+            if (pattern == null) {
+                pattern = PillarParticleConfig.get().pattern;
+            }
+
+            ChatFormatting color = getPatternColor(pattern);
+
+            TextComponent patternText = (TextComponent) new TextComponent(pattern).withStyle(color);
+            player.displayClientMessage(patternText, true);
+
+            level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK, SoundSource.BLOCKS, 0.5f, 1.0f);
+            return InteractionResult.SUCCESS;
+        }
+    }
+
+    /** A click on a lower pillar acts on the top of the stack; PASS when the top has no pillar entity. */
+    private InteractionResult interactWithStackTop(
+            Level level, BlockPos pos, BlockPos topBlockPos, Player player, InteractionHand hand, ItemStack heldItem) {
+        BlockEntity topEntity = level.getBlockEntity(topBlockPos);
+        if (topEntity instanceof PillarBlockEntity topPillarBE) {
+            InteractionResult taken = tryTakeDisplayedItem(level, pos, topBlockPos, heldItem, topPillarBE);
+            if (taken != null) {
+                return taken;
+            }
+            return handleItemInteraction(topPillarBE, level, topBlockPos, player, hand);
+        }
+        return InteractionResult.PASS;
+    }
+
+    /**
+     * An empty hand takes the displayed item off the pillar and drops it above {@code dropPos}; null when the
+     * hand is not empty or nothing is displayed. {@code updatePos} is the block that gets the update.
+     */
+    private static InteractionResult tryTakeDisplayedItem(
+            Level level, BlockPos dropPos, BlockPos updatePos, ItemStack heldItem, PillarBlockEntity pillarBE) {
+        if (!(heldItem.isEmpty() && pillarBE.hasDisplayItem())) {
+            return null;
+        }
+        ItemStack displayedItem = pillarBE.getDisplayedItem();
+        if (displayedItem.isEmpty()) {
+            return null;
+        }
+        pillarBE.setDisplayedItem(ItemStack.EMPTY);
+        level.sendBlockUpdated(updatePos, level.getBlockState(updatePos), level.getBlockState(updatePos), 3);
+        ItemEntity itemEntity = new ItemEntity(
+                level, dropPos.getX() + 0.5, dropPos.getY() + 1.0, dropPos.getZ() + 0.5, displayedItem.copy());
+        itemEntity.setDefaultPickUpDelay();
+        level.addFreshEntity(itemEntity);
+        level.playSound(null, dropPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1.0f, 1.0f);
+        return InteractionResult.SUCCESS;
     }
 
     private InteractionResult handleItemInteraction(

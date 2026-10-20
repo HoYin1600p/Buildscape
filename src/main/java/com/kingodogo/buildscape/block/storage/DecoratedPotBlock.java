@@ -166,187 +166,158 @@ public class DecoratedPotBlock
             ItemStack heldItem = player.getItemInHand(hand);
 
             if (!heldItem.isEmpty() && player.isShiftKeyDown()) {
-                ItemStack stored = be.getStoredItem();
-
-                if (heldItem.getItem() instanceof BlockItem) {
-                    Block heldBlock = ((BlockItem) heldItem.getItem()).getBlock();
-                    if (heldBlock instanceof DecoratedPotBlock) {
-                        return InteractionResult.PASS;
-                    }
-                }
-
-                if (stored.isEmpty()) {
-                    if (!level.isClientSide) {
-                        ItemStack toStore = heldItem.copy();
-                        int maxStack = toStore.getMaxStackSize();
-                        int toTake = Math.min(heldItem.getCount(), maxStack);
-                        toStore.setCount(toTake);
-                        be.setStoredItem(toStore, false);
-                        heldItem.shrink(toTake);
-                        if (heldItem.isEmpty()) {
-                            player.setItemInHand(hand, ItemStack.EMPTY);
-                        }
-                        level.playSound(
-                                null,
-                                pos,
-                                ModSounds.DECORATED_POT_INSERT_ITEM.get(),
-                                SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f);
-                        spawnInsertParticles(level, pos);
-                        be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
-                        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                } else if (ItemStack.isSameItemSameTags(stored, heldItem) &&
-                        stored.getCount() < stored.getMaxStackSize()) {
-                    if (!level.isClientSide) {
-                        int maxStack = stored.getMaxStackSize();
-                        int spaceAvailable = maxStack - stored.getCount();
-                        int toAdd = Math.min(heldItem.getCount(), spaceAvailable);
-                        int canAdd = Math.min(toAdd, spaceAvailable);
-                        stored.grow(canAdd);
-                        be.setStoredItem(stored, true);
-                        heldItem.shrink(canAdd);
-                        if (heldItem.isEmpty()) {
-                            player.setItemInHand(hand, ItemStack.EMPTY);
-                        }
-                        level.playSound(
-                                null,
-                                pos,
-                                ModSounds.DECORATED_POT_INSERT_ITEM.get(),
-                                SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f);
-                        spawnInsertParticles(level, pos);
-                        be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
-                        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                }
-                if (!level.isClientSide) {
-                    level.playSound(
-                            null,
-                            pos,
-                            ModSounds.DECORATED_POT_INSERT_FAIL.get(),
-                            SoundSource.BLOCKS,
-                            0.5f,
-                            1.0f);
-                    be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.NEGATIVE);
-                    level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                }
-                return InteractionResult.PASS;
+                return insertStackWhileSneaking(level, pos, player, hand, heldItem, be);
             }
 
             if (heldItem.isEmpty() && !player.isShiftKeyDown()) {
-                if (!level.isClientSide) {
-                    level.playSound(
-                            null,
-                            pos,
-                            ModSounds.DECORATED_POT_HIT.get(),
-                            SoundSource.BLOCKS,
-                            0.5f,
-                            1.0f);
-                    be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
-                    level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return knockPot(level, pos, player, be);
             }
 
-            if (!heldItem.isEmpty() &&
-                    heldItem.getItem() instanceof BlockItem) {
-                Block heldBlock = ((BlockItem) heldItem.getItem()).getBlock();
-                if (heldBlock instanceof DecoratedPotBlock) {
-                    return InteractionResult.PASS;
-                }
+            if (!heldItem.isEmpty() && isDecoratedPotItem(heldItem)) {
+                return InteractionResult.PASS;
             }
 
             if (!heldItem.isEmpty() && !player.isShiftKeyDown()) {
-                ItemStack stored = be.getStoredItem();
-
-                if (stored.isEmpty()) {
-                    if (!level.isClientSide) {
-                        ItemStack toStore = heldItem.copy();
-                        toStore.setCount(1);
-                        be.setStoredItem(toStore, true);
-                        heldItem.shrink(1);
-                        if (heldItem.isEmpty()) {
-                            player.setItemInHand(hand, ItemStack.EMPTY);
-                        }
-                        level.playSound(
-                                null,
-                                pos,
-                                ModSounds.DECORATED_POT_INSERT_ITEM.get(),
-                                SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f);
-                        spawnInsertParticles(level, pos);
-                        be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
-                        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                } else if (ItemStack.isSameItemSameTags(stored, heldItem) &&
-                        stored.getCount() < stored.getMaxStackSize()) {
-                    if (!level.isClientSide) {
-                        int maxStack = stored.getMaxStackSize();
-                        int spaceAvailable = maxStack - stored.getCount();
-                        int toAdd = 1;
-                        int canAdd = Math.min(toAdd, spaceAvailable);
-                        stored.grow(canAdd);
-                        be.setStoredItem(stored, true);
-                        heldItem.shrink(canAdd);
-                        if (heldItem.isEmpty()) {
-                            player.setItemInHand(hand, ItemStack.EMPTY);
-                        }
-                        level.playSound(
-                                null,
-                                pos,
-                                ModSounds.DECORATED_POT_INSERT_ITEM.get(),
-                                SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f);
-                        spawnInsertParticles(level, pos);
-                        be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
-                        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                } else {
-                    if (!level.isClientSide) {
-                        level.playSound(
-                                null,
-                                pos,
-                                ModSounds.DECORATED_POT_INSERT_FAIL.get(),
-                                SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f);
-                        be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.NEGATIVE);
-                        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                    }
+                InteractionResult inserted = insertSingleItem(level, pos, player, hand, heldItem, be);
+                if (inserted != null) {
+                    return inserted;
                 }
             }
 
             if (heldItem.isEmpty() && player.isShiftKeyDown() && !be.isEmpty()) {
-                if (!level.isClientSide) {
-                    ItemStack stored = be.getStoredItem().copy();
-                    be.setStoredItem(ItemStack.EMPTY, true);
-
-                    if (!player.getInventory().add(stored)) {
-                        ItemEntity itemEntity = new ItemEntity(
-                                level,
-                                pos.getX() + 0.5,
-                                pos.getY() + 0.5,
-                                pos.getZ() + 0.5,
-                                stored);
-                        itemEntity.setDefaultPickUpDelay();
-                        level.addFreshEntity(itemEntity);
-                    }
-                    level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return takeStoredItem(level, pos, player, be);
             }
         }
 
         return InteractionResult.PASS;
+    }
+
+    private static boolean isDecoratedPotItem(ItemStack stack) {
+        return stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof DecoratedPotBlock;
+    }
+
+    /** Sneaking with an item: stores up to a stack of it, or fails with a wobble. Never null. */
+    private InteractionResult insertStackWhileSneaking(
+            Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack heldItem,
+            DecoratedPotBlockEntity be) {
+        ItemStack stored = be.getStoredItem();
+
+        if (isDecoratedPotItem(heldItem)) {
+            return InteractionResult.PASS;
+        }
+
+        if (stored.isEmpty()) {
+            if (!level.isClientSide) {
+                ItemStack toStore = heldItem.copy();
+                int maxStack = toStore.getMaxStackSize();
+                int toTake = Math.min(heldItem.getCount(), maxStack);
+                toStore.setCount(toTake);
+                be.setStoredItem(toStore, false);
+                heldItem.shrink(toTake);
+                finishInsert(level, pos, player, hand, heldItem, be);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < stored.getMaxStackSize()) {
+            if (!level.isClientSide) {
+                int maxStack = stored.getMaxStackSize();
+                int spaceAvailable = maxStack - stored.getCount();
+                int toAdd = Math.min(heldItem.getCount(), spaceAvailable);
+                int canAdd = Math.min(toAdd, spaceAvailable);
+                stored.grow(canAdd);
+                be.setStoredItem(stored, true);
+                heldItem.shrink(canAdd);
+                finishInsert(level, pos, player, hand, heldItem, be);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+        playInsertFail(level, pos, player, be);
+        return InteractionResult.PASS;
+    }
+
+    /** Empty hand, not sneaking: the pot only wobbles. */
+    private static InteractionResult knockPot(
+            Level level, BlockPos pos, Player player, DecoratedPotBlockEntity be) {
+        if (!level.isClientSide) {
+            level.playSound(null, pos, ModSounds.DECORATED_POT_HIT.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
+            be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
+            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /**
+     * Not sneaking with an item: stores one item. Null when the item does not fit (the failure wobble has played),
+     * so that the remaining checks of {@link #use} still run.
+     */
+    private InteractionResult insertSingleItem(
+            Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack heldItem,
+            DecoratedPotBlockEntity be) {
+        ItemStack stored = be.getStoredItem();
+
+        if (stored.isEmpty()) {
+            if (!level.isClientSide) {
+                ItemStack toStore = heldItem.copy();
+                toStore.setCount(1);
+                be.setStoredItem(toStore, true);
+                heldItem.shrink(1);
+                finishInsert(level, pos, player, hand, heldItem, be);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < stored.getMaxStackSize()) {
+            if (!level.isClientSide) {
+                int maxStack = stored.getMaxStackSize();
+                int spaceAvailable = maxStack - stored.getCount();
+                int toAdd = 1;
+                int canAdd = Math.min(toAdd, spaceAvailable);
+                stored.grow(canAdd);
+                be.setStoredItem(stored, true);
+                heldItem.shrink(canAdd);
+                finishInsert(level, pos, player, hand, heldItem, be);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        } else {
+            playInsertFail(level, pos, player, be);
+            return null;
+        }
+    }
+
+    /** Clears an emptied hand and plays the insert sound, particles, wobble and game event. */
+    private void finishInsert(
+            Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack heldItem,
+            DecoratedPotBlockEntity be) {
+        if (heldItem.isEmpty()) {
+            player.setItemInHand(hand, ItemStack.EMPTY);
+        }
+        level.playSound(null, pos, ModSounds.DECORATED_POT_INSERT_ITEM.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
+        spawnInsertParticles(level, pos);
+        be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
+        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+    }
+
+    private static void playInsertFail(Level level, BlockPos pos, Player player, DecoratedPotBlockEntity be) {
+        if (!level.isClientSide) {
+            level.playSound(null, pos, ModSounds.DECORATED_POT_INSERT_FAIL.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
+            be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.NEGATIVE);
+            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+        }
+    }
+
+    /** Sneaking with an empty hand: gives the stored item to the player, or drops it. */
+    private static InteractionResult takeStoredItem(
+            Level level, BlockPos pos, Player player, DecoratedPotBlockEntity be) {
+        if (!level.isClientSide) {
+            ItemStack stored = be.getStoredItem().copy();
+            be.setStoredItem(ItemStack.EMPTY, true);
+
+            if (!player.getInventory().add(stored)) {
+                ItemEntity itemEntity = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                        stored);
+                itemEntity.setDefaultPickUpDelay();
+                level.addFreshEntity(itemEntity);
+            }
+            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override

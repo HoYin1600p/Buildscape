@@ -264,30 +264,11 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         boolean hasFluid = HollowPipeBlock.getContainedFluid(state, hollowBe) != Fluids.EMPTY;
         boolean hasDecoration = state.getValue(HAS_DECORATION);
 
+        // Each step returns null when it does not apply, so the next step runs; the order is the priority order.
         if (hasFluid && isFullGlassBlock(held)) {
-            BooleanProperty glassProp = targetPos ? HAS_GLASS_POS : HAS_GLASS_NEG;
-            if (!state.getValue(glassProp)) {
-                if (!level.isClientSide) {
-                    state = state.setValue(glassProp, true);
-                    level.setBlock(pos, state, 3);
-                    if (hollowBe != null && held.getItem() instanceof BlockItem blockItem) {
-                        BlockState glassState = blockItem.getBlock().defaultBlockState();
-                        if (targetPos) {
-                            hollowBe.setGlassCoverPos(glassState);
-                        } else {
-                            hollowBe.setGlassCoverNeg(glassState);
-                        }
-                        hollowBe.setGlassPlacedByPlayer(player.getUUID());
-                        hollowBe.setChanged();
-                    }
-                    if (!player.getAbilities().instabuild) {
-                        held.shrink(1);
-                    }
-                    level.playSound(null, pos, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    level.updateNeighborsAt(pos, state.getBlock());
-                    HollowPipeTransportManager.markDirty(level, pos);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+            InteractionResult result = tryPlaceGlassCover(state, level, pos, player, held, hollowBe, targetPos);
+            if (result != null) {
+                return result;
             }
         }
 
@@ -299,112 +280,231 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY);
 
             if (isEmptyBucket && sourceFluid != Fluids.EMPTY) {
-                if (!level.isClientSide) {
-                    if (hollowBe != null) {
-                        hollowBe.setFluidType("none");
-                        hollowBe.setLavaTicks(0);
-                        hollowBe.setChanged();
-                    }
-                    state = state.setValue(WATERLOGGED, false).setValue(LAVA_LOGGED, false);
-                    level.setBlock(pos, state, 3);
-                    level.updateNeighborsAt(pos, state.getBlock());
-
-                    ItemStack filledBucket = HollowPipeBlock.getFilledBucketForFluid(sourceFluid);
-                    if (!player.getAbilities().instabuild) {
-                        held.shrink(1);
-                        if (held.isEmpty()) {
-                            player.setItemInHand(hand, filledBucket);
-                        } else if (!player.getInventory().add(filledBucket)) {
-                            player.drop(filledBucket, false);
-                        }
-                    }
-                    SoundEvent sound = sourceFluid.getAttributes().getFillSound();
-                    if (sound == null) {
-                        sound = (sourceFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
-                    }
-                    level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    HollowPipeTransportManager.onBucketUsed(level, pos, state);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return drainIntoBucket(state, level, pos, player, hand, held, hollowBe, sourceFluid);
             }
 
             Fluid fluidInBucket = HollowPipeBlock.getFluidFromItem(held);
             if (fluidInBucket != Fluids.EMPTY) {
-                if (containedFluid != Fluids.EMPTY) {
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                }
-                if (!level.isClientSide) {
-                    boolean isWater = (fluidInBucket == Fluids.WATER);
-                    boolean isLava = (fluidInBucket == Fluids.LAVA);
-                    if (hollowBe != null) {
-                        String fKey = isWater
-                                ? "water"
-                                : (isLava ? "lava" : ForgeRegistries.FLUIDS.getKey(fluidInBucket).toString());
-                        hollowBe.setFluidType(fKey);
-                        if (isLava) {
-                            hollowBe.setLavaTicks(100 + level.random.nextInt(71901));
-                            hollowBe.setLavaPlacedByPlayer(player.getUUID());
-                        } else {
-                            hollowBe.setLavaTicks(0);
-                        }
-                        hollowBe.setChanged();
-                    }
-                    state = state.setValue(WATERLOGGED, isWater).setValue(LAVA_LOGGED, isLava);
-                    level.setBlock(pos, state, 3);
-                    level.updateNeighborsAt(pos, state.getBlock());
-                    HollowPipeTransportManager.onBucketUsed(level, pos, state);
-
-                    if (!player.getAbilities().instabuild) {
-                        ItemStack emptyContainer = held.hasContainerItem()
-                                ? held.getContainerItem()
-                                : new ItemStack(Items.BUCKET);
-                        held.shrink(1);
-                        if (held.isEmpty()) {
-                            player.setItemInHand(hand, emptyContainer);
-                        } else if (!player.getInventory().add(emptyContainer)) {
-                            player.drop(emptyContainer, false);
-                        }
-                    }
-                    SoundEvent sound = fluidInBucket.getAttributes().getEmptySound();
-                    if (sound == null) {
-                        sound = (fluidInBucket == Fluids.LAVA)
-                                ? SoundEvents.BUCKET_EMPTY_LAVA
-                                : SoundEvents.BUCKET_EMPTY;
-                    }
-                    level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                return pourFromBucket(state, level, pos, player, hand, held, hollowBe, containedFluid, fluidInBucket);
             }
         }
 
         if (hasDecoration && hollowBe != null && hollowBe.getDecorationState().is(Blocks.FLOWER_POT)) {
-            BlockState pottedState = getPottedBlockState(held.getItem());
-            if (pottedState != null) {
-                if (pottedState.hasProperty(PottedHazeBushBlock.HAS_HAZE)) {
-                    boolean hasHaze = !HazeBushItem.isDrained(held);
-                    pottedState = pottedState.setValue(PottedHazeBushBlock.HAS_HAZE, hasHaze);
-                }
-                if (!level.isClientSide) {
-                    hollowBe.setDecorationState(pottedState);
-                    hollowBe.setChanged();
-                    if (!player.getAbilities().instabuild) {
-                        held.shrink(1);
-                    }
-                    level.playSound(null, pos, SoundEvents.GRASS_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+            InteractionResult result = tryPlacePottedPlant(level, pos, player, held, hollowBe);
+            if (result != null) {
+                return result;
             }
         }
 
         if (!hasFluid && !hasDecoration) {
-            boolean isPotAllowed = (axis != Direction.Axis.Y) || state.getValue(HAS_GLASS_NEG);
+            InteractionResult result = tryInstallDecoration(state, level, pos, player, held, hollowBe, axis);
+            if (result != null) {
+                return result;
+            }
+        }
 
-            if (held.is(Items.FLOWER_POT) && isPotAllowed) {
+        if (held.isEmpty() || player.isShiftKeyDown()) {
+            InteractionResult result = tryRemoveCoverOrDecoration(state, level, pos, hollowBe, targetPos);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        return InteractionResult.PASS;
+    }
+
+    /** Puts a held glass block over the targeted end of a fluid-filled log; null when that end is already covered. */
+    private static InteractionResult tryPlaceGlassCover(
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            ItemStack held,
+            HollowLogBlockEntity hollowBe,
+            boolean targetPos) {
+        BooleanProperty glassProp = targetPos ? HAS_GLASS_POS : HAS_GLASS_NEG;
+        if (state.getValue(glassProp)) {
+            return null;
+        }
+        if (!level.isClientSide) {
+            state = state.setValue(glassProp, true);
+            level.setBlock(pos, state, 3);
+            if (hollowBe != null && held.getItem() instanceof BlockItem blockItem) {
+                BlockState glassState = blockItem.getBlock().defaultBlockState();
+                if (targetPos) {
+                    hollowBe.setGlassCoverPos(glassState);
+                } else {
+                    hollowBe.setGlassCoverNeg(glassState);
+                }
+                hollowBe.setGlassPlacedByPlayer(player.getUUID());
+                hollowBe.setChanged();
+            }
+            if (!player.getAbilities().instabuild) {
+                held.shrink(1);
+            }
+            level.playSound(null, pos, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.updateNeighborsAt(pos, state.getBlock());
+            HollowPipeTransportManager.markDirty(level, pos);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** An empty bucket takes the log's source fluid. */
+    private static InteractionResult drainIntoBucket(
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            ItemStack held,
+            HollowLogBlockEntity hollowBe,
+            Fluid sourceFluid) {
+        if (!level.isClientSide) {
+            if (hollowBe != null) {
+                hollowBe.setFluidType("none");
+                hollowBe.setLavaTicks(0);
+                hollowBe.setChanged();
+            }
+            state = state.setValue(WATERLOGGED, false).setValue(LAVA_LOGGED, false);
+            level.setBlock(pos, state, 3);
+            level.updateNeighborsAt(pos, state.getBlock());
+
+            ItemStack filledBucket = HollowPipeBlock.getFilledBucketForFluid(sourceFluid);
+            if (!player.getAbilities().instabuild) {
+                held.shrink(1);
+                if (held.isEmpty()) {
+                    player.setItemInHand(hand, filledBucket);
+                } else if (!player.getInventory().add(filledBucket)) {
+                    player.drop(filledBucket, false);
+                }
+            }
+            SoundEvent sound = sourceFluid.getAttributes().getFillSound();
+            if (sound == null) {
+                sound = (sourceFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
+            }
+            level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+            HollowPipeTransportManager.onBucketUsed(level, pos, state);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** A filled bucket empties into the log, unless the log already holds a fluid. */
+    private static InteractionResult pourFromBucket(
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            ItemStack held,
+            HollowLogBlockEntity hollowBe,
+            Fluid containedFluid,
+            Fluid fluidInBucket) {
+        if (containedFluid != Fluids.EMPTY) {
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+        if (!level.isClientSide) {
+            boolean isWater = (fluidInBucket == Fluids.WATER);
+            boolean isLava = (fluidInBucket == Fluids.LAVA);
+            if (hollowBe != null) {
+                String fKey = isWater
+                        ? "water"
+                        : (isLava ? "lava" : ForgeRegistries.FLUIDS.getKey(fluidInBucket).toString());
+                hollowBe.setFluidType(fKey);
+                if (isLava) {
+                    hollowBe.setLavaTicks(100 + level.random.nextInt(71901));
+                    hollowBe.setLavaPlacedByPlayer(player.getUUID());
+                } else {
+                    hollowBe.setLavaTicks(0);
+                }
+                hollowBe.setChanged();
+            }
+            state = state.setValue(WATERLOGGED, isWater).setValue(LAVA_LOGGED, isLava);
+            level.setBlock(pos, state, 3);
+            level.updateNeighborsAt(pos, state.getBlock());
+            HollowPipeTransportManager.onBucketUsed(level, pos, state);
+
+            if (!player.getAbilities().instabuild) {
+                ItemStack emptyContainer = held.hasContainerItem()
+                        ? held.getContainerItem()
+                        : new ItemStack(Items.BUCKET);
+                held.shrink(1);
+                if (held.isEmpty()) {
+                    player.setItemInHand(hand, emptyContainer);
+                } else if (!player.getInventory().add(emptyContainer)) {
+                    player.drop(emptyContainer, false);
+                }
+            }
+            SoundEvent sound = fluidInBucket.getAttributes().getEmptySound();
+            if (sound == null) {
+                sound = (fluidInBucket == Fluids.LAVA)
+                        ? SoundEvents.BUCKET_EMPTY_LAVA
+                        : SoundEvents.BUCKET_EMPTY;
+            }
+            level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** Plants the held item in the log's flower pot; null when the item cannot be potted. */
+    private static InteractionResult tryPlacePottedPlant(
+            Level level, BlockPos pos, Player player, ItemStack held, HollowLogBlockEntity hollowBe) {
+        BlockState pottedState = getPottedBlockState(held.getItem());
+        if (pottedState == null) {
+            return null;
+        }
+        if (pottedState.hasProperty(PottedHazeBushBlock.HAS_HAZE)) {
+            boolean hasHaze = !HazeBushItem.isDrained(held);
+            pottedState = pottedState.setValue(PottedHazeBushBlock.HAS_HAZE, hasHaze);
+        }
+        if (!level.isClientSide) {
+            hollowBe.setDecorationState(pottedState);
+            hollowBe.setChanged();
+            if (!player.getAbilities().instabuild) {
+                held.shrink(1);
+            }
+            level.playSound(null, pos, SoundEvents.GRASS_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** Puts a held flower pot or full block into an empty, fluid-free log; null when the item does not fit. */
+    private static InteractionResult tryInstallDecoration(
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            ItemStack held,
+            HollowLogBlockEntity hollowBe,
+            Direction.Axis axis) {
+        boolean isPotAllowed = (axis != Direction.Axis.Y) || state.getValue(HAS_GLASS_NEG);
+
+        if (held.is(Items.FLOWER_POT) && isPotAllowed) {
+            if (!level.isClientSide) {
+                state = state.setValue(HAS_DECORATION, true);
+                level.setBlock(pos, state, 3);
+                if (hollowBe != null) {
+                    hollowBe.setDecorationState(Blocks.FLOWER_POT.defaultBlockState());
+                    hollowBe.setChanged();
+                }
+                if (!player.getAbilities().instabuild) {
+                    held.shrink(1);
+                }
+                level.playSound(null, pos, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+
+        if (held.getItem() instanceof BlockItem blockItem) {
+            Block block = blockItem.getBlock();
+            boolean isFullBlock = isValidFullBlockDecoration(block);
+
+            if (isFullBlock) {
                 if (!level.isClientSide) {
+                    BlockState stateToStore = block.defaultBlockState();
                     state = state.setValue(HAS_DECORATION, true);
                     level.setBlock(pos, state, 3);
                     if (hollowBe != null) {
-                        hollowBe.setDecorationState(Blocks.FLOWER_POT.defaultBlockState());
+                        hollowBe.setDecorationState(stateToStore);
                         hollowBe.setChanged();
                     }
                     if (!player.getAbilities().instabuild) {
@@ -414,81 +514,61 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
-
-            if (held.getItem() instanceof BlockItem blockItem) {
-                Block block = blockItem.getBlock();
-                boolean isFullBlock = isValidFullBlockDecoration(block);
-
-                if (isFullBlock) {
-                    if (!level.isClientSide) {
-                        BlockState stateToStore = block.defaultBlockState();
-                        state = state.setValue(HAS_DECORATION, true);
-                        level.setBlock(pos, state, 3);
-                        if (hollowBe != null) {
-                            hollowBe.setDecorationState(stateToStore);
-                            hollowBe.setChanged();
-                        }
-                        if (!player.getAbilities().instabuild) {
-                            held.shrink(1);
-                        }
-                        level.playSound(null, pos, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                }
-            }
         }
+        return null;
+    }
 
-        if (held.isEmpty() || player.isShiftKeyDown()) {
-            BooleanProperty glassProp = targetPos ? HAS_GLASS_POS : HAS_GLASS_NEG;
-            boolean hasTargetGlass = state.getValue(glassProp) || (hollowBe != null
-                    && (targetPos ? !hollowBe.getGlassCoverPos().isAir() : !hollowBe.getGlassCoverNeg().isAir()));
-            boolean hasAnyDecoration = state.getValue(HAS_DECORATION)
-                    || (hollowBe != null && !hollowBe.getDecorationState().isAir());
+    /** Empty hand or sneaking: takes out the glass cover at the targeted end, else the decoration; null if neither. */
+    private static InteractionResult tryRemoveCoverOrDecoration(
+            BlockState state, Level level, BlockPos pos, HollowLogBlockEntity hollowBe, boolean targetPos) {
+        BooleanProperty glassProp = targetPos ? HAS_GLASS_POS : HAS_GLASS_NEG;
+        boolean hasTargetGlass = state.getValue(glassProp) || (hollowBe != null
+                && (targetPos ? !hollowBe.getGlassCoverPos().isAir() : !hollowBe.getGlassCoverNeg().isAir()));
+        boolean hasAnyDecoration = state.getValue(HAS_DECORATION)
+                || (hollowBe != null && !hollowBe.getDecorationState().isAir());
 
-            if (hasTargetGlass) {
-                if (!level.isClientSide) {
-                    state = state.setValue(glassProp, false);
-                    level.setBlock(pos, state, 3);
-                    if (hollowBe != null) {
-                        BlockState glassState = targetPos ? hollowBe.getGlassCoverPos() : hollowBe.getGlassCoverNeg();
-                        if (!glassState.isAir()) {
-                            popResource(level, pos, new ItemStack(glassState.getBlock()));
-                        } else {
-                            popResource(level, pos, new ItemStack(Items.GLASS));
-                        }
-                        if (targetPos) {
-                            hollowBe.setGlassCoverPos(Blocks.AIR.defaultBlockState());
-                        } else {
-                            hollowBe.setGlassCoverNeg(Blocks.AIR.defaultBlockState());
-                        }
-                        hollowBe.setChanged();
+        if (hasTargetGlass) {
+            if (!level.isClientSide) {
+                state = state.setValue(glassProp, false);
+                level.setBlock(pos, state, 3);
+                if (hollowBe != null) {
+                    BlockState glassState = targetPos ? hollowBe.getGlassCoverPos() : hollowBe.getGlassCoverNeg();
+                    if (!glassState.isAir()) {
+                        popResource(level, pos, new ItemStack(glassState.getBlock()));
+                    } else {
+                        popResource(level, pos, new ItemStack(Items.GLASS));
                     }
-                    level.playSound(null, pos, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
-
-                    level.updateNeighborsAt(pos, state.getBlock());
-                    HollowPipeTransportManager.markDirty(level, pos);
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
-            } else if (hasAnyDecoration) {
-                if (!level.isClientSide) {
-                    state = state.setValue(HAS_DECORATION, false);
-                    level.setBlock(pos, state, 3);
-                    if (hollowBe != null) {
-                        BlockState decState = hollowBe.getDecorationState();
-                        for (ItemStack drop : getDecorationDrops(decState)) {
-                            popResource(level, pos, drop);
-                        }
-                        hollowBe.setDecorationState(Blocks.AIR.defaultBlockState());
-                        hollowBe.setChanged();
+                    if (targetPos) {
+                        hollowBe.setGlassCoverPos(Blocks.AIR.defaultBlockState());
+                    } else {
+                        hollowBe.setGlassCoverNeg(Blocks.AIR.defaultBlockState());
                     }
-                    level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    level.updateNeighborsAt(pos, state.getBlock());
+                    hollowBe.setChanged();
                 }
-                return InteractionResult.sidedSuccess(level.isClientSide);
+                level.playSound(null, pos, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+
+                level.updateNeighborsAt(pos, state.getBlock());
+                HollowPipeTransportManager.markDirty(level, pos);
             }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        } else if (hasAnyDecoration) {
+            if (!level.isClientSide) {
+                state = state.setValue(HAS_DECORATION, false);
+                level.setBlock(pos, state, 3);
+                if (hollowBe != null) {
+                    BlockState decState = hollowBe.getDecorationState();
+                    for (ItemStack drop : getDecorationDrops(decState)) {
+                        popResource(level, pos, drop);
+                    }
+                    hollowBe.setDecorationState(Blocks.AIR.defaultBlockState());
+                    hollowBe.setChanged();
+                }
+                level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+                level.updateNeighborsAt(pos, state.getBlock());
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
-
-        return InteractionResult.PASS;
+        return null;
     }
 
     private static List<ItemStack> getDecorationDrops(BlockState decState) {

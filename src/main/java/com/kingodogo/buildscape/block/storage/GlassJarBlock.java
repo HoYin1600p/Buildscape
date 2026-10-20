@@ -183,201 +183,281 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
         ItemStack handStack = player.getItemInHand(hand);
         boolean isSneaking = player.isShiftKeyDown();
 
+        // Each step returns null when it does not apply, so the next step runs; the order is the priority order.
+        InteractionResult result;
         if (!isSneaking) {
-            if (GlassJarBlockEntity.isLiquidItem(handStack) && jarBE.canAcceptLiquid(handStack)) {
-                if (level.isClientSide) {
-                    return InteractionResult.SUCCESS;
-                }
-                boolean isBucket = handStack.getItem() instanceof BucketItem
-                        || handStack.getItem() instanceof MilkBucketItem;
-                ItemStack copy = handStack.copy();
-
-                if (jarBE.addLiquid(copy)) {
-                    if (!player.getAbilities().instabuild) {
-                        handStack.shrink(1);
-                        ItemStack returnItem = isBucket
-                                ? new ItemStack(Items.BUCKET)
-                                : new ItemStack(Items.GLASS_BOTTLE);
-                        if (!player.getInventory().add(returnItem)) {
-                            player.drop(returnItem, false);
-                        }
-                    }
-                    SoundEvent sound = isBucket ? SoundEvents.BUCKET_EMPTY : SoundEvents.BOTTLE_EMPTY;
-                    level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    return InteractionResult.SUCCESS;
-                }
+            result = tryInsertLiquid(level, pos, player, handStack, jarBE);
+            if (result != null) {
+                return result;
             }
 
-            if (GlassJarBlockEntity.isFoodItem(handStack) && jarBE.canAcceptFood(handStack)) {
-                if (level.isClientSide) {
-                    return InteractionResult.SUCCESS;
-                }
-                ItemStack singleInsert = handStack.copy();
-                singleInsert.setCount(1);
-
-                int added = jarBE.addFood(singleInsert);
-                if (added > 0) {
-                    if (!player.getAbilities().instabuild) {
-                        handStack.shrink(added);
-                    }
-                    level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.8F, 1.2F);
-                    return InteractionResult.SUCCESS;
-                }
+            result = tryInsertFood(level, pos, player, handStack, jarBE);
+            if (result != null) {
+                return result;
             }
         }
 
         if (isSneaking) {
-            if (!jarBE.isEmpty() && !jarBE.hasLiquid()) {
-                ItemStack stored = jarBE.getStoredItem();
-                if (handStack.isEmpty()) {
-                    if (level.isClientSide) {
-                        return InteractionResult.SUCCESS;
-                    }
-                    ItemStack item = jarBE.extractFood(1);
-                    if (!item.isEmpty()) {
-                        player.setItemInHand(hand, item);
-                        level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.8F, 0.9F);
-                        return InteractionResult.SUCCESS;
-                    }
-                } else if (ItemStack.isSameItemSameTags(handStack, stored)) {
-                    if (level.isClientSide) {
-                        return InteractionResult.SUCCESS;
-                    }
-                    ItemStack item = jarBE.extractFood(1);
-                    if (!item.isEmpty()) {
-                        if (handStack.getCount() < handStack.getMaxStackSize()) {
-                            handStack.grow(1);
-                        } else {
-                            if (!player.getInventory().add(item)) {
-                                player.drop(item, false);
-                            }
-                        }
-                        level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.8F, 0.9F);
-                        return InteractionResult.SUCCESS;
-                    }
-                }
-            }
-
-        }
-
-        if (handStack.is(Items.BUCKET) && jarBE.hasLiquid()) {
-            int required = GlassJarBlockEntity.isXpLiquid(jarBE.getStoredLiquidItem())
-                    ? GlassJarBlockEntity.XP_BOTTLE_MAX
-                    : GlassJarBlockEntity.MAX_LIQUID_LEVEL;
-            if (jarBE.getLiquidLevel() >= required) {
-                ItemStack bucketRepresentation = jarBE.getBucketRepresentation();
-                if (!bucketRepresentation.isEmpty()) {
-                    if (level.isClientSide) {
-                        return InteractionResult.SUCCESS;
-                    }
-                    ItemStack filledBucket = jarBE.extractBucket();
-                    if (!filledBucket.isEmpty()) {
-                        if (!player.getAbilities().instabuild) {
-                            handStack.shrink(1);
-                            if (!player.getInventory().add(filledBucket)) {
-                                player.drop(filledBucket, false);
-                            }
-                        }
-                        level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-                        return InteractionResult.SUCCESS;
-                    }
-                }
+            result = tryExtractStoredFood(level, pos, player, hand, handStack, jarBE);
+            if (result != null) {
+                return result;
             }
         }
 
-        if (handStack.is(Items.GLASS_BOTTLE) && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0) {
-            ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
-            if (!bottleRepresentation.isEmpty()) {
-                if (level.isClientSide) {
-                    return InteractionResult.SUCCESS;
-                }
-                ItemStack filledBottle = jarBE.extractBottle();
-                if (!filledBottle.isEmpty()) {
-                    if (!player.getAbilities().instabuild) {
-                        handStack.shrink(1);
-                        if (!player.getInventory().add(filledBottle)) {
-                            player.drop(filledBottle, false);
-                        }
-                    }
-                    level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    return InteractionResult.SUCCESS;
-                }
-            }
+        result = tryFillBucket(level, pos, player, handStack, jarBE);
+        if (result != null) {
+            return result;
+        }
+
+        result = tryFillBottle(level, pos, player, handStack, jarBE);
+        if (result != null) {
+            return result;
         }
 
         if (!isSneaking && handStack.isEmpty()) {
-            if (!jarBE.isEmpty() && !jarBE.hasLiquid()) {
-                if (player.canEat(false) || player.getAbilities().instabuild) {
-                    if (level.isClientSide) {
-                        return InteractionResult.SUCCESS;
-                    }
-
-                    ItemStack stored = jarBE.getStoredItem();
-                    if (!stored.isEmpty()) {
-                        ItemStack singleFood = stored.copy();
-                        singleFood.setCount(1);
-
-                        ItemStack remainder = singleFood.finishUsingItem(level, player);
-                        if (!remainder.isEmpty() && !player.getInventory().add(remainder)) {
-                            player.drop(remainder, false);
-                        }
-                        jarBE.extractFood(1);
-
-                        level.playSound(null, pos, SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, 0.8F, 1.0F);
-                        return InteractionResult.SUCCESS;
-                    }
-                }
+            result = tryEatStoredFood(level, pos, player, jarBE);
+            if (result != null) {
+                return result;
             }
 
-            if (jarBE.hasLiquid()) {
-                ItemStack liquidItem = jarBE.getStoredLiquidItem();
-                if (!liquidItem.isEmpty()) {
-                    if (liquidItem.is(Items.LAVA_BUCKET)
-                            || (liquidItem.getItem() instanceof BucketItem bucket && bucket.getFluid() == Fluids.LAVA)
-                            || GlassJarBlockEntity.isXpLiquid(liquidItem)) {
-                        return InteractionResult.PASS;
-                    }
-
-                    if (level.isClientSide) {
-                        return InteractionResult.SUCCESS;
-                    }
-
-                    if (liquidItem.getItem() instanceof PotionItem) {
-                        for (MobEffectInstance effect : PotionUtils.getMobEffects(liquidItem)) {
-                            if (effect.getEffect().isInstantenous()) {
-                                effect.getEffect().applyInstantenousEffect(player, player, player,
-                                        effect.getAmplifier(), 1.0);
-                            } else {
-                                player.addEffect(new MobEffectInstance(effect));
-                            }
-                        }
-                        jarBE.consumeLevel();
-                        level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
-                        return InteractionResult.SUCCESS;
-                    } else if (liquidItem.getItem() instanceof HoneyBottleItem) {
-                        player.getFoodData().eat(6, 0.6F);
-                        player.removeEffect(MobEffects.POISON);
-                        jarBE.consumeLevel();
-                        level.playSound(null, pos, SoundEvents.HONEY_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
-                        return InteractionResult.SUCCESS;
-                    } else if (liquidItem.is(Items.MILK_BUCKET)) {
-                        player.removeAllEffects();
-                        jarBE.consumeLevel();
-                        level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
-                        return InteractionResult.SUCCESS;
-                    } else {
-                        if (player.isOnFire()) {
-                            player.clearFire();
-                        }
-                        jarBE.consumeLevel();
-                        level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
-                        return InteractionResult.SUCCESS;
-                    }
-                }
+            result = tryDrinkLiquid(level, pos, player, jarBE);
+            if (result != null) {
+                return result;
             }
         }
 
         return InteractionResult.PASS;
+    }
+
+    /** Pours a held bottle or bucket into the jar; null when nothing was inserted. */
+    private static InteractionResult tryInsertLiquid(
+            Level level, BlockPos pos, Player player, ItemStack handStack, GlassJarBlockEntity jarBE) {
+        if (!(GlassJarBlockEntity.isLiquidItem(handStack) && jarBE.canAcceptLiquid(handStack))) {
+            return null;
+        }
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+        boolean isBucket = handStack.getItem() instanceof BucketItem || handStack.getItem() instanceof MilkBucketItem;
+        ItemStack copy = handStack.copy();
+
+        if (!jarBE.addLiquid(copy)) {
+            return null;
+        }
+        if (!player.getAbilities().instabuild) {
+            handStack.shrink(1);
+            ItemStack returnItem = isBucket ? new ItemStack(Items.BUCKET) : new ItemStack(Items.GLASS_BOTTLE);
+            if (!player.getInventory().add(returnItem)) {
+                player.drop(returnItem, false);
+            }
+        }
+        SoundEvent sound = isBucket ? SoundEvents.BUCKET_EMPTY : SoundEvents.BOTTLE_EMPTY;
+        level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+        return InteractionResult.SUCCESS;
+    }
+
+    /** Puts one held food item into the jar; null when nothing was inserted. */
+    private static InteractionResult tryInsertFood(
+            Level level, BlockPos pos, Player player, ItemStack handStack, GlassJarBlockEntity jarBE) {
+        if (!(GlassJarBlockEntity.isFoodItem(handStack) && jarBE.canAcceptFood(handStack))) {
+            return null;
+        }
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+        ItemStack singleInsert = handStack.copy();
+        singleInsert.setCount(1);
+
+        int added = jarBE.addFood(singleInsert);
+        if (added <= 0) {
+            return null;
+        }
+        if (!player.getAbilities().instabuild) {
+            handStack.shrink(added);
+        }
+        level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.8F, 1.2F);
+        return InteractionResult.SUCCESS;
+    }
+
+    /** Sneaking: takes one stored food item into an empty hand or onto a matching held stack; null when none moved. */
+    private static InteractionResult tryExtractStoredFood(
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            ItemStack handStack,
+            GlassJarBlockEntity jarBE) {
+        if (jarBE.isEmpty() || jarBE.hasLiquid()) {
+            return null;
+        }
+        ItemStack stored = jarBE.getStoredItem();
+        if (handStack.isEmpty()) {
+            if (level.isClientSide) {
+                return InteractionResult.SUCCESS;
+            }
+            ItemStack item = jarBE.extractFood(1);
+            if (!item.isEmpty()) {
+                player.setItemInHand(hand, item);
+                level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.8F, 0.9F);
+                return InteractionResult.SUCCESS;
+            }
+        } else if (ItemStack.isSameItemSameTags(handStack, stored)) {
+            if (level.isClientSide) {
+                return InteractionResult.SUCCESS;
+            }
+            ItemStack item = jarBE.extractFood(1);
+            if (!item.isEmpty()) {
+                if (handStack.getCount() < handStack.getMaxStackSize()) {
+                    handStack.grow(1);
+                } else {
+                    if (!player.getInventory().add(item)) {
+                        player.drop(item, false);
+                    }
+                }
+                level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.8F, 0.9F);
+                return InteractionResult.SUCCESS;
+            }
+        }
+        return null;
+    }
+
+    /** An empty bucket in hand takes a full jar's liquid; null when it does not apply. */
+    private static InteractionResult tryFillBucket(
+            Level level, BlockPos pos, Player player, ItemStack handStack, GlassJarBlockEntity jarBE) {
+        if (!(handStack.is(Items.BUCKET) && jarBE.hasLiquid())) {
+            return null;
+        }
+        int required = GlassJarBlockEntity.isXpLiquid(jarBE.getStoredLiquidItem())
+                ? GlassJarBlockEntity.XP_BOTTLE_MAX
+                : GlassJarBlockEntity.MAX_LIQUID_LEVEL;
+        if (jarBE.getLiquidLevel() < required) {
+            return null;
+        }
+        ItemStack bucketRepresentation = jarBE.getBucketRepresentation();
+        if (bucketRepresentation.isEmpty()) {
+            return null;
+        }
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+        ItemStack filledBucket = jarBE.extractBucket();
+        if (filledBucket.isEmpty()) {
+            return null;
+        }
+        if (!player.getAbilities().instabuild) {
+            handStack.shrink(1);
+            if (!player.getInventory().add(filledBucket)) {
+                player.drop(filledBucket, false);
+            }
+        }
+        level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+        return InteractionResult.SUCCESS;
+    }
+
+    /** An empty glass bottle in hand takes one bottle of the jar's liquid; null when it does not apply. */
+    private static InteractionResult tryFillBottle(
+            Level level, BlockPos pos, Player player, ItemStack handStack, GlassJarBlockEntity jarBE) {
+        if (!(handStack.is(Items.GLASS_BOTTLE) && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0)) {
+            return null;
+        }
+        ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
+        if (bottleRepresentation.isEmpty()) {
+            return null;
+        }
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+        ItemStack filledBottle = jarBE.extractBottle();
+        if (filledBottle.isEmpty()) {
+            return null;
+        }
+        if (!player.getAbilities().instabuild) {
+            handStack.shrink(1);
+            if (!player.getInventory().add(filledBottle)) {
+                player.drop(filledBottle, false);
+            }
+        }
+        level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+        return InteractionResult.SUCCESS;
+    }
+
+    /** Empty hand: eats one stored food item; null when it does not apply. */
+    private static InteractionResult tryEatStoredFood(
+            Level level, BlockPos pos, Player player, GlassJarBlockEntity jarBE) {
+        if (jarBE.isEmpty() || jarBE.hasLiquid()) {
+            return null;
+        }
+        if (!(player.canEat(false) || player.getAbilities().instabuild)) {
+            return null;
+        }
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+
+        ItemStack stored = jarBE.getStoredItem();
+        if (stored.isEmpty()) {
+            return null;
+        }
+        ItemStack singleFood = stored.copy();
+        singleFood.setCount(1);
+
+        ItemStack remainder = singleFood.finishUsingItem(level, player);
+        if (!remainder.isEmpty() && !player.getInventory().add(remainder)) {
+            player.drop(remainder, false);
+        }
+        jarBE.extractFood(1);
+
+        level.playSound(null, pos, SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, 0.8F, 1.0F);
+        return InteractionResult.SUCCESS;
+    }
+
+    /** Empty hand: drinks one level of the jar's liquid; null when there is none, PASS for lava and experience. */
+    private static InteractionResult tryDrinkLiquid(Level level, BlockPos pos, Player player,
+            GlassJarBlockEntity jarBE) {
+        if (!jarBE.hasLiquid()) {
+            return null;
+        }
+        ItemStack liquidItem = jarBE.getStoredLiquidItem();
+        if (liquidItem.isEmpty()) {
+            return null;
+        }
+        if (liquidItem.is(Items.LAVA_BUCKET)
+                || (liquidItem.getItem() instanceof BucketItem bucket && bucket.getFluid() == Fluids.LAVA)
+                || GlassJarBlockEntity.isXpLiquid(liquidItem)) {
+            return InteractionResult.PASS;
+        }
+
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+
+        if (liquidItem.getItem() instanceof PotionItem) {
+            for (MobEffectInstance effect : PotionUtils.getMobEffects(liquidItem)) {
+                if (effect.getEffect().isInstantenous()) {
+                    effect.getEffect().applyInstantenousEffect(player, player, player, effect.getAmplifier(), 1.0);
+                } else {
+                    player.addEffect(new MobEffectInstance(effect));
+                }
+            }
+            jarBE.consumeLevel();
+            level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
+        } else if (liquidItem.getItem() instanceof HoneyBottleItem) {
+            player.getFoodData().eat(6, 0.6F);
+            player.removeEffect(MobEffects.POISON);
+            jarBE.consumeLevel();
+            level.playSound(null, pos, SoundEvents.HONEY_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
+        } else if (liquidItem.is(Items.MILK_BUCKET)) {
+            player.removeAllEffects();
+            jarBE.consumeLevel();
+            level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
+        } else {
+            if (player.isOnFire()) {
+                player.clearFire();
+            }
+            jarBE.consumeLevel();
+            level.playSound(null, pos, SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.8F, 1.0F);
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override

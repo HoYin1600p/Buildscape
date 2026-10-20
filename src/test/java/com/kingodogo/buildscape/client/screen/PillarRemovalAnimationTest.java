@@ -126,4 +126,47 @@ public class PillarRemovalAnimationTest {
         assertEquals(newTargets[1], visualY2_end, 0.001f);
         assertEquals(newTargets[2], visualY4_end, 0.001f);
     }
+
+    @Test
+    public void configScreenAnimsSpeedCycleAndMultipliers() {
+        ConfigScreenAnims.setAnimSpeedIndex(0); // Smooth
+        assertEquals(0, ConfigScreenAnims.getAnimSpeedIndex());
+        assertEquals("Smooth", ConfigScreenAnims.getAnimSpeedLabel());
+        assertEquals(1.0f, ConfigScreenAnims.getAnimSpeedMultiplier(), 0.001f);
+
+        ConfigScreenAnims.cycleAnimSpeed(1); // Snappy
+        assertEquals(1, ConfigScreenAnims.getAnimSpeedIndex());
+        assertEquals("Snappy", ConfigScreenAnims.getAnimSpeedLabel());
+        assertEquals(0.60f, ConfigScreenAnims.getAnimSpeedMultiplier(), 0.001f);
+
+        ConfigScreenAnims.cycleAnimSpeed(1); // Instant
+        assertEquals(2, ConfigScreenAnims.getAnimSpeedIndex());
+        assertEquals("Instant", ConfigScreenAnims.getAnimSpeedLabel());
+        assertEquals(0.001f, ConfigScreenAnims.getAnimSpeedMultiplier(), 0.0001f);
+
+        ConfigScreenAnims.cycleAnimSpeed(1); // Wrap to Smooth
+        assertEquals(0, ConfigScreenAnims.getAnimSpeedIndex());
+        assertEquals("Smooth", ConfigScreenAnims.getAnimSpeedLabel());
+    }
+
+    @Test
+    public void pillarRemovalEntrySlideAndAlpha() {
+        long start = 3000L;
+        int duration = 260;
+        ConfigScreenAnims.PillarRemovalEntry entry = new ConfigScreenAnims.PillarRemovalEntry(null, 50.0f, start, duration);
+
+        assertFalse(entry.isFinished(start + 100));
+        assertTrue(entry.isFinished(start + 260));
+
+        assertEquals(0.0f, entry.getProgress(start), 0.001f);
+        assertEquals(0.5f, entry.getProgress(start + 130), 0.001f);
+        assertEquals(1.0f, entry.getProgress(start + 260), 0.001f);
+
+        int slideX = entry.getSlideX(10, 200, start + 130);
+        assertTrue(slideX > 10);
+        assertTrue(slideX < 210);
+
+        float alpha = entry.getRemovalAlpha(1.0f, start + 130);
+        assertEquals(0.5f, alpha, 0.001f);
+    }
 }

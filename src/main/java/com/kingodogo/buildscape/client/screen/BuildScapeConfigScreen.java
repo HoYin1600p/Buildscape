@@ -185,9 +185,7 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     static float calculateItemContentTransitionAlpha(long now, long startedAt, int duration) {
-        if (duration <= 0) return 1.0F;
-        float progress = Math.min(1.0F, Math.max(0.0F, (now - startedAt) / (float) duration));
-        return 0.45F + 0.55F * easeOutCubic(progress);
+        return ConfigScreenAnims.calculateItemContentTransitionAlpha(now, startedAt, duration);
     }
 
     static boolean shouldCacheTagDiscovery(Collection<String> tags) {
@@ -267,46 +265,24 @@ public class BuildScapeConfigScreen extends Screen {
     private Consumer<AbstractWidget> addWidgetConsumer;
     private Consumer<GuiEventListener> removeWidgetConsumer;
 
-    // Local client preferences and animation scaling.
-    private static int animSpeedIndex = 0;
-    private static final String[] ANIM_SPEEDS = {"Smooth", "Snappy", "Instant"};
+    // Local client preferences and animation scaling (delegated to ConfigScreenAnims).
+    public static final String[] ANIM_SPEEDS = ConfigScreenAnims.ANIM_SPEEDS;
+    public static int getAnimSpeedIndex() { return ConfigScreenAnims.getAnimSpeedIndex(); }
+    public static void setAnimSpeedIndex(int index) { ConfigScreenAnims.setAnimSpeedIndex(index); }
+    public static float getAnimSpeedMultiplier() { return ConfigScreenAnims.getAnimSpeedMultiplier(); }
 
-    public static float getAnimSpeedMultiplier() {
-        return switch (animSpeedIndex) {
-            case 1 -> 0.60f; // Snappy
-            case 2 -> 0.001f; // Instant
-            default -> 1.0f; // Smooth
-        };
-    }
+    public static int getOpenAnimMs() { return ConfigScreenAnims.getOpenAnimMs(); }
+    public static int getCloseAnimMs() { return ConfigScreenAnims.getCloseAnimMs(); }
+    public static int getNavAnimMs() { return ConfigScreenAnims.getNavAnimMs(); }
+    public static int getNavIndicatorAnimMs() { return ConfigScreenAnims.getNavIndicatorAnimMs(); }
+    public static int getTabTransitionAnimMs() { return ConfigScreenAnims.getTabTransitionAnimMs(); }
+    public static int getSidePanelAnimMs() { return ConfigScreenAnims.getSidePanelAnimMs(); }
+    public static int getPillarRemovalAnimMs() { return ConfigScreenAnims.getPillarRemovalAnimMs(); }
 
-    public static int getOpenAnimMs() { return Math.max(1, (int) (300 * getAnimSpeedMultiplier())); }
-    public static int getCloseAnimMs() { return Math.max(1, (int) (220 * getAnimSpeedMultiplier())); }
-    public static int getNavAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
-    public static int getNavIndicatorAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
-    public static int getTabTransitionAnimMs() { return Math.max(1, (int) (240 * getAnimSpeedMultiplier())); }
-    public static int getSidePanelAnimMs() { return Math.max(1, (int) (280 * getAnimSpeedMultiplier())); }
-    public static int getPillarRemovalAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
-
-    public static float easeOutSine(float t) {
-        float clamped = Math.min(1.0f, Math.max(0.0f, t));
-        return (float) Math.sin(clamped * (Math.PI / 2.0));
-    }
-
-    public static float easeInSine(float t) {
-        float clamped = Math.min(1.0f, Math.max(0.0f, t));
-        return 1.0f - (float) Math.cos(clamped * (Math.PI / 2.0));
-    }
-
-    public static float easeOutCubic(float t) {
-        float clamped = Math.min(1.0f, Math.max(0.0f, t));
-        float f = 1.0f - clamped;
-        return 1.0f - f * f * f;
-    }
-
-    public static float easeInCubic(float t) {
-        float clamped = Math.min(1.0f, Math.max(0.0f, t));
-        return clamped * clamped * clamped;
-    }
+    public static float easeOutSine(float t) { return ConfigScreenAnims.easeOutSine(t); }
+    public static float easeInSine(float t) { return ConfigScreenAnims.easeInSine(t); }
+    public static float easeOutCubic(float t) { return ConfigScreenAnims.easeOutCubic(t); }
+    public static float easeInCubic(float t) { return ConfigScreenAnims.easeInCubic(t); }
 
     private long openStartTime;
     private long closeStartTime = -1;
@@ -470,85 +446,25 @@ public class BuildScapeConfigScreen extends Screen {
     private long lastPillarRowClickTime = 0L;
     private String lastPillarRowClickId = null;
 
-    // Animated pillar row removal & shift state
+    // Animated pillar row removal & shift state (delegated to ConfigScreenAnims)
     static float calculatePillarRowShift(float startOffset, long startTime, int durationMs, long now) {
-        if (durationMs <= 0 || now >= startTime + durationMs) return 0.0f;
-        if (now <= startTime) return startOffset;
-        float progress = (now - startTime) / (float) durationMs;
-        return startOffset * (1.0f - easeOutCubic(progress));
+        return ConfigScreenAnims.calculatePillarRowShift(startOffset, startTime, durationMs, now);
     }
 
     static int calculatePillarRemovalSlideX(int colX, int slideDistance, long startTime, int durationMs, long now) {
-        if (durationMs <= 0 || now <= startTime) return colX;
-        float progress = Math.min(1.0f, Math.max(0.0f, (now - startTime) / (float) durationMs));
-        return colX + (int) (slideDistance * easeOutSine(progress));
+        return ConfigScreenAnims.calculatePillarRemovalSlideX(colX, slideDistance, startTime, durationMs, now);
     }
 
     static float calculatePillarRemovalAlpha(float baseAlpha, long startTime, int durationMs, long now) {
-        if (durationMs <= 0 || now >= startTime + durationMs) return 0.0f;
-        if (now <= startTime) return baseAlpha;
-        float progress = Math.min(1.0f, Math.max(0.0f, (now - startTime) / (float) durationMs));
-        return baseAlpha * (1.0f - progress);
+        return ConfigScreenAnims.calculatePillarRemovalAlpha(baseAlpha, startTime, durationMs, now);
     }
 
-    private static class PillarRowShiftAnim {
-        final float startOffset;
-        final long startTime;
-        final int durationMs;
-
-        PillarRowShiftAnim(float startOffset, long startTime, int durationMs) {
-            this.startOffset = startOffset;
-            this.startTime = startTime;
-            this.durationMs = durationMs;
-        }
-
-        float getCurrentOffset(long now) {
-            return calculatePillarRowShift(startOffset, startTime, durationMs, now);
-        }
-
-        boolean isFinished(long now) {
-            return now >= startTime + durationMs;
-        }
-    }
-
-    private static class PillarRemovalEntry {
-        final PillarIdManager.PillarData data;
-        final float contentY;
-        final long startTime;
-        final int durationMs;
-
-        PillarRemovalEntry(PillarIdManager.PillarData data, float contentY, long startTime, int durationMs) {
-            this.data = data;
-            this.contentY = contentY;
-            this.startTime = startTime;
-            this.durationMs = durationMs;
-        }
-
-        float getProgress(long now) {
-            if (durationMs <= 0) return 1.0f;
-            float progress = (now - startTime) / (float) durationMs;
-            return Math.min(1.0f, Math.max(0.0f, progress));
-        }
-
-        int getSlideX(int colX, int slideDistance, long now) {
-            return calculatePillarRemovalSlideX(colX, slideDistance, startTime, durationMs, now);
-        }
-
-        float getRemovalAlpha(float baseAlpha, long now) {
-            return calculatePillarRemovalAlpha(baseAlpha, startTime, durationMs, now);
-        }
-
-        boolean isFinished(long now) {
-            return now >= startTime + durationMs;
-        }
-    }
-
-    private final Map<String, PillarRowShiftAnim> pillarRowShiftAnims = new HashMap<>();
-    private final Map<String, PillarRemovalEntry> activePillarRemovals = new HashMap<>();
+    private final Map<String, ConfigScreenAnims.PillarRowShiftAnim> pillarRowShiftAnims = new HashMap<>();
+    private final Map<String, ConfigScreenAnims.PillarRemovalEntry> activePillarRemovals = new HashMap<>();
 
     private float getPillarRowVisualY(String id, int index, int rowStep, long now) {
         float offset = 0.0f;
-        PillarRowShiftAnim anim = pillarRowShiftAnims.get(id);
+        ConfigScreenAnims.PillarRowShiftAnim anim = pillarRowShiftAnims.get(id);
         if (anim != null) {
             if (anim.isFinished(now)) {
                 pillarRowShiftAnims.remove(id);
@@ -587,7 +503,7 @@ public class BuildScapeConfigScreen extends Screen {
             }
             float curVisualY = visualYBeforeRemoval.getOrDefault(id, 0.0f);
             if (data != null) {
-                activePillarRemovals.put(id, new PillarRemovalEntry(data, curVisualY, now, durationMs));
+                activePillarRemovals.put(id, new ConfigScreenAnims.PillarRemovalEntry(data, curVisualY, now, durationMs));
             }
             PillarIdManager.getClient().removePillarData(id);
             selectedPillarIds.remove(id);
@@ -608,7 +524,7 @@ public class BuildScapeConfigScreen extends Screen {
             float prevVisualY = visualYBeforeRemoval.getOrDefault(sData.id, newTargetY);
             float diff = prevVisualY - newTargetY;
             if (Math.abs(diff) > 0.5f) {
-                pillarRowShiftAnims.put(sData.id, new PillarRowShiftAnim(diff, now, durationMs));
+                pillarRowShiftAnims.put(sData.id, new ConfigScreenAnims.PillarRowShiftAnim(diff, now, durationMs));
             } else {
                 pillarRowShiftAnims.remove(sData.id);
             }
@@ -1216,7 +1132,7 @@ public class BuildScapeConfigScreen extends Screen {
             String savedTheme = cfg.getUiTheme();
             applyTheme(ConfigThemes.getById(savedTheme));
             ConfigBackgrounds.setBackgroundById(cfg.getUiBackground());
-            animSpeedIndex = Math.max(0, Math.min(ANIM_SPEEDS.length - 1, cfg.getAnimationSpeedIndex()));
+            ConfigScreenAnims.setAnimSpeedIndex(cfg.getAnimationSpeedIndex());
             this.selectedPresetIndex = presetIndexFor(PresetsConfig.get().getPresetKeys(), cfg.getLastPreset());
             int savedTab = cfg.getLastActiveTab();
             if (savedTab >= 0 && savedTab < 6) {
@@ -3234,7 +3150,7 @@ public class BuildScapeConfigScreen extends Screen {
         int rowH = 24;
         int rowGap = 2;
         int effectiveRowCount = pillarList.size();
-        for (PillarRemovalEntry rem : activePillarRemovals.values()) {
+        for (ConfigScreenAnims.PillarRemovalEntry rem : activePillarRemovals.values()) {
             int remIdx = (int) (rem.contentY / (rowH + rowGap)) + 1;
             if (remIdx > effectiveRowCount) {
                 effectiveRowCount = remIdx;
@@ -3279,8 +3195,8 @@ public class BuildScapeConfigScreen extends Screen {
             // 2. Render removing rows (sliding right and fading out)
             if (!activePillarRemovals.isEmpty()) {
                 List<String> finished = new ArrayList<>();
-                for (Map.Entry<String, PillarRemovalEntry> entry : activePillarRemovals.entrySet()) {
-                    PillarRemovalEntry rem = entry.getValue();
+                for (Map.Entry<String, ConfigScreenAnims.PillarRemovalEntry> entry : activePillarRemovals.entrySet()) {
+                    ConfigScreenAnims.PillarRemovalEntry rem = entry.getValue();
                     if (rem.isFinished(now)) {
                         finished.add(entry.getKey());
                         continue;
@@ -3587,7 +3503,7 @@ public class BuildScapeConfigScreen extends Screen {
         renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Background", "Decorative backdrop pattern applied over the theme", ConfigBackgrounds.getCurrentBackground().displayName, mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
-        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ANIM_SPEEDS[animSpeedIndex], mouseX, mouseY, alpha);
+        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ConfigScreenAnims.getAnimSpeedLabel(), mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
         PillarParticleConfig.EditPermissionMode policy = PillarParticleConfig.get().edit_permission_mode;
@@ -6205,9 +6121,9 @@ public class BuildScapeConfigScreen extends Screen {
                 // Row 2: Screen Animation Cycle
                 int animStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (animStep != 0) {
-                    animSpeedIndex = (animSpeedIndex + animStep + ANIM_SPEEDS.length) % ANIM_SPEEDS.length;
+                    ConfigScreenAnims.cycleAnimSpeed(animStep);
                     try {
-                        BuildscapeClientConfig.get().setAnimationSpeedIndex(animSpeedIndex);
+                        BuildscapeClientConfig.get().setAnimationSpeedIndex(ConfigScreenAnims.getAnimSpeedIndex());
                     } catch (Exception ignored) {}
                     return true;
                 }

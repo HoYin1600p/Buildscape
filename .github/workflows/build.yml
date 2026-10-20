@@ -53,6 +53,8 @@ jobs:
           if [[ "$REF_NAME" == *"main"* ]]; then
             echo "Release branch detected."
             IS_RELEASE="true"
+            IS_PRERELEASE="false"
+            BUILD_TYPE="Production Release"
             EFFECTIVE_VER="$MOD_VER"
             JAR_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}.jar"
             TAG_NAME="v${MC_VER}-${EFFECTIVE_VER}"
@@ -61,20 +63,26 @@ jobs:
           else
             echo "Development branch detected."
             IS_RELEASE="false"
+            IS_PRERELEASE="true"
+            BUILD_TYPE="Development Build [ Dev ]"
             # Approach B: Monotonically incrementing GitHub run number
             RUN_NUM="${{ github.run_number }}"
             EFFECTIVE_VER="${MOD_VER}${RUN_NUM}-Dev"
             JAR_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}.jar"
-            TAG_NAME=""
-            RELEASE_TITLE=""
+            TAG_NAME="v${MC_VER}-${EFFECTIVE_VER}"
+            RELEASE_TITLE="[ Dev ] Buildscape ${MC_VER}-${EFFECTIVE_VER}"
             ARTIFACT_NAME="[ Dev ] buildscape-${MC_VER}-${EFFECTIVE_VER}"
           fi
 
           echo "Effective Version: $EFFECTIVE_VER"
           echo "Jar Name: $JAR_NAME"
+          echo "Tag Name: $TAG_NAME"
+          echo "Release Title: $RELEASE_TITLE"
           echo "Artifact Name: $ARTIFACT_NAME"
 
           echo "is_release=$IS_RELEASE" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "build_type=$BUILD_TYPE" >> $GITHUB_OUTPUT
           echo "effective_version=$EFFECTIVE_VER" >> $GITHUB_OUTPUT
           echo "jar_name=$JAR_NAME" >> $GITHUB_OUTPUT
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
@@ -88,7 +96,10 @@ jobs:
         run: ./gradlew check --no-daemon
 
       - name: Build Mod Jar
-        run: ./gradlew jar "-Pmod_version_override=${{ steps.version_info.outputs.effective_version }}" --no-daemon
+        run: |
+          ./gradlew jar \
+            "-Pmod_version_override=${{ steps.version_info.outputs.effective_version }}" \
+            --no-daemon
 
       - name: Verify Built Jar File
         shell: bash
@@ -104,15 +115,32 @@ jobs:
           path: build/libs/${{ steps.version_info.outputs.jar_name }}
           if-no-files-found: error
 
+      - name: Generate Release Description
+        shell: bash
+        run: |
+          if [ "${{ steps.version_info.outputs.is_release }}" = "false" ]; then
+            cat << 'EOF' > release_body.md
+          ### 📦 Development Build Details
+          - **Source Branch**: `${{ github.ref_name }}`
+          - **Commit**: [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+          - **Build Version**: `${{ steps.version_info.outputs.effective_version }}`
+          - **Jar File**: `${{ steps.version_info.outputs.jar_name }}`
+
+          EOF
+          else
+            # Release builds stay clean with official release notes
+            touch release_body.md
+          fi
+
       - name: Publish GitHub Release
-        if: steps.version_info.outputs.is_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version_info.outputs.tag_name }}
           name: ${{ steps.version_info.outputs.release_title }}
+          body_path: release_body.md
           files: build/libs/${{ steps.version_info.outputs.jar_name }}
           generate_release_notes: true
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.version_info.outputs.is_prerelease == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -163,7 +163,8 @@ spotless {
     lineEndings = com.diffplug.spotless.LineEnding.UNIX
     java {
         target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
-        targetExclude 'src/main/java/com/kingodogo/buildscape/client/screen/**'
+        targetExclude 'src/main/java/com/kingodogo/buildscape/client/screen/**',
+                'src/test/java/com/kingodogo/buildscape/client/screen/**'
         eclipse().configFile('config/spotless/eclipse-formatter.xml')
     }
 }

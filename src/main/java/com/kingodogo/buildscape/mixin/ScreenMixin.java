@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.mixin;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData;
 import com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData;
-import com.kingodogo.buildscape.event.TagTooltipEvents;
+import com.kingodogo.buildscape.client.tooltip.TagTooltipEvents;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;

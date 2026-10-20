@@ -56,6 +56,8 @@ com.kingodogo.buildscape.client.feature.muff.MuffBlockManager bus=FORGE dist=CLI
   onPlaySound(net.minecraftforge.client.event.sound.PlaySoundEvent) NORMAL
 com.kingodogo.buildscape.client.feature.pillar.ItemFrameParticleClient bus=FORGE dist=CLIENT
   onClientTick(net.minecraftforge.event.TickEvent$ClientTickEvent) NORMAL
+com.kingodogo.buildscape.client.particle.ModClientParticleEvents bus=MOD dist=CLIENT
+  registerParticleFactories(net.minecraftforge.client.event.ParticleFactoryRegisterEvent) NORMAL
 com.kingodogo.buildscape.client.particle.ParticleCacheEvents bus=FORGE dist=CLIENT
   onClientTick(net.minecraftforge.event.TickEvent$ClientTickEvent) NORMAL
   onDisconnect(net.minecraftforge.client.event.ClientPlayerNetworkEvent$LoggedOutEvent) NORMAL
@@ -81,6 +83,8 @@ com.kingodogo.buildscape.client.setup.ClientSetup bus=MOD dist=CLIENT
   onModelRegistry(net.minecraftforge.client.event.ModelRegistryEvent) NORMAL
   onRegisterClientReloadListeners(net.minecraftforge.client.event.RegisterClientReloadListenersEvent) NORMAL
   registerLayerDefinitions(net.minecraftforge.client.event.EntityRenderersEvent$RegisterLayerDefinitions) NORMAL
+com.kingodogo.buildscape.client.tooltip.TagTooltipEvents bus=FORGE dist=CLIENT
+  onItemTooltip(net.minecraftforge.event.entity.player.ItemTooltipEvent) LOWEST
 com.kingodogo.buildscape.config.PillarParticleConfig$TagEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onTagsUpdated(net.minecraftforge.event.TagsUpdatedEvent) NORMAL
 com.kingodogo.buildscape.data.ModDataGen bus=MOD dist=CLIENT,DEDICATED_SERVER
@@ -101,13 +105,9 @@ com.kingodogo.buildscape.event.FrostRoseDropEvents bus=FORGE dist=CLIENT,DEDICAT
   onLivingDeath(net.minecraftforge.event.entity.living.LivingDeathEvent) LOWEST
   onServerStopping(net.minecraftforge.event.server.ServerStoppingEvent) NORMAL
   onServerTick(net.minecraftforge.event.TickEvent$ServerTickEvent) NORMAL
-com.kingodogo.buildscape.event.ModClientParticleEvents bus=MOD dist=CLIENT
-  registerParticleFactories(net.minecraftforge.client.event.ParticleFactoryRegisterEvent) NORMAL
 com.kingodogo.buildscape.event.StrawBedEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onPlayerSetSpawn(net.minecraftforge.event.entity.player.PlayerSetSpawnEvent) NORMAL
   onPlayerWakeUp(net.minecraftforge.event.entity.player.PlayerWakeUpEvent) NORMAL
-com.kingodogo.buildscape.event.TagTooltipEvents bus=FORGE dist=CLIENT
-  onItemTooltip(net.minecraftforge.event.entity.player.ItemTooltipEvent) LOWEST
 com.kingodogo.buildscape.feature.biome.BiomeBrushEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onLeftClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent$LeftClickBlock) NORMAL
   onLeftClickEmpty(net.minecraftforge.event.entity.player.PlayerInteractEvent$LeftClickEmpty) NORMAL

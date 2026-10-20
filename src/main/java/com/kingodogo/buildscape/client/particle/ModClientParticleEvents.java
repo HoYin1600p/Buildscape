@@ -1,7 +1,6 @@
-package com.kingodogo.buildscape.event;
+package com.kingodogo.buildscape.client.particle;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.client.particle.FireflyParticle;
 import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.FlameParticle;

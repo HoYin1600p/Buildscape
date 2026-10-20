@@ -27,9 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -209,134 +206,8 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         );
     }
 
-    private void syncPatternFromStack() {
-        if (level == null || level.isClientSide)
-            return;
-
-        if (this.particlePattern != null) {
-            propagatePatternToStack(this.particlePattern);
-            return;
-        }
-
-        String stackPattern = getStackParticlePattern();
-        if (stackPattern != null && !stackPattern.equals(this.particlePattern)) {
-            this.particlePattern = stackPattern;
-            this.setChanged();
-            level.sendBlockUpdated(
-                    worldPosition,
-                    getBlockState(),
-                    getBlockState(),
-                    3);
-        }
-    }
-
     public ItemStack getDisplayedItem() {
         return displayedItem;
-    }
-
-    public void syncPatternFromManager() {
-        if (level == null || level.isClientSide)
-            return;
-
-        if (level.getServer() == null ||
-                !level.getServer().isRunning() ||
-                !BuildScape.isServerFullyInitialized()) {
-            return;
-        }
-
-        if (level.getServer().getPlayerList().getPlayerCount() == 0) {
-            return;
-        }
-
-        if (!level.hasChunkAt(worldPosition)) {
-            return;
-        }
-
-        try {
-            ChunkAccess chunk = level.getChunk(
-                    worldPosition);
-            if (!(chunk instanceof LevelChunk)) {
-                return;
-            }
-            if (!chunk
-                    .getStatus()
-                    .isOrAfter(ChunkStatus.FULL)) {
-                return;
-            }
-        } catch (Exception e) {
-            return;
-        }
-
-        PillarIdManager manager = PillarIdManager.get(level);
-
-        if (!manager.hasLoaded()) {
-            return;
-        }
-
-        String expectedPrefix = PillarIdManager.getVariantPrefix(
-                level,
-                worldPosition);
-
-        String idToSync = this.pillarId;
-
-        if (idToSync == null || idToSync.isEmpty()) {
-            idToSync = getStackPillarId();
-        }
-
-        if (idToSync == null || idToSync.isEmpty()) {
-            return;
-        }
-
-        if (!idToSync.startsWith(expectedPrefix) && manager.getPillarData(idToSync) == null) {
-            return;
-        }
-
-        PillarIdManager.PillarData data = manager.getPillarData(idToSync);
-
-        if (data != null) {
-            boolean needsUpdate = false;
-
-            String managerPattern = data.pattern;
-            if (managerPattern != null && !managerPattern.isEmpty()) {
-                boolean validPattern = false;
-                for (String p : PATTERNS) {
-                    if (p.equals(managerPattern)) {
-                        validPattern = true;
-                        break;
-                    }
-                }
-
-                if (validPattern && (this.particlePattern == null || !this.particlePattern.equals(managerPattern))) {
-                    this.particlePattern = managerPattern;
-                    needsUpdate = true;
-                }
-            }
-
-            if (data.pattern_speed != null
-                    && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
-                this.patternSpeed = data.pattern_speed;
-                needsUpdate = true;
-            }
-            if (data.pattern_spread != null
-                    && (this.patternSpread == null || !this.patternSpread.equals(data.pattern_spread))) {
-                this.patternSpread = data.pattern_spread;
-                needsUpdate = true;
-            }
-            if (data.pattern_intensity != null
-                    && (this.patternIntensity == null || !this.patternIntensity.equals(data.pattern_intensity))) {
-                this.patternIntensity = data.pattern_intensity;
-                needsUpdate = true;
-            }
-
-            if (needsUpdate) {
-                this.setChanged();
-                level.sendBlockUpdated(
-                        worldPosition,
-                        getBlockState(),
-                        getBlockState(),
-                        3);
-            }
-        }
     }
 
     public float getFacingYaw() {
@@ -466,126 +337,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
-    private void syncBothFromManager() {
-        if (level == null || level.isClientSide)
-            return;
-
-        if (level.getServer() == null ||
-                !level.getServer().isRunning() ||
-                !BuildScape.isServerFullyInitialized()) {
-            return;
-        }
-        if (level.getServer().getPlayerList().getPlayerCount() == 0)
-            return;
-        if (!level.hasChunkAt(worldPosition))
-            return;
-        try {
-            ChunkAccess chunk = level.getChunk(worldPosition);
-            if (!(chunk instanceof LevelChunk))
-                return;
-            if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL))
-                return;
-        } catch (Exception e) {
-            return;
-        }
-
-        PillarIdManager manager = PillarIdManager.get(level);
-        if (!manager.hasLoaded())
-            return;
-
-        String expectedPrefix = PillarIdManager.getVariantPrefix(level, worldPosition);
-        String idToSync = (this.pillarId != null && !this.pillarId.isEmpty())
-                ? this.pillarId
-                : getStackPillarId();
-        if (idToSync == null || idToSync.isEmpty())
-            return;
-        if (!idToSync.startsWith(expectedPrefix) && manager.getPillarData(idToSync) == null)
-            return;
-
-        PillarIdManager.PillarData data = manager.getPillarData(idToSync);
-        boolean changed = false;
-
-        if (data != null && data.hasColors()) {
-            List<String> managerColors = data.getColors();
-            boolean colorsDiffer = (this.particleColors == null ||
-                    this.particleColors.isEmpty() ||
-                    !idToSync.equals(this.pillarId) ||
-                    managerColors.size() != this.particleColors.size());
-
-            if (!colorsDiffer) {
-                for (int i = 0; i < managerColors.size(); i++) {
-                    String mc = managerColors.get(i), cc = this.particleColors.get(i);
-                    if (mc == null || !mc.equals(cc)) {
-                        colorsDiffer = true;
-                        break;
-                    }
-                }
-            }
-
-            if (colorsDiffer) {
-                this.pillarId = idToSync;
-                this.particleColors = new ArrayList<>(managerColors);
-                this.colorsInitialized = true;
-                this.particleColorCounter = 0;
-                this.lastParticleTick = 0;
-                this.colorsVersion++;
-                changed = true;
-            }
-        }
-
-        if (data != null) {
-            String managerPattern = data.pattern;
-            if (managerPattern != null && !managerPattern.isEmpty()) {
-                boolean validPattern = false;
-                for (String p : PATTERNS) {
-                    if (p.equals(managerPattern)) {
-                        validPattern = true;
-                        break;
-                    }
-                }
-                if (validPattern && (this.particlePattern == null || !this.particlePattern.equals(managerPattern))) {
-                    this.particlePattern = managerPattern;
-                    changed = true;
-                }
-            } else if (this.particlePattern != null) {
-                this.particlePattern = null;
-                changed = true;
-            }
-
-            if (data.pattern_speed != null
-                    && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
-                this.patternSpeed = data.pattern_speed;
-                changed = true;
-            } else if (data.pattern_speed == null && this.patternSpeed != null) {
-                this.patternSpeed = null;
-                changed = true;
-            }
-
-            if (data.pattern_spread != null
-                    && (this.patternSpread == null || !this.patternSpread.equals(data.pattern_spread))) {
-                this.patternSpread = data.pattern_spread;
-                changed = true;
-            } else if (data.pattern_spread == null && this.patternSpread != null) {
-                this.patternSpread = null;
-                changed = true;
-            }
-
-            if (data.pattern_intensity != null
-                    && (this.patternIntensity == null || !this.patternIntensity.equals(data.pattern_intensity))) {
-                this.patternIntensity = data.pattern_intensity;
-                changed = true;
-            } else if (data.pattern_intensity == null && this.patternIntensity != null) {
-                this.patternIntensity = null;
-                changed = true;
-            }
-        }
-
-        if (changed) {
-            this.setChanged();
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-        }
-    }
-
     public Double getPatternSpeed() {
         return patternSpeed;
     }
@@ -673,157 +424,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         if (useConfigColors) {
             if (particleColors != null && !colorsInitialized) {
                 this.particleColors = null;
-            }
-        }
-    }
-
-    public void syncColorsFromManager() {
-        if (level == null || level.isClientSide)
-            return;
-
-        if (level.getServer() == null ||
-                !level.getServer().isRunning() ||
-                !BuildScape.isServerFullyInitialized()) {
-            return;
-        }
-
-        if (level.getServer().getPlayerList().getPlayerCount() == 0) {
-            return;
-        }
-
-        if (!level.hasChunkAt(worldPosition)) {
-            return;
-        }
-
-        try {
-            ChunkAccess chunk = level.getChunk(
-                    worldPosition);
-            if (!(chunk instanceof LevelChunk)) {
-                return;
-            }
-            if (!chunk
-                    .getStatus()
-                    .isOrAfter(ChunkStatus.FULL)) {
-                return;
-            }
-        } catch (Exception e) {
-            return;
-        }
-
-
-        PillarIdManager manager = PillarIdManager.get(level);
-
-        if (!manager.hasLoaded()) {
-            return;
-        }
-        String expectedPrefix = PillarIdManager.getVariantPrefix(
-                level,
-                worldPosition);
-
-        String idToSync = this.pillarId;
-
-        if (idToSync == null || idToSync.isEmpty()) {
-            idToSync = getStackPillarId();
-        }
-
-        if (idToSync == null || idToSync.isEmpty()) {
-            return;
-        }
-
-        if (!idToSync.startsWith(expectedPrefix) && manager.getPillarData(idToSync) == null) {
-            if (this.particleColors == null || this.particleColors.isEmpty()) {
-                this.pillarId = null;
-                this.particleColors = null;
-                this.colorsInitialized = false;
-                this.particleColorCounter = 0;
-                this.setChanged();
-                level.sendBlockUpdated(
-                        worldPosition,
-                        getBlockState(),
-                        getBlockState(),
-                        3);
-            }
-            return;
-        }
-
-        PillarIdManager.PillarData data = manager.getPillarData(idToSync);
-
-        if (data != null && data.hasColors()) {
-            List<String> managerColors = data.getColors();
-            boolean shouldSync = false;
-
-            if (this.pillarId == null || this.pillarId.isEmpty()) {
-                shouldSync = true;
-            } else if (!this.pillarId.equals(idToSync)) {
-                shouldSync = true;
-            } else if (this.particleColors == null || this.particleColors.isEmpty()) {
-                shouldSync = true;
-            } else {
-                if (managerColors.size() != this.particleColors.size()) {
-                    shouldSync = true;
-                } else {
-                    for (int i = 0; i < managerColors.size(); i++) {
-                        String managerColor = managerColors.get(i);
-                        String currentColor = this.particleColors.get(i);
-                        if (managerColor == null || !managerColor.equals(currentColor)) {
-                            shouldSync = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (shouldSync) {
-                this.pillarId = idToSync;
-                this.particleColors = new ArrayList<>(managerColors);
-                this.colorsInitialized = true;
-                this.particleColorCounter = 0;
-                this.lastParticleTick = 0;
-                this.setChanged();
-
-                level.sendBlockUpdated(
-                        worldPosition,
-                        getBlockState(),
-                        getBlockState(),
-                        3);
-            }
-        } else {
-            if (this.pillarId != null && this.pillarId.equals(idToSync) &&
-                    this.particleColors != null && !this.particleColors.isEmpty()) {
-                BlockPos bottomPos = findStackBottom();
-                PillarIdManager.PillarData newData = manager.getPillarDataByPosition(level, bottomPos);
-                if (newData == null) {
-                    newData = manager.getOrCreatePillarData(level, bottomPos);
-                }
-                if (newData != null && idToSync.equals(newData.id)) {
-                    boolean needsSync = false;
-                    if (!newData.hasColors()) {
-                        needsSync = true;
-                    } else {
-                        List<String> managerColors = newData.getColors();
-                        if (managerColors.size() != this.particleColors.size()) {
-                            needsSync = true;
-                        } else {
-                            for (int i = 0; i < this.particleColors.size(); i++) {
-                                String nbtColor = this.particleColors.get(i);
-                                String managerColor = i < managerColors.size() ? managerColors.get(i) : null;
-                                if (nbtColor == null || !nbtColor.equals(managerColor)) {
-                                    needsSync = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (needsSync) {
-                        newData.clearColors();
-                        for (String color : this.particleColors) {
-                            if (color != null && !color.isEmpty()) {
-                                newData.addColor(color);
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -1069,104 +669,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
 
             BlockState state = getBlockState();
             level.sendBlockUpdated(worldPosition, state, state, 3);
-        }
-    }
-
-    public void syncFromData(PillarIdManager.PillarData data) {
-        if (data == null)
-            return;
-
-        boolean changed = false;
-
-        if (this.pillarId == null || !this.pillarId.equals(data.id)) {
-            this.pillarId = data.id;
-            changed = true;
-        }
-
-        if (data.hasColors()) {
-            List<String> newColors = data.getColors();
-            if (this.particleColors == null || this.particleColors.size() != newColors.size()) {
-                this.particleColors = new ArrayList<>(newColors);
-                this.colorsInitialized = true;
-                this.particleColorCounter = 0;
-                this.colorsVersion++;
-                changed = true;
-            } else {
-                for (int i = 0; i < newColors.size(); i++) {
-                    if (!newColors.get(i).equals(this.particleColors.get(i))) {
-                        this.particleColors = new ArrayList<>(newColors);
-                        this.colorsInitialized = true;
-                        this.particleColorCounter = 0;
-                        this.colorsVersion++;
-                        changed = true;
-                        break;
-                    }
-                }
-            }
-        } else if (this.particleColors != null) {
-            this.particleColors = null;
-            this.colorsInitialized = false;
-            this.particleColorCounter = 0;
-            this.colorsVersion++;
-            changed = true;
-        }
-
-        if (data.pattern != null && !data.pattern.equals(this.particlePattern)) {
-            this.particlePattern = data.pattern;
-            changed = true;
-        } else if (data.pattern == null && this.particlePattern != null) {
-            this.particlePattern = null;
-            changed = true;
-        }
-
-        if (data.use_pattern != null && (!data.use_pattern.equals(this.usePattern))) {
-            this.usePattern = data.use_pattern;
-            changed = true;
-        } else if (data.use_pattern == null && this.usePattern != null) {
-            this.usePattern = null;
-            changed = true;
-        }
-
-        if (data.pattern_speed != null && (!data.pattern_speed.equals(this.patternSpeed))) {
-            this.patternSpeed = data.pattern_speed;
-            changed = true;
-        } else if (data.pattern_speed == null && this.patternSpeed != null) {
-            this.patternSpeed = null;
-            changed = true;
-        }
-
-        if (data.pattern_spread != null && (!data.pattern_spread.equals(this.patternSpread))) {
-            this.patternSpread = data.pattern_spread;
-            changed = true;
-        } else if (data.pattern_spread == null && this.patternSpread != null) {
-            this.patternSpread = null;
-            changed = true;
-        }
-
-        if (data.pattern_intensity != null && (!data.pattern_intensity.equals(this.patternIntensity))) {
-            this.patternIntensity = data.pattern_intensity;
-            changed = true;
-        } else if (data.pattern_intensity == null && this.patternIntensity != null) {
-            this.patternIntensity = null;
-            changed = true;
-        }
-
-        if (data.max_particle_color != null && (!data.max_particle_color.equals(this.maxParticleColor))) {
-            this.maxParticleColor = data.max_particle_color;
-            changed = true;
-        } else if (data.max_particle_color == null && this.maxParticleColor != null) {
-            this.maxParticleColor = null;
-            changed = true;
-        }
-
-        if (changed) {
-            this.lastParticleTick = 0;
-            this.setChanged();
-            if (level != null && !level.isClientSide) {
-                BlockState currentState = getBlockState();
-                level.sendBlockUpdated(worldPosition, currentState, currentState, 3);
-                level.getChunkAt(worldPosition).setUnsaved(true);
-            }
         }
     }
 
@@ -1519,7 +1021,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return PillarStack.findStackTop(this);
     }
 
-    private String getStackParticlePattern() {
+    String getStackParticlePattern() {
         return PillarStack.getStackParticlePattern(this);
     }
 
@@ -1531,15 +1033,31 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return PillarStack.getStackPillarId(this);
     }
 
-    private void propagatePatternToStack(String pattern) {
+    void propagatePatternToStack(String pattern) {
         PillarStack.propagatePatternToStack(this, pattern);
     }
 
-    private void propagateToStack(String stackId, List<String> colors) {
+    void propagateToStack(String stackId, List<String> colors) {
         PillarStack.propagateToStack(this, stackId, colors);
     }
 
     public PillarBlockEntity getTopPillar() {
         return PillarStack.getTopPillar(this);
+    }
+
+    public void syncPatternFromManager() {
+        PillarEntitySync.syncPatternFromManager(this);
+    }
+
+    void syncBothFromManager() {
+        PillarEntitySync.syncBothFromManager(this);
+    }
+
+    public void syncColorsFromManager() {
+        PillarEntitySync.syncColorsFromManager(this);
+    }
+
+    public void syncFromData(PillarIdManager.PillarData data) {
+        PillarEntitySync.syncFromData(this, data);
     }
 }

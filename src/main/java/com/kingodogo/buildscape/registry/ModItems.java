@@ -57,7 +57,7 @@ public class ModItems {
             tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.spawn_info"));
             if (level != null) {
                 long currentTime = System.currentTimeMillis();
-                long endTime = HomemakerCooldownTracker.cooldownEndTime;
+                long endTime = HomemakerCooldownTracker.getCooldownEndTime();
                 if (endTime > currentTime) {
                     long remainingMs = endTime - currentTime;
                     long totalSeconds = remainingMs / 1000;
@@ -92,7 +92,7 @@ public class ModItems {
                     new TranslatableComponent("tooltip.buildscape.festive_wandering_homemaker_spawn_egg.spawn_info"));
             if (level != null) {
                 long currentTime = System.currentTimeMillis();
-                long endTime = HomemakerCooldownTracker.cooldownEndTime;
+                long endTime = HomemakerCooldownTracker.getCooldownEndTime();
                 if (endTime > currentTime) {
                     long remainingMs = endTime - currentTime;
                     long totalSeconds = remainingMs / 1000;

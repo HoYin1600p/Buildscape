@@ -79,7 +79,7 @@ public final class ClientPacketHandlers {
     }
 
     public static void setHomemakerCooldown(long cooldownEndTime) {
-        HomemakerCooldownTracker.cooldownEndTime = cooldownEndTime;
+        HomemakerCooldownTracker.setCooldownEndTime(cooldownEndTime);
     }
 
     public static void applySignFrame(BlockPos pos, String frameId) {

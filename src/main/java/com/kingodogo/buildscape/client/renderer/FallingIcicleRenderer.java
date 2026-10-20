@@ -1,13 +1,15 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.entity.FallingIcicleEntity;
+import com.kingodogo.buildscape.feature.icicle.FallingIcicleEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -32,8 +34,7 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
             float partialTicks,
             PoseStack poseStack,
             MultiBufferSource bufferSource,
-            int packedLight
-    ) {
+            int packedLight) {
         BlockState blockState = entity.getBlockState();
         if (blockState.getRenderShape() == RenderShape.MODEL) {
             Level level = entity.level;
@@ -42,13 +43,11 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
                 BlockPos blockPos = new BlockPos(
                         entity.getX(),
                         entity.getBoundingBox().maxY,
-                        entity.getZ()
-                );
-                poseStack.translate(-0.5D, 0.0D, -0.5D);
+                        entity.getZ());
+                poseStack.translate(-0.5, 0.0, -0.5);
 
                 BlockRenderDispatcher blockRenderer = getBlockRenderer();
-                net.minecraft.client.renderer.RenderType renderType =
-                        net.minecraft.client.renderer.RenderType.cutout();
+                RenderType renderType = RenderType.cutout();
                 blockRenderer
                         .getModelRenderer()
                         .tesselateBlock(
@@ -61,8 +60,7 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
                                 false,
                                 level.random,
                                 blockState.getSeed(entity.getStartPos()),
-                                OverlayTexture.NO_OVERLAY
-                        );
+                                OverlayTexture.NO_OVERLAY);
 
                 poseStack.popPose();
                 super.render(
@@ -71,14 +69,13 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
                         partialTicks,
                         poseStack,
                         bufferSource,
-                        packedLight
-                );
+                        packedLight);
             }
         }
     }
 
     @Override
     public ResourceLocation getTextureLocation(FallingIcicleEntity entity) {
-        return net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS;
+        return TextureAtlas.LOCATION_BLOCKS;
     }
 }

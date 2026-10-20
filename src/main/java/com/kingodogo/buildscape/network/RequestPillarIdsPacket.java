@@ -1,29 +1,31 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request for the full pillar list. The server limits each player to one request per five seconds,
+ * loads the registry first if it is not loaded yet, and answers with {@link SyncPillarIdsPacket} chunks.
+ */
 public class RequestPillarIdsPacket {
 
     private static final String LAST_REQUEST_TIME = "BuildScapePillarSyncRequestTime";
     private static final long REQUEST_COOLDOWN_MS = 5_000L;
 
-    public RequestPillarIdsPacket() {
-    }
+    public RequestPillarIdsPacket() {}
 
-    public RequestPillarIdsPacket(FriendlyByteBuf buf) {
-    }
+    public RequestPillarIdsPacket(FriendlyByteBuf buf) {}
 
     public static RequestPillarIdsPacket decode(FriendlyByteBuf buf) {
         return new RequestPillarIdsPacket(buf);
     }
 
-    public void encode(FriendlyByteBuf buf) {
-    }
+    public void encode(FriendlyByteBuf buf) {}
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
@@ -49,7 +51,7 @@ public class RequestPillarIdsPacket {
             try {
                 SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());
             } catch (RuntimeException e) {
-                com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to send pillar data to {}", player.getGameProfile().getName(), e);
+                BuildScape.LOGGER.error("Unable to send pillar data to {}", player.getGameProfile().getName(), e);
             }
         });
         ctx.get().setPacketHandled(true);

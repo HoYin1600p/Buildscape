@@ -1,50 +1,48 @@
 package com.kingodogo.buildscape.worldgen;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModBlocks;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.util.valueproviders.ConstantInt;
-import net.minecraft.util.valueproviders.UniformInt;
-import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.placement.*;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
+import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
+import net.minecraft.world.level.levelgen.placement.HeightmapPlacement;
+import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE
-)
+import java.util.ArrayList;
+import java.util.List;
+
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModBiomeModifications {
 
     private static BlockPredicate matchesBlocksBelow(List<Block> blocks) {
-        return BlockPredicate.matchesBlocks(blocks, new net.minecraft.core.Vec3i(0, -1, 0));
+        return BlockPredicate.matchesBlocks(blocks, new Vec3i(0, -1, 0));
     }
 
     private static BlockPredicate mossBlockAboveAir() {
-        return BlockPredicate.matchesBlocks(List.of(net.minecraft.world.level.block.Blocks.MOSS_BLOCK), new net.minecraft.core.Vec3i(0, 1, 0));
+        return BlockPredicate.matchesBlocks(List.of(Blocks.MOSS_BLOCK), new Vec3i(0, 1, 0));
     }
 
     private static void addFeatureToBiome(
             BiomeLoadingEvent event,
             ConfiguredFeature<?, ?> feature,
-            int rarity
-    ) {
+            int rarity) {
         if (feature != null) {
             PlacedFeature placed = new PlacedFeature(
                     Holder.direct(feature),
@@ -53,24 +51,17 @@ public class ModBiomeModifications {
                             InSquarePlacement.spread(),
                             HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
                             BlockPredicateFilter.forPredicate(
-                                    net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                            List.of(net.minecraft.world.level.block.Blocks.AIR)
-                                    )
-                            ),
+                                    BlockPredicate.matchesBlocks(
+                                            List.of(Blocks.AIR))),
                             BlockPredicateFilter.forPredicate(
                                     matchesBlocksBelow(
-                                            List.of(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)
-                                    )
-                            ),
-                            BiomeFilter.biome()
-                    )
-            );
+                                            List.of(Blocks.GRASS_BLOCK))),
+                            BiomeFilter.biome()));
             event
                     .getGeneration()
                     .addFeature(
                             GenerationStep.Decoration.VEGETAL_DECORATION,
-                            Holder.direct(placed)
-                    );
+                            Holder.direct(placed));
         }
     }
 
@@ -92,8 +83,7 @@ public class ModBiomeModifications {
             ConfiguredFeature<?, ?> state4S,
             ConfiguredFeature<?, ?> state4E,
             ConfiguredFeature<?, ?> state4W,
-            int rarity
-    ) {
+            int rarity) {
         addFeatureToBiome(event, state1N, rarity);
         addFeatureToBiome(event, state1S, rarity);
         addFeatureToBiome(event, state1E, rarity);
@@ -115,8 +105,7 @@ public class ModBiomeModifications {
     private static void addPropagulePatchToBiome(
             BiomeLoadingEvent event,
             ConfiguredFeature<?, ?> feature,
-            int rarity
-    ) {
+            int rarity) {
         if (feature != null) {
             PlacedFeature placed = new PlacedFeature(
                     Holder.direct(feature),
@@ -125,43 +114,33 @@ public class ModBiomeModifications {
                             InSquarePlacement.spread(),
                             HeightmapPlacement.onHeightmap(Heightmap.Types.OCEAN_FLOOR_WG),
                             BlockPredicateFilter.forPredicate(
-                                    net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                            List.of(net.minecraft.world.level.block.Blocks.AIR)
-                                    )
-                            ),
+                                    BlockPredicate.matchesBlocks(
+                                            List.of(Blocks.AIR))),
                             BlockPredicateFilter.forPredicate(
                                     matchesBlocksBelow(
-                                            new java.util.ArrayList<net.minecraft.world.level.block.Block>() {
+                                            new ArrayList<Block>() {
                                                 {
-                                                    add(net.minecraft.world.level.block.Blocks.GRASS_BLOCK);
-                                                    add(com.kingodogo.buildscape.block.ModBlocks.MUD.get());
+                                                    add(Blocks.GRASS_BLOCK);
+                                                    add(SandstoneBlocks.MUD.get());
                                                 }
-                                            }
-                                    )
-                            ),
+                                            })),
                             BlockPredicateFilter.forPredicate(
-                                    net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.wouldSurvive(
-                                            com.kingodogo.buildscape.block.ModBlocks.MANGROVE_PROPAGULE.get()
+                                    BlockPredicate.wouldSurvive(
+                                            DecorBlocks.MANGROVE_PROPAGULE.get()
                                                     .defaultBlockState(),
-                                            net.minecraft.core.BlockPos.ZERO
-                                    )
-                            ),
-                            BiomeFilter.biome()
-                    )
-            );
+                                            BlockPos.ZERO)),
+                            BiomeFilter.biome()));
             event
                     .getGeneration()
                     .addFeature(
                             GenerationStep.Decoration.VEGETAL_DECORATION,
-                            Holder.direct(placed)
-                    );
+                            Holder.direct(placed));
         }
     }
 
     private static void addCloverStatesToBiome(
             BiomeLoadingEvent event,
-            int rarity
-    ) {
+            int rarity) {
         addFeatureToBiome(event, ModConfiguredFeatures.CLOVER_1_N.get(), rarity);
         addFeatureToBiome(event, ModConfiguredFeatures.CLOVER_1_S.get(), rarity);
         addFeatureToBiome(event, ModConfiguredFeatures.CLOVER_1_E.get(), rarity);
@@ -192,16 +171,13 @@ public class ModBiomeModifications {
             addFeatureToBiome(
                     event,
                     ModConfiguredFeatures.LIGHT_BLUE_MONETS.get(),
-                    4
-            );
+                    4);
             addFeatureToBiome(event, ModConfiguredFeatures.PINK_MONETS.get(), 4);
             addFeatureToBiome(event, ModConfiguredFeatures.YELLOW_MONETS.get(), 4);
         }
 
-        if (
-                event.getName().equals(Biomes.BIRCH_FOREST.location()) ||
-                        event.getName().equals(Biomes.OLD_GROWTH_BIRCH_FOREST.location())
-        ) {
+        if (event.getName().equals(Biomes.BIRCH_FOREST.location()) ||
+                event.getName().equals(Biomes.OLD_GROWTH_BIRCH_FOREST.location())) {
             addFeatureToBiome(event, ModConfiguredFeatures.ALL_PETALS.get(), 11);
             addFeatureToBiome(event, ModConfiguredFeatures.CLOVER.get(), 32);
             addFeatureToBiome(event, ModConfiguredFeatures.WILDFLOWERS.get(), 11);
@@ -210,52 +186,41 @@ public class ModBiomeModifications {
 
         if (event.getName().equals(Biomes.LUSH_CAVES.location())) {
             if (ModConfiguredFeatures.ALL_COLORED_SPORE_BLOSSOM.isPresent()) {
-                ConfiguredFeature<?, ?> sporeBlossomFeature =
-                        ModConfiguredFeatures.ALL_COLORED_SPORE_BLOSSOM.get();
+                ConfiguredFeature<?, ?> sporeBlossomFeature = ModConfiguredFeatures.ALL_COLORED_SPORE_BLOSSOM.get();
 
                 PlacedFeature innerPlaced = new PlacedFeature(
                         Holder.direct(sporeBlossomFeature),
                         List.of(
-                                com.kingodogo.buildscape.worldgen.MossBlockCeilingPlacement.INSTANCE,
+                                MossBlockCeilingPlacement.INSTANCE,
                                 BlockPredicateFilter.forPredicate(
-                                        net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                                List.of(net.minecraft.world.level.block.Blocks.AIR)
-                                        )
-                                )
-                        )
-                );
+                                        BlockPredicate.matchesBlocks(
+                                                List.of(Blocks.AIR)))));
 
                 ConfiguredFeature<?, ?> patchFeature = new ConfiguredFeature<>(
-                        net.minecraft.world.level.levelgen.feature.Feature.RANDOM_PATCH,
-                        new net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration(
+                        Feature.RANDOM_PATCH,
+                        new RandomPatchConfiguration(
                                 10,
                                 7,
                                 2,
-                                Holder.direct(innerPlaced)
-                        )
-                );
+                                Holder.direct(innerPlaced)));
 
                 PlacedFeature sporeBlossomPlaced = new PlacedFeature(
                         Holder.direct(patchFeature),
                         List.of(
                                 RarityFilter.onAverageOnceEvery(5),
                                 InSquarePlacement.spread(),
-                                BiomeFilter.biome()
-                        )
-                );
+                                BiomeFilter.biome()));
 
                 event
                         .getGeneration()
                         .addFeature(
                                 GenerationStep.Decoration.VEGETAL_DECORATION,
-                                Holder.direct(sporeBlossomPlaced)
-                        );
+                                Holder.direct(sporeBlossomPlaced));
             }
         }
 
         if (event.getName().equals(Biomes.SWAMP.location())) {
-            ConfiguredFeature<?, ?> cloverFeature =
-                    ModConfiguredFeatures.CLOVER.get();
+            ConfiguredFeature<?, ?> cloverFeature = ModConfiguredFeatures.CLOVER.get();
             if (cloverFeature != null) {
                 PlacedFeature cloverPlaced = new PlacedFeature(
                         Holder.direct(cloverFeature),
@@ -264,81 +229,62 @@ public class ModBiomeModifications {
                                 InSquarePlacement.spread(),
                                 HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
                                 BlockPredicateFilter.forPredicate(
-                                        net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
-                                                List.of(net.minecraft.world.level.block.Blocks.AIR)
-                                        )
-                                ),
+                                        BlockPredicate.matchesBlocks(
+                                                List.of(Blocks.AIR))),
                                 BlockPredicateFilter.forPredicate(
                                         matchesBlocksBelow(
-                                                new java.util.ArrayList<
-                                                        net.minecraft.world.level.block.Block
-                                                        >() {
+                                                new ArrayList<Block>() {
                                                     {
-                                                        add(net.minecraft.world.level.block.Blocks.GRASS_BLOCK);
-                                                        add(com.kingodogo.buildscape.block.ModBlocks.MUD.get());
+                                                        add(Blocks.GRASS_BLOCK);
+                                                        add(SandstoneBlocks.MUD.get());
                                                     }
-                                                }
-                                        )
-                                ),
+                                                })),
                                 BlockPredicateFilter.forPredicate(
-                                        net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.wouldSurvive(
-                                                com.kingodogo.buildscape.block.ModBlocks.CLOVER.get()
+                                        BlockPredicate.wouldSurvive(
+                                                DecorBlocks.CLOVER.get()
                                                         .defaultBlockState(),
-                                                net.minecraft.core.BlockPos.ZERO
-                                        )
-                                ),
-                                BiomeFilter.biome()
-                        )
-                );
+                                                BlockPos.ZERO)),
+                                BiomeFilter.biome()));
                 event
                         .getGeneration()
                         .addFeature(
                                 GenerationStep.Decoration.VEGETAL_DECORATION,
-                                Holder.direct(cloverPlaced)
-                        );
+                                Holder.direct(cloverPlaced));
             }
 
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_1.get(),
-                    5
-            );
+                    5);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_2.get(),
-                    5
-            );
+                    5);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_3.get(),
-                    5
-            );
+                    5);
 
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_4.get(),
-                    40
-            );
+                    40);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_5.get(),
-                    53
-            );
+                    53);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_6.get(),
-                    107
-            );
+                    107);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_7.get(),
-                    160
-            );
+                    160);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_8.get(),
-                    320
-            );
+                    320);
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.HollowLogBlock;
-import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.client.renderer.PipeSpillVertexConsumer;
+import com.kingodogo.buildscape.feature.pipe.HollowLogBlock;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.block.LiquidBlockRenderer;
 import net.minecraft.core.BlockPos;
@@ -31,8 +31,7 @@ public class LiquidBlockRendererMixin {
             VertexConsumer buffer,
             BlockState state,
             FluidState fluidState,
-            CallbackInfoReturnable<Boolean> cir
-    ) {
+            CallbackInfoReturnable<Boolean> cir) {
         if (state.getBlock() instanceof HollowPipeBlock || state.getBlock() instanceof HollowLogBlock) {
             cir.setReturnValue(false);
         }
@@ -43,8 +42,7 @@ public class LiquidBlockRendererMixin {
             BlockAndTintGetter level,
             Fluid fluid,
             BlockPos pos,
-            CallbackInfoReturnable<Float> cir
-    ) {
+            CallbackInfoReturnable<Float> cir) {
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof HollowPipeBlock || state.getBlock() instanceof HollowLogBlock) {
             cir.setReturnValue(-1.0F);

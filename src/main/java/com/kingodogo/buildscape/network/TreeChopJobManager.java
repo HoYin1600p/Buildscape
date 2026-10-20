@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -21,6 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Server-side queue of tree-chop jobs, one per player. A job removes the collected logs in small batches every few
+ * ticks instead of all at once, and is dropped when the player logs out, leaves creative, loses permission or
+ * changes level, and when the server stops. State is in memory only.
+ */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class TreeChopJobManager {
 
@@ -28,9 +34,11 @@ public final class TreeChopJobManager {
     private static final int MAX_BATCH_SIZE = 8;
     private static final Map<UUID, TreeChopJob> JOBS = new HashMap<>();
 
-    private TreeChopJobManager() {
-    }
+    private TreeChopJobManager() {}
 
+    /**
+     * Queues a job for the player, replacing any job already running for them. Does nothing for an empty block list.
+     */
     public static void start(ServerPlayer player, ServerLevel level, Block targetBlock, Iterable<BlockPos> blocks) {
         List<BlockPos> positions = new ArrayList<>();
         for (BlockPos block : blocks) {
@@ -114,7 +122,7 @@ public final class TreeChopJobManager {
                 if (state.getBlock() != targetBlock) {
                     continue;
                 }
-                if (net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(
+                if (ForgeHooks.onBlockBreakEvent(
                         level, player.gameMode.getGameModeForPlayer(), player, pos) < 0) {
                     continue;
                 }

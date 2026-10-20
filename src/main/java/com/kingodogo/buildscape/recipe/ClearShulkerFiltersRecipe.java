@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.recipe;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.BuildersPouchItem;
+import com.kingodogo.buildscape.registry.ModRecipeSerializers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -13,9 +15,13 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
+/**
+ * Crafting recipe: a single filtered shulker box (or supported container) alone in the grid comes back as one copy with
+ * its ghost filters removed.
+ */
 public class ClearShulkerFiltersRecipe extends CustomRecipe {
-    private static final String BLOCK_ENTITY_TAG = "BlockEntityTag";
-    private static final String FILTERS_TAG = "GhostFilters";
+    private static final String BLOCK_ENTITY_TAG = NbtKeys.BLOCK_ENTITY_TAG;
+    private static final String FILTERS_TAG = NbtKeys.GHOST_FILTERS;
 
     public ClearShulkerFiltersRecipe(ResourceLocation id) {
         super(id);
@@ -26,8 +32,12 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
         ItemStack filteredContainer = ItemStack.EMPTY;
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
-            if (stack.isEmpty()) continue;
-            if (!filteredContainer.isEmpty() || !isSupportedContainer(stack)) return false;
+            if (stack.isEmpty()) {
+                continue;
+            }
+            if (!filteredContainer.isEmpty() || !isSupportedContainer(stack)) {
+                return false;
+            }
             filteredContainer = stack;
         }
         return !filteredContainer.isEmpty() && hasFilters(filteredContainer);
@@ -67,23 +77,31 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
     }
 
     private static boolean hasFilters(ItemStack stack) {
-        if (stack.getItem() instanceof BuildersPouchItem) return BuildersPouchItem.hasFilters(stack);
+        if (stack.getItem() instanceof BuildersPouchItem) {
+            return BuildersPouchItem.hasFilters(stack);
+        }
         CompoundTag blockEntityTag = stack.getTagElement(BLOCK_ENTITY_TAG);
-        if (blockEntityTag == null) return false;
+        if (blockEntityTag == null) {
+            return false;
+        }
 
         if (blockEntityTag.contains(FILTERS_TAG, Tag.TAG_LIST)) {
             ListTag filters = blockEntityTag.getList(FILTERS_TAG, Tag.TAG_STRING);
             for (int i = 0; i < filters.size(); i++) {
-                if (!filters.getString(i).isEmpty()) return true;
+                if (!filters.getString(i).isEmpty()) {
+                    return true;
+                }
             }
         }
 
-        if (!blockEntityTag.contains("Items", Tag.TAG_LIST)) return false;
-        ListTag items = blockEntityTag.getList("Items", Tag.TAG_COMPOUND);
+        if (!blockEntityTag.contains(NbtKeys.ITEMS, Tag.TAG_LIST)) {
+            return false;
+        }
+        ListTag items = blockEntityTag.getList(NbtKeys.ITEMS, Tag.TAG_COMPOUND);
         for (int i = 0; i < items.size(); i++) {
             CompoundTag item = items.getCompound(i);
-            if (item.contains("tag", Tag.TAG_COMPOUND)
-                    && item.getCompound("tag").getBoolean("ghost")) {
+            if (item.contains(NbtKeys.TAG, Tag.TAG_COMPOUND)
+                    && item.getCompound(NbtKeys.TAG).getBoolean(NbtKeys.GHOST)) {
                 return true;
             }
         }
@@ -96,19 +114,23 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
             return;
         }
         CompoundTag blockEntityTag = stack.getTagElement(BLOCK_ENTITY_TAG);
-        if (blockEntityTag == null) return;
+        if (blockEntityTag == null) {
+            return;
+        }
 
         blockEntityTag.remove(FILTERS_TAG);
-        if (!blockEntityTag.contains("Items", Tag.TAG_LIST)) return;
+        if (!blockEntityTag.contains(NbtKeys.ITEMS, Tag.TAG_LIST)) {
+            return;
+        }
 
-        ListTag items = blockEntityTag.getList("Items", Tag.TAG_COMPOUND);
+        ListTag items = blockEntityTag.getList(NbtKeys.ITEMS, Tag.TAG_COMPOUND);
         for (int i = items.size() - 1; i >= 0; i--) {
             CompoundTag item = items.getCompound(i);
-            if (item.contains("tag", Tag.TAG_COMPOUND)
-                    && item.getCompound("tag").getBoolean("ghost")) {
+            if (item.contains(NbtKeys.TAG, Tag.TAG_COMPOUND)
+                    && item.getCompound(NbtKeys.TAG).getBoolean(NbtKeys.GHOST)) {
                 items.remove(i);
             }
         }
-        blockEntityTag.put("Items", items);
+        blockEntityTag.put(NbtKeys.ITEMS, items);
     }
 }

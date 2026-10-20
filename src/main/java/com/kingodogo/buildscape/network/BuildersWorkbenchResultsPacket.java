@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity;
+import com.kingodogo.buildscape.block.BuildersWorkbenchMenu;
 import com.kingodogo.buildscape.util.ColorGradientSolver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -16,6 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server packet carrying the nine result items the Builder's Workbench screen computed for a tab.
+ * Results travel as item ids; the server only applies them after it re-checks that the player has this workbench
+ * open, the tab and filter mask are valid and the results match the inputs, so a client cannot inject items.
+ */
 public final class BuildersWorkbenchResultsPacket {
     private static final int RESULT_COUNT = 9;
 
@@ -26,7 +32,7 @@ public final class BuildersWorkbenchResultsPacket {
     private final List<ResourceLocation> results;
 
     public BuildersWorkbenchResultsPacket(BlockPos pos, int tab, int filterMask, int[] offsets,
-                                          List<ItemStack> results) {
+            List<ItemStack> results) {
         this.pos = pos;
         this.tab = tab;
         this.filterMask = filterMask;
@@ -43,12 +49,15 @@ public final class BuildersWorkbenchResultsPacket {
         this.tab = buffer.readByte();
         this.filterMask = buffer.readUnsignedByte();
         this.offsets = new int[RESULT_COUNT];
-        for (int i = 0; i < RESULT_COUNT; i++) offsets[i] = NetworkPacketLimits.readResultOffset(buffer);
+        for (int i = 0; i < RESULT_COUNT; i++) {
+            offsets[i] = NetworkPacketLimits.readResultOffset(buffer);
+        }
         this.results = new ArrayList<>(RESULT_COUNT);
         for (int i = 0; i < RESULT_COUNT; i++) {
             results.add(buffer.readBoolean()
                     ? new ResourceLocation(NetworkPacketLimits.readUtf(buffer,
-                    NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "workbench result")) : null);
+                            NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "workbench result"))
+                    : null);
         }
     }
 
@@ -60,7 +69,9 @@ public final class BuildersWorkbenchResultsPacket {
         buffer.writeBlockPos(pos);
         buffer.writeByte(tab);
         buffer.writeByte(filterMask);
-        for (int offset : offsets) buffer.writeVarInt(Math.max(0, offset));
+        for (int offset : offsets) {
+            buffer.writeVarInt(Math.max(0, offset));
+        }
         for (ResourceLocation result : results) {
             buffer.writeBoolean(result != null);
             if (result != null) {
@@ -74,8 +85,12 @@ public final class BuildersWorkbenchResultsPacket {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null || player.level == null) return;
-            if (!(player.containerMenu instanceof BuildersWorkbenchMenu menu)) return;
+            if (player == null || player.level == null) {
+                return;
+            }
+            if (!(player.containerMenu instanceof BuildersWorkbenchMenu menu)) {
+                return;
+            }
             BuildersWorkbenchBlockEntity workbench = menu.getBlockEntity();
             if (workbench == null
                     || !workbench.getBlockPos().equals(pos)
@@ -93,10 +108,14 @@ public final class BuildersWorkbenchResultsPacket {
                     continue;
                 }
                 Item item = Registry.ITEM.getOptional(id).orElse(null);
-                if (!(item instanceof BlockItem) || !ColorGradientSolver.isCandidateBlock(item)) return;
+                if (!(item instanceof BlockItem) || !ColorGradientSolver.isCandidateBlock(item)) {
+                    return;
+                }
                 validated.add(new ItemStack(item));
             }
-            if (!workbench.resultsMatchInputs(tab, validated)) return;
+            if (!workbench.resultsMatchInputs(tab, validated)) {
+                return;
+            }
             workbench.applyClientResults(tab, filterMask, offsets, validated);
         });
         context.setPacketHandled(true);

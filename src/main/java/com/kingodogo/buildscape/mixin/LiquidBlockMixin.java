@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.fluid.ModFluids;
+import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LiquidBlock.class)
 public abstract class LiquidBlockMixin {
-    @Redirect(method = "shouldSpreadLiquid", require = 0, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/material/FluidState;is(Lnet/minecraft/tags/TagKey;)Z"))
+    @Redirect(method = "shouldSpreadLiquid", require = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;is(Lnet/minecraft/tags/TagKey;)Z"))
     private boolean buildscape$excludeExperienceFromLavaMixing(FluidState state, TagKey<Fluid> tag) {
         return state.is(tag) && !(tag.equals(FluidTags.WATER) && ModFluids.isExperience(state.getType()));
     }

@@ -10,10 +10,20 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
+import java.util.Random;
+
+/**
+ * Shapeless counterpart of {@link ShapedDurabilityRecipe}, with the same durability handling. Registered as
+ * {@code shapeless_durability}.
+ */
 public class ShapelessDurabilityRecipe extends ShapelessRecipe {
 
     private final int damageAmount;
@@ -23,8 +33,7 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
             String group,
             ItemStack result,
             NonNullList<Ingredient> ingredients,
-            int damageAmount
-    ) {
+            int damageAmount) {
         super(id, group, result, ingredients);
         this.damageAmount = damageAmount;
     }
@@ -40,20 +49,18 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
     public NonNullList<ItemStack> getRemainingItems(CraftingContainer container) {
         NonNullList<ItemStack> remaining = NonNullList.withSize(
                 container.getContainerSize(),
-                ItemStack.EMPTY
-        );
+                ItemStack.EMPTY);
 
         for (int i = 0; i < remaining.size(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty()) {
                 if ((stack.isDamageableItem() || stack.getMaxDamage() > 0) && !(stack.getItem() instanceof ArmorItem)) {
                     ItemStack damagedStack = stack.copy();
-                    int unbreakingLevel = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
-                            net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, damagedStack
-                    );
+                    int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(
+                            Enchantments.UNBREAKING, damagedStack);
                     boolean shouldDamage = true;
                     if (unbreakingLevel > 0) {
-                        java.util.Random random = new java.util.Random();
+                        Random random = new Random();
                         if (random.nextFloat() >= (1.0f / (unbreakingLevel + 1.0f))) {
                             shouldDamage = false;
                         }
@@ -82,21 +89,21 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
     }
 
     public static class Serializer
-            extends ForgeRegistryEntry<RecipeSerializer<?>>
-            implements RecipeSerializer<ShapelessDurabilityRecipe> {
+            extends
+                ForgeRegistryEntry<RecipeSerializer<?>>
+            implements
+                RecipeSerializer<ShapelessDurabilityRecipe> {
 
         @Override
         public ShapelessDurabilityRecipe fromJson(
                 ResourceLocation recipeId,
-                JsonObject json
-        ) {
+                JsonObject json) {
             String group = GsonHelper.getAsString(json, "group", "");
             int damageAmount = GsonHelper.getAsInt(json, "damageAmount", 1);
 
             JsonArray ingredientsJson = GsonHelper.getAsJsonArray(
                     json,
-                    "ingredients"
-            );
+                    "ingredients");
             NonNullList<Ingredient> ingredients = NonNullList.create();
 
             for (int i = 0; i < ingredientsJson.size(); i++) {
@@ -108,36 +115,31 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
 
             if (ingredients.isEmpty()) {
                 throw new JsonParseException(
-                        "No ingredients for shapeless durability recipe"
-                );
+                        "No ingredients for shapeless durability recipe");
             }
 
             ItemStack result = CraftingHelper.getItemStack(
                     GsonHelper.getAsJsonObject(json, "result"),
-                    true
-            );
+                    true);
 
             return new ShapelessDurabilityRecipe(
                     recipeId,
                     group,
                     result,
                     ingredients,
-                    damageAmount
-            );
+                    damageAmount);
         }
 
         @Override
         public ShapelessDurabilityRecipe fromNetwork(
                 ResourceLocation recipeId,
-                FriendlyByteBuf buffer
-        ) {
+                FriendlyByteBuf buffer) {
             String group = buffer.readUtf();
             int damageAmount = buffer.readInt();
             int ingredientCount = buffer.readVarInt();
             NonNullList<Ingredient> ingredients = NonNullList.withSize(
                     ingredientCount,
-                    Ingredient.EMPTY
-            );
+                    Ingredient.EMPTY);
 
             for (int i = 0; i < ingredients.size(); i++) {
                 ingredients.set(i, Ingredient.fromNetwork(buffer));
@@ -150,15 +152,13 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
                     group,
                     result,
                     ingredients,
-                    damageAmount
-            );
+                    damageAmount);
         }
 
         @Override
         public void toNetwork(
                 FriendlyByteBuf buffer,
-                ShapelessDurabilityRecipe recipe
-        ) {
+                ShapelessDurabilityRecipe recipe) {
             buffer.writeUtf(recipe.getGroup());
             buffer.writeInt(recipe.damageAmount);
             buffer.writeVarInt(recipe.getIngredients().size());

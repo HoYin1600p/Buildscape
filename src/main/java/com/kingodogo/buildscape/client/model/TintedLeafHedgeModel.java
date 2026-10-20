@@ -1,6 +1,9 @@
 package com.kingodogo.buildscape.client.model;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,8 +26,7 @@ public class TintedLeafHedgeModel implements BakedModel {
     public @NotNull List<BakedQuad> getQuads(
             @Nullable BlockState state,
             @Nullable Direction side,
-            @NotNull Random rand
-    ) {
+            @NotNull Random rand) {
         List<BakedQuad> originalQuads = originalModel.getQuads(state, side, rand);
 
         boolean needsModification = false;
@@ -43,21 +45,21 @@ public class TintedLeafHedgeModel implements BakedModel {
 
         for (BakedQuad quad : originalQuads) {
             if (quad.getTintIndex() == -1) {
-                net.minecraft.client.renderer.texture.TextureAtlasSprite sprite =
-                        quad.getSprite();
+                TextureAtlasSprite sprite = quad.getSprite();
 
                 int[] vertexData = quad.getVertices().clone();
 
                 Direction dir = quad.getDirection();
-                if (dir == null) dir = Direction.NORTH;
+                if (dir == null) {
+                    dir = Direction.NORTH;
+                }
 
                 BakedQuad tintedQuad = new BakedQuad(
                         vertexData,
                         0,
                         dir,
                         sprite,
-                        quad.isShade()
-                );
+                        quad.isShade());
                 tintedQuads.add(tintedQuad);
             } else {
                 tintedQuads.add(quad);
@@ -88,17 +90,17 @@ public class TintedLeafHedgeModel implements BakedModel {
     }
 
     @Override
-    public net.minecraft.client.renderer.texture.TextureAtlasSprite getParticleIcon() {
+    public TextureAtlasSprite getParticleIcon() {
         return originalModel.getParticleIcon();
     }
 
     @Override
-    public net.minecraft.client.renderer.block.model.ItemTransforms getTransforms() {
+    public ItemTransforms getTransforms() {
         return originalModel.getTransforms();
     }
 
     @Override
-    public net.minecraft.client.renderer.block.model.ItemOverrides getOverrides() {
+    public ItemOverrides getOverrides() {
         return originalModel.getOverrides();
     }
 }

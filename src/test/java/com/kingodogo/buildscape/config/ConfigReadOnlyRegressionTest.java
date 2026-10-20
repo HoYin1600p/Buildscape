@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.config;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
-import org.junit.BeforeClass;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -15,15 +14,15 @@ import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-public class ConfigReadOnlyRegressionTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class ConfigReadOnlyRegressionTest extends BootstrappedGameTest {
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @Test
     public void missingDefaultsAreAppendedOnceWithoutChangingAnyExistingBytes() throws Exception {
@@ -45,7 +44,8 @@ public class ConfigReadOnlyRegressionTest {
                 assertEquals(original + (trailingNewline ? "" : newline)
                         + "# Maximum number of pipes in one network." + newline
                         + "MaxPipeNetworkSize = 64" + newline
-                        + "# Number of custom item presets that can be saved besides Default (1-32, default 4)." + newline
+                        + "# Number of custom item presets that can be saved besides Default (1-32, default 4)."
+                        + newline
                         + "MaxCustomPresets = 4" + newline, ConfigLayoutIO.readText(file));
                 assertEquals(64, config.getMaxPipeNetworkSize());
                 assertFalse(config.isCakeStackingEnabled());
@@ -163,7 +163,9 @@ public class ConfigReadOnlyRegressionTest {
     private static byte[] badBytes(String text) {
         byte[] bytes = text.getBytes(StandardCharsets.US_ASCII);
         for (int i = 0; i < bytes.length; i++) {
-            if (bytes[i] == '@') bytes[i] = (byte) 0x81;
+            if (bytes[i] == '@') {
+                bytes[i] = (byte) 0x81;
+            }
         }
         return bytes;
     }

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.config.ConfigSetting;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -9,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to delete a list of pillar records (at most 256 ids) from the server's pillar registry.
+ * Needs the pillar-edit permission; on success the server re-syncs pillar data to every player.
+ */
 public class RemovePillarPacket {
 
     public static final int MAX_IDS = 256;
@@ -47,8 +52,12 @@ public class RemovePillarPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
-            if (!EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_EDIT)) return;
+            if (player == null) {
+                return;
+            }
+            if (!EditGuard.require(player, ConfigSetting.PILLAR_EDIT)) {
+                return;
+            }
 
             PillarIdManager manager = PillarIdManager.get();
             boolean changed = manager.removePillars(pillarIds);

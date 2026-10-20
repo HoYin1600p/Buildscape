@@ -9,8 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class CopperChestClientEvents {
-    private CopperChestClientEvents() {
-    }
+    private CopperChestClientEvents() {}
 
     @SubscribeEvent
     public static void onTextureStitch(TextureStitchEvent.Pre event) {

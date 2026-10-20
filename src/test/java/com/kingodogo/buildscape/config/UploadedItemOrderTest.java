@@ -1,20 +1,14 @@
 package com.kingodogo.buildscape.config;
 
-import org.junit.BeforeClass;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import org.junit.Test;
-
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class UploadedItemOrderTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class UploadedItemOrderTest extends BootstrappedGameTest {
 
     /**
      * A client's merged upload is a set (the server list plus the sender's additions). The server writes it
@@ -24,7 +18,8 @@ public class UploadedItemOrderTest {
     public void aMergedUploadKeepsTheServerListOrderAndAppendsTheNewEntry() {
         List<String> serverFile = List.of("minecraft:stone", "minecraft:emerald", "minecraft:dirt", "not an id");
         Set<String> merged = Set.of("minecraft:dirt", "minecraft:stone", "minecraft:emerald", "minecraft:diamond");
-        assertEquals(List.of("minecraft:stone", "minecraft:emerald", "minecraft:dirt", "not an id", "minecraft:diamond"),
+        assertEquals(
+                List.of("minecraft:stone", "minecraft:emerald", "minecraft:dirt", "not an id", "minecraft:diamond"),
                 PillarParticleConfig.orderedItemsForSave(serverFile, merged));
     }
 }

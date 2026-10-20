@@ -1,12 +1,11 @@
 package com.kingodogo.buildscape.recipe.framework.util;
 
+import org.junit.Test;
+
 public final class PatternBoundsTest {
-    private static int checks;
 
-    private PatternBoundsTest() {
-    }
-
-    public static void main(String[] args) {
+    @Test
+    public void boundsTrimBlankRowsAndColumns() {
         PatternBounds wall = bounds("   ", "BBB", "BBB");
         check(wall.minRow() == 1 && wall.minCol() == 0, "leading blank row is trimmed");
         check(wall.width() == 3 && wall.height() == 2, "wall pattern shrinks to 3x2");
@@ -26,8 +25,6 @@ public final class PatternBoundsTest {
 
         PatternBounds empty = bounds("  ", "  ");
         check(empty.isFull(2, 2), "empty pattern is left unchanged");
-
-        System.out.println("Pattern bounds tests passed: " + checks + " checks");
     }
 
     private static PatternBounds bounds(String... rows) {
@@ -40,6 +37,5 @@ public final class PatternBoundsTest {
         if (!result) {
             throw new AssertionError(description);
         }
-        checks++;
     }
 }

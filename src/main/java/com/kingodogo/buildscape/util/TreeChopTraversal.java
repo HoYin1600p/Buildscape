@@ -10,8 +10,7 @@ import java.util.function.Predicate;
 
 public final class TreeChopTraversal {
 
-    private TreeChopTraversal() {
-    }
+    private TreeChopTraversal() {}
 
     public static Set<BlockPos> collect(BlockPos startPos, Predicate<BlockPos> matches, int limit) {
         Set<BlockPos> visited = new LinkedHashSet<>();

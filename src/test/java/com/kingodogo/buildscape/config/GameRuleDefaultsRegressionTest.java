@@ -1,12 +1,11 @@
 package com.kingodogo.buildscape.config;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.world.ModGameRules;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.GameRules;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -20,15 +19,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
-public class GameRuleDefaultsRegressionTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class GameRuleDefaultsRegressionTest extends BootstrappedGameTest {
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @Test
     @SuppressWarnings("unchecked")
@@ -45,7 +42,9 @@ public class GameRuleDefaultsRegressionTest {
         }
         Field registry = null;
         for (Field field : GameRules.class.getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers()) && Map.class.isAssignableFrom(field.getType())) registry = field;
+            if (Modifier.isStatic(field.getModifiers()) && Map.class.isAssignableFrom(field.getType())) {
+                registry = field;
+            }
         }
         assertNotNull(registry);
         registry.setAccessible(true);
@@ -55,7 +54,9 @@ public class GameRuleDefaultsRegressionTest {
         for (Method method : GameRules.BooleanValue.class.getDeclaredMethods()) {
             if (method.getReturnType() == GameRules.Type.class && method.getParameterCount() == 2
                     && method.getParameterTypes()[0] == boolean.class
-                    && method.getParameterTypes()[1] == BiConsumer.class) factory = method;
+                    && method.getParameterTypes()[1] == BiConsumer.class) {
+                factory = method;
+            }
         }
         assertNotNull(factory);
         factory.setAccessible(true);
@@ -91,7 +92,9 @@ public class GameRuleDefaultsRegressionTest {
             types.clear();
             types.putAll(previousTypes);
             instance.set(null, previousConfig);
-            for (Map.Entry<Field, Object> entry : previousFields.entrySet()) entry.getKey().set(null, entry.getValue());
+            for (Map.Entry<Field, Object> entry : previousFields.entrySet()) {
+                entry.getKey().set(null, entry.getValue());
+            }
         }
     }
 }

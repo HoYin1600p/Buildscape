@@ -1,14 +1,17 @@
 package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.core.io.AtomicFiles;
+import com.kingodogo.buildscape.core.io.Json;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
-import java.nio.file.AtomicMoveNotSupportedException;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -16,8 +19,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Per-player cosmetic choices (equipped cosmetics by slot, their colors, tree-breaker and shulker-preview toggles) and
+ * the color picker position. Data is saved as compressed NBT in {@code <game dir>/buildscape/data}: one
+ * {@code <uuid>-cosmetic.dat} per player and {@code global-settings.dat} for the shared values. An older JSON file in
+ * the config folder is read once and renamed with a {@code .bak} suffix.
+ */
 public class CosmeticsConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = Json.PRETTY;
+    /** Key and file-name part for settings that belong to no player. */
+    public static final String GLOBAL_SCOPE = "global";
     private static CosmeticsConfig INSTANCE;
     private final Path dataDirectory;
     private final Path legacyConfigDirectory;
@@ -42,7 +53,9 @@ public class CosmeticsConfig {
         this.dataDirectory = dataDirectory;
         this.legacyConfigDirectory = legacyConfigDirectory;
         File dataDir = getDataDir();
-        if (!dataDir.exists()) dataDir.mkdirs();
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
 
         migrateLegacyData();
 
@@ -61,7 +74,7 @@ public class CosmeticsConfig {
     }
 
     private File getPlayerFile(UUID playerUuid) {
-        String fileName = (playerUuid != null ? playerUuid.toString() : "global") + "-cosmetic.dat";
+        String fileName = (playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE) + "-cosmetic.dat";
         return new File(getDataDir(), fileName);
     }
 
@@ -83,10 +96,12 @@ public class CosmeticsConfig {
                         if (!newFile.exists()) {
                             Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         } else {
-                            Files.move(oldFile.toPath(), oldFile.toPath().resolveSibling(oldFile.getName() + ".migrated"));
+                            Files.move(oldFile.toPath(),
+                                    oldFile.toPath().resolveSibling(oldFile.getName() + ".migrated"));
                         }
                     } catch (Exception e) {
-                        BuildScape.getLogger().error("CosmeticsConfig: Failed to relocate " + oldFile.getName(), e);
+                        // relocating old files is best effort; any file system failure leaves the file in place
+                        BuildScape.LOGGER.error("CosmeticsConfig: Failed to relocate {}", oldFile.getName(), e);
                     }
                 }
             }
@@ -96,14 +111,18 @@ public class CosmeticsConfig {
             boolean loadedSuccessfully = false;
             try {
                 String source = ConfigLayoutIO.readText(legacyJson.toPath());
-                if (ConfigLayoutIO.protectInvalidEncoding(legacyJson.toPath())) return;
+                if (ConfigLayoutIO.protectInvalidEncoding(legacyJson.toPath())) {
+                    return;
+                }
                 @SuppressWarnings("unchecked")
                 Map<String, Object> loaded = GSON.fromJson(source, Map.class);
                 if (loaded != null) {
                     processLegacyJsonMap(loaded);
                 }
                 loadedSuccessfully = true;
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                // the legacy JSON may be malformed in any way; keep the file and log
+                BuildScape.LOGGER.warn("CosmeticsConfig: Unable to read the legacy JSON cosmetics", e);
             }
 
             if (loadedSuccessfully) {
@@ -115,12 +134,13 @@ public class CosmeticsConfig {
                         try {
                             Files.move(legacyPath, backupPath);
                             break;
-                        } catch (java.nio.file.FileAlreadyExistsException e) {
+                        } catch (FileAlreadyExistsException e) {
                             backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak." + suffix++);
                         }
                     }
                 } catch (Exception e) {
-                    BuildScape.getLogger().warn("Unable to retain legacy cosmetics backup: " + legacyPath, e);
+                    // keeping the backup is best effort; any file system failure is only logged
+                    BuildScape.LOGGER.warn("Unable to retain legacy cosmetics backup: {}", legacyPath, e);
                 }
             }
         }
@@ -135,20 +155,30 @@ public class CosmeticsConfig {
             if (key.equals("global_settings")) {
                 if (val instanceof Map) {
                     Map<String, Object> globalData = (Map<String, Object>) val;
-                    if (globalData.containsKey("colorPickerX") && globalData.get("colorPickerX") instanceof Number)
-                        colorPickerX = ((Number) globalData.get("colorPickerX")).intValue();
-                    if (globalData.containsKey("colorPickerY") && globalData.get("colorPickerY") instanceof Number)
-                        colorPickerY = ((Number) globalData.get("colorPickerY")).intValue();
+                    if (globalData.containsKey("colorPickerX")
+                            && globalData.get(NbtKeys.COLOR_PICKER_X) instanceof Number) {
+                        colorPickerX = ((Number) globalData.get(NbtKeys.COLOR_PICKER_X)).intValue();
+                    }
+                    if (globalData.containsKey("colorPickerY")
+                            && globalData.get(NbtKeys.COLOR_PICKER_Y) instanceof Number) {
+                        colorPickerY = ((Number) globalData.get(NbtKeys.COLOR_PICKER_Y)).intValue();
+                    }
                 }
                 continue;
             }
 
             UUID uuid = null;
-            if (!key.equals("global")) {
-                try { uuid = UUID.fromString(key); } catch (Exception ignored) {}
+            if (!key.equals(GLOBAL_SCOPE)) {
+                try {
+                    uuid = UUID.fromString(key);
+                } catch (IllegalArgumentException ignored) {
+                    // the key is not a UUID; the entry stays without an owner
+                }
             }
 
-            if (getPlayerFile(uuid).exists()) continue;
+            if (getPlayerFile(uuid).exists()) {
+                continue;
+            }
 
             Map<Integer, String> cosmetics = new HashMap<>();
             Map<String, String> colors = new HashMap<>();
@@ -161,15 +191,21 @@ public class CosmeticsConfig {
                     for (Map.Entry<String, Object> cosEntry : ((Map<String, Object>) cosObj).entrySet()) {
                         try {
                             int slot = Integer.parseInt(cosEntry.getKey());
-                            if (cosEntry.getValue() instanceof String) cosmetics.put(slot, (String) cosEntry.getValue());
-                        } catch (Exception ignored) {}
+                            if (cosEntry.getValue() instanceof String) {
+                                cosmetics.put(slot, (String) cosEntry.getValue());
+                            }
+                        } catch (NumberFormatException ignored) {
+                            // skip entries whose slot key is not a number
+                        }
                     }
                 }
 
                 Object colObj = playerData.get("colors");
                 if (colObj instanceof Map) {
                     for (Map.Entry<String, Object> colEntry : ((Map<String, Object>) colObj).entrySet()) {
-                        if (colEntry.getValue() instanceof String) colors.put(colEntry.getKey(), (String) colEntry.getValue());
+                        if (colEntry.getValue() instanceof String) {
+                            colors.put(colEntry.getKey(), (String) colEntry.getValue());
+                        }
                     }
                 }
             }
@@ -183,7 +219,7 @@ public class CosmeticsConfig {
 
     private void loadPlayer(UUID playerUuid) {
         File file = getPlayerFile(playerUuid);
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
 
         if (!file.exists()) {
             playerCosmetics.putIfAbsent(uuidStr, null);
@@ -196,10 +232,10 @@ public class CosmeticsConfig {
         try {
             CompoundTag nbt = NbtIo.readCompressed(file);
             if (nbt != null) {
-                if (playerUuid != null && nbt.hasUUID("player_uuid")) {
-                    UUID storedUuid = nbt.getUUID("player_uuid");
+                if (playerUuid != null && nbt.hasUUID(NbtKeys.PLAYER_UUID)) {
+                    UUID storedUuid = nbt.getUUID(NbtKeys.PLAYER_UUID);
                     if (!storedUuid.equals(playerUuid)) {
-                        BuildScape.getLogger().error("CosmeticsConfig: SECURITY MISMATCH for " + file.getName());
+                        BuildScape.LOGGER.error("CosmeticsConfig: SECURITY MISMATCH for {}", file.getName());
                         PillarParticleConfig.backupUnreadableFile(file);
                         playerCosmetics.putIfAbsent(uuidStr, null);
                         playerCosmeticColors.putIfAbsent(uuidStr, null);
@@ -210,37 +246,42 @@ public class CosmeticsConfig {
                 }
 
                 Map<Integer, String> cosmetics = new HashMap<>();
-                if (nbt.contains("equipped_cosmetics", 10)) {
-                    CompoundTag equipped = nbt.getCompound("equipped_cosmetics");
+                if (nbt.contains(NbtKeys.EQUIPPED_COSMETICS, 10)) {
+                    CompoundTag equipped = nbt.getCompound(NbtKeys.EQUIPPED_COSMETICS);
                     for (String key : equipped.getAllKeys()) {
-                        try { cosmetics.put(Integer.parseInt(key), equipped.getString(key)); } catch (Exception ignored) {}
+                        try {
+                            cosmetics.put(Integer.parseInt(key), equipped.getString(key));
+                        } catch (NumberFormatException ignored) {
+                            // skip entries whose slot key is not a number
+                        }
                     }
                 }
                 playerCosmetics.put(uuidStr, cosmetics);
 
                 Map<String, String> colors = new HashMap<>();
-                if (nbt.contains("cosmetic_colors", 10)) {
-                    CompoundTag colorsTag = nbt.getCompound("cosmetic_colors");
+                if (nbt.contains(NbtKeys.COSMETIC_COLORS, 10)) {
+                    CompoundTag colorsTag = nbt.getCompound(NbtKeys.COSMETIC_COLORS);
                     for (String key : colorsTag.getAllKeys()) {
                         colors.put(key, colorsTag.getString(key));
                     }
                 }
                 playerCosmeticColors.put(uuidStr, colors);
 
-                if (nbt.contains("creative_tree_breaker")) {
-                    playerCreativeTreeBreaker.put(uuidStr, nbt.getBoolean("creative_tree_breaker"));
+                if (nbt.contains(NbtKeys.CREATIVE_TREE_BREAKER)) {
+                    playerCreativeTreeBreaker.put(uuidStr, nbt.getBoolean(NbtKeys.CREATIVE_TREE_BREAKER));
                 } else {
                     playerCreativeTreeBreaker.put(uuidStr, false);
                 }
 
-                if (nbt.contains("shulker_preview")) {
-                    playerShulkerPreview.put(uuidStr, nbt.getBoolean("shulker_preview"));
+                if (nbt.contains(NbtKeys.SHULKER_PREVIEW)) {
+                    playerShulkerPreview.put(uuidStr, nbt.getBoolean(NbtKeys.SHULKER_PREVIEW));
                 } else {
                     playerShulkerPreview.put(uuidStr, true);
                 }
             }
         } catch (Exception e) {
-            BuildScape.getLogger().error("CosmeticsConfig: Failed to read data for " + uuidStr, e);
+            // the player data file may be corrupt NBT or hold bad values; back it up and use defaults
+            BuildScape.LOGGER.error("CosmeticsConfig: Failed to read data for {}", uuidStr, e);
             PillarParticleConfig.backupUnreadableFile(file);
             playerCosmetics.putIfAbsent(uuidStr, null);
             playerCosmeticColors.putIfAbsent(uuidStr, null);
@@ -251,13 +292,15 @@ public class CosmeticsConfig {
 
     private void savePlayer(UUID playerUuid) {
         File file = getPlayerFile(playerUuid);
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
 
         Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
         Map<String, String> colors = playerCosmeticColors.get(uuidStr);
 
         CompoundTag nbt = new CompoundTag();
-        if (playerUuid != null) nbt.putUUID("player_uuid", playerUuid);
+        if (playerUuid != null) {
+            nbt.putUUID(NbtKeys.PLAYER_UUID, playerUuid);
+        }
 
         CompoundTag equippedTag = new CompoundTag();
         if (cosmetics != null) {
@@ -265,7 +308,7 @@ public class CosmeticsConfig {
                 equippedTag.putString(entry.getKey().toString(), entry.getValue());
             }
         }
-        nbt.put("equipped_cosmetics", equippedTag);
+        nbt.put(NbtKeys.EQUIPPED_COSMETICS, equippedTag);
 
         CompoundTag colorsTag = new CompoundTag();
         if (colors != null) {
@@ -273,37 +316,25 @@ public class CosmeticsConfig {
                 colorsTag.putString(entry.getKey(), entry.getValue());
             }
         }
-        nbt.put("cosmetic_colors", colorsTag);
+        nbt.put(NbtKeys.COSMETIC_COLORS, colorsTag);
 
         Boolean treeBreaker = playerCreativeTreeBreaker.get(uuidStr);
         if (treeBreaker != null) {
-            nbt.putBoolean("creative_tree_breaker", treeBreaker);
+            nbt.putBoolean(NbtKeys.CREATIVE_TREE_BREAKER, treeBreaker);
         }
 
         Boolean shulkerPreview = playerShulkerPreview.get(uuidStr);
         if (shulkerPreview != null) {
-            nbt.putBoolean("shulker_preview", shulkerPreview);
+            nbt.putBoolean(NbtKeys.SHULKER_PREVIEW, shulkerPreview);
         }
 
-        Path temporary = null;
         try {
-            temporary = Files.createTempFile(file.getParentFile().toPath(), file.getName(), ".tmp");
-            NbtIo.writeCompressed(nbt, temporary.toFile());
-            try {
-                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-        } catch (Exception e) {
-            BuildScape.getLogger().error("CosmeticsConfig: Failed to write data for " + uuidStr, e);
-        } finally {
-            if (temporary != null) {
-                try {
-                    Files.deleteIfExists(temporary);
-                } catch (java.io.IOException e) {
-                    BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for " + uuidStr, e);
-                }
-            }
+            AtomicFiles.write(file.toPath(), file.getName(),
+                    temporary -> NbtIo.writeCompressed(nbt, temporary.toFile()),
+                    e -> BuildScape.LOGGER.warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr,
+                            e));
+        } catch (IOException e) {
+            BuildScape.LOGGER.error("CosmeticsConfig: Failed to write data for {}", uuidStr, e);
         }
     }
 
@@ -312,39 +343,56 @@ public class CosmeticsConfig {
         if (file.exists()) {
             try {
                 CompoundTag nbt = NbtIo.readCompressed(file);
-                if (nbt.contains("colorPickerX")) colorPickerX = nbt.getInt("colorPickerX");
-                if (nbt.contains("colorPickerY")) colorPickerY = nbt.getInt("colorPickerY");
-            } catch (Exception ignored) {}
+                if (nbt.contains(NbtKeys.COLOR_PICKER_X)) {
+                    colorPickerX = nbt.getInt(NbtKeys.COLOR_PICKER_X);
+                }
+                if (nbt.contains(NbtKeys.COLOR_PICKER_Y)) {
+                    colorPickerY = nbt.getInt(NbtKeys.COLOR_PICKER_Y);
+                }
+            } catch (Exception e) {
+                // the position file may be corrupt NBT; keep the default position
+                BuildScape.LOGGER.debug("CosmeticsConfig: Unable to read the colour picker position", e);
+            }
         }
     }
 
     private void saveGlobalSettings() {
         File file = getGlobalSettingsFile();
         CompoundTag nbt = new CompoundTag();
-        if (colorPickerX != null) nbt.putInt("colorPickerX", colorPickerX);
-        if (colorPickerY != null) nbt.putInt("colorPickerY", colorPickerY);
+        if (colorPickerX != null) {
+            nbt.putInt(NbtKeys.COLOR_PICKER_X, colorPickerX);
+        }
+        if (colorPickerY != null) {
+            nbt.putInt(NbtKeys.COLOR_PICKER_Y, colorPickerY);
+        }
 
         try {
             NbtIo.writeCompressed(nbt, file);
-        } catch (Exception ignored) {}
+        } catch (IOException e) {
+            BuildScape.LOGGER.warn("CosmeticsConfig: Unable to write the cosmetics file", e);
+        }
     }
 
     public Map<Integer, String> getEquippedCosmetics(UUID playerUuid) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
-        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
+        if (!playerCosmetics.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
         Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
         return cosmetics != null ? new HashMap<>(cosmetics) : new HashMap<>();
     }
 
     public void setEquippedCosmetics(UUID playerUuid, Map<Integer, String> cosmeticsBySlot) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         playerCosmetics.put(uuidStr, new HashMap<>(cosmeticsBySlot));
         savePlayer(playerUuid);
     }
 
     public void equipCosmetic(UUID playerUuid, int slotIndex, String cosmeticId) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
-        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
+        if (!playerCosmetics.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
 
         updateMap(playerCosmetics.computeIfAbsent(uuidStr, k -> new HashMap<>()), slotIndex, cosmeticId);
         savePlayer(playerUuid);
@@ -353,12 +401,16 @@ public class CosmeticsConfig {
     private void updateMap(Map<Integer, String> map, int slot, String id) {
         map.values().remove(id);
         map.remove(slot);
-        if (id != null && !id.isEmpty()) map.put(slot, id);
+        if (id != null && !id.isEmpty()) {
+            map.put(slot, id);
+        }
     }
 
     public void unequipCosmetic(UUID playerUuid, int slotIndex) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
-        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
+        if (!playerCosmetics.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
 
         Map<Integer, String> playerMap = playerCosmetics.get(uuidStr);
         if (playerMap != null) {
@@ -368,20 +420,32 @@ public class CosmeticsConfig {
     }
 
     public String getCosmeticColor(UUID playerUuid, String cosmeticId) {
-        if (cosmeticId == null) return null;
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
-        if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (cosmeticId == null) {
+            return null;
+        }
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
+        if (!playerCosmeticColors.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
         Map<String, String> colors = playerCosmeticColors.get(uuidStr);
-        if (colors != null && colors.containsKey(cosmeticId)) return colors.get(cosmeticId);
-        if (!playerCosmeticColors.containsKey("global")) loadPlayer(null);
-        Map<String, String> globalColors = playerCosmeticColors.get("global");
+        if (colors != null && colors.containsKey(cosmeticId)) {
+            return colors.get(cosmeticId);
+        }
+        if (!playerCosmeticColors.containsKey(GLOBAL_SCOPE)) {
+            loadPlayer(null);
+        }
+        Map<String, String> globalColors = playerCosmeticColors.get(GLOBAL_SCOPE);
         return globalColors != null ? globalColors.get(cosmeticId) : null;
     }
 
     public void setCosmeticColor(UUID playerUuid, String cosmeticId, String hexColor) {
-        if (cosmeticId == null) return;
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
-        if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (cosmeticId == null) {
+            return;
+        }
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
+        if (!playerCosmeticColors.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
 
         Map<String, String> colors = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
         if (hexColor == null || hexColor.isEmpty()) {
@@ -393,25 +457,29 @@ public class CosmeticsConfig {
     }
 
     public boolean getCreativeTreeBreaker(UUID playerUuid) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
-        if (!playerCreativeTreeBreaker.containsKey(uuidStr)) loadPlayer(playerUuid);
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
+        if (!playerCreativeTreeBreaker.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
         return playerCreativeTreeBreaker.getOrDefault(uuidStr, false);
     }
 
     public void setCreativeTreeBreaker(UUID playerUuid, boolean enabled) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         playerCreativeTreeBreaker.put(uuidStr, enabled);
         savePlayer(playerUuid);
     }
 
     public boolean getShulkerPreview(UUID playerUuid) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
-        if (!playerShulkerPreview.containsKey(uuidStr)) loadPlayer(playerUuid);
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
+        if (!playerShulkerPreview.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
         return playerShulkerPreview.getOrDefault(uuidStr, true);
     }
 
     public void setShulkerPreview(UUID playerUuid, boolean enabled) {
-        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
         playerShulkerPreview.put(uuidStr, enabled);
         savePlayer(playerUuid);
     }

@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.config;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
-import org.junit.BeforeClass;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -11,15 +10,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class PresetSlotsAndItemOrderTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class PresetSlotsAndItemOrderTest extends BootstrappedGameTest {
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @Test
     public void fourCustomPresetsByDefaultThenTheLimitMessageCase() throws Exception {
@@ -81,7 +78,8 @@ public class PresetSlotsAndItemOrderTest {
         // Remove stone, add two new ones: existing order and the repeated entry stay, additions follow.
         List<String> saved = PillarParticleConfig.orderedItemsForSave(existing,
                 Set.of("minecraft:zebra", "minecraft:apple", "minecraft:dirt", "#forge:gems"));
-        assertEquals(List.of("minecraft:zebra", "minecraft:apple", "minecraft:apple", "#forge:gems", "minecraft:dirt"), saved);
+        assertEquals(List.of("minecraft:zebra", "minecraft:apple", "minecraft:apple", "#forge:gems", "minecraft:dirt"),
+                saved);
         // Nothing changed: the list comes back exactly as it was.
         assertEquals(existing, PillarParticleConfig.orderedItemsForSave(existing, Set.copyOf(existing)));
         // An unreadable token is kept where it was even though the screen never lists it.
@@ -94,13 +92,15 @@ public class PresetSlotsAndItemOrderTest {
     public void savingToDiskKeepsTheFileOrderAndAppendsAdditions() throws Exception {
         Path directory = temporary.newFolder().toPath();
         Path file = directory.resolve("pillar-items.json");
-        Files.writeString(file, "{\n  \"items\": [\n    \"minecraft:zebra\",\n    \"minecraft:apple\",\n    \"minecraft:stone\"\n  ]\n}\n");
+        Files.writeString(file,
+                "{\n  \"items\": [\n    \"minecraft:zebra\",\n    \"minecraft:apple\",\n    \"minecraft:stone\"\n  ]\n}\n");
         PillarParticleConfig config = new PillarParticleConfig(directory);
         config.loadItemsInternal(false);
         config.items.remove("minecraft:stone");
         config.items.add("minecraft:dirt");
         assertTrue(config.saveItemsToDisk(false));
-        com.google.gson.JsonArray saved = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file)).getAsJsonArray("items");
+        com.google.gson.JsonArray saved = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file))
+                .getAsJsonArray("items");
         int zebra = indexOf(saved, "minecraft:zebra");
         int apple = indexOf(saved, "minecraft:apple");
         int dirt = indexOf(saved, "minecraft:dirt");
@@ -111,7 +111,9 @@ public class PresetSlotsAndItemOrderTest {
 
     private static int indexOf(com.google.gson.JsonArray array, String value) {
         for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).getAsString().equals(value)) return i;
+            if (array.get(i).getAsString().equals(value)) {
+                return i;
+            }
         }
         return -1;
     }

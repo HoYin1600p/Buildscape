@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.TrappedDecoratedPotBlockEntity;
+import com.kingodogo.buildscape.block.storage.TrappedDecoratedPotBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -14,7 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class TrappedDecoratedPotBlockEntityRenderer
-        implements BlockEntityRenderer<TrappedDecoratedPotBlockEntity> {
+        implements
+            BlockEntityRenderer<TrappedDecoratedPotBlockEntity> {
 
     private final BlockRenderDispatcher blockRenderer;
 
@@ -32,9 +33,10 @@ public class TrappedDecoratedPotBlockEntityRenderer
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
-        if (blockEntity.getLevel() == null) return;
+            int combinedOverlay) {
+        if (blockEntity.getLevel() == null) {
+            return;
+        }
 
         long currentTick = blockEntity.getLevel().getGameTime();
         long wobbleStartTick = blockEntity.getWobbleStartedAtTick();
@@ -71,8 +73,7 @@ public class TrappedDecoratedPotBlockEntityRenderer
                 1.0f, 1.0f, 1.0f,
                 combinedLight,
                 combinedOverlay,
-                EmptyModelData.INSTANCE
-        );
+                EmptyModelData.INSTANCE);
 
         poseStack.popPose();
     }

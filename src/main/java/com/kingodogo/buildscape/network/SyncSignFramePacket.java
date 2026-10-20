@@ -1,16 +1,18 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client packet that sets the frame id of the sign at a position on the client.
+ * An empty id means no frame.
+ */
 public class SyncSignFramePacket {
 
     private final BlockPos pos;
@@ -37,21 +39,8 @@ public class SyncSignFramePacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-                if (mc.level != null) {
-                    BlockEntity be = mc.level.getBlockEntity(this.pos);
-                    if (be instanceof SignBlockEntity sign) {
-                        if (this.frameId.isEmpty()) {
-                            sign.getTileData().remove(SignFrameAttachment.NBT_KEY);
-                        } else {
-                            sign.getTileData().putString(SignFrameAttachment.NBT_KEY, this.frameId);
-                        }
-                    }
-                }
-            });
-        });
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.applySignFrame(this.pos, this.frameId)));
         ctx.get().setPacketHandled(true);
     }
 }

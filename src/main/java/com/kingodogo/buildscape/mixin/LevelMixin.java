@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.ExperienceFluidBlock;
-import com.kingodogo.buildscape.fluid.ModFluids;
+import com.kingodogo.buildscape.block.water.ExperienceFluidBlock;
+import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,7 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LevelMixin {
 
     @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V", at = @At("HEAD"), cancellable = true)
-    private void onAddParticle(ParticleOptions options, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
+    private void onAddParticle(ParticleOptions options, double x, double y, double z, double xSpeed, double ySpeed,
+            double zSpeed, CallbackInfo ci) {
         if (isWaterParticle(options)) {
             Level self = (Level) (Object) this;
             BlockPos pos = new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
@@ -28,7 +29,8 @@ public abstract class LevelMixin {
     }
 
     @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZDDDDDD)V", at = @At("HEAD"), cancellable = true)
-    private void onAddParticleAlways(ParticleOptions options, boolean alwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
+    private void onAddParticleAlways(ParticleOptions options, boolean alwaysRender, double x, double y, double z,
+            double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
         if (isWaterParticle(options)) {
             Level self = (Level) (Object) this;
             BlockPos pos = new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
@@ -39,18 +41,22 @@ public abstract class LevelMixin {
     }
 
     private static boolean isWaterParticle(ParticleOptions options) {
-        if (options == null) return false;
+        if (options == null) {
+            return false;
+        }
         return options.getType() == ParticleTypes.SPLASH ||
-               options.getType() == ParticleTypes.BUBBLE ||
-               options.getType() == ParticleTypes.BUBBLE_POP ||
-               options.getType() == ParticleTypes.BUBBLE_COLUMN_UP ||
-               options.getType() == ParticleTypes.UNDERWATER ||
-               options.getType() == ParticleTypes.RAIN ||
-               options.getType() == ParticleTypes.FALLING_WATER;
+                options.getType() == ParticleTypes.BUBBLE ||
+                options.getType() == ParticleTypes.BUBBLE_POP ||
+                options.getType() == ParticleTypes.BUBBLE_COLUMN_UP ||
+                options.getType() == ParticleTypes.UNDERWATER ||
+                options.getType() == ParticleTypes.RAIN ||
+                options.getType() == ParticleTypes.FALLING_WATER;
     }
 
     private static boolean isExperienceFluid(Level level, BlockPos pos) {
-        if (level == null || pos == null) return false;
+        if (level == null || pos == null) {
+            return false;
+        }
         return checkFluidOrBlock(level, pos);
     }
 

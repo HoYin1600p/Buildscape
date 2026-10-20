@@ -1,23 +1,40 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.client.network.ClientConfigHooks;
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.ConfigSetting;
+import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.core.ParticlePatterns;
+import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
 
+/**
+ * One chunk of a client-to-server config upload. A config upload is encoded once, cut into chunks of 24,000 bytes
+ * tagged with a transfer id and index, and reassembled by {@link ConfigAssembly} on the server.
+ * The server then applies only the settings the sender's permission and the edit policy allow, saves them, and
+ * refuses the rest with an {@code EditRefusedPacket}.
+ */
 public class UpdateConfigPacket {
 
     private static final int CHUNK_BYTES = 24_000;
@@ -29,10 +46,18 @@ public class UpdateConfigPacket {
     private final int chunkCount;
     private final byte[] payload;
 
-    public UUID getTransferId() { return transferId; }
-    public int getChunkIndex() { return chunkIndex; }
-    public int getChunkCount() { return chunkCount; }
-    public byte[] getPayload() { return payload; }
+    public UUID getTransferId() {
+        return transferId;
+    }
+    public int getChunkIndex() {
+        return chunkIndex;
+    }
+    public int getChunkCount() {
+        return chunkCount;
+    }
+    public byte[] getPayload() {
+        return payload;
+    }
 
     private UpdateConfigPacket(UUID transferId, int chunkIndex, int chunkCount, byte[] payload) {
         this.transferId = transferId;
@@ -45,7 +70,11 @@ public class UpdateConfigPacket {
         return split(config, ConfigSetting.uploadable());
     }
 
-    public static List<UpdateConfigPacket> split(PillarParticleConfig config, java.util.Set<ConfigSetting> settings) {
+    /**
+     * Encodes the chosen setting groups of {@code config} and cuts them into ordered chunks.
+     * Throws {@link IllegalArgumentException} when the upload exceeds 2 MiB.
+     */
+    public static List<UpdateConfigPacket> split(PillarParticleConfig config, Set<ConfigSetting> settings) {
         SyncConfigPacket data = new SyncConfigPacket(config);
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
@@ -70,25 +99,18 @@ public class UpdateConfigPacket {
     }
 
     public static void send(PillarParticleConfig config) {
-        for (UpdateConfigPacket packet : ClientUpload.split(config)) {
+        for (UpdateConfigPacket packet : ClientConfigHooks.splitForUpload(config)) {
             ModMessages.INSTANCE.sendToServer(packet);
         }
     }
 
-    static List<UpdateConfigPacket> splitForClient(PillarParticleConfig config, int syncedLevel, boolean levelTwo, boolean levelFour) {
+    public static List<UpdateConfigPacket> splitForClient(PillarParticleConfig config, int syncedLevel,
+            boolean levelTwo,
+            boolean levelFour) {
         int level = PillarParticleConfig.resolveClientPermissionLevel(syncedLevel, levelTwo, levelFour);
-        java.util.Set<ConfigSetting> settings = ConfigSetting.allowed(config.edit_permission_mode, level);
+        Set<ConfigSetting> settings = ConfigSetting.allowed(config.edit_permission_mode, level);
         settings.removeIf(setting -> setting.itemsFile ? !config.canEditItems() : !config.canEditProperties());
         return split(config, settings);
-    }
-
-    @net.minecraftforge.api.distmarker.OnlyIn(net.minecraftforge.api.distmarker.Dist.CLIENT)
-    private static final class ClientUpload {
-        private static List<UpdateConfigPacket> split(PillarParticleConfig config) {
-            net.minecraft.client.player.LocalPlayer player = net.minecraft.client.Minecraft.getInstance().player;
-            return splitForClient(config, -1, player != null && player.hasPermissions(2),
-                    player != null && player.hasPermissions(PillarParticleConfig.CONFIG_PERMISSION_LEVEL));
-        }
     }
 
     public UpdateConfigPacket(FriendlyByteBuf buf) {
@@ -127,9 +149,13 @@ public class UpdateConfigPacket {
         return applyValues(serverConfig, data, PillarParticleConfig.CONFIG_PERMISSION_LEVEL);
     }
 
+    /**
+     * Copies the allowed groups from {@code data} into the server config and trims {@code data.uploadSettings} to the groups
+     * that were accepted. Returns a refusal message for the last refused group, or null when everything was accepted.
+     */
     public static String applyValues(PillarParticleConfig serverConfig, SyncConfigPacket data, int permissionLevel) {
         String refusal = null;
-        java.util.Set<ConfigSetting> accepted = java.util.EnumSet.noneOf(ConfigSetting.class);
+        Set<ConfigSetting> accepted = EnumSet.noneOf(ConfigSetting.class);
         // Resolve every rule against the policy before this upload, including policy changes.
         for (ConfigSetting setting : data.uploadSettings) {
             if (!setting.canEdit(serverConfig.edit_permission_mode, permissionLevel)) {
@@ -149,28 +175,11 @@ public class UpdateConfigPacket {
                 }
             }
         }
-        if (accepted.contains(ConfigSetting.PARTICLES)) {
-            serverConfig.particle_speed = data.particle_speed;
-            serverConfig.particle_spread = data.particle_spread;
-            serverConfig.particle_lifetime = data.particle_lifetime;
-            serverConfig.particle_density = data.particle_density;
-            serverConfig.use_pattern = data.use_pattern;
-            serverConfig.pattern = data.pattern;
-            serverConfig.pattern_speed = data.pattern_speed;
-            serverConfig.pattern_spread = data.pattern_spread;
-            serverConfig.pattern_intensity = data.pattern_intensity;
-        }
-        if (accepted.contains(ConfigSetting.COLORS)) {
-            serverConfig.max_particle_color = data.max_particle_color;
-            if (data.particle_color != null) {
-                serverConfig.particle_color = new ArrayList<>(data.particle_color);
+        if (!accepted.isEmpty()) {
+            boolean applied = serverConfig.applyUpload(data, accepted);
+            if (!applied && refusal == null) {
+                refusal = "BuildScape: Config update refused because your configuration is out of date. Please resync.";
             }
-        }
-        if (accepted.contains(ConfigSetting.ITEMS) && data.items != null) {
-            serverConfig.editItems(data.items);
-        }
-        if (accepted.contains(ConfigSetting.POLICY) && data.edit_permission_mode != null) {
-            serverConfig.edit_permission_mode = data.edit_permission_mode;
         }
         data.uploadSettings = accepted;
         return refusal;
@@ -184,28 +193,34 @@ public class UpdateConfigPacket {
     }
 
     static <K> ConfigAssembly pendingAssembly(Map<K, ConfigAssembly> pending, K sender, UpdateConfigPacket packet,
-                                            PillarParticleConfig.EditPermissionMode mode, int permissionLevel) {
+            PillarParticleConfig.EditPermissionMode mode, int permissionLevel) {
         if (ConfigSetting.allowed(mode, permissionLevel).isEmpty()) {
             pending.remove(sender);
             return null;
         }
         pending.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue().getStarted() > 30_000L);
-        if (packet.chunkIndex == 0) pending.put(sender, new ConfigAssembly());
+        if (packet.chunkIndex == 0) {
+            pending.put(sender, new ConfigAssembly());
+        }
         return pending.get(sender);
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+            if (player == null) {
+                return;
+            }
 
             PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
             int permissionLevel = player.hasPermissions(PillarParticleConfig.CONFIG_PERMISSION_LEVEL)
-                    ? PillarParticleConfig.CONFIG_PERMISSION_LEVEL : player.hasPermissions(2) ? 2 : 0;
+                    ? PillarParticleConfig.CONFIG_PERMISSION_LEVEL
+                    : player.hasPermissions(2) ? 2 : 0;
             ConfigAssembly assembly = pendingAssembly(ServerPendingHolder.PENDING, player, this,
                     serverConfig.edit_permission_mode, permissionLevel);
             if (assembly == null) {
-                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+                        new SyncConfigPacket(serverConfig));
                 EditGuard.refuse(player, EditRefusedPacket.Reason.LOCKED, null);
                 return;
             }
@@ -213,12 +228,14 @@ public class UpdateConfigPacket {
             try {
                 data = assembly.accept(this);
             } catch (Exception e) {
+                // the payload is untrusted; any failure rejects the update
                 ServerPendingHolder.PENDING.remove(player);
-                com.kingodogo.buildscape.BuildScape.LOGGER.warn("Rejected config update from " + player.getUUID(), e);
-                player.displayClientMessage(new net.minecraft.network.chat.TextComponent(
+                BuildScape.LOGGER.warn("Rejected config update from {}", player.getUUID(), e);
+                player.displayClientMessage(new TextComponent(
                         "BuildScape: Config update refused because it contains invalid or incomplete data.")
-                        .withStyle(net.minecraft.ChatFormatting.RED), false);
-                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                        .withStyle(ChatFormatting.RED), false);
+                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+                        new SyncConfigPacket(serverConfig));
                 EditGuard.refuse(player, EditRefusedPacket.Reason.INVALID, null);
                 return;
             }
@@ -231,14 +248,16 @@ public class UpdateConfigPacket {
 
             String refusal = applyValues(serverConfig, data, permissionLevel);
             if (refusal != null) {
-                player.displayClientMessage(new net.minecraft.network.chat.TextComponent(refusal)
-                        .withStyle(net.minecraft.ChatFormatting.RED), false);
-                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                player.displayClientMessage(new TextComponent(refusal)
+                        .withStyle(ChatFormatting.RED), false);
+                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+                        new SyncConfigPacket(serverConfig));
                 EditGuard.refuse(player, EditGuard.reasonFor(refusal), null);
             }
             if (data.uploadSettings.isEmpty()) {
                 if (refusal == null) {
-                    ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                    ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+                            new SyncConfigPacket(serverConfig));
                 }
                 return;
             }
@@ -247,32 +266,37 @@ public class UpdateConfigPacket {
                     || serverConfig.savePropertiesToDisk();
             boolean itemsSaved = !data.uploadSettings.contains(ConfigSetting.ITEMS) || serverConfig.saveItemsToDisk();
             if (!propertiesSaved || !itemsSaved) {
-                String files = !propertiesSaved && !itemsSaved ? "pillar-properties.json and pillar-items.json"
+                String files = !propertiesSaved && !itemsSaved
+                        ? "pillar-properties.json and pillar-items.json"
                         : !propertiesSaved ? "pillar-properties.json" : "pillar-items.json";
-                player.displayClientMessage(new net.minecraft.network.chat.TextComponent(
+                player.displayClientMessage(new TextComponent(
                         "BuildScape: Changes to " + files + " are active but will not survive a restart: "
                                 + serverConfig.getSaveFailureReason() + ".")
-                        .withStyle(net.minecraft.ChatFormatting.YELLOW), false);
+                        .withStyle(ChatFormatting.YELLOW), false);
             }
 
             ModMessages.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
-                    new SyncConfigPacket(serverConfig)
-            );
+                    new SyncConfigPacket(serverConfig));
 
-            if (!data.uploadSettings.contains(ConfigSetting.PARTICLES) && !data.uploadSettings.contains(ConfigSetting.COLORS)) return;
+            if (!data.uploadSettings.contains(ConfigSetting.PARTICLES)
+                    && !data.uploadSettings.contains(ConfigSetting.COLORS)) {
+                return;
+            }
 
-            com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager.get();
+            PillarIdManager manager = PillarIdManager.get();
             if (manager.hasLoaded()) {
                 boolean updatedAny = false;
                 boolean isPatternChanged = !serverConfig.pattern.equals(oldPattern);
 
-                for (com.kingodogo.buildscape.config.PillarIdManager.PillarData pData : manager.getAllData()) {
-                    boolean hasPatternOverride = pData.pattern != null && !pData.pattern.equals("default");
+                for (PillarIdManager.PillarData pData : manager.getAllData()) {
+                    boolean hasPatternOverride = pData.pattern != null
+                            && !pData.pattern.equals(ParticlePatterns.DEFAULT);
                     boolean isCustomized = pData.hasColors() || hasPatternOverride;
 
                     if (isCustomized) {
-                        if (isPatternChanged && (pData.pattern == null || pData.pattern.equals("default"))) {
+                        if (isPatternChanged
+                                && (pData.pattern == null || pData.pattern.equals(ParticlePatterns.DEFAULT))) {
                             pData.pattern = oldPattern;
                             updatedAny = true;
                         }
@@ -292,23 +316,31 @@ public class UpdateConfigPacket {
                     manager.saveImmediate();
                 }
 
-                for (net.minecraft.server.level.ServerLevel level : player.getServer().getAllLevels()) {
-                    if (level == null) continue;
-                    String dimensionKey = com.kingodogo.buildscape.config.PillarIdManager.getDimensionKey(level);
+                for (ServerLevel level : player.getServer().getAllLevels()) {
+                    if (level == null) {
+                        continue;
+                    }
+                    String dimensionKey = PillarIdManager.getDimensionKey(level);
 
-                    for (com.kingodogo.buildscape.config.PillarIdManager.PillarData pData : manager.getAllData()) {
-                        if (pData == null || !pData.dimension.equals(dimensionKey)) continue;
+                    for (PillarIdManager.PillarData pData : manager.getAllData()) {
+                        if (pData == null || !pData.dimension.equals(dimensionKey)) {
+                            continue;
+                        }
 
                         try {
-                            net.minecraft.core.BlockPos pos = pData.getBlockPos();
-                            if (!level.hasChunkAt(pos)) continue;
+                            BlockPos pos = pData.getBlockPos();
+                            if (!level.hasChunkAt(pos)) {
+                                continue;
+                            }
 
-                            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
-                            if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
+                            BlockEntity be = level.getBlockEntity(pos);
+                            if (be instanceof PillarBlockEntity pillarBE) {
                                 pillarBE.syncFromData(pData);
                                 level.sendBlockUpdated(pos, pillarBE.getBlockState(), pillarBE.getBlockState(), 3);
                             }
-                        } catch (Exception ignored) {
+                        } catch (Exception e) {
+                            // one bad pillar must not stop the rest of the sync
+                            BuildScape.LOGGER.debug("Unable to sync pillar block entity for {}", pData.id, e);
                         }
                     }
                 }

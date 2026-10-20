@@ -4,6 +4,11 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.network.FriendlyByteBuf;
 
+/**
+ * Shared size and range limits for packet fields, plus read/write helpers that enforce them.
+ * Decoders throw {@code DecoderException} and encoders throw {@code EncoderException} on a violation, so a malformed
+ * or hostile packet is dropped instead of allocating unbounded lists or strings.
+ */
 final class NetworkPacketLimits {
     static final int MAX_PILLARS = 16_384;
     static final int MAX_CONFIG_ITEMS = 65_536;
@@ -15,15 +20,14 @@ final class NetworkPacketLimits {
     static final int MAX_RULE_NAME_LENGTH = 64;
     static final int MAX_PILLAR_JSON_LENGTH = 32_767;
     static final int MAX_RESULT_OFFSET = 1_000_000;
-    static final double MIN_PARTICLE_RATE = 0.001D;
-    static final double MAX_PARTICLE_SPEED = 4.0D;
-    static final double MAX_PARTICLE_SPREAD = 16.0D;
-    static final double MAX_PARTICLE_INTENSITY = 64.0D;
+    static final double MIN_PARTICLE_RATE = 0.001;
+    static final double MAX_PARTICLE_SPEED = 4.0;
+    static final double MAX_PARTICLE_SPREAD = 16.0;
+    static final double MAX_PARTICLE_INTENSITY = 64.0;
     static final int MAX_PARTICLE_LIFETIME = 12_000;
     static final int MAX_PARTICLE_DENSITY = 128;
 
-    private NetworkPacketLimits() {
-    }
+    private NetworkPacketLimits() {}
 
     static int readCount(FriendlyByteBuf buffer, int maximum, String field) {
         int count = buffer.readInt();

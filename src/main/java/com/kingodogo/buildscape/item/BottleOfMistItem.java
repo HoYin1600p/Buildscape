@@ -1,17 +1,24 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.particle.ModParticles;
+import com.kingodogo.buildscape.registry.ModParticles;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.Vec3;
 
+import java.util.List;
 import java.util.Random;
+import javax.annotation.Nullable;
 
 public class BottleOfMistItem extends Item {
 
@@ -30,7 +37,7 @@ public class BottleOfMistItem extends Item {
             double py = player.getEyeY();
             double pz = player.getZ();
 
-            net.minecraft.world.phys.Vec3 look = player.getLookAngle();
+            Vec3 look = player.getLookAngle();
             double cx = px + look.x * 2.0;
             double cy = py + look.y * 2.0;
             double cz = pz + look.z * 2.0;
@@ -54,10 +61,11 @@ public class BottleOfMistItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
-        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.bottle_of_mist.use").withStyle(net.minecraft.ChatFormatting.GRAY));
-        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.bottle_of_mist.collect").withStyle(net.minecraft.ChatFormatting.GRAY));
-        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.mist_toggle").withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(new TranslatableComponent("tooltip.buildscape.bottle_of_mist.use").withStyle(ChatFormatting.GRAY));
+        tooltip.add(
+                new TranslatableComponent("tooltip.buildscape.bottle_of_mist.collect").withStyle(ChatFormatting.GRAY));
+        tooltip.add(new TranslatableComponent("tooltip.buildscape.mist_toggle").withStyle(ChatFormatting.DARK_AQUA));
         super.appendHoverText(stack, level, tooltip, flag);
     }
 }

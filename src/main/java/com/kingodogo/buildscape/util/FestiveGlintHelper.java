@@ -11,8 +11,7 @@ public final class FestiveGlintHelper {
     public static final String TAG_BUILDCAPE_GLINT = "BuildscapeGlint";
     public static final String TAG_LEGACY_GLINT = "festive_glint";
 
-    private FestiveGlintHelper() {
-    }
+    private FestiveGlintHelper() {}
 
     public static boolean hasFestiveGlint(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {

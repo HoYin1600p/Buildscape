@@ -1,27 +1,65 @@
 package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.ClientHooks;
+import com.kingodogo.buildscape.core.ParticlePatterns;
+import com.kingodogo.buildscape.core.io.Json;
+import com.kingodogo.buildscape.network.SyncConfigPacket;
+import com.kingodogo.buildscape.network.UpdateConfigPacket;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Type;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
+/**
+ * The pillar particle config: default particle and pattern settings, the particle colors, the list of items that
+ * are pillar-capable, and the edit permission mode. Settings live in {@code config/buildscape/pillar/pillar-properties.json}
+ * and items in {@code pillar-items.json}, both created from bundled templates when missing. A file that cannot be read
+ * is backed up and the config switches to read-only so it is not overwritten. The server copy is synced to clients with
+ * {@code SyncConfigPacket}. The nested enums define who may edit what.
+ */
 public class PillarParticleConfig {
     public static final int CONFIG_PERMISSION_LEVEL = 4;
 
@@ -38,16 +76,20 @@ public class PillarParticleConfig {
     }
 
     public static EditPermissionMode parseEditPermissionMode(String value) {
-        if (value == null) return EditPermissionMode.STRICT;
+        if (value == null) {
+            return EditPermissionMode.STRICT;
+        }
         try {
-            return EditPermissionMode.valueOf(value.trim().toUpperCase(java.util.Locale.ROOT));
+            return EditPermissionMode.valueOf(value.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ignored) {
             return EditPermissionMode.STRICT;
         }
     }
 
     public static boolean canEdit(EditPermissionMode mode, int permissionLevel, EditScope scope) {
-        if (scope == EditScope.POLICY) return permissionLevel >= CONFIG_PERMISSION_LEVEL;
+        if (scope == EditScope.POLICY) {
+            return permissionLevel >= CONFIG_PERMISSION_LEVEL;
+        }
         EditPermissionMode resolvedMode = mode != null ? mode : EditPermissionMode.STRICT;
         return switch (resolvedMode) {
             case STRICT -> permissionLevel >= CONFIG_PERMISSION_LEVEL;
@@ -58,8 +100,9 @@ public class PillarParticleConfig {
         };
     }
 
-    public static boolean canPlayerEdit(net.minecraft.world.entity.player.Player player, EditPermissionMode mode, EditScope scope) {
-        int permissionLevel = player != null && player.hasPermissions(CONFIG_PERMISSION_LEVEL) ? CONFIG_PERMISSION_LEVEL
+    public static boolean canPlayerEdit(Player player, EditPermissionMode mode, EditScope scope) {
+        int permissionLevel = player != null && player.hasPermissions(CONFIG_PERMISSION_LEVEL)
+                ? CONFIG_PERMISSION_LEVEL
                 : player != null && player.hasPermissions(2) ? 2 : 0;
         return canEdit(mode, permissionLevel, scope);
     }
@@ -69,22 +112,21 @@ public class PillarParticleConfig {
     };
 
     public static int resolveClientPermissionLevel(int syncedLevel, boolean localLevelTwo, boolean localLevelFour) {
-        if (syncedLevel >= 0) return Math.min(CONFIG_PERMISSION_LEVEL, syncedLevel);
+        if (syncedLevel >= 0) {
+            return Math.min(CONFIG_PERMISSION_LEVEL, syncedLevel);
+        }
         return localLevelFour ? CONFIG_PERMISSION_LEVEL : localLevelTwo ? 2 : 0;
     }
 
     public EditPermissionMode edit_permission_mode = EditPermissionMode.STRICT;
 
-
-    private static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+    private static final Gson GSON = Json.PRETTY;
     private static final String PROPERTIES_FILE_NAME = "pillar-properties.json";
     private static final String ITEMS_FILE_NAME = "pillar-items.json";
     private static PillarParticleConfig INSTANCE;
 
     private static PillarParticleConfig SERVER_CONFIG = null;
-    private static final Set<String> WARNED_INVALID_ITEMS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final Set<String> WARNED_INVALID_ITEMS = ConcurrentHashMap.newKeySet();
 
     private long lastLoadedProperties = 0L;
     private long lastFileSizeProperties = 0L;
@@ -95,7 +137,7 @@ public class PillarParticleConfig {
     private static Thread watchThread = null;
     private static final AtomicBoolean watcherInitialized = new AtomicBoolean(
             false);
-    private static final List<java.util.function.Consumer<Boolean>> configReloadCallbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static final List<Consumer<Boolean>> configReloadCallbacks = new CopyOnWriteArrayList<>();
     private static long lastNotifyTime = 0;
 
     private static volatile PillarParticleConfig SNAPSHOT = null;
@@ -112,22 +154,23 @@ public class PillarParticleConfig {
     private static volatile long lastStatCheckTime = 0L;
     private static final long STAT_CHECK_INTERVAL_MS = 2000L;
 
-    public static void addConfigReloadCallback(java.util.function.Consumer<Boolean> callback) {
+    public static void addConfigReloadCallback(Consumer<Boolean> callback) {
         configReloadCallbacks.add(callback);
     }
 
     private static void notifyCallbacks(boolean isRemote) {
-        for (java.util.function.Consumer<Boolean> callback : configReloadCallbacks) {
+        for (Consumer<Boolean> callback : configReloadCallbacks) {
             try {
                 callback.accept(isRemote);
             } catch (Exception e) {
-                e.printStackTrace();
+                // callbacks are other code; one failing callback must not stop the rest
+                BuildScape.LOGGER.error("Config reload callback failed", e);
             }
         }
         clearMatchCache();
     }
 
-    public volatile Set<String> items = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    public volatile Set<String> items = ConcurrentHashMap.newKeySet();
     private boolean itemsLoaded;
     private boolean itemsFileUnreadable;
     private transient boolean itemsReadOnly;
@@ -148,22 +191,243 @@ public class PillarParticleConfig {
 
     PillarParticleConfig(Path configDirectory) {
         this.configDirectory = configDirectory;
+        recordSnapshot();
+    }
+
+    public static class Snapshot {
+        public final int revision;
+        public final double particle_speed;
+        public final double particle_spread;
+        public final int particle_lifetime;
+        public final int particle_density;
+        public final boolean use_pattern;
+        public final String pattern;
+        public final double pattern_speed;
+        public final double pattern_spread;
+        public final double pattern_intensity;
+        public final List<String> particle_color;
+        public final int max_particle_color;
+        public final Set<String> items;
+        public final EditPermissionMode edit_permission_mode;
+
+        public Snapshot(int revision, PillarParticleConfig config) {
+            this.revision = revision;
+            this.particle_speed = config.particle_speed;
+            this.particle_spread = config.particle_spread;
+            this.particle_lifetime = config.particle_lifetime;
+            this.particle_density = config.particle_density;
+            this.use_pattern = config.use_pattern;
+            this.pattern = config.pattern != null ? config.pattern : "ring";
+            this.pattern_speed = config.pattern_speed;
+            this.pattern_spread = config.pattern_spread;
+            this.pattern_intensity = config.pattern_intensity;
+            this.particle_color = new ArrayList<>(config.particle_color != null ? config.particle_color : List.of());
+            this.max_particle_color = config.max_particle_color;
+            this.items = new HashSet<>(config.items != null ? config.items : Set.of());
+            this.edit_permission_mode = config.edit_permission_mode;
+        }
+    }
+
+    public int revision = 0;
+    private final transient List<Snapshot> snapshotHistory = new ArrayList<>();
+    private transient boolean initialLoadDone = false;
+    private transient boolean isApplyingUpload = false;
+
+    public synchronized void establishBaseline() {
+        snapshotHistory.clear();
+        snapshotHistory.add(new Snapshot(revision, this));
+        initialLoadDone = true;
+    }
+
+    public synchronized void onReload() {
+        this.revision++;
+        recordSnapshot();
+    }
+
+    public synchronized void recordSnapshot() {
+        if (isApplyingUpload) {
+            if (snapshotHistory.isEmpty() || !isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+                snapshotHistory.add(new Snapshot(revision, this));
+                if (snapshotHistory.size() > 50) {
+                    snapshotHistory.remove(0);
+                }
+            }
+            return;
+        }
+        if (snapshotHistory.isEmpty()) {
+            snapshotHistory.add(new Snapshot(revision, this));
+        } else if (snapshotHistory.size() == 1 && revision == 0 && !initialLoadDone) {
+            snapshotHistory.set(0, new Snapshot(revision, this));
+        } else if (!isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+            snapshotHistory.add(new Snapshot(revision, this));
+            if (snapshotHistory.size() > 50) {
+                snapshotHistory.remove(0);
+            }
+        }
+    }
+
+    private boolean isSameState(Snapshot s) {
+        return revision == s.revision
+                && Double.compare(particle_speed, s.particle_speed) == 0
+                && Double.compare(particle_spread, s.particle_spread) == 0
+                && particle_lifetime == s.particle_lifetime
+                && particle_density == s.particle_density
+                && use_pattern == s.use_pattern
+                && Objects.equals(pattern, s.pattern)
+                && Double.compare(pattern_speed, s.pattern_speed) == 0
+                && Double.compare(pattern_spread, s.pattern_spread) == 0
+                && Double.compare(pattern_intensity, s.pattern_intensity) == 0
+                && Objects.equals(particle_color, s.particle_color)
+                && max_particle_color == s.max_particle_color
+                && Objects.equals(items, s.items)
+                && edit_permission_mode == s.edit_permission_mode;
+    }
+
+    public synchronized Snapshot findBaseSnapshot(int baseRev) {
+        for (int i = snapshotHistory.size() - 1; i >= 0; i--) {
+            Snapshot s = snapshotHistory.get(i);
+            if (s.revision == baseRev) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public synchronized Snapshot findBaseSnapshot(int baseRev, Set<ConfigSetting> groups, Double inSpeed,
+            Integer inLifetime, Set<String> inItems) {
+        return findBaseSnapshot(baseRev);
+    }
+
+    public synchronized boolean applyUpload(PillarParticleConfig client, Set<ConfigSetting> groups) {
+        SyncConfigPacket data = new SyncConfigPacket(client);
+        data.baseRevision = client.revision;
+        boolean applied = applyUpload(data, groups);
+        if (applied) {
+            client.revision = this.revision;
+        }
+        return applied;
+    }
+
+    public synchronized boolean applyUpload(SyncConfigPacket data, Set<ConfigSetting> groups) {
+        if (groups == null || groups.isEmpty()) {
+            return true;
+        }
+        Snapshot base = findBaseSnapshot(data.baseRevision);
+        if (base == null) {
+            groups.clear();
+            return false;
+        }
+
+        isApplyingUpload = true;
+        try {
+            if (groups.contains(ConfigSetting.PARTICLES)) {
+                if (Double.compare(data.particle_speed, base.particle_speed) != 0) {
+                    this.particle_speed = data.particle_speed;
+                }
+                if (Double.compare(data.particle_spread, base.particle_spread) != 0) {
+                    this.particle_spread = data.particle_spread;
+                }
+                if (data.particle_lifetime != base.particle_lifetime) {
+                    this.particle_lifetime = data.particle_lifetime;
+                }
+                if (data.particle_density != base.particle_density) {
+                    this.particle_density = data.particle_density;
+                }
+                if (data.use_pattern != base.use_pattern) {
+                    this.use_pattern = data.use_pattern;
+                }
+                if (!Objects.equals(data.pattern, base.pattern) && data.pattern != null) {
+                    this.pattern = data.pattern;
+                }
+                if (Double.compare(data.pattern_speed, base.pattern_speed) != 0) {
+                    this.pattern_speed = data.pattern_speed;
+                }
+                if (Double.compare(data.pattern_spread, base.pattern_spread) != 0) {
+                    this.pattern_spread = data.pattern_spread;
+                }
+                if (Double.compare(data.pattern_intensity, base.pattern_intensity) != 0) {
+                    this.pattern_intensity = data.pattern_intensity;
+                }
+            }
+
+            if (groups.contains(ConfigSetting.COLORS)) {
+                if (data.max_particle_color != base.max_particle_color && data.max_particle_color > 0) {
+                    this.max_particle_color = data.max_particle_color;
+                }
+                if (data.particle_color != null) {
+                    if (data.particle_color.size() != base.particle_color.size()) {
+                        this.particle_color = new ArrayList<>(data.particle_color);
+                    } else {
+                        List<String> merged = new ArrayList<>(this.particle_color);
+                        while (merged.size() < data.particle_color.size()) {
+                            merged.add(DEFAULT_COLORS[Math.min(merged.size(), DEFAULT_COLORS.length - 1)]);
+                        }
+                        for (int i = 0; i < data.particle_color.size(); i++) {
+                            if (!Objects.equals(data.particle_color.get(i), base.particle_color.get(i))) {
+                                if (i < merged.size()) {
+                                    merged.set(i, data.particle_color.get(i));
+                                }
+                            }
+                        }
+                        this.particle_color = merged;
+                    }
+                }
+            }
+
+            if (groups.contains(ConfigSetting.ITEMS) && data.items != null) {
+                Set<String> added = new HashSet<>();
+                for (String item : data.items) {
+                    if (!base.items.contains(item)) {
+                        added.add(item);
+                    }
+                }
+                Set<String> removed = new HashSet<>();
+                for (String item : base.items) {
+                    if (!data.items.contains(item) && isValidItemId(item)) {
+                        removed.add(item);
+                    }
+                }
+
+                Set<String> merged = new HashSet<>(this.items);
+                merged.addAll(added);
+                merged.removeAll(removed);
+                this.editItems(merged);
+            }
+
+            if (groups.contains(ConfigSetting.POLICY) && data.edit_permission_mode != null) {
+                if (data.edit_permission_mode != base.edit_permission_mode) {
+                    this.edit_permission_mode = data.edit_permission_mode;
+                }
+            }
+
+            this.revision++;
+            data.baseRevision = this.revision;
+            recordSnapshot();
+            return true;
+        } finally {
+            isApplyingUpload = false;
+        }
     }
 
     public synchronized void replaceItems(Collection<String> updatedItems) {
-        Set<String> replacement = java.util.concurrent.ConcurrentHashMap.newKeySet();
+        Set<String> replacement = ConcurrentHashMap.newKeySet();
         replacement.addAll(updatedItems);
         for (String item : replacement) {
             if (!isValidItemId(item) && WARNED_INVALID_ITEMS.add(item)) {
-                BuildScape.LOGGER.warn("Invalid configured item or tag retained without applying it: " + item);
+                BuildScape.LOGGER.warn("Invalid configured item or tag retained without applying it: {}", item);
             }
         }
         items = replacement;
         clearMatchCache();
+        if (!isApplyingUpload && !initialLoadDone && revision == 0 && snapshotHistory.size() <= 1) {
+            recordSnapshot();
+        }
     }
 
     public static boolean isValidItemId(String item) {
-        if (item == null) return false;
+        if (item == null) {
+            return false;
+        }
         String id = item.startsWith("#") ? item.substring(1) : item;
         return !id.isEmpty() && ResourceLocation.isValidResourceLocation(id);
     }
@@ -171,7 +435,9 @@ public class PillarParticleConfig {
     public Set<String> getInvalidItems() {
         Set<String> invalid = new TreeSet<>();
         for (String item : items) {
-            if (!isValidItemId(item)) invalid.add(item);
+            if (!isValidItemId(item)) {
+                invalid.add(item);
+            }
         }
         return invalid;
     }
@@ -179,7 +445,9 @@ public class PillarParticleConfig {
     public synchronized void editItems(Collection<String> updatedItems) {
         Set<String> replacement = getInvalidItems();
         for (String item : updatedItems) {
-            if (isValidItemId(item)) replacement.add(item);
+            if (isValidItemId(item)) {
+                replacement.add(item);
+            }
         }
         replaceItems(replacement);
     }
@@ -191,11 +459,12 @@ public class PillarParticleConfig {
                 Files.copy(file.toPath(), backup);
             }
         } catch (Exception e) {
-            BuildScape.LOGGER.error("Unable to back up unreadable config " + file, e);
+            // the backup is best effort; any file system failure is only logged
+            BuildScape.LOGGER.error("Unable to back up unreadable config {}", file, e);
         }
     }
 
-    private static final java.util.concurrent.ConcurrentHashMap<net.minecraft.world.item.Item, Boolean> MATCH_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Item, Boolean> MATCH_CACHE = new ConcurrentHashMap<>();
 
     private static void clearMatchCache() {
         MATCH_CACHE.clear();
@@ -215,7 +484,7 @@ public class PillarParticleConfig {
     public int particle_density = 2;
 
     public boolean use_pattern = true;
-    public String pattern = "ring";
+    public String pattern = ParticlePatterns.RING;
 
     public double pattern_speed = 0.05;
     public double pattern_spread = 0.05;
@@ -233,7 +502,7 @@ public class PillarParticleConfig {
         if (now - connectedCacheTime < CONNECTED_CACHE_TTL_MS) {
             return cachedConnectedToServer;
         }
-        boolean result = ClientConnectionState.isConnected();
+        boolean result = ClientHooks.get().isConnectedToServer();
         cachedConnectedToServer = result;
         connectedCacheTime = now;
         return result;
@@ -300,6 +569,9 @@ public class PillarParticleConfig {
                 if (reloadItems) {
                     INSTANCE.loadItemsInternal();
                 }
+                if (reloadProperties || reloadItems) {
+                    INSTANCE.onReload();
+                }
             }
             SNAPSHOT = INSTANCE;
         }
@@ -307,7 +579,7 @@ public class PillarParticleConfig {
     }
 
     public static void setServerConfig(
-            com.kingodogo.buildscape.network.SyncConfigPacket packet) {
+            SyncConfigPacket packet) {
         SERVER_CONFIG = new PillarParticleConfig();
         SERVER_CONFIG.remote = true;
         SERVER_CONFIG.itemsReadOnly = packet.itemsReadOnly;
@@ -321,13 +593,14 @@ public class PillarParticleConfig {
         SERVER_CONFIG.particle_lifetime = packet.particle_lifetime > 0
                 ? packet.particle_lifetime
                 : 20;
+        SERVER_CONFIG.revision = packet.baseRevision;
         SERVER_CONFIG.particle_density = packet.particle_density >= 0
                 ? packet.particle_density
                 : 2;
         SERVER_CONFIG.use_pattern = packet.use_pattern;
         SERVER_CONFIG.pattern = packet.pattern != null && !packet.pattern.isEmpty()
                 ? packet.pattern
-                : "ring";
+                : ParticlePatterns.RING;
         SERVER_CONFIG.pattern_speed = packet.pattern_speed > 0
                 ? packet.pattern_speed
                 : 0.05;
@@ -365,6 +638,7 @@ public class PillarParticleConfig {
                 : EditPermissionMode.STRICT;
 
         clearMatchCache();
+        SERVER_CONFIG.establishBaseline();
         notifyCallbacks(true);
         SNAPSHOT = SERVER_CONFIG;
     }
@@ -384,89 +658,79 @@ public class PillarParticleConfig {
                     StandardWatchEventKinds.ENTRY_MODIFY,
                     StandardWatchEventKinds.ENTRY_CREATE);
 
-            watchThread = new Thread(
-                    () -> {
-                        try {
-                            while (true) {
-                                WatchKey key = watchService.take();
-
-                                for (WatchEvent<?> event : key.pollEvents()) {
-                                    WatchEvent.Kind<?> kind = event.kind();
-
-                                    if (kind == StandardWatchEventKinds.OVERFLOW) {
-                                        continue;
-                                    }
-
-                                    @SuppressWarnings("unchecked")
-                                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                                    Path filename = ev.context();
-
-                                    if (filename.toString().equals(PROPERTIES_FILE_NAME) ||
-                                            filename.toString().equals(ITEMS_FILE_NAME)) {
-
-                                        Thread.sleep(100);
-
-                                        if (INSTANCE != null) {
-                                            boolean wasProperties = filename
-                                                    .toString()
-                                                    .equals(PROPERTIES_FILE_NAME);
-                                            boolean wasItems = filename
-                                                    .toString()
-                                                    .equals(ITEMS_FILE_NAME);
-
-                                            boolean reloaded = false;
-                                            if (wasProperties) {
-                                                INSTANCE.loadPropertiesInternal();
-                                                reloaded = true;
-                                            }
-                                            if (wasItems) {
-                                                INSTANCE.loadItemsInternal();
-                                                reloaded = true;
-                                            }
-
-                                            if (reloaded) {
-                                                long currentTime = System.currentTimeMillis();
-                                                if (currentTime - lastNotifyTime > 500) {
-                                                    lastNotifyTime = currentTime;
-                                                    if (!configReloadCallbacks.isEmpty()) {
-                                                        notifyCallbacks(false);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                boolean valid = key.reset();
-                                if (!valid) {
-                                    break;
-                                }
-                            }
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        } catch (Exception e) {
-                            BuildScape.LOGGER.error("Error in config file watcher: " + e.getMessage());
-                        }
-                    },
-                    "BuildScape-ConfigWatcher");
+            watchThread = new Thread(PillarParticleConfig::runWatchLoop, "BuildScape-ConfigWatcher");
 
             watchThread.setDaemon(true);
             watchThread.start();
         } catch (Exception e) {
+            // watcher setup can fail on unsupported file systems; the config then loads without live reload
             watcherInitialized.set(false);
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    private static final class ClientConnectionState {
-        private static boolean hasLocalServer() {
-            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
-            return minecraft != null && minecraft.hasSingleplayerServer();
+    /** Body of the watcher thread: reacts to config file changes until the watch key becomes invalid. */
+    private static void runWatchLoop() {
+        try {
+            while (true) {
+                WatchKey key = watchService.take();
+
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    handleWatchEvent(event);
+                }
+
+                boolean valid = key.reset();
+                if (!valid) {
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            // any watcher or reload failure is logged and ends the watcher thread
+            BuildScape.LOGGER.error("Error in config file watcher", e);
+        }
+    }
+
+    private static void handleWatchEvent(WatchEvent<?> event) throws InterruptedException {
+        if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
+            return;
         }
 
-        private static boolean isConnected() {
-            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
-            return minecraft.getConnection() != null && minecraft.level != null;
+        @SuppressWarnings("unchecked")
+        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+        String filename = ev.context().toString();
+
+        boolean wasProperties = filename.equals(PROPERTIES_FILE_NAME);
+        boolean wasItems = filename.equals(ITEMS_FILE_NAME);
+        if (!wasProperties && !wasItems) {
+            return;
+        }
+
+        Thread.sleep(100);
+
+        if (INSTANCE == null) {
+            return;
+        }
+
+        if (wasProperties) {
+            INSTANCE.loadPropertiesInternal();
+        }
+        if (wasItems) {
+            INSTANCE.loadItemsInternal();
+        }
+
+        INSTANCE.onReload();
+        notifyReloadCallbacksIfDue();
+    }
+
+    /** Tells the reload callbacks about a file reload, at most once per 500 ms. */
+    private static void notifyReloadCallbacksIfDue() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastNotifyTime > 500) {
+            lastNotifyTime = currentTime;
+            if (!configReloadCallbacks.isEmpty()) {
+                notifyCallbacks(false);
+            }
         }
     }
 
@@ -486,8 +750,9 @@ public class PillarParticleConfig {
 
     private File getConfigDir() {
         File dir = (configDirectory != null ? configDirectory : Paths.get("config", "buildscape", "pillar")).toFile();
-        if (!dir.exists())
+        if (!dir.exists()) {
             dir.mkdirs();
+        }
         return dir;
     }
 
@@ -502,6 +767,7 @@ public class PillarParticleConfig {
                     "#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF"));
             ConfigLayoutIO.write(f.toPath(), groupedProperties(defaults.propertyValues()), null, false);
         } catch (Exception e) {
+            // writing the default file is best effort; the defaults stay in memory
             BuildScape.LOGGER.error("Unable to create default pillar properties", e);
         }
     }
@@ -567,6 +833,7 @@ public class PillarParticleConfig {
     }
 
     private void loadInternal() {
+        boolean wasInitial = !initialLoadDone;
         File propertiesFile = getPropertiesFile();
         File itemsFile = getItemsFile();
         boolean migrationComplete = migrateOldConfig();
@@ -580,6 +847,12 @@ public class PillarParticleConfig {
             loadItemsInternal();
         } else {
             itemsFileUnreadable = true;
+        }
+
+        if (wasInitial) {
+            establishBaseline();
+        } else {
+            onReload();
         }
     }
 
@@ -595,12 +868,16 @@ public class PillarParticleConfig {
             try {
                 originalProperties = ConfigLayoutIO.readProperties(propertiesSource);
             } catch (Exception e) {
+                // the properties file may be malformed in any way; load it read-only
                 propertiesReadOnly = true;
                 originalProperties = null;
             }
-            Type mapType = new TypeToken<Map<String, Object>>() { }.getType();
+            Type mapType = new TypeToken<Map<String, Object>>() {
+            }.getType();
             Map<String, Object> jsonMap = GSON.fromJson(stripComments(propertiesSource), mapType);
-            if (jsonMap == null) throw new IllegalArgumentException("Expected pillar properties");
+            if (jsonMap == null) {
+                throw new IllegalArgumentException("Expected pillar properties");
+            }
             if (jsonMap != null) {
                 if (jsonMap.containsKey("use_template") &&
                         !jsonMap.containsKey("use_pattern")) {
@@ -645,7 +922,7 @@ public class PillarParticleConfig {
                             ? Math.max(0, loaded.particle_density)
                             : this.particle_density;
                     this.use_pattern = loaded.use_pattern;
-                    this.pattern = loaded.pattern != null ? loaded.pattern : "ring";
+                    this.pattern = loaded.pattern != null ? loaded.pattern : ParticlePatterns.RING;
                     this.pattern_speed = loaded.pattern_speed > 0
                             ? loaded.pattern_speed
                             : this.pattern_speed;
@@ -657,7 +934,8 @@ public class PillarParticleConfig {
                             : this.pattern_intensity;
 
                     if (jsonMap.containsKey("edit_permission_mode")) {
-                        this.edit_permission_mode = parseEditPermissionMode(String.valueOf(jsonMap.get("edit_permission_mode")));
+                        this.edit_permission_mode = parseEditPermissionMode(
+                                String.valueOf(jsonMap.get("edit_permission_mode")));
                     } else if (loaded.edit_permission_mode != null) {
                         this.edit_permission_mode = loaded.edit_permission_mode;
                     }
@@ -668,9 +946,9 @@ public class PillarParticleConfig {
                     } else {
                         if (jsonMap.containsKey("particle_color")) {
                             Object colorObj = jsonMap.get("particle_color");
-                            if (colorObj instanceof String) {
+                            if (colorObj instanceof String string) {
                                 rawColors = new ArrayList<>();
-                                rawColors.add((String) colorObj);
+                                rawColors.add(string);
                             } else if (colorObj instanceof List) {
                                 rawColors = (List<String>) colorObj;
                             }
@@ -681,7 +959,7 @@ public class PillarParticleConfig {
                     if (rawColors != null && !rawColors.isEmpty()) {
                         for (String color : rawColors) {
                             if (color != null && color.matches("^#[0-9A-Fa-f]{6}$")) {
-                                newColors.add(color.toUpperCase());
+                                newColors.add(color.toUpperCase(Locale.ROOT));
                             }
                         }
                     }
@@ -724,7 +1002,14 @@ public class PillarParticleConfig {
                 }
             }
             loadedPropertyValues = propertyValues();
+            if (!initialLoadDone) {
+                if (snapshotHistory.size() <= 1 && revision == 0) {
+                    snapshotHistory.clear();
+                    snapshotHistory.add(new Snapshot(revision, this));
+                }
+            }
         } catch (Exception e) {
+            // the properties file may be malformed in any way; keep the original and make it read-only
             propertiesReadOnly = true;
             backupUnreadableFile(file);
             BuildScape.LOGGER.error("Unable to load pillar properties; retaining the original file", e);
@@ -735,7 +1020,7 @@ public class PillarParticleConfig {
     }
 
     private synchronized void loadItemsInternal() {
-        loadItemsInternal(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+        loadItemsInternal(ModList.get().isLoaded("the_vault"));
     }
 
     synchronized void loadItemsInternal(boolean vaultLoaded) {
@@ -756,11 +1041,14 @@ public class PillarParticleConfig {
             try {
                 ConfigLayoutIO.readProperties(normalized);
             } catch (Exception e) {
+                // unparsable properties text only makes the items file read-only
                 itemsReadOnly = true;
             }
             // Non-string entries can be ignored in memory, but must not be lost in a rewrite.
             for (JsonElement entry : document.getAsJsonArray("items")) {
-                if (!entry.isJsonPrimitive() || !entry.getAsJsonPrimitive().isString()) itemsReadOnly = true;
+                if (!entry.isJsonPrimitive() || !entry.getAsJsonPrimitive().isString()) {
+                    itemsReadOnly = true;
+                }
             }
             itemsReadOnly |= !ConfigLayoutIO.isWritable(file.toPath());
             if (!itemsReadOnly) {
@@ -777,6 +1065,7 @@ public class PillarParticleConfig {
                     }
                     document = merged;
                 } catch (Exception e) {
+                    // merging new default items is best effort; keep the existing file
                     BuildScape.LOGGER.warn("Unable to merge new default items; retaining the existing file", e);
                 }
             }
@@ -784,48 +1073,72 @@ public class PillarParticleConfig {
             originalItems = document;
             replaceItems(parsed);
             itemsFileUnreadable = false;
+            if (!initialLoadDone) {
+                if (snapshotHistory.size() <= 1 && revision == 0) {
+                    snapshotHistory.clear();
+                    snapshotHistory.add(new Snapshot(revision, this));
+                }
+            }
         } catch (Exception e) {
+            // the items file may be malformed in any way; keep the last good item list
             itemsFileUnreadable = true;
             backupUnreadableFile(file);
-            BuildScape.LOGGER.error("Unable to load items config " + file + "; keeping the last good item list", e);
+            BuildScape.LOGGER.error("Unable to load items config {}; keeping the last good item list", file, e);
         } finally {
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
         }
     }
 
-    static JsonObject mergeDefaultItems(JsonObject document, boolean vaultLoaded) throws java.io.IOException {
-        JsonObject defaults = ConfigPaths.loadItemsTemplate(vaultLoaded ? "vault_pillar_items" : "vanilla_pillar_items");
+    static JsonObject mergeDefaultItems(JsonObject document, boolean vaultLoaded) throws IOException {
+        JsonObject defaults = ConfigPaths
+                .loadItemsTemplate(vaultLoaded ? "vault_pillar_items" : "vanilla_pillar_items");
         int defaultsVersion = defaults.get("defaults_version").getAsInt();
         Set<String> offered = new HashSet<>();
         if (document.has("offered_defaults")) {
-            if (!document.get("offered_defaults").isJsonArray()) throw new java.io.IOException("Invalid offered defaults");
-            for (JsonElement entry : document.getAsJsonArray("offered_defaults")) offered.add(entry.getAsString());
+            if (!document.get("offered_defaults").isJsonArray()) {
+                throw new IOException("Invalid offered defaults");
+            }
+            for (JsonElement entry : document.getAsJsonArray("offered_defaults")) {
+                offered.add(entry.getAsString());
+            }
         } else if (document.has("defaults_version") && document.get("defaults_version").getAsInt() >= defaultsVersion) {
             // Current files may have been hand-edited before offered defaults were recorded.
-            for (JsonElement entry : defaults.getAsJsonArray("items")) offered.add(entry.getAsString());
+            for (JsonElement entry : defaults.getAsJsonArray("items")) {
+                offered.add(entry.getAsString());
+            }
         } else {
             boolean hadVaultItems = false;
             for (JsonElement entry : document.getAsJsonArray("items")) {
-                if (isVaultItem(entry.getAsString())) hadVaultItems = true;
+                if (isVaultItem(entry.getAsString())) {
+                    hadVaultItems = true;
+                }
             }
             // Infer removals only from defaults the old installation could have offered.
             for (JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items").getAsJsonArray("items")) {
                 String item = entry.getAsString();
-                if (!isVaultItem(item) || hadVaultItems) offered.add(item);
+                if (!isVaultItem(item) || hadVaultItems) {
+                    offered.add(item);
+                }
             }
         }
         JsonObject merged = document.deepCopy();
         Set<String> present = new HashSet<>();
-        for (JsonElement entry : document.getAsJsonArray("items")) present.add(entry.getAsString());
+        for (JsonElement entry : document.getAsJsonArray("items")) {
+            present.add(entry.getAsString());
+        }
         for (JsonElement entry : defaults.getAsJsonArray("items")) {
             String item = entry.getAsString();
-            if (!offered.contains(item) && present.add(item)) merged.getAsJsonArray("items").add(entry.deepCopy());
+            if (!offered.contains(item) && present.add(item)) {
+                merged.getAsJsonArray("items").add(entry.deepCopy());
+            }
             offered.add(item);
         }
         merged.add("offered_defaults", GSON.toJsonTree(new TreeSet<>(offered)));
         merged.addProperty("defaults_version", defaultsVersion);
-        if (vaultLoaded) merged.addProperty("vault_defaults_version", defaultsVersion);
+        if (vaultLoaded) {
+            merged.addProperty("vault_defaults_version", defaultsVersion);
+        }
         return merged;
     }
 
@@ -833,9 +1146,13 @@ public class PillarParticleConfig {
         return item.startsWith("the_vault:") || item.startsWith("#the_vault:");
     }
 
-    private static boolean isLegacyItems(JsonObject document) throws java.io.IOException {
-        if (document == null || document.has("offered_defaults")) return false;
-        if (document.has("defaults_version")) return document.get("defaults_version").getAsInt() <= 405;
+    private static boolean isLegacyItems(JsonObject document) throws IOException {
+        if (document == null || document.has("offered_defaults")) {
+            return false;
+        }
+        if (document.has("defaults_version")) {
+            return document.get("defaults_version").getAsInt() <= 405;
+        }
         Set<String> existing = new HashSet<>();
         for (JsonElement entry : document.getAsJsonArray("items")) {
             existing.add(entry.getAsString());
@@ -845,7 +1162,9 @@ public class PillarParticleConfig {
         for (JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items").getAsJsonArray("items")) {
             String item = entry.getAsString();
             vault.add(item);
-            if (!isVaultItem(item)) vanilla.add(item);
+            if (!isVaultItem(item)) {
+                vanilla.add(item);
+            }
         }
         // Use a normal backup when an unversioned file's origin cannot be established.
         return existing.equals(vanilla) || existing.equals(vault);
@@ -856,10 +1175,10 @@ public class PillarParticleConfig {
     }
 
     static Set<String> parseItems(String content, String source) {
-        com.google.gson.JsonObject root;
+        JsonObject root;
         try {
-            root = GSON.fromJson(ConfigLayoutIO.itemsJson(content), com.google.gson.JsonObject.class);
-        } catch (java.io.IOException e) {
+            root = GSON.fromJson(ConfigLayoutIO.itemsJson(content), JsonObject.class);
+        } catch (IOException e) {
             throw new IllegalArgumentException("Invalid items config " + source, e);
         }
         if (root == null || !root.has("items") || !root.get("items").isJsonArray()) {
@@ -867,7 +1186,7 @@ public class PillarParticleConfig {
         }
         Set<String> parsed = new HashSet<>();
         boolean skippedEntries = false;
-        for (com.google.gson.JsonElement item : root.getAsJsonArray("items")) {
+        for (JsonElement item : root.getAsJsonArray("items")) {
             if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) {
                 skippedEntries = true;
                 continue;
@@ -875,21 +1194,26 @@ public class PillarParticleConfig {
             parsed.add(item.getAsString());
         }
         if (skippedEntries) {
-            BuildScape.LOGGER.warn("Skipped non-string entries in items array from " + source);
+            BuildScape.LOGGER.warn("Skipped non-string entries in items array from {}", source);
         }
         return parsed;
     }
 
     private boolean migrateOldConfig() {
-        Path oldFile = configDirectory == null ? Paths.get("config", "buildscape", "pillar-particles.json")
+        Path oldFile = configDirectory == null
+                ? Paths.get("config", "buildscape", "pillar-particles.json")
                 : configDirectory.resolveSibling("pillar-particles.json");
         Path backup = oldFile.resolveSibling("pillar-particles.json.backup");
         Path completion = oldFile.resolveSibling("pillar-particles.json.backup.complete");
-        if (!Files.exists(oldFile) || Files.exists(completion)) return true;
+        if (!Files.exists(oldFile) || Files.exists(completion)) {
+            return true;
+        }
         try {
             String source = ConfigLayoutIO.readText(oldFile);
             JsonObject old = GSON.fromJson(ConfigLayoutIO.itemsJson(source), JsonObject.class);
-            if (old == null) return false;
+            if (old == null) {
+                return false;
+            }
             boolean replacementDecoded = ConfigLayoutIO.protectInvalidEncoding(oldFile);
             boolean hasItems = old.has("items") && !old.get("items").isJsonNull();
             try {
@@ -907,6 +1231,7 @@ public class PillarParticleConfig {
                     }
                 }
             } catch (Exception e) {
+                // legacy migration is best effort; keep the original file
                 BuildScape.LOGGER.error("Unable to migrate legacy pillar items; retaining the original", e);
             }
             try {
@@ -918,10 +1243,12 @@ public class PillarParticleConfig {
                         Files.copy(oldFile, propertiesFile.toPath());
                     } else {
                         ConfigLayoutIO.write(propertiesFile.toPath(),
-                                ConfigLayoutIO.retainComments(source, groupedProperties(properties), true), null, false);
+                                ConfigLayoutIO.retainComments(source, groupedProperties(properties), true), null,
+                                false);
                     }
                 }
             } catch (Exception e) {
+                // legacy migration is best effort; keep the original file
                 BuildScape.LOGGER.error("Unable to migrate legacy pillar properties; retaining the original", e);
             }
             boolean migrated = getPropertiesFile().exists() && (getItemsFile().exists() || !hasItems);
@@ -933,6 +1260,7 @@ public class PillarParticleConfig {
             }
             return migrated;
         } catch (Exception e) {
+            // legacy migration is best effort; keep the original file
             BuildScape.LOGGER.error("Unable to migrate legacy pillar config; retaining the original", e);
             return false;
         }
@@ -944,15 +1272,18 @@ public class PillarParticleConfig {
     }
 
     public boolean matches(ItemStack stack) {
-        if (stack == null || stack.isEmpty())
+        if (stack == null || stack.isEmpty()) {
             return false;
+        }
 
-        if (items == null || items.isEmpty())
+        if (items == null || items.isEmpty()) {
             return true;
+        }
 
         Boolean cached = MATCH_CACHE.get(stack.getItem());
-        if (cached != null)
+        if (cached != null) {
             return cached;
+        }
 
         boolean result = matchesUncached(stack);
         MATCH_CACHE.put(stack.getItem(), result);
@@ -960,7 +1291,7 @@ public class PillarParticleConfig {
     }
 
     private boolean matchesUncached(ItemStack stack) {
-        ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(
                 stack.getItem());
         if (id != null && items.contains(id.toString())) {
             return true;
@@ -971,14 +1302,15 @@ public class PillarParticleConfig {
                 String tagString = itemOrTag.substring(1);
                 try {
                     ResourceLocation tagLocation = new ResourceLocation(tagString);
-                    net.minecraft.tags.TagKey<net.minecraft.world.item.Item> tagKey = net.minecraft.tags.TagKey.create(
-                            net.minecraft.core.Registry.ITEM_REGISTRY,
+                    TagKey<Item> tagKey = TagKey.create(
+                            Registry.ITEM_REGISTRY,
                             tagLocation);
 
                     if (stack.getItem().builtInRegistryHolder().is(tagKey)) {
                         return true;
                     }
-                } catch (Exception e) {
+                } catch (ResourceLocationException e) {
+                    // invalid tag id; treat it as not matching
                 }
             }
         }
@@ -993,11 +1325,10 @@ public class PillarParticleConfig {
         }
         clearMatchCache();
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
-            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> {
-                        if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
-                            com.kingodogo.buildscape.network.UpdateConfigPacket.send(this);
+                        if (ClientHooks.get().canUploadConfig()) {
+                            UpdateConfigPacket.send(this);
                         }
                     });
             return;
@@ -1006,15 +1337,20 @@ public class PillarParticleConfig {
     }
 
     public synchronized boolean saveItemsToDisk() {
-        if (remote) return false;
-        return saveItemsToDisk(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+        if (remote) {
+            return false;
+        }
+        return saveItemsToDisk(ModList.get().isLoaded("the_vault"));
     }
 
     synchronized boolean saveItemsToDisk(boolean vaultLoaded) {
-        if (remote) return false;
+        if (remote) {
+            return false;
+        }
         clearMatchCache();
         if (itemsFileUnreadable || itemsReadOnly) {
-            BuildScape.LOGGER.warn("Not saving read-only items config; unreadable/legacy file kept as-is: " + getItemsFile());
+            BuildScape.LOGGER.warn("Not saving read-only items config; unreadable/legacy file kept as-is: {}",
+                    getItemsFile());
             return false;
         }
         File file = getItemsFile();
@@ -1033,7 +1369,8 @@ public class PillarParticleConfig {
             json = mergeDefaultItems(json, vaultLoaded);
             String output = ConfigLayoutIO.retainComments(itemsSource, GSON.toJson(json), true);
             output = ConfigLayoutIO.retainInvalidItemTokens(itemsSource, output);
-            ConfigLayoutIO.writeItems(file.toPath(), output, itemsSource, itemsOnDiskIs405 || isLegacyItems(originalItems));
+            ConfigLayoutIO.writeItems(file.toPath(), output, itemsSource,
+                    itemsOnDiskIs405 || isLegacyItems(originalItems));
             itemsOnDiskIs405 = false;
             replaceItems(parseItems(output));
             itemsSource = output;
@@ -1042,7 +1379,8 @@ public class PillarParticleConfig {
             lastFileSizeItems = file.length();
             return true;
         } catch (Exception e) {
-            BuildScape.LOGGER.error("Error saving items config: " + e.getMessage());
+            // any save failure is logged and reported to the caller as false
+            BuildScape.LOGGER.error("Error saving items config", e);
             return false;
         }
     }
@@ -1053,11 +1391,10 @@ public class PillarParticleConfig {
             return;
         }
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
-            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> {
-                        if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
-                            com.kingodogo.buildscape.network.UpdateConfigPacket.send(this);
+                        if (ClientHooks.get().canUploadConfig()) {
+                            UpdateConfigPacket.send(this);
                         }
                     });
             return;
@@ -1066,9 +1403,12 @@ public class PillarParticleConfig {
     }
 
     public synchronized boolean savePropertiesToDisk() {
-        if (remote) return false;
+        if (remote) {
+            return false;
+        }
         if (propertiesReadOnly) {
-            BuildScape.LOGGER.warn("Not saving read-only pillar properties; unreadable/legacy file kept as-is: " + getPropertiesFile());
+            BuildScape.LOGGER.warn("Not saving read-only pillar properties; unreadable/legacy file kept as-is: {}",
+                    getPropertiesFile());
             return false;
         }
         File file = getPropertiesFile();
@@ -1078,7 +1418,8 @@ public class PillarParticleConfig {
                 String source = ConfigLayoutIO.readText(file.toPath());
                 if (ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                     propertiesReadOnly = true;
-                    BuildScape.LOGGER.warn("Not saving read-only pillar properties; replacement-decoded file kept as-is: " + file);
+                    BuildScape.LOGGER.warn(
+                            "Not saving read-only pillar properties; replacement-decoded file kept as-is: {}", file);
                     return false;
                 }
                 JsonObject original = ConfigLayoutIO.readProperties(source);
@@ -1094,7 +1435,8 @@ public class PillarParticleConfig {
             JsonObject output = originalProperties == null ? new JsonObject() : originalProperties.deepCopy();
             for (Map.Entry<String, JsonElement> entry : current.entrySet()) {
                 String key = entry.getKey();
-                boolean changed = loadedPropertyValues == null || !entry.getValue().equals(loadedPropertyValues.get(key));
+                boolean changed = loadedPropertyValues == null
+                        || !entry.getValue().equals(loadedPropertyValues.get(key));
                 if ("edit_permission_mode".equals(key) && !output.has(key) && !changed && originalProperties != null) {
                     continue;
                 }
@@ -1112,6 +1454,7 @@ public class PillarParticleConfig {
             lastFileSizeProperties = file.length();
             return true;
         } catch (Exception ignored) {
+            // any save failure is logged and reported to the caller as false
             BuildScape.LOGGER.warn("Unable to save pillar properties", ignored);
             return false;
         }
@@ -1126,7 +1469,9 @@ public class PillarParticleConfig {
     private static List<String> itemsForSave(JsonObject original, Collection<String> updated) {
         List<String> existing = new ArrayList<>();
         if (original != null) {
-            for (JsonElement entry : original.getAsJsonArray("items")) existing.add(entry.getAsString());
+            for (JsonElement entry : original.getAsJsonArray("items")) {
+                existing.add(entry.getAsString());
+            }
         }
         return orderedItemsForSave(existing, updated);
     }
@@ -1142,11 +1487,15 @@ public class PillarParticleConfig {
         Set<String> present = new HashSet<>();
         for (String item : existing) {
             present.add(item);
-            if (wanted.contains(item) || !isValidItemId(item)) values.add(item);
+            if (wanted.contains(item) || !isValidItemId(item)) {
+                values.add(item);
+            }
         }
         List<String> added = new ArrayList<>();
         for (String item : wanted) {
-            if (!present.contains(item)) added.add(item);
+            if (!present.contains(item)) {
+                added.add(item);
+            }
         }
         added.sort(String::compareTo);
         values.addAll(added);
@@ -1154,14 +1503,14 @@ public class PillarParticleConfig {
     }
 
     public boolean canEditItems() {
-        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConnectionState.hasLocalServer()) {
+        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientHooks.get().hasLocalServer()) {
             return getLocalConfig().canEditItems();
         }
         return !itemsFileUnreadable && !itemsReadOnly;
     }
 
     public boolean canEditProperties() {
-        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConnectionState.hasLocalServer()) {
+        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientHooks.get().hasLocalServer()) {
             return getLocalConfig().canEditProperties();
         }
         return !propertiesReadOnly;
@@ -1172,8 +1521,12 @@ public class PillarParticleConfig {
     }
 
     public boolean canApplyUpdate(boolean items, boolean properties) {
-        if ((properties && !canEditProperties()) || (items && !canEditItems())) return false;
-        if (remote) return true;
+        if ((properties && !canEditProperties()) || (items && !canEditItems())) {
+            return false;
+        }
+        if (remote) {
+            return true;
+        }
         try {
             File propertiesFile = getPropertiesFile();
             File itemsFile = getItemsFile();
@@ -1186,7 +1539,7 @@ public class PillarParticleConfig {
                         || !ConfigLayoutIO.isWritable(itemsFile.toPath());
             }
             return (!properties || canEditProperties()) && (!items || canEditItems());
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             BuildScape.LOGGER.warn("Unable to check server config protection", e);
             return false;
         }
@@ -1205,7 +1558,8 @@ public class PillarParticleConfig {
         values.addProperty("pattern_intensity", pattern_intensity);
         values.addProperty("use_pattern", use_pattern);
         values.addProperty("particle_density", particle_density);
-        values.addProperty("edit_permission_mode", edit_permission_mode != null ? edit_permission_mode.name().toLowerCase(java.util.Locale.ROOT) : "strict");
+        values.addProperty("edit_permission_mode",
+                edit_permission_mode != null ? edit_permission_mode.name().toLowerCase(Locale.ROOT) : "strict");
         return values;
     }
 
@@ -1215,7 +1569,7 @@ public class PillarParticleConfig {
                 + "  // Right-click a pillar with dyes to override config colors for that pillar (up to 5 dyes).\n"
                 + "  // Dye colors cycle in application order; break and replace the pillar to reset them.\n"
                 + "  // Config colors cycle from the first color through max_particle_color.\n");
-        java.util.Set<String> written = new java.util.HashSet<>();
+        Set<String> written = new HashSet<>();
         appendProperties(text, values, written, "Visuals", new String[][]{
                 {"particle_color", "Hexadecimal particle color palette (up to 7 colors)"},
                 {"max_particle_color", "Maximum number of colors to use from particle_color (1-7)"},
@@ -1232,7 +1586,7 @@ public class PillarParticleConfig {
                 {"particle_density", "Number of particles spawned per tick when use_pattern = false"}});
         boolean otherHeading = false;
         // Sort unknown keys as well, so output remains stable regardless of input key order.
-        for (String key : new java.util.TreeSet<>(values.keySet())) {
+        for (String key : new TreeSet<>(values.keySet())) {
             if (!written.contains(key)) {
                 if (!otherHeading) {
                     text.append("\n  // --- Other ---\n");
@@ -1243,16 +1597,20 @@ public class PillarParticleConfig {
             }
         }
         int comma = text.lastIndexOf(",\n");
-        if (comma >= 0) text.deleteCharAt(comma);
+        if (comma >= 0) {
+            text.deleteCharAt(comma);
+        }
         return text.append("}\n").toString();
     }
 
     private static void appendProperties(StringBuilder text, JsonObject values, Set<String> written,
-                                         String section, String[][] entries) {
+            String section, String[][] entries) {
         text.append("\n  // --- ").append(section).append(" ---\n");
         for (String[] entry : entries) {
             written.add(entry[0]);
-            if (!values.has(entry[0])) continue;
+            if (!values.has(entry[0])) {
+                continue;
+            }
             text.append("  // ").append(entry[1]).append('\n');
             appendProperty(text, entry[0], values.get(entry[0]));
         }
@@ -1263,7 +1621,9 @@ public class PillarParticleConfig {
     }
 
     public boolean addItem(String itemId) {
-        if (!canEditItems()) return false;
+        if (!canEditItems()) {
+            return false;
+        }
         if (!isValidItemId(itemId)) {
             return false;
         }
@@ -1276,7 +1636,9 @@ public class PillarParticleConfig {
     }
 
     public boolean removeItem(String itemId) {
-        if (!canEditItems()) return false;
+        if (!canEditItems()) {
+            return false;
+        }
         if (!isValidItemId(itemId)) {
             return false;
         }

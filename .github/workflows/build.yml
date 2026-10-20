@@ -1,0 +1,189 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.editorconfig'
+      - '.prettierignore'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Jar & Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Determine Version and Build Type
+        id: version_info
+        shell: bash
+        run: |
+          REF_NAME="${{ github.ref_name }}"
+          echo "Current Git Ref: $REF_NAME"
+
+          # Extract base versions from gradle.properties
+          MOD_VER=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d '\r\n[:space:]')
+          MC_VER=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d '\r\n[:space:]')
+          echo "Base Mod Version: $MOD_VER"
+          echo "Minecraft Version: $MC_VER"
+
+          # Check if branch contains 'main' (e.g. main, dev/main-1.18.2, main/1.18.2-4.1.0)
+          if [[ "$REF_NAME" == *"main"* ]]; then
+            echo "Release branch detected."
+            IS_RELEASE="true"
+            IS_PRERELEASE="false"
+            BUILD_TYPE="Production Release"
+            EFFECTIVE_VER="$MOD_VER"
+            JAR_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}.jar"
+            TAG_NAME="v${MC_VER}-${EFFECTIVE_VER}"
+            RELEASE_TITLE="Buildscape ${MC_VER}-${EFFECTIVE_VER}"
+            ARTIFACT_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}"
+          else
+            echo "Development branch detected."
+            IS_RELEASE="false"
+            IS_PRERELEASE="true"
+            BUILD_TYPE="Development Build [ Dev ]"
+            # SemVer hyphenated dev counter: e.g. 4.1.0-dev.1, 4.1.0-dev.2
+            RUN_NUM="${{ github.run_number }}"
+            EFFECTIVE_VER="${MOD_VER}-dev.${RUN_NUM}"
+            JAR_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}.jar"
+            # Single grouped tag for the entire development cycle
+            TAG_NAME="v${MC_VER}-${MOD_VER}-Dev"
+            RELEASE_TITLE="[ Dev ] Buildscape ${MC_VER}-${MOD_VER} (Latest: ${EFFECTIVE_VER})"
+            ARTIFACT_NAME="[ Dev ] buildscape-${MC_VER}-${EFFECTIVE_VER}"
+          fi
+
+          echo "Effective Version: $EFFECTIVE_VER"
+          echo "Jar Name: $JAR_NAME"
+          echo "Tag Name: $TAG_NAME"
+          echo "Release Title: $RELEASE_TITLE"
+          echo "Artifact Name: $ARTIFACT_NAME"
+
+          echo "is_release=$IS_RELEASE" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "build_type=$BUILD_TYPE" >> $GITHUB_OUTPUT
+          echo "effective_version=$EFFECTIVE_VER" >> $GITHUB_OUTPUT
+          echo "jar_name=$JAR_NAME" >> $GITHUB_OUTPUT
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "release_title=$RELEASE_TITLE" >> $GITHUB_OUTPUT
+          echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Grant Execute Permission to Gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Verification Checks
+        run: ./gradlew check --no-daemon
+
+      - name: Build Mod Jar
+        run: |
+          ./gradlew jar \
+            "-Pmod_version_override=${{ steps.version_info.outputs.effective_version }}" \
+            --no-daemon
+
+      - name: Verify Built Jar File
+        shell: bash
+        run: |
+          echo "Checking built artifacts in build/libs/:"
+          ls -la build/libs/
+          test -f "build/libs/${{ steps.version_info.outputs.jar_name }}"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.version_info.outputs.artifact_name }}
+          path: build/libs/${{ steps.version_info.outputs.jar_name }}
+          if-no-files-found: error
+
+      - name: Generate Release Description
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.version_info.outputs.tag_name }}
+          IS_RELEASE: ${{ steps.version_info.outputs.is_release }}
+          EFFECTIVE_VER: ${{ steps.version_info.outputs.effective_version }}
+          JAR_NAME: ${{ steps.version_info.outputs.jar_name }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          COMMIT_SHA: ${{ github.sha }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          if [ "$IS_RELEASE" = "true" ]; then
+            touch release_body.md
+          else
+            python3 - << 'EOF'
+          import os, subprocess, re
+
+          tag = os.environ.get('TAG_NAME', '')
+          version = os.environ.get('EFFECTIVE_VER', '')
+          jar = os.environ.get('JAR_NAME', '')
+          branch = os.environ.get('BRANCH_NAME', '')
+          commit = os.environ.get('COMMIT_SHA', '')
+          repo_url = os.environ.get('REPO_URL', '')
+          commit_short = commit[:7] if commit else ''
+          download_url = f"{repo_url}/releases/download/{tag}/{jar}"
+
+          new_entry = (
+              f"### Build: `{version}`\n"
+              f"- **Download**: [`{jar}`]({download_url})\n"
+              f"- **Branch**: `{branch}`\n"
+              f"- **Commit**: [`{commit_short}`]({repo_url}/commit/{commit})"
+          )
+
+          existing_history = ""
+          try:
+              output = subprocess.check_output(
+                  ["gh", "release", "view", tag, "--json", "body", "--jq", ".body"],
+                  stderr=subprocess.DEVNULL,
+                  text=True
+              ).strip()
+              if output and output != "null":
+                  parts = re.split(r'\n##\s+', output)
+                  existing_history = parts[0].strip()
+          except Exception:
+              pass
+
+          if existing_history:
+              combined = f"{new_entry}\n\n---\n\n{existing_history}\n"
+          else:
+              combined = f"{new_entry}\n"
+
+          with open("release_body.md", "w", encoding="utf-8") as f:
+              f.write(combined)
+          EOF
+          fi
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version_info.outputs.tag_name }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.version_info.outputs.release_title }}
+          body_path: release_body.md
+          files: build/libs/${{ steps.version_info.outputs.jar_name }}
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ steps.version_info.outputs.is_prerelease == 'true' }}
+          make_latest: ${{ steps.version_info.outputs.is_release == 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

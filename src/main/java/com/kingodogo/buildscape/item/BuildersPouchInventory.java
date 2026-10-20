@@ -14,7 +14,9 @@ public class BuildersPouchInventory implements Container {
     public BuildersPouchInventory(ItemStack pouch) {
         this.pouch = pouch;
         CompoundTag data = BuildersPouchItem.getData(pouch, false);
-        if (data != null) ContainerHelper.loadAllItems(data, items);
+        if (data != null) {
+            ContainerHelper.loadAllItems(data, items);
+        }
     }
 
     @Override
@@ -35,28 +37,36 @@ public class BuildersPouchInventory implements Container {
     @Override
     public ItemStack removeItem(int slot, int amount) {
         ItemStack result = ContainerHelper.removeItem(items, slot, amount);
-        if (!result.isEmpty()) setChanged();
+        if (!result.isEmpty()) {
+            setChanged();
+        }
         return result;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
         ItemStack result = ContainerHelper.takeItem(items, slot);
-        if (!result.isEmpty()) setChanged();
+        if (!result.isEmpty()) {
+            setChanged();
+        }
         return result;
     }
 
     @Override
     public void setItem(int slot, ItemStack stack) {
         items.set(slot, stack);
-        if (stack.getCount() > getMaxStackSize()) stack.setCount(getMaxStackSize());
+        if (stack.getCount() > getMaxStackSize()) {
+            stack.setCount(getMaxStackSize());
+        }
         setChanged();
     }
 
     @Override
     public void setChanged() {
         CompoundTag data = BuildersPouchItem.getData(pouch, true);
-        if (data != null) ContainerHelper.saveAllItems(data, items);
+        if (data != null) {
+            ContainerHelper.saveAllItems(data, items);
+        }
     }
 
     @Override

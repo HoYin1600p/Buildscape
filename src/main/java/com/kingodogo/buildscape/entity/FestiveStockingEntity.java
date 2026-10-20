@@ -1,5 +1,8 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.registry.DyeVariants;
+import com.kingodogo.buildscape.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -8,6 +11,7 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -22,22 +26,21 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 
+import java.util.List;
 import javax.annotation.Nullable;
 
 public class FestiveStockingEntity extends HangingEntity {
 
-    private static final EntityDataAccessor<ItemStack> DATA_ITEM =
-            SynchedEntityData.defineId(
-                    FestiveStockingEntity.class,
-                    EntityDataSerializers.ITEM_STACK
-            );
+    private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(
+            FestiveStockingEntity.class,
+            EntityDataSerializers.ITEM_STACK);
     private String colorVariant = "festive";
 
     public FestiveStockingEntity(
             EntityType<? extends FestiveStockingEntity> entityType,
-            Level level
-    ) {
+            Level level) {
         super(entityType, level);
     }
 
@@ -55,8 +58,7 @@ public class FestiveStockingEntity extends HangingEntity {
             Level level,
             BlockPos pos,
             Direction direction,
-            String color
-    ) {
+            String color) {
         this(ModEntities.FESTIVE_STOCKING.get(), level, pos);
         this.colorVariant = color;
         if (direction != null) {
@@ -78,8 +80,7 @@ public class FestiveStockingEntity extends HangingEntity {
     public FestiveStockingEntity(
             EntityType<? extends FestiveStockingEntity> entityType,
             Level level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         super(entityType, level, pos);
     }
 
@@ -87,7 +88,6 @@ public class FestiveStockingEntity extends HangingEntity {
     public void setDirection(Direction direction) {
         if (direction != null) {
             this.direction = direction;
-
 
             if (this.pos != null) {
                 this.recalculateBoundingBox();
@@ -109,37 +109,27 @@ public class FestiveStockingEntity extends HangingEntity {
     @Override
     protected void recalculateBoundingBox() {
         if (this.direction != null && this.pos != null) {
-            double d0 = (double) this.pos.getX() + 0.5D;
-            double d1 = (double) this.pos.getY() + 0.5D;
-            double d2 = (double) this.pos.getZ() + 0.5D;
-            double d3 = 0.46875D;
+            double d0 = (double) this.pos.getX() + 0.5;
+            double d1 = (double) this.pos.getY() + 0.5;
+            double d2 = (double) this.pos.getZ() + 0.5;
+            double d3 = 0.46875;
             double d4 = this.offs(this.getWidth());
             double d5 = this.offs(this.getHeight());
 
-            d0 -= (double) this.direction.getStepX() * 0.46875D;
-            d1 -= (double) this.direction.getStepY() * 0.46875D;
-            d2 -= (double) this.direction.getStepZ() * 0.46875D;
+            d0 -= (double) this.direction.getStepX() * 0.46875;
+            d1 -= (double) this.direction.getStepY() * 0.46875;
+            d2 -= (double) this.direction.getStepZ() * 0.46875;
 
             Direction offsetDir;
             if (this.direction.getAxis() == Direction.Axis.Y) {
                 offsetDir = Direction.NORTH;
             } else {
                 switch (this.direction) {
-                    case NORTH:
-                        offsetDir = Direction.EAST;
-                        break;
-                    case SOUTH:
-                        offsetDir = Direction.WEST;
-                        break;
-                    case EAST:
-                        offsetDir = Direction.SOUTH;
-                        break;
-                    case WEST:
-                        offsetDir = Direction.NORTH;
-                        break;
-                    default:
-                        offsetDir = Direction.NORTH;
-                        break;
+                    case NORTH -> offsetDir = Direction.EAST;
+                    case SOUTH -> offsetDir = Direction.WEST;
+                    case EAST -> offsetDir = Direction.SOUTH;
+                    case WEST -> offsetDir = Direction.NORTH;
+                    default -> offsetDir = Direction.NORTH;
                 }
             }
 
@@ -154,36 +144,34 @@ public class FestiveStockingEntity extends HangingEntity {
             if (this.direction.getAxis() == Direction.Axis.Z) {
                 d6 = (double) this.getWidth();
                 d7 = (double) this.getHeight();
-                d8 = 2.0D;
+                d8 = 2.0;
             } else if (this.direction.getAxis() == Direction.Axis.X) {
-                d6 = 2.0D;
+                d6 = 2.0;
                 d7 = (double) this.getHeight();
                 d8 = (double) this.getWidth();
             } else {
                 d6 = (double) this.getWidth();
-                d7 = 2.0D;
+                d7 = 2.0;
                 d8 = (double) this.getHeight();
             }
 
-            d6 /= 32.0D;
-            d7 /= 32.0D;
-            d8 /= 32.0D;
+            d6 /= 32.0;
+            d7 /= 32.0;
+            d8 /= 32.0;
 
             this.setBoundingBox(
-                    new net.minecraft.world.phys.AABB(
+                    new AABB(
                             d0 - d6,
                             d1 - d7,
                             d2 - d8,
                             d0 + d6,
                             d1 + d7,
-                            d2 + d8
-                    )
-            );
+                            d2 + d8));
         }
     }
 
-    private double offs(int p_31731_) {
-        return p_31731_ % 32 == 0 ? 0.5D : 0.0D;
+    private double offs(int index) {
+        return index % 32 == 0 ? 0.5 : 0.0;
     }
 
     @Override
@@ -205,16 +193,11 @@ public class FestiveStockingEntity extends HangingEntity {
             ItemStack storedItem = this.getItem();
             boolean hasSilkTouch = false;
 
-            if (entity instanceof Player) {
-                Player player = (Player) entity;
+            if (entity instanceof Player player) {
                 ItemStack tool = player.getMainHandItem();
-                if (
-                        EnchantmentHelper.getItemEnchantmentLevel(
-                                Enchantments.SILK_TOUCH,
-                                tool
-                        ) >
-                                0
-                ) {
+                if (EnchantmentHelper.getItemEnchantmentLevel(
+                        Enchantments.SILK_TOUCH,
+                        tool) > 0) {
                     hasSilkTouch = true;
                 }
             }
@@ -225,7 +208,7 @@ public class FestiveStockingEntity extends HangingEntity {
                 CompoundTag tag = stockingItem.getOrCreateTag();
                 CompoundTag storedTag = new CompoundTag();
                 storedItem.save(storedTag);
-                tag.put("StoredItem", storedTag);
+                tag.put(NbtKeys.STORED_ITEM, storedTag);
             }
 
             this.spawnAtLocation(stockingItem);
@@ -246,9 +229,7 @@ public class FestiveStockingEntity extends HangingEntity {
         ItemStack heldItem = player.getItemInHand(hand);
         ItemStack storedItem = this.getItem();
 
-        if (
-                heldItem.isEmpty() && player.isShiftKeyDown() && !storedItem.isEmpty()
-        ) {
+        if (heldItem.isEmpty() && player.isShiftKeyDown() && !storedItem.isEmpty()) {
             if (!this.level.isClientSide) {
                 ItemStack toGive = storedItem.copy();
                 this.setItem(ItemStack.EMPTY);
@@ -259,8 +240,7 @@ public class FestiveStockingEntity extends HangingEntity {
                             this.getX(),
                             this.getY(),
                             this.getZ(),
-                            toGive
-                    );
+                            toGive);
                     itemEntity.setDefaultPickUpDelay();
                     this.level.addFreshEntity(itemEntity);
                 }
@@ -286,10 +266,8 @@ public class FestiveStockingEntity extends HangingEntity {
                     }
                 }
                 return InteractionResult.sidedSuccess(this.level.isClientSide);
-            } else if (
-                    ItemStack.isSameItemSameTags(storedItem, heldItem) &&
-                            storedItem.getCount() < storedItem.getMaxStackSize()
-            ) {
+            } else if (ItemStack.isSameItemSameTags(storedItem, heldItem) &&
+                    storedItem.getCount() < storedItem.getMaxStackSize()) {
                 if (!this.level.isClientSide) {
                     int maxStack = storedItem.getMaxStackSize();
                     int spaceAvailable = maxStack - storedItem.getCount();
@@ -341,15 +319,15 @@ public class FestiveStockingEntity extends HangingEntity {
         if (!storedItem.isEmpty()) {
             CompoundTag itemTag = new CompoundTag();
             storedItem.save(itemTag);
-            tag.put("Item", itemTag);
+            tag.put(NbtKeys.ITEM, itemTag);
         }
-        tag.putString("ColorVariant", colorVariant);
+        tag.putString(NbtKeys.COLOR_VARIANT, colorVariant);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        CompoundTag itemTag = tag.getCompound("Item");
+        CompoundTag itemTag = tag.getCompound(NbtKeys.ITEM);
         if (itemTag != null && !itemTag.isEmpty()) {
             ItemStack item = ItemStack.of(itemTag);
             if (item.isEmpty()) {
@@ -360,8 +338,8 @@ public class FestiveStockingEntity extends HangingEntity {
         } else {
             this.setItem(ItemStack.EMPTY, false);
         }
-        if (tag.contains("ColorVariant")) {
-            this.colorVariant = tag.getString("ColorVariant");
+        if (tag.contains(NbtKeys.COLOR_VARIANT)) {
+            this.colorVariant = tag.getString(NbtKeys.COLOR_VARIANT);
         }
     }
 
@@ -371,13 +349,10 @@ public class FestiveStockingEntity extends HangingEntity {
             return false;
         } else {
             BlockPos blockpos = this.pos.relative(this.direction.getOpposite());
-            if (
-                    !this.level.getBlockState(blockpos).isSolidRender(this.level, blockpos)
-            ) {
+            if (!this.level.getBlockState(blockpos).isSolidRender(this.level, blockpos)) {
                 return false;
             } else {
-                java.util.List<Entity> entities =
-                        this.level.getEntities(this, this.getBoundingBox());
+                List<Entity> entities = this.level.getEntities(this, this.getBoundingBox());
                 for (Entity entity : entities) {
                     if (entity instanceof HangingEntity && entity != this) {
                         return false;
@@ -415,7 +390,7 @@ public class FestiveStockingEntity extends HangingEntity {
         }
     }
 
-    private net.minecraft.sounds.SoundEvent getRemoveItemSound() {
+    private SoundEvent getRemoveItemSound() {
         return SoundEvents.ITEM_FRAME_REMOVE_ITEM;
     }
 
@@ -427,81 +402,12 @@ public class FestiveStockingEntity extends HangingEntity {
             CompoundTag tag = result.getOrCreateTag();
             CompoundTag storedTag = new CompoundTag();
             storedItem.save(storedTag);
-            tag.put("StoredItem", storedTag);
+            tag.put(NbtKeys.STORED_ITEM, storedTag);
         }
         return result;
     }
 
     private ItemStack getStockingItemForColor(String color) {
-        switch (color) {
-            case "black":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.BLACK_FESTIVE_STOCKING.get()
-                );
-            case "blue":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.BLUE_FESTIVE_STOCKING.get()
-                );
-            case "brown":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.BROWN_FESTIVE_STOCKING.get()
-                );
-            case "cyan":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.CYAN_FESTIVE_STOCKING.get()
-                );
-            case "gray":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.GRAY_FESTIVE_STOCKING.get()
-                );
-            case "green":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.GREEN_FESTIVE_STOCKING.get()
-                );
-            case "light_blue":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.LIGHT_BLUE_FESTIVE_STOCKING.get()
-                );
-            case "light_gray":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.LIGHT_GRAY_FESTIVE_STOCKING.get()
-                );
-            case "lime":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.LIME_FESTIVE_STOCKING.get()
-                );
-            case "magenta":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.MAGENTA_FESTIVE_STOCKING.get()
-                );
-            case "orange":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.ORANGE_FESTIVE_STOCKING.get()
-                );
-            case "pink":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.PINK_FESTIVE_STOCKING.get()
-                );
-            case "purple":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.PURPLE_FESTIVE_STOCKING.get()
-                );
-            case "red":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.RED_FESTIVE_STOCKING.get()
-                );
-            case "white":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.WHITE_FESTIVE_STOCKING.get()
-                );
-            case "yellow":
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.YELLOW_FESTIVE_STOCKING.get()
-                );
-            default:
-                return new ItemStack(
-                        com.kingodogo.buildscape.item.ModItems.FESTIVE_STOCKING.get()
-                );
-        }
+        return new ItemStack(DyeVariants.festiveStockingItem(color));
     }
 }

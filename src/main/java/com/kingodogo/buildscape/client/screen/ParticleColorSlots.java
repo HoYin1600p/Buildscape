@@ -5,8 +5,7 @@ import java.util.List;
 final class ParticleColorSlots {
     static final String DEFAULT_COLOR = "#FFFFFF";
 
-    private ParticleColorSlots() {
-    }
+    private ParticleColorSlots() {}
 
     static String colorAt(List<String> colors, int index) {
         if (colors == null || index < 0 || index >= colors.size()) {

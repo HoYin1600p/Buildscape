@@ -1,8 +1,10 @@
 package com.kingodogo.buildscape.recipe.framework.compiler;
 
+import com.kingodogo.buildscape.core.io.AtomicFiles;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.kingodogo.buildscape.recipe.framework.util.PatternBounds;
+import com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -14,10 +16,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -30,6 +30,11 @@ import java.util.Map;
 import java.util.Set;
 
 // Compiles BDRE recipe pack JSON sources into binary cache (recipes.bscb) with SHA-256 integrity validation.
+/**
+ * Build-time tool that compiles the recipe pack JSON into the bundled {@code recipes.bscb} and can sync a local copy.
+ * Its main method skips work when the existing cache already matches the source hash and checks the written file.
+ * {@code GENERATOR_VERSION} must be bumped whenever compile logic changes, since the cache would otherwise look current.
+ */
 public class RecipeCacheGenerator {
 
     public static final int MAGIC_HEADER = 0x4B59524F;
@@ -65,7 +70,7 @@ public class RecipeCacheGenerator {
             byte[] hashBytes = digest.digest();
             StringBuilder hex = new StringBuilder();
             for (byte b : hashBytes) {
-                hex.append(String.format("%02x", b));
+                hex.append(String.format(Locale.ROOT, "%02x", b));
             }
             return hex.toString();
         } catch (NoSuchAlgorithmException e) {
@@ -90,36 +95,17 @@ public class RecipeCacheGenerator {
         }
     }
 
+    /**
+     * Compiles every category found in the source directory and returns the cache file bytes.
+     * BundledRecipeCacheVerify compares these bytes with the bundled file.
+     */
     public static byte[] generateCache(Path sourceDirectory) throws IOException {
-        Map<String, byte[]> rawCategoryData = new LinkedHashMap<>();
-        StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
-
-        for (String category : CATEGORIES) {
-            Path sourceFile = sourceDirectory.resolve(category + ".json");
-            if (Files.isRegularFile(sourceFile)) {
-                rawCategoryData.put(category, Files.readAllBytes(sourceFile));
-                com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter.validateJson(
-                        Files.readString(sourceFile, StandardCharsets.UTF_8));
-                try (Reader reader = Files.newBufferedReader(sourceFile, StandardCharsets.UTF_8)) {
-                    cycles.addCategory(StreamingRecipeParser.parseCategory(category, reader));
-                }
-            }
-        }
-        cycles.validate();
+        Map<String, byte[]> rawCategoryData = readAndValidateCategories(sourceDirectory);
 
         String contentHash = computeSourceHash(CATEGORIES, rawCategoryData);
         Set<String> runtimeCategories = findRuntimeCategories(rawCategoryData);
 
-        List<String> stringPool = new ArrayList<>();
-        Map<String, Integer> stringIndexMap = new HashMap<>();
-
-        ByteArrayOutputStream recipeByteStream = new ByteArrayOutputStream();
-        DataOutputStream recipeDataOut = new DataOutputStream(recipeByteStream);
-
-        int totalRecipeCount = 0;
-        Set<String> registeredRecipeIds = new HashSet<>();
-        RecipeIdAllocator recipeIds = new RecipeIdAllocator();
-
+        CacheBody body = new CacheBody();
         for (String category : CATEGORIES) {
             if (runtimeCategories.contains(category)) {
                 continue;
@@ -130,6 +116,48 @@ public class RecipeCacheGenerator {
                 continue;
             }
 
+            body.writeCategory(category, bytes);
+        }
+
+        return body.assemble(contentHash);
+    }
+
+    /** Reads each category file that exists, validates its JSON and checks the stonecutting graph for cycles. */
+    private static Map<String, byte[]> readAndValidateCategories(Path sourceDirectory) throws IOException {
+        Map<String, byte[]> rawCategoryData = new LinkedHashMap<>();
+        StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
+
+        for (String category : CATEGORIES) {
+            Path sourceFile = sourceDirectory.resolve(category + ".json");
+            if (Files.isRegularFile(sourceFile)) {
+                rawCategoryData.put(category, Files.readAllBytes(sourceFile));
+                RecipePackFormatter.validateJson(
+                        Files.readString(sourceFile, StandardCharsets.UTF_8));
+                try (Reader reader = Files.newBufferedReader(sourceFile, StandardCharsets.UTF_8)) {
+                    cycles.addCategory(StreamingRecipeParser.parseCategory(category, reader));
+                }
+            }
+        }
+        cycles.validate();
+        return rawCategoryData;
+    }
+
+    /** The mutable state of one cache build: the shared string pool and the recipe records written so far. */
+    private static final class CacheBody {
+        private final List<String> stringPool = new ArrayList<>();
+        private final Map<String, Integer> stringIndexMap = new HashMap<>();
+        private final ByteArrayOutputStream recipeByteStream = new ByteArrayOutputStream();
+        private final DataOutputStream recipeDataOut = new DataOutputStream(recipeByteStream);
+        private final Set<String> registeredRecipeIds = new HashSet<>();
+        private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
+        private int totalRecipeCount = 0;
+
+        private int index(String value) {
+            return getStringIndex(value, stringPool, stringIndexMap);
+        }
+
+        /** Parses one category from its raw JSON and writes every recipe it expands to. */
+        void writeCategory(String category, byte[] bytes) throws IOException {
             try (Reader reader = new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
                 AliasResolver aliasResolver = new AliasResolver();
@@ -153,133 +181,134 @@ public class RecipeCacheGenerator {
                 }
 
                 for (RecipeIR.RecipeSpec spec : allSpecs) {
-                    if (spec == null) continue;
-
-                    String specType = spec.type() != null ? spec.type().toLowerCase(Locale.ROOT) : category.toLowerCase(Locale.ROOT);
-                    if ("forge:conditional".equals(specType) || (spec.rawJson() != null && spec.rawJson().contains("\"conditions\""))) {
+                    if (spec == null) {
                         continue;
                     }
-
-                    try {
-                        ShapedRecipeSymbols.validate(spec);
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Skipping recipe " + spec.id() + ": " + e.getMessage());
-                        continue;
-                    }
-                    String recipeId = recipeIds.allocate(category, spec, aliasResolver);
-
-                    if (registeredRecipeIds.contains(recipeId)) {
-                        System.err.println("WARNING: Duplicate recipe ID in " + category + ": " + recipeId
-                                + "; retaining the first recipe only");
-                        continue;
-                    }
-                    registeredRecipeIds.add(recipeId);
-
-                    String group = spec.group() != null ? spec.group() : "";
-                    String resultItemStr = (spec.result() != null && spec.result().item() != null)
-                            ? aliasResolver.resolveString(spec.result().item()) : "minecraft:air";
-                    int count = spec.result() != null ? spec.result().count() : 1;
-                    String resultNbt = (spec.result() != null && spec.result().nbt() != null) ? spec.result().nbt() : "";
-
-                    recipeDataOut.writeInt(getStringIndex(recipeId, stringPool, stringIndexMap));
-                    recipeDataOut.writeInt(getStringIndex(group, stringPool, stringIndexMap));
-                    recipeDataOut.writeInt(getStringIndex(resultItemStr, stringPool, stringIndexMap));
-                    recipeDataOut.writeInt(count);
-                    recipeDataOut.writeInt(getStringIndex(resultNbt, stringPool, stringIndexMap));
-
-                    switch (specType) {
-                        case "shaped" -> {
-                            recipeDataOut.writeByte(1);
-                            writeShapedRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
-                        }
-                        case "shapeless" -> {
-                            recipeDataOut.writeByte(2);
-                            writeShapelessRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
-                        }
-                        case "buildscape:haze_bush_dye" -> {
-                            recipeDataOut.writeByte(13);
-                            writeShapelessRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
-                        }
-                        case "stonecutting" -> {
-                            recipeDataOut.writeByte(3);
-                            String ingJson = resolveIngredientJson(spec.input(), aliasResolver);
-                            recipeDataOut.writeInt(getStringIndex(ingJson, stringPool, stringIndexMap));
-                        }
-                        case "smelting" -> {
-                            recipeDataOut.writeByte(4);
-                            String ingJson = resolveIngredientJson(spec.input(), aliasResolver);
-                            recipeDataOut.writeInt(getStringIndex(ingJson, stringPool, stringIndexMap));
-                            recipeDataOut.writeFloat(spec.experience());
-                            recipeDataOut.writeInt(spec.cookingTime());
-                        }
-                        case "blasting" -> {
-                            recipeDataOut.writeByte(5);
-                            String ingJson = resolveIngredientJson(spec.input(), aliasResolver);
-                            recipeDataOut.writeInt(getStringIndex(ingJson, stringPool, stringIndexMap));
-                            recipeDataOut.writeFloat(spec.experience());
-                            recipeDataOut.writeInt(spec.cookingTime());
-                        }
-                        case "smoking" -> {
-                            recipeDataOut.writeByte(6);
-                            String ingJson = resolveIngredientJson(spec.input(), aliasResolver);
-                            recipeDataOut.writeInt(getStringIndex(ingJson, stringPool, stringIndexMap));
-                            recipeDataOut.writeFloat(spec.experience());
-                            recipeDataOut.writeInt(spec.cookingTime());
-                        }
-                        case "campfire", "campfire_cooking" -> {
-                            recipeDataOut.writeByte(7);
-                            String ingJson = resolveIngredientJson(spec.input(), aliasResolver);
-                            recipeDataOut.writeInt(getStringIndex(ingJson, stringPool, stringIndexMap));
-                            recipeDataOut.writeFloat(spec.experience());
-                            recipeDataOut.writeInt(spec.cookingTime());
-                        }
-                        case "smithing" -> {
-                            recipeDataOut.writeByte(8);
-                            String baseIngJson = resolveIngredientJson(spec.input(), aliasResolver);
-                            String addIngJson = (spec.ingredients() != null && !spec.ingredients().isEmpty())
-                                    ? resolveIngredientJson(spec.ingredients().get(0), aliasResolver) : "";
-                            recipeDataOut.writeInt(getStringIndex(baseIngJson, stringPool, stringIndexMap));
-                            recipeDataOut.writeInt(getStringIndex(addIngJson, stringPool, stringIndexMap));
-                        }
-                        case "shaped_durability", "buildscape:shaped_durability" -> {
-                            recipeDataOut.writeByte(9);
-                            writeShapedRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
-                        }
-                        case "shapeless_durability", "buildscape:shapeless_durability" -> {
-                            recipeDataOut.writeByte(10);
-                            writeShapelessRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
-                        }
-                        case "confetti_configure", "buildscape:confetti_configure" -> {
-                            recipeDataOut.writeByte(11);
-                        }
-                        case "clear_shulker_filters", "buildscape:clear_shulker_filters" -> {
-                            recipeDataOut.writeByte(12);
-                        }
-                        default -> {
-                            throw new IllegalArgumentException("Unknown recipe type: " + specType);
-                        }
-                    }
-
-                    totalRecipeCount++;
+                    writeSpec(category, spec, aliasResolver);
                 }
             }
         }
 
-        ByteArrayOutputStream finalOut = new ByteArrayOutputStream();
-        DataOutputStream out = new DataOutputStream(finalOut);
-        out.writeInt(MAGIC_HEADER);
-        out.writeInt(CACHE_VERSION);
-        out.writeUTF(contentHash);
+        /** Writes one recipe record, or skips it (conditional, invalid or duplicate) without counting it. */
+        private void writeSpec(String category, RecipeIR.RecipeSpec spec, AliasResolver aliasResolver)
+                throws IOException {
+            String specType = spec.type() != null
+                    ? spec.type().toLowerCase(Locale.ROOT)
+                    : category.toLowerCase(Locale.ROOT);
+            if ("forge:conditional".equals(specType)
+                    || (spec.rawJson() != null && spec.rawJson().contains("\"conditions\""))) {
+                return;
+            }
 
-        out.writeInt(stringPool.size());
-        for (String s : stringPool) {
-            out.writeUTF(s);
+            try {
+                ShapedRecipeSymbols.validate(spec);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Skipping recipe " + spec.id() + ": " + e.getMessage());
+                return;
+            }
+            String recipeId = recipeIds.allocate(category, spec, aliasResolver);
+
+            if (registeredRecipeIds.contains(recipeId)) {
+                System.err.println("WARNING: Duplicate recipe ID in " + category + ": " + recipeId
+                        + "; retaining the first recipe only");
+                return;
+            }
+            registeredRecipeIds.add(recipeId);
+
+            String group = spec.group() != null ? spec.group() : "";
+            String resultItemStr = (spec.result() != null && spec.result().item() != null)
+                    ? aliasResolver.resolveString(spec.result().item())
+                    : "minecraft:air";
+            int count = spec.result() != null ? spec.result().count() : 1;
+            String resultNbt = (spec.result() != null && spec.result().nbt() != null)
+                    ? spec.result().nbt()
+                    : "";
+
+            recipeDataOut.writeInt(index(recipeId));
+            recipeDataOut.writeInt(index(group));
+            recipeDataOut.writeInt(index(resultItemStr));
+            recipeDataOut.writeInt(count);
+            recipeDataOut.writeInt(index(resultNbt));
+
+            writeTypePayload(specType, spec, aliasResolver);
+
+            totalRecipeCount++;
         }
 
-        out.writeInt(totalRecipeCount);
-        out.write(recipeByteStream.toByteArray());
+        /** Writes the type id byte and the type-specific body of one recipe. */
+        private void writeTypePayload(String specType, RecipeIR.RecipeSpec spec, AliasResolver aliasResolver)
+                throws IOException {
+            switch (specType) {
+                case "shaped" -> {
+                    recipeDataOut.writeByte(1);
+                    writeShapedRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
+                }
+                case "shapeless" -> {
+                    recipeDataOut.writeByte(2);
+                    writeShapelessRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
+                }
+                case "buildscape:haze_bush_dye" -> {
+                    recipeDataOut.writeByte(13);
+                    writeShapelessRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
+                }
+                case "stonecutting" -> {
+                    recipeDataOut.writeByte(3);
+                    recipeDataOut.writeInt(index(resolveIngredientJson(spec.input(), aliasResolver)));
+                }
+                case "smelting" -> writeCooking(4, spec, aliasResolver);
+                case "blasting" -> writeCooking(5, spec, aliasResolver);
+                case "smoking" -> writeCooking(6, spec, aliasResolver);
+                case "campfire", "campfire_cooking" -> writeCooking(7, spec, aliasResolver);
+                case "smithing" -> {
+                    recipeDataOut.writeByte(8);
+                    String baseIngJson = resolveIngredientJson(spec.input(), aliasResolver);
+                    String addIngJson = (spec.ingredients() != null && !spec.ingredients().isEmpty())
+                            ? resolveIngredientJson(spec.ingredients().get(0), aliasResolver)
+                            : "";
+                    recipeDataOut.writeInt(index(baseIngJson));
+                    recipeDataOut.writeInt(index(addIngJson));
+                }
+                case "shaped_durability", "buildscape:shaped_durability" -> {
+                    recipeDataOut.writeByte(9);
+                    writeShapedRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
+                }
+                case "shapeless_durability", "buildscape:shapeless_durability" -> {
+                    recipeDataOut.writeByte(10);
+                    writeShapelessRecipe(recipeDataOut, spec, aliasResolver, stringPool, stringIndexMap);
+                }
+                case "confetti_configure", "buildscape:confetti_configure" -> recipeDataOut.writeByte(11);
+                case "clear_shulker_filters", "buildscape:clear_shulker_filters" -> recipeDataOut.writeByte(12);
+                default -> throw new IllegalArgumentException("Unknown recipe type: " + specType);
+            }
+        }
 
-        return finalOut.toByteArray();
+        /** Smelting-style body: ingredient, experience, cooking time. */
+        private void writeCooking(int typeId, RecipeIR.RecipeSpec spec, AliasResolver aliasResolver)
+                throws IOException {
+            recipeDataOut.writeByte(typeId);
+            recipeDataOut.writeInt(index(resolveIngredientJson(spec.input(), aliasResolver)));
+            recipeDataOut.writeFloat(spec.experience());
+            recipeDataOut.writeInt(spec.cookingTime());
+        }
+
+        /** Header, string pool and recipe records as the final cache file bytes. */
+        byte[] assemble(String contentHash) throws IOException {
+            ByteArrayOutputStream finalOut = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(finalOut);
+            out.writeInt(MAGIC_HEADER);
+            out.writeInt(CACHE_VERSION);
+            out.writeUTF(contentHash);
+
+            out.writeInt(stringPool.size());
+            for (String s : stringPool) {
+                out.writeUTF(s);
+            }
+
+            out.writeInt(totalRecipeCount);
+            out.write(recipeByteStream.toByteArray());
+
+            return finalOut.toByteArray();
+        }
     }
 
     private static void writeShapedRecipe(
@@ -290,7 +319,9 @@ public class RecipeCacheGenerator {
             Map<String, Integer> stringIndexMap) throws IOException {
 
         List<String> patternList = spec.pattern();
-        if (patternList == null) patternList = List.of();
+        if (patternList == null) {
+            patternList = List.of();
+        }
         int height = patternList.size();
         int width = 0;
         for (String line : patternList) {
@@ -353,7 +384,9 @@ public class RecipeCacheGenerator {
             Map<String, Integer> stringIndexMap) throws IOException {
 
         List<String> ingredients = spec.ingredients();
-        if (ingredients == null) ingredients = List.of();
+        if (ingredients == null) {
+            ingredients = List.of();
+        }
 
         List<String> resolved = new ArrayList<>();
         for (String ingStr : ingredients) {
@@ -384,7 +417,9 @@ public class RecipeCacheGenerator {
                     entries.add(itemJson);
                 }
             }
-            if (entries.isEmpty()) return "";
+            if (entries.isEmpty()) {
+                return "";
+            }
             return "[" + String.join(",", entries) + "]";
         }
 
@@ -397,7 +432,9 @@ public class RecipeCacheGenerator {
     }
 
     private static int getStringIndex(String str, List<String> stringPool, Map<String, Integer> stringIndexMap) {
-        if (str == null) str = "";
+        if (str == null) {
+            str = "";
+        }
         return stringIndexMap.computeIfAbsent(str, s -> {
             int idx = stringPool.size();
             stringPool.add(s);
@@ -418,27 +455,10 @@ public class RecipeCacheGenerator {
         return runtimeCategories;
     }
 
-    public static void writeAtomically(Path targetFile, byte[] data) throws IOException {
-        Path parent = targetFile.toAbsolutePath().getParent();
-        if (parent == null) {
-            throw new IOException("Target has no parent directory: " + targetFile);
-        }
-        Files.createDirectories(parent);
-        Path temporaryFile = Files.createTempFile(parent, targetFile.getFileName().toString(), ".tmp");
-        try {
-            Files.write(temporaryFile, data);
-            try {
-                Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-        } finally {
-            Files.deleteIfExists(temporaryFile);
-        }
-    }
-
     public static void main(String[] args) throws Exception {
-        Path sourceDir = args.length > 0 ? Path.of(args[0]) : Path.of("src/main/resources/data/buildscape/recipes_pack");
+        Path sourceDir = args.length > 0
+                ? Path.of(args[0])
+                : Path.of("src/main/resources/data/buildscape/recipes_pack");
         Path targetBundledCache = args.length > 1 ? Path.of(args[1]) : sourceDir.resolve("recipes.bscb");
         Path targetLocalCache = args.length > 2 ? Path.of(args[2]) : null;
 
@@ -456,7 +476,8 @@ public class RecipeCacheGenerator {
         boolean localValid = targetLocalCache == null || isCacheValid(targetLocalCache, expectedHash);
 
         if (bundledValid && localValid) {
-            System.out.println("Recipe cache is already up to date with source hash: " + expectedHash + ". Skipping rebuild.");
+            System.out.println(
+                    "Recipe cache is already up to date with source hash: " + expectedHash + ". Skipping rebuild.");
             return;
         }
 
@@ -466,23 +487,26 @@ public class RecipeCacheGenerator {
         } else {
             // Compile binary cache from JSON sources only when sources or hash changed
             cacheBytes = generateCache(sourceDir);
-            writeAtomically(targetBundledCache, cacheBytes);
-            System.out.println("Generated bundled binary recipe cache: " + targetBundledCache.toAbsolutePath() + " (" + cacheBytes.length + " bytes)");
+            AtomicFiles.write(targetBundledCache, cacheBytes);
+            System.out.println("Generated bundled binary recipe cache: " + targetBundledCache.toAbsolutePath() + " ("
+                    + cacheBytes.length + " bytes)");
         }
 
         if (targetLocalCache != null && !localValid) {
             try {
-                writeAtomically(targetLocalCache, cacheBytes);
+                AtomicFiles.write(targetLocalCache, cacheBytes);
                 System.out.println("Synchronized local runtime cache: " + targetLocalCache.toAbsolutePath());
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.out.println("Note: Local runtime cache directory not present or skipped: " + e.getMessage());
             }
         }
 
         // Validate written cache matches computed source hash
         if (!isCacheValid(targetBundledCache, expectedHash)) {
-            throw new IllegalStateException("Integrity check failed: Written bundled cache does not match the source hash!");
+            throw new IllegalStateException(
+                    "Integrity check failed: Written bundled cache does not match the source hash!");
         }
-        System.out.println("Integrity verified: " + targetBundledCache.toAbsolutePath() + " matches live source hash " + expectedHash);
+        System.out.println("Integrity verified: " + targetBundledCache.toAbsolutePath() + " matches live source hash "
+                + expectedHash);
     }
 }

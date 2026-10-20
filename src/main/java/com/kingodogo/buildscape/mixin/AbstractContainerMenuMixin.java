@@ -1,11 +1,14 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.item.GhostFilterMenu;
+import com.kingodogo.buildscape.mixin.accessor.StonecutterMenuAccessor;
 import com.kingodogo.buildscape.util.StonecutterMenuExtension;
-import com.kingodogo.buildscape.util.GhostFilterMenu;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ShulkerBoxMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Mixin(AbstractContainerMenu.class)
@@ -24,16 +28,19 @@ public abstract class AbstractContainerMenuMixin {
     private void onBeforeClicked(int slotId, int buttonId, ClickType clickType, Player player, CallbackInfo ci) {
         AbstractContainerMenu containerMenu = (AbstractContainerMenu) (Object) this;
 
-        if ((Object) this instanceof net.minecraft.world.inventory.ShulkerBoxMenu
+        if ((Object) this instanceof ShulkerBoxMenu
                 && (Object) this instanceof GhostFilterMenu filterMenu) {
             if (clickType == ClickType.QUICK_MOVE && slotId >= filterMenu.buildscape$getFilterSlotCount()
                     && slotId < containerMenu.slots.size()) {
-                net.minecraft.world.inventory.Slot sourceSlot = containerMenu.getSlot(slotId);
+                Slot sourceSlot = containerMenu.getSlot(slotId);
                 ItemStack source = sourceSlot.getItem();
                 if (!source.isEmpty() && hasFilters(filterMenu)) {
                     moveToFilteredSlots(containerMenu, filterMenu, source);
-                    if (source.isEmpty()) sourceSlot.set(ItemStack.EMPTY);
-                    else sourceSlot.setChanged();
+                    if (source.isEmpty()) {
+                        sourceSlot.set(ItemStack.EMPTY);
+                    } else {
+                        sourceSlot.setChanged();
+                    }
                     containerMenu.broadcastChanges();
                     ci.cancel();
                     return;
@@ -68,7 +75,8 @@ public abstract class AbstractContainerMenuMixin {
 
                                 for (int i = 0; i < Inventory.INVENTORY_SIZE; i++) {
                                     ItemStack invStack = player.getInventory().getItem(i);
-                                    if (!invStack.isEmpty() && invStack.getItem() == inputItem && ItemStack.isSameItemSameTags(invStack, inputStack)) {
+                                    if (!invStack.isEmpty() && invStack.getItem() == inputItem
+                                            && ItemStack.isSameItemSameTags(invStack, inputStack)) {
                                         totalInputCount += invStack.getCount();
                                         playerInvSlots.add(i);
                                     }
@@ -84,7 +92,9 @@ public abstract class AbstractContainerMenuMixin {
                                     toConsume -= fromInput;
 
                                     for (int slotIdx : playerInvSlots) {
-                                        if (toConsume <= 0) break;
+                                        if (toConsume <= 0) {
+                                            break;
+                                        }
                                         ItemStack invStack = player.getInventory().getItem(slotIdx);
                                         int fromInv = Math.min(toConsume, invStack.getCount());
                                         invStack.shrink(fromInv);
@@ -107,9 +117,10 @@ public abstract class AbstractContainerMenuMixin {
                                         remainingOutput -= toGive;
                                     }
 
-                                    player.awardRecipes(java.util.Collections.singleton(recipe));
+                                    player.awardRecipes(Collections.singleton(recipe));
 
-                                    ((StonecutterMenuAccessor) menu).callSetupRecipeList(menu.container, menu.getSlot(0).getItem());
+                                    ((StonecutterMenuAccessor) menu).callSetupRecipeList(menu.container,
+                                            menu.getSlot(0).getItem());
 
                                     menu.broadcastChanges();
                                 }
@@ -123,7 +134,9 @@ public abstract class AbstractContainerMenuMixin {
 
     private static boolean hasFilters(GhostFilterMenu menu) {
         for (int i = 0; i < menu.buildscape$getFilterSlotCount(); i++) {
-            if (menu.buildscape$getFilterItem(i) != null) return true;
+            if (menu.buildscape$getFilterItem(i) != null) {
+                return true;
+            }
         }
         return false;
     }
@@ -132,7 +145,7 @@ public abstract class AbstractContainerMenuMixin {
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter != null && source.getItem() == filter) {
-                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Slot target = menu.getSlot(i);
                 if (!target.getItem().isEmpty()) {
                     target.safeInsert(source);
                 }
@@ -141,7 +154,7 @@ public abstract class AbstractContainerMenuMixin {
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter == null) {
-                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Slot target = menu.getSlot(i);
                 if (!target.getItem().isEmpty()) {
                     target.safeInsert(source);
                 }
@@ -150,7 +163,7 @@ public abstract class AbstractContainerMenuMixin {
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter != null && source.getItem() == filter) {
-                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Slot target = menu.getSlot(i);
                 if (target.getItem().isEmpty()) {
                     target.safeInsert(source);
                 }
@@ -159,7 +172,7 @@ public abstract class AbstractContainerMenuMixin {
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter == null) {
-                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Slot target = menu.getSlot(i);
                 if (target.getItem().isEmpty()) {
                     target.safeInsert(source);
                 }
@@ -168,7 +181,7 @@ public abstract class AbstractContainerMenuMixin {
     }
 
     private static boolean wouldInsertMismatchedItem(AbstractContainerMenu menu, Player player,
-                                                     ClickType clickType, int buttonId, Item filter) {
+            ClickType clickType, int buttonId, Item filter) {
         if (clickType == ClickType.PICKUP || clickType == ClickType.QUICK_CRAFT) {
             ItemStack carried = menu.getCarried();
             return !carried.isEmpty() && carried.getItem() != filter;

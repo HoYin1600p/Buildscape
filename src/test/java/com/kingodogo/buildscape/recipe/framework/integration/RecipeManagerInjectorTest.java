@@ -7,13 +7,15 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
 public final class RecipeManagerInjectorTest {
 
-    public static void main(String[] args) {
+    @Test
+    public void mergeKeepsExistingRecipesAndOrder() {
         Recipe<?> vanilla = new StubRecipe("minecraft:shared");
         Recipe<?> originalBuildscape = new StubRecipe("buildscape:shared");
         Recipe<?> replacementBuildscape = new StubRecipe("buildscape:shared");
@@ -51,8 +53,8 @@ public final class RecipeManagerInjectorTest {
                 "Named recipe index did not include the new recipe");
 
         PlainRecipe disabledPlain = new PlainRecipe("crafting", "buildscape:disabled");
-        RecipeManagerInjector.Indexes<String, String, PlainRecipe> withDisabled =
-                RecipeManagerInjector.mergeIndexesGeneric(
+        RecipeManagerInjector.Indexes<String, String, PlainRecipe> withDisabled = RecipeManagerInjector
+                .mergeIndexesGeneric(
                         Map.of("crafting", Map.of(vanillaPlain.id(), vanillaPlain)),
                         Map.of(vanillaPlain.id(), vanillaPlain),
                         List.of(disabledPlain, addedPlain), PlainRecipe::type, PlainRecipe::id,
@@ -83,8 +85,6 @@ public final class RecipeManagerInjectorTest {
                 "Named recipe index lost insertion order");
         require(new java.util.ArrayList<>(ordered.byType().get("crafting").keySet()).equals(expectedOrder),
                 "Typed recipe index lost insertion order");
-
-        System.out.println("Recipe manager injection: 14 checks passed.");
     }
 
     private static void require(boolean condition, String message) {

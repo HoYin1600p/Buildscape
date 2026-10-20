@@ -4,8 +4,7 @@ public final class PillarDisplayEffects {
     private static boolean outlinesEnabled;
     private static boolean outlineRendered;
 
-    private PillarDisplayEffects() {
-    }
+    private PillarDisplayEffects() {}
 
     public static void beginFrame(boolean enabled) {
         outlinesEnabled = enabled;

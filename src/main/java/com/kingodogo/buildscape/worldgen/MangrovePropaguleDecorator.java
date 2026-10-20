@@ -1,16 +1,10 @@
 package com.kingodogo.buildscape.worldgen;
 
+import com.kingodogo.buildscape.block.plant.MangrovePropaguleBlock;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.Blocks;
@@ -18,28 +12,33 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.function.BiConsumer;
 
 public class MangrovePropaguleDecorator extends TreeDecorator {
 
-    public static final Codec<MangrovePropaguleDecorator> CODEC =
-            RecordCodecBuilder.create(instance ->
-                    instance
-                            .group(
-                                    Codec.floatRange(0.0F, 1.0F)
-                                            .fieldOf("probability")
-                                            .forGetter(decorator -> decorator.probability),
-                                    IntProvider.codec(0, 16)
-                                            .fieldOf("exclusion_radius_xz")
-                                            .forGetter(decorator -> decorator.exclusionRadiusXZ),
-                                    IntProvider.codec(0, 16)
-                                            .fieldOf("exclusion_radius_y")
-                                            .forGetter(decorator -> decorator.exclusionRadiusY),
-                                    Codec.intRange(0, 16)
-                                            .fieldOf("required_empty_blocks")
-                                            .forGetter(decorator -> decorator.requiredEmptyBlocks)
-                            )
-                            .apply(instance, MangrovePropaguleDecorator::new)
-            );
+    public static final Codec<MangrovePropaguleDecorator> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(
+                    Codec.floatRange(0.0F, 1.0F)
+                            .fieldOf("probability")
+                            .forGetter(decorator -> decorator.probability),
+                    IntProvider.codec(0, 16)
+                            .fieldOf("exclusion_radius_xz")
+                            .forGetter(decorator -> decorator.exclusionRadiusXZ),
+                    IntProvider.codec(0, 16)
+                            .fieldOf("exclusion_radius_y")
+                            .forGetter(decorator -> decorator.exclusionRadiusY),
+                    Codec.intRange(0, 16)
+                            .fieldOf("required_empty_blocks")
+                            .forGetter(decorator -> decorator.requiredEmptyBlocks))
+            .apply(instance, MangrovePropaguleDecorator::new));
 
     private final float probability;
     private final IntProvider exclusionRadiusXZ;
@@ -50,8 +49,7 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
             float probability,
             IntProvider exclusionRadiusXZ,
             IntProvider exclusionRadiusY,
-            int requiredEmptyBlocks
-    ) {
+            int requiredEmptyBlocks) {
         this.probability = probability;
         this.exclusionRadiusXZ = exclusionRadiusXZ;
         this.exclusionRadiusY = exclusionRadiusY;
@@ -69,8 +67,7 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
             BiConsumer<BlockPos, BlockState> blockSetter,
             Random random,
             List<BlockPos> logPositions,
-            List<BlockPos> leavesPositions
-    ) {
+            List<BlockPos> leavesPositions) {
         if (leavesPositions.isEmpty()) {
             return;
         }
@@ -91,10 +88,10 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
         }
         var supportedLeaves = new ArrayList<>(supported);
         supportedLeaves.sort(BlockPos::compareTo);
-        java.util.Collections.shuffle(supportedLeaves, random);
+        Collections.shuffle(supportedLeaves, random);
 
         int placed = 0;
-        List<net.minecraft.world.phys.AABB> exclusions = new ArrayList<>();
+        List<AABB> exclusions = new ArrayList<>();
         for (BlockPos leafPos : supportedLeaves) {
             if (placed >= propagulesToPlace) {
                 break;
@@ -102,25 +99,19 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
 
             BlockPos belowPos = leafPos.below();
             if (random.nextFloat() >= probability || exclusions.stream().anyMatch(
-                    bounds -> bounds.contains(net.minecraft.world.phys.Vec3.atCenterOf(belowPos)))) {
+                    bounds -> bounds.contains(Vec3.atCenterOf(belowPos)))) {
                 continue;
             }
 
-            if (
-                    level.isStateAtPosition(
-                            belowPos,
-                            state -> state.isAir() || state.is(Blocks.WATER)
-                    )
-            ) {
+            if (level.isStateAtPosition(
+                    belowPos,
+                    state -> state.isAir() || state.is(Blocks.WATER))) {
                 boolean canPlace = true;
                 for (int i = 1; i <= requiredEmptyBlocks; i++) {
                     BlockPos checkPos = belowPos.below(i);
-                    if (
-                            !level.isStateAtPosition(
-                                    checkPos,
-                                    state -> state.isAir() || state.is(Blocks.WATER)
-                            )
-                    ) {
+                    if (!level.isStateAtPosition(
+                            checkPos,
+                            state -> state.isAir() || state.is(Blocks.WATER))) {
                         canPlace = false;
                         break;
                     }
@@ -128,25 +119,21 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
 
                 if (canPlace) {
                     int age = random.nextInt(5);
-                    BlockState propaguleState =
-                            com.kingodogo.buildscape.block.ModBlocks.MANGROVE_PROPAGULE.get()
-                                    .defaultBlockState()
-                                    .setValue(
-                                            com.kingodogo.buildscape.block.MangrovePropaguleBlock.AGE,
-                                            age
-                                    )
-                                    .setValue(
-                                            com.kingodogo.buildscape.block.MangrovePropaguleBlock.HANGING,
-                                            true
-                                    )
-                                    .setValue(
-                                            com.kingodogo.buildscape.block.MangrovePropaguleBlock.WATERLOGGED,
-                                            level.isStateAtPosition(belowPos, state -> state.is(Blocks.WATER))
-                                    );
+                    BlockState propaguleState = DecorBlocks.MANGROVE_PROPAGULE.get()
+                            .defaultBlockState()
+                            .setValue(
+                                    MangrovePropaguleBlock.AGE,
+                                    age)
+                            .setValue(
+                                    MangrovePropaguleBlock.HANGING,
+                                    true)
+                            .setValue(
+                                    MangrovePropaguleBlock.WATERLOGGED,
+                                    level.isStateAtPosition(belowPos, state -> state.is(Blocks.WATER)));
 
                     blockSetter.accept(belowPos, propaguleState);
                     int radiusXZ = exclusionRadiusXZ.sample(random);
-                    exclusions.add(new net.minecraft.world.phys.AABB(belowPos).inflate(
+                    exclusions.add(new AABB(belowPos).inflate(
                             radiusXZ, exclusionRadiusY.sample(random), radiusXZ));
                     placed++;
                 }

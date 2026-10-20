@@ -1,12 +1,17 @@
 package com.kingodogo.buildscape.util;
 
-import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +22,7 @@ public final class BeaconScanContext {
     private static final Map<Level, Map<BlockPos, CachedHeight>> CLIENT_HEIGHTS = new WeakHashMap<>();
     private static int cleanupTicks;
 
-    private BeaconScanContext() {
-    }
+    private BeaconScanContext() {}
 
     public static void begin(BeaconBlockEntity beacon) {
         ACTIVE_BEACON.set(beacon);
@@ -65,8 +69,8 @@ public final class BeaconScanContext {
         for (int y = beaconPos.getY() + 1; y <= top; y++) {
             scanPos.set(beaconPos.getX(), y, beaconPos.getZ());
             BlockState state = level.getBlockState(scanPos);
-            if (state.is(ModBlocks.TINTED_GLASS_ORNAMENT.get())
-                    || state.is(ModBlocks.BIG_TINTED_GLASS_ORNAMENT.get())) {
+            if (state.is(DecorBlocks.TINTED_GLASS_ORNAMENT.get())
+                    || state.is(DecorBlocks.BIG_TINTED_GLASS_ORNAMENT.get())) {
                 return y - beaconPos.getY();
             }
         }
@@ -83,13 +87,11 @@ public final class BeaconScanContext {
         }
     }
 
-    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-            modid = com.kingodogo.buildscape.BuildScape.MODID,
-            value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+    @Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
     public static final class ClientEvents {
-        @net.minecraftforge.eventbus.api.SubscribeEvent
-        public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
-            if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || ++cleanupTicks < 20) {
+        @SubscribeEvent
+        public static void onClientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase != TickEvent.Phase.END || ++cleanupTicks < 20) {
                 return;
             }
             cleanupTicks = 0;

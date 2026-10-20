@@ -1,33 +1,43 @@
 package com.kingodogo.buildscape.client;
 
+import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.util.Arrays;
+import javax.imageio.ImageIO;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-        modid = com.kingodogo.buildscape.BuildScape.MODID,
-        bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD,
-        value = net.minecraftforge.api.distmarker.Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class DryFoliageColor {
     private static final int[] pixels = new int[65536];
     private static volatile boolean loaded = false;
 
-    public static final ColorResolver DRY_FOLIAGE_RESOLVER = (biome, x, z) -> get(biome.getBaseTemperature(), biome.getDownfall());
+    public static final ColorResolver DRY_FOLIAGE_RESOLVER = (biome, x, z) -> get(biome.getBaseTemperature(),
+            biome.getDownfall());
 
     public static synchronized void init() {
-        if (loaded) return;
+        if (loaded) {
+            return;
+        }
         reload(Minecraft.getInstance().getResourceManager());
     }
 
-    @net.minecraftforge.eventbus.api.SubscribeEvent
-    public static void registerReloadListeners(net.minecraftforge.client.event.RegisterClientReloadListenersEvent event) {
+    @SubscribeEvent
+    public static void registerReloadListeners(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener((ResourceManagerReloadListener) resourceManager -> {
             reload(resourceManager);
             Minecraft mc = Minecraft.getInstance();
@@ -38,7 +48,7 @@ public class DryFoliageColor {
     }
 
     private static synchronized void reload(ResourceManager resourceManager) {
-        java.util.Arrays.fill(pixels, 0x867E36);
+        Arrays.fill(pixels, 0x867E36);
         try {
             ResourceLocation loc = new ResourceLocation("minecraft", "textures/colormap/dry_foliage.png");
             Resource resource = resourceManager.getResource(loc);
@@ -49,7 +59,8 @@ public class DryFoliageColor {
                 }
             }
         } catch (Exception e) {
-            java.util.Arrays.fill(pixels, 0x867E36);
+            // missing resource, undecodable image or one smaller than 256x256; use the default colour
+            Arrays.fill(pixels, 0x867E36);
         } finally {
             loaded = true;
         }
@@ -60,8 +71,8 @@ public class DryFoliageColor {
             init();
         }
         humidity *= temperature;
-        int i = (int) ((1.0D - temperature) * 255.0D);
-        int j = (int) ((1.0D - humidity) * 255.0D);
+        int i = (int) ((1.0 - temperature) * 255.0);
+        int j = (int) ((1.0 - humidity) * 255.0);
         i = Math.max(0, Math.min(255, i));
         j = Math.max(0, Math.min(255, j));
         int index = j << 8 | i;
@@ -69,11 +80,11 @@ public class DryFoliageColor {
     }
 
     public static int getDefaultColor() {
-        return get(0.5D, 1.0D);
+        return get(0.5, 1.0);
     }
 
-    public static int getDryFoliageColor(net.minecraft.world.level.BlockAndTintGetter level, net.minecraft.core.BlockPos pos) {
-        if (level == null || pos == null || !(level instanceof net.minecraft.world.level.LevelReader levelReader)) {
+    public static int getDryFoliageColor(BlockAndTintGetter level, BlockPos pos) {
+        if (level == null || pos == null || !(level instanceof LevelReader levelReader)) {
             return getDefaultColor();
         }
         int r = 0, g = 0, b = 0;
@@ -84,8 +95,8 @@ public class DryFoliageColor {
         int zMax = pos.getZ() + 1;
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
-                net.minecraft.core.BlockPos curPos = new net.minecraft.core.BlockPos(x, pos.getY(), z);
-                net.minecraft.world.level.biome.Biome biome = levelReader.getBiome(curPos).value();
+                BlockPos curPos = new BlockPos(x, pos.getY(), z);
+                Biome biome = levelReader.getBiome(curPos).value();
                 int color = get(biome.getBaseTemperature(), biome.getDownfall());
                 r += (color >> 16) & 0xFF;
                 g += (color >> 8) & 0xFF;

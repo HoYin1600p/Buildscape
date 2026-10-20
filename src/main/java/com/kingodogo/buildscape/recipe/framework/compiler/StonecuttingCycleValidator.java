@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.recipe.framework.compiler;
 
-import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.google.gson.JsonElement;
+import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -12,23 +12,35 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+/**
+ * Detects stonecutting loops that would multiply items: a graph of input to output edges weighted by output count,
+ * searched for a cycle whose conversion gains items. Tag inputs are not followed, so cycles through tags are not found.
+ */
 public final class StonecuttingCycleValidator {
     private final Map<String, List<Edge>> outgoing = new LinkedHashMap<>();
     private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
     private final Set<String> registeredIds = new HashSet<>();
 
-    private record Edge(String input, String output, int count, String recipeId) {}
+    private record Edge(String input, String output, int count, String recipeId) {
+    }
 
     // Cycles through tag inputs are not detected by either the generator or runtime validation.
     public static List<String> inputNodes(JsonElement ingredient) {
         List<String> inputs = new ArrayList<>();
         if (ingredient.isJsonArray()) {
-            for (JsonElement alternative : ingredient.getAsJsonArray()) inputs.addAll(inputNodes(alternative));
+            for (JsonElement alternative : ingredient.getAsJsonArray()) {
+                inputs.addAll(inputNodes(alternative));
+            }
         } else if (ingredient.isJsonObject()) {
             var object = ingredient.getAsJsonObject();
-            if (object.has("item")) inputs.add(inputNode(object.get("item").getAsString(), false));
-            if (object.has("tag")) inputs.add(inputNode(object.get("tag").getAsString(), true));
+            if (object.has("item")) {
+                inputs.add(inputNode(object.get("item").getAsString(), false));
+            }
+            if (object.has("tag")) {
+                inputs.add(inputNode(object.get("tag").getAsString(), true));
+            }
         }
         return inputs;
     }
@@ -38,24 +50,33 @@ public final class StonecuttingCycleValidator {
     }
 
     public void addRecipe(String id, List<String> inputs, String output, int count) {
-        if (count < 1) return;
-        if (!registeredIds.add(id)) return;
+        if (count < 1) {
+            return;
+        }
+        if (!registeredIds.add(id)) {
+            return;
+        }
         for (String input : inputs) {
             outgoing.computeIfAbsent(input, key -> new ArrayList<>()).add(new Edge(input, output, count, id));
         }
     }
 
     public void removeRecipe(String id) {
-        if (!registeredIds.remove(id)) return;
+        if (!registeredIds.remove(id)) {
+            return;
+        }
         outgoing.values().forEach(edges -> edges.removeIf(edge -> edge.recipeId().equals(id)));
         outgoing.values().removeIf(List::isEmpty);
     }
 
-    private record SearchNode(String item, boolean gain) {}
+    private record SearchNode(String item, boolean gain) {
+    }
 
     /** Adds a candidate to an accepted graph that has no gain cycles. */
     public void addRecipeChecked(String id, List<String> inputs, String output, int count) {
-        if (count < 1 || registeredIds.contains(id)) return;
+        if (count < 1 || registeredIds.contains(id)) {
+            return;
+        }
         Set<String> targets = new HashSet<>(inputs);
         SearchNode start = new SearchNode(output, count > 1);
         Map<SearchNode, Edge> previous = new HashMap<>();
@@ -106,19 +127,27 @@ public final class StonecuttingCycleValidator {
             specs.addAll(pack.recipes());
         }
         for (RecipeIR.RecipeSpec spec : specs) {
-            if (spec == null) continue;
+            if (spec == null) {
+                continue;
+            }
             String id = recipeIds.allocate(pack.category(), spec, aliases);
-            if (!registeredIds.add(id)) continue;
+            if (!registeredIds.add(id)) {
+                continue;
+            }
             String type = spec.type() != null ? spec.type() : pack.category();
             if (!"stonecutting".equalsIgnoreCase(type) || spec.result() == null
-                    || spec.result().count() < 1 || spec.result().item() == null) continue;
+                    || spec.result().count() < 1 || spec.result().item() == null) {
+                continue;
+            }
             String output = aliases.resolveString(spec.result().item());
             addInput(spec.input(), output, spec.result().count(), id, aliases);
         }
     }
 
     private void addInput(String input, String output, int count, String id, AliasResolver aliases) {
-        if (input == null || input.isEmpty()) return;
+        if (input == null || input.isEmpty()) {
+            return;
+        }
         if (input.startsWith("[") && input.endsWith("]")) {
             for (String part : input.substring(1, input.length() - 1).split(",")) {
                 addInput(part.trim(), output, count, id, aliases);
@@ -130,10 +159,15 @@ public final class StonecuttingCycleValidator {
         outgoing.computeIfAbsent(resolved, key -> new ArrayList<>()).add(new Edge(resolved, output, count, id));
     }
 
+    /**
+     * Throws {@link IllegalArgumentException} naming the recipes in the first gain cycle found.
+     */
     public void validate() {
         for (List<Edge> edges : outgoing.values()) {
             for (Edge gain : edges) {
-                if (gain.count() <= 1) continue;
+                if (gain.count() <= 1) {
+                    continue;
+                }
                 Map<String, Edge> previous = new HashMap<>();
                 Set<String> visited = new HashSet<>();
                 ArrayDeque<String> queue = new ArrayDeque<>();
@@ -168,7 +202,7 @@ public final class StonecuttingCycleValidator {
         return new IllegalArgumentException("Stonecutting cycle with net item gain: "
                 + cycle.stream().map(edge -> edge.recipeId() + " (" + edge.input()
                         + " -> " + edge.count() + " " + edge.output() + ")")
-                        .collect(java.util.stream.Collectors.joining("; ")));
+                        .collect(Collectors.joining("; ")));
     }
 
     public void clear() {

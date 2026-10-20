@@ -44,7 +44,9 @@ enum ParticleRange {
 
     /** The in-range value an explicit edit of an out-of-range value lands on: the nearest bound. */
     double nearestInRange(double value) {
-        if (Double.isNaN(value) || value < min) return min;
+        if (Double.isNaN(value) || value < min) {
+            return min;
+        }
         return Math.min(max, value);
     }
 
@@ -58,7 +60,9 @@ enum ParticleRange {
     }
 
     private String plain(double value) {
-        if (Double.isNaN(value) || Double.isInfinite(value)) return String.valueOf(value);
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            return String.valueOf(value);
+        }
         BigDecimal exact = BigDecimal.valueOf(value);
         if (exact.stripTrailingZeros().scale() > decimals) {
             BigDecimal shown = exact.setScale(Math.min(6, exact.stripTrailingZeros().scale()), RoundingMode.HALF_UP);
@@ -90,7 +94,11 @@ enum ParticleRange {
      * setting within {@link #MIGRATION_WINDOW_MS} commits the in-range value. Another setting's click starts over.
      */
     static final class Migration {
-        enum Step { EDIT, WARN, COMMIT }
+        enum Step {
+            EDIT,
+            WARN,
+            COMMIT
+        }
 
         private ParticleRange armed;
         private String armedScope;

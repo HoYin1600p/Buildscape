@@ -13,8 +13,7 @@ import java.util.function.IntConsumer;
 public final class BuildscapeStartupWork {
     private static final AtomicInteger POOL_IDS = new AtomicInteger();
 
-    private BuildscapeStartupWork() {
-    }
+    private BuildscapeStartupWork() {}
 
     public static void forEachIndex(int itemCount, IntConsumer action) {
         if (itemCount <= 0) {
@@ -35,8 +34,7 @@ public final class BuildscapeStartupWork {
         ThreadFactory threadFactory = runnable -> {
             Thread thread = new Thread(
                     runnable,
-                    "Buildscape-Startup-" + poolId + "-" + threadIds.incrementAndGet()
-            );
+                    "Buildscape-Startup-" + poolId + "-" + threadIds.incrementAndGet());
             thread.setDaemon(true);
             return thread;
         };

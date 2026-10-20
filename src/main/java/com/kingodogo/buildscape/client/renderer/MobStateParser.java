@@ -1,7 +1,12 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.NbtKeys;
+import java.io.IOException;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -11,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +41,7 @@ public class MobStateParser {
                         .getResourceManager()
                         .getResource(statesFile)
                         .getInputStream();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 BuildScape.LOGGER.error("Could not find mob_states.txt resource.");
             }
 
@@ -54,8 +60,8 @@ public class MobStateParser {
                     if (line.contains("|")) {
                         String[] parts = line.split("\\|");
                         if (parts.length >= 2) {
-                            String mobName = parts[0].trim().toLowerCase().replace(" ", "_");
-                            String stateName = parts[1].trim().toLowerCase();
+                            String mobName = parts[0].trim().toLowerCase(Locale.ROOT).replace(" ", "_");
+                            String stateName = parts[1].trim().toLowerCase(Locale.ROOT);
 
                             if (stateName.contains(" ")) {
                                 String[] stateWords = stateName.split("\\s+");
@@ -74,14 +80,14 @@ public class MobStateParser {
                     }
 
                     if (line.startsWith("**") && line.endsWith("**")) {
-                        currentMob = line.substring(2, line.length() - 2).trim().toLowerCase();
+                        currentMob = line.substring(2, line.length() - 2).trim().toLowerCase(Locale.ROOT);
                         currentMob = currentMob.replace(" ", "_");
                         continue;
                     }
 
                     if (line.startsWith("•") || line.startsWith("-") || line.startsWith("*")) {
                         if (currentMob != null) {
-                            String stateName = line.substring(1).trim().toLowerCase();
+                            String stateName = line.substring(1).trim().toLowerCase(Locale.ROOT);
                             if (stateName.endsWith(":")) {
                                 continue;
                             }
@@ -95,12 +101,9 @@ public class MobStateParser {
 
             statesLoaded = true;
 
-
-
-
         } catch (Exception e) {
-            System.err.println("[BuildScape] Failed to load states: " + e.getMessage());
-            e.printStackTrace();
+            // the bundled states file may be missing or malformed; fall back to the universal states
+            BuildScape.LOGGER.error("Failed to load states", e);
             addUniversalStates();
             statesLoaded = true;
         }
@@ -223,13 +226,13 @@ public class MobStateParser {
 
         loadStates();
 
-        String mobTypeName = entityType.getDescriptionId().toLowerCase();
+        String mobTypeName = entityType.getDescriptionId().toLowerCase(Locale.ROOT);
         if (mobTypeName.contains(".")) {
             String[] parts = mobTypeName.split("\\.");
             mobTypeName = parts[parts.length - 1];
         }
 
-        String lowerName = customName.toLowerCase();
+        String lowerName = customName.toLowerCase(Locale.ROOT);
 
         lowerName = lowerName.replace("no pumpkin", "nopumpkin");
         lowerName = lowerName.replace("no horns", "nohorns");
@@ -244,7 +247,6 @@ public class MobStateParser {
             }
 
             state.parsedStates.add(word);
-
 
             if (word.equals("spin")) {
                 state.spin = true;
@@ -281,43 +283,113 @@ public class MobStateParser {
     }
 
     private static String resolveAlias(String word) {
-        if (word.equals("sit")) return "sitting";
-        if (word.equals("tame")) return "tamed";
-        if (word.equals("power")) return "powered";
-        if (word.equals("charge")) return "charged";
-        if (word.equals("saddle")) return "saddled";
-        if (word.equals("shear")) return "sheared";
-        if (word.equals("ignite")) return "ignited";
-        if (word.equals("sleep")) return "sleeping";
-        if (word.equals("crouch")) return "crouching";
-        if (word.equals("scream")) return "screaming";
-        if (word.equals("aggro")) return "angry";
-        if (word.equals("grumm")) return "grum";
-        if (word.equals("jeb_")) return "jeb";
+        if (word.equals("sit")) {
+            return "sitting";
+        }
+        if (word.equals("tame")) {
+            return "tamed";
+        }
+        if (word.equals("power")) {
+            return "powered";
+        }
+        if (word.equals("charge")) {
+            return "charged";
+        }
+        if (word.equals("saddle")) {
+            return "saddled";
+        }
+        if (word.equals("shear")) {
+            return "sheared";
+        }
+        if (word.equals("ignite")) {
+            return "ignited";
+        }
+        if (word.equals("sleep")) {
+            return "sleeping";
+        }
+        if (word.equals("crouch")) {
+            return "crouching";
+        }
+        if (word.equals("scream")) {
+            return "screaming";
+        }
+        if (word.equals("aggro")) {
+            return "angry";
+        }
+        if (word.equals("grumm")) {
+            return "grum";
+        }
+        if (word.equals("jeb_")) {
+            return "jeb";
+        }
 
-        if (word.equals("beg")) return "begging";
-        if (word.equals("stand")) return "standing";
-        if (word.equals("chest")) return "chested";
-        if (word.equals("glow")) return "glowing";
-        if (word.equals("freeze")) return "frozen";
-        if (word.equals("hang")) return "hanging";
-        if (word.equals("roost")) return "roosting";
-        if (word.equals("climb")) return "climbing";
-        if (word.equals("cast")) return "casting";
-        if (word.equals("carry")) return "carrying";
-        if (word.equals("rear")) return "rearing";
-        if (word.equals("stare")) return "staring";
-        if (word.equals("crack")) return "cracked";
-        if (word.equals("break")) return "broken";
-        if (word.equals("damage")) return "hurt";
-        if (word.equals("puffed")) return "puff";
-        if (word.equals("opened")) return "open";
-        if (word.equals("invulnerable")) return "invul";
+        if (word.equals("beg")) {
+            return "begging";
+        }
+        if (word.equals("stand")) {
+            return "standing";
+        }
+        if (word.equals("chest")) {
+            return "chested";
+        }
+        if (word.equals("glow")) {
+            return "glowing";
+        }
+        if (word.equals("freeze")) {
+            return "frozen";
+        }
+        if (word.equals("hang")) {
+            return "hanging";
+        }
+        if (word.equals("roost")) {
+            return "roosting";
+        }
+        if (word.equals("climb")) {
+            return "climbing";
+        }
+        if (word.equals("cast")) {
+            return "casting";
+        }
+        if (word.equals("carry")) {
+            return "carrying";
+        }
+        if (word.equals("rear")) {
+            return "rearing";
+        }
+        if (word.equals("stare")) {
+            return "staring";
+        }
+        if (word.equals("crack")) {
+            return "cracked";
+        }
+        if (word.equals("break")) {
+            return "broken";
+        }
+        if (word.equals("damage")) {
+            return "hurt";
+        }
+        if (word.equals("puffed")) {
+            return "puff";
+        }
+        if (word.equals("opened")) {
+            return "open";
+        }
+        if (word.equals("invulnerable")) {
+            return "invul";
+        }
 
-        if (word.equals("no_pumpkin")) return "nopumpkin";
-        if (word.equals("no_horns")) return "nohorns";
-        if (word.equals("no_base")) return "nobase";
-        if (word.equals("no_bottom")) return "nobottom";
+        if (word.equals("no_pumpkin")) {
+            return "nopumpkin";
+        }
+        if (word.equals("no_horns")) {
+            return "nohorns";
+        }
+        if (word.equals("no_base")) {
+            return "nobase";
+        }
+        if (word.equals("no_bottom")) {
+            return "nobottom";
+        }
 
         return word;
     }
@@ -327,32 +399,32 @@ public class MobStateParser {
             return null;
         }
 
-        net.minecraft.nbt.CompoundTag tag = stack.getTag();
-        if (tag == null || !tag.contains("display", 10)) {
+        CompoundTag tag = stack.getTag();
+        if (tag == null || !tag.contains(NbtKeys.DISPLAY, 10)) {
             return null;
         }
 
-        net.minecraft.nbt.CompoundTag displayTag = tag.getCompound("display");
-        if (!displayTag.contains("Name", 8)) {
+        CompoundTag displayTag = tag.getCompound(NbtKeys.DISPLAY);
+        if (!displayTag.contains(NbtKeys.NAME, 8)) {
             return null;
         }
 
-        String nameJson = displayTag.getString("Name");
+        String nameJson = displayTag.getString(NbtKeys.NAME);
         if (nameJson == null || nameJson.isEmpty()) {
             return null;
         }
 
         try {
-            net.minecraft.network.chat.Component nameComponent =
-                    net.minecraft.network.chat.Component.Serializer.fromJson(nameJson);
+            Component nameComponent = Component.Serializer.fromJson(nameJson);
             if (nameComponent != null) {
                 String displayName = nameComponent.getString();
                 if (displayName != null && !displayName.isEmpty()) {
-                    return net.minecraft.ChatFormatting.stripFormatting(displayName.trim());
+                    return ChatFormatting.stripFormatting(displayName.trim());
                 }
             }
         } catch (Exception e) {
-            return net.minecraft.ChatFormatting.stripFormatting(nameJson.trim());
+            // custom names are arbitrary JSON from items; any parse failure uses the raw text
+            return ChatFormatting.stripFormatting(nameJson.trim());
         }
 
         return null;

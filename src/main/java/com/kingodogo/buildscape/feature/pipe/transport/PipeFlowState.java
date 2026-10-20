@@ -1,0 +1,274 @@
+package com.kingodogo.buildscape.feature.pipe.transport;
+
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Objects;
+import java.util.Set;
+
+import com.kingodogo.buildscape.core.NbtKeys;
+
+/**
+ * Fluid state of one pipe block: fluid id, source flag, flow directions, inflow direction, distance from the source,
+ * bubble column and open-endpoint flag. It is calculated by {@link WaterPipeTransport}, stored on the pipe's block
+ * entity and saved as part of its NBT.
+ */
+public class PipeFlowState {
+    public static final String WATER_FLUID_ID = "minecraft:water";
+
+    private String fluidId = "";
+    private boolean isSource;
+    private final Set<Direction> flowDirections = EnumSet.noneOf(Direction.class);
+    @Nullable
+    private Direction inflowDirection = null;
+    private BubbleColumnState bubbleColumn = BubbleColumnState.NONE;
+    private int distance = 0;
+    private int maxDistance = 0;
+    private boolean isOpenEndpoint = false;
+
+    public PipeFlowState() {}
+
+    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections,
+            @Nullable Direction inflowDirection, BubbleColumnState bubbleColumn, int distance, int maxDistance,
+            boolean isOpenEndpoint) {
+        this.fluidId = hasWater ? WATER_FLUID_ID : "";
+        this.isSource = isSource;
+        if (flowDirections != null) {
+            this.flowDirections.addAll(flowDirections);
+        }
+        this.inflowDirection = inflowDirection;
+        this.bubbleColumn = bubbleColumn != null ? bubbleColumn : BubbleColumnState.NONE;
+        this.distance = distance;
+        this.maxDistance = maxDistance;
+        this.isOpenEndpoint = isOpenEndpoint;
+    }
+
+    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections,
+            BubbleColumnState bubbleColumn, int distance, int maxDistance, boolean isOpenEndpoint) {
+        this(hasWater, isSource, flowDirections, null, bubbleColumn, distance, maxDistance, isOpenEndpoint);
+    }
+
+    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections,
+            BubbleColumnState bubbleColumn, int distance) {
+        this(hasWater, isSource, flowDirections, null, bubbleColumn, distance, 0, false);
+    }
+
+    public boolean hasWater() {
+        return WATER_FLUID_ID.equals(fluidId);
+    }
+
+    public void setHasWater(boolean hasWater) {
+        this.fluidId = hasWater ? WATER_FLUID_ID : "";
+    }
+
+    public boolean hasFluid() {
+        return !fluidId.isEmpty();
+    }
+
+    public String getFluidId() {
+        return fluidId;
+    }
+
+    public void setFluidId(@Nullable String fluidId) {
+        this.fluidId = fluidId == null ? "" : fluidId;
+    }
+
+    public boolean isSource() {
+        return isSource;
+    }
+
+    public void setSource(boolean source) {
+        isSource = source;
+    }
+
+    public Set<Direction> getFlowDirections() {
+        return flowDirections;
+    }
+
+    public void setFlowDirections(Collection<Direction> dirs) {
+        this.flowDirections.clear();
+        if (dirs != null) {
+            this.flowDirections.addAll(dirs);
+        }
+    }
+
+    public void addFlowDirection(Direction dir) {
+        if (dir != null) {
+            this.flowDirections.add(dir);
+        }
+    }
+
+    public boolean hasFlowDirection(Direction dir) {
+        return this.flowDirections.contains(dir);
+    }
+
+    public void clearFlowDirections() {
+        this.flowDirections.clear();
+    }
+
+    @Nullable
+    public Direction getInflowDirection() {
+        return inflowDirection;
+    }
+
+    public void setInflowDirection(@Nullable Direction inflowDirection) {
+        this.inflowDirection = inflowDirection;
+    }
+
+    public BubbleColumnState getBubbleColumn() {
+        return bubbleColumn;
+    }
+
+    public void setBubbleColumn(BubbleColumnState bubbleColumn) {
+        this.bubbleColumn = bubbleColumn != null ? bubbleColumn : BubbleColumnState.NONE;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
+    }
+
+    public int getMaxDistance() {
+        return maxDistance;
+    }
+    public void setMaxDistance(int maxDistance) {
+        this.maxDistance = Math.max(0, maxDistance);
+    }
+
+    public boolean isOpenEndpoint() {
+        return isOpenEndpoint;
+    }
+    public void setOpenEndpoint(boolean openEndpoint) {
+        isOpenEndpoint = openEndpoint;
+    }
+
+    public boolean isEmpty() {
+        return !hasFluid() && !isSource && flowDirections.isEmpty() && inflowDirection == null
+                && bubbleColumn == BubbleColumnState.NONE && distance == 0 && maxDistance == 0 && !isOpenEndpoint;
+    }
+
+    public void clear() {
+        this.fluidId = "";
+        this.isSource = false;
+        this.flowDirections.clear();
+        this.inflowDirection = null;
+        this.bubbleColumn = BubbleColumnState.NONE;
+        this.distance = 0;
+        this.maxDistance = 0;
+        this.isOpenEndpoint = false;
+    }
+
+    public PipeFlowState copy() {
+        PipeFlowState copy = new PipeFlowState(false, this.isSource, this.flowDirections, this.inflowDirection,
+                this.bubbleColumn, this.distance, this.maxDistance, this.isOpenEndpoint);
+        copy.fluidId = this.fluidId;
+        return copy;
+    }
+
+    /**
+     * Writes all fields into {@code tag} and returns it. The fluid id is written only when there is a fluid.
+     */
+    public CompoundTag writeToNbt(CompoundTag tag) {
+        tag.putBoolean("HasWater", hasWater());
+        if (hasFluid()) {
+            tag.putString(NbtKeys.FLUID_ID, fluidId);
+        }
+        tag.putBoolean("IsSource", isSource);
+        tag.putString("BubbleColumn", bubbleColumn.getSerializedName());
+        tag.putInt("Distance", distance);
+        tag.putInt(NbtKeys.MAX_DISTANCE, maxDistance);
+        tag.putBoolean(NbtKeys.IS_OPEN_ENDPOINT, isOpenEndpoint);
+
+        if (inflowDirection != null) {
+            tag.putString(NbtKeys.INFLOW_DIR, inflowDirection.getName());
+        }
+
+        ListTag list = new ListTag();
+        for (Direction dir : flowDirections) {
+            list.add(StringTag.valueOf(dir.getName()));
+        }
+        tag.put(NbtKeys.FLOW_DIRS, list);
+        return tag;
+    }
+
+    /**
+     * Reads a state written by {@link #writeToNbt(CompoundTag)}; missing keys fall back to the empty defaults.
+     */
+    public static PipeFlowState readFromNbt(CompoundTag tag) {
+        PipeFlowState state = new PipeFlowState();
+        if (tag == null) {
+            return state;
+        }
+
+        state.fluidId = tag.contains(NbtKeys.FLUID_ID, Tag.TAG_STRING)
+                ? tag.getString(NbtKeys.FLUID_ID)
+                : (tag.getBoolean("HasWater") ? WATER_FLUID_ID : "");
+        state.isSource = tag.getBoolean("IsSource");
+        state.bubbleColumn = BubbleColumnState.byName(tag.getString("BubbleColumn"));
+        state.distance = tag.getInt("Distance");
+        state.maxDistance = tag.contains(NbtKeys.MAX_DISTANCE) ? tag.getInt(NbtKeys.MAX_DISTANCE) : 0;
+        state.isOpenEndpoint = tag.contains(NbtKeys.IS_OPEN_ENDPOINT) && tag.getBoolean(NbtKeys.IS_OPEN_ENDPOINT);
+
+        if (tag.contains(NbtKeys.INFLOW_DIR)) {
+            state.inflowDirection = Direction.byName(tag.getString(NbtKeys.INFLOW_DIR));
+        }
+
+        if (tag.contains(NbtKeys.FLOW_DIRS, Tag.TAG_LIST)) {
+            ListTag list = tag.getList(NbtKeys.FLOW_DIRS, Tag.TAG_STRING);
+            for (int i = 0; i < list.size(); i++) {
+                Direction d = Direction.byName(list.getString(i));
+                if (d != null) {
+                    state.flowDirections.add(d);
+                }
+            }
+        }
+        return state;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PipeFlowState that)) {
+            return false;
+        }
+        return Objects.equals(fluidId, that.fluidId) &&
+                isSource == that.isSource &&
+                distance == that.distance &&
+                maxDistance == that.maxDistance &&
+                isOpenEndpoint == that.isOpenEndpoint &&
+                bubbleColumn == that.bubbleColumn &&
+                inflowDirection == that.inflowDirection &&
+                Objects.equals(flowDirections, that.flowDirections);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fluidId, isSource, flowDirections, inflowDirection, bubbleColumn, distance, maxDistance,
+                isOpenEndpoint);
+    }
+
+    @Override
+    public String toString() {
+        return "PipeFlowState{" +
+                "fluidId='" + fluidId + '\'' +
+                ", isSource=" + isSource +
+                ", flowDirections=" + flowDirections +
+                ", inflowDirection=" + inflowDirection +
+                ", bubbleColumn=" + bubbleColumn +
+                ", distance=" + distance +
+                ", maxDistance=" + maxDistance +
+                ", isOpenEndpoint=" + isOpenEndpoint +
+                '}';
+    }
+}

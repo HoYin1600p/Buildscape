@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorStandItem;
 import net.minecraft.world.item.ElytraItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -35,9 +37,10 @@ public class ArmorPillarRenderer {
             float rotation,
             float gameTime,
             float facingYaw,
-            boolean isFixed
-    ) {
-        if (itemStack == null || level == null || pos == null) return;
+            boolean isFixed) {
+        if (itemStack == null || level == null || pos == null) {
+            return;
+        }
 
         ArmorStand armorStand = armorStandCache.get(pos);
         if (armorStand == null || !armorStand.isAlive() || armorStand.level != level) {
@@ -53,7 +56,7 @@ public class ArmorPillarRenderer {
             }
         }
 
-        boolean isStandItem = itemStack.getItem() instanceof net.minecraft.world.item.ArmorStandItem;
+        boolean isStandItem = itemStack.getItem() instanceof ArmorStandItem;
         EquipmentSlot slot = getEquipmentSlot(itemStack);
 
         ItemStack cachedStack = lastRenderedStacks.get(pos);
@@ -68,7 +71,6 @@ public class ArmorPillarRenderer {
 
         float scale = 0.85f;
         double yOffset = 0.0;
-
 
         double baseOffset = -0.42;
 
@@ -108,8 +110,7 @@ public class ArmorPillarRenderer {
                 partialTicks,
                 poseStack,
                 bufferSource,
-                combinedLight
-        );
+                combinedLight);
 
         poseStack.popPose();
     }
@@ -121,8 +122,8 @@ public class ArmorPillarRenderer {
         nbt.putBoolean("ShowArms", true);
         nbt.putBoolean("Small", false);
         nbt.putBoolean("NoGravity", true);
-        nbt.putBoolean("NoBasePlate", true);
-        nbt.putBoolean("Invisible", true);
+        nbt.putBoolean(NbtKeys.NO_BASE_PLATE, true);
+        nbt.putBoolean(NbtKeys.INVISIBLE, true);
         armorStand.readAdditionalSaveData(nbt);
 
         armorStand.setUUID(UUID.randomUUID());
@@ -131,21 +132,20 @@ public class ArmorPillarRenderer {
         return armorStand;
     }
 
-    private static void updateArmorStandState(ArmorStand armorStand, ItemStack stack, EquipmentSlot slot, boolean isStandItem) {
+    private static void updateArmorStandState(ArmorStand armorStand, ItemStack stack, EquipmentSlot slot,
+            boolean isStandItem) {
         for (EquipmentSlot s : EquipmentSlot.values()) {
             armorStand.setItemSlot(s, ItemStack.EMPTY);
         }
 
-
         CompoundTag nbt = new CompoundTag();
 
-
         if (isStandItem) {
-            nbt.putBoolean("Invisible", false);
-            nbt.putBoolean("NoBasePlate", false);
+            nbt.putBoolean(NbtKeys.INVISIBLE, false);
+            nbt.putBoolean(NbtKeys.NO_BASE_PLATE, false);
         } else {
-            nbt.putBoolean("Invisible", true);
-            nbt.putBoolean("NoBasePlate", true);
+            nbt.putBoolean(NbtKeys.INVISIBLE, true);
+            nbt.putBoolean(NbtKeys.NO_BASE_PLATE, true);
 
             if (slot != null && !stack.isEmpty()) {
                 armorStand.setItemSlot(slot, stack.copy());
@@ -157,6 +157,7 @@ public class ArmorPillarRenderer {
         try {
             armorStand.readAdditionalSaveData(nbt);
         } catch (Exception e) {
+            // a partly applied NBT is fine for the display stand
         }
     }
 

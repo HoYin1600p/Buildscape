@@ -1,6 +1,9 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.core.ParticlePatterns;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -12,10 +15,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client snapshot of the shared pillar particle config (speeds, pattern, colors, edit policy, item list and
+ * the read-only flags). The same class carries the decoded form of a client upload in {@link #uploadSettings},
+ * which then names only the groups the client sent. Values are clamped to the limits in {@link NetworkPacketLimits}.
+ */
 public class SyncConfigPacket {
     // Present only for assembled uploads; server-to-client sync always contains all settings.
-    public java.util.Set<com.kingodogo.buildscape.config.ConfigSetting> uploadSettings =
-            com.kingodogo.buildscape.config.ConfigSetting.uploadable();
+    /** Which setting groups an upload carries; all groups for a packet built on the server. */
+    public Set<ConfigSetting> uploadSettings = ConfigSetting.uploadable();
     public static final double MIN_PARTICLE_RATE = NetworkPacketLimits.MIN_PARTICLE_RATE;
     public static final double MAX_PARTICLE_SPEED = NetworkPacketLimits.MAX_PARTICLE_SPEED;
     public static final double MAX_PARTICLE_SPREAD = NetworkPacketLimits.MAX_PARTICLE_SPREAD;
@@ -23,6 +31,7 @@ public class SyncConfigPacket {
     public static final int MAX_PARTICLE_LIFETIME = NetworkPacketLimits.MAX_PARTICLE_LIFETIME;
     public static final int MAX_PARTICLE_DENSITY = NetworkPacketLimits.MAX_PARTICLE_DENSITY;
 
+    /** Limits a particle rate to the range from {@link #MIN_PARTICLE_RATE} up to {@code maximum}. */
     public static double clampParticleValue(double value, double maximum) {
         return NetworkPacketLimits.clamp(value, MIN_PARTICLE_RATE, maximum);
     }
@@ -40,14 +49,19 @@ public class SyncConfigPacket {
     public int max_particle_color;
     public PillarParticleConfig.EditPermissionMode edit_permission_mode = PillarParticleConfig.EditPermissionMode.STRICT;
 
+    /** Item ids that show particles on a pillar. */
     public Set<String> items;
+    /** True when the receiving player may not edit the item list. */
     public boolean itemsReadOnly;
+    /** True when the receiving player may not edit the particle properties. */
     public boolean propertiesReadOnly;
+    public int baseRevision = 0;
 
-    public SyncConfigPacket() {
-    }
+    public SyncConfigPacket() {}
 
+    /** Builds the snapshot from the server config, clamping values to the packet limits. */
     public SyncConfigPacket(PillarParticleConfig config) {
+        this.baseRevision = config.revision;
         this.particle_speed = NetworkPacketLimits.clamp(config.particle_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
         this.particle_spread = NetworkPacketLimits.clamp(config.particle_spread,
@@ -55,7 +69,7 @@ public class SyncConfigPacket {
         this.particle_lifetime = clamp(config.particle_lifetime, 1, NetworkPacketLimits.MAX_PARTICLE_LIFETIME);
         this.particle_density = clamp(config.particle_density, 0, NetworkPacketLimits.MAX_PARTICLE_DENSITY);
         this.use_pattern = config.use_pattern;
-        this.pattern = config.pattern != null ? config.pattern : "ring";
+        this.pattern = config.pattern != null ? config.pattern : ParticlePatterns.RING;
         this.pattern_speed = NetworkPacketLimits.clamp(config.pattern_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
         this.pattern_spread = NetworkPacketLimits.clamp(config.pattern_spread,
@@ -63,15 +77,13 @@ public class SyncConfigPacket {
         this.pattern_intensity = NetworkPacketLimits.clamp(config.pattern_intensity,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY);
         this.particle_color = new ArrayList<>(
-                config.particle_color != null ? config.particle_color : new ArrayList<>()
-        );
+                config.particle_color != null ? config.particle_color : new ArrayList<>());
         this.max_particle_color = clamp(config.max_particle_color, 0, NetworkPacketLimits.MAX_DYE_COLORS);
         this.edit_permission_mode = config.edit_permission_mode != null
                 ? config.edit_permission_mode
                 : PillarParticleConfig.EditPermissionMode.STRICT;
         this.items = new HashSet<>(
-                config.items != null ? config.items : new HashSet<>()
-        );
+                config.items != null ? config.items : new HashSet<>());
         this.itemsReadOnly = !config.canEditItems();
         this.propertiesReadOnly = !config.canEditProperties();
     }
@@ -97,19 +109,25 @@ public class SyncConfigPacket {
         int colorCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_DYE_COLORS, "particle color");
         this.particle_color = new ArrayList<>();
         for (int i = 0; i < colorCount; i++) {
-            this.particle_color.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color"));
+            this.particle_color.add(
+                    NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color"));
         }
-        this.max_particle_color = NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS, "maximum particle colors");
+        this.max_particle_color = NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS,
+                "maximum particle colors");
         this.edit_permission_mode = PillarParticleConfig.parseEditPermissionMode(
                 NetworkPacketLimits.readUtf(buf, 16, "edit permission mode"));
 
         int itemCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
         this.items = new HashSet<>();
         for (int i = 0; i < itemCount; i++) {
-            this.items.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
+            this.items.add(
+                    NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
         }
         this.itemsReadOnly = buf.readBoolean();
         this.propertiesReadOnly = buf.readBoolean();
+        if (buf.isReadable()) {
+            this.baseRevision = buf.readInt();
+        }
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -118,7 +136,7 @@ public class SyncConfigPacket {
         buf.writeInt(particle_lifetime);
         buf.writeInt(particle_density);
         buf.writeBoolean(use_pattern);
-        NetworkPacketLimits.writeUtf(buf, pattern != null ? pattern : "ring",
+        NetworkPacketLimits.writeUtf(buf, pattern != null ? pattern : ParticlePatterns.RING,
                 NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern");
         buf.writeDouble(pattern_speed);
         buf.writeDouble(pattern_spread);
@@ -149,6 +167,7 @@ public class SyncConfigPacket {
         }
         buf.writeBoolean(itemsReadOnly);
         buf.writeBoolean(propertiesReadOnly);
+        buf.writeInt(baseRevision);
     }
 
     public static SyncConfigPacket decode(FriendlyByteBuf buf) {
@@ -159,23 +178,10 @@ public class SyncConfigPacket {
         return Math.max(minimum, Math.min(maximum, value));
     }
 
+    /** Client side: applies the received config on the main thread. */
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx
-                .get()
-                .enqueueWork(() -> {
-                    DistExecutor.unsafeRunWhenOn(
-                            Dist.CLIENT,
-                            () ->
-                                    () -> {
-                                        PillarParticleConfig.setServerConfig(this);
-                                        net.minecraft.client.gui.screens.Screen screen =
-                                                net.minecraft.client.Minecraft.getInstance().screen;
-                                        if (screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen open) {
-                                            open.onServerConfigSynced();
-                                        }
-                                    }
-                    );
-                });
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.applyServerConfig(this)));
         ctx.get().setPacketHandled(true);
     }
 }

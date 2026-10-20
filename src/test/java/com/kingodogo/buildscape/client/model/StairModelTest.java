@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client.model;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -19,7 +20,8 @@ public final class StairModelTest {
             "straight", "inner_left", "inner_right", "outer_left", "outer_right"
     };
 
-    public static void main(String[] args) throws IOException {
+    @Test
+    public void stairBlockstatesAndGlassGeometryAreConsistent() throws IOException {
         int blocks = 0;
         int states = 0;
         try (Stream<Path> paths = Files.list(ASSETS.resolve("blockstates"))) {
@@ -34,21 +36,28 @@ public final class StairModelTest {
                             require(variant != null, path + ": missing " + key);
                             boolean top = half.equals("top");
                             int y = facing.getValue();
-                            if (!top && shape.endsWith("left")) y -= 90;
-                            if (top && shape.endsWith("right")) y += 90;
+                            if (!top && shape.endsWith("left")) {
+                                y -= 90;
+                            }
+                            if (top && shape.endsWith("right")) {
+                                y += 90;
+                            }
                             require(number(variant, "x") == (top ? 180 : 0)
-                                            && number(variant, "y") == Math.floorMod(y, 360),
+                                    && number(variant, "y") == Math.floorMod(y, 360),
                                     path + ": incorrect rotation for " + key);
                             String modelId = variant.get("model").getAsString();
                             require(modelId.startsWith("buildscape:"), path + ": unexpected model " + modelId);
                             JsonObject model = read(ASSETS.resolve("models/"
                                     + modelId.substring("buildscape:".length()) + ".json"));
                             String parent = model.get("parent").getAsString();
-                            String kind = shape.startsWith("inner") ? "inner" : shape.startsWith("outer") ? "outer" : "straight";
-                            require(parent.equals("minecraft:block/" + (kind.equals("straight") ? "stairs" : kind + "_stairs"))
-                                            || parent.equals("block/" + (kind.equals("straight") ? "stairs" : kind + "_stairs"))
-                                            || parent.equals("buildscape:block/glass_stairs"
-                                                + (kind.equals("straight") ? "" : "_" + kind) + "_template"),
+                            String kind = shape.startsWith("inner")
+                                    ? "inner"
+                                    : shape.startsWith("outer") ? "outer" : "straight";
+                            require(parent.equals(
+                                    "minecraft:block/" + (kind.equals("straight") ? "stairs" : kind + "_stairs"))
+                                    || parent.equals("block/" + (kind.equals("straight") ? "stairs" : kind + "_stairs"))
+                                    || parent.equals("buildscape:block/glass_stairs"
+                                            + (kind.equals("straight") ? "" : "_" + kind) + "_template"),
                                     path + ": wrong model parent for " + key);
                             states++;
                         }
@@ -61,7 +70,6 @@ public final class StairModelTest {
         checkGlassGeometry("straight");
         checkGlassGeometry("inner");
         checkGlassGeometry("outer");
-        System.out.println("Stair models passed: " + blocks + " blocks, " + states + " states, 3 glass templates");
     }
 
     private static void checkGlassGeometry(String kind) throws IOException {
@@ -89,7 +97,9 @@ public final class StairModelTest {
                             double to = element.getAsJsonArray("to").get(axis).getAsDouble();
                             inside &= point[axis] + 0.5 >= from && point[axis] + 0.5 < to;
                         }
-                        if (inside) covering++;
+                        if (inside) {
+                            covering++;
+                        }
                     }
                     require(covering == (expected ? 1 : 0), kind + ": geometry mismatch at " + x + "," + y + "," + z);
                 }
@@ -108,6 +118,8 @@ public final class StairModelTest {
     }
 
     private static void require(boolean condition, String message) {
-        if (!condition) throw new AssertionError(message);
+        if (!condition) {
+            throw new AssertionError(message);
+        }
     }
 }

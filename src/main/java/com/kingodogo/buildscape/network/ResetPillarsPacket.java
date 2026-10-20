@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.config.ConfigSetting;
-import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -11,6 +11,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to reset the listed pillars to their defaults. Needs the pillar-edit permission; when
+ * something changed the server saves at once and re-syncs all players.
+ */
 public class ResetPillarsPacket {
 
     private final List<String> pillarIds;

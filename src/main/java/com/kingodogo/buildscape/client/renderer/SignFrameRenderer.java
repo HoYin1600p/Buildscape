@@ -1,11 +1,10 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
-import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
+import com.kingodogo.buildscape.feature.cosmetic.sign.SignFrameAttachment;
+import com.kingodogo.buildscape.feature.cosmetic.sign.SignFrameType;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -27,8 +26,7 @@ public class SignFrameRenderer {
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (blockEntity == null || blockEntity.getLevel() == null) {
             return;
         }
@@ -53,17 +51,17 @@ public class SignFrameRenderer {
             Direction facing = state.getValue(WallSignBlock.FACING);
             float yRot = (facing.toYRot() + 180.0F) % 360.0F;
 
-            poseStack.translate(0.5D, 0.5D, 0.5D);
+            poseStack.translate(0.5, 0.5, 0.5);
             poseStack.mulPose(Vector3f.YP.rotationDegrees(-yRot));
-            poseStack.translate(-0.5D, -0.5D, -0.5D);
+            poseStack.translate(-0.5, -0.5, -0.5);
         } else if (block instanceof StandingSignBlock) {
             float rotation = (float) (state.getValue(StandingSignBlock.ROTATION) * 360) / 16.0F;
             float yRot = (rotation + 180.0F) % 360.0F;
 
-            poseStack.translate(0.5D, 0.5D, 0.5D);
+            poseStack.translate(0.5, 0.5, 0.5);
             poseStack.mulPose(Vector3f.YP.rotationDegrees(-yRot));
-            poseStack.translate(0.0D, 0.3125D, -0.4375D);
-            poseStack.translate(-0.5D, -0.5D, -0.5D);
+            poseStack.translate(0.0, 0.3125, -0.4375);
+            poseStack.translate(-0.5, -0.5, -0.5);
         } else {
             poseStack.popPose();
             return;
@@ -78,8 +76,7 @@ public class SignFrameRenderer {
                 1.0F, 1.0F, 1.0F,
                 combinedLight,
                 combinedOverlay,
-                EmptyModelData.INSTANCE
-        );
+                EmptyModelData.INSTANCE);
 
         poseStack.popPose();
     }

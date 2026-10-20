@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.network;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.kingodogo.buildscape.config.PillarIdManager;
-import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.config.ConfigSetting;
+import com.kingodogo.buildscape.core.io.Json;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -14,9 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server bulk update of pillar records, sent as one JSON string per pillar. Needs the bulk pillar-edit
+ * permission. The server checks id, pattern and numeric fields of each entry and stops at the first
+ * out-of-range value.
+ */
 public class UpdateAllPillarIdsPacket {
 
-    private static final Gson GSON = new GsonBuilder().create();
+    private static final Gson GSON = Json.PLAIN;
     private final List<PillarIdManager.PillarData> pillarDataList;
 
     public UpdateAllPillarIdsPacket(Map<String, PillarIdManager.PillarData> dataMap) {
@@ -61,7 +66,7 @@ public class UpdateAllPillarIdsPacket {
         NetworkEvent.Context context = ctx.get();
         context.enqueueWork(() -> {
             ServerPlayer serverPlayer = context.getSender();
-            if (serverPlayer == null || !EditGuard.require(serverPlayer, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_BULK)) {
+            if (serverPlayer == null || !EditGuard.require(serverPlayer, ConfigSetting.PILLAR_BULK)) {
                 return;
             }
 
@@ -69,23 +74,29 @@ public class UpdateAllPillarIdsPacket {
             boolean changed = false;
 
             for (PillarIdManager.PillarData incoming : packet.pillarDataList) {
-                if (incoming == null || incoming.id == null) continue;
+                if (incoming == null || incoming.id == null) {
+                    continue;
+                }
                 if (incoming.id.length() > NetworkPacketLimits.MAX_PILLAR_ID_LENGTH) {
                     return;
                 }
                 if (incoming.pattern != null && incoming.pattern.length() > NetworkPacketLimits.MAX_PATTERN_LENGTH) {
                     return;
                 }
-                if (incoming.pattern_speed != null && (!Double.isFinite(incoming.pattern_speed) || incoming.pattern_speed < 0)) {
+                if (incoming.pattern_speed != null
+                        && (!Double.isFinite(incoming.pattern_speed) || incoming.pattern_speed < 0)) {
                     return;
                 }
-                if (incoming.pattern_spread != null && (!Double.isFinite(incoming.pattern_spread) || incoming.pattern_spread < 0)) {
+                if (incoming.pattern_spread != null
+                        && (!Double.isFinite(incoming.pattern_spread) || incoming.pattern_spread < 0)) {
                     return;
                 }
-                if (incoming.pattern_intensity != null && (!Double.isFinite(incoming.pattern_intensity) || incoming.pattern_intensity < 0)) {
+                if (incoming.pattern_intensity != null
+                        && (!Double.isFinite(incoming.pattern_intensity) || incoming.pattern_intensity < 0)) {
                     return;
                 }
-                if (incoming.max_particle_color != null && (incoming.max_particle_color < 0 || incoming.max_particle_color > NetworkPacketLimits.MAX_DYE_COLORS)) {
+                if (incoming.max_particle_color != null && (incoming.max_particle_color < 0
+                        || incoming.max_particle_color > NetworkPacketLimits.MAX_DYE_COLORS)) {
                     return;
                 }
                 if (incoming.dyeColors != null) {
@@ -101,19 +112,28 @@ public class UpdateAllPillarIdsPacket {
             }
 
             for (PillarIdManager.PillarData incoming : packet.pillarDataList) {
-                if (incoming == null || incoming.id == null) continue;
+                if (incoming == null || incoming.id == null) {
+                    continue;
+                }
                 PillarIdManager.PillarData existing = manager.getPillarData(incoming.id);
                 if (existing != null) {
                     existing.pattern = incoming.pattern;
                     existing.pattern_speed = incoming.pattern_speed != null
-                            ? NetworkPacketLimits.clamp(incoming.pattern_speed, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED) : null;
+                            ? NetworkPacketLimits.clamp(incoming.pattern_speed, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                                    NetworkPacketLimits.MAX_PARTICLE_SPEED)
+                            : null;
                     existing.pattern_spread = incoming.pattern_spread != null
-                            ? NetworkPacketLimits.clamp(incoming.pattern_spread, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD) : null;
+                            ? NetworkPacketLimits.clamp(incoming.pattern_spread, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                                    NetworkPacketLimits.MAX_PARTICLE_SPREAD)
+                            : null;
                     existing.pattern_intensity = incoming.pattern_intensity != null
-                            ? NetworkPacketLimits.clamp(incoming.pattern_intensity, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY) : null;
+                            ? NetworkPacketLimits.clamp(incoming.pattern_intensity,
+                                    NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY)
+                            : null;
                     existing.use_pattern = incoming.use_pattern;
                     existing.max_particle_color = incoming.max_particle_color != null
-                            ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, incoming.max_particle_color)) : null;
+                            ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, incoming.max_particle_color))
+                            : null;
                     if (incoming.dyeColors != null) {
                         existing.dyeColors = new ArrayList<>(incoming.dyeColors);
                     }

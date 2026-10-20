@@ -19,9 +19,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelRenderer.class)
 public abstract class PillarOutlineRendererMixin {
-    @Shadow private PostChain entityEffect;
-    @Shadow protected abstract boolean shouldShowEntityOutlines();
-    @Unique private boolean buildscape$outlineProcessed;
+    @Shadow
+    private PostChain entityEffect;
+    @Shadow
+    protected abstract boolean shouldShowEntityOutlines();
+    @Unique
+    private boolean buildscape$outlineProcessed;
 
     @Inject(method = "renderLevel", at = @At("HEAD"))
     private void buildscape$beginOutlines(CallbackInfo callback) {
@@ -29,10 +32,11 @@ public abstract class PillarOutlineRendererMixin {
         PillarDisplayEffects.beginFrame(shouldShowEntityOutlines());
     }
 
-    @Redirect(method = "renderLevel", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/PostChain;process(F)V"))
+    @Redirect(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/PostChain;process(F)V"))
     private void buildscape$processOutlines(PostChain chain, float partialTick) {
-        if (chain == entityEffect) buildscape$outlineProcessed = true;
+        if (chain == entityEffect) {
+            buildscape$outlineProcessed = true;
+        }
         chain.process(partialTick);
     }
 

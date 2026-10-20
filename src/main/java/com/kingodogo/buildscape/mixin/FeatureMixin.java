@@ -23,8 +23,7 @@ public class FeatureMixin {
             Random random,
             BlockPos pos,
             TreeConfiguration treeConfig,
-            CallbackInfo ci
-    ) {
+            CallbackInfo ci) {
         if (level.isStateAtPosition(pos, state -> state.is(Blocks.COMPOSTER))) {
             ci.cancel();
         }

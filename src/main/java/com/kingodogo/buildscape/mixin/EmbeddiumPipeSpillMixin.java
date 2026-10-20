@@ -22,11 +22,15 @@ public class EmbeddiumPipeSpillMixin {
     private void buildscape$renderSpill(BlockAndTintGetter level, FluidState fluid, BlockPos pos,
             BlockPos offset, ChunkModelBuilder builder, CallbackInfoReturnable<Boolean> cir) {
         BlockState state = level.getBlockState(pos);
-        if (PipeSpillVertexConsumer.findOutlets(level, pos, state, fluid).isEmpty()) return;
+        if (PipeSpillVertexConsumer.findOutlets(level, pos, state, fluid).isEmpty()) {
+            return;
+        }
         EmbeddiumSpillBuffer buffer = new EmbeddiumSpillBuffer(builder, pos, offset);
         Minecraft.getInstance().getBlockRenderer().renderLiquid(pos, level, buffer, state, fluid);
         for (var sprite : ForgeHooksClient.getFluidSprites(level, pos, fluid)) {
-            if (sprite != null) builder.addSprite(sprite);
+            if (sprite != null) {
+                builder.addSprite(sprite);
+            }
         }
         cir.setReturnValue(true);
     }

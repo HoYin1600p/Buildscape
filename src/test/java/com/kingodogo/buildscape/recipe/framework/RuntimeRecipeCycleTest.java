@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.recipe.framework;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
-import com.kingodogo.buildscape.recipe.framework.compiler.StonecuttingCycleValidator;
-import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver;
+import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
+import com.kingodogo.buildscape.recipe.framework.compiler.StonecuttingCycleValidator;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
@@ -14,7 +14,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -27,13 +26,13 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class RuntimeRecipeCycleTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class RuntimeRecipeCycleTest extends BootstrappedGameTest {
 
     @Test
     public void runtimeCategoriesRejectOnlyTheRecipeClosingAGainCycle() throws Exception {
@@ -134,7 +133,9 @@ public class RuntimeRecipeCycleTest {
     @Test
     public void hundredsOfSafeRuntimeRecipesUseOneBatchValidation() {
         List<Recipe<?>> runtime = new ArrayList<>();
-        for (int i = 0; i < 400; i++) runtime.add(cut("safe_" + i, Items.GRANITE, Items.DIORITE, 2));
+        for (int i = 0; i < 400; i++) {
+            runtime.add(cut("safe_" + i, Items.GRANITE, Items.DIORITE, 2));
+        }
         AtomicInteger validations = new AtomicInteger();
         AtomicInteger staleReports = new AtomicInteger();
         assertEquals(runtime, BuildScapeRecipeLoader.combineRuntimeRecipes(List.of(), runtime, cycles -> {
@@ -233,7 +234,9 @@ public class RuntimeRecipeCycleTest {
     @Test
     public void thousandsOfRecipesWithOneOffenderUseCheapFallbacks() {
         List<Recipe<?>> candidates = new ArrayList<>();
-        for (int i = 0; i < 4000; i++) candidates.add(cut("safe_" + i, Items.STONE, Items.GRANITE, 2));
+        for (int i = 0; i < 4000; i++) {
+            candidates.add(cut("safe_" + i, Items.STONE, Items.GRANITE, 2));
+        }
         List<Recipe<?>> expected = List.copyOf(candidates);
         candidates.add(2000, cut("offender", Items.GRANITE, Items.STONE, 1));
         for (boolean staleCache : List.of(false, true)) {
@@ -335,18 +338,19 @@ public class RuntimeRecipeCycleTest {
     }
 
     private static List<Recipe<?>> append(Map<String, String> sources, Set<String> categories,
-                                           List<Recipe<?>> cached) throws Exception {
+            List<Recipe<?>> cached) throws Exception {
         return append(sources, categories, cached, false);
     }
 
     @SuppressWarnings("unchecked")
     private static List<Recipe<?>> append(Map<String, String> sources, Set<String> categories,
-                                           List<Recipe<?>> cached, boolean trustedBundledCache) throws Exception {
+            List<Recipe<?>> cached, boolean trustedBundledCache) throws Exception {
         Map<String, byte[]> bytes = new java.util.LinkedHashMap<>();
         sources.forEach((category, source) -> bytes.put(category, source.getBytes(StandardCharsets.UTF_8)));
         Method append = BuildScapeRecipeLoader.class.getDeclaredMethod(
                 "appendRuntimeRecipes", Map.class, Set.class, List.class, boolean.class);
         append.setAccessible(true);
-        return (List<Recipe<?>>) append.invoke(BuildScapeRecipeLoader.INSTANCE, bytes, categories, cached, trustedBundledCache);
+        return (List<Recipe<?>>) append.invoke(BuildScapeRecipeLoader.INSTANCE, bytes, categories, cached,
+                trustedBundledCache);
     }
 }

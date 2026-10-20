@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.IcicleCauldronBlockEntity;
+import com.kingodogo.buildscape.feature.icicle.IcicleCauldronBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -9,19 +9,20 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class IcicleCauldronBlockEntityRenderer
-        implements BlockEntityRenderer<IcicleCauldronBlockEntity> {
+        implements
+            BlockEntityRenderer<IcicleCauldronBlockEntity> {
 
     private final BlockRenderDispatcher blockRenderer;
 
     public IcicleCauldronBlockEntityRenderer(
-            BlockEntityRendererProvider.Context context
-    ) {
+            BlockEntityRendererProvider.Context context) {
         this.blockRenderer = context.getBlockRenderDispatcher();
     }
 
@@ -32,8 +33,7 @@ public class IcicleCauldronBlockEntityRenderer
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (blockEntity.getLevel() == null) {
             return;
         }
@@ -43,8 +43,7 @@ public class IcicleCauldronBlockEntityRenderer
         BakedModel model = blockRenderer.getBlockModel(cauldronState);
         RenderType renderType = ItemBlockRenderTypes.getRenderType(
                 cauldronState,
-                true
-        );
+                true);
         blockRenderer
                 .getModelRenderer()
                 .renderModel(
@@ -57,17 +56,13 @@ public class IcicleCauldronBlockEntityRenderer
                         1.0f,
                         combinedLight,
                         combinedOverlay,
-                        EmptyModelData.INSTANCE
-                );
+                        EmptyModelData.INSTANCE);
         poseStack.popPose();
 
         ItemStack storedIcicle = blockEntity.getStoredIcicle();
-        if (
-                !storedIcicle.isEmpty() &&
-                        storedIcicle.getItem() instanceof net.minecraft.world.item.BlockItem
-        ) {
-            net.minecraft.world.item.BlockItem blockItem =
-                    (net.minecraft.world.item.BlockItem) storedIcicle.getItem();
+        if (!storedIcicle.isEmpty() &&
+                storedIcicle.getItem() instanceof BlockItem) {
+            BlockItem blockItem = (BlockItem) storedIcicle.getItem();
             BlockState icicleBlockState = blockItem.getBlock().defaultBlockState();
 
             poseStack.pushPose();
@@ -77,8 +72,7 @@ public class IcicleCauldronBlockEntityRenderer
             BakedModel icicleModel = blockRenderer.getBlockModel(icicleBlockState);
             RenderType icicleRenderType = ItemBlockRenderTypes.getRenderType(
                     icicleBlockState,
-                    true
-            );
+                    true);
             blockRenderer
                     .getModelRenderer()
                     .renderModel(
@@ -91,8 +85,7 @@ public class IcicleCauldronBlockEntityRenderer
                             1.0f,
                             combinedLight,
                             combinedOverlay,
-                            EmptyModelData.INSTANCE
-                    );
+                            EmptyModelData.INSTANCE);
 
             poseStack.popPose();
         }

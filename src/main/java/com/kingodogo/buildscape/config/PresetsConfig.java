@@ -1,15 +1,18 @@
 package com.kingodogo.buildscape.config;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.io.AtomicFiles;
+import com.kingodogo.buildscape.core.io.Json;
+import net.minecraftforge.fml.ModList;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,8 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Named item presets for the pillar item list, saved in {@code config/buildscape/pillar/pillar-presets.json}.
+ * It always has a Default preset, a number of custom slots from the client config, an automatic "unnamed" preset for
+ * unsaved edits and the key of the last applied preset. Entries it cannot understand are kept and written back.
+ */
 public class PresetsConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static final Gson GSON = Json.PRETTY_WITH_NULLS;
     private static final String PRESETS_FILE_NAME = "pillar-presets.json";
     private static PresetsConfig INSTANCE;
     private final transient Path configDirectory;
@@ -32,26 +40,31 @@ public class PresetsConfig {
     }
 
     private File getConfigDir() {
-        String configPath = (configDirectory != null ? configDirectory : Paths.get("config", "buildscape", "pillar")).toString();
+        String configPath = (configDirectory != null ? configDirectory : Paths.get("config", "buildscape", "pillar"))
+                .toString();
         File dir = new File(configPath);
-        if (!dir.exists())
+        if (!dir.exists()) {
             dir.mkdirs();
+        }
         return dir;
     }
 
     private Map<String, Preset> presets = new HashMap<>();
-    private final Map<String, com.google.gson.JsonElement> preservedPresets = new HashMap<>();
+    private final Map<String, JsonElement> preservedPresets = new HashMap<>();
     private boolean fileUnreadable;
     private String lastEditFailure = "";
-    private String lastAppliedPreset = "default";
+    private String lastAppliedPreset = DEFAULT_PRESET_KEY;
     private static final String UNNAMED_PRESET_KEY = "_unnamed";
+    private static final String DEFAULT_PRESET_KEY = "default";
+    private static final String LAST_APPLIED_KEY = "_lastApplied";
     /** Custom preset slots besides Default; null reads the buildscape.cfg setting. */
     private transient Integer customSlotsOverride;
 
     public void load() {
         File file = getPresetsFile();
         if (!file.exists()) {
-            if (ConfigPaths.copyTemplateIfMissing(file.toPath(), "/data/buildscape/config/default_pillar_presets.json")) {
+            if (ConfigPaths.copyTemplateIfMissing(file.toPath(),
+                    "/data/buildscape/config/default_pillar_presets.json")) {
                 // Template copied from resources, proceed to parse from disk
             } else {
                 initializeDefaults();
@@ -63,28 +76,34 @@ public class PresetsConfig {
 
         try {
             String source = ConfigLayoutIO.readText(file.toPath());
-            com.google.gson.JsonObject loaded = GSON.fromJson(source, com.google.gson.JsonObject.class);
+            JsonObject loaded = GSON.fromJson(source, JsonObject.class);
             boolean[] skippedEntries = {false};
             Map<String, Preset> loadedPresets = parsePresets(loaded, skippedEntries);
-            Map<String, com.google.gson.JsonElement> preserved = new HashMap<>();
-            for (Map.Entry<String, com.google.gson.JsonElement> entry : loaded.entrySet()) {
-                if (entry.getKey().equals("_lastApplied") || entry.getKey().equals(UNNAMED_PRESET_KEY)) continue;
+            Map<String, JsonElement> preserved = new HashMap<>();
+            for (Map.Entry<String, JsonElement> entry : loaded.entrySet()) {
+                if (entry.getKey().equals(LAST_APPLIED_KEY) || entry.getKey().equals(UNNAMED_PRESET_KEY)) {
+                    continue;
+                }
                 Preset preset = loadedPresets.get(entry.getKey());
                 boolean partial = preset == null;
                 if (preset != null) {
-                    for (com.google.gson.JsonElement item : entry.getValue().getAsJsonObject().getAsJsonArray("items")) {
-                        if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) partial = true;
+                    for (JsonElement item : entry.getValue().getAsJsonObject().getAsJsonArray("items")) {
+                        if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) {
+                            partial = true;
+                        }
                     }
                 }
-                if (partial) preserved.put(entry.getKey(), entry.getValue().deepCopy());
+                if (partial) {
+                    preserved.put(entry.getKey(), entry.getValue().deepCopy());
+                }
             }
             if (skippedEntries[0]) {
                 PillarParticleConfig.backupUnreadableFile(file);
             }
-            String loadedLastApplied = "default";
-            if (loaded.has("_lastApplied") && loaded.get("_lastApplied").isJsonPrimitive()
-                    && loaded.get("_lastApplied").getAsJsonPrimitive().isString()) {
-                loadedLastApplied = loaded.get("_lastApplied").getAsString();
+            String loadedLastApplied = DEFAULT_PRESET_KEY;
+            if (loaded.has(LAST_APPLIED_KEY) && loaded.get(LAST_APPLIED_KEY).isJsonPrimitive()
+                    && loaded.get(LAST_APPLIED_KEY).getAsJsonPrimitive().isString()) {
+                loadedLastApplied = loaded.get(LAST_APPLIED_KEY).getAsString();
             }
             presets = loadedPresets;
             preservedPresets.clear();
@@ -93,31 +112,34 @@ public class PresetsConfig {
             fileUnreadable = ConfigLayoutIO.protectInvalidEncoding(file.toPath())
                     || !ConfigLayoutIO.isWritable(file.toPath());
         } catch (Exception e) {
+            // the presets file may be malformed in any way; keep the last good presets
             fileUnreadable = true;
             PillarParticleConfig.backupUnreadableFile(file);
-            com.kingodogo.buildscape.BuildScape.getLogger().error(
-                    "Failed to load presets " + file + "; keeping the last good presets", e);
+            BuildScape.LOGGER.error("Failed to load presets {}; keeping the last good presets", file, e);
             if (presets.isEmpty()) {
                 initializeDefaults();
             }
             return;
         }
 
-        if (!presets.containsKey("default")) {
-            presets.put("default", new Preset("Default", getDefaultItems()));
+        if (!presets.containsKey(DEFAULT_PRESET_KEY)) {
+            presets.put(DEFAULT_PRESET_KEY, new Preset("Default", getDefaultItems()));
         }
 
         if (lastAppliedPreset == null || lastAppliedPreset.isEmpty()) {
-            lastAppliedPreset = "default";
+            lastAppliedPreset = DEFAULT_PRESET_KEY;
         }
     }
 
     /** Number of custom presets that may exist besides Default (MaxCustomPresets in buildscape.cfg, default 4). */
     public int getCustomSlots() {
-        if (customSlotsOverride != null) return customSlotsOverride;
+        if (customSlotsOverride != null) {
+            return customSlotsOverride;
+        }
         try {
             return BuildscapeClientConfig.get().getMaxCustomPresets();
         } catch (Throwable e) {
+            // the client config can be unavailable, for example in tests, including as a linkage error
             return BuildscapeClientConfig.DEFAULT_CUSTOM_PRESETS;
         }
     }
@@ -129,7 +151,9 @@ public class PresetsConfig {
     public int getCustomPresetCount() {
         int count = 0;
         for (String k : getPresetKeys()) {
-            if (!k.equals("default") && !k.equals(UNNAMED_PRESET_KEY)) count++;
+            if (!k.equals(DEFAULT_PRESET_KEY) && !k.equals(UNNAMED_PRESET_KEY)) {
+                count++;
+            }
         }
         return count;
     }
@@ -146,40 +170,41 @@ public class PresetsConfig {
         return INSTANCE;
     }
 
-    static Map<String, Preset> parsePresets(com.google.gson.JsonObject loaded) {
+    static Map<String, Preset> parsePresets(JsonObject loaded) {
         return parsePresets(loaded, new boolean[]{false});
     }
 
-    private static Map<String, Preset> parsePresets(com.google.gson.JsonObject loaded, boolean[] skippedEntries) {
+    private static Map<String, Preset> parsePresets(JsonObject loaded, boolean[] skippedEntries) {
         if (loaded == null) {
             throw new IllegalArgumentException("Expected a presets object");
         }
         Map<String, Preset> parsed = new HashMap<>();
-        for (Map.Entry<String, com.google.gson.JsonElement> entry : loaded.entrySet()) {
-            if (!entry.getKey().equals("_lastApplied") && !entry.getKey().equals(UNNAMED_PRESET_KEY)) {
+        for (Map.Entry<String, JsonElement> entry : loaded.entrySet()) {
+            if (!entry.getKey().equals(LAST_APPLIED_KEY) && !entry.getKey().equals(UNNAMED_PRESET_KEY)) {
                 try {
-                    com.google.gson.JsonElement value = entry.getValue();
+                    JsonElement value = entry.getValue();
                     if (!value.isJsonObject() || !value.getAsJsonObject().has("items")
                             || !value.getAsJsonObject().get("items").isJsonArray()) {
                         throw new IllegalArgumentException("Expected items for preset " + entry.getKey());
                     }
                     Set<String> items = PillarParticleConfig.parseItems(value.toString(),
                             PRESETS_FILE_NAME + " preset " + entry.getKey());
-                    for (com.google.gson.JsonElement item : value.getAsJsonObject().getAsJsonArray("items")) {
+                    for (JsonElement item : value.getAsJsonObject().getAsJsonArray("items")) {
                         if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) {
                             skippedEntries[0] = true;
                         }
                     }
                     String name = value.getAsJsonObject().has("name")
-                            ? GSON.fromJson(value.getAsJsonObject().get("name"), String.class) : "";
+                            ? GSON.fromJson(value.getAsJsonObject().get("name"), String.class)
+                            : "";
                     if (name == null) {
                         throw new IllegalArgumentException("Expected a name for preset " + entry.getKey());
                     }
                     parsed.put(entry.getKey(), new Preset(name, items));
                 } catch (RuntimeException e) {
                     skippedEntries[0] = true;
-                    com.kingodogo.buildscape.BuildScape.getLogger().warn(
-                            "Skipped malformed preset " + entry.getKey() + " in " + PRESETS_FILE_NAME, e);
+                    BuildScape.LOGGER.warn("Skipped malformed preset {} in {}", entry.getKey(), PRESETS_FILE_NAME,
+                            e);
                 }
             }
         }
@@ -195,58 +220,45 @@ public class PresetsConfig {
         File file = getPresetsFile();
         if (fileUnreadable) {
             lastEditFailure = "unreadable";
-            com.kingodogo.buildscape.BuildScape.getLogger().error("Not overwriting unreadable presets " + file);
+            BuildScape.LOGGER.error("Not overwriting unreadable presets {}", file);
             return false;
         }
-        Path temporary = null;
         try {
             if (file.exists() && ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                 fileUnreadable = true;
                 lastEditFailure = "unreadable";
-                com.kingodogo.buildscape.BuildScape.getLogger().warn("Not overwriting replacement-decoded presets " + file);
+                BuildScape.LOGGER.warn("Not overwriting replacement-decoded presets {}", file);
                 return false;
             }
-            File parentDir = file.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-            temporary = Files.createTempFile(parentDir.toPath(), PRESETS_FILE_NAME, ".tmp");
-            try (FileWriter writer = new FileWriter(temporary.toFile(), java.nio.charset.StandardCharsets.UTF_8)) {
-                Map<String, Object> toSave = new HashMap<>();
-                for (Map.Entry<String, Preset> entry : presets.entrySet()) {
-                    if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
-                        toSave.put(entry.getKey(), entry.getValue());
+            AtomicFiles.write(file.toPath(), PRESETS_FILE_NAME, temporary -> {
+                try (FileWriter writer = new FileWriter(temporary.toFile(), StandardCharsets.UTF_8)) {
+                    Map<String, Object> toSave = new HashMap<>();
+                    for (Map.Entry<String, Preset> entry : presets.entrySet()) {
+                        if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
+                            toSave.put(entry.getKey(), entry.getValue());
+                        }
                     }
+                    toSave.put(LAST_APPLIED_KEY, lastAppliedPreset);
+                    toSave.putAll(preservedPresets);
+                    GSON.toJson(toSave, writer);
                 }
-                toSave.put("_lastApplied", lastAppliedPreset);
-                toSave.putAll(preservedPresets);
-                GSON.toJson(toSave, writer);
-            }
-            try {
-                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporary, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
+            }, e -> BuildScape.LOGGER.warn("Failed to remove temporary presets file", e));
             lastEditFailure = "";
             return true;
         } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to save presets " + file, e);
+            // any save failure is logged and reported to the caller as false
+            BuildScape.LOGGER.error("Failed to save presets {}", file, e);
             return false;
-        } finally {
-            if (temporary != null) {
-                try {
-                    Files.deleteIfExists(temporary);
-                } catch (java.io.IOException e) {
-                    com.kingodogo.buildscape.BuildScape.getLogger().warn("Failed to remove temporary presets file", e);
-                }
-            }
         }
     }
 
+    /**
+     * Applies the Default preset when the pillar item list is empty.
+     */
     public void applyPresetOnStartup() {
         PillarParticleConfig itemConfig = PillarParticleConfig.get();
         if (itemConfig.items.isEmpty()) {
-            applyPreset("default");
+            applyPreset(DEFAULT_PRESET_KEY);
         }
     }
 
@@ -255,23 +267,25 @@ public class PresetsConfig {
         preservedPresets.clear();
 
         Preset defaultPreset = new Preset("Default", getDefaultItems());
-        presets.put("default", defaultPreset);
+        presets.put(DEFAULT_PRESET_KEY, defaultPreset);
     }
 
     private Set<String> getDefaultItems() {
-        return ConfigPaths.loadDefaultItems(net.minecraftforge.fml.ModList.get().isLoaded("the_vault"));
+        return ConfigPaths.loadDefaultItems(ModList.get().isLoaded("the_vault"));
     }
 
     public List<Preset> getPresets() {
         List<Preset> presetList = new ArrayList<>();
-        for (String key : getPresetKeys()) presetList.add(getPreset(key));
+        for (String key : getPresetKeys()) {
+            presetList.add(getPreset(key));
+        }
         return presetList;
     }
 
     public List<String> getPresetKeys() {
         List<String> keys = new ArrayList<>();
-        if (presets.containsKey("default")) {
-            keys.add("default");
+        if (presets.containsKey(DEFAULT_PRESET_KEY)) {
+            keys.add(DEFAULT_PRESET_KEY);
         }
         if (presets.containsKey(UNNAMED_PRESET_KEY)) {
             keys.add(UNNAMED_PRESET_KEY);
@@ -279,7 +293,7 @@ public class PresetsConfig {
         Set<String> allKeys = new HashSet<>(presets.keySet());
         allKeys.addAll(preservedPresets.keySet());
         List<String> sortedKeys = new ArrayList<>(allKeys);
-        sortedKeys.remove("default");
+        sortedKeys.remove(DEFAULT_PRESET_KEY);
         sortedKeys.remove(UNNAMED_PRESET_KEY);
         sortedKeys.sort(String::compareTo);
 
@@ -288,7 +302,7 @@ public class PresetsConfig {
     }
 
     public boolean savePreset(String key, String name, Set<String> items) {
-        if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
+        if (key.equals(DEFAULT_PRESET_KEY) || key.equals(UNNAMED_PRESET_KEY)) {
             lastEditFailure = "reserved";
             return false;
         }
@@ -297,17 +311,25 @@ public class PresetsConfig {
             return false;
         }
 
-        if (!presets.containsKey(key) && !preservedPresets.containsKey(key) && getCustomPresetCount() >= getCustomSlots()) {
+        if (!presets.containsKey(key) && !preservedPresets.containsKey(key)
+                && getCustomPresetCount() >= getCustomSlots()) {
             lastEditFailure = "limit";
             return false;
         }
 
         Preset previous = presets.put(key, new Preset(name, items));
-        com.google.gson.JsonElement preserved = preservedPresets.remove(key);
-        if (saveToDisk()) return true;
-        if (previous != null) presets.put(key, previous);
-        else presets.remove(key);
-        if (preserved != null) preservedPresets.put(key, preserved);
+        JsonElement preserved = preservedPresets.remove(key);
+        if (saveToDisk()) {
+            return true;
+        }
+        if (previous != null) {
+            presets.put(key, previous);
+        } else {
+            presets.remove(key);
+        }
+        if (preserved != null) {
+            preservedPresets.put(key, preserved);
+        }
         return false;
     }
 
@@ -340,7 +362,7 @@ public class PresetsConfig {
     }
 
     public boolean deletePreset(String key) {
-        if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
+        if (key.equals(DEFAULT_PRESET_KEY) || key.equals(UNNAMED_PRESET_KEY)) {
             lastEditFailure = "reserved";
             return false;
         }
@@ -349,14 +371,22 @@ public class PresetsConfig {
             return false;
         }
         Preset previous = presets.remove(key);
-        com.google.gson.JsonElement preserved = preservedPresets.remove(key);
+        JsonElement preserved = preservedPresets.remove(key);
         if (previous != null || preserved != null) {
             String previousLastApplied = lastAppliedPreset;
-            if (key.equals(lastAppliedPreset)) lastAppliedPreset = "default";
-            if (saveToDisk()) return true;
+            if (key.equals(lastAppliedPreset)) {
+                lastAppliedPreset = DEFAULT_PRESET_KEY;
+            }
+            if (saveToDisk()) {
+                return true;
+            }
             lastAppliedPreset = previousLastApplied;
-            if (previous != null) presets.put(key, previous);
-            if (preserved != null) preservedPresets.put(key, preserved);
+            if (previous != null) {
+                presets.put(key, previous);
+            }
+            if (preserved != null) {
+                preservedPresets.put(key, preserved);
+            }
             return false;
         }
         lastEditFailure = "missing";
@@ -369,7 +399,7 @@ public class PresetsConfig {
             PillarParticleConfig config = PillarParticleConfig.get();
             if (fileUnreadable || !config.canEditItems()) {
                 lastEditFailure = "unreadable";
-                com.kingodogo.buildscape.BuildScape.getLogger().warn("Not applying a preset while its config files are read-only");
+                BuildScape.LOGGER.warn("Not applying a preset while its config files are read-only");
                 return;
             }
             config.editItems(preset.items);
@@ -401,14 +431,17 @@ public class PresetsConfig {
         presets.remove(UNNAMED_PRESET_KEY);
     }
 
+    /**
+     * Applies the unnamed preset if one exists, otherwise the last applied preset, otherwise Default.
+     */
     public void autoApplyOnLoad() {
         if (hasUnnamedPreset()) {
             applyPreset(UNNAMED_PRESET_KEY);
         } else if (lastAppliedPreset != null && presets.containsKey(lastAppliedPreset)) {
             applyPreset(lastAppliedPreset);
         } else {
-            applyPreset("default");
-            lastAppliedPreset = "default";
+            applyPreset(DEFAULT_PRESET_KEY);
+            lastAppliedPreset = DEFAULT_PRESET_KEY;
             save();
         }
     }

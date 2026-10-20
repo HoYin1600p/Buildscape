@@ -1,10 +1,9 @@
 package com.kingodogo.buildscape.recipe.framework.cache;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.recipe.HazeBushDyeRecipe;
 
 import com.google.gson.JsonParser;
-import com.kingodogo.buildscape.recipe.framework.cache.BinaryRecipeCache;
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -15,7 +14,6 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -23,25 +21,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class HazeBushDyeRecipeTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class HazeBushDyeRecipeTest extends BootstrappedGameTest {
 
     private HazeBushDyeRecipe recipe() {
         // Vanilla stand-ins keep these unit tests independent of mod registry startup.
         return new HazeBushDyeRecipe(new ResourceLocation("buildscape", "test_haze_dye"), "",
                 new ItemStack(Items.ORANGE_TULIP), NonNullList.of(Ingredient.EMPTY,
-                Ingredient.of(Items.WHITE_TULIP), Ingredient.of(Items.ORANGE_DYE)));
+                        Ingredient.of(Items.WHITE_TULIP), Ingredient.of(Items.ORANGE_DYE)));
     }
 
     private CraftingContainer grid(ItemStack bush) {
         AbstractContainerMenu menu = new AbstractContainerMenu(null, 0) {
             @Override
-            public boolean stillValid(net.minecraft.world.entity.player.Player player) { return true; }
+            public boolean stillValid(net.minecraft.world.entity.player.Player player) {
+                return true;
+            }
 
             @Override
             public ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {
@@ -98,7 +96,9 @@ public class HazeBushDyeRecipeTest {
             in.readInt(); // version
             assertEquals("test", in.readUTF());
             String[] pool = new String[in.readInt()];
-            for (int i = 0; i < pool.length; i++) pool[i] = in.readUTF();
+            for (int i = 0; i < pool.length; i++) {
+                pool[i] = in.readUTF();
+            }
             assertEquals(1, in.readInt());
             in.mark(cache.length);
             in.readInt(); // id
@@ -113,8 +113,12 @@ public class HazeBushDyeRecipeTest {
             items[resultIndex] = Items.ORANGE_TULIP;
             Ingredient[] ingredients = new Ingredient[pool.length];
             for (int i = 0; i < pool.length; i++) {
-                if (pool[i].contains("minecraft:white_tulip")) ingredients[i] = Ingredient.of(Items.WHITE_TULIP);
-                if (pool[i].contains("minecraft:orange_dye")) ingredients[i] = Ingredient.of(Items.ORANGE_DYE);
+                if (pool[i].contains("minecraft:white_tulip")) {
+                    ingredients[i] = Ingredient.of(Items.WHITE_TULIP);
+                }
+                if (pool[i].contains("minecraft:orange_dye")) {
+                    ingredients[i] = Ingredient.of(Items.ORANGE_DYE);
+                }
             }
             assertTrue(BinaryRecipeCache.readRecipe(in, pool, ingredients, items,
                     new ResourceLocation[pool.length]) instanceof HazeBushDyeRecipe);
@@ -136,9 +140,13 @@ public class HazeBushDyeRecipeTest {
                 "src/main/resources/data/buildscape/recipes_pack/crafting.json"))).getAsJsonObject();
         int count = 0;
         for (var entry : pack.getAsJsonArray("crafting_shapeless")) {
-            if (!entry.isJsonObject()) continue;
+            if (!entry.isJsonObject()) {
+                continue;
+            }
             var json = entry.getAsJsonObject();
-            if (!json.has("type") || !"buildscape:haze_bush_dye".equals(json.get("type").getAsString())) continue;
+            if (!json.has("type") || !"buildscape:haze_bush_dye".equals(json.get("type").getAsString())) {
+                continue;
+            }
             var ingredients = json.getAsJsonArray("ingredients");
             assertEquals("BS:white_haze_bush", ingredients.get(0).getAsString());
             String color = ingredients.get(1).getAsString().replace("MC:", "").replace("_dye", "");

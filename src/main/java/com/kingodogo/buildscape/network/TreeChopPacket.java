@@ -12,6 +12,11 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to chop a whole tree starting at a log position. Only creative operators who may build
+ * can use it. The server collects up to 200 connected logs of the same block and hands them to
+ * {@link TreeChopJobManager}.
+ */
 public class TreeChopPacket {
 
     private static final int MAX_LOGS = 200;
@@ -51,7 +56,7 @@ public class TreeChopPacket {
             }
 
             if (!level.isLoaded(pos)
-                    || player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) > 64.0D
+                    || player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0
                     || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
                 return;
             }
@@ -72,11 +77,9 @@ public class TreeChopPacket {
     }
 
     private boolean isLog(BlockState state) {
-        return (
-                state.is(BlockTags.LOGS) ||
-                        state.is(BlockTags.WARPED_STEMS) ||
-                        state.is(BlockTags.CRIMSON_STEMS)
-        );
+        return (state.is(BlockTags.LOGS) ||
+                state.is(BlockTags.WARPED_STEMS) ||
+                state.is(BlockTags.CRIMSON_STEMS));
     }
 
 }

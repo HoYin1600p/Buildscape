@@ -1,8 +1,7 @@
 package com.kingodogo.buildscape.config;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.google.gson.Gson;
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.nio.file.Files;
@@ -10,13 +9,11 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-public class PillarConfigParsingTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class PillarConfigParsingTest extends BootstrappedGameTest {
 
     @Test
     public void existingItemListsRemainExactAndSupportComments() {

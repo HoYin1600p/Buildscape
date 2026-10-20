@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.fluid.ModFluids;
+import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LavaFluidMixin {
     @Inject(method = "spreadTo", at = @At("HEAD"), cancellable = true)
     private void buildscape$preserveExperience(LevelAccessor level, BlockPos pos, BlockState state,
-                                              Direction direction, FluidState fluidState, CallbackInfo ci) {
-        if (ModFluids.isExperience(level.getFluidState(pos).getType())) ci.cancel();
+            Direction direction, FluidState fluidState, CallbackInfo ci) {
+        if (ModFluids.isExperience(level.getFluidState(pos).getType())) {
+            ci.cancel();
+        }
     }
 }

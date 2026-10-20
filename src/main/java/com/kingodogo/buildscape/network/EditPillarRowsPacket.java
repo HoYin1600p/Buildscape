@@ -1,19 +1,26 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to rename pillar identities in bulk. Pillar ids are now read-only, so the server answers
+ * every request with an {@link EditPillarRowsResultPacket} that carries the reason {@code read_only} and changes nothing.
+ * The packet stays so older screens get a defined reply.
+ */
 public class EditPillarRowsPacket {
 
+    /** Most rows one request may carry. */
     public static final int MAX_ROWS = 80;
     private final long batchId;
     private final List<Row> rows;
@@ -58,20 +65,24 @@ public class EditPillarRowsPacket {
             }
             NetworkPacketLimits.writeUtf(buf, row.oldId, 32, "old pillar id");
             NetworkPacketLimits.writeUtf(buf, row.newId, 32, "new pillar id");
-            NetworkPacketLimits.writeUtf(buf, row.dimension, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "pillar dimension");
+            NetworkPacketLimits.writeUtf(buf, row.dimension, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                    "pillar dimension");
             buf.writeInt(row.x);
             buf.writeInt(row.y);
             buf.writeInt(row.z);
         }
     }
 
+    /** Server side: changes nothing and answers the sender with a {@code read_only} result for the requested ids. */
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+            if (player == null) {
+                return;
+            }
             // Pillar identities are read-only; network requests attempting to rename or edit identities are rejected.
             String reason = "read_only";
-            ModMessages.INSTANCE.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+            ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
                     new EditPillarRowsResultPacket(batchId, rows.stream().map(row -> row.oldId).toList(), reason));
         });
         ctx.get().setPacketHandled(true);
@@ -92,6 +103,7 @@ public class EditPillarRowsPacket {
             this.z = z;
         }
 
+        /** True if both ids match the pillar id pattern and the dimension is a valid resource id of reasonable length. */
         public boolean isValid() {
             return oldId != null && oldId.matches(PillarIdManager.VALID_ID_PATTERN)
                     && newId != null && newId.matches(PillarIdManager.VALID_ID_PATTERN)

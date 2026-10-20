@@ -1,0 +1,8 @@
+buildscape:falling_icicle
+buildscape:festive_stocking
+buildscape:mangrove_boat
+buildscape:colored_item_frame
+buildscape:seat
+buildscape:poplar_boat
+buildscape:wandering_homemaker
+buildscape:festive_wandering_homemaker

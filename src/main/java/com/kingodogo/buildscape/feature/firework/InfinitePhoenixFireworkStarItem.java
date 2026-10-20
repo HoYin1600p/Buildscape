@@ -1,0 +1,49 @@
+package com.kingodogo.buildscape.feature.firework;
+
+import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.FireworkStarItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
+public class InfinitePhoenixFireworkStarItem extends FireworkStarItem {
+
+    public InfinitePhoenixFireworkStarItem(Item.Properties properties) {
+        super(properties);
+    }
+
+    public static ItemStack createDefaultStack() {
+        ItemStack stack = new ItemStack(MasonryItems.INFINITE_PHOENIX_FIREWORK_STAR.get());
+        CompoundTag explosionTag = stack.getOrCreateTagElement(NbtKeys.EXPLOSION);
+        explosionTag.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.PHOENIX_ID);
+        explosionTag.putIntArray(NbtKeys.COLORS, new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00});
+        explosionTag.putBoolean(NbtKeys.FLICKER, true);
+        explosionTag.putBoolean(NbtKeys.TRAIL, true);
+        return stack;
+    }
+
+    @Override
+    public boolean hasContainerItem(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getContainerItem(ItemStack stack) {
+        return stack.copy();
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+        tooltip.add(new TextComponent("§d§lInfinite Uses").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD));
+    }
+}

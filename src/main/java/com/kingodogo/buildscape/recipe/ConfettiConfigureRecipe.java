@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.recipe;
 
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.registry.ModRecipeSerializers;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -9,6 +11,10 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
+/**
+ * Crafting recipe: one confetti item plus one or more gunpowder raises its burst level by the gunpowder count, up to 5.
+ * The result is a copy of the confetti item with the new level in its NBT.
+ */
 public class ConfettiConfigureRecipe extends CustomRecipe {
     public ConfettiConfigureRecipe(ResourceLocation id) {
         super(id);
@@ -22,7 +28,7 @@ public class ConfettiConfigureRecipe extends CustomRecipe {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty()) {
-                if (stack.is(ModItems.CONFETTI_ITEM.get())) {
+                if (stack.is(MasonryItems.CONFETTI_ITEM.get())) {
                     confettiCount++;
                 } else if (stack.is(Items.GUNPOWDER)) {
                     gunpowderCount++;
@@ -43,7 +49,7 @@ public class ConfettiConfigureRecipe extends CustomRecipe {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty()) {
-                if (stack.is(ModItems.CONFETTI_ITEM.get())) {
+                if (stack.is(MasonryItems.CONFETTI_ITEM.get())) {
                     confettiStack = stack;
                 } else if (stack.is(Items.GUNPOWDER)) {
                     gunpowderCount++;
@@ -56,14 +62,14 @@ public class ConfettiConfigureRecipe extends CustomRecipe {
         }
 
         int currentLevel = 1;
-        if (confettiStack.hasTag() && confettiStack.getTag().contains("BurstLevel")) {
-            currentLevel = confettiStack.getTag().getInt("BurstLevel");
+        if (confettiStack.hasTag() && confettiStack.getTag().contains(NbtKeys.BURST_LEVEL)) {
+            currentLevel = confettiStack.getTag().getInt(NbtKeys.BURST_LEVEL);
         }
 
         int nextLevel = Math.min(5, currentLevel + gunpowderCount);
         ItemStack result = confettiStack.copy();
         result.setCount(1);
-        result.getOrCreateTag().putInt("BurstLevel", nextLevel);
+        result.getOrCreateTag().putInt(NbtKeys.BURST_LEVEL, nextLevel);
         return result;
     }
 

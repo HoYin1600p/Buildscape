@@ -8,26 +8,33 @@ import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEntity> {
 
-    private static final ResourceLocation BIRCH_PLANKS = new ResourceLocation("minecraft", "textures/block/birch_planks.png");
-    private static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(BuildScape.MODID, "textures/entity/white_item_frame.png");
-    private static final java.util.Map<String, ResourceLocation> COLOR_TEXTURES = new java.util.HashMap<>();
+    private static final ResourceLocation BIRCH_PLANKS = new ResourceLocation("minecraft",
+            "textures/block/birch_planks.png");
+    private static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(BuildScape.MODID,
+            "textures/entity/white_item_frame.png");
+    private static final Map<String, ResourceLocation> COLOR_TEXTURES = new HashMap<>();
 
     static {
         for (DyeColor color : DyeColor.values()) {
@@ -36,7 +43,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         }
     }
 
-    private final net.minecraft.client.renderer.entity.ItemRenderer itemRenderer;
+    private final ItemRenderer itemRenderer;
 
     public ColoredItemFrameRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -53,15 +60,14 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
     @Override
     public Vec3 getRenderOffset(ColoredItemFrameEntity entity, float partialTicks) {
         return new Vec3(
-                (double) entity.getDirection().getStepX() * 0.3D,
-                -0.25D,
-                (double) entity.getDirection().getStepZ() * 0.3D
-        );
+                (double) entity.getDirection().getStepX() * 0.3,
+                -0.25,
+                (double) entity.getDirection().getStepZ() * 0.3);
     }
 
     @Override
     public void render(ColoredItemFrameEntity entity, float entityYaw, float partialTicks,
-                       PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+            PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
 
         Direction direction = entity.getDirection();
@@ -71,7 +77,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
 
         if (direction == Direction.UP || direction == Direction.DOWN) {
             BlockPos lightPos = entity.blockPosition().relative(direction);
-            packedLight = net.minecraft.client.renderer.LevelRenderer.getLightColor(entity.level, lightPos);
+            packedLight = LevelRenderer.getLightColor(entity.level, lightPos);
         }
 
         poseStack.pushPose();
@@ -79,12 +85,11 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         Vec3 renderOffset = this.getRenderOffset(entity, partialTicks);
         poseStack.translate(-renderOffset.x(), -renderOffset.y(), -renderOffset.z());
 
-        double wallOffset = 0.469D;
+        double wallOffset = 0.469;
         poseStack.translate(
                 (double) direction.getStepX() * wallOffset,
                 (double) direction.getStepY() * wallOffset,
-                (double) direction.getStepZ() * wallOffset
-        );
+                (double) direction.getStepZ() * wallOffset);
 
         poseStack.mulPose(Vector3f.XP.rotationDegrees(entity.getXRot()));
         poseStack.mulPose(Vector3f.YP.rotationDegrees(180.0F - entity.getYRot()));
@@ -109,9 +114,10 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         poseStack.popPose();
     }
 
-    private void renderNormalFrame(PoseStack poseStack, MultiBufferSource buffer, int packedLight, ResourceLocation backTexture) {
+    private void renderNormalFrame(PoseStack poseStack, MultiBufferSource buffer, int packedLight,
+            ResourceLocation backTexture) {
         poseStack.pushPose();
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
+        poseStack.translate(-0.5, -0.5, -0.5);
 
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
@@ -161,9 +167,10 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         poseStack.popPose();
     }
 
-    private void renderMapFrame(PoseStack poseStack, MultiBufferSource buffer, int packedLight, ResourceLocation backTexture) {
+    private void renderMapFrame(PoseStack poseStack, MultiBufferSource buffer, int packedLight,
+            ResourceLocation backTexture) {
         poseStack.pushPose();
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
+        poseStack.translate(-0.5, -0.5, -0.5);
 
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
@@ -214,12 +221,11 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
     }
 
     private void renderBoxFaces(VertexConsumer consumer, Matrix4f pose, Matrix3f normal, int packedLight,
-                                float x1, float y1, float z1,
-                                float x2, float y2, float z2) {
+            float x1, float y1, float z1,
+            float x2, float y2, float z2) {
         float w = x2 - x1;
-        float h =
-                y2 -
-                        y1;
+        float h = y2 -
+                y1;
 
         renderQuadWithUV(consumer, pose, normal, packedLight,
                 x2, y1, z1, x1, y1, z1, x1, y2, z1, x2, y2, z1,
@@ -253,12 +259,12 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
     }
 
     private void renderQuadWithUV(VertexConsumer consumer, Matrix4f pose, Matrix3f normal, int packedLight,
-                                  float x1, float y1, float z1,
-                                  float x2, float y2, float z2,
-                                  float x3, float y3, float z3,
-                                  float x4, float y4, float z4,
-                                  float u1, float v1, float u2, float v2,
-                                  float nx, float ny, float nz) {
+            float x1, float y1, float z1,
+            float x2, float y2, float z2,
+            float x3, float y3, float z3,
+            float x4, float y4, float z4,
+            float u1, float v1, float u2, float v2,
+            float nx, float ny, float nz) {
         consumer.vertex(pose, x1, y1, z1).color(255, 255, 255, 255)
                 .uv(u1, v1).overlayCoords(OverlayTexture.NO_OVERLAY)
                 .uv2(packedLight).normal(normal, nx, ny, nz).endVertex();
@@ -274,10 +280,10 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
     }
 
     private void renderItem(ColoredItemFrameEntity entity, ItemStack itemStack,
-                            PoseStack poseStack, MultiBufferSource buffer, int packedLight, boolean isMap, boolean isInvisible) {
+            PoseStack poseStack, MultiBufferSource buffer, int packedLight, boolean isMap, boolean isInvisible) {
         MapItemSavedData mapData = isMap ? MapItem.getSavedData(itemStack, entity.level) : null;
 
-        poseStack.translate(0.0D, 0.0D, isInvisible ? 0.5D : 0.4375D);
+        poseStack.translate(0.0, 0.0, isInvisible ? 0.5 : 0.4375);
 
         int rotation;
         if (mapData != null) {
@@ -290,8 +296,8 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         if (mapData != null) {
             poseStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
             poseStack.scale(0.0078125F, 0.0078125F, 0.0078125F);
-            poseStack.translate(-64.0D, -64.0D, 0.0D);
-            poseStack.translate(0.0D, 0.0D, -1.0D);
+            poseStack.translate(-64.0, -64.0, 0.0);
+            poseStack.translate(0.0, 0.0, -1.0);
             Integer mapId = MapItem.getMapId(itemStack);
             if (mapId != null && mapData != null) {
                 Minecraft.getInstance().gameRenderer.getMapRenderer()
@@ -306,8 +312,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                     OverlayTexture.NO_OVERLAY,
                     poseStack,
                     buffer,
-                    entity.getId()
-            );
+                    entity.getId());
         }
     }
 

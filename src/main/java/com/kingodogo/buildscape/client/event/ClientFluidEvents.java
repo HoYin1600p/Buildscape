@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.event;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.fluid.ModFluids;
+import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.api.distmarker.Dist;

@@ -1,0 +1,46 @@
+{
+  // Basic parameters apply when use_pattern = false; patterns use pattern_* values instead.
+  // Right-click a pillar with dyes to override config colors for that pillar (up to 5 dyes).
+  // Dye colors cycle in application order; break and replace the pillar to reset them.
+  // Config colors cycle from the first color through max_particle_color.
+
+  // --- Visuals ---
+  // Hexadecimal particle color palette (up to 7 colors)
+  "particle_color": [
+  "#FFB81C",
+  "#FFFFFF",
+  "#FFFF00",
+  "#E8FEFD",
+  "#FF5C00",
+  "#3CDFFF"
+],
+  // Maximum number of colors to use from particle_color (1-7)
+  "max_particle_color": 3,
+  // How far particles spread from center when use_pattern = false
+  "particle_spread": 0.1,
+
+  // --- Timing & patterns ---
+  // Basic particle parameters (used when use_pattern = false): base speed multiplier
+  "particle_speed": 0.02,
+  // How long particles last (in ticks, 20 ticks = 1 second)
+  "particle_lifetime": 20,
+  // Available patterns: beam, spiral, fountain, pulse, ring, burst
+  "pattern": "ring",
+  // Base speed multiplier for pattern particles
+  "pattern_speed": 0.05,
+  // Spread amount for pattern particles
+  "pattern_spread": 0.05,
+  // Intensity multiplier for pattern effects (higher = more intense)
+  "pattern_intensity": 1.0,
+
+  // --- Behaviour ---
+  // Pattern system (overrides basic particle parameters)
+  "use_pattern": true,
+  // Number of particles spawned per tick when use_pattern = false
+  "particle_density": 2,
+
+  // --- Other ---
+  // Unrecognized setting retained with its original value
+  "edit_permission_mode": "strict"
+}
+

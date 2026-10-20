@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.network.BuildersPouchMenu;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -38,8 +37,8 @@ public class BuildersPouchItem extends Item {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             Component title = new TranslatableComponent("container.buildscape.builders_pouch");
             NetworkHooks.openGui(serverPlayer,
-                    new SimpleMenuProvider((id, inventory, ignored) ->
-                            new BuildersPouchMenu(id, inventory, hand), title),
+                    new SimpleMenuProvider((id, inventory, ignored) -> new BuildersPouchMenu(id, inventory, hand),
+                            title),
                     buffer -> buffer.writeEnum(hand));
         }
         return InteractionResultHolder.sidedSuccess(pouch, level.isClientSide);
@@ -49,22 +48,30 @@ public class BuildersPouchItem extends Item {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         int configured = 0;
         for (String filter : getFilters(stack)) {
-            if (!filter.isEmpty()) configured++;
+            if (!filter.isEmpty()) {
+                configured++;
+            }
         }
         tooltip.add(new TranslatableComponent("item.buildscape.builders_pouch.configured", configured, SLOT_COUNT));
     }
 
     public static List<String> getFilters(ItemStack pouch) {
         List<String> filters = new ArrayList<>(SLOT_COUNT);
-        for (int i = 0; i < SLOT_COUNT; i++) filters.add("");
+        for (int i = 0; i < SLOT_COUNT; i++) {
+            filters.add("");
+        }
 
         CompoundTag data = getData(pouch, false);
-        if (data == null || !data.contains(FILTERS_KEY, 9)) return filters;
+        if (data == null || !data.contains(FILTERS_KEY, 9)) {
+            return filters;
+        }
 
         ListTag list = data.getList(FILTERS_KEY, 8);
         for (int i = 0; i < SLOT_COUNT && i < list.size(); i++) {
             String id = list.getString(i);
-            if (ResourceLocation.isValidResourceLocation(id)) filters.set(i, id);
+            if (ResourceLocation.isValidResourceLocation(id)) {
+                filters.set(i, id);
+            }
         }
         return filters;
     }
@@ -81,23 +88,31 @@ public class BuildersPouchItem extends Item {
 
     public static boolean hasFilters(ItemStack pouch) {
         for (String filter : getFilters(pouch)) {
-            if (!filter.isEmpty()) return true;
+            if (!filter.isEmpty()) {
+                return true;
+            }
         }
         return false;
     }
 
     public static void clearFilters(ItemStack pouch) {
         CompoundTag data = getData(pouch, false);
-        if (data != null) data.remove(FILTERS_KEY);
+        if (data != null) {
+            data.remove(FILTERS_KEY);
+        }
     }
 
     @Nullable
     public static CompoundTag getData(ItemStack pouch, boolean create) {
         CompoundTag root = create ? pouch.getOrCreateTag() : pouch.getTag();
-        if (root == null) return null;
-        if (create) return root.getCompound(DATA_KEY).isEmpty()
-                ? createData(root)
-                : root.getCompound(DATA_KEY);
+        if (root == null) {
+            return null;
+        }
+        if (create) {
+            return root.getCompound(DATA_KEY).isEmpty()
+                    ? createData(root)
+                    : root.getCompound(DATA_KEY);
+        }
         return root.contains(DATA_KEY, 10) ? root.getCompound(DATA_KEY) : null;
     }
 

@@ -23,7 +23,7 @@ public class SmokeColorRegistry {
         POSITION_COLOR_MAP.clear();
     }
 
-    static void cleanupOldEntries() {
+    public static void cleanupOldEntries() {
         long now = System.currentTimeMillis();
         Iterator<Map.Entry<ParticlePositionKey, ColorEntry>> iterator = POSITION_COLOR_MAP.entrySet().iterator();
         while (iterator.hasNext()) {

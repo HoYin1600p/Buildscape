@@ -6,6 +6,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Assigns each recipe spec a unique id of the form {@code buildscape:autogen/<category>/<name>}. A spec with an
+ * explicit id keeps it; an unnamed spec is named after its result and gets a hash suffix on a collision. The two
+ * special recipes get fixed ids.
+ */
 public final class RecipeIdAllocator {
     private final Map<String, RecipeIR.RecipeSpec> assigned = new HashMap<>();
 

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.recipe;
 
 import com.google.gson.JsonObject;
+import com.kingodogo.buildscape.core.NbtKeys;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -18,7 +19,7 @@ public class HazeBushDyeRecipe extends ShapelessRecipe {
     public static final Serializer SERIALIZER = new Serializer();
 
     public HazeBushDyeRecipe(ResourceLocation id, String group, ItemStack result,
-                             NonNullList<Ingredient> ingredients) {
+            NonNullList<Ingredient> ingredients) {
         super(id, group, result, ingredients);
     }
 
@@ -30,11 +31,11 @@ public class HazeBushDyeRecipe extends ShapelessRecipe {
             if (getIngredients().get(0).test(input)) {
                 CompoundTag tag = input.getTag();
                 if (tag != null) {
-                    if (tag.contains("BlockStateTag", Tag.TAG_COMPOUND)) {
-                        result.addTagElement("BlockStateTag", tag.getCompound("BlockStateTag").copy());
+                    if (tag.contains(NbtKeys.BLOCK_STATE_TAG, Tag.TAG_COMPOUND)) {
+                        result.addTagElement("BlockStateTag", tag.getCompound(NbtKeys.BLOCK_STATE_TAG).copy());
                     }
-                    if (tag.contains("HasHaze")) {
-                        result.addTagElement("HasHaze", tag.get("HasHaze").copy());
+                    if (tag.contains(NbtKeys.HAS_HAZE)) {
+                        result.addTagElement("HasHaze", tag.get(NbtKeys.HAS_HAZE).copy());
                     }
                 }
                 break;
@@ -49,7 +50,8 @@ public class HazeBushDyeRecipe extends ShapelessRecipe {
     }
 
     public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>
-            implements RecipeSerializer<HazeBushDyeRecipe> {
+            implements
+                RecipeSerializer<HazeBushDyeRecipe> {
         private final ShapelessRecipe.Serializer delegate = new ShapelessRecipe.Serializer();
 
         private HazeBushDyeRecipe wrap(ShapelessRecipe recipe) {

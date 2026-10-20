@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.recipe.framework.integration;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.mixin.RecipeManagerAccessor;
+import com.kingodogo.buildscape.mixin.accessor.RecipeManagerAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -16,17 +16,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * Adds the pack's recipes to a {@code RecipeManager} after vanilla has loaded its own. Existing ids win over the pack
+ * (so a datapack can override a recipe), disabled ids are skipped, and insertion order is kept so recipe lookups give
+ * the same result every launch.
+ */
 public final class RecipeManagerInjector {
 
-    private RecipeManagerInjector() {
-    }
+    private RecipeManagerInjector() {}
 
+    /**
+     * Merges the recipes into the manager's recipe tables through a mixin accessor. A failure is logged, not thrown.
+     */
     public static void inject(RecipeManager recipeManager, List<Recipe<?>> newRecipes) {
         inject(recipeManager, newRecipes, Set.of());
     }
 
     public static void inject(RecipeManager recipeManager, List<Recipe<?>> newRecipes,
-                              Set<ResourceLocation> disabledIds) {
+            Set<ResourceLocation> disabledIds) {
         if (recipeManager == null || newRecipes == null || newRecipes.isEmpty()) {
             return;
         }
@@ -93,7 +100,9 @@ public final class RecipeManagerInjector {
 
         if (newRecipes != null) {
             for (R recipe : newRecipes) {
-                if (recipe == null) continue;
+                if (recipe == null) {
+                    continue;
+                }
                 K recipeId = id.apply(recipe);
                 if (byName.containsKey(recipeId) || (disabledIds != null && disabledIds.contains(recipeId))) {
                     continue;

@@ -19,8 +19,10 @@ public class StringlightFrameItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(new TranslatableComponent("tooltip.buildscape.stringlight_frame.desc1").withStyle(ChatFormatting.GRAY));
-        tooltip.add(new TranslatableComponent("tooltip.buildscape.stringlight_frame.desc2").withStyle(ChatFormatting.GRAY));
+        tooltip.add(
+                new TranslatableComponent("tooltip.buildscape.stringlight_frame.desc1").withStyle(ChatFormatting.GRAY));
+        tooltip.add(
+                new TranslatableComponent("tooltip.buildscape.stringlight_frame.desc2").withStyle(ChatFormatting.GRAY));
         super.appendHoverText(stack, level, tooltip, flag);
     }
 }

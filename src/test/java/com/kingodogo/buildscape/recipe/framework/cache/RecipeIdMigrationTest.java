@@ -1,13 +1,13 @@
 package com.kingodogo.buildscape.recipe.framework.cache;
 
-import com.kingodogo.buildscape.recipe.RecipeIdMigration;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
+import com.kingodogo.buildscape.core.RecipeIdMigration;
 import com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.BufferedInputStream;
@@ -19,13 +19,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class RecipeIdMigrationTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class RecipeIdMigrationTest extends BootstrappedGameTest {
 
     @Test
     public void everyMigrationTargetExistsInBundledCache() throws Exception {
@@ -35,7 +35,9 @@ public class RecipeIdMigrationTest {
                 resource("recipe_id_migration_405.txt"), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.isBlank() || line.startsWith("#")) continue;
+                if (line.isBlank() || line.startsWith("#")) {
+                    continue;
+                }
                 String[] ids = line.split("\\s+");
                 assertEquals("Expected old and new recipe ids", 2, ids.length);
                 ResourceLocation oldId = new ResourceLocation(ids[0]);

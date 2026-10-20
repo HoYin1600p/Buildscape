@@ -1,27 +1,30 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
+import com.kingodogo.buildscape.testutil.RegistryTestSupport;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.RegistryObject;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import com.kingodogo.buildscape.block.decor.WoolLayersBlock;
 
-public class ToolSpeedTagsTest {
+public class ToolSpeedTagsTest extends BootstrappedGameTest {
+
     @Test
     public void everyRegisteredVariantHasItsMatchingToolTag() throws IOException {
         Set<String> hoe = readTag("minecraft:mineable/hoe");
@@ -72,24 +75,24 @@ public class ToolSpeedTagsTest {
     @Test
     public void carpetLayersUseVanillaCarpetStrengthAndShearsSpeed() throws IOException {
         Set<String> wool = readTag("minecraft:wool");
-        String source = Files.readString(Path.of("src/main/java/com/kingodogo/buildscape/block/ModBlocks.java"));
-        Matcher carpets = Pattern.compile("BLOCKS\\s*\\.\\s*register\\(\\s*\"([a-z_]+_carpet_layers)\""
-                + ",\\s*\\(\\) -> new WoolLayersBlock\\((.*?)\\.strength\\(([^)]+)\\)", Pattern.DOTALL).matcher(source);
         int count = 0;
-        while (carpets.find()) {
-            assertEquals(carpets.group(1), "0.1f", carpets.group(3));
-            assertFalse(carpets.group(1), wool.contains("buildscape:" + carpets.group(1)));
+        for (String name : registeredNames()) {
+            if (!name.matches("[a-z_]+_carpet_layers")) {
+                continue;
+            }
+            Block block = RegistryTestSupport.create(BlocksRegister.blocks(), name);
+            assertTrue(name, block instanceof WoolLayersBlock);
+            assertEquals(name, 0.1f, block.defaultDestroyTime(), 0.0f);
+            assertFalse(name, wool.contains("buildscape:" + name));
             count++;
         }
         assertEquals(16, count);
     }
 
-    private static Set<String> registeredNames() throws IOException {
-        String source = Files.readString(Path.of("src/main/java/com/kingodogo/buildscape/block/ModBlocks.java"));
-        Matcher matcher = Pattern.compile("BLOCKS\\s*\\.\\s*register\\(\\s*\"([a-z0-9_]+)\"").matcher(source);
+    private static Set<String> registeredNames() {
         Set<String> names = new HashSet<>();
-        while (matcher.find()) {
-            names.add(matcher.group(1));
+        for (RegistryObject<Block> entry : BlocksRegister.blocks().getEntries()) {
+            names.add(entry.getId().getPath());
         }
         return names;
     }

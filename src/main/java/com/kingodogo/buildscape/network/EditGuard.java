@@ -1,8 +1,9 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.ConfigSetting;
-import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import com.kingodogo.buildscape.world.ModGameRules;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextComponent;
@@ -15,8 +16,7 @@ import net.minecraftforge.network.PacketDistributor;
  * config screen applies, and a refused sender is told why and given the server's current state again.
  */
 public final class EditGuard {
-    private EditGuard() {
-    }
+    private EditGuard() {}
 
     public static int permissionLevel(ServerPlayer player) {
         return ConfigSetting.permissionLevel(player.hasPermissions(2),
@@ -29,10 +29,13 @@ public final class EditGuard {
 
     /** True when the sender may perform the operation; otherwise refuses it and resyncs the sender. */
     public static boolean require(ServerPlayer player, ConfigSetting setting) {
-        if (allows(player, setting)) return true;
+        if (allows(player, setting)) {
+            return true;
+        }
         player.displayClientMessage(new TextComponent(refusalText(setting)).withStyle(ChatFormatting.RED), false);
         resync(player, setting);
-        refuse(player, setting == ConfigSetting.POLICY ? EditRefusedPacket.Reason.POLICY_LEVEL
+        refuse(player, setting == ConfigSetting.POLICY
+                ? EditRefusedPacket.Reason.POLICY_LEVEL
                 : EditRefusedPacket.Reason.LOCKED, setting);
         return false;
     }
@@ -44,8 +47,12 @@ public final class EditGuard {
 
     /** The screen feedback for a refusal text returned by the config upload. */
     static EditRefusedPacket.Reason reasonFor(String refusalText) {
-        if (refusalText.contains("read-only")) return EditRefusedPacket.Reason.READ_ONLY;
-        if (refusalText.contains("locked")) return EditRefusedPacket.Reason.LOCKED;
+        if (refusalText.contains("read-only")) {
+            return EditRefusedPacket.Reason.READ_ONLY;
+        }
+        if (refusalText.contains("locked")) {
+            return EditRefusedPacket.Reason.LOCKED;
+        }
         return EditRefusedPacket.Reason.INVALID;
     }
 
@@ -70,10 +77,12 @@ public final class EditGuard {
                         rules.getBoolean(ModGameRules.IS_WATER_BOTTLE_STACK)));
             } else if (setting == ConfigSetting.PILLAR_EDIT || setting == ConfigSetting.PILLAR_BULK) {
                 PillarIdManager manager = PillarIdManager.get();
-                if (manager.hasLoaded()) SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());
+                if (manager.hasLoaded()) {
+                    SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());
+                }
             }
         } catch (RuntimeException e) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Unable to resync {} after a refused edit", player.getGameProfile().getName(), e);
+            BuildScape.LOGGER.warn("Unable to resync {} after a refused edit", player.getGameProfile().getName(), e);
         }
     }
 }

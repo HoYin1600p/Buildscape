@@ -1,16 +1,30 @@
 package com.kingodogo.buildscape.client;
 
-import com.kingodogo.buildscape.block.LeafHedgeBlock;
-import com.kingodogo.buildscape.block.PillarBlockEntity;
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.block.base.CustomSoundType;
+import com.kingodogo.buildscape.block.plant.LeafHedgeBlock;
+import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
+import com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer;
+import com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleEvents;
+import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
+import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
+import com.kingodogo.buildscape.client.particle.TintedDripParticle;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -19,11 +33,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(
-        modid = com.kingodogo.buildscape.BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEvents {
 
     private static boolean wasPressed = false;
@@ -42,24 +52,23 @@ public class ClientEvents {
 
     public static void resetAllPillarParticles() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) {
+            return;
+        }
 
-        net.minecraft.core.BlockPos playerPos = mc.player.blockPosition();
+        BlockPos playerPos = mc.player.blockPosition();
         int chunkX = playerPos.getX() >> 4;
         int chunkZ = playerPos.getZ() >> 4;
 
         for (int x = -8; x <= 8; x++) {
             for (int z = -8; z <= 8; z++) {
-                net.minecraft.world.level.chunk.LevelChunk chunk = mc.level.getChunk(
+                LevelChunk chunk = mc.level.getChunk(
                         chunkX + x,
-                        chunkZ + z
-                );
+                        chunkZ + z);
                 if (chunk != null) {
                     for (BlockEntity be : chunk.getBlockEntities().values()) {
-                        if (
-                                be instanceof PillarBlockEntity pillarBE &&
-                                        pillarBE.hasDisplayItem()
-                        ) {
+                        if (be instanceof PillarBlockEntity pillarBE &&
+                                pillarBE.hasDisplayItem()) {
                             pillarBE.resetParticleTick(true);
                         }
                     }
@@ -81,7 +90,9 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
-        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
+        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) {
+            return;
+        }
 
         int screenWidth = event.getWindow().getGuiScaledWidth();
         int screenHeight = event.getWindow().getGuiScaledHeight();
@@ -89,7 +100,7 @@ public class ClientEvents {
         renderOverlay(event.getMatrixStack(), screenWidth, screenHeight);
     }
 
-    public static void renderOverlay(com.mojang.blaze3d.vertex.PoseStack poseStack, int screenWidth, int screenHeight) {
+    public static void renderOverlay(PoseStack poseStack, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
 
         if (overlayMessage != null) {
@@ -120,16 +131,15 @@ public class ClientEvents {
             poseStack.scale(scale, scale, 1.0f);
             poseStack.translate(-x, -y, 0);
 
-            com.mojang.blaze3d.systems.RenderSystem.disableDepthTest();
+            RenderSystem.disableDepthTest();
             GuiComponent.drawCenteredString(
                     poseStack,
                     mc.font,
                     overlayMessage,
                     x,
                     y,
-                    0xFFFF5555
-            );
-            com.mojang.blaze3d.systems.RenderSystem.enableDepthTest();
+                    0xFFFF5555);
+            RenderSystem.enableDepthTest();
 
             poseStack.popPose();
         }
@@ -141,19 +151,16 @@ public class ClientEvents {
             return;
         }
 
-
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) {
             return;
         }
 
-
-        net.minecraft.world.entity.player.Player player = mc.player;
+        Player player = mc.player;
         if (player.isOnGround()) {
             BlockPos playerBlockPos = player.blockPosition();
             BlockPos blockBelowPlayer = playerBlockPos.below();
             BlockState blockBelow = mc.level.getBlockState(blockBelowPlayer);
-
 
             if (blockBelow.getBlock() instanceof LeafHedgeBlock) {
                 double playerY = player.getY();
@@ -163,19 +170,15 @@ public class ClientEvents {
                     float stepInterval = 2.0f;
                     int currentStep = (int) (player.walkDist / stepInterval);
 
-                    if (
-                            currentStep != lastHedgeStep && player.walkDist > player.walkDistO
-                    ) {
+                    if (currentStep != lastHedgeStep && player.walkDist > player.walkDistO) {
                         lastHedgeStep = currentStep;
 
                         SoundType sounds = blockBelow.getSoundType();
-                        net.minecraft.sounds.SoundEvent stepSound = sounds.getStepSound();
+                        SoundEvent stepSound = sounds.getStepSound();
                         float volume = 0.15f;
                         float pitch = 1.0f;
 
-                        if (
-                                sounds instanceof com.kingodogo.buildscape.block.CustomSoundType customSounds
-                        ) {
+                        if (sounds instanceof CustomSoundType customSounds) {
                             volume = customSounds.getStepVolume();
                             pitch = customSounds.getStepPitch();
                         }
@@ -188,8 +191,7 @@ public class ClientEvents {
                                 SoundSource.BLOCKS,
                                 volume,
                                 pitch,
-                                false
-                        );
+                                false);
                     }
                 }
             } else {
@@ -202,8 +204,7 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onClientDisconnect(
-            ClientPlayerNetworkEvent.LoggedOutEvent event
-    ) {
+            ClientPlayerNetworkEvent.LoggedOutEvent event) {
         overlayMessage = null;
         overlayMessageTime = 0;
         wasPressed = false;
@@ -211,10 +212,10 @@ public class ClientEvents {
 
         wasZoomKeyPressed = false;
 
-        com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
-        com.kingodogo.buildscape.config.PillarIdManager.resetClientCache();
-        com.kingodogo.buildscape.network.SyncPillarIdsPacket.clearClientState();
-        com.kingodogo.buildscape.client.MuffBlockManager.clear();
+        PillarParticleConfig.clearServerConfig();
+        PillarIdManager.resetClientCache();
+        SyncPillarIdsPacket.clearClientState();
+        MuffBlockManager.clear();
     }
 
     @SubscribeEvent
@@ -229,15 +230,14 @@ public class ClientEvents {
         lastHedgeStep = -1;
 
         try {
-            com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer.clearEntityCache();
-            com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer.clearAllCaches();
-            com.kingodogo.buildscape.particle.TintedDripParticle.clearColorCache();
-            com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearCaches();
-            com.kingodogo.buildscape.client.MuffBlockManager.clear();
+            PillarBlockEntityRenderer.clearEntityCache();
+            ArmorPillarRenderer.clearAllCaches();
+            TintedDripParticle.clearColorCache();
+            ItemFrameParticleEvents.clearCaches();
+            MuffBlockManager.clear();
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error clearing caches on world unload: " + e.getMessage()
-            );
+            // cache clearers touch several renderer caches; one failure must not block the world unload
+            BuildScape.LOGGER.error("Error clearing caches on world unload", e);
         }
     }
 }

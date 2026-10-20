@@ -5,14 +5,12 @@ import com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator;
 import com.kingodogo.buildscape.recipe.framework.compiler.TemplateEngine;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter;
-import net.minecraft.SharedConstants;
-import net.minecraft.server.Bootstrap;
+import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraftforge.network.NetworkEvent;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,20 +23,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class RecipeCacheRegressionTest {
+    /** Kept for the config screen tests; the implementation lives in {@link RegistryTestSupport}. */
     @BeforeClass
     public static void bootstrap() {
-        // Plain JUnit does not run Forge's event transformer. Seed listener lists through
-        // event instances so bootstrap never asks for injected no-argument constructors.
-        new NetworkEvent(() -> null).getListenerList();
-        new NetworkEvent.GatherLoginPayloadsEvent(new ArrayList<>(), false).getListenerList();
-        SharedConstants.tryDetectVersion();
-        Bootstrap.bootStrap();
+        RegistryTestSupport.bootstrap();
     }
 
     @Test
@@ -154,8 +152,10 @@ public class RecipeCacheRegressionTest {
                     writeRecord(out, 3, 2, 6);
                 }
                 try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
-                    assertNull(BinaryRecipeCache.readRecipe(in, pool, ingredients, items, new ResourceLocation[pool.length]));
-                    assertNotNull(BinaryRecipeCache.readRecipe(in, pool, ingredients, items, new ResourceLocation[pool.length]));
+                    assertNull(BinaryRecipeCache.readRecipe(in, pool, ingredients, items,
+                            new ResourceLocation[pool.length]));
+                    assertNotNull(BinaryRecipeCache.readRecipe(in, pool, ingredients, items,
+                            new ResourceLocation[pool.length]));
                     assertEquals(0, in.available());
                 }
             }
@@ -189,7 +189,8 @@ public class RecipeCacheRegressionTest {
                 new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(
                         new ResourceLocation("buildscape:autogen/special/clear_shulker_filters")));
         byte[] cache = BinaryRecipeCache.serializeCache("dynamic-specials", cold);
-        List<Recipe<?>> warm = BinaryRecipeCache.loadCacheFromStream(new ByteArrayInputStream(cache), "dynamic-specials");
+        List<Recipe<?>> warm = BinaryRecipeCache.loadCacheFromStream(new ByteArrayInputStream(cache),
+                "dynamic-specials");
         assertEquals(cold.stream().map(Recipe::getId).toList(), warm.stream().map(Recipe::getId).toList());
         assertEquals(cold.stream().map(Object::getClass).toList(), warm.stream().map(Object::getClass).toList());
     }
@@ -200,20 +201,25 @@ public class RecipeCacheRegressionTest {
         java.lang.reflect.Method dissolve = serializer.getDeclaredMethod("dissolvePattern", String[].class,
                 Map.class, int.class, int.class);
         dissolve.setAccessible(true);
-        java.lang.reflect.InvocationTargetException undefined = assertThrows(java.lang.reflect.InvocationTargetException.class,
+        java.lang.reflect.InvocationTargetException undefined = assertThrows(
+                java.lang.reflect.InvocationTargetException.class,
                 () -> dissolve.invoke(null, new String[]{"AB"}, Map.of('A', Ingredient.of(Items.STONE)), 2, 1));
         assertTrue(undefined.getCause() instanceof com.google.gson.JsonParseException);
-        java.lang.reflect.Method pattern = serializer.getDeclaredMethod("deserializePattern", com.google.gson.JsonArray.class);
+        java.lang.reflect.Method pattern = serializer.getDeclaredMethod("deserializePattern",
+                com.google.gson.JsonArray.class);
         pattern.setAccessible(true);
         for (String source : List.of("[]", "[\"AAAA\"]", "[\"AA\",\"A\"]", "[\"A\",\"A\",\"A\",\"A\"]")) {
-            java.lang.reflect.InvocationTargetException dimensions = assertThrows(java.lang.reflect.InvocationTargetException.class,
+            java.lang.reflect.InvocationTargetException dimensions = assertThrows(
+                    java.lang.reflect.InvocationTargetException.class,
                     () -> pattern.invoke(null, com.google.gson.JsonParser.parseString(source).getAsJsonArray()));
             assertTrue(dimensions.getCause() instanceof com.google.gson.JsonParseException);
         }
     }
 
     private static void writeRecord(DataOutputStream out, int type, int result, int ingredient) throws Exception {
-        for (int value : new int[]{0, 1, result, 1, 1}) out.writeInt(value);
+        for (int value : new int[]{0, 1, result, 1, 1}) {
+            out.writeInt(value);
+        }
         out.writeByte(type);
         if (type == 1 || type == 9) {
             out.writeInt(1);
@@ -223,7 +229,9 @@ public class RecipeCacheRegressionTest {
             out.writeInt(1);
         }
         out.writeInt(ingredient);
-        if (type == 8) out.writeInt(6);
+        if (type == 8) {
+            out.writeInt(6);
+        }
         if (type >= 4 && type <= 7) {
             out.writeFloat(0.1f);
             out.writeInt(200);

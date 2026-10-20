@@ -1,23 +1,36 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.config.PillarIdManager;
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client transfer of the pillar registry, cut into chunks of 64 pillars that share a sync id.
+ * The client collects the chunks per sync id, ignores older syncs, discards a sync that is inconsistent, too large or
+ * older than 30 seconds, and replaces its pillar list only once every chunk of the newest sync has arrived.
+ */
 public class SyncPillarIdsPacket {
 
     private static final int PILLARS_PER_CHUNK = 64;
@@ -37,7 +50,7 @@ public class SyncPillarIdsPacket {
     private final int encodedSize;
 
     private SyncPillarIdsPacket(long syncId, int chunkIndex, int chunkCount,
-                                Collection<PillarIdManager.PillarData> pillarDataList) {
+            Collection<PillarIdManager.PillarData> pillarDataList) {
         this.syncId = syncId;
         this.chunkIndex = chunkIndex;
         this.chunkCount = chunkCount;
@@ -82,12 +95,18 @@ public class SyncPillarIdsPacket {
         ctx.get().setPacketHandled(true);
     }
 
+    /**
+     * Chunks the list and sends it to every connected player. Sends nothing when the list is over the 65,536 entry limit.
+     */
     public static void sendToAll(List<PillarIdManager.PillarData> data) {
         for (SyncPillarIdsPacket packet : createChunks(data)) {
             ModMessages.INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
         }
     }
 
+    /**
+     * Chunks the list and sends it to one player, skipping a disconnected one.
+     */
     public static void sendToPlayer(ServerPlayer player, List<PillarIdManager.PillarData> data) {
         if (player == null || player.hasDisconnected()) {
             return;
@@ -97,6 +116,9 @@ public class SyncPillarIdsPacket {
         }
     }
 
+    /**
+     * Client side: forgets partly received syncs, for example when leaving a world.
+     */
     public static void clearClientState() {
         synchronized (CLIENT_ACCUMULATORS) {
             CLIENT_ACCUMULATORS.clear();
@@ -118,10 +140,10 @@ public class SyncPillarIdsPacket {
             }
         }
         if (skipped > 0) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Skipped {} invalid pillar sync entries", skipped);
+            BuildScape.LOGGER.warn("Skipped {} invalid pillar sync entries", skipped);
         }
         if (snapshot.size() > MAX_BUFFERED_ENTRIES) {
-            com.kingodogo.buildscape.BuildScape.LOGGER.warn("Pillar sync exceeds the {} entry limit", MAX_BUFFERED_ENTRIES);
+            BuildScape.LOGGER.warn("Pillar sync exceeds the {} entry limit", MAX_BUFFERED_ENTRIES);
             return List.of();
         }
         int chunkCount = (int) Math.max(1L, (snapshot.size() + (long) PILLARS_PER_CHUNK - 1) / PILLARS_PER_CHUNK);
@@ -174,28 +196,24 @@ public class SyncPillarIdsPacket {
             return;
         }
 
-        PillarIdManager.getClient().replaceFromServerSync(complete);
-        try {
-            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.onPillarsSynced();
-        } catch (Throwable ignored) {}
+        ClientPacketHandlers.replacePillarsFromServer(complete);
     }
 
     private static void expireClientState() {
         long now = System.currentTimeMillis();
         synchronized (CLIENT_ACCUMULATORS) {
-            if (CLIENT_ACCUMULATORS.entrySet().removeIf(entry ->
-                    now - entry.getValue().createdAt > ACCUMULATOR_TIMEOUT_MS)) {
+            if (CLIENT_ACCUMULATORS.entrySet()
+                    .removeIf(entry -> now - entry.getValue().createdAt > ACCUMULATOR_TIMEOUT_MS)) {
                 clientSyncDiscarded = true;
             }
         }
     }
 
-    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(
-            modid = com.kingodogo.buildscape.BuildScape.MODID, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
     public static final class ClientEvents {
-        @net.minecraftforge.eventbus.api.SubscribeEvent
-        public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event) {
-            if (event.phase == net.minecraftforge.event.TickEvent.Phase.END) {
+        @SubscribeEvent
+        public static void onClientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase == TickEvent.Phase.END) {
                 expireClientState();
             }
         }
@@ -204,7 +222,8 @@ public class SyncPillarIdsPacket {
     private static PillarIdManager.PillarData readPillarData(FriendlyByteBuf buf) {
         PillarIdManager.PillarData data = new PillarIdManager.PillarData();
         data.id = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
-        data.dimension = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "pillar dimension");
+        data.dimension = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                "pillar dimension");
         data.x = buf.readInt();
         data.y = buf.readInt();
         data.z = buf.readInt();
@@ -232,11 +251,12 @@ public class SyncPillarIdsPacket {
     }
 
     public static boolean canEncode(PillarIdManager.PillarData data) {
-        io.netty.buffer.ByteBuf scratch = io.netty.buffer.Unpooled.buffer();
+        ByteBuf scratch = Unpooled.buffer();
         try {
             writePillarData(new FriendlyByteBuf(scratch), data);
             return true;
         } catch (RuntimeException e) {
+            // any write failure means the data cannot be encoded
             return false;
         } finally {
             scratch.release();
@@ -248,14 +268,15 @@ public class SyncPillarIdsPacket {
             throw new EncoderException("pillar data is incomplete");
         }
         NetworkPacketLimits.writeUtf(buf, data.id, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
-        NetworkPacketLimits.writeUtf(buf, data.dimension, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "pillar dimension");
+        NetworkPacketLimits.writeUtf(buf, data.dimension, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                "pillar dimension");
         buf.writeInt(data.x);
         buf.writeInt(data.y);
         buf.writeInt(data.z);
         buf.writeLong(data.createdTime);
         buf.writeLong(data.modifiedTime);
 
-        List<String> colors = data.dyeColors != null ? data.dyeColors : java.util.Collections.emptyList();
+        List<String> colors = data.dyeColors != null ? data.dyeColors : Collections.emptyList();
         NetworkPacketLimits.checkCount(colors.size(), NetworkPacketLimits.MAX_DYE_COLORS, "pillar color");
         buf.writeInt(colors.size());
         for (String color : colors) {

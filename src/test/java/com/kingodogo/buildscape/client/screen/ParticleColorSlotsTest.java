@@ -1,16 +1,15 @@
 package com.kingodogo.buildscape.client.screen;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public final class ParticleColorSlotsTest {
-    private static int checks;
 
-    private ParticleColorSlotsTest() {
-    }
-
-    public static void main(String[] args) {
+    @Test
+    public void colorSlotsHaveSafeDefaults() {
         List<String> sixColors = new ArrayList<>(Arrays.asList(
                 "#111111", "#222222", "#333333", "#444444", "#555555", "#666666"));
         check("#666666".equals(ParticleColorSlots.colorAt(sixColors, 5)), "existing color remains intact");
@@ -28,14 +27,11 @@ public final class ParticleColorSlotsTest {
         check("#666666".equals(sixColors.get(5)), "materializing a slot preserves earlier colors");
         ParticleColorSlots.ensureCapacity(sixColors, 7);
         check(sixColors.size() == 7, "materializing a slot is idempotent");
-
-        System.out.println("Particle color slot tests passed: " + checks + " checks");
     }
 
     private static void check(boolean result, String description) {
         if (!result) {
             throw new AssertionError(description);
         }
-        checks++;
     }
 }

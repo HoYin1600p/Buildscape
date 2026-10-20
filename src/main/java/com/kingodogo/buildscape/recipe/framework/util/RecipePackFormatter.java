@@ -1,13 +1,13 @@
 package com.kingodogo.buildscape.recipe.framework.util;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import com.kingodogo.buildscape.core.io.Json;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -23,16 +23,15 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 // Formats BDRE recipe JSON files into compact format single-line recipe entries.
+/**
+ * Development tool that rewrites recipe pack JSON into the compact one-line-per-recipe layout and checks files for
+ * duplicate JSON members. It runs from Gradle tasks, not at game runtime.
+ */
 public class RecipePackFormatter {
 
-    private static final Gson PRETTY_GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .create();
+    private static final Gson PRETTY_GSON = Json.PRETTY_NO_HTML_ESCAPING;
 
-    private static final Gson COMPACT_GSON = new GsonBuilder()
-            .disableHtmlEscaping()
-            .create();
+    private static final Gson COMPACT_GSON = Json.COMPACT_NO_HTML_ESCAPING;
 
     private static final Set<String> PRETTY_TOP_LEVEL_KEYS = Set.of(
             "_comment",
@@ -40,8 +39,7 @@ public class RecipePackFormatter {
             "wood_families",
             "stone_families",
             "templates",
-            "families"
-    );
+            "families");
 
     public static String format(String jsonString) {
         validateJson(jsonString);
@@ -66,9 +64,13 @@ public class RecipePackFormatter {
                 String[] lines = prettyVal.split("\r?\n");
                 StringBuilder indented = new StringBuilder();
                 for (int l = 0; l < lines.length; l++) {
-                    if (l > 0) indented.append("  ");
+                    if (l > 0) {
+                        indented.append("  ");
+                    }
                     indented.append(lines[l]);
-                    if (l < lines.length - 1) indented.append("\n");
+                    if (l < lines.length - 1) {
+                        indented.append("\n");
+                    }
                 }
                 sb.append("  \"").append(key).append("\": ").append(indented).append(comma).append("\n");
             } else if (val.isJsonArray()) {
@@ -92,6 +94,9 @@ public class RecipePackFormatter {
     }
 
     // Validate before Gson constructs objects and overwrites duplicate members.
+    /**
+     * Throws if the text has a duplicate object member, which the JSON parser would otherwise silently overwrite.
+     */
     public static void validateJson(String content) {
         try (JsonReader reader = new JsonReader(new StringReader(content))) {
             reader.setLenient(false);
@@ -120,7 +125,9 @@ public class RecipePackFormatter {
             }
             case BEGIN_ARRAY -> {
                 reader.beginArray();
-                while (reader.hasNext()) validateValue(reader);
+                while (reader.hasNext()) {
+                    validateValue(reader);
+                }
                 reader.endArray();
             }
             case STRING, NUMBER, BOOLEAN, NULL -> reader.skipValue();
@@ -142,7 +149,8 @@ public class RecipePackFormatter {
         String content = Files.readString(path, StandardCharsets.UTF_8);
         String formatted = format(content);
         if (!content.equals(formatted)) {
-            Files.writeString(path, formatted, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(path, formatted, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
             return true;
         }
         return false;
@@ -160,6 +168,7 @@ public class RecipePackFormatter {
                             boolean changed = formatFile(p);
                             System.out.println((changed ? "Formatted: " : "Unchanged: ") + p.toAbsolutePath());
                         } catch (Exception e) {
+                            // wrap any failure with the file name
                             throw new IllegalStateException("Failed to format " + p + ": " + e.getMessage(), e);
                         }
                     });

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.performance;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.BlocksRegister;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -17,13 +17,12 @@ public final class BuildscapeBlockStateCacheCoordinator {
     private static volatile Set<Block> buildscapeBlocks = Set.of();
     private static volatile boolean collecting;
 
-    private BuildscapeBlockStateCacheCoordinator() {
-    }
+    private BuildscapeBlockStateCacheCoordinator() {}
 
     public static synchronized void begin() {
         PENDING_STATES.clear();
         Set<Block> blocks = Collections.newSetFromMap(new IdentityHashMap<>());
-        ModBlocks.BLOCKS.getEntries().stream()
+        BlocksRegister.blocks().getEntries().stream()
                 .filter(entry -> entry.isPresent())
                 .forEach(entry -> blocks.add(entry.get()));
         buildscapeBlocks = blocks;
@@ -65,14 +64,14 @@ public final class BuildscapeBlockStateCacheCoordinator {
                 try {
                     state.initCache();
                 } catch (RuntimeException exception) {
+                    // retried on the calling thread below, where a real failure surfaces
                     retrySequentially.add(state);
                 }
             });
         } catch (RuntimeException exception) {
             BuildScape.LOGGER.warn(
                     "Buildscape parallel block-state cache setup failed; retrying sequentially",
-                    exception
-            );
+                    exception);
             retrySequentially.clear();
             retrySequentially.addAll(states);
         }
@@ -86,7 +85,6 @@ public final class BuildscapeBlockStateCacheCoordinator {
                 "Buildscape startup initialized {} block-state caches in parallel ({} ms, {} sequential retries)",
                 states.size(),
                 elapsedMillis,
-                retrySequentially.size()
-        );
+                retrySequentially.size());
     }
 }

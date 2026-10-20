@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.entity;
 
+import com.kingodogo.buildscape.registry.ModEntities;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.Entity;
@@ -21,16 +22,13 @@ public class SeatEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-    }
+    protected void defineSynchedData() {}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-    }
+    protected void readAdditionalSaveData(CompoundTag tag) {}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-    }
+    protected void addAdditionalSaveData(CompoundTag tag) {}
 
     @Override
     public void tick() {

@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.registry.items.MasonryItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;
@@ -24,11 +24,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class InvisibleFrameOverlayRenderer {
 
     private static final double SEARCH_RANGE = 16.0;
@@ -52,9 +48,9 @@ public class InvisibleFrameOverlayRenderer {
 
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
-        boolean holdingInvisibleFrame =
-                (!mainHand.isEmpty() && mainHand.getItem() == ModItems.INVISIBLE_ITEM_FRAME.get()) ||
-                        (!offHand.isEmpty() && offHand.getItem() == ModItems.INVISIBLE_ITEM_FRAME.get());
+        boolean holdingInvisibleFrame = (!mainHand.isEmpty()
+                && mainHand.getItem() == MasonryItems.INVISIBLE_ITEM_FRAME.get()) ||
+                (!offHand.isEmpty() && offHand.getItem() == MasonryItems.INVISIBLE_ITEM_FRAME.get());
 
         if (!holdingInvisibleFrame) {
             return;
@@ -62,11 +58,9 @@ public class InvisibleFrameOverlayRenderer {
 
         AABB searchBox = player.getBoundingBox().inflate(SEARCH_RANGE);
         List<ItemFrame> vanillaFrames = mc.level.getEntitiesOfClass(
-                ItemFrame.class, searchBox, Entity::isInvisible
-        );
+                ItemFrame.class, searchBox, Entity::isInvisible);
         List<ColoredItemFrameEntity> moddedFrames = mc.level.getEntitiesOfClass(
-                ColoredItemFrameEntity.class, searchBox, Entity::isInvisible
-        );
+                ColoredItemFrameEntity.class, searchBox, Entity::isInvisible);
 
         if (vanillaFrames.isEmpty() && moddedFrames.isEmpty()) {
             return;
@@ -88,10 +82,12 @@ public class InvisibleFrameOverlayRenderer {
 
         VertexConsumer fillBuffer = bufferSource.getBuffer(RenderType.lightning());
         for (ItemFrame frame : vanillaFrames) {
-            renderFilledBox(poseStack, fillBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, fillAlpha);
+            renderFilledBox(poseStack, fillBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b,
+                    fillAlpha);
         }
         for (ColoredItemFrameEntity frame : moddedFrames) {
-            renderFilledBox(poseStack, fillBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, fillAlpha);
+            renderFilledBox(poseStack, fillBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b,
+                    fillAlpha);
         }
 
         VertexConsumer lineBuffer = bufferSource.getBuffer(RenderType.lines());
@@ -107,8 +103,8 @@ public class InvisibleFrameOverlayRenderer {
     }
 
     private static void renderFilledBox(PoseStack poseStack, VertexConsumer buffer,
-                                        Vec3 cameraPos, AABB bb,
-                                        int r, int g, int b, float alpha) {
+            Vec3 cameraPos, AABB bb,
+            int r, int g, int b, float alpha) {
         float minX = (float) (bb.minX - cameraPos.x);
         float minY = (float) (bb.minY - cameraPos.y);
         float minZ = (float) (bb.minZ - cameraPos.z);
@@ -151,8 +147,8 @@ public class InvisibleFrameOverlayRenderer {
     }
 
     private static void renderOutline(PoseStack poseStack, VertexConsumer buffer,
-                                      Vec3 cameraPos, AABB bb,
-                                      int r, int g, int b, float alpha) {
+            Vec3 cameraPos, AABB bb,
+            int r, int g, int b, float alpha) {
         float minX = (float) (bb.minX - cameraPos.x);
         float minY = (float) (bb.minY - cameraPos.y);
         float minZ = (float) (bb.minZ - cameraPos.z);
@@ -182,9 +178,9 @@ public class InvisibleFrameOverlayRenderer {
     }
 
     private static void drawLine(VertexConsumer buffer, Matrix4f pose, Matrix3f normal,
-                                 float x1, float y1, float z1,
-                                 float x2, float y2, float z2,
-                                 int r, int g, int b, int a) {
+            float x1, float y1, float z1,
+            float x2, float y2, float z2,
+            int r, int g, int b, int a) {
         buffer.vertex(pose, x1, y1, z1)
                 .color(r, g, b, a)
                 .normal(normal, 0, 1, 0)

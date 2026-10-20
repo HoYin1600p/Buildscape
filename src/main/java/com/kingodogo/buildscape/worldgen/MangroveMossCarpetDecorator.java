@@ -1,7 +1,14 @@
 package com.kingodogo.buildscape.worldgen;
 
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import com.kingodogo.buildscape.registry.blocks.StoneBlocks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelSimulatedReader;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
 
 import java.util.HashSet;
 import java.util.List;
@@ -9,25 +16,14 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelSimulatedReader;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
-import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
-
 public class MangroveMossCarpetDecorator extends TreeDecorator {
 
-    public static final Codec<MangroveMossCarpetDecorator> CODEC =
-            RecordCodecBuilder.create(instance ->
-                    instance
-                            .group(
-                                    Codec.floatRange(0.0F, 1.0F)
-                                            .fieldOf("probability")
-                                            .forGetter(decorator -> decorator.probability)
-                            )
-                            .apply(instance, MangroveMossCarpetDecorator::new)
-            );
+    public static final Codec<MangroveMossCarpetDecorator> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(
+                    Codec.floatRange(0.0F, 1.0F)
+                            .fieldOf("probability")
+                            .forGetter(decorator -> decorator.probability))
+            .apply(instance, MangroveMossCarpetDecorator::new));
 
     private final float probability;
 
@@ -46,8 +42,7 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
             BiConsumer<BlockPos, BlockState> blockSetter,
             Random random,
             List<BlockPos> logPositions,
-            List<BlockPos> leavesPositions
-    ) {
+            List<BlockPos> leavesPositions) {
         if (logPositions.isEmpty()) {
             return;
         }
@@ -70,14 +65,10 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
 
                     boolean isRoot = level.isStateAtPosition(
                             checkPos,
-                            state ->
+                            state -> state.is(
+                                    DecorBlocks.MANGROVE_ROOTS.get()) ||
                                     state.is(
-                                            com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get()
-                                    ) ||
-                                            state.is(
-                                                    com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get()
-                                            )
-                    );
+                                            DecorBlocks.MUDDY_MANGROVE_ROOTS.get()));
 
                     if (isRoot) {
                         BlockPos abovePos = checkPos.above();
@@ -86,9 +77,8 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
                             if (level.isStateAtPosition(abovePos, state -> state.isAir())) {
                                 blockSetter.accept(
                                         abovePos,
-                                        com.kingodogo.buildscape.block.ModBlocks.MOSS_OVERLAY.get()
-                                                .defaultBlockState()
-                                );
+                                        StoneBlocks.MOSS_OVERLAY.get()
+                                                .defaultBlockState());
                             }
                         }
                     }

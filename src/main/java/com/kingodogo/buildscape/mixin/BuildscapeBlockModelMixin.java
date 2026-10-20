@@ -31,8 +31,7 @@ public abstract class BuildscapeBlockModelMixin {
     private void buildscape$getCachedMaterials(
             Function<ResourceLocation, UnbakedModel> modelGetter,
             Set<Pair<String, String>> missingTextureErrors,
-            CallbackInfoReturnable<Collection<Material>> callback
-    ) {
+            CallbackInfoReturnable<Collection<Material>> callback) {
         Collection<Material> materials = buildscape$materials;
         if (materials != null && buildscape$canCacheMaterials()) {
             callback.setReturnValue(materials);
@@ -43,8 +42,7 @@ public abstract class BuildscapeBlockModelMixin {
     private void buildscape$cacheMaterials(
             Function<ResourceLocation, UnbakedModel> modelGetter,
             Set<Pair<String, String>> missingTextureErrors,
-            CallbackInfoReturnable<Collection<Material>> callback
-    ) {
+            CallbackInfoReturnable<Collection<Material>> callback) {
         if (buildscape$materials == null && buildscape$canCacheMaterials()) {
             buildscape$materials = List.copyOf(callback.getReturnValue());
         }

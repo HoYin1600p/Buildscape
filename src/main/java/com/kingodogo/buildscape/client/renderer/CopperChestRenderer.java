@@ -1,13 +1,15 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.CopperChestBlockEntity;
+import com.kingodogo.buildscape.feature.copper.CopperChestBlockEntity;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
@@ -24,8 +26,7 @@ public class CopperChestRenderer extends ChestRenderer<CopperChestBlockEntity> {
             texture("weathered_copper_chest_right"),
             texture("oxidized_copper_chest"),
             texture("oxidized_copper_chest_left"),
-            texture("oxidized_copper_chest_right")
-    );
+            texture("oxidized_copper_chest_right"));
 
     private static final Material SINGLE = material(0);
     private static final Material LEFT = material(1);
@@ -63,8 +64,8 @@ public class CopperChestRenderer extends ChestRenderer<CopperChestBlockEntity> {
 
     @Override
     protected Material getMaterial(CopperChestBlockEntity blockEntity, ChestType chestType) {
-        net.minecraft.world.level.block.Block block = blockEntity.getBlockState().getBlock();
-        ResourceLocation blockId = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
+        Block block = blockEntity.getBlockState().getBlock();
+        ResourceLocation blockId = ForgeRegistries.BLOCKS.getKey(block);
         String path = blockId == null ? "" : blockId.getPath();
 
         if (path.contains("oxidized")) {
@@ -79,13 +80,10 @@ public class CopperChestRenderer extends ChestRenderer<CopperChestBlockEntity> {
     }
 
     private Material chooseMaterial(ChestType chestType, Material single, Material left, Material right) {
-        switch (chestType) {
-            case LEFT:
-                return left;
-            case RIGHT:
-                return right;
-            default:
-                return single;
-        }
+        return switch (chestType) {
+            case LEFT -> left;
+            case RIGHT -> right;
+            default -> single;
+        };
     }
 }

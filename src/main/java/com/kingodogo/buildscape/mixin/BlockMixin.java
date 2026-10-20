@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.block.plant.PlanterHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,8 +19,8 @@ public class BlockMixin {
                 return state.setValue(BlockStateProperties.WATERLOGGED, false);
             }
         }
-        if (state.hasProperty(com.kingodogo.buildscape.block.PlanterHelper.PLANTER)) {
-            return state.setValue(com.kingodogo.buildscape.block.PlanterHelper.PLANTER, com.kingodogo.buildscape.block.PlanterHelper.PlanterType.NONE);
+        if (state.hasProperty(PlanterHelper.PLANTER)) {
+            return state.setValue(PlanterHelper.PLANTER, PlanterHelper.PlanterType.NONE);
         }
         return state;
     }

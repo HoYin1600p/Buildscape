@@ -40,8 +40,7 @@ public final class ClientBlockColorCatalog {
     private static boolean failed;
     private static int generation;
 
-    private ClientBlockColorCatalog() {
-    }
+    private ClientBlockColorCatalog() {}
 
     public static synchronized void invalidate() {
         ready = false;
@@ -55,8 +54,12 @@ public final class ClientBlockColorCatalog {
 
     public static boolean ensureReady() {
         synchronized (ClientBlockColorCatalog.class) {
-            if (ready) return true;
-            if (building || failed) return false;
+            if (ready) {
+                return true;
+            }
+            if (building || failed) {
+                return false;
+            }
             building = true;
         }
 
@@ -69,7 +72,9 @@ public final class ClientBlockColorCatalog {
 
             for (ResourceLocation id : Registry.ITEM.keySet()) {
                 Item item = Registry.ITEM.get(id);
-                if (!ColorGradientSolver.isCandidateBlock(item)) continue;
+                if (!ColorGradientSolver.isCandidateBlock(item)) {
+                    continue;
+                }
                 try {
                     Block block = ((BlockItem) item).getBlock();
                     BlockState state = block.defaultBlockState();
@@ -106,6 +111,7 @@ public final class ClientBlockColorCatalog {
                     colors.size(), spriteCache.size(), elapsedMs);
             return true;
         } catch (Throwable error) {
+            // block and tint providers run arbitrary mod code; a failure only disables this catalog
             synchronized (ClientBlockColorCatalog.class) {
                 failed = true;
             }
@@ -119,11 +125,12 @@ public final class ClientBlockColorCatalog {
     }
 
     private static BlockSample sampleBlock(Minecraft minecraft, BlockColors blockColors, BlockState state,
-                                           Map<SpriteKey, PixelSample> spriteCache) {
+            Map<SpriteKey, PixelSample> spriteCache) {
         BakedModel model;
         try {
             model = minecraft.getBlockRenderer().getBlockModel(state);
         } catch (RuntimeException ignored) {
+            // a model that cannot be fetched is left out of the catalog
             return null;
         }
 
@@ -145,28 +152,36 @@ public final class ClientBlockColorCatalog {
     }
 
     private static void sampleQuads(BakedModel model, BlockState state, Direction side, BlockColors blockColors,
-                                    Map<SpriteKey, PixelSample> spriteCache, BlockAccumulator accumulator) {
+            Map<SpriteKey, PixelSample> spriteCache, BlockAccumulator accumulator) {
         List<BakedQuad> quads;
         try {
             quads = model.getQuads(state, side, new Random(42L), EmptyModelData.INSTANCE);
         } catch (RuntimeException ignored) {
+            // a model that cannot list its quads contributes no colour for this face
             return;
         }
 
         Set<SpriteKey> seenOnFace = new HashSet<>();
         for (BakedQuad quad : quads) {
             TextureAtlasSprite sprite = quad.getSprite();
-            if (sprite == null || MissingTextureAtlasSprite.getLocation().equals(sprite.getName())) continue;
+            if (sprite == null || MissingTextureAtlasSprite.getLocation().equals(sprite.getName())) {
+                continue;
+            }
             int tint = 0xFFFFFF;
             if (quad.isTinted()) {
                 try {
                     int resolved = blockColors.getColor(state, null, null, quad.getTintIndex());
-                    if (resolved != -1) tint = resolved & 0xFFFFFF;
+                    if (resolved != -1) {
+                        tint = resolved & 0xFFFFFF;
+                    }
                 } catch (RuntimeException ignored) {
+                    // some tint providers need a real level; keep the untinted colour
                 }
             }
             SpriteKey key = new SpriteKey(sprite.getName(), tint);
-            if (!seenOnFace.add(key)) continue;
+            if (!seenOnFace.add(key)) {
+                continue;
+            }
             int tintColor = tint;
             PixelSample sample = spriteCache.computeIfAbsent(key, ignored -> sampleSprite(sprite, tintColor));
             accumulator.add(sample, sprite.getName());
@@ -179,7 +194,9 @@ public final class ClientBlockColorCatalog {
         int stepX = Math.max(1, (width + MAX_SAMPLES_PER_AXIS - 1) / MAX_SAMPLES_PER_AXIS);
         int stepY = Math.max(1, (height + MAX_SAMPLES_PER_AXIS - 1) / MAX_SAMPLES_PER_AXIS);
         int[] frames = sprite.getUniqueFrames().toArray();
-        if (frames.length == 0) frames = new int[]{0};
+        if (frames.length == 0) {
+            frames = new int[]{0};
+        }
 
         int tintRed = tint >> 16 & 255;
         int tintGreen = tint >> 8 & 255;
@@ -195,8 +212,12 @@ public final class ClientBlockColorCatalog {
                 for (int x = 0; x < width; x += stepX) {
                     int pixel = sprite.getPixelRGBA(frame, x, y);
                     int alpha = NativeImage.getA(pixel);
-                    if (alpha < 250) transparent = true;
-                    if (alpha < 16) continue;
+                    if (alpha < 250) {
+                        transparent = true;
+                    }
+                    if (alpha < 16) {
+                        continue;
+                    }
                     double alphaWeight = alpha / 255.0;
                     int pixelRed = NativeImage.getR(pixel) * tintRed / 255;
                     int pixelGreen = NativeImage.getG(pixel) * tintGreen / 255;
@@ -208,7 +229,9 @@ public final class ClientBlockColorCatalog {
                 }
             }
         }
-        if (weight == 0) return PixelSample.EMPTY;
+        if (weight == 0) {
+            return PixelSample.EMPTY;
+        }
         return new PixelSample(red / weight, green / weight, blue / weight, transparent, true);
     }
 
@@ -217,6 +240,7 @@ public final class ClientBlockColorCatalog {
         try {
             full = Block.isShapeFullBlock(state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
         } catch (RuntimeException ignored) {
+            // a shape that cannot be read counts as not a full block
             full = false;
         }
         boolean transparent = sampledTransparency
@@ -229,6 +253,7 @@ public final class ClientBlockColorCatalog {
             int color = state.getMapColor(null, null).col;
             return color == 0 ? 0x808080 : color;
         } catch (RuntimeException ignored) {
+            // no map colour for this state; fall back to neutral grey
             return 0x808080;
         }
     }
@@ -262,17 +287,23 @@ public final class ClientBlockColorCatalog {
         private final Set<ResourceLocation> textures = new HashSet<>();
 
         private void add(PixelSample sample, ResourceLocation texture) {
-            if (sample == null || !sample.valid) return;
+            if (sample == null || !sample.valid) {
+                return;
+            }
             red += sample.red;
             green += sample.green;
             blue += sample.blue;
             transparent |= sample.transparent;
-            if (texture != null) textures.add(texture);
+            if (texture != null) {
+                textures.add(texture);
+            }
             weight++;
         }
 
         private BlockSample finish() {
-            if (weight == 0) return null;
+            if (weight == 0) {
+                return null;
+            }
             int r = linearToSrgb(red / weight);
             int g = linearToSrgb(green / weight);
             int b = linearToSrgb(blue / weight);

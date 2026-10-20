@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
@@ -54,17 +55,8 @@ public class EditRefusedPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() ->
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.handle(this)));
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.showEditRefusal(this.reason, this.setting())));
         ctx.get().setPacketHandled(true);
-    }
-
-    private static final class ClientHandler {
-        private static void handle(EditRefusedPacket packet) {
-            net.minecraft.client.gui.screens.Screen screen = net.minecraft.client.Minecraft.getInstance().screen;
-            if (screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen open) {
-                open.onServerRefusal(packet.reason, packet.setting());
-            }
-        }
     }
 }

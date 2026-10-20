@@ -24,13 +24,12 @@ public abstract class ChainBlockMixin extends RotatedPillarBlock {
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            LivingEntity entity
-    ) {
-        if (entity == null) return false;
-        return (
-                entity instanceof Player &&
-                        state.getValue(ChainBlock.AXIS) == Direction.Axis.Y
-        );
+            LivingEntity entity) {
+        if (entity == null) {
+            return false;
+        }
+        return (entity instanceof Player &&
+                state.getValue(ChainBlock.AXIS) == Direction.Axis.Y);
     }
 
     @Override
@@ -38,8 +37,7 @@ public abstract class ChainBlockMixin extends RotatedPillarBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            PathComputationType type
-    ) {
+            PathComputationType type) {
         return true;
     }
 }

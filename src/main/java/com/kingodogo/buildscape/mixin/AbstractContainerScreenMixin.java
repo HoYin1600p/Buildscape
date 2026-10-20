@@ -1,7 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.core.NbtKeys;
+import com.kingodogo.buildscape.item.GhostFilterMenu;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.kingodogo.buildscape.util.GhostFilterMenu;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -25,12 +26,16 @@ public abstract class AbstractContainerScreenMixin {
 
     @Inject(method = "renderSlot", at = @At("TAIL"))
     private void renderFilterPlaceholder(PoseStack poseStack, Slot slot, CallbackInfo ci) {
-        if (slot.hasItem() || !slot.isActive() || !(menu instanceof GhostFilterMenu filters)) return;
+        if (slot.hasItem() || !slot.isActive() || !(menu instanceof GhostFilterMenu filters)) {
+            return;
+        }
         Item filter = filters.buildscape$getFilterItem(slot.index);
-        if (filter == null) return;
+        if (filter == null) {
+            return;
+        }
 
         ItemStack placeholder = new ItemStack(filter);
-        placeholder.getOrCreateTag().putBoolean("ghost", true);
+        placeholder.getOrCreateTag().putBoolean(NbtKeys.GHOST, true);
         Minecraft minecraft = Minecraft.getInstance();
         ItemRenderer renderer = minecraft.getItemRenderer();
         float previousBlitOffset = renderer.blitOffset;

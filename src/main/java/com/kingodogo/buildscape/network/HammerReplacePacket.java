@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.advancement.AdvancementGrants;
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.HammerItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -10,11 +12,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -29,6 +34,12 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to swap the block at a position for the block item in the player's off hand, using
+ * a hammer in the main hand. The server re-checks reach, build permission, hammer tier hardness limit,
+ * correct-tool rules, protected multi-block parts and block-place events before it replaces the block, drops the old
+ * block's loot, consumes the off-hand item and wears the hammer (survival only).
+ */
 public class HammerReplacePacket {
 
     private final BlockPos pos;
@@ -49,43 +60,76 @@ public class HammerReplacePacket {
         NetworkEvent.Context ctx = ctxSupplier.get();
         ctx.enqueueWork(() -> {
             ServerPlayer player = ctx.getSender();
-            if (player == null) return;
+            if (player == null) {
+                return;
+            }
 
             ServerLevel level = player.getLevel();
             BlockPos pos = msg.pos;
 
-            if (!level.isLoaded(pos)) return;
-            if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) return;
-            if (!player.mayBuild() || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) return;
-            if (!level.mayInteract(player, pos)) return;
+            if (!level.isLoaded(pos)) {
+                return;
+            }
+            if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) {
+                return;
+            }
+            if (!player.mayBuild()
+                    || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
+                return;
+            }
+            if (!level.mayInteract(player, pos)) {
+                return;
+            }
 
             ItemStack hammerStack = player.getMainHandItem();
-            if (hammerStack.isEmpty() || !(hammerStack.getItem() instanceof HammerItem hammer)) return;
+            if (hammerStack.isEmpty() || !(hammerStack.getItem() instanceof HammerItem hammer)) {
+                return;
+            }
 
             ItemStack offhandStack = player.getOffhandItem();
-            if (offhandStack.isEmpty() || !(offhandStack.getItem() instanceof BlockItem blockItem)) return;
+            if (offhandStack.isEmpty() || !(offhandStack.getItem() instanceof BlockItem blockItem)) {
+                return;
+            }
 
             BlockState targetState = level.getBlockState(pos);
-            if (targetState.isAir()) return;
+            if (targetState.isAir()) {
+                return;
+            }
 
             float destroyTime = targetState.getDestroySpeed(level, pos);
-            if (destroyTime < 0) return;
+            if (destroyTime < 0) {
+                return;
+            }
 
             HammerItem.HammerTier tier = hammer.getHammerTier();
-            if (!tier.canReplaceObsidianLevel() && destroyTime >= 50.0f) return;
+            if (!tier.canReplaceObsidianLevel() && destroyTime >= 50.0f) {
+                return;
+            }
             ItemStack harvestTool = createHarvestTool(tier, hammerStack);
-            if (targetState.requiresCorrectToolForDrops() && !harvestTool.isCorrectToolForDrops(targetState)) return;
+            if (targetState.requiresCorrectToolForDrops() && !harvestTool.isCorrectToolForDrops(targetState)) {
+                return;
+            }
 
             Block replacementBlock = blockItem.getBlock();
-            if (targetState.getBlock() == replacementBlock) return;
-            if (isMultiBlockPart(targetState)) return;
-            if (offhandStack.getTagElement("BlockEntityTag") != null) return;
+            if (targetState.getBlock() == replacementBlock) {
+                return;
+            }
+            if (isMultiBlockPart(targetState)) {
+                return;
+            }
+            if (offhandStack.getTagElement(NbtKeys.BLOCK_ENTITY_TAG) != null) {
+                return;
+            }
 
             BlockState newState = replacementBlock.defaultBlockState();
-            if (isMultiBlockPart(newState) || !newState.canSurvive(level, pos)) return;
+            if (isMultiBlockPart(newState) || !newState.canSurvive(level, pos)) {
+                return;
+            }
 
             int experience = ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos);
-            if (experience < 0) return;
+            if (experience < 0) {
+                return;
+            }
             BlockSnapshot before = BlockSnapshot.create(level.dimension(), level, pos);
             BlockEvent.EntityPlaceEvent placement = new BlockEvent.EntityPlaceEvent(
                     before, level.getBlockState(pos.below()), player) {
@@ -103,7 +147,9 @@ public class HammerReplacePacket {
                 player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
                 return;
             }
-            if (level.getBlockState(pos) != targetState) return;
+            if (level.getBlockState(pos) != targetState) {
+                return;
+            }
 
             BlockEntity blockEntity = level.getBlockEntity(pos);
             LootContext.Builder builder = new LootContext.Builder(level)
@@ -113,8 +159,10 @@ public class HammerReplacePacket {
                     .withParameter(LootContextParams.THIS_ENTITY, player)
                     .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
             List<ItemStack> drops = targetState.getDrops(builder);
-            if (!level.setBlock(pos, newState, 3)) return;
-            com.kingodogo.buildscape.event.AdvancementEvents.onHammerReplace(player);
+            if (!level.setBlock(pos, newState, 3)) {
+                return;
+            }
+            AdvancementGrants.onHammerReplace(player);
 
             if (!player.isCreative()) {
                 offhandStack.shrink(1);
@@ -124,8 +172,8 @@ public class HammerReplacePacket {
                 Block.popResource(level, pos, drop);
             }
             if (!player.isCreative() && experience > 0
-                    && level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOBLOCKDROPS)) {
-                net.minecraft.world.entity.ExperienceOrb.award(level, Vec3.atCenterOf(pos), experience);
+                    && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
+                ExperienceOrb.award(level, Vec3.atCenterOf(pos), experience);
             }
 
             if (!player.isCreative()) {
@@ -136,8 +184,7 @@ public class HammerReplacePacket {
             level.sendParticles(
                     ParticleTypes.CRIT,
                     pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                    8, 0.3, 0.3, 0.3, 0.05
-            );
+                    8, 0.3, 0.3, 0.3, 0.05);
         });
         ctx.setPacketHandled(true);
     }
@@ -145,7 +192,7 @@ public class HammerReplacePacket {
     private static boolean isMultiBlockPart(BlockState state) {
         return state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
                 || state.hasProperty(BlockStateProperties.BED_PART)
-                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
+                || state.getBlock() instanceof PistonHeadBlock
                 || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED));
     }
 

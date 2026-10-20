@@ -9,7 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FestiveRenderTypes extends RenderType {
 
-    public static final ResourceLocation FESTIVE_GLINT_LOCATION = new ResourceLocation(BuildScape.MODID, "textures/misc/festive_glint.png");
+    public static final ResourceLocation FESTIVE_GLINT_LOCATION = new ResourceLocation(BuildScape.MODID,
+            "textures/misc/festive_glint.png");
 
     private static final RenderType FESTIVE_GLINT = create(
             "festive_glint",
@@ -26,8 +27,7 @@ public class FestiveRenderTypes extends RenderType {
                     .setDepthTestState(EQUAL_DEPTH_TEST)
                     .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(GLINT_TEXTURING)
-                    .createCompositeState(false)
-    );
+                    .createCompositeState(false));
 
     private static final RenderType FESTIVE_GLINT_DIRECT = create(
             "festive_glint_direct",
@@ -44,8 +44,7 @@ public class FestiveRenderTypes extends RenderType {
                     .setDepthTestState(EQUAL_DEPTH_TEST)
                     .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(GLINT_TEXTURING)
-                    .createCompositeState(false)
-    );
+                    .createCompositeState(false));
 
     private static final RenderType FESTIVE_GLINT_TRANSLUCENT = create(
             "festive_glint_translucent",
@@ -63,8 +62,7 @@ public class FestiveRenderTypes extends RenderType {
                     .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(GLINT_TEXTURING)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
-                    .createCompositeState(false)
-    );
+                    .createCompositeState(false));
 
     private static final RenderType FESTIVE_ENTITY_GLINT = create(
             "festive_entity_glint",
@@ -82,8 +80,7 @@ public class FestiveRenderTypes extends RenderType {
                     .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
                     .setOutputState(ITEM_ENTITY_TARGET)
-                    .createCompositeState(false)
-    );
+                    .createCompositeState(false));
 
     private static final RenderType FESTIVE_ENTITY_GLINT_DIRECT = create(
             "festive_entity_glint_direct",
@@ -100,8 +97,7 @@ public class FestiveRenderTypes extends RenderType {
                     .setDepthTestState(EQUAL_DEPTH_TEST)
                     .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
-                    .createCompositeState(false)
-    );
+                    .createCompositeState(false));
 
     private static final RenderType FESTIVE_ARMOR_GLINT = create(
             "festive_armor_glint",
@@ -119,8 +115,7 @@ public class FestiveRenderTypes extends RenderType {
                     .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(GLINT_TEXTURING)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
-                    .createCompositeState(false)
-    );
+                    .createCompositeState(false));
 
     private static final RenderType FESTIVE_ARMOR_ENTITY_GLINT = create(
             "festive_armor_entity_glint",
@@ -138,10 +133,10 @@ public class FestiveRenderTypes extends RenderType {
                     .setTransparencyState(GLINT_TRANSPARENCY)
                     .setTexturingState(ENTITY_GLINT_TEXTURING)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
-                    .createCompositeState(false)
-    );
+                    .createCompositeState(false));
 
-    private FestiveRenderTypes(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize, boolean affectsCrumbling, boolean sortOnUpload, Runnable setupState, Runnable clearState) {
+    private FestiveRenderTypes(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize,
+            boolean affectsCrumbling, boolean sortOnUpload, Runnable setupState, Runnable clearState) {
         super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
     }
 

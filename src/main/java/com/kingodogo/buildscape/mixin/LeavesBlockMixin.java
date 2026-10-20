@@ -21,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Random;
+
 @Mixin(LeavesBlock.class)
 public abstract class LeavesBlockMixin extends Block implements SimpleWaterloggedBlock {
 
@@ -28,12 +30,10 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
         super(properties);
     }
 
-
     @Inject(method = "createBlockStateDefinition", at = @At("TAIL"))
     private void buildscape$addWaterlogged(StateDefinition.Builder<Block, BlockState> builder, CallbackInfo ci) {
         builder.add(BlockStateProperties.WATERLOGGED);
     }
-
 
     @Inject(method = "getStateForPlacement", at = @At("RETURN"), cancellable = true)
     private void buildscape$waterloggedPlacement(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir) {
@@ -46,8 +46,8 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
 
     @Inject(method = "updateShape", at = @At("HEAD"))
     private void buildscape$scheduleFluidTick(BlockState state, Direction direction, BlockState neighborState,
-                                              LevelAccessor level, BlockPos pos, BlockPos neighborPos,
-                                              CallbackInfoReturnable<BlockState> cir) {
+            LevelAccessor level, BlockPos pos, BlockPos neighborPos,
+            CallbackInfoReturnable<BlockState> cir) {
         if (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -60,15 +60,13 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
                 : super.getFluidState(state);
     }
 
-
     @Inject(method = "tick", at = @At("TAIL"))
     private void buildscape$onTick(
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            java.util.Random random,
-            CallbackInfo ci
-    ) {
+            Random random,
+            CallbackInfo ci) {
         if (level.getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY)) {
             BlockState currentState = level.getBlockState(pos);
             if (currentState.getBlock() instanceof LeavesBlock) {

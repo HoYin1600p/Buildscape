@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.biometint;
 
-import com.kingodogo.buildscape.biometint.ClientBiomeTints;
+import com.kingodogo.buildscape.client.feature.biome.ClientBiomeTints;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -14,8 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class BiomeColorsMixin {
     @Inject(method = "getAverageColor", at = @At("HEAD"), cancellable = true)
     private static void buildscape$columnTint(BlockAndTintGetter level, BlockPos pos, ColorResolver resolver,
-                                              CallbackInfoReturnable<Integer> callback) {
+            CallbackInfoReturnable<Integer> callback) {
         Integer color = ClientBiomeTints.color(level, pos, resolver);
-        if (color != null) callback.setReturnValue(color);
+        if (color != null) {
+            callback.setReturnValue(color);
+        }
     }
 }

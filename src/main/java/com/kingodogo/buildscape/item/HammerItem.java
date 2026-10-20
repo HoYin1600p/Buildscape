@@ -1,9 +1,25 @@
 package com.kingodogo.buildscape.item;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
+import javax.annotation.Nullable;
 
 public class HammerItem extends Item {
 
@@ -30,9 +46,9 @@ public class HammerItem extends Item {
 
         public Item getHarvestToolItem() {
             return switch (this) {
-                case IRON -> net.minecraft.world.item.Items.IRON_PICKAXE;
-                case DIAMOND -> net.minecraft.world.item.Items.DIAMOND_PICKAXE;
-                case NETHERITE -> net.minecraft.world.item.Items.NETHERITE_PICKAXE;
+                case IRON -> Items.IRON_PICKAXE;
+                case DIAMOND -> Items.DIAMOND_PICKAXE;
+                case NETHERITE -> Items.NETHERITE_PICKAXE;
             };
         }
     }
@@ -53,7 +69,7 @@ public class HammerItem extends Item {
     }
 
     @Override
-    public boolean isCorrectToolForDrops(net.minecraft.world.level.block.state.BlockState state) {
+    public boolean isCorrectToolForDrops(BlockState state) {
         // Forge's break event uses the held item to decide whether the block awards XP.
         return getHarvestToolItem().isCorrectToolForDrops(state);
     }
@@ -73,9 +89,9 @@ public class HammerItem extends Item {
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return switch (tier) {
-            case IRON -> repair.is(net.minecraft.world.item.Items.IRON_INGOT);
-            case DIAMOND -> repair.is(net.minecraft.world.item.Items.DIAMOND);
-            case NETHERITE -> repair.is(net.minecraft.world.item.Items.NETHERITE_INGOT);
+            case IRON -> repair.is(Items.IRON_INGOT);
+            case DIAMOND -> repair.is(Items.DIAMOND);
+            case NETHERITE -> repair.is(Items.NETHERITE_INGOT);
         };
     }
 
@@ -85,34 +101,34 @@ public class HammerItem extends Item {
     }
 
     @Override
-    public net.minecraft.world.InteractionResult useOn(net.minecraft.world.item.context.UseOnContext context) {
-        if (context.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND) {
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getHand() == InteractionHand.MAIN_HAND) {
             ItemStack offHand = context.getPlayer().getOffhandItem();
-            if (!offHand.isEmpty() && offHand.getItem() instanceof net.minecraft.world.item.BlockItem) {
-                return net.minecraft.world.InteractionResult.sidedSuccess(context.getLevel().isClientSide());
+            if (!offHand.isEmpty() && offHand.getItem() instanceof BlockItem) {
+                return InteractionResult.sidedSuccess(context.getLevel().isClientSide());
             }
         }
-        return net.minecraft.world.InteractionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public net.minecraft.world.InteractionResultHolder<ItemStack> use(net.minecraft.world.level.Level level, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
-        if (hand == net.minecraft.world.InteractionHand.MAIN_HAND) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        if (hand == InteractionHand.MAIN_HAND) {
             ItemStack offHand = player.getOffhandItem();
-            if (!offHand.isEmpty() && offHand.getItem() instanceof net.minecraft.world.item.BlockItem) {
-                return net.minecraft.world.InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
+            if (!offHand.isEmpty() && offHand.getItem() instanceof BlockItem) {
+                return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide());
             }
         }
-        return net.minecraft.world.InteractionResultHolder.pass(player.getItemInHand(hand));
+        return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
     @Override
-    public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
-        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.hammer.desc1").withStyle(net.minecraft.ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(new TranslatableComponent("tooltip.buildscape.hammer.desc1").withStyle(ChatFormatting.GRAY));
         if (tier == HammerTier.IRON) {
-            tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.hammer.desc2").withStyle(net.minecraft.ChatFormatting.RED));
+            tooltip.add(new TranslatableComponent("tooltip.buildscape.hammer.desc2").withStyle(ChatFormatting.RED));
         }
-        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.hammer.desc3").withStyle(net.minecraft.ChatFormatting.AQUA));
+        tooltip.add(new TranslatableComponent("tooltip.buildscape.hammer.desc3").withStyle(ChatFormatting.AQUA));
         super.appendHoverText(stack, level, tooltip, flag);
     }
 }

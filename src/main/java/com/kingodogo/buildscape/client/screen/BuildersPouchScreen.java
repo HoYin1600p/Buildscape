@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.client.screen.workbench.WbRenderer;
-import com.kingodogo.buildscape.network.BuildersPouchMenu;
+import com.kingodogo.buildscape.item.BuildersPouchMenu;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -11,10 +11,10 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class BuildersPouchScreen extends AbstractContainerScreen<BuildersPouchMenu> {
 
-    private static final ResourceLocation BACKGROUND =
-            new ResourceLocation("buildscape", "textures/gui/builders_pouch/builders_pouch_bg.png");
-    private static final ResourceLocation TITLE =
-            new ResourceLocation("buildscape", "textures/gui/builders_pouch/builders_pouch_title.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("buildscape",
+            "textures/gui/builders_pouch/builders_pouch_bg.png");
+    private static final ResourceLocation TITLE = new ResourceLocation("buildscape",
+            "textures/gui/builders_pouch/builders_pouch_title.png");
 
     private static final int GUI_WIDTH = 188;
     private static final int GUI_HEIGHT = 134;

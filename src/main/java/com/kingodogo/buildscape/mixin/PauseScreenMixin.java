@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import com.kingodogo.buildscape.config.BuildscapeClientConfig;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -64,8 +65,7 @@ public abstract class PauseScreenMixin extends Screen {
                 20,
                 20,
                 new TextComponent("B"),
-                (button) -> net.minecraft.client.Minecraft.getInstance().setScreen(new BuildScapeConfigScreen(screen))
-        );
+                (button) -> Minecraft.getInstance().setScreen(new BuildScapeConfigScreen(screen)));
 
         this.addRenderableWidget(configButton);
     }

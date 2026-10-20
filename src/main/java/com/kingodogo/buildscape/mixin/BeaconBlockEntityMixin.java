@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.mixin.accessor.BeaconBlockEntityAccessor;
 import com.kingodogo.buildscape.util.BeaconBeamHeightAccessor;
 import com.kingodogo.buildscape.util.BeaconBeamScanState;
 import com.kingodogo.buildscape.util.BeaconScanContext;
@@ -40,7 +41,8 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
-    private static void buildscape$onTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
+    private static void buildscape$onTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity,
+            CallbackInfo ci) {
         BeaconScanContext.begin(blockEntity);
         if (((BeaconBlockEntityAccessor) blockEntity).getLastCheckY() < pos.getY()) {
             ((BeaconBeamHeightAccessor) blockEntity).buildscape$beginBeamScan();
@@ -48,7 +50,8 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
-    private static void buildscape$afterTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
+    private static void buildscape$afterTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity,
+            CallbackInfo ci) {
         if (((BeaconBlockEntityAccessor) blockEntity).getLastCheckY() < pos.getY()) {
             BeaconBeamHeightAccessor heightAccessor = (BeaconBeamHeightAccessor) blockEntity;
             heightAccessor.buildscape$completeBeamScan();

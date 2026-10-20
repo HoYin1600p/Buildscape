@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.util.GhostFilterable;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -20,7 +21,8 @@ import java.util.List;
 @Mixin(ShulkerBoxBlock.class)
 public class ShulkerBoxBlockMixin {
     @Inject(method = "getDrops", at = @At("RETURN"))
-    private void preserveGhostFiltersInDrops(BlockState state, LootContext.Builder builder, CallbackInfoReturnable<List<ItemStack>> cir) {
+    private void preserveGhostFiltersInDrops(BlockState state, LootContext.Builder builder,
+            CallbackInfoReturnable<List<ItemStack>> cir) {
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof GhostFilterable filterable) {
             String[] ghostFilters = filterable.buildscape$getGhostFilters();
@@ -29,14 +31,17 @@ public class ShulkerBoxBlockMixin {
                 ListTag filterList = new ListTag();
                 for (int i = 0; i < 27; i++) {
                     String f = i < ghostFilters.length && ghostFilters[i] != null ? ghostFilters[i] : "";
-                    if (!f.isEmpty()) hasFilter = true;
+                    if (!f.isEmpty()) {
+                        hasFilter = true;
+                    }
                     filterList.add(StringTag.valueOf(f));
                 }
                 if (hasFilter) {
                     List<ItemStack> drops = cir.getReturnValue();
                     for (ItemStack stack : drops) {
                         if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
-                            stack.getOrCreateTagElement("BlockEntityTag").put("GhostFilters", filterList.copy());
+                            stack.getOrCreateTagElement(NbtKeys.BLOCK_ENTITY_TAG).put(NbtKeys.GHOST_FILTERS,
+                                    filterList.copy());
                         }
                     }
                 }

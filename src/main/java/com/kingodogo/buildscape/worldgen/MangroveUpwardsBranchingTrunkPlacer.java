@@ -7,9 +7,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelSimulatedReader;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
 
@@ -19,26 +21,21 @@ import java.util.function.BiConsumer;
 
 public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
 
-    public static final Codec<MangroveUpwardsBranchingTrunkPlacer> CODEC =
-            RecordCodecBuilder.create(instance ->
-                    trunkPlacerParts(instance)
-                            .and(
-                                    IntProvider.codec(0, 24)
-                                            .fieldOf("extra_branch_steps")
-                                            .forGetter(placer -> placer.extraBranchSteps)
-                            )
-                            .and(
-                                    Codec.floatRange(0.0F, 1.0F)
-                                            .fieldOf("place_branch_per_log_probability")
-                                            .forGetter(placer -> placer.placeBranchPerLogProbability)
-                            )
-                            .and(
-                                    IntProvider.codec(0, 24)
-                                            .fieldOf("extra_branch_length")
-                                            .forGetter(placer -> placer.extraBranchLength)
-                            )
-                            .apply(instance, MangroveUpwardsBranchingTrunkPlacer::new)
-            );
+    public static final Codec<MangroveUpwardsBranchingTrunkPlacer> CODEC = RecordCodecBuilder
+            .create(instance -> trunkPlacerParts(instance)
+                    .and(
+                            IntProvider.codec(0, 24)
+                                    .fieldOf("extra_branch_steps")
+                                    .forGetter(placer -> placer.extraBranchSteps))
+                    .and(
+                            Codec.floatRange(0.0F, 1.0F)
+                                    .fieldOf("place_branch_per_log_probability")
+                                    .forGetter(placer -> placer.placeBranchPerLogProbability))
+                    .and(
+                            IntProvider.codec(0, 24)
+                                    .fieldOf("extra_branch_length")
+                                    .forGetter(placer -> placer.extraBranchLength))
+                    .apply(instance, MangroveUpwardsBranchingTrunkPlacer::new));
 
     private final IntProvider extraBranchSteps;
     private final IntProvider extraBranchLength;
@@ -50,8 +47,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
             int heightRandB,
             IntProvider extraBranchSteps,
             float placeBranchPerLogProbability,
-            IntProvider extraBranchLength
-    ) {
+            IntProvider extraBranchLength) {
         super(baseHeight, heightRandA, heightRandB);
         this.extraBranchSteps = extraBranchSteps;
         this.placeBranchPerLogProbability = placeBranchPerLogProbability;
@@ -70,14 +66,12 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
             Random random,
             int freeTreeHeight,
             BlockPos pos,
-            TreeConfiguration config
-    ) {
-        List<FoliagePlacer.FoliageAttachment> foliageAttachments =
-                Lists.newArrayList();
+            TreeConfiguration config) {
+        List<FoliagePlacer.FoliageAttachment> foliageAttachments = Lists.newArrayList();
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
         int elevationShift = -1;
-        for (net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator decorator : config.decorators) {
+        for (TreeDecorator decorator : config.decorators) {
             if (decorator instanceof MangroveRootDecorator roots) {
                 elevationShift = roots.sampleTrunkOffset(random);
                 break;
@@ -104,8 +98,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
                             random,
                             mutablePos,
                             config,
-                            foliageAttachments
-                    );
+                            foliageAttachments);
                 }
             }
         }
@@ -114,9 +107,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
                 new FoliagePlacer.FoliageAttachment(
                         mutablePos.set(pos.getX(), elevatedStartY + trunkHeight, pos.getZ()),
                         0,
-                        false
-                )
-        );
+                        false));
 
         return foliageAttachments;
     }
@@ -127,8 +118,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
             Random random,
             BlockPos.MutableBlockPos branchStart,
             TreeConfiguration config,
-            List<FoliagePlacer.FoliageAttachment> foliageAttachments
-    ) {
+            List<FoliagePlacer.FoliageAttachment> foliageAttachments) {
         int branchSteps = this.extraBranchSteps.sample(random);
         int branchLength = this.extraBranchLength.sample(random);
 
@@ -142,8 +132,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
                 Direction.EAST,
                 Direction.WEST,
         };
-        Direction branchDirection =
-                horizontalDirections[random.nextInt(horizontalDirections.length)];
+        Direction branchDirection = horizontalDirections[random.nextInt(horizontalDirections.length)];
 
         BlockPos.MutableBlockPos currentPos = branchStart.mutable();
         BlockPos.MutableBlockPos branchEnd = branchStart.mutable();
@@ -162,8 +151,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
             if (placeMangroveLog(level, blockSetter, random, branchEnd, config)) {
                 currentPos.set(branchEnd);
                 foliageAttachments.add(
-                        new FoliagePlacer.FoliageAttachment(currentPos.immutable(), 0, false)
-                );
+                        new FoliagePlacer.FoliageAttachment(currentPos.immutable(), 0, false));
             } else {
                 break;
             }
@@ -171,10 +159,10 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
     }
 
     private static boolean placeMangroveLog(LevelSimulatedReader level,
-                                           BiConsumer<BlockPos, BlockState> blockSetter,
-                                           Random random, BlockPos pos, TreeConfiguration config) {
+            BiConsumer<BlockPos, BlockState> blockSetter,
+            Random random, BlockPos pos, TreeConfiguration config) {
         return level.isStateAtPosition(pos, state -> state.isAir()
-                || state.is(net.minecraft.world.level.block.Blocks.WATER))
+                || state.is(Blocks.WATER))
                 && placeLog(level, blockSetter, random, pos, config);
     }
 }

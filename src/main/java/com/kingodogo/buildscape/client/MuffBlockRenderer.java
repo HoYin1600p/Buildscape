@@ -1,11 +1,14 @@
 package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModBlocks;
-import com.kingodogo.buildscape.block.MuffBlock;
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.block.decor.MuffBlock;
+import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
+import com.kingodogo.buildscape.registry.blocks.ShapedWoodBlocks;
+import com.kingodogo.buildscape.registry.items.ShapedWoodItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,11 +24,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.Set;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MuffBlockRenderer {
 
     private static final double MAX_RENDER_DISTANCE = 128.0;
@@ -41,13 +40,15 @@ public class MuffBlockRenderer {
             return;
         }
 
-        if (!mc.player.getOffhandItem().is(ModItems.MUFF_BLOCK.get())) {
+        if (!mc.player.getOffhandItem().is(ShapedWoodItems.MUFF_BLOCK.get())) {
             return;
         }
 
         Level level = mc.level;
         Camera camera = event.getCamera();
-        if (camera == null) return;
+        if (camera == null) {
+            return;
+        }
 
         Vec3 cameraPos = camera.getPosition();
         PoseStack poseStack = event.getPoseStack();
@@ -78,7 +79,7 @@ public class MuffBlockRenderer {
             }
 
             BlockState state = level.getBlockState(pos);
-            if (state.is(ModBlocks.MUFF_BLOCK.get())) {
+            if (state.is(ShapedWoodBlocks.MUFF_BLOCK.get())) {
                 int radius = state.getValue(MuffBlock.RADIUS);
                 double cx = pos.getX() + 0.5 + offsetX;
                 double cy = pos.getY() + 0.5 + offsetY;
@@ -113,14 +114,14 @@ public class MuffBlockRenderer {
     }
 
     private static void drawLine(VertexConsumer buffer, PoseStack poseStack,
-                                 double x1, double y1, double z1, double x2, double y2, double z2, int color) {
+            double x1, double y1, double z1, double x2, double y2, double z2, int color) {
         int r = (color >> 24) & 0xFF;
         int g = (color >> 16) & 0xFF;
         int b = (color >> 8) & 0xFF;
         int a = color & 0xFF;
 
-        com.mojang.math.Matrix4f pose = poseStack.last().pose();
-        com.mojang.math.Matrix3f normal = poseStack.last().normal();
+        Matrix4f pose = poseStack.last().pose();
+        Matrix3f normal = poseStack.last().normal();
 
         buffer.vertex(pose, (float) x1, (float) y1, (float) z1)
                 .color(r, g, b, a)

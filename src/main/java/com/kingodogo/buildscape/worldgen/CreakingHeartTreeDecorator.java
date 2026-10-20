@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.worldgen;
 
-import com.kingodogo.buildscape.block.ModBlocks;
+import com.kingodogo.buildscape.registry.blocks.CopperBlocks;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelSimulatedReader;
@@ -22,7 +22,8 @@ public class CreakingHeartTreeDecorator extends TreeDecorator {
     }
 
     @Override
-    public void place(LevelSimulatedReader level, BiConsumer<BlockPos, BlockState> blockSetter, Random random, List<BlockPos> logPositions, List<BlockPos> leafPositions) {
+    public void place(LevelSimulatedReader level, BiConsumer<BlockPos, BlockState> blockSetter, Random random,
+            List<BlockPos> logPositions, List<BlockPos> leafPositions) {
         if (logPositions.isEmpty()) {
             return;
         }
@@ -30,6 +31,6 @@ public class CreakingHeartTreeDecorator extends TreeDecorator {
         int midIndex = logPositions.size() / 2;
         BlockPos targetPos = logPositions.get(midIndex);
 
-        blockSetter.accept(targetPos, ModBlocks.CREAKING_HEART.get().defaultBlockState());
+        blockSetter.accept(targetPos, CopperBlocks.CREAKING_HEART.get().defaultBlockState());
     }
 }

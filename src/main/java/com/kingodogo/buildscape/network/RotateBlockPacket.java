@@ -1,29 +1,43 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
+import com.kingodogo.buildscape.registry.items.WoodItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request from the wrench arrows to rotate the block at a position.
+ * The server requires a sneaking player with a wrench in either hand, in reach and allowed to build, then picks the
+ * new state from the arrow and the player's facing (half, slab type, facing or axis properties). Beds, doors and
+ * other two-part blocks are left alone.
+ */
 public class RotateBlockPacket {
 
     public enum ArrowDirection {
-        UP, DOWN, LEFT, RIGHT;
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT;
 
         public static ArrowDirection fromOrdinal(int ord) {
             ArrowDirection[] values = values();
@@ -61,36 +75,52 @@ public class RotateBlockPacket {
         NetworkEvent.Context ctx = ctxSupplier.get();
         ctx.enqueueWork(() -> {
             ServerPlayer player = ctx.getSender();
-            if (player == null || !player.mayBuild()) return;
+            if (player == null || !player.mayBuild()) {
+                return;
+            }
 
-            if (!player.isCrouching()) return;
+            if (!player.isCrouching()) {
+                return;
+            }
 
             ItemStack mainHand = player.getMainHandItem();
             ItemStack offHand = player.getOffhandItem();
-            boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
-                                (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
-            if (!hasWrench) return;
+            boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == WoodItems.WRENCH.get()) ||
+                    (!offHand.isEmpty() && offHand.getItem() == WoodItems.WRENCH.get());
+            if (!hasWrench) {
+                return;
+            }
 
             ServerLevel level = player.getLevel();
             BlockPos pos = msg.pos;
 
-            if (!level.isLoaded(pos)) return;
-            if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) return;
-            if (player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) return;
-            if (!level.mayInteract(player, pos)) return;
+            if (!level.isLoaded(pos)) {
+                return;
+            }
+            if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) {
+                return;
+            }
+            if (player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
+                return;
+            }
+            if (!level.mayInteract(player, pos)) {
+                return;
+            }
 
             BlockState state = level.getBlockState(pos);
-            if (state.isAir()) return;
+            if (state.isAir()) {
+                return;
+            }
 
             BlockState newState = calculateRotatedState(state, msg.direction, player.getDirection());
 
             if (!newState.equals(state)) {
-                if (net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,
-                        net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos), Direction.UP)) {
-                    player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(level, pos));
+                if (ForgeEventFactory.onBlockPlace(player,
+                        BlockSnapshot.create(level.dimension(), level, pos), Direction.UP)) {
+                    player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
                     return;
                 }
-                if (state.getBlock() instanceof com.kingodogo.buildscape.block.HollowPipeBlock pipe
+                if (state.getBlock() instanceof HollowPipeBlock pipe
                         && newState.hasProperty(BlockStateProperties.AXIS)) {
                     pipe.setAxisAndRefresh(level, pos, state, newState.getValue(BlockStateProperties.AXIS));
                 } else {
@@ -104,8 +134,7 @@ public class RotateBlockPacket {
                 level.sendParticles(
                         ParticleTypes.WAX_OFF,
                         pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                        6, 0.25, 0.25, 0.25, 0.05
-                );
+                        6, 0.25, 0.25, 0.25, 0.05);
             }
         });
         ctx.setPacketHandled(true);
@@ -115,8 +144,9 @@ public class RotateBlockPacket {
     private static BlockState calculateRotatedState(BlockState state, ArrowDirection arrowDir, Direction playerFacing) {
         if (state.hasProperty(BlockStateProperties.BED_PART)
                 || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
-                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
-                || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED))) {
+                || state.getBlock() instanceof PistonHeadBlock
+                || (state.hasProperty(BlockStateProperties.EXTENDED)
+                        && state.getValue(BlockStateProperties.EXTENDED))) {
             return state;
         }
         BlockState newState = state;

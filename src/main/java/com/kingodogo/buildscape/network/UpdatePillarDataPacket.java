@@ -1,10 +1,11 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.block.PillarBlockEntity;
-import com.kingodogo.buildscape.config.PillarIdManager;
-import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.config.ConfigSetting;
+import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
+import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -14,6 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server update of one pillar's particle settings (pattern, speeds, color count, dye colors).
+ * Null fields mean "leave unchanged". Numbers are clamped on both ends, and the server needs the pillar-edit
+ * permission and saves the registry immediately after applying a change.
+ */
 public class UpdatePillarDataPacket {
 
     private final String pillarId;
@@ -33,22 +39,25 @@ public class UpdatePillarDataPacket {
             Double patternSpread,
             Double patternIntensity,
             Integer maxParticleColor,
-            List<String> dyeColors
-    ) {
+            List<String> dyeColors) {
         this.pillarId = pillarId;
         this.pattern = pattern;
         this.usePattern = usePattern;
         this.patternSpeed = patternSpeed != null
                 ? NetworkPacketLimits.clamp(patternSpeed, NetworkPacketLimits.MIN_PARTICLE_RATE,
-                NetworkPacketLimits.MAX_PARTICLE_SPEED) : null;
+                        NetworkPacketLimits.MAX_PARTICLE_SPEED)
+                : null;
         this.patternSpread = patternSpread != null
                 ? NetworkPacketLimits.clamp(patternSpread, NetworkPacketLimits.MIN_PARTICLE_RATE,
-                NetworkPacketLimits.MAX_PARTICLE_SPREAD) : null;
+                        NetworkPacketLimits.MAX_PARTICLE_SPREAD)
+                : null;
         this.patternIntensity = patternIntensity != null
                 ? NetworkPacketLimits.clamp(patternIntensity, NetworkPacketLimits.MIN_PARTICLE_RATE,
-                NetworkPacketLimits.MAX_PARTICLE_INTENSITY) : null;
+                        NetworkPacketLimits.MAX_PARTICLE_INTENSITY)
+                : null;
         this.maxParticleColor = maxParticleColor != null
-                ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, maxParticleColor)) : null;
+                ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, maxParticleColor))
+                : null;
         this.dyeColors = dyeColors != null ? new ArrayList<>(dyeColors) : new ArrayList<>();
     }
 
@@ -61,32 +70,43 @@ public class UpdatePillarDataPacket {
                 data != null ? data.pattern_spread : null,
                 data != null ? data.pattern_intensity : null,
                 data != null ? data.max_particle_color : null,
-                data != null ? data.dyeColors : null
-        );
+                data != null ? data.dyeColors : null);
     }
 
     public UpdatePillarDataPacket(FriendlyByteBuf buf) {
         this.pillarId = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
 
         this.pattern = buf.readBoolean()
-                ? NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern") : null;
+                ? NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern")
+                : null;
 
         this.usePattern = buf.readBoolean() ? buf.readBoolean() : null;
 
-        this.patternSpeed = buf.readBoolean() ? NetworkPacketLimits.readBoundedDouble(buf,
-                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED, "pattern speed") : null;
-        this.patternSpread = buf.readBoolean() ? NetworkPacketLimits.readBoundedDouble(buf,
-                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD, "pattern spread") : null;
-        this.patternIntensity = buf.readBoolean() ? NetworkPacketLimits.readBoundedDouble(buf,
-                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY, "pattern intensity") : null;
+        this.patternSpeed = buf.readBoolean()
+                ? NetworkPacketLimits.readBoundedDouble(buf,
+                        NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED, "pattern speed")
+                : null;
+        this.patternSpread = buf.readBoolean()
+                ? NetworkPacketLimits.readBoundedDouble(buf,
+                        NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD,
+                        "pattern spread")
+                : null;
+        this.patternIntensity = buf.readBoolean()
+                ? NetworkPacketLimits.readBoundedDouble(buf,
+                        NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY,
+                        "pattern intensity")
+                : null;
 
         this.maxParticleColor = buf.readBoolean()
-                ? NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS, "maximum particle colors") : null;
+                ? NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS,
+                        "maximum particle colors")
+                : null;
 
         int colorCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_DYE_COLORS, "dye color");
         this.dyeColors = new ArrayList<>();
         for (int i = 0; i < colorCount; i++) {
-            this.dyeColors.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "dye color"));
+            this.dyeColors
+                    .add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "dye color"));
         }
     }
 
@@ -140,7 +160,9 @@ public class UpdatePillarDataPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null || !EditGuard.require(player, com.kingodogo.buildscape.config.ConfigSetting.PILLAR_EDIT)) return;
+            if (player == null || !EditGuard.require(player, ConfigSetting.PILLAR_EDIT)) {
+                return;
+            }
 
             PillarIdManager manager = PillarIdManager.get();
             PillarIdManager.PillarData data = manager.getPillarData(pillarId);
@@ -197,13 +219,15 @@ public class UpdatePillarDataPacket {
         ctx.get().setPacketHandled(true);
     }
 
-    private void updateBlockEntity(net.minecraft.server.MinecraftServer server, PillarIdManager.PillarData data) {
+    private void updateBlockEntity(MinecraftServer server, PillarIdManager.PillarData data) {
         if (server == null || !server.isRunning()) {
             return;
         }
 
         for (ServerLevel level : server.getAllLevels()) {
-            if (level == null) continue;
+            if (level == null) {
+                continue;
+            }
 
             String dimensionKey = PillarIdManager.getDimensionKey(level);
             if (!dimensionKey.equals(data.dimension)) {
@@ -231,7 +255,9 @@ public class UpdatePillarDataPacket {
             boolean patternChanged = data.pattern != null && !data.pattern.isEmpty()
                     && !data.pattern.equals(bottomPillarBE.getParticlePattern());
             bottomPillarBE.syncFromData(data);
-            if (patternChanged) bottomPillarBE.setParticlePattern(data.pattern);
+            if (patternChanged) {
+                bottomPillarBE.setParticlePattern(data.pattern);
+            }
 
             break;
         }

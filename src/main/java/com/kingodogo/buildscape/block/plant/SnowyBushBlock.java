@@ -1,0 +1,115 @@
+package com.kingodogo.buildscape.block.plant;
+
+import com.kingodogo.buildscape.registry.blocks.DecorBlocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.List;
+
+public class SnowyBushBlock extends BushBlock implements SinksOnFarmland {
+
+    protected static final VoxelShape SHAPE = Block.box(
+            2.0,
+            0.0,
+            2.0,
+            14.0,
+            13.0,
+            14.0);
+
+    public SnowyBushBlock(BlockBehaviour.Properties properties) {
+        super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(ON_FARMLAND, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(ON_FARMLAND);
+    }
+
+    @Override
+    public VoxelShape getShape(
+            BlockState state,
+            BlockGetter level,
+            BlockPos pos,
+            CollisionContext context) {
+        VoxelShape shape = SHAPE;
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625, 0);
+        }
+        return shape;
+    }
+
+    @Override
+    protected boolean mayPlaceOn(
+            BlockState state,
+            BlockGetter level,
+            BlockPos pos) {
+        return (state.is(BlockTags.DIRT) ||
+                state.is(Blocks.FARMLAND) ||
+                state.is(Blocks.SNOW_BLOCK) ||
+                state.is(DecorBlocks.SNOW_BRICKS.get()));
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState state = super.getStateForPlacement(context);
+        if (state != null) {
+            return state.setValue(ON_FARMLAND, shouldSink(context.getLevel(), context.getClickedPos()));
+        }
+        return null;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
+        if (direction == Direction.DOWN) {
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState,
+                    level, pos, adjacentPos);
+        }
+        return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
+    }
+
+    @Override
+    public List<ItemStack> getDrops(
+            BlockState state,
+            LootContext.Builder builder) {
+        LootContext ctx = builder
+                .withParameter(LootContextParams.BLOCK_STATE, state)
+                .create(
+                        LootContextParamSets.BLOCK);
+        ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
+
+        if (tool != null && !tool.isEmpty()) {
+            if (tool.is(Items.SHEARS)) {
+                return Collections.singletonList(new ItemStack(this));
+            }
+            if (EnchantmentHelper.getItemEnchantmentLevel(
+                    Enchantments.SILK_TOUCH,
+                    tool) > 0) {
+                return Collections.singletonList(new ItemStack(this));
+            }
+        }
+
+        return Collections.emptyList();
+    }
+}

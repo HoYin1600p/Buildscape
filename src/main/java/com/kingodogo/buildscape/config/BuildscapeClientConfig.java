@@ -10,6 +10,12 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Settings stored in {@code config/buildscape/buildscape.cfg}, a text file of key = value lines grouped into sections.
+ * The instance is loaded once and cached; {@link #reload()} reads it again. An older file in the config folder and the
+ * old {@code ui-state.cfg} are migrated on load. If the file cannot be parsed the config becomes read-only and is
+ * never rewritten, so a damaged file is not lost.
+ */
 public class BuildscapeClientConfig {
     public static final String KEY_HIDE_CONFIG_BUTTON = "HideBuildscapeConfig";
     public static final String KEY_PARALLEL_MODEL_LOADING = "OptimizeBuildscapeModelLoading";
@@ -22,6 +28,7 @@ public class BuildscapeClientConfig {
     public static final String KEY_UI_THEME = "UITheme";
     public static final String KEY_UI_BACKGROUND = "UIBackground";
     public static final String KEY_SIDE_PANEL_EXPANDED = "SidePanelExpanded";
+    public static final String KEY_NAVBAR_EXPANDED = "NavbarExpanded";
     public static final String KEY_ANIMATION_SPEED = "AnimationSpeed";
     public static final String KEY_LAST_ACTIVE_TAB = "LastActiveTab";
     public static final String KEY_MAX_CUSTOM_PRESETS = "MaxCustomPresets";
@@ -43,7 +50,6 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_CAKE_STACKING, "true");
         DEFAULTS.put(KEY_WATER_BOTTLE_STACKING, "true");
         DEFAULTS.put(KEY_MAX_CUSTOM_PRESETS, String.valueOf(DEFAULT_CUSTOM_PRESETS));
-
     }
 
     private final Map<String, String> values;
@@ -75,6 +81,9 @@ public class BuildscapeClientConfig {
         return config;
     }
 
+    /**
+     * Drops the cached instance and reads the file again.
+     */
     public static synchronized void reload() {
         INSTANCE = new BuildscapeClientConfig();
     }
@@ -86,6 +95,7 @@ public class BuildscapeClientConfig {
                 configDir = FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable ignored) {
+            // FMLPaths is not ready yet, possibly as a linkage error; configDir stays null and the caller handles that
         }
         if (configDir == null) {
             configDir = ConfigPaths.root();
@@ -105,6 +115,7 @@ public class BuildscapeClientConfig {
                 configDir = FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable ignored) {
+            // FMLPaths is not ready yet, possibly as a linkage error; configDir stays null and the caller handles that
         }
         if (configDir == null) {
             configDir = ConfigPaths.root();
@@ -127,7 +138,9 @@ public class BuildscapeClientConfig {
                 readOnly |= ConfigLayoutIO.protectInvalidEncoding(file.toPath());
                 Map<String, String> loaded = ConfigLayoutIO.readEntries(source);
                 values.putAll(loaded);
-                if (!readOnly) appendMissingDefaults(file.toPath(), loaded);
+                if (!readOnly) {
+                    appendMissingDefaults(file.toPath(), loaded);
+                }
             }
         } catch (IOException e) {
             readOnly = true;
@@ -136,10 +149,12 @@ public class BuildscapeClientConfig {
                     try {
                         values.putAll(ConfigLayoutIO.readEntries(line));
                     } catch (IOException ignored) {
+                        // skip this unreadable line; the remaining lines are still read
                     }
                 }
             }
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Config is read-only because it could not be parsed", e);
+            BuildScape.LOGGER.warn("BuildscapeClientConfig: Config is read-only because it could not be parsed",
+                    e);
         }
 
         // Migrate and merge legacy buildscape/ui-state.cfg if it exists
@@ -153,12 +168,15 @@ public class BuildscapeClientConfig {
                     values.putIfAbsent(entry.getKey(), entry.getValue());
                 }
                 Files.deleteIfExists(uiFile);
-                BuildScape.getLogger().info("BuildscapeClientConfig: Merged buildscape/ui-state.cfg into buildscape/buildscape.cfg and removed ui-state.cfg");
+                BuildScape.LOGGER.info(
+                        "BuildscapeClientConfig: Merged buildscape/ui-state.cfg into buildscape/buildscape.cfg and removed ui-state.cfg");
                 if (file.exists() && !readOnly) {
                     save();
                 }
             } catch (Exception e) {
-                BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to merge ui-state.cfg into buildscape.cfg", e);
+                // merging the old ui-state file is best effort; any read or parse failure keeps both files
+                BuildScape.LOGGER.warn("BuildscapeClientConfig: Failed to merge ui-state.cfg into buildscape.cfg",
+                        e);
             }
         }
 
@@ -171,24 +189,32 @@ public class BuildscapeClientConfig {
         String newline = source.contains("\r\n") ? "\r\n" : source.contains("\r") ? "\r" : "\n";
         StringBuilder missing = new StringBuilder();
         for (Map.Entry<String, String> entry : DEFAULTS.entrySet()) {
-            if (loaded.containsKey(entry.getKey())) continue;
+            if (loaded.containsKey(entry.getKey())) {
+                continue;
+            }
             if (missing.length() == 0 && !source.isEmpty() && !source.endsWith("\n") && !source.endsWith("\r")) {
                 missing.append(newline);
             }
             missing.append("# ").append(description(entry.getKey())).append(newline);
             missing.append(entry.getKey()).append(" = ").append(entry.getValue()).append(newline);
         }
-        if (missing.length() == 0) return;
+        if (missing.length() == 0) {
+            return;
+        }
         ConfigLayoutIO.append(file, missing.toString(), source);
         source += missing;
     }
 
     private File migrateLegacyConfig(File file, File legacyFile) {
-        if (legacyFile == null || !legacyFile.exists()) return file;
+        if (legacyFile == null || !legacyFile.exists()) {
+            return file;
+        }
         Path legacy = legacyFile.toPath();
         Path backup = legacy.resolveSibling(legacyFile.getName() + ".backup");
         Path completion = legacy.resolveSibling(legacyFile.getName() + ".backup.complete");
-        if (Files.exists(completion)) return file;
+        if (Files.exists(completion)) {
+            return file;
+        }
         try {
             String output = null;
             boolean replacementDecoded = false;
@@ -199,20 +225,25 @@ public class BuildscapeClientConfig {
                 replacementDecoded = ConfigLayoutIO.protectInvalidEncoding(legacy);
                 output = groupedText(original, migrated);
             }
-            if (!Files.exists(backup)) Files.copy(legacy, backup);
-            else if (!Files.isRegularFile(backup) || Files.mismatch(legacy, backup) != -1) {
+            if (!Files.exists(backup)) {
+                Files.copy(legacy, backup);
+            } else if (!Files.isRegularFile(backup) || Files.mismatch(legacy, backup) != -1) {
                 throw new IOException("Legacy backup does not match the original: " + backup);
             }
             if (output != null) {
-                if (replacementDecoded) Files.copy(legacy, file.toPath());
-                else ConfigLayoutIO.writeNew(file.toPath(), output);
+                if (replacementDecoded) {
+                    Files.copy(legacy, file.toPath());
+                } else {
+                    ConfigLayoutIO.writeNew(file.toPath(), output);
+                }
             }
             Files.createFile(completion);
             if (output != null) {
-                BuildScape.getLogger().info("BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
+                BuildScape.LOGGER.info(
+                        "BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
             }
         } catch (IOException e) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to migrate legacy config - " + e.getMessage());
+            BuildScape.LOGGER.warn("BuildscapeClientConfig: Failed to migrate legacy config - {}", e.getMessage(), e);
             if (!file.exists()) {
                 readOnly = true;
                 return legacyFile;
@@ -221,29 +252,41 @@ public class BuildscapeClientConfig {
         return file;
     }
 
+    /**
+     * Rewrites the file with the current values, grouped by section. Does nothing and logs a warning when the config is
+     * read-only.
+     */
     public void save() {
         if (readOnly) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Not saving read-only config; unreadable/legacy file kept as-is");
+            BuildScape.LOGGER
+                    .warn("BuildscapeClientConfig: Not saving read-only config; unreadable/legacy file kept as-is");
             return;
         }
         File file = getConfigFile();
-        if (file == null) return;
+        if (file == null) {
+            return;
+        }
         try {
             String output = groupedText(source, values);
             ConfigLayoutIO.write(file.toPath(), output, source, true);
             source = output;
         } catch (IOException e) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to write config", e);
+            BuildScape.LOGGER.warn("BuildscapeClientConfig: Failed to write config", e);
         }
     }
 
     private static String groupedText(String source, Map<String, String> values) {
-        StringBuilder text = new StringBuilder("# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
+        StringBuilder text = new StringBuilder(
+                "# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
         for (String section : new String[]{"Gameplay", "Performance", "Visuals & particles", "Interface", "Other"}) {
-            if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) continue;
+            if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) {
+                continue;
+            }
             text.append("\n# --- ").append(section).append(" ---\n");
             for (Map.Entry<String, String> entry : values.entrySet()) {
-                if (!section.equals(section(entry.getKey()))) continue;
+                if (!section.equals(section(entry.getKey()))) {
+                    continue;
+                }
                 text.append("# ").append(description(entry.getKey())).append('\n');
                 text.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
             }
@@ -255,10 +298,12 @@ public class BuildscapeClientConfig {
         return switch (key) {
             case KEY_CAKE_STACKING, KEY_WATER_BOTTLE_STACKING, KEY_MAX_PIPE_NETWORK_SIZE -> "Gameplay";
             case KEY_PARALLEL_MODEL_LOADING, KEY_CACHE_MODEL_MATERIALS,
-                    KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE -> "Performance";
+                    KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE ->
+                "Performance";
             case KEY_HIDE_CONFIG_BUTTON, KEY_UI_THEME, KEY_UI_BACKGROUND,
-                    KEY_SIDE_PANEL_EXPANDED, KEY_ANIMATION_SPEED, KEY_LAST_ACTIVE_TAB,
-                    KEY_MAX_CUSTOM_PRESETS, KEY_LAST_PRESET -> "Interface";
+                    KEY_SIDE_PANEL_EXPANDED, KEY_NAVBAR_EXPANDED, KEY_ANIMATION_SPEED, KEY_LAST_ACTIVE_TAB,
+                    KEY_MAX_CUSTOM_PRESETS, KEY_LAST_PRESET ->
+                "Interface";
             default -> "Other";
         };
     }
@@ -274,11 +319,14 @@ public class BuildscapeClientConfig {
             case KEY_PARALLEL_BLOCK_STATE_CACHE -> "Build block-state caches in parallel.";
             case KEY_HIDE_CONFIG_BUTTON -> "Hide the BuildScape button on client screens.";
             case KEY_UI_THEME -> "Active theme for the BuildScape configuration screen (dark, light, cyber, etc.).";
-            case KEY_UI_BACKGROUND -> "Background style for the BuildScape configuration screen (none, blueprint, etc.).";
+            case KEY_UI_BACKGROUND ->
+                "Background style for the BuildScape configuration screen (none, blueprint, etc.).";
             case KEY_SIDE_PANEL_EXPANDED -> "Whether the configuration screen side panel is expanded.";
+            case KEY_NAVBAR_EXPANDED -> "Whether the configuration screen navigation bar is expanded.";
             case KEY_ANIMATION_SPEED -> "UI animation speed index (0=normal, 1=fast, 2=instant).";
             case KEY_LAST_ACTIVE_TAB -> "Last selected tab index in the BuildScape configuration screen.";
-            case KEY_MAX_CUSTOM_PRESETS -> "Number of custom item presets that can be saved besides Default (1-32, default 4).";
+            case KEY_MAX_CUSTOM_PRESETS ->
+                "Number of custom item presets that can be saved besides Default (1-32, default 4).";
             case KEY_LAST_PRESET -> "Last applied item preset, shown as selected when the configuration screen opens.";
             default -> "Unrecognized setting retained with its original value.";
         };
@@ -351,11 +399,22 @@ public class BuildscapeClientConfig {
     }
 
     public boolean isSidePanelExpanded() {
-        return getBoolean(KEY_SIDE_PANEL_EXPANDED);
+        return values.containsKey(KEY_SIDE_PANEL_EXPANDED)
+                ? Boolean.parseBoolean(values.get(KEY_SIDE_PANEL_EXPANDED))
+                : true;
     }
 
     public void setSidePanelExpanded(boolean expanded) {
         values.put(KEY_SIDE_PANEL_EXPANDED, String.valueOf(expanded));
+        save();
+    }
+
+    public boolean isNavbarExpanded() {
+        return getBoolean(KEY_NAVBAR_EXPANDED);
+    }
+
+    public void setNavbarExpanded(boolean expanded) {
+        values.put(KEY_NAVBAR_EXPANDED, String.valueOf(expanded));
         save();
     }
 
@@ -384,7 +443,9 @@ public class BuildscapeClientConfig {
 
     public void setLastPreset(String key) {
         String normalized = key == null || key.isBlank() ? "default" : key;
-        if (normalized.equals(getLastPreset())) return;
+        if (normalized.equals(getLastPreset())) {
+            return;
+        }
         values.put(KEY_LAST_PRESET, normalized);
         save();
     }

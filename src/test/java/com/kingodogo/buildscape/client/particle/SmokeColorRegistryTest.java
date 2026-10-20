@@ -1,14 +1,14 @@
 package com.kingodogo.buildscape.client.particle;
 
 import com.kingodogo.buildscape.particle.SmokeColorRegistry;
+import org.junit.Test;
 
 import java.util.Locale;
 
 public final class SmokeColorRegistryTest {
-    private SmokeColorRegistryTest() {
-    }
 
-    public static void main(String[] args) {
+    @Test
+    public void queuedColorsSurviveLocaleChanges() {
         Locale original = Locale.getDefault();
         try {
             SmokeColorRegistry.clearColorCache();
@@ -38,6 +38,8 @@ public final class SmokeColorRegistryTest {
     }
 
     private static void check(boolean result, String description) {
-        if (!result) throw new AssertionError(description);
+        if (!result) {
+            throw new AssertionError(description);
+        }
     }
 }

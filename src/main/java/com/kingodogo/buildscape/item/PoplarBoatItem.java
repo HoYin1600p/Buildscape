@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.item;
 
+import com.kingodogo.buildscape.entity.PoplarBoatEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -22,8 +23,7 @@ import java.util.function.Predicate;
 
 public class PoplarBoatItem extends Item {
 
-    private static final Predicate<Entity> ENTITY_PREDICATE =
-            EntitySelector.NO_SPECTATORS.and(Entity::isPickable);
+    private static final Predicate<Entity> ENTITY_PREDICATE = EntitySelector.NO_SPECTATORS.and(Entity::isPickable);
 
     public PoplarBoatItem(Item.Properties properties) {
         super(properties);
@@ -33,23 +33,20 @@ public class PoplarBoatItem extends Item {
     public InteractionResultHolder<ItemStack> use(
             Level level,
             Player player,
-            InteractionHand hand
-    ) {
+            InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         HitResult hitresult = getPlayerPOVHitResult(
                 level,
                 player,
-                ClipContext.Fluid.ANY
-        );
+                ClipContext.Fluid.ANY);
         if (hitresult.getType() == HitResult.Type.MISS) {
             return InteractionResultHolder.pass(itemstack);
         } else {
             Vec3 vec3 = player.getViewVector(1.0F);
             List<Entity> list = level.getEntities(
                     player,
-                    player.getBoundingBox().expandTowards(vec3.scale(5.0D)).inflate(1.0D),
-                    ENTITY_PREDICATE
-            );
+                    player.getBoundingBox().expandTowards(vec3.scale(5.0)).inflate(1.0),
+                    ENTITY_PREDICATE);
             if (!list.isEmpty()) {
                 Vec3 vec31 = player.getEyePosition();
 
@@ -64,12 +61,11 @@ public class PoplarBoatItem extends Item {
             }
 
             if (hitresult.getType() == HitResult.Type.BLOCK) {
-                Boat boat = new com.kingodogo.buildscape.entity.PoplarBoatEntity(
+                Boat boat = new PoplarBoatEntity(
                         level,
                         hitresult.getLocation().x,
                         hitresult.getLocation().y,
-                        hitresult.getLocation().z
-                );
+                        hitresult.getLocation().z);
                 boat.setYRot(player.getYRot());
                 if (!level.noCollision(boat, boat.getBoundingBox())) {
                     return InteractionResultHolder.fail(itemstack);
@@ -79,8 +75,7 @@ public class PoplarBoatItem extends Item {
                         level.gameEvent(
                                 player,
                                 GameEvent.ENTITY_PLACE,
-                                new BlockPos(hitresult.getLocation())
-                        );
+                                new BlockPos(hitresult.getLocation()));
                         if (!player.getAbilities().instabuild) {
                             itemstack.shrink(1);
                         }
@@ -89,8 +84,7 @@ public class PoplarBoatItem extends Item {
                     player.awardStat(Stats.ITEM_USED.get(this));
                     return InteractionResultHolder.sidedSuccess(
                             itemstack,
-                            level.isClientSide()
-                    );
+                            level.isClientSide());
                 }
             } else {
                 return InteractionResultHolder.pass(itemstack);

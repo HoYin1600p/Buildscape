@@ -1,3 +1,4 @@
+* text=auto eol=lf
 *.ogg binary
 *.bscb binary
 src/main/resources/data/buildscape/recipes_pack/*.json linguist-generated=true text eol=lf

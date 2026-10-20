@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.config;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
-import org.junit.BeforeClass;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -14,16 +13,16 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-public class LegacyEncodingMigrationTest {
+public class LegacyEncodingMigrationTest extends BootstrappedGameTest {
     private static final Charset LEGACY = Charset.forName("windows-1252");
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @Test
     public void legacyPropertiesKeepTextAndOriginalBytesAndRemainEditable() throws Exception {

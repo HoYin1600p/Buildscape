@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -9,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client reply to {@link EditPillarRowsPacket}: the batch id, the old ids it covered and a short reason.
+ * On the client it only triggers a refresh of the pillar list.
+ */
 public class EditPillarRowsResultPacket {
     private static final int MAX_REASON_LENGTH = 96;
     private final long batchId;
@@ -26,26 +31,26 @@ public class EditPillarRowsResultPacket {
         long batchId = buf.readLong();
         int count = NetworkPacketLimits.readCount(buf, EditPillarRowsPacket.MAX_ROWS, "pillar edit result");
         List<String> ids = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) ids.add(NetworkPacketLimits.readUtf(buf, 32, "old pillar id"));
-        return new EditPillarRowsResultPacket(batchId, ids, NetworkPacketLimits.readUtf(buf, MAX_REASON_LENGTH, "edit result reason"));
+        for (int i = 0; i < count; i++) {
+            ids.add(NetworkPacketLimits.readUtf(buf, 32, "old pillar id"));
+        }
+        return new EditPillarRowsResultPacket(batchId, ids,
+                NetworkPacketLimits.readUtf(buf, MAX_REASON_LENGTH, "edit result reason"));
     }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeLong(batchId);
         NetworkPacketLimits.checkCount(oldIds.size(), EditPillarRowsPacket.MAX_ROWS, "pillar edit result");
         buf.writeInt(oldIds.size());
-        for (String id : oldIds) NetworkPacketLimits.writeUtf(buf, id, 32, "old pillar id");
+        for (String id : oldIds) {
+            NetworkPacketLimits.writeUtf(buf, id, 32, "old pillar id");
+        }
         NetworkPacketLimits.writeUtf(buf, reason, MAX_REASON_LENGTH, "edit result reason");
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> applyClient()));
+        ctx.get().enqueueWork(
+                () -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.pillarsSynced()));
         ctx.get().setPacketHandled(true);
-    }
-
-    private void applyClient() {
-        try {
-            com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.onPillarsSynced();
-        } catch (Throwable ignored) {}
     }
 }

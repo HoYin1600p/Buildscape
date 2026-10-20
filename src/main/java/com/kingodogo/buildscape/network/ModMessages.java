@@ -1,12 +1,25 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.biometint.SyncBiomeTintPacket;
+import com.kingodogo.buildscape.feature.biome.ClearBiomeBrushPacket;
+import com.kingodogo.buildscape.feature.biome.SyncBiomeTintPacket;
+import com.kingodogo.buildscape.feature.homemaker.SyncHomemakerCooldownPacket;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+/**
+ * Declares the mod's single network channel and registers every packet with its numeric id and direction.
+ * Ids are part of the wire protocol: do not reorder them, and change {@code PROTOCOL_VERSION} when a packet layout
+ * changes so mismatched client and server versions refuse each other.
+ */
 public class ModMessages {
 
     static final String PROTOCOL_VERSION = "12";
@@ -14,9 +27,11 @@ public class ModMessages {
             new ResourceLocation(BuildScape.MODID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
+            PROTOCOL_VERSION::equals);
 
+    /**
+     * Registers all packets on {@link #INSTANCE}. Called once during mod setup on both sides.
+     */
     public static void register() {
         register(ActionBarMessagePacket.class, 1, NetworkDirection.PLAY_TO_CLIENT,
                 ActionBarMessagePacket::encode, ActionBarMessagePacket::decode, ActionBarMessagePacket::handle);
@@ -41,13 +56,15 @@ public class ModMessages {
         register(UpdateGameRulePacket.class, 11, NetworkDirection.PLAY_TO_SERVER,
                 UpdateGameRulePacket::encode, UpdateGameRulePacket::decode, UpdateGameRulePacket::handle);
         register(SyncHomemakerCooldownPacket.class, 12, NetworkDirection.PLAY_TO_CLIENT,
-                SyncHomemakerCooldownPacket::encode, SyncHomemakerCooldownPacket::decode, SyncHomemakerCooldownPacket::handle);
+                SyncHomemakerCooldownPacket::encode, SyncHomemakerCooldownPacket::decode,
+                SyncHomemakerCooldownPacket::handle);
         register(RotateBlockPacket.class, 13, NetworkDirection.PLAY_TO_SERVER,
                 RotateBlockPacket::encode, RotateBlockPacket::decode, RotateBlockPacket::handle);
         register(HammerReplacePacket.class, 14, NetworkDirection.PLAY_TO_SERVER,
                 HammerReplacePacket::encode, HammerReplacePacket::decode, HammerReplacePacket::handle);
         register(BuildersWorkbenchResultsPacket.class, 15, NetworkDirection.PLAY_TO_SERVER,
-                BuildersWorkbenchResultsPacket::encode, BuildersWorkbenchResultsPacket::decode, BuildersWorkbenchResultsPacket::handle);
+                BuildersWorkbenchResultsPacket::encode, BuildersWorkbenchResultsPacket::decode,
+                BuildersWorkbenchResultsPacket::handle);
         register(ClearBiomeBrushPacket.class, 16, NetworkDirection.PLAY_TO_SERVER,
                 ClearBiomeBrushPacket::encode, ClearBiomeBrushPacket::decode, ClearBiomeBrushPacket::handle);
         register(SyncSignFramePacket.class, 17, NetworkDirection.PLAY_TO_CLIENT,
@@ -57,7 +74,8 @@ public class ModMessages {
         register(SyncBiomeTintPacket.class, 19, NetworkDirection.PLAY_TO_CLIENT,
                 SyncBiomeTintPacket::encode, SyncBiomeTintPacket::decode, SyncBiomeTintPacket::handle);
         register(EditPillarRowsResultPacket.class, 20, NetworkDirection.PLAY_TO_CLIENT,
-                EditPillarRowsResultPacket::encode, EditPillarRowsResultPacket::decode, EditPillarRowsResultPacket::handle);
+                EditPillarRowsResultPacket::encode, EditPillarRowsResultPacket::decode,
+                EditPillarRowsResultPacket::handle);
         register(UpdateAllPillarIdsPacket.class, 21, NetworkDirection.PLAY_TO_SERVER,
                 UpdateAllPillarIdsPacket::encode, UpdateAllPillarIdsPacket::decode, UpdateAllPillarIdsPacket::handle);
         register(ResetPillarsPacket.class, 22, NetworkDirection.PLAY_TO_SERVER,
@@ -70,10 +88,9 @@ public class ModMessages {
             Class<T> type,
             int id,
             NetworkDirection direction,
-            java.util.function.BiConsumer<T, net.minecraft.network.FriendlyByteBuf> encoder,
-            java.util.function.Function<net.minecraft.network.FriendlyByteBuf, T> decoder,
-            java.util.function.BiConsumer<T, java.util.function.Supplier<net.minecraftforge.network.NetworkEvent.Context>> consumer
-    ) {
+            BiConsumer<T, FriendlyByteBuf> encoder,
+            Function<FriendlyByteBuf, T> decoder,
+            BiConsumer<T, Supplier<NetworkEvent.Context>> consumer) {
         INSTANCE.messageBuilder(type, id, direction)
                 .encoder(encoder)
                 .decoder(decoder)

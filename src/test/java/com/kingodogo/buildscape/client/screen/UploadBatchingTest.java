@@ -21,27 +21,26 @@ public class UploadBatchingTest {
     private static PillarParticleConfig copyOf(PillarParticleConfig source) {
         PillarParticleConfig copy = new PillarParticleConfig();
         copy.particle_speed = source.particle_speed;
+        copy.particle_spread = source.particle_spread;
         copy.particle_lifetime = source.particle_lifetime;
+        copy.particle_density = source.particle_density;
+        copy.use_pattern = source.use_pattern;
         copy.pattern = source.pattern;
+        copy.pattern_speed = source.pattern_speed;
+        copy.pattern_spread = source.pattern_spread;
+        copy.pattern_intensity = source.pattern_intensity;
         copy.particle_color = new ArrayList<>(source.particle_color);
         copy.max_particle_color = source.max_particle_color;
         copy.edit_permission_mode = source.edit_permission_mode;
         copy.replaceItems(source.items);
+        copy.revision = source.revision;
+        copy.establishBaseline();
         return copy;
     }
 
-    /** What the server does with an upload: the uploaded groups of the client's config replace its own. */
+    /** What the server does with an upload: merges the uploaded groups using conflict handling so simultaneous uploads don't overwrite unrelated fields or items. */
     private static void upload(PillarParticleConfig server, PillarParticleConfig client, Set<ConfigSetting> groups) {
-        if (groups.contains(ConfigSetting.PARTICLES)) {
-            server.particle_speed = client.particle_speed;
-            server.particle_lifetime = client.particle_lifetime;
-            server.pattern = client.pattern;
-        }
-        if (groups.contains(ConfigSetting.COLORS)) {
-            server.particle_color = new ArrayList<>(client.particle_color);
-            server.max_particle_color = client.max_particle_color;
-        }
-        if (groups.contains(ConfigSetting.ITEMS)) server.replaceItems(client.items);
+        server.applyUpload(client, groups);
     }
 
     @Test
@@ -136,6 +135,127 @@ public class UploadBatchingTest {
     }
 
     @Test
+    public void simultaneousUploadsToDifferentFieldsInSameGroupDoNotOverwrite() {
+        PillarParticleConfig server = new PillarParticleConfig();
+        PillarParticleConfig clientA = copyOf(server);
+        PillarParticleConfig clientB = copyOf(server);
+        ConfigUploadBatch batchA = new ConfigUploadBatch();
+        batchA.rebase(clientA);
+        ConfigUploadBatch batchB = new ConfigUploadBatch();
+        batchB.rebase(clientB);
+
+        // A submits particle speed 0.40; B submits lifetime 90.
+        clientA.particle_speed = 0.4D;
+        batchA.edited(ConfigSetting.PARTICLES, clientA, 1000L);
+
+        clientB.particle_lifetime = 90;
+        batchB.edited(ConfigSetting.PARTICLES, clientB, 1000L);
+
+        // Both uploads constructed before either client receives the other's update
+        Set<ConfigSetting> groupsA = batchA.take();
+        Set<ConfigSetting> groupsB = batchB.take();
+
+        upload(server, clientA, groupsA);
+        upload(server, clientB, groupsB);
+
+        assertEquals(0.4D, server.particle_speed, 0.0D);
+        assertEquals(90, server.particle_lifetime);
+    }
+
+    @Test
+    public void simultaneousUploadsAddingDifferentItemsDoNotOverwrite() {
+        PillarParticleConfig server = new PillarParticleConfig();
+        server.replaceItems(List.of("minecraft:stone"));
+        PillarParticleConfig clientA = copyOf(server);
+        PillarParticleConfig clientB = copyOf(server);
+        ConfigUploadBatch batchA = new ConfigUploadBatch();
+        batchA.rebase(clientA);
+        ConfigUploadBatch batchB = new ConfigUploadBatch();
+        batchB.rebase(clientB);
+
+        // A adds diamond; B adds dirt.
+        clientA.items.add("minecraft:diamond");
+        batchA.edited(ConfigSetting.ITEMS, clientA, 1000L);
+
+        clientB.items.add("minecraft:dirt");
+        batchB.edited(ConfigSetting.ITEMS, clientB, 1000L);
+
+        // Both uploads constructed before either client receives the other's update
+        Set<ConfigSetting> groupsA = batchA.take();
+        Set<ConfigSetting> groupsB = batchB.take();
+
+        upload(server, clientA, groupsA);
+        upload(server, clientB, groupsB);
+
+        assertEquals(Set.of("minecraft:stone", "minecraft:diamond", "minecraft:dirt"), server.items);
+    }
+
+    @Test
+    public void loadedConfigurationUsesLoadedValuesAsRevisionZeroBaseline() {
+        PillarParticleConfig server = new PillarParticleConfig();
+        server.particle_speed = 0.30D;
+        server.establishBaseline();
+
+        PillarParticleConfig clientA = copyOf(server);
+        PillarParticleConfig clientB = copyOf(server);
+        ConfigUploadBatch batchA = new ConfigUploadBatch();
+        batchA.rebase(clientA);
+        ConfigUploadBatch batchB = new ConfigUploadBatch();
+        batchB.rebase(clientB);
+
+        clientA.particle_speed = 0.40D;
+        batchA.edited(ConfigSetting.PARTICLES, clientA, 1000L);
+
+        clientB.particle_lifetime = 90;
+        batchB.edited(ConfigSetting.PARTICLES, clientB, 1000L);
+
+        Set<ConfigSetting> groupsA = batchA.take();
+        Set<ConfigSetting> groupsB = batchB.take();
+
+        upload(server, clientA, groupsA);
+        upload(server, clientB, groupsB);
+
+        assertEquals(0.40D, server.particle_speed, 0.0D);
+        assertEquals(90, server.particle_lifetime);
+    }
+
+    @Test
+    public void expiredRevisionHistoryRejectsStaleOverwrites() {
+        PillarParticleConfig server = new PillarParticleConfig();
+        server.particle_color = new ArrayList<>(
+                List.of("#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF"));
+        server.establishBaseline();
+
+        PillarParticleConfig staleClient = copyOf(server);
+        ConfigUploadBatch staleBatch = new ConfigUploadBatch();
+        staleBatch.rebase(staleClient);
+
+        for (int i = 0; i < 51; i++) {
+            PillarParticleConfig peer = copyOf(server);
+            ConfigUploadBatch peerBatch = new ConfigUploadBatch();
+            peerBatch.rebase(peer);
+            peer.particle_lifetime = 20 + i + 1;
+            peerBatch.edited(ConfigSetting.PARTICLES, peer, 1000L);
+            if (i == 25) {
+                peer.particle_color.set(0, "#AABBCC");
+                peerBatch.edited(ConfigSetting.COLORS, peer, 1000L);
+            }
+            upload(server, peer, peerBatch.take());
+        }
+
+        assertEquals("#AABBCC", server.particle_color.get(0));
+
+        staleClient.particle_color.set(1, "#123456");
+        staleBatch.edited(ConfigSetting.COLORS, staleClient, 1000L);
+
+        Set<ConfigSetting> groups = staleBatch.take();
+        boolean applied = server.applyUpload(staleClient, groups);
+
+        assertFalse(applied);
+        assertEquals("#AABBCC", server.particle_color.get(0));
+    }
+
+    @Test
     public void anItemRemovedLocallyStaysRemovedAndAnItemTheOtherPlayerAddedStays() {
         PillarParticleConfig server = new PillarParticleConfig();
         server.replaceItems(List.of("minecraft:stone", "minecraft:dirt", "minecraft:sand"));
@@ -180,8 +300,9 @@ public class UploadBatchingTest {
         local.particle_color = new ArrayList<>(List.of("#ABCDEF"));
         local.max_particle_color = 1;
         batch.edited(ConfigSetting.COLORS, local, 2L);
-        local.edit_permission_mode = PillarParticleConfig.EditPermissionMode.values()[
-                (local.edit_permission_mode.ordinal() + 1) % PillarParticleConfig.EditPermissionMode.values().length];
+        local.edit_permission_mode = PillarParticleConfig.EditPermissionMode
+                .values()[(local.edit_permission_mode.ordinal() + 1)
+                        % PillarParticleConfig.EditPermissionMode.values().length];
         batch.edited(ConfigSetting.POLICY, local, 3L);
         // A stored value outside the screen's range is carried as it is.
         local.particle_speed = 4.0D;
@@ -224,25 +345,192 @@ public class UploadBatchingTest {
     }
 
     @Test
-    public void aRefusedGroupIsDroppedSoTheServerStateShowsAndOthersStay() {
+    public void aRefusedGroupIsRestoredSoTheServerStateShowsAndOthersStay() {
         PillarParticleConfig local = new PillarParticleConfig();
         ConfigUploadBatch batch = new ConfigUploadBatch();
         batch.rebase(local);
         local.particle_speed = 0.4D;
         batch.edited(ConfigSetting.PARTICLES, local, 1L);
+        sendNow(batch, local);
         local.max_particle_color = 5;
-        batch.edited(ConfigSetting.COLORS, local, 2L);
+        batch.edited(ConfigSetting.COLORS, local, 3L);
 
-        batch.dropRefused(ConfigSetting.PARTICLES);
+        batch.refuse(ConfigSetting.PARTICLES, local);
+        assertEquals(new PillarParticleConfig().particle_speed, local.particle_speed, 0.0D);
         PillarParticleConfig incoming = new PillarParticleConfig();
         batch.reapply(incoming);
-        assertEquals(new PillarParticleConfig().particle_speed, incoming.particle_speed, 0.0D);
         assertEquals(5, incoming.max_particle_color);
         assertEquals(Set.of(ConfigSetting.COLORS), batch.take());
+    }
 
-        batch.edited(ConfigSetting.ITEMS, local, 3L);
-        batch.dropRefused(null);
+    /** The upload goes out: the groups leave the batch and later edits are measured against the sent values. */
+    private static Set<ConfigSetting> sendNow(ConfigUploadBatch batch, PillarParticleConfig local) {
+        Set<ConfigSetting> groups = batch.take();
+        batch.measureFrom(local);
+        return groups;
+    }
+
+    @Test
+    public void aRefusalWithNoNewerEditsRestoresEveryRefusedFieldAndLeavesNothingPending() {
+        PillarParticleConfig local = new PillarParticleConfig();
+        ConfigUploadBatch batch = new ConfigUploadBatch();
+        batch.rebase(local);
+        double serverSpeed = local.particle_speed;
+        int serverMax = local.max_particle_color;
+        local.particle_speed = 0.4D;
+        batch.edited(ConfigSetting.PARTICLES, local, 1L);
+        local.max_particle_color = serverMax + 1;
+        batch.edited(ConfigSetting.COLORS, local, 2L);
+        assertEquals(Set.of(ConfigSetting.PARTICLES, ConfigSetting.COLORS), sendNow(batch, local));
+
+        // Refusal first, no snapshot: the displayed values go back to the server's.
+        batch.refuse(null, local);
+        assertEquals(serverSpeed, local.particle_speed, 0.0D);
+        assertEquals(serverMax, local.max_particle_color);
         assertFalse(batch.hasPending());
+        assertTrue(batch.inFlightSettings().isEmpty());
+    }
+
+    @Test
+    public void aRefusalNamingOneGroupLeavesTheOtherGroupsUploadAlone() {
+        PillarParticleConfig local = new PillarParticleConfig();
+        ConfigUploadBatch batch = new ConfigUploadBatch();
+        batch.rebase(local);
+        double serverSpeed = local.particle_speed;
+        local.particle_speed = 0.4D;
+        batch.edited(ConfigSetting.PARTICLES, local, 1L);
+        local.max_particle_color = local.max_particle_color + 1;
+        batch.edited(ConfigSetting.COLORS, local, 2L);
+        int sentMax = local.max_particle_color;
+        sendNow(batch, local);
+
+        batch.refuse(ConfigSetting.PARTICLES, local);
+        assertEquals(serverSpeed, local.particle_speed, 0.0D);
+        assertEquals(sentMax, local.max_particle_color);
+        assertEquals(Set.of(ConfigSetting.COLORS), batch.inFlightSettings());
+    }
+
+    @Test
+    public void aNewerEditToTheRefusedFieldSurvivesTheSnapshotAndThenTheRefusal() {
+        PillarParticleConfig local = new PillarParticleConfig();
+        ConfigUploadBatch batch = new ConfigUploadBatch();
+        batch.rebase(local);
+        PillarParticleConfig server = copyOf(local);
+        local.particle_speed = 0.40D;
+        batch.edited(ConfigSetting.PARTICLES, local, 1L);
+        sendNow(batch, local);
+        // Another edit of the same field before the answer arrives.
+        local.particle_speed = 0.45D;
+        batch.edited(ConfigSetting.PARTICLES, local, 2L);
+
+        // The server sends its state, then the refusal for PARTICLES.
+        PillarParticleConfig snapshot = copyOf(server);
+        batch.reapply(snapshot);
+        batch.refuse(ConfigSetting.PARTICLES, snapshot);
+
+        assertEquals(0.45D, snapshot.particle_speed, 0.0D);
+        assertEquals(Set.of(ConfigSetting.PARTICLES), batch.pendingSettings());
+        assertTrue(batch.isDue(2L + ConfigUploadBatch.DELAY_MS));
+        assertEquals(Set.of(ConfigSetting.PARTICLES), batch.take());
+    }
+
+    @Test
+    public void aNewerEditToAnotherGroupKeepsItWhileAGeneralRefusalRestoresTheRefusedField() {
+        PillarParticleConfig local = new PillarParticleConfig();
+        ConfigUploadBatch batch = new ConfigUploadBatch();
+        batch.rebase(local);
+        PillarParticleConfig server = copyOf(local);
+        local.particle_speed = 0.40D;
+        batch.edited(ConfigSetting.PARTICLES, local, 1L);
+        sendNow(batch, local);
+        int newMax = local.max_particle_color + 2;
+        local.max_particle_color = newMax;
+        batch.edited(ConfigSetting.COLORS, local, 2L);
+
+        // The refusal names no setting.
+        PillarParticleConfig snapshot = copyOf(server);
+        batch.reapply(snapshot);
+        batch.refuse(null, snapshot);
+
+        assertEquals(server.particle_speed, snapshot.particle_speed, 0.0D);
+        assertEquals(newMax, snapshot.max_particle_color);
+        assertEquals(Set.of(ConfigSetting.COLORS), batch.pendingSettings());
+    }
+
+    @Test
+    public void aRefusalBeforeTheSnapshotGivesTheSameFinalScreen() {
+        PillarParticleConfig local = new PillarParticleConfig();
+        ConfigUploadBatch batch = new ConfigUploadBatch();
+        batch.rebase(local);
+        PillarParticleConfig server = copyOf(local);
+        local.particle_speed = 0.40D;
+        local.particle_lifetime = local.particle_lifetime + 7;
+        batch.edited(ConfigSetting.PARTICLES, local, 1L);
+        sendNow(batch, local);
+        local.particle_speed = 0.45D;
+        batch.edited(ConfigSetting.PARTICLES, local, 2L);
+        int newMax = local.max_particle_color + 2;
+        local.max_particle_color = newMax;
+        batch.edited(ConfigSetting.COLORS, local, 3L);
+
+        // Refusal first: the refused field without a newer edit is back, the newer ones stay.
+        batch.refuse(null, local);
+        assertEquals(0.45D, local.particle_speed, 0.0D);
+        assertEquals(server.particle_lifetime, local.particle_lifetime);
+        assertEquals(newMax, local.max_particle_color);
+        // Then the snapshot.
+        PillarParticleConfig snapshot = copyOf(server);
+        batch.reapply(snapshot);
+        assertEquals(0.45D, snapshot.particle_speed, 0.0D);
+        assertEquals(server.particle_lifetime, snapshot.particle_lifetime);
+        assertEquals(newMax, snapshot.max_particle_color);
+        assertEquals(Set.of(ConfigSetting.PARTICLES, ConfigSetting.COLORS), batch.pendingSettings());
+    }
+
+    @Test
+    public void anAcceptedUploadIsConfirmedBySnapshotAndNothingIsRestored() {
+        PillarParticleConfig local = new PillarParticleConfig();
+        ConfigUploadBatch batch = new ConfigUploadBatch();
+        batch.rebase(local);
+        PillarParticleConfig server = copyOf(local);
+        local.particle_speed = 0.40D;
+        batch.edited(ConfigSetting.PARTICLES, local, 1L);
+        sendNow(batch, local);
+        assertEquals(Set.of(ConfigSetting.PARTICLES), batch.inFlightSettings());
+        upload(server, local, Set.of(ConfigSetting.PARTICLES));
+
+        PillarParticleConfig snapshot = copyOf(server);
+        batch.reapply(snapshot);
+        assertEquals(0.40D, snapshot.particle_speed, 0.0D);
+        assertTrue(batch.inFlightSettings().isEmpty());
+        assertFalse(batch.hasPending());
+        // A refusal of something else later does not undo the accepted value.
+        batch.refuse(null, snapshot);
+        assertEquals(0.40D, snapshot.particle_speed, 0.0D);
+    }
+
+    @Test
+    public void refusedColourSlotsAndItemsReturnToTheServerStateExceptNewerEdits() {
+        PillarParticleConfig local = new PillarParticleConfig();
+        local.particle_color = new ArrayList<>(List.of("#000001", "#000002", "#000003"));
+        local.replaceItems(List.of("minecraft:stone", "minecraft:dirt"));
+        ConfigUploadBatch batch = new ConfigUploadBatch();
+        batch.rebase(local);
+        local.particle_color.set(0, "#AAAAAA");
+        local.particle_color.set(1, "#BBBBBB");
+        batch.edited(ConfigSetting.COLORS, local, 1L);
+        local.items.add("minecraft:diamond");
+        local.items.remove("minecraft:dirt");
+        batch.edited(ConfigSetting.ITEMS, local, 1L);
+        sendNow(batch, local);
+        // Slot 1 is edited again before the answer.
+        local.particle_color.set(1, "#CCCCCC");
+        batch.edited(ConfigSetting.COLORS, local, 2L);
+
+        batch.refuse(null, local);
+        assertEquals(List.of("#000001", "#CCCCCC", "#000003"), local.particle_color);
+        assertEquals(Set.of("minecraft:stone", "minecraft:dirt"), local.items);
+        assertEquals(Set.of(ConfigSetting.COLORS), batch.pendingSettings());
     }
 
     @Test

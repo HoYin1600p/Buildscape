@@ -1,21 +1,19 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.HollowLogBlock;
-import com.kingodogo.buildscape.block.HollowLogBlockEntity;
-import com.kingodogo.buildscape.block.HollowPipeBlock;
-import com.kingodogo.buildscape.pipe.transport.BubbleColumnState;
-import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
-import com.kingodogo.buildscape.pipe.transport.PipeFluidTransport;
-import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
+import com.kingodogo.buildscape.feature.pipe.HollowLogBlockEntity;
+import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
+import com.kingodogo.buildscape.feature.pipe.transport.BubbleColumnState;
+import com.kingodogo.buildscape.feature.pipe.transport.PipeFlowState;
+import com.kingodogo.buildscape.feature.pipe.transport.PipeFluidTransport;
+import com.kingodogo.buildscape.feature.pipe.transport.WorldPipeTopologyAccess;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,8 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     private static final double OPEN_MIN = 0.127;
     private static final double OPEN_MAX = 1.0 - OPEN_MIN;
 
-    public record Outlet(Direction direction, double height) {}
+    public record Outlet(Direction direction, double height) {
+    }
 
     private final VertexConsumer delegate;
     private final List<Outlet> outlets;
@@ -47,7 +46,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     }
 
     public static VertexConsumer wrap(VertexConsumer delegate, BlockAndTintGetter level, BlockPos pos,
-                                      BlockState state, FluidState fluid) {
+            BlockState state, FluidState fluid) {
         List<Outlet> outlets = findOutlets(level, pos, state, fluid);
         return outlets.isEmpty() ? delegate : new PipeSpillVertexConsumer(delegate, pos, outlets);
     }
@@ -59,7 +58,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
         }
         BlockPos above = pos.above();
         BlockState pipeAbove = level.getBlockState(above);
-        if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
+        if (fluid.getValue(FlowingFluid.FALLING)
                 && PipeFluidTransport.isHollowPipe(pipeAbove)
                 && level.getBlockEntity(above) instanceof HollowLogBlockEntity entity
                 && entity.getPipeFlowState().hasFluid()
@@ -68,7 +67,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 && entity.getPipeFlowState().hasFlowDirection(Direction.DOWN)) {
             return List.of(new Outlet(Direction.UP, 1.0));
         }
-        if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
+        if (fluid.getValue(FlowingFluid.FALLING)
                 || level.getFluidState(pos.above()).getType().isSame(fluid.getType())) {
             return List.of();
         }
@@ -100,31 +99,76 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                         || pipe.getValue(HollowPipeBlock.SOUTH))
                         && !pipe.getValue(HollowPipeBlock.WEST) && !pipe.getValue(HollowPipeBlock.EAST);
                 double height = straightX || straightZ ? heights.outlet() : heights.center();
-                if (straightX && exit == Direction.WEST && flow.getInflowDirection() == Direction.WEST) height = heights.inlet();
-                if (straightX && exit == Direction.EAST && flow.getInflowDirection() == Direction.EAST) height = heights.inlet();
-                if (straightZ && exit == Direction.NORTH && flow.getInflowDirection() == Direction.NORTH) height = heights.inlet();
-                if (straightZ && exit == Direction.SOUTH && flow.getInflowDirection() == Direction.SOUTH) height = heights.inlet();
-                if (outlets == null) outlets = new ArrayList<>(2);
+                if (straightX && exit == Direction.WEST && flow.getInflowDirection() == Direction.WEST) {
+                    height = heights.inlet();
+                }
+                if (straightX && exit == Direction.EAST && flow.getInflowDirection() == Direction.EAST) {
+                    height = heights.inlet();
+                }
+                if (straightZ && exit == Direction.NORTH && flow.getInflowDirection() == Direction.NORTH) {
+                    height = heights.inlet();
+                }
+                if (straightZ && exit == Direction.SOUTH && flow.getInflowDirection() == Direction.SOUTH) {
+                    height = heights.inlet();
+                }
+                if (outlets == null) {
+                    outlets = new ArrayList<>(2);
+                }
                 outlets.add(new Outlet(direction, height));
             }
         }
         return outlets == null ? List.of() : outlets;
     }
 
-    @Override public VertexConsumer vertex(double x, double y, double z) {
-        this.x = x; this.y = y; this.z = z; return this;
+    @Override
+    public VertexConsumer vertex(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
     }
-    @Override public VertexConsumer color(int r, int g, int b, int a) {
-        red = r; green = g; blue = b; alpha = a; return this;
+    @Override
+    public VertexConsumer color(int r, int g, int b, int a) {
+        red = r;
+        green = g;
+        blue = b;
+        alpha = a;
+        return this;
     }
-    @Override public VertexConsumer uv(float u, float v) { this.u = u; this.v = v; return this; }
-    @Override public VertexConsumer overlayCoords(int u, int v) { overlayU = u; overlayV = v; return this; }
-    @Override public VertexConsumer uv2(int u, int v) { lightU = u; lightV = v; return this; }
-    @Override public VertexConsumer normal(float x, float y, float z) { nx = x; ny = y; nz = z; return this; }
-    @Override public void defaultColor(int r, int g, int b, int a) { color(r, g, b, a); }
-    @Override public void unsetDefaultColor() {}
+    @Override
+    public VertexConsumer uv(float u, float v) {
+        this.u = u;
+        this.v = v;
+        return this;
+    }
+    @Override
+    public VertexConsumer overlayCoords(int u, int v) {
+        overlayU = u;
+        overlayV = v;
+        return this;
+    }
+    @Override
+    public VertexConsumer uv2(int u, int v) {
+        lightU = u;
+        lightV = v;
+        return this;
+    }
+    @Override
+    public VertexConsumer normal(float x, float y, float z) {
+        nx = x;
+        ny = y;
+        nz = z;
+        return this;
+    }
+    @Override
+    public void defaultColor(int r, int g, int b, int a) {
+        color(r, g, b, a);
+    }
+    @Override
+    public void unsetDefaultColor() {}
 
-    @Override public void endVertex() {
+    @Override
+    public void endVertex() {
         quad[count++] = new Vertex(x, y, z, u, v, red, green, blue, alpha,
                 overlayU, overlayV, lightU, lightV, nx, ny, nz);
         if (count == 4) {
@@ -143,11 +187,17 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 return;
             }
             int index = px == 0 ? (pz == 0 ? 0 : 1) : (pz == 0 ? 3 : 2);
-            if (corners[index] != null) { emitOriginal(); return; }
+            if (corners[index] != null) {
+                emitOriginal();
+                return;
+            }
             corners[index] = vertex;
         }
         for (Vertex corner : corners) {
-            if (corner == null) { emitOriginal(); return; }
+            if (corner == null) {
+                emitOriginal();
+                return;
+            }
         }
         if (downwardOutlet) {
             renderDownwardOutlet(corners);
@@ -164,13 +214,18 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 double sideZ = outlet.direction.getAxis() == Direction.Axis.Z ? edgeZ : across;
                 gap = Math.max(gap, outlet.height - (sample(corners, sideX, sideZ).y - baseY));
             }
-            if (gap <= 0.001) continue;
+            if (gap <= 0.001) {
+                continue;
+            }
             double length = Math.min(0.875, Math.max(0.25, gap * 2.0));
             spills.add(new Spill(outlet, length));
             cuts.add(length);
             cuts.add(1.0 - length);
         }
-        if (spills.isEmpty()) { emitOriginal(); return; }
+        if (spills.isEmpty()) {
+            emitOriginal();
+            return;
+        }
         Double[] grid = cuts.toArray(Double[]::new);
         boolean forward = quad[1].z > quad[0].z;
         for (int ix = 0; ix < grid.length - 1; ix++) {
@@ -179,7 +234,10 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 Vertex sw = raised(corners, spills, grid[ix], grid[iz + 1]);
                 Vertex se = raised(corners, spills, grid[ix + 1], grid[iz + 1]);
                 Vertex ne = raised(corners, spills, grid[ix + 1], grid[iz]);
-                emit(nw); emit(forward ? sw : ne); emit(se); emit(forward ? ne : sw);
+                emit(nw);
+                emit(forward ? sw : ne);
+                emit(se);
+                emit(forward ? ne : sw);
             }
         }
     }
@@ -230,21 +288,26 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
         Vertex a = c[0], b = x <= z ? c[1] : c[3], d = c[2];
         double wb = Math.abs(z - x), wd = Math.min(x, z), wa = 1 - wb - wd;
         return a.at(baseX + x, a.y * wa + b.y * wb + d.y * wd, baseZ + z,
-                (float)(a.u * wa + b.u * wb + d.u * wd), (float)(a.v * wa + b.v * wb + d.v * wd));
+                (float) (a.u * wa + b.u * wb + d.u * wd), (float) (a.v * wa + b.v * wb + d.v * wd));
     }
 
-    private void emitOriginal() { for (Vertex vertex : quad) emit(vertex); }
+    private void emitOriginal() {
+        for (Vertex vertex : quad) {
+            emit(vertex);
+        }
+    }
 
     private void emit(Vertex v) {
         delegate.vertex(v.x, v.y, v.z).color(v.red, v.green, v.blue, v.alpha).uv(v.u, v.v)
                 .overlayCoords(v.overlayU, v.overlayV).uv2(v.lightU, v.lightV).normal(v.nx, v.ny, v.nz).endVertex();
     }
 
-    private record Spill(Outlet outlet, double length) {}
+    private record Spill(Outlet outlet, double length) {
+    }
 
     private record Vertex(double x, double y, double z, float u, float v,
-                          int red, int green, int blue, int alpha, int overlayU, int overlayV,
-                          int lightU, int lightV, float nx, float ny, float nz) {
+            int red, int green, int blue, int alpha, int overlayU, int overlayV,
+            int lightU, int lightV, float nx, float ny, float nz) {
         Vertex at(double x, double y, double z, float u, float v) {
             return new Vertex(x, y, z, u, v, red, green, blue, alpha,
                     overlayU, overlayV, lightU, lightV, nx, ny, nz);

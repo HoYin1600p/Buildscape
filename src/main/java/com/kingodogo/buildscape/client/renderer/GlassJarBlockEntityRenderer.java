@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.GlassJarBlockEntity;
+import com.kingodogo.buildscape.block.storage.GlassJarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.fluids.FluidStack;
 
 public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJarBlockEntity> {
 
@@ -78,15 +79,14 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
             float oscillation = (float) Math.sin(wobbleProgress * Math.PI * 6);
             float rotationAngle = 8.0F * dampening * oscillation;
 
-            poseStack.translate(0.5D, 0.0D, 0.5D);
+            poseStack.translate(0.5, 0.0, 0.5);
             poseStack.mulPose(Vector3f.ZP.rotationDegrees(rotationAngle));
-            poseStack.translate(-0.5D, 0.0D, -0.5D);
+            poseStack.translate(-0.5, 0.0, -0.5);
         }
 
         if (blockEntity.hasLiquid()) {
             renderLiquid(blockEntity, poseStack, bufferSource, light, combinedOverlay);
-        }
-        else if (!blockEntity.isEmpty()) {
+        } else if (!blockEntity.isEmpty()) {
             ItemStack storedItem = blockEntity.getStoredItem();
             if (storedItem != null && !storedItem.isEmpty()) {
                 int count = storedItem.getCount();
@@ -103,7 +103,7 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
                     float offsetZ = getJitter(pos, i, 2) * 0.025F;
                     float currentY = startY + (i * yStep);
 
-                    poseStack.translate(0.5D + offsetX, currentY, 0.5D + offsetZ);
+                    poseStack.translate(0.5 + offsetX, currentY, 0.5 + offsetZ);
 
                     float randomAngle = getDeterministicRandomAngle(pos, i);
                     poseStack.mulPose(Vector3f.YP.rotationDegrees(randomAngle));
@@ -150,8 +150,9 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
             int overlay) {
         ItemStack liquidItem = blockEntity.getStoredLiquidItem();
         int level = blockEntity.getLiquidLevel();
-        if (liquidItem == null || liquidItem.isEmpty() || level <= 0)
+        if (liquidItem == null || liquidItem.isEmpty() || level <= 0) {
             return;
+        }
 
         ResourceLocation textureLoc = new ResourceLocation("minecraft", "block/water_still");
         int color = 0xFF3F76E4;
@@ -182,7 +183,7 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
                 color = 0xFF3F76E4;
                 textureLoc = new ResourceLocation("minecraft", "block/water_still");
             } else {
-                net.minecraftforge.fluids.FluidStack fluidStack = new net.minecraftforge.fluids.FluidStack(fluid, 1000);
+                FluidStack fluidStack = new FluidStack(fluid, 1000);
                 ResourceLocation stillTexture = fluid.getAttributes().getStillTexture(fluidStack);
                 if (stillTexture != null) {
                     textureLoc = stillTexture;
@@ -223,8 +224,9 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
         float g = ((color >> 8) & 0xFF) / 255.0F;
         float b = (color & 0xFF) / 255.0F;
         float a = ((color >> 24) & 0xFF) / 255.0F;
-        if (a == 0.0F)
+        if (a == 0.0F) {
             a = 0.88F;
+        }
 
         float u0 = sprite.getU0();
         float u1 = sprite.getU1();

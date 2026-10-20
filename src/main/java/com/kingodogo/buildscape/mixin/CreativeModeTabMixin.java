@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.registry.ModCreativeModeTab;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
@@ -64,7 +65,7 @@ public class CreativeModeTabMixin {
 
             items.clear();
             items.addAll(ordered);
-            com.kingodogo.buildscape.item.ModCreativeModeTab.sortItems(items);
+            ModCreativeModeTab.sortItems(items);
         }
     }
 }

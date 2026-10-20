@@ -1,12 +1,14 @@
 package com.kingodogo.buildscape.util;
 
 import net.minecraft.core.BlockPos;
+import org.junit.Test;
 
 import java.util.Set;
 
 public final class TreeChopTraversalTest {
 
-    public static void main(String[] args) {
+    @Test
+    public void traversalHonoursLimitAndPredicate() {
         BlockPos origin = BlockPos.ZERO;
         Set<BlockPos> capped = TreeChopTraversal.collect(origin, pos -> true, 200);
         require(capped.size() == 200, "Traversal did not enforce the exact 200-block limit");
@@ -20,7 +22,6 @@ public final class TreeChopTraversalTest {
 
         Set<BlockPos> rejected = TreeChopTraversal.collect(origin, pos -> false, 200);
         require(rejected.isEmpty(), "Traversal accepted a rejected starting block");
-        System.out.println("Tree chop traversal: 4 checks passed.");
     }
 
     private static void require(boolean condition, String message) {

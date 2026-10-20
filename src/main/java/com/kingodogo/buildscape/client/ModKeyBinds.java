@@ -4,6 +4,5 @@ public class ModKeyBinds {
 
     public static final String CATEGORY = "key.categories.buildscape";
 
-    public static void register() {
-    }
+    public static void register() {}
 }

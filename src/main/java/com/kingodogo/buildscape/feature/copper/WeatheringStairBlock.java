@@ -1,0 +1,24 @@
+package com.kingodogo.buildscape.feature.copper;
+
+import com.kingodogo.buildscape.block.building.ModStairBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import java.util.Random;
+
+public class WeatheringStairBlock extends ModStairBlock implements BuildscapeWeatheringCopper {
+    public WeatheringStairBlock(BlockState baseState, BlockBehaviour.Properties properties) {
+        super(baseState, properties.randomTicks());
+    }
+
+    @Override
+    public boolean isRandomlyTicking(BlockState state) {
+        return this.canWeather(state);
+    }
+
+    @Override
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+        this.onRandomTick(state, level, pos, random);
+    }
+}

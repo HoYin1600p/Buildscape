@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.entity.MangroveBoatEntity;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.model.BoatModel;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -12,16 +11,15 @@ import net.minecraft.world.entity.vehicle.Boat;
 
 public class MangroveBoatRenderer extends BoatRenderer {
 
-    private static final ResourceLocation MANGROVE_BOAT_TEXTURE =
-            new ResourceLocation(BuildScape.MODID, "textures/entity/boat/mangrove.png");
+    private static final ResourceLocation MANGROVE_BOAT_TEXTURE = new ResourceLocation(BuildScape.MODID,
+            "textures/entity/boat/mangrove.png");
 
     private final BoatModel boatModel;
 
     public MangroveBoatRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.boatModel = new BoatModel(
-                context.bakeLayer(ModelLayers.createBoatModelName(Boat.Type.OAK))
-        );
+                context.bakeLayer(ModelLayers.createBoatModelName(Boat.Type.OAK)));
     }
 
     @Override

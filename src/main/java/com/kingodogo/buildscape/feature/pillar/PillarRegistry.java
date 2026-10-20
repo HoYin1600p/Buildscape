@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.feature.pillar;
 
+import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager.PillarData;
 import java.io.*;
@@ -9,11 +10,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * The pillar and item frame records of one {@link PillarIdManager}: the id and position maps and the
- * operations that need nothing but those maps. Anything that touches the world, the files or the save
- * flags stays in the manager.
+ * operations that need nothing but those maps, plus the id prefix a block gets. Anything that changes
+ * the world, the files or the save flags stays in the manager.
  */
 final class PillarRegistry {
 
@@ -320,5 +327,116 @@ final class PillarRegistry {
             if ((!hasId || id.equals(data.id)) && isSameFrameLocation(data, dimension, pos, facing)) return true;
         }
         return false;
+    }
+
+
+    static String getVariantPrefix(Level level, BlockPos pos) {
+        if (level == null || pos == null) return PillarIdManager.PREFIX_STONE + "-P";
+
+        if (
+                !level.isClientSide &&
+                        !BuildScape.isServerFullyInitialized()
+        ) {
+            return PillarIdManager.PREFIX_STONE + "-P";
+        }
+
+        if (!level.hasChunkAt(pos)) {
+            return PillarIdManager.PREFIX_STONE + "-P";
+        }
+
+        try {
+            if (!level.isClientSide) {
+                ChunkAccess chunk = level.getChunk(pos);
+                if (!(chunk instanceof LevelChunk)) {
+                    return PillarIdManager.PREFIX_STONE + "-P";
+                }
+                if (
+                        !chunk
+                                .getStatus()
+                                .isOrAfter(ChunkStatus.FULL)
+                ) {
+                    return PillarIdManager.PREFIX_STONE + "-P";
+                }
+            }
+        } catch (Exception e) {
+            return PillarIdManager.PREFIX_STONE + "-P";
+        }
+
+        try {
+            BlockState state = level.getBlockState(pos);
+            Block block = state.getBlock();
+            String blockName =
+                    ForgeRegistries.BLOCKS.getKey(
+                            block
+                    ).getPath();
+
+            if (blockName.contains("mossy")) {
+                return PillarIdManager.PREFIX_MOSSY + "-P";
+            } else if (blockName.contains("deepslate")) {
+                return PillarIdManager.PREFIX_DEEPSLATE + "-P";
+            } else if (blockName.contains("quartz")) {
+                return PillarIdManager.PREFIX_QUARTZ + "-P";
+            } else if (blockName.contains("ashenking_diamond")) {
+                return "AK-D";
+            } else if (blockName.contains("ashenking_emerald")) {
+                return "AK-E";
+            } else if (blockName.contains("ashenking_netherite")) {
+                return "AK-N";
+            } else if (blockName.contains("ashenking_gold")) {
+                return "AK-G";
+            } else if (blockName.contains("ashenking_pillar")) {
+                return "AK-P";
+            } else if (blockName.contains("amethyst")) {
+                return "AM-P";
+            } else if (blockName.contains("andesite")) {
+                return "AN-P";
+            } else if (blockName.contains("basalt")) {
+                return "BS-P";
+            } else if (blockName.contains("blackstone")) {
+                return "BL-P";
+            } else if (blockName.contains("blue_ice")) {
+                return "BI-P";
+            } else if (blockName.contains("calcite")) {
+                return "CA-P";
+            } else if (blockName.contains("cinnabar")) {
+                return "CI-P";
+            } else if (blockName.contains("exposed_copper")) {
+                return "EC-P";
+            } else if (blockName.contains("oxidized_copper")) {
+                return "OC-P";
+            } else if (blockName.contains("weathered_copper")) {
+                return "WC-P";
+            } else if (blockName.contains("copper")) {
+                return "CO-P";
+            } else if (blockName.contains("dark_prismarine")) {
+                return "DP-P";
+            } else if (blockName.contains("prismarine")) {
+                return "PR-P";
+            } else if (blockName.contains("diorite")) {
+                return "DI-P";
+            } else if (blockName.contains("dripstone")) {
+                return "DR-P";
+            } else if (blockName.contains("granite")) {
+                return "GR-P";
+            } else if (blockName.contains("netherrack")) {
+                return "NE-P";
+            } else if (blockName.contains("obsidian")) {
+                return "OB-P";
+            } else if (blockName.contains("packed_mud")) {
+                return "PM-P";
+            } else if (blockName.contains("sculk")) {
+                return "SC-P";
+            } else if (blockName.contains("sulfur")) {
+                return "SU-P";
+            } else if (blockName.contains("tuff")) {
+                return "TU-P";
+            } else if (blockName.contains("stone")) {
+                return PillarIdManager.PREFIX_STONE + "-P";
+            } else {
+                return PillarIdManager.PREFIX_STONE + "-P";
+            }
+        } catch (Exception e) {
+            return PillarIdManager.PREFIX_STONE + "-P";
+        }
     }
 }

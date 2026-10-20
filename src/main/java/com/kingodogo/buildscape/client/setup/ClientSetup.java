@@ -38,7 +38,9 @@ import com.kingodogo.buildscape.registry.ModEntities;
 import com.kingodogo.buildscape.registry.ModItems;
 import com.kingodogo.buildscape.registry.ModMenuTypes;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -57,6 +59,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.FoliageColor;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.GrassColor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
@@ -77,6 +80,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Client-only mod-bus setup: registers key bindings, block entity and entity renderers, menu screens, block and item
@@ -220,535 +224,479 @@ public class ClientSetup {
     }
 
     private static void registerBlockColors() {
-        BlockColors blockColors = Minecraft
-                .getInstance().getBlockColors();
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (reader == null || pos == null) {
-                        return 0x7FA832;
-                    }
-                    if (tintIndex == 1) {
-                        if (reader instanceof LevelReader levelReader) {
-                            return levelReader
-                                    .getBiome(pos)
-                                    .value()
-                                    .getGrassColor(pos.getX(),
-                                            pos.getZ());
-                        }
-                        return 0x7FA832;
-                    }
-                    return -1;
-                },
-                ModBlocks.CLOVER.get());
+        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+        for (BlockTint tint : blockTints()) {
+            blockColors.register(
+                    tint.provider(),
+                    tint.blocks().stream().map(Supplier::get).toArray(Block[]::new));
+        }
+    }
 
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (reader == null || pos == null) {
-                        return 0x7FA832;
-                    }
-                    if (tintIndex == 1) {
-                        if (reader instanceof LevelReader levelReader) {
-                            return levelReader
-                                    .getBiome(pos)
-                                    .value()
-                                    .getGrassColor(pos.getX(),
-                                            pos.getZ());
-                        }
-                        return 0x7FA832;
-                    }
-                    return -1;
-                },
-                ModBlocks.RED_PETAL.get(),
-                ModBlocks.BLUE_PETAL.get(),
-                ModBlocks.ORANGE_PETAL.get(),
-                ModBlocks.PINK_PETAL.get(),
-                ModBlocks.PURPLE_PETAL.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-
-                    if (state.hasProperty(
-                            OrnamentBlock.STRING_COLOR)) {
-                        OrnamentBlock.StringColor stringColor = state
-                                .getValue(
-                                        OrnamentBlock.STRING_COLOR);
-                        return stringColor.getColor();
-                    }
-
-                    return 0xFFFFFF;
-                },
-                ModBlocks.WHITE_ORNAMENT.get(),
-                ModBlocks.ORANGE_ORNAMENT.get(),
-                ModBlocks.MAGENTA_ORNAMENT.get(),
-                ModBlocks.LIGHT_BLUE_ORNAMENT.get(),
-                ModBlocks.YELLOW_ORNAMENT.get(),
-                ModBlocks.LIME_ORNAMENT.get(),
-                ModBlocks.PINK_ORNAMENT.get(),
-                ModBlocks.GRAY_ORNAMENT.get(),
-                ModBlocks.LIGHT_GRAY_ORNAMENT.get(),
-                ModBlocks.CYAN_ORNAMENT.get(),
-                ModBlocks.PURPLE_ORNAMENT.get(),
-                ModBlocks.BLUE_ORNAMENT.get(),
-                ModBlocks.BROWN_ORNAMENT.get(),
-                ModBlocks.GREEN_ORNAMENT.get(),
-                ModBlocks.RED_ORNAMENT.get(),
-                ModBlocks.BLACK_ORNAMENT.get(),
-                ModBlocks.GLASS_ORNAMENT.get(),
-                ModBlocks.TINTED_GLASS_ORNAMENT.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-
-                    if (state.hasProperty(
-                            StringLightBlock.STRING_COLOR)) {
-                        StringLightBlock.StringColor stringColor = state
-                                .getValue(
-                                        StringLightBlock.STRING_COLOR);
-                        return stringColor.getColor();
-                    }
-
-                    return 0xFFFFFF;
-                },
-                ModBlocks.WHITE_STRING_LIGHT.get(),
-                ModBlocks.ORANGE_STRING_LIGHT.get(),
-                ModBlocks.MAGENTA_STRING_LIGHT.get(),
-                ModBlocks.LIGHT_BLUE_STRING_LIGHT.get(),
-                ModBlocks.YELLOW_STRING_LIGHT.get(),
-                ModBlocks.LIME_STRING_LIGHT.get(),
-                ModBlocks.PINK_STRING_LIGHT.get(),
-                ModBlocks.GRAY_STRING_LIGHT.get(),
-                ModBlocks.LIGHT_GRAY_STRING_LIGHT.get(),
-                ModBlocks.CYAN_STRING_LIGHT.get(),
-                ModBlocks.PURPLE_STRING_LIGHT.get(),
-                ModBlocks.BLUE_STRING_LIGHT.get(),
-                ModBlocks.BROWN_STRING_LIGHT.get(),
-                ModBlocks.GREEN_STRING_LIGHT.get(),
-                ModBlocks.RED_STRING_LIGHT.get(),
-                ModBlocks.BLACK_STRING_LIGHT.get(),
-                ModBlocks.MULTICOLOR_STRING_LIGHT.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-
-                    if (reader != null
-                            && pos != null
-                            && reader instanceof LevelReader levelReader) {
-                        return levelReader.getBiome(pos).value()
-                                .getFoliageColor();
-                    }
-
-                    return 0x48B518;
-                },
-                ModBlocks.OAK_LEAF_LAYERS.get(),
-                ModBlocks.JUNGLE_LEAF_LAYERS.get(),
-                ModBlocks.ACACIA_LEAF_LAYERS.get(),
-                ModBlocks.DARK_OAK_LEAF_LAYERS.get(),
-                ModBlocks.OAK_LEAF_HEDGE.get(),
-                ModBlocks.JUNGLE_LEAF_HEDGE.get(),
-                ModBlocks.ACACIA_LEAF_HEDGE.get(),
-                ModBlocks.DARK_OAK_LEAF_HEDGE.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    if (reader != null && pos != null) {
-                        return BiomeColors.getAverageFoliageColor(reader, pos);
-                    }
-                    return FoliageColor.getDefaultColor();
-                },
-                ModBlocks.BUSH.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    if (reader != null && pos != null) {
-                        return DryFoliageColor.getDryFoliageColor(reader, pos);
-                    }
-                    return DryFoliageColor.getDefaultColor();
-                },
-                ModBlocks.LEAF_LITTER.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex == 1 || tintIndex == 0) {
-                        if (reader != null && pos != null) {
-                            return BiomeColors.getAverageFoliageColor(reader, pos);
-                        }
-                        return FoliageColor.getDefaultColor();
-                    }
-                    return -1;
-                },
-                ModBlocks.WILDFLOWERS.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    return 0x619961;
-                },
-                ModBlocks.SPRUCE_LEAF_LAYERS.get(),
-                ModBlocks.SPRUCE_LEAF_HEDGE.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    return 0x80a755;
-                },
-                ModBlocks.BIRCH_LEAF_LAYERS.get(),
-                ModBlocks.BIRCH_LEAF_HEDGE.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    return -1;
-                },
-                ModBlocks.AZALEA_LEAF_LAYERS.get(),
-                ModBlocks.FLOWERING_AZALEA_LEAF_LAYERS.get(),
-                ModBlocks.AZALEA_LEAF_HEDGE.get(),
-                ModBlocks.FLOWERING_AZALEA_LEAF_HEDGE.get(),
-                ModBlocks.ORANGE_POPLAR_LEAF_LAYERS.get(),
-                ModBlocks.RED_POPLAR_LEAF_LAYERS.get(),
-                ModBlocks.YELLOW_POPLAR_LEAF_LAYERS.get(),
-                ModBlocks.CHERRY_LEAF_LAYERS.get(),
-                ModBlocks.PALE_OAK_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_CHERRY_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_PALE_OAK_LEAF_LAYERS.get(),
-                ModBlocks.ORANGE_POPLAR_LEAF_HEDGE.get(),
-                ModBlocks.RED_POPLAR_LEAF_HEDGE.get(),
-                ModBlocks.YELLOW_POPLAR_LEAF_HEDGE.get(),
-                ModBlocks.CHERRY_LEAF_HEDGE.get(),
-                ModBlocks.PALE_OAK_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_CHERRY_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_PALE_OAK_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_CHERRY_LEAVES.get(),
-                ModBlocks.SNOWY_PALE_OAK_LEAVES.get(),
-                ModBlocks.SNOWY_ORANGE_POPLAR_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_RED_POPLAR_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_ORANGE_POPLAR_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_RED_POPLAR_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_YELLOW_POPLAR_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_ORANGE_POPLAR_LEAVES.get(),
-                ModBlocks.SNOWY_RED_POPLAR_LEAVES.get(),
-                ModBlocks.SNOWY_YELLOW_POPLAR_LEAVES.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    return -1;
-                },
-                ModBlocks.SNOWY_OAK_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_SPRUCE_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_BIRCH_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_JUNGLE_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_ACACIA_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_DARK_OAK_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_MANGROVE_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_AZALEA_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get(),
-                ModBlocks.SNOWY_OAK_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_SPRUCE_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_BIRCH_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_JUNGLE_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_ACACIA_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_DARK_OAK_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_MANGROVE_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_AZALEA_LEAF_HEDGE.get(),
-                ModBlocks.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    if (reader != null
-                            && pos != null
-                            && reader instanceof LevelReader levelReader) {
-                        return levelReader.getBiome(pos).value()
-                                .getFoliageColor();
-                    }
-                    return 0x92c648;
-                },
-                ModBlocks.MANGROVE_LEAF_LAYERS.get(),
-                ModBlocks.MANGROVE_LEAF_HEDGE.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    if (reader != null
-                            && pos != null
-                            && reader instanceof LevelReader levelReader) {
-                        return levelReader.getBiome(pos).value()
-                                .getFoliageColor();
-                    }
-                    return 0x92c648;
-                },
-                ModBlocks.MANGROVE_LEAVES.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    if (reader != null && pos != null) {
-                        return BiomeColors.getAverageWaterColor(reader, pos);
-                    }
-                    return 0x3F76E4;
-                },
-                ModBlocks.CASCADE_BLOCK.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    if (reader != null && pos != null) {
-                        return BiomeColors.getAverageWaterColor(reader, pos);
-                    }
-                    return 0x3F76E4;
-                },
-                ModBlocks.CASCADE_BLOCK_NO_MIST.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-
-                    if (reader != null && pos != null) {
-                        BlockEntity be = reader
-                                .getBlockEntity(pos);
-                        if (be instanceof GlowLightsBlockEntity glowBE) {
-                            List<String> dyeColors = glowBE
-                                    .getDyeColors();
-                            if (dyeColors != null && !dyeColors.isEmpty()) {
-                                int hash = pos.hashCode()
-                                        ^ state.hashCode();
-                                int colorIndex = Math.abs(hash)
-                                        % dyeColors.size();
-                                String colorCode = dyeColors
-                                        .get(colorIndex);
-
-                                try {
-                                    if (colorCode != null
-                                            && colorCode.startsWith(
-                                                    "#")
-                                            && colorCode.length() == 7) {
-                                        int color = Integer
-                                                .parseInt(colorCode
-                                                        .substring(1),
-                                                        16);
-                                        return color | 0xFF000000;
-                                    }
-                                } catch (NumberFormatException e) {
-                                    // malformed tint colour code; fall through to the default tint
-                                }
-                            }
-                        }
-                    }
-
-                    return -1;
-                },
-                ModBlocks.GLOW_LIGHTS.get());
-
-        blockColors.register(
-                (state, reader, pos, tintIndex) -> {
-                    if (tintIndex == 0) {
-                        if (reader != null && pos != null) {
-                            return BiomeColors.getAverageGrassColor(reader, pos);
-                        }
-                        return GrassColor.get(0.5, 1.0);
-                    }
-                    return -1;
-                },
-                Blocks.COMPOSTER);
+    /** The block colour registrations, in registration order. */
+    private static List<BlockTint> blockTints() {
+        return List.of(
+                blockTint(GRASS_LAYER_TINT,
+                        ModBlocks.CLOVER),
+                blockTint(GRASS_LAYER_TINT,
+                        ModBlocks.RED_PETAL,
+                        ModBlocks.BLUE_PETAL,
+                        ModBlocks.ORANGE_PETAL,
+                        ModBlocks.PINK_PETAL,
+                        ModBlocks.PURPLE_PETAL),
+                blockTint(ORNAMENT_TINT,
+                        ModBlocks.WHITE_ORNAMENT,
+                        ModBlocks.ORANGE_ORNAMENT,
+                        ModBlocks.MAGENTA_ORNAMENT,
+                        ModBlocks.LIGHT_BLUE_ORNAMENT,
+                        ModBlocks.YELLOW_ORNAMENT,
+                        ModBlocks.LIME_ORNAMENT,
+                        ModBlocks.PINK_ORNAMENT,
+                        ModBlocks.GRAY_ORNAMENT,
+                        ModBlocks.LIGHT_GRAY_ORNAMENT,
+                        ModBlocks.CYAN_ORNAMENT,
+                        ModBlocks.PURPLE_ORNAMENT,
+                        ModBlocks.BLUE_ORNAMENT,
+                        ModBlocks.BROWN_ORNAMENT,
+                        ModBlocks.GREEN_ORNAMENT,
+                        ModBlocks.RED_ORNAMENT,
+                        ModBlocks.BLACK_ORNAMENT,
+                        ModBlocks.GLASS_ORNAMENT,
+                        ModBlocks.TINTED_GLASS_ORNAMENT),
+                blockTint(STRING_LIGHT_TINT,
+                        ModBlocks.WHITE_STRING_LIGHT,
+                        ModBlocks.ORANGE_STRING_LIGHT,
+                        ModBlocks.MAGENTA_STRING_LIGHT,
+                        ModBlocks.LIGHT_BLUE_STRING_LIGHT,
+                        ModBlocks.YELLOW_STRING_LIGHT,
+                        ModBlocks.LIME_STRING_LIGHT,
+                        ModBlocks.PINK_STRING_LIGHT,
+                        ModBlocks.GRAY_STRING_LIGHT,
+                        ModBlocks.LIGHT_GRAY_STRING_LIGHT,
+                        ModBlocks.CYAN_STRING_LIGHT,
+                        ModBlocks.PURPLE_STRING_LIGHT,
+                        ModBlocks.BLUE_STRING_LIGHT,
+                        ModBlocks.BROWN_STRING_LIGHT,
+                        ModBlocks.GREEN_STRING_LIGHT,
+                        ModBlocks.RED_STRING_LIGHT,
+                        ModBlocks.BLACK_STRING_LIGHT,
+                        ModBlocks.MULTICOLOR_STRING_LIGHT),
+                blockTint(BIOME_FOLIAGE_TINT,
+                        ModBlocks.OAK_LEAF_LAYERS,
+                        ModBlocks.JUNGLE_LEAF_LAYERS,
+                        ModBlocks.ACACIA_LEAF_LAYERS,
+                        ModBlocks.DARK_OAK_LEAF_LAYERS,
+                        ModBlocks.OAK_LEAF_HEDGE,
+                        ModBlocks.JUNGLE_LEAF_HEDGE,
+                        ModBlocks.ACACIA_LEAF_HEDGE,
+                        ModBlocks.DARK_OAK_LEAF_HEDGE),
+                blockTint(BUSH_TINT,
+                        ModBlocks.BUSH),
+                blockTint(LEAF_LITTER_TINT,
+                        ModBlocks.LEAF_LITTER),
+                blockTint(WILDFLOWERS_TINT,
+                        ModBlocks.WILDFLOWERS),
+                blockTint(SPRUCE_LEAF_TINT,
+                        ModBlocks.SPRUCE_LEAF_LAYERS,
+                        ModBlocks.SPRUCE_LEAF_HEDGE),
+                blockTint(BIRCH_LEAF_TINT,
+                        ModBlocks.BIRCH_LEAF_LAYERS,
+                        ModBlocks.BIRCH_LEAF_HEDGE),
+                blockTint(NO_TINT,
+                        ModBlocks.AZALEA_LEAF_LAYERS,
+                        ModBlocks.FLOWERING_AZALEA_LEAF_LAYERS,
+                        ModBlocks.AZALEA_LEAF_HEDGE,
+                        ModBlocks.FLOWERING_AZALEA_LEAF_HEDGE,
+                        ModBlocks.ORANGE_POPLAR_LEAF_LAYERS,
+                        ModBlocks.RED_POPLAR_LEAF_LAYERS,
+                        ModBlocks.YELLOW_POPLAR_LEAF_LAYERS,
+                        ModBlocks.CHERRY_LEAF_LAYERS,
+                        ModBlocks.PALE_OAK_LEAF_LAYERS,
+                        ModBlocks.SNOWY_CHERRY_LEAF_LAYERS,
+                        ModBlocks.SNOWY_PALE_OAK_LEAF_LAYERS,
+                        ModBlocks.ORANGE_POPLAR_LEAF_HEDGE,
+                        ModBlocks.RED_POPLAR_LEAF_HEDGE,
+                        ModBlocks.YELLOW_POPLAR_LEAF_HEDGE,
+                        ModBlocks.CHERRY_LEAF_HEDGE,
+                        ModBlocks.PALE_OAK_LEAF_HEDGE,
+                        ModBlocks.SNOWY_CHERRY_LEAF_HEDGE,
+                        ModBlocks.SNOWY_PALE_OAK_LEAF_HEDGE,
+                        ModBlocks.SNOWY_CHERRY_LEAVES,
+                        ModBlocks.SNOWY_PALE_OAK_LEAVES,
+                        ModBlocks.SNOWY_ORANGE_POPLAR_LEAF_LAYERS,
+                        ModBlocks.SNOWY_RED_POPLAR_LEAF_LAYERS,
+                        ModBlocks.SNOWY_YELLOW_POPLAR_LEAF_LAYERS,
+                        ModBlocks.SNOWY_ORANGE_POPLAR_LEAF_HEDGE,
+                        ModBlocks.SNOWY_RED_POPLAR_LEAF_HEDGE,
+                        ModBlocks.SNOWY_YELLOW_POPLAR_LEAF_HEDGE,
+                        ModBlocks.SNOWY_ORANGE_POPLAR_LEAVES,
+                        ModBlocks.SNOWY_RED_POPLAR_LEAVES,
+                        ModBlocks.SNOWY_YELLOW_POPLAR_LEAVES),
+                blockTint(NO_TINT,
+                        ModBlocks.SNOWY_OAK_LEAF_LAYERS,
+                        ModBlocks.SNOWY_SPRUCE_LEAF_LAYERS,
+                        ModBlocks.SNOWY_BIRCH_LEAF_LAYERS,
+                        ModBlocks.SNOWY_JUNGLE_LEAF_LAYERS,
+                        ModBlocks.SNOWY_ACACIA_LEAF_LAYERS,
+                        ModBlocks.SNOWY_DARK_OAK_LEAF_LAYERS,
+                        ModBlocks.SNOWY_MANGROVE_LEAF_LAYERS,
+                        ModBlocks.SNOWY_AZALEA_LEAF_LAYERS,
+                        ModBlocks.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS,
+                        ModBlocks.SNOWY_OAK_LEAF_HEDGE,
+                        ModBlocks.SNOWY_SPRUCE_LEAF_HEDGE,
+                        ModBlocks.SNOWY_BIRCH_LEAF_HEDGE,
+                        ModBlocks.SNOWY_JUNGLE_LEAF_HEDGE,
+                        ModBlocks.SNOWY_ACACIA_LEAF_HEDGE,
+                        ModBlocks.SNOWY_DARK_OAK_LEAF_HEDGE,
+                        ModBlocks.SNOWY_MANGROVE_LEAF_HEDGE,
+                        ModBlocks.SNOWY_AZALEA_LEAF_HEDGE,
+                        ModBlocks.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE),
+                blockTint(MANGROVE_LEAF_TINT,
+                        ModBlocks.MANGROVE_LEAF_LAYERS,
+                        ModBlocks.MANGROVE_LEAF_HEDGE),
+                blockTint(MANGROVE_LEAF_TINT,
+                        ModBlocks.MANGROVE_LEAVES),
+                blockTint(WATER_TINT,
+                        ModBlocks.CASCADE_BLOCK),
+                blockTint(WATER_TINT,
+                        ModBlocks.CASCADE_BLOCK_NO_MIST),
+                blockTint(GLOW_LIGHTS_TINT,
+                        ModBlocks.GLOW_LIGHTS),
+                blockTint(COMPOSTER_TINT,
+                        () -> Blocks.COMPOSTER));
     }
 
     private static void registerItemColors() {
-        ItemColors itemColors = Minecraft
-                .getInstance().getItemColors();
-        ItemColors vanillaItemColors = Minecraft
-                .getInstance().getItemColors();
+        ItemColors itemColors = Minecraft.getInstance().getItemColors();
+        for (ItemTint tint : itemTints(itemColors)) {
+            itemColors.register(
+                    tint.provider(),
+                    tint.items().stream().map(Supplier::get).toArray(ItemLike[]::new));
+        }
+    }
 
-        itemColors.register(
-                (stack, tintIndex) -> tintIndex == 0 ? 0x3F76E4 : -1,
-                ModItems.CASCADE_BLOCK.get());
+    /** The item colour registrations, in registration order. */
+    private static List<ItemTint> itemTints(ItemColors vanillaItemColors) {
+        return List.of(
+                itemTint(CASCADE_ITEM_TINT,
+                        ModItems.CASCADE_BLOCK),
+                itemTint(PHOENIX_STAR_TINT,
+                        ModItems.INFINITE_PHOENIX_FIREWORK_STAR),
+                itemTint(CASCADE_ITEM_TINT,
+                        ModItems.CASCADE_BLOCK_NO_MIST),
+                itemTint(leafItemTint(vanillaItemColors),
+                        ModItems.OAK_LEAF_LAYERS,
+                        ModItems.LEAF_LITTER,
+                        ModItems.SPRUCE_LEAF_LAYERS,
+                        ModItems.BIRCH_LEAF_LAYERS,
+                        ModItems.JUNGLE_LEAF_LAYERS,
+                        ModItems.ACACIA_LEAF_LAYERS,
+                        ModItems.DARK_OAK_LEAF_LAYERS,
+                        ModItems.AZALEA_LEAF_LAYERS,
+                        ModItems.FLOWERING_AZALEA_LEAF_LAYERS,
+                        ModItems.SNOWY_OAK_LEAF_LAYERS,
+                        ModItems.SNOWY_SPRUCE_LEAF_LAYERS,
+                        ModItems.SNOWY_BIRCH_LEAF_LAYERS,
+                        ModItems.SNOWY_JUNGLE_LEAF_LAYERS,
+                        ModItems.SNOWY_ACACIA_LEAF_LAYERS,
+                        ModItems.SNOWY_DARK_OAK_LEAF_LAYERS,
+                        ModItems.SNOWY_MANGROVE_LEAF_LAYERS,
+                        ModItems.SNOWY_AZALEA_LEAF_LAYERS,
+                        ModItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS,
+                        ModItems.MANGROVE_LEAF_LAYERS,
+                        ModItems.OAK_LEAF_HEDGE,
+                        ModItems.SPRUCE_LEAF_HEDGE,
+                        ModItems.BIRCH_LEAF_HEDGE,
+                        ModItems.JUNGLE_LEAF_HEDGE,
+                        ModItems.ACACIA_LEAF_HEDGE,
+                        ModItems.DARK_OAK_LEAF_HEDGE,
+                        ModItems.AZALEA_LEAF_HEDGE,
+                        ModItems.FLOWERING_AZALEA_LEAF_HEDGE,
+                        ModItems.BUSH,
+                        ModItems.SNOWY_OAK_LEAF_HEDGE,
+                        ModItems.SNOWY_SPRUCE_LEAF_HEDGE,
+                        ModItems.SNOWY_BIRCH_LEAF_HEDGE,
+                        ModItems.SNOWY_JUNGLE_LEAF_HEDGE,
+                        ModItems.SNOWY_ACACIA_LEAF_HEDGE,
+                        ModItems.SNOWY_DARK_OAK_LEAF_HEDGE,
+                        ModItems.SNOWY_MANGROVE_LEAF_HEDGE,
+                        ModItems.SNOWY_AZALEA_LEAF_HEDGE,
+                        ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE,
+                        ModItems.MANGROVE_LEAF_HEDGE,
+                        ModItems.MANGROVE_LEAVES),
+                itemTint(BIOME_BRUSH_TINT,
+                        ModItems.COPPER_BIOME_BRUSH,
+                        ModItems.DIAMOND_BIOME_BRUSH,
+                        ModItems.NETHERITE_BIOME_BRUSH));
+    }
 
-        itemColors.register(
-                (stack, tintIndex) -> {
-                    if (tintIndex != 1) {
-                        return -1;
-                    }
-                    CompoundTag tag = stack.getTagElement(NbtKeys.EXPLOSION);
-                    int[] colors = tag != null ? tag.getIntArray(NbtKeys.COLORS) : null;
-                    if (colors != null && colors.length > 0) {
-                        if (colors.length == 1) {
-                            return colors[0];
+    /** One colour provider and the blocks it tints, registered together. */
+    private record BlockTint(BlockColor provider, List<Supplier<? extends Block>> blocks) {
+    }
+
+    /** One colour provider and the items it tints, registered together. */
+    private record ItemTint(ItemColor provider, List<Supplier<? extends ItemLike>> items) {
+    }
+
+    @SafeVarargs
+    private static BlockTint blockTint(BlockColor provider, Supplier<? extends Block>... blocks) {
+        return new BlockTint(provider, List.of(blocks));
+    }
+
+    @SafeVarargs
+    private static ItemTint itemTint(ItemColor provider, Supplier<? extends ItemLike>... items) {
+        return new ItemTint(provider, List.of(items));
+    }
+
+    /** Grass-coloured second layer of the clover and petal blocks. */
+    private static final BlockColor GRASS_LAYER_TINT = (state, reader, pos, tintIndex) -> {
+        if (reader == null || pos == null) {
+            return 0x7FA832;
+        }
+        if (tintIndex == 1) {
+            if (reader instanceof LevelReader levelReader) {
+                return levelReader.getBiome(pos).value().getGrassColor(pos.getX(), pos.getZ());
+            }
+            return 0x7FA832;
+        }
+        return -1;
+    };
+
+    private static final BlockColor ORNAMENT_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex != 0) {
+            return -1;
+        }
+
+        if (state.hasProperty(OrnamentBlock.STRING_COLOR)) {
+            OrnamentBlock.StringColor stringColor = state.getValue(OrnamentBlock.STRING_COLOR);
+            return stringColor.getColor();
+        }
+
+        return 0xFFFFFF;
+    };
+
+    private static final BlockColor STRING_LIGHT_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex != 0) {
+            return -1;
+        }
+
+        if (state.hasProperty(StringLightBlock.STRING_COLOR)) {
+            StringLightBlock.StringColor stringColor = state.getValue(StringLightBlock.STRING_COLOR);
+            return stringColor.getColor();
+        }
+
+        return 0xFFFFFF;
+    };
+
+    /** Biome foliage colour for the oak-family leaf layers and hedges. */
+    private static final BlockColor BIOME_FOLIAGE_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex != 0) {
+            return -1;
+        }
+
+        if (reader != null && pos != null && reader instanceof LevelReader levelReader) {
+            return levelReader.getBiome(pos).value().getFoliageColor();
+        }
+
+        return 0x48B518;
+    };
+
+    private static final BlockColor BUSH_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex != 0) {
+            return -1;
+        }
+        if (reader != null && pos != null) {
+            return BiomeColors.getAverageFoliageColor(reader, pos);
+        }
+        return FoliageColor.getDefaultColor();
+    };
+
+    private static final BlockColor LEAF_LITTER_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex != 0) {
+            return -1;
+        }
+        if (reader != null && pos != null) {
+            return DryFoliageColor.getDryFoliageColor(reader, pos);
+        }
+        return DryFoliageColor.getDefaultColor();
+    };
+
+    private static final BlockColor WILDFLOWERS_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex == 1 || tintIndex == 0) {
+            if (reader != null && pos != null) {
+                return BiomeColors.getAverageFoliageColor(reader, pos);
+            }
+            return FoliageColor.getDefaultColor();
+        }
+        return -1;
+    };
+
+    private static final BlockColor SPRUCE_LEAF_TINT = fixedLeafTint(0x619961);
+
+    private static final BlockColor BIRCH_LEAF_TINT = fixedLeafTint(0x80a755);
+
+    /** Leaves whose textures carry their own colour: no tint. */
+    private static final BlockColor NO_TINT = (state, reader, pos, tintIndex) -> -1;
+
+    private static final BlockColor MANGROVE_LEAF_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex != 0) {
+            return -1;
+        }
+        if (reader != null && pos != null && reader instanceof LevelReader levelReader) {
+            return levelReader.getBiome(pos).value().getFoliageColor();
+        }
+        return 0x92c648;
+    };
+
+    private static final BlockColor WATER_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex != 0) {
+            return -1;
+        }
+        if (reader != null && pos != null) {
+            return BiomeColors.getAverageWaterColor(reader, pos);
+        }
+        return 0x3F76E4;
+    };
+
+    private static final BlockColor GLOW_LIGHTS_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex != 0) {
+            return -1;
+        }
+
+        if (reader != null && pos != null) {
+            BlockEntity be = reader.getBlockEntity(pos);
+            if (be instanceof GlowLightsBlockEntity glowBE) {
+                List<String> dyeColors = glowBE.getDyeColors();
+                if (dyeColors != null && !dyeColors.isEmpty()) {
+                    int hash = pos.hashCode() ^ state.hashCode();
+                    int colorIndex = Math.abs(hash) % dyeColors.size();
+                    String colorCode = dyeColors.get(colorIndex);
+
+                    try {
+                        if (colorCode != null && colorCode.startsWith("#") && colorCode.length() == 7) {
+                            int color = Integer.parseInt(colorCode.substring(1), 16);
+                            return color | 0xFF000000;
                         }
-                        int r = 0, g = 0, b = 0;
-                        for (int c : colors) {
-                            r += (c >> 16) & 0xFF;
-                            g += (c >> 8) & 0xFF;
-                            b += c & 0xFF;
-                        }
-                        return ((r / colors.length) << 16) | ((g / colors.length) << 8) | (b / colors.length);
+                    } catch (NumberFormatException e) {
+                        // malformed tint colour code; fall through to the default tint
                     }
-                    return 0xFFB000;
-                },
-                ModItems.INFINITE_PHOENIX_FIREWORK_STAR.get());
+                }
+            }
+        }
 
-        itemColors.register(
-                (stack, tintIndex) -> tintIndex == 0 ? 0x3F76E4 : -1,
-                ModItems.CASCADE_BLOCK_NO_MIST.get());
+        return -1;
+    };
 
-        itemColors.register(
-                (stack, tintIndex) -> {
-                    if (tintIndex != 0) {
-                        return -1;
-                    }
-                    Item item = stack.getItem();
-                    if (item instanceof BlockItem blockItem) {
-                        Block block = blockItem
-                                .getBlock();
+    private static final BlockColor COMPOSTER_TINT = (state, reader, pos, tintIndex) -> {
+        if (tintIndex == 0) {
+            if (reader != null && pos != null) {
+                return BiomeColors.getAverageGrassColor(reader, pos);
+            }
+            return GrassColor.get(0.5, 1.0);
+        }
+        return -1;
+    };
 
-                        int color = -1;
-                        if (block == ModBlocks.LEAF_LITTER.get()) {
-                            color = DryFoliageColor.getDefaultColor();
-                        } else if (block == ModBlocks.BUSH.get()
-                                || block == ModBlocks.OAK_LEAF_HEDGE.get()
-                                || block == ModBlocks.OAK_LEAF_LAYERS.get()) {
-                            color = vanillaItemColors.getColor(
-                                    new ItemStack(
-                                            Items.OAK_LEAVES),
-                                    0);
-                        } else if (block == ModBlocks.JUNGLE_LEAF_HEDGE.get()
-                                || block == ModBlocks.JUNGLE_LEAF_LAYERS
-                                        .get()) {
-                            color = vanillaItemColors.getColor(
-                                    new ItemStack(
-                                            Items.JUNGLE_LEAVES),
-                                    0);
-                        } else if (block == ModBlocks.ACACIA_LEAF_HEDGE.get()
-                                || block == ModBlocks.ACACIA_LEAF_LAYERS
-                                        .get()) {
-                            color = vanillaItemColors.getColor(
-                                    new ItemStack(
-                                            Items.ACACIA_LEAVES),
-                                    0);
-                        } else if (block == ModBlocks.DARK_OAK_LEAF_HEDGE.get()
-                                || block == ModBlocks.DARK_OAK_LEAF_LAYERS
-                                        .get()) {
-                            color = vanillaItemColors.getColor(
-                                    new ItemStack(
-                                            Items.DARK_OAK_LEAVES),
-                                    0);
-                        } else if (block == ModBlocks.SPRUCE_LEAF_HEDGE.get()
-                                || block == ModBlocks.SPRUCE_LEAF_LAYERS
-                                        .get()) {
-                            color = 0x619961;
-                        } else if (block == ModBlocks.BIRCH_LEAF_HEDGE.get()
-                                || block == ModBlocks.BIRCH_LEAF_LAYERS
-                                        .get()) {
-                            color = 0x80a755;
-                        } else if (block == ModBlocks.MANGROVE_LEAVES.get()
-                                || block == ModBlocks.MANGROVE_LEAF_LAYERS
-                                        .get()
-                                ||
-                                block == ModBlocks.MANGROVE_LEAF_HEDGE
-                                        .get()) {
-                            color = 0x92c648;
-                        }
+    /** A leaf tint with one fixed colour on tint layer 0. */
+    private static BlockColor fixedLeafTint(int color) {
+        return (state, reader, pos, tintIndex) -> {
+            if (tintIndex != 0) {
+                return -1;
+            }
+            return color;
+        };
+    }
 
-                        return color;
-                    }
-                    return -1;
-                },
-                ModItems.OAK_LEAF_LAYERS.get(),
-                ModItems.LEAF_LITTER.get(),
-                ModItems.SPRUCE_LEAF_LAYERS.get(),
-                ModItems.BIRCH_LEAF_LAYERS.get(),
-                ModItems.JUNGLE_LEAF_LAYERS.get(),
-                ModItems.ACACIA_LEAF_LAYERS.get(),
-                ModItems.DARK_OAK_LEAF_LAYERS.get(),
-                ModItems.AZALEA_LEAF_LAYERS.get(),
-                ModItems.FLOWERING_AZALEA_LEAF_LAYERS.get(),
-                ModItems.SNOWY_OAK_LEAF_LAYERS.get(),
-                ModItems.SNOWY_SPRUCE_LEAF_LAYERS.get(),
-                ModItems.SNOWY_BIRCH_LEAF_LAYERS.get(),
-                ModItems.SNOWY_JUNGLE_LEAF_LAYERS.get(),
-                ModItems.SNOWY_ACACIA_LEAF_LAYERS.get(),
-                ModItems.SNOWY_DARK_OAK_LEAF_LAYERS.get(),
-                ModItems.SNOWY_MANGROVE_LEAF_LAYERS.get(),
-                ModItems.SNOWY_AZALEA_LEAF_LAYERS.get(),
-                ModItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get(),
-                ModItems.MANGROVE_LEAF_LAYERS.get(),
-                ModItems.OAK_LEAF_HEDGE.get(),
-                ModItems.SPRUCE_LEAF_HEDGE.get(),
-                ModItems.BIRCH_LEAF_HEDGE.get(),
-                ModItems.JUNGLE_LEAF_HEDGE.get(),
-                ModItems.ACACIA_LEAF_HEDGE.get(),
-                ModItems.DARK_OAK_LEAF_HEDGE.get(),
-                ModItems.AZALEA_LEAF_HEDGE.get(),
-                ModItems.FLOWERING_AZALEA_LEAF_HEDGE.get(),
-                ModItems.BUSH.get(),
-                ModItems.SNOWY_OAK_LEAF_HEDGE.get(),
-                ModItems.SNOWY_SPRUCE_LEAF_HEDGE.get(),
-                ModItems.SNOWY_BIRCH_LEAF_HEDGE.get(),
-                ModItems.SNOWY_JUNGLE_LEAF_HEDGE.get(),
-                ModItems.SNOWY_ACACIA_LEAF_HEDGE.get(),
-                ModItems.SNOWY_DARK_OAK_LEAF_HEDGE.get(),
-                ModItems.SNOWY_MANGROVE_LEAF_HEDGE.get(),
-                ModItems.SNOWY_AZALEA_LEAF_HEDGE.get(),
-                ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get(),
-                ModItems.MANGROVE_LEAF_HEDGE.get(),
-                ModItems.MANGROVE_LEAVES.get());
+    /** Water-blue tint for the cascade block items. */
+    private static final ItemColor CASCADE_ITEM_TINT = (stack, tintIndex) -> tintIndex == 0 ? 0x3F76E4 : -1;
 
-        itemColors.register(
-                (stack, tintIndex) -> {
-                    if (tintIndex != 1) {
-                        return -1;
-                    }
-                    if (stack.getItem() instanceof BiomeBrushItem brush) {
-                        String biomeStr = brush.getCapturedBiome(stack);
-                        if (biomeStr != null && !biomeStr.isEmpty()) {
-                            ResourceLocation biomeKey = ResourceLocation.tryParse(biomeStr);
-                            if (biomeKey != null) {
-                                ClientLevel level = Minecraft.getInstance().level;
-                                if (level != null) {
-                                    Optional<? extends Registry<Biome>> registryOpt = level.registryAccess()
-                                            .registry(Registry.BIOME_REGISTRY);
-                                    if (registryOpt.isPresent()) {
-                                        Biome biome = registryOpt.get().get(biomeKey);
-                                        if (biome != null) {
-                                            return biome.getFoliageColor();
-                                        }
-                                    }
-                                }
+    /** Average of the explosion colours stored on the infinite phoenix firework star. */
+    private static final ItemColor PHOENIX_STAR_TINT = (stack, tintIndex) -> {
+        if (tintIndex != 1) {
+            return -1;
+        }
+        CompoundTag tag = stack.getTagElement(NbtKeys.EXPLOSION);
+        int[] colors = tag != null ? tag.getIntArray(NbtKeys.COLORS) : null;
+        if (colors != null && colors.length > 0) {
+            if (colors.length == 1) {
+                return colors[0];
+            }
+            int r = 0, g = 0, b = 0;
+            for (int c : colors) {
+                r += (c >> 16) & 0xFF;
+                g += (c >> 8) & 0xFF;
+                b += c & 0xFF;
+            }
+            return ((r / colors.length) << 16) | ((g / colors.length) << 8) | (b / colors.length);
+        }
+        return 0xFFB000;
+    };
+
+    /** Tint of the leaf layer, hedge and bush items, taken from the matching vanilla leaves where there are any. */
+    private static ItemColor leafItemTint(ItemColors vanillaItemColors) {
+        return (stack, tintIndex) -> {
+            if (tintIndex != 0) {
+                return -1;
+            }
+            Item item = stack.getItem();
+            if (item instanceof BlockItem blockItem) {
+                Block block = blockItem.getBlock();
+
+                int color = -1;
+                if (block == ModBlocks.LEAF_LITTER.get()) {
+                    color = DryFoliageColor.getDefaultColor();
+                } else if (block == ModBlocks.BUSH.get()
+                        || block == ModBlocks.OAK_LEAF_HEDGE.get()
+                        || block == ModBlocks.OAK_LEAF_LAYERS.get()) {
+                    color = vanillaItemColors.getColor(new ItemStack(Items.OAK_LEAVES), 0);
+                } else if (block == ModBlocks.JUNGLE_LEAF_HEDGE.get() || block == ModBlocks.JUNGLE_LEAF_LAYERS.get()) {
+                    color = vanillaItemColors.getColor(new ItemStack(Items.JUNGLE_LEAVES), 0);
+                } else if (block == ModBlocks.ACACIA_LEAF_HEDGE.get() || block == ModBlocks.ACACIA_LEAF_LAYERS.get()) {
+                    color = vanillaItemColors.getColor(new ItemStack(Items.ACACIA_LEAVES), 0);
+                } else if (block == ModBlocks.DARK_OAK_LEAF_HEDGE.get()
+                        || block == ModBlocks.DARK_OAK_LEAF_LAYERS.get()) {
+                    color = vanillaItemColors.getColor(new ItemStack(Items.DARK_OAK_LEAVES), 0);
+                } else if (block == ModBlocks.SPRUCE_LEAF_HEDGE.get() || block == ModBlocks.SPRUCE_LEAF_LAYERS.get()) {
+                    color = 0x619961;
+                } else if (block == ModBlocks.BIRCH_LEAF_HEDGE.get() || block == ModBlocks.BIRCH_LEAF_LAYERS.get()) {
+                    color = 0x80a755;
+                } else if (block == ModBlocks.MANGROVE_LEAVES.get()
+                        || block == ModBlocks.MANGROVE_LEAF_LAYERS.get()
+                        || block == ModBlocks.MANGROVE_LEAF_HEDGE.get()) {
+                    color = 0x92c648;
+                }
+
+                return color;
+            }
+            return -1;
+        };
+    }
+
+    /** Foliage colour of the biome a biome brush has captured. */
+    private static final ItemColor BIOME_BRUSH_TINT = (stack, tintIndex) -> {
+        if (tintIndex != 1) {
+            return -1;
+        }
+        if (stack.getItem() instanceof BiomeBrushItem brush) {
+            String biomeStr = brush.getCapturedBiome(stack);
+            if (biomeStr != null && !biomeStr.isEmpty()) {
+                ResourceLocation biomeKey = ResourceLocation.tryParse(biomeStr);
+                if (biomeKey != null) {
+                    ClientLevel level = Minecraft.getInstance().level;
+                    if (level != null) {
+                        Optional<? extends Registry<Biome>> registryOpt = level.registryAccess()
+                                .registry(Registry.BIOME_REGISTRY);
+                        if (registryOpt.isPresent()) {
+                            Biome biome = registryOpt.get().get(biomeKey);
+                            if (biome != null) {
+                                return biome.getFoliageColor();
                             }
                         }
                     }
-                    return -1;
-                },
-                ModItems.COPPER_BIOME_BRUSH.get(),
-                ModItems.DIAMOND_BIOME_BRUSH.get(),
-                ModItems.NETHERITE_BIOME_BRUSH.get());
-    }
+                }
+            }
+        }
+        return -1;
+    };
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {

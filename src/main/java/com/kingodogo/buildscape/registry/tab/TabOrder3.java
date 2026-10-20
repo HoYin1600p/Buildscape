@@ -3,7 +3,6 @@ package com.kingodogo.buildscape.registry.tab;
 import com.kingodogo.buildscape.registry.ModItems;
 import java.util.List;
 import java.util.function.Supplier;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 
 /**

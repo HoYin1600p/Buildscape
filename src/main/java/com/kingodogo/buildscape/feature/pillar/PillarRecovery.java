@@ -2,8 +2,9 @@ package com.kingodogo.buildscape.feature.pillar;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager.PillarData;
-import java.io.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;

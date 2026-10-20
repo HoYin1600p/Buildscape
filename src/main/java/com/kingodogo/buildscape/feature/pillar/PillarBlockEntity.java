@@ -26,7 +26,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -40,7 +39,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class PillarBlockEntity extends SyncedBlockEntity {
 
-    private ItemStack displayedItem = ItemStack.EMPTY;
+    ItemStack displayedItem = ItemStack.EMPTY;
 
     private final LazyOptional<IItemHandler> itemHandler = LazyOptional.of(() -> new IItemHandler() {
         @Override
@@ -93,34 +92,34 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     });
 
-    private long lastParticleTick = 0L;
-    private String particlePattern = null;
+    long lastParticleTick = 0L;
+    String particlePattern = null;
 
-    private Double patternSpeed = null;
-    private Double patternSpread = null;
-    private Double patternIntensity = null;
+    Double patternSpeed = null;
+    Double patternSpread = null;
+    Double patternIntensity = null;
     private static final Pattern HEX_COLOR_PATTERN = Pattern
             .compile("^#[0-9A-Fa-f]{6}$");
-    private Integer maxParticleColor = null;
+    Integer maxParticleColor = null;
 
-    private String pillarId = null;
+    String pillarId = null;
 
-    private List<String> particleColors = null;
+    List<String> particleColors = null;
 
-    private boolean colorsInitialized = false;
+    boolean colorsInitialized = false;
 
-    private int particleColorCounter = 0;
+    int particleColorCounter = 0;
 
-    private int colorsVersion = 0;
+    int colorsVersion = 0;
     private final int lastSyncedColorsVersion = -1;
 
     private static final int MAX_SYNC_ATTEMPTS = 5;
 
     public static final int MAX_DYE_COLORS = 5;
 
-    private float facingYaw = 0.0f;
+    float facingYaw = 0.0f;
 
-    private static final String[] PATTERNS = {
+    static final String[] PATTERNS = {
             ParticlePatterns.NONE,
             ParticlePatterns.DEFAULT,
             ParticlePatterns.BEAM,
@@ -147,7 +146,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
     }
 
     private static final int SYNC_INTERVAL = 100;
-    private Boolean usePattern = null;
+    Boolean usePattern = null;
 
     public static void clientTick(
             Level level,
@@ -860,114 +859,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
-    public BlockPos findStackTop() {
-        if (level == null)
-            return worldPosition;
-
-        if (!level.isClientSide &&
-                !BuildScape.isServerFullyInitialized()) {
-            return worldPosition;
-        }
-
-        BlockPos current = worldPosition;
-        int maxHeight = 256;
-        int checked = 0;
-
-        while (checked < maxHeight) {
-            BlockPos above = current.above();
-            if (!level.hasChunkAt(above)) {
-                break;
-            }
-
-            try {
-                if (!level.isClientSide) {
-                    ChunkAccess chunk = level.getChunk(
-                            above);
-                    if (!(chunk instanceof LevelChunk)) {
-                        break;
-                    }
-                    if (!chunk
-                            .getStatus()
-                            .isOrAfter(ChunkStatus.FULL)) {
-                        break;
-                    }
-                }
-            } catch (Exception e) {
-                break;
-            }
-
-            if (!(level.getBlockState(above).getBlock() instanceof PillarBlock)) {
-                break;
-            }
-            current = above;
-            checked++;
-        }
-        return current;
-    }
-
-    private String getStackParticlePattern() {
-        if (level == null)
-            return this.particlePattern;
-
-        if (!level.isClientSide &&
-                !BuildScape.isServerFullyInitialized()) {
-            return this.particlePattern;
-        }
-
-        if (!level.isClientSide &&
-                (level.getServer() == null ||
-                        !level.getServer().isRunning() ||
-                        level.getServer().getPlayerList().getPlayerCount() == 0)) {
-            return this.particlePattern;
-        }
-
-        try {
-            BlockPos bottom = findStackBottom();
-            BlockPos current = bottom;
-            int maxHeight = 256;
-            int checked = 0;
-
-            while (checked < maxHeight &&
-                    level.getBlockState(current).getBlock() instanceof PillarBlock) {
-                if (!level.hasChunkAt(current)) {
-                    break;
-                }
-
-                try {
-                    if (!level.isClientSide) {
-                        ChunkAccess chunk = level.getChunk(
-                                current);
-                        if (!(chunk instanceof LevelChunk)) {
-                            break;
-                        }
-                        if (!chunk
-                                .getStatus()
-                                .isOrAfter(ChunkStatus.FULL)) {
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    break;
-                }
-
-                BlockEntity be = level.getBlockEntity(current);
-                if (be instanceof PillarBlockEntity pillarBE) {
-                    if (pillarBE.particlePattern != null &&
-                            !pillarBE.particlePattern.isEmpty() &&
-                            !pillarBE.particlePattern.equals(ParticlePatterns.DEFAULT)) {
-                        return pillarBE.particlePattern;
-                    }
-                }
-                current = current.above();
-                checked++;
-            }
-        } catch (Exception e) {
-            return this.particlePattern;
-        }
-
-        return null;
-    }
-
     public String getParticleColor(PillarParticleConfig cfg) {
         if (particleColors != null && !particleColors.isEmpty()) {
             int numColors = particleColors.size();
@@ -1006,51 +897,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
             return configColor.toUpperCase(Locale.ROOT);
         }
         return "#FFFFFF";
-    }
-
-    public BlockPos findStackBottom() {
-        if (level == null)
-            return worldPosition;
-
-        if (!level.isClientSide &&
-                !BuildScape.isServerFullyInitialized()) {
-            return worldPosition;
-        }
-
-        BlockPos current = worldPosition;
-        int maxDepth = 256;
-        int checked = 0;
-
-        while (checked < maxDepth) {
-            BlockPos below = current.below();
-            if (!level.hasChunkAt(below)) {
-                break;
-            }
-
-            try {
-                if (!level.isClientSide) {
-                    ChunkAccess chunk = level.getChunk(
-                            below);
-                    if (!(chunk instanceof LevelChunk)) {
-                        break;
-                    }
-                    if (!chunk
-                            .getStatus()
-                            .isOrAfter(ChunkStatus.FULL)) {
-                        break;
-                    }
-                }
-            } catch (Exception e) {
-                break;
-            }
-
-            if (!(level.getBlockState(below).getBlock() instanceof PillarBlock)) {
-                break;
-            }
-            current = below;
-            checked++;
-        }
-        return current;
     }
 
     public boolean addParticleColor(String color) {
@@ -1104,119 +950,8 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return true;
     }
 
-    public String getStackPillarId() {
-        if (level == null || level.isClientSide)
-            return this.pillarId;
-
-        if (!BuildScape.isServerFullyInitialized()) {
-            return this.pillarId;
-        }
-
-        if (level.getServer() == null ||
-                !level.getServer().isRunning() ||
-                level.getServer().getPlayerList().getPlayerCount() == 0) {
-            return this.pillarId;
-        }
-
-        try {
-            BlockPos bottom = findStackBottom();
-            BlockPos current = bottom;
-            int maxHeight = 256;
-            int checked = 0;
-
-            while (checked < maxHeight &&
-                    level.getBlockState(current).getBlock() instanceof PillarBlock) {
-                if (!level.hasChunkAt(current)) {
-                    break;
-                }
-
-                try {
-                    if (!level.isClientSide) {
-                        ChunkAccess chunk = level.getChunk(
-                                current);
-                        if (!(chunk instanceof LevelChunk)) {
-                            break;
-                        }
-                        if (!chunk
-                                .getStatus()
-                                .isOrAfter(ChunkStatus.FULL)) {
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    break;
-                }
-
-                BlockEntity be = level.getBlockEntity(current);
-                if (be instanceof PillarBlockEntity pillarBE) {
-                    if (pillarBE.pillarId != null && !pillarBE.pillarId.isEmpty()) {
-                        return pillarBE.pillarId;
-                    }
-                }
-                current = current.above();
-                checked++;
-            }
-        } catch (Exception e) {
-            return this.pillarId;
-        }
-
-        return null;
-    }
-
     public Boolean getUsePattern() {
         return usePattern;
-    }
-
-    private void propagatePatternToStack(String pattern) {
-        if (level == null || level.isClientSide)
-            return;
-
-        BlockPos bottom = findStackBottom();
-        BlockPos current = bottom;
-
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
-            BlockEntity be = level.getBlockEntity(current);
-            if (be instanceof PillarBlockEntity pillarBE) {
-                pillarBE.particlePattern = pattern;
-                pillarBE.setChanged();
-
-                level.sendBlockUpdated(
-                        current,
-                        level.getBlockState(current),
-                        level.getBlockState(current),
-                        3);
-            }
-            current = current.above();
-        }
-    }
-
-    private void propagateToStack(String stackId, List<String> colors) {
-        if (level == null || level.isClientSide)
-            return;
-
-        BlockPos bottom = findStackBottom();
-        BlockPos current = bottom;
-
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
-            BlockEntity be = level.getBlockEntity(current);
-            if (be instanceof PillarBlockEntity pillarBE) {
-                pillarBE.pillarId = stackId;
-                pillarBE.particleColors = colors != null
-                        ? new ArrayList<>(colors)
-                        : null;
-                pillarBE.colorsInitialized = (colors != null && !colors.isEmpty());
-                pillarBE.particleColorCounter = 0;
-                pillarBE.lastParticleTick = 0;
-                pillarBE.setChanged();
-
-                level.sendBlockUpdated(
-                        current,
-                        level.getBlockState(current),
-                        level.getBlockState(current),
-                        3);
-            }
-            current = current.above();
-        }
     }
 
     public void setUsePattern(Boolean use) {
@@ -1712,7 +1447,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
-    private boolean needsManagerSync = false;
+    boolean needsManagerSync = false;
 
     @Override
     public void setLevel(Level level) {
@@ -1763,24 +1498,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
-    public PillarBlockEntity getTopPillar() {
-        if (this.level == null)
-            return this;
-        BlockPos current = this.worldPosition;
-        try {
-            while (this.level.getBlockState(current.above()).getBlock() instanceof PillarBlock &&
-                    !(this.level.getBlockState(current.above()).getBlock() instanceof AshenKingPillarBlock)) {
-                current = current.above();
-            }
-            BlockEntity be = this.level.getBlockEntity(current);
-            if (be instanceof PillarBlockEntity topPillar) {
-                return topPillar;
-            }
-        } catch (Exception ignored) {
-        }
-        return this;
-    }
-
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
@@ -1796,5 +1513,33 @@ public class PillarBlockEntity extends SyncedBlockEntity {
     public void invalidateCaps() {
         super.invalidateCaps();
         itemHandler.invalidate();
+    }
+
+    public BlockPos findStackTop() {
+        return PillarStack.findStackTop(this);
+    }
+
+    private String getStackParticlePattern() {
+        return PillarStack.getStackParticlePattern(this);
+    }
+
+    public BlockPos findStackBottom() {
+        return PillarStack.findStackBottom(this);
+    }
+
+    public String getStackPillarId() {
+        return PillarStack.getStackPillarId(this);
+    }
+
+    private void propagatePatternToStack(String pattern) {
+        PillarStack.propagatePatternToStack(this, pattern);
+    }
+
+    private void propagateToStack(String stackId, List<String> colors) {
+        PillarStack.propagateToStack(this, stackId, colors);
+    }
+
+    public PillarBlockEntity getTopPillar() {
+        return PillarStack.getTopPillar(this);
     }
 }

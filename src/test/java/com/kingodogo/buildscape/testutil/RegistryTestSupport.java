@@ -1,12 +1,15 @@
 package com.kingodogo.buildscape.testutil;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.Registry;
+import net.minecraft.server.Bootstrap;
+import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -16,8 +19,14 @@ import java.util.function.Supplier;
 public final class RegistryTestSupport {
     private RegistryTestSupport() {}
 
+    /** Boots the vanilla game headlessly (registries, tags) and seeds Forge's event listener lists. */
     public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
+        // Plain JUnit does not run Forge's event transformer. Seed listener lists through
+        // event instances so bootstrap never asks for injected no-argument constructors.
+        new NetworkEvent(() -> null).getListenerList();
+        new NetworkEvent.GatherLoginPayloadsEvent(new ArrayList<>(), false).getListenerList();
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
     }
 
     /** Registered path (without namespace) by Java field name, for every {@link RegistryObject} field of a holder. */

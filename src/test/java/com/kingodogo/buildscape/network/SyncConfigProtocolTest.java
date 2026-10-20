@@ -1,11 +1,10 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -13,11 +12,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class SyncConfigProtocolTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class SyncConfigProtocolTest extends BootstrappedGameTest {
 
     @Test
     public void protocolVersionPinsTheCurrentPacketLayout() {

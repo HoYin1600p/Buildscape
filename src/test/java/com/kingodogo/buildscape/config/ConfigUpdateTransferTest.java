@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.config;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.network.SyncConfigPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -13,11 +13,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class ConfigUpdateTransferTest {
-    @BeforeClass
-    public static void bootstrap() {
-        com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest.bootstrap();
-    }
+public class ConfigUpdateTransferTest extends BootstrappedGameTest {
 
     private PillarParticleConfig largeConfig() {
         PillarParticleConfig config = new PillarParticleConfig();

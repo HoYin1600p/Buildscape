@@ -1,12 +1,11 @@
 package com.kingodogo.buildscape.config;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.google.gson.Gson;
 import com.kingodogo.buildscape.network.SyncConfigPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -20,14 +19,9 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class ConfigFollowupRegressionTest {
+public class ConfigItemValidationAndEncodingTest extends BootstrappedGameTest {
     @Rule
     public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
 
     @Test
     public void invalidLoadedItemsSurviveValidEditsAndPresetReplacement() throws Exception {

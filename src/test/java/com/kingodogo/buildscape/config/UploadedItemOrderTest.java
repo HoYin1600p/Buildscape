@@ -1,20 +1,14 @@
 package com.kingodogo.buildscape.config;
 
-import org.junit.BeforeClass;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import org.junit.Test;
-
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class UploadedItemOrderTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class UploadedItemOrderTest extends BootstrappedGameTest {
 
     /**
      * A client's merged upload is a set (the server list plus the sender's additions). The server writes it

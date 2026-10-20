@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.recipe.framework;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver;
 import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
 import com.kingodogo.buildscape.recipe.framework.compiler.StonecuttingCycleValidator;
@@ -14,7 +14,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -29,11 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 
-public class RuntimeRecipeCycleTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class RuntimeRecipeCycleTest extends BootstrappedGameTest {
 
     @Test
     public void runtimeCategoriesRejectOnlyTheRecipeClosingAGainCycle() throws Exception {

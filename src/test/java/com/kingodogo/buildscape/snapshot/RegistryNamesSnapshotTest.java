@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.snapshot;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModEntities;
@@ -16,7 +17,6 @@ import com.kingodogo.buildscape.worldgen.ModPlacementModifiers;
 import com.kingodogo.buildscape.worldgen.ModTreeDecoratorTypes;
 import com.kingodogo.buildscape.worldgen.ModTrunkPlacerTypes;
 import net.minecraftforge.registries.DeferredRegister;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,11 +24,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertFalse;
 
 /** The registry names of every DeferredRegister, in registration order, must not change. */
-public class RegistryNamesSnapshotTest {
-    @BeforeClass
-    public static void bootstrap() {
-        SnapshotSupport.bootstrap();
-    }
+public class RegistryNamesSnapshotTest extends BootstrappedGameTest {
 
     private static void check(String name, DeferredRegister<?> register) throws IOException {
         assertFalse(name + " is empty", register.getEntries().isEmpty());

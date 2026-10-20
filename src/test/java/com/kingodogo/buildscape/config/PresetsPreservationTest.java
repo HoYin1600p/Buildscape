@@ -1,9 +1,8 @@
 package com.kingodogo.buildscape.config;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -14,14 +13,9 @@ import java.nio.file.Path;
 
 import static org.junit.Assert.*;
 
-public class PresetsPreservationTest {
+public class PresetsPreservationTest extends BootstrappedGameTest {
     @Rule
     public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
 
     @Test
     public void savingAfterPartialParsePreservesMalformedPresetAndValidPreset() throws Exception {

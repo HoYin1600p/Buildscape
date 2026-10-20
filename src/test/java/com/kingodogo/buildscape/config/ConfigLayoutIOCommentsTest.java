@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 import static org.junit.Assert.*;
 
-public class ConfigLayoutIO405Test {
+public class ConfigLayoutIOCommentsTest {
     @Rule
     public TemporaryFolder temporary = new TemporaryFolder();
 

@@ -1,12 +1,11 @@
 package com.kingodogo.buildscape.config;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.world.ModGameRules;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.GameRules;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -22,14 +21,9 @@ import java.util.function.BiConsumer;
 
 import static org.junit.Assert.*;
 
-public class GameRuleDefaultsRegressionTest {
+public class GameRuleDefaultsRegressionTest extends BootstrappedGameTest {
     @Rule
     public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
 
     @Test
     @SuppressWarnings("unchecked")

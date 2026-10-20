@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.recipe.framework.cache;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.core.RecipeIdMigration;
 import com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator;
 import net.minecraft.resources.ResourceLocation;
@@ -7,7 +8,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.BufferedInputStream;
@@ -21,11 +21,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class RecipeIdMigrationTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class RecipeIdMigrationTest extends BootstrappedGameTest {
 
     @Test
     public void everyMigrationTargetExistsInBundledCache() throws Exception {

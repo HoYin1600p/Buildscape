@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.snapshot;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.network.ModMessages;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,11 +14,7 @@ import java.util.TreeMap;
 import static org.junit.Assert.assertFalse;
 
 /** Packet ids, their classes and directions as registered by ModMessages must not change. */
-public class PacketIdSnapshotTest {
-    @BeforeClass
-    public static void bootstrap() {
-        SnapshotSupport.bootstrap();
-    }
+public class PacketIdSnapshotTest extends BootstrappedGameTest {
 
     private static Object field(Object target, String name) throws ReflectiveOperationException {
         Class<?> type = target.getClass();

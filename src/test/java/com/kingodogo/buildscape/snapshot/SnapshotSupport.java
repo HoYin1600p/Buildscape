@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.snapshot;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -23,10 +22,6 @@ final class SnapshotSupport {
     private static final Path SNAPSHOT_DIR = Path.of("src", "test", "resources", "snapshot");
 
     private SnapshotSupport() {}
-
-    static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
 
     static List<String> ids(DeferredRegister<?> register) {
         List<String> ids = new ArrayList<>();

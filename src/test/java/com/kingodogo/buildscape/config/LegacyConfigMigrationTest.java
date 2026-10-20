@@ -1,8 +1,7 @@
 package com.kingodogo.buildscape.config;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.google.gson.JsonObject;
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -19,14 +18,9 @@ import java.util.Set;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
-public class Config405MigrationTest {
+public class LegacyConfigMigrationTest extends BootstrappedGameTest {
     @Rule
     public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
 
     /** A 4.0.5 client config gains the settings added since: just the preset slot count so far. */
     private static java.util.Map<String, String> withNewDefaults(java.util.Map<String, String> entries) {
@@ -36,7 +30,7 @@ public class Config405MigrationTest {
     }
 
     private static String fixture(String name) throws Exception {
-        try (InputStream input = Config405MigrationTest.class.getResourceAsStream("/config405/" + name)) {
+        try (InputStream input = LegacyConfigMigrationTest.class.getResourceAsStream("/legacy-config/" + name)) {
             assertNotNull(name, input);
             return new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }

@@ -1,9 +1,8 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.item.HammerItem;
-import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.Bootstrap;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -13,25 +12,15 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.network.NetworkEvent;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class HammerHarvestTest {
-    @BeforeClass
-    public static void bootstrap() {
-        new NetworkEvent(() -> null).getListenerList();
-        new NetworkEvent.GatherLoginPayloadsEvent(new ArrayList<>(), false).getListenerList();
-        SharedConstants.tryDetectVersion();
-        Bootstrap.bootStrap();
-    }
+public class HammerHarvestTest extends BootstrappedGameTest {
 
     @Test
     public void tierMappingAndLootToolAgreeOnHarvestEligibility() {

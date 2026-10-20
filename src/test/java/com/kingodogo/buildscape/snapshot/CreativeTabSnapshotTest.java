@@ -1,13 +1,12 @@
 package com.kingodogo.buildscape.snapshot;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.registry.ModCreativeModeTab;
 import com.kingodogo.buildscape.registry.tab.TabOrder1;
 import com.kingodogo.buildscape.registry.tab.TabOrder2;
 import com.kingodogo.buildscape.registry.tab.TabOrder3;
-import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.registries.RegistryObject;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,11 +23,7 @@ import static org.junit.Assert.assertFalse;
  * tab adds them. Entries are read through the lists' public API; vanilla items (plain lambdas) are not mod
  * registrations and are not part of the snapshot.
  */
-public class CreativeTabSnapshotTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RegistryTestSupport.bootstrap();
-    }
+public class CreativeTabSnapshotTest extends BootstrappedGameTest {
 
     private static void collect(List<Supplier<? extends ItemLike>> order, List<String> lines) {
         for (Supplier<? extends ItemLike> entry : order) {

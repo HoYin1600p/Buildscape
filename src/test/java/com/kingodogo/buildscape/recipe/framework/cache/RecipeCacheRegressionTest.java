@@ -5,14 +5,12 @@ import com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator;
 import com.kingodogo.buildscape.recipe.framework.compiler.TemplateEngine;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter;
-import net.minecraft.SharedConstants;
-import net.minecraft.server.Bootstrap;
+import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraftforge.network.NetworkEvent;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,20 +23,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 import static org.junit.Assert.*;
 
 public class RecipeCacheRegressionTest {
+    /** Kept for the config screen tests; the implementation lives in {@link RegistryTestSupport}. */
     @BeforeClass
     public static void bootstrap() {
-        // Plain JUnit does not run Forge's event transformer. Seed listener lists through
-        // event instances so bootstrap never asks for injected no-argument constructors.
-        new NetworkEvent(() -> null).getListenerList();
-        new NetworkEvent.GatherLoginPayloadsEvent(new ArrayList<>(), false).getListenerList();
-        SharedConstants.tryDetectVersion();
-        Bootstrap.bootStrap();
+        RegistryTestSupport.bootstrap();
     }
 
     @Test

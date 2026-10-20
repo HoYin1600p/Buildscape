@@ -1,9 +1,8 @@
 package com.kingodogo.buildscape.config;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -15,14 +14,9 @@ import java.util.UUID;
 
 import static org.junit.Assert.*;
 
-public class Cosmetics410RegressionTest {
+public class CosmeticsRecordRecoveryTest extends BootstrappedGameTest {
     @Rule
     public TemporaryFolder temporary = new TemporaryFolder();
-
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
 
     @Test
     public void unreadableRecordIsPreservedBeforePreferenceAndCosmeticEdits() throws Exception {

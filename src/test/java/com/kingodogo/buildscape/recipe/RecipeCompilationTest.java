@@ -15,7 +15,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class RecipeCompilation410Test {
+public class RecipeCompilationTest {
     @Test
     public void outputIdsRemainStableWhenRecipeContentsChange() throws Exception {
         RecipeIR.RecipeSpec one = parse("{\"stonecutting\":[[\"BS:copper_chest\",\"MC:stone\",1]]}").get(0);

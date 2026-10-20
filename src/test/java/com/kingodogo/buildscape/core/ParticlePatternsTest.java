@@ -34,7 +34,7 @@ public class ParticlePatternsTest {
         found.add(new PillarParticleConfig().pattern);
         try (Stream<Path> files = Stream.concat(
                 Stream.concat(Files.walk(Path.of("src", "main", "resources", "data", "buildscape", "config")),
-                        Files.walk(Path.of("src", "test", "resources", "config405"))),
+                        Files.walk(Path.of("src", "test", "resources", "legacy-config"))),
                 Stream.of(Path.of("pillar-items.json")))) {
             for (Path file : (Iterable<Path>) files.filter(p -> p.toString().endsWith(".json"))::iterator) {
                 try {

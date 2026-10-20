@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.recipe.framework.cache;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.recipe.HazeBushDyeRecipe;
 
 import com.google.gson.JsonParser;
@@ -13,7 +14,6 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -23,11 +23,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class HazeBushDyeRecipeTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class HazeBushDyeRecipeTest extends BootstrappedGameTest {
 
     private HazeBushDyeRecipe recipe() {
         // Vanilla stand-ins keep these unit tests independent of mod registry startup.

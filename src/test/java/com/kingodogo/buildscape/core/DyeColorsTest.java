@@ -1,20 +1,15 @@
 package com.kingodogo.buildscape.core;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.kingodogo.buildscape.block.OrnamentBlock;
 import com.kingodogo.buildscape.block.StringLightBlock;
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
 import net.minecraft.world.item.Items;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class DyeColorsTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class DyeColorsTest extends BootstrappedGameTest {
 
     @Test
     public void tableHasTheSixteenExpectedColours() {

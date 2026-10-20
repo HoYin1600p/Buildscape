@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -7,7 +8,6 @@ import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.RegistryObject;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,11 +22,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ToolSpeedTagsTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RegistryTestSupport.bootstrap();
-    }
+public class ToolSpeedTagsTest extends BootstrappedGameTest {
 
     @Test
     public void everyRegisteredVariantHasItsMatchingToolTag() throws IOException {

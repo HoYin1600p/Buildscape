@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.feature.pipe;
 
-import com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest;
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -8,7 +8,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Proxy;
@@ -16,11 +15,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class PipeOutletPlacementTest {
-    @BeforeClass
-    public static void bootstrap() {
-        RecipeCacheRegressionTest.bootstrap();
-    }
+public class PipeOutletPlacementTest extends BootstrappedGameTest {
 
     @Test
     public void sourcesDryWaterloggableBlocksAndSolidsAreBlockedWithoutRescheduling() {

@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.config;
 
+import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.BeforeClass;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
@@ -12,11 +12,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class DefaultPillarItems405Test {
-    @BeforeClass
-    public static void bootstrap() {
-        com.kingodogo.buildscape.recipe.framework.cache.RecipeCacheRegressionTest.bootstrap();
-    }
+public class DefaultPillarItemsTest extends BootstrappedGameTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -301,8 +297,8 @@ public class DefaultPillarItems405Test {
             assertTrue(item, names.contains(item));
         }
         String real;
-        try (java.io.InputStream input = DefaultPillarItems405Test.class
-                .getResourceAsStream("/config405/old-pillar-items-vault.json")) {
+        try (java.io.InputStream input = DefaultPillarItemsTest.class
+                .getResourceAsStream("/legacy-config/old-pillar-items-vault.json")) {
             real = new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
         }
         assertEquals(new HashSet<>(names), PillarParticleConfig.parseItems(real));

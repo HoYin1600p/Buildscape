@@ -44,21 +44,32 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
             BlockHitResult hitResult) {
-        if (!level.isClientSide) {
-            if (state.getValue(ACTIVE)) {
-                level.setBlock(pos, state.setValue(ACTIVE, false), 3);
-            }
+        boolean emptyHand = player.getItemInHand(hand).isEmpty();
+        if (!emptyHand || level.isClientSide) {
+            return resinInteractionResult(emptyHand, 0, level.isClientSide);
+        }
 
-            spawnResinOnHeart(level, pos);
+        if (state.getValue(ACTIVE)) {
+            level.setBlock(pos, state.setValue(ACTIVE, false), 3);
+        }
 
+        int spawned = spawnResinOnHeart(level, pos);
+        if (spawned > 0) {
             level.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.levelEvent(2005, pos, 0);
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return resinInteractionResult(emptyHand, spawned, false);
     }
 
-    private void spawnResinOnHeart(Level level, BlockPos pos) {
+    static InteractionResult resinInteractionResult(boolean emptyHand, int spawned, boolean clientSide) {
+        if (!emptyHand || (!clientSide && spawned == 0)) {
+            return InteractionResult.PASS;
+        }
+        return InteractionResult.sidedSuccess(clientSide);
+    }
+
+    private int spawnResinOnHeart(Level level, BlockPos pos) {
         List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST,
                 Direction.WEST, Direction.UP, Direction.DOWN));
         Collections.shuffle(directions, level.random);
@@ -71,20 +82,21 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
             BlockState adjState = level.getBlockState(adjPos);
 
             if (adjState.is(CopperBlocks.RESIN_CLUMP.get())) {
-                if (!adjState.getValue(faceProp)) {
-                    level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
+                if (!adjState.getValue(faceProp) && level.setBlock(adjPos, adjState.setValue(faceProp, true), 3)) {
                     spawned++;
                 }
             } else if (adjState.isAir()) {
                 BlockState newState = CopperBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
-                level.setBlock(adjPos, newState, 3);
-                spawned++;
+                if (level.setBlock(adjPos, newState, 3)) {
+                    spawned++;
+                }
             }
 
             if (spawned >= 2) {
                 break;
             }
         }
+        return spawned;
     }
 
     @Override

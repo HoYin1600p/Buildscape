@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.feature.pillar;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.nbt.CompoundTag;
@@ -26,76 +27,12 @@ final class PillarEntityNbt {
                 ? self.particleColors.get(0)
                 : null;
 
-        try {
-            if (tag.contains(NbtKeys.DISPLAYED_ITEM, 10)) {
-                ItemStack loaded = ItemStack.of(tag.getCompound(NbtKeys.DISPLAYED_ITEM));
-                self.displayedItem = loaded == null ? ItemStack.EMPTY : loaded;
-            } else if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
-                String itemId = tag.getString(NbtKeys.PILLAR_ITEM);
-                try {
-                    ResourceLocation itemLocation = new ResourceLocation(
-                            itemId);
-                    Item item = ForgeRegistries.ITEMS
-                            .getValue(itemLocation);
-                    if (item != null && item != Items.AIR) {
-                        self.displayedItem = new ItemStack(item);
-                    } else {
-                        self.displayedItem = ItemStack.EMPTY;
-                    }
-                } catch (ResourceLocationException e) {
-                    self.displayedItem = ItemStack.EMPTY;
-                }
-            } else {
-                self.displayedItem = ItemStack.EMPTY;
-            }
-        } catch (Exception e) {
-            // displayed item NBT may be malformed in any way; show no item
-            self.displayedItem = ItemStack.EMPTY;
-        }
+        self.displayedItem = readDisplayedItem(tag);
+        self.particlePattern = readParticlePattern(tag);
 
-        if (tag.contains(NbtKeys.PARTICLE_PATTERN, 8)) {
-            self.particlePattern = tag.getString(NbtKeys.PARTICLE_PATTERN);
-            boolean valid = false;
-            for (String p : PillarBlockEntity.PATTERNS) {
-                if (p.equals(self.particlePattern)) {
-                    valid = true;
-                    break;
-                }
-            }
-            if (!valid) {
-                self.particlePattern = null;
-            }
-        } else if (tag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
-            self.particlePattern = tag.getString(NbtKeys.PILLAR_PATTERN);
-            boolean valid = false;
-            for (String p : PillarBlockEntity.PATTERNS) {
-                if (p.equals(self.particlePattern)) {
-                    valid = true;
-                    break;
-                }
-            }
-            if (!valid) {
-                self.particlePattern = null;
-            }
-        } else {
-            self.particlePattern = null;
-        }
-
-        if (tag.contains(NbtKeys.PATTERN_SPEED, 6)) {
-            self.patternSpeed = tag.getDouble(NbtKeys.PATTERN_SPEED);
-        } else {
-            self.patternSpeed = null;
-        }
-        if (tag.contains(NbtKeys.PATTERN_SPREAD, 6)) {
-            self.patternSpread = tag.getDouble(NbtKeys.PATTERN_SPREAD);
-        } else {
-            self.patternSpread = null;
-        }
-        if (tag.contains(NbtKeys.PATTERN_INTENSITY, 6)) {
-            self.patternIntensity = tag.getDouble(NbtKeys.PATTERN_INTENSITY);
-        } else {
-            self.patternIntensity = null;
-        }
+        self.patternSpeed = optionalDouble(tag, NbtKeys.PATTERN_SPEED);
+        self.patternSpread = optionalDouble(tag, NbtKeys.PATTERN_SPREAD);
+        self.patternIntensity = optionalDouble(tag, NbtKeys.PATTERN_INTENSITY);
 
         if (tag.contains(NbtKeys.MAX_PARTICLE_COLOR, 3)) {
             self.maxParticleColor = tag.getInt(NbtKeys.MAX_PARTICLE_COLOR);
@@ -103,38 +40,7 @@ final class PillarEntityNbt {
             self.maxParticleColor = null;
         }
 
-        try {
-            if (tag.contains(NbtKeys.PARTICLE_COLORS, 9)) {
-                ListTag colorList = tag.getList(NbtKeys.PARTICLE_COLORS, 8);
-                if (colorList.size() > 0) {
-                    self.particleColors = new ArrayList<>();
-                    int maxColors = Math.min(7, colorList.size());
-                    for (int i = 0; i < maxColors; i++) {
-                        try {
-                            String color = colorList.getString(i);
-                            if (color != null &&
-                                    !color.isEmpty() &&
-                                    color.matches("^#[0-9A-Fa-f]{6}$")) {
-                                self.particleColors.add(color.toUpperCase(Locale.ROOT));
-                            }
-                        } catch (Exception e) {
-                            // defensive guard around one colour entry
-                            // skip a malformed colour entry
-                        }
-                    }
-                    if (self.particleColors.isEmpty()) {
-                        self.particleColors = null;
-                    }
-                } else {
-                    self.particleColors = null;
-                }
-            } else {
-                self.particleColors = null;
-            }
-        } catch (Exception e) {
-            // colour list NBT may be malformed in any way; use the default colours
-            self.particleColors = null;
-        }
+        self.particleColors = readParticleColors(tag);
 
         if (tag.contains(NbtKeys.PARTICLE_COLOR_COUNTER, 3)) {
             self.particleColorCounter = tag.getInt(NbtKeys.PARTICLE_COLOR_COUNTER);
@@ -168,15 +74,7 @@ final class PillarEntityNbt {
             self.usePattern = null;
         }
 
-        if (tag.contains(NbtKeys.FACING_YAW, 5)) {
-            self.facingYaw = tag.getFloat(NbtKeys.FACING_YAW);
-            self.facingYaw = self.facingYaw % 360.0f;
-            if (self.facingYaw < 0) {
-                self.facingYaw += 360.0f;
-            }
-        } else {
-            self.facingYaw = 0.0f;
-        }
+        self.facingYaw = readFacingYaw(tag);
 
         String newColor = (self.particleColors != null && !self.particleColors.isEmpty())
                 ? self.particleColors.get(0)
@@ -191,6 +89,109 @@ final class PillarEntityNbt {
                 (self.particleColors == null || self.particleColors.isEmpty())) {
             self.needsManagerSync = true;
         }
+    }
+
+    /** The displayed item from the full stack tag or the legacy id string; empty when absent or malformed. */
+    private static ItemStack readDisplayedItem(CompoundTag tag) {
+        try {
+            if (tag.contains(NbtKeys.DISPLAYED_ITEM, 10)) {
+                ItemStack loaded = ItemStack.of(tag.getCompound(NbtKeys.DISPLAYED_ITEM));
+                return loaded == null ? ItemStack.EMPTY : loaded;
+            }
+            if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
+                return legacyItemStack(tag.getString(NbtKeys.PILLAR_ITEM));
+            }
+            return ItemStack.EMPTY;
+        } catch (Exception e) {
+            // displayed item NBT may be malformed in any way; show no item
+            return ItemStack.EMPTY;
+        }
+    }
+
+    private static ItemStack legacyItemStack(String itemId) {
+        try {
+            ResourceLocation itemLocation = new ResourceLocation(
+                    itemId);
+            Item item = ForgeRegistries.ITEMS
+                    .getValue(itemLocation);
+            if (item != null && item != Items.AIR) {
+                return new ItemStack(item);
+            }
+            return ItemStack.EMPTY;
+        } catch (ResourceLocationException e) {
+            return ItemStack.EMPTY;
+        }
+    }
+
+    /** The saved pattern name (current key first, then the legacy key); null when absent or not a known pattern. */
+    private static String readParticlePattern(CompoundTag tag) {
+        if (tag.contains(NbtKeys.PARTICLE_PATTERN, 8)) {
+            return knownPatternOrNull(tag.getString(NbtKeys.PARTICLE_PATTERN));
+        }
+        if (tag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
+            return knownPatternOrNull(tag.getString(NbtKeys.PILLAR_PATTERN));
+        }
+        return null;
+    }
+
+    private static String knownPatternOrNull(String pattern) {
+        for (String p : PillarBlockEntity.PATTERNS) {
+            if (p.equals(pattern)) {
+                return pattern;
+            }
+        }
+        return null;
+    }
+
+    private static Double optionalDouble(CompoundTag tag, String key) {
+        if (tag.contains(key, 6)) {
+            return tag.getDouble(key);
+        }
+        return null;
+    }
+
+    /** Up to seven valid hex colours, upper-cased; null when none survive or the list is malformed. */
+    private static List<String> readParticleColors(CompoundTag tag) {
+        try {
+            if (!tag.contains(NbtKeys.PARTICLE_COLORS, 9)) {
+                return null;
+            }
+            ListTag colorList = tag.getList(NbtKeys.PARTICLE_COLORS, 8);
+            if (colorList.size() <= 0) {
+                return null;
+            }
+            List<String> colors = new ArrayList<>();
+            int maxColors = Math.min(7, colorList.size());
+            for (int i = 0; i < maxColors; i++) {
+                try {
+                    String color = colorList.getString(i);
+                    if (color != null &&
+                            !color.isEmpty() &&
+                            color.matches("^#[0-9A-Fa-f]{6}$")) {
+                        colors.add(color.toUpperCase(Locale.ROOT));
+                    }
+                } catch (Exception e) {
+                    // defensive guard around one colour entry
+                    // skip a malformed colour entry
+                }
+            }
+            return colors.isEmpty() ? null : colors;
+        } catch (Exception e) {
+            // colour list NBT may be malformed in any way; use the default colours
+            return null;
+        }
+    }
+
+    /** The facing yaw wrapped into [0, 360); 0 when absent. */
+    private static float readFacingYaw(CompoundTag tag) {
+        if (!tag.contains(NbtKeys.FACING_YAW, 5)) {
+            return 0.0f;
+        }
+        float yaw = tag.getFloat(NbtKeys.FACING_YAW) % 360.0f;
+        if (yaw < 0) {
+            yaw += 360.0f;
+        }
+        return yaw;
     }
 
     static void write(PillarBlockEntity self, CompoundTag tag) {

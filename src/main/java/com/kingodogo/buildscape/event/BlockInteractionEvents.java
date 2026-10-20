@@ -92,156 +92,30 @@ public class BlockInteractionEvents {
             return;
         }
 
-        if (state.is(Blocks.FLOWER_POT) && !event.getPlayer().isSecondaryUseActive()) {
-            if (heldItem.getItem() instanceof HazeBushItem && HazeBushItem.isDrained(heldItem)) {
-                if (heldItem.getItem() instanceof BlockItem blockItem
-                        && blockItem.getBlock() instanceof HazeBushBlock bushBlock) {
-                    DyeColor color = bushBlock.getColor();
-                    RegistryObject<Block> pottedObj = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color);
-                    if (pottedObj != null) {
-                        if (!event.getWorld().isClientSide) {
-                            BlockState newState = pottedObj.get().defaultBlockState()
-                                    .setValue(PottedHazeBushBlock.HAS_HAZE, false);
-                            event.getWorld().setBlock(event.getPos(), newState, 3);
-                            event.getPlayer().awardStat(Stats.POT_FLOWER);
-                            if (!event.getPlayer().getAbilities().instabuild) {
-                                heldItem.shrink(1);
-                            }
-                            event.getWorld().gameEvent(event.getPlayer(), GameEvent.BLOCK_CHANGE, event.getPos());
-                        }
-                        event.setCancellationResult(InteractionResult.sidedSuccess(event.getWorld().isClientSide));
-                        event.setCanceled(true);
-                        return;
-                    }
-                }
-            }
+        if (state.is(Blocks.FLOWER_POT) && !event.getPlayer().isSecondaryUseActive()
+                && potDrainedHazeBush(event, heldItem)) {
+            return;
         }
 
-        if (state.getBlock() instanceof VineBlock) {
-            if (heldItem.is(Items.SHEARS)) {
-                if (state.hasProperty(ModBlockProperties.SHEARED)) {
-                    if (!state.getValue(ModBlockProperties.SHEARED)) {
-                        if (!event.getWorld().isClientSide) {
-                            event.getWorld().setBlockAndUpdate(event.getPos(),
-                                    state.setValue(ModBlockProperties.SHEARED, true));
-                            event.getWorld().playSound(null, event.getPos(), SoundEvents.GROWING_PLANT_CROP,
-                                    SoundSource.BLOCKS, 1.0F, 1.0F);
-                            event.getWorld().gameEvent(event.getPlayer(), GameEvent.SHEAR, event.getPos());
-                            heldItem.hurtAndBreak(1, event.getPlayer(), (p) -> p.broadcastBreakEvent(event.getHand()));
-                        }
-                        event.setCancellationResult(InteractionResult.sidedSuccess(event.getWorld().isClientSide));
-                        event.setCanceled(true);
-                        return;
-                    }
-                }
-            }
+        if (state.getBlock() instanceof VineBlock && shearVine(event, state, heldItem)) {
+            return;
         }
 
         if (state.getBlock() == ModBlocks.BAMBOO_BLOCK.get()
                 && heldItem.getItem() instanceof AxeItem) {
-            BlockPos pos = event.getPos();
-            Level level = event.getWorld();
-            Player player = event.getPlayer();
-
-            Direction.Axis axis = state.getValue(
-                    RotatedPillarBlock.AXIS);
-
-            level.setBlock(
-                    pos,
-                    ModBlocks.STRIPPED_BAMBOO_BLOCK.get()
-                            .defaultBlockState()
-                            .setValue(
-                                    RotatedPillarBlock.AXIS,
-                                    axis),
-                    11);
-
-            level.playSound(
-                    null,
-                    pos,
-                    SoundEvents.AXE_STRIP,
-                    SoundSource.BLOCKS,
-                    1.0f,
-                    1.0f);
-
-            if (!player.getAbilities().instabuild) {
-                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
-            }
-
-            event.setCanceled(true);
-            event.setCancellationResult(
-                    InteractionResult.SUCCESS);
+            stripWithAxe(event, state, heldItem, ModBlocks.STRIPPED_BAMBOO_BLOCK.get());
             return;
         }
 
         if (state.getBlock() == ModBlocks.MANGROVE_LOG.get()
                 && heldItem.getItem() instanceof AxeItem) {
-            BlockPos pos = event.getPos();
-            Level level = event.getWorld();
-            Player player = event.getPlayer();
-
-            Direction.Axis axis = state.getValue(
-                    RotatedPillarBlock.AXIS);
-
-            level.setBlock(
-                    pos,
-                    ModBlocks.STRIPPED_MANGROVE_LOG.get()
-                            .defaultBlockState()
-                            .setValue(
-                                    RotatedPillarBlock.AXIS,
-                                    axis),
-                    11);
-
-            level.playSound(
-                    null,
-                    pos,
-                    SoundEvents.AXE_STRIP,
-                    SoundSource.BLOCKS,
-                    1.0f,
-                    1.0f);
-
-            if (!player.getAbilities().instabuild) {
-                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
-            }
-
-            event.setCanceled(true);
-            event.setCancellationResult(
-                    InteractionResult.SUCCESS);
+            stripWithAxe(event, state, heldItem, ModBlocks.STRIPPED_MANGROVE_LOG.get());
             return;
         }
 
         if (state.getBlock() == ModBlocks.MANGROVE_WOOD.get()
                 && heldItem.getItem() instanceof AxeItem) {
-            BlockPos pos = event.getPos();
-            Level level = event.getWorld();
-            Player player = event.getPlayer();
-
-            Direction.Axis axis = state.getValue(
-                    RotatedPillarBlock.AXIS);
-
-            level.setBlock(
-                    pos,
-                    ModBlocks.STRIPPED_MANGROVE_WOOD.get()
-                            .defaultBlockState()
-                            .setValue(
-                                    RotatedPillarBlock.AXIS,
-                                    axis),
-                    11);
-
-            level.playSound(
-                    null,
-                    pos,
-                    SoundEvents.AXE_STRIP,
-                    SoundSource.BLOCKS,
-                    1.0f,
-                    1.0f);
-
-            if (!player.getAbilities().instabuild) {
-                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
-            }
-
-            event.setCanceled(true);
-            event.setCancellationResult(
-                    InteractionResult.SUCCESS);
+            stripWithAxe(event, state, heldItem, ModBlocks.STRIPPED_MANGROVE_WOOD.get());
             return;
         }
 
@@ -250,48 +124,135 @@ public class BlockInteractionEvents {
         }
 
         if (state.getBlock() == Blocks.DIRT
-                && heldItem.getItem() == Items.POTION) {
-            if (PotionUtils
-                    .getPotion(heldItem) == Potions.WATER) {
-                BlockPos pos = event.getPos();
-                Level level = event.getWorld();
-                Player player = event.getPlayer();
+                && heldItem.getItem() == Items.POTION
+                && PotionUtils.getPotion(heldItem) == Potions.WATER) {
+            turnDirtToMud(event, heldItem);
+        }
+    }
 
-                if (level.isClientSide) {
-                    spawnSplashParticles(level, pos);
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
-                    return;
-                }
-
-                level.setBlock(pos, ModBlocks.MUD.get().defaultBlockState(), 3);
-
-                level.playSound(
-                        null,
-                        pos,
-                        SoundEvents.BOTTLE_EMPTY,
-                        SoundSource.BLOCKS,
-                        1.0f,
-                        1.0f);
-
-                if (!player.getAbilities().instabuild) {
-                    heldItem.shrink(1);
-                    ItemStack emptyBottle = new ItemStack(
-                            Items.GLASS_BOTTLE);
-                    if (heldItem.isEmpty()) {
-                        player.setItemInHand(event.getHand(), emptyBottle);
-                    } else if (!player.getInventory().add(emptyBottle)) {
-                        player.drop(emptyBottle, false);
+    /** A drained haze bush used on a flower pot becomes the potted bush; true when the click was consumed. */
+    private static boolean potDrainedHazeBush(PlayerInteractEvent.RightClickBlock event, ItemStack heldItem) {
+        if (heldItem.getItem() instanceof HazeBushItem && HazeBushItem.isDrained(heldItem)) {
+            if (heldItem.getItem() instanceof BlockItem blockItem
+                    && blockItem.getBlock() instanceof HazeBushBlock bushBlock) {
+                DyeColor color = bushBlock.getColor();
+                RegistryObject<Block> pottedObj = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color);
+                if (pottedObj != null) {
+                    if (!event.getWorld().isClientSide) {
+                        BlockState newState = pottedObj.get().defaultBlockState()
+                                .setValue(PottedHazeBushBlock.HAS_HAZE, false);
+                        event.getWorld().setBlock(event.getPos(), newState, 3);
+                        event.getPlayer().awardStat(Stats.POT_FLOWER);
+                        if (!event.getPlayer().getAbilities().instabuild) {
+                            heldItem.shrink(1);
+                        }
+                        event.getWorld().gameEvent(event.getPlayer(), GameEvent.BLOCK_CHANGE, event.getPos());
                     }
+                    event.setCancellationResult(InteractionResult.sidedSuccess(event.getWorld().isClientSide));
+                    event.setCanceled(true);
+                    return true;
                 }
-
-                spawnSplashParticles(level, pos);
-
-                event.setCanceled(true);
-                event.setCancellationResult(
-                        InteractionResult.sidedSuccess(level.isClientSide));
             }
         }
+        return false;
+    }
+
+    /** Shears on a not yet sheared vine; true when the click was consumed. */
+    private static boolean shearVine(PlayerInteractEvent.RightClickBlock event, BlockState state,
+            ItemStack heldItem) {
+        if (heldItem.is(Items.SHEARS)
+                && state.hasProperty(ModBlockProperties.SHEARED)
+                && !state.getValue(ModBlockProperties.SHEARED)) {
+            if (!event.getWorld().isClientSide) {
+                event.getWorld().setBlockAndUpdate(event.getPos(),
+                        state.setValue(ModBlockProperties.SHEARED, true));
+                event.getWorld().playSound(null, event.getPos(), SoundEvents.GROWING_PLANT_CROP,
+                        SoundSource.BLOCKS, 1.0F, 1.0F);
+                event.getWorld().gameEvent(event.getPlayer(), GameEvent.SHEAR, event.getPos());
+                heldItem.hurtAndBreak(1, event.getPlayer(), (p) -> p.broadcastBreakEvent(event.getHand()));
+            }
+            event.setCancellationResult(InteractionResult.sidedSuccess(event.getWorld().isClientSide));
+            event.setCanceled(true);
+            return true;
+        }
+        return false;
+    }
+
+    /** Axe-strips the clicked block into its stripped variant, keeping the axis. */
+    private static void stripWithAxe(PlayerInteractEvent.RightClickBlock event, BlockState state,
+            ItemStack heldItem, Block stripped) {
+        BlockPos pos = event.getPos();
+        Level level = event.getWorld();
+        Player player = event.getPlayer();
+
+        Direction.Axis axis = state.getValue(
+                RotatedPillarBlock.AXIS);
+
+        level.setBlock(
+                pos,
+                stripped
+                        .defaultBlockState()
+                        .setValue(
+                                RotatedPillarBlock.AXIS,
+                                axis),
+                11);
+
+        level.playSound(
+                null,
+                pos,
+                SoundEvents.AXE_STRIP,
+                SoundSource.BLOCKS,
+                1.0f,
+                1.0f);
+
+        if (!player.getAbilities().instabuild) {
+            heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
+        }
+
+        event.setCanceled(true);
+        event.setCancellationResult(
+                InteractionResult.SUCCESS);
+    }
+
+    /** A water bottle used on dirt makes mud and hands back an empty bottle. */
+    private void turnDirtToMud(PlayerInteractEvent.RightClickBlock event, ItemStack heldItem) {
+        BlockPos pos = event.getPos();
+        Level level = event.getWorld();
+        Player player = event.getPlayer();
+
+        if (level.isClientSide) {
+            spawnSplashParticles(level, pos);
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
+            return;
+        }
+
+        level.setBlock(pos, ModBlocks.MUD.get().defaultBlockState(), 3);
+
+        level.playSound(
+                null,
+                pos,
+                SoundEvents.BOTTLE_EMPTY,
+                SoundSource.BLOCKS,
+                1.0f,
+                1.0f);
+
+        if (!player.getAbilities().instabuild) {
+            heldItem.shrink(1);
+            ItemStack emptyBottle = new ItemStack(
+                    Items.GLASS_BOTTLE);
+            if (heldItem.isEmpty()) {
+                player.setItemInHand(event.getHand(), emptyBottle);
+            } else if (!player.getInventory().add(emptyBottle)) {
+                player.drop(emptyBottle, false);
+            }
+        }
+
+        spawnSplashParticles(level, pos);
+
+        event.setCanceled(true);
+        event.setCancellationResult(
+                InteractionResult.sidedSuccess(level.isClientSide));
     }
 
     @SubscribeEvent

@@ -47,6 +47,7 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class BlockInteractionEvents {
 
@@ -296,213 +297,242 @@ public class BlockInteractionEvents {
     @SubscribeEvent
     public void onBackportBonemealRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         ItemStack held = event.getItemStack();
-        if (held.is(Items.BONE_MEAL)) {
-            Level level = event.getWorld();
-            BlockPos pos = event.getPos();
-            BlockState state = level.getBlockState(pos);
+        if (!held.is(Items.BONE_MEAL)) {
+            return;
+        }
 
-            if (state.is(Blocks.CACTUS) && event.getFace() == Direction.UP) {
-                BlockPos above = pos.above();
-                if (level.isEmptyBlock(above)) {
-                    if (!level.isClientSide) {
-                        level.setBlock(above, ModBlocks.CACTUS_FLOWER.get().defaultBlockState(), 3);
-                        level.levelEvent(2005, pos, 0);
-                        if (!event.getPlayer().getAbilities().instabuild) {
-                            held.shrink(1);
-                        }
-                    }
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.SUCCESS);
-                    return;
-                }
-            }
+        Level level = event.getWorld();
+        BlockPos pos = event.getPos();
+        BlockState state = level.getBlockState(pos);
 
-            if ((state.is(Blocks.SAND) || state.is(Blocks.RED_SAND)) && event.getFace() == Direction.UP) {
-                BlockPos above = pos.above();
-                if (level.isEmptyBlock(above)) {
-                    if (!level.isClientSide) {
-                        level.setBlock(above, ModBlocks.DRY_GRASS.get().defaultBlockState(), 3);
-                        level.levelEvent(2005, pos, 0);
-                        if (!event.getPlayer().getAbilities().instabuild) {
-                            held.shrink(1);
-                        }
-                    }
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.SUCCESS);
-                    return;
-                }
-            }
+        // Handlers that return true have consumed the click and ended the event; the others fall through.
+        if (state.is(Blocks.CACTUS) && event.getFace() == Direction.UP
+                && plantOnTop(event, held, level, pos, ModBlocks.CACTUS_FLOWER, InteractionResult.SUCCESS)) {
+            return;
+        }
 
-            if (state.is(Blocks.PODZOL) && event.getFace() == Direction.UP) {
-                BlockPos above = pos.above();
-                if (level.isEmptyBlock(above)) {
-                    if (!level.isClientSide) {
-                        level.setBlock(above, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
-                        level.levelEvent(2005, pos, 0);
-                        if (!event.getPlayer().getAbilities().instabuild) {
-                            held.shrink(1);
-                        }
-                    }
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
-                    return;
-                } else {
-                    List<BlockPos> validPositions = new ArrayList<>();
-                    for (int dx = -1; dx <= 1; dx++) {
-                        for (int dz = -1; dz <= 1; dz++) {
-                            if (dx == 0 && dz == 0) {
-                                continue;
-                            }
-                            BlockPos nearbyGround = pos.offset(dx, 0, dz);
-                            BlockPos nearbyAbove = nearbyGround.above();
-                            if (level.getBlockState(nearbyGround).is(Blocks.PODZOL)
-                                    && level.isEmptyBlock(nearbyAbove)) {
-                                validPositions.add(nearbyAbove);
-                            }
-                        }
-                    }
-                    if (!validPositions.isEmpty()) {
-                        if (!level.isClientSide) {
-                            BlockPos target = validPositions.get(level.random.nextInt(validPositions.size()));
-                            level.setBlock(target, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
-                            level.levelEvent(2005, pos, 0);
-                            if (!event.getPlayer().getAbilities().instabuild) {
-                                held.shrink(1);
-                            }
-                        }
-                        event.setCanceled(true);
-                        event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
-                        return;
-                    }
-                }
-            }
+        if ((state.is(Blocks.SAND) || state.is(Blocks.RED_SAND)) && event.getFace() == Direction.UP
+                && plantOnTop(event, held, level, pos, ModBlocks.DRY_GRASS, InteractionResult.SUCCESS)) {
+            return;
+        }
 
-            if (state.is(Blocks.GRASS_BLOCK) && event.getFace() == Direction.UP) {
-                if (!level.isClientSide) {
-                    final BlockPos finalPos = pos;
-                    ((ServerLevel) level).getServer().execute(() -> {
-                        BlockPos.betweenClosedStream(finalPos.offset(-3, -1, -3), finalPos.offset(3, 1, 3))
-                                .forEach(checkPos -> {
-                                    if (level.getBlockState(checkPos).is(Blocks.GRASS_BLOCK)
-                                            && level.isEmptyBlock(checkPos.above())) {
-                                        if (level.random.nextFloat() < 0.05F) {
-                                            level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(),
-                                                    3);
-                                        }
-                                    }
-                                });
-                    });
-                }
-            }
+        if (state.is(Blocks.PODZOL) && event.getFace() == Direction.UP && bonemealPodzol(event, held, level, pos)) {
+            return;
+        }
 
-            if (state.is(Blocks.MOSS_BLOCK) && event.getFace() == Direction.UP) {
-                if (!level.isClientSide) {
-                    final BlockPos finalMossPos = pos;
-                    ((ServerLevel) level).getServer().execute(() -> {
-                        BlockPos.betweenClosedStream(finalMossPos.offset(-3, -1, -3), finalMossPos.offset(3, 1, 3))
-                                .forEach(checkPos -> {
-                                    if (level.getBlockState(checkPos).is(Blocks.MOSS_BLOCK)
-                                            && level.isEmptyBlock(checkPos.above())) {
-                                        float roll = level.random.nextFloat();
-                                        if (roll < 0.10F) {
-                                            level.setBlock(checkPos.above(),
-                                                    ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
-                                        } else if (roll < 0.15F) {
-                                            BlockState saplingState = ModBlocks.CHERRY_SAPLING.get()
-                                                    .defaultBlockState();
-                                            if (saplingState.canSurvive(level, checkPos.above())) {
-                                                level.setBlock(checkPos.above(), saplingState, 3);
-                                            }
-                                        } else if (roll < 0.20F) {
-                                            BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get()
-                                                    .defaultBlockState();
-                                            if (propaguleState.canSurvive(level, checkPos.above())) {
-                                                level.setBlock(checkPos.above(), propaguleState, 3);
-                                            }
-                                        }
-                                    }
-                                });
-                    });
-                }
-            }
+        if (state.is(Blocks.GRASS_BLOCK) && event.getFace() == Direction.UP) {
+            scatterBushesAroundGrass(level, pos);
+        }
 
-            if (state.is(ModBlocks.PALE_OAK_LEAVES.get())) {
-                BlockPos targetPos = pos.below();
-                while (level.getBlockState(targetPos).is(ModBlocks.PALE_HANGING_MOSS.get())) {
-                    targetPos = targetPos.below();
-                }
-                if (level.isEmptyBlock(targetPos)) {
-                    if (!level.isClientSide) {
-                        level.setBlock(targetPos, ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState()
-                                .setValue(HangingMossBlock.TIP, true), 3);
-                        level.levelEvent(2005, pos, 0);
-                        if (!event.getPlayer().getAbilities().instabuild) {
-                            held.shrink(1);
-                        }
-                    }
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.SUCCESS);
-                    return;
-                }
-            }
+        if (state.is(Blocks.MOSS_BLOCK) && event.getFace() == Direction.UP) {
+            scatterPlantsAroundMoss(level, pos);
+        }
 
-            if (state.is(ModBlocks.CREAKING_HEART.get())) {
-                if (!level.isClientSide) {
-                    if (state.getBlock() instanceof CreakingHeartBlock heart) {
-                        level.setBlock(pos, state.setValue(CreakingHeartBlock.ACTIVE, true), 3);
-                        level.scheduleTick(pos, heart, 40);
-                    }
-                    List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH,
-                            Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN));
-                    Collections.shuffle(directions, level.random);
-                    int spawned = 0;
-                    for (Direction dir : directions) {
-                        BlockPos adjPos = pos.relative(dir);
-                        Direction attachFace = dir.getOpposite();
-                        BooleanProperty faceProp = GlowLichenBlock.getFaceProperty(attachFace);
-                        BlockState adjState = level.getBlockState(adjPos);
+        if (state.is(ModBlocks.PALE_OAK_LEAVES.get()) && hangPaleMoss(event, held, level, pos)) {
+            return;
+        }
 
-                        if (adjState.is(ModBlocks.RESIN_CLUMP.get())) {
-                            if (!adjState.getValue(faceProp)) {
-                                level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
-                                spawned++;
-                            }
-                        } else if (adjState.isAir()) {
-                            BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp,
-                                    true);
-                            level.setBlock(adjPos, newState, 3);
-                            spawned++;
-                        }
-                        if (spawned >= 2) {
-                            break;
-                        }
-                    }
-                    level.levelEvent(2005, pos, 0);
-                    if (!event.getPlayer().getAbilities().instabuild) {
-                        held.shrink(1);
-                    }
-                }
-                event.setCanceled(true);
-                event.setCancellationResult(InteractionResult.SUCCESS);
-                return;
-            }
+        if (state.is(ModBlocks.CREAKING_HEART.get())) {
+            activateCreakingHeart(event, held, level, pos, state);
+            return;
+        }
 
-            if (state.is(ModBlocks.TALL_DRY_GRASS.get())) {
-                if (!level.isClientSide) {
-                    ItemEntity item = new ItemEntity(
-                            level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                            new ItemStack(ModItems.DRY_GRASS.get(), 1));
-                    level.addFreshEntity(item);
-                    level.levelEvent(2005, pos, 0);
-                    if (!event.getPlayer().getAbilities().instabuild) {
-                        held.shrink(1);
-                    }
+        if (state.is(ModBlocks.TALL_DRY_GRASS.get())) {
+            dropDryGrass(event, held, level, pos);
+            return;
+        }
+    }
+
+    /** Uses up one bone meal and shows the growth particles; the caller has checked for the server side. */
+    private static void consumeBoneMeal(PlayerInteractEvent.RightClickBlock event, ItemStack held, Level level,
+            BlockPos pos) {
+        level.levelEvent(2005, pos, 0);
+        if (!event.getPlayer().getAbilities().instabuild) {
+            held.shrink(1);
+        }
+    }
+
+    private static void cancelWith(PlayerInteractEvent.RightClickBlock event, InteractionResult result) {
+        event.setCanceled(true);
+        event.setCancellationResult(result);
+    }
+
+    /** Grows {@code plant} on the block above when that is empty; false (nothing done) when it is not. */
+    private static boolean plantOnTop(
+            PlayerInteractEvent.RightClickBlock event,
+            ItemStack held,
+            Level level,
+            BlockPos pos,
+            Supplier<? extends Block> plant,
+            InteractionResult result) {
+        BlockPos above = pos.above();
+        if (!level.isEmptyBlock(above)) {
+            return false;
+        }
+        if (!level.isClientSide) {
+            level.setBlock(above, plant.get().defaultBlockState(), 3);
+            consumeBoneMeal(event, held, level, pos);
+        }
+        cancelWith(event, result);
+        return true;
+    }
+
+    /** Bone meal on podzol grows a haze bush on top, or on a free podzol neighbour; false when neither fits. */
+    private static boolean bonemealPodzol(
+            PlayerInteractEvent.RightClickBlock event, ItemStack held, Level level, BlockPos pos) {
+        if (plantOnTop(
+                event, held, level, pos, ModBlocks.WHITE_HAZE_BUSH,
+                InteractionResult.sidedSuccess(level.isClientSide))) {
+            return true;
+        }
+
+        List<BlockPos> validPositions = new ArrayList<>();
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) {
+                    continue;
                 }
-                event.setCanceled(true);
-                event.setCancellationResult(InteractionResult.SUCCESS);
-                return;
+                BlockPos nearbyGround = pos.offset(dx, 0, dz);
+                BlockPos nearbyAbove = nearbyGround.above();
+                if (level.getBlockState(nearbyGround).is(Blocks.PODZOL) && level.isEmptyBlock(nearbyAbove)) {
+                    validPositions.add(nearbyAbove);
+                }
             }
         }
+        if (validPositions.isEmpty()) {
+            return false;
+        }
+        if (!level.isClientSide) {
+            BlockPos target = validPositions.get(level.random.nextInt(validPositions.size()));
+            level.setBlock(target, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
+            consumeBoneMeal(event, held, level, pos);
+        }
+        cancelWith(event, InteractionResult.sidedSuccess(level.isClientSide));
+        return true;
+    }
+
+    /** Bone meal on grass later scatters bushes on the grass around it (server side, queued). */
+    private static void scatterBushesAroundGrass(Level level, BlockPos pos) {
+        if (level.isClientSide) {
+            return;
+        }
+        final BlockPos finalPos = pos;
+        ((ServerLevel) level).getServer().execute(() -> {
+            BlockPos.betweenClosedStream(finalPos.offset(-3, -1, -3), finalPos.offset(3, 1, 3))
+                    .forEach(checkPos -> {
+                        if (level.getBlockState(checkPos).is(Blocks.GRASS_BLOCK)
+                                && level.isEmptyBlock(checkPos.above())) {
+                            if (level.random.nextFloat() < 0.05F) {
+                                level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(), 3);
+                            }
+                        }
+                    });
+        });
+    }
+
+    /** Bone meal on moss later scatters firefly bushes, cherry saplings and propagules around it (queued). */
+    private static void scatterPlantsAroundMoss(Level level, BlockPos pos) {
+        if (level.isClientSide) {
+            return;
+        }
+        final BlockPos finalMossPos = pos;
+        ((ServerLevel) level).getServer().execute(() -> {
+            BlockPos.betweenClosedStream(finalMossPos.offset(-3, -1, -3), finalMossPos.offset(3, 1, 3))
+                    .forEach(checkPos -> {
+                        if (level.getBlockState(checkPos).is(Blocks.MOSS_BLOCK)
+                                && level.isEmptyBlock(checkPos.above())) {
+                            float roll = level.random.nextFloat();
+                            if (roll < 0.10F) {
+                                level.setBlock(checkPos.above(), ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
+                            } else if (roll < 0.15F) {
+                                BlockState saplingState = ModBlocks.CHERRY_SAPLING.get().defaultBlockState();
+                                if (saplingState.canSurvive(level, checkPos.above())) {
+                                    level.setBlock(checkPos.above(), saplingState, 3);
+                                }
+                            } else if (roll < 0.20F) {
+                                BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState();
+                                if (propaguleState.canSurvive(level, checkPos.above())) {
+                                    level.setBlock(checkPos.above(), propaguleState, 3);
+                                }
+                            }
+                        }
+                    });
+        });
+    }
+
+    /** Bone meal on pale oak leaves extends the hanging moss below; false when the end of the moss is not free. */
+    private static boolean hangPaleMoss(
+            PlayerInteractEvent.RightClickBlock event, ItemStack held, Level level, BlockPos pos) {
+        BlockPos targetPos = pos.below();
+        while (level.getBlockState(targetPos).is(ModBlocks.PALE_HANGING_MOSS.get())) {
+            targetPos = targetPos.below();
+        }
+        if (!level.isEmptyBlock(targetPos)) {
+            return false;
+        }
+        if (!level.isClientSide) {
+            level.setBlock(
+                    targetPos,
+                    ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState().setValue(HangingMossBlock.TIP, true),
+                    3);
+            consumeBoneMeal(event, held, level, pos);
+        }
+        cancelWith(event, InteractionResult.SUCCESS);
+        return true;
+    }
+
+    /** Bone meal on a creaking heart wakes it and spreads up to two resin clumps around it. */
+    private static void activateCreakingHeart(
+            PlayerInteractEvent.RightClickBlock event, ItemStack held, Level level, BlockPos pos, BlockState state) {
+        if (!level.isClientSide) {
+            if (state.getBlock() instanceof CreakingHeartBlock heart) {
+                level.setBlock(pos, state.setValue(CreakingHeartBlock.ACTIVE, true), 3);
+                level.scheduleTick(pos, heart, 40);
+            }
+            List<Direction> directions = new ArrayList<>(
+                    List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP,
+                            Direction.DOWN));
+            Collections.shuffle(directions, level.random);
+            int spawned = 0;
+            for (Direction dir : directions) {
+                BlockPos adjPos = pos.relative(dir);
+                Direction attachFace = dir.getOpposite();
+                BooleanProperty faceProp = GlowLichenBlock.getFaceProperty(attachFace);
+                BlockState adjState = level.getBlockState(adjPos);
+
+                if (adjState.is(ModBlocks.RESIN_CLUMP.get())) {
+                    if (!adjState.getValue(faceProp)) {
+                        level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
+                        spawned++;
+                    }
+                } else if (adjState.isAir()) {
+                    BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
+                    level.setBlock(adjPos, newState, 3);
+                    spawned++;
+                }
+                if (spawned >= 2) {
+                    break;
+                }
+            }
+            consumeBoneMeal(event, held, level, pos);
+        }
+        cancelWith(event, InteractionResult.SUCCESS);
+    }
+
+    /** Bone meal on tall dry grass drops a dry grass item. */
+    private static void dropDryGrass(
+            PlayerInteractEvent.RightClickBlock event, ItemStack held, Level level, BlockPos pos) {
+        if (!level.isClientSide) {
+            ItemEntity item = new ItemEntity(
+                    level,
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.5,
+                    pos.getZ() + 0.5,
+                    new ItemStack(ModItems.DRY_GRASS.get(), 1));
+            level.addFreshEntity(item);
+            consumeBoneMeal(event, held, level, pos);
+        }
+        cancelWith(event, InteractionResult.SUCCESS);
     }
 
     @SubscribeEvent

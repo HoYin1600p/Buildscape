@@ -614,8 +614,8 @@ public class BuildScapeConfigScreen extends Screen {
     private static final Map<String, Boolean> toggleLastStateMap = new HashMap<>();
 
     private float getThemeTargetPos(ConfigThemes.Theme theme) {
-        if (theme != null && "light".equals(theme.id)) return 1.0f;
-        return 0.0f; // 2-stage toggle: Moon on 0.0f for Dark and all other custom themes
+        if (theme != null && theme.isLight()) return 1.0f;
+        return 0.0f; // 2-stage toggle: Moon on 0.0f for Dark mode, Sun on 1.0f for Light mode
     }
 
     private float navAnimProgress = 0.0f; // 0.0 = collapsed, 1.0 = expanded
@@ -2422,9 +2422,10 @@ public class BuildScapeConfigScreen extends Screen {
         Set<String> invalidItems = "items".equals(current.id) ? this.invalidItems : Collections.emptySet();
         boolean noticeShown = headerNotice != null && System.currentTimeMillis() <= headerNoticeUntil;
         int textY = y + (catHeaderH - 8) / 2;
+        int btnRight = frameRight - 5;
         int presetBtnW = 32;
-        int presetBtnH = 22;
-        int presetBtnX = (x + w) - presetBtnW - 4;
+        int presetBtnH = 24;
+        int presetBtnX = btnRight - presetBtnW;
         int presetBtnY = y + (catHeaderH - presetBtnH) / 2;
         int maxHeaderRight = "items".equals(current.id) ? (presetBtnX - 8) : (x + w - 12);
         if (current.iconTexture != null) {
@@ -3354,7 +3355,8 @@ public class BuildScapeConfigScreen extends Screen {
         int curY = startY;
         int systemRowH = getSystemSettingRowHeight();
 
-        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", currentTheme.displayName, mouseX, mouseY, alpha);
+        ConfigThemes.Theme baseTheme = ConfigThemes.getBaseTheme(currentTheme);
+        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", baseTheme.displayName, mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
         renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Background", "Decorative backdrop pattern applied over the theme", ConfigBackgrounds.getCurrentBackground().displayName, mouseX, mouseY, alpha);
@@ -3791,8 +3793,9 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     private void drawInlinePresetsTab(Object poseStackOrGraphics, int btnX, int btnY, int btnW, int btnH, boolean hover, boolean active, float alpha) {
-        // 1. Chassis Body Fill (Matches main panel frame chassis base)
-        fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + btnH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        int btnRight = btnX + btnW;
+        // 1. Chassis Body Fill (Seamlessly docked against main panel bevel)
+        fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + btnH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
@@ -3800,51 +3803,54 @@ public class BuildScapeConfigScreen extends Screen {
         int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
-        // 2. Outermost 1px Black Border (Matches main panel frame)
-        fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + 1, black);
-        fill(poseStackOrGraphics, btnX, btnY + btnH - 1, btnX + btnW, btnY + btnH, black);
+        // 2. Outermost 1px Black Border (Top & Bottom seamlessly attach to main panel outer frame)
         fill(poseStackOrGraphics, btnX, btnY, btnX + 1, btnY + btnH, black);
-        fill(poseStackOrGraphics, btnX + btnW - 1, btnY, btnX + btnW, btnY + btnH, black);
+        fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + 1, black);
+        fill(poseStackOrGraphics, btnX, btnY + btnH - 1, btnRight, btnY + btnH, black);
 
-        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
-        drawHorizontalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom)
         drawVerticalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
-        fill(poseStackOrGraphics, btnX + 1, btnY + btnH - 2, btnX + btnW - 1, btnY + btnH - 1, shadow);
-        fill(poseStackOrGraphics, btnX + btnW - 2, btnY + 1, btnX + btnW - 1, btnY + btnH - 1, shadow);
+        drawHorizontalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        fill(poseStackOrGraphics, btnX + 1, btnY + btnH - 2, btnRight, btnY + btnH - 1, shadow);
 
-        // 4. Outer Chassis Band (Offset 2, exactly matches main frame chassis band)
-        fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + btnW - 2, btnY + 3, band);
-        fill(poseStackOrGraphics, btnX + 2, btnY + btnH - 3, btnX + btnW - 2, btnY + btnH - 2, band);
+        // 4. Outer Chassis Band (Offset 2, left/top/bottom meeting main panel border)
         fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + 3, btnY + btnH - 2, band);
-        fill(poseStackOrGraphics, btnX + btnW - 3, btnY + 2, btnX + btnW - 2, btnY + btnH - 2, band);
+        fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnRight, btnY + 3, band);
+        fill(poseStackOrGraphics, btnX + 2, btnY + btnH - 3, btnRight, btnY + btnH - 2, band);
 
-        // 5. Stepped Bevel Ridge & Groove (Offset 3, matching main frame stepped bevel)
-        fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + btnW - 3, btnY + 4, bevelShadow);
+        // 5. Stepped Bevel Ridge & Groove (Offset 3)
         fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + 4, btnY + btnH - 3, bevelShadow);
-        fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnX + btnW - 3, btnY + btnH - 3, bevelHighlight);
-        fill(poseStackOrGraphics, btnX + btnW - 4, btnY + 3, btnX + btnW - 3, btnY + btnH - 3, bevelHighlight);
+        fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnRight - 1, btnY + 4, bevelShadow);
+        fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnRight - 1, btnY + btnH - 3, bevelHighlight);
 
-        // 6. Inner Face Plate (Offset 4)
+        // Vertical right bevel connecting directly into main panel's bevel line
+        fill(poseStackOrGraphics, btnRight - 1, btnY + 3, btnRight, btnY + btnH - 3, bevelHighlight);
+
+        // 6. Inner Face Plate (Docked flush against main panel bevel)
         int faceX = btnX + 4;
         int faceY = btnY + 4;
-        int faceW = btnW - 8;
+        int faceW = (btnRight - 1) - faceX;
         int faceH = btnH - 8;
 
         int bgCol = active ? (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE)
                 : (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG);
-        fill(poseStackOrGraphics, faceX, faceY, faceX + faceW, faceY + faceH, applyAlpha(bgCol, alpha));
+        fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + faceH, applyAlpha(bgCol, alpha));
 
-        // Active / Hover Accent Framing
+        // Active / Hover Accent Framing (Docked tab outline meeting main panel bevel)
         if (active) {
             int accentGlow = applyAlpha(COLOR_ACCENT, (hover ? 0.90f : 0.70f) * alpha);
-            drawBorder(poseStackOrGraphics, faceX, faceY, faceW, faceH, accentGlow);
+            fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, accentGlow);
+            fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, accentGlow);
+            fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, accentGlow);
         } else if (hover) {
             int hoverGlow = applyAlpha(COLOR_ROW_BORDER_HOVER, alpha * 0.75f);
-            drawBorder(poseStackOrGraphics, faceX, faceY, faceW, faceH, hoverGlow);
+            fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, hoverGlow);
+            fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, hoverGlow);
+            fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, hoverGlow);
         }
 
-        // 7. 3-Slider Equalizer Icon (Theme-unified tracks and beveled knobs)
-        int cx = btnX + btnW / 2;
+        // 7. 3-Slider Equalizer Icon (Centered within docked face)
+        int cx = faceX + faceW / 2;
         int cy = btnY + btnH / 2;
 
         int trkCol = applyAlpha(active ? COLOR_ACCENT : (hover ? COLOR_ROW_BORDER_HOVER : COLOR_CHASSIS_BAND), alpha);
@@ -4017,13 +4023,10 @@ public class BuildScapeConfigScreen extends Screen {
 
         if (hover) {
             List<Component> tip = new ArrayList<>();
-            if ("light".equals(currentTheme.id)) {
-                tip.add(ComponentHelper.literal("Theme: Light Mode §7(Click for Dark)"));
-            } else if ("dark".equals(currentTheme.id)) {
-                tip.add(ComponentHelper.literal("Theme: Dark Mode §7(Click for Light)"));
-            } else {
-                tip.add(ComponentHelper.literal("Theme: " + currentTheme.displayName + " §7(Click for Light)"));
-            }
+            ConfigThemes.Theme base = ConfigThemes.getBaseTheme(currentTheme);
+            boolean isLight = currentTheme != null && currentTheme.isLight();
+            tip.add(ComponentHelper.literal("Theme: " + base.displayName + (isLight ? " (Light)" : " (Dark)")));
+            tip.add(ComponentHelper.literal("§7Click to switch to " + (isLight ? "Dark" : "Light") + " mode"));
             deferredTooltip = tip;
             deferredTooltipX = rawMouseX + 12;
             deferredTooltipY = rawMouseY;
@@ -4076,14 +4079,16 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void handleHeaderThemeToggleClick(double mouseX, int toggleX, int toggleW) {
         float mid = toggleX + toggleW / 2.0f;
-        boolean isLight = currentTheme != null && "light".equals(currentTheme.id);
+        boolean currentIsLight = currentTheme != null && currentTheme.isLight();
+        ConfigThemes.Theme nextTheme;
         if (mouseX < mid) {
             // Clicked Moon / Dark side
-            applyTheme(isLight ? ConfigThemes.DARK : ConfigThemes.LIGHT);
+            nextTheme = currentIsLight ? ConfigThemes.getDarkVariant(currentTheme) : ConfigThemes.getLightVariant(currentTheme);
         } else {
             // Clicked Sun / Light side
-            applyTheme(isLight ? ConfigThemes.DARK : ConfigThemes.LIGHT);
+            nextTheme = !currentIsLight ? ConfigThemes.getLightVariant(currentTheme) : ConfigThemes.getDarkVariant(currentTheme);
         }
+        applyTheme(nextTheme);
         themeToggleAnimStartTime = System.currentTimeMillis();
         themeToggleAnimFrom = themeToggleAnimPos;
     }
@@ -5361,9 +5366,10 @@ public class BuildScapeConfigScreen extends Screen {
 
         // Inline Presets Toggle Button (top-right, inside items content header)
         if (selectedTabIndex >= 0 && selectedTabIndex < navItems.size() && "items".equals(navItems.get(selectedTabIndex).id)) {
+            int btnRight = layout.frameRight - 5;
             int presetBtnW = 32;
-            int presetBtnH = 22;
-            int presetBtnX = (contentX + contentW) - presetBtnW - 4;
+            int presetBtnH = 24;
+            int presetBtnX = btnRight - presetBtnW;
             int presetBtnY = contentY + (catHeaderH - presetBtnH) / 2;
             if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
                     && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH) {
@@ -5397,9 +5403,10 @@ public class BuildScapeConfigScreen extends Screen {
         switch (current.id) {
             case "items" -> {
                 // Inline Presets Toggle Button (top-right of content header)
+                int btnRight = frameRight - 5;
                 int presetBtnW = 32;
-                int presetBtnH = 22;
-                int presetBtnX = (contentX + contentW) - presetBtnW - 4;
+                int presetBtnH = 24;
+                int presetBtnX = btnRight - presetBtnW;
                 int presetBtnY = contentY + (catHeaderH - presetBtnH) / 2;
                 if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
                         && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH) {
@@ -5920,7 +5927,9 @@ public class BuildScapeConfigScreen extends Screen {
                 // Row 0: UI Theme Cycle
                 int themeStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (themeStep != 0) {
-                    ConfigThemes.Theme next = (themeStep < 0) ? ConfigThemes.cyclePrevTheme() : ConfigThemes.cycleNextTheme();
+                    boolean isLight = currentTheme != null && currentTheme.isLight();
+                    ConfigThemes.Theme nextBase = (themeStep < 0) ? ConfigThemes.cyclePrevBaseTheme(currentTheme) : ConfigThemes.cycleNextBaseTheme(currentTheme);
+                    ConfigThemes.Theme next = ConfigThemes.getVariant(nextBase, isLight);
                     applyTheme(next);
                     return true;
                 }

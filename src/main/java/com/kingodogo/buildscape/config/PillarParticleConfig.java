@@ -433,78 +433,78 @@ public class PillarParticleConfig {
                     StandardWatchEventKinds.ENTRY_MODIFY,
                     StandardWatchEventKinds.ENTRY_CREATE);
 
-            watchThread = new Thread(
-                    () -> {
-                        try {
-                            while (true) {
-                                WatchKey key = watchService.take();
-
-                                for (WatchEvent<?> event : key.pollEvents()) {
-                                    WatchEvent.Kind<?> kind = event.kind();
-
-                                    if (kind == StandardWatchEventKinds.OVERFLOW) {
-                                        continue;
-                                    }
-
-                                    @SuppressWarnings("unchecked")
-                                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                                    Path filename = ev.context();
-
-                                    if (filename.toString().equals(PROPERTIES_FILE_NAME) ||
-                                            filename.toString().equals(ITEMS_FILE_NAME)) {
-
-                                        Thread.sleep(100);
-
-                                        if (INSTANCE != null) {
-                                            boolean wasProperties = filename
-                                                    .toString()
-                                                    .equals(PROPERTIES_FILE_NAME);
-                                            boolean wasItems = filename
-                                                    .toString()
-                                                    .equals(ITEMS_FILE_NAME);
-
-                                            boolean reloaded = false;
-                                            if (wasProperties) {
-                                                INSTANCE.loadPropertiesInternal();
-                                                reloaded = true;
-                                            }
-                                            if (wasItems) {
-                                                INSTANCE.loadItemsInternal();
-                                                reloaded = true;
-                                            }
-
-                                            if (reloaded) {
-                                                long currentTime = System.currentTimeMillis();
-                                                if (currentTime - lastNotifyTime > 500) {
-                                                    lastNotifyTime = currentTime;
-                                                    if (!configReloadCallbacks.isEmpty()) {
-                                                        notifyCallbacks(false);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                boolean valid = key.reset();
-                                if (!valid) {
-                                    break;
-                                }
-                            }
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        } catch (Exception e) {
-                            // any watcher or reload failure is logged and ends the watcher thread
-                            BuildScape.LOGGER.error("Error in config file watcher", e);
-                        }
-                    },
-                    "BuildScape-ConfigWatcher");
+            watchThread = new Thread(PillarParticleConfig::runWatchLoop, "BuildScape-ConfigWatcher");
 
             watchThread.setDaemon(true);
             watchThread.start();
         } catch (Exception e) {
             // watcher setup can fail on unsupported file systems; the config then loads without live reload
             watcherInitialized.set(false);
+        }
+    }
+
+    /** Body of the watcher thread: reacts to config file changes until the watch key becomes invalid. */
+    private static void runWatchLoop() {
+        try {
+            while (true) {
+                WatchKey key = watchService.take();
+
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    handleWatchEvent(event);
+                }
+
+                boolean valid = key.reset();
+                if (!valid) {
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            // any watcher or reload failure is logged and ends the watcher thread
+            BuildScape.LOGGER.error("Error in config file watcher", e);
+        }
+    }
+
+    private static void handleWatchEvent(WatchEvent<?> event) throws InterruptedException {
+        if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+        String filename = ev.context().toString();
+
+        boolean wasProperties = filename.equals(PROPERTIES_FILE_NAME);
+        boolean wasItems = filename.equals(ITEMS_FILE_NAME);
+        if (!wasProperties && !wasItems) {
+            return;
+        }
+
+        Thread.sleep(100);
+
+        if (INSTANCE == null) {
+            return;
+        }
+
+        if (wasProperties) {
+            INSTANCE.loadPropertiesInternal();
+        }
+        if (wasItems) {
+            INSTANCE.loadItemsInternal();
+        }
+
+        notifyReloadCallbacksIfDue();
+    }
+
+    /** Tells the reload callbacks about a file reload, at most once per 500 ms. */
+    private static void notifyReloadCallbacksIfDue() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastNotifyTime > 500) {
+            lastNotifyTime = currentTime;
+            if (!configReloadCallbacks.isEmpty()) {
+                notifyCallbacks(false);
+            }
         }
     }
 

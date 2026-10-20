@@ -35,9 +35,7 @@ final class PillarWorldSync {
 
     private PillarWorldSync() {}
 
-    static void syncAllLoadedPillars(
-            PillarIdManager m,
-            MinecraftServer server) {
+    static void syncAllLoadedPillars(PillarIdManager m, MinecraftServer server) {
         if (server == null || !server.isRunning()) {
             return;
         }
@@ -47,9 +45,6 @@ final class PillarWorldSync {
         }
 
         try {
-            int syncedCount = 0;
-            int skippedCount = 0;
-
             for (ServerLevel level : server.getAllLevels()) {
                 if (level == null) {
                     continue;
@@ -69,45 +64,40 @@ final class PillarWorldSync {
                         continue;
                     }
 
-                    try {
-                        BlockPos pos = data.getBlockPos();
-
-                        if (!level.hasChunkAt(pos)) {
-                            skippedCount++;
-                            continue;
-                        }
-
-                        ChunkAccess chunk = level.getChunk(
-                                pos);
-                        if (!(chunk instanceof LevelChunk)) {
-                            skippedCount++;
-                            continue;
-                        }
-
-                        if (!chunk
-                                .getStatus()
-                                .isOrAfter(ChunkStatus.FULL)) {
-                            skippedCount++;
-                            continue;
-                        }
-
-                        BlockEntity be = level.getBlockEntity(pos);
-                        if (be instanceof PillarBlockEntity pillarBE) {
-
-                            pillarBE.syncFromData(data);
-                            syncedCount++;
-                        }
-                    } catch (Exception e) {
-                        // one bad pillar must not stop the rest of the sync
-                        BuildScape.LOGGER.error("Error syncing pillar {}: {}", (data != null ? data.id : "unknown"),
-                                e.getMessage(), e);
-                    }
+                    syncPillarFromData(level, data);
                 }
             }
 
         } catch (Exception e) {
             // the sync is best effort; a failure is logged and nothing else changes
             BuildScape.LOGGER.error("Error in syncAllLoadedPillars", e);
+        }
+    }
+
+    private static void syncPillarFromData(ServerLevel level, PillarData data) {
+        try {
+            BlockPos pos = data.getBlockPos();
+
+            if (!level.hasChunkAt(pos)) {
+                return;
+            }
+
+            ChunkAccess chunk = level.getChunk(pos);
+            if (!(chunk instanceof LevelChunk)) {
+                return;
+            }
+
+            if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
+                return;
+            }
+
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof PillarBlockEntity pillarBE) {
+                pillarBE.syncFromData(data);
+            }
+        } catch (Exception e) {
+            // one bad pillar must not stop the rest of the sync
+            BuildScape.LOGGER.error("Error syncing pillar {}: {}", data.id, e.getMessage(), e);
         }
     }
 
@@ -164,6 +154,13 @@ final class PillarWorldSync {
         }
     }
 
+    /** Counters filled in while copying colours from the block entities to the records. */
+    private static final class ColorSyncCounts {
+        int synced = 0;
+        int preserved = 0;
+        int patternSynced = 0;
+    }
+
     static void syncColorsFromNBTToManager(PillarIdManager m, MinecraftServer server) {
         if (server == null) {
             return;
@@ -174,9 +171,7 @@ final class PillarWorldSync {
         }
 
         try {
-            int syncedCount = 0;
-            int preservedCount = 0;
-            int patternSyncedCount = 0;
+            ColorSyncCounts counts = new ColorSyncCounts();
 
             for (ServerLevel level : server.getAllLevels()) {
                 if (level == null) {
@@ -193,100 +188,51 @@ final class PillarWorldSync {
                         continue;
                     }
 
-                    int existingColorCount = (data.dyeColors != null) ? data.dyeColors.size() : 0;
-
-                    try {
-                        BlockPos pos = data.getBlockPos();
-
-                        if (!level.isLoaded(pos)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        ChunkAccess chunk = level.getChunk(pos);
-                        if (!(chunk instanceof LevelChunk)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        BlockEntity be = level.getBlockEntity(pos);
-                        if (!(be instanceof PillarBlockEntity pillarBE)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        BlockPos bottomPos = pillarBE.findStackBottom();
-                        BlockEntity bottomBE = level.getBlockEntity(bottomPos);
-
-                        if (!(bottomBE instanceof PillarBlockEntity bottomPillarBE)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        List<String> nbtColors = bottomPillarBE.getParticleColors();
-
-                        if (nbtColors != null && !nbtColors.isEmpty()) {
-                            boolean needsSync = false;
-                            if (data.dyeColors == null || data.dyeColors.isEmpty()) {
-                                needsSync = true;
-                            } else if (data.dyeColors.size() != nbtColors.size()) {
-                                needsSync = true;
-                            } else {
-                                for (int i = 0; i < nbtColors.size(); i++) {
-                                    String nbtColor = nbtColors.get(i);
-                                    String managerColor = i < data.dyeColors.size() ? data.dyeColors.get(i) : null;
-                                    if (nbtColor == null || !nbtColor.equals(managerColor)) {
-                                        needsSync = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (needsSync) {
-                                data.clearColors();
-                                for (String color : nbtColors) {
-                                    if (color != null && !color.isEmpty()) {
-                                        data.addColor(color);
-                                    }
-                                }
-                                syncedCount++;
-                            } else {
-                                preservedCount++;
-                            }
-
-                            if (syncPatternSettingsFromNBT(bottomPillarBE, data)) {
-                                patternSyncedCount++;
-                            }
-                        } else {
-                            if (existingColorCount > 0) {
-                                preservedCount++;
-                            }
-                            if (syncPatternSettingsFromNBT(bottomPillarBE, data)) {
-                                patternSyncedCount++;
-                            }
-                        }
-                    } catch (Exception e) {
-                        // one bad pillar must not stop the rest of the sync
-                        preservedCount++;
-                        BuildScape.LOGGER.error("Error syncing colors from NBT for pillar {}: {}",
-                                (data != null ? data.id : "unknown"),
-                                e.getMessage(), e);
-                    }
+                    syncColorsForPillar(level, data, counts);
                 }
             }
 
-            if (syncedCount > 0 || patternSyncedCount > 0) {
+            if (counts.synced > 0 || counts.patternSynced > 0) {
                 m.requestSave();
-            } else if (preservedCount > 0) {
             }
         } catch (Exception e) {
             // the sync is best effort; a failure is logged and nothing else changes
             BuildScape.LOGGER.error("Error in syncColorsFromNBTToManager", e);
+        }
+    }
+
+    private static void syncColorsForPillar(ServerLevel level, PillarData data, ColorSyncCounts counts) {
+        try {
+            PillarBlockEntity bottomPillarBE = findLoadedStackBottom(level, data);
+            if (bottomPillarBE == null) {
+                counts.preserved++;
+                return;
+            }
+
+            List<String> nbtColors = bottomPillarBE.getParticleColors();
+
+            if (nbtColors != null && !nbtColors.isEmpty()) {
+                if (PillarRecovery.colorsChanged(data.dyeColors, nbtColors)) {
+                    data.clearColors();
+                    addNonEmptyColors(data, nbtColors);
+                    counts.synced++;
+                } else {
+                    counts.preserved++;
+                }
+            } else {
+                int existingColorCount = (data.dyeColors != null) ? data.dyeColors.size() : 0;
+                if (existingColorCount > 0) {
+                    counts.preserved++;
+                }
+            }
+
+            if (syncPatternSettingsFromNBT(bottomPillarBE, data)) {
+                counts.patternSynced++;
+            }
+        } catch (Exception e) {
+            // one bad pillar must not stop the rest of the sync
+            counts.preserved++;
+            BuildScape.LOGGER.error("Error syncing colors from NBT for pillar {}: {}", data.id, e.getMessage(), e);
         }
     }
 
@@ -317,65 +263,79 @@ final class PillarWorldSync {
                         continue;
                     }
 
-                    try {
-                        BlockPos pos = data.getBlockPos();
-
-                        if (!level.isLoaded(pos)) {
-                            continue;
-                        }
-
-                        ChunkAccess chunk = level.getChunk(pos);
-                        if (!(chunk instanceof LevelChunk)) {
-                            continue;
-                        }
-
-                        if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
-                            continue;
-                        }
-
-                        BlockEntity be = level.getBlockEntity(pos);
-                        if (!(be instanceof PillarBlockEntity pillarBE)) {
-                            continue;
-                        }
-
-                        BlockPos bottomPos = pillarBE.findStackBottom();
-                        BlockEntity bottomBE = level.getBlockEntity(bottomPos);
-
-                        if (!(bottomBE instanceof PillarBlockEntity bottomPillarBE)) {
-                            continue;
-                        }
-
-                        List<String> nbtColors = bottomPillarBE.getParticleColors();
-
-                        if (nbtColors != null && !nbtColors.isEmpty()) {
-                            data.clearColors();
-                            for (String color : nbtColors) {
-                                if (color != null && !color.isEmpty()) {
-                                    data.addColor(color);
-                                }
-                            }
-                            loadedCount++;
-                        } else {
-                            int fileColorCount = (data.dyeColors != null) ? data.dyeColors.size() : 0;
-                            if (fileColorCount > 0) {
-                            }
-                        }
-                    } catch (Exception e) {
-                        // one bad pillar must not stop the rest of the sync
-                        BuildScape.LOGGER.error("Error loading colors from NBT for pillar {}: {}",
-                                (data != null ? data.id : "unknown"),
-                                e.getMessage(), e);
+                    if (loadColorsForPillar(level, data)) {
+                        loadedCount++;
                     }
                 }
             }
 
             if (loadedCount > 0) {
                 m.requestSave();
-            } else {
             }
         } catch (Exception e) {
             // the sync is best effort; a failure is logged and nothing else changes
             BuildScape.LOGGER.error("Error in loadColorsFromNBT", e);
+        }
+    }
+
+    /** Copies the stack bottom's colours onto the record; true when colours were loaded. */
+    private static boolean loadColorsForPillar(ServerLevel level, PillarData data) {
+        try {
+            PillarBlockEntity bottomPillarBE = findLoadedStackBottom(level, data);
+            if (bottomPillarBE == null) {
+                return false;
+            }
+
+            List<String> nbtColors = bottomPillarBE.getParticleColors();
+            if (nbtColors == null || nbtColors.isEmpty()) {
+                return false;
+            }
+
+            data.clearColors();
+            addNonEmptyColors(data, nbtColors);
+            return true;
+        } catch (Exception e) {
+            // one bad pillar must not stop the rest of the sync
+            BuildScape.LOGGER.error("Error loading colors from NBT for pillar {}: {}", data.id, e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * The bottom pillar of the stack that holds the record's position, or null when the position is not in a
+     * fully loaded chunk or is not a pillar stack.
+     */
+    private static PillarBlockEntity findLoadedStackBottom(ServerLevel level, PillarData data) {
+        BlockPos pos = data.getBlockPos();
+
+        if (!level.isLoaded(pos)) {
+            return null;
+        }
+
+        ChunkAccess chunk = level.getChunk(pos);
+        if (!(chunk instanceof LevelChunk)) {
+            return null;
+        }
+
+        if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
+            return null;
+        }
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof PillarBlockEntity pillarBE)) {
+            return null;
+        }
+
+        BlockPos bottomPos = pillarBE.findStackBottom();
+        BlockEntity bottomBE = level.getBlockEntity(bottomPos);
+        return bottomBE instanceof PillarBlockEntity bottomPillarBE ? bottomPillarBE : null;
+    }
+
+    private static void addNonEmptyColors(PillarData data, List<String> colors) {
+        for (String color : colors) {
+            if (color != null && !color.isEmpty()) {
+                data.addColor(color);
+            }
         }
     }
 

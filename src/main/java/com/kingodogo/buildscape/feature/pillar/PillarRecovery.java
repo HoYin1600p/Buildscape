@@ -19,41 +19,34 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 /**
  * Scheduling and running the recovery of pillar records from the loaded world, for the server instance.
- * The flags are static and shared, as they were in {@link PillarIdManager}.
+ * The flags belong to the current server lifecycle and live in {@link PillarServerState}.
  */
 final class PillarRecovery {
 
     private PillarRecovery() {}
 
-    static boolean recoveryScheduled = false;
-    static long recoveryScheduledTime = 0L;
-    static boolean recoveryClearColors = false;
     static final long RECOVERY_DELAY_MS = 5000;
-    static boolean recoveryInProgress = false;
-
-    static long worldLoadStartTime = 0L;
     static final long MIN_WORLD_LOAD_TIME_MS = 15000;
-    /** Clears the recovery flags and restarts the world-load clock; called when a world is loaded or reset. */
-    static void reset() {
-        worldLoadStartTime = System.currentTimeMillis();
-        recoveryScheduled = false;
-        recoveryScheduledTime = 0L;
-        recoveryClearColors = false;
-        recoveryInProgress = false;
+
+    /** True while a recovery scan of the current server is running; saves wait for it. */
+    static boolean isInProgress() {
+        return PillarServerState.current().recoveryInProgress;
     }
 
     static void schedule(boolean clearColors) {
-        recoveryScheduled = true;
-        recoveryScheduledTime = System.currentTimeMillis();
-        recoveryClearColors = clearColors;
+        PillarServerState state = PillarServerState.current();
+        state.recoveryScheduled = true;
+        state.recoveryScheduledTime = System.currentTimeMillis();
+        state.recoveryClearColors = clearColors;
     }
 
     static void checkAndRunScheduledRecovery() {
-        if (!recoveryScheduled) {
+        PillarServerState state = PillarServerState.current();
+        if (!state.recoveryScheduled) {
             return;
         }
 
-        long elapsed = System.currentTimeMillis() - recoveryScheduledTime;
+        long elapsed = System.currentTimeMillis() - state.recoveryScheduledTime;
         if (elapsed < RECOVERY_DELAY_MS) {
             return;
         }
@@ -76,13 +69,14 @@ final class PillarRecovery {
             return;
         }
 
-        recoveryScheduled = false;
-        boolean clearColors = recoveryClearColors;
-        recoveryClearColors = false;
+        state.recoveryScheduled = false;
+        boolean clearColors = state.recoveryClearColors;
+        state.recoveryClearColors = false;
         recoverPillarsFromWorld(manager, server, clearColors);
     }
 
     static boolean isWorldReadyForRecovery() {
+        long worldLoadStartTime = PillarServerState.current().worldLoadStartTime;
         if (worldLoadStartTime == 0L) {
             return true;
         }
@@ -193,6 +187,7 @@ final class PillarRecovery {
             return;
         }
 
+        PillarServerState state = PillarServerState.current();
         try {
             if (clearColors) {
                 clearAllPillarIdsFromWorld(server);
@@ -200,7 +195,7 @@ final class PillarRecovery {
                 return;
             }
 
-            recoveryInProgress = true;
+            state.recoveryInProgress = true;
             RecoveryCounts counts = new RecoveryCounts();
 
             for (ServerLevel level : server.getAllLevels()) {
@@ -222,7 +217,7 @@ final class PillarRecovery {
             m.registry.rebuildPositionIndex();
             PillarWorldSync.syncColorsFromNBTToManager(m, server);
 
-            recoveryInProgress = false;
+            state.recoveryInProgress = false;
 
             if (counts.recovered > 0 || counts.colorCleared > 0) {
                 m.requestSave();
@@ -232,7 +227,7 @@ final class PillarRecovery {
             // recovery runs on live world data; log any failure (the flag is released below)
             BuildScape.LOGGER.error("Error during pillar recovery", e);
         } finally {
-            recoveryInProgress = false;
+            state.recoveryInProgress = false;
         }
     }
 

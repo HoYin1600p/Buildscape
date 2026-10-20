@@ -39,8 +39,6 @@ final class PillarStore {
     static final String BACKUP_FILE_NAME = "pillar-ids.bak.dat";
     static final String FOLDER_NAME = "buildscape";
 
-    static File cachedWorldSaveDir = null;
-
     static void updateCachedWorldDir() {
         try {
             if (!BuildScape.isServerFullyInitialized()) {
@@ -58,7 +56,7 @@ final class PillarStore {
                         if (!buildscapeDir.exists()) {
                             buildscapeDir.mkdirs();
                         }
-                        cachedWorldSaveDir = buildscapeDir;
+                        PillarServerState.current().cachedWorldSaveDir = buildscapeDir;
                     }
                 } catch (Exception e) {
                     // creating the folder is best effort; any file system failure is only logged
@@ -80,6 +78,8 @@ final class PillarStore {
 
     private static File getDataDir() {
         try {
+            PillarServerState state = PillarServerState.current();
+            File cachedWorldSaveDir = state.cachedWorldSaveDir;
             if (cachedWorldSaveDir != null && cachedWorldSaveDir.exists()) {
                 return cachedWorldSaveDir;
             }
@@ -93,7 +93,7 @@ final class PillarStore {
                         if (!buildscapeDir.exists()) {
                             buildscapeDir.mkdirs();
                         }
-                        cachedWorldSaveDir = buildscapeDir;
+                        state.cachedWorldSaveDir = buildscapeDir;
                         return buildscapeDir;
                     }
                 } catch (Exception e) {
@@ -128,10 +128,6 @@ final class PillarStore {
             return GSON.fromJson(reader, type);
         }
     }
-    static void resetCachedWorldDir() {
-        cachedWorldSaveDir = null;
-    }
-
     /** Copies an unreadable data file aside. Returns false when the copy failed, which blocks saving. */
     static boolean preserveCorrupted(File file, Throwable error, String errorType) {
         boolean preserved = false;

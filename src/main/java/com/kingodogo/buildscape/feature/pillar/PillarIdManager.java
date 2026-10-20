@@ -34,14 +34,13 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 /**
- * Registry of every pillar and item frame that has a pillar id. There is one server instance ({@link #get()}) and one
+ * Registry of every pillar and item frame that has a pillar id. There is one server instance per server lifecycle ({@link #get()}, held by {@link PillarServerState}) and one
  * client copy ({@link #getClient()}) fed by {@code SyncPillarIdsPacket}. Each {@link PillarData} record stores
  * the id, dimension, position, displayed item and particle overrides. The server saves the registry as JSON
  * in the world folder ({@code buildscape/pillar-ids.dat} with a backup file); a damaged file is preserved and the
  * registry is rebuilt from the loaded block entities. Ids start with a variant prefix (M, S, D, Q, or I-F for item frames).
  */
 public class PillarIdManager {
-    private static final PillarIdManager SERVER_INSTANCE = new PillarIdManager(true);
     private static final PillarIdManager CLIENT_INSTANCE = new PillarIdManager(false);
 
     final boolean serverAuthoritative;
@@ -71,17 +70,22 @@ public class PillarIdManager {
     public static final String PREFIX_QUARTZ = "Q";
     public static final String PREFIX_ITEM_FRAME = "I-F";
 
-    /** Forgets the cached world folder and any scheduled recovery, and empties the server registry. */
+    /**
+     * Drops the server state (registry, cached world folder, recovery flags) and starts a fresh one: the cached world
+     * folder and any scheduled recovery are forgotten and the server registry is empty.
+     */
     public static void resetWorldCache() {
-        PillarStore.resetCachedWorldDir();
-        PillarRecovery.reset();
-
-        SERVER_INSTANCE.resetState(false);
+        PillarServerState.replace();
     }
 
     /** The server registry. On a client use {@link #getClient()} or {@link #get(Level)} for the synced copy. */
     public static PillarIdManager get() {
-        return SERVER_INSTANCE;
+        return PillarServerState.current().manager;
+    }
+
+    /** A new, empty server registry; only {@link PillarServerState} creates one per server lifecycle. */
+    static PillarIdManager newServerInstance() {
+        return new PillarIdManager(true);
     }
 
     /** The client copy, filled by {@code SyncPillarIdsPacket}. */
@@ -91,7 +95,7 @@ public class PillarIdManager {
 
     /** The client copy for a client level, the server registry for any other level (and for null). */
     public static PillarIdManager get(Level level) {
-        return level != null && level.isClientSide ? CLIENT_INSTANCE : SERVER_INSTANCE;
+        return level != null && level.isClientSide ? CLIENT_INSTANCE : get();
     }
 
     /** Empties the client copy; the next sync from the server fills it again. */
@@ -145,10 +149,7 @@ public class PillarIdManager {
 
     /** Same reset as {@link #resetWorldCache()}. */
     public static void fullReset() {
-        PillarStore.resetCachedWorldDir();
-        PillarRecovery.reset();
-
-        SERVER_INSTANCE.resetState(false);
+        PillarServerState.replace();
     }
 
     /** A new unused id with the default {@code S-P} prefix. */
@@ -208,7 +209,7 @@ public class PillarIdManager {
         registry.pillarData.put(id, newData);
         positionIndex.put(posKey, id);
 
-        if (!PillarRecovery.recoveryInProgress) {
+        if (!PillarRecovery.isInProgress()) {
             requestSave();
         }
         return newData;
@@ -769,7 +770,7 @@ public class PillarIdManager {
         }
         dirty = true;
         try {
-            if (PillarRecovery.recoveryInProgress) {
+            if (PillarRecovery.isInProgress()) {
                 return false;
             }
 
@@ -838,7 +839,7 @@ public class PillarIdManager {
         if (!serverAuthoritative) {
             return;
         }
-        if (PillarRecovery.recoveryInProgress || !hasLoaded) {
+        if (PillarRecovery.isInProgress() || !hasLoaded) {
             return;
         }
         if (registry.pillarData.isEmpty() && lastFileSize > 0L && !allowEmptySave) {

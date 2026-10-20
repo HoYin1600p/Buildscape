@@ -146,10 +146,10 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() instanceof BoneMealItem) {
             if (this.isValidBonemealTarget(level, pos, state, level.isClientSide)) {
-                if (level instanceof ServerLevel) {
+                if (level instanceof ServerLevel serverLevel) {
                     if (this.isBonemealSuccess(level, level.getRandom(), pos, state)) {
                         this.performBonemeal(
-                                (ServerLevel) level,
+                                serverLevel,
                                 level.getRandom(),
                                 pos,
                                 state);
@@ -226,8 +226,8 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
             Block foliageBlock = getRandomSnowyFoliage(random);
             if (foliageBlock != null) {
                 BlockState foliageState = foliageBlock.defaultBlockState();
-                if (foliageBlock instanceof BushBlock) {
-                    if (!((BushBlock) foliageBlock).canSurvive(
+                if (foliageBlock instanceof BushBlock bushBlock) {
+                    if (!bushBlock.canSurvive(
                             foliageState,
                             level,
                             abovePos)) {

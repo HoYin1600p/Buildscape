@@ -222,8 +222,8 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                 level.setBlock(pos, validatedState, 2);
             }
 
-            if (level instanceof ServerLevel) {
-                ((ServerLevel) level).scheduleTick(pos, this, 2);
+            if (level instanceof ServerLevel serverLevel) {
+                serverLevel.scheduleTick(pos, this, 2);
             }
             updateDripstoneNeighbors(level, pos);
         }
@@ -520,14 +520,14 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
 
             if (neighborPos.equals(supportPos)) {
                 if (!canSurvive(state, level, pos)) {
-                    if (level instanceof ServerLevel) {
-                        ((ServerLevel) level).scheduleTick(pos, this, 2);
+                    if (level instanceof ServerLevel serverLevel) {
+                        serverLevel.scheduleTick(pos, this, 2);
                     }
-                } else if (level instanceof ServerLevel) {
-                    ((ServerLevel) level).scheduleTick(pos, this, 2);
+                } else if (level instanceof ServerLevel serverLevel) {
+                    serverLevel.scheduleTick(pos, this, 2);
                 }
-            } else if (level instanceof ServerLevel) {
-                ((ServerLevel) level).scheduleTick(pos, this, 2);
+            } else if (level instanceof ServerLevel serverLevel) {
+                serverLevel.scheduleTick(pos, this, 2);
             }
         }
 
@@ -846,8 +846,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                     3);
 
             BlockEntity blockEntity = level.getBlockEntity(cauldronPos);
-            if (blockEntity instanceof IcicleCauldronBlockEntity) {
-                IcicleCauldronBlockEntity cauldronEntity = (IcicleCauldronBlockEntity) blockEntity;
+            if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
                 Item icicleItem = ModItems.PACKED_ICICLE_BLOCK.get();
                 cauldronEntity.setStoredIcicle(
                         new ItemStack(icicleItem, 1));

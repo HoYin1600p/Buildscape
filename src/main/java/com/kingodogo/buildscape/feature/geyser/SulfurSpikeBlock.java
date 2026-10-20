@@ -151,8 +151,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                 }
             }
 
-            if (level instanceof ServerLevel) {
-                ((ServerLevel) level).scheduleTick(pos, this, 2);
+            if (level instanceof ServerLevel serverLevel) {
+                serverLevel.scheduleTick(pos, this, 2);
             }
             updateDripstoneNeighbors(level, pos);
         }
@@ -407,8 +407,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                     updatedState);
             updatedState = updatedState.setValue(THICKNESS, correctThickness);
 
-            if (level instanceof Level) {
-                Level world = (Level) level;
+            if (level instanceof Level world) {
                 updateNeighborThickness(world, pos.above());
                 updateNeighborThickness(world, pos.below());
                 updateDripstoneNeighbors(world, pos);
@@ -437,14 +436,14 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
             if (neighborPos.equals(supportPos)) {
                 if (!canSurvive(state, level, pos)) {
-                    if (level instanceof ServerLevel) {
-                        ((ServerLevel) level).scheduleTick(pos, this, 2);
+                    if (level instanceof ServerLevel serverLevel) {
+                        serverLevel.scheduleTick(pos, this, 2);
                     }
-                } else if (level instanceof ServerLevel) {
-                    ((ServerLevel) level).scheduleTick(pos, this, 2);
+                } else if (level instanceof ServerLevel serverLevel) {
+                    serverLevel.scheduleTick(pos, this, 2);
                 }
-            } else if (level instanceof ServerLevel) {
-                ((ServerLevel) level).scheduleTick(pos, this, 2);
+            } else if (level instanceof ServerLevel serverLevel) {
+                serverLevel.scheduleTick(pos, this, 2);
             }
         }
 

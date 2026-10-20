@@ -42,8 +42,7 @@ public class FestiveStockingItem extends BlockItem {
             ItemStack stack,
             BlockState state) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
+        if (be instanceof FestiveStockingBlockEntity stockingEntity) {
             CompoundTag tag = stack.getTag();
             if (tag != null && tag.contains(NbtKeys.STORED_ITEM, 10)) {
                 CompoundTag storedTag = tag.getCompound(NbtKeys.STORED_ITEM);

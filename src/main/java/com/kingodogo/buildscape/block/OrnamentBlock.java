@@ -429,9 +429,9 @@ public class OrnamentBlock
                 TextComponent message = new TextComponent(
                         "String colored: " + dyeColor.getDisplayName());
                 message.withStyle(ChatFormatting.GREEN);
-                if (player instanceof ServerPlayer) {
+                if (player instanceof ServerPlayer serverPlayer) {
                     ModMessages.INSTANCE.send(
-                            PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                            PacketDistributor.PLAYER.with(() -> serverPlayer),
                             new ActionBarMessagePacket(message));
                 }
 

@@ -55,10 +55,10 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() instanceof BoneMealItem) {
             if (this.isValidBonemealTarget(level, pos, state, level.isClientSide)) {
-                if (level instanceof ServerLevel) {
+                if (level instanceof ServerLevel serverLevel) {
                     if (this.isBonemealSuccess(level, level.getRandom(), pos, state)) {
                         this.performBonemeal(
-                                (ServerLevel) level,
+                                serverLevel,
                                 level.getRandom(),
                                 pos,
                                 state);

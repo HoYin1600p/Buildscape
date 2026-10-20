@@ -202,18 +202,18 @@ public class MobPillarRenderer {
             if (state.baby) {
                 boolean handled = false;
 
-                if (livingEntity instanceof AgeableMob) {
-                    ((AgeableMob) livingEntity).setBaby(true);
+                if (livingEntity instanceof AgeableMob ageableMob) {
+                    ageableMob.setBaby(true);
                     handled = true;
                 }
 
-                if (!handled && livingEntity instanceof Zombie) {
-                    ((Zombie) livingEntity).setBaby(true);
+                if (!handled && livingEntity instanceof Zombie zombie) {
+                    zombie.setBaby(true);
                     handled = true;
                 }
 
-                if (!handled && livingEntity instanceof Zoglin) {
-                    ((Zoglin) livingEntity).setBaby(true);
+                if (!handled && livingEntity instanceof Zoglin zoglin) {
+                    zoglin.setBaby(true);
                     handled = true;
                 }
 

@@ -84,8 +84,8 @@ public class LeafLayersBlock
         }
 
         Item heldItem = context.getItemInHand().getItem();
-        if (heldItem instanceof BlockItem) {
-            Block heldBlock = ((BlockItem) heldItem).getBlock();
+        if (heldItem instanceof BlockItem blockItem) {
+            Block heldBlock = blockItem.getBlock();
 
             if (heldBlock instanceof LeafLayersBlock && heldBlock != this) {
                 return false;

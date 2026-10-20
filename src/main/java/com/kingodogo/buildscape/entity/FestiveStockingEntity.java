@@ -193,8 +193,7 @@ public class FestiveStockingEntity extends HangingEntity {
             ItemStack storedItem = this.getItem();
             boolean hasSilkTouch = false;
 
-            if (entity instanceof Player) {
-                Player player = (Player) entity;
+            if (entity instanceof Player player) {
                 ItemStack tool = player.getMainHandItem();
                 if (EnchantmentHelper.getItemEnchantmentLevel(
                         Enchantments.SILK_TOUCH,

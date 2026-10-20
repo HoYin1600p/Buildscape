@@ -335,8 +335,8 @@ public class RoseVinesBlock extends VineBlock {
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         Item heldItem = context.getItemInHand().getItem();
-        if (heldItem instanceof BlockItem) {
-            Block heldBlock = ((BlockItem) heldItem)
+        if (heldItem instanceof BlockItem blockItem) {
+            Block heldBlock = blockItem
                     .getBlock();
 
             if (!(heldBlock instanceof RoseVinesBlock)) {

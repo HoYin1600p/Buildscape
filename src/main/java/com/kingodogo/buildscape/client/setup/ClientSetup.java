@@ -601,8 +601,8 @@ public class ClientSetup {
                             return -1;
                         }
                         Item item = stack.getItem();
-                        if (item instanceof BlockItem) {
-                            Block block = ((BlockItem) item)
+                        if (item instanceof BlockItem blockItem) {
+                            Block block = blockItem
                                     .getBlock();
 
                             int color = -1;

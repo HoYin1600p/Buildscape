@@ -459,8 +459,8 @@ public class GlowLightsBlock
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         Item heldItem = context.getItemInHand().getItem();
-        if (heldItem instanceof BlockItem) {
-            Block heldBlock = ((BlockItem) heldItem).getBlock();
+        if (heldItem instanceof BlockItem blockItem) {
+            Block heldBlock = blockItem.getBlock();
 
             if (!(heldBlock instanceof GlowLightsBlock)) {
                 return false;
@@ -588,9 +588,9 @@ public class GlowLightsBlock
                                     GlowLightsBlockEntity.MAX_DYE_COLORS +
                                     " colors! Break and replace to reset.");
                     message.withStyle(ChatFormatting.RED);
-                    if (player instanceof ServerPlayer) {
+                    if (player instanceof ServerPlayer serverPlayer) {
                         ModMessages.INSTANCE.send(
-                                PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                                PacketDistributor.PLAYER.with(() -> serverPlayer),
                                 new ActionBarMessagePacket(
                                         message));
                     }
@@ -623,9 +623,9 @@ public class GlowLightsBlock
                     TextComponent message = new TextComponent(
                             "Glow Lights color added: " + dyeName + progressText);
                     message.withStyle(ChatFormatting.GREEN);
-                    if (player instanceof ServerPlayer) {
+                    if (player instanceof ServerPlayer serverPlayer) {
                         ModMessages.INSTANCE.send(
-                                PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                                PacketDistributor.PLAYER.with(() -> serverPlayer),
                                 new ActionBarMessagePacket(
                                         message));
                     }

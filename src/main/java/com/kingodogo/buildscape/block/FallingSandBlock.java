@@ -35,8 +35,8 @@ public class FallingSandBlock extends Block {
             BlockState oldState,
             boolean isMoving) {
         if (!level.isClientSide &&
-                level instanceof ServerLevel) {
-            ((ServerLevel) level).scheduleTick(
+                level instanceof ServerLevel serverLevel) {
+            serverLevel.scheduleTick(
                     pos,
                     this,
                     this.getDelayAfterPlace());
@@ -52,8 +52,8 @@ public class FallingSandBlock extends Block {
             BlockPos neighborPos,
             boolean movedByPiston) {
         if (!level.isClientSide &&
-                level instanceof ServerLevel) {
-            ((ServerLevel) level).scheduleTick(
+                level instanceof ServerLevel serverLevel) {
+            serverLevel.scheduleTick(
                     pos,
                     this,
                     this.getDelayAfterPlace());

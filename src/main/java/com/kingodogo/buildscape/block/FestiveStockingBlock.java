@@ -256,8 +256,7 @@ public class FestiveStockingBlock
             Level level,
             BlockPos pos) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
+        if (be instanceof FestiveStockingBlockEntity stockingEntity) {
             return stockingEntity.getComparatorOutput();
         }
         return 0;
@@ -272,8 +271,7 @@ public class FestiveStockingBlock
             InteractionHand hand,
             BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
+        if (be instanceof FestiveStockingBlockEntity stockingEntity) {
             ItemStack heldItem = player.getItemInHand(hand);
 
             if (heldItem.isEmpty() &&
@@ -433,8 +431,7 @@ public class FestiveStockingBlock
             BlockState state,
             Player player) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
+        if (be instanceof FestiveStockingBlockEntity stockingEntity) {
             if (!stockingEntity.isEmpty()) {
                 ItemStack tool = player.getMainHandItem();
                 boolean hasSilkTouch = EnchantmentHelper.getItemEnchantmentLevel(
@@ -494,8 +491,7 @@ public class FestiveStockingBlock
         if (tool != null &&
                 !tool.isEmpty() &&
                 EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0 &&
-                be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
+                be instanceof FestiveStockingBlockEntity stockingEntity) {
             if (!stockingEntity.isEmpty()) {
                 CompoundTag tag = result.getOrCreateTag();
                 CompoundTag storedTag = new CompoundTag();

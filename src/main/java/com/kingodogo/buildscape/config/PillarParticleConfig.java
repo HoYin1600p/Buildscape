@@ -698,9 +698,9 @@ public class PillarParticleConfig {
                     } else {
                         if (jsonMap.containsKey("particle_color")) {
                             Object colorObj = jsonMap.get("particle_color");
-                            if (colorObj instanceof String) {
+                            if (colorObj instanceof String string) {
                                 rawColors = new ArrayList<>();
-                                rawColors.add((String) colorObj);
+                                rawColors.add(string);
                             } else if (colorObj instanceof List) {
                                 rawColors = (List<String>) colorObj;
                             }

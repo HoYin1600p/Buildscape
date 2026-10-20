@@ -26,35 +26,7 @@ public class PillarResetHandler {
 
             server.execute(() -> {
                 try {
-                    for (ServerLevel level : server.getAllLevels()) {
-                        if (level.dimension().location().toString().equals(dimension)) {
-                            if (!level.isLoaded(pos)) {
-                                return;
-                            }
-
-                            BlockEntity blockEntity = level.getBlockEntity(pos);
-                            if (blockEntity instanceof PillarBlockEntity bottomBE) {
-                                BlockPos bottomPos = bottomBE.findStackBottom();
-
-                                BlockPos current = bottomPos;
-                                int resetCount = 0;
-
-                                while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
-                                    BlockEntity be = level.getBlockEntity(current);
-                                    if (be instanceof PillarBlockEntity pillarBE) {
-                                        resetPillarBlockEntity(pillarBE);
-                                        resetCount++;
-                                    }
-                                    current = current.above();
-
-                                    if (resetCount > 256) {
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
+                    resetInDimension(server, dimension, pos);
                 } catch (Exception e) {
                     // world and block entity access on the server thread; log and keep the server running
                     BuildScape.LOGGER.warn("Unable to reset the pillar stack at {}", pos, e);
@@ -63,6 +35,43 @@ public class PillarResetHandler {
         } catch (Exception e) {
             // scheduling must not break the caller
             BuildScape.LOGGER.warn("Unable to schedule the pillar reset", e);
+        }
+    }
+
+    /** Resets the stack in the first level with this dimension id; nothing happens if that position is unloaded. */
+    private static void resetInDimension(MinecraftServer server, String dimension, BlockPos pos) {
+        for (ServerLevel level : server.getAllLevels()) {
+            if (!level.dimension().location().toString().equals(dimension)) {
+                continue;
+            }
+            if (!level.isLoaded(pos)) {
+                return;
+            }
+            resetStackAt(level, pos);
+            return;
+        }
+    }
+
+    /** Resets every pillar block entity from the stack bottom upwards, stopping after 256 resets. */
+    private static void resetStackAt(ServerLevel level, BlockPos pos) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (!(blockEntity instanceof PillarBlockEntity bottomBE)) {
+            return;
+        }
+        BlockPos current = bottomBE.findStackBottom();
+        int resetCount = 0;
+
+        while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
+            BlockEntity be = level.getBlockEntity(current);
+            if (be instanceof PillarBlockEntity pillarBE) {
+                resetPillarBlockEntity(pillarBE);
+                resetCount++;
+            }
+            current = current.above();
+
+            if (resetCount > 256) {
+                break;
+            }
         }
     }
 

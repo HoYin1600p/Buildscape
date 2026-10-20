@@ -133,14 +133,11 @@ tasks.named('processResources', ProcessResources).configure {
 }
 
 // Formatting: `gradlew spotlessApply` rewrites, `gradlew spotlessCheck` verifies, and `check` (so `build`) fails on format drift.
-// The config screen package is excluded while it is under separate development.
 spotless {
     enforceCheck = true
     lineEndings = com.diffplug.spotless.LineEnding.UNIX
     java {
         target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
-        targetExclude 'src/main/java/com/kingodogo/buildscape/client/screen/**',
-                'src/test/java/com/kingodogo/buildscape/client/screen/**'
         eclipse().configFile('config/spotless/eclipse-formatter.xml')
     }
 }
@@ -158,7 +155,6 @@ configurations.checkstyle {
     }
 }
 tasks.withType(Checkstyle).configureEach {
-    exclude '**/client/screen/**'
     reports {
         xml.required = false
         html.required = false

@@ -170,160 +170,31 @@ public class GlowLightsBlock
             return null;
         }
 
-        if (isExistingGlowLight &&
-                !(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
-            if (blockState.getBlock() == this) {
-                BooleanProperty property = VineBlock.getPropertyForFace(
-                        attachDirection);
-                if (property != null &&
-                        blockState.hasProperty(property) &&
-                        blockState.getValue(property)) {
-                    return null;
-                }
-                if (attachDirection == Direction.DOWN &&
-                        blockState.hasProperty(DOWN) &&
-                        blockState.getValue(DOWN)) {
-                    return null;
-                }
-            }
+        if (isExistingGlowLight && blockState.getBlock() == this
+                && isFaceAlreadyAttached(blockState, attachDirection)) {
+            return null;
         }
 
         if (!isExistingGlowLight) {
             BlockPos originalPos = clickedPos.relative(clickedFace.getOpposite());
             BlockState originalState = context.getLevel().getBlockState(originalPos);
             if (originalState.getBlock() instanceof GlowLightsBlock) {
-                Direction attachToGlow = clickedFace.getOpposite();
-                BooleanProperty attachProperty = attachToGlow == Direction.DOWN
-                        ? DOWN
-                        : VineBlock.getPropertyForFace(
-                                attachToGlow);
-
-                if (attachProperty != null &&
-                        originalState.hasProperty(attachProperty) &&
-                        originalState.getValue(attachProperty)) {
-                    return null;
-                }
-
-                BlockState state = this.defaultBlockState();
-                if (state.hasProperty(attachProperty)) {
-                    state = state.setValue(attachProperty, true);
-                }
-                BlockPos placePos = context.getClickedPos();
-                FluidState fluidState = context.getLevel().getFluidState(placePos);
-                return state
-                        .setValue(LIT, true)
-                        .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+                return placeAgainstGlowLight(context, originalState, clickedFace);
             }
         }
 
         if (clickedFace == Direction.UP) {
-            BlockState state;
-            if (isExistingGlowLight) {
-                if (blockState.getBlock() == this) {
-                    state = blockState;
-                } else {
-                    state = this.defaultBlockState();
-                    if (blockState.hasProperty(VineBlock.UP)) {
-                        state = state.setValue(
-                                VineBlock.UP,
-                                blockState.getValue(VineBlock.UP));
-                    }
-                    if (blockState.hasProperty(DOWN)) {
-                        state = state.setValue(
-                                DOWN,
-                                blockState.getValue(DOWN));
-                    }
-                    if (blockState.hasProperty(
-                            VineBlock.NORTH)) {
-                        state = state.setValue(
-                                VineBlock.NORTH,
-                                blockState.getValue(VineBlock.NORTH));
-                    }
-                    if (blockState.hasProperty(
-                            VineBlock.SOUTH)) {
-                        state = state.setValue(
-                                VineBlock.SOUTH,
-                                blockState.getValue(VineBlock.SOUTH));
-                    }
-                    if (blockState.hasProperty(
-                            VineBlock.EAST)) {
-                        state = state.setValue(
-                                VineBlock.EAST,
-                                blockState.getValue(VineBlock.EAST));
-                    }
-                    if (blockState.hasProperty(
-                            VineBlock.WEST)) {
-                        state = state.setValue(
-                                VineBlock.WEST,
-                                blockState.getValue(VineBlock.WEST));
-                    }
-                }
-            } else {
-                state = this.defaultBlockState();
-            }
-
+            BlockState state = existingOrDefaultState(blockState, isExistingGlowLight);
             state = state.setValue(DOWN, true);
-            BlockPos placePos = context.getClickedPos();
-            FluidState fluidState = context.getLevel().getFluidState(placePos);
-            return state
-                    .setValue(LIT, true)
-                    .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+            return withLitAndWater(state, context);
         }
 
         if (clickedFace == Direction.DOWN) {
-            BlockState state;
-            if (isExistingGlowLight) {
-                if (blockState.getBlock() == this) {
-                    state = blockState;
-                } else {
-                    state = this.defaultBlockState();
-                    if (blockState.hasProperty(VineBlock.UP)) {
-                        state = state.setValue(
-                                VineBlock.UP,
-                                blockState.getValue(VineBlock.UP));
-                    }
-                    if (blockState.hasProperty(DOWN)) {
-                        state = state.setValue(
-                                DOWN,
-                                blockState.getValue(DOWN));
-                    }
-                    if (blockState.hasProperty(
-                            VineBlock.NORTH)) {
-                        state = state.setValue(
-                                VineBlock.NORTH,
-                                blockState.getValue(VineBlock.NORTH));
-                    }
-                    if (blockState.hasProperty(
-                            VineBlock.SOUTH)) {
-                        state = state.setValue(
-                                VineBlock.SOUTH,
-                                blockState.getValue(VineBlock.SOUTH));
-                    }
-                    if (blockState.hasProperty(
-                            VineBlock.EAST)) {
-                        state = state.setValue(
-                                VineBlock.EAST,
-                                blockState.getValue(VineBlock.EAST));
-                    }
-                    if (blockState.hasProperty(
-                            VineBlock.WEST)) {
-                        state = state.setValue(
-                                VineBlock.WEST,
-                                blockState.getValue(VineBlock.WEST));
-                    }
-                }
-            } else {
-                state = this.defaultBlockState();
-            }
-
+            BlockState state = existingOrDefaultState(blockState, isExistingGlowLight);
             state = state.setValue(
                     VineBlock.UP,
                     true);
-            BlockPos placePos = context.getClickedPos();
-            FluidState fluidState = context.getLevel().getFluidState(placePos);
-            return state
-                    .setValue(LIT, true)
-                    .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+            return withLitAndWater(state, context);
         }
 
         BlockState state;
@@ -340,43 +211,7 @@ public class GlowLightsBlock
                 }
             }
 
-            if (blockState.getBlock() == this) {
-                state = blockState;
-            } else {
-                state = this.defaultBlockState();
-                if (blockState.hasProperty(VineBlock.UP)) {
-                    state = state.setValue(
-                            VineBlock.UP,
-                            blockState.getValue(VineBlock.UP));
-                }
-                if (blockState.hasProperty(DOWN)) {
-                    state = state.setValue(
-                            DOWN,
-                            blockState.getValue(DOWN));
-                }
-                if (blockState.hasProperty(
-                        VineBlock.NORTH)) {
-                    state = state.setValue(
-                            VineBlock.NORTH,
-                            blockState.getValue(VineBlock.NORTH));
-                }
-                if (blockState.hasProperty(
-                        VineBlock.SOUTH)) {
-                    state = state.setValue(
-                            VineBlock.SOUTH,
-                            blockState.getValue(VineBlock.SOUTH));
-                }
-                if (blockState.hasProperty(VineBlock.EAST)) {
-                    state = state.setValue(
-                            VineBlock.EAST,
-                            blockState.getValue(VineBlock.EAST));
-                }
-                if (blockState.hasProperty(VineBlock.WEST)) {
-                    state = state.setValue(
-                            VineBlock.WEST,
-                            blockState.getValue(VineBlock.WEST));
-                }
-            }
+            state = existingOrDefaultState(blockState, true);
 
             BooleanProperty property = attachDirection == Direction.DOWN
                     ? DOWN
@@ -401,6 +236,64 @@ public class GlowLightsBlock
             }
         }
 
+        return withLitAndWater(state, context);
+    }
+
+    /** True when the clicked-on glow light of this block already has the face we would attach to. */
+    private static boolean isFaceAlreadyAttached(BlockState blockState, Direction attachDirection) {
+        BooleanProperty property = VineBlock.getPropertyForFace(
+                attachDirection);
+        if (property != null &&
+                blockState.hasProperty(property) &&
+                blockState.getValue(property)) {
+            return true;
+        }
+        return attachDirection == Direction.DOWN &&
+                blockState.hasProperty(DOWN) &&
+                blockState.getValue(DOWN);
+    }
+
+    /** Placing into an empty position against a neighbouring glow light; null when that face is already taken. */
+    private BlockState placeAgainstGlowLight(
+            BlockPlaceContext context, BlockState originalState, Direction clickedFace) {
+        Direction attachToGlow = clickedFace.getOpposite();
+        BooleanProperty attachProperty = attachToGlow == Direction.DOWN
+                ? DOWN
+                : VineBlock.getPropertyForFace(
+                        attachToGlow);
+
+        if (attachProperty != null &&
+                originalState.hasProperty(attachProperty) &&
+                originalState.getValue(attachProperty)) {
+            return null;
+        }
+
+        BlockState state = this.defaultBlockState();
+        if (state.hasProperty(attachProperty)) {
+            state = state.setValue(attachProperty, true);
+        }
+        return withLitAndWater(state, context);
+    }
+
+    /** The clicked glow light itself when it is this block, a copy of its faces onto this block otherwise. */
+    private BlockState existingOrDefaultState(BlockState blockState, boolean isExistingGlowLight) {
+        if (!isExistingGlowLight) {
+            return this.defaultBlockState();
+        }
+        if (blockState.getBlock() == this) {
+            return blockState;
+        }
+        BlockState state = this.defaultBlockState();
+        for (BooleanProperty face : new BooleanProperty[]{
+                VineBlock.UP, DOWN, VineBlock.NORTH, VineBlock.SOUTH, VineBlock.EAST, VineBlock.WEST}) {
+            if (blockState.hasProperty(face)) {
+                state = state.setValue(face, blockState.getValue(face));
+            }
+        }
+        return state;
+    }
+
+    private static BlockState withLitAndWater(BlockState state, BlockPlaceContext context) {
         BlockPos placePos = context.getClickedPos();
         FluidState fluidState = context.getLevel().getFluidState(placePos);
         return state

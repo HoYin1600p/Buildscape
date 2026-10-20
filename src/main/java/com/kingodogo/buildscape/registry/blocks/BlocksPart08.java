@@ -14,7 +14,7 @@ import com.kingodogo.buildscape.block.PoplarTreeGrower;
 import com.kingodogo.buildscape.block.SoftFabricBlock;
 import com.kingodogo.buildscape.block.SpoolBlock;
 import com.kingodogo.buildscape.block.VerticalSlabBlock;
-import com.kingodogo.buildscape.block.WeatheringVerticalSlabBlock;
+import com.kingodogo.buildscape.feature.copper.WeatheringVerticalSlabBlock;
 import com.kingodogo.buildscape.feature.geyser.PotentSulfurBlock;
 import com.kingodogo.buildscape.feature.geyser.SulfurSpikeBlock;
 import com.kingodogo.buildscape.registry.ModItems;

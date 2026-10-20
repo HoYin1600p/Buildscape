@@ -6,8 +6,6 @@ import com.kingodogo.buildscape.block.LargeChainBlock;
 import com.kingodogo.buildscape.block.PottedHazeBushBlock;
 import com.kingodogo.buildscape.block.ShelfBlock;
 import com.kingodogo.buildscape.block.SideChainPartBlock;
-import com.kingodogo.buildscape.block.WeatheringClimbableChainBlock;
-import com.kingodogo.buildscape.block.WeatheringLargeChainBlock;
 import com.kingodogo.buildscape.feature.geyser.SulfurSpikeBlock;
 import com.kingodogo.buildscape.feature.icicle.PointedIcicleBlock;
 import com.kingodogo.buildscape.feature.pipe.transport.HollowPipeTransportManager;
@@ -563,8 +561,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 || block instanceof FenceBlock || block instanceof FenceGateBlock || block instanceof IronBarsBlock
                 || block instanceof ChainBlock || block instanceof ClimbableChainBlock
                 || block instanceof LargeChainBlock
-                || block instanceof SideChainPartBlock || block instanceof WeatheringClimbableChainBlock
-                || block instanceof WeatheringLargeChainBlock
+                || block instanceof SideChainPartBlock
                 || block instanceof TrapDoorBlock || block instanceof DoorBlock
                 || block instanceof LadderBlock || block instanceof LanternBlock || block instanceof TorchBlock
                 || block instanceof BushBlock || block instanceof FlowerBlock || block instanceof MushroomBlock

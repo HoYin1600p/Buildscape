@@ -1,22 +1,19 @@
-package com.kingodogo.buildscape.block;
-
-import com.kingodogo.buildscape.feature.copper.BuildscapeWeatheringCopper;
-import com.kingodogo.buildscape.feature.copper.CopperOxidationHandler;
+package com.kingodogo.buildscape.feature.copper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import java.util.Random;
 
-public class WeatheringLanternBlock extends LanternBlock implements BuildscapeWeatheringCopper {
-    public WeatheringLanternBlock(Properties properties) {
+public class WeatheringBlock extends Block implements BuildscapeWeatheringCopper {
+    public WeatheringBlock(Properties properties) {
         super(properties.randomTicks());
     }
 
     @Override
     public boolean isRandomlyTicking(BlockState state) {
-        return CopperOxidationHandler.canOxidize(state);
+        return this.canWeather(state);
     }
 
     @Override

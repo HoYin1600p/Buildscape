@@ -11,6 +11,11 @@ import java.util.Optional;
 import java.util.Random;
 
 public interface BuildscapeWeatheringCopper extends WeatheringCopper {
+    /** Shared isRandomlyTicking answer: only blocks that can still oxidize need random ticks. */
+    default boolean canWeather(BlockState state) {
+        return CopperOxidationHandler.canOxidize(state);
+    }
+
     @Override
     default WeatherState getAge() {
         return CopperOxidationHandler.getAge((Block) this);

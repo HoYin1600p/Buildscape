@@ -36,7 +36,7 @@ import com.kingodogo.buildscape.block.SnowyTallGrassBlock;
 import com.kingodogo.buildscape.block.StarBlock;
 import com.kingodogo.buildscape.block.SteelBoltBlock;
 import com.kingodogo.buildscape.block.StringLightBlock;
-import com.kingodogo.buildscape.block.WeatheringClimbableChainBlock;
+import com.kingodogo.buildscape.feature.copper.WeatheringClimbableChainBlock;
 import com.kingodogo.buildscape.feature.icicle.IcicleBlock;
 import com.kingodogo.buildscape.feature.icicle.IcicleCauldronBlock;
 import com.kingodogo.buildscape.feature.icicle.PackedIcicleBlock;

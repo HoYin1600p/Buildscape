@@ -8,7 +8,7 @@ import com.kingodogo.buildscape.block.FrostRoseBlock;
 import com.kingodogo.buildscape.block.MuffBlock;
 import com.kingodogo.buildscape.block.SmokeVentBlock;
 import com.kingodogo.buildscape.block.SteelBoltBlock;
-import com.kingodogo.buildscape.block.WeatheringBoltBlock;
+import com.kingodogo.buildscape.feature.copper.WeatheringBoltBlock;
 import com.kingodogo.buildscape.feature.firework.InfinitePhoenixFireworkStarItem;
 import com.kingodogo.buildscape.feature.homemaker.FestiveWanderingHomemakerEntity;
 import com.kingodogo.buildscape.feature.homemaker.WanderingHomemakerEntity;

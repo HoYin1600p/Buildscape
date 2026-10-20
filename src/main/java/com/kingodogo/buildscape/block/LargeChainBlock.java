@@ -153,12 +153,12 @@ public class LargeChainBlock
             CollisionContext context) {
         Direction.Axis axis = state.getValue(AXIS);
         switch (axis) {
-            case X :
+            case X:
                 return SHAPE_X;
-            case Z :
+            case Z:
                 return SHAPE_Z;
-            case Y :
-            default :
+            case Y:
+            default:
                 return SHAPE_Y;
         }
     }
@@ -179,12 +179,12 @@ public class LargeChainBlock
 
         Direction.Axis axis = state.getValue(AXIS);
         switch (axis) {
-            case X :
+            case X:
                 return COLLISION_SHAPE_X;
-            case Z :
+            case Z:
                 return COLLISION_SHAPE_Z;
-            case Y :
-            default :
+            case Y:
+            default:
                 return COLLISION_SHAPE_Y;
         }
     }

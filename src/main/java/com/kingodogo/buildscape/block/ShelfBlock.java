@@ -83,14 +83,14 @@ public class ShelfBlock extends BaseEntityBlock
     public VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos,
             final CollisionContext context) {
         switch (state.getValue(FACING)) {
-            case SOUTH :
+            case SOUTH:
                 return SHAPE_SOUTH;
-            case EAST :
+            case EAST:
                 return SHAPE_EAST;
-            case WEST :
+            case WEST:
                 return SHAPE_WEST;
-            case NORTH :
-            default :
+            case NORTH:
+            default:
                 return SHAPE_NORTH;
         }
     }

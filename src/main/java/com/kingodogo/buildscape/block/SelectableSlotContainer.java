@@ -36,21 +36,21 @@ public interface SelectableSlotContainer {
             double relativeZ = relativeHit.z();
             Optional<Vec2> hitPoint;
             switch (hitDirection) {
-                case NORTH :
+                case NORTH:
                     hitPoint = Optional.of(new Vec2((float) (1.0D - relativeX), (float) relativeY));
                     break;
-                case SOUTH :
+                case SOUTH:
                     hitPoint = Optional.of(new Vec2((float) relativeX, (float) relativeY));
                     break;
-                case WEST :
+                case WEST:
                     hitPoint = Optional.of(new Vec2((float) relativeZ, (float) relativeY));
                     break;
-                case EAST :
+                case EAST:
                     hitPoint = Optional.of(new Vec2((float) (1.0D - relativeZ), (float) relativeY));
                     break;
-                case DOWN :
-                case UP :
-                default :
+                case DOWN:
+                case UP:
+                default:
                     hitPoint = Optional.empty();
                     break;
             }

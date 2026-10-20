@@ -20,8 +20,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ItemFrame;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -38,8 +36,8 @@ public class PillarIdManager {
     private static final PillarIdManager SERVER_INSTANCE = new PillarIdManager(true);
     private static final PillarIdManager CLIENT_INSTANCE = new PillarIdManager(false);
 
-    private final boolean serverAuthoritative;
-    private final PillarRegistry registry = new PillarRegistry();
+    final boolean serverAuthoritative;
+    final PillarRegistry registry = new PillarRegistry();
     private final Map<String, PillarData> removedFrames = registry.removedFrames;
     private final Map<String, String> positionIndex = registry.positionIndex;
 
@@ -54,18 +52,9 @@ public class PillarIdManager {
     private volatile boolean loadInProgress = false;
     private boolean hadColorsOnLoad = false;
     private boolean isServerSynced = false;
-    private boolean allowEmptySave = false;
+    boolean allowEmptySave = false;
     private volatile boolean dirty = false;
     private volatile boolean syncDirty = false;
-
-    private static boolean recoveryScheduled = false;
-    private static long recoveryScheduledTime = 0L;
-    private static boolean recoveryClearColors = false;
-    private static final long RECOVERY_DELAY_MS = 5000;
-    private static boolean recoveryInProgress = false;
-
-    private static long worldLoadStartTime = 0L;
-    private static final long MIN_WORLD_LOAD_TIME_MS = 15000;
 
     public static final String PREFIX_MOSSY = "M";
     public static final String PREFIX_STONE = "S";
@@ -75,11 +64,7 @@ public class PillarIdManager {
 
     public static void resetWorldCache() {
         PillarStore.resetCachedWorldDir();
-        worldLoadStartTime = System.currentTimeMillis();
-        recoveryScheduled = false;
-        recoveryScheduledTime = 0L;
-        recoveryClearColors = false;
-        recoveryInProgress = false;
+        PillarRecovery.reset();
 
         SERVER_INSTANCE.resetState(false);
     }
@@ -248,55 +233,9 @@ public class PillarIdManager {
 
     public static void fullReset() {
         PillarStore.resetCachedWorldDir();
-        worldLoadStartTime = System.currentTimeMillis();
-        recoveryScheduled = false;
-        recoveryScheduledTime = 0L;
-        recoveryClearColors = false;
-        recoveryInProgress = false;
+        PillarRecovery.reset();
 
         SERVER_INSTANCE.resetState(false);
-    }
-
-    public static void checkAndRunScheduledRecovery() {
-        if (!recoveryScheduled) {
-            return;
-        }
-
-        long elapsed = System.currentTimeMillis() - recoveryScheduledTime;
-        if (elapsed < RECOVERY_DELAY_MS) {
-            return;
-        }
-
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null || !server.isRunning()) {
-            return;
-        }
-
-        PillarIdManager manager = get();
-        if (manager == null) {
-            return;
-        }
-
-        if (!manager.hasLoaded()) {
-            return;
-        }
-
-        if (server.getPlayerList().getPlayerCount() == 0 || !isWorldReadyForRecovery()) {
-            return;
-        }
-
-        recoveryScheduled = false;
-        boolean clearColors = recoveryClearColors;
-        recoveryClearColors = false;
-        manager.recoverPillarsFromWorld(server, clearColors);
-    }
-
-    private static boolean isWorldReadyForRecovery() {
-        if (worldLoadStartTime == 0L) {
-            return true;
-        }
-        long elapsed = System.currentTimeMillis() - worldLoadStartTime;
-        return elapsed >= MIN_WORLD_LOAD_TIME_MS;
     }
 
     public String generatePillarId() {
@@ -350,7 +289,7 @@ public class PillarIdManager {
         registry.pillarData.put(id, newData);
         positionIndex.put(posKey, id);
 
-        if (!recoveryInProgress) {
+        if (!PillarRecovery.recoveryInProgress) {
             requestSave();
         }
         return newData;
@@ -825,7 +764,7 @@ public class PillarIdManager {
         }
         dirty = true;
         try {
-            if (recoveryInProgress) {
+            if (PillarRecovery.recoveryInProgress) {
                 return false;
             }
 
@@ -873,316 +812,7 @@ public class PillarIdManager {
         if (!serverAuthoritative || server == null || !server.isRunning()) {
             return;
         }
-        recoveryScheduled = true;
-        recoveryScheduledTime = System.currentTimeMillis();
-        recoveryClearColors = clearColors;
-    }
-
-    public int clearAllPillarIdsFromWorld(MinecraftServer server) {
-        if (server == null || !server.isRunning()) {
-            return 0;
-        }
-
-        if (server.getPlayerList().getPlayerCount() == 0) {
-            return 0;
-        }
-
-        int clearedCount = 0;
-
-        try {
-
-            for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
-
-                try {
-                    int chunkRange = 64;
-                    BlockPos spawnPos = level.getSharedSpawnPos();
-                    ChunkPos spawnChunk = spawnPos != null
-                            ? new ChunkPos(spawnPos)
-                            : new ChunkPos(0, 0);
-
-                    for (
-                            int chunkX = spawnChunk.x - chunkRange;
-                            chunkX <= spawnChunk.x + chunkRange;
-                            chunkX++
-                    ) {
-                        for (
-                                int chunkZ = spawnChunk.z - chunkRange;
-                                chunkZ <= spawnChunk.z + chunkRange;
-                                chunkZ++
-                        ) {
-                            ChunkPos chunkPos =
-                                    new ChunkPos(chunkX, chunkZ);
-
-                            if (!level.hasChunkAt(chunkPos.getWorldPosition())) {
-                                continue;
-                            }
-
-                            try {
-                                ChunkAccess chunkAccess =
-                                        level.getChunk(chunkX, chunkZ);
-
-                                if (
-                                        !(chunkAccess instanceof LevelChunk chunk)
-                                ) {
-                                    continue;
-                                }
-
-                                if (
-                                        !chunkAccess
-                                                .getStatus()
-                                                .isOrAfter(ChunkStatus.FULL)
-                                ) {
-                                    continue;
-                                }
-
-                                for (BlockEntity be : chunk
-                                        .getBlockEntities()
-                                        .values()) {
-                                    if (
-                                            be instanceof PillarBlockEntity pillarBE
-                                    ) {
-
-                                        if (
-                                                pillarBE.getPillarId() != null &&
-                                                        !pillarBE.getPillarId().isEmpty()
-                                        ) {
-                                            pillarBE.clearLocalStateOnly();
-                                            pillarBE.setChanged();
-
-                                            level.sendBlockUpdated(
-                                                    be.getBlockPos(),
-                                                    level.getBlockState(be.getBlockPos()),
-                                                    level.getBlockState(be.getBlockPos()),
-                                                    3
-                                            );
-
-                                            clearedCount++;
-                                        }
-                                    }
-                                }
-                            } catch (Exception e) {
-                                continue;
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    BuildScape.LOGGER.error("Error scanning chunks to clear pillar IDs: {}", e.getMessage());
-                }
-            }
-
-        } catch (Exception e) {
-            BuildScape.LOGGER.error("Error clearing pillar IDs from world", e);
-        }
-
-        return clearedCount;
-    }
-
-    public void recoverPillarsFromWorld(
-            MinecraftServer server,
-            boolean clearColors
-    ) {
-        if (server == null || !server.isRunning()) {
-            return;
-        }
-
-        if (server.getPlayerList().getPlayerCount() == 0) {
-            return;
-        }
-
-        try {
-            if (clearColors) {
-                int clearedCount = clearAllPillarIdsFromWorld(server);
-                requestSave();
-                return;
-            }
-
-            recoveryInProgress = true;
-            int recoveredCount = 0;
-            int skippedCount = 0;
-            int colorClearedCount = 0;
-
-            for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
-
-                String dimensionKey = getDimensionKey(level);
-
-                try {
-                    Set<
-                            BlockEntity
-                            > allBlockEntities = new HashSet<>();
-
-                    int chunkRange = 64;
-                    BlockPos spawnPos = level.getSharedSpawnPos();
-                    ChunkPos spawnChunk = spawnPos != null
-                            ? new ChunkPos(spawnPos)
-                            : new ChunkPos(0, 0);
-
-                    for (
-                            int chunkX = spawnChunk.x - chunkRange;
-                            chunkX <= spawnChunk.x + chunkRange;
-                            chunkX++
-                    ) {
-                        for (
-                                int chunkZ = spawnChunk.z - chunkRange;
-                                chunkZ <= spawnChunk.z + chunkRange;
-                                chunkZ++
-                        ) {
-                            ChunkPos chunkPos =
-                                    new ChunkPos(chunkX, chunkZ);
-
-                            if (!level.hasChunkAt(chunkPos.getWorldPosition())) {
-                                continue;
-                            }
-
-                            try {
-                                ChunkAccess chunkAccess =
-                                        level.getChunk(chunkX, chunkZ);
-
-                                if (
-                                        !(chunkAccess instanceof LevelChunk chunk)
-                                ) {
-                                    continue;
-                                }
-
-                                if (
-                                        !chunkAccess
-                                                .getStatus()
-                                                .isOrAfter(ChunkStatus.FULL)
-                                ) {
-                                    continue;
-                                }
-
-                                for (BlockEntity be : chunk
-                                        .getBlockEntities()
-                                        .values()) {
-                                    if (
-                                            be instanceof
-                                                    PillarBlockEntity
-                                    ) {
-                                        allBlockEntities.add(be);
-                                    }
-                                }
-                            } catch (Exception e) {
-                                continue;
-                            }
-                        }
-                    }
-
-                    for (BlockEntity be : allBlockEntities) {
-                        if (
-                                be instanceof PillarBlockEntity pillarBE
-                        ) {
-                            try {
-
-                                String pillarId = pillarBE.getPillarId();
-                                if (pillarId == null || pillarId.isEmpty()) {
-                                    skippedCount++;
-                                    continue;
-                                }
-
-                                BlockPos pos = be.getBlockPos();
-
-                                PillarData existingData = registry.pillarData.get(pillarId);
-
-                                if (existingData != null) {
-                                    boolean positionChanged = !(
-                                            existingData.dimension.equals(dimensionKey) &&
-                                                    existingData.x == pos.getX() &&
-                                                    existingData.y == pos.getY() &&
-                                                    existingData.z == pos.getZ()
-                                    );
-
-                                    if (positionChanged) {
-
-                                        existingData.dimension = dimensionKey;
-                                        existingData.x = pos.getX();
-                                        existingData.y = pos.getY();
-                                        existingData.z = pos.getZ();
-                                        requestSave();
-                                    }
-
-                                    if (!clearColors) {
-                                        List<String> pillarColors =
-                                                pillarBE.getParticleColors();
-                                        if (pillarColors != null && !pillarColors.isEmpty()) {
-                                            boolean colorsChanged = false;
-                                            if (existingData.dyeColors == null || existingData.dyeColors.size() != pillarColors.size()) {
-                                                colorsChanged = true;
-                                            } else {
-                                                for (int i = 0; i < pillarColors.size(); i++) {
-                                                    String nbtColor = pillarColors.get(i);
-                                                    String managerColor = i < existingData.dyeColors.size() ? existingData.dyeColors.get(i) : null;
-                                                    if (nbtColor == null || !nbtColor.equals(managerColor)) {
-                                                        colorsChanged = true;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-
-                                            if (colorsChanged) {
-                                                existingData.clearColors();
-                                                for (String color : pillarColors) {
-                                                    if (color != null && !color.isEmpty()) {
-                                                        existingData.addColor(color);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } else if (clearColors && existingData.hasColors()) {
-                                        existingData.clearColors();
-                                        colorClearedCount++;
-                                    }
-
-                                    continue;
-                                }
-
-                                PillarData data = new PillarData(pillarId, dimensionKey, pos);
-
-                                if (clearColors) {
-                                    data.clearColors();
-                                    colorClearedCount++;
-                                } else {
-                                    List<String> pillarColors =
-                                            pillarBE.getParticleColors();
-                                    if (pillarColors != null && !pillarColors.isEmpty()) {
-                                        for (String color : pillarColors) {
-                                            if (color != null && !color.isEmpty()) {
-                                                data.addColor(color);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                registry.pillarData.put(pillarId, data);
-                                recoveredCount++;
-                            } catch (Exception e) {
-                                BuildScape.LOGGER.error("Error processing pillar: {}", e.getMessage());
-                                skippedCount++;
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    BuildScape.LOGGER.error("Error scanning chunks for pillars: {}", e.getMessage());
-                    skippedCount++;
-                }
-            }
-
-            rebuildPositionIndex();
-            syncColorsFromNBTToManager(server);
-
-            recoveryInProgress = false;
-
-            if (recoveredCount > 0 || colorClearedCount > 0) {
-                requestSave();
-            } else {
-            }
-
-        } catch (Exception e) {
-            BuildScape.LOGGER.error("Error during pillar recovery", e);
-        } finally {
-            recoveryInProgress = false;
-        }
+        PillarRecovery.schedule(clearColors);
     }
 
     public void save() {
@@ -1193,7 +823,7 @@ public class PillarIdManager {
         if (!serverAuthoritative) {
             return;
         }
-        if (recoveryInProgress || !hasLoaded) {
+        if (PillarRecovery.recoveryInProgress || !hasLoaded) {
             return;
         }
         if (registry.pillarData.isEmpty() && lastFileSize > 0L && !allowEmptySave) {
@@ -1245,79 +875,6 @@ public class PillarIdManager {
         load();
     }
 
-    public void syncAllLoadedPillars(
-            MinecraftServer server
-    ) {
-        if (server == null || !server.isRunning()) {
-            return;
-        }
-
-        if (server.getPlayerList().getPlayerCount() == 0) {
-            return;
-        }
-
-        try {
-            int syncedCount = 0;
-            int skippedCount = 0;
-
-            for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
-
-                if (!server.isRunning()) break;
-
-                String dimensionKey = getDimensionKey(level);
-
-                for (PillarData data : registry.pillarData.values()) {
-                    if (data == null) continue;
-                    if (!data.dimension.equals(dimensionKey)) continue;
-
-                    try {
-                        BlockPos pos = data.getBlockPos();
-
-                        if (!level.hasChunkAt(pos)) {
-                            skippedCount++;
-                            continue;
-                        }
-
-                        ChunkAccess chunk = level.getChunk(
-                                pos
-                        );
-                        if (
-                                !(chunk instanceof LevelChunk)
-                        ) {
-                            skippedCount++;
-                            continue;
-                        }
-
-                        if (
-                                !chunk
-                                        .getStatus()
-                                        .isOrAfter(ChunkStatus.FULL)
-                        ) {
-                            skippedCount++;
-                            continue;
-                        }
-
-                        BlockEntity be =
-                                level.getBlockEntity(pos);
-                        if (
-                                be instanceof PillarBlockEntity pillarBE
-                        ) {
-
-                            pillarBE.syncFromData(data);
-                            syncedCount++;
-                        }
-                    } catch (Exception e) {
-                        BuildScape.LOGGER.error("Error syncing pillar {}: {}", (data != null ? data.id : "unknown"), e.getMessage());
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            BuildScape.LOGGER.error("Error in syncAllLoadedPillars", e);
-        }
-    }
-
     public void saveBackupFile() {
         try {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -1342,347 +899,6 @@ public class PillarIdManager {
         } catch (Throwable t) {
             BuildScape.LOGGER.error("Error saving backup file: {}", t.getMessage());
         }
-    }
-
-    public void cleanupOrphans(Level level) {
-        if (!serverAuthoritative || !hasLoaded || !(level instanceof ServerLevel serverLevel)) {
-            return;
-        }
-        String dimension = getDimensionKey(level);
-        Map<ChunkPos, List<PillarData>> chunks = new HashMap<>();
-        for (PillarData data : registry.pillarData.values()) {
-            if (!PillarRegistry.isItemFrameData(data) || !Objects.equals(dimension, data.dimension)) continue;
-            BlockPos pos = data.getBlockPos();
-            if (!level.hasChunkAt(pos) || !serverLevel.areEntitiesLoaded(ChunkPos.asLong(pos))) continue;
-            chunks.computeIfAbsent(new ChunkPos(pos), key -> new ArrayList<>()).add(data);
-        }
-        boolean changed = false;
-        for (Map.Entry<ChunkPos, List<PillarData>> entry : chunks.entrySet()) {
-            ChunkPos chunk = entry.getKey();
-            Set<String> livePositions = new HashSet<>();
-            AABB bounds = new AABB(
-                    chunk.getMinBlockX() - 1, level.getMinBuildHeight() - 1, chunk.getMinBlockZ() - 1,
-                    chunk.getMinBlockX() + 17, level.getMaxBuildHeight() + 1, chunk.getMinBlockZ() + 17);
-            for (Entity entity : level.getEntitiesOfClass(Entity.class, bounds)) {
-                Direction facing;
-                if (entity instanceof ItemFrame frame) {
-                    facing = frame.getDirection();
-                } else if (entity instanceof ColoredItemFrameEntity frame) {
-                    facing = frame.getDirection();
-                } else {
-                    continue;
-                }
-                livePositions.add(positionKey(dimension, entity.blockPosition(), facing));
-                livePositions.add(positionKey(dimension, entity.blockPosition(), null));
-            }
-            for (PillarData data : entry.getValue()) {
-                Direction facing = data.facing != null
-                        ? Direction.byName(data.facing) : null;
-                if (!livePositions.contains(positionKey(dimension, data.getBlockPos(), facing))) {
-                    changed |= registry.pillarData.remove(data.id, data);
-                }
-            }
-        }
-        if (changed) {
-            rebuildPositionIndex();
-            if (registry.pillarData.isEmpty()) allowEmptySave = true;
-            requestSave();
-        }
-    }
-
-    public void syncColorsFromNBTToManager(MinecraftServer server) {
-        if (server == null) {
-            return;
-        }
-
-
-        if (!hasLoaded()) {
-            return;
-        }
-
-        try {
-            int syncedCount = 0;
-            int preservedCount = 0;
-            int patternSyncedCount = 0;
-
-            for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
-
-                String dimensionKey = getDimensionKey(level);
-
-                for (PillarData data : registry.pillarData.values()) {
-                    if (data == null) continue;
-                    if (!data.dimension.equals(dimensionKey)) continue;
-
-                    int existingColorCount = (data.dyeColors != null) ? data.dyeColors.size() : 0;
-
-                    try {
-                        BlockPos pos = data.getBlockPos();
-
-                        if (!level.isLoaded(pos)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        ChunkAccess chunk = level.getChunk(pos);
-                        if (!(chunk instanceof LevelChunk)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        BlockEntity be = level.getBlockEntity(pos);
-                        if (!(be instanceof PillarBlockEntity pillarBE)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        BlockPos bottomPos = pillarBE.findStackBottom();
-                        BlockEntity bottomBE = level.getBlockEntity(bottomPos);
-
-                        if (!(bottomBE instanceof PillarBlockEntity bottomPillarBE)) {
-                            preservedCount++;
-                            continue;
-                        }
-
-                        List<String> nbtColors = bottomPillarBE.getParticleColors();
-
-                        if (nbtColors != null && !nbtColors.isEmpty()) {
-                            boolean needsSync = false;
-                            if (data.dyeColors == null || data.dyeColors.isEmpty()) {
-                                needsSync = true;
-                            } else if (data.dyeColors.size() != nbtColors.size()) {
-                                needsSync = true;
-                            } else {
-                                for (int i = 0; i < nbtColors.size(); i++) {
-                                    String nbtColor = nbtColors.get(i);
-                                    String managerColor = i < data.dyeColors.size() ? data.dyeColors.get(i) : null;
-                                    if (nbtColor == null || !nbtColor.equals(managerColor)) {
-                                        needsSync = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (needsSync) {
-                                data.clearColors();
-                                for (String color : nbtColors) {
-                                    if (color != null && !color.isEmpty()) {
-                                        data.addColor(color);
-                                    }
-                                }
-                                syncedCount++;
-                            } else {
-                                preservedCount++;
-                            }
-
-                            if (syncPatternSettingsFromNBT(bottomPillarBE, data)) {
-                                patternSyncedCount++;
-                            }
-                        } else {
-                            if (existingColorCount > 0) {
-                                preservedCount++;
-                            }
-                            if (syncPatternSettingsFromNBT(bottomPillarBE, data)) {
-                                patternSyncedCount++;
-                            }
-                        }
-                    } catch (Exception e) {
-                        preservedCount++;
-                        BuildScape.LOGGER.error("Error syncing colors from NBT for pillar {}: {}",
-                                (data != null ? data.id : "unknown"),
-                                e.getMessage());
-                    }
-                }
-            }
-
-            if (syncedCount > 0 || patternSyncedCount > 0) {
-                requestSave();
-            } else if (preservedCount > 0) {
-            }
-        } catch (Exception e) {
-            BuildScape.LOGGER.error("Error in syncColorsFromNBTToManager", e);
-        }
-    }
-
-    public void loadColorsFromNBT(MinecraftServer server) {
-        if (server == null || !server.isRunning()) {
-            return;
-        }
-
-        if (server.getPlayerList().getPlayerCount() == 0) {
-            return;
-        }
-
-        try {
-            int loadedCount = 0;
-
-            for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
-
-                String dimensionKey = getDimensionKey(level);
-
-                for (PillarData data : registry.pillarData.values()) {
-                    if (data == null) continue;
-                    if (!data.dimension.equals(dimensionKey)) continue;
-
-                    try {
-                        BlockPos pos = data.getBlockPos();
-
-                        if (!level.isLoaded(pos)) {
-                            continue;
-                        }
-
-                        ChunkAccess chunk = level.getChunk(pos);
-                        if (!(chunk instanceof LevelChunk)) {
-                            continue;
-                        }
-
-                        if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
-                            continue;
-                        }
-
-                        BlockEntity be = level.getBlockEntity(pos);
-                        if (!(be instanceof PillarBlockEntity pillarBE)) {
-                            continue;
-                        }
-
-                        BlockPos bottomPos = pillarBE.findStackBottom();
-                        BlockEntity bottomBE = level.getBlockEntity(bottomPos);
-
-                        if (!(bottomBE instanceof PillarBlockEntity bottomPillarBE)) {
-                            continue;
-                        }
-
-                        List<String> nbtColors = bottomPillarBE.getParticleColors();
-
-                        if (nbtColors != null && !nbtColors.isEmpty()) {
-                            data.clearColors();
-                            for (String color : nbtColors) {
-                                if (color != null && !color.isEmpty()) {
-                                    data.addColor(color);
-                                }
-                            }
-                            loadedCount++;
-                        } else {
-                            int fileColorCount = (data.dyeColors != null) ? data.dyeColors.size() : 0;
-                            if (fileColorCount > 0) {
-                            }
-                        }
-                    } catch (Exception e) {
-                        BuildScape.LOGGER.error("Error loading colors from NBT for pillar {}: {}",
-                                (data != null ? data.id : "unknown"),
-                                e.getMessage());
-                    }
-                }
-            }
-
-            if (loadedCount > 0) {
-                requestSave();
-            } else {
-            }
-        } catch (Exception e) {
-            BuildScape.LOGGER.error("Error in loadColorsFromNBT", e);
-        }
-    }
-
-    public boolean syncPatternSettingsFromNBT(
-            PillarBlockEntity pillarBE,
-            PillarData data
-    ) {
-        if (pillarBE == null || data == null) {
-            return false;
-        }
-
-        boolean needsSave = false;
-
-        String pillarType = ForgeRegistries.ITEMS.getKey(pillarBE.getBlockState().getBlock().asItem()).toString();
-        if (data.pillarType == null || !data.pillarType.equals(pillarType)) {
-            data.pillarType = pillarType;
-            needsSave = true;
-        }
-
-        String nbtPattern = pillarBE.getParticlePattern();
-        if (nbtPattern != null && !nbtPattern.isEmpty()) {
-            if (data.pattern == null || !data.pattern.equals(nbtPattern)) {
-                data.pattern = nbtPattern;
-                needsSave = true;
-            }
-        }
-
-        Double nbtSpeed = pillarBE.getPatternSpeed();
-        if (nbtSpeed != null) {
-            if (data.pattern_speed == null || !data.pattern_speed.equals(nbtSpeed)) {
-                data.pattern_speed = nbtSpeed;
-                needsSave = true;
-            }
-        }
-
-        Double nbtSpread = pillarBE.getPatternSpread();
-        if (nbtSpread != null) {
-            if (data.pattern_spread == null || !data.pattern_spread.equals(nbtSpread)) {
-                data.pattern_spread = nbtSpread;
-                needsSave = true;
-            }
-        }
-
-        Double nbtIntensity = pillarBE.getPatternIntensity();
-        if (nbtIntensity != null) {
-            if (data.pattern_intensity == null || !data.pattern_intensity.equals(nbtIntensity)) {
-                data.pattern_intensity = nbtIntensity;
-                needsSave = true;
-            }
-        }
-
-        Integer nbtMaxColor = pillarBE.getMaxParticleColor();
-        if (nbtMaxColor == null && data.max_particle_color == null) {
-            List<String> nbtColors = pillarBE.getParticleColors();
-            if (nbtColors != null && !nbtColors.isEmpty()) nbtMaxColor = nbtColors.size();
-        }
-        if (nbtMaxColor != null && !nbtMaxColor.equals(data.max_particle_color)) {
-            data.max_particle_color = nbtMaxColor;
-            needsSave = true;
-        }
-
-        BlockPos topPos = pillarBE.findStackTop();
-        BlockEntity topBE = pillarBE.getLevel().getBlockEntity(topPos);
-        ItemStack displayedItem = ItemStack.EMPTY;
-
-        if (topBE instanceof PillarBlockEntity topPillar) {
-            displayedItem = topPillar.getDisplayedItem();
-        } else {
-            displayedItem = pillarBE.getDisplayedItem();
-        }
-
-        if (displayedItem != null && !displayedItem.isEmpty()) {
-            ResourceLocation key = ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
-            String itemId = key != null ? key.toString() : null;
-            if (itemId != null && (data.displayedItem == null || !data.displayedItem.equals(itemId))) {
-                data.displayedItem = itemId;
-                needsSave = true;
-            }
-        } else {
-            if (data.displayedItem != null) {
-                data.displayedItem = null;
-                needsSave = true;
-            }
-        }
-
-        float itemYaw = pillarBE.getFacingYaw();
-        if (data.itemYaw == null || !data.itemYaw.equals(itemYaw)) {
-            data.itemYaw = itemYaw;
-            needsSave = true;
-        }
-
-        if (needsSave) {
-            data.modifiedTime = System.currentTimeMillis();
-        }
-
-        return needsSave;
     }
 
     public synchronized String editPillarRows(List<EditPillarRowsPacket.Row> rows) {
@@ -2342,6 +1558,48 @@ public class PillarIdManager {
     public String getFrameIdForPosition(String dimension, BlockPos pos, Direction facing) {
         return registry.getFrameIdForPosition(dimension, pos, facing);
     }
+    // ---- Recovery and world sync delegation: the public API is unchanged ----
+
+    public static void checkAndRunScheduledRecovery() {
+        PillarRecovery.checkAndRunScheduledRecovery();
+    }
+
+    public int clearAllPillarIdsFromWorld(MinecraftServer server) {
+        return PillarRecovery.clearAllPillarIdsFromWorld(server);
+    }
+
+    public void recoverPillarsFromWorld(
+            MinecraftServer server,
+            boolean clearColors
+    ) {
+        PillarRecovery.recoverPillarsFromWorld(this, server, clearColors);
+    }
+
+    public void syncAllLoadedPillars(
+            MinecraftServer server
+    ) {
+        PillarWorldSync.syncAllLoadedPillars(this, server);
+    }
+
+    public void cleanupOrphans(Level level) {
+        PillarWorldSync.cleanupOrphans(this, level);
+    }
+
+    public void syncColorsFromNBTToManager(MinecraftServer server) {
+        PillarWorldSync.syncColorsFromNBTToManager(this, server);
+    }
+
+    public void loadColorsFromNBT(MinecraftServer server) {
+        PillarWorldSync.loadColorsFromNBT(this, server);
+    }
+
+    public boolean syncPatternSettingsFromNBT(
+            PillarBlockEntity pillarBE,
+            PillarData data
+    ) {
+        return PillarWorldSync.syncPatternSettingsFromNBT(pillarBE, data);
+    }
+
 
 
     public static class PillarData {

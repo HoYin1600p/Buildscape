@@ -1,4 +1,4 @@
-# Buildscape Startup Optimization Notes
+# BuildScape Startup Optimization Notes
 
 This document describes the startup optimizations maintained on the
 `main` branch and what contributors must check when adding content.
@@ -12,8 +12,8 @@ The following behavior is registry- or namespace-driven and normally requires
 no optimization-specific changes:
 
 - Bundled JSON models under `assets/buildscape/models` are discovered and
-  parsed through the Buildscape model pipeline.
-- Buildscape top-level models are included in parallel model baking.
+  parsed through the BuildScape model pipeline.
+- BuildScape top-level models are included in parallel model baking.
 - Blocks registered through `ModBlocks.BLOCKS` are included in eager block-state
   cache initialization.
 - Items registered through `ModItems.ITEMS` are included in scoped item setup.
@@ -26,7 +26,7 @@ no optimization-specific changes:
   machine-specific fixed thread count.
 
 These optimizations only apply while the content remains in the `buildscape`
-namespace and uses the established Buildscape registries.
+namespace and uses the established BuildScape registries.
 
 ## Render-Layer Exception
 
@@ -42,7 +42,7 @@ When adding a translucent, cutout, or cutout-mipped block:
 2. If it does not, extend the classifier for the new family or add an exact
    path case.
 3. Verify that the rule does not classify unrelated solid blocks.
-4. Inspect the block in-world, in the Buildscape creative tab, and in JEI.
+4. Inspect the block in-world, in the BuildScape creative tab, and in JEI.
 
 A non-solid block that does not match the classifier will use Minecraft's
 default solid render layer and may appear opaque, invisible, or visually
@@ -51,8 +51,8 @@ broken.
 ## Custom-Model Exception
 
 Models containing a Forge `"loader"` declaration are deliberately excluded
-from parallel JSON parsing. If Buildscape custom geometry is detected during a
-resource reload, Buildscape model baking remains sequential for that reload.
+from parallel JSON parsing. If BuildScape custom geometry is detected during a
+resource reload, BuildScape model baking remains sequential for that reload.
 This compatibility fallback is intentional.
 
 When adding custom geometry:
@@ -63,13 +63,13 @@ When adding custom geometry:
 4. Do not force the model through the parallel path without proving that its
    loader and bake operations are thread-safe.
 
-Resource packs that introduce entirely new Buildscape models not present in the
+Resource packs that introduce entirely new BuildScape models not present in the
 bundled mod archive remain supported by Minecraft's normal sequential loader.
 
 ## Compatibility
 
-Buildscape checks for LaunchFaster before enabling overlapping optimizations.
-Do not remove this ownership check. Buildscape-scoped work may remain active,
+BuildScape checks for LaunchFaster before enabling overlapping optimizations.
+Do not remove this ownership check. BuildScape-scoped work may remain active,
 while overlapping global block-state or material-cache work is left to
 LaunchFaster when it is installed and enabled.
 

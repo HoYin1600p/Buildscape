@@ -7,7 +7,7 @@ Botany Pots crop recipes live in:
 `src/main/resources/data/buildscape/recipes/botany_pots`
 
 Each recipe is wrapped in Forge's `mod_loaded` condition. Keep the
-`botanypots:crop` recipe inside that wrapper so Buildscape remains usable
+`botanypots:crop` recipe inside that wrapper so BuildScape remains usable
 without Botany Pots installed.
 
 Use the repository-only generator to add or update recipes:

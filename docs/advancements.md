@@ -1,4 +1,4 @@
-# Buildscape Achievements
+# BuildScape Achievements
 
 ```text
 Achievement                                 | Requirement                                        | trophy_id                            | item_id

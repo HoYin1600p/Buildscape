@@ -1,6 +1,6 @@
 # Cosmetic API Security Requirements
 
-This document defines the supported security boundary for Buildscape's optional
+This document defines the supported security boundary for BuildScape's optional
 cosmetic service.
 
 ## Client Rules
@@ -9,7 +9,7 @@ cosmetic service.
 - The mod must never read, store, log, serialize, or transmit a Minecraft,
   Microsoft, Xbox, or Mojang session credential.
 - Minecraft access tokens and launcher credentials must never be sent to a
-  Buildscape-owned service.
+  BuildScape-owned service.
 - Cosmetic requests must be asynchronous, use HTTPS, enforce timeouts, validate
   response sizes, and fail without affecting normal gameplay.
 - Cosmetic responses are cached only for the current client session.

@@ -5,11 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.client.network.ClientConfigHooks;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.network.SyncConfigPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -17,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -258,7 +257,7 @@ public class PillarParticleConfig {
         if (now - connectedCacheTime < CONNECTED_CACHE_TTL_MS) {
             return cachedConnectedToServer;
         }
-        boolean result = ClientConnectionState.isConnected();
+        boolean result = ClientConfigHooks.isConnected();
         cachedConnectedToServer = result;
         connectedCacheTime = now;
         return result;
@@ -479,19 +478,6 @@ public class PillarParticleConfig {
             watchThread.start();
         } catch (Exception e) {
             watcherInitialized.set(false);
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static final class ClientConnectionState {
-        private static boolean hasLocalServer() {
-            Minecraft minecraft = Minecraft.getInstance();
-            return minecraft != null && minecraft.hasSingleplayerServer();
-        }
-
-        private static boolean isConnected() {
-            Minecraft minecraft = Minecraft.getInstance();
-            return minecraft.getConnection() != null && minecraft.level != null;
         }
     }
 
@@ -1059,8 +1045,7 @@ public class PillarParticleConfig {
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> {
-                        if (Minecraft.getInstance().player != null &&
-                                Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
+                        if (ClientConfigHooks.canUploadConfig()) {
                             UpdateConfigPacket.send(this);
                         }
                     });
@@ -1125,8 +1110,7 @@ public class PillarParticleConfig {
         if (this == SERVER_CONFIG && isClientConnectedToServer()) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                     () -> () -> {
-                        if (Minecraft.getInstance().player != null &&
-                                Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
+                        if (ClientConfigHooks.canUploadConfig()) {
                             UpdateConfigPacket.send(this);
                         }
                     });
@@ -1235,14 +1219,14 @@ public class PillarParticleConfig {
     }
 
     public boolean canEditItems() {
-        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConnectionState.hasLocalServer()) {
+        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConfigHooks.hasLocalServer()) {
             return getLocalConfig().canEditItems();
         }
         return !itemsFileUnreadable && !itemsReadOnly;
     }
 
     public boolean canEditProperties() {
-        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConnectionState.hasLocalServer()) {
+        if (remote && FMLEnvironment.dist == Dist.CLIENT && ClientConfigHooks.hasLocalServer()) {
             return getLocalConfig().canEditProperties();
         }
         return !propertiesReadOnly;

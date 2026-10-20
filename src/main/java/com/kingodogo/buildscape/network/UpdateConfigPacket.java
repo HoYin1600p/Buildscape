@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.network;
 
+import com.kingodogo.buildscape.client.network.ClientConfigHooks;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
@@ -9,16 +10,12 @@ import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
@@ -92,26 +89,17 @@ public class UpdateConfigPacket {
     }
 
     public static void send(PillarParticleConfig config) {
-        for (UpdateConfigPacket packet : ClientUpload.split(config)) {
+        for (UpdateConfigPacket packet : ClientConfigHooks.splitForUpload(config)) {
             ModMessages.INSTANCE.sendToServer(packet);
         }
     }
 
-    static List<UpdateConfigPacket> splitForClient(PillarParticleConfig config, int syncedLevel, boolean levelTwo,
+    public static List<UpdateConfigPacket> splitForClient(PillarParticleConfig config, int syncedLevel, boolean levelTwo,
             boolean levelFour) {
         int level = PillarParticleConfig.resolveClientPermissionLevel(syncedLevel, levelTwo, levelFour);
         Set<ConfigSetting> settings = ConfigSetting.allowed(config.edit_permission_mode, level);
         settings.removeIf(setting -> setting.itemsFile ? !config.canEditItems() : !config.canEditProperties());
         return split(config, settings);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static final class ClientUpload {
-        private static List<UpdateConfigPacket> split(PillarParticleConfig config) {
-            LocalPlayer player = Minecraft.getInstance().player;
-            return splitForClient(config, -1, player != null && player.hasPermissions(2),
-                    player != null && player.hasPermissions(PillarParticleConfig.CONFIG_PERMISSION_LEVEL));
-        }
     }
 
     public UpdateConfigPacket(FriendlyByteBuf buf) {

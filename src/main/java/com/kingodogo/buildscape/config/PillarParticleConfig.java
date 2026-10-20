@@ -148,7 +148,212 @@ public class PillarParticleConfig {
 
     PillarParticleConfig(Path configDirectory) {
         this.configDirectory = configDirectory;
+        recordSnapshot();
     }
+
+    public static class Snapshot {
+        public final int revision;
+        public final double particle_speed;
+        public final double particle_spread;
+        public final int particle_lifetime;
+        public final int particle_density;
+        public final boolean use_pattern;
+        public final String pattern;
+        public final double pattern_speed;
+        public final double pattern_spread;
+        public final double pattern_intensity;
+        public final List<String> particle_color;
+        public final int max_particle_color;
+        public final Set<String> items;
+        public final EditPermissionMode edit_permission_mode;
+
+        public Snapshot(int revision, PillarParticleConfig config) {
+            this.revision = revision;
+            this.particle_speed = config.particle_speed;
+            this.particle_spread = config.particle_spread;
+            this.particle_lifetime = config.particle_lifetime;
+            this.particle_density = config.particle_density;
+            this.use_pattern = config.use_pattern;
+            this.pattern = config.pattern != null ? config.pattern : "ring";
+            this.pattern_speed = config.pattern_speed;
+            this.pattern_spread = config.pattern_spread;
+            this.pattern_intensity = config.pattern_intensity;
+            this.particle_color = new ArrayList<>(config.particle_color != null ? config.particle_color : List.of());
+            this.max_particle_color = config.max_particle_color;
+            this.items = new HashSet<>(config.items != null ? config.items : Set.of());
+            this.edit_permission_mode = config.edit_permission_mode;
+        }
+    }
+
+    public int revision = 0;
+    private final transient List<Snapshot> snapshotHistory = new ArrayList<>();
+
+    public synchronized void recordSnapshot() {
+        if (snapshotHistory.isEmpty() || !isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+            snapshotHistory.add(new Snapshot(revision, this));
+            if (snapshotHistory.size() > 50) {
+                snapshotHistory.remove(0);
+            }
+        }
+    }
+
+    private boolean isSameState(Snapshot s) {
+        return revision == s.revision
+                && Double.compare(particle_speed, s.particle_speed) == 0
+                && Double.compare(particle_spread, s.particle_spread) == 0
+                && particle_lifetime == s.particle_lifetime
+                && particle_density == s.particle_density
+                && use_pattern == s.use_pattern
+                && Objects.equals(pattern, s.pattern)
+                && Double.compare(pattern_speed, s.pattern_speed) == 0
+                && Double.compare(pattern_spread, s.pattern_spread) == 0
+                && Double.compare(pattern_intensity, s.pattern_intensity) == 0
+                && Objects.equals(particle_color, s.particle_color)
+                && max_particle_color == s.max_particle_color
+                && Objects.equals(items, s.items)
+                && edit_permission_mode == s.edit_permission_mode;
+    }
+
+    public synchronized Snapshot findBaseSnapshot(int baseRev, Set<ConfigSetting> groups, Double inSpeed, Integer inLifetime, Set<String> inItems) {
+        if (!snapshotHistory.isEmpty()) {
+            for (int i = snapshotHistory.size() - 1; i >= 0; i--) {
+                Snapshot s = snapshotHistory.get(i);
+                if (s.revision == baseRev) {
+                    return (s.revision < this.revision) ? s : null;
+                }
+            }
+        }
+        if (snapshotHistory.size() > 1) {
+            for (int i = snapshotHistory.size() - 2; i >= 0; i--) {
+                Snapshot s = snapshotHistory.get(i);
+                if (groups.contains(ConfigSetting.PARTICLES)) {
+                    if (inSpeed != null && Double.compare(inSpeed, s.particle_speed) == 0 && Double.compare(s.particle_speed, this.particle_speed) != 0) {
+                        return s;
+                    }
+                    if (inLifetime != null && inLifetime.intValue() == s.particle_lifetime && s.particle_lifetime != this.particle_lifetime) {
+                        return s;
+                    }
+                }
+                if (groups.contains(ConfigSetting.ITEMS) && inItems != null) {
+                    if (inItems.containsAll(s.items) && !inItems.containsAll(this.items)) {
+                        return s;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public synchronized void applyUpload(PillarParticleConfig client, Set<ConfigSetting> groups) {
+        com.kingodogo.buildscape.network.SyncConfigPacket data = new com.kingodogo.buildscape.network.SyncConfigPacket(client);
+        data.baseRevision = client.revision;
+        applyUpload(data, groups);
+        client.revision = this.revision;
+    }
+
+    public synchronized void applyUpload(com.kingodogo.buildscape.network.SyncConfigPacket data, Set<ConfigSetting> groups) {
+        Snapshot base = findBaseSnapshot(data.baseRevision, groups, data.particle_speed, data.particle_lifetime, data.items);
+
+        if (groups.contains(ConfigSetting.PARTICLES)) {
+            if (base != null) {
+                if (Double.compare(data.particle_speed, base.particle_speed) != 0) {
+                    this.particle_speed = data.particle_speed;
+                }
+                if (Double.compare(data.particle_spread, base.particle_spread) != 0) {
+                    this.particle_spread = data.particle_spread;
+                }
+                if (data.particle_lifetime != base.particle_lifetime) {
+                    this.particle_lifetime = data.particle_lifetime;
+                }
+                if (data.particle_density != base.particle_density) {
+                    this.particle_density = data.particle_density;
+                }
+                if (data.use_pattern != base.use_pattern) {
+                    this.use_pattern = data.use_pattern;
+                }
+                if (!Objects.equals(data.pattern, base.pattern) && data.pattern != null) {
+                    this.pattern = data.pattern;
+                }
+                if (Double.compare(data.pattern_speed, base.pattern_speed) != 0) {
+                    this.pattern_speed = data.pattern_speed;
+                }
+                if (Double.compare(data.pattern_spread, base.pattern_spread) != 0) {
+                    this.pattern_spread = data.pattern_spread;
+                }
+                if (Double.compare(data.pattern_intensity, base.pattern_intensity) != 0) {
+                    this.pattern_intensity = data.pattern_intensity;
+                }
+            } else {
+                this.particle_speed = data.particle_speed;
+                this.particle_spread = data.particle_spread;
+                this.particle_lifetime = data.particle_lifetime;
+                this.particle_density = data.particle_density;
+                this.use_pattern = data.use_pattern;
+                if (data.pattern != null) this.pattern = data.pattern;
+                this.pattern_speed = data.pattern_speed;
+                this.pattern_spread = data.pattern_spread;
+                this.pattern_intensity = data.pattern_intensity;
+            }
+        }
+
+        if (groups.contains(ConfigSetting.COLORS)) {
+            if (base != null) {
+                if (data.max_particle_color != base.max_particle_color) {
+                    this.max_particle_color = data.max_particle_color;
+                }
+                if (data.particle_color != null) {
+                    if (data.particle_color.size() != base.particle_color.size()) {
+                        this.particle_color = new ArrayList<>(data.particle_color);
+                    } else {
+                        List<String> merged = new ArrayList<>(this.particle_color);
+                        while (merged.size() < data.particle_color.size()) {
+                            merged.add(DEFAULT_COLORS[Math.min(merged.size(), DEFAULT_COLORS.length - 1)]);
+                        }
+                        for (int i = 0; i < data.particle_color.size(); i++) {
+                            if (!Objects.equals(data.particle_color.get(i), base.particle_color.get(i))) {
+                                if (i < merged.size()) merged.set(i, data.particle_color.get(i));
+                            }
+                        }
+                        this.particle_color = merged;
+                    }
+                }
+            } else {
+                this.max_particle_color = data.max_particle_color;
+                if (data.particle_color != null) {
+                    this.particle_color = new ArrayList<>(data.particle_color);
+                }
+            }
+        }
+
+        if (groups.contains(ConfigSetting.ITEMS) && data.items != null) {
+            if (base != null) {
+                Set<String> added = new HashSet<>();
+                for (String item : data.items) {
+                    if (!base.items.contains(item)) added.add(item);
+                }
+                Set<String> removed = new HashSet<>();
+                for (String item : base.items) {
+                    if (!data.items.contains(item) && isValidItemId(item)) removed.add(item);
+                }
+
+                Set<String> merged = new HashSet<>(this.items);
+                merged.addAll(added);
+                merged.removeAll(removed);
+                this.editItems(merged);
+            } else {
+                this.editItems(data.items);
+            }
+        }
+
+        if (groups.contains(ConfigSetting.POLICY) && data.edit_permission_mode != null) {
+            this.edit_permission_mode = data.edit_permission_mode;
+        }
+
+        this.revision++;
+        data.baseRevision = this.revision;
+        recordSnapshot();
+    }
+
 
     public synchronized void replaceItems(Collection<String> updatedItems) {
         Set<String> replacement = java.util.concurrent.ConcurrentHashMap.newKeySet();
@@ -321,6 +526,7 @@ public class PillarParticleConfig {
         SERVER_CONFIG.particle_lifetime = packet.particle_lifetime > 0
                 ? packet.particle_lifetime
                 : 20;
+        SERVER_CONFIG.revision = packet.baseRevision;
         SERVER_CONFIG.particle_density = packet.particle_density >= 0
                 ? packet.particle_density
                 : 2;

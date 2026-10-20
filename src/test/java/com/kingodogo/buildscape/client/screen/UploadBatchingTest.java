@@ -27,21 +27,13 @@ public class UploadBatchingTest {
         copy.max_particle_color = source.max_particle_color;
         copy.edit_permission_mode = source.edit_permission_mode;
         copy.replaceItems(source.items);
+        copy.revision = source.revision;
         return copy;
     }
 
-    /** What the server does with an upload: the uploaded groups of the client's config replace its own. */
+    /** What the server does with an upload: merges the uploaded groups using conflict handling so simultaneous uploads don't overwrite unrelated fields or items. */
     private static void upload(PillarParticleConfig server, PillarParticleConfig client, Set<ConfigSetting> groups) {
-        if (groups.contains(ConfigSetting.PARTICLES)) {
-            server.particle_speed = client.particle_speed;
-            server.particle_lifetime = client.particle_lifetime;
-            server.pattern = client.pattern;
-        }
-        if (groups.contains(ConfigSetting.COLORS)) {
-            server.particle_color = new ArrayList<>(client.particle_color);
-            server.max_particle_color = client.max_particle_color;
-        }
-        if (groups.contains(ConfigSetting.ITEMS)) server.replaceItems(client.items);
+        server.applyUpload(client, groups);
     }
 
     @Test
@@ -133,6 +125,62 @@ public class UploadBatchingTest {
         incoming.particle_lifetime = 60;
         batch.reapply(incoming);
         assertEquals(30, incoming.particle_lifetime);
+    }
+
+    @Test
+    public void simultaneousUploadsToDifferentFieldsInSameGroupDoNotOverwrite() {
+        PillarParticleConfig server = new PillarParticleConfig();
+        PillarParticleConfig clientA = copyOf(server);
+        PillarParticleConfig clientB = copyOf(server);
+        ConfigUploadBatch batchA = new ConfigUploadBatch();
+        batchA.rebase(clientA);
+        ConfigUploadBatch batchB = new ConfigUploadBatch();
+        batchB.rebase(clientB);
+
+        // A submits particle speed 0.40; B submits lifetime 90.
+        clientA.particle_speed = 0.4D;
+        batchA.edited(ConfigSetting.PARTICLES, clientA, 1000L);
+
+        clientB.particle_lifetime = 90;
+        batchB.edited(ConfigSetting.PARTICLES, clientB, 1000L);
+
+        // Both uploads constructed before either client receives the other's update
+        Set<ConfigSetting> groupsA = batchA.take();
+        Set<ConfigSetting> groupsB = batchB.take();
+
+        upload(server, clientA, groupsA);
+        upload(server, clientB, groupsB);
+
+        assertEquals(0.4D, server.particle_speed, 0.0D);
+        assertEquals(90, server.particle_lifetime);
+    }
+
+    @Test
+    public void simultaneousUploadsAddingDifferentItemsDoNotOverwrite() {
+        PillarParticleConfig server = new PillarParticleConfig();
+        server.replaceItems(List.of("minecraft:stone"));
+        PillarParticleConfig clientA = copyOf(server);
+        PillarParticleConfig clientB = copyOf(server);
+        ConfigUploadBatch batchA = new ConfigUploadBatch();
+        batchA.rebase(clientA);
+        ConfigUploadBatch batchB = new ConfigUploadBatch();
+        batchB.rebase(clientB);
+
+        // A adds diamond; B adds dirt.
+        clientA.items.add("minecraft:diamond");
+        batchA.edited(ConfigSetting.ITEMS, clientA, 1000L);
+
+        clientB.items.add("minecraft:dirt");
+        batchB.edited(ConfigSetting.ITEMS, clientB, 1000L);
+
+        // Both uploads constructed before either client receives the other's update
+        Set<ConfigSetting> groupsA = batchA.take();
+        Set<ConfigSetting> groupsB = batchB.take();
+
+        upload(server, clientA, groupsA);
+        upload(server, clientB, groupsB);
+
+        assertEquals(Set.of("minecraft:stone", "minecraft:diamond", "minecraft:dirt"), server.items);
     }
 
     @Test

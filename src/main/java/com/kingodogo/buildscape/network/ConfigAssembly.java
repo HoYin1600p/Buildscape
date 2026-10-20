@@ -80,6 +80,7 @@ public class ConfigAssembly {
         if (settings.contains(ConfigSetting.POLICY)) {
             NetworkPacketLimits.writeUtf(buffer, data.edit_permission_mode.name(), 16, "edit permission mode");
         }
+        buffer.writeInt(data.baseRevision);
     }
 
     private static SyncConfigPacket readUpload(FriendlyByteBuf buffer) {
@@ -113,6 +114,9 @@ public class ConfigAssembly {
         }
         if (data.uploadSettings.contains(ConfigSetting.POLICY)) {
             data.edit_permission_mode = PillarParticleConfig.parseEditPermissionMode(NetworkPacketLimits.readUtf(buffer, 16, "edit permission mode"));
+        }
+        if (buffer.isReadable()) {
+            data.baseRevision = buffer.readInt();
         }
         return data;
     }

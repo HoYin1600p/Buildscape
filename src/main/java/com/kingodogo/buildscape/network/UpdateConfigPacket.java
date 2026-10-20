@@ -149,29 +149,7 @@ public class UpdateConfigPacket {
                 }
             }
         }
-        if (accepted.contains(ConfigSetting.PARTICLES)) {
-            serverConfig.particle_speed = data.particle_speed;
-            serverConfig.particle_spread = data.particle_spread;
-            serverConfig.particle_lifetime = data.particle_lifetime;
-            serverConfig.particle_density = data.particle_density;
-            serverConfig.use_pattern = data.use_pattern;
-            serverConfig.pattern = data.pattern;
-            serverConfig.pattern_speed = data.pattern_speed;
-            serverConfig.pattern_spread = data.pattern_spread;
-            serverConfig.pattern_intensity = data.pattern_intensity;
-        }
-        if (accepted.contains(ConfigSetting.COLORS)) {
-            serverConfig.max_particle_color = data.max_particle_color;
-            if (data.particle_color != null) {
-                serverConfig.particle_color = new ArrayList<>(data.particle_color);
-            }
-        }
-        if (accepted.contains(ConfigSetting.ITEMS) && data.items != null) {
-            serverConfig.editItems(data.items);
-        }
-        if (accepted.contains(ConfigSetting.POLICY) && data.edit_permission_mode != null) {
-            serverConfig.edit_permission_mode = data.edit_permission_mode;
-        }
+        serverConfig.applyUpload(data, accepted);
         data.uploadSettings = accepted;
         return refusal;
     }

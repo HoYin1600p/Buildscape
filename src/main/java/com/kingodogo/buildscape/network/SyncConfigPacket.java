@@ -43,11 +43,13 @@ public class SyncConfigPacket {
     public Set<String> items;
     public boolean itemsReadOnly;
     public boolean propertiesReadOnly;
+    public int baseRevision = 0;
 
     public SyncConfigPacket() {
     }
 
     public SyncConfigPacket(PillarParticleConfig config) {
+        this.baseRevision = config.revision;
         this.particle_speed = NetworkPacketLimits.clamp(config.particle_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
         this.particle_spread = NetworkPacketLimits.clamp(config.particle_spread,
@@ -110,6 +112,9 @@ public class SyncConfigPacket {
         }
         this.itemsReadOnly = buf.readBoolean();
         this.propertiesReadOnly = buf.readBoolean();
+        if (buf.isReadable()) {
+            this.baseRevision = buf.readInt();
+        }
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -149,6 +154,7 @@ public class SyncConfigPacket {
         }
         buf.writeBoolean(itemsReadOnly);
         buf.writeBoolean(propertiesReadOnly);
+        buf.writeInt(baseRevision);
     }
 
     public static SyncConfigPacket decode(FriendlyByteBuf buf) {

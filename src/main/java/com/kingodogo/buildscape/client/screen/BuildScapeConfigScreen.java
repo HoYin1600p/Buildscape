@@ -754,6 +754,10 @@ public class BuildScapeConfigScreen extends Screen {
         if (sidePanelType == type && (isSidePanelOpening || sidePanelProgress >= 1.0f)) {
             return;
         }
+        if (sidePanelType != type) {
+            sidePanelScrollOffset = 0;
+            sidePanelMaxScroll = 0;
+        }
         sidePanelType = type;
         isSidePanelOpening = true;
         isSidePanelClosing = false;
@@ -784,6 +788,8 @@ public class BuildScapeConfigScreen extends Screen {
         }
         selectedPillarDetailId = pillarId;
         closingPillarDetailId = null;
+        sidePanelScrollOffset = 0;
+        sidePanelMaxScroll = 0;
         openSidePanel(SidePanelType.PILLAR_DETAIL);
     }
 
@@ -2110,12 +2116,10 @@ public class BuildScapeConfigScreen extends Screen {
             float curX = panelCenterX + (bCenterX - panelCenterX) * ease;
             float curY = panelCenterY + (bCenterY - panelCenterY) * ease;
 
-            pushGuiPose(poseStackOrGraphics);
-            translateGuiPose(poseStackOrGraphics, curX, curY, 0);
-            scaleGuiPose(poseStackOrGraphics, zoomScale, zoomScale);
-            translateGuiPose(poseStackOrGraphics, -panelCenterX, -panelCenterY, 0);
+            // Flush queued geometry (e.g. backdrop) before changing global ModelView matrix
+            ConfigGuiBatch.flush();
 
-            // Mirror on ModelViewStack so item icons zoom with the panel
+            // Apply closing transform ONCE globally on ModelViewStack so both ordinary geometry and item icons zoom cleanly
             PoseStack modelView = RenderSystem.getModelViewStack();
             modelView.pushPose();
             modelView.translate(curX, curY, 0);
@@ -2237,7 +2241,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
 
         if (applyClosingTransform) {
-            popGuiPose(poseStackOrGraphics);
+            ConfigGuiBatch.flush();
             PoseStack modelView = RenderSystem.getModelViewStack();
             modelView.popPose();
             RenderSystem.applyModelViewMatrix();
@@ -4105,8 +4109,6 @@ public class BuildScapeConfigScreen extends Screen {
         drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         PillarParticleConfig globalCfg = PillarParticleConfig.get();
-        sidePanelScrollOffset = 0;
-        sidePanelMaxScroll = 0;
 
         // Pillar switch transition animation
         long now = System.currentTimeMillis();
@@ -4132,18 +4134,18 @@ public class BuildScapeConfigScreen extends Screen {
 
         enableGuiScissor(poseStackOrGraphics, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
 
-        int curY = y + 4;
-        int rowH = 22;
-        int rowGap = 3;
+        int curY = y + 3 - sidePanelScrollOffset;
+        int rowH = 20;
+        int rowGap = 2;
         int rowX = x + 4 + slideOffsetX;
         int rowW = w - 8;
 
         // Row 0: Coordinates & Dimension badge
         String dimStr = formatDimensionName(data.dimension);
         String locStr = String.format("%s · %d, %d, %d", dimStr, data.x, data.y, data.z);
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, 15, COLOR_BTN_BG, false, false, contentAlpha);
-        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, contentAlpha));
-        curY += 15 + rowGap;
+        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, 14, COLOR_BTN_BG, false, false, contentAlpha);
+        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 3, applyAlpha(COLOR_TEXT_SILVER, contentAlpha));
+        curY += 14 + rowGap;
 
         // Row 1: Custom Pattern Toggle
         boolean usePat = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
@@ -4177,8 +4179,8 @@ public class BuildScapeConfigScreen extends Screen {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
         int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(7, Math.max(1, colors.size())));
-        renderSideRowPalette(poseStackOrGraphics, font, rowX, curY, rowW, 34, colors, maxColors, mouseX, mouseY, contentAlpha);
-        curY += 34 + rowGap;
+        renderSideRowPalette(poseStackOrGraphics, font, rowX, curY, rowW, 32, colors, maxColors, mouseX, mouseY, contentAlpha);
+        curY += 32 + rowGap;
 
         // Embedded Inline Color Picker at bottom of details panel
         curY = renderInlinePillarColorPicker(poseStackOrGraphics, font, rowX, curY, rowW, data, mouseX, mouseY, contentAlpha);
@@ -4196,8 +4198,21 @@ public class BuildScapeConfigScreen extends Screen {
         boolean hoverLoc = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverLoc ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverLoc, false, contentAlpha);
         drawCenteredText(poseStackOrGraphics, font, "⌖ Locate in World", rowX + rowW / 2, curY + 4, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, contentAlpha));
+        curY += btnH + 3;
 
         disableGuiScissor(poseStackOrGraphics);
+
+        int totalContentH = (curY + sidePanelScrollOffset) - y;
+        sidePanelMaxScroll = Math.max(0, totalContentH - h);
+        sidePanelScrollOffset = Math.max(0, Math.min(sidePanelMaxScroll, sidePanelScrollOffset));
+
+        if (sidePanelMaxScroll > 0) {
+            int sbW = 3;
+            int sbX = x + w - sbW - 1;
+            int sbY = y + 2;
+            int sbH = Math.max(1, h - 4);
+            renderCustomScrollbar(poseStackOrGraphics, sbX, sbY, sbW, sbH, sidePanelScrollOffset, sidePanelMaxScroll, mouseX, mouseY, alpha);
+        }
     }
 
     private void updateLivePillarColor(PillarIdManager.PillarData data) {
@@ -4227,7 +4242,7 @@ public class BuildScapeConfigScreen extends Screen {
         int pad = 4;
         int hueW = 12;
         int gradW = w - hueW - pad - 2;
-        int gradH = 68;
+        int gradH = 58;
         int gradX = x + 1;
         int gradY = curY + 1;
         int hueX = gradX + gradW + pad;
@@ -6693,14 +6708,14 @@ public class BuildScapeConfigScreen extends Screen {
         if (data == null) return false;
 
         PillarParticleConfig globalCfg = PillarParticleConfig.get();
-        int curY = y + 4 - sidePanelScrollOffset;
-        int rowH = 22;
-        int rowGap = 3;
+        int curY = y + 3 - sidePanelScrollOffset;
+        int rowH = 20;
+        int rowGap = 2;
         int rowX = x + 4;
         int rowW = w - 8;
 
         // Skip row 0 (coordinates badge)
-        curY += 15 + rowGap;
+        curY += 14 + rowGap;
 
         // Row 1: Custom Pattern Toggle
         if (checkSideRowToggleClick(mouseX, mouseY, rowX, curY, rowW, rowH)) {
@@ -6827,14 +6842,14 @@ public class BuildScapeConfigScreen extends Screen {
                 return true;
             }
         }
-        curY += 34 + rowGap;
+        curY += 32 + rowGap;
 
         // Embedded Inline Color Picker Clicks
         if (editingColorIndex >= 0 && editingColorIndex < colors.size()) {
             int gradX = inlinePickerGradW > 0 ? inlinePickerGradX : (rowX + 1);
             int gradY = inlinePickerGradH > 0 ? inlinePickerGradY : (curY + 1);
             int gradW = inlinePickerGradW > 0 ? inlinePickerGradW : (rowW - 12 - 4 - 2);
-            int gradH = inlinePickerGradH > 0 ? inlinePickerGradH : 68;
+            int gradH = inlinePickerGradH > 0 ? inlinePickerGradH : 58;
             int hueX = inlinePickerHueW > 0 ? inlinePickerHueX : (gradX + gradW + 4);
             int hueY = inlinePickerHueH > 0 ? inlinePickerHueY : gradY;
             int hueW = inlinePickerHueW > 0 ? inlinePickerHueW : 12;

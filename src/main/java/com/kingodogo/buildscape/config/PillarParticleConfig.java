@@ -51,6 +51,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+/**
+ * The pillar particle config: default particle and pattern settings, the particle colors, the list of items that
+ * are pillar-capable, and the edit permission mode. Settings live in {@code config/buildscape/pillar/pillar-properties.json}
+ * and items in {@code pillar-items.json}, both created from bundled templates when missing. A file that cannot be read
+ * is backed up and the config switches to read-only so it is not overwritten. The server copy is synced to clients with
+ * {@code SyncConfigPacket}. The nested enums define who may edit what.
+ */
 public class PillarParticleConfig {
     public static final int CONFIG_PERMISSION_LEVEL = 4;
 

@@ -37,6 +37,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Mod entry point (both sides). The constructor registers every deferred register on the mod event bus, the common
+ * setup listener and the server-side event handler classes. Block and item holders load through {@code ModBlocks} and
+ * {@code ModItems}, which keeps their registration order fixed.
+ */
 @Mod(BuildScape.MODID)
 public class BuildScape {
 
@@ -93,10 +98,17 @@ public class BuildScape {
         MinecraftForge.EVENT_BUS.register(new SculkEvents());
     }
 
+    /**
+     * True once the pillar server events report that the server finished starting; delegates to {@code PillarServerEvents}.
+     */
     public static boolean isServerFullyInitialized() {
         return PillarServerEvents.isServerFullyInitialized();
     }
 
+    /**
+     * Shared daemon thread pool ({@code BuildScape-Async}) for background work such as pillar saves and pipe transport.
+     * Tasks must not touch the world or other game state directly.
+     */
     public static ExecutorService getAsyncPool() {
         return ASYNC_POOL;
     }

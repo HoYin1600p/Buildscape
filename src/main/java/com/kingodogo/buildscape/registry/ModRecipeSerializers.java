@@ -15,6 +15,10 @@ import net.minecraftforge.registries.RegistryObject;
 
 import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 
+/**
+ * Deferred register for the mod's custom recipe serializers (durability recipes, haze bush dye, confetti configure,
+ * shulker filter clearing and custom firework stars).
+ */
 public class ModRecipeSerializers {
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(

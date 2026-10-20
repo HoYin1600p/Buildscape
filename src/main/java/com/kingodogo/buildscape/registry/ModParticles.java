@@ -9,6 +9,10 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+/**
+ * Deferred register for the mod's particle types, all simple particles without extra data. Client factories are
+ * attached in {@code ClientParticleSetup}.
+ */
 public class ModParticles {
 
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister

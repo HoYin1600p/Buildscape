@@ -14,6 +14,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
+/**
+ * Deferred register for the mod's sound events. Registered names have dots replaced by underscores; the matching entries
+ * in sounds.json use the same names.
+ */
 public class ModSounds {
 
     private static final Logger LOGGER = BuildScape.LOGGER;

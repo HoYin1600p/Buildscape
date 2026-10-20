@@ -16,6 +16,10 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Client-side set of positions of muff blocks that are currently active. Blocks add themselves with
+ * {@link #register(BlockPos)}; the set is held in memory only and can be emptied with {@link #clear()}.
+ */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MuffBlockManager {
 

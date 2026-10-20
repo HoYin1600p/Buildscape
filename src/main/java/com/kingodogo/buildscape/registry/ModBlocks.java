@@ -19,6 +19,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
+/**
+ * Public facade for block holders. Every field is an alias of a holder in {@code registry.blocks}
+ * (for example {@code SandstoneBlocks.BLACK_SAND}), kept so callers use one stable name.
+ * The static initializer starts the last holder, which in turn loads its predecessors, so all blocks register in the
+ * fixed order the ids and creative-tab layout rely on.
+ */
 public class ModBlocks {
 
     /** The deferred register that all block holders register into; the same object as {@code BlocksRegister.BLOCKS}. */

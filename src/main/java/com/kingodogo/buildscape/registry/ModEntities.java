@@ -18,6 +18,10 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+/**
+ * Deferred register for the mod's entity types (falling icicle, festive stocking and others) with their
+ * size and tracking settings, and registers their attributes on the mod bus.
+ */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEntities {
 

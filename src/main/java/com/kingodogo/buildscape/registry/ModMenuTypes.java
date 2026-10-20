@@ -10,6 +10,10 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+/**
+ * Deferred register for container menu types: the Builder's Workbench and the Builder's Pouch.
+ * Screens for them are bound on the client in {@code ClientSetup}.
+ */
 public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.CONTAINERS,
             BuildScape.MODID);

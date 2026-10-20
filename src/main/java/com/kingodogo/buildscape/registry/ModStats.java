@@ -7,6 +7,9 @@ import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.Stats;
 
+/**
+ * Custom statistic ids shown on the statistics screen, including the header rows that group them.
+ */
 public class ModStats {
     public static final ResourceLocation INTERACT_WITH_PILLAR = new ResourceLocation(BuildScape.MODID,
             "interact_with_pillar");
@@ -45,6 +48,9 @@ public class ModStats {
     public static Stat<ResourceLocation> HEADER_BUILDSCAPE_STAT;
     public static Stat<ResourceLocation> HEADER_OTHER_STAT;
 
+    /**
+     * Registers the custom stats with the game registry. Called from common setup on both sides.
+     */
     public static void registerStats() {
         HEADER_MINECRAFT_STAT = registerCustomStat("header_minecraft", HEADER_MINECRAFT);
         HEADER_BUILDSCAPE_STAT = registerCustomStat("header_buildscape", HEADER_BUILDSCAPE);

@@ -18,6 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Per-player cosmetic choices (equipped cosmetics by slot, their colors, tree-breaker and shulker-preview toggles) and
+ * the color picker position. Data is saved as compressed NBT in {@code <game dir>/buildscape/data}: one
+ * {@code <uuid>-cosmetic.dat} per player and {@code global-settings.dat} for the shared values. An older JSON file in
+ * the config folder is read once and renamed with a {@code .bak} suffix.
+ */
 public class CosmeticsConfig {
     private static final Gson GSON = Json.PRETTY;
     /** Key and file-name part for settings that belong to no player. */

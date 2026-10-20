@@ -15,6 +15,10 @@ import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
 
+/**
+ * Registers the experience fluid (still and flowing) and offers null-safe lookups for code that can
+ * run before the fluid exists.
+ */
 public class ModFluids {
     /** The still experience fluid, or null while its registry object is not present. */
     @Nullable

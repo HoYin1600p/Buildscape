@@ -20,6 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Named item presets for the pillar item list, saved in {@code config/buildscape/pillar/pillar-presets.json}.
+ * It always has a Default preset, a number of custom slots from the client config, an automatic "unnamed" preset for
+ * unsaved edits and the key of the last applied preset. Entries it cannot understand are kept and written back.
+ */
 public class PresetsConfig {
     private static final Gson GSON = Json.PRETTY_WITH_NULLS;
     private static final String PRESETS_FILE_NAME = "pillar-presets.json";
@@ -245,6 +250,9 @@ public class PresetsConfig {
         }
     }
 
+    /**
+     * Applies the Default preset when the pillar item list is empty.
+     */
     public void applyPresetOnStartup() {
         PillarParticleConfig itemConfig = PillarParticleConfig.get();
         if (itemConfig.items.isEmpty()) {
@@ -421,6 +429,9 @@ public class PresetsConfig {
         presets.remove(UNNAMED_PRESET_KEY);
     }
 
+    /**
+     * Applies the unnamed preset if one exists, otherwise the last applied preset, otherwise Default.
+     */
     public void autoApplyOnLoad() {
         if (hasUnnamedPreset()) {
             applyPreset(UNNAMED_PRESET_KEY);

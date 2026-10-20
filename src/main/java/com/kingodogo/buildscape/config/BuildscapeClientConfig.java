@@ -10,6 +10,12 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Settings stored in {@code config/buildscape/buildscape.cfg}, a text file of key = value lines grouped into sections.
+ * The instance is loaded once and cached; {@link #reload()} reads it again. An older file in the config folder and the
+ * old {@code ui-state.cfg} are migrated on load. If the file cannot be parsed the config becomes read-only and is
+ * never rewritten, so a damaged file is not lost.
+ */
 public class BuildscapeClientConfig {
     public static final String KEY_HIDE_CONFIG_BUTTON = "HideBuildscapeConfig";
     public static final String KEY_PARALLEL_MODEL_LOADING = "OptimizeBuildscapeModelLoading";
@@ -75,6 +81,9 @@ public class BuildscapeClientConfig {
         return config;
     }
 
+    /**
+     * Drops the cached instance and reads the file again.
+     */
     public static synchronized void reload() {
         INSTANCE = new BuildscapeClientConfig();
     }
@@ -242,6 +251,10 @@ public class BuildscapeClientConfig {
         return file;
     }
 
+    /**
+     * Rewrites the file with the current values, grouped by section. Does nothing and logs a warning when the config is
+     * read-only.
+     */
     public void save() {
         if (readOnly) {
             BuildScape.LOGGER

@@ -27,6 +27,11 @@ import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
+/**
+ * Public facade for item holders: fields alias the holders in {@code registry.items}, and {@code ITEMS} is the same
+ * deferred register as {@code ItemsRegister.ITEMS}. It also holds the two spawn egg item classes
+ * and a helper to register a block item.
+ */
 public class ModItems {
 
     /** The deferred register that all item holders register into; the same object as {@code ItemsRegister.ITEMS}. */

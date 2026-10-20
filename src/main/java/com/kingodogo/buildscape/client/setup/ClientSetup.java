@@ -78,6 +78,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Client-only mod-bus setup: registers key bindings, block entity and entity renderers, menu screens, block and item
+ * colors, layer definitions and the special models, and swaps the leaf hedge models for tinted ones when models bake.
+ */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientSetup {
 

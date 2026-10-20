@@ -29,6 +29,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * The BuildScape creative tab. Its item list is built from a hard-coded list plus whatever other BuildScape items are
+ * registered, then arranged so variants of a block sit together. Items from other namespaces are dropped, and each item
+ * appears once except custom firework variants.
+ */
 public class ModCreativeModeTab {
 
     /** The item shown as the tab icon. A method, not a field, so the item holder loads when it is first used. */

@@ -30,6 +30,10 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.Objects;
 
+/**
+ * Deferred register for the mod's block entity types (sculk catalyst, signs, pillars, workbench, shelf, trophy,
+ * hollow log and others), each bound to the blocks that may own it.
+ */
 public class ModBlockEntities {
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister

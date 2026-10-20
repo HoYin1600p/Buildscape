@@ -8,6 +8,10 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Immutable description of an item moving along a path of pipe positions: the stack, the path, the start tick and the
+ * duration. It reports which block the item is in and an interpolated position for a given tick.
+ */
 public class PipeItemTransit {
 
     private final ItemStack stack;

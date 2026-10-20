@@ -16,6 +16,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
+/**
+ * {@link PipeTopologyAccess} backed by a live level, answering from the current block states. It also converts
+ * between fluids and the string ids stored in {@link PipeFlowState}.
+ */
 public class WorldPipeTopologyAccess implements PipeTopologyAccess {
 
     private final BlockGetter level;

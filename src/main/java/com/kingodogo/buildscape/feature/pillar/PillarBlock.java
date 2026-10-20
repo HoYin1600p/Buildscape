@@ -63,6 +63,12 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+/**
+ * The pillar block: a waterlogged column that shows one item on top and emits particles above it. Each block has a
+ * {@link PillarPart} (single, bottom, middle or top) that updates with its neighbours so a stack acts as one pillar.
+ * The {@link PillarBlockEntity} holds the displayed item and particle settings; right-clicking with an item sets the
+ * display, and right-clicking with dye adds a particle color.
+ */
 public class PillarBlock
         extends
             OpenWaterloggedBlock

@@ -4,6 +4,10 @@ import com.kingodogo.buildscape.feature.pipe.HollowPipeBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 
+/**
+ * Computes how much water a pipe opening releases: 8 downward, none upward, and a horizontal amount that shrinks with
+ * the distance from the source. An opening that is closed, dry or not part of the flow releases none.
+ */
 public final class PipeOutletWater {
     private PipeOutletWater() {}
 

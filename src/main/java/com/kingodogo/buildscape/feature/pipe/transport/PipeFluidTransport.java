@@ -14,10 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Base class for a fluid that flows through hollow pipes, plus shared helpers to test pipe connections. A subclass
+ * names its fluid and recalculates a connected network from a starting position.
+ */
 public abstract class PipeFluidTransport {
 
     public abstract Fluid getFluidType();
 
+    /**
+     * Recalculates and applies the flow of the network that contains {@code startPos}. Returns the positions it covered.
+     */
     public abstract Set<BlockPos> recalculateNetwork(Level level, BlockPos startPos);
 
     public static boolean isHollowPipe(BlockState state) {

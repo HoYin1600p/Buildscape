@@ -44,6 +44,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Server and client handler that gives item frames (vanilla and colored) the same particle pattern, dye colors and
+ * registry id that pillars have. Pattern, colors and frame id are kept in the frame entity's NBT; the client keeps
+ * caches by entity id that {@link #clearClientCaches()} empties. About every five seconds the server removes registry
+ * entries whose frame no longer exists.
+ */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ItemFrameParticleHandler {
 

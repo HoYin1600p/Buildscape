@@ -14,6 +14,11 @@ import java.util.Set;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 
+/**
+ * Fluid state of one pipe block: fluid id, source flag, flow directions, inflow direction, distance from the source,
+ * bubble column and open-endpoint flag. It is calculated by {@link WaterPipeTransport}, stored on the pipe's block
+ * entity and saved as part of its NBT.
+ */
 public class PipeFlowState {
     public static final String WATER_FLUID_ID = "minecraft:water";
 
@@ -169,6 +174,9 @@ public class PipeFlowState {
         return copy;
     }
 
+    /**
+     * Writes all fields into {@code tag} and returns it. The fluid id is written only when there is a fluid.
+     */
     public CompoundTag writeToNbt(CompoundTag tag) {
         tag.putBoolean("HasWater", hasWater());
         if (hasFluid()) {
@@ -192,6 +200,9 @@ public class PipeFlowState {
         return tag;
     }
 
+    /**
+     * Reads a state written by {@link #writeToNbt(CompoundTag)}; missing keys fall back to the empty defaults.
+     */
     public static PipeFlowState readFromNbt(CompoundTag tag) {
         PipeFlowState state = new PipeFlowState();
         if (tag == null) {

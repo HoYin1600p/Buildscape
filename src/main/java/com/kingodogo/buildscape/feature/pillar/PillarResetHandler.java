@@ -7,6 +7,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+/**
+ * Resets pillar stacks to the default look on the server. It finds the loaded pillar by dimension and position, walks
+ * up the stack (at most 256 blocks) and resets each block entity. It does nothing for unloaded positions.
+ */
 public class PillarResetHandler {
 
     public static void resetPillarToDefault(String dimension, BlockPos pos) {

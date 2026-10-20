@@ -33,6 +33,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+/**
+ * Registry of every pillar and item frame that has a pillar id. There is one server instance ({@link #get()}) and one
+ * client copy ({@link #getClient()}) fed by {@code SyncPillarIdsPacket}. Each {@link PillarData} record stores
+ * the id, dimension, position, displayed item and particle overrides. The server saves the registry as JSON
+ * in the world folder ({@code buildscape/pillar-ids.dat} with a backup file); a damaged file is preserved and the
+ * registry is rebuilt from the loaded block entities. Ids start with a variant prefix (M, S, D, Q, or I-F for item frames).
+ */
 public class PillarIdManager {
     private static final PillarIdManager SERVER_INSTANCE = new PillarIdManager(true);
     private static final PillarIdManager CLIENT_INSTANCE = new PillarIdManager(false);
@@ -212,6 +219,9 @@ public class PillarIdManager {
 
     private volatile boolean saveRequested = false;
 
+    /**
+     * Marks the registry changed and asks for a save, which {@link #flushRequestedSave()} performs. Ignored on the client copy.
+     */
     public void requestSave() {
         if (!serverAuthoritative) {
             return;
@@ -250,6 +260,9 @@ public class PillarIdManager {
         removePillar(pillarId);
     }
 
+    /**
+     * Writes the registry to disk now.
+     */
     public void saveAllPillars() {
         saveImmediate();
     }
@@ -290,6 +303,9 @@ public class PillarIdManager {
         return changed;
     }
 
+    /**
+     * Deletes the listed pillar records. Returns true if anything changed.
+     */
     public boolean removePillars(Collection<String> pillarIds) {
         return removePillars(pillarIds, true);
     }
@@ -488,6 +504,10 @@ public class PillarIdManager {
         }
     }
 
+    /**
+     * Starts loading the registry file from the world folder. Does nothing on the client copy, once loaded, or while a load
+     * is running.
+     */
     public void load() {
         if (!serverAuthoritative) {
             return;
@@ -995,6 +1015,9 @@ public class PillarIdManager {
         }
     }
 
+    /**
+     * Server only: adds or reconciles the record of a loaded pillar or frame block entity.
+     */
     public void registerPillar(BlockEntity be) {
         if (be == null || be.getLevel() == null || be.getLevel().isClientSide) {
             return;

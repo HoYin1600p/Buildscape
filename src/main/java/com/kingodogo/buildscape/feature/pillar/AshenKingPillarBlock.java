@@ -42,6 +42,10 @@ import net.minecraftforge.network.PacketDistributor;
 import java.util.AbstractMap;
 import java.util.Map;
 
+/**
+ * Pillar block variant with a horizontal facing and its own shape for each facing and {@link PillarPart}. It extends
+ * {@link PillarBlock} and overrides placement, shape, neighbour updates and right-click handling.
+ */
 public class AshenKingPillarBlock extends PillarBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;

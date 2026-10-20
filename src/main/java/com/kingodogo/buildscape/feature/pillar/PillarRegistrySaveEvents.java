@@ -9,6 +9,10 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+/**
+ * Server event hooks for {@link PillarIdManager}: periodic save on world save, chunk load and unload tracking, and a
+ * final save with backup when the server stops.
+ */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID)
 public class PillarRegistrySaveEvents {
     @SubscribeEvent

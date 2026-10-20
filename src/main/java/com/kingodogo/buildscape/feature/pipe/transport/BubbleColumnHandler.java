@@ -17,6 +17,11 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Random;
 import java.util.Set;
 
+/**
+ * Bubble column behaviour for pipes: finds whether a pipe sits on a bubble column base (soul sand or magma block), moves
+ * entities and items inside a flowing pipe, and spawns the flow and bubble particles. Particle methods run on the
+ * client; entity movement runs wherever the block's entity-inside callback runs.
+ */
 public class BubbleColumnHandler {
 
     public static BubbleColumnState detectBubbleColumnBase(BlockGetter level, BlockPos pos) {

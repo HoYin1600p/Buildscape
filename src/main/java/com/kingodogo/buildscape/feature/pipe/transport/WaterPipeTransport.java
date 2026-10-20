@@ -24,6 +24,12 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 
+/**
+ * Water flow through hollow pipes. It finds the connected network (at most 512 pipes), then spreads water from sources
+ * through it with a falloff by distance (at most 128 steps, at most 7 horizontal flow levels), and
+ * writes the resulting {@link PipeFlowState} to each pipe. The calculation works on a snapshot so it can run off the
+ * server thread; only applying the result touches the world.
+ */
 public class WaterPipeTransport extends PipeFluidTransport {
 
     public static final WaterPipeTransport INSTANCE = new WaterPipeTransport();
@@ -95,6 +101,10 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return prepared.component();
     }
 
+    /**
+     * Server thread: snapshots the connected network around {@code startPos}. Returns null on the client, for an unloaded
+     * position, or when there is no network.
+     */
     public PreparedNetwork prepareNetwork(Level level, BlockPos startPos) {
         if (level == null || level.isClientSide || startPos == null || !level.isLoaded(startPos)) {
             return null;
@@ -137,6 +147,9 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return new PreparedNetwork(Set.copyOf(component), List.copyOf(sources), new SnapshotTopology(nodes), truncated);
     }
 
+    /**
+     * Pure calculation over a prepared snapshot. Does not touch the world, so it may run on another thread.
+     */
     public Map<BlockPos, PipeFlowState> calculatePreparedNetwork(PreparedNetwork prepared) {
         if (prepared == null) {
             return Collections.emptyMap();
@@ -144,6 +157,10 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return calculateFlow(prepared.topology(), prepared.component(), prepared.sources());
     }
 
+    /**
+     * Server thread: writes the calculated states into the pipes' block entities. A network without a source is drained
+     * with a delay. Returns false if the world no longer matches the snapshot, in which case the caller recalculates.
+     */
     public boolean applyPreparedNetwork(Level level, PreparedNetwork prepared,
             Map<BlockPos, PipeFlowState> newStates) {
         if (level == null || level.isClientSide || prepared == null || newStates == null

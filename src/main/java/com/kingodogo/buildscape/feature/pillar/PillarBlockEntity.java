@@ -31,6 +31,12 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
+/**
+ * Block entity of a pillar block: displayed item and facing, particle pattern, speed, spread, intensity and dye colors,
+ * and the pillar id used in the registry. NBT reading and writing go through {@code PillarEntityNbt}. The server tick
+ * registers the pillar with {@link PillarIdManager} once the registry is loaded and re-syncs from it every 100 ticks;
+ * the client tick spawns the particles.
+ */
 public class PillarBlockEntity extends SyncedBlockEntity {
 
     ItemStack displayedItem = ItemStack.EMPTY;

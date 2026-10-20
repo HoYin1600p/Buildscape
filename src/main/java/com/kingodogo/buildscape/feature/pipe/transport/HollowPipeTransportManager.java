@@ -27,6 +27,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Server-side scheduler for pipe network recalculation. Placing or removing a pipe, a neighbour change or a bucket use
+ * marks positions dirty. Each server tick (end phase) it spends at most 2 ms and 16 networks: it applies finished
+ * results, then starts new calculations. The flow of a network is calculated on {@code BuildScape.getAsyncPool()} (at
+ * most four at once) from a snapshot, and applied on the server thread. A result is discarded and requeued if the
+ * network changed while it was being calculated. State is in memory only and is cleared when a level unloads.
+ */
 @Mod.EventBusSubscriber(modid = "buildscape", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class HollowPipeTransportManager {
 
@@ -41,6 +48,10 @@ public class HollowPipeTransportManager {
     private static final Queue<CompletedJob> COMPLETED = new ConcurrentLinkedQueue<>();
     private static final AtomicInteger ASYNC_NETWORKS = new AtomicInteger();
 
+    /**
+     * Queues the pipe at {@code pos} for recalculation. Ignored on the client. If a calculation already covers the
+     * position, that calculation is flagged so its result is requeued instead of applied.
+     */
     public static void markDirty(Level level, BlockPos pos) {
         if (level == null || level.isClientSide || pos == null) {
             return;

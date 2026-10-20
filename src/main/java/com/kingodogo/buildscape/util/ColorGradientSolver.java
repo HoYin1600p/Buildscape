@@ -871,7 +871,44 @@ public final class ColorGradientSolver {
     }
 
     private enum ShapeFamily {
-        FULL_BLOCK, GLASS, PANE, CARPET, LAYER, OVERLAY, CHEST, DOOR, TRAPDOOR, WALL, SLAB, STAIR, BUTTON, PRESSURE_PLATE, VERTICAL_SLAB, FENCE, FENCE_GATE, FLOWER, FOLIAGE, CHAIN, ORNAMENT, STAR, STRING_LIGHT, LIGHT_BLOCK, VINE, BED, BANNER, CANDLE, CLUSTER, SIGN, LEAVES, MESH, LADDER, DECORATED, ITEM_FRAME, STOCKING, CUSHION, JAR
+        FULL_BLOCK,
+        GLASS,
+        PANE,
+        CARPET,
+        LAYER,
+        OVERLAY,
+        CHEST,
+        DOOR,
+        TRAPDOOR,
+        WALL,
+        SLAB,
+        STAIR,
+        BUTTON,
+        PRESSURE_PLATE,
+        VERTICAL_SLAB,
+        FENCE,
+        FENCE_GATE,
+        FLOWER,
+        FOLIAGE,
+        CHAIN,
+        ORNAMENT,
+        STAR,
+        STRING_LIGHT,
+        LIGHT_BLOCK,
+        VINE,
+        BED,
+        BANNER,
+        CANDLE,
+        CLUSTER,
+        SIGN,
+        LEAVES,
+        MESH,
+        LADDER,
+        DECORATED,
+        ITEM_FRAME,
+        STOCKING,
+        CUSHION,
+        JAR
     }
 
     public static final class BlockColor {

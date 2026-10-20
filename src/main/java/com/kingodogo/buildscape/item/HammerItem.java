@@ -24,7 +24,9 @@ import javax.annotation.Nullable;
 public class HammerItem extends Item {
 
     public enum HammerTier {
-        IRON(1024, false), DIAMOND(2048, true), NETHERITE(4096, true);
+        IRON(1024, false),
+        DIAMOND(2048, true),
+        NETHERITE(4096, true);
 
         private final int durability;
         private final boolean canReplaceObsidianLevel;

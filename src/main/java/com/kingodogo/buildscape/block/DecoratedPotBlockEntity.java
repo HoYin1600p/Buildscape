@@ -30,7 +30,9 @@ public class DecoratedPotBlockEntity
     private static final int[] SLOTS = new int[]{0};
 
     public enum WobbleStyle {
-        NONE, POSITIVE, NEGATIVE,
+        NONE,
+        POSITIVE,
+        NEGATIVE,
     }
 
     public DecoratedPotBlockEntity(BlockPos pos, BlockState state) {

@@ -44,7 +44,12 @@ public class WanderingHomemakerSpawningHandler {
     }
 
     private enum BlockCategory {
-        DECORATED_POT, BIG_CANDLE, PILLAR, STAR, CUSHION, NONE
+        DECORATED_POT,
+        BIG_CANDLE,
+        PILLAR,
+        STAR,
+        CUSHION,
+        NONE
     }
 
     private static BlockCategory getCategory(Block block) {

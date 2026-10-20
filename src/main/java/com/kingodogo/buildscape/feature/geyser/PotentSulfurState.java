@@ -3,7 +3,11 @@ package com.kingodogo.buildscape.feature.geyser;
 import net.minecraft.util.StringRepresentable;
 
 public enum PotentSulfurState implements StringRepresentable {
-    DRY("dry"), WET("wet"), DORMANT("dormant"), ERUPTING("erupting"), CONTINUOUS("continuous");
+    DRY("dry"),
+    WET("wet"),
+    DORMANT("dormant"),
+    ERUPTING("erupting"),
+    CONTINUOUS("continuous");
 
     private final String name;
 

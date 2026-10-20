@@ -3,7 +3,10 @@ package com.kingodogo.buildscape.block;
 import net.minecraft.util.StringRepresentable;
 
 public enum SideChainPart implements StringRepresentable {
-    UNCONNECTED("unconnected"), RIGHT("right"), CENTER("center"), LEFT("left");
+    UNCONNECTED("unconnected"),
+    RIGHT("right"),
+    CENTER("center"),
+    LEFT("left");
 
     private final String name;
 

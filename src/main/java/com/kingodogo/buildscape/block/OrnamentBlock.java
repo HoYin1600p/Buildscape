@@ -97,7 +97,9 @@ public class OrnamentBlock
             11);
 
     public enum AttachmentType implements StringRepresentable {
-        FLOOR("floor"), CEILING("ceiling"), WALL("wall");
+        FLOOR("floor"),
+        CEILING("ceiling"),
+        WALL("wall");
 
         private final String name;
 
@@ -112,11 +114,22 @@ public class OrnamentBlock
     }
 
     public enum StringColor implements StringRepresentable {
-        WHITE(DyeColors.WHITE), ORANGE(DyeColors.ORANGE), MAGENTA(DyeColors.MAGENTA), LIGHT_BLUE(
-                DyeColors.LIGHT_BLUE), YELLOW(DyeColors.YELLOW), LIME(DyeColors.LIME), PINK(DyeColors.PINK), GRAY(
-                        DyeColors.GRAY), LIGHT_GRAY(DyeColors.LIGHT_GRAY), CYAN(DyeColors.CYAN), PURPLE(
-                                DyeColors.PURPLE), BLUE(DyeColors.BLUE), BROWN(DyeColors.BROWN), GREEN(
-                                        DyeColors.GREEN), RED(DyeColors.RED), BLACK(DyeColors.BLACK);
+        WHITE(DyeColors.WHITE),
+        ORANGE(DyeColors.ORANGE),
+        MAGENTA(DyeColors.MAGENTA),
+        LIGHT_BLUE(DyeColors.LIGHT_BLUE),
+        YELLOW(DyeColors.YELLOW),
+        LIME(DyeColors.LIME),
+        PINK(DyeColors.PINK),
+        GRAY(DyeColors.GRAY),
+        LIGHT_GRAY(DyeColors.LIGHT_GRAY),
+        CYAN(DyeColors.CYAN),
+        PURPLE(DyeColors.PURPLE),
+        BLUE(DyeColors.BLUE),
+        BROWN(DyeColors.BROWN),
+        GREEN(DyeColors.GREEN),
+        RED(DyeColors.RED),
+        BLACK(DyeColors.BLACK);
 
         private final DyeColors dye;
 

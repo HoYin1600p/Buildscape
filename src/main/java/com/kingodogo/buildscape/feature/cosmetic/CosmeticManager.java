@@ -217,6 +217,16 @@ public class CosmeticManager {
     }
 
     public enum CosmeticType {
-        ITEM, BLOCK, PARTICLE_TRAIL, WINGS, PARTICLE_WINGS, EFFECT, PET, HEAD, CHEST, LEGS, FEET
+        ITEM,
+        BLOCK,
+        PARTICLE_TRAIL,
+        WINGS,
+        PARTICLE_WINGS,
+        EFFECT,
+        PET,
+        HEAD,
+        CHEST,
+        LEGS,
+        FEET
     }
 }

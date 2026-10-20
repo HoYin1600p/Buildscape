@@ -41,11 +41,15 @@ public class PillarParticleConfig {
     public static final int CONFIG_PERMISSION_LEVEL = 4;
 
     public enum EditPermissionMode {
-        STRICT, STANDARD, OPEN
+        STRICT,
+        STANDARD,
+        OPEN
     }
 
     public enum EditScope {
-        LIMITED, GENERAL, POLICY
+        LIMITED,
+        GENERAL,
+        POLICY
     }
 
     public static EditPermissionMode parseEditPermissionMode(String value) {

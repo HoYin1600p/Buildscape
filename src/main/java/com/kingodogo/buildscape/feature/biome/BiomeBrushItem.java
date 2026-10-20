@@ -43,7 +43,9 @@ import javax.annotation.Nullable;
 public class BiomeBrushItem extends Item {
 
     public enum BiomeBrushTier {
-        COPPER(1024), DIAMOND(2048), NETHERITE(4096);
+        COPPER(1024),
+        DIAMOND(2048),
+        NETHERITE(4096);
 
         private final int durability;
 

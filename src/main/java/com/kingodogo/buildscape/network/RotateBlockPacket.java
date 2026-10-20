@@ -28,7 +28,10 @@ import java.util.function.Supplier;
 public class RotateBlockPacket {
 
     public enum ArrowDirection {
-        UP, DOWN, LEFT, RIGHT;
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT;
 
         public static ArrowDirection fromOrdinal(int ord) {
             ArrowDirection[] values = values();

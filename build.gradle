@@ -12,6 +12,8 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0,7)'
+    id 'checkstyle'
+    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -150,6 +152,39 @@ tasks.named('processResources', ProcessResources).configure {
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
+    }
+}
+
+// Formatting: `gradlew spotlessApply` rewrites, `gradlew spotlessCheck` verifies. Deliberately not part of `check`
+// (enforceCheck = false) so a stray indent never fails a release build; run it before committing.
+// The config screen package is excluded while it is under separate development.
+spotless {
+    enforceCheck = false
+    lineEndings = com.diffplug.spotless.LineEnding.UNIX
+    java {
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
+        targetExclude 'src/main/java/com/kingodogo/buildscape/client/screen/**'
+        eclipse().configFile('config/spotless/eclipse-formatter.xml')
+    }
+}
+
+// Brace rule (config/checkstyle/checkstyle.xml): every if/else/for/while body needs braces.
+checkstyle {
+    toolVersion = '10.12.7'
+    configFile = file('config/checkstyle/checkstyle.xml')
+    maxWarnings = 0
+}
+// Checkstyle 10.x pulls in both guava and the old google-collections; keep guava (Checkstyle's documented workaround).
+configurations.checkstyle {
+    resolutionStrategy.capabilitiesResolution.withCapability('com.google.collections:google-collections') {
+        select('com.google.guava:guava:0')
+    }
+}
+tasks.withType(Checkstyle).configureEach {
+    exclude '**/client/screen/**'
+    reports {
+        xml.required = false
+        html.required = false
     }
 }
 

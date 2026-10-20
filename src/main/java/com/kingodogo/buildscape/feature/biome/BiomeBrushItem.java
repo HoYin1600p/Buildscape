@@ -197,184 +197,209 @@ public class BiomeBrushItem extends Item {
 
         Level level = context.getLevel();
         ItemStack stack = context.getItemInHand();
-        BlockPos clickedPos = context.getClickedPos();
 
         if (stack.getDamageValue() >= stack.getMaxDamage()) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.DISPENSER_FAIL,
                     SoundSource.PLAYERS, 1.0f, 0.8f);
-            player.displayClientMessage(
-                    new TranslatableComponent("message.buildscape.biome_brush.broken").withStyle(ChatFormatting.RED),
-                    true);
-            return InteractionResult.FAIL;
+            return failWith(player, new TranslatableComponent("message.buildscape.biome_brush.broken")
+                    .withStyle(ChatFormatting.RED));
         }
 
         if (player.isShiftKeyDown()) {
-            if (level.isClientSide()) {
-                return InteractionResult.SUCCESS;
-            }
-
-            String biomeStr = getCapturedBiome(stack);
-            BlockPos pos1 = getPos1(stack);
-            BlockPos pos2 = getPos2(stack);
-
-            if (biomeStr == null || pos1 == null || pos2 == null) {
-                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cannot_apply")
-                        .withStyle(ChatFormatting.RED), true);
-                return InteractionResult.FAIL;
-            }
-
-            ResourceLocation biomeKey = ResourceLocation.tryParse(biomeStr);
-            if (biomeKey == null) {
-                return InteractionResult.FAIL;
-            }
-
-            ServerLevel serverLevel = (ServerLevel) level;
-            Registry<Biome> registry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
-            ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, biomeKey);
-            Optional<Holder<Biome>> holderOpt = registry.getHolder(key);
-
-            if (holderOpt.isEmpty()) {
-                player.displayClientMessage(
-                        new TranslatableComponent("message.buildscape.biome_brush.invalid_biome", biomeStr)
-                                .withStyle(ChatFormatting.RED),
-                        true);
-                return InteractionResult.FAIL;
-            }
-            int minX = Math.min(pos1.getX(), pos2.getX());
-            int maxX = Math.max(pos1.getX(), pos2.getX());
-            int minY = Math.min(pos1.getY(), pos2.getY());
-            int maxY = Math.max(pos1.getY(), pos2.getY());
-            int minZ = Math.min(pos1.getZ(), pos2.getZ());
-            int maxZ = Math.max(pos1.getZ(), pos2.getZ());
-
-            String currentDimension = serverLevel.dimension().location().toString();
-            if (!isInDimension(stack, KEY_POS1_DIMENSION, currentDimension)
-                    || !isInDimension(stack, KEY_POS2_DIMENSION, currentDimension)) {
-                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.wrong_dimension")
-                        .withStyle(ChatFormatting.RED), true);
-                return InteractionResult.FAIL;
-            }
-            if ((long) maxX - minX + 1 > MAX_HORIZONTAL_SIZE || (long) maxZ - minZ + 1 > MAX_HORIZONTAL_SIZE) {
-                player.displayClientMessage(
-                        new TranslatableComponent("message.buildscape.biome_brush.too_large", MAX_HORIZONTAL_SIZE)
-                                .withStyle(ChatFormatting.RED),
-                        true);
-                return InteractionResult.FAIL;
-            }
-
-            if (!(player instanceof ServerPlayer serverPlayer) || !player.mayBuild()
-                    || player.distanceToSqr(pos1.getX() + 0.5, pos1.getY() + 0.5, pos1.getZ() + 0.5) > 64.0 * 64.0
-                    || player.distanceToSqr(pos2.getX() + 0.5, pos2.getY() + 0.5, pos2.getZ() + 0.5) > 64.0 * 64.0
-                    || minY < level.getMinBuildHeight() || maxY >= level.getMaxBuildHeight()) {
-                player.displayClientMessage(new TextComponent(
-                        "Cannot paint: both corners must be within 64 blocks and you must have build permission.")
-                        .withStyle(ChatFormatting.RED), true);
-                return InteractionResult.FAIL;
-            }
-
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    BlockPos bottom = new BlockPos(x, minY, z);
-                    BlockPos top = new BlockPos(x, maxY, z);
-                    boolean columnAllowed = level.hasChunkAt(bottom) && level.getWorldBorder().isWithinBounds(bottom)
-                            && canPaintAt(level, serverPlayer, bottom, context.getClickedFace(), stack)
-                            && (bottom.equals(top)
-                                    || canPaintAt(level, serverPlayer, top, context.getClickedFace(), stack));
-                    for (int y = level.getMinBuildHeight(); y < level.getMaxBuildHeight() && columnAllowed; y += 16) {
-                        if (y != minY && y != maxY) {
-                            columnAllowed = canPaintAt(level, serverPlayer, new BlockPos(x, y, z),
-                                    context.getClickedFace(), stack);
-                        }
-                    }
-                    if (!columnAllowed) {
-                        player.displayClientMessage(new TextComponent(
-                                "Cannot paint: the selection includes an unloaded or protected column.")
-                                .withStyle(ChatFormatting.RED), true);
-                        return InteractionResult.FAIL;
-                    }
-                }
-            }
-
-            int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack);
-            boolean creative = player.getAbilities().instabuild;
-            int affectedBlocks = 0;
-            Set<ChunkPos> modifiedChunks = new HashSet<>();
-            BiomeTintData tints = BiomeTintData.get(serverLevel);
-            boolean broken = false;
-            for (int x = minX; x <= maxX && !broken; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    if (!creative && stack.getDamageValue() >= stack.getMaxDamage()) {
-                        broken = true;
-                        break;
-                    }
-                    if (!tints.putColumn(x, z, biomeKey)) {
-                        continue;
-                    }
-                    modifiedChunks.add(new ChunkPos(x >> 4, z >> 4));
-                    affectedBlocks++;
-                    if (BiomeBrushDurability.chargesDurability(creative, unbreakingLevel, level.random::nextInt)) {
-                        stack.setDamageValue(stack.getDamageValue() + 1);
-                    }
-                }
-            }
-
-            for (ChunkPos chunk : modifiedChunks) {
-                BiomeTintSync.sync(serverLevel, chunk);
-            }
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BONE_MEAL_USE,
-                    SoundSource.PLAYERS, 1.0f, 1.0f);
-
-            Component biomeName = new TranslatableComponent(
-                    "biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.applied", biomeName)
-                    .withStyle(ChatFormatting.GREEN), true);
-            player.displayClientMessage(
-                    new TranslatableComponent("message.buildscape.biome_brush.applied_detail", affectedBlocks)
-                            .withStyle(ChatFormatting.GREEN),
-                    false);
-
-            CompoundTag tag = stack.getTag();
-            if (tag != null) {
-                tag.remove(KEY_POS1);
-                tag.remove(KEY_POS2);
-                tag.remove(KEY_POS1_DIMENSION);
-                tag.remove(KEY_POS2_DIMENSION);
-            }
-
-            return InteractionResult.SUCCESS;
+            return paintSelection(context, player, level, stack);
         }
 
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
 
-        String biomeStr = getCapturedBiome(stack);
-        if (biomeStr == null) {
-            Holder<Biome> biomeHolder = level.getBiome(clickedPos);
-            ResourceLocation biomeKey = registryKey(level, biomeHolder.value());
-            if (biomeKey != null) {
-                setCapturedBiome(stack, biomeKey.toString());
-                Component biomeName = new TranslatableComponent(
-                        "biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
-                player.displayClientMessage(
-                        new TranslatableComponent("message.buildscape.biome_brush.captured", biomeName)
-                                .withStyle(ChatFormatting.GREEN),
-                        true);
-                level.playSound(null, clickedPos, SoundEvents.BOTTLE_FILL_DRAGONBREATH, SoundSource.PLAYERS, 1.0f,
-                        1.2f);
-                if (player instanceof ServerPlayer serverPlayer) {
-                    Advancement adv = serverPlayer.getServer().getAdvancements()
-                            .getAdvancement(new ResourceLocation("buildscape", "touch_grass"));
-                    if (adv != null) {
-                        serverPlayer.getAdvancements().award(adv, "capture_biome");
-                    }
-                }
-            }
+        if (getCapturedBiome(stack) == null) {
+            captureBiome(level, player, stack, context.getClickedPos());
         } else {
-            setPos1(stack, clickedPos, player);
+            setPos1(stack, context.getClickedPos(), player);
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    /** Shows the message on the action bar and fails the use. */
+    private static InteractionResult failWith(Player player, Component message) {
+        player.displayClientMessage(message, true);
+        return InteractionResult.FAIL;
+    }
+
+    /** The two selected corners as an ordered box. */
+    private record SelectionBox(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+        static SelectionBox of(BlockPos pos1, BlockPos pos2) {
+            return new SelectionBox(
+                    Math.min(pos1.getX(), pos2.getX()), Math.max(pos1.getX(), pos2.getX()),
+                    Math.min(pos1.getY(), pos2.getY()), Math.max(pos1.getY(), pos2.getY()),
+                    Math.min(pos1.getZ(), pos2.getZ()), Math.max(pos1.getZ(), pos2.getZ()));
+        }
+    }
+
+    /** Sneak-use: applies the captured biome to the selected box, spending durability per painted column. */
+    private InteractionResult paintSelection(UseOnContext context, Player player, Level level, ItemStack stack) {
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+
+        String biomeStr = getCapturedBiome(stack);
+        BlockPos pos1 = getPos1(stack);
+        BlockPos pos2 = getPos2(stack);
+
+        if (biomeStr == null || pos1 == null || pos2 == null) {
+            return failWith(player, new TranslatableComponent("message.buildscape.biome_brush.cannot_apply")
+                    .withStyle(ChatFormatting.RED));
+        }
+
+        ResourceLocation biomeKey = ResourceLocation.tryParse(biomeStr);
+        if (biomeKey == null) {
+            return InteractionResult.FAIL;
+        }
+
+        ServerLevel serverLevel = (ServerLevel) level;
+        Registry<Biome> registry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+        ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, biomeKey);
+        Optional<Holder<Biome>> holderOpt = registry.getHolder(key);
+
+        if (holderOpt.isEmpty()) {
+            return failWith(player, new TranslatableComponent("message.buildscape.biome_brush.invalid_biome", biomeStr)
+                    .withStyle(ChatFormatting.RED));
+        }
+        SelectionBox box = SelectionBox.of(pos1, pos2);
+
+        String currentDimension = serverLevel.dimension().location().toString();
+        if (!isInDimension(stack, KEY_POS1_DIMENSION, currentDimension)
+                || !isInDimension(stack, KEY_POS2_DIMENSION, currentDimension)) {
+            return failWith(player, new TranslatableComponent("message.buildscape.biome_brush.wrong_dimension")
+                    .withStyle(ChatFormatting.RED));
+        }
+        if ((long) box.maxX() - box.minX() + 1 > MAX_HORIZONTAL_SIZE
+                || (long) box.maxZ() - box.minZ() + 1 > MAX_HORIZONTAL_SIZE) {
+            return failWith(player, new TranslatableComponent("message.buildscape.biome_brush.too_large",
+                    MAX_HORIZONTAL_SIZE).withStyle(ChatFormatting.RED));
+        }
+
+        if (!(player instanceof ServerPlayer serverPlayer) || !player.mayBuild()
+                || player.distanceToSqr(pos1.getX() + 0.5, pos1.getY() + 0.5, pos1.getZ() + 0.5) > 64.0 * 64.0
+                || player.distanceToSqr(pos2.getX() + 0.5, pos2.getY() + 0.5, pos2.getZ() + 0.5) > 64.0 * 64.0
+                || box.minY() < level.getMinBuildHeight() || box.maxY() >= level.getMaxBuildHeight()) {
+            return failWith(player, new TextComponent(
+                    "Cannot paint: both corners must be within 64 blocks and you must have build permission.")
+                    .withStyle(ChatFormatting.RED));
+        }
+
+        if (!allColumnsPaintable(level, serverPlayer, box, context.getClickedFace(), stack)) {
+            return failWith(player, new TextComponent(
+                    "Cannot paint: the selection includes an unloaded or protected column.")
+                    .withStyle(ChatFormatting.RED));
+        }
+
+        int affectedBlocks = paintColumns(serverLevel, player, stack, box, biomeKey);
+
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BONE_MEAL_USE,
+                SoundSource.PLAYERS, 1.0f, 1.0f);
+
+        Component biomeName = new TranslatableComponent(
+                "biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
+        player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.applied", biomeName)
+                .withStyle(ChatFormatting.GREEN), true);
+        player.displayClientMessage(
+                new TranslatableComponent("message.buildscape.biome_brush.applied_detail", affectedBlocks)
+                        .withStyle(ChatFormatting.GREEN),
+                false);
+
+        CompoundTag tag = stack.getTag();
+        if (tag != null) {
+            tag.remove(KEY_POS1);
+            tag.remove(KEY_POS2);
+            tag.remove(KEY_POS1_DIMENSION);
+            tag.remove(KEY_POS2_DIMENSION);
+        }
+
+        return InteractionResult.SUCCESS;
+    }
+
+    /** True when every column of the box is loaded, inside the world border and open to this player. */
+    private static boolean allColumnsPaintable(
+            Level level, ServerPlayer serverPlayer, SelectionBox box, Direction face, ItemStack stack) {
+        for (int x = box.minX(); x <= box.maxX(); x++) {
+            for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                BlockPos bottom = new BlockPos(x, box.minY(), z);
+                BlockPos top = new BlockPos(x, box.maxY(), z);
+                boolean columnAllowed = level.hasChunkAt(bottom) && level.getWorldBorder().isWithinBounds(bottom)
+                        && canPaintAt(level, serverPlayer, bottom, face, stack)
+                        && (bottom.equals(top)
+                                || canPaintAt(level, serverPlayer, top, face, stack));
+                for (int y = level.getMinBuildHeight(); y < level.getMaxBuildHeight() && columnAllowed; y += 16) {
+                    if (y != box.minY() && y != box.maxY()) {
+                        columnAllowed = canPaintAt(level, serverPlayer, new BlockPos(x, y, z), face, stack);
+                    }
+                }
+                if (!columnAllowed) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /** Paints each column, charging durability until the brush breaks, then syncs the touched chunks. */
+    private static int paintColumns(
+            ServerLevel serverLevel, Player player, ItemStack stack, SelectionBox box, ResourceLocation biomeKey) {
+        int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack);
+        boolean creative = player.getAbilities().instabuild;
+        int affectedBlocks = 0;
+        Set<ChunkPos> modifiedChunks = new HashSet<>();
+        BiomeTintData tints = BiomeTintData.get(serverLevel);
+        boolean broken = false;
+        for (int x = box.minX(); x <= box.maxX() && !broken; x++) {
+            for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                if (!creative && stack.getDamageValue() >= stack.getMaxDamage()) {
+                    broken = true;
+                    break;
+                }
+                if (!tints.putColumn(x, z, biomeKey)) {
+                    continue;
+                }
+                modifiedChunks.add(new ChunkPos(x >> 4, z >> 4));
+                affectedBlocks++;
+                if (BiomeBrushDurability.chargesDurability(creative, unbreakingLevel, serverLevel.random::nextInt)) {
+                    stack.setDamageValue(stack.getDamageValue() + 1);
+                }
+            }
+        }
+
+        for (ChunkPos chunk : modifiedChunks) {
+            BiomeTintSync.sync(serverLevel, chunk);
+        }
+        return affectedBlocks;
+    }
+
+    /** Stores the biome at the clicked block on the brush and awards the capture advancement. */
+    private void captureBiome(Level level, Player player, ItemStack stack, BlockPos clickedPos) {
+        Holder<Biome> biomeHolder = level.getBiome(clickedPos);
+        ResourceLocation biomeKey = registryKey(level, biomeHolder.value());
+        if (biomeKey == null) {
+            return;
+        }
+        setCapturedBiome(stack, biomeKey.toString());
+        Component biomeName = new TranslatableComponent(
+                "biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
+        player.displayClientMessage(
+                new TranslatableComponent("message.buildscape.biome_brush.captured", biomeName)
+                        .withStyle(ChatFormatting.GREEN),
+                true);
+        level.playSound(null, clickedPos, SoundEvents.BOTTLE_FILL_DRAGONBREATH, SoundSource.PLAYERS, 1.0f,
+                1.2f);
+        if (player instanceof ServerPlayer serverPlayer) {
+            Advancement adv = serverPlayer.getServer().getAdvancements()
+                    .getAdvancement(new ResourceLocation("buildscape", "touch_grass"));
+            if (adv != null) {
+                serverPlayer.getAdvancements().award(adv, "capture_biome");
+            }
+        }
     }
 
     private static ResourceLocation registryKey(Level level, Biome biome) {

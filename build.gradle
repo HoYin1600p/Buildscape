@@ -18,10 +18,11 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 
 group = mod_group_id
-version = mod_version
+def effectiveModVersion = providers.gradleProperty('mod_version_override').getOrElse(mod_version)
+version = effectiveModVersion
 
 base {
-    archivesName = mod_id
+    archivesName = "${mod_id}-${minecraft_version}"
 }
 
 java {
@@ -166,7 +167,7 @@ tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
                              forge_version       : forge_version, forge_version_range: forge_version_range,
                              loader_version_range: loader_version_range,
-                             mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+                             mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: version,
                              mod_authors         : mod_authors, mod_description: mod_description,]
 
     inputs.properties replaceProperties

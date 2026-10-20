@@ -1,0 +1,118 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.editorconfig'
+      - '.prettierignore'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Jar & Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Determine Version and Build Type
+        id: version_info
+        shell: bash
+        run: |
+          REF_NAME="${{ github.ref_name }}"
+          echo "Current Git Ref: $REF_NAME"
+
+          # Extract base versions from gradle.properties
+          MOD_VER=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d '\r\n[:space:]')
+          MC_VER=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d '\r\n[:space:]')
+          echo "Base Mod Version: $MOD_VER"
+          echo "Minecraft Version: $MC_VER"
+
+          # Check if branch contains 'main' (e.g. main, dev/main-1.18.2, main/1.18.2-4.1.0)
+          if [[ "$REF_NAME" == *"main"* ]]; then
+            echo "Release branch detected."
+            IS_RELEASE="true"
+            EFFECTIVE_VER="$MOD_VER"
+            JAR_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}.jar"
+            TAG_NAME="v${MC_VER}-${EFFECTIVE_VER}"
+            RELEASE_TITLE="Buildscape ${MC_VER}-${EFFECTIVE_VER}"
+            ARTIFACT_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}"
+          else
+            echo "Development branch detected."
+            IS_RELEASE="false"
+            # Approach B: Monotonically incrementing GitHub run number
+            RUN_NUM="${{ github.run_number }}"
+            EFFECTIVE_VER="${MOD_VER}${RUN_NUM}-Dev"
+            JAR_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}.jar"
+            TAG_NAME=""
+            RELEASE_TITLE=""
+            ARTIFACT_NAME="[ Dev ] buildscape-${MC_VER}-${EFFECTIVE_VER}"
+          fi
+
+          echo "Effective Version: $EFFECTIVE_VER"
+          echo "Jar Name: $JAR_NAME"
+          echo "Artifact Name: $ARTIFACT_NAME"
+
+          echo "is_release=$IS_RELEASE" >> $GITHUB_OUTPUT
+          echo "effective_version=$EFFECTIVE_VER" >> $GITHUB_OUTPUT
+          echo "jar_name=$JAR_NAME" >> $GITHUB_OUTPUT
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "release_title=$RELEASE_TITLE" >> $GITHUB_OUTPUT
+          echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Grant Execute Permission to Gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Verification Checks
+        run: ./gradlew check --no-daemon
+
+      - name: Build Mod Jar
+        run: ./gradlew jar "-Pmod_version_override=${{ steps.version_info.outputs.effective_version }}" --no-daemon
+
+      - name: Verify Built Jar File
+        shell: bash
+        run: |
+          echo "Checking built artifacts in build/libs/:"
+          ls -la build/libs/
+          test -f "build/libs/${{ steps.version_info.outputs.jar_name }}"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.version_info.outputs.artifact_name }}
+          path: build/libs/${{ steps.version_info.outputs.jar_name }}
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: steps.version_info.outputs.is_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version_info.outputs.tag_name }}
+          name: ${{ steps.version_info.outputs.release_title }}
+          files: build/libs/${{ steps.version_info.outputs.jar_name }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

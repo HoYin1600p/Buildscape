@@ -1,16 +1,15 @@
 package com.kingodogo.buildscape.feature.pillar;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
-import com.kingodogo.buildscape.core.io.AtomicFiles;
-import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.network.EditPillarRowsPacket;
 import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
+import java.io.*;
+import java.util.*;
+import java.util.Locale;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -30,40 +29,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.*;
-import java.lang.reflect.Type;
-import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-
 public class PillarIdManager {
-
-    private static final Gson GSON = Json.PRETTY;
-    private static final String FILE_NAME = "pillar-ids.dat";
-    private static final String BACKUP_FILE_NAME = "pillar-ids.bak.dat";
-    private static final String FOLDER_NAME = "buildscape";
-    private static final int MAX_REMOVED_FRAMES = 4096;
     private static final PillarIdManager SERVER_INSTANCE = new PillarIdManager(true);
     private static final PillarIdManager CLIENT_INSTANCE = new PillarIdManager(false);
 
     private final boolean serverAuthoritative;
-
-    private final Map<String, PillarData> pillarData = new ConcurrentHashMap<>();
-    private final Map<String, PillarData> removedFrames = new ConcurrentHashMap<>();
+    private final PillarRegistry registry = new PillarRegistry();
+    private final Map<String, PillarData> removedFrames = registry.removedFrames;
+    private final Map<String, String> positionIndex = registry.positionIndex;
 
     public static final String VALID_ID_PATTERN = "^[A-Z][A-Za-z0-9-]{1,31}$";
-    private final Map<String, String> positionIndex = new ConcurrentHashMap<>();
     private final Set<LevelChunk> loadedChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private volatile List<PillarData> syncSnapshot = Collections.emptyList();
 
@@ -87,8 +67,6 @@ public class PillarIdManager {
     private static long worldLoadStartTime = 0L;
     private static final long MIN_WORLD_LOAD_TIME_MS = 15000;
 
-    private static File cachedWorldSaveDir = null;
-
     public static final String PREFIX_MOSSY = "M";
     public static final String PREFIX_STONE = "S";
     public static final String PREFIX_DEEPSLATE = "D";
@@ -96,7 +74,7 @@ public class PillarIdManager {
     public static final String PREFIX_ITEM_FRAME = "I-F";
 
     public static void resetWorldCache() {
-        cachedWorldSaveDir = null;
+        PillarStore.resetCachedWorldDir();
         worldLoadStartTime = System.currentTimeMillis();
         recoveryScheduled = false;
         recoveryScheduledTime = 0L;
@@ -128,7 +106,7 @@ public class PillarIdManager {
 
     private void resetState(boolean serverSynced) {
         isServerSynced = serverSynced;
-        pillarData.clear();
+        registry.pillarData.clear();
         removedFrames.clear();
         positionIndex.clear();
         loadedChunks.clear();
@@ -155,7 +133,7 @@ public class PillarIdManager {
     }
 
     public boolean needsWorldRecovery() {
-        return serverAuthoritative && hasLoaded && fileWasDeleted && pillarData.isEmpty();
+        return serverAuthoritative && hasLoaded && fileWasDeleted && registry.pillarData.isEmpty();
     }
 
     public static String getVariantPrefix(Level level, BlockPos pos) {
@@ -268,81 +246,8 @@ public class PillarIdManager {
         }
     }
 
-    private void updateCachedWorldDir() {
-        try {
-            if (!BuildScape.isServerFullyInitialized()) {
-                return;
-            }
-
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (
-                    server != null &&
-                            server.isRunning() &&
-                            server.getPlayerList().getPlayerCount() > 0
-            ) {
-                try {
-                    Path worldPath = server.getWorldPath(LevelResource.ROOT);
-                    if (worldPath != null) {
-                        File buildscapeDir = worldPath.resolve(FOLDER_NAME).toFile();
-                        if (!buildscapeDir.exists()) {
-                            buildscapeDir.mkdirs();
-                        }
-                        cachedWorldSaveDir = buildscapeDir;
-                    }
-                } catch (Exception e) {
-                }
-            }
-        } catch (Throwable t) {
-        }
-    }
-
-    private File getDataFile() {
-        return new File(getDataDir(), FILE_NAME);
-    }
-
-    private File getBackupDataFile() {
-        return new File(getDataDir(), BACKUP_FILE_NAME);
-    }
-
-    private File getDataDir() {
-        try {
-            if (cachedWorldSaveDir != null && cachedWorldSaveDir.exists()) {
-                return cachedWorldSaveDir;
-            }
-
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (server != null) {
-                try {
-                    Path worldPath = server.getWorldPath(LevelResource.ROOT);
-                    if (worldPath != null) {
-                        File buildscapeDir = worldPath.resolve(FOLDER_NAME).toFile();
-                        if (!buildscapeDir.exists()) {
-                            buildscapeDir.mkdirs();
-                        }
-                        cachedWorldSaveDir = buildscapeDir;
-                        return buildscapeDir;
-                    }
-                } catch (Exception e) {
-                }
-            }
-
-            String configPath = Paths.get(
-                    "config",
-                    "buildscape",
-                    "pillar"
-            ).toString();
-            File dir = new File(configPath);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            return dir;
-        } catch (Throwable t) {
-            return new File(".");
-        }
-    }
-
     public static void fullReset() {
-        cachedWorldSaveDir = null;
+        PillarStore.resetCachedWorldDir();
         worldLoadStartTime = System.currentTimeMillis();
         recoveryScheduled = false;
         recoveryScheduledTime = 0L;
@@ -394,65 +299,6 @@ public class PillarIdManager {
         return elapsed >= MIN_WORLD_LOAD_TIME_MS;
     }
 
-    public String generatePillarId(String expectedPrefix) {
-        if (expectedPrefix == null || expectedPrefix.isEmpty()) {
-            expectedPrefix = PREFIX_STONE + "-P";
-        }
-
-        String prefix = expectedPrefix;
-        Random random = new Random();
-
-        for (int attempt = 0; attempt < 50; attempt++) {
-            int num = random.nextInt(9999) + 1;
-            String id = prefix + String.format(Locale.ROOT, "%04d", num);
-            if (!pillarData.containsKey(id)) {
-                return id;
-            }
-        }
-
-        for (int num = 1; num <= 9999; num++) {
-            String id = prefix + String.format(Locale.ROOT, "%04d", num);
-            if (!pillarData.containsKey(id)) {
-                return id;
-            }
-        }
-
-        for (int attempt = 0; attempt < 100; attempt++) {
-            char c1 = (char) ('a' + random.nextInt(26));
-            char c2 = ALPHANUMERIC.charAt(random.nextInt(36));
-            char c3 = ALPHANUMERIC.charAt(random.nextInt(36));
-            char c4 = ALPHANUMERIC.charAt(random.nextInt(36));
-            String id = prefix + c1 + c2 + c3 + c4;
-            if (!pillarData.containsKey(id)) {
-                return id;
-            }
-        }
-
-        for (int i = 10; i < 36; i++) {
-            char c1 = ALPHANUMERIC.charAt(i);
-            for (int j = 0; j < 36; j++) {
-                for (int k = 0; k < 36; k++) {
-                    for (int l = 0; l < 36; l++) {
-                        String id =
-                                prefix +
-                                        c1 +
-                                        ALPHANUMERIC.charAt(j) +
-                                        ALPHANUMERIC.charAt(k) +
-                                        ALPHANUMERIC.charAt(l);
-                        if (!pillarData.containsKey(id)) {
-                            return id;
-                        }
-                    }
-                }
-            }
-        }
-
-        return prefix + Long.toString(System.currentTimeMillis(), 36);
-    }
-
-    private static final String ALPHANUMERIC =
-            "0123456789abcdefghijklmnopqrstuvwxyz";
-
     public String generatePillarId() {
         return generatePillarId(PREFIX_STONE + "-P");
     }
@@ -476,7 +322,7 @@ public class PillarIdManager {
 
         String existingId = positionIndex.get(posKey);
         if (existingId != null) {
-            PillarData existing = pillarData.get(existingId);
+            PillarData existing = registry.pillarData.get(existingId);
             if (existing != null) {
                 return existing;
             } else {
@@ -501,44 +347,13 @@ public class PillarIdManager {
             }
         }
 
-        pillarData.put(id, newData);
+        registry.pillarData.put(id, newData);
         positionIndex.put(posKey, id);
 
         if (!recoveryInProgress) {
             requestSave();
         }
         return newData;
-    }
-
-    private String positionKey(String dimension, BlockPos pos) {
-        return positionKey(dimension, pos, null);
-    }
-
-    public String positionKey(String dimension, BlockPos pos, Direction facing) {
-        String key = dimension + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
-        if (facing != null) {
-            key += ":" + facing.getSerializedName();
-        }
-        return key;
-    }
-
-    public static String getDimensionKey(Level level) {
-        if (level == null) return "unknown";
-        return level.dimension().location().toString();
-    }
-
-    public String getIdForPosition(String posKey) {
-        if (posKey == null) return null;
-        return positionIndex.get(posKey);
-    }
-
-    public Collection<PillarData> getAllData() {
-        return pillarData.values();
-    }
-
-    public PillarData getPillarData(String pillarId) {
-        if (pillarId == null) return null;
-        return pillarData.get(pillarId);
     }
 
     public String addDyeColor(Level level, BlockPos pos, String colorCode) {
@@ -560,21 +375,6 @@ public class PillarIdManager {
             return data.id;
         }
         return null;
-    }
-
-    public PillarData getPillarDataByPosition(Level level, BlockPos pos) {
-        String dimension = getDimensionKey(level);
-        String id = positionIndex.get(positionKey(dimension, pos));
-        return id != null ? pillarData.get(id) : null;
-    }
-
-    public String getPillarIdByPosition(Level level, BlockPos pos) {
-        PillarData data = getPillarDataByPosition(level, pos);
-        return data != null ? data.id : null;
-    }
-
-    public boolean isIdTaken(String id) {
-        return id != null && (pillarData.containsKey(id) || removedFrames.containsKey(id));
     }
 
     private volatile boolean saveRequested = false;
@@ -603,12 +403,6 @@ public class PillarIdManager {
         }
     }
 
-    private static boolean isSameFrameLocation(PillarData data, String dimension, BlockPos pos, Direction facing) {
-        if (!Objects.equals(data.dimension, dimension)) return false;
-        if (data.x != pos.getX() || data.y != pos.getY() || data.z != pos.getZ()) return false;
-        return data.facing == null || facing == null || data.facing.equals(facing.getSerializedName());
-    }
-
     public void removePillar(String pillarId) {
         removePillars(Collections.singleton(pillarId));
     }
@@ -627,27 +421,10 @@ public class PillarIdManager {
 
     public void updatePillarData(PillarData data) {
         if (data != null && data.id != null) {
-            pillarData.put(data.id, data);
+            registry.pillarData.put(data.id, data);
             data.modifiedTime = System.currentTimeMillis();
             saveImmediate();
         }
-    }
-
-    public static void clearPillarOverrides(PillarData data) {
-        if (data == null) {
-            return;
-        }
-        if (data.dyeColors == null) {
-            data.dyeColors = new ArrayList<>();
-        } else {
-            data.dyeColors.clear();
-        }
-        data.use_pattern = null;
-        data.pattern = null;
-        data.pattern_speed = null;
-        data.pattern_spread = null;
-        data.pattern_intensity = null;
-        data.max_particle_color = null;
     }
 
     /**
@@ -660,10 +437,10 @@ public class PillarIdManager {
         boolean changed = false;
         Set<String> frames = new LinkedHashSet<>();
         for (String id : pillarIds) {
-            PillarData existing = id == null ? null : pillarData.get(id);
+            PillarData existing = id == null ? null : registry.pillarData.get(id);
             if (existing == null) continue;
             clearPillarOverrides(existing);
-            if (serverAuthoritative && isItemFrameData(existing)) frames.add(id);
+            if (serverAuthoritative && PillarRegistry.isItemFrameData(existing)) frames.add(id);
             changed = true;
         }
         if (!frames.isEmpty()) removePillars(frames, true);
@@ -685,13 +462,13 @@ public class PillarIdManager {
             if (pillarId == null) {
                 continue;
             }
-            PillarData data = pillarData.remove(pillarId);
+            PillarData data = registry.pillarData.remove(pillarId);
             if (data == null) {
                 continue;
             }
             removedIds.add(pillarId);
             if (serverAuthoritative) {
-                if (isItemFrameData(data)) {
+                if (PillarRegistry.isItemFrameData(data)) {
                     if (rememberRemovedFrames) {
                         data.removed = true;
                         data.frameEditPending = null;
@@ -707,9 +484,9 @@ public class PillarIdManager {
         }
 
         if (changed) {
-            pruneRemovedFrames();
+            registry.pruneRemovedFrames();
             positionIndex.values().removeIf(removedIds::contains);
-            if (pillarData.isEmpty()) {
+            if (registry.pillarData.isEmpty()) {
                 allowEmptySave = true;
             }
             requestSave();
@@ -717,22 +494,9 @@ public class PillarIdManager {
         return changed;
     }
 
-    private boolean pruneRemovedFrames() {
-        int excess = removedFrames.size() - MAX_REMOVED_FRAMES;
-        if (excess <= 0) return false;
-        List<PillarData> oldest = new ArrayList<>(removedFrames.values());
-        oldest.sort(Comparator.comparingLong((PillarData data) -> data.modifiedTime)
-                .thenComparing(data -> data.id));
-        for (int i = 0; i < excess; i++) {
-            PillarData data = oldest.get(i);
-            removedFrames.remove(data.id, data);
-        }
-        return true;
-    }
-
     public void updateDisplayedItem(String pillarId, String itemResourceId) {
         if (pillarId == null) return;
-        PillarData data = pillarData.get(pillarId);
+        PillarData data = registry.pillarData.get(pillarId);
         if (data != null) {
             boolean changed = false;
             if (itemResourceId == null || itemResourceId.isEmpty()) {
@@ -761,7 +525,7 @@ public class PillarIdManager {
 
         String idToRemove = positionIndex.remove(posKey);
         if (idToRemove != null) {
-            PillarData data = pillarData.get(idToRemove);
+            PillarData data = registry.pillarData.get(idToRemove);
             if (data != null && Objects.equals(data.dimension, dimension)
                     && data.getBlockPos().equals(pos)) {
                 removePillar(idToRemove);
@@ -774,7 +538,7 @@ public class PillarIdManager {
         String key = positionKey(dimension, pos);
         String id = positionIndex.get(key);
         if (id != null) {
-            PillarData data = pillarData.get(id);
+            PillarData data = registry.pillarData.get(id);
             if (data == null || !Objects.equals(data.dimension, dimension)
                     || !data.getBlockPos().equals(pos)) {
                 positionIndex.remove(key, id);
@@ -783,7 +547,7 @@ public class PillarIdManager {
     }
 
     public void updatePillarPosition(String pillarId, BlockPos pos) {
-        PillarData data = pillarData.get(pillarId);
+        PillarData data = registry.pillarData.get(pillarId);
         if (data != null && !data.getBlockPos().equals(pos)) {
             data.x = pos.getX();
             data.y = pos.getY();
@@ -811,16 +575,16 @@ public class PillarIdManager {
     }
 
     public void mergePillarStack(String pillarId, BlockPos bottom, BlockPos top) {
-        PillarData data = pillarData.get(pillarId);
+        PillarData data = registry.pillarData.get(pillarId);
         if (data == null) return;
 
         boolean changed = false;
-        for (PillarData other : new ArrayList<>(pillarData.values())) {
-            if (!other.id.equals(pillarId) && !isItemFrameData(other)
+        for (PillarData other : new ArrayList<>(registry.pillarData.values())) {
+            if (!other.id.equals(pillarId) && !PillarRegistry.isItemFrameData(other)
                     && Objects.equals(other.dimension, data.dimension)
                     && other.x == bottom.getX() && other.z == bottom.getZ()
                     && other.y >= bottom.getY() && other.y <= top.getY()) {
-                changed |= pillarData.remove(other.id, other);
+                changed |= registry.pillarData.remove(other.id, other);
             }
         }
         if (!data.getBlockPos().equals(bottom)) {
@@ -836,7 +600,7 @@ public class PillarIdManager {
     }
 
     public void clearPillarColors(String pillarId) {
-        PillarData data = pillarData.get(pillarId);
+        PillarData data = registry.pillarData.get(pillarId);
         if (data != null) {
             data.clearColors();
             requestSave();
@@ -887,7 +651,7 @@ public class PillarIdManager {
         try {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server == null) {
-                pillarData.clear();
+                registry.pillarData.clear();
                 lastLoadedTime = 0L;
                 lastFileSize = 0L;
                 fileWasDeleted = false;
@@ -896,8 +660,8 @@ public class PillarIdManager {
                 return;
             }
 
-            File file = getDataFile();
-            if (hasLoaded && pillarData.isEmpty() && file.exists() && !dirty) {
+            File file = PillarStore.getDataFile();
+            if (hasLoaded && registry.pillarData.isEmpty() && file.exists() && !dirty) {
                 hasLoaded = false;
             }
 
@@ -920,41 +684,24 @@ public class PillarIdManager {
             BuildScape.LOGGER.error("Critical error in load() - will recover from world later", t);
             loadInProgress = false;
             hasLoaded = true;
-            pillarData.clear();
+            registry.pillarData.clear();
             lastLoadedTime = 0L;
             lastFileSize = 0L;
             fileWasDeleted = true;
         }
     }
 
-    public Set<String> getAllPillarIds() {
-        return Collections.unmodifiableSet(pillarData.keySet());
-    }
-
-    public int getPillarCount() {
-        return pillarData.size();
-    }
-
     private boolean corruptedFileUnpreserved = false;
-
     private void handleCorruptedFile(File file, Throwable error, String errorType) {
         lastFileSize = Math.max(lastFileSize, file.length());
-        corruptedFileUnpreserved = true;
-        try {
-            Files.copy(file.toPath(), new File(file.getParentFile(),
-                    file.getName() + ".corrupted." + System.currentTimeMillis()).toPath());
-            corruptedFileUnpreserved = false;
-        } catch (IOException e) {
-            LogManager.getLogger(PillarIdManager.class).error("Unable to preserve corrupted pillar data; saves are blocked", e);
-        }
-        LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar data (" + errorType + ")", error);
+        corruptedFileUnpreserved = !PillarStore.preserveCorrupted(file, error, errorType);
     }
 
     private boolean fileWasDeleted = false;
 
     private void processLoadedData(Map<String, PillarData> loaded, MinecraftServer server, File sourceFile) {
-        Map<String, PillarData> existingData = new HashMap<>(pillarData);
-        pillarData.clear();
+        Map<String, PillarData> existingData = new HashMap<>(registry.pillarData);
+        registry.pillarData.clear();
         boolean changed = false;
         if (loaded != null) {
             for (Map.Entry<String, PillarData> entry : loaded.entrySet()) {
@@ -973,24 +720,24 @@ public class PillarIdManager {
                     data.dyeColors = new ArrayList<>();
                     changed = true;
                 }
-                if (Boolean.TRUE.equals(data.removed) && isItemFrameData(data)) {
+                if (Boolean.TRUE.equals(data.removed) && PillarRegistry.isItemFrameData(data)) {
                     removedFrames.put(id, data);
                 } else {
-                    pillarData.put(id, data);
+                    registry.pillarData.put(id, data);
                 }
             }
         }
-        changed |= pruneRemovedFrames();
+        changed |= registry.pruneRemovedFrames();
         rebuildPositionIndex();
         for (Map.Entry<String, PillarData> entry : existingData.entrySet()) {
             if (removedFrames.containsKey(entry.getKey())) continue;
             PillarData data = entry.getValue();
-            if (isItemFrameData(data) && isRemovedFrame(data.id, data.dimension, data.getBlockPos(),
+            if (PillarRegistry.isItemFrameData(data) && isRemovedFrame(data.id, data.dimension, data.getBlockPos(),
                     data.facing == null ? null : Direction.byName(data.facing))) continue;
-            if (pillarData.putIfAbsent(entry.getKey(), entry.getValue()) == null) changed = true;
+            if (registry.pillarData.putIfAbsent(entry.getKey(), entry.getValue()) == null) changed = true;
         }
         changed |= pruneRegistry();
-        hadColorsOnLoad = pillarData.values().stream().anyMatch(PillarData::hasColors);
+        hadColorsOnLoad = registry.pillarData.values().stream().anyMatch(PillarData::hasColors);
         fileWasDeleted = false;
         if (sourceFile != null) {
             lastLoadedTime = sourceFile.lastModified();
@@ -998,30 +745,30 @@ public class PillarIdManager {
         }
         hasLoaded = true;
         for (PillarData removed : removedFrames.values()) resetLoadedFrame(removed);
-        for (PillarData edited : new ArrayList<>(pillarData.values())) {
-            if (edited.frameEditPending != null && isItemFrameData(edited)) {
+        for (PillarData edited : new ArrayList<>(registry.pillarData.values())) {
+            if (edited.frameEditPending != null && PillarRegistry.isItemFrameData(edited)) {
                 applyFrameEdit(edited);
                 if (edited.frameEditPending == null) changed = true;
             }
         }
-        updateCachedWorldDir();
+        PillarStore.updateCachedWorldDir();
         refreshSyncSnapshot();
         if (changed) {
-            if (pillarData.isEmpty()) allowEmptySave = true;
+            if (registry.pillarData.isEmpty()) allowEmptySave = true;
             requestSave();
         }
     }
 
     private void loadFileAsync(MinecraftServer server) {
         try {
-            File file = getDataFile();
+            File file = PillarStore.getDataFile();
 
-            SavedData saved = readSavedData(file, getBackupDataFile());
+            SavedData saved = readSavedData(file, PillarStore.getBackupDataFile());
             Map<String, PillarData> loadedData = saved.data;
             File sourceFile = saved.file;
             if (loadedData == null || loadedData.isEmpty()) {
                 fileWasDeleted = true;
-                pillarData.clear();
+                registry.pillarData.clear();
                 lastLoadedTime = 0L;
                 lastFileSize = Math.max(lastFileSize, file.length());
                 hasLoaded = true;
@@ -1034,7 +781,7 @@ public class PillarIdManager {
         } catch (Throwable t) {
             BuildScape.LOGGER.error("Critical error in loadFileAsync() - will recover after world is fully loaded", t);
             fileWasDeleted = true;
-            pillarData.clear();
+            registry.pillarData.clear();
             lastLoadedTime = 0L;
 
             hasLoaded = true;
@@ -1055,7 +802,7 @@ public class PillarIdManager {
     private SavedData readSavedData(File file, File backupFile) {
         if (file.exists() && file.length() > 0) {
             try {
-                Map<String, PillarData> loaded = loadFromFile(file);
+                Map<String, PillarData> loaded = PillarStore.loadFromFile(file);
                 if (loaded != null) return new SavedData(file, loaded);
             } catch (Exception e) {
                 handleCorruptedFile(file, e, "parse");
@@ -1063,24 +810,13 @@ public class PillarIdManager {
         }
         if (backupFile.exists() && backupFile.length() > 0) {
             try {
-                Map<String, PillarData> loaded = loadFromFile(backupFile);
+                Map<String, PillarData> loaded = PillarStore.loadFromFile(backupFile);
                 if (loaded != null && !loaded.isEmpty()) return new SavedData(backupFile, loaded);
             } catch (Exception e) {
                 LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar backup", e);
             }
         }
         return new SavedData(file, Collections.emptyMap());
-    }
-
-    private Map<String, PillarData> loadFromFile(File file) throws Exception {
-        try (
-                FileInputStream fis = new FileInputStream(file);
-                InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-                BufferedReader reader = new BufferedReader(isr)
-        ) {
-            Type type = new TypeToken<Map<String, PillarData>>() {}.getType();
-            return GSON.fromJson(reader, type);
-        }
     }
 
     public synchronized boolean saveImmediate() {
@@ -1102,18 +838,18 @@ public class PillarIdManager {
                 return false;
             }
 
-            if (pillarData.isEmpty() && lastFileSize > 0 && !allowEmptySave) {
+            if (registry.pillarData.isEmpty() && lastFileSize > 0 && !allowEmptySave) {
                 return false;
             }
-            if (!saveToFile(getDataFile(), FILE_NAME)) {
+            if (!saveToFile(PillarStore.getDataFile(), PillarStore.FILE_NAME)) {
                 return false;
             }
-            if (allowEmptySave && !saveToFile(getBackupDataFile(), BACKUP_FILE_NAME)) {
+            if (allowEmptySave && !saveToFile(PillarStore.getBackupDataFile(), PillarStore.BACKUP_FILE_NAME)) {
                 return false;
             }
             allowEmptySave = false;
 
-            File mainFile = getDataFile();
+            File mainFile = PillarStore.getDataFile();
             if (mainFile.exists()) {
                 lastLoadedTime = mainFile.lastModified();
                 lastFileSize = mainFile.length();
@@ -1347,7 +1083,7 @@ public class PillarIdManager {
 
                                 BlockPos pos = be.getBlockPos();
 
-                                PillarData existingData = pillarData.get(pillarId);
+                                PillarData existingData = registry.pillarData.get(pillarId);
 
                                 if (existingData != null) {
                                     boolean positionChanged = !(
@@ -1418,7 +1154,7 @@ public class PillarIdManager {
                                     }
                                 }
 
-                                pillarData.put(pillarId, data);
+                                registry.pillarData.put(pillarId, data);
                                 recoveredCount++;
                             } catch (Exception e) {
                                 BuildScape.LOGGER.error("Error processing pillar: {}", e.getMessage());
@@ -1460,13 +1196,13 @@ public class PillarIdManager {
         if (recoveryInProgress || !hasLoaded) {
             return;
         }
-        if (pillarData.isEmpty() && lastFileSize > 0L && !allowEmptySave) {
+        if (registry.pillarData.isEmpty() && lastFileSize > 0L && !allowEmptySave) {
             return;
         }
 
         if (dirty) {
-            File mainFile = getDataFile();
-            if (!saveToFile(mainFile, FILE_NAME)) {
+            File mainFile = PillarStore.getDataFile();
+            if (!saveToFile(mainFile, PillarStore.FILE_NAME)) {
                 return;
             }
             if (mainFile.exists()) {
@@ -1480,7 +1216,7 @@ public class PillarIdManager {
             syncDirty = true;
         }
         if (includeBackup) {
-            saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
+            saveToFile(PillarStore.getBackupDataFile(), PillarStore.BACKUP_FILE_NAME);
         }
     }
 
@@ -1488,7 +1224,7 @@ public class PillarIdManager {
         if (!serverAuthoritative) {
             return;
         }
-        File mainFile = getDataFile();
+        File mainFile = PillarStore.getDataFile();
 
         if (mainFile.exists()) {
             long currentModified = mainFile.lastModified();
@@ -1500,45 +1236,9 @@ public class PillarIdManager {
             }
         }
     }
-
     private synchronized boolean saveToFile(File file, String tempFileName) {
         if (corruptedFileUnpreserved || !hasLoaded) return false;
-        try {
-            File parentDir = file.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-
-            File tempFile = new File(file.getParentFile(), tempFileName + ".tmp");
-
-            try (
-                    FileOutputStream fos = new FileOutputStream(tempFile);
-                    OutputStreamWriter osw = new OutputStreamWriter(
-                            fos,
-                            StandardCharsets.UTF_8
-                    );
-                    BufferedWriter writer = new BufferedWriter(osw)
-            ) {
-                Map<String, PillarData> savedData = new HashMap<>(removedFrames);
-                savedData.putAll(pillarData);
-                GSON.toJson(savedData, writer);
-                writer.flush();
-                osw.flush();
-                fos.flush();
-
-                try {
-                    FileChannel channel = fos.getChannel();
-                    channel.force(true);
-                } catch (Exception forceEx) {
-                }
-            }
-
-            AtomicFiles.moveReplacing(tempFile.toPath(), file.toPath());
-            return true;
-        } catch (Exception e) {
-            BuildScape.LOGGER.error("Error saving pillar data to {}", file.getAbsolutePath(), e);
-            return false;
-        }
+        return PillarStore.write(file, tempFileName, registry.removedFrames, registry.pillarData);
     }
 
     public void forceReload() {
@@ -1567,7 +1267,7 @@ public class PillarIdManager {
 
                 String dimensionKey = getDimensionKey(level);
 
-                for (PillarData data : pillarData.values()) {
+                for (PillarData data : registry.pillarData.values()) {
                     if (data == null) continue;
                     if (!data.dimension.equals(dimensionKey)) continue;
 
@@ -1629,16 +1329,16 @@ public class PillarIdManager {
                 return;
             }
 
-            int saveCount = pillarData.size();
+            int saveCount = registry.pillarData.size();
             int colorsCount = 0;
-            for (PillarData data : pillarData.values()) {
+            for (PillarData data : registry.pillarData.values()) {
                 if (data != null && data.hasColors()) {
                     colorsCount++;
                 }
             }
 
 
-            saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
+            saveToFile(PillarStore.getBackupDataFile(), PillarStore.BACKUP_FILE_NAME);
         } catch (Throwable t) {
             BuildScape.LOGGER.error("Error saving backup file: {}", t.getMessage());
         }
@@ -1650,8 +1350,8 @@ public class PillarIdManager {
         }
         String dimension = getDimensionKey(level);
         Map<ChunkPos, List<PillarData>> chunks = new HashMap<>();
-        for (PillarData data : pillarData.values()) {
-            if (!isItemFrameData(data) || !Objects.equals(dimension, data.dimension)) continue;
+        for (PillarData data : registry.pillarData.values()) {
+            if (!PillarRegistry.isItemFrameData(data) || !Objects.equals(dimension, data.dimension)) continue;
             BlockPos pos = data.getBlockPos();
             if (!level.hasChunkAt(pos) || !serverLevel.areEntitiesLoaded(ChunkPos.asLong(pos))) continue;
             chunks.computeIfAbsent(new ChunkPos(pos), key -> new ArrayList<>()).add(data);
@@ -1679,13 +1379,13 @@ public class PillarIdManager {
                 Direction facing = data.facing != null
                         ? Direction.byName(data.facing) : null;
                 if (!livePositions.contains(positionKey(dimension, data.getBlockPos(), facing))) {
-                    changed |= pillarData.remove(data.id, data);
+                    changed |= registry.pillarData.remove(data.id, data);
                 }
             }
         }
         if (changed) {
             rebuildPositionIndex();
-            if (pillarData.isEmpty()) allowEmptySave = true;
+            if (registry.pillarData.isEmpty()) allowEmptySave = true;
             requestSave();
         }
     }
@@ -1710,7 +1410,7 @@ public class PillarIdManager {
 
                 String dimensionKey = getDimensionKey(level);
 
-                for (PillarData data : pillarData.values()) {
+                for (PillarData data : registry.pillarData.values()) {
                     if (data == null) continue;
                     if (!data.dimension.equals(dimensionKey)) continue;
 
@@ -1826,7 +1526,7 @@ public class PillarIdManager {
 
                 String dimensionKey = getDimensionKey(level);
 
-                for (PillarData data : pillarData.values()) {
+                for (PillarData data : registry.pillarData.values()) {
                     if (data == null) continue;
                     if (!data.dimension.equals(dimensionKey)) continue;
 
@@ -1985,42 +1685,6 @@ public class PillarIdManager {
         return needsSave;
     }
 
-
-    public Map<String, PillarData> copyDataSnapshot() {
-        Map<String, PillarData> snapshot = new HashMap<>();
-        for (Map.Entry<String, PillarData> entry : pillarData.entrySet()) {
-            PillarData original = entry.getValue();
-            if (original != null) {
-                PillarData copy = new PillarData();
-                copy.id = original.id;
-                copy.dimension = original.dimension;
-                copy.x = original.x;
-                copy.y = original.y;
-                copy.z = original.z;
-                copy.createdTime = original.createdTime;
-                copy.modifiedTime = original.modifiedTime;
-                copy.pattern = original.pattern;
-                copy.pattern_speed = original.pattern_speed;
-                copy.pattern_spread = original.pattern_spread;
-                copy.pattern_intensity = original.pattern_intensity;
-                copy.max_particle_color = original.max_particle_color;
-                copy.use_pattern = original.use_pattern;
-                copy.displayedItem = original.displayedItem;
-                copy.pillarType = original.pillarType;
-                copy.facing = original.facing;
-                copy.itemYaw = original.itemYaw;
-                copy.frameEditPending = original.frameEditPending;
-                if (original.dyeColors != null && !original.dyeColors.isEmpty()) {
-                    copy.dyeColors = new ArrayList<>(original.dyeColors);
-                } else {
-                    copy.dyeColors = new ArrayList<>();
-                }
-                snapshot.put(entry.getKey(), copy);
-            }
-        }
-        return snapshot;
-    }
-
     public synchronized String editPillarRows(List<EditPillarRowsPacket.Row> rows) {
         if (!serverAuthoritative || rows == null
                 || rows.size() > EditPillarRowsPacket.MAX_ROWS) {
@@ -2031,7 +1695,7 @@ public class PillarIdManager {
         Set<String> oldIds = new HashSet<>();
         for (EditPillarRowsPacket.Row row : rows) {
             if (row == null || !row.isValid() || !oldIds.add(row.oldId)) return "invalid";
-            if (!pillarData.containsKey(row.oldId)) return "missing";
+            if (!registry.pillarData.containsKey(row.oldId)) return "missing";
             finalData.remove(row.oldId);
         }
         for (EditPillarRowsPacket.Row row : rows) {
@@ -2064,7 +1728,7 @@ public class PillarIdManager {
             Level level = chunk.getLevel();
             Map<String, String> renamedIds = new HashMap<>();
             for (EditPillarRowsPacket.Row row : rows) {
-                PillarData previous = pillarData.get(row.oldId);
+                PillarData previous = registry.pillarData.get(row.oldId);
                 if (Objects.equals(previous.dimension, getDimensionKey(level)) && previous.facing == null) {
                     renamedIds.put(row.oldId, row.newId);
                 }
@@ -2079,13 +1743,13 @@ public class PillarIdManager {
         }
         Map<String, Map<String, String>> frameRenames = new HashMap<>();
         for (EditPillarRowsPacket.Row row : rows) {
-            PillarData previous = pillarData.get(row.oldId);
+            PillarData previous = registry.pillarData.get(row.oldId);
             if (previous.facing != null) {
                 frameRenames.computeIfAbsent(previous.dimension, key -> new HashMap<>()).put(row.oldId, row.newId);
             }
         }
-        pillarData.clear();
-        pillarData.putAll(finalData);
+        registry.pillarData.clear();
+        registry.pillarData.putAll(finalData);
         rebuildPositionIndex();
         loadedUpdates.forEach(PillarBlockEntity::setPillarId);
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -2124,11 +1788,11 @@ public class PillarIdManager {
         if (serverAuthoritative) {
             throw new IllegalStateException("Cannot replace authoritative pillar data from a client sync");
         }
-        pillarData.clear();
+        registry.pillarData.clear();
         if (syncedData != null) {
             for (PillarData data : syncedData) {
                 if (data != null && data.id != null) {
-                    pillarData.put(data.id, data);
+                    registry.pillarData.put(data.id, data);
                 }
             }
         }
@@ -2138,88 +1802,8 @@ public class PillarIdManager {
         isServerSynced = true;
     }
 
-    private void rebuildPositionIndex() {
-        deduplicateFramePositions();
-        positionIndex.clear();
-        for (PillarData data : pillarData.values()) {
-            if (data == null || data.id == null || data.dimension == null) {
-                continue;
-            }
-            try {
-                indexPosition(data);
-            } catch (Exception ignored) {
-            }
-        }
-    }
-
-    private void indexPosition(PillarData data) {
-        Direction facing = data.facing != null
-                ? Direction.byName(data.facing)
-                : null;
-        String key = positionKey(data.dimension, data.getBlockPos(), facing);
-        String previousId = positionIndex.get(key);
-        PillarData previous = previousId != null ? pillarData.get(previousId) : null;
-        if (previous == null || data.modifiedTime > previous.modifiedTime
-                || (data.modifiedTime == previous.modifiedTime && data.id.compareTo(previous.id) < 0)) {
-            positionIndex.put(key, data.id);
-        }
-    }
-
-    private static boolean isItemFrameData(PillarData data) {
-        return data.pillarType != null && (data.pillarType.endsWith(":item_frame")
-                || data.pillarType.endsWith("_item_frame"));
-    }
-
-    private static boolean hasFrameParticleData(String pattern, List<String> colors) {
-        return (colors != null && !colors.isEmpty()) || (pattern != null && !pattern.isEmpty()
-                && !ParticlePatterns.NONE.equals(pattern) && !ParticlePatterns.NOT_SET.equals(pattern));
-    }
-
-    private void deduplicateFramePositions() {
-        Map<String, PillarData> frames = new HashMap<>();
-        for (PillarData data : new ArrayList<>(pillarData.values())) {
-            if (!isItemFrameData(data)) continue;
-            Direction facing = data.facing != null
-                    ? Direction.byName(data.facing) : null;
-            String key = positionKey(data.dimension, data.getBlockPos(), facing);
-            PillarData previous = frames.get(key);
-            if (previous == null) {
-                frames.put(key, data);
-            } else if (data.modifiedTime > previous.modifiedTime
-                    || (data.modifiedTime == previous.modifiedTime && data.id.compareTo(previous.id) < 0)) {
-                pillarData.remove(previous.id, previous);
-                frames.put(key, data);
-            } else {
-                pillarData.remove(data.id, data);
-            }
-        }
-    }
-
-    private boolean pruneRegistry() {
-        int previousSize = pillarData.size();
-        // Dimensions are never a pruning reason: mods register some dimensions dynamically after startup.
-        pillarData.values().removeIf(data -> isItemFrameData(data) && data.frameEditPending == null
-                && !hasFrameParticleData(data.pattern, data.dyeColors));
-        rebuildPositionIndex();
-        return previousSize != pillarData.size();
-    }
-
-    public String getFrameIdForPosition(String dimension, BlockPos pos, Direction facing) {
-        return facing == null ? null : positionIndex.get(positionKey(dimension, pos, facing));
-    }
-
-    private boolean removeOtherFrameAtPosition(String key, String id) {
-        String previousId = positionIndex.get(key);
-        if (previousId == null || previousId.equals(id)) return false;
-        PillarData previous = pillarData.get(previousId);
-        if (previous == null || !isItemFrameData(previous)) return false;
-        pillarData.remove(previousId, previous);
-        positionIndex.remove(key, previousId);
-        return true;
-    }
-
     public void clearForServerSync() {
-        pillarData.clear();
+        registry.pillarData.clear();
         positionIndex.clear();
         ItemFrameParticleHandler.clearClientCaches();
         hasLoaded = false;
@@ -2229,7 +1813,7 @@ public class PillarIdManager {
         if (data == null || data.id == null) {
             return;
         }
-        pillarData.put(data.id, data);
+        registry.pillarData.put(data.id, data);
         if (data.dimension != null) {
             try {
                 Direction facing = null;
@@ -2268,7 +1852,7 @@ public class PillarIdManager {
             return;
         }
 
-        PillarData existing = pillarData.get(id);
+        PillarData existing = registry.pillarData.get(id);
         PillarData data = registerPillarData(id, dimension, pillar.getBlockPos());
         if (existing == null) {
             syncPatternSettingsFromNBT(pillar, data);
@@ -2287,37 +1871,13 @@ public class PillarIdManager {
     }
 
     private PillarData registerPillarData(String id, String dimension, BlockPos pos) {
-        PillarData data = pillarData.get(id);
+        PillarData data = registry.pillarData.get(id);
         if (data == null) {
             data = new PillarData(id, dimension, pos);
-            pillarData.put(id, data);
+            registry.pillarData.put(id, data);
         }
-        indexPosition(data);
+        registry.indexPosition(data);
         return data;
-    }
-
-    private String reconcilePillarId(String savedId, String dimension, BlockPos basePos) {
-        return reconcilePillarId(savedId, dimension, basePos, basePos);
-    }
-
-    private String reconcilePillarId(String savedId, String dimension, BlockPos pos, BlockPos basePos) {
-        if (savedId == null || savedId.isEmpty()) return savedId;
-        PillarData saved = pillarData.get(savedId);
-        if (saved != null && Objects.equals(saved.dimension, dimension)
-                && saved.x == pos.getX() && saved.z == pos.getZ()
-                && saved.y >= basePos.getY() && saved.y <= pos.getY()) {
-            return savedId;
-        }
-        for (BlockPos current = pos; current.getY() >= basePos.getY(); current = current.below()) {
-            String authoritativeId = positionIndex.get(positionKey(dimension, current));
-            if (authoritativeId != null) return authoritativeId;
-        }
-        return savedId;
-    }
-
-    private String reconcileFrameId(String savedId, String dimension, BlockPos pos, Direction facing) {
-        String authoritativeId = getFrameIdForPosition(dimension, pos, facing);
-        return authoritativeId != null ? authoritativeId : savedId;
     }
 
     private void saveFrameChange() {
@@ -2369,7 +1929,7 @@ public class PillarIdManager {
      * not loaded are marked pending and take the registry values when they register.
      */
     public void applyFrameEdit(PillarData data) {
-        if (!serverAuthoritative || data == null || !isItemFrameData(data)) return;
+        if (!serverAuthoritative || data == null || !PillarRegistry.isItemFrameData(data)) return;
         data.frameEditPending = writeLoadedFrame(data) ? null : Boolean.TRUE;
     }
 
@@ -2386,7 +1946,7 @@ public class PillarIdManager {
                 Direction facing = entity instanceof ItemFrame itemFrame
                         ? itemFrame.getDirection()
                         : ((ColoredItemFrameEntity) entity).getDirection();
-                if (!isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) continue;
+                if (!PillarRegistry.isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) continue;
                 writeFrameData(entity.getPersistentData(), data.pattern, data.dyeColors);
                 if (entity instanceof ColoredItemFrameEntity coloredFrame) {
                     coloredFrame.setParticlePattern(framePattern(data.pattern));
@@ -2426,16 +1986,6 @@ public class PillarIdManager {
         if (immediate) return false;
         writeFrameData(tag, existing.pattern, existing.dyeColors);
         return true;
-    }
-
-    private boolean isRemovedFrame(String id, String dimension, BlockPos pos, Direction facing) {
-        boolean hasId = id != null && !id.isEmpty();
-        if (hasId && removedFrames.containsKey(id)) return true;
-        if (getFrameIdForPosition(dimension, pos, facing) != null) return false;
-        for (PillarData data : removedFrames.values()) {
-            if ((!hasId || id.equals(data.id)) && isSameFrameLocation(data, dimension, pos, facing)) return true;
-        }
-        return false;
     }
 
     private boolean prepareFrameRegistration(Entity frame, boolean immediate) {
@@ -2496,9 +2046,9 @@ public class PillarIdManager {
 
         id = reconcileFrameId(id, dimension, pos, facing);
         dataTag.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, id);
-        PillarData existing = pillarData.get(id);
+        PillarData existing = registry.pillarData.get(id);
         if (existing == null && !hasFrameParticleData(pattern, colors)) return;
-        if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
+        if (existing != null && !PillarRegistry.isSameFrameLocation(existing, dimension, pos, facing)) {
             id = ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
         }
@@ -2520,7 +2070,7 @@ public class PillarIdManager {
                 if (itemRL != null) data.displayedItem = itemRL.toString();
             }
 
-            pillarData.put(id, data);
+            registry.pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
             saveFrameChange();
@@ -2600,9 +2150,9 @@ public class PillarIdManager {
 
         id = reconcileFrameId(id, dimension, pos, facing);
         dataTag.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, id);
-        PillarData existing = pillarData.get(id);
+        PillarData existing = registry.pillarData.get(id);
         if (existing == null && !hasFrameParticleData(pattern, colors)) return;
-        if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
+        if (existing != null && !PillarRegistry.isSameFrameLocation(existing, dimension, pos, facing)) {
             id = ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
         }
@@ -2633,7 +2183,7 @@ public class PillarIdManager {
                 }
             }
 
-            pillarData.put(id, data);
+            registry.pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
             saveFrameChange();
@@ -2689,12 +2239,110 @@ public class PillarIdManager {
     }
 
     public List<PillarData> getAllPillarDataForSync() {
-        return serverAuthoritative ? syncSnapshot : new ArrayList<>(pillarData.values());
+        return serverAuthoritative ? syncSnapshot : new ArrayList<>(registry.pillarData.values());
     }
 
     private void refreshSyncSnapshot() {
         syncSnapshot = Collections.unmodifiableList(new ArrayList<>(copyDataSnapshot().values()));
     }
+    // ---- Registry delegation: the public API of the pillar records ----
+
+    public String generatePillarId(String expectedPrefix) {
+        return registry.generatePillarId(expectedPrefix);
+    }
+
+    private String positionKey(String dimension, BlockPos pos) {
+        return PillarRegistry.positionKey(dimension, pos);
+    }
+
+    public String positionKey(String dimension, BlockPos pos, Direction facing) {
+        return PillarRegistry.positionKey(dimension, pos, facing);
+    }
+
+    public static String getDimensionKey(Level level) {
+        return PillarRegistry.getDimensionKey(level);
+    }
+
+    public String getIdForPosition(String posKey) {
+        return registry.getIdForPosition(posKey);
+    }
+
+    public Collection<PillarData> getAllData() {
+        return registry.getAllData();
+    }
+
+    public PillarData getPillarData(String pillarId) {
+        return registry.getPillarData(pillarId);
+    }
+
+    public PillarData getPillarDataByPosition(Level level, BlockPos pos) {
+        return registry.getPillarDataByPosition(level, pos);
+    }
+
+    public String getPillarIdByPosition(Level level, BlockPos pos) {
+        return registry.getPillarIdByPosition(level, pos);
+    }
+
+    public boolean isIdTaken(String id) {
+        return registry.isIdTaken(id);
+    }
+
+    public static void clearPillarOverrides(PillarData data) {
+        PillarRegistry.clearPillarOverrides(data);
+    }
+
+    // ---- Hooks the persistence tests reach by reflection; each is a one-line pass-through to the registry ----
+
+    private static final int MAX_REMOVED_FRAMES = PillarRegistry.MAX_REMOVED_FRAMES;
+
+    private void rebuildPositionIndex() {
+        registry.rebuildPositionIndex();
+    }
+
+    private boolean pruneRegistry() {
+        return registry.pruneRegistry();
+    }
+
+    private static boolean hasFrameParticleData(String pattern, List<String> colors) {
+        return PillarRegistry.hasFrameParticleData(pattern, colors);
+    }
+
+    private boolean removeOtherFrameAtPosition(String key, String id) {
+        return registry.removeOtherFrameAtPosition(key, id);
+    }
+
+    private String reconcilePillarId(String savedId, String dimension, BlockPos basePos) {
+        return registry.reconcilePillarId(savedId, dimension, basePos);
+    }
+
+    private String reconcilePillarId(String savedId, String dimension, BlockPos pos, BlockPos basePos) {
+        return registry.reconcilePillarId(savedId, dimension, pos, basePos);
+    }
+
+    private String reconcileFrameId(String savedId, String dimension, BlockPos pos, Direction facing) {
+        return registry.reconcileFrameId(savedId, dimension, pos, facing);
+    }
+
+    private boolean isRemovedFrame(String id, String dimension, BlockPos pos, Direction facing) {
+        return registry.isRemovedFrame(id, dimension, pos, facing);
+    }
+
+    public Set<String> getAllPillarIds() {
+        return registry.getAllPillarIds();
+    }
+
+    public int getPillarCount() {
+        return registry.getPillarCount();
+    }
+
+    public Map<String, PillarData> copyDataSnapshot() {
+        return registry.copyDataSnapshot();
+    }
+
+    public String getFrameIdForPosition(String dimension, BlockPos pos, Direction facing) {
+        return registry.getFrameIdForPosition(dimension, pos, facing);
+    }
+
 
     public static class PillarData {
 

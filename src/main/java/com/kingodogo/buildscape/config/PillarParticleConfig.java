@@ -1108,15 +1108,21 @@ public class PillarParticleConfig {
                 offered.add(entry.getAsString());
             }
         } else {
+            Set<String> pre405 = parseItems(ConfigPaths.loadItemsTemplate("legacy_pillar_items_pre405").toString());
+            Set<String> legacy405 = parseItems(ConfigPaths.loadItemsTemplate("legacy_pillar_items").toString());
             boolean hadVaultItems = false;
+            boolean has405OnlyItem = false;
             for (JsonElement entry : document.getAsJsonArray("items")) {
-                if (isVaultItem(entry.getAsString())) {
+                String item = entry.getAsString();
+                if (isVaultItem(item)) {
                     hadVaultItems = true;
+                }
+                if (legacy405.contains(item) && !pre405.contains(item)) {
+                    has405OnlyItem = true;
                 }
             }
             // Infer removals only from defaults the old installation could have offered.
-            for (JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items").getAsJsonArray("items")) {
-                String item = entry.getAsString();
+            for (String item : has405OnlyItem ? legacy405 : pre405) {
                 if (!isVaultItem(item) || hadVaultItems) {
                     offered.add(item);
                 }
@@ -1159,15 +1165,22 @@ public class PillarParticleConfig {
         }
         Set<String> vanilla = new HashSet<>();
         Set<String> vault = new HashSet<>();
-        for (JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items").getAsJsonArray("items")) {
-            String item = entry.getAsString();
-            vault.add(item);
-            if (!isVaultItem(item)) {
-                vanilla.add(item);
+        for (String template : new String[]{"legacy_pillar_items", "legacy_pillar_items_pre405"}) {
+            vanilla.clear();
+            vault.clear();
+            for (JsonElement entry : ConfigPaths.loadItemsTemplate(template).getAsJsonArray("items")) {
+                String item = entry.getAsString();
+                vault.add(item);
+                if (!isVaultItem(item)) {
+                    vanilla.add(item);
+                }
+            }
+            if (existing.equals(vanilla) || existing.equals(vault)) {
+                return true;
             }
         }
         // Use a normal backup when an unversioned file's origin cannot be established.
-        return existing.equals(vanilla) || existing.equals(vault);
+        return false;
     }
 
     static Set<String> parseItems(String content) {

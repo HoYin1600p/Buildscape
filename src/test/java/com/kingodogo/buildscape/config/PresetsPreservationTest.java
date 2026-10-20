@@ -22,6 +22,49 @@ public class PresetsPreservationTest extends BootstrappedGameTest {
     public TemporaryFolder temporary = new TemporaryFolder();
 
     @Test
+    public void defaultItemsAreRebuiltOnEveryLoadWhileUserPresetsStayUnchanged() throws Exception {
+        for (boolean vault : new boolean[]{false, true}) {
+            Path directory = temporary.newFolder().toPath();
+            Path file = directory.resolve("pillar-presets.json");
+            String original = "{\"default\":{\"name\":\"Default\",\"items\":[\"minecraft:stick\"]},"
+                    + "\"custom\":{\"name\":\"My preset\",\"items\":[\"example:custom_item\"]},"
+                    + "\"empty\":{\"name\":\"Empty\",\"items\":[]},\"_lastApplied\":\"custom\"}";
+            JsonObject expected = JsonParser.parseString(original).getAsJsonObject();
+            Files.writeString(file, original);
+            PresetsConfig config = new PresetsConfig(directory);
+            config.load(vault);
+            assertEquals(ConfigPaths.loadDefaultItems(vault), config.getPreset("default").items);
+            assertEquals(java.util.Set.of("example:custom_item"), config.getPreset("custom").items);
+            assertTrue(config.getPreset("empty").items.isEmpty());
+            assertEquals("custom", config.getLastAppliedPreset());
+            assertEquals(original, Files.readString(file));
+            config.save();
+            JsonObject saved = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
+            assertEquals(expected.get("custom"), saved.get("custom"));
+            assertEquals(expected.get("empty"), saved.get("empty"));
+            assertEquals(ConfigPaths.loadDefaultItems(vault),
+                    PillarParticleConfig.parseItems(saved.get("default").toString()));
+            // Reloading after the available mod set changes replaces only the built-in list.
+            config.load(!vault);
+            assertEquals(ConfigPaths.loadDefaultItems(!vault), config.getPreset("default").items);
+            assertEquals(java.util.Set.of("example:custom_item"), config.getPreset("custom").items);
+            assertTrue(config.getPreset("empty").items.isEmpty());
+        }
+    }
+
+    @Test
+    public void bundledDefaultPresetMatchesTheCurrentVanillaItems() throws Exception {
+        try (java.io.InputStream input = getClass()
+                .getResourceAsStream("/data/buildscape/config/default_pillar_presets.json")) {
+            assertNotNull(input);
+            String source = new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            JsonObject document = JsonParser.parseString(source).getAsJsonObject();
+            assertEquals(ConfigPaths.loadDefaultItems(false),
+                    PillarParticleConfig.parseItems(document.get("default").toString()));
+        }
+    }
+
+    @Test
     public void savingAfterPartialParsePreservesMalformedPresetAndValidPreset() throws Exception {
         assertPreserved("{\"name\":\"Broken\",\"items\":{\"keep\":42},\"extra\":[null,true],\"nullable\":null}");
     }
@@ -64,7 +107,8 @@ public class PresetsPreservationTest extends BootstrappedGameTest {
         JsonObject expected = JsonParser.parseString(original).getAsJsonObject();
         JsonObject actual = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
         assertEquals(expected.get("damaged"), actual.get("damaged"));
-        assertEquals(expected.get("default"), actual.get("default"));
+        assertEquals(ConfigPaths.loadDefaultItems(false),
+                PillarParticleConfig.parseItems(actual.get("default").toString()));
         assertEquals("default", actual.get("_lastApplied").getAsString());
         assertTrue(config.getPreset("default").items.contains("minecraft:diamond"));
         assertEquals(original, Files.readString(directory.resolve("pillar-presets.json.bak")));
@@ -77,8 +121,8 @@ public class PresetsPreservationTest extends BootstrappedGameTest {
         assertNull(config.getPreset("damaged"));
         JsonObject deleted = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
         assertFalse(deleted.has("damaged"));
-        assertEquals(expected.get("default"), deleted.get("default"));
-        assertEquals(java.util.Set.of("minecraft:diamond"), config.getPreset("default").items);
+        assertEquals(actual.get("default"), deleted.get("default"));
+        assertEquals(ConfigPaths.loadDefaultItems(false), config.getPreset("default").items);
         Files.writeString(file, original);
         config.load();
         assertTrue(config.savePreset("damaged", "Replacement", java.util.Set.of("minecraft:dirt")));
@@ -87,7 +131,7 @@ public class PresetsPreservationTest extends BootstrappedGameTest {
         JsonObject replaced = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
         assertEquals("Replacement", replaced.getAsJsonObject("damaged").get("name").getAsString());
         assertEquals(java.util.Set.of("minecraft:dirt"), config.getPreset("damaged").items);
-        assertEquals(expected.get("default"), replaced.get("default"));
+        assertEquals(actual.get("default"), replaced.get("default"));
         assertFalse(replaced.getAsJsonObject("damaged").has("extra"));
     }
 }

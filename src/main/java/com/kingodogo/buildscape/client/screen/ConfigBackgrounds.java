@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 
+import java.io.DataInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -319,6 +320,21 @@ public class ConfigBackgrounds {
         }
     }
 
+    private static boolean isOversizedPng(Path filePath) {
+        try (DataInputStream header = new DataInputStream(Files.newInputStream(filePath))) {
+            // PNG signature followed by the fixed-size IHDR chunk.
+            if (header.readLong() != 0x89504E470D0A1A0AL || header.readInt() != 13
+                    || header.readInt() != 0x49484452) {
+                return false;
+            }
+            long width = Integer.toUnsignedLong(header.readInt());
+            long height = Integer.toUnsignedLong(header.readInt());
+            return width > 4096 || height > 4096;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
     private static void loadCustomBackgroundFile(Path filePath) {
         String fileName = filePath.getFileName().toString();
         String id = sanitizeId(fileName);
@@ -327,6 +343,11 @@ public class ConfigBackgrounds {
         }
 
         if (REGISTERED_BACKGROUND_IDS.contains(id) || !LOADING_BACKGROUND_IDS.add(id)) {
+            return;
+        }
+
+        if (isOversizedPng(filePath)) {
+            LOADING_BACKGROUND_IDS.remove(id);
             return;
         }
 

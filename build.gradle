@@ -19,10 +19,11 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 
 group = mod_group_id
-version = mod_version
+def effectiveModVersion = providers.gradleProperty('mod_version_override').getOrElse(mod_version)
+version = effectiveModVersion
 
 base {
-    archivesName = mod_id
+    archivesName = "${mod_id}-${minecraft_version}"
 }
 
 java {

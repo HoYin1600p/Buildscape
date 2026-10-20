@@ -185,9 +185,7 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     static float calculateItemContentTransitionAlpha(long now, long startedAt, int duration) {
-        if (duration <= 0) return 1.0F;
-        float progress = Math.min(1.0F, Math.max(0.0F, (now - startedAt) / (float) duration));
-        return 0.45F + 0.55F * easeOutCubic(progress);
+        return ConfigScreenAnims.calculateItemContentTransitionAlpha(now, startedAt, duration);
     }
 
     static boolean shouldCacheTagDiscovery(Collection<String> tags) {
@@ -267,45 +265,24 @@ public class BuildScapeConfigScreen extends Screen {
     private Consumer<AbstractWidget> addWidgetConsumer;
     private Consumer<GuiEventListener> removeWidgetConsumer;
 
-    // Local client preferences and animation scaling.
-    private static int animSpeedIndex = 0;
-    private static final String[] ANIM_SPEEDS = {"Smooth", "Snappy", "Instant"};
+    // Local client preferences and animation scaling (delegated to ConfigScreenAnims).
+    public static final String[] ANIM_SPEEDS = ConfigScreenAnims.ANIM_SPEEDS;
+    public static int getAnimSpeedIndex() { return ConfigScreenAnims.getAnimSpeedIndex(); }
+    public static void setAnimSpeedIndex(int index) { ConfigScreenAnims.setAnimSpeedIndex(index); }
+    public static float getAnimSpeedMultiplier() { return ConfigScreenAnims.getAnimSpeedMultiplier(); }
 
-    public static float getAnimSpeedMultiplier() {
-        return switch (animSpeedIndex) {
-            case 1 -> 0.60f; // Snappy
-            case 2 -> 0.001f; // Instant
-            default -> 1.0f; // Smooth
-        };
-    }
+    public static int getOpenAnimMs() { return ConfigScreenAnims.getOpenAnimMs(); }
+    public static int getCloseAnimMs() { return ConfigScreenAnims.getCloseAnimMs(); }
+    public static int getNavAnimMs() { return ConfigScreenAnims.getNavAnimMs(); }
+    public static int getNavIndicatorAnimMs() { return ConfigScreenAnims.getNavIndicatorAnimMs(); }
+    public static int getTabTransitionAnimMs() { return ConfigScreenAnims.getTabTransitionAnimMs(); }
+    public static int getSidePanelAnimMs() { return ConfigScreenAnims.getSidePanelAnimMs(); }
+    public static int getPillarRemovalAnimMs() { return ConfigScreenAnims.getPillarRemovalAnimMs(); }
 
-    public static int getOpenAnimMs() { return Math.max(1, (int) (300 * getAnimSpeedMultiplier())); }
-    public static int getCloseAnimMs() { return Math.max(1, (int) (220 * getAnimSpeedMultiplier())); }
-    public static int getNavAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
-    public static int getNavIndicatorAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
-    public static int getTabTransitionAnimMs() { return Math.max(1, (int) (240 * getAnimSpeedMultiplier())); }
-    public static int getSidePanelAnimMs() { return Math.max(1, (int) (280 * getAnimSpeedMultiplier())); }
-
-    public static float easeOutSine(float t) {
-        float clamped = Math.min(1.0f, Math.max(0.0f, t));
-        return (float) Math.sin(clamped * (Math.PI / 2.0));
-    }
-
-    public static float easeInSine(float t) {
-        float clamped = Math.min(1.0f, Math.max(0.0f, t));
-        return 1.0f - (float) Math.cos(clamped * (Math.PI / 2.0));
-    }
-
-    public static float easeOutCubic(float t) {
-        float clamped = Math.min(1.0f, Math.max(0.0f, t));
-        float f = 1.0f - clamped;
-        return 1.0f - f * f * f;
-    }
-
-    public static float easeInCubic(float t) {
-        float clamped = Math.min(1.0f, Math.max(0.0f, t));
-        return clamped * clamped * clamped;
-    }
+    public static float easeOutSine(float t) { return ConfigScreenAnims.easeOutSine(t); }
+    public static float easeInSine(float t) { return ConfigScreenAnims.easeInSine(t); }
+    public static float easeOutCubic(float t) { return ConfigScreenAnims.easeOutCubic(t); }
+    public static float easeInCubic(float t) { return ConfigScreenAnims.easeInCubic(t); }
 
     private long openStartTime;
     private long closeStartTime = -1;
@@ -469,6 +446,101 @@ public class BuildScapeConfigScreen extends Screen {
     private long lastPillarRowClickTime = 0L;
     private String lastPillarRowClickId = null;
 
+    // Animated pillar row removal & shift state (delegated to ConfigScreenAnims)
+    static float calculatePillarRowShift(float startOffset, long startTime, int durationMs, long now) {
+        return ConfigScreenAnims.calculatePillarRowShift(startOffset, startTime, durationMs, now);
+    }
+
+    static int calculatePillarRemovalSlideX(int colX, int slideDistance, long startTime, int durationMs, long now) {
+        return ConfigScreenAnims.calculatePillarRemovalSlideX(colX, slideDistance, startTime, durationMs, now);
+    }
+
+    static float calculatePillarRemovalAlpha(float baseAlpha, long startTime, int durationMs, long now) {
+        return ConfigScreenAnims.calculatePillarRemovalAlpha(baseAlpha, startTime, durationMs, now);
+    }
+
+    private final Map<String, ConfigScreenAnims.PillarRowShiftAnim> pillarRowShiftAnims = new HashMap<>();
+    private final Map<String, ConfigScreenAnims.PillarRemovalEntry> activePillarRemovals = new HashMap<>();
+
+    private float getPillarRowVisualY(String id, int index, int rowStep, long now) {
+        float offset = 0.0f;
+        ConfigScreenAnims.PillarRowShiftAnim anim = pillarRowShiftAnims.get(id);
+        if (anim != null) {
+            if (anim.isFinished(now)) {
+                pillarRowShiftAnims.remove(id);
+            } else {
+                offset = anim.getCurrentOffset(now);
+            }
+        }
+        return index * rowStep + offset;
+    }
+
+    private void triggerPillarRemovals(Collection<String> idsToRemove, List<PillarIdManager.PillarData> currentList) {
+        if (idsToRemove == null || idsToRemove.isEmpty()) return;
+        long now = System.currentTimeMillis();
+        int durationMs = getPillarRemovalAnimMs();
+        int rowStep = 24 + 2; // rowH + rowGap
+
+        // 1. Snapshot the visual positions of ALL currently displayed rows before removal.
+        Map<String, Float> visualYBeforeRemoval = new HashMap<>();
+        Map<String, PillarIdManager.PillarData> dataById = new HashMap<>();
+        for (int r = 0; r < currentList.size(); r++) {
+            PillarIdManager.PillarData data = currentList.get(r);
+            if (data.id != null) {
+                float visualY = getPillarRowVisualY(data.id, r, rowStep, now);
+                visualYBeforeRemoval.put(data.id, visualY);
+                dataById.put(data.id, data);
+            }
+        }
+
+        Set<String> toRemoveSet = new HashSet<>(idsToRemove);
+
+        // 2. Queue removed rows into activePillarRemovals so they animate sliding right & fading out
+        for (String id : toRemoveSet) {
+            PillarIdManager.PillarData data = dataById.get(id);
+            if (data == null) {
+                data = PillarIdManager.getClient().getPillarData(id);
+            }
+            float curVisualY = visualYBeforeRemoval.getOrDefault(id, 0.0f);
+            if (data != null) {
+                activePillarRemovals.put(id, new ConfigScreenAnims.PillarRemovalEntry(data, curVisualY, now, durationMs));
+            }
+            PillarIdManager.getClient().removePillarData(id);
+            selectedPillarIds.remove(id);
+            pillarRowShiftAnims.remove(id);
+            if (Objects.equals(selectedPillarDetailId, id) && sidePanelType == SidePanelType.PILLAR_DETAIL) {
+                closeSidePanel();
+            }
+        }
+
+        // 3. For all surviving rows, compute their new target positions and animate them smoothly upward
+        List<PillarIdManager.PillarData> surviving = new ArrayList<>(PillarIdManager.getClient().getAllData());
+        surviving.sort(Comparator.comparing(d -> d.id != null ? d.id : ""));
+
+        for (int r = 0; r < surviving.size(); r++) {
+            PillarIdManager.PillarData sData = surviving.get(r);
+            if (sData.id == null) continue;
+            float newTargetY = r * rowStep;
+            float prevVisualY = visualYBeforeRemoval.getOrDefault(sData.id, newTargetY);
+            float diff = prevVisualY - newTargetY;
+            if (Math.abs(diff) > 0.5f) {
+                pillarRowShiftAnims.put(sData.id, new ConfigScreenAnims.PillarRowShiftAnim(diff, now, durationMs));
+            } else {
+                pillarRowShiftAnims.remove(sData.id);
+            }
+        }
+
+        // 4. Send network packets to the server
+        List<String> idList = new ArrayList<>(toRemoveSet);
+        if (idList.size() == 1) {
+            ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(idList.get(0)));
+        } else if (idList.size() > 1) {
+            for (List<String> batch : removalBatches(idList)) {
+                ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(batch));
+            }
+        }
+    }
+
     // Cached tab view state.
     private final TabCacheManager tabCache = new TabCacheManager();
 
@@ -601,6 +673,14 @@ public class BuildScapeConfigScreen extends Screen {
     private long sidePanelAnimStartTime = 0L;
     private int sidePanelScrollOffset = 0;
     private int sidePanelMaxScroll = 0;
+    private boolean isDraggingSideScrollbar = false;
+    private double sideScrollDragStartY = 0.0;
+    private double sideScrollDragStartOffset = 0.0;
+    private int sideScrollbarTrackX = 0;
+    private int sideScrollbarTrackY = 0;
+    private int sideScrollbarTrackW = 0;
+    private int sideScrollbarTrackH = 0;
+    private int sideScrollbarThumbH = 18;
     private boolean pendingPresetsAutoOpen = false;
 
     // Sidenav expansion animation
@@ -614,8 +694,8 @@ public class BuildScapeConfigScreen extends Screen {
     private static final Map<String, Boolean> toggleLastStateMap = new HashMap<>();
 
     private float getThemeTargetPos(ConfigThemes.Theme theme) {
-        if (theme != null && "light".equals(theme.id)) return 1.0f;
-        return 0.0f; // 2-stage toggle: Moon on 0.0f for Dark and all other custom themes
+        if (theme != null && theme.isLight()) return 1.0f;
+        return 0.0f; // 2-stage toggle: Moon on 0.0f for Dark mode, Sun on 1.0f for Light mode
     }
 
     private float navAnimProgress = 0.0f; // 0.0 = collapsed, 1.0 = expanded
@@ -754,6 +834,10 @@ public class BuildScapeConfigScreen extends Screen {
         if (sidePanelType == type && (isSidePanelOpening || sidePanelProgress >= 1.0f)) {
             return;
         }
+        if (sidePanelType != type) {
+            sidePanelScrollOffset = 0;
+            sidePanelMaxScroll = 0;
+        }
         sidePanelType = type;
         isSidePanelOpening = true;
         isSidePanelClosing = false;
@@ -784,6 +868,8 @@ public class BuildScapeConfigScreen extends Screen {
         }
         selectedPillarDetailId = pillarId;
         closingPillarDetailId = null;
+        sidePanelScrollOffset = 0;
+        sidePanelMaxScroll = 0;
         openSidePanel(SidePanelType.PILLAR_DETAIL);
     }
 
@@ -794,6 +880,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
         isSidePanelClosing = true;
         isSidePanelOpening = false;
+        isDraggingSideScrollbar = false;
         int duration = getSidePanelAnimMs();
         sidePanelAnimStartTime = System.currentTimeMillis() - (long) ((1.0f - sidePanelProgress) * duration);
     }
@@ -1045,7 +1132,7 @@ public class BuildScapeConfigScreen extends Screen {
             String savedTheme = cfg.getUiTheme();
             applyTheme(ConfigThemes.getById(savedTheme));
             ConfigBackgrounds.setBackgroundById(cfg.getUiBackground());
-            animSpeedIndex = Math.max(0, Math.min(ANIM_SPEEDS.length - 1, cfg.getAnimationSpeedIndex()));
+            ConfigScreenAnims.setAnimSpeedIndex(cfg.getAnimationSpeedIndex());
             this.selectedPresetIndex = presetIndexFor(PresetsConfig.get().getPresetKeys(), cfg.getLastPreset());
             int savedTab = cfg.getLastActiveTab();
             if (savedTab >= 0 && savedTab < 6) {
@@ -1369,9 +1456,13 @@ public class BuildScapeConfigScreen extends Screen {
 
     public void init(Minecraft mc, int width, int height, Consumer<AbstractWidget> addWidget, Consumer<GuiEventListener> removeWidget) {
         currentInstance = this;
-        this.openStartTime = 0L;
-        this.isOpening = true;
-        this.openProgress = 0.0f;
+        this.pillarRowShiftAnims.clear();
+        this.activePillarRemovals.clear();
+        if (this.isOpening || this.openProgress < 0.99f) {
+            this.openStartTime = 0L;
+            this.isOpening = true;
+            this.openProgress = 0.0f;
+        }
 
         this.addWidgetConsumer = addWidget;
         this.removeWidgetConsumer = removeWidget;
@@ -1625,7 +1716,7 @@ public class BuildScapeConfigScreen extends Screen {
                     openSidePanel(SidePanelType.PRESETS);
                 }
             } else {
-                openProgress = easeOutSine(elapsed);
+                openProgress = easeOutCubic(elapsed);
             }
         }
 
@@ -2041,29 +2132,36 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
+    private void renderParentBackground(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
+        if (parent == null || closeToWorld) return;
+        ConfigGuiBatch.flush();
+        PoseStack parentPose = asPose(poseStackOrGraphics);
+        parentPose.pushPose();
+        try {
+            parent.render(parentPose, mouseX, mouseY, partialTick);
+        } catch (Exception ignored) {
+        } finally {
+            ConfigGuiBatch.flush();
+            parentPose.popPose();
+        }
+    }
+
     private void renderInternal(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
         if (isClosing && closeProgress <= 0.001f && closeStartTime > 0L) {
+            renderParentBackground(poseStackOrGraphics, mouseX, mouseY, partialTick);
             return;
         }
 
         float alpha = updateAnimations();
         if (isClosing && closeProgress <= 0.001f) {
+            renderParentBackground(poseStackOrGraphics, mouseX, mouseY, partialTick);
             return;
         }
         if (alpha <= 0.001f && !isOpening) return;
         alpha = Math.max(0.01f, Math.min(1.0f, alpha));
 
-        // If closing and parent screen exists, render parent behind the shrinking panel
-        if (isClosing && parent != null) {
-            PoseStack parentPose = asPose(poseStackOrGraphics);
-            parentPose.pushPose();
-            try {
-                parent.render(parentPose, -999, -999, partialTick);
-            } catch (Exception ignored) {
-            } finally {
-                parentPose.popPose();
-            }
-        }
+        // Render parent behind the config screen so transitions and backdrop are seamless
+        renderParentBackground(poseStackOrGraphics, -999, -999, partialTick);
 
         this.rawMouseX = mouseX;
         this.rawMouseY = mouseY;
@@ -2075,9 +2173,11 @@ public class BuildScapeConfigScreen extends Screen {
         // 1. Full-screen dimmed backdrop (draw before pose scaling to cover physical window)
         fill(poseStackOrGraphics, 0, 0, width, height, applyAlpha(COLOR_OVERLAY, alpha));
 
-        // Compute B button center for closing zoom animation
+        // Compute B button center for opening/closing zoom animation
         boolean applyClosingTransform = isClosing && closeStartTime > 0L;
-        if (applyClosingTransform) {
+        boolean applyOpeningTransform = isOpening && openStartTime > 0L;
+        boolean applyTransitionTransform = applyClosingTransform || applyOpeningTransform;
+        if (applyTransitionTransform) {
             int bCenterX = width / 2 + 104 + 10;
             int bCenterY = height / 4 + 72 + 10;
             if (parent != null) {
@@ -2095,27 +2195,34 @@ public class BuildScapeConfigScreen extends Screen {
             }
 
             long now = System.currentTimeMillis();
-            int duration = getCloseAnimMs();
-            float t = Math.min(1.0f, (now - closeStartTime) / (float) duration);
-            float ease = easeInCubic(t);
-
-            // Zoom out scale: from 1.0 down to 0.04
-            float zoomScale = Math.max(0.04f, 1.0f - 0.96f * ease);
-
-            // Geometry center in screen coordinates
             SidePanelLayout baseLayout = calculateLayout();
             float panelCenterX = baseLayout.frameX + baseLayout.frameW / 2.0f;
             float panelCenterY = baseLayout.frameY + baseLayout.frameH / 2.0f;
 
-            float curX = panelCenterX + (bCenterX - panelCenterX) * ease;
-            float curY = panelCenterY + (bCenterY - panelCenterY) * ease;
+            float zoomScale;
+            float curX;
+            float curY;
 
-            pushGuiPose(poseStackOrGraphics);
-            translateGuiPose(poseStackOrGraphics, curX, curY, 0);
-            scaleGuiPose(poseStackOrGraphics, zoomScale, zoomScale);
-            translateGuiPose(poseStackOrGraphics, -panelCenterX, -panelCenterY, 0);
+            if (applyClosingTransform) {
+                int duration = getCloseAnimMs();
+                float t = Math.min(1.0f, (now - closeStartTime) / (float) duration);
+                float ease = easeInCubic(t);
+                zoomScale = Math.max(0.04f, 1.0f - 0.96f * ease);
+                curX = panelCenterX + (bCenterX - panelCenterX) * ease;
+                curY = panelCenterY + (bCenterY - panelCenterY) * ease;
+            } else {
+                int duration = getOpenAnimMs();
+                float t = Math.min(1.0f, (now - openStartTime) / (float) duration);
+                float ease = easeOutCubic(t);
+                zoomScale = Math.min(1.0f, 0.04f + 0.96f * ease);
+                curX = bCenterX + (panelCenterX - bCenterX) * ease;
+                curY = bCenterY + (panelCenterY - bCenterY) * ease;
+            }
 
-            // Mirror on ModelViewStack so item icons zoom with the panel
+            // Flush queued geometry (e.g. parent background and backdrop) before changing global ModelView matrix
+            ConfigGuiBatch.flush();
+
+            // Apply transition transform ONCE globally on ModelViewStack so both ordinary geometry and item icons zoom cleanly
             PoseStack modelView = RenderSystem.getModelViewStack();
             modelView.pushPose();
             modelView.translate(curX, curY, 0);
@@ -2139,7 +2246,7 @@ public class BuildScapeConfigScreen extends Screen {
         updateSidePanelAnimation();
         SidePanelLayout layout = calculateLayout();
 
-        int offsetY = isClosing ? 0 : Math.round((1.0f - alpha) * 8.0f);
+        int offsetY = 0;
         int panelX = layout.panelX;
         int panelY = layout.panelY + offsetY;
         int panelW = layout.panelW;
@@ -2236,8 +2343,8 @@ public class BuildScapeConfigScreen extends Screen {
             scissorUiScale = 1.0f;
         }
 
-        if (applyClosingTransform) {
-            popGuiPose(poseStackOrGraphics);
+        if (applyTransitionTransform) {
+            ConfigGuiBatch.flush();
             PoseStack modelView = RenderSystem.getModelViewStack();
             modelView.popPose();
             RenderSystem.applyModelViewMatrix();
@@ -2422,9 +2529,10 @@ public class BuildScapeConfigScreen extends Screen {
         Set<String> invalidItems = "items".equals(current.id) ? this.invalidItems : Collections.emptySet();
         boolean noticeShown = headerNotice != null && System.currentTimeMillis() <= headerNoticeUntil;
         int textY = y + (catHeaderH - 8) / 2;
+        int btnRight = frameRight - 5;
         int presetBtnW = 32;
-        int presetBtnH = 22;
-        int presetBtnX = (x + w) - presetBtnW - 4;
+        int presetBtnH = 24;
+        int presetBtnX = btnRight - presetBtnW;
         int presetBtnY = y + (catHeaderH - presetBtnH) / 2;
         int maxHeaderRight = "items".equals(current.id) ? (presetBtnX - 8) : (x + w - 12);
         if (current.iconTexture != null) {
@@ -3061,134 +3169,188 @@ public class BuildScapeConfigScreen extends Screen {
 
         int rowH = 24;
         int rowGap = 2;
-        int totalContentHeight = Math.max(1, pillarList.size()) * (rowH + rowGap) + 4;
+        int effectiveRowCount = pillarList.size();
+        for (ConfigScreenAnims.PillarRemovalEntry rem : activePillarRemovals.values()) {
+            int remIdx = (int) (rem.contentY / (rowH + rowGap)) + 1;
+            if (remIdx > effectiveRowCount) {
+                effectiveRowCount = remIdx;
+            }
+        }
+        int totalContentHeight = Math.max(1, effectiveRowCount) * (rowH + rowGap) + 4;
         maxScroll = Math.max(0, totalContentHeight - viewportH);
         scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
 
         int startY = viewportY + 2 - (int) scrollOffset;
 
-        enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
+        int scissorWidth = (scrollbarTrackX - 2) - (x + 4);
+        enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, scissorWidth, viewportH);
 
-        if (pillarList.isEmpty()) {
+        long now = System.currentTimeMillis();
+
+        if (pillarList.isEmpty() && activePillarRemovals.isEmpty()) {
             int emptyY = startY + 8;
             drawBeveledButton(poseStackOrGraphics, colX, emptyY, availW, 36, COLOR_ROW_BG, false, false, alpha);
             drawCenteredText(poseStackOrGraphics, font, "No placed pillars found in world.", colX + availW / 2, emptyY + 8, applyAlpha(COLOR_TEXT_SILVER, alpha));
             drawCenteredText(poseStackOrGraphics, font, "Place and customize pillar columns to synchronize their IDs.", colX + availW / 2, emptyY + 20, applyAlpha(COLOR_TEXT_MUTED, alpha));
         } else {
+            // 1. Render surviving rows (smoothly shifted vertically into place)
             int[] visible = ConfigRenderWork.visibleRows(viewportY - startY, viewportH, rowH + rowGap, pillarList.size());
-            for (int r = visible[0]; r < visible[1]; r++) {
+            int visibleStart = Math.max(0, visible[0] - 2);
+            int visibleEnd = Math.min(pillarList.size(), visible[1] + 3);
+
+            for (int r = visibleStart; r < visibleEnd; r++) {
                 PillarIdManager.PillarData data = pillarList.get(r);
-                int rowY = startY + r * (rowH + rowGap);
+                float visualY = getPillarRowVisualY(data.id, r, rowH + rowGap, now);
+                int rowY = startY + (int) visualY;
                 if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;
 
                 boolean isSelected = selectedPillarIds.contains(data.id);
                 boolean isEditingInSidePanel = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PILLAR_DETAIL && Objects.equals(selectedPillarDetailId, data.id);
-                boolean hover = mouseX >= colX && mouseX <= colX + availW && mouseY >= rowY && mouseY <= rowY + rowH &&
-                        mouseY >= viewportY && mouseY <= viewportY + viewportH;
 
-                int rowBg = isEditingInSidePanel ? (currentTheme.isLight() ? 0xFFDCFCE7 : 0xFF1C2C22) : (isSelected ? (currentTheme.isLight() ? 0xFFF0FDF4 : 0xFF16241A) : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG));
-                drawBeveledButton(poseStackOrGraphics, colX, rowY, availW, rowH, rowBg, hover, isSelected || isEditingInSidePanel, alpha);
+                renderSinglePillarRow(poseStackOrGraphics, font, colX, rowY, availW, rowH,
+                        chkW, chkBoxSize, gap, idColW, iconColW, colorsColW, dimColW, coordsColW, actionsColW,
+                        data, isSelected, isEditingInSidePanel, true, mouseX, mouseY, alpha);
+            }
 
-                // Row Checkbox
-                int rChkX = colX + (chkW - chkBoxSize) / 2;
-                int rChkY = rowY + (rowH - chkBoxSize) / 2;
-                drawBeveledButton(poseStackOrGraphics, rChkX, rChkY, chkBoxSize, chkBoxSize, COLOR_SLOT_BG, hover, isSelected, alpha);
-                if (isSelected) {
-                    fill(poseStackOrGraphics, rChkX + 2, rChkY + 2, rChkX + chkBoxSize - 2, rChkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
-                }
-
-                int rcX = colX + chkW + gap;
-
-                // ID Column (clickable to open detail!)
-                String idText = data.id != null ? data.id : "unknown";
-                int idTextCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
-                drawText(poseStackOrGraphics, font, font.plainSubstrByWidth(idText, idColW - 4), rcX + 2, rowY + 8, applyAlpha(idTextCol, alpha));
-                rcX += idColW + gap;
-
-                // ITEM Column (Pillar Type + Displayed Item icons side by side)
-                ItemStack pillarTypeStack = getItemStackFromId(data.pillarType);
-                ItemStack dispStack = getItemStackFromId(data.displayedItem);
-                int iconY = rowY + (rowH - 16) / 2;
-                int iconStartX = rcX + (iconColW - 36) / 2;
-
-                if (!pillarTypeStack.isEmpty() || !dispStack.isEmpty()) {
-                    if (!pillarTypeStack.isEmpty()) {
-                        renderGuiItem(poseStackOrGraphics, pillarTypeStack, iconStartX, iconY);
+            // 2. Render removing rows (sliding right and fading out)
+            if (!activePillarRemovals.isEmpty()) {
+                List<String> finished = new ArrayList<>();
+                for (Map.Entry<String, ConfigScreenAnims.PillarRemovalEntry> entry : activePillarRemovals.entrySet()) {
+                    ConfigScreenAnims.PillarRemovalEntry rem = entry.getValue();
+                    if (rem.isFinished(now)) {
+                        finished.add(entry.getKey());
+                        continue;
                     }
-                    if (!dispStack.isEmpty()) {
-                        renderGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY);
+                    float progress = rem.getProgress(now);
+                    int rowY = startY + (int) rem.contentY;
+                    if (rowY + rowH < viewportY || rowY > viewportY + viewportH) {
+                        continue;
                     }
-                } else {
-                    drawCenteredText(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                    // Slide to the right across the table
+                    int rowX = rem.getSlideX(colX, availW, now);
+                    float remAlpha = rem.getRemovalAlpha(alpha, now);
+                    if (remAlpha <= 0.01f) continue;
+
+                    renderSinglePillarRow(poseStackOrGraphics, font, rowX, rowY, availW, rowH,
+                            chkW, chkBoxSize, gap, idColW, iconColW, colorsColW, dimColW, coordsColW, actionsColW,
+                            rem.data, false, false, false, mouseX, mouseY, remAlpha);
                 }
-                rcX += iconColW + gap;
-
-                // COLORS Column (Consistent same-sized mini swatches)
-                List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : PillarParticleConfig.get().particle_color;
-                int numSwatches = Math.min(7, colors != null ? colors.size() : 0);
-                if (numSwatches > 0) {
-                    int swSize = 7;
-                    int swGap = 2;
-                    int totalSwW = numSwatches * swSize + (numSwatches - 1) * swGap;
-                    int swStartX = rcX + (colorsColW - totalSwW) / 2;
-                    int swY = rowY + (rowH - swSize) / 2;
-                    for (int s = 0; s < numSwatches; s++) {
-                        int swX = swStartX + s * (swSize + swGap);
-                        int colInt = 0xFFFFFFFF;
-                        try {
-                            String hex = colors.get(s).replace("#", "");
-                            colInt = 0xFF000000 | Integer.parseInt(hex, 16);
-                        } catch (Exception ignored) {}
-                        fill(poseStackOrGraphics, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, alpha));
-                        drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(0xFF000000, alpha));
-                    }
-                } else {
-                    drawCenteredText(poseStackOrGraphics, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                for (String finishedId : finished) {
+                    activePillarRemovals.remove(finishedId);
                 }
-                rcX += colorsColW + gap;
-
-                // DIMENSION Column
-                String dimName = formatDimensionName(data.dimension);
-                drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
-                rcX += dimColW + gap;
-
-                // COORDINATES Column (colored X, Y, Z)
-                String coordsStr = String.format("%d %d %d", data.x, data.y, data.z);
-                int coordTextW = font.width(coordsStr);
-                int cX = rcX + (coordsColW - coordTextW) / 2;
-                String xStr = String.valueOf(data.x);
-                String yStr = String.valueOf(data.y);
-                String zStr = String.valueOf(data.z);
-                drawText(poseStackOrGraphics, font, xStr, cX, rowY + 8, applyAlpha(0xFFFF5555, alpha));
-                int xW = font.width(xStr + " ");
-                drawText(poseStackOrGraphics, font, yStr, cX + xW, rowY + 8, applyAlpha(0xFF5599FF, alpha));
-                int yW = font.width(yStr + " ");
-                drawText(poseStackOrGraphics, font, zStr, cX + xW + yW, rowY + 8, applyAlpha(0xFF55FF55, alpha));
-                rcX += coordsColW + gap;
-
-                // ACTIONS Column ([ ✎ Edit ] and [ ✕ ])
-                int actH = 13;
-                int actY = rowY + (rowH - actH) / 2;
-
-                int editW = 34;
-                int editX = rcX + 2;
-                boolean hoverEdit = mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH;
-                drawBeveledButton(poseStackOrGraphics, editX, actY, editW, actH, hoverEdit ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverEdit, false, alpha);
-                drawCenteredText(poseStackOrGraphics, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-
-                int delW = 16;
-                int delX = editX + editW + 4;
-                boolean hoverDel = mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH;
-                int delBg = hoverDel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
-                drawBeveledButton(poseStackOrGraphics, delX, actY, delW, actH, delBg, hoverDel, false, alpha);
-                int delTextCol = hoverDel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
-                drawCenteredText(poseStackOrGraphics, font, "✕", delX + delW / 2, actY + 2, applyAlpha(delTextCol, alpha));
             }
         }
 
         disableGuiScissor(poseStackOrGraphics);
 
         renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
+    }
+
+    private void renderSinglePillarRow(Object poseStackOrGraphics, Font font, int rowX, int rowY, int availW, int rowH,
+                                       int chkW, int chkBoxSize, int gap,
+                                       int idColW, int iconColW, int colorsColW, int dimColW, int coordsColW, int actionsColW,
+                                       PillarIdManager.PillarData data, boolean isSelected, boolean isEditingInSidePanel,
+                                       boolean isInteractive, int mouseX, int mouseY, float alpha) {
+        boolean hover = isInteractive && mouseX >= rowX && mouseX <= rowX + availW && mouseY >= rowY && mouseY <= rowY + rowH;
+        int rowBg = isEditingInSidePanel ? (currentTheme.isLight() ? 0xFFDCFCE7 : 0xFF1C2C22) : (isSelected ? (currentTheme.isLight() ? 0xFFF0FDF4 : 0xFF16241A) : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG));
+        drawBeveledButton(poseStackOrGraphics, rowX, rowY, availW, rowH, rowBg, hover, isSelected || isEditingInSidePanel, alpha);
+
+        // Row Checkbox
+        int rChkX = rowX + (chkW - chkBoxSize) / 2;
+        int rChkY = rowY + (rowH - chkBoxSize) / 2;
+        drawBeveledButton(poseStackOrGraphics, rChkX, rChkY, chkBoxSize, chkBoxSize, COLOR_SLOT_BG, hover, isSelected, alpha);
+        if (isSelected) {
+            fill(poseStackOrGraphics, rChkX + 2, rChkY + 2, rChkX + chkBoxSize - 2, rChkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
+        }
+
+        int rcX = rowX + chkW + gap;
+
+        // ID Column (clickable to open detail!)
+        String idText = data.id != null ? data.id : "unknown";
+        int idTextCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
+        drawText(poseStackOrGraphics, font, font.plainSubstrByWidth(idText, idColW - 4), rcX + 2, rowY + 8, applyAlpha(idTextCol, alpha));
+        rcX += idColW + gap;
+
+        // ITEM Column (Pillar Type + Displayed Item icons side by side)
+        ItemStack pillarTypeStack = getItemStackFromId(data.pillarType);
+        ItemStack dispStack = getItemStackFromId(data.displayedItem);
+        int iconY = rowY + (rowH - 16) / 2;
+        int iconStartX = rcX + (iconColW - 36) / 2;
+
+        if (!pillarTypeStack.isEmpty() || !dispStack.isEmpty()) {
+            if (alpha >= 0.05f) {
+                if (!pillarTypeStack.isEmpty()) {
+                    renderGuiItem(poseStackOrGraphics, pillarTypeStack, iconStartX, iconY);
+                }
+                if (!dispStack.isEmpty()) {
+                    renderGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY);
+                }
+            }
+        } else {
+            drawCenteredText(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        }
+        rcX += iconColW + gap;
+
+        // COLORS Column (Consistent same-sized mini swatches)
+        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : PillarParticleConfig.get().particle_color;
+        int numSwatches = Math.min(7, colors != null ? colors.size() : 0);
+        if (numSwatches > 0) {
+            int swSize = 7;
+            int swGap = 2;
+            int totalSwW = numSwatches * swSize + (numSwatches - 1) * swGap;
+            int swStartX = rcX + (colorsColW - totalSwW) / 2;
+            int swY = rowY + (rowH - swSize) / 2;
+            for (int s = 0; s < numSwatches; s++) {
+                int swX = swStartX + s * (swSize + swGap);
+                int colInt = 0xFFFFFFFF;
+                try {
+                    String hex = colors.get(s).replace("#", "");
+                    colInt = 0xFF000000 | Integer.parseInt(hex, 16);
+                } catch (Exception ignored) {}
+                fill(poseStackOrGraphics, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, alpha));
+                drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(0xFF000000, alpha));
+            }
+        } else {
+            drawCenteredText(poseStackOrGraphics, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        }
+        rcX += colorsColW + gap;
+
+        // DIMENSION Column
+        String dimName = formatDimensionName(data.dimension);
+        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        rcX += dimColW + gap;
+
+        // COORDINATES Column (colored X, Y, Z)
+        String coordsStr = String.format("%d %d %d", data.x, data.y, data.z);
+        int coordTextW = font.width(coordsStr);
+        int cX = rcX + (coordsColW - coordTextW) / 2;
+        String xStr = String.valueOf(data.x);
+        String yStr = String.valueOf(data.y);
+        String zStr = String.valueOf(data.z);
+        drawText(poseStackOrGraphics, font, xStr, cX, rowY + 8, applyAlpha(0xFFFF5555, alpha));
+        int xW = font.width(xStr + " ");
+        drawText(poseStackOrGraphics, font, yStr, cX + xW, rowY + 8, applyAlpha(0xFF5599FF, alpha));
+        int yW = font.width(yStr + " ");
+        drawText(poseStackOrGraphics, font, zStr, cX + xW + yW, rowY + 8, applyAlpha(0xFF55FF55, alpha));
+        rcX += coordsColW + gap;
+
+        // ACTIONS Column ([ ✎ Edit ] and [ ✕ ])
+        int actH = 13;
+        int actY = rowY + (rowH - actH) / 2;
+
+        int editW = 34;
+        int editX = rcX + 2;
+        boolean hoverEdit = isInteractive && mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH;
+        drawBeveledButton(poseStackOrGraphics, editX, actY, editW, actH, hoverEdit ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverEdit, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+
+        int delW = 16;
+        int delX = editX + editW + 4;
+        boolean hoverDel = isInteractive && mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH;
+        int delBg = hoverDel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
+        drawBeveledButton(poseStackOrGraphics, delX, actY, delW, actH, delBg, hoverDel, false, alpha);
+        int delTextCol = hoverDel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
+        drawCenteredText(poseStackOrGraphics, font, "✕", delX + delW / 2, actY + 2, applyAlpha(delTextCol, alpha));
     }
 
     // Per-pillar customization view.
@@ -3354,13 +3516,14 @@ public class BuildScapeConfigScreen extends Screen {
         int curY = startY;
         int systemRowH = getSystemSettingRowHeight();
 
-        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", currentTheme.displayName, mouseX, mouseY, alpha);
+        ConfigThemes.Theme baseTheme = ConfigThemes.getBaseTheme(currentTheme);
+        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", baseTheme.displayName, mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
         renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Background", "Decorative backdrop pattern applied over the theme", ConfigBackgrounds.getCurrentBackground().displayName, mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
-        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ANIM_SPEEDS[animSpeedIndex], mouseX, mouseY, alpha);
+        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ConfigScreenAnims.getAnimSpeedLabel(), mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
         PillarParticleConfig.EditPermissionMode policy = PillarParticleConfig.get().edit_permission_mode;
@@ -3791,8 +3954,9 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     private void drawInlinePresetsTab(Object poseStackOrGraphics, int btnX, int btnY, int btnW, int btnH, boolean hover, boolean active, float alpha) {
-        // 1. Chassis Body Fill (Matches main panel frame chassis base)
-        fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + btnH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        int btnRight = btnX + btnW;
+        // 1. Chassis Body Fill (Seamlessly docked against main panel bevel)
+        fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + btnH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
@@ -3800,51 +3964,54 @@ public class BuildScapeConfigScreen extends Screen {
         int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
-        // 2. Outermost 1px Black Border (Matches main panel frame)
-        fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + 1, black);
-        fill(poseStackOrGraphics, btnX, btnY + btnH - 1, btnX + btnW, btnY + btnH, black);
+        // 2. Outermost 1px Black Border (Top & Bottom seamlessly attach to main panel outer frame)
         fill(poseStackOrGraphics, btnX, btnY, btnX + 1, btnY + btnH, black);
-        fill(poseStackOrGraphics, btnX + btnW - 1, btnY, btnX + btnW, btnY + btnH, black);
+        fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + 1, black);
+        fill(poseStackOrGraphics, btnX, btnY + btnH - 1, btnRight, btnY + btnH, black);
 
-        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
-        drawHorizontalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom)
         drawVerticalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
-        fill(poseStackOrGraphics, btnX + 1, btnY + btnH - 2, btnX + btnW - 1, btnY + btnH - 1, shadow);
-        fill(poseStackOrGraphics, btnX + btnW - 2, btnY + 1, btnX + btnW - 1, btnY + btnH - 1, shadow);
+        drawHorizontalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        fill(poseStackOrGraphics, btnX + 1, btnY + btnH - 2, btnRight, btnY + btnH - 1, shadow);
 
-        // 4. Outer Chassis Band (Offset 2, exactly matches main frame chassis band)
-        fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + btnW - 2, btnY + 3, band);
-        fill(poseStackOrGraphics, btnX + 2, btnY + btnH - 3, btnX + btnW - 2, btnY + btnH - 2, band);
+        // 4. Outer Chassis Band (Offset 2, left/top/bottom meeting main panel border)
         fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + 3, btnY + btnH - 2, band);
-        fill(poseStackOrGraphics, btnX + btnW - 3, btnY + 2, btnX + btnW - 2, btnY + btnH - 2, band);
+        fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnRight, btnY + 3, band);
+        fill(poseStackOrGraphics, btnX + 2, btnY + btnH - 3, btnRight, btnY + btnH - 2, band);
 
-        // 5. Stepped Bevel Ridge & Groove (Offset 3, matching main frame stepped bevel)
-        fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + btnW - 3, btnY + 4, bevelShadow);
+        // 5. Stepped Bevel Ridge & Groove (Offset 3)
         fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + 4, btnY + btnH - 3, bevelShadow);
-        fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnX + btnW - 3, btnY + btnH - 3, bevelHighlight);
-        fill(poseStackOrGraphics, btnX + btnW - 4, btnY + 3, btnX + btnW - 3, btnY + btnH - 3, bevelHighlight);
+        fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnRight - 1, btnY + 4, bevelShadow);
+        fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnRight - 1, btnY + btnH - 3, bevelHighlight);
 
-        // 6. Inner Face Plate (Offset 4)
+        // Vertical right bevel connecting directly into main panel's bevel line
+        fill(poseStackOrGraphics, btnRight - 1, btnY + 3, btnRight, btnY + btnH - 3, bevelHighlight);
+
+        // 6. Inner Face Plate (Docked flush against main panel bevel)
         int faceX = btnX + 4;
         int faceY = btnY + 4;
-        int faceW = btnW - 8;
+        int faceW = (btnRight - 1) - faceX;
         int faceH = btnH - 8;
 
         int bgCol = active ? (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE)
                 : (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG);
-        fill(poseStackOrGraphics, faceX, faceY, faceX + faceW, faceY + faceH, applyAlpha(bgCol, alpha));
+        fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + faceH, applyAlpha(bgCol, alpha));
 
-        // Active / Hover Accent Framing
+        // Active / Hover Accent Framing (Docked tab outline meeting main panel bevel)
         if (active) {
             int accentGlow = applyAlpha(COLOR_ACCENT, (hover ? 0.90f : 0.70f) * alpha);
-            drawBorder(poseStackOrGraphics, faceX, faceY, faceW, faceH, accentGlow);
+            fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, accentGlow);
+            fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, accentGlow);
+            fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, accentGlow);
         } else if (hover) {
             int hoverGlow = applyAlpha(COLOR_ROW_BORDER_HOVER, alpha * 0.75f);
-            drawBorder(poseStackOrGraphics, faceX, faceY, faceW, faceH, hoverGlow);
+            fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, hoverGlow);
+            fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, hoverGlow);
+            fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, hoverGlow);
         }
 
-        // 7. 3-Slider Equalizer Icon (Theme-unified tracks and beveled knobs)
-        int cx = btnX + btnW / 2;
+        // 7. 3-Slider Equalizer Icon (Centered within docked face)
+        int cx = faceX + faceW / 2;
         int cy = btnY + btnH / 2;
 
         int trkCol = applyAlpha(active ? COLOR_ACCENT : (hover ? COLOR_ROW_BORDER_HOVER : COLOR_CHASSIS_BAND), alpha);
@@ -4017,13 +4184,10 @@ public class BuildScapeConfigScreen extends Screen {
 
         if (hover) {
             List<Component> tip = new ArrayList<>();
-            if ("light".equals(currentTheme.id)) {
-                tip.add(ComponentHelper.literal("Theme: Light Mode §7(Click for Dark)"));
-            } else if ("dark".equals(currentTheme.id)) {
-                tip.add(ComponentHelper.literal("Theme: Dark Mode §7(Click for Light)"));
-            } else {
-                tip.add(ComponentHelper.literal("Theme: " + currentTheme.displayName + " §7(Click for Light)"));
-            }
+            ConfigThemes.Theme base = ConfigThemes.getBaseTheme(currentTheme);
+            boolean isLight = currentTheme != null && currentTheme.isLight();
+            tip.add(ComponentHelper.literal("Theme: " + base.displayName + (isLight ? " (Light)" : " (Dark)")));
+            tip.add(ComponentHelper.literal("§7Click to switch to " + (isLight ? "Dark" : "Light") + " mode"));
             deferredTooltip = tip;
             deferredTooltipX = rawMouseX + 12;
             deferredTooltipY = rawMouseY;
@@ -4076,14 +4240,16 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void handleHeaderThemeToggleClick(double mouseX, int toggleX, int toggleW) {
         float mid = toggleX + toggleW / 2.0f;
-        boolean isLight = currentTheme != null && "light".equals(currentTheme.id);
+        boolean currentIsLight = currentTheme != null && currentTheme.isLight();
+        ConfigThemes.Theme nextTheme;
         if (mouseX < mid) {
             // Clicked Moon / Dark side
-            applyTheme(isLight ? ConfigThemes.DARK : ConfigThemes.LIGHT);
+            nextTheme = currentIsLight ? ConfigThemes.getDarkVariant(currentTheme) : ConfigThemes.getLightVariant(currentTheme);
         } else {
             // Clicked Sun / Light side
-            applyTheme(isLight ? ConfigThemes.DARK : ConfigThemes.LIGHT);
+            nextTheme = !currentIsLight ? ConfigThemes.getLightVariant(currentTheme) : ConfigThemes.getDarkVariant(currentTheme);
         }
+        applyTheme(nextTheme);
         themeToggleAnimStartTime = System.currentTimeMillis();
         themeToggleAnimFrom = themeToggleAnimPos;
     }
@@ -4100,8 +4266,6 @@ public class BuildScapeConfigScreen extends Screen {
         drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         PillarParticleConfig globalCfg = PillarParticleConfig.get();
-        sidePanelScrollOffset = 0;
-        sidePanelMaxScroll = 0;
 
         // Pillar switch transition animation
         long now = System.currentTimeMillis();
@@ -4127,18 +4291,18 @@ public class BuildScapeConfigScreen extends Screen {
 
         enableGuiScissor(poseStackOrGraphics, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
 
-        int curY = y + 4;
-        int rowH = 22;
-        int rowGap = 3;
+        int curY = y + 3 - sidePanelScrollOffset;
+        int rowH = 20;
+        int rowGap = 2;
         int rowX = x + 4 + slideOffsetX;
         int rowW = w - 8;
 
         // Row 0: Coordinates & Dimension badge
         String dimStr = formatDimensionName(data.dimension);
         String locStr = String.format("%s · %d, %d, %d", dimStr, data.x, data.y, data.z);
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, 15, COLOR_BTN_BG, false, false, contentAlpha);
-        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, contentAlpha));
-        curY += 15 + rowGap;
+        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, 14, COLOR_BTN_BG, false, false, contentAlpha);
+        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 3, applyAlpha(COLOR_TEXT_SILVER, contentAlpha));
+        curY += 14 + rowGap;
 
         // Row 1: Custom Pattern Toggle
         boolean usePat = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
@@ -4172,27 +4336,40 @@ public class BuildScapeConfigScreen extends Screen {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
         int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(7, Math.max(1, colors.size())));
-        renderSideRowPalette(poseStackOrGraphics, font, rowX, curY, rowW, 34, colors, maxColors, mouseX, mouseY, contentAlpha);
-        curY += 34 + rowGap;
+        renderSideRowPalette(poseStackOrGraphics, font, rowX, curY, rowW, 32, colors, maxColors, mouseX, mouseY, contentAlpha);
+        curY += 32 + rowGap;
 
         // Embedded Inline Color Picker at bottom of details panel
         curY = renderInlinePillarColorPicker(poseStackOrGraphics, font, rowX, curY, rowW, data, mouseX, mouseY, contentAlpha);
         curY += rowGap;
 
         // Row 7: Save Button
-        int btnH = 16;
+        int btnH = 18;
         boolean hoverSave = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         hoverConfigAccess(hoverSave, ConfigSetting.PILLAR_EDIT, false, false, false);
         drawBeveledGreenButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverSave, contentAlpha);
-        drawCenteredText(poseStackOrGraphics, font, "✓ Save Pillar", rowX + rowW / 2, curY + 4, applyAlpha(hoverSave ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, contentAlpha));
+        drawCenteredText(poseStackOrGraphics, font, "✓ Save Pillar", rowX + rowW / 2, curY + 5, applyAlpha(hoverSave ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, contentAlpha));
         curY += btnH + rowGap;
 
         // Row 8: Locate in World
         boolean hoverLoc = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverLoc ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverLoc, false, contentAlpha);
-        drawCenteredText(poseStackOrGraphics, font, "⌖ Locate in World", rowX + rowW / 2, curY + 4, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, contentAlpha));
+        drawCenteredText(poseStackOrGraphics, font, "⌖ Locate in World", rowX + rowW / 2, curY + 5, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, contentAlpha));
+        curY += btnH + 3;
 
         disableGuiScissor(poseStackOrGraphics);
+
+        int totalContentH = (curY + sidePanelScrollOffset) - y;
+        sidePanelMaxScroll = Math.max(0, totalContentH - h);
+        sidePanelScrollOffset = Math.max(0, Math.min(sidePanelMaxScroll, sidePanelScrollOffset));
+
+        if (sidePanelMaxScroll > 0) {
+            int sbW = 3;
+            int sbX = x + w - sbW - 1;
+            int sbY = y + 2;
+            int sbH = Math.max(1, h - 4);
+            renderCustomScrollbar(poseStackOrGraphics, sbX, sbY, sbW, sbH, sidePanelScrollOffset, sidePanelMaxScroll, mouseX, mouseY, alpha, true);
+        }
     }
 
     private void updateLivePillarColor(PillarIdManager.PillarData data) {
@@ -4222,7 +4399,7 @@ public class BuildScapeConfigScreen extends Screen {
         int pad = 4;
         int hueW = 12;
         int gradW = w - hueW - pad - 2;
-        int gradH = 68;
+        int gradH = 60;
         int gradX = x + 1;
         int gradY = curY + 1;
         int hueX = gradX + gradW + pad;
@@ -4261,7 +4438,7 @@ public class BuildScapeConfigScreen extends Screen {
         fill(poseStackOrGraphics, hueX - 1, thumbY - 1, hueX + hueW + 1, thumbY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
         drawBorder(poseStackOrGraphics, hueX - 1, thumbY - 1, hueW + 2, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
-        curY += gradH + 5;
+        curY += gradH + 4;
 
         // Preview & Hex Input
         int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
@@ -4287,7 +4464,7 @@ public class BuildScapeConfigScreen extends Screen {
         drawText(poseStackOrGraphics, font, trimTextToWidth(font, displayedHex, hexW - 8, true), hexX + 4, curY + 3,
                 applyAlpha(hexColorSelected ? COLOR_ACCENT : COLOR_TEXT_WHITE, alpha));
 
-        curY += prevSize + 4;
+        curY += prevSize + 3;
 
         // Quick Preset Swatches
         int pSize = 11;
@@ -4299,7 +4476,7 @@ public class BuildScapeConfigScreen extends Screen {
             fill(poseStackOrGraphics, px, curY, px + pSize, curY + pSize, applyAlpha(PALETTE_PRESETS[p], alpha));
             drawBorder(poseStackOrGraphics, px, curY, pSize, pSize, applyAlpha(0xFF000000, alpha));
         }
-        curY += pSize + 4;
+        curY += pSize + 3;
 
         return curY;
     }
@@ -4404,10 +4581,10 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void renderSideRowToggle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, boolean val, int mouseX, int mouseY, float alpha) {
         drawBeveledButton(poseStackOrGraphics, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, label, x + 4, y + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStackOrGraphics, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int btnW = 26;
-        int btnH = 15;
+        int btnH = 16;
         int btnX = x + w - btnW - 8;
         int btnY = y + (h - btnH) / 2;
         boolean hover = mouseX >= btnX - 2 && mouseX <= btnX + btnW + 2 && mouseY >= btnY - 2 && mouseY <= btnY + btnH + 2;
@@ -4417,10 +4594,10 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void renderSideRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
         drawBeveledButton(poseStackOrGraphics, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, label, x + 4, y + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStackOrGraphics, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int btnW = 66;
-        int btnH = 15;
+        int btnH = 16;
         int btnX = x + w - btnW - 4;
         int btnY = y + (h - btnH) / 2;
         boolean hover = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
@@ -4431,8 +4608,8 @@ public class BuildScapeConfigScreen extends Screen {
     private void renderSideRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, ParticleRange range, double value, int mouseX, int mouseY, float alpha) {
         renderSideRowCounter(poseStackOrGraphics, font, x, y, w, h, label, range.formatValue(value), mouseX, mouseY, alpha);
         int counterX = x + w - 74 - 4;
-        int counterY = y + (h - 15) / 2;
-        if (mouseX >= counterX && mouseX <= counterX + 74 && mouseY >= counterY && mouseY <= counterY + 15) {
+        int counterY = y + (h - 16) / 2;
+        if (mouseX >= counterX && mouseX <= counterX + 74 && mouseY >= counterY && mouseY <= counterY + 16) {
             deferredTooltip = Collections.singletonList(ComponentHelper.literal(range.tooltip(value)));
             deferredTooltipX = rawMouseX + 12;
             deferredTooltipY = rawMouseY;
@@ -4441,10 +4618,10 @@ public class BuildScapeConfigScreen extends Screen {
 
     private void renderSideRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
         drawBeveledButton(poseStackOrGraphics, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, label, x + 4, y + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStackOrGraphics, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int counterW = 74;
-        int counterH = 15;
+        int counterH = 16;
         int counterX = x + w - counterW - 4;
         int counterY = y + (h - counterH) / 2;
         int stepW = 15;
@@ -4470,29 +4647,29 @@ public class BuildScapeConfigScreen extends Screen {
         drawText(poseStackOrGraphics, font, "Colors (" + maxColors + "/7)", x + 4, y + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int counterW = 60;
-        int counterH = 14;
+        int counterH = 16;
         int counterX = x + w - counterW - 4;
         int counterY = y + 2;
         int stepW = 13;
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int valX = counterX + stepW;
         int valW = counterW - stepW * 2;
         fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
         drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        drawCenteredText(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int swSize = 13;
         int swGap = 4;
-        int swY = y + 17;
+        int swY = y + 16;
         for (int i = 0; i < 7; i++) {
             int swX = x + 6 + i * (swSize + swGap);
             int colInt = 0xFFFFFFFF;
@@ -4612,7 +4789,7 @@ public class BuildScapeConfigScreen extends Screen {
     private float scissorUiScale = 1.0f;
 
     private void enableGuiScissor(Object poseStackOrGraphics, int guiX, int guiY, int guiW, int guiH) {
-        if (isClosing) return;
+        if (isClosing || (isOpening && openProgress < 0.99f)) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.getWindow() == null) return;
         int[] rect = scissorRect(guiX, guiY, guiW, guiH, mc.getWindow().getGuiScale() * scissorUiScale,
@@ -4632,7 +4809,7 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     private void disableGuiScissor(Object poseStackOrGraphics) {
-        if (isClosing) return;
+        if (isClosing || (isOpening && openProgress < 0.99f)) return;
         disableScissor();
     }
 
@@ -4755,15 +4932,30 @@ public class BuildScapeConfigScreen extends Screen {
 
     // Shared custom scrollbar.
     private void renderCustomScrollbar(Object poseStackOrGraphics, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha) {
+        renderCustomScrollbar(poseStackOrGraphics, trackX, trackY, trackW, trackH, scroll, maxSc, mouseX, mouseY, alpha, false);
+    }
+
+    private void renderCustomScrollbar(Object poseStackOrGraphics, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha, boolean isSidePanel) {
         if (maxSc <= 0) return;
 
-        currentScrollbarTrackX = trackX;
-        currentScrollbarTrackY = trackY;
-        currentScrollbarTrackW = trackW;
-        currentScrollbarTrackH = trackH;
+        if (isSidePanel) {
+            sideScrollbarTrackX = trackX;
+            sideScrollbarTrackY = trackY;
+            sideScrollbarTrackW = trackW;
+            sideScrollbarTrackH = trackH;
+        } else {
+            currentScrollbarTrackX = trackX;
+            currentScrollbarTrackY = trackY;
+            currentScrollbarTrackW = trackW;
+            currentScrollbarTrackH = trackH;
+        }
 
         int thumbH = Math.max(18, (int) ((trackH / (float) (trackH + maxSc)) * trackH));
-        currentScrollbarThumbH = thumbH;
+        if (isSidePanel) {
+            sideScrollbarThumbH = thumbH;
+        } else {
+            currentScrollbarThumbH = thumbH;
+        }
         int thumbY = trackY + (int) ((scroll / maxSc) * (trackH - thumbH));
 
         // Track: clean recessed slot
@@ -4772,7 +4964,8 @@ public class BuildScapeConfigScreen extends Screen {
 
         // Thumb: clean metallic button with bevels (no weird gradient banding)
         boolean hoverThumb = mouseX >= trackX && mouseX <= trackX + trackW && mouseY >= thumbY && mouseY <= thumbY + thumbH;
-        int thumbColor = isDraggingScrollbar ? COLOR_ACCENT : (hoverThumb ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE);
+        boolean dragging = isSidePanel ? isDraggingSideScrollbar : isDraggingScrollbar;
+        int thumbColor = dragging ? COLOR_ACCENT : (hoverThumb ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE);
 
         // Thumb fill
         fill(poseStackOrGraphics, trackX + 1, thumbY + 1, trackX + trackW - 1, thumbY + thumbH - 1, applyAlpha(thumbColor, alpha));
@@ -5240,7 +5433,7 @@ public class BuildScapeConfigScreen extends Screen {
     // Mouse and keyboard event handling.
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (isClosing) return true;
+        if (isClosing || (isOpening && openProgress < 0.2f)) return true;
 
         float uiScale = getGuiUiScale();
         if (Math.abs(uiScale - 1.0f) > 0.001f) {
@@ -5361,9 +5554,10 @@ public class BuildScapeConfigScreen extends Screen {
 
         // Inline Presets Toggle Button (top-right, inside items content header)
         if (selectedTabIndex >= 0 && selectedTabIndex < navItems.size() && "items".equals(navItems.get(selectedTabIndex).id)) {
+            int btnRight = layout.frameRight - 5;
             int presetBtnW = 32;
-            int presetBtnH = 22;
-            int presetBtnX = (contentX + contentW) - presetBtnW - 4;
+            int presetBtnH = 24;
+            int presetBtnX = btnRight - presetBtnW;
             int presetBtnY = contentY + (catHeaderH - presetBtnH) / 2;
             if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
                     && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH) {
@@ -5397,9 +5591,10 @@ public class BuildScapeConfigScreen extends Screen {
         switch (current.id) {
             case "items" -> {
                 // Inline Presets Toggle Button (top-right of content header)
+                int btnRight = frameRight - 5;
                 int presetBtnW = 32;
-                int presetBtnH = 22;
-                int presetBtnX = (contentX + contentW) - presetBtnW - 4;
+                int presetBtnH = 24;
+                int presetBtnX = btnRight - presetBtnW;
                 int presetBtnY = contentY + (catHeaderH - presetBtnH) / 2;
                 if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
                         && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH) {
@@ -5920,7 +6115,9 @@ public class BuildScapeConfigScreen extends Screen {
                 // Row 0: UI Theme Cycle
                 int themeStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (themeStep != 0) {
-                    ConfigThemes.Theme next = (themeStep < 0) ? ConfigThemes.cyclePrevTheme() : ConfigThemes.cycleNextTheme();
+                    boolean isLight = currentTheme != null && currentTheme.isLight();
+                    ConfigThemes.Theme nextBase = (themeStep < 0) ? ConfigThemes.cyclePrevBaseTheme(currentTheme) : ConfigThemes.cycleNextBaseTheme(currentTheme);
+                    ConfigThemes.Theme next = ConfigThemes.getVariant(nextBase, isLight);
                     applyTheme(next);
                     return true;
                 }
@@ -5944,9 +6141,9 @@ public class BuildScapeConfigScreen extends Screen {
                 // Row 2: Screen Animation Cycle
                 int animStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (animStep != 0) {
-                    animSpeedIndex = (animSpeedIndex + animStep + ANIM_SPEEDS.length) % ANIM_SPEEDS.length;
+                    ConfigScreenAnims.cycleAnimSpeed(animStep);
                     try {
-                        BuildscapeClientConfig.get().setAnimationSpeedIndex(animSpeedIndex);
+                        BuildscapeClientConfig.get().setAnimationSpeedIndex(ConfigScreenAnims.getAnimSpeedIndex());
                     } catch (Exception ignored) {}
                     return true;
                 }
@@ -6003,14 +6200,7 @@ public class BuildScapeConfigScreen extends Screen {
         if (!selectedPillarIds.isEmpty() && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             if (!confirmDestructiveAction("remove:selected")) return true;
-            List<String> ids = new ArrayList<>(selectedPillarIds);
-            for (String id : ids) {
-                PillarIdManager.getClient().removePillarData(id);
-            }
-            for (List<String> batch : removalBatches(ids)) {
-                ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(batch));
-            }
-            selectedPillarIds.clear();
+            triggerPillarRemovals(new ArrayList<>(selectedPillarIds), pillarList);
             return true;
         }
 
@@ -6024,13 +6214,9 @@ public class BuildScapeConfigScreen extends Screen {
             for (PillarIdManager.PillarData data : pillarList) {
                 if (data.id != null) {
                     ids.add(data.id);
-                    PillarIdManager.getClient().removePillarData(data.id);
                 }
             }
-            for (List<String> batch : removalBatches(ids)) {
-                ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(batch));
-            }
-            selectedPillarIds.clear();
+            triggerPillarRemovals(ids, pillarList);
             return true;
         }
 
@@ -6092,9 +6278,11 @@ public class BuildScapeConfigScreen extends Screen {
         int rowGap = 2;
         int startY = viewportY + 2 - (int) scrollOffset;
 
+        long clickTime = System.currentTimeMillis();
         for (int r = 0; r < pillarList.size(); r++) {
             PillarIdManager.PillarData data = pillarList.get(r);
-            int rowY = startY + r * (rowH + rowGap);
+            float visualY = getPillarRowVisualY(data.id, r, rowH + rowGap, clickTime);
+            int rowY = startY + (int) visualY;
             if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;
 
             if (mouseX >= colX && mouseX <= colX + availW && mouseY >= rowY && mouseY <= rowY + rowH) {
@@ -6124,12 +6312,7 @@ public class BuildScapeConfigScreen extends Screen {
 
                 if (mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH) {
                     if (!requireConfigModificationAccess()) return true;
-                    PillarIdManager.getClient().removePillarData(data.id);
-                    ModMessages.INSTANCE.sendToServer(new RemovePillarPacket(data.id));
-                    selectedPillarIds.remove(data.id);
-                    if (Objects.equals(selectedPillarDetailId, data.id) && sidePanelType == SidePanelType.PILLAR_DETAIL) {
-                        closeSidePanel();
-                    }
+                    triggerPillarRemovals(Collections.singletonList(data.id), pillarList);
                     return true;
                 }
 
@@ -6459,7 +6642,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     private boolean checkSideRowToggleClick(double mouseX, double mouseY, int x, int y, int w, int h) {
         int btnW = 26;
-        int btnH = 15;
+        int btnH = 16;
         int btnX = x + w - btnW - 8;
         int btnY = y + (h - btnH) / 2;
         return mouseX >= btnX - 3 && mouseX <= btnX + btnW + 3 && mouseY >= btnY - 3 && mouseY <= btnY + btnH + 3;
@@ -6467,7 +6650,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     private boolean checkSideRowCycleClick(double mouseX, double mouseY, int x, int y, int w, int h) {
         int btnW = 66;
-        int btnH = 15;
+        int btnH = 16;
         int btnX = x + w - btnW - 4;
         int btnY = y + (h - btnH) / 2;
         return mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
@@ -6475,7 +6658,7 @@ public class BuildScapeConfigScreen extends Screen {
 
     private int checkSideRowCounterClick(double mouseX, double mouseY, int x, int y, int w, int h) {
         int counterW = 74;
-        int counterH = 15;
+        int counterH = 16;
         int counterX = x + w - counterW - 4;
         int counterY = y + (h - counterH) / 2;
         int stepW = 15;
@@ -6513,6 +6696,25 @@ public class BuildScapeConfigScreen extends Screen {
         int sContentY = geometry.contentY();
         int sContentW = geometry.contentWidth();
         int sContentH = geometry.contentHeight();
+
+        // Side scrollbar interaction (drag & page jump)
+        if (sidePanelMaxScroll > 0 && sideScrollbarTrackW > 0) {
+            int pad = 3;
+            if (mouseX >= sideScrollbarTrackX - pad && mouseX <= sideScrollbarTrackX + sideScrollbarTrackW + pad &&
+                    mouseY >= sideScrollbarTrackY && mouseY <= sideScrollbarTrackY + sideScrollbarTrackH) {
+                int thumbY = sideScrollbarTrackY + (int) ((sidePanelScrollOffset / (double) sidePanelMaxScroll) * (sideScrollbarTrackH - sideScrollbarThumbH));
+                if (mouseY >= thumbY && mouseY <= thumbY + sideScrollbarThumbH) {
+                    isDraggingSideScrollbar = true;
+                    sideScrollDragStartY = mouseY;
+                    sideScrollDragStartOffset = sidePanelScrollOffset;
+                } else if (mouseY < thumbY) {
+                    sidePanelScrollOffset = Math.max(0, (int) (sidePanelScrollOffset - sideScrollbarTrackH * 0.75));
+                } else {
+                    sidePanelScrollOffset = Math.min(sidePanelMaxScroll, (int) (sidePanelScrollOffset + sideScrollbarTrackH * 0.75));
+                }
+                return true;
+            }
+        }
 
         if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
             return handleSidePanelPillarClick(mouseX, mouseY, button, sContentX, sContentY, sContentW, sContentH);
@@ -6684,14 +6886,14 @@ public class BuildScapeConfigScreen extends Screen {
         if (data == null) return false;
 
         PillarParticleConfig globalCfg = PillarParticleConfig.get();
-        int curY = y + 4 - sidePanelScrollOffset;
-        int rowH = 22;
-        int rowGap = 3;
+        int curY = y + 3 - sidePanelScrollOffset;
+        int rowH = 20;
+        int rowGap = 2;
         int rowX = x + 4;
         int rowW = w - 8;
 
         // Skip row 0 (coordinates badge)
-        curY += 15 + rowGap;
+        curY += 14 + rowGap;
 
         // Row 1: Custom Pattern Toggle
         if (checkSideRowToggleClick(mouseX, mouseY, rowX, curY, rowW, rowH)) {
@@ -6772,7 +6974,7 @@ public class BuildScapeConfigScreen extends Screen {
         int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(7, Math.max(1, colors.size())));
 
         int counterW = 60;
-        int counterH = 14;
+        int counterH = 16;
         int counterX = rowX + rowW - counterW - 4;
         int counterY = curY + 2;
         int stepW = 13;
@@ -6797,7 +6999,7 @@ public class BuildScapeConfigScreen extends Screen {
         // Swatches click
         int swSize = 13;
         int swGap = 4;
-        int swY = curY + 17;
+        int swY = curY + 16;
         for (int i = 0; i < 7; i++) {
             int swX = rowX + 6 + i * (swSize + swGap);
             if (mouseX >= swX && mouseX <= swX + swSize && mouseY >= swY && mouseY <= swY + swSize) {
@@ -6818,14 +7020,14 @@ public class BuildScapeConfigScreen extends Screen {
                 return true;
             }
         }
-        curY += 34 + rowGap;
+        curY += 32 + rowGap;
 
         // Embedded Inline Color Picker Clicks
         if (editingColorIndex >= 0 && editingColorIndex < colors.size()) {
             int gradX = inlinePickerGradW > 0 ? inlinePickerGradX : (rowX + 1);
             int gradY = inlinePickerGradH > 0 ? inlinePickerGradY : (curY + 1);
             int gradW = inlinePickerGradW > 0 ? inlinePickerGradW : (rowW - 12 - 4 - 2);
-            int gradH = inlinePickerGradH > 0 ? inlinePickerGradH : 68;
+            int gradH = inlinePickerGradH > 0 ? inlinePickerGradH : 60;
             int hueX = inlinePickerHueW > 0 ? inlinePickerHueX : (gradX + gradW + 4);
             int hueY = inlinePickerHueH > 0 ? inlinePickerHueY : gradY;
             int hueW = inlinePickerHueW > 0 ? inlinePickerHueW : 12;
@@ -6852,7 +7054,7 @@ public class BuildScapeConfigScreen extends Screen {
                 return true;
             }
 
-            curY += gradH + 5;
+            curY += gradH + 4;
 
             // Preview & Hex Input
             int prevSize = 14;
@@ -6865,7 +7067,7 @@ public class BuildScapeConfigScreen extends Screen {
                 return true;
             }
 
-            curY += prevSize + 4;
+            curY += prevSize + 3;
 
             // Quick Preset Swatches Click
             int pSize = 11;
@@ -6887,11 +7089,11 @@ public class BuildScapeConfigScreen extends Screen {
                     return true;
                 }
             }
-            curY += pSize + 4 + rowGap;
+            curY += pSize + 3 + rowGap;
         }
 
         // Row 7: Save Button
-        int btnH = 16;
+        int btnH = 18;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             PillarIdManager.getClient().saveAllPillars();
@@ -7119,6 +7321,7 @@ public class BuildScapeConfigScreen extends Screen {
             mouseY /= uiScale;
         }
         isDraggingScrollbar = false;
+        isDraggingSideScrollbar = false;
         draggingGradient = false;
         draggingHue = false;
         if (activeTab != null && activeTab.mouseReleased(mouseX, mouseY, button)) {
@@ -7135,6 +7338,18 @@ public class BuildScapeConfigScreen extends Screen {
             mouseY /= uiScale;
             dragX /= uiScale;
             dragY /= uiScale;
+        }
+
+        if (isDraggingSideScrollbar && sidePanelMaxScroll > 0) {
+            int trackH = sideScrollbarTrackH;
+            int thumbH = sideScrollbarThumbH;
+            int usableTrack = trackH - thumbH;
+            if (usableTrack > 0) {
+                double deltaThumb = mouseY - sideScrollDragStartY;
+                double newOffset = sideScrollDragStartOffset + (deltaThumb / (double) usableTrack) * sidePanelMaxScroll;
+                sidePanelScrollOffset = Math.max(0, Math.min(sidePanelMaxScroll, (int) Math.round(newOffset)));
+            }
+            return true;
         }
 
         if (isDraggingScrollbar && maxScroll > 0) {

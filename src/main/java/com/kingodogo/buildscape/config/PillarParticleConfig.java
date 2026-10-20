@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Locale;
@@ -190,6 +191,222 @@ public class PillarParticleConfig {
 
     PillarParticleConfig(Path configDirectory) {
         this.configDirectory = configDirectory;
+        recordSnapshot();
+    }
+
+    public static class Snapshot {
+        public final int revision;
+        public final double particle_speed;
+        public final double particle_spread;
+        public final int particle_lifetime;
+        public final int particle_density;
+        public final boolean use_pattern;
+        public final String pattern;
+        public final double pattern_speed;
+        public final double pattern_spread;
+        public final double pattern_intensity;
+        public final List<String> particle_color;
+        public final int max_particle_color;
+        public final Set<String> items;
+        public final EditPermissionMode edit_permission_mode;
+
+        public Snapshot(int revision, PillarParticleConfig config) {
+            this.revision = revision;
+            this.particle_speed = config.particle_speed;
+            this.particle_spread = config.particle_spread;
+            this.particle_lifetime = config.particle_lifetime;
+            this.particle_density = config.particle_density;
+            this.use_pattern = config.use_pattern;
+            this.pattern = config.pattern != null ? config.pattern : "ring";
+            this.pattern_speed = config.pattern_speed;
+            this.pattern_spread = config.pattern_spread;
+            this.pattern_intensity = config.pattern_intensity;
+            this.particle_color = new ArrayList<>(config.particle_color != null ? config.particle_color : List.of());
+            this.max_particle_color = config.max_particle_color;
+            this.items = new HashSet<>(config.items != null ? config.items : Set.of());
+            this.edit_permission_mode = config.edit_permission_mode;
+        }
+    }
+
+    public int revision = 0;
+    private final transient List<Snapshot> snapshotHistory = new ArrayList<>();
+    private transient boolean initialLoadDone = false;
+    private transient boolean isApplyingUpload = false;
+
+    public synchronized void establishBaseline() {
+        snapshotHistory.clear();
+        snapshotHistory.add(new Snapshot(revision, this));
+        initialLoadDone = true;
+    }
+
+    public synchronized void onReload() {
+        this.revision++;
+        recordSnapshot();
+    }
+
+    public synchronized void recordSnapshot() {
+        if (isApplyingUpload) {
+            if (snapshotHistory.isEmpty() || !isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+                snapshotHistory.add(new Snapshot(revision, this));
+                if (snapshotHistory.size() > 50) {
+                    snapshotHistory.remove(0);
+                }
+            }
+            return;
+        }
+        if (snapshotHistory.isEmpty()) {
+            snapshotHistory.add(new Snapshot(revision, this));
+        } else if (snapshotHistory.size() == 1 && revision == 0 && !initialLoadDone) {
+            snapshotHistory.set(0, new Snapshot(revision, this));
+        } else if (!isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+            snapshotHistory.add(new Snapshot(revision, this));
+            if (snapshotHistory.size() > 50) {
+                snapshotHistory.remove(0);
+            }
+        }
+    }
+
+    private boolean isSameState(Snapshot s) {
+        return revision == s.revision
+                && Double.compare(particle_speed, s.particle_speed) == 0
+                && Double.compare(particle_spread, s.particle_spread) == 0
+                && particle_lifetime == s.particle_lifetime
+                && particle_density == s.particle_density
+                && use_pattern == s.use_pattern
+                && Objects.equals(pattern, s.pattern)
+                && Double.compare(pattern_speed, s.pattern_speed) == 0
+                && Double.compare(pattern_spread, s.pattern_spread) == 0
+                && Double.compare(pattern_intensity, s.pattern_intensity) == 0
+                && Objects.equals(particle_color, s.particle_color)
+                && max_particle_color == s.max_particle_color
+                && Objects.equals(items, s.items)
+                && edit_permission_mode == s.edit_permission_mode;
+    }
+
+    public synchronized Snapshot findBaseSnapshot(int baseRev) {
+        for (int i = snapshotHistory.size() - 1; i >= 0; i--) {
+            Snapshot s = snapshotHistory.get(i);
+            if (s.revision == baseRev) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public synchronized Snapshot findBaseSnapshot(int baseRev, Set<ConfigSetting> groups, Double inSpeed,
+            Integer inLifetime, Set<String> inItems) {
+        return findBaseSnapshot(baseRev);
+    }
+
+    public synchronized boolean applyUpload(PillarParticleConfig client, Set<ConfigSetting> groups) {
+        SyncConfigPacket data = new SyncConfigPacket(client);
+        data.baseRevision = client.revision;
+        boolean applied = applyUpload(data, groups);
+        if (applied) {
+            client.revision = this.revision;
+        }
+        return applied;
+    }
+
+    public synchronized boolean applyUpload(SyncConfigPacket data, Set<ConfigSetting> groups) {
+        if (groups == null || groups.isEmpty()) {
+            return true;
+        }
+        Snapshot base = findBaseSnapshot(data.baseRevision);
+        if (base == null) {
+            groups.clear();
+            return false;
+        }
+
+        isApplyingUpload = true;
+        try {
+            if (groups.contains(ConfigSetting.PARTICLES)) {
+                if (Double.compare(data.particle_speed, base.particle_speed) != 0) {
+                    this.particle_speed = data.particle_speed;
+                }
+                if (Double.compare(data.particle_spread, base.particle_spread) != 0) {
+                    this.particle_spread = data.particle_spread;
+                }
+                if (data.particle_lifetime != base.particle_lifetime) {
+                    this.particle_lifetime = data.particle_lifetime;
+                }
+                if (data.particle_density != base.particle_density) {
+                    this.particle_density = data.particle_density;
+                }
+                if (data.use_pattern != base.use_pattern) {
+                    this.use_pattern = data.use_pattern;
+                }
+                if (!Objects.equals(data.pattern, base.pattern) && data.pattern != null) {
+                    this.pattern = data.pattern;
+                }
+                if (Double.compare(data.pattern_speed, base.pattern_speed) != 0) {
+                    this.pattern_speed = data.pattern_speed;
+                }
+                if (Double.compare(data.pattern_spread, base.pattern_spread) != 0) {
+                    this.pattern_spread = data.pattern_spread;
+                }
+                if (Double.compare(data.pattern_intensity, base.pattern_intensity) != 0) {
+                    this.pattern_intensity = data.pattern_intensity;
+                }
+            }
+
+            if (groups.contains(ConfigSetting.COLORS)) {
+                if (data.max_particle_color != base.max_particle_color && data.max_particle_color > 0) {
+                    this.max_particle_color = data.max_particle_color;
+                }
+                if (data.particle_color != null) {
+                    if (data.particle_color.size() != base.particle_color.size()) {
+                        this.particle_color = new ArrayList<>(data.particle_color);
+                    } else {
+                        List<String> merged = new ArrayList<>(this.particle_color);
+                        while (merged.size() < data.particle_color.size()) {
+                            merged.add(DEFAULT_COLORS[Math.min(merged.size(), DEFAULT_COLORS.length - 1)]);
+                        }
+                        for (int i = 0; i < data.particle_color.size(); i++) {
+                            if (!Objects.equals(data.particle_color.get(i), base.particle_color.get(i))) {
+                                if (i < merged.size()) {
+                                    merged.set(i, data.particle_color.get(i));
+                                }
+                            }
+                        }
+                        this.particle_color = merged;
+                    }
+                }
+            }
+
+            if (groups.contains(ConfigSetting.ITEMS) && data.items != null) {
+                Set<String> added = new HashSet<>();
+                for (String item : data.items) {
+                    if (!base.items.contains(item)) {
+                        added.add(item);
+                    }
+                }
+                Set<String> removed = new HashSet<>();
+                for (String item : base.items) {
+                    if (!data.items.contains(item) && isValidItemId(item)) {
+                        removed.add(item);
+                    }
+                }
+
+                Set<String> merged = new HashSet<>(this.items);
+                merged.addAll(added);
+                merged.removeAll(removed);
+                this.editItems(merged);
+            }
+
+            if (groups.contains(ConfigSetting.POLICY) && data.edit_permission_mode != null) {
+                if (data.edit_permission_mode != base.edit_permission_mode) {
+                    this.edit_permission_mode = data.edit_permission_mode;
+                }
+            }
+
+            this.revision++;
+            data.baseRevision = this.revision;
+            recordSnapshot();
+            return true;
+        } finally {
+            isApplyingUpload = false;
+        }
     }
 
     public synchronized void replaceItems(Collection<String> updatedItems) {
@@ -202,6 +419,9 @@ public class PillarParticleConfig {
         }
         items = replacement;
         clearMatchCache();
+        if (!isApplyingUpload && !initialLoadDone && revision == 0 && snapshotHistory.size() <= 1) {
+            recordSnapshot();
+        }
     }
 
     public static boolean isValidItemId(String item) {
@@ -349,6 +569,9 @@ public class PillarParticleConfig {
                 if (reloadItems) {
                     INSTANCE.loadItemsInternal();
                 }
+                if (reloadProperties || reloadItems) {
+                    INSTANCE.onReload();
+                }
             }
             SNAPSHOT = INSTANCE;
         }
@@ -370,6 +593,7 @@ public class PillarParticleConfig {
         SERVER_CONFIG.particle_lifetime = packet.particle_lifetime > 0
                 ? packet.particle_lifetime
                 : 20;
+        SERVER_CONFIG.revision = packet.baseRevision;
         SERVER_CONFIG.particle_density = packet.particle_density >= 0
                 ? packet.particle_density
                 : 2;
@@ -414,6 +638,7 @@ public class PillarParticleConfig {
                 : EditPermissionMode.STRICT;
 
         clearMatchCache();
+        SERVER_CONFIG.establishBaseline();
         notifyCallbacks(true);
         SNAPSHOT = SERVER_CONFIG;
     }
@@ -494,6 +719,7 @@ public class PillarParticleConfig {
             INSTANCE.loadItemsInternal();
         }
 
+        INSTANCE.onReload();
         notifyReloadCallbacksIfDue();
     }
 
@@ -607,6 +833,7 @@ public class PillarParticleConfig {
     }
 
     private void loadInternal() {
+        boolean wasInitial = !initialLoadDone;
         File propertiesFile = getPropertiesFile();
         File itemsFile = getItemsFile();
         boolean migrationComplete = migrateOldConfig();
@@ -620,6 +847,12 @@ public class PillarParticleConfig {
             loadItemsInternal();
         } else {
             itemsFileUnreadable = true;
+        }
+
+        if (wasInitial) {
+            establishBaseline();
+        } else {
+            onReload();
         }
     }
 
@@ -769,6 +1002,12 @@ public class PillarParticleConfig {
                 }
             }
             loadedPropertyValues = propertyValues();
+            if (!initialLoadDone) {
+                if (snapshotHistory.size() <= 1 && revision == 0) {
+                    snapshotHistory.clear();
+                    snapshotHistory.add(new Snapshot(revision, this));
+                }
+            }
         } catch (Exception e) {
             // the properties file may be malformed in any way; keep the original and make it read-only
             propertiesReadOnly = true;
@@ -834,6 +1073,12 @@ public class PillarParticleConfig {
             originalItems = document;
             replaceItems(parsed);
             itemsFileUnreadable = false;
+            if (!initialLoadDone) {
+                if (snapshotHistory.size() <= 1 && revision == 0) {
+                    snapshotHistory.clear();
+                    snapshotHistory.add(new Snapshot(revision, this));
+                }
+            }
         } catch (Exception e) {
             // the items file may be malformed in any way; keep the last good item list
             itemsFileUnreadable = true;

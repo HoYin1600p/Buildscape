@@ -111,9 +111,7 @@ public class ConfigThemes {
             String lower = this.id.toLowerCase(java.util.Locale.ROOT);
             return "light".equals(lower)
                     || lower.startsWith("light_")
-                    || "silver".equals(lower)
-                    || "white".equals(lower)
-                    || "pink".equals(lower);
+                    || "white".equals(lower);
         }
 
         public boolean isDark() {
@@ -163,39 +161,39 @@ public class ConfigThemes {
     public static final Theme LIGHT = new Theme(
             "light", "Light",
             0x70000000, // overlay
-            0xFFF0F2F6, // panelBg
-            0xFFE2E5EC, // chassisBody
-            0xFFE8ECF2, // innerDark (recessed container basin)
-            0xFFDDE2EB, // headerBg (distinct clean header bar)
-            0xFF181C24, // frameBlack (crisp dark outer perimeter line)
-            0xFFFFFFFF, // borderGradientStart (bright specular top-left highlight)
-            0xFFC8CFDC, // borderGradientEnd (smooth bevel blend)
-            0xFFA6AFBE, // borderShadow (soft bottom bevel shadow)
-            0xFFD2D8E3, // chassisBand
-            0xFFB2BAC8, // bevelShadow
-            0xFFFFFFFF, // bevelHighlight
-            0xFF0F172A, // textWhite (crisp deep dark graphite text - primary headings & values)
-            0xFF334155, // textSilver (readable secondary text - coordinates & labels)
-            0xFF64748B, // textMuted (soft helper text - descriptions & inactive badges)
-            0xFFFFFFFF, // rowBg (pure white elevated card)
-            0xFFF6F8FC, // rowBgHover (elevated hover)
-            0xFFCDD3DE, // rowBorder (clean 1px card border)
-            0xFF0284C7, // rowBorderHover (crisp accent hover highlight)
-            0xFFDCFCE7, // toggleOnBg
-            0xFF22C55E, // toggleOnBorder
-            0xFF15803D, // toggleOnText
-            0xFFF1F3F7, // toggleOffBg
-            0xFFBAC1CF, // toggleOffBorder
-            0xFF64748B, // toggleOffText
-            0xFFFFFFFF, // btnBg (clean white elevated button)
-            0xFFF0F4FA, // btnBgHover
-            0xFFE2E7F2, // btnBgActive
-            0xFFBFC6D4, // btnBorder
+            0xFFE8EBF0, // panelBg (calm slate off-white, eye-protective)
+            0xFFDCE0E7, // chassisBody
+            0xFFE2E6ED, // innerDark (recessed container basin)
+            0xFFD6DBE4, // headerBg
+            0xFF161B22, // frameBlack
+            0xFFF4F6F9, // borderGradientStart (soft non-glare highlight)
+            0xFFC2C9D6, // borderGradientEnd
+            0xFFA0A9B8, // borderShadow
+            0xFFCCD2DE, // chassisBand
+            0xFFAEB8C6, // bevelShadow
+            0xFFF5F7FA, // bevelHighlight (gentle matte highlight)
+            0xFF1E2633, // textWhite (crisp deep graphite - easy on eyes)
+            0xFF3E4A5B, // textSilver (readable secondary labels)
+            0xFF6A778B, // textMuted (soft helper text)
+            0xFFF4F6F9, // rowBg (softer card background, zero glare)
+            0xFFEAEFF5, // rowBgHover
+            0xFFC4CBD7, // rowBorder
+            0xFF0284C7, // rowBorderHover
+            0xFFD7F5E3, // toggleOnBg
+            0xFF16A34A, // toggleOnBorder
+            0xFF14532D, // toggleOnText
+            0xFFE5E9F0, // toggleOffBg
+            0xFFB4BDCC, // toggleOffBorder
+            0xFF647285, // toggleOffText
+            0xFFECEFF5, // btnBg (softer elevated button)
+            0xFFE2E7EF, // btnBgHover
+            0xFFD5DCE7, // btnBgActive
+            0xFFB8C1D0, // btnBorder
             0xFF0284C7, // btnBorderHover
-            0xFFE0E5EE, // slotBg
-            0xFFEEF2F8, // slotBgHover
-            0xFFBDC5D3, // slotBorder
-            0xFF0284C7, // accent (vibrant azure blue)
+            0xFFD8DEE8, // slotBg
+            0xFFE5EBF4, // slotBgHover
+            0xFFB4BED0, // slotBorder
+            0xFF0284C7, // accent (calming azure blue)
             0x400284C7  // accentGlow
     );
 
@@ -441,17 +439,17 @@ public class ConfigThemes {
             0xFFE6E6EB, // innerDark
             0xFFDCDCE2, // headerBg
             0xFF18181C, // frameBlack
-            0xFFFFFFFF, // borderGradientStart
+            0xFFF5F5F8, // borderGradientStart (soft highlight)
             0xFFC8C8D0, // borderGradientEnd
             0xFFA8A8B2, // borderShadow
             0xFFD2D2DA, // chassisBand
             0xFFB4B4BE, // bevelShadow
-            0xFFFFFFFF, // bevelHighlight
+            0xFFF5F5F8, // bevelHighlight (soft highlight)
             0xFF18181C, // textWhite
             0xFF383842, // textSilver
             0xFF6A6A78, // textMuted
-            0xFFFFFFFF, // rowBg
-            0xFFF6F6F9, // rowBgHover
+            0xFFF3F3F6, // rowBg (softer card, zero glare)
+            0xFFEAEAF0, // rowBgHover
             0xFFCECED8, // rowBorder
             0xFF64748B, // rowBorderHover
             0xFFDCFCE7, // toggleOnBg
@@ -460,9 +458,9 @@ public class ConfigThemes {
             0xFFF0F0F4, // toggleOffBg
             0xFFC0C0CB, // toggleOffBorder
             0xFF64748B, // toggleOffText
-            0xFFFFFFFF, // btnBg
-            0xFFEEEEF4, // btnBgHover
-            0xFFE2E2EA, // btnBgActive
+            0xFFEAEAF0, // btnBg (softer elevated button)
+            0xFFDFDFE6, // btnBgHover
+            0xFFD4D4DC, // btnBgActive
             0xFFC2C2CD, // btnBorder
             0xFF64748B, // btnBorderHover
             0xFFDFDFE7, // slotBg
@@ -474,6 +472,45 @@ public class ConfigThemes {
 
     public static final Theme SILVER = new Theme(
             "silver", "Silver",
+            0xD8101418, // overlay
+            0xFF1A1E24, // panelBg
+            0xFF242830, // chassisBody
+            0xFF14171C, // innerDark
+            0xFF1E222A, // headerBg
+            0xFF0A0C0E, // frameBlack
+            0xFFCBD5E1, // borderGradientStart
+            0xFF64748B, // borderGradientEnd
+            0xFF101418, // borderShadow
+            0xFF2C323C, // chassisBand
+            0xFF12151A, // bevelShadow
+            0xFF94A3B8, // bevelHighlight
+            0xFFF8FAFC, // textWhite
+            0xFFCBD5E1, // textSilver
+            0xFF94A3B8, // textMuted
+            0xFF1C2026, // rowBg
+            0xFF262C34, // rowBgHover
+            0xFF3A424E, // rowBorder
+            0xFF38BDF8, // rowBorderHover
+            0xFF1E3A4A, // toggleOnBg
+            0xFF38BDF8, // toggleOnBorder
+            0xFF7DD3FC, // toggleOnText
+            0xFF1E2228, // toggleOffBg
+            0xFF3B4350, // toggleOffBorder
+            0xFF7D8898, // toggleOffText
+            0xFF222830, // btnBg
+            0xFF2C3440, // btnBgHover
+            0xFF36404E, // btnBgActive
+            0xFF465264, // btnBorder
+            0xFF38BDF8, // btnBorderHover
+            0xFF14171C, // slotBg
+            0xFF202630, // slotBgHover
+            0xFF303844, // slotBorder
+            0xFF38BDF8, // accent
+            0x6038BDF8  // accentGlow
+    );
+
+    public static final Theme LIGHT_SILVER = new Theme(
+            "light_silver", "Light Silver",
             0x75141820, // overlay
             0xFFE8EBF0, // panelBg
             0xFFDCE0E8, // chassisBody
@@ -548,6 +585,45 @@ public class ConfigThemes {
             0xFF3F331A, // slotBorder
             0xFFF59E0B, // accent
             0x60F59E0B  // accentGlow
+    );
+
+    public static final Theme LIGHT_GOLD = new Theme(
+            "light_gold", "Light Gold",
+            0x701A1402, // overlay
+            0xFFFEFDF6, // panelBg
+            0xFFFAF3DC, // chassisBody
+            0xFFFDF8E8, // innerDark
+            0xFFF6ECC4, // headerBg
+            0xFF2A2004, // frameBlack
+            0xFFFFFFFF, // borderGradientStart
+            0xFFE9DC9F, // borderGradientEnd
+            0xFFC8B56A, // borderShadow
+            0xFFEFE4B5, // chassisBand
+            0xFFD2C07D, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF332402, // textWhite
+            0xFF543E08, // textSilver
+            0xFF85681A, // textMuted
+            0xFFFFFFFF, // rowBg
+            0xFFFEFBF0, // rowBgHover
+            0xFFECDC9E, // rowBorder
+            0xFFD97706, // rowBorderHover
+            0xFFFEF3C7, // toggleOnBg
+            0xFFD97706, // toggleOnBorder
+            0xFFB45309, // toggleOnText
+            0xFFF7F2E2, // toggleOffBg
+            0xFFD5C8A8, // toggleOffBorder
+            0xFF7D7254, // toggleOffText
+            0xFFFFFFFF, // btnBg
+            0xFFFEFAEA, // btnBgHover
+            0xFFFAF0D2, // btnBgActive
+            0xFFE3D094, // btnBorder
+            0xFFD97706, // btnBorderHover
+            0xFFF7EED0, // slotBg
+            0xFFFCF6E4, // slotBgHover
+            0xFFDECB8E, // slotBorder
+            0xFFD97706, // accent
+            0x50D97706  // accentGlow
     );
 
     public static final Theme RED = new Theme(
@@ -784,6 +860,45 @@ public class ConfigThemes {
             0x6014B8A6  // accentGlow
     );
 
+    public static final Theme LIGHT_CYAN = new Theme(
+            "light_cyan", "Light Cyan",
+            0x7000181A, // overlay
+            0xFFF0FDFD, // panelBg
+            0xFFE0F7F6, // chassisBody
+            0xFFE8FAF9, // innerDark
+            0xFFD2F1EF, // headerBg
+            0xFF082224, // frameBlack
+            0xFFFFFFFF, // borderGradientStart
+            0xFFBBEAE7, // borderGradientEnd
+            0xFF93D6D2, // borderShadow
+            0xFFC7EDE9, // chassisBand
+            0xFFA3DED9, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF082B2E, // textWhite
+            0xFF154A4E, // textSilver
+            0xFF367A80, // textMuted
+            0xFFFFFFFF, // rowBg
+            0xFFF0FDFD, // rowBgHover
+            0xFFBEECE8, // rowBorder
+            0xFF0D9488, // rowBorderHover
+            0xFFCCFBF1, // toggleOnBg
+            0xFF0D9488, // toggleOnBorder
+            0xFF0F766E, // toggleOnText
+            0xFFEDF8F7, // toggleOffBg
+            0xFFB8D8D5, // toggleOffBorder
+            0xFF587D7A, // toggleOffText
+            0xFFFFFFFF, // btnBg
+            0xFFEDFAF8, // btnBgHover
+            0xFFDCF4F1, // btnBgActive
+            0xFFB4E4E0, // btnBorder
+            0xFF0D9488, // btnBorderHover
+            0xFFDDF3F1, // slotBg
+            0xFFEAF8F6, // slotBgHover
+            0xFFB0DFDA, // slotBorder
+            0xFF0D9488, // accent
+            0x500D9488  // accentGlow
+    );
+
     public static final Theme BLACK = new Theme(
             "black", "Black",
             0xE8050507, // overlay
@@ -826,44 +941,83 @@ public class ConfigThemes {
     public static final Theme WHITE = new Theme(
             "white", "White",
             0x70000000, // overlay
-            0xFFFFFFFF, // panelBg
-            0xFFF1F5F9, // chassisBody
-            0xFFF8FAFC, // innerDark
-            0xFFE2E8F0, // headerBg
-            0xFF0F172A, // frameBlack
-            0xFFFFFFFF, // borderGradientStart
-            0xFFCBD5E1, // borderGradientEnd
-            0xFF94A3B8, // borderShadow
-            0xFFE2E8F0, // chassisBand
-            0xFFCBD5E1, // bevelShadow
-            0xFFFFFFFF, // bevelHighlight
-            0xFF0F172A, // textWhite
-            0xFF334155, // textSilver
-            0xFF64748B, // textMuted
-            0xFFFFFFFF, // rowBg
-            0xFFF1F5F9, // rowBgHover
-            0xFFE2E8F0, // rowBorder
+            0xFFF2F1ED, // panelBg (warm eye-protective alabaster paper, zero glare)
+            0xFFE6E5E0, // chassisBody
+            0xFFECEBE6, // innerDark
+            0xFFDFDDD7, // headerBg
+            0xFF1C1B19, // frameBlack
+            0xFFF9F8F5, // borderGradientStart (soft non-glare highlight)
+            0xFFC8C6BF, // borderGradientEnd
+            0xFFA2A098, // borderShadow
+            0xFFD4D2CB, // chassisBand
+            0xFFB3B1A9, // bevelShadow
+            0xFFFBFBFA, // bevelHighlight (soft matte highlight)
+            0xFF1F1E1B, // textWhite (crisp dark espresso ink)
+            0xFF42403B, // textSilver (readable secondary labels)
+            0xFF6E6C65, // textMuted (soft helper text)
+            0xFFF8F7F4, // rowBg (softer warm card background, zero glare)
+            0xFFEEEEEA, // rowBgHover
+            0xFFCAC8C0, // rowBorder
             0xFF0284C7, // rowBorderHover
-            0xFFDCFCE7, // toggleOnBg
-            0xFF22C55E, // toggleOnBorder
-            0xFF15803D, // toggleOnText
-            0xFFF1F5F9, // toggleOffBg
-            0xFFCBD5E1, // toggleOffBorder
-            0xFF64748B, // toggleOffText
-            0xFFFFFFFF, // btnBg
-            0xFFF1F5F9, // btnBgHover
-            0xFFE2E8F0, // btnBgActive
-            0xFFCBD5E1, // btnBorder
+            0xFFD5F3DF, // toggleOnBg
+            0xFF16A34A, // toggleOnBorder
+            0xFF14532D, // toggleOnText
+            0xFFE7E6E1, // toggleOffBg
+            0xFFB9B7AF, // toggleOffBorder
+            0xFF6A6861, // toggleOffText
+            0xFFECEBE6, // btnBg (soft elevated warm button)
+            0xFFE3E1DB, // btnBgHover
+            0xFFD7D5CE, // btnBgActive
+            0xFFBEBCB4, // btnBorder
             0xFF0284C7, // btnBorderHover
-            0xFFF8FAFC, // slotBg
-            0xFFF1F5F9, // slotBgHover
-            0xFFCBD5E1, // slotBorder
+            0xFFDDDCD5, // slotBg
+            0xFFE9E8E2, // slotBgHover
+            0xFFB7B5AC, // slotBorder
             0xFF0284C7, // accent
             0x500284C7  // accentGlow
     );
 
     public static final Theme PINK = new Theme(
             "pink", "Pink",
+            0xD81C0612, // overlay
+            0xFF220E18, // panelBg
+            0xFF301422, // chassisBody
+            0xFF180A12, // innerDark
+            0xFF28101C, // headerBg
+            0xFF0A0307, // frameBlack
+            0xFFF472B6, // borderGradientStart
+            0xFF831843, // borderGradientEnd
+            0xFF160610, // borderShadow
+            0xFF3A182A, // chassisBand
+            0xFF12050D, // bevelShadow
+            0xFFEC4899, // bevelHighlight
+            0xFFFDF2F8, // textWhite
+            0xFFFBCFE8, // textSilver
+            0xFFF472B6, // textMuted
+            0xFF240E19, // rowBg
+            0xFF331424, // rowBgHover
+            0xFF561A3C, // rowBorder
+            0xFFEC4899, // rowBorderHover
+            0xFF4C0528, // toggleOnBg
+            0xFFEC4899, // toggleOnBorder
+            0xFFF9A8D4, // toggleOnText
+            0xFF220F19, // toggleOffBg
+            0xFF421C2F, // toggleOffBorder
+            0xFF8B5A73, // toggleOffText
+            0xFF2C1220, // btnBg
+            0xFF3A182B, // btnBgHover
+            0xFF471C35, // btnBgActive
+            0xFF5C2243, // btnBorder
+            0xFFEC4899, // btnBorderHover
+            0xFF170911, // slotBg
+            0xFF2A101E, // slotBgHover
+            0xFF40182E, // slotBorder
+            0xFFEC4899, // accent
+            0x60EC4899  // accentGlow
+    );
+
+    public static final Theme LIGHT_PINK = new Theme(
+            "light_pink", "Light Pink",
             0x70200814, // overlay
             0xFFFFF0F5, // panelBg
             0xFFFCE7F0, // chassisBody
@@ -1174,34 +1328,97 @@ public class ConfigThemes {
             0x60C026D3  // accentGlow
     );
 
+    public static final Theme LIGHT_MAGENTA = new Theme(
+            "light_magenta", "Light Magenta",
+            0x701A0418, // overlay
+            0xFFFDF4FB, // panelBg
+            0xFFF8E5F4, // chassisBody
+            0xFFFAECF7, // innerDark
+            0xFFF2D5EC, // headerBg
+            0xFF2E0929, // frameBlack
+            0xFFFFFFFF, // borderGradientStart
+            0xFFEBC4E4, // borderGradientEnd
+            0xFFD69ECC, // borderShadow
+            0xFFEDCEE7, // chassisBand
+            0xFFDCABD3, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF360830, // textWhite
+            0xFF56154F, // textSilver
+            0xFF8A3C80, // textMuted
+            0xFFFFFFFF, // rowBg
+            0xFFFCF0FA, // rowBgHover
+            0xFFECC8E6, // rowBorder
+            0xFFC026D3, // rowBorderHover
+            0xFFFAE8F7, // toggleOnBg
+            0xFFC026D3, // toggleOnBorder
+            0xFFA21CAF, // toggleOnText
+            0xFFF8EFF6, // toggleOffBg
+            0xFFD6BFD2, // toggleOffBorder
+            0xFF82627E, // toggleOffText
+            0xFFFFFFFF, // btnBg
+            0xFFFDF0FB, // btnBgHover
+            0xFFF8E0F4, // btnBgActive
+            0xFFE6C0E0, // btnBorder
+            0xFFC026D3, // btnBorderHover
+            0xFFF5DEF1, // slotBg
+            0xFFFCEBF8, // slotBgHover
+            0xFFE0B8DC, // slotBorder
+            0xFFC026D3, // accent
+            0x50C026D3  // accentGlow
+    );
+
+    public static final List<Theme> BASE_THEMES = Arrays.asList(
+            DARK,
+            RED,
+            PINK,
+            MAGENTA,
+            PURPLE,
+            BLUE,
+            CYAN,
+            GREEN,
+            LIME,
+            YELLOW,
+            ORANGE,
+            BROWN,
+            GRAY,
+            BLACK,
+            SILVER,
+            GOLD
+    );
+
     private static final List<Theme> THEMES = Arrays.asList(
             DARK,
             LIGHT,
-            BLACK,
-            WHITE,
-            GRAY,
-            LIGHT_GRAY,
-            SILVER,
-            GOLD,
             RED,
             LIGHT_RED,
             PINK,
+            LIGHT_PINK,
+            MAGENTA,
+            LIGHT_MAGENTA,
+            PURPLE,
+            LIGHT_PURPLE,
+            BLUE,
+            LIGHT_BLUE,
+            CYAN,
+            LIGHT_CYAN,
+            GREEN,
+            LIGHT_GREEN,
+            LIME,
+            LIGHT_LIME,
+            YELLOW,
+            LIGHT_YELLOW,
             ORANGE,
             LIGHT_ORANGE,
             BROWN,
             LIGHT_BROWN,
-            YELLOW,
-            LIGHT_YELLOW,
-            LIME,
-            LIGHT_LIME,
-            GREEN,
-            LIGHT_GREEN,
-            CYAN,
-            BLUE,
-            LIGHT_BLUE,
-            PURPLE,
-            LIGHT_PURPLE,
-            MAGENTA
+            GRAY,
+            LIGHT_GRAY,
+            BLACK,
+            WHITE,
+            SILVER,
+            LIGHT_SILVER,
+            GOLD,
+            LIGHT_GOLD
     );
     private static int activeThemeIndex = 0;
 
@@ -1216,6 +1433,78 @@ public class ConfigThemes {
         return THEMES;
     }
 
+    public static List<Theme> getBaseThemes() {
+        return BASE_THEMES;
+    }
+
+    public static Theme getBaseTheme(Theme theme) {
+        if (theme == null) return DARK;
+        String id = theme.id.toLowerCase(java.util.Locale.ROOT);
+        if ("light".equals(id)) return DARK;
+        if ("white".equals(id)) return BLACK;
+        if (id.startsWith("light_")) {
+            String baseId = id.substring("light_".length());
+            for (Theme base : BASE_THEMES) {
+                if (base.id.equalsIgnoreCase(baseId)) {
+                    return base;
+                }
+            }
+        }
+        for (Theme base : BASE_THEMES) {
+            if (base.id.equalsIgnoreCase(id)) {
+                return base;
+            }
+        }
+        return DARK;
+    }
+
+    public static Theme getDarkVariant(Theme theme) {
+        return getBaseTheme(theme);
+    }
+
+    public static Theme getLightVariant(Theme theme) {
+        Theme base = getBaseTheme(theme);
+        String baseId = base.id.toLowerCase(java.util.Locale.ROOT);
+        if ("dark".equals(baseId)) return LIGHT;
+        if ("black".equals(baseId)) return WHITE;
+        if ("gold".equals(baseId)) return LIGHT_GOLD;
+        String lightId = "light_" + baseId;
+        for (Theme t : THEMES) {
+            if (t.id.equalsIgnoreCase(lightId)) {
+                return t;
+            }
+        }
+        return LIGHT;
+    }
+
+    public static Theme getVariant(Theme baseTheme, boolean lightMode) {
+        return lightMode ? getLightVariant(baseTheme) : getDarkVariant(baseTheme);
+    }
+
+    public static Theme getOppositeVariant(Theme theme) {
+        if (theme == null || theme.isLight()) {
+            return getDarkVariant(theme);
+        } else {
+            return getLightVariant(theme);
+        }
+    }
+
+    public static Theme cycleNextBaseTheme(Theme currentTheme) {
+        Theme base = getBaseTheme(currentTheme);
+        int idx = BASE_THEMES.indexOf(base);
+        if (idx < 0) idx = 0;
+        int nextIdx = (idx + 1) % BASE_THEMES.size();
+        return BASE_THEMES.get(nextIdx);
+    }
+
+    public static Theme cyclePrevBaseTheme(Theme currentTheme) {
+        Theme base = getBaseTheme(currentTheme);
+        int idx = BASE_THEMES.indexOf(base);
+        if (idx < 0) idx = 0;
+        int prevIdx = (idx - 1 + BASE_THEMES.size()) % BASE_THEMES.size();
+        return BASE_THEMES.get(prevIdx);
+    }
+
     public static Theme getCurrentTheme() {
         if (activeThemeIndex < 0 || activeThemeIndex >= THEMES.size()) {
             activeThemeIndex = 0;
@@ -1228,13 +1517,21 @@ public class ConfigThemes {
     }
 
     public static Theme cycleNextTheme() {
-        activeThemeIndex = (activeThemeIndex + 1) % THEMES.size();
-        return getCurrentTheme();
+        Theme curr = getCurrentTheme();
+        boolean light = curr.isLight();
+        Theme nextBase = cycleNextBaseTheme(curr);
+        Theme next = getVariant(nextBase, light);
+        setThemeById(next.id);
+        return next;
     }
 
     public static Theme cyclePrevTheme() {
-        activeThemeIndex = (activeThemeIndex - 1 + THEMES.size()) % THEMES.size();
-        return getCurrentTheme();
+        Theme curr = getCurrentTheme();
+        boolean light = curr.isLight();
+        Theme prevBase = cyclePrevBaseTheme(curr);
+        Theme prev = getVariant(prevBase, light);
+        setThemeById(prev.id);
+        return prev;
     }
 
     public static void setThemeIndex(int index) {

@@ -10,4 +10,5 @@ pattern = ring
 pattern_intensity = 1.0
 pattern_speed = 0.05
 pattern_spread = 0.05
+revision = 0
 use_pattern = true

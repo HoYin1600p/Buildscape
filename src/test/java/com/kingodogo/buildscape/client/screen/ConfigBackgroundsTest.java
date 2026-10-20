@@ -16,7 +16,7 @@ public class ConfigBackgroundsTest {
     public void allBuiltInBackgroundsAreRegisteredAndNamedProperly() {
         List<ConfigBackgrounds.Background> list = ConfigBackgrounds.getAllBackgrounds();
         assertNotNull(list);
-        assertEquals("Expected exactly 10 built-in backgrounds", 10, list.size());
+        assertEquals("Expected exactly 19 built-in backgrounds (None + 18 Creeper variants)", 19, list.size());
 
         Set<String> ids = new HashSet<>();
         for (ConfigBackgrounds.Background bg : list) {
@@ -41,6 +41,20 @@ public class ConfigBackgroundsTest {
         assertNotNull(ConfigBackgrounds.getById("golden_creeper"));
         assertNotNull(ConfigBackgrounds.getById("crimson_creeper"));
         assertNotNull(ConfigBackgrounds.getById("warped_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("blue_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("purple_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("red_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("orange_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("white_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("black_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("yellow_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("lime_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("cyan_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("light_blue_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("pink_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("magenta_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("brown_creeper"));
+        assertNotNull(ConfigBackgrounds.getById("gray_creeper"));
 
         // Removed creeper variants safely fall back to NONE
         assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("diamond_creeper"));
@@ -54,14 +68,12 @@ public class ConfigBackgroundsTest {
     }
 
     @Test
-    public void iconicEntityVariantsExist() {
-        assertEquals(ConfigBackgrounds.ENDERMAN, ConfigBackgrounds.getById("enderman"));
-        assertEquals(ConfigBackgrounds.WOLF, ConfigBackgrounds.getById("wolf"));
-        assertEquals(ConfigBackgrounds.FOX, ConfigBackgrounds.getById("fox"));
-        assertEquals(ConfigBackgrounds.SKELETON, ConfigBackgrounds.getById("skeleton"));
-        assertEquals(ConfigBackgrounds.SLIME, ConfigBackgrounds.getById("slime"));
-
-        // Ensure removed entities fall back to NONE
+    public void removedEntitiesFallBackToNone() {
+        assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("enderman"));
+        assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("wolf"));
+        assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("fox"));
+        assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("skeleton"));
+        assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("slime"));
         assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("warden"));
         assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("bee"));
         assertEquals(ConfigBackgrounds.NONE, ConfigBackgrounds.getById("wither_skeleton"));

@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 /**
  * Modular GUI background registry and backdrop renderer for Buildscape configuration screens.
  * Provides optimized hardware-shaded backdrop gradients and pixel-perfect mob face presets
- * including Creeper variations (Green, Golden, Crimson, Warped) and iconic entities (Enderman, Wolf, Fox, Skeleton, Slime).
+ * featuring authentic Minecraft Creeper color variations (Green, Golden, Crimson, Warped, Blue, Purple, Red, Orange, White, Black, Yellow, Lime, Cyan, Light Blue, Pink, Magenta, Brown, Gray).
  */
 public class ConfigBackgrounds {
 
@@ -109,30 +109,74 @@ public class ConfigBackgrounds {
             ConfigBackgrounds::drawWarpedCreeperBackground
     );
 
-    // Entity Presets
-    public static final Background ENDERMAN = new Background(
-            "enderman", "Enderman",
-            ConfigBackgrounds::drawEndermanBackground
+    public static final Background BLUE_CREEPER = new Background(
+            "blue_creeper", "Blue Creeper",
+            ConfigBackgrounds::drawBlueCreeperBackground
     );
 
-    public static final Background WOLF = new Background(
-            "wolf", "Wolf",
-            ConfigBackgrounds::drawWolfBackground
+    public static final Background PURPLE_CREEPER = new Background(
+            "purple_creeper", "Purple Creeper",
+            ConfigBackgrounds::drawPurpleCreeperBackground
     );
 
-    public static final Background FOX = new Background(
-            "fox", "Fox",
-            ConfigBackgrounds::drawFoxBackground
+    public static final Background RED_CREEPER = new Background(
+            "red_creeper", "Red Creeper",
+            ConfigBackgrounds::drawRedCreeperBackground
     );
 
-    public static final Background SKELETON = new Background(
-            "skeleton", "Skeleton",
-            ConfigBackgrounds::drawSkeletonBackground
+    public static final Background ORANGE_CREEPER = new Background(
+            "orange_creeper", "Orange Creeper",
+            ConfigBackgrounds::drawOrangeCreeperBackground
     );
 
-    public static final Background SLIME = new Background(
-            "slime", "Slime",
-            ConfigBackgrounds::drawSlimeBackground
+    public static final Background WHITE_CREEPER = new Background(
+            "white_creeper", "White Creeper",
+            ConfigBackgrounds::drawWhiteCreeperBackground
+    );
+
+    public static final Background BLACK_CREEPER = new Background(
+            "black_creeper", "Black Creeper",
+            ConfigBackgrounds::drawBlackCreeperBackground
+    );
+
+    public static final Background YELLOW_CREEPER = new Background(
+            "yellow_creeper", "Yellow Creeper",
+            ConfigBackgrounds::drawYellowCreeperBackground
+    );
+
+    public static final Background LIME_CREEPER = new Background(
+            "lime_creeper", "Lime Creeper",
+            ConfigBackgrounds::drawLimeCreeperBackground
+    );
+
+    public static final Background CYAN_CREEPER = new Background(
+            "cyan_creeper", "Cyan Creeper",
+            ConfigBackgrounds::drawCyanCreeperBackground
+    );
+
+    public static final Background LIGHT_BLUE_CREEPER = new Background(
+            "light_blue_creeper", "Light Blue Creeper",
+            ConfigBackgrounds::drawLightBlueCreeperBackground
+    );
+
+    public static final Background PINK_CREEPER = new Background(
+            "pink_creeper", "Pink Creeper",
+            ConfigBackgrounds::drawPinkCreeperBackground
+    );
+
+    public static final Background MAGENTA_CREEPER = new Background(
+            "magenta_creeper", "Magenta Creeper",
+            ConfigBackgrounds::drawMagentaCreeperBackground
+    );
+
+    public static final Background BROWN_CREEPER = new Background(
+            "brown_creeper", "Brown Creeper",
+            ConfigBackgrounds::drawBrownCreeperBackground
+    );
+
+    public static final Background GRAY_CREEPER = new Background(
+            "gray_creeper", "Gray Creeper",
+            ConfigBackgrounds::drawGrayCreeperBackground
     );
 
     private static final List<Background> BACKGROUNDS = new java.util.ArrayList<>(Arrays.asList(
@@ -141,11 +185,20 @@ public class ConfigBackgrounds {
             GOLDEN_CREEPER,
             CRIMSON_CREEPER,
             WARPED_CREEPER,
-            ENDERMAN,
-            WOLF,
-            FOX,
-            SKELETON,
-            SLIME
+            BLUE_CREEPER,
+            PURPLE_CREEPER,
+            RED_CREEPER,
+            ORANGE_CREEPER,
+            WHITE_CREEPER,
+            BLACK_CREEPER,
+            YELLOW_CREEPER,
+            LIME_CREEPER,
+            CYAN_CREEPER,
+            LIGHT_BLUE_CREEPER,
+            PINK_CREEPER,
+            MAGENTA_CREEPER,
+            BROWN_CREEPER,
+            GRAY_CREEPER
     ));
 
     private static final List<String> BUILT_IN_IDS;
@@ -421,6 +474,48 @@ public class ConfigBackgrounds {
     private static final int[] ROW_WARPED_TOP = { 0xFF2DD4BF, 0xFF14B8A6, 0xFF0D9488, 0xFF14B8A6, 0xFF0D9488, 0xFF0F766E, 0xFF115E59, 0xFF134E4A };
     private static final int[] ROW_WARPED_ALT = { 0xFF5EEAD4, 0xFF2DD4BF, 0xFF14B8A6, 0xFF0D9488, 0xFF0F766E, 0xFF115E59, 0xFF134E4A, 0xFF042F2E };
 
+    private static final int[] ROW_BLUE_TOP = { 0xFF3B82F6, 0xFF2563EB, 0xFF1D4ED8, 0xFF2563EB, 0xFF1D4ED8, 0xFF1E40AF, 0xFF1E3A8A, 0xFF172554 };
+    private static final int[] ROW_BLUE_ALT = { 0xFF60A5FA, 0xFF3B82F6, 0xFF2563EB, 0xFF1D4ED8, 0xFF1E40AF, 0xFF1E3A8A, 0xFF172554, 0xFF0F172A };
+
+    private static final int[] ROW_PURPLE_TOP = { 0xFFA855F7, 0xFF9333EA, 0xFF7E22CE, 0xFF9333EA, 0xFF7E22CE, 0xFF6B21A8, 0xFF581C87, 0xFF3B0764 };
+    private static final int[] ROW_PURPLE_ALT = { 0xFFC084FC, 0xFFA855F7, 0xFF9333EA, 0xFF7E22CE, 0xFF6B21A8, 0xFF581C87, 0xFF3B0764, 0xFF2E0854 };
+
+    private static final int[] ROW_RED_TOP = { 0xFFEF4444, 0xFFDC2626, 0xFFB91C1C, 0xFFDC2626, 0xFFB91C1C, 0xFF991B1B, 0xFF7F1D1D, 0xFF450A0A };
+    private static final int[] ROW_RED_ALT = { 0xFFF87171, 0xFFEF4444, 0xFFDC2626, 0xFFB91C1C, 0xFF991B1B, 0xFF7F1D1D, 0xFF450A0A, 0xFF300606 };
+
+    private static final int[] ROW_ORANGE_TOP = { 0xFFF97316, 0xFFEA580C, 0xFFC2410C, 0xFFEA580C, 0xFFC2410C, 0xFF9A3412, 0xFF7C2D12, 0xFF431407 };
+    private static final int[] ROW_ORANGE_ALT = { 0xFFFB923C, 0xFFF97316, 0xFFEA580C, 0xFFC2410C, 0xFF9A3412, 0xFF7C2D12, 0xFF431407, 0xFF2E0E05 };
+
+    private static final int[] ROW_WHITE_TOP = { 0xFFF8FAFC, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFCBD5E1, 0xFF94A3B8, 0xFF64748B };
+    private static final int[] ROW_WHITE_ALT = { 0xFFFFFFFF, 0xFFF8FAFC, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFCBD5E1, 0xFF94A3B8, 0xFF64748B, 0xFF475569 };
+
+    private static final int[] ROW_BLACK_TOP = { 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF1E293B, 0xFF0F172A, 0xFF0B1120, 0xFF080C17, 0xFF05070E };
+    private static final int[] ROW_BLACK_ALT = { 0xFF475569, 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF0B1120, 0xFF080C17, 0xFF05070E, 0xFF030408 };
+
+    private static final int[] ROW_YELLOW_TOP = { 0xFFFACC15, 0xFFEAB308, 0xFFCA8A04, 0xFFEAB308, 0xFFCA8A04, 0xFFA16207, 0xFF854D0E, 0xFF713F12 };
+    private static final int[] ROW_YELLOW_ALT = { 0xFFFEF08A, 0xFFFDE047, 0xFFFACC15, 0xFFEAB308, 0xFFCA8A04, 0xFFA16207, 0xFF854D0E, 0xFF582D09 };
+
+    private static final int[] ROW_LIME_TOP = { 0xFF84CC16, 0xFF65A30D, 0xFF4D7C0F, 0xFF65A30D, 0xFF4D7C0F, 0xFF3F6212, 0xFF365314, 0xFF1A2E05 };
+    private static final int[] ROW_LIME_ALT = { 0xFFA3E635, 0xFF84CC16, 0xFF65A30D, 0xFF4D7C0F, 0xFF3F6212, 0xFF365314, 0xFF1A2E05, 0xFF101D03 };
+
+    private static final int[] ROW_CYAN_TOP = { 0xFF06B6D4, 0xFF0891B2, 0xFF0E7490, 0xFF0891B2, 0xFF0E7490, 0xFF155E75, 0xFF164E63, 0xFF083344 };
+    private static final int[] ROW_CYAN_ALT = { 0xFF22D3EE, 0xFF06B6D4, 0xFF0891B2, 0xFF0E7490, 0xFF155E75, 0xFF164E63, 0xFF083344, 0xFF04202C };
+
+    private static final int[] ROW_LIGHT_BLUE_TOP = { 0xFF38BDF8, 0xFF0284C7, 0xFF0369A1, 0xFF0284C7, 0xFF0369A1, 0xFF075985, 0xFF0C4A6E, 0xFF082F49 };
+    private static final int[] ROW_LIGHT_BLUE_ALT = { 0xFF7DD3FC, 0xFF38BDF8, 0xFF0284C7, 0xFF0369A1, 0xFF075985, 0xFF0C4A6E, 0xFF082F49, 0xFF051E30 };
+
+    private static final int[] ROW_PINK_TOP = { 0xFFF472B6, 0xFFEC4899, 0xFFDB2777, 0xFFEC4899, 0xFFDB2777, 0xFFBE185D, 0xFF9D174D, 0xFF831843 };
+    private static final int[] ROW_PINK_ALT = { 0xFFF9A8D4, 0xFFF472B6, 0xFFEC4899, 0xFFDB2777, 0xFFBE185D, 0xFF9D174D, 0xFF831843, 0xFF500728 };
+
+    private static final int[] ROW_MAGENTA_TOP = { 0xFFE879F9, 0xFFD946EF, 0xFFC026D3, 0xFFD946EF, 0xFFC026D3, 0xFFA21CAF, 0xFF86198F, 0xFF701A75 };
+    private static final int[] ROW_MAGENTA_ALT = { 0xFFF0ABFC, 0xFFE879F9, 0xFFD946EF, 0xFFC026D3, 0xFFA21CAF, 0xFF86198F, 0xFF701A75, 0xFF4A044E };
+
+    private static final int[] ROW_BROWN_TOP = { 0xFF8D5B4C, 0xFF784537, 0xFF63372C, 0xFF784537, 0xFF63372C, 0xFF502B22, 0xFF3E1F18, 0xFF2C1510 };
+    private static final int[] ROW_BROWN_ALT = { 0xFFA67161, 0xFF8D5B4C, 0xFF784537, 0xFF63372C, 0xFF502B22, 0xFF3E1F18, 0xFF2C1510, 0xFF1D0D0A };
+
+    private static final int[] ROW_GRAY_TOP = { 0xFF64748B, 0xFF475569, 0xFF334155, 0xFF475569, 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF020617 };
+    private static final int[] ROW_GRAY_ALT = { 0xFF94A3B8, 0xFF64748B, 0xFF475569, 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF020617, 0xFF01030B };
+
     /**
      * Unified, high-performance Creeper backdrop renderer.
      * Combines Gouraud-shaded wash gradients with batch-optimized face and cutout geometry.
@@ -508,203 +603,116 @@ public class ConfigBackgrounds {
                 0xFF042224, 0xFF021314);
     }
 
-    // --- Entity Background Implementations ---
-
-    public static void drawEndermanBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
-        if (!(poseStackOrGraphics instanceof PoseStack ps)) return;
-
-        boolean light = theme != null && theme.isLight();
-        float washAlpha = light ? 0.08f : 0.14f;
-        drawVerticalGradientRect(ps, x, y, width, height, 0xFF120320, 0xFF280845, 0xFF090110, alpha * washAlpha);
-
-        FaceBounds b = new FaceBounds(x, y, width, height);
-        int cs = b.cellSize;
-        float headAlpha = light ? 0.18f : 0.25f;
-
-        // Dark obsidian head base
-        ConfigGuiBatch.fill(ps, b.x, b.y, b.x + b.size, b.y + b.size, applyAlpha(0xFF141217, alpha * headAlpha));
-        // Subtle top and bottom shade
-        ConfigGuiBatch.fill(ps, b.x, b.y, b.x + b.size, b.y + cs * 2, applyAlpha(0xFF0F0E12, alpha * headAlpha));
-        ConfigGuiBatch.fill(ps, b.x, b.y + cs * 6, b.x + b.size, b.y + b.size, applyAlpha(0xFF0B0A0E, alpha * headAlpha));
-
-        // Soft eye glow wash
-        ConfigGuiBatch.fill(ps, b.x + cs - 1, b.y + 3 * cs - 1, b.x + 7 * cs + 1, b.y + 4 * cs + 1,
-                applyAlpha(0xFF7E22CE, alpha * (light ? 0.15f : 0.25f)));
-
-        // Eyes (Row 3, cols 1..2 and 5..6): Outer violet, inner white/magenta pupil
-        float eyeAlpha = light ? 0.80f : 0.95f;
-        // Left eye
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + 3 * cs, b.x + 2 * cs, b.y + 4 * cs, applyAlpha(0xFFC026D3, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 2 * cs, b.y + 3 * cs, b.x + 3 * cs, b.y + 4 * cs, applyAlpha(0xFFF5D0FE, alpha * eyeAlpha));
-        // Right eye
-        ConfigGuiBatch.fill(ps, b.x + 5 * cs, b.y + 3 * cs, b.x + 6 * cs, b.y + 4 * cs, applyAlpha(0xFFF5D0FE, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs, b.y + 3 * cs, b.x + 7 * cs, b.y + 4 * cs, applyAlpha(0xFFC026D3, alpha * eyeAlpha));
-
-        // Subtle mouth slit line (Row 5)
-        ConfigGuiBatch.fill(ps, b.x + 2 * cs, b.y + 5 * cs + cs / 2, b.x + 6 * cs, b.y + 5 * cs + cs / 2 + 1,
-                applyAlpha(0xFF261D30, alpha * 0.40f));
-
-        int borderCol = light ? 0xFF9333EA : 0xFFC084FC;
-        drawBorder(ps, b.x - 1, b.y - 1, b.size + 2, b.size + 2, applyAlpha(borderCol, alpha * (light ? 0.25f : 0.35f)));
+    public static void drawBlueCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF0B192C, 0xFF1E3A8A, 0xFF060D17,
+                ROW_BLUE_TOP, ROW_BLUE_ALT,
+                0xFF1D4ED8, 0xFF60A5FA,
+                0xFF0F172A, 0xFF050811);
     }
 
-    public static void drawWolfBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
-        if (!(poseStackOrGraphics instanceof PoseStack ps)) return;
-
-        boolean light = theme != null && theme.isLight();
-        float washAlpha = light ? 0.08f : 0.14f;
-        drawVerticalGradientRect(ps, x, y, width, height, 0xFF141E1C, 0xFF2B3A37, 0xFF0E1413, alpha * washAlpha);
-
-        FaceBounds b = new FaceBounds(x, y, width, height);
-        int cs = b.cellSize;
-        float headAlpha = light ? 0.18f : 0.26f;
-
-        // Gray wolf head base
-        ConfigGuiBatch.fill(ps, b.x, b.y, b.x + b.size, b.y + b.size, applyAlpha(0xFF94A3B8, alpha * headAlpha));
-
-        // Ears (Row 0, cols 1 and 6)
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y, b.x + 2 * cs, b.y + cs, applyAlpha(0xFF475569, alpha * headAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs, b.y, b.x + 7 * cs, b.y + cs, applyAlpha(0xFF475569, alpha * headAlpha));
-        ConfigGuiBatch.fill(ps, b.x + cs + 1, b.y + 1, b.x + 2 * cs - 1, b.y + cs, applyAlpha(0xFFCBD5E1, alpha * headAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs + 1, b.y + 1, b.x + 7 * cs - 1, b.y + cs, applyAlpha(0xFFCBD5E1, alpha * headAlpha));
-
-        // Eyes (Row 2, cols 1-2 and 5-6)
-        float eyeAlpha = light ? 0.55f : 0.70f;
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + 2 * cs, b.x + 3 * cs, b.y + 3 * cs, applyAlpha(0xFF1E293B, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 2 * cs, b.y + 2 * cs, b.x + 3 * cs, b.y + 3 * cs, applyAlpha(0xFFF8FAFC, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 5 * cs, b.y + 2 * cs, b.x + 7 * cs, b.y + 3 * cs, applyAlpha(0xFF1E293B, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 5 * cs, b.y + 2 * cs, b.x + 6 * cs, b.y + 3 * cs, applyAlpha(0xFFF8FAFC, alpha * eyeAlpha));
-
-        // Snout (Rows 4-6, cols 2-5)
-        ConfigGuiBatch.fill(ps, b.x + 2 * cs, b.y + 4 * cs, b.x + 6 * cs, b.y + 7 * cs, applyAlpha(0xFFE2E8F0, alpha * headAlpha));
-        // Black nose (Row 4, cols 3-4)
-        ConfigGuiBatch.fill(ps, b.x + 3 * cs, b.y + 4 * cs, b.x + 5 * cs, b.y + 5 * cs, applyAlpha(0xFF0F172A, alpha * eyeAlpha));
-        // Mouth line
-        ConfigGuiBatch.fill(ps, b.x + 3 * cs + cs / 2, b.y + 5 * cs, b.x + 4 * cs + cs / 2, b.y + 7 * cs, applyAlpha(0xFF64748B, alpha * headAlpha));
-
-        // Classic red collar (Row 7, cols 1-6)
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + 7 * cs, b.x + 7 * cs, b.y + b.size, applyAlpha(0xFFDC2626, alpha * (light ? 0.35f : 0.45f)));
-
-        int borderCol = light ? 0xFF64748B : 0xFF94A3B8;
-        drawBorder(ps, b.x - 1, b.y - 1, b.size + 2, b.size + 2, applyAlpha(borderCol, alpha * (light ? 0.22f : 0.30f)));
+    public static void drawPurpleCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF190B28, 0xFF581C87, 0xFF0D0517,
+                ROW_PURPLE_TOP, ROW_PURPLE_ALT,
+                0xFF7E22CE, 0xFFC084FC,
+                0xFF1E0A33, 0xFF0A0214);
     }
 
-    public static void drawFoxBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
-        if (!(poseStackOrGraphics instanceof PoseStack ps)) return;
-
-        boolean light = theme != null && theme.isLight();
-        // Warm autumnal spruce forest evening glow
-        float washAlpha = light ? 0.08f : 0.13f;
-        drawVerticalGradientRect(ps, x, y, width, height, 0xFF1F150C, 0xFF522A0C, 0xFF140D06, alpha * washAlpha);
-
-        FaceBounds b = new FaceBounds(x, y, width, height);
-        int cs = b.cellSize;
-        float headAlpha = light ? 0.22f : 0.30f;
-
-        // Rich warm russet-orange fox base fur (authentic Minecraft fox palette)
-        ConfigGuiBatch.fill(ps, b.x, b.y, b.x + b.size, b.y + b.size, applyAlpha(0xFFD45E1B, alpha * headAlpha));
-
-        // Subtle brow shade across rows 1-2 for depth
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + cs, b.x + 7 * cs, b.y + 2 * cs, applyAlpha(0xFFBD4F14, alpha * headAlpha * 0.7f));
-
-        // Dark charcoal ear tips (Row 0, cols 1 and 6)
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y, b.x + 2 * cs, b.y + cs, applyAlpha(0xFF2B231D, alpha * headAlpha * 1.3f));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs, b.y, b.x + 7 * cs, b.y + cs, applyAlpha(0xFF2B231D, alpha * headAlpha * 1.3f));
-
-        // Soft cream inner ear (Row 1, cols 1 and 6)
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + cs, b.x + 2 * cs, b.y + 2 * cs, applyAlpha(0xFFF5ECE1, alpha * headAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs, b.y + cs, b.x + 7 * cs, b.y + 2 * cs, applyAlpha(0xFFF5ECE1, alpha * headAlpha));
-
-        // Warm dark espresso fox eyes (Row 3, cols 1 and 6)
-        float eyeAlpha = light ? 0.70f : 0.85f;
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + 3 * cs, b.x + 2 * cs, b.y + 4 * cs, applyAlpha(0xFF1F150E, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs, b.y + 3 * cs, b.x + 7 * cs, b.y + 4 * cs, applyAlpha(0xFF1F150E, alpha * eyeAlpha));
-        // Subtle warm eye sparkle
-        ConfigGuiBatch.fill(ps, b.x + cs + cs / 2, b.y + 3 * cs, b.x + 2 * cs, b.y + 3 * cs + cs / 2, applyAlpha(0xFF8C4A20, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs, b.y + 3 * cs, b.x + 6 * cs + cs / 2, b.y + 3 * cs + cs / 2, applyAlpha(0xFF8C4A20, alpha * eyeAlpha));
-
-        // Fluffy ivory/white cheeks (Rows 4-6, cols 0..1 and cols 6..7)
-        ConfigGuiBatch.fill(ps, b.x, b.y + 4 * cs, b.x + 2 * cs, b.y + 7 * cs, applyAlpha(0xFFFAF4EB, alpha * headAlpha * 1.15f));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs, b.y + 4 * cs, b.x + b.size, b.y + 7 * cs, applyAlpha(0xFFFAF4EB, alpha * headAlpha * 1.15f));
-
-        // Snout center warmth (Rows 4-6, cols 2-5)
-        ConfigGuiBatch.fill(ps, b.x + 2 * cs, b.y + 4 * cs, b.x + 6 * cs, b.y + 7 * cs, applyAlpha(0xFFDC6824, alpha * headAlpha));
-
-        // Dark charcoal button nose (Row 5, cols 3-4)
-        ConfigGuiBatch.fill(ps, b.x + 3 * cs, b.y + 5 * cs, b.x + 5 * cs, b.y + 6 * cs, applyAlpha(0xFF211812, alpha * eyeAlpha));
-
-        // Warm russet-amber border
-        int borderCol = light ? 0xFFB45309 : 0xFFF59E0B;
-        drawBorder(ps, b.x - 1, b.y - 1, b.size + 2, b.size + 2, applyAlpha(borderCol, alpha * (light ? 0.25f : 0.35f)));
+    public static void drawRedCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF260808, 0xFF7F1D1D, 0xFF140303,
+                ROW_RED_TOP, ROW_RED_ALT,
+                0xFFB91C1C, 0xFFF87171,
+                0xFF200505, 0xFF0D0202);
     }
 
-    public static void drawSkeletonBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
-        if (!(poseStackOrGraphics instanceof PoseStack ps)) return;
-
-        boolean light = theme != null && theme.isLight();
-        float washAlpha = light ? 0.07f : 0.12f;
-        drawVerticalGradientRect(ps, x, y, width, height, 0xFF14171A, 0xFF2A343D, 0xFF0C0E10, alpha * washAlpha);
-
-        FaceBounds b = new FaceBounds(x, y, width, height);
-        int cs = b.cellSize;
-        float headAlpha = light ? 0.20f : 0.28f;
-
-        // Bone gray head base
-        ConfigGuiBatch.fill(ps, b.x, b.y, b.x + b.size, b.y + b.size, applyAlpha(0xFFCBD5E1, alpha * headAlpha));
-
-        // Hollow eye sockets (Rows 2-3, cols 1-2 and 5-6)
-        float socketAlpha = light ? 0.50f : 0.65f;
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + 2 * cs, b.x + 3 * cs, b.y + 4 * cs, applyAlpha(0xFF0F172A, alpha * socketAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 5 * cs, b.y + 2 * cs, b.x + 7 * cs, b.y + 4 * cs, applyAlpha(0xFF0F172A, alpha * socketAlpha));
-
-        // Nasal cavity (Row 4, cols 3-4)
-        ConfigGuiBatch.fill(ps, b.x + 3 * cs, b.y + 4 * cs, b.x + 5 * cs, b.y + 5 * cs, applyAlpha(0xFF0F172A, alpha * socketAlpha));
-
-        // Teeth row (Rows 6-7, cols 1-6) with vertical dividing slits
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + 6 * cs, b.x + 7 * cs, b.y + 7 * cs, applyAlpha(0xFF94A3B8, alpha * headAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 2 * cs, b.y + 6 * cs, b.x + 2 * cs + 1, b.y + 7 * cs, applyAlpha(0xFF0F172A, alpha * socketAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 4 * cs, b.y + 6 * cs, b.x + 4 * cs + 1, b.y + 7 * cs, applyAlpha(0xFF0F172A, alpha * socketAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 6 * cs, b.y + 6 * cs, b.x + 6 * cs + 1, b.y + 7 * cs, applyAlpha(0xFF0F172A, alpha * socketAlpha));
-
-        int borderCol = light ? 0xFF64748B : 0xFFCBD5E1;
-        drawBorder(ps, b.x - 1, b.y - 1, b.size + 2, b.size + 2, applyAlpha(borderCol, alpha * (light ? 0.22f : 0.30f)));
+    public static void drawOrangeCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF251006, 0xFF7C2D12, 0xFF140803,
+                ROW_ORANGE_TOP, ROW_ORANGE_ALT,
+                0xFFC2410C, 0xFFFB923C,
+                0xFF240D05, 0xFF0E0502);
     }
 
-    public static void drawSlimeBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
-        if (!(poseStackOrGraphics instanceof PoseStack ps)) return;
+    public static void drawWhiteCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF141923, 0xFF334155, 0xFF0D1117,
+                ROW_WHITE_TOP, ROW_WHITE_ALT,
+                0xFF64748B, 0xFFE2E8F0,
+                0xFF1E293B, 0xFF0F172A);
+    }
 
-        boolean light = theme != null && theme.isLight();
-        float washAlpha = light ? 0.08f : 0.14f;
-        drawVerticalGradientRect(ps, x, y, width, height, 0xFF0B210F, 0xFF1A5927, 0xFF061409, alpha * washAlpha);
+    public static void drawBlackCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF0F1219, 0xFF1E2433, 0xFF080A0E,
+                ROW_BLACK_TOP, ROW_BLACK_ALT,
+                0xFF334155, 0xFF64748B,
+                0xFF080B12, 0xFF020306);
+    }
 
-        FaceBounds b = new FaceBounds(x, y, width, height);
-        int cs = b.cellSize;
-        float outerAlpha = light ? 0.16f : 0.24f;
-        float innerAlpha = light ? 0.24f : 0.34f;
+    public static void drawYellowCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF2A2304, 0xFF713F12, 0xFF171302,
+                ROW_YELLOW_TOP, ROW_YELLOW_ALT,
+                0xFFCA8A04, 0xFFFDE047,
+                0xFF2B2004, 0xFF140E02);
+    }
 
-        // Outer bouncy translucent lime jelly cube
-        ConfigGuiBatch.fill(ps, b.x, b.y, b.x + b.size, b.y + b.size, applyAlpha(0xFF4ADE80, alpha * outerAlpha));
-        // Inner denser slime core
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + cs, b.x + 7 * cs, b.y + 7 * cs, applyAlpha(0xFF16A34A, alpha * innerAlpha));
+    public static void drawLimeCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF142006, 0xFF365314, 0xFF0A1003,
+                ROW_LIME_TOP, ROW_LIME_ALT,
+                0xFF4D7C0F, 0xFFA3E635,
+                0xFF192605, 0xFF0B1202);
+    }
 
-        // Cute dark jelly eyes (Row 3, cols 1-2 and 5-6)
-        float eyeAlpha = light ? 0.60f : 0.75f;
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + 3 * cs, b.x + 3 * cs, b.y + 4 * cs, applyAlpha(0xFF052E16, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 5 * cs, b.y + 3 * cs, b.x + 7 * cs, b.y + 4 * cs, applyAlpha(0xFF052E16, alpha * eyeAlpha));
-        // Bright eye highlights
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + 3 * cs, b.x + 2 * cs, b.y + 3 * cs + cs / 2, applyAlpha(0xFF86EFAC, alpha * eyeAlpha));
-        ConfigGuiBatch.fill(ps, b.x + 5 * cs, b.y + 3 * cs, b.x + 6 * cs, b.y + 3 * cs + cs / 2, applyAlpha(0xFF86EFAC, alpha * eyeAlpha));
+    public static void drawCyanCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF061E28, 0xFF164E63, 0xFF030F14,
+                ROW_CYAN_TOP, ROW_CYAN_ALT,
+                0xFF0E7490, 0xFF22D3EE,
+                0xFF08222E, 0xFF031017);
+    }
 
-        // Cute 1-cell jelly mouth (Row 5, col 4)
-        ConfigGuiBatch.fill(ps, b.x + 4 * cs, b.y + 5 * cs, b.x + 5 * cs, b.y + 6 * cs, applyAlpha(0xFF052E16, alpha * eyeAlpha));
+    public static void drawLightBlueCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF082030, 0xFF0C4A6E, 0xFF04111A,
+                ROW_LIGHT_BLUE_TOP, ROW_LIGHT_BLUE_ALT,
+                0xFF0369A1, 0xFF7DD3FC,
+                0xFF0A2336, 0xFF04121C);
+    }
 
-        int borderCol = light ? 0xFF16A34A : 0xFF4ADE80;
-        drawBorder(ps, b.x - 1, b.y - 1, b.size + 2, b.size + 2, applyAlpha(borderCol, alpha * (light ? 0.25f : 0.35f)));
+    public static void drawPinkCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF280B1B, 0xFF831843, 0xFF14050D,
+                ROW_PINK_TOP, ROW_PINK_ALT,
+                0xFFDB2777, 0xFFF9A8D4,
+                0xFF2B0A1D, 0xFF13040D);
+    }
+
+    public static void drawMagentaCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF240726, 0xFF701A75, 0xFF120313,
+                ROW_MAGENTA_TOP, ROW_MAGENTA_ALT,
+                0xFFC026D3, 0xFFF0ABFC,
+                0xFF29082B, 0xFF120314);
+    }
+
+    public static void drawBrownCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF1F100B, 0xFF3E1F18, 0xFF100805,
+                ROW_BROWN_TOP, ROW_BROWN_ALT,
+                0xFF63372C, 0xFFA67161,
+                0xFF24110C, 0xFF100705);
+    }
+
+    public static void drawGrayCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+                0xFF141923, 0xFF1E293B, 0xFF0A0D12,
+                ROW_GRAY_TOP, ROW_GRAY_ALT,
+                0xFF334155, 0xFF94A3B8,
+                0xFF131A26, 0xFF080C14);
     }
 
     // --- Shared Background Drawing Utilities ---

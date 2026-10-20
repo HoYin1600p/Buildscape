@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.feature.copper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.junit.Test;
 
 import java.io.Reader;
 import java.nio.file.Files;
@@ -16,15 +17,11 @@ import java.util.function.Supplier;
 
 /** Headless regression checks following the project's standalone test-runner convention. */
 public final class CopperRodLogicTest {
-    private static int checks;
 
-    private CopperRodLogicTest() {
-    }
-
-    public static void main(String[] args) throws Exception {
+    @Test
+    public void copperStagesAndToolTag() throws Exception {
         checkStages();
         checkToolTag();
-        System.out.println("Copper rod logic tests passed: " + checks + " checks");
     }
 
     private static void checkStages() {
@@ -102,6 +99,5 @@ public final class CopperRodLogicTest {
         if (!condition) {
             throw new AssertionError(description);
         }
-        checks++;
     }
 }

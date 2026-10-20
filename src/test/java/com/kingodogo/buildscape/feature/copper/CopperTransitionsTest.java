@@ -1,11 +1,11 @@
 package com.kingodogo.buildscape.feature.copper;
 
+import org.junit.Test;
 
 public final class CopperTransitionsTest {
-    private CopperTransitionsTest() {
-    }
 
-    public static void main(String[] args) {
+    @Test
+    public void transitionTableMapsChainsAndWax() {
         CopperTransitions<Object> table = new CopperTransitions<>();
         Object[] stages = {new String("copper"), new String("copper"),
                 new String("copper"), new String("copper")};
@@ -31,7 +31,6 @@ public final class CopperTransitionsTest {
         check(table.first(secondOxidized) == secondFresh, "independent family first stage");
         check(table.first(stages[3]) == stages[0], "adding a family preserves existing chains");
         check(table.unwaxed(other) == null && table.waxed(other) == null, "unmapped waxing is absent");
-        System.out.println("Copper transition tests passed");
     }
 
     private static void check(boolean condition, String description) {

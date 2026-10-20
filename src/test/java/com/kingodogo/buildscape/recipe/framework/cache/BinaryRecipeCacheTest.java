@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.recipe.framework.cache;
 
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +13,8 @@ import java.util.Map;
 
 public final class BinaryRecipeCacheTest {
 
-    public static void main(String[] args) throws Exception {
+    @Test
+    public void cacheKeyAndFileHandling() throws Exception {
         String[] categories = {"first", "second"};
         Map<String, byte[]> first = new LinkedHashMap<>();
         first.put("first", new byte[]{1});
@@ -48,7 +51,6 @@ public final class BinaryRecipeCacheTest {
             Files.deleteIfExists(cacheFile);
             Files.deleteIfExists(directory);
         }
-        System.out.println("Binary recipe cache: 5 checks passed.");
     }
 
     private static void require(boolean condition, String message) {

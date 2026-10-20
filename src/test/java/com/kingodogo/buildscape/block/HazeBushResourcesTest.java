@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,10 +17,8 @@ public final class HazeBushResourcesTest {
             "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"
     };
 
-    private HazeBushResourcesTest() {
-    }
-
-    public static void main(String[] args) {
+    @Test
+    public void hazeBushResourcesAreComplete() {
         JsonObject lang = readResource("assets/buildscape/lang/en_us.json");
         for (String color : COLORS) {
             String bush = color + "_haze_bush";
@@ -36,7 +35,6 @@ public final class HazeBushResourcesTest {
             require(!key.matches("item\\.buildscape\\.[a-z_]+_haze_bush(?:\\.drained)?"),
                     "unused haze item translation: " + key);
         }
-        System.out.println("Haze bush resource tests passed: all 16 colors");
     }
 
     private static void checkBushLoot(String bush) {

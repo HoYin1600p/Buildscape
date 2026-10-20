@@ -1,12 +1,12 @@
 package com.kingodogo.buildscape.util;
 
 import net.minecraft.nbt.CompoundTag;
+import org.junit.Test;
 
 public final class GoldenDandelionGrowthTest {
-    private GoldenDandelionGrowthTest() {
-    }
 
-    public static void main(String[] args) {
+    @Test
+    public void freezeRulesAndLegacyMigration() {
         expect(true, GoldenDandelionGrowth.canToggle(true, false), "unfrozen baby can freeze");
         expect(true, GoldenDandelionGrowth.canToggle(true, true), "frozen baby can unfreeze");
         expect(false, GoldenDandelionGrowth.canToggle(false, false), "unfrozen adult is ignored");

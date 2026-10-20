@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client.model;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -19,7 +20,8 @@ public final class StairModelTest {
             "straight", "inner_left", "inner_right", "outer_left", "outer_right"
     };
 
-    public static void main(String[] args) throws IOException {
+    @Test
+    public void stairBlockstatesAndGlassGeometryAreConsistent() throws IOException {
         int blocks = 0;
         int states = 0;
         try (Stream<Path> paths = Files.list(ASSETS.resolve("blockstates"))) {
@@ -61,7 +63,6 @@ public final class StairModelTest {
         checkGlassGeometry("straight");
         checkGlassGeometry("inner");
         checkGlassGeometry("outer");
-        System.out.println("Stair models passed: " + blocks + " blocks, " + states + " states, 3 glass templates");
     }
 
     private static void checkGlassGeometry(String kind) throws IOException {

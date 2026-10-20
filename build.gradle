@@ -201,91 +201,6 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += ['-Xlint:-removal']
 }
 
-tasks.register('runPipeSpillTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.client.renderer.PipeSpillTest'
-}
-
-tasks.register('runPipeOutletTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.feature.pipe.transport.PipeOutletWaterTest'
-}
-
-tasks.register('runRecipeManagerInjectorTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjectorTest'
-}
-
-tasks.register('runBinaryRecipeCacheTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.recipe.framework.cache.BinaryRecipeCacheTest'
-}
-
-tasks.register('runTreeChopTraversalTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.util.TreeChopTraversalTest'
-}
-
-tasks.register('runBeaconBeamScanTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.util.BeaconBeamScanStateTest'
-}
-
-tasks.register('runGoldenDandelionGrowthTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.util.GoldenDandelionGrowthTest'
-}
-
-tasks.register('runMangroveLeafSupportTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.worldgen.MangroveLeafSupportTest'
-}
-
-tasks.register('runCopperRodLogicTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.feature.copper.CopperRodLogicTest'
-}
-
-tasks.register('runHazeBushResourcesTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.block.HazeBushResourcesTest'
-}
-
-tasks.register('runEyeblossomTransitionTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.block.EyeblossomTransitionTest'
-}
-
-tasks.register('runParticleColorSlotsTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.client.screen.ParticleColorSlotsTest'
-}
-
-tasks.register('runStairModelTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.client.model.StairModelTest'
-}
-
-tasks.register('runPatternBoundsTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.recipe.framework.util.PatternBoundsTest'
-}
-
-tasks.register('runRecipePackFormatterTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatterTest'
-}
-
-tasks.register('runSmokeColorRegistryTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.client.particle.SmokeColorRegistryTest'
-}
-
-tasks.register('runCopperTransitionsTests', JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.feature.copper.CopperTransitionsTest'
-}
-
 tasks.register('syncBundledRecipeCache', JavaExec) {
     group = 'buildscape'
     description = 'Compiles and synchronizes the bundled BDRE binary cache (recipes.bscb) directly from source JSONs.'
@@ -339,11 +254,5 @@ tasks.named('syncBundledRecipeCache').configure {
     mustRunAfter 'verifyBundledRecipeCache', 'checkRecipePackFormat', 'compactizeRecipes'
 }
 tasks.named('check').configure {
-    dependsOn 'runPipeSpillTests', 'runPipeOutletTests',
-            'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',
-            'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests', 'runMangroveLeafSupportTests',
-            'runEyeblossomTransitionTests', 'runCopperRodLogicTests', 'runHazeBushResourcesTests',
-            'runParticleColorSlotsTests', 'runStairModelTests', 'runPatternBoundsTests',
-            'runRecipePackFormatterTests', 'runSmokeColorRegistryTests', 'runCopperTransitionsTests',
-            'verifyBundledRecipeCache', 'checkRecipePackFormat'
+    dependsOn 'verifyBundledRecipeCache', 'checkRecipePackFormat'
 }

@@ -1,10 +1,11 @@
 package com.kingodogo.buildscape.util;
 
-public final class BeaconBeamScanStateTest {
-    private BeaconBeamScanStateTest() {
-    }
+import org.junit.Test;
 
-    public static void main(String[] args) {
+public final class BeaconBeamScanStateTest {
+
+    @Test
+    public void scanStateTracksNearestObstruction() {
         BeaconBeamScanState state = new BeaconBeamScanState();
         expect(BeaconBeamScanState.UNLIMITED, state.confirmedHeight(), "initial beam height");
 

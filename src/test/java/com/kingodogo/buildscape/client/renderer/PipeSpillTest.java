@@ -3,14 +3,15 @@ package com.kingodogo.buildscape.client.renderer;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class PipeSpillTest {
-    private static int checks;
 
-    public static void main(String[] args) {
+    @Test
+    public void pipeSpillGeometryIsCorrect() {
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             for (BlockPos pos : List.of(BlockPos.ZERO, new BlockPos(15, -60, 15), new BlockPos(-1, 70, -17))) {
                 for (boolean reverse : new boolean[]{false, true}) {
@@ -30,7 +31,6 @@ public final class PipeSpillTest {
                 verifyDownwardOutlet(pos, reverse);
             }
         }
-        System.out.println("Pipe spill geometry: " + checks + " checks passed.");
     }
 
     private static void verifySpill(BlockPos pos, Direction direction, boolean reverse, double base, double lip) {
@@ -189,7 +189,6 @@ public final class PipeSpillTest {
     }
 
     private static void require(boolean value, String message) {
-        checks++;
         if (!value) throw new AssertionError(message);
     }
 

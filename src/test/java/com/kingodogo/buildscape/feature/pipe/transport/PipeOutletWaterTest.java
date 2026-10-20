@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.feature.pipe.transport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,9 +12,9 @@ import java.util.Map;
 import java.util.Set;
 
 public final class PipeOutletWaterTest {
-    private static int checks;
 
-    public static void main(String[] args) {
+    @Test
+    public void outletAmountFollowsFlowState() {
         for (Direction exit : Direction.Plane.HORIZONTAL) {
             PipeFlowState flow = new PipeFlowState();
             flow.setHasWater(true);
@@ -37,15 +38,10 @@ public final class PipeOutletWaterTest {
         flow.setDistance(7);
         expect(8, PipeOutletWater.amount(flow, Direction.DOWN, true, true), "falling water resets range");
         expect(0, PipeOutletWater.amount(flow, Direction.UP, true, true), "no upward world spill");
-        testHorizontalRange();
-        testBranchDistances();
-        testVerticalReset();
-        testFluidIdentityPropagation();
-        testDifferentFluidsDoNotMix();
-        System.out.println("Pipe outlet supply: " + checks + " checks passed.");
     }
 
-    private static void testHorizontalRange() {
+    @Test
+    public void testHorizontalRange() {
         TestTopology topology = new TestTopology();
         List<BlockPos> positions = topology.addLine(new BlockPos(0, 0, 0), Direction.EAST, 9);
         topology.sources.add(positions.get(0));
@@ -62,7 +58,8 @@ public final class PipeOutletWaterTest {
         expect(7, states.get(positions.get(0)).getMaxDistance(), "horizontal branch maximum");
     }
 
-    private static void testBranchDistances() {
+    @Test
+    public void testBranchDistances() {
         TestTopology topology = new TestTopology();
         BlockPos source = BlockPos.ZERO;
         List<BlockPos> east = topology.addLine(source, Direction.EAST, 8);
@@ -77,7 +74,8 @@ public final class PipeOutletWaterTest {
         expect(3, states.get(west.get(1)).getMaxDistance(), "short branch maximum");
     }
 
-    private static void testVerticalReset() {
+    @Test
+    public void testVerticalReset() {
         TestTopology topology = new TestTopology();
         BlockPos source = new BlockPos(0, 2, 0);
         BlockPos lower = source.below();
@@ -93,7 +91,8 @@ public final class PipeOutletWaterTest {
         expect(7, states.get(run.get(7)).getDistance(), "full range after downward reset");
     }
 
-    private static void testFluidIdentityPropagation() {
+    @Test
+    public void testFluidIdentityPropagation() {
         TestTopology topology = new TestTopology();
         List<BlockPos> positions = topology.addLine(BlockPos.ZERO, Direction.EAST, 4);
         topology.sourceFluids.put(positions.get(0), "buildscape:experience_still");
@@ -105,7 +104,8 @@ public final class PipeOutletWaterTest {
         }
     }
 
-    private static void testDifferentFluidsDoNotMix() {
+    @Test
+    public void testDifferentFluidsDoNotMix() {
         TestTopology topology = new TestTopology();
         List<BlockPos> positions = topology.addLine(BlockPos.ZERO, Direction.EAST, 5);
         topology.sourceFluids.put(positions.get(0), PipeFlowState.WATER_FLUID_ID);
@@ -127,17 +127,14 @@ public final class PipeOutletWaterTest {
     }
 
     private static void expect(int expected, int actual, String label) {
-        checks++;
         if (expected != actual) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
     }
 
     private static void expect(boolean expected, boolean actual, String label) {
-        checks++;
         if (expected != actual) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
     }
 
     private static void expect(String expected, String actual, String label) {
-        checks++;
         if (!expected.equals(actual)) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
     }
 

@@ -4,9 +4,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
+import org.junit.Test;
 
 public final class MangroveLeafSupportTest {
-    public static void main(String[] args) {
+    @Test
+    public void leafSupportFollowsFaceConnectedPaths() {
         Set<BlockPos> leaves = new HashSet<>();
         for (int x = 1; x <= 7; x++) leaves.add(new BlockPos(x, 0, 0));
         Set<BlockPos> supported = MangroveLeafSupport.findSupportedLeaves(List.of(BlockPos.ZERO), leaves);
@@ -27,6 +29,5 @@ public final class MangroveLeafSupportTest {
         if (!MangroveLeafSupport.findSupportedLeaves(List.of(), prunedCanopy).isEmpty()) {
             throw new AssertionError("Retained leaves must still lose support when logs are removed");
         }
-        System.out.println("Mangrove leaf support: 6 checks passed.");
     }
 }

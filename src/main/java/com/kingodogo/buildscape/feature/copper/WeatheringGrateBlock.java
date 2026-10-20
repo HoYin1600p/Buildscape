@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.feature.copper;
 
 import com.kingodogo.buildscape.block.WaterloggableGrateBlock;
 
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;

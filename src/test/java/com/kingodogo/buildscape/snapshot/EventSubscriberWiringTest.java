@@ -77,7 +77,7 @@ public class EventSubscriberWiringTest {
             new ClassReader(stream).accept(new ClassVisitor(Opcodes.ASM9) {
                 @Override
                 public void visit(int version, int access, String name, String signature, String superName,
-                                  String[] interfaces) {
+                        String[] interfaces) {
                     subscriber.name = name.replace('/', '.');
                 }
 
@@ -113,7 +113,7 @@ public class EventSubscriberWiringTest {
 
                 @Override
                 public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-                                                 String[] exceptions) {
+                        String[] exceptions) {
                     Handler handler = new Handler();
                     handler.name = name;
                     handler.isPublic = (access & Opcodes.ACC_PUBLIC) != 0;

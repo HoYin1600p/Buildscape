@@ -60,8 +60,7 @@ public final class CommonSetup {
 
     private static final AtomicBoolean CONFIG_CALLBACK_REGISTERED = new AtomicBoolean();
 
-    private CommonSetup() {
-    }
+    private CommonSetup() {}
 
     public static void onCommonSetup(final FMLCommonSetupEvent event) {
         // Potion and cake stack sizes are decided per world by the isWaterbottleStack / isCakeStack
@@ -482,50 +481,52 @@ public final class CommonSetup {
             return InteractionResult.PASS;
         });
 
-        BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS.put(Items.GLASS_BOTTLE, (state, level, pos, player, hand, stack) -> {
-            if (!level.isClientSide) {
-                player.awardStat(Stats.USE_CAULDRON);
-                int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
-                if (cauldronLevel > 1) {
-                    level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, cauldronLevel - 1));
-                } else {
-                    level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
-                }
-                level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-                ItemStack filledBottle = new ItemStack(Items.EXPERIENCE_BOTTLE);
-                if (!player.getAbilities().instabuild) {
-                    stack.shrink(1);
-                    if (stack.isEmpty()) {
-                        player.setItemInHand(hand, filledBottle);
-                    } else {
-                        if (!player.getInventory().add(filledBottle)) {
-                            player.drop(filledBottle, false);
+        BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS.put(Items.GLASS_BOTTLE,
+                (state, level, pos, player, hand, stack) -> {
+                    if (!level.isClientSide) {
+                        player.awardStat(Stats.USE_CAULDRON);
+                        int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
+                        if (cauldronLevel > 1) {
+                            level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, cauldronLevel - 1));
+                        } else {
+                            level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
+                        }
+                        level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+                        ItemStack filledBottle = new ItemStack(Items.EXPERIENCE_BOTTLE);
+                        if (!player.getAbilities().instabuild) {
+                            stack.shrink(1);
+                            if (stack.isEmpty()) {
+                                player.setItemInHand(hand, filledBottle);
+                            } else {
+                                if (!player.getInventory().add(filledBottle)) {
+                                    player.drop(filledBottle, false);
+                                }
+                            }
                         }
                     }
-                }
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        });
+                    return InteractionResult.sidedSuccess(level.isClientSide);
+                });
 
-        BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS.put(Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
-            int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
-            if (cauldronLevel < 3) {
-                if (!level.isClientSide) {
-                    player.awardStat(Stats.FILL_CAULDRON);
-                    level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, cauldronLevel + 1));
-                    level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    if (!player.getAbilities().instabuild) {
-                        stack.shrink(1);
-                        ItemStack returnStack = new ItemStack(Items.GLASS_BOTTLE);
-                        if (!player.getInventory().add(returnStack)) {
-                            player.drop(returnStack, false);
+        BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS.put(Items.EXPERIENCE_BOTTLE,
+                (state, level, pos, player, hand, stack) -> {
+                    int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
+                    if (cauldronLevel < 3) {
+                        if (!level.isClientSide) {
+                            player.awardStat(Stats.FILL_CAULDRON);
+                            level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, cauldronLevel + 1));
+                            level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                            if (!player.getAbilities().instabuild) {
+                                stack.shrink(1);
+                                ItemStack returnStack = new ItemStack(Items.GLASS_BOTTLE);
+                                if (!player.getInventory().add(returnStack)) {
+                                    player.drop(returnStack, false);
+                                }
+                            }
                         }
+                        return InteractionResult.sidedSuccess(level.isClientSide);
                     }
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
-            }
-            return InteractionResult.PASS;
-        });
+                    return InteractionResult.PASS;
+                });
 
         BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS.put(ModItems.EXPERIENCE_BUCKET.get(),
                 (state, level, pos, player, hand, stack) -> {

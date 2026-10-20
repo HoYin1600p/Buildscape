@@ -94,7 +94,8 @@ public class UpdateConfigPacket {
         }
     }
 
-    public static List<UpdateConfigPacket> splitForClient(PillarParticleConfig config, int syncedLevel, boolean levelTwo,
+    public static List<UpdateConfigPacket> splitForClient(PillarParticleConfig config, int syncedLevel,
+            boolean levelTwo,
             boolean levelFour) {
         int level = PillarParticleConfig.resolveClientPermissionLevel(syncedLevel, levelTwo, levelFour);
         Set<ConfigSetting> settings = ConfigSetting.allowed(config.edit_permission_mode, level);

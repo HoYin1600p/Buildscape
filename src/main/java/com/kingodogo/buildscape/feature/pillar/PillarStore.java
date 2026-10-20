@@ -96,7 +96,8 @@ final class PillarStore {
                         return buildscapeDir;
                     }
                 } catch (Exception e) {
-                    BuildScape.LOGGER.warn("Unable to create the world data folder, falling back to the config folder", e);
+                    BuildScape.LOGGER.warn("Unable to create the world data folder, falling back to the config folder",
+                            e);
                 }
             }
 

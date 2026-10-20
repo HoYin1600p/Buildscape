@@ -93,7 +93,8 @@ public class ItemFrameParticleClient {
             String pattern,
             PillarParticleConfig cfg,
             long time) {
-        ItemFrameParticleHandler.FrameSettings settings = ItemFrameParticleHandler.resolveFrameSettings(level, ItemFrameParticleHandler.getFrameId(itemFrame), pattern, cfg);
+        ItemFrameParticleHandler.FrameSettings settings = ItemFrameParticleHandler.resolveFrameSettings(level,
+                ItemFrameParticleHandler.getFrameId(itemFrame), pattern, cfg);
         if (settings.count() == 0) {
             return;
         }
@@ -252,7 +253,8 @@ public class ItemFrameParticleClient {
             String pattern,
             PillarParticleConfig cfg,
             long time) {
-        ItemFrameParticleHandler.FrameSettings settings = ItemFrameParticleHandler.resolveFrameSettings(level, ItemFrameParticleHandler.getFrameIdColored(coloredFrame), pattern, cfg);
+        ItemFrameParticleHandler.FrameSettings settings = ItemFrameParticleHandler.resolveFrameSettings(level,
+                ItemFrameParticleHandler.getFrameIdColored(coloredFrame), pattern, cfg);
         if (settings.count() == 0) {
             return;
         }
@@ -386,7 +388,8 @@ public class ItemFrameParticleClient {
                     : ModParticles.GLOW_LIME_SPARKLE.get();
 
             if (!isSnowflake) {
-                String colorCode = ItemFrameParticleHandler.getNextColorColored(coloredFrame, cfg, settings.maxColors());
+                String colorCode = ItemFrameParticleHandler.getNextColorColored(coloredFrame, cfg,
+                        settings.maxColors());
                 PillarSparkleParticle.queueColor(
                         particleX,
                         particleY,

@@ -102,7 +102,8 @@ public final class CopperBlocks {
             () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
                     () -> ModItems.PALE_MOSS_LAYERS.get(), () -> CopperBlocks.PALE_MOSS_BLOCK.get()));
     public static final RegistryObject<Block> PALE_MOSS_BLOCK = BLOCKS.register("pale_moss_block",
-            () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK), ShapedWoodBlocks.PALE_MOSS_CARPET,
+            () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
+                    ShapedWoodBlocks.PALE_MOSS_CARPET,
                     PALE_MOSS_OVERLAY, PALE_MOSS_LAYERS, () -> ShapedWoodBlocks.PALE_OAK_SAPLING.get(),
                     () -> CopperBlocks.CLOSED_EYEBLOSSOM.get()));
     public static final RegistryObject<Block> PALE_MOSS_BLOCK_SLAB = BLOCKS.register("pale_moss_block_slab",

@@ -104,16 +104,20 @@ public final class SteelBlocks {
     public static final RegistryObject<Block> FLAMING_STEEL_BOLTS = BLOCKS.register("flaming_steel_bolts",
             () -> new SteelBoltBlock(WoolBlocks.flamingSteelProperties()));
     public static final RegistryObject<Block> FLAMING_STEEL_DOOR = BLOCKS.register("flaming_steel_door",
-            () -> new ModCopperDoorBlock(BlockBehaviour.Properties.copy(WoolBlocks.FLAMING_STEEL_BLOCK.get()).noOcclusion()));
+            () -> new ModCopperDoorBlock(
+                    BlockBehaviour.Properties.copy(WoolBlocks.FLAMING_STEEL_BLOCK.get()).noOcclusion()));
     public static final RegistryObject<Block> FLAMING_STEEL_TRAPDOOR = BLOCKS.register("flaming_steel_trapdoor",
-            () -> new ModCopperTrapdoorBlock(BlockBehaviour.Properties.copy(WoolBlocks.FLAMING_STEEL_BLOCK.get()).noOcclusion()));
+            () -> new ModCopperTrapdoorBlock(
+                    BlockBehaviour.Properties.copy(WoolBlocks.FLAMING_STEEL_BLOCK.get()).noOcclusion()));
     public static final RegistryObject<Block> FLAMING_STEEL_BUTTON = BLOCKS.register("flaming_steel_button",
             () -> new ModButtonBlock(
-                    BlockBehaviour.Properties.copy(WoolBlocks.FLAMING_STEEL_BLOCK.get()).noCollission().strength(0.5f)));
+                    BlockBehaviour.Properties.copy(WoolBlocks.FLAMING_STEEL_BLOCK.get()).noCollission()
+                            .strength(0.5f)));
     public static final RegistryObject<Block> FLAMING_STEEL_PRESSURE_PLATE = BLOCKS.register(
             "flaming_steel_pressure_plate",
             () -> new ModPressurePlateBlock(150,
-                    BlockBehaviour.Properties.copy(WoolBlocks.FLAMING_STEEL_BLOCK.get()).noCollission().strength(0.5f)));
+                    BlockBehaviour.Properties.copy(WoolBlocks.FLAMING_STEEL_BLOCK.get()).noCollission()
+                            .strength(0.5f)));
     public static final RegistryObject<Block> MAGENTA_FLAMING_STEEL_BLOCK = BLOCKS.register(
             "magenta_flaming_steel_block",
             () -> new Block(WoolBlocks.flamingSteelProperties()));

@@ -25,7 +25,7 @@ public class ConfigBackgrounds {
 
     @FunctionalInterface
     public interface BackgroundRenderer {
-        void render(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme);
+        void render(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme);
     }
 
     public static class Background {
@@ -39,9 +39,9 @@ public class ConfigBackgrounds {
             this.renderer = renderer;
         }
 
-        public void draw(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        public void draw(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
             if (renderer != null) {
-                renderer.render(poseStackOrGraphics, x, y, width, height, alpha, theme);
+                renderer.render(poseStack, x, y, width, height, alpha, theme);
             }
         }
     }
@@ -85,7 +85,7 @@ public class ConfigBackgrounds {
 
     public static final Background NONE = new Background(
             "none", "None",
-            (poseStackOrGraphics, x, y, width, height, alpha, theme) -> {}
+            (poseStack, x, y, width, height, alpha, theme) -> {}
     );
 
     // Creeper Presets
@@ -351,7 +351,7 @@ public class ConfigBackgrounds {
     public static Background registerImageBackground(String id, String displayName, ResourceLocation textureId) {
         String key = id.toLowerCase(Locale.ROOT);
         REGISTERED_BACKGROUND_IDS.add(key);
-        Background bg = new Background(id, displayName, (ps, x, y, w, h, a, t) -> drawImageBackground(ps, textureId, x, y, w, h, a, t));
+        Background bg = new Background(id, displayName, (poseStack, x, y, w, h, a, t) -> drawImageBackground(poseStack, textureId, x, y, w, h, a, t));
         BACKGROUNDS.add(bg);
         return bg;
     }
@@ -441,23 +441,21 @@ public class ConfigBackgrounds {
         return NONE;
     }
 
-    public static void drawCurrentBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        getCurrentBackground().draw(poseStackOrGraphics, x, y, width, height, alpha, theme);
+    public static void drawCurrentBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        getCurrentBackground().draw(poseStack, x, y, width, height, alpha, theme);
     }
 
     // External images are shaded to preserve control and text contrast.
-    public static void drawImageBackground(Object poseStackOrGraphics, ResourceLocation texture, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawImageBackground(PoseStack poseStack, ResourceLocation texture, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f || texture == null) return;
-        if (poseStackOrGraphics instanceof PoseStack ps) {
-            ConfigGuiBatch.flush();
-            RenderSystem.setShaderTexture(0, texture);
-            GuiComponent.blit(ps, x, y, width, height, 0.0f, 0.0f, width, height, width, height);
+        ConfigGuiBatch.flush();
+        RenderSystem.setShaderTexture(0, texture);
+        GuiComponent.blit(poseStack, x, y, width, height, 0.0f, 0.0f, width, height, width, height);
 
-            boolean light = theme != null && theme.isLight();
-            int washCol = light ? 0xFFFFFFFF : 0xFF08080C;
-            float washAlpha = light ? 0.32f : 0.42f;
-            ConfigGuiBatch.fill(ps, x, y, x + width, y + height, applyAlpha(washCol, alpha * washAlpha));
-        }
+        boolean light = theme != null && theme.isLight();
+        int washCol = light ? 0xFFFFFFFF : 0xFF08080C;
+        float washAlpha = light ? 0.32f : 0.42f;
+        ConfigGuiBatch.fill(poseStack, x, y, x + width, y + height, applyAlpha(washCol, alpha * washAlpha));
     }
 
     // --- Creeper Palette Data ---
@@ -520,17 +518,16 @@ public class ConfigBackgrounds {
      * Unified, high-performance Creeper backdrop renderer.
      * Combines Gouraud-shaded wash gradients with batch-optimized face and cutout geometry.
      */
-    private static void drawCreeperPreset(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme,
+    private static void drawCreeperPreset(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme,
                                          int topWash, int midWash, int botWash,
                                          int[] rowTop, int[] rowAlt,
                                          int borderLight, int borderDark,
                                          int cutoutLight, int cutoutDark) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
-        if (!(poseStackOrGraphics instanceof PoseStack ps)) return;
 
         boolean light = theme != null && theme.isLight();
         float washAlpha = light ? 0.08f : 0.14f;
-        drawVerticalGradientRect(ps, x, y, width, height, topWash, midWash, botWash, alpha * washAlpha);
+        drawVerticalGradientRect(poseStack, x, y, width, height, topWash, midWash, botWash, alpha * washAlpha);
 
         FaceBounds b = new FaceBounds(x, y, width, height);
         float headAlpha = light ? 0.18f : 0.25f;
@@ -546,7 +543,7 @@ public class ConfigBackgrounds {
                 if (CREEPER_MASK[r][c] == 0) {
                     int col = ((r + c) % 2 == 0) ? col1 : col2;
                     int cx = b.x + c * b.cellSize;
-                    ConfigGuiBatch.fill(ps, cx, cy, cx + b.cellSize, cy + b.cellSize, col);
+                    ConfigGuiBatch.fill(poseStack, cx, cy, cx + b.cellSize, cy + b.cellSize, col);
                 }
             }
         }
@@ -554,161 +551,161 @@ public class ConfigBackgrounds {
         // 2. Batched merged cutouts (6 quads total instead of 20 individual cutout cells)
         int cs = b.cellSize;
         // Eyes (2x2 each):
-        ConfigGuiBatch.fill(ps, b.x + cs, b.y + cs, b.x + 3 * cs, b.y + 3 * cs, cutoutCol);
-        ConfigGuiBatch.fill(ps, b.x + 5 * cs, b.y + cs, b.x + 7 * cs, b.y + 3 * cs, cutoutCol);
+        ConfigGuiBatch.fill(poseStack, b.x + cs, b.y + cs, b.x + 3 * cs, b.y + 3 * cs, cutoutCol);
+        ConfigGuiBatch.fill(poseStack, b.x + 5 * cs, b.y + cs, b.x + 7 * cs, b.y + 3 * cs, cutoutCol);
         // Nose bridge (2x1):
-        ConfigGuiBatch.fill(ps, b.x + 3 * cs, b.y + 3 * cs, b.x + 5 * cs, b.y + 4 * cs, cutoutCol);
+        ConfigGuiBatch.fill(poseStack, b.x + 3 * cs, b.y + 3 * cs, b.x + 5 * cs, b.y + 4 * cs, cutoutCol);
         // Upper mouth (4x2):
-        ConfigGuiBatch.fill(ps, b.x + 2 * cs, b.y + 4 * cs, b.x + 6 * cs, b.y + 6 * cs, cutoutCol);
+        ConfigGuiBatch.fill(poseStack, b.x + 2 * cs, b.y + 4 * cs, b.x + 6 * cs, b.y + 6 * cs, cutoutCol);
         // Lower mouth fangs (1x1 each at row 6, cols 2 and 5):
-        ConfigGuiBatch.fill(ps, b.x + 2 * cs, b.y + 6 * cs, b.x + 3 * cs, b.y + 7 * cs, cutoutCol);
-        ConfigGuiBatch.fill(ps, b.x + 5 * cs, b.y + 6 * cs, b.x + 6 * cs, b.y + 7 * cs, cutoutCol);
+        ConfigGuiBatch.fill(poseStack, b.x + 2 * cs, b.y + 6 * cs, b.x + 3 * cs, b.y + 7 * cs, cutoutCol);
+        ConfigGuiBatch.fill(poseStack, b.x + 5 * cs, b.y + 6 * cs, b.x + 6 * cs, b.y + 7 * cs, cutoutCol);
 
         // 3. Border
         int borderCol = light ? borderLight : borderDark;
-        drawBorder(ps, b.x - 1, b.y - 1, b.size + 2, b.size + 2, applyAlpha(borderCol, alpha * (light ? 0.22f : 0.30f)));
+        drawBorder(poseStack, b.x - 1, b.y - 1, b.size + 2, b.size + 2, applyAlpha(borderCol, alpha * (light ? 0.22f : 0.30f)));
     }
 
     // --- Creeper Background Implementations ---
 
-    public static void drawGreenCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawGreenCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF0B2914, 0xFF166534, 0xFF061A0C,
                 ROW_GREEN_TOP, ROW_GREEN_ALT,
                 0xFF15803D, 0xFF34D399,
                 0xFF0B2010, 0xFF030D06);
     }
 
-    public static void drawGoldenCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawGoldenCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF2B1D04, 0xFFB45309, 0xFF1C1202,
                 ROW_GOLD_TOP, ROW_GOLD_ALT,
                 0xFFD97706, 0xFFFDE047,
                 0xFF261804, 0xFF140B02);
     }
 
-    public static void drawCrimsonCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawCrimsonCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF26050C, 0xFF9F1239, 0xFF140206,
                 ROW_CRIMSON_TOP, ROW_CRIMSON_ALT,
                 0xFFBE123C, 0xFFFB7185,
                 0xFF24040A, 0xFF120205);
     }
 
-    public static void drawWarpedCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawWarpedCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF042022, 0xFF0D6E6E, 0xFF031415,
                 ROW_WARPED_TOP, ROW_WARPED_ALT,
                 0xFF0D9488, 0xFF2DD4BF,
                 0xFF042224, 0xFF021314);
     }
 
-    public static void drawBlueCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawBlueCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF0B192C, 0xFF1E3A8A, 0xFF060D17,
                 ROW_BLUE_TOP, ROW_BLUE_ALT,
                 0xFF1D4ED8, 0xFF60A5FA,
                 0xFF0F172A, 0xFF050811);
     }
 
-    public static void drawPurpleCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawPurpleCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF190B28, 0xFF581C87, 0xFF0D0517,
                 ROW_PURPLE_TOP, ROW_PURPLE_ALT,
                 0xFF7E22CE, 0xFFC084FC,
                 0xFF1E0A33, 0xFF0A0214);
     }
 
-    public static void drawRedCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawRedCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF260808, 0xFF7F1D1D, 0xFF140303,
                 ROW_RED_TOP, ROW_RED_ALT,
                 0xFFB91C1C, 0xFFF87171,
                 0xFF200505, 0xFF0D0202);
     }
 
-    public static void drawOrangeCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawOrangeCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF251006, 0xFF7C2D12, 0xFF140803,
                 ROW_ORANGE_TOP, ROW_ORANGE_ALT,
                 0xFFC2410C, 0xFFFB923C,
                 0xFF240D05, 0xFF0E0502);
     }
 
-    public static void drawWhiteCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawWhiteCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF141923, 0xFF334155, 0xFF0D1117,
                 ROW_WHITE_TOP, ROW_WHITE_ALT,
                 0xFF64748B, 0xFFE2E8F0,
                 0xFF1E293B, 0xFF0F172A);
     }
 
-    public static void drawBlackCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawBlackCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF0F1219, 0xFF1E2433, 0xFF080A0E,
                 ROW_BLACK_TOP, ROW_BLACK_ALT,
                 0xFF334155, 0xFF64748B,
                 0xFF080B12, 0xFF020306);
     }
 
-    public static void drawYellowCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawYellowCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF2A2304, 0xFF713F12, 0xFF171302,
                 ROW_YELLOW_TOP, ROW_YELLOW_ALT,
                 0xFFCA8A04, 0xFFFDE047,
                 0xFF2B2004, 0xFF140E02);
     }
 
-    public static void drawLimeCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawLimeCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF142006, 0xFF365314, 0xFF0A1003,
                 ROW_LIME_TOP, ROW_LIME_ALT,
                 0xFF4D7C0F, 0xFFA3E635,
                 0xFF192605, 0xFF0B1202);
     }
 
-    public static void drawCyanCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawCyanCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF061E28, 0xFF164E63, 0xFF030F14,
                 ROW_CYAN_TOP, ROW_CYAN_ALT,
                 0xFF0E7490, 0xFF22D3EE,
                 0xFF08222E, 0xFF031017);
     }
 
-    public static void drawLightBlueCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawLightBlueCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF082030, 0xFF0C4A6E, 0xFF04111A,
                 ROW_LIGHT_BLUE_TOP, ROW_LIGHT_BLUE_ALT,
                 0xFF0369A1, 0xFF7DD3FC,
                 0xFF0A2336, 0xFF04121C);
     }
 
-    public static void drawPinkCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawPinkCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF280B1B, 0xFF831843, 0xFF14050D,
                 ROW_PINK_TOP, ROW_PINK_ALT,
                 0xFFDB2777, 0xFFF9A8D4,
                 0xFF2B0A1D, 0xFF13040D);
     }
 
-    public static void drawMagentaCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawMagentaCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF240726, 0xFF701A75, 0xFF120313,
                 ROW_MAGENTA_TOP, ROW_MAGENTA_ALT,
                 0xFFC026D3, 0xFFF0ABFC,
                 0xFF29082B, 0xFF120314);
     }
 
-    public static void drawBrownCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawBrownCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF1F100B, 0xFF3E1F18, 0xFF100805,
                 ROW_BROWN_TOP, ROW_BROWN_ALT,
                 0xFF63372C, 0xFFA67161,
                 0xFF24110C, 0xFF100705);
     }
 
-    public static void drawGrayCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        drawCreeperPreset(poseStackOrGraphics, x, y, width, height, alpha, theme,
+    public static void drawGrayCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF141923, 0xFF1E293B, 0xFF0A0D12,
                 ROW_GRAY_TOP, ROW_GRAY_ALT,
                 0xFF334155, 0xFF94A3B8,
@@ -742,15 +739,13 @@ public class ConfigBackgrounds {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
-    public static void drawBorder(Object poseStackOrGraphics, int x, int y, int w, int h, int color) {
+    public static void drawBorder(PoseStack poseStack, int x, int y, int w, int h, int color) {
         if (w <= 0 || h <= 0) return;
-        if (poseStackOrGraphics instanceof PoseStack ps) {
-            ConfigGuiBatch.fill(ps, x, y, x + w, y + 1, color);
-            ConfigGuiBatch.fill(ps, x, y + h - 1, x + w, y + h, color);
-            if (h > 2) {
-                ConfigGuiBatch.fill(ps, x, y + 1, x + 1, y + h - 1, color);
-                ConfigGuiBatch.fill(ps, x + w - 1, y + 1, x + w, y + h - 1, color);
-            }
+        ConfigGuiBatch.fill(poseStack, x, y, x + w, y + 1, color);
+        ConfigGuiBatch.fill(poseStack, x, y + h - 1, x + w, y + h, color);
+        if (h > 2) {
+            ConfigGuiBatch.fill(poseStack, x, y + 1, x + 1, y + h - 1, color);
+            ConfigGuiBatch.fill(poseStack, x + w - 1, y + 1, x + w, y + h - 1, color);
         }
     }
 
@@ -758,9 +753,8 @@ public class ConfigBackgrounds {
      * Hardware Gouraud-shaded vertical 3-stop gradient rectangle.
      * Submits exactly 2 quads directly to the batch buffer without CPU per-strip rasterization.
      */
-    public static void drawVerticalGradientRect(Object poseStackOrGraphics, int x, int y, int w, int h, int topCol, int midCol, int botCol, float alpha) {
+    public static void drawVerticalGradientRect(PoseStack poseStack, int x, int y, int w, int h, int topCol, int midCol, int botCol, float alpha) {
         if (h <= 0 || w <= 0 || alpha <= 0.001f) return;
-        if (!(poseStackOrGraphics instanceof PoseStack ps)) return;
 
         int halfH = h / 2;
         int topAlphaCol = applyAlpha(topCol, alpha);
@@ -768,10 +762,10 @@ public class ConfigBackgrounds {
         int botAlphaCol = applyAlpha(botCol, alpha);
 
         if (halfH > 0) {
-            ConfigGuiBatch.gradient(ps, x, y, x + w, y + halfH, topAlphaCol, topAlphaCol, midAlphaCol, midAlphaCol);
+            ConfigGuiBatch.gradient(poseStack, x, y, x + w, y + halfH, topAlphaCol, topAlphaCol, midAlphaCol, midAlphaCol);
         }
         if (h - halfH > 0) {
-            ConfigGuiBatch.gradient(ps, x, y + halfH, x + w, y + h, midAlphaCol, midAlphaCol, botAlphaCol, botAlphaCol);
+            ConfigGuiBatch.gradient(poseStack, x, y + halfH, x + w, y + h, midAlphaCol, midAlphaCol, botAlphaCol, botAlphaCol);
         }
     }
 }

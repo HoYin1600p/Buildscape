@@ -2119,49 +2119,44 @@ public class BuildScapeConfigScreen extends Screen {
         renderBatched(poseStack, mouseX, mouseY, partialTick);
     }
 
-    public void render(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
-        renderBatched(poseStackOrGraphics, mouseX, mouseY, partialTick);
-    }
-
-    private void renderBatched(Object graphics, int mouseX, int mouseY, float partialTick) {
+    private void renderBatched(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         refreshResourceCaches();
         try {
-            renderInternal(graphics, mouseX, mouseY, partialTick);
+            renderInternal(poseStack, mouseX, mouseY, partialTick);
         } finally {
             ConfigGuiBatch.flush();
         }
     }
 
-    private void renderParentBackground(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
+    private void renderParentBackground(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         if (parent == null || closeToWorld) return;
         ConfigGuiBatch.flush();
-        PoseStack parentPose = asPose(poseStackOrGraphics);
-        parentPose.pushPose();
+        poseStack.pushPose();
         try {
-            parent.render(parentPose, mouseX, mouseY, partialTick);
+            parent.render(poseStack, mouseX, mouseY, partialTick);
         } catch (Exception ignored) {
         } finally {
             ConfigGuiBatch.flush();
-            parentPose.popPose();
+            poseStack.popPose();
         }
     }
 
-    private void renderInternal(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
+    private void renderInternal(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         if (isClosing && closeProgress <= 0.001f && closeStartTime > 0L) {
-            renderParentBackground(poseStackOrGraphics, mouseX, mouseY, partialTick);
+            renderParentBackground(poseStack, mouseX, mouseY, partialTick);
             return;
         }
 
         float alpha = updateAnimations();
         if (isClosing && closeProgress <= 0.001f) {
-            renderParentBackground(poseStackOrGraphics, mouseX, mouseY, partialTick);
+            renderParentBackground(poseStack, mouseX, mouseY, partialTick);
             return;
         }
         if (alpha <= 0.001f && !isOpening) return;
         alpha = Math.max(0.01f, Math.min(1.0f, alpha));
 
         // Render parent behind the config screen so transitions and backdrop are seamless
-        renderParentBackground(poseStackOrGraphics, -999, -999, partialTick);
+        renderParentBackground(poseStack, -999, -999, partialTick);
 
         this.rawMouseX = mouseX;
         this.rawMouseY = mouseY;
@@ -2171,7 +2166,7 @@ public class BuildScapeConfigScreen extends Screen {
         Font font = Minecraft.getInstance().font;
 
         // 1. Full-screen dimmed backdrop (draw before pose scaling to cover physical window)
-        fill(poseStackOrGraphics, 0, 0, width, height, applyAlpha(COLOR_OVERLAY, alpha));
+        fillBatched(poseStack, 0, 0, width, height, applyAlpha(COLOR_OVERLAY, alpha));
 
         // Compute B button center for opening/closing zoom animation
         boolean applyClosingTransform = isClosing && closeStartTime > 0L;
@@ -2234,8 +2229,8 @@ public class BuildScapeConfigScreen extends Screen {
         float uiScale = getGuiUiScale();
         boolean scaled = Math.abs(uiScale - 1.0f) > 0.001f;
         if (scaled) {
-            pushGuiPose(poseStackOrGraphics);
-            scaleGuiPose(poseStackOrGraphics, uiScale, uiScale);
+            pushGuiPose(poseStack);
+            scaleGuiPose(poseStack, uiScale, uiScale);
             scissorUiScale = uiScale;
         }
 
@@ -2266,9 +2261,9 @@ public class BuildScapeConfigScreen extends Screen {
         // 2b. Connected Sliding Right Side Panel (sits to the right of the shrunk main chassis)
         if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
             if (sidePanelW > 0 && sidePanelH > 0) {
-                enableGuiScissor(poseStackOrGraphics, sidePanelX, sidePanelY, sidePanelW, sidePanelH);
-                renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelW, sidePanelH, effMouseX, effMouseY, alpha);
-                disableGuiScissor(poseStackOrGraphics);
+                enableGuiScissor(poseStack, sidePanelX, sidePanelY, sidePanelW, sidePanelH);
+                renderSidePanel(poseStack, font, sidePanelX, sidePanelY, sidePanelW, sidePanelH, effMouseX, effMouseY, alpha);
+                disableGuiScissor(poseStack);
             }
         }
 
@@ -2290,56 +2285,56 @@ public class BuildScapeConfigScreen extends Screen {
         int contentH = navH;
 
         // 3b. Composite Master Chassis Frame (Single unified frame pass for outer chassis and inner basins)
-        drawMasterChassisFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH,
+        drawMasterChassisFrame(poseStack, frameX, frameY, frameW, frameH,
                 headerX, headerY, headerW, headerH,
                 navX, navY, navW, navH,
                 contentX, contentY, contentW, contentH, alpha);
 
         // 4. Header Bar Contents (Forge 1.18.2 on top left, mod version on top right, Crest Badge, Close button)
-        drawText(poseStackOrGraphics, font, "Forge 1.18.2", headerX + 8, headerY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStack, font, "Forge 1.18.2", headerX + 8, headerY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         String versionTag = getModVersionTag();
         int tagW = font.width(versionTag);
         int versionTagX = headerX + headerW - tagW - 28;
-        drawText(poseStackOrGraphics, font, versionTag, versionTagX, headerY + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        drawText(poseStack, font, versionTag, versionTagX, headerY + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
         // 2-Stage Theme Toggle Button (Dark 🌙 <-> Light ☀️)
         int themeToggleW = 44;
         int themeToggleH = 16;
         int themeToggleX = versionTagX - themeToggleW - 10;
         int themeToggleY = headerY + (headerH - themeToggleH) / 2;
-        renderHeaderThemeToggle(poseStackOrGraphics, font, themeToggleX, themeToggleY, themeToggleW, themeToggleH, effMouseX, effMouseY, alpha);
+        renderHeaderThemeToggle(poseStack, font, themeToggleX, themeToggleY, themeToggleW, themeToggleH, effMouseX, effMouseY, alpha);
 
-        drawTopCrestBadge(poseStackOrGraphics, font, frameX, frameY, frameW, alpha);
+        drawTopCrestBadge(poseStack, font, frameX, frameY, frameW, alpha);
 
         int closeBtnSize = 14;
         int closeBtnX = headerX + headerW - closeBtnSize - 5;
         int closeBtnY = headerY + 5;
         boolean hoverClose = effMouseX >= closeBtnX && effMouseX <= closeBtnX + closeBtnSize && effMouseY >= closeBtnY && effMouseY <= closeBtnY + closeBtnSize;
-        drawBeveledButton(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, hoverClose ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverClose, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "✕", closeBtnX + closeBtnSize / 2, closeBtnY + 3, applyAlpha(hoverClose ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, hoverClose ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverClose, false, alpha);
+        drawCenteredText(poseStack, font, "✕", closeBtnX + closeBtnSize / 2, closeBtnY + 3, applyAlpha(hoverClose ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // 5. Render Left Navigation Strip
-        renderSidenav(poseStackOrGraphics, font, navX, navY, navW, navH, effMouseX, effMouseY, alpha);
+        renderSidenav(poseStack, font, navX, navY, navW, navH, effMouseX, effMouseY, alpha);
 
         // 6. Render Right Main Configuration Content Area
-        renderContentArea(poseStackOrGraphics, font, contentX, contentY, contentW, contentH, frameRight, effMouseX, effMouseY, alpha);
+        renderContentArea(poseStack, font, contentX, contentY, contentW, contentH, frameRight, effMouseX, effMouseY, alpha);
 
         // 7. Fallback Color Picker Modal if explicitly toggled
         if (showColorModal) {
             hoveredRefusalTooltip = null;
-            renderColorPickerModal(poseStackOrGraphics, font, effMouseX, effMouseY, alpha);
+            renderColorPickerModal(poseStack, font, effMouseX, effMouseY, alpha);
         }
 
         // Render legacy activeTab if any
         if (activeTab != null) {
             ConfigGuiBatch.flush();
-            activeTab.render(poseStackOrGraphics, effMouseX, effMouseY, partialTick);
-            activeTab.renderTooltips(poseStackOrGraphics, effMouseX, effMouseY, partialTick);
+            activeTab.render(poseStack, effMouseX, effMouseY, partialTick);
+            activeTab.renderTooltips(poseStack, effMouseX, effMouseY, partialTick);
         }
 
         if (scaled) {
-            popGuiPose(poseStackOrGraphics);
+            popGuiPose(poseStack);
             scissorUiScale = 1.0f;
         }
 
@@ -2355,8 +2350,8 @@ public class BuildScapeConfigScreen extends Screen {
             if (deniedAlpha > 0.0F) {
                 int pulse = 7 + Math.round(3.0F * deniedAlpha);
                 int color = applyAlpha(0xFFFF3B30, deniedAlpha);
-                drawBorder(poseStackOrGraphics, readOnlyDeniedX - pulse, readOnlyDeniedY - pulse, pulse * 2, pulse * 2, color);
-                drawText(poseStackOrGraphics, font, "✕", readOnlyDeniedX - 3, readOnlyDeniedY - 4, color);
+                drawBorder(poseStack, readOnlyDeniedX - pulse, readOnlyDeniedY - pulse, pulse * 2, pulse * 2, color);
+                drawText(poseStack, font, "✕", readOnlyDeniedX - 3, readOnlyDeniedY - 4, color);
             }
 
             // Render deferred tooltip in unscaled screen coordinates
@@ -2367,32 +2362,33 @@ public class BuildScapeConfigScreen extends Screen {
                 deferredTooltipY = rawMouseY;
             }
             if (deferredTooltip != null && !deferredTooltip.isEmpty()) {
-                renderComponentTooltip(poseStackOrGraphics, deferredTooltip, deferredTooltipX, deferredTooltipY);
+                ConfigGuiBatch.flush();
+                renderComponentTooltip(poseStack, deferredTooltip, deferredTooltipX, deferredTooltipY);
             }
         }
     }
 
     // Unified chassis frame layout.
-    private void drawMasterChassisFrame(Object poseStackOrGraphics, int frameX, int frameY, int frameW, int frameH,
+    private void drawMasterChassisFrame(PoseStack poseStack, int frameX, int frameY, int frameW, int frameH,
                                         int headerX, int headerY, int headerW, int headerH,
                                         int navX, int navY, int navW, int navH,
                                         int contentX, int contentY, int contentW, int contentH, float alpha) {
         // 1. Outer Chassis Body & Metallic Border Frame
-        drawBaseFrameBorder(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, true, alpha);
+        drawBaseFrameBorder(poseStack, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, true, alpha);
 
         // 2. Header Bar Basin
-        drawBeveledComponent(poseStackOrGraphics, headerX, headerY, headerW, headerH, COLOR_HEADER_BG, alpha);
+        drawBeveledComponent(poseStack, headerX, headerY, headerW, headerH, COLOR_HEADER_BG, alpha);
 
         // 3. Sidenav Container Basin
-        drawBeveledComponent(poseStackOrGraphics, navX, navY, navW, navH, COLOR_INNER_DARK, alpha);
+        drawBeveledComponent(poseStack, navX, navY, navW, navH, COLOR_INNER_DARK, alpha);
 
         // 4. Main Content Container Basin
-        drawBeveledComponent(poseStackOrGraphics, contentX, contentY, contentW, contentH, COLOR_INNER_DARK, alpha);
+        drawBeveledComponent(poseStack, contentX, contentY, contentW, contentH, COLOR_INNER_DARK, alpha);
     }
 
     // Side navigation rendering.
-    private void renderSidenav(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
-        enableGuiScissor(poseStackOrGraphics, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
+    private void renderSidenav(PoseStack poseStack, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+        enableGuiScissor(poseStack, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
 
         int tabH = 26;
         int tabGap = 3;
@@ -2418,18 +2414,18 @@ public class BuildScapeConfigScreen extends Screen {
             int tabX = x + 3;
             boolean hover = mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH;
             int bg = hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG;
-            drawBeveledButton(poseStackOrGraphics, tabX, tabY, tabW, tabH, bg, hover, false, alpha);
+            drawBeveledButton(poseStack, tabX, tabY, tabW, tabH, bg, hover, false, alpha);
         }
 
         // 2. Animated sliding selection pill
         int indW = w - 6;
         int indX = x + 3;
         int indY = (int) Math.round(currentIndicatorY);
-        drawBeveledButton(poseStackOrGraphics, indX, indY, indW, tabH, COLOR_BTN_BG_ACTIVE, false, true, alpha);
+        drawBeveledButton(poseStack, indX, indY, indW, tabH, COLOR_BTN_BG_ACTIVE, false, true, alpha);
         // Glowing cyan/white left accent bar
-        fill(poseStackOrGraphics, indX, indY, indX + 2, indY + tabH, applyAlpha(COLOR_ACCENT, alpha));
+        fillBatched(poseStack, indX, indY, indX + 2, indY + tabH, applyAlpha(COLOR_ACCENT, alpha));
         // Top edge sheen
-        fill(poseStackOrGraphics, indX + 2, indY, indX + indW, indY + 1, applyAlpha(COLOR_ACCENT_GLOW, alpha));
+        fillBatched(poseStack, indX + 2, indY, indX + indW, indY + 1, applyAlpha(COLOR_ACCENT_GLOW, alpha));
 
         // 3. Draw icons and labels with proximity-based illumination
         for (int i = 0; i < navItems.size(); i++) {
@@ -2451,12 +2447,12 @@ public class BuildScapeConfigScreen extends Screen {
                 int iconExpandedX = tabX + 5;
                 int iconX = (int) Math.round(iconCollapsedX + (iconExpandedX - iconCollapsedX) * navAnimProgress);
                 int iconY = tabY + (tabH - 16) / 2;
-                drawTintedTexture(poseStackOrGraphics, item.iconTexture, iconX, iconY, 16, 16, iconCol, alpha);
+                drawTintedTexture(poseStack, item.iconTexture, iconX, iconY, 16, 16, iconCol, alpha);
             } else {
                 int iconCollapsedX = tabX + (tabW / 2) - (font.width(item.icon) / 2);
                 int iconExpandedX = tabX + 6;
                 int iconX = (int) Math.round(iconCollapsedX + (iconExpandedX - iconCollapsedX) * navAnimProgress);
-                drawText(poseStackOrGraphics, font, item.icon, iconX, tabY + 9, applyAlpha(iconCol, alpha));
+                drawText(poseStack, font, item.icon, iconX, tabY + 9, applyAlpha(iconCol, alpha));
             }
 
             if (navAnimProgress > 0.15f) {
@@ -2464,7 +2460,7 @@ public class BuildScapeConfigScreen extends Screen {
                 int baseTextCol = hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED;
                 int textCol = lerpColor(baseTextCol, COLOR_TEXT_WHITE, selectWeight);
                 int titleX = item.iconTexture != null ? tabX + 25 : tabX + 20;
-                drawText(poseStackOrGraphics, font, item.title, titleX, tabY + 9, applyAlpha(textCol, textAlpha));
+                drawText(poseStack, font, item.title, titleX, tabY + 9, applyAlpha(textCol, textAlpha));
             } else if (hover) {
                 hoveredTooltip = item.title;
             }
@@ -2477,17 +2473,17 @@ public class BuildScapeConfigScreen extends Screen {
         int toggleY = y + h - toggleH - 3;
         boolean hoverToggle = mouseX >= toggleX && mouseX <= toggleX + toggleW && mouseY >= toggleY && mouseY <= toggleY + toggleH;
 
-        drawBeveledButton(poseStackOrGraphics, toggleX, toggleY, toggleW, toggleH, hoverToggle ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverToggle, false, alpha);
+        drawBeveledButton(poseStack, toggleX, toggleY, toggleW, toggleH, hoverToggle ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverToggle, false, alpha);
 
         if (navAnimProgress > 0.4f) {
             float toggleAlpha = alpha * Math.min(1.0f, (navAnimProgress - 0.4f) / 0.6f);
-            drawCenteredText(poseStackOrGraphics, font, "◀ Collapse", toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, toggleAlpha));
+            drawCenteredText(poseStack, font, "◀ Collapse", toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, toggleAlpha));
         } else {
             float toggleAlpha = alpha * Math.min(1.0f, (1.0f - navAnimProgress / 0.4f));
-            drawCenteredText(poseStackOrGraphics, font, "▶", toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, toggleAlpha));
+            drawCenteredText(poseStack, font, "▶", toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, toggleAlpha));
         }
 
-        disableGuiScissor(poseStackOrGraphics);
+        disableGuiScissor(poseStack);
 
         if (hoveredTooltip != null) {
             deferredTooltip = Collections.singletonList(ComponentHelper.literal(hoveredTooltip));
@@ -2497,8 +2493,8 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     // Content area rendering.
-    private void renderContentArea(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int frameRight, int mouseX, int mouseY, float alpha) {
-        ConfigBackgrounds.drawCurrentBackground(poseStackOrGraphics, x + 1, y + 1, w - 2, h - 2, alpha, currentTheme);
+    private void renderContentArea(PoseStack poseStack, Font font, int x, int y, int w, int h, int frameRight, int mouseX, int mouseY, float alpha) {
+        ConfigBackgrounds.drawCurrentBackground(poseStack, x + 1, y + 1, w - 2, h - 2, alpha, currentTheme);
 
         if (selectedTabIndex < 0 || selectedTabIndex >= navItems.size()) return;
         NavItem current = navItems.get(selectedTabIndex);
@@ -2536,24 +2532,24 @@ public class BuildScapeConfigScreen extends Screen {
         int presetBtnY = y + (catHeaderH - presetBtnH) / 2;
         int maxHeaderRight = "items".equals(current.id) ? (presetBtnX - 8) : (x + w - 12);
         if (current.iconTexture != null) {
-            drawTintedTexture(poseStackOrGraphics, current.iconTexture, x + 8, y + (catHeaderH - 16) / 2, 16, 16, COLOR_TEXT_WHITE, tabAlpha);
-            drawText(poseStackOrGraphics, font, current.title.toUpperCase(), x + 28, textY, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
+            drawTintedTexture(poseStack, current.iconTexture, x + 8, y + (catHeaderH - 16) / 2, 16, 16, COLOR_TEXT_WHITE, tabAlpha);
+            drawText(poseStack, font, current.title.toUpperCase(), x + 28, textY, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
             if (invalidItems.isEmpty() && !noticeShown) {
                 int titleW = font.width(current.title.toUpperCase());
                 int subX = x + 28 + titleW + 8;
                 int maxSubW = maxHeaderRight - subX;
                 if (maxSubW > 20) {
-                    drawText(poseStackOrGraphics, font, trimTextToWidth(font, current.subtitle, maxSubW, true), subX, textY, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
+                    drawText(poseStack, font, trimTextToWidth(font, current.subtitle, maxSubW, true), subX, textY, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
                 }
             }
         } else {
-            drawText(poseStackOrGraphics, font, current.icon + "  " + current.title.toUpperCase(), x + 8, textY, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
+            drawText(poseStack, font, current.icon + "  " + current.title.toUpperCase(), x + 8, textY, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
             if (invalidItems.isEmpty() && !noticeShown) {
                 int titleW = font.width(current.icon + "  " + current.title.toUpperCase());
                 int subX = x + 8 + titleW + 8;
                 int maxSubW = maxHeaderRight - subX;
                 if (maxSubW > 20) {
-                    drawText(poseStackOrGraphics, font, trimTextToWidth(font, current.subtitle, maxSubW, true), subX, textY, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
+                    drawText(poseStack, font, trimTextToWidth(font, current.subtitle, maxSubW, true), subX, textY, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
                 }
             }
         }
@@ -2568,20 +2564,20 @@ public class BuildScapeConfigScreen extends Screen {
             int badgeW = 62;
             int badgeX = maxHeaderRight - badgeW;
             float pulse = 0.80F + 0.20F * (float) Math.sin(System.currentTimeMillis() / 180.0D);
-            drawBeveledButton(poseStackOrGraphics, badgeX, y + (catHeaderH - 14) / 2, badgeW, 14, limited ? COLOR_BTN_BG_ACTIVE : 0xFF351616, false, true, tabAlpha);
-            drawCenteredText(poseStackOrGraphics, font, limited ? "LIMITED" : "READ ONLY", badgeX + badgeW / 2, textY,
+            drawBeveledButton(poseStack, badgeX, y + (catHeaderH - 14) / 2, badgeW, 14, limited ? COLOR_BTN_BG_ACTIVE : 0xFF351616, false, true, tabAlpha);
+            drawCenteredText(poseStack, font, limited ? "LIMITED" : "READ ONLY", badgeX + badgeW / 2, textY,
                     applyAlpha(limited ? COLOR_ACCENT : 0xFFFF5A52, tabAlpha * pulse));
         }
         if (noticeShown) {
             int invalidW = invalidItems.isEmpty() ? 0 : font.width(new TranslatableComponent("buildscape.config.invalid_items", invalidItems.size())) + 10;
             int headerNoticeX = maxHeaderRight - (restricted || limited ? 68 : 0) - invalidW - font.width(headerNotice);
-            drawText(poseStackOrGraphics, font, headerNotice, headerNoticeX, textY, applyAlpha(0xFFFFFF55, tabAlpha));
+            drawText(poseStack, font, headerNotice, headerNoticeX, textY, applyAlpha(0xFFFFFF55, tabAlpha));
         }
         if (!invalidItems.isEmpty()) {
             Component notice = new TranslatableComponent("buildscape.config.invalid_items", invalidItems.size());
             int noticeW = font.width(notice);
             int noticeX = maxHeaderRight - (restricted || limited ? 68 : 0) - noticeW;
-            drawText(poseStackOrGraphics, font, notice.getString(), noticeX, textY, applyAlpha(0xFFFFFF55, tabAlpha));
+            drawText(poseStack, font, notice.getString(), noticeX, textY, applyAlpha(0xFFFFFF55, tabAlpha));
             if (mouseX >= noticeX && mouseX <= noticeX + noticeW && mouseY >= y + 4 && mouseY <= y + catHeaderH - 4) {
                 deferredTooltip = Collections.singletonList(ComponentHelper.literal(String.join(", ", invalidItems)));
                 deferredTooltipX = rawMouseX + 12;
@@ -2593,7 +2589,7 @@ public class BuildScapeConfigScreen extends Screen {
             boolean presetOpen = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PRESETS && !isSidePanelClosing;
             boolean hoverPresetBtn = mouseX >= presetBtnX && mouseX <= presetBtnX + presetBtnW
                     && mouseY >= presetBtnY && mouseY <= presetBtnY + presetBtnH;
-            drawInlinePresetsTab(poseStackOrGraphics, presetBtnX, presetBtnY, presetBtnW, presetBtnH, hoverPresetBtn, presetOpen, tabAlpha);
+            drawInlinePresetsTab(poseStack, presetBtnX, presetBtnY, presetBtnW, presetBtnH, hoverPresetBtn, presetOpen, tabAlpha);
 
             if (hoverPresetBtn && !presetOpen) {
                 deferredTooltip = Collections.singletonList(ComponentHelper.literal("Presets (Click to Open)"));
@@ -2606,12 +2602,12 @@ public class BuildScapeConfigScreen extends Screen {
             }
         }
 
-        drawGroove(poseStackOrGraphics, x + 2, y + catHeaderH, w - 4, true, alpha);
+        drawGroove(poseStack, x + 2, y + catHeaderH, w - 4, true, alpha);
 
         if ("items".equals(current.id)) {
-            renderItemAndTagsPanel(poseStackOrGraphics, font, x, y + slideOffsetY, w, h, catHeaderH, mouseX, mouseY, tabAlpha);
+            renderItemAndTagsPanel(poseStack, font, x, y + slideOffsetY, w, h, catHeaderH, mouseX, mouseY, tabAlpha);
         } else if ("pillars".equals(current.id)) {
-            renderPillarsPanel(poseStackOrGraphics, font, x, y + slideOffsetY, w, h, catHeaderH, mouseX, mouseY, tabAlpha);
+            renderPillarsPanel(poseStack, font, x, y + slideOffsetY, w, h, catHeaderH, mouseX, mouseY, tabAlpha);
         } else {
             int clipY = y + catHeaderH + 4;
             int viewH = h - catHeaderH - 8;
@@ -2630,16 +2626,16 @@ public class BuildScapeConfigScreen extends Screen {
 
             int startY = viewY + 2 - (int) scrollOffset;
 
-            enableGuiScissor(poseStackOrGraphics, x + 4, clipY, w - 8, viewH);
+            enableGuiScissor(poseStack, x + 4, clipY, w - 8, viewH);
             switch (current.id) {
-                case "particles" -> renderParticleSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
-                case "world" -> renderWorldSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, getWorldSettingRowHeight(), rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
-                case "system" -> renderSystemRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
-                case "links" -> renderLinksRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
+                case "particles" -> renderParticleSettingsRows(poseStack, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
+                case "world" -> renderWorldSettingsRows(poseStack, font, rowX, startY, rowW, getWorldSettingRowHeight(), rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
+                case "system" -> renderSystemRows(poseStack, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
+                case "links" -> renderLinksRows(poseStack, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
             }
-            disableGuiScissor(poseStackOrGraphics);
+            disableGuiScissor(poseStack);
 
-            renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, clipY, scrollbarW, viewH, scrollOffset, maxScroll, mouseX, mouseY, tabAlpha);
+            renderCustomScrollbar(poseStack, scrollbarTrackX, clipY, scrollbarW, viewH, scrollOffset, maxScroll, mouseX, mouseY, tabAlpha);
         }
     }
 
@@ -2674,18 +2670,18 @@ public class BuildScapeConfigScreen extends Screen {
         return count * (rowH + gap) + 6;
     }
 
-    private void renderLinksRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap,
+    private void renderLinksRows(PoseStack poseStack, Font font, int x, int startY, int w, int h, int gap,
                                  int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         int curY = startY;
         for (ConfigLink link : CONFIG_LINKS) {
-            renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH,
+            renderConfigRowButton(poseStack, font, x, curY, w, h, clipY, clipH,
                     link.title(), link.description(), "Open ↗", link.icon(), mouseX, mouseY, alpha);
             curY += h + gap;
         }
     }
 
     // Items and tags panel rendering.
-    private void renderItemAndTagsPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
+    private void renderItemAndTagsPanel(PoseStack poseStack, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         PillarParticleConfig cfg = PillarParticleConfig.get();
 
         int curY = y + catHeaderH + 4;
@@ -2699,26 +2695,26 @@ public class BuildScapeConfigScreen extends Screen {
         int sub0X = x + 6;
         boolean isSub0 = (itemsSubTab == 0);
         boolean hoverSub0 = mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
-        drawBeveledButton(poseStackOrGraphics, sub0X, subY, subBtnW, subBtnH, isSub0 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub0, isSub0, alpha);
+        drawBeveledButton(poseStack, sub0X, subY, subBtnW, subBtnH, isSub0 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub0, isSub0, alpha);
         int sub0TextCol = isSub0 ? COLOR_TEXT_WHITE : (hoverSub0 ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
         String sub0Text = "Display Items (" + cachedActiveItems.size() + ")";
         int sub0IconSize = 12;
         int sub0ContentW = sub0IconSize + 4 + font.width(sub0Text);
         int sub0StartX = sub0X + (subBtnW - sub0ContentW) / 2;
-        drawTintedTexture(poseStackOrGraphics, SUBTAB_ITEMS_TEXTURE, sub0StartX, subY + (subBtnH - sub0IconSize) / 2, sub0IconSize, sub0IconSize, sub0TextCol, alpha);
-        drawText(poseStackOrGraphics, font, sub0Text, sub0StartX + sub0IconSize + 4, subY + 4, applyAlpha(sub0TextCol, alpha));
+        drawTintedTexture(poseStack, SUBTAB_ITEMS_TEXTURE, sub0StartX, subY + (subBtnH - sub0IconSize) / 2, sub0IconSize, sub0IconSize, sub0TextCol, alpha);
+        drawText(poseStack, font, sub0Text, sub0StartX + sub0IconSize + 4, subY + 4, applyAlpha(sub0TextCol, alpha));
 
         int sub1X = sub0X + subBtnW + 4;
         boolean isSub1 = (itemsSubTab == 1);
         boolean hoverSub1 = mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
-        drawBeveledButton(poseStackOrGraphics, sub1X, subY, subBtnW, subBtnH, isSub1 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub1, isSub1, alpha);
+        drawBeveledButton(poseStack, sub1X, subY, subBtnW, subBtnH, isSub1 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub1, isSub1, alpha);
         int sub1TextCol = isSub1 ? COLOR_TEXT_WHITE : (hoverSub1 ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
         String sub1Text = "Display Tags (" + cachedActiveTags.size() + ")";
         int sub1IconSize = 12;
         int sub1ContentW = sub1IconSize + 4 + font.width(sub1Text);
         int sub1StartX = sub1X + (subBtnW - sub1ContentW) / 2;
-        drawTintedTexture(poseStackOrGraphics, SUBTAB_TAGS_TEXTURE, sub1StartX, subY + (subBtnH - sub1IconSize) / 2, sub1IconSize, sub1IconSize, sub1TextCol, alpha);
-        drawText(poseStackOrGraphics, font, sub1Text, sub1StartX + sub1IconSize + 4, subY + 4, applyAlpha(sub1TextCol, alpha));
+        drawTintedTexture(poseStack, SUBTAB_TAGS_TEXTURE, sub1StartX, subY + (subBtnH - sub1IconSize) / 2, sub1IconSize, sub1IconSize, sub1TextCol, alpha);
+        drawText(poseStack, font, sub1Text, sub1StartX + sub1IconSize + 4, subY + 4, applyAlpha(sub1TextCol, alpha));
 
         curY += row1H + 2;
 
@@ -2735,8 +2731,8 @@ public class BuildScapeConfigScreen extends Screen {
             int px = toolbarX + f * (pillW + toolbar.gap());
             boolean isF = (itemsSubTab == 0 ? itemFilterMode : tagFilterMode) == f;
             boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH;
-            drawBeveledButton(poseStackOrGraphics, px, pillY, pillW, pillH, isF ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPill, isF, alpha);
-            drawCenteredText(poseStackOrGraphics, font, trimTextToWidth(font, filterLabels.get(f), pillW - 4, false), px + pillW / 2, pillY + 3,
+            drawBeveledButton(poseStack, px, pillY, pillW, pillH, isF ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPill, isF, alpha);
+            drawCenteredText(poseStack, font, trimTextToWidth(font, filterLabels.get(f), pillW - 4, false), px + pillW / 2, pillY + 3,
                     applyAlpha(isF ? COLOR_TEXT_WHITE : (hoverPill ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED), alpha));
         }
 
@@ -2748,10 +2744,10 @@ public class BuildScapeConfigScreen extends Screen {
         boolean itemSearch = itemsSubTab == 0;
         String searchValue = itemSearch ? itemSearchFilter : tagSearchFilter;
         boolean searchFocused = focusedSearchField == (itemSearch ? 1 : 2);
-        drawBeveledButton(poseStackOrGraphics, searchX, searchY, searchW, searchH, COLOR_SLOT_BG, false, searchFocused, alpha);
+        drawBeveledButton(poseStack, searchX, searchY, searchW, searchH, COLOR_SLOT_BG, false, searchFocused, alpha);
         if (searchFocused) {
-            drawBorder(poseStackOrGraphics, searchX, searchY, searchW, searchH, applyAlpha(COLOR_ACCENT, alpha));
-            drawBorder(poseStackOrGraphics, searchX + 1, searchY + 1, Math.max(1, searchW - 2), Math.max(1, searchH - 2),
+            drawBorder(poseStack, searchX, searchY, searchW, searchH, applyAlpha(COLOR_ACCENT, alpha));
+            drawBorder(poseStack, searchX + 1, searchY + 1, Math.max(1, searchW - 2), Math.max(1, searchH - 2),
                     applyAlpha(COLOR_ACCENT_GLOW, alpha * 0.65F));
         }
         boolean caretVisible = searchFocused && (System.currentTimeMillis() / 450L) % 2L == 0L;
@@ -2761,10 +2757,10 @@ public class BuildScapeConfigScreen extends Screen {
         searchText = trimTextToWidth(font, searchText, Math.max(1, searchW - 10), !searchValue.isEmpty());
         if (searchFocused && searchTextSelected && !searchValue.isEmpty()) {
             int selectedWidth = Math.min(searchW - 8, font.width(trimTextToWidth(font, searchValue, Math.max(1, searchW - 10), true)));
-            fill(poseStackOrGraphics, searchX + 4, searchY + 3, searchX + 5 + selectedWidth,
+            fillBatched(poseStack, searchX + 4, searchY + 3, searchX + 5 + selectedWidth,
                     searchY + searchH - 2, applyAlpha(COLOR_ACCENT, alpha * 0.45F));
         }
-        drawText(poseStackOrGraphics, font, searchText, searchX + 5, searchY + 4,
+        drawText(poseStack, font, searchText, searchX + 5, searchY + 4,
                 applyAlpha(searchFocused ? COLOR_TEXT_WHITE : searchValue.isEmpty() ? COLOR_TEXT_MUTED : COLOR_TEXT_SILVER, alpha));
 
         List<String> namespaces = itemSearch ? availableModNamespaces : availableTagNamespaces;
@@ -2773,8 +2769,8 @@ public class BuildScapeConfigScreen extends Screen {
         namespaceLabel = trimTextToWidth(font, namespaceLabel, Math.max(1, namespaceW - 8), false);
         int namespaceX = searchX + searchW + toolbar.gap();
         boolean namespaceHover = mouseX >= namespaceX && mouseX <= namespaceX + namespaceW && mouseY >= searchY && mouseY <= searchY + searchH;
-        drawBeveledButton(poseStackOrGraphics, namespaceX, searchY, namespaceW, searchH, COLOR_BTN_BG, namespaceHover, namespaceIndex >= 0, alpha);
-        drawCenteredText(poseStackOrGraphics, font, namespaceLabel, namespaceX + namespaceW / 2, searchY + 4,
+        drawBeveledButton(poseStack, namespaceX, searchY, namespaceW, searchH, COLOR_BTN_BG, namespaceHover, namespaceIndex >= 0, alpha);
+        drawCenteredText(poseStack, font, namespaceLabel, namespaceX + namespaceW / 2, searchY + 4,
                 applyAlpha(namespaceHover ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
 
         curY += bar2H + 3;
@@ -2812,7 +2808,7 @@ public class BuildScapeConfigScreen extends Screen {
 
             int startY = viewportY + 2 - (int) scrollOffset;
 
-            enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
+            enableGuiScissor(poseStack, x + 4, viewportY, w - 8, viewportH);
 
             int startRow = Math.max(0, (int) (scrollOffset / step));
             int endRow = Math.min(rows, (int) ((scrollOffset + viewportH) / step) + 1);
@@ -2838,29 +2834,29 @@ public class BuildScapeConfigScreen extends Screen {
                             mouseY >= viewportY && mouseY <= viewportY + viewportH;
 
                     int bg = isSelected ? COLOR_TOGGLE_ON_BG : (hover ? COLOR_SLOT_BG_HOVER : COLOR_SLOT_BG);
-                    fill(poseStackOrGraphics, slotX + 1, slotY + 1, slotX + slotSize - 1, slotY + slotSize - 1, applyAlpha(bg, alpha));
+                    fillBatched(poseStack, slotX + 1, slotY + 1, slotX + slotSize - 1, slotY + slotSize - 1, applyAlpha(bg, alpha));
 
                     if (isSelected) {
                         int emTopLeft = applyAlpha(hover ? 0xFF86EFAC : 0xFF4ADE80, alpha);
                         int emBottomRight = applyAlpha(0xFF14532D, alpha);
-                        fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, emTopLeft);
-                        fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, emTopLeft);
-                        fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, emBottomRight);
-                        fill(poseStackOrGraphics, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, emBottomRight);
+                        fillBatched(poseStack, slotX, slotY, slotX + slotSize, slotY + 1, emTopLeft);
+                        fillBatched(poseStack, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, emTopLeft);
+                        fillBatched(poseStack, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, emBottomRight);
+                        fillBatched(poseStack, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, emBottomRight);
                     } else if (hover) {
                         int hTopLeft = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
                         int hBottomRight = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-                        fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, hTopLeft);
-                        fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, hTopLeft);
-                        fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, hBottomRight);
-                        fill(poseStackOrGraphics, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, hBottomRight);
+                        fillBatched(poseStack, slotX, slotY, slotX + slotSize, slotY + 1, hTopLeft);
+                        fillBatched(poseStack, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, hTopLeft);
+                        fillBatched(poseStack, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, hBottomRight);
+                        fillBatched(poseStack, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, hBottomRight);
                     } else {
                         int dark = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
                         int light = applyAlpha(COLOR_SLOT_BORDER, alpha);
-                        fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, dark);
-                        fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize, dark);
-                        fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, light);
-                        fill(poseStackOrGraphics, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, light);
+                        fillBatched(poseStack, slotX, slotY, slotX + slotSize, slotY + 1, dark);
+                        fillBatched(poseStack, slotX, slotY + 1, slotX + 1, slotY + slotSize, dark);
+                        fillBatched(poseStack, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, light);
+                        fillBatched(poseStack, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, light);
                     }
 
                     ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
@@ -2873,10 +2869,10 @@ public class BuildScapeConfigScreen extends Screen {
                 }
             }
             itemGridBatch.render(scissorUiScale, icon ->
-                    renderGuiItem(poseStackOrGraphics, icon.stack(), icon.x(), icon.y()));
-            disableGuiScissor(poseStackOrGraphics);
+                    renderGuiItem(poseStack, icon.stack(), icon.x(), icon.y()));
+            disableGuiScissor(poseStack);
 
-            renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
+            renderCustomScrollbar(poseStack, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
 
             if (hoveredStack != null) {
                 hoverConfigAccess(true, ConfigSetting.ITEMS, true, false, false);
@@ -2900,7 +2896,7 @@ public class BuildScapeConfigScreen extends Screen {
             int rowW = availGridW;
             int rowX = x + 6;
 
-            enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
+            enableGuiScissor(poseStack, x + 4, viewportY, w - 8, viewportH);
 
             int[] visible = ConfigRenderWork.visibleRows(viewportY - startY, viewportH, tagRowH + tagRowGap, tagsToDisplay.size());
             for (int ti = visible[0]; ti < visible[1]; ti++) {
@@ -2913,19 +2909,19 @@ public class BuildScapeConfigScreen extends Screen {
                         mouseY >= viewportY && mouseY <= viewportY + viewportH;
 
                 int rBg = isActive ? 0xFF142418 : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG);
-                drawBeveledButton(poseStackOrGraphics, rowX, rowY, rowW, tagRowH, rBg, hover, isActive, alpha);
+                drawBeveledButton(poseStack, rowX, rowY, rowW, tagRowH, rBg, hover, isActive, alpha);
 
                 // Emblem '#'
                 int emblemSize = 14;
                 int emblemX = rowX + 5;
                 int emblemY = rowY + (tagRowH - emblemSize) / 2;
                 int embCol = isActive ? (currentTheme.isLight() ? 0xFF15803D : 0xFF4ADE80) : COLOR_TEXT_SILVER;
-                drawBeveledButton(poseStackOrGraphics, emblemX, emblemY, emblemSize, emblemSize, isActive ? (currentTheme.isLight() ? 0xFFDCFCE7 : 0xFF1A3820) : COLOR_BTN_BG, false, isActive, alpha);
-                drawCenteredText(poseStackOrGraphics, font, "#", emblemX + emblemSize / 2, emblemY + 3, applyAlpha(embCol, alpha));
+                drawBeveledButton(poseStack, emblemX, emblemY, emblemSize, emblemSize, isActive ? (currentTheme.isLight() ? 0xFFDCFCE7 : 0xFF1A3820) : COLOR_BTN_BG, false, isActive, alpha);
+                drawCenteredText(poseStack, font, "#", emblemX + emblemSize / 2, emblemY + 3, applyAlpha(embCol, alpha));
 
                 // Tag Name
                 int textCol = isActive ? COLOR_TEXT_WHITE : (hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                drawText(poseStackOrGraphics, font, tagId, emblemX + emblemSize + 6, rowY + 7, applyAlpha(textCol, alpha));
+                drawText(poseStack, font, tagId, emblemX + emblemSize + 6, rowY + 7, applyAlpha(textCol, alpha));
 
                 // Registered Items Count Badge
                 int count = tagItemCounts.getOrDefault(tagId, 1);
@@ -2933,8 +2929,8 @@ public class BuildScapeConfigScreen extends Screen {
                 int countW = font.width(countStr) + 8;
                 int countX = rowX + rowW - countW - 52;
                 int countY = rowY + (tagRowH - 12) / 2;
-                drawBeveledButton(poseStackOrGraphics, countX, countY, countW, 12, COLOR_SLOT_BG, false, false, alpha);
-                drawCenteredText(poseStackOrGraphics, font, countStr, countX + countW / 2, countY + 2, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                drawBeveledButton(poseStack, countX, countY, countW, 12, COLOR_SLOT_BG, false, false, alpha);
+                drawCenteredText(poseStack, font, countStr, countX + countW / 2, countY + 2, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
                 // Toggle Button [ ON ] / [ OFF ]
                 int tBtnW = 42;
@@ -2942,12 +2938,12 @@ public class BuildScapeConfigScreen extends Screen {
                 int tBtnX = rowX + rowW - tBtnW - 6;
                 int tBtnY = rowY + (tagRowH - tBtnH) / 2;
                 if (isActive) {
-                    drawBeveledGreenButton(poseStackOrGraphics, tBtnX, tBtnY, tBtnW, tBtnH, hover, alpha);
+                    drawBeveledGreenButton(poseStack, tBtnX, tBtnY, tBtnW, tBtnH, hover, alpha);
                 } else {
-                    drawBeveledButton(poseStackOrGraphics, tBtnX, tBtnY, tBtnW, tBtnH, COLOR_TOGGLE_OFF_BG, hover, false, alpha);
+                    drawBeveledButton(poseStack, tBtnX, tBtnY, tBtnW, tBtnH, COLOR_TOGGLE_OFF_BG, hover, false, alpha);
                 }
                 int tBtnTextCol = isActive ? (hover ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT) : (hover ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT);
-                drawCenteredText(poseStackOrGraphics, font, isActive ? "ON" : "OFF", tBtnX + tBtnW / 2, tBtnY + 3, applyAlpha(tBtnTextCol, alpha));
+                drawCenteredText(poseStack, font, isActive ? "ON" : "OFF", tBtnX + tBtnW / 2, tBtnY + 3, applyAlpha(tBtnTextCol, alpha));
 
                 if (hover) {
                     List<Component> tooltip = new ArrayList<>();
@@ -2959,9 +2955,9 @@ public class BuildScapeConfigScreen extends Screen {
                     deferredTooltipY = rawMouseY;
                 }
             }
-            disableGuiScissor(poseStackOrGraphics);
+            disableGuiScissor(poseStack);
 
-            renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
+            renderCustomScrollbar(poseStack, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
         }
     }
 
@@ -2974,7 +2970,7 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     // Particle controls and color customization.
-    private void renderParticleSettingsRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
+    private void renderParticleSettingsRows(PoseStack poseStack, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         PillarParticleConfig cfg = PillarParticleConfig.get();
         for (int row = 0; row < 12; row++) {
             int rowY = startY + row * (h + gap);
@@ -2991,58 +2987,58 @@ public class BuildScapeConfigScreen extends Screen {
         int curY = startY;
 
         // 1. Mode Toggle
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Use Particle Pattern", "Enable animated particle patterns", cfg.use_pattern, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Use Particle Pattern", "Enable animated particle patterns", cfg.use_pattern, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 2. Pattern Cycle
         String patternDisplay = cfg.pattern.substring(0, 1).toUpperCase() + cfg.pattern.substring(1);
-        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Pattern", "Select particle movement animation", patternDisplay, mouseX, mouseY, alpha);
+        renderConfigRowCycle(poseStack, font, x, curY, w, h, clipY, clipH, "Particle Pattern", "Select particle movement animation", patternDisplay, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 3. Pattern Speed
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED, cfg.pattern_speed, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED, cfg.pattern_speed, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 4. Pattern Spread
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD, cfg.pattern_spread, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD, cfg.pattern_spread, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 5. Pattern Intensity
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY, cfg.pattern_intensity, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY, cfg.pattern_intensity, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 6. Basic Particle Speed
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Base vertical speed of particles", ParticleRange.PARTICLE_SPEED, cfg.particle_speed, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Base vertical speed of particles", ParticleRange.PARTICLE_SPEED, cfg.particle_speed, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 7. Basic Particle Spread
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Base spread distance of particles", ParticleRange.PARTICLE_SPREAD, cfg.particle_spread, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Base spread distance of particles", ParticleRange.PARTICLE_SPREAD, cfg.particle_spread, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 8. Particle Lifetime
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Lifetime", "Particle duration in ticks before fading", ParticleRange.PARTICLE_LIFETIME, cfg.particle_lifetime, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, x, curY, w, h, clipY, clipH, "Particle Lifetime", "Particle duration in ticks before fading", ParticleRange.PARTICLE_LIFETIME, cfg.particle_lifetime, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 9. Particle Density
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Density", "Particle count emitted per pillar", ParticleRange.PARTICLE_DENSITY, cfg.particle_density, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, x, curY, w, h, clipY, clipH, "Particle Density", "Particle count emitted per pillar", ParticleRange.PARTICLE_DENSITY, cfg.particle_density, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 10. Swatches & Active Colors
-        renderConfigRowPalette(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Colors", cfg.particle_color, cfg.max_particle_color, mouseX, mouseY, alpha);
+        renderConfigRowPalette(poseStack, font, x, curY, w, h, clipY, clipH, "Particle Colors", cfg.particle_color, cfg.max_particle_color, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Properties", "Restore default particle behavior", "↻ Reset Properties", mouseX, mouseY, alpha);
+        renderConfigRowButton(poseStack, font, x, curY, w, h, clipY, clipH, "Reset Properties", "Restore default particle behavior", "↻ Reset Properties", mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Colors", "Restore default particle colors", "↻ Reset Colors", mouseX, mouseY, alpha);
+        renderConfigRowButton(poseStack, font, x, curY, w, h, clipY, clipH, "Reset Colors", "Restore default particle colors", "↻ Reset Colors", mouseX, mouseY, alpha);
     }
 
     // Server-authoritative pillar table.
-    private void renderPillarsPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
-        renderPillarTablePanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
+    private void renderPillarsPanel(PoseStack poseStack, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
+        renderPillarTablePanel(poseStack, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
     }
 
-    private void renderPillarTablePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
+    private void renderPillarTablePanel(PoseStack poseStack, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         PillarIdManager manager = PillarIdManager.getClient();
         Collection<PillarIdManager.PillarData> pillars = manager.getAllData();
         List<PillarIdManager.PillarData> pillarList = new ArrayList<>(pillars);
@@ -3059,8 +3055,8 @@ public class BuildScapeConfigScreen extends Screen {
         int relW = Math.max(60, font.width("⟳ Reload") + 14);
         int relX = x + 6;
         boolean hoverRel = mouseX >= relX && mouseX <= relX + relW && mouseY >= barY && mouseY <= barY + btnH;
-        drawBeveledButton(poseStackOrGraphics, relX, barY, relW, btnH, hoverRel ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverRel, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "⟳ Reload", relX + relW / 2, barY + 3, applyAlpha(hoverRel ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, relX, barY, relW, btnH, hoverRel ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverRel, false, alpha);
+        drawCenteredText(poseStack, font, "⟳ Reload", relX + relW / 2, barY + 3, applyAlpha(hoverRel ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // [ ✕ Remove Selected (<N>) ]
         int selCount = selectedPillarIds.size();
@@ -3070,12 +3066,12 @@ public class BuildScapeConfigScreen extends Screen {
         boolean hoverRemSel = hasSel && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH;
         hoverConfigAccess(hoverRemSel, ConfigSetting.PILLAR_EDIT, false, false, false);
         int remSelBg = hasSel ? (hoverRemSel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414)) : COLOR_BTN_BG;
-        drawBeveledButton(poseStackOrGraphics, remSelX, barY, remSelW, btnH, remSelBg, hoverRemSel, false, alpha);
+        drawBeveledButton(poseStack, remSelX, barY, remSelW, btnH, remSelBg, hoverRemSel, false, alpha);
         boolean confirmingSelected = isConfirmedAction(pendingDestructiveAction, "remove:selected")
                 && System.currentTimeMillis() <= pendingDestructiveActionUntil;
         String remSelLabel = confirmingSelected ? "Confirm Remove" : hasSel ? ("✕ Remove (" + selCount + ")") : "✕ Remove Selected";
         int remSelTextCol = hasSel ? (hoverRemSel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050) : COLOR_TEXT_MUTED;
-        drawCenteredText(poseStackOrGraphics, font, remSelLabel, remSelX + remSelW / 2, barY + 3, applyAlpha(remSelTextCol, alpha));
+        drawCenteredText(poseStack, font, remSelLabel, remSelX + remSelW / 2, barY + 3, applyAlpha(remSelTextCol, alpha));
 
         // [ ✕ Remove All ]
         int remAllW = Math.max(75, font.width("✕ Remove All") + 14);
@@ -3084,18 +3080,18 @@ public class BuildScapeConfigScreen extends Screen {
         boolean hoverRemAll = hasAny && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH;
         hoverConfigAccess(hoverRemAll, ConfigSetting.PILLAR_EDIT, false, false, false);
         int remAllBg = hasAny ? (hoverRemAll ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414)) : COLOR_BTN_BG;
-        drawBeveledButton(poseStackOrGraphics, remAllX, barY, remAllW, btnH, remAllBg, hoverRemAll, false, alpha);
+        drawBeveledButton(poseStack, remAllX, barY, remAllW, btnH, remAllBg, hoverRemAll, false, alpha);
         int remAllTextCol = hasAny ? (hoverRemAll ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050) : COLOR_TEXT_MUTED;
         boolean confirmingAll = isConfirmedAction(pendingDestructiveAction, "remove:all")
                 && System.currentTimeMillis() <= pendingDestructiveActionUntil;
-        drawCenteredText(poseStackOrGraphics, font, confirmingAll ? "Confirm All" : "✕ Remove All", remAllX + remAllW / 2, barY + 3, applyAlpha(remAllTextCol, alpha));
+        drawCenteredText(poseStack, font, confirmingAll ? "Confirm All" : "✕ Remove All", remAllX + remAllW / 2, barY + 3, applyAlpha(remAllTextCol, alpha));
 
         int resetW = Math.max(78, font.width("↻ Reset Selected") + 14);
         int resetX = remAllX + remAllW + 4;
         boolean hoverReset = hasSel && mouseX >= resetX && mouseX <= resetX + resetW && mouseY >= barY && mouseY <= barY + btnH;
         hoverConfigAccess(hoverReset, ConfigSetting.PILLAR_EDIT, false, false, false);
-        drawBeveledButton(poseStackOrGraphics, resetX, barY, resetW, btnH, COLOR_BTN_BG, hoverReset, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "↻ Reset Selected", resetX + resetW / 2, barY + 3,
+        drawBeveledButton(poseStack, resetX, barY, resetW, btnH, COLOR_BTN_BG, hoverReset, false, alpha);
+        drawCenteredText(poseStack, font, "↻ Reset Selected", resetX + resetW / 2, barY + 3,
                 applyAlpha(hasSel ? (hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER) : COLOR_TEXT_MUTED, alpha));
 
         curY += bar1H + 2;
@@ -3107,7 +3103,7 @@ public class BuildScapeConfigScreen extends Screen {
         int availW = (scrollbarTrackX - 6) - (x + 6);
         int colX = x + 6;
 
-        drawBeveledButton(poseStackOrGraphics, colX, curY, availW, headH, COLOR_HEADER_BG, false, true, alpha);
+        drawBeveledButton(poseStack, colX, curY, availW, headH, COLOR_HEADER_BG, false, true, alpha);
 
         int chkW = 16;
         int iconColW = 38;
@@ -3124,42 +3120,42 @@ public class BuildScapeConfigScreen extends Screen {
         int chkBoxSize = 10;
         int chkX = colX + (chkW - chkBoxSize) / 2;
         int chkY = curY + (headH - chkBoxSize) / 2;
-        drawBeveledButton(poseStackOrGraphics, chkX, chkY, chkBoxSize, chkBoxSize, COLOR_SLOT_BG, false, allChecked, alpha);
+        drawBeveledButton(poseStack, chkX, chkY, chkBoxSize, chkBoxSize, COLOR_SLOT_BG, false, allChecked, alpha);
         if (allChecked) {
-            fill(poseStackOrGraphics, chkX + 2, chkY + 2, chkX + chkBoxSize - 2, chkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
+            fillBatched(poseStack, chkX + 2, chkY + 2, chkX + chkBoxSize - 2, chkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
         } else if (someChecked) {
-            fill(poseStackOrGraphics, chkX + 2, chkY + (chkBoxSize / 2) - 1, chkX + chkBoxSize - 2, chkY + (chkBoxSize / 2) + 1, applyAlpha(0xFF22C55E, alpha));
+            fillBatched(poseStack, chkX + 2, chkY + (chkBoxSize / 2) - 1, chkX + chkBoxSize - 2, chkY + (chkBoxSize / 2) + 1, applyAlpha(0xFF22C55E, alpha));
         }
 
         int curColX = colX + chkW + gap;
 
         // ID Header
-        drawText(poseStackOrGraphics, font, "ID", curColX + 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawText(poseStack, font, "ID", curColX + 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
         curColX += idColW + gap;
 
         // ITEM Header
-        drawCenteredText(poseStackOrGraphics, font, "ITEM", curColX + iconColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStack, font, "ITEM", curColX + iconColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
         curColX += iconColW + gap;
 
         // COLORS Header
-        drawCenteredText(poseStackOrGraphics, font, "COLORS", curColX + colorsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStack, font, "COLORS", curColX + colorsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
         curColX += colorsColW + gap;
 
         // DIMENSION Header
-        drawCenteredText(poseStackOrGraphics, font, "DIMENSION", curColX + dimColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStack, font, "DIMENSION", curColX + dimColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
         curColX += dimColW + gap;
 
         // COORDINATES Header (X, Y, Z colored)
         int cx = curColX + coordsColW / 2;
         int coordLabelW = font.width("X  Y  Z");
         int coordStartX = cx - coordLabelW / 2;
-        drawText(poseStackOrGraphics, font, "X", coordStartX, curY + 4, applyAlpha(0xFFFF5555, alpha));
-        drawText(poseStackOrGraphics, font, "Y", coordStartX + font.width("X  "), curY + 4, applyAlpha(0xFF5599FF, alpha));
-        drawText(poseStackOrGraphics, font, "Z", coordStartX + font.width("X  Y  "), curY + 4, applyAlpha(0xFF55FF55, alpha));
+        drawText(poseStack, font, "X", coordStartX, curY + 4, applyAlpha(0xFFFF5555, alpha));
+        drawText(poseStack, font, "Y", coordStartX + font.width("X  "), curY + 4, applyAlpha(0xFF5599FF, alpha));
+        drawText(poseStack, font, "Z", coordStartX + font.width("X  Y  "), curY + 4, applyAlpha(0xFF55FF55, alpha));
         curColX += coordsColW + gap;
 
         // ACTIONS Header
-        drawCenteredText(poseStackOrGraphics, font, "ACTIONS", curColX + actionsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStack, font, "ACTIONS", curColX + actionsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
 
         curY += headH + 3;
 
@@ -3183,15 +3179,15 @@ public class BuildScapeConfigScreen extends Screen {
         int startY = viewportY + 2 - (int) scrollOffset;
 
         int scissorWidth = (scrollbarTrackX - 2) - (x + 4);
-        enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, scissorWidth, viewportH);
+        enableGuiScissor(poseStack, x + 4, viewportY, scissorWidth, viewportH);
 
         long now = System.currentTimeMillis();
 
         if (pillarList.isEmpty() && activePillarRemovals.isEmpty()) {
             int emptyY = startY + 8;
-            drawBeveledButton(poseStackOrGraphics, colX, emptyY, availW, 36, COLOR_ROW_BG, false, false, alpha);
-            drawCenteredText(poseStackOrGraphics, font, "No placed pillars found in world.", colX + availW / 2, emptyY + 8, applyAlpha(COLOR_TEXT_SILVER, alpha));
-            drawCenteredText(poseStackOrGraphics, font, "Place and customize pillar columns to synchronize their IDs.", colX + availW / 2, emptyY + 20, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            drawBeveledButton(poseStack, colX, emptyY, availW, 36, COLOR_ROW_BG, false, false, alpha);
+            drawCenteredText(poseStack, font, "No placed pillars found in world.", colX + availW / 2, emptyY + 8, applyAlpha(COLOR_TEXT_SILVER, alpha));
+            drawCenteredText(poseStack, font, "Place and customize pillar columns to synchronize their IDs.", colX + availW / 2, emptyY + 20, applyAlpha(COLOR_TEXT_MUTED, alpha));
         } else {
             // 1. Render surviving rows (smoothly shifted vertically into place)
             int[] visible = ConfigRenderWork.visibleRows(viewportY - startY, viewportH, rowH + rowGap, pillarList.size());
@@ -3207,7 +3203,7 @@ public class BuildScapeConfigScreen extends Screen {
                 boolean isSelected = selectedPillarIds.contains(data.id);
                 boolean isEditingInSidePanel = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PILLAR_DETAIL && Objects.equals(selectedPillarDetailId, data.id);
 
-                renderSinglePillarRow(poseStackOrGraphics, font, colX, rowY, availW, rowH,
+                renderSinglePillarRow(poseStack, font, colX, rowY, availW, rowH,
                         chkW, chkBoxSize, gap, idColW, iconColW, colorsColW, dimColW, coordsColW, actionsColW,
                         data, isSelected, isEditingInSidePanel, true, mouseX, mouseY, alpha);
             }
@@ -3231,7 +3227,7 @@ public class BuildScapeConfigScreen extends Screen {
                     float remAlpha = rem.getRemovalAlpha(alpha, now);
                     if (remAlpha <= 0.01f) continue;
 
-                    renderSinglePillarRow(poseStackOrGraphics, font, rowX, rowY, availW, rowH,
+                    renderSinglePillarRow(poseStack, font, rowX, rowY, availW, rowH,
                             chkW, chkBoxSize, gap, idColW, iconColW, colorsColW, dimColW, coordsColW, actionsColW,
                             rem.data, false, false, false, mouseX, mouseY, remAlpha);
                 }
@@ -3241,26 +3237,26 @@ public class BuildScapeConfigScreen extends Screen {
             }
         }
 
-        disableGuiScissor(poseStackOrGraphics);
+        disableGuiScissor(poseStack);
 
-        renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
+        renderCustomScrollbar(poseStack, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
     }
 
-    private void renderSinglePillarRow(Object poseStackOrGraphics, Font font, int rowX, int rowY, int availW, int rowH,
+    private void renderSinglePillarRow(PoseStack poseStack, Font font, int rowX, int rowY, int availW, int rowH,
                                        int chkW, int chkBoxSize, int gap,
                                        int idColW, int iconColW, int colorsColW, int dimColW, int coordsColW, int actionsColW,
                                        PillarIdManager.PillarData data, boolean isSelected, boolean isEditingInSidePanel,
                                        boolean isInteractive, int mouseX, int mouseY, float alpha) {
         boolean hover = isInteractive && mouseX >= rowX && mouseX <= rowX + availW && mouseY >= rowY && mouseY <= rowY + rowH;
         int rowBg = isEditingInSidePanel ? (currentTheme.isLight() ? 0xFFDCFCE7 : 0xFF1C2C22) : (isSelected ? (currentTheme.isLight() ? 0xFFF0FDF4 : 0xFF16241A) : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG));
-        drawBeveledButton(poseStackOrGraphics, rowX, rowY, availW, rowH, rowBg, hover, isSelected || isEditingInSidePanel, alpha);
+        drawBeveledButton(poseStack, rowX, rowY, availW, rowH, rowBg, hover, isSelected || isEditingInSidePanel, alpha);
 
         // Row Checkbox
         int rChkX = rowX + (chkW - chkBoxSize) / 2;
         int rChkY = rowY + (rowH - chkBoxSize) / 2;
-        drawBeveledButton(poseStackOrGraphics, rChkX, rChkY, chkBoxSize, chkBoxSize, COLOR_SLOT_BG, hover, isSelected, alpha);
+        drawBeveledButton(poseStack, rChkX, rChkY, chkBoxSize, chkBoxSize, COLOR_SLOT_BG, hover, isSelected, alpha);
         if (isSelected) {
-            fill(poseStackOrGraphics, rChkX + 2, rChkY + 2, rChkX + chkBoxSize - 2, rChkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
+            fillBatched(poseStack, rChkX + 2, rChkY + 2, rChkX + chkBoxSize - 2, rChkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
         }
 
         int rcX = rowX + chkW + gap;
@@ -3268,7 +3264,7 @@ public class BuildScapeConfigScreen extends Screen {
         // ID Column (clickable to open detail!)
         String idText = data.id != null ? data.id : "unknown";
         int idTextCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
-        drawText(poseStackOrGraphics, font, font.plainSubstrByWidth(idText, idColW - 4), rcX + 2, rowY + 8, applyAlpha(idTextCol, alpha));
+        drawText(poseStack, font, font.plainSubstrByWidth(idText, idColW - 4), rcX + 2, rowY + 8, applyAlpha(idTextCol, alpha));
         rcX += idColW + gap;
 
         // ITEM Column (Pillar Type + Displayed Item icons side by side)
@@ -3280,14 +3276,14 @@ public class BuildScapeConfigScreen extends Screen {
         if (!pillarTypeStack.isEmpty() || !dispStack.isEmpty()) {
             if (alpha >= 0.05f) {
                 if (!pillarTypeStack.isEmpty()) {
-                    renderGuiItem(poseStackOrGraphics, pillarTypeStack, iconStartX, iconY);
+                    renderGuiItem(poseStack, pillarTypeStack, iconStartX, iconY);
                 }
                 if (!dispStack.isEmpty()) {
-                    renderGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY);
+                    renderGuiItem(poseStack, dispStack, iconStartX + 18, iconY);
                 }
             }
         } else {
-            drawCenteredText(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            drawCenteredText(poseStack, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
         }
         rcX += iconColW + gap;
 
@@ -3307,17 +3303,17 @@ public class BuildScapeConfigScreen extends Screen {
                     String hex = colors.get(s).replace("#", "");
                     colInt = 0xFF000000 | Integer.parseInt(hex, 16);
                 } catch (Exception ignored) {}
-                fill(poseStackOrGraphics, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, alpha));
-                drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(0xFF000000, alpha));
+                fillBatched(poseStack, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, alpha));
+                drawBorder(poseStack, swX, swY, swSize, swSize, applyAlpha(0xFF000000, alpha));
             }
         } else {
-            drawCenteredText(poseStackOrGraphics, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            drawCenteredText(poseStack, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
         }
         rcX += colorsColW + gap;
 
         // DIMENSION Column
         String dimName = formatDimensionName(data.dimension);
-        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        drawCenteredText(poseStack, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
         rcX += dimColW + gap;
 
         // COORDINATES Column (colored X, Y, Z)
@@ -3327,11 +3323,11 @@ public class BuildScapeConfigScreen extends Screen {
         String xStr = String.valueOf(data.x);
         String yStr = String.valueOf(data.y);
         String zStr = String.valueOf(data.z);
-        drawText(poseStackOrGraphics, font, xStr, cX, rowY + 8, applyAlpha(0xFFFF5555, alpha));
+        drawText(poseStack, font, xStr, cX, rowY + 8, applyAlpha(0xFFFF5555, alpha));
         int xW = font.width(xStr + " ");
-        drawText(poseStackOrGraphics, font, yStr, cX + xW, rowY + 8, applyAlpha(0xFF5599FF, alpha));
+        drawText(poseStack, font, yStr, cX + xW, rowY + 8, applyAlpha(0xFF5599FF, alpha));
         int yW = font.width(yStr + " ");
-        drawText(poseStackOrGraphics, font, zStr, cX + xW + yW, rowY + 8, applyAlpha(0xFF55FF55, alpha));
+        drawText(poseStack, font, zStr, cX + xW + yW, rowY + 8, applyAlpha(0xFF55FF55, alpha));
         rcX += coordsColW + gap;
 
         // ACTIONS Column ([ ✎ Edit ] and [ ✕ ])
@@ -3341,20 +3337,20 @@ public class BuildScapeConfigScreen extends Screen {
         int editW = 34;
         int editX = rcX + 2;
         boolean hoverEdit = isInteractive && mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH;
-        drawBeveledButton(poseStackOrGraphics, editX, actY, editW, actH, hoverEdit ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverEdit, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, editX, actY, editW, actH, hoverEdit ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverEdit, false, alpha);
+        drawCenteredText(poseStack, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         int delW = 16;
         int delX = editX + editW + 4;
         boolean hoverDel = isInteractive && mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH;
         int delBg = hoverDel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
-        drawBeveledButton(poseStackOrGraphics, delX, actY, delW, actH, delBg, hoverDel, false, alpha);
+        drawBeveledButton(poseStack, delX, actY, delW, actH, delBg, hoverDel, false, alpha);
         int delTextCol = hoverDel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
-        drawCenteredText(poseStackOrGraphics, font, "✕", delX + delW / 2, actY + 2, applyAlpha(delTextCol, alpha));
+        drawCenteredText(poseStack, font, "✕", delX + delW / 2, actY + 2, applyAlpha(delTextCol, alpha));
     }
 
     // Per-pillar customization view.
-    private void renderPillarDetailPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
+    private void renderPillarDetailPanel(PoseStack poseStack, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
         if (data == null) {
             selectedPillarDetailId = null;
@@ -3374,23 +3370,23 @@ public class BuildScapeConfigScreen extends Screen {
         int backW = 54;
         int backX = x + 6;
         boolean hoverBack = mouseX >= backX && mouseX <= backX + backW && mouseY >= barY && mouseY <= barY + btnH;
-        drawBeveledButton(poseStackOrGraphics, backX, barY, backW, btnH, hoverBack ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBack, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "◀ Back", backX + backW / 2, barY + 3, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, backX, barY, backW, btnH, hoverBack ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBack, false, alpha);
+        drawCenteredText(poseStack, font, "◀ Back", backX + backW / 2, barY + 3, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // Title: Pillar ID + coords badge
         String titleText = "Pillar: " + data.id;
-        drawText(poseStackOrGraphics, font, titleText, backX + backW + 8, barY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStack, font, titleText, backX + backW + 8, barY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         String locText = String.format("[%s · %d, %d, %d]", formatDimensionName(data.dimension), data.x, data.y, data.z);
-        drawText(poseStackOrGraphics, font, locText, backX + backW + 8 + font.width(titleText) + 8, barY + 3, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        drawText(poseStack, font, locText, backX + backW + 8 + font.width(titleText) + 8, barY + 3, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
         // [ ✓ Save Pillar ]
         int saveW = 82;
         int saveX = x + w - saveW - 6;
         boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH;
         hoverConfigAccess(hoverSave, ConfigSetting.PILLAR_EDIT, false, false, false);
-        drawBeveledGreenButton(poseStackOrGraphics, saveX, barY, saveW, btnH, hoverSave, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "✓ Save Pillar", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+        drawBeveledGreenButton(poseStack, saveX, barY, saveW, btnH, hoverSave, alpha);
+        drawCenteredText(poseStack, font, "✓ Save Pillar", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
 
         curY += bar1H + 3;
 
@@ -3412,32 +3408,32 @@ public class BuildScapeConfigScreen extends Screen {
         int startY = viewportY + 2 - (int) scrollOffset;
         int rY = startY;
 
-        enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
+        enableGuiScissor(poseStack, x + 4, viewportY, w - 8, viewportH);
 
         // Row 1: Use Custom Pattern Toggle (fallback to global use_pattern)
         boolean usePat = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
-        renderConfigRowToggle(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Use Custom Pattern", "Override global particle pattern for this pillar", usePat, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Use Custom Pattern", "Override global particle pattern for this pillar", usePat, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 2: Particle Pattern Cycle (fallback to "default")
         String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
         String patDisplay = curPat.substring(0, 1).toUpperCase() + curPat.substring(1);
-        renderConfigRowCycle(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Particle Pattern", "Select particle movement animation", patDisplay, mouseX, mouseY, alpha);
+        renderConfigRowCycle(poseStack, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Particle Pattern", "Select particle movement animation", patDisplay, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 3: Pattern Speed Counter (fallback to global pattern_speed)
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED, speed, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED, speed, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 4: Pattern Spread Counter (fallback to global pattern_spread)
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD, spread, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD, spread, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 5: Pattern Intensity Counter (fallback to global pattern_intensity)
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY, intensity, mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStack, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY, intensity, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 6: Per-Pillar Color Palette (fallback to global particle_color & max_particle_color)
@@ -3446,19 +3442,19 @@ public class BuildScapeConfigScreen extends Screen {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
         int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(7, Math.max(1, colors.size())));
-        renderConfigRowPalette(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pillar Colors", colors, maxColors, mouseX, mouseY, alpha);
+        renderConfigRowPalette(poseStack, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pillar Colors", colors, maxColors, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 7: Save & Sync Pillar Configuration
-        renderConfigRowButton(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Save Changes", "Save and sync pillar settings to server", "✓ Save", mouseX, mouseY, alpha);
+        renderConfigRowButton(poseStack, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Save Changes", "Save and sync pillar settings to server", "✓ Save", mouseX, mouseY, alpha);
 
-        disableGuiScissor(poseStackOrGraphics);
+        disableGuiScissor(poseStack);
 
-        renderCustomScrollbar(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
+        renderCustomScrollbar(poseStack, scrollbarTrackX, viewportY, scrollbarW, viewportH, scrollOffset, maxScroll, mouseX, mouseY, alpha);
     }
 
     // World setting rows.
-    private void renderWorldSettingsRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
+    private void renderWorldSettingsRows(PoseStack poseStack, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         UUID playerUuid = getPlayerUuid();
         Level level = getLevel();
 
@@ -3473,84 +3469,84 @@ public class BuildScapeConfigScreen extends Screen {
 
         int curY = startY;
 
-        renderSectionDivider(poseStackOrGraphics, font, x, curY, w, "Player Settings", alpha);
+        renderSectionDivider(poseStack, font, x, curY, w, "Player Settings", alpha);
         curY += 14;
 
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Creative Tree Breaker", "Break entire trees at once in Creative mode.", treeBreaker, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Creative Tree Breaker", "Break entire trees at once in Creative mode.", treeBreaker, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Shulker Box Preview", "Preview shulker box inventory contents on hover.", shulkerPeek, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Shulker Box Preview", "Preview shulker box inventory contents on hover.", shulkerPeek, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderSectionDivider(poseStackOrGraphics, font, x, curY, w, "World Rules", alpha);
+        renderSectionDivider(poseStack, font, x, curY, w, "World Rules", alpha);
         curY += 14;
 
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Fast Leaf Decay", "Leaves decay rapidly when tree trunks are broken.", fastLeaves, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Fast Leaf Decay", "Leaves decay rapidly when tree trunks are broken.", fastLeaves, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Disable Enderman Griefing", "Prevent Endermen from picking up or placing blocks.", endermanGrief, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Disable Enderman Griefing", "Prevent Endermen from picking up or placing blocks.", endermanGrief, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Disable Creeper Griefing", "Prevent Creepers from destroying blocks when exploding.", creeperGrief, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Disable Creeper Griefing", "Prevent Creepers from destroying blocks when exploding.", creeperGrief, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Disable Ghast Griefing", "Prevent Ghast fireballs from destroying blocks.", ghastGrief, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Disable Ghast Griefing", "Prevent Ghast fireballs from destroying blocks.", ghastGrief, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Cake Stacking", "Allow cakes to stack up to 64 in player inventories.", cakeStack, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Cake Stacking", "Allow cakes to stack up to 64 in player inventories.", cakeStack, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Water Bottle Stacking", "Allow water bottles to stack up to 16 in player inventories.", waterStack, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStack, font, x, curY, w, h, clipY, clipH, "Water Bottle Stacking", "Allow water bottles to stack up to 16 in player inventories.", waterStack, mouseX, mouseY, alpha);
     }
 
-    private void renderSectionDivider(Object poseStackOrGraphics, Font font, int x, int y, int w, String label, float alpha) {
-        drawText(poseStackOrGraphics, font, label.toUpperCase(Locale.ROOT), x + 5, y + 2, applyAlpha(COLOR_ACCENT, alpha));
+    private void renderSectionDivider(PoseStack poseStack, Font font, int x, int y, int w, String label, float alpha) {
+        drawText(poseStack, font, label.toUpperCase(Locale.ROOT), x + 5, y + 2, applyAlpha(COLOR_ACCENT, alpha));
         int lineX = x + 12 + font.width(label.toUpperCase(Locale.ROOT));
         if (lineX < x + w - 4) {
-            fill(poseStackOrGraphics, lineX, y + 6, x + w - 4, y + 7, applyAlpha(COLOR_ROW_BORDER, alpha));
+            fillBatched(poseStack, lineX, y + 6, x + w - 4, y + 7, applyAlpha(COLOR_ROW_BORDER, alpha));
         }
     }
 
     // System setting rows.
-    private void renderSystemRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
+    private void renderSystemRows(PoseStack poseStack, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         int curY = startY;
         int systemRowH = getSystemSettingRowHeight();
 
         ConfigThemes.Theme baseTheme = ConfigThemes.getBaseTheme(currentTheme);
-        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", baseTheme.displayName, mouseX, mouseY, alpha);
+        renderConfigRowCycleDetailed(poseStack, font, x, curY, w, systemRowH, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", baseTheme.displayName, mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
-        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "UI Background", "Decorative backdrop pattern applied over the theme", ConfigBackgrounds.getCurrentBackground().displayName, mouseX, mouseY, alpha);
+        renderConfigRowCycleDetailed(poseStack, font, x, curY, w, systemRowH, clipY, clipH, "UI Background", "Decorative backdrop pattern applied over the theme", ConfigBackgrounds.getCurrentBackground().displayName, mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
-        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ConfigScreenAnims.getAnimSpeedLabel(), mouseX, mouseY, alpha);
+        renderConfigRowCycleDetailed(poseStack, font, x, curY, w, systemRowH, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ConfigScreenAnims.getAnimSpeedLabel(), mouseX, mouseY, alpha);
         curY += systemRowH + gap;
 
         PillarParticleConfig.EditPermissionMode policy = PillarParticleConfig.get().edit_permission_mode;
         hoverConfigAccess(checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH) != 0,
                 ConfigSetting.POLICY, false, true, false);
-        renderConfigRowCycleDetailed(poseStackOrGraphics, font, x, curY, w, systemRowH, clipY, clipH, "Edit Permissions",
+        renderConfigRowCycleDetailed(poseStack, font, x, curY, w, systemRowH, clipY, clipH, "Edit Permissions",
                 "Choose Strict (level 4), Standard (limited level 2), or Open access", capitalize(policy.name().toLowerCase(Locale.ROOT)), mouseX, mouseY, alpha);
     }
 
     // Draggable saturation, brightness, and hue picker.
-    private void renderColorPickerModal(Object poseStackOrGraphics, Font font, int mouseX, int mouseY, float alpha) {
+    private void renderColorPickerModal(PoseStack poseStack, Font font, int mouseX, int mouseY, float alpha) {
         int effW = getEffectiveWidth();
         int effH = getEffectiveHeight();
-        fill(poseStackOrGraphics, 0, 0, effW, effH, applyAlpha(0xA0000000, alpha));
+        fillBatched(poseStack, 0, 0, effW, effH, applyAlpha(0xA0000000, alpha));
 
         int modalW = 340;
         int modalH = 196;
         int modalX = (effW - modalW) / 2;
         int modalY = (effH - modalH) / 2;
 
-        drawBaseFrameBorder(poseStackOrGraphics, modalX, modalY, modalW, modalH, COLOR_PANEL_BG, alpha);
+        drawBaseFrameBorder(poseStack, modalX, modalY, modalW, modalH, COLOR_PANEL_BG, alpha);
 
         int headH = 24;
-        fill(poseStackOrGraphics, modalX + 7, modalY + 7, modalX + modalW - 7, modalY + headH, applyAlpha(COLOR_HEADER_BG, alpha));
-        drawBorder(poseStackOrGraphics, modalX + 7, modalY + 7, modalW - 14, headH - 7, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        fillBatched(poseStack, modalX + 7, modalY + 7, modalX + modalW - 7, modalY + headH, applyAlpha(COLOR_HEADER_BG, alpha));
+        drawBorder(poseStack, modalX + 7, modalY + 7, modalW - 14, headH - 7, applyAlpha(COLOR_FRAME_BLACK, alpha));
         String modalTitle = isEditingPillarColor ? "Customize Pillar Color" : "Customize Particle Color";
-        drawText(poseStackOrGraphics, font, modalTitle, modalX + 12, modalY + 9, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStack, font, modalTitle, modalX + 12, modalY + 9, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         // Close button
         int closeSize = 14;
@@ -3558,9 +3554,9 @@ public class BuildScapeConfigScreen extends Screen {
         int closeY = modalY + 7;
         boolean hoverClose = mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize;
         int closeBg = hoverClose ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
-        drawBeveledButton(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, closeBg, hoverClose, false, alpha);
+        drawBeveledButton(poseStack, closeX, closeY, closeSize, closeSize, closeBg, hoverClose, false, alpha);
         int closeCol = hoverClose ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
-        drawCenteredText(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
+        drawCenteredText(poseStack, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
 
         // 1. 2D Saturation x Brightness Draggable Box
         int gradBoxX = modalX + 16;
@@ -3568,15 +3564,15 @@ public class BuildScapeConfigScreen extends Screen {
         int gradBoxW = 110;
         int gradBoxH = 88;
 
-        ConfigGuiBatch.colorField(asPose(poseStackOrGraphics), gradBoxX, gradBoxY,
+        ConfigGuiBatch.colorField(poseStack, gradBoxX, gradBoxY,
                 gradBoxW, gradBoxH, hsbToRgb(pickerHue, 1, 1), alpha);
-        drawBorder(poseStackOrGraphics, gradBoxX - 1, gradBoxY - 1, gradBoxW + 2, gradBoxH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStack, gradBoxX - 1, gradBoxY - 1, gradBoxW + 2, gradBoxH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         // Crosshair Indicator on 2D Box
         int curCrossX = gradBoxX + (int) (pickerSat * gradBoxW);
         int curCrossY = gradBoxY + (int) ((1.0f - pickerBri) * gradBoxH);
-        drawBorder(poseStackOrGraphics, curCrossX - 3, curCrossY - 3, 6, 6, applyAlpha(COLOR_FRAME_BLACK, alpha));
-        drawBorder(poseStackOrGraphics, curCrossX - 2, curCrossY - 2, 4, 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBorder(poseStack, curCrossX - 3, curCrossY - 3, 6, 6, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStack, curCrossX - 2, curCrossY - 2, 4, 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         // 2. Vertical Hue Rainbow Slider
         int hueX = gradBoxX + gradBoxW + 10;
@@ -3588,13 +3584,13 @@ public class BuildScapeConfigScreen extends Screen {
             float h = (y / (float) hueH) * 360.0f;
             int col = hsbToRgb(h, 1.0f, 1.0f);
             int hh = Math.min(3, hueH - y);
-            fill(poseStackOrGraphics, hueX, hueY + y, hueX + hueW, hueY + y + hh, applyAlpha(col, alpha));
+            fillBatched(poseStack, hueX, hueY + y, hueX + hueW, hueY + y + hh, applyAlpha(col, alpha));
         }
-        drawBorder(poseStackOrGraphics, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStack, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         int curHueY = hueY + (int) ((pickerHue / 360.0f) * hueH);
-        fill(poseStackOrGraphics, hueX - 2, curHueY - 1, hueX + hueW + 2, curHueY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
-        drawBorder(poseStackOrGraphics, hueX - 2, curHueY - 1, hueW + 4, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        fillBatched(poseStack, hueX - 2, curHueY - 1, hueX + hueW + 2, curHueY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBorder(poseStack, hueX - 2, curHueY - 1, hueW + 4, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         // 3. Right Side: Current Color Preview Box & Hex String
         int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
@@ -3606,10 +3602,10 @@ public class BuildScapeConfigScreen extends Screen {
         int previewX = hueX + hueW + 14;
         int previewY = gradBoxY;
         int previewSize = 36;
-        fill(poseStackOrGraphics, previewX, previewY, previewX + previewSize, previewY + previewSize, applyAlpha(currentColorInt, alpha));
-        drawBorder(poseStackOrGraphics, previewX, previewY, previewSize, previewSize, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        fillBatched(poseStack, previewX, previewY, previewX + previewSize, previewY + previewSize, applyAlpha(currentColorInt, alpha));
+        drawBorder(poseStack, previewX, previewY, previewSize, previewSize, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
-        drawText(poseStackOrGraphics, font, hexString, previewX, previewY + previewSize + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStack, font, hexString, previewX, previewY + previewSize + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         // 4. Preset Swatches Grid (12 Vibrant Presets)
         int presetStartX = previewX + previewSize + 8;
@@ -3619,8 +3615,8 @@ public class BuildScapeConfigScreen extends Screen {
         for (int p = 0; p < PALETTE_PRESETS.length; p++) {
             int px = presetStartX + (p % 4) * (swatchSize + swatchGap);
             int py = presetStartY + (p / 4) * (swatchSize + swatchGap);
-            fill(poseStackOrGraphics, px, py, px + swatchSize, py + swatchSize, applyAlpha(PALETTE_PRESETS[p], alpha));
-            drawBorder(poseStackOrGraphics, px, py, swatchSize, swatchSize, applyAlpha(0xFF000000, alpha));
+            fillBatched(poseStack, px, py, px + swatchSize, py + swatchSize, applyAlpha(PALETTE_PRESETS[p], alpha));
+            drawBorder(poseStack, px, py, swatchSize, swatchSize, applyAlpha(0xFF000000, alpha));
         }
 
         // 5. Apply Button
@@ -3631,19 +3627,19 @@ public class BuildScapeConfigScreen extends Screen {
         boolean hoverApply = mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= applyY && mouseY <= applyY + applyH;
         hoverConfigAccess(hoverApply, isEditingPillarColor ? ConfigSetting.PILLAR_EDIT
                 : ConfigSetting.COLORS, false, !isEditingPillarColor, false);
-        drawBeveledGreenButton(poseStackOrGraphics, applyX, applyY, applyW, applyH, hoverApply, alpha);
+        drawBeveledGreenButton(poseStack, applyX, applyY, applyW, applyH, hoverApply, alpha);
         int applyTextCol = hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT;
-        drawCenteredText(poseStackOrGraphics, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(applyTextCol, alpha));
+        drawCenteredText(poseStack, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(applyTextCol, alpha));
     }
 
     // Shared border and bevel rendering.
-    private void drawBaseFrameBorder(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
-        drawBaseFrameBorder(poseStackOrGraphics, x, y, w, h, bgRgb, false, alpha);
+    private void drawBaseFrameBorder(PoseStack poseStack, int x, int y, int w, int h, int bgRgb, float alpha) {
+        drawBaseFrameBorder(poseStack, x, y, w, h, bgRgb, false, alpha);
     }
 
-    private void drawBaseFrameBorder(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, boolean hasCrestNotch, float alpha) {
+    private void drawBaseFrameBorder(PoseStack poseStack, int x, int y, int w, int h, int bgRgb, boolean hasCrestNotch, float alpha) {
         // 1. Outer Chassis Body Fill (Solid metallic chassis backing)
-        fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        fillBatched(poseStack, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
@@ -3656,14 +3652,14 @@ public class BuildScapeConfigScreen extends Screen {
 
         // 2. Outermost 1px Black Border
         if (hasCrestNotch) {
-            fill(poseStackOrGraphics, x, y, crestX + 1, y + 1, black);
-            fill(poseStackOrGraphics, crestX + crestW - 1, y, x + w, y + 1, black);
+            fillBatched(poseStack, x, y, crestX + 1, y + 1, black);
+            fillBatched(poseStack, crestX + crestW - 1, y, x + w, y + 1, black);
         } else {
-            fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
+            fillBatched(poseStack, x, y, x + w, y + 1, black);
         }
-        fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
-        fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
-        fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
+        fillBatched(poseStack, x, y + h - 1, x + w, y + h, black);
+        fillBatched(poseStack, x, y, x + 1, y + h, black);
+        fillBatched(poseStack, x + w - 1, y, x + w, y + h, black);
 
         // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
         if (hasCrestNotch) {
@@ -3672,7 +3668,7 @@ public class BuildScapeConfigScreen extends Screen {
             if (leftSegW > 0) {
                 float tLeftEnd = (float) (crestX - x) / (float) Math.max(1, w - 3);
                 int cCornerLeft = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, tLeftEnd);
-                drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, leftSegW, COLOR_BORDER_GRADIENT_START, cCornerLeft, alpha);
+                drawHorizontalGradientLine(poseStack, x + 1, y + 1, leftSegW, COLOR_BORDER_GRADIENT_START, cCornerLeft, alpha);
             }
 
             // Right top horizontal: from crestX + crestW to x + w - 2 (abuts logo badge's right black border)
@@ -3681,48 +3677,48 @@ public class BuildScapeConfigScreen extends Screen {
             if (rightSegW > 0) {
                 float tRightStart = (float) (rightStart - x) / (float) Math.max(1, w - 3);
                 int cCornerRight = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, tRightStart);
-                drawHorizontalGradientLine(poseStackOrGraphics, rightStart, y + 1, rightSegW, cCornerRight, COLOR_BORDER_GRADIENT_END, alpha);
+                drawHorizontalGradientLine(poseStack, rightStart, y + 1, rightSegW, cCornerRight, COLOR_BORDER_GRADIENT_END, alpha);
             }
         } else {
-            drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+            drawHorizontalGradientLine(poseStack, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         }
 
-        drawVerticalGradientLine(poseStackOrGraphics, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
-        fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
-        fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
+        drawVerticalGradientLine(poseStack, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+        fillBatched(poseStack, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
+        fillBatched(poseStack, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
         // 4. Outer Chassis Band (offset 2 to 3)
         for (int o = 2; o <= 3; o++) {
             if (hasCrestNotch) {
-                if (crestX > x + o) fill(poseStackOrGraphics, x + o, y + o, crestX, y + o + 1, band);
-                if (x + w - o > crestX + crestW) fill(poseStackOrGraphics, crestX + crestW, y + o, x + w - o, y + o + 1, band);
+                if (crestX > x + o) fillBatched(poseStack, x + o, y + o, crestX, y + o + 1, band);
+                if (x + w - o > crestX + crestW) fillBatched(poseStack, crestX + crestW, y + o, x + w - o, y + o + 1, band);
             } else {
-                fill(poseStackOrGraphics, x + o, y + o, x + w - o, y + o + 1, band);
+                fillBatched(poseStack, x + o, y + o, x + w - o, y + o + 1, band);
             }
-            fill(poseStackOrGraphics, x + o, y + h - o - 1, x + w - o, y + h - o, band);
-            fill(poseStackOrGraphics, x + o, y + o, x + o + 1, y + h - o, band);
-            fill(poseStackOrGraphics, x + w - o - 1, y + o, x + w - o, y + h - o, band);
+            fillBatched(poseStack, x + o, y + h - o - 1, x + w - o, y + h - o, band);
+            fillBatched(poseStack, x + o, y + o, x + o + 1, y + h - o, band);
+            fillBatched(poseStack, x + w - o - 1, y + o, x + w - o, y + h - o, band);
         }
 
         // 5. Stepped Bevel Ridge & Groove at offset 5
         int o5 = 5;
         if (hasCrestNotch) {
-            if (crestX > x + o5) fill(poseStackOrGraphics, x + o5, y + o5, crestX, y + o5 + 1, bevelShadow);
-            if (x + w - o5 > crestX + crestW) fill(poseStackOrGraphics, crestX + crestW, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
+            if (crestX > x + o5) fillBatched(poseStack, x + o5, y + o5, crestX, y + o5 + 1, bevelShadow);
+            if (x + w - o5 > crestX + crestW) fillBatched(poseStack, crestX + crestW, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
         } else {
-            fill(poseStackOrGraphics, x + o5, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
+            fillBatched(poseStack, x + o5, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
         }
-        fill(poseStackOrGraphics, x + o5, y + o5, x + o5 + 1, y + h - o5, bevelShadow);
-        fill(poseStackOrGraphics, x + o5, y + h - o5 - 1, x + w - o5, y + h - o5, bevelHighlight);
-        fill(poseStackOrGraphics, x + w - o5 - 1, y + o5, x + w - o5, y + h - o5, bevelHighlight);
+        fillBatched(poseStack, x + o5, y + o5, x + o5 + 1, y + h - o5, bevelShadow);
+        fillBatched(poseStack, x + o5, y + h - o5 - 1, x + w - o5, y + h - o5, bevelHighlight);
+        fillBatched(poseStack, x + w - o5 - 1, y + o5, x + w - o5, y + h - o5, bevelHighlight);
 
         // 6. Secondary soft metallic transition at offset 8
         int softGroove = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-        drawBorder(poseStackOrGraphics, x + 8, y + 8, w - 16, h - 16, softGroove);
+        drawBorder(poseStack, x + 8, y + 8, w - 16, h - 16, softGroove);
     }
 
-    private void drawConnectedSidePanelFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
-        fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+    private void drawConnectedSidePanelFrame(PoseStack poseStack, int x, int y, int w, int h, int bgRgb, float alpha) {
+        fillBatched(poseStack, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
@@ -3730,38 +3726,38 @@ public class BuildScapeConfigScreen extends Screen {
         int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
-        fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
-        fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
-        fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
-        fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
+        fillBatched(poseStack, x, y, x + w, y + 1, black);
+        fillBatched(poseStack, x, y + h - 1, x + w, y + h, black);
+        fillBatched(poseStack, x + w - 1, y, x + w, y + h, black);
+        fillBatched(poseStack, x, y, x + 1, y + h, black);
 
-        drawHorizontalGradientLine(poseStackOrGraphics, x, y + 1, w - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        fill(poseStackOrGraphics, x, y + h - 2, x + w - 1, y + h - 2, shadow);
-        fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
+        drawHorizontalGradientLine(poseStack, x, y + 1, w - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        fillBatched(poseStack, x, y + h - 2, x + w - 1, y + h - 2, shadow);
+        fillBatched(poseStack, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
         for (int o = 2; o <= 3; o++) {
-            fill(poseStackOrGraphics, x, y + o, x + w - o, y + o + 1, band);
-            fill(poseStackOrGraphics, x, y + h - o - 1, x + w - o, y + h - o, band);
-            fill(poseStackOrGraphics, x + w - o - 1, y + o, x + w - o, y + h - o, band);
+            fillBatched(poseStack, x, y + o, x + w - o, y + o + 1, band);
+            fillBatched(poseStack, x, y + h - o - 1, x + w - o, y + h - o, band);
+            fillBatched(poseStack, x + w - o - 1, y + o, x + w - o, y + h - o, band);
         }
 
         int o5 = 5;
-        fill(poseStackOrGraphics, x, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
-        fill(poseStackOrGraphics, x, y + h - o5 - 1, x + w - o5, y + h - o5, bevelHighlight);
-        fill(poseStackOrGraphics, x + w - o5 - 1, y + o5, x + w - o5, y + h - o5, bevelHighlight);
+        fillBatched(poseStack, x, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
+        fillBatched(poseStack, x, y + h - o5 - 1, x + w - o5, y + h - o5, bevelHighlight);
+        fillBatched(poseStack, x + w - o5 - 1, y + o5, x + w - o5, y + h - o5, bevelHighlight);
 
         if (w > 20 && h > 20) {
             int softGroove = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-            fill(poseStackOrGraphics, x, y + 8, x + w - 8, y + 9, softGroove);
-            fill(poseStackOrGraphics, x, y + h - 9, x + w - 8, y + h - 8, softGroove);
-            fill(poseStackOrGraphics, x + w - 9, y + 8, x + w - 8, y + h - 8, softGroove);
+            fillBatched(poseStack, x, y + 8, x + w - 8, y + 9, softGroove);
+            fillBatched(poseStack, x, y + h - 9, x + w - 8, y + h - 8, softGroove);
+            fillBatched(poseStack, x + w - 9, y + 8, x + w - 8, y + h - 8, softGroove);
         }
     }
 
-    private void renderSidePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+    private void renderSidePanel(PoseStack poseStack, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         if (sidePanelType == SidePanelType.NONE) return;
 
-        drawConnectedSidePanelFrame(poseStackOrGraphics, x, y, w, h, COLOR_PANEL_BG, alpha);
+        drawConnectedSidePanelFrame(poseStack, x, y, w, h, COLOR_PANEL_BG, alpha);
 
         if (w >= 60 && h >= 40) {
             SidePanelContentGeometry geometry = calculateSidePanelContentGeometry(x, y, w, h);
@@ -3769,7 +3765,7 @@ public class BuildScapeConfigScreen extends Screen {
             int sHeadY = geometry.headerY();
             int sHeadW = geometry.headerWidth();
             int sHeadH = 22;
-            drawBeveledComponent(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, COLOR_HEADER_BG, alpha);
+            drawBeveledComponent(poseStack, sHeadX, sHeadY, sHeadW, sHeadH, COLOR_HEADER_BG, alpha);
 
             String titleText = "Modifiers";
             ResourceLocation panelIcon = null;
@@ -3808,14 +3804,14 @@ public class BuildScapeConfigScreen extends Screen {
 
             int textX = sHeadX + 6 + titleOffsetX;
             if (panelIcon != null) {
-                drawTintedTexture(poseStackOrGraphics, panelIcon, textX, sHeadY + (sHeadH - 14) / 2, 14, 14, COLOR_ACCENT, titleAlpha);
+                drawTintedTexture(poseStack, panelIcon, textX, sHeadY + (sHeadH - 14) / 2, 14, 14, COLOR_ACCENT, titleAlpha);
                 textX += 18;
             }
-            drawText(poseStackOrGraphics, font, titleText, textX, sHeadY + 7, applyAlpha(COLOR_TEXT_WHITE, titleAlpha));
+            drawText(poseStack, font, titleText, textX, sHeadY + 7, applyAlpha(COLOR_TEXT_WHITE, titleAlpha));
 
             if (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching) {
                 float glowAlpha = (1.0f - switchProgress) * 0.45f * alpha;
-                drawBorder(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, applyAlpha(COLOR_ACCENT, glowAlpha));
+                drawBorder(poseStack, sHeadX, sHeadY, sHeadW, sHeadH, applyAlpha(COLOR_ACCENT, glowAlpha));
             }
 
             int closeSize = 14;
@@ -3823,9 +3819,9 @@ public class BuildScapeConfigScreen extends Screen {
             int closeY = sHeadY + 4;
             boolean hoverClose = mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize;
             int closeBg = hoverClose ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
-            drawBeveledButton(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, closeBg, hoverClose, false, alpha);
+            drawBeveledButton(poseStack, closeX, closeY, closeSize, closeSize, closeBg, hoverClose, false, alpha);
             int closeCol = hoverClose ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
-            drawCenteredText(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
+            drawCenteredText(poseStack, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
 
             int sContentX = geometry.contentX();
             int sContentY = geometry.contentY();
@@ -3834,11 +3830,11 @@ public class BuildScapeConfigScreen extends Screen {
 
             if (sContentH > 20) {
                 if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
-                    renderSidePanelPillarDetail(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+                    renderSidePanelPillarDetail(poseStack, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
                 } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
-                    renderSidePanelColorPicker(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+                    renderSidePanelColorPicker(poseStack, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
                 } else if (sidePanelType == SidePanelType.PRESETS) {
-                    renderSidePanelPresets(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+                    renderSidePanelPresets(poseStack, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
                 }
             }
         }
@@ -3860,8 +3856,8 @@ public class BuildScapeConfigScreen extends Screen {
         return presetDeleteReveal;
     }
 
-    private void renderSidePanelPresets(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
-        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+    private void renderSidePanelPresets(PoseStack poseStack, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+        drawBeveledComponent(poseStack, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         PresetsConfig presetsCfg = PresetsConfig.get();
         List<PresetsConfig.Preset> presets = presetsCfg.getPresets();
@@ -3883,80 +3879,80 @@ public class BuildScapeConfigScreen extends Screen {
         int btnH = 18;
 
         int selectedCardH = 64;
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, selectedCardH, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, "Selected Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, rowX, curY, rowW, selectedCardH, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStack, font, "Selected Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
         int selectorY = curY + 18;
         int selectorX = rowX + cardPad;
         int selectorW = rowW - cardPad * 2;
         int arrowW = 20;
         boolean hoverPrev = mouseX >= selectorX && mouseX <= selectorX + arrowW && mouseY >= selectorY && mouseY <= selectorY + btnH;
         boolean hoverNext = mouseX >= selectorX + selectorW - arrowW && mouseX <= selectorX + selectorW && mouseY >= selectorY && mouseY <= selectorY + btnH;
-        drawBeveledButton(poseStackOrGraphics, selectorX, selectorY, arrowW, btnH, hoverPrev ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPrev, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "‹", selectorX + arrowW / 2, selectorY + 5, applyAlpha(hoverPrev ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, selectorX, selectorY, arrowW, btnH, hoverPrev ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPrev, false, alpha);
+        drawCenteredText(poseStack, font, "‹", selectorX + arrowW / 2, selectorY + 5, applyAlpha(hoverPrev ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         int valueX = selectorX + arrowW;
         int valueW = selectorW - arrowW * 2;
-        drawBeveledButton(poseStackOrGraphics, valueX, selectorY, valueW, btnH, COLOR_SLOT_BG, false, false, alpha);
+        drawBeveledButton(poseStack, valueX, selectorY, valueW, btnH, COLOR_SLOT_BG, false, false, alpha);
         String valueText = currentPresetName + " (" + (currentPreset != null ? currentPreset.items.size() : 0) + ")";
-        drawCenteredText(poseStackOrGraphics, font, trimTextToWidth(font, valueText, valueW - 8, false), valueX + valueW / 2, selectorY + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStack, font, trimTextToWidth(font, valueText, valueW - 8, false), valueX + valueW / 2, selectorY + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
         int nextX = selectorX + selectorW - arrowW;
-        drawBeveledButton(poseStackOrGraphics, nextX, selectorY, arrowW, btnH, hoverNext ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNext, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "›", nextX + arrowW / 2, selectorY + 5, applyAlpha(hoverNext ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, nextX, selectorY, arrowW, btnH, hoverNext ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNext, false, alpha);
+        drawCenteredText(poseStack, font, "›", nextX + arrowW / 2, selectorY + 5, applyAlpha(hoverNext ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         int applyY = selectorY + btnH + 5;
         boolean hoverApply = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= applyY && mouseY <= applyY + btnH;
         hoverConfigAccess(hoverApply, ConfigSetting.ITEMS, true, false, true);
-        drawBeveledGreenButton(poseStackOrGraphics, selectorX, applyY, selectorW, btnH, hoverApply, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "✓ Apply Preset", selectorX + selectorW / 2, applyY + 5, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
+        drawBeveledGreenButton(poseStack, selectorX, applyY, selectorW, btnH, hoverApply, alpha);
+        drawCenteredText(poseStack, font, "✓ Apply Preset", selectorX + selectorW / 2, applyY + 5, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
         int sectionGap = Math.round(8.0F - 4.0F * deleteReveal);
         int resetGap = Math.round(18.0F - 12.0F * deleteReveal);
         curY += selectedCardH + sectionGap;
 
         int manageCardH = Math.round(41.0F + 20.0F * deleteReveal);
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, manageCardH, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, "Manage Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, rowX, curY, rowW, manageCardH, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStack, font, "Manage Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
         int manageY = curY + 19;
         boolean hoverSave = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= manageY && mouseY <= manageY + btnH;
         hoverConfigAccess(hoverSave, ConfigSetting.ITEMS, false, false, true);
-        drawBeveledButton(poseStackOrGraphics, selectorX, manageY, selectorW, btnH, hoverSave ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverSave, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "▣ Save Changes", selectorX + selectorW / 2, manageY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, selectorX, manageY, selectorW, btnH, hoverSave ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverSave, false, alpha);
+        drawCenteredText(poseStack, font, "▣ Save Changes", selectorX + selectorW / 2, manageY + 5, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         int visibleDeleteH = Math.round(btnH * deleteReveal);
         if (visibleDeleteH > 0) {
             int deleteY = manageY + btnH + 4;
             boolean hoverDelete = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= deleteY && mouseY <= deleteY + btnH;
             hoverConfigAccess(hoverDelete && deleteReveal > 0.75F, ConfigSetting.ITEMS, true, false, true);
-            drawBeveledRedButton(poseStackOrGraphics, selectorX, deleteY, selectorW, visibleDeleteH, hoverDelete, alpha * deleteReveal);
+            drawBeveledRedButton(poseStack, selectorX, deleteY, selectorW, visibleDeleteH, hoverDelete, alpha * deleteReveal);
             if (deleteReveal > 0.45F) {
-                drawCenteredText(poseStackOrGraphics, font, "✕ Delete Preset", selectorX + selectorW / 2, deleteY + 5,
+                drawCenteredText(poseStack, font, "✕ Delete Preset", selectorX + selectorW / 2, deleteY + 5,
                         applyAlpha(hoverDelete ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT, alpha * deleteReveal));
             }
         }
         curY += manageCardH + sectionGap;
 
         int createCardH = 61;
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, createCardH, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, "New Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, rowX, curY, rowW, createCardH, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStack, font, "New Preset", rowX + cardPad, curY + 5, applyAlpha(COLOR_TEXT_SILVER, alpha));
         int nameY = curY + 19;
         boolean hoverName = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= nameY && mouseY <= nameY + btnH;
-        drawBeveledButton(poseStackOrGraphics, selectorX, nameY, selectorW, btnH, COLOR_SLOT_BG, hoverName, presetNameFocused, alpha);
+        drawBeveledButton(poseStack, selectorX, nameY, selectorW, btnH, COLOR_SLOT_BG, hoverName, presetNameFocused, alpha);
         String nameText = presetNameInput.isEmpty() ? "Preset name..." : presetNameInput + (presetNameFocused && !presetNameSelected ? "_" : "");
-        drawText(poseStackOrGraphics, font, trimTextToWidth(font, nameText, selectorW - 10, !presetNameInput.isEmpty()), selectorX + 5, nameY + 5,
+        drawText(poseStack, font, trimTextToWidth(font, nameText, selectorW - 10, !presetNameInput.isEmpty()), selectorX + 5, nameY + 5,
                 applyAlpha(presetNameSelected ? COLOR_ACCENT : presetNameInput.isEmpty() ? COLOR_TEXT_MUTED : COLOR_TEXT_WHITE, alpha));
         int createY = nameY + btnH + 4;
         boolean hoverNew = mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= createY && mouseY <= createY + btnH;
         hoverConfigAccess(hoverNew, ConfigSetting.ITEMS, false, false, true);
-        drawBeveledButton(poseStackOrGraphics, selectorX, createY, selectorW, btnH, hoverNew ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNew, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "+ Create Preset", selectorX + selectorW / 2, createY + 5, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, selectorX, createY, selectorW, btnH, hoverNew ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNew, false, alpha);
+        drawCenteredText(poseStack, font, "+ Create Preset", selectorX + selectorW / 2, createY + 5, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         curY += createCardH + resetGap;
 
         boolean hoverReset = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         hoverConfigAccess(hoverReset, ConfigSetting.ITEMS, true, false, true);
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverReset ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverReset, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "↻ Reset to Defaults", rowX + rowW / 2, curY + 5, applyAlpha(hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, rowX, curY, rowW, btnH, hoverReset ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverReset, false, alpha);
+        drawCenteredText(poseStack, font, "↻ Reset to Defaults", rowX + rowW / 2, curY + 5, applyAlpha(hoverReset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
-    private void drawInlinePresetsTab(Object poseStackOrGraphics, int btnX, int btnY, int btnW, int btnH, boolean hover, boolean active, float alpha) {
+    private void drawInlinePresetsTab(PoseStack poseStack, int btnX, int btnY, int btnW, int btnH, boolean hover, boolean active, float alpha) {
         int btnRight = btnX + btnW;
         // 1. Chassis Body Fill (Seamlessly docked against main panel bevel)
-        fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + btnH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        fillBatched(poseStack, btnX, btnY, btnRight, btnY + btnH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
@@ -3965,27 +3961,27 @@ public class BuildScapeConfigScreen extends Screen {
         int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
         // 2. Outermost 1px Black Border (Top & Bottom seamlessly attach to main panel outer frame)
-        fill(poseStackOrGraphics, btnX, btnY, btnX + 1, btnY + btnH, black);
-        fill(poseStackOrGraphics, btnX, btnY, btnRight, btnY + 1, black);
-        fill(poseStackOrGraphics, btnX, btnY + btnH - 1, btnRight, btnY + btnH, black);
+        fillBatched(poseStack, btnX, btnY, btnX + 1, btnY + btnH, black);
+        fillBatched(poseStack, btnX, btnY, btnRight, btnY + 1, black);
+        fillBatched(poseStack, btnX, btnY + btnH - 1, btnRight, btnY + btnH, black);
 
         // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom)
-        drawVerticalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
-        drawHorizontalGradientLine(poseStackOrGraphics, btnX + 1, btnY + 1, btnW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        fill(poseStackOrGraphics, btnX + 1, btnY + btnH - 2, btnRight, btnY + btnH - 1, shadow);
+        drawVerticalGradientLine(poseStack, btnX + 1, btnY + 1, btnH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+        drawHorizontalGradientLine(poseStack, btnX + 1, btnY + 1, btnW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        fillBatched(poseStack, btnX + 1, btnY + btnH - 2, btnRight, btnY + btnH - 1, shadow);
 
         // 4. Outer Chassis Band (Offset 2, left/top/bottom meeting main panel border)
-        fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnX + 3, btnY + btnH - 2, band);
-        fill(poseStackOrGraphics, btnX + 2, btnY + 2, btnRight, btnY + 3, band);
-        fill(poseStackOrGraphics, btnX + 2, btnY + btnH - 3, btnRight, btnY + btnH - 2, band);
+        fillBatched(poseStack, btnX + 2, btnY + 2, btnX + 3, btnY + btnH - 2, band);
+        fillBatched(poseStack, btnX + 2, btnY + 2, btnRight, btnY + 3, band);
+        fillBatched(poseStack, btnX + 2, btnY + btnH - 3, btnRight, btnY + btnH - 2, band);
 
         // 5. Stepped Bevel Ridge & Groove (Offset 3)
-        fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnX + 4, btnY + btnH - 3, bevelShadow);
-        fill(poseStackOrGraphics, btnX + 3, btnY + 3, btnRight - 1, btnY + 4, bevelShadow);
-        fill(poseStackOrGraphics, btnX + 3, btnY + btnH - 4, btnRight - 1, btnY + btnH - 3, bevelHighlight);
+        fillBatched(poseStack, btnX + 3, btnY + 3, btnX + 4, btnY + btnH - 3, bevelShadow);
+        fillBatched(poseStack, btnX + 3, btnY + 3, btnRight - 1, btnY + 4, bevelShadow);
+        fillBatched(poseStack, btnX + 3, btnY + btnH - 4, btnRight - 1, btnY + btnH - 3, bevelHighlight);
 
         // Vertical right bevel connecting directly into main panel's bevel line
-        fill(poseStackOrGraphics, btnRight - 1, btnY + 3, btnRight, btnY + btnH - 3, bevelHighlight);
+        fillBatched(poseStack, btnRight - 1, btnY + 3, btnRight, btnY + btnH - 3, bevelHighlight);
 
         // 6. Inner Face Plate (Docked flush against main panel bevel)
         int faceX = btnX + 4;
@@ -3995,19 +3991,19 @@ public class BuildScapeConfigScreen extends Screen {
 
         int bgCol = active ? (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE)
                 : (hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG);
-        fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + faceH, applyAlpha(bgCol, alpha));
+        fillBatched(poseStack, faceX, faceY, btnRight - 1, faceY + faceH, applyAlpha(bgCol, alpha));
 
         // Active / Hover Accent Framing (Docked tab outline meeting main panel bevel)
         if (active) {
             int accentGlow = applyAlpha(COLOR_ACCENT, (hover ? 0.90f : 0.70f) * alpha);
-            fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, accentGlow);
-            fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, accentGlow);
-            fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, accentGlow);
+            fillBatched(poseStack, faceX, faceY, faceX + 1, faceY + faceH, accentGlow);
+            fillBatched(poseStack, faceX, faceY, btnRight - 1, faceY + 1, accentGlow);
+            fillBatched(poseStack, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, accentGlow);
         } else if (hover) {
             int hoverGlow = applyAlpha(COLOR_ROW_BORDER_HOVER, alpha * 0.75f);
-            fill(poseStackOrGraphics, faceX, faceY, faceX + 1, faceY + faceH, hoverGlow);
-            fill(poseStackOrGraphics, faceX, faceY, btnRight - 1, faceY + 1, hoverGlow);
-            fill(poseStackOrGraphics, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, hoverGlow);
+            fillBatched(poseStack, faceX, faceY, faceX + 1, faceY + faceH, hoverGlow);
+            fillBatched(poseStack, faceX, faceY, btnRight - 1, faceY + 1, hoverGlow);
+            fillBatched(poseStack, faceX, faceY + faceH - 1, btnRight - 1, faceY + faceH, hoverGlow);
         }
 
         // 7. 3-Slider Equalizer Icon (Centered within docked face)
@@ -4021,34 +4017,34 @@ public class BuildScapeConfigScreen extends Screen {
         int knobShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha * 0.65f);
 
         // Track 1 (Top, cy - 4)
-        fill(poseStackOrGraphics, cx - 7, cy - 4, cx + 7, cy - 3, trkCol);
+        fillBatched(poseStack, cx - 7, cy - 4, cx + 7, cy - 3, trkCol);
         // Knob 1 (Left: cx - 5 to cx - 2, cy - 6 to cy - 1)
-        fill(poseStackOrGraphics, cx - 5, cy - 6, cx - 2, cy - 1, knobCol);
-        fill(poseStackOrGraphics, cx - 5, cy - 6, cx - 2, cy - 5, knobHl);
-        fill(poseStackOrGraphics, cx - 5, cy - 5, cx - 4, cy - 1, knobHl);
-        fill(poseStackOrGraphics, cx - 3, cy - 5, cx - 2, cy - 1, knobShadow);
-        fill(poseStackOrGraphics, cx - 5, cy - 2, cx - 2, cy - 1, knobShadow);
+        fillBatched(poseStack, cx - 5, cy - 6, cx - 2, cy - 1, knobCol);
+        fillBatched(poseStack, cx - 5, cy - 6, cx - 2, cy - 5, knobHl);
+        fillBatched(poseStack, cx - 5, cy - 5, cx - 4, cy - 1, knobHl);
+        fillBatched(poseStack, cx - 3, cy - 5, cx - 2, cy - 1, knobShadow);
+        fillBatched(poseStack, cx - 5, cy - 2, cx - 2, cy - 1, knobShadow);
 
         // Track 2 (Middle, cy)
-        fill(poseStackOrGraphics, cx - 7, cy, cx + 7, cy + 1, trkCol);
+        fillBatched(poseStack, cx - 7, cy, cx + 7, cy + 1, trkCol);
         // Knob 2 (Right: cx + 2 to cx + 5, cy - 2 to cy + 3)
-        fill(poseStackOrGraphics, cx + 2, cy - 2, cx + 5, cy + 3, knobCol);
-        fill(poseStackOrGraphics, cx + 2, cy - 2, cx + 5, cy - 1, knobHl);
-        fill(poseStackOrGraphics, cx + 2, cy - 1, cx + 3, cy + 3, knobHl);
-        fill(poseStackOrGraphics, cx + 4, cy - 1, cx + 5, cy + 3, knobShadow);
-        fill(poseStackOrGraphics, cx + 2, cy + 2, cx + 5, cy + 3, knobShadow);
+        fillBatched(poseStack, cx + 2, cy - 2, cx + 5, cy + 3, knobCol);
+        fillBatched(poseStack, cx + 2, cy - 2, cx + 5, cy - 1, knobHl);
+        fillBatched(poseStack, cx + 2, cy - 1, cx + 3, cy + 3, knobHl);
+        fillBatched(poseStack, cx + 4, cy - 1, cx + 5, cy + 3, knobShadow);
+        fillBatched(poseStack, cx + 2, cy + 2, cx + 5, cy + 3, knobShadow);
 
         // Track 3 (Bottom, cy + 4)
-        fill(poseStackOrGraphics, cx - 7, cy + 4, cx + 7, cy + 5, trkCol);
+        fillBatched(poseStack, cx - 7, cy + 4, cx + 7, cy + 5, trkCol);
         // Knob 3 (Center: cx - 2 to cx + 1, cy + 2 to cy + 7)
-        fill(poseStackOrGraphics, cx - 2, cy + 2, cx + 1, cy + 7, knobCol);
-        fill(poseStackOrGraphics, cx - 2, cy + 2, cx + 1, cy + 3, knobHl);
-        fill(poseStackOrGraphics, cx - 2, cy + 3, cx - 1, cy + 7, knobHl);
-        fill(poseStackOrGraphics, cx, cy + 3, cx + 1, cy + 7, knobShadow);
-        fill(poseStackOrGraphics, cx - 2, cy + 6, cx + 1, cy + 7, knobShadow);
+        fillBatched(poseStack, cx - 2, cy + 2, cx + 1, cy + 7, knobCol);
+        fillBatched(poseStack, cx - 2, cy + 2, cx + 1, cy + 3, knobHl);
+        fillBatched(poseStack, cx - 2, cy + 3, cx - 1, cy + 7, knobHl);
+        fillBatched(poseStack, cx, cy + 3, cx + 1, cy + 7, knobShadow);
+        fillBatched(poseStack, cx - 2, cy + 6, cx + 1, cy + 7, knobShadow);
     }
 
-    private void drawPresetsSideTab(Object poseStackOrGraphics, Font font, int frameRight, int tabY, int mouseX, int mouseY, float alpha) {
+    private void drawPresetsSideTab(PoseStack poseStack, Font font, int frameRight, int tabY, int mouseX, int mouseY, float alpha) {
         PresetSideTabGeometry hoverBounds = calculatePresetSideTabGeometry(frameRight, tabY, true);
         boolean hover = mouseX >= hoverBounds.x() && mouseX <= hoverBounds.x() + hoverBounds.width()
                 && mouseY >= hoverBounds.y() && mouseY <= hoverBounds.y() + hoverBounds.height();
@@ -4064,30 +4060,30 @@ public class BuildScapeConfigScreen extends Screen {
         int sideBevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         int btnBg = applyAlpha(hover ? COLOR_BTN_BG_HOVER : COLOR_PANEL_BG, alpha);
 
-        fill(poseStackOrGraphics, tabX, tabY, tabX + currentW, tabY + tabH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        fillBatched(poseStack, tabX, tabY, tabX + currentW, tabY + tabH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
-        fill(poseStackOrGraphics, tabX, tabY, tabX + currentW, tabY + 1, black);
-        fill(poseStackOrGraphics, tabX, tabY + tabH - 1, tabX + currentW, tabY + tabH, black);
-        fill(poseStackOrGraphics, tabX + currentW - 1, tabY, tabX + currentW, tabY + tabH, black);
+        fillBatched(poseStack, tabX, tabY, tabX + currentW, tabY + 1, black);
+        fillBatched(poseStack, tabX, tabY + tabH - 1, tabX + currentW, tabY + tabH, black);
+        fillBatched(poseStack, tabX + currentW - 1, tabY, tabX + currentW, tabY + tabH, black);
 
-        drawHorizontalGradientLine(poseStackOrGraphics, tabX, tabY + 1, currentW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        fill(poseStackOrGraphics, tabX, tabY + tabH - 2, tabX + currentW - 1, tabY + tabH - 1, shadow);
-        fill(poseStackOrGraphics, tabX + currentW - 2, tabY + 1, tabX + currentW - 1, tabY + tabH - 1, shadow);
+        drawHorizontalGradientLine(poseStack, tabX, tabY + 1, currentW - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        fillBatched(poseStack, tabX, tabY + tabH - 2, tabX + currentW - 1, tabY + tabH - 1, shadow);
+        fillBatched(poseStack, tabX + currentW - 2, tabY + 1, tabX + currentW - 1, tabY + tabH - 1, shadow);
 
         for (int o = 2; o <= 3; o++) {
-            fill(poseStackOrGraphics, tabX, tabY + o, tabX + currentW - o, tabY + o + 1, sideBand);
-            fill(poseStackOrGraphics, tabX, tabY + tabH - o - 1, tabX + currentW - o, tabY + tabH - o, sideBand);
-            fill(poseStackOrGraphics, tabX + currentW - o - 1, tabY + o, tabX + currentW - o, tabY + tabH - o, sideBand);
+            fillBatched(poseStack, tabX, tabY + o, tabX + currentW - o, tabY + o + 1, sideBand);
+            fillBatched(poseStack, tabX, tabY + tabH - o - 1, tabX + currentW - o, tabY + tabH - o, sideBand);
+            fillBatched(poseStack, tabX + currentW - o - 1, tabY + o, tabX + currentW - o, tabY + tabH - o, sideBand);
         }
 
         int o5 = 5;
         if (currentW > 14 && tabH > 14) {
-            fill(poseStackOrGraphics, tabX, tabY + o5, tabX + currentW - o5, tabY + o5 + 1, sideBevelShadow);
-            fill(poseStackOrGraphics, tabX, tabY + tabH - o5 - 1, tabX + currentW - o5, tabY + tabH - o5, sideBevelHighlight);
-            fill(poseStackOrGraphics, tabX + currentW - o5 - 1, tabY + o5, tabX + currentW - o5, tabY + tabH - o5, sideBevelHighlight);
-            fill(poseStackOrGraphics, tabX, tabY + 6, tabX + currentW - 6, tabY + tabH - 6, btnBg);
+            fillBatched(poseStack, tabX, tabY + o5, tabX + currentW - o5, tabY + o5 + 1, sideBevelShadow);
+            fillBatched(poseStack, tabX, tabY + tabH - o5 - 1, tabX + currentW - o5, tabY + tabH - o5, sideBevelHighlight);
+            fillBatched(poseStack, tabX + currentW - o5 - 1, tabY + o5, tabX + currentW - o5, tabY + tabH - o5, sideBevelHighlight);
+            fillBatched(poseStack, tabX, tabY + 6, tabX + currentW - 6, tabY + tabH - 6, btnBg);
         } else {
-            fill(poseStackOrGraphics, tabX, tabY + 4, tabX + currentW - 4, tabY + tabH - 4, btnBg);
+            fillBatched(poseStack, tabX, tabY + 4, tabX + currentW - 4, tabY + tabH - 4, btnBg);
         }
 
         int cx = geometry.centerX();
@@ -4096,20 +4092,20 @@ public class BuildScapeConfigScreen extends Screen {
         int knobCol = applyAlpha(hover ? COLOR_ACCENT : (currentTheme.isLight() ? 0xFF334155 : COLOR_TEXT_WHITE), alpha);
         int knobHighlight = applyAlpha(hover ? 0xFFFFFFFF : (currentTheme.isLight() ? 0xFFFFFFFF : 0xFFCCCCCC), alpha);
 
-        fill(poseStackOrGraphics, cx - 6, cy - 4, cx + 6, cy - 3, trkCol);
-        fill(poseStackOrGraphics, cx - 4, cy - 6, cx - 2, cy - 1, knobCol);
-        fill(poseStackOrGraphics, cx - 3, cy - 5, cx - 2, cy - 2, knobHighlight);
+        fillBatched(poseStack, cx - 6, cy - 4, cx + 6, cy - 3, trkCol);
+        fillBatched(poseStack, cx - 4, cy - 6, cx - 2, cy - 1, knobCol);
+        fillBatched(poseStack, cx - 3, cy - 5, cx - 2, cy - 2, knobHighlight);
 
-        fill(poseStackOrGraphics, cx - 6, cy, cx + 6, cy + 1, trkCol);
-        fill(poseStackOrGraphics, cx + 2, cy - 2, cx + 4, cy + 3, knobCol);
-        fill(poseStackOrGraphics, cx + 3, cy - 1, cx + 4, cy + 2, knobHighlight);
+        fillBatched(poseStack, cx - 6, cy, cx + 6, cy + 1, trkCol);
+        fillBatched(poseStack, cx + 2, cy - 2, cx + 4, cy + 3, knobCol);
+        fillBatched(poseStack, cx + 3, cy - 1, cx + 4, cy + 2, knobHighlight);
 
-        fill(poseStackOrGraphics, cx - 6, cy + 4, cx + 6, cy + 5, trkCol);
-        fill(poseStackOrGraphics, cx - 1, cy + 2, cx + 1, cy + 7, knobCol);
-        fill(poseStackOrGraphics, cx, cy + 3, cx + 1, cy + 6, knobHighlight);
+        fillBatched(poseStack, cx - 6, cy + 4, cx + 6, cy + 5, trkCol);
+        fillBatched(poseStack, cx - 1, cy + 2, cx + 1, cy + 7, knobCol);
+        fillBatched(poseStack, cx, cy + 3, cx + 1, cy + 6, knobHighlight);
 
         // Draw the exposed edge last so the bevel cannot cover its black outline.
-        fill(poseStackOrGraphics, tabX + currentW - 1, tabY, tabX + currentW, tabY + tabH, black);
+        fillBatched(poseStack, tabX + currentW - 1, tabY, tabX + currentW, tabY + tabH, black);
 
         if (hover) {
             deferredTooltip = Collections.singletonList(ComponentHelper.literal("Presets (Click to Open)"));
@@ -4118,7 +4114,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
-    private void renderHeaderThemeToggle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+    private void renderHeaderThemeToggle(PoseStack poseStack, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         float target = getThemeTargetPos(currentTheme);
         if (themeToggleAnimPos < 0.0f) {
             themeToggleAnimPos = target;
@@ -4146,7 +4142,7 @@ public class BuildScapeConfigScreen extends Screen {
         // 1. Unified Track (matched to current theme slot colors, no random color patches)
         int trackBg = COLOR_SLOT_BG;
         int trackBorder = hover ? COLOR_ROW_BORDER_HOVER : COLOR_SLOT_BORDER;
-        renderRoundedPill(poseStackOrGraphics, x, y, w, h, trackBg, trackBorder, alpha);
+        renderRoundedPill(poseStack, x, y, w, h, trackBg, trackBorder, alpha);
 
         // 2. Sliding Rounded Knob (matched to current theme button colors)
         int knobSize = 12;
@@ -4156,7 +4152,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         int knobBg = hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG;
         int knobBorder = hover ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER;
-        renderRoundedKnob(poseStackOrGraphics, knobX, knobY, knobSize, knobBg, knobBorder, alpha);
+        renderRoundedKnob(poseStack, knobX, knobY, knobSize, knobBg, knobBorder, alpha);
 
         // 3. Plain text symbols for Moon and Sun (standard BMP unicode in Minecraft font, no surrogate pairs or VS16)
         String moonEmoji = "\u263E"; // ☾
@@ -4169,18 +4165,18 @@ public class BuildScapeConfigScreen extends Screen {
         // Ambient unselected emoji on the inactive side of the track
         if (pos > 0.25f) {
             int moonDimCol = applyAlpha(COLOR_TEXT_MUTED, alpha * Math.min(1.0f, pos) * 0.45f);
-            drawCenteredText(poseStackOrGraphics, font, moonEmoji, leftX, textY, moonDimCol);
+            drawCenteredText(poseStack, font, moonEmoji, leftX, textY, moonDimCol);
         }
         if (pos < 0.75f) {
             int sunDimCol = applyAlpha(COLOR_TEXT_MUTED, alpha * Math.min(1.0f, 1.0f - pos) * 0.45f);
-            drawCenteredText(poseStackOrGraphics, font, sunEmoji, rightX, textY, sunDimCol);
+            drawCenteredText(poseStack, font, sunEmoji, rightX, textY, sunDimCol);
         }
 
         // Active emoji directly centered on the sliding knob
         int knobCenterX = knobX + knobSize / 2;
         String activeEmoji = pos < 0.5f ? moonEmoji : sunEmoji;
         int activeCol = applyAlpha(COLOR_TEXT_WHITE, alpha);
-        drawCenteredText(poseStackOrGraphics, font, activeEmoji, knobCenterX, textY, activeCol);
+        drawCenteredText(poseStack, font, activeEmoji, knobCenterX, textY, activeCol);
 
         if (hover) {
             List<Component> tip = new ArrayList<>();
@@ -4194,48 +4190,48 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
-    private void renderRoundedPill(Object poseStackOrGraphics, int x, int y, int w, int h, int bgCol, int borderCol, float alpha) {
+    private void renderRoundedPill(PoseStack poseStack, int x, int y, int w, int h, int bgCol, int borderCol, float alpha) {
         int bg = applyAlpha(bgCol, alpha);
         int border = applyAlpha(borderCol, alpha);
 
         // Background interior
-        fill(poseStackOrGraphics, x + 3, y, x + w - 3, y + h, bg);
-        fill(poseStackOrGraphics, x + 1, y + 1, x + 3, y + h - 1, bg);
-        fill(poseStackOrGraphics, x + w - 3, y + 1, x + w - 1, y + h - 1, bg);
-        fill(poseStackOrGraphics, x, y + 3, x + 1, y + h - 3, bg);
-        fill(poseStackOrGraphics, x + w - 1, y + 3, x + w, y + h - 3, bg);
+        fillBatched(poseStack, x + 3, y, x + w - 3, y + h, bg);
+        fillBatched(poseStack, x + 1, y + 1, x + 3, y + h - 1, bg);
+        fillBatched(poseStack, x + w - 3, y + 1, x + w - 1, y + h - 1, bg);
+        fillBatched(poseStack, x, y + 3, x + 1, y + h - 3, bg);
+        fillBatched(poseStack, x + w - 1, y + 3, x + w, y + h - 3, bg);
 
         // Border
-        fill(poseStackOrGraphics, x + 3, y, x + w - 3, y + 1, border);
-        fill(poseStackOrGraphics, x + 3, y + h - 1, x + w - 3, y + h, border);
-        fill(poseStackOrGraphics, x, y + 3, x + 1, y + h - 3, border);
-        fill(poseStackOrGraphics, x + w - 1, y + 3, x + w, y + h - 3, border);
-        fill(poseStackOrGraphics, x + 1, y + 1, x + 3, y + 2, border);
-        fill(poseStackOrGraphics, x + 1, y + 2, x + 2, y + 3, border);
-        fill(poseStackOrGraphics, x + w - 3, y + 1, x + w - 1, y + 2, border);
-        fill(poseStackOrGraphics, x + w - 2, y + 2, x + w - 1, y + 3, border);
-        fill(poseStackOrGraphics, x + 1, y + h - 2, x + 3, y + h - 1, border);
-        fill(poseStackOrGraphics, x + 1, y + h - 3, x + 2, y + h - 2, border);
-        fill(poseStackOrGraphics, x + w - 3, y + h - 2, x + w - 1, y + h - 1, border);
-        fill(poseStackOrGraphics, x + w - 2, y + h - 3, x + w - 1, y + h - 2, border);
+        fillBatched(poseStack, x + 3, y, x + w - 3, y + 1, border);
+        fillBatched(poseStack, x + 3, y + h - 1, x + w - 3, y + h, border);
+        fillBatched(poseStack, x, y + 3, x + 1, y + h - 3, border);
+        fillBatched(poseStack, x + w - 1, y + 3, x + w, y + h - 3, border);
+        fillBatched(poseStack, x + 1, y + 1, x + 3, y + 2, border);
+        fillBatched(poseStack, x + 1, y + 2, x + 2, y + 3, border);
+        fillBatched(poseStack, x + w - 3, y + 1, x + w - 1, y + 2, border);
+        fillBatched(poseStack, x + w - 2, y + 2, x + w - 1, y + 3, border);
+        fillBatched(poseStack, x + 1, y + h - 2, x + 3, y + h - 1, border);
+        fillBatched(poseStack, x + 1, y + h - 3, x + 2, y + h - 2, border);
+        fillBatched(poseStack, x + w - 3, y + h - 2, x + w - 1, y + h - 1, border);
+        fillBatched(poseStack, x + w - 2, y + h - 3, x + w - 1, y + h - 2, border);
     }
 
-    private void renderRoundedKnob(Object poseStackOrGraphics, int x, int y, int size, int bgCol, int borderCol, float alpha) {
+    private void renderRoundedKnob(PoseStack poseStack, int x, int y, int size, int bgCol, int borderCol, float alpha) {
         int bg = applyAlpha(bgCol, alpha);
         int border = applyAlpha(borderCol, alpha);
 
-        fill(poseStackOrGraphics, x + 2, y, x + size - 2, y + size, bg);
-        fill(poseStackOrGraphics, x + 1, y + 1, x + size - 1, y + size - 1, bg);
-        fill(poseStackOrGraphics, x, y + 2, x + size, y + size - 2, bg);
+        fillBatched(poseStack, x + 2, y, x + size - 2, y + size, bg);
+        fillBatched(poseStack, x + 1, y + 1, x + size - 1, y + size - 1, bg);
+        fillBatched(poseStack, x, y + 2, x + size, y + size - 2, bg);
 
-        fill(poseStackOrGraphics, x + 2, y, x + size - 2, y + 1, border);
-        fill(poseStackOrGraphics, x + 2, y + size - 1, x + size - 2, y + size, border);
-        fill(poseStackOrGraphics, x, y + 2, x + 1, y + size - 2, border);
-        fill(poseStackOrGraphics, x + size - 1, y + 2, x + size, y + size - 2, border);
-        fill(poseStackOrGraphics, x + 1, y + 1, x + 2, y + 2, border);
-        fill(poseStackOrGraphics, x + size - 2, y + 1, x + size - 1, y + 2, border);
-        fill(poseStackOrGraphics, x + 1, y + size - 2, x + 2, y + size - 1, border);
-        fill(poseStackOrGraphics, x + size - 2, y + size - 2, x + size - 1, y + size - 1, border);
+        fillBatched(poseStack, x + 2, y, x + size - 2, y + 1, border);
+        fillBatched(poseStack, x + 2, y + size - 1, x + size - 2, y + size, border);
+        fillBatched(poseStack, x, y + 2, x + 1, y + size - 2, border);
+        fillBatched(poseStack, x + size - 1, y + 2, x + size, y + size - 2, border);
+        fillBatched(poseStack, x + 1, y + 1, x + 2, y + 2, border);
+        fillBatched(poseStack, x + size - 2, y + 1, x + size - 1, y + 2, border);
+        fillBatched(poseStack, x + 1, y + size - 2, x + 2, y + size - 1, border);
+        fillBatched(poseStack, x + size - 2, y + size - 2, x + size - 1, y + size - 1, border);
     }
 
     private void handleHeaderThemeToggleClick(double mouseX, int toggleX, int toggleW) {
@@ -4254,16 +4250,16 @@ public class BuildScapeConfigScreen extends Screen {
         themeToggleAnimFrom = themeToggleAnimPos;
     }
 
-    private void renderSidePanelPillarDetail(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+    private void renderSidePanelPillarDetail(PoseStack poseStack, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         String activeId = selectedPillarDetailId != null ? selectedPillarDetailId : closingPillarDetailId;
         PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(activeId);
         if (data == null) {
-            drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
-            drawCenteredText(poseStackOrGraphics, font, "No pillar selected", x + w / 2, y + h / 2 - 4, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            drawBeveledComponent(poseStack, x, y, w, h, COLOR_INNER_DARK, alpha);
+            drawCenteredText(poseStack, font, "No pillar selected", x + w / 2, y + h / 2 - 4, applyAlpha(COLOR_TEXT_MUTED, alpha));
             return;
         }
 
-        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+        drawBeveledComponent(poseStack, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         PillarParticleConfig globalCfg = PillarParticleConfig.get();
 
@@ -4286,10 +4282,10 @@ public class BuildScapeConfigScreen extends Screen {
 
         if (isPillarSwitching) {
             float pulseAlpha = (1.0f - switchProgress) * 0.45f * alpha;
-            fill(poseStackOrGraphics, x + 2, y + 1, x + w - 2, y + 2, applyAlpha(COLOR_ACCENT, pulseAlpha));
+            fillBatched(poseStack, x + 2, y + 1, x + w - 2, y + 2, applyAlpha(COLOR_ACCENT, pulseAlpha));
         }
 
-        enableGuiScissor(poseStackOrGraphics, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
+        enableGuiScissor(poseStack, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
 
         int curY = y + 3 - sidePanelScrollOffset;
         int rowH = 20;
@@ -4300,34 +4296,34 @@ public class BuildScapeConfigScreen extends Screen {
         // Row 0: Coordinates & Dimension badge
         String dimStr = formatDimensionName(data.dimension);
         String locStr = String.format("%s · %d, %d, %d", dimStr, data.x, data.y, data.z);
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, 14, COLOR_BTN_BG, false, false, contentAlpha);
-        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 3, applyAlpha(COLOR_TEXT_SILVER, contentAlpha));
+        drawBeveledButton(poseStack, rowX, curY, rowW, 14, COLOR_BTN_BG, false, false, contentAlpha);
+        drawCenteredText(poseStack, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 3, applyAlpha(COLOR_TEXT_SILVER, contentAlpha));
         curY += 14 + rowGap;
 
         // Row 1: Custom Pattern Toggle
         boolean usePat = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
-        renderSideRowToggle(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Custom Pattern", usePat, mouseX, mouseY, contentAlpha);
+        renderSideRowToggle(poseStack, font, rowX, curY, rowW, rowH, "Custom Pattern", usePat, mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 2: Particle Pattern Cycle
         String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
         String patDisplay = curPat.substring(0, 1).toUpperCase() + curPat.substring(1);
-        renderSideRowCycle(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Pattern", patDisplay, mouseX, mouseY, contentAlpha);
+        renderSideRowCycle(poseStack, font, rowX, curY, rowW, rowH, "Pattern", patDisplay, mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 3: Speed Counter
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Speed", ParticleRange.PATTERN_SPEED, speed, mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStack, font, rowX, curY, rowW, rowH, "Speed", ParticleRange.PATTERN_SPEED, speed, mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 4: Spread Counter
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Spread", ParticleRange.PATTERN_SPREAD, spread, mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStack, font, rowX, curY, rowW, rowH, "Spread", ParticleRange.PATTERN_SPREAD, spread, mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 5: Intensity Counter
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Intensity", ParticleRange.PATTERN_INTENSITY, intensity, mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStack, font, rowX, curY, rowW, rowH, "Intensity", ParticleRange.PATTERN_INTENSITY, intensity, mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 6: Per-Pillar Colors Palette
@@ -4336,28 +4332,28 @@ public class BuildScapeConfigScreen extends Screen {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
         int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(7, Math.max(1, colors.size())));
-        renderSideRowPalette(poseStackOrGraphics, font, rowX, curY, rowW, 32, colors, maxColors, mouseX, mouseY, contentAlpha);
+        renderSideRowPalette(poseStack, font, rowX, curY, rowW, 32, colors, maxColors, mouseX, mouseY, contentAlpha);
         curY += 32 + rowGap;
 
         // Embedded Inline Color Picker at bottom of details panel
-        curY = renderInlinePillarColorPicker(poseStackOrGraphics, font, rowX, curY, rowW, data, mouseX, mouseY, contentAlpha);
+        curY = renderInlinePillarColorPicker(poseStack, font, rowX, curY, rowW, data, mouseX, mouseY, contentAlpha);
         curY += rowGap;
 
         // Row 7: Save Button
         int btnH = 18;
         boolean hoverSave = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         hoverConfigAccess(hoverSave, ConfigSetting.PILLAR_EDIT, false, false, false);
-        drawBeveledGreenButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverSave, contentAlpha);
-        drawCenteredText(poseStackOrGraphics, font, "✓ Save Pillar", rowX + rowW / 2, curY + 5, applyAlpha(hoverSave ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, contentAlpha));
+        drawBeveledGreenButton(poseStack, rowX, curY, rowW, btnH, hoverSave, contentAlpha);
+        drawCenteredText(poseStack, font, "✓ Save Pillar", rowX + rowW / 2, curY + 5, applyAlpha(hoverSave ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, contentAlpha));
         curY += btnH + rowGap;
 
         // Row 8: Locate in World
         boolean hoverLoc = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
-        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverLoc ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverLoc, false, contentAlpha);
-        drawCenteredText(poseStackOrGraphics, font, "⌖ Locate in World", rowX + rowW / 2, curY + 5, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, contentAlpha));
+        drawBeveledButton(poseStack, rowX, curY, rowW, btnH, hoverLoc ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverLoc, false, contentAlpha);
+        drawCenteredText(poseStack, font, "⌖ Locate in World", rowX + rowW / 2, curY + 5, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, contentAlpha));
         curY += btnH + 3;
 
-        disableGuiScissor(poseStackOrGraphics);
+        disableGuiScissor(poseStack);
 
         int totalContentH = (curY + sidePanelScrollOffset) - y;
         sidePanelMaxScroll = Math.max(0, totalContentH - h);
@@ -4368,7 +4364,7 @@ public class BuildScapeConfigScreen extends Screen {
             int sbX = x + w - sbW - 1;
             int sbY = y + 2;
             int sbH = Math.max(1, h - 4);
-            renderCustomScrollbar(poseStackOrGraphics, sbX, sbY, sbW, sbH, sidePanelScrollOffset, sidePanelMaxScroll, mouseX, mouseY, alpha, true);
+            renderCustomScrollbar(poseStack, sbX, sbY, sbW, sbH, sidePanelScrollOffset, sidePanelMaxScroll, mouseX, mouseY, alpha, true);
         }
     }
 
@@ -4394,7 +4390,7 @@ public class BuildScapeConfigScreen extends Screen {
         PillarIdManager.getClient().updatePillarData(data);
     }
 
-    private int renderInlinePillarColorPicker(Object poseStackOrGraphics, Font font, int x, int curY, int w, PillarIdManager.PillarData data, int mouseX, int mouseY, float alpha) {
+    private int renderInlinePillarColorPicker(PoseStack poseStack, Font font, int x, int curY, int w, PillarIdManager.PillarData data, int mouseX, int mouseY, float alpha) {
         if (editingColorIndex < 0) editingColorIndex = 0;
         int pad = 4;
         int hueW = 12;
@@ -4416,27 +4412,27 @@ public class BuildScapeConfigScreen extends Screen {
         this.inlinePickerHueH = hueH;
 
         // 2D Sat x Bri Box
-        ConfigGuiBatch.colorField(asPose(poseStackOrGraphics), gradX, gradY, gradW, gradH, hsbToRgb(pickerHue, 1, 1), alpha);
-        drawBorder(poseStackOrGraphics, gradX - 1, gradY - 1, gradW + 2, gradH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        ConfigGuiBatch.colorField(poseStack, gradX, gradY, gradW, gradH, hsbToRgb(pickerHue, 1, 1), alpha);
+        drawBorder(poseStack, gradX - 1, gradY - 1, gradW + 2, gradH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         // Crosshair
         int crossX = gradX + (int) (pickerSat * gradW);
         int crossY = gradY + (int) ((1.0f - pickerBri) * gradH);
-        drawBorder(poseStackOrGraphics, crossX - 3, crossY - 3, 6, 6, applyAlpha(COLOR_FRAME_BLACK, alpha));
-        drawBorder(poseStackOrGraphics, crossX - 2, crossY - 2, 4, 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBorder(poseStack, crossX - 3, crossY - 3, 6, 6, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStack, crossX - 2, crossY - 2, 4, 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         // Hue Slider
         for (int hy = 0; hy < hueH; hy += 2) {
             float hVal = (hy / (float) hueH) * 360.0f;
             int col = hsbToRgb(hVal, 1.0f, 1.0f);
             int hh = Math.min(2, hueH - hy);
-            fill(poseStackOrGraphics, hueX, hueY + hy, hueX + hueW, hueY + hy + hh, applyAlpha(col, alpha));
+            fillBatched(poseStack, hueX, hueY + hy, hueX + hueW, hueY + hy + hh, applyAlpha(col, alpha));
         }
-        drawBorder(poseStackOrGraphics, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStack, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         int thumbY = hueY + (int) ((pickerHue / 360.0f) * hueH);
-        fill(poseStackOrGraphics, hueX - 1, thumbY - 1, hueX + hueW + 1, thumbY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
-        drawBorder(poseStackOrGraphics, hueX - 1, thumbY - 1, hueW + 2, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        fillBatched(poseStack, hueX - 1, thumbY - 1, hueX + hueW + 1, thumbY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBorder(poseStack, hueX - 1, thumbY - 1, hueW + 2, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         curY += gradH + 4;
 
@@ -4451,17 +4447,17 @@ public class BuildScapeConfigScreen extends Screen {
         }
 
         int prevSize = 14;
-        fill(poseStackOrGraphics, gradX, curY, gradX + prevSize, curY + prevSize, applyAlpha(currentColorInt, alpha));
-        drawBorder(poseStackOrGraphics, gradX, curY, prevSize, prevSize, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        fillBatched(poseStack, gradX, curY, gradX + prevSize, curY + prevSize, applyAlpha(currentColorInt, alpha));
+        drawBorder(poseStack, gradX, curY, prevSize, prevSize, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         int hexX = gradX + prevSize + 4;
         int hexW = w - prevSize - 6;
         boolean validHex = parseHexColor(hexColorInput) >= 0;
-        drawBeveledButton(poseStackOrGraphics, hexX, curY, hexW, prevSize, COLOR_SLOT_BG, false, hexColorFocused, alpha);
-        drawBorder(poseStackOrGraphics, hexX, curY, hexW, prevSize,
+        drawBeveledButton(poseStack, hexX, curY, hexW, prevSize, COLOR_SLOT_BG, false, hexColorFocused, alpha);
+        drawBorder(poseStack, hexX, curY, hexW, prevSize,
                 applyAlpha(validHex || !hexColorFocused ? COLOR_SLOT_BORDER : COLOR_TOGGLE_OFF_BORDER, alpha));
         String displayedHex = hexColorInput + (hexColorFocused && !hexColorSelected ? "_" : "");
-        drawText(poseStackOrGraphics, font, trimTextToWidth(font, displayedHex, hexW - 8, true), hexX + 4, curY + 3,
+        drawText(poseStack, font, trimTextToWidth(font, displayedHex, hexW - 8, true), hexX + 4, curY + 3,
                 applyAlpha(hexColorSelected ? COLOR_ACCENT : COLOR_TEXT_WHITE, alpha));
 
         curY += prevSize + 3;
@@ -4473,16 +4469,16 @@ public class BuildScapeConfigScreen extends Screen {
         int presetsToShow = Math.min(PALETTE_PRESETS.length, pCols);
         for (int p = 0; p < presetsToShow; p++) {
             int px = gradX + p * (pSize + pGap);
-            fill(poseStackOrGraphics, px, curY, px + pSize, curY + pSize, applyAlpha(PALETTE_PRESETS[p], alpha));
-            drawBorder(poseStackOrGraphics, px, curY, pSize, pSize, applyAlpha(0xFF000000, alpha));
+            fillBatched(poseStack, px, curY, px + pSize, curY + pSize, applyAlpha(PALETTE_PRESETS[p], alpha));
+            drawBorder(poseStack, px, curY, pSize, pSize, applyAlpha(0xFF000000, alpha));
         }
         curY += pSize + 3;
 
         return curY;
     }
 
-    private void renderSidePanelColorPicker(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
-        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+    private void renderSidePanelColorPicker(PoseStack poseStack, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+        drawBeveledComponent(poseStack, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         int pad = 6;
         int curY = y + pad;
@@ -4497,28 +4493,28 @@ public class BuildScapeConfigScreen extends Screen {
         int hueY = gradY;
         int hueH = gradH;
 
-        ConfigGuiBatch.colorField(asPose(poseStackOrGraphics), gradX, gradY,
+        ConfigGuiBatch.colorField(poseStack, gradX, gradY,
                 gradW, gradH, hsbToRgb(pickerHue, 1, 1), alpha);
-        drawBorder(poseStackOrGraphics, gradX - 1, gradY - 1, gradW + 2, gradH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStack, gradX - 1, gradY - 1, gradW + 2, gradH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         // Crosshair
         int crossX = gradX + (int) (pickerSat * gradW);
         int crossY = gradY + (int) ((1.0f - pickerBri) * gradH);
-        drawBorder(poseStackOrGraphics, crossX - 3, crossY - 3, 6, 6, applyAlpha(COLOR_FRAME_BLACK, alpha));
-        drawBorder(poseStackOrGraphics, crossX - 2, crossY - 2, 4, 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBorder(poseStack, crossX - 3, crossY - 3, 6, 6, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStack, crossX - 2, crossY - 2, 4, 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         // Hue Slider
         for (int hy = 0; hy < hueH; hy += 3) {
             float hVal = (hy / (float) hueH) * 360.0f;
             int col = hsbToRgb(hVal, 1.0f, 1.0f);
             int hh = Math.min(3, hueH - hy);
-            fill(poseStackOrGraphics, hueX, hueY + hy, hueX + hueW, hueY + hy + hh, applyAlpha(col, alpha));
+            fillBatched(poseStack, hueX, hueY + hy, hueX + hueW, hueY + hy + hh, applyAlpha(col, alpha));
         }
-        drawBorder(poseStackOrGraphics, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStack, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         int thumbY = hueY + (int) ((pickerHue / 360.0f) * hueH);
-        fill(poseStackOrGraphics, hueX - 2, thumbY - 1, hueX + hueW + 2, thumbY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
-        drawBorder(poseStackOrGraphics, hueX - 2, thumbY - 1, hueW + 4, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        fillBatched(poseStack, hueX - 2, thumbY - 1, hueX + hueW + 2, thumbY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBorder(poseStack, hueX - 2, thumbY - 1, hueW + 4, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         curY += gradH + 8;
 
@@ -4533,22 +4529,22 @@ public class BuildScapeConfigScreen extends Screen {
         }
 
         int prevSize = 20;
-        fill(poseStackOrGraphics, gradX, curY, gradX + prevSize, curY + prevSize, applyAlpha(currentColorInt, alpha));
-        drawBorder(poseStackOrGraphics, gradX, curY, prevSize, prevSize, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        fillBatched(poseStack, gradX, curY, gradX + prevSize, curY + prevSize, applyAlpha(currentColorInt, alpha));
+        drawBorder(poseStack, gradX, curY, prevSize, prevSize, applyAlpha(COLOR_FRAME_BLACK, alpha));
         int hexX = gradX + prevSize + 6;
         int hexW = gradW + hueW + pad - prevSize - 6;
         boolean validHex = parseHexColor(hexColorInput) >= 0;
-        drawBeveledButton(poseStackOrGraphics, hexX, curY, hexW, prevSize, COLOR_SLOT_BG, false, hexColorFocused, alpha);
-        drawBorder(poseStackOrGraphics, hexX, curY, hexW, prevSize,
+        drawBeveledButton(poseStack, hexX, curY, hexW, prevSize, COLOR_SLOT_BG, false, hexColorFocused, alpha);
+        drawBorder(poseStack, hexX, curY, hexW, prevSize,
                 applyAlpha(validHex || !hexColorFocused ? COLOR_SLOT_BORDER : COLOR_TOGGLE_OFF_BORDER, alpha));
         String displayedHex = hexColorInput + (hexColorFocused && !hexColorSelected ? "_" : "");
-        drawText(poseStackOrGraphics, font, trimTextToWidth(font, displayedHex, hexW - 10, true), hexX + 5, curY + 6,
+        drawText(poseStack, font, trimTextToWidth(font, displayedHex, hexW - 10, true), hexX + 5, curY + 6,
                 applyAlpha(hexColorSelected ? COLOR_ACCENT : COLOR_TEXT_WHITE, alpha));
 
         curY += prevSize + 8;
 
         // 3. Preset Swatches
-        drawText(poseStackOrGraphics, font, "Presets:", gradX, curY, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        drawText(poseStack, font, "Presets:", gradX, curY, applyAlpha(COLOR_TEXT_MUTED, alpha));
         curY += 11;
         int pSize = 13;
         int pGap = 3;
@@ -4556,8 +4552,8 @@ public class BuildScapeConfigScreen extends Screen {
         for (int p = 0; p < PALETTE_PRESETS.length; p++) {
             int px = gradX + (p % pCols) * (pSize + pGap);
             int py = curY + (p / pCols) * (pSize + pGap);
-            fill(poseStackOrGraphics, px, py, px + pSize, py + pSize, applyAlpha(PALETTE_PRESETS[p], alpha));
-            drawBorder(poseStackOrGraphics, px, py, pSize, pSize, applyAlpha(0xFF000000, alpha));
+            fillBatched(poseStack, px, py, px + pSize, py + pSize, applyAlpha(PALETTE_PRESETS[p], alpha));
+            drawBorder(poseStack, px, py, pSize, pSize, applyAlpha(0xFF000000, alpha));
         }
         int pRows = (int) Math.ceil((double) PALETTE_PRESETS.length / pCols);
         curY += pRows * (pSize + pGap) + 10;
@@ -4568,20 +4564,20 @@ public class BuildScapeConfigScreen extends Screen {
         boolean hoverApply = mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH;
         hoverConfigAccess(hoverApply, isEditingPillarColor ? ConfigSetting.PILLAR_EDIT
                 : ConfigSetting.COLORS, false, !isEditingPillarColor, false);
-        drawBeveledGreenButton(poseStackOrGraphics, gradX, curY, btnW, btnH, hoverApply, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "✓ Apply Color", gradX + btnW / 2, curY + 4, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
+        drawBeveledGreenButton(poseStack, gradX, curY, btnW, btnH, hoverApply, alpha);
+        drawCenteredText(poseStack, font, "✓ Apply Color", gradX + btnW / 2, curY + 4, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
         curY += btnH + 4;
 
         if (returnSidePanelType == SidePanelType.PILLAR_DETAIL) {
             boolean hoverBack = mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH;
-            drawBeveledButton(poseStackOrGraphics, gradX, curY, btnW, btnH, hoverBack ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBack, false, alpha);
-            drawCenteredText(poseStackOrGraphics, font, "◀ Back to Pillar", gradX + btnW / 2, curY + 4, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+            drawBeveledButton(poseStack, gradX, curY, btnW, btnH, hoverBack ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBack, false, alpha);
+            drawCenteredText(poseStack, font, "◀ Back to Pillar", gradX + btnW / 2, curY + 4, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         }
     }
 
-    private void renderSideRowToggle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, boolean val, int mouseX, int mouseY, float alpha) {
-        drawBeveledButton(poseStackOrGraphics, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
+    private void renderSideRowToggle(PoseStack poseStack, Font font, int x, int y, int w, int h, String label, boolean val, int mouseX, int mouseY, float alpha) {
+        drawBeveledButton(poseStack, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStack, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int btnW = 26;
         int btnH = 16;
@@ -4589,24 +4585,24 @@ public class BuildScapeConfigScreen extends Screen {
         int btnY = y + (h - btnH) / 2;
         boolean hover = mouseX >= btnX - 2 && mouseX <= btnX + btnW + 2 && mouseY >= btnY - 2 && mouseY <= btnY + btnH + 2;
 
-        renderToggleButton(poseStackOrGraphics, "side_" + label, btnX, btnY, val, hover, alpha);
+        renderToggleButton(poseStack, "side_" + label, btnX, btnY, val, hover, alpha);
     }
 
-    private void renderSideRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
-        drawBeveledButton(poseStackOrGraphics, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
+    private void renderSideRowCycle(PoseStack poseStack, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
+        drawBeveledButton(poseStack, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStack, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int btnW = 66;
         int btnH = 16;
         int btnX = x + w - btnW - 4;
         int btnY = y + (h - btnH) / 2;
         boolean hover = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
-        drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hover, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(value, btnW - 4), btnX + btnW / 2, btnY + 4, applyAlpha(hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, btnX, btnY, btnW, btnH, hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hover, false, alpha);
+        drawCenteredText(poseStack, font, font.plainSubstrByWidth(value, btnW - 4), btnX + btnW / 2, btnY + 4, applyAlpha(hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
-    private void renderSideRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, ParticleRange range, double value, int mouseX, int mouseY, float alpha) {
-        renderSideRowCounter(poseStackOrGraphics, font, x, y, w, h, label, range.formatValue(value), mouseX, mouseY, alpha);
+    private void renderSideRowCounter(PoseStack poseStack, Font font, int x, int y, int w, int h, String label, ParticleRange range, double value, int mouseX, int mouseY, float alpha) {
+        renderSideRowCounter(poseStack, font, x, y, w, h, label, range.formatValue(value), mouseX, mouseY, alpha);
         int counterX = x + w - 74 - 4;
         int counterY = y + (h - 16) / 2;
         if (mouseX >= counterX && mouseX <= counterX + 74 && mouseY >= counterY && mouseY <= counterY + 16) {
@@ -4616,9 +4612,9 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
-    private void renderSideRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
-        drawBeveledButton(poseStackOrGraphics, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
+    private void renderSideRowCounter(PoseStack poseStack, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
+        drawBeveledButton(poseStack, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStack, font, label, x + 4, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int counterW = 74;
         int counterH = 16;
@@ -4627,24 +4623,24 @@ public class BuildScapeConfigScreen extends Screen {
         int stepW = 15;
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
-        drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBeveledButton(poseStack, counterX, counterY, stepW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
+        drawCenteredText(poseStack, font, "−", counterX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int valX = counterX + stepW;
         int valW = counterW - stepW * 2;
-        fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
-        drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        drawCenteredText(poseStackOrGraphics, font, value, valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        fillBatched(poseStack, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
+        drawBorder(poseStack, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
+        drawCenteredText(poseStack, font, value, valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
-        drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBeveledButton(poseStack, plusX, counterY, stepW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
+        drawCenteredText(poseStack, font, "+", plusX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
     }
 
-    private void renderSideRowPalette(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, List<String> colors, int maxColors, int mouseX, int mouseY, float alpha) {
-        drawBeveledButton(poseStackOrGraphics, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
-        drawText(poseStackOrGraphics, font, "Colors (" + maxColors + "/7)", x + 4, y + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+    private void renderSideRowPalette(PoseStack poseStack, Font font, int x, int y, int w, int h, List<String> colors, int maxColors, int mouseX, int mouseY, float alpha) {
+        drawBeveledButton(poseStack, x, y, w, h, COLOR_ROW_BG, false, false, alpha);
+        drawText(poseStack, font, "Colors (" + maxColors + "/7)", x + 4, y + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int counterW = 60;
         int counterH = 16;
@@ -4653,19 +4649,19 @@ public class BuildScapeConfigScreen extends Screen {
         int stepW = 13;
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
-        drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBeveledButton(poseStack, counterX, counterY, stepW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
+        drawCenteredText(poseStack, font, "−", counterX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int valX = counterX + stepW;
         int valW = counterW - stepW * 2;
-        fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
-        drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        drawCenteredText(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        fillBatched(poseStack, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
+        drawBorder(poseStack, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
+        drawCenteredText(poseStack, font, String.valueOf(maxColors), valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
-        drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBeveledButton(poseStack, plusX, counterY, stepW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
+        drawCenteredText(poseStack, font, "+", plusX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int swSize = 13;
         int swGap = 4;
@@ -4681,106 +4677,106 @@ public class BuildScapeConfigScreen extends Screen {
             }
 
             boolean active = i < maxColors;
-            fill(poseStackOrGraphics, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, active ? alpha : alpha * 0.30f));
+            fillBatched(poseStack, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, active ? alpha : alpha * 0.30f));
             int borderCol = active ? COLOR_TEXT_WHITE : COLOR_SLOT_BORDER;
-            drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(borderCol, alpha));
+            drawBorder(poseStack, swX, swY, swSize, swSize, applyAlpha(borderCol, alpha));
 
             if ((isEditingPillarColor || sidePanelType == SidePanelType.PILLAR_DETAIL) && i == editingColorIndex) {
-                drawBorder(poseStackOrGraphics, swX - 1, swY - 1, swSize + 2, swSize + 2, applyAlpha(COLOR_ACCENT, alpha));
+                drawBorder(poseStack, swX - 1, swY - 1, swSize + 2, swSize + 2, applyAlpha(COLOR_ACCENT, alpha));
             } else if (mouseX >= swX && mouseX <= swX + swSize && mouseY >= swY && mouseY <= swY + swSize) {
-                drawBorder(poseStackOrGraphics, swX - 1, swY - 1, swSize + 2, swSize + 2, applyAlpha(COLOR_ACCENT_GLOW, alpha * 0.7f));
+                drawBorder(poseStack, swX - 1, swY - 1, swSize + 2, swSize + 2, applyAlpha(COLOR_ACCENT_GLOW, alpha * 0.7f));
             }
         }
     }
-    private void drawHorizontalGradientLine(Object poseStackOrGraphics, int x, int y, int w, int startCol, int endCol, float alpha) {
+    private void drawHorizontalGradientLine(PoseStack poseStack, int x, int y, int w, int startCol, int endCol, float alpha) {
         if (w <= 0) return;
         if (w <= 6) {
             int col = lerpColor(startCol, endCol, 0.5f);
-            fill(poseStackOrGraphics, x, y, x + w, y + 1, applyAlpha(col, alpha));
+            fillBatched(poseStack, x, y, x + w, y + 1, applyAlpha(col, alpha));
             return;
         }
         int left = applyAlpha(startCol, alpha), right = applyAlpha(endCol, alpha);
-        ConfigGuiBatch.gradient(asPose(poseStackOrGraphics), x, y, x + w, y + 1, left, right, right, left);
+        ConfigGuiBatch.gradient(poseStack, x, y, x + w, y + 1, left, right, right, left);
     }
 
-    private void drawVerticalGradientLine(Object poseStackOrGraphics, int x, int y, int h, int startCol, int endCol, float alpha) {
+    private void drawVerticalGradientLine(PoseStack poseStack, int x, int y, int h, int startCol, int endCol, float alpha) {
         if (h <= 0) return;
         if (h <= 6) {
             int col = lerpColor(startCol, endCol, 0.5f);
-            fill(poseStackOrGraphics, x, y, x + 1, y + h, applyAlpha(col, alpha));
+            fillBatched(poseStack, x, y, x + 1, y + h, applyAlpha(col, alpha));
             return;
         }
         int top = applyAlpha(startCol, alpha), bottom = applyAlpha(endCol, alpha);
-        ConfigGuiBatch.gradient(asPose(poseStackOrGraphics), x, y, x + 1, y + h, top, top, bottom, bottom);
+        ConfigGuiBatch.gradient(poseStack, x, y, x + 1, y + h, top, top, bottom, bottom);
     }
 
-    private void drawBeveledComponent(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
+    private void drawBeveledComponent(PoseStack poseStack, int x, int y, int w, int h, int bgRgb, float alpha) {
         // 1. Interior Fill
-        fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bgRgb, alpha));
+        fillBatched(poseStack, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bgRgb, alpha));
 
         // 2. Bottom & Right dark recessed shadow
         int dark = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-        fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
-        fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
+        fillBatched(poseStack, x, y + h - 1, x + w, y + h, dark);
+        fillBatched(poseStack, x + w - 1, y, x + w, y + h, dark);
 
         // 3. Top & Left Metallic Gradient Highlights
-        drawHorizontalGradientLine(poseStackOrGraphics, x, y, w - 1, COLOR_BEVEL_HIGHLIGHT, COLOR_BORDER_SHADOW, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, x, y, h - 1, COLOR_BEVEL_HIGHLIGHT, COLOR_BORDER_SHADOW, alpha);
+        drawHorizontalGradientLine(poseStack, x, y, w - 1, COLOR_BEVEL_HIGHLIGHT, COLOR_BORDER_SHADOW, alpha);
+        drawVerticalGradientLine(poseStack, x, y, h - 1, COLOR_BEVEL_HIGHLIGHT, COLOR_BORDER_SHADOW, alpha);
     }
 
     // Top & Left Metallic Gradient Button Frame
-    private void drawBeveledButton(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, boolean hover, boolean active, float alpha) {
+    private void drawBeveledButton(PoseStack poseStack, int x, int y, int w, int h, int bgRgb, boolean hover, boolean active, float alpha) {
         int bg = bgRgb;
         if (active) {
             bg = hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE;
         } else if (hover) {
             bg = COLOR_BTN_BG_HOVER;
         }
-        fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
+        fillBatched(poseStack, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
 
         int dark = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-        fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
-        fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
+        fillBatched(poseStack, x, y + h - 1, x + w, y + h, dark);
+        fillBatched(poseStack, x + w - 1, y, x + w, y + h, dark);
 
         int startCol = active ? COLOR_BEVEL_HIGHLIGHT : (hover ? COLOR_BORDER_GRADIENT_START : COLOR_BTN_BORDER);
         int endCol = active ? COLOR_BORDER_SHADOW : (hover ? COLOR_BORDER_GRADIENT_END : COLOR_BEVEL_SHADOW);
 
-        drawHorizontalGradientLine(poseStackOrGraphics, x, y, w - 1, startCol, endCol, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, x, y, h - 1, startCol, endCol, alpha);
+        drawHorizontalGradientLine(poseStack, x, y, w - 1, startCol, endCol, alpha);
+        drawVerticalGradientLine(poseStack, x, y, h - 1, startCol, endCol, alpha);
     }
 
     // Top & Left Metallic Green Button (for Apply / ON states)
-    private void drawBeveledGreenButton(Object poseStackOrGraphics, int x, int y, int w, int h, boolean hover, float alpha) {
+    private void drawBeveledGreenButton(PoseStack poseStack, int x, int y, int w, int h, boolean hover, float alpha) {
         boolean light = currentTheme != null && currentTheme.isLight();
         int bg = hover ? (light ? 0xFFBBF7D0 : 0xFF1E4828) : COLOR_TOGGLE_ON_BG;
-        fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
+        fillBatched(poseStack, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
 
         int dark = applyAlpha(light ? 0xFF86EFAC : 0xFF0A2412, alpha);
-        fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
-        fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
+        fillBatched(poseStack, x, y + h - 1, x + w, y + h, dark);
+        fillBatched(poseStack, x + w - 1, y, x + w, y + h, dark);
 
         int startCol = hover ? (light ? 0xFF4ADE80 : 0xFFCEFFE0) : (light ? 0xFF86EFAC : 0xFF86EFAC);
         int endCol = hover ? (light ? 0xFF22C55E : 0xFF4ADE80) : (light ? 0xFF22C55E : 0xFF22C55E);
 
-        drawHorizontalGradientLine(poseStackOrGraphics, x, y, w - 1, startCol, endCol, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, x, y, h - 1, startCol, endCol, alpha);
+        drawHorizontalGradientLine(poseStack, x, y, w - 1, startCol, endCol, alpha);
+        drawVerticalGradientLine(poseStack, x, y, h - 1, startCol, endCol, alpha);
     }
 
     // Top & Left Metallic Crimson Red Button (for OFF states / Cancel)
-    private void drawBeveledRedButton(Object poseStackOrGraphics, int x, int y, int w, int h, boolean hover, float alpha) {
+    private void drawBeveledRedButton(PoseStack poseStack, int x, int y, int w, int h, boolean hover, float alpha) {
         boolean light = currentTheme != null && currentTheme.isLight();
         int bg = hover ? (light ? 0xFFE2E8F0 : 0xFF4A1A1A) : COLOR_TOGGLE_OFF_BG;
-        fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
+        fillBatched(poseStack, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
 
         int dark = applyAlpha(light ? COLOR_BEVEL_SHADOW : 0xFF200808, alpha);
-        fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
-        fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
+        fillBatched(poseStack, x, y + h - 1, x + w, y + h, dark);
+        fillBatched(poseStack, x + w - 1, y, x + w, y + h, dark);
 
         int startCol = hover ? (light ? 0xFFCBD5E1 : 0xFFFFD2D2) : (light ? COLOR_BTN_BORDER : 0xFFFCA5A5);
         int endCol = hover ? (light ? 0xFF94A3B8 : 0xFFF87171) : (light ? COLOR_BEVEL_SHADOW : 0xFFEF4444);
 
-        drawHorizontalGradientLine(poseStackOrGraphics, x, y, w - 1, startCol, endCol, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, x, y, h - 1, startCol, endCol, alpha);
+        drawHorizontalGradientLine(poseStack, x, y, w - 1, startCol, endCol, alpha);
+        drawVerticalGradientLine(poseStack, x, y, h - 1, startCol, endCol, alpha);
     }
 
     // Viewport Scissor Helpers
@@ -4788,14 +4784,14 @@ public class BuildScapeConfigScreen extends Screen {
     // the screen shrunk by the UI scale (small GUI canvases), they must be shrunk by the same factor.
     private float scissorUiScale = 1.0f;
 
-    private void enableGuiScissor(Object poseStackOrGraphics, int guiX, int guiY, int guiW, int guiH) {
+    private void enableGuiScissor(PoseStack poseStack, int guiX, int guiY, int guiW, int guiH) {
         if (isClosing || (isOpening && openProgress < 0.99f)) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.getWindow() == null) return;
         int[] rect = scissorRect(guiX, guiY, guiW, guiH, mc.getWindow().getGuiScale() * scissorUiScale,
                 mc.getWindow().getHeight());
         if (rect[2] > 0 && rect[3] > 0) {
-            enableScissor(poseStackOrGraphics, rect[0], rect[1], rect[2], rect[3]);
+            enableScissor(poseStack, rect[0], rect[1], rect[2], rect[3]);
         }
     }
 
@@ -4808,29 +4804,29 @@ public class BuildScapeConfigScreen extends Screen {
         };
     }
 
-    private void disableGuiScissor(Object poseStackOrGraphics) {
+    private void disableGuiScissor(PoseStack poseStack) {
         if (isClosing || (isOpening && openProgress < 0.99f)) return;
         disableScissor();
     }
 
-    private void drawInsetBox(Object poseStackOrGraphics, int x, int y, int w, int h, int fillRgb, float alpha) {
-        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, fillRgb, alpha);
+    private void drawInsetBox(PoseStack poseStack, int x, int y, int w, int h, int fillRgb, float alpha) {
+        drawBeveledComponent(poseStack, x, y, w, h, fillRgb, alpha);
     }
 
-    private void drawGroove(Object poseStackOrGraphics, int x, int y, int w, boolean horizontal, float alpha) {
+    private void drawGroove(PoseStack poseStack, int x, int y, int w, boolean horizontal, float alpha) {
         int dark = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int light = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         if (horizontal) {
-            fill(poseStackOrGraphics, x, y, x + w, y + 1, dark);
-            fill(poseStackOrGraphics, x, y + 1, x + w, y + 2, light);
+            fillBatched(poseStack, x, y, x + w, y + 1, dark);
+            fillBatched(poseStack, x, y + 1, x + w, y + 2, light);
         }
     }
 
-    private static void drawBorder(Object poseStackOrGraphics, int x, int y, int w, int h, int color) {
-        fill(poseStackOrGraphics, x, y, x + w, y + 1, color);
-        fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, color);
-        fill(poseStackOrGraphics, x, y + 1, x + 1, y + h - 1, color);
-        fill(poseStackOrGraphics, x + w - 1, y + 1, x + w, y + h - 1, color);
+    private static void drawBorder(PoseStack poseStack, int x, int y, int w, int h, int color) {
+        fillBatched(poseStack, x, y, x + w, y + 1, color);
+        fillBatched(poseStack, x, y + h - 1, x + w, y + h, color);
+        fillBatched(poseStack, x, y + 1, x + 1, y + h - 1, color);
+        fillBatched(poseStack, x + w - 1, y + 1, x + w, y + h - 1, color);
     }
 
     private int lerpColor(int c1, int c2, float t) {
@@ -4852,29 +4848,29 @@ public class BuildScapeConfigScreen extends Screen {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
-    private void drawText(Object poseStackOrGraphics, Font font, String text, int x, int y, int color) {
+    private void drawText(PoseStack poseStack, Font font, String text, int x, int y, int color) {
         if (currentTheme != null && currentTheme.isLight()) {
-            draw(poseStackOrGraphics, font, text, x, y, color);
+            draw(poseStack, font, text, x, y, color);
         } else {
-            drawShadow(poseStackOrGraphics, font, text, x, y, color);
+            drawShadow(poseStack, font, text, x, y, color);
         }
     }
 
-    private void drawCenteredText(Object poseStackOrGraphics, Font font, String text, int centerX, int y, int color) {
+    private void drawCenteredText(PoseStack poseStack, Font font, String text, int centerX, int y, int color) {
         if (text == null) return;
         int textW = font.width(text);
         int startX = centerX - textW / 2;
         if (currentTheme != null && currentTheme.isLight()) {
-            draw(poseStackOrGraphics, font, text, startX, y, color);
+            draw(poseStack, font, text, startX, y, color);
         } else {
-            drawShadow(poseStackOrGraphics, font, text, startX, y, color);
+            drawShadow(poseStack, font, text, startX, y, color);
         }
     }
 
     // Top-center crest frame.
     private static final ResourceLocation LOGO_TEXTURE = new ResourceLocation("buildscape", "textures/gui/logo.png");
 
-    private void drawTopCrestBadge(Object poseStackOrGraphics, Font font, int frameX, int frameY, int frameW, float alpha) {
+    private void drawTopCrestBadge(PoseStack poseStack, Font font, int frameX, int frameY, int frameW, float alpha) {
         int crestW = 100;
         int crestH = 40;
         int crestX = frameX + (frameW - crestW) / 2;
@@ -4886,29 +4882,29 @@ public class BuildScapeConfigScreen extends Screen {
         int bHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
         // 1. Solid Outer Chassis Body Fill
-        fill(poseStackOrGraphics, crestX, crestY, crestX + crestW, crestY + crestH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        fillBatched(poseStack, crestX, crestY, crestX + crestW, crestY + crestH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         // 2. 1px Black Border Outline (Single continuous 1px black line throughout)
-        drawBorder(poseStackOrGraphics, crestX, crestY, crestW, crestH, black);
+        drawBorder(poseStack, crestX, crestY, crestW, crestH, black);
 
         // 3. Layer 1: Outer metallic highlight (top & left) & shadow (bottom & right)
-        drawHorizontalGradientLine(poseStackOrGraphics, crestX + 1, crestY + 1, crestW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        drawVerticalGradientLine(poseStackOrGraphics, crestX + 1, crestY + 1, crestH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
-        fill(poseStackOrGraphics, crestX + 1, crestY + crestH - 2, crestX + crestW - 1, crestY + crestH - 1, shadow);
-        fill(poseStackOrGraphics, crestX + crestW - 2, crestY + 1, crestX + crestW - 1, crestY + crestH - 1, shadow);
+        drawHorizontalGradientLine(poseStack, crestX + 1, crestY + 1, crestW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        drawVerticalGradientLine(poseStack, crestX + 1, crestY + 1, crestH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+        fillBatched(poseStack, crestX + 1, crestY + crestH - 2, crestX + crestW - 1, crestY + crestH - 1, shadow);
+        fillBatched(poseStack, crestX + crestW - 2, crestY + 1, crestX + crestW - 1, crestY + crestH - 1, shadow);
 
         // 4. Layer 3: Inner Recessed Plate with unified 4px border width on all sides
         int plateX = crestX + 4;
         int plateY = crestY + 4;
         int plateW = crestW - 8;
         int plateH = crestH - 8;
-        fill(poseStackOrGraphics, plateX, plateY, plateX + plateW, plateY + plateH, applyAlpha(COLOR_INNER_DARK, alpha));
+        fillBatched(poseStack, plateX, plateY, plateX + plateW, plateY + plateH, applyAlpha(COLOR_INNER_DARK, alpha));
 
         // Inner plate 1px subtle bevel (shadow top & left, highlight bottom & right)
-        fill(poseStackOrGraphics, plateX, plateY, plateX + plateW, plateY + 1, bShadow);
-        fill(poseStackOrGraphics, plateX, plateY, plateX + 1, plateY + plateH, bShadow);
-        fill(poseStackOrGraphics, plateX, plateY + plateH - 1, plateX + plateW, plateY + plateH, bHighlight);
-        fill(poseStackOrGraphics, plateX + plateW - 1, plateY, plateX + plateW, plateY + plateH, bHighlight);
+        fillBatched(poseStack, plateX, plateY, plateX + plateW, plateY + 1, bShadow);
+        fillBatched(poseStack, plateX, plateY, plateX + 1, plateY + plateH, bShadow);
+        fillBatched(poseStack, plateX, plateY + plateH - 1, plateX + plateW, plateY + plateH, bHighlight);
+        fillBatched(poseStack, plateX + plateW - 1, plateY, plateX + plateW, plateY + plateH, bHighlight);
 
         // 5. Proportional Buildscape Logo Texture (Crisp 256x143 native scaling, unstretched)
         int maxLogoW = plateW - 4;
@@ -4923,19 +4919,19 @@ public class BuildScapeConfigScreen extends Screen {
         int logoY = plateY + (plateH - logoH) / 2;
 
         try {
-            blit(poseStackOrGraphics, LOGO_TEXTURE, logoX, logoY, logoW, logoH, 0.0f, 0.0f, 256, 143, 256, 143);
+            blit(poseStack, LOGO_TEXTURE, logoX, logoY, logoW, logoH, 0.0f, 0.0f, 256, 143, 256, 143);
         } catch (Exception e) {
             int textCol = applyAlpha(COLOR_ACCENT, alpha);
-            drawCenteredText(poseStackOrGraphics, font, "✦ BUILDSCAPE ✦", crestX + crestW / 2, plateY + (plateH - 8) / 2, textCol);
+            drawCenteredText(poseStack, font, "✦ BUILDSCAPE ✦", crestX + crestW / 2, plateY + (plateH - 8) / 2, textCol);
         }
     }
 
     // Shared custom scrollbar.
-    private void renderCustomScrollbar(Object poseStackOrGraphics, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha) {
-        renderCustomScrollbar(poseStackOrGraphics, trackX, trackY, trackW, trackH, scroll, maxSc, mouseX, mouseY, alpha, false);
+    private void renderCustomScrollbar(PoseStack poseStack, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha) {
+        renderCustomScrollbar(poseStack, trackX, trackY, trackW, trackH, scroll, maxSc, mouseX, mouseY, alpha, false);
     }
 
-    private void renderCustomScrollbar(Object poseStackOrGraphics, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha, boolean isSidePanel) {
+    private void renderCustomScrollbar(PoseStack poseStack, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha, boolean isSidePanel) {
         if (maxSc <= 0) return;
 
         if (isSidePanel) {
@@ -4959,8 +4955,8 @@ public class BuildScapeConfigScreen extends Screen {
         int thumbY = trackY + (int) ((scroll / maxSc) * (trackH - thumbH));
 
         // Track: clean recessed slot
-        fill(poseStackOrGraphics, trackX, trackY, trackX + trackW, trackY + trackH, applyAlpha(COLOR_SLOT_BG, alpha * 0.75f));
-        drawBorder(poseStackOrGraphics, trackX, trackY, trackW, trackH, applyAlpha(COLOR_FRAME_BLACK, alpha * 0.40f));
+        fillBatched(poseStack, trackX, trackY, trackX + trackW, trackY + trackH, applyAlpha(COLOR_SLOT_BG, alpha * 0.75f));
+        drawBorder(poseStack, trackX, trackY, trackW, trackH, applyAlpha(COLOR_FRAME_BLACK, alpha * 0.40f));
 
         // Thumb: clean metallic button with bevels (no weird gradient banding)
         boolean hoverThumb = mouseX >= trackX && mouseX <= trackX + trackW && mouseY >= thumbY && mouseY <= thumbY + thumbH;
@@ -4968,15 +4964,15 @@ public class BuildScapeConfigScreen extends Screen {
         int thumbColor = dragging ? COLOR_ACCENT : (hoverThumb ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE);
 
         // Thumb fill
-        fill(poseStackOrGraphics, trackX + 1, thumbY + 1, trackX + trackW - 1, thumbY + thumbH - 1, applyAlpha(thumbColor, alpha));
+        fillBatched(poseStack, trackX + 1, thumbY + 1, trackX + trackW - 1, thumbY + thumbH - 1, applyAlpha(thumbColor, alpha));
 
         // Thumb 1px border & bevel
         int highlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         int shadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
-        fill(poseStackOrGraphics, trackX, thumbY, trackX + trackW, thumbY + 1, highlight);
-        fill(poseStackOrGraphics, trackX, thumbY + 1, trackX + 1, thumbY + thumbH - 1, highlight);
-        fill(poseStackOrGraphics, trackX, thumbY + thumbH - 1, trackX + trackW, thumbY + thumbH, shadow);
-        fill(poseStackOrGraphics, trackX + trackW - 1, thumbY + 1, trackX + trackW, thumbY + thumbH - 1, shadow);
+        fillBatched(poseStack, trackX, thumbY, trackX + trackW, thumbY + 1, highlight);
+        fillBatched(poseStack, trackX, thumbY + 1, trackX + 1, thumbY + thumbH - 1, highlight);
+        fillBatched(poseStack, trackX, thumbY + thumbH - 1, trackX + trackW, thumbY + thumbH, shadow);
+        fillBatched(poseStack, trackX + trackW - 1, thumbY + 1, trackX + trackW, thumbY + thumbH - 1, shadow);
     }
 
     // In-world pillar location handling.
@@ -5014,36 +5010,36 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     // Configuration row rendering helpers.
-    private void renderRowCardBase(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, int mouseX, int mouseY, float alpha) {
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, null, mouseX, mouseY, alpha);
+    private void renderRowCardBase(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, int mouseX, int mouseY, float alpha) {
+        renderRowCardBase(poseStack, font, x, y, w, h, clipY, clipH, label, desc, null, mouseX, mouseY, alpha);
     }
 
-    private void renderRowCardBase(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, ResourceLocation icon, int mouseX, int mouseY, float alpha) {
+    private void renderRowCardBase(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, ResourceLocation icon, int mouseX, int mouseY, float alpha) {
         if (y + h < clipY || y > clipY + clipH) return;
 
         boolean hover = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h && mouseY >= clipY && mouseY <= clipY + clipH;
         int bg = hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG;
-        drawBeveledButton(poseStackOrGraphics, x, y, w, h, bg, hover, false, alpha);
+        drawBeveledButton(poseStack, x, y, w, h, bg, hover, false, alpha);
 
         int contentX = x + 6;
         if (icon != null) {
             int iconY = y + (h - 16) / 2;
             int iconCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
-            drawTintedTexture(poseStackOrGraphics, icon, contentX, iconY, 16, 16, iconCol, alpha);
+            drawTintedTexture(poseStack, icon, contentX, iconY, 16, 16, iconCol, alpha);
             contentX += 22;
         }
 
-        drawText(poseStackOrGraphics, font, label, contentX, y + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStack, font, label, contentX, y + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
         if (desc != null && !desc.isEmpty()) {
-            drawText(poseStackOrGraphics, font, desc, contentX, y + 15, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            drawText(poseStack, font, desc, contentX, y + 15, applyAlpha(COLOR_TEXT_MUTED, alpha));
         }
     }
 
-    private void renderToggleButton(Object poseStackOrGraphics, int x, int y, boolean value, boolean hover, float alpha) {
-        renderToggleButton(poseStackOrGraphics, null, x, y, value, hover, alpha);
+    private void renderToggleButton(PoseStack poseStack, int x, int y, boolean value, boolean hover, float alpha) {
+        renderToggleButton(poseStack, null, x, y, value, hover, alpha);
     }
 
-    private void renderToggleButton(Object poseStackOrGraphics, String key, int x, int y, boolean value, boolean hover, float alpha) {
+    private void renderToggleButton(PoseStack poseStack, String key, int x, int y, boolean value, boolean hover, float alpha) {
         if (key == null) {
             key = "tb_" + x + "_" + y;
         }
@@ -5083,28 +5079,28 @@ public class BuildScapeConfigScreen extends Screen {
         int accent = hover ? COLOR_ACCENT_GLOW : COLOR_ACCENT;
 
         if (progress <= 0.001f) {
-            drawTintedTexture(poseStackOrGraphics, TOGGLE_OFF_TINT_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, accent, alpha);
-            drawTintedTexture(poseStackOrGraphics, TOGGLE_OFF_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, 0xFFFFFFFF, alpha);
+            drawTintedTexture(poseStack, TOGGLE_OFF_TINT_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, accent, alpha);
+            drawTintedTexture(poseStack, TOGGLE_OFF_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, 0xFFFFFFFF, alpha);
         } else if (progress >= 0.999f) {
-            drawTintedTexture(poseStackOrGraphics, TOGGLE_ON_TINT_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, accent, alpha);
-            drawTintedTexture(poseStackOrGraphics, TOGGLE_ON_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, 0xFFFFFFFF, alpha);
+            drawTintedTexture(poseStack, TOGGLE_ON_TINT_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, accent, alpha);
+            drawTintedTexture(poseStack, TOGGLE_ON_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, 0xFFFFFFFF, alpha);
         } else {
             // Smooth cross-fade between OFF and ON states in the active theme accent color
             float offAlpha = (1.0f - progress) * alpha;
             float onAlpha = progress * alpha;
 
-            drawTintedTexture(poseStackOrGraphics, TOGGLE_OFF_TINT_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, accent, offAlpha);
-            drawTintedTexture(poseStackOrGraphics, TOGGLE_OFF_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, 0xFFFFFFFF, offAlpha);
+            drawTintedTexture(poseStack, TOGGLE_OFF_TINT_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, accent, offAlpha);
+            drawTintedTexture(poseStack, TOGGLE_OFF_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, 0xFFFFFFFF, offAlpha);
 
-            drawTintedTexture(poseStackOrGraphics, TOGGLE_ON_TINT_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, accent, onAlpha);
-            drawTintedTexture(poseStackOrGraphics, TOGGLE_ON_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, 0xFFFFFFFF, onAlpha);
+            drawTintedTexture(poseStack, TOGGLE_ON_TINT_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, accent, onAlpha);
+            drawTintedTexture(poseStack, TOGGLE_ON_TEXTURE, x, y, w, h, 0.0f, 0.0f, 24, 13, 24, 13, 0xFFFFFFFF, onAlpha);
         }
     }
 
-    private void renderConfigRowToggle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, boolean value, int mouseX, int mouseY, float alpha) {
+    private void renderConfigRowToggle(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, boolean value, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
         hoverWorldOrPillarAccess(checkToggleClick(mouseX, mouseY, x, y, w, h, clipY, clipH), label);
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, "", mouseX, mouseY, alpha);
+        renderRowCardBase(poseStack, font, x, y, w, h, clipY, clipH, label, "", mouseX, mouseY, alpha);
 
         int btnW = 26;
         int btnH = 15;
@@ -5112,24 +5108,24 @@ public class BuildScapeConfigScreen extends Screen {
         int btnY = y + (h - btnH) / 2;
 
         boolean hoverBtn = mouseX >= btnX - 2 && mouseX <= btnX + btnW + 2 && mouseY >= btnY - 2 && mouseY <= btnY + btnH + 2;
-        renderToggleButton(poseStackOrGraphics, "cfg_" + label, btnX, btnY, value, hoverBtn, alpha);
+        renderToggleButton(poseStack, "cfg_" + label, btnX, btnY, value, hoverBtn, alpha);
 
         if (desc != null && !desc.isEmpty()) {
             int descriptionWidth = calculateToggleDescriptionWidth(w, btnW);
             int maxLines = h >= 32 ? 2 : 1;
             List<String> lines = wrapTextToLines(font, desc, descriptionWidth, maxLines);
             for (int line = 0; line < lines.size(); line++) {
-                drawText(poseStackOrGraphics, font, lines.get(line), x + 6, y + 15 + line * 9, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                drawText(poseStack, font, lines.get(line), x + 6, y + 15 + line * 9, applyAlpha(COLOR_TEXT_MUTED, alpha));
             }
         }
     }
 
-    private void renderConfigRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String currentVal, int mouseX, int mouseY, float alpha) {
+    private void renderConfigRowCycle(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String currentVal, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
         hoverWorldOrPillarAccess(checkCycleClick(mouseX, mouseY, x, y, w, h, clipY, clipH) != 0, label);
         int cycleW = 138;
         String visibleDescription = trimTextToWidth(font, desc, calculateCycleDescriptionWidth(w, cycleW), false);
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, visibleDescription, mouseX, mouseY, alpha);
+        renderRowCardBase(poseStack, font, x, y, w, h, clipY, clipH, label, visibleDescription, mouseX, mouseY, alpha);
 
         int cycleH = 15;
         int cycleX = x + w - cycleW - 8;
@@ -5138,15 +5134,15 @@ public class BuildScapeConfigScreen extends Screen {
 
         // 1. Left Arrow Button [ ‹ ]
         boolean hoverPrev = mouseX >= cycleX && mouseX <= cycleX + arrowW && mouseY >= cycleY && mouseY <= cycleY + cycleH;
-        drawBeveledButton(poseStackOrGraphics, cycleX, cycleY, arrowW, cycleH, hoverPrev ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPrev, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "‹", cycleX + arrowW / 2, cycleY + 3, applyAlpha(hoverPrev ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, cycleX, cycleY, arrowW, cycleH, hoverPrev ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPrev, false, alpha);
+        drawCenteredText(poseStack, font, "‹", cycleX + arrowW / 2, cycleY + 3, applyAlpha(hoverPrev ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // 2. Middle Value Container
         int valX = cycleX + arrowW + 1;
         int valW = cycleW - (arrowW * 2) - 2;
         boolean hoverVal = mouseX >= valX && mouseX <= valX + valW && mouseY >= cycleY && mouseY <= cycleY + cycleH;
-        fill(poseStackOrGraphics, valX, cycleY, valX + valW, cycleY + cycleH, applyAlpha(hoverVal ? COLOR_BTN_BG_HOVER : COLOR_SLOT_BG, alpha));
-        drawBorder(poseStackOrGraphics, valX, cycleY, valW, cycleH, applyAlpha(hoverVal ? COLOR_ROW_BORDER_HOVER : COLOR_SLOT_BORDER, alpha));
+        fillBatched(poseStack, valX, cycleY, valX + valW, cycleY + cycleH, applyAlpha(hoverVal ? COLOR_BTN_BG_HOVER : COLOR_SLOT_BG, alpha));
+        drawBorder(poseStack, valX, cycleY, valW, cycleH, applyAlpha(hoverVal ? COLOR_ROW_BORDER_HOVER : COLOR_SLOT_BORDER, alpha));
 
         String displayVal = currentVal;
         if (font.width(displayVal) > valW - 6) {
@@ -5155,24 +5151,24 @@ public class BuildScapeConfigScreen extends Screen {
             }
             displayVal = displayVal + "…";
         }
-        drawCenteredText(poseStackOrGraphics, font, displayVal, valX + valW / 2, cycleY + 3, applyAlpha(hoverVal ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStack, font, displayVal, valX + valW / 2, cycleY + 3, applyAlpha(hoverVal ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // 3. Right Arrow Button [ › ]
         int rightX = cycleX + cycleW - arrowW;
         boolean hoverNext = mouseX >= rightX && mouseX <= rightX + arrowW && mouseY >= cycleY && mouseY <= cycleY + cycleH;
-        drawBeveledButton(poseStackOrGraphics, rightX, cycleY, arrowW, cycleH, hoverNext ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNext, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "›", rightX + arrowW / 2, cycleY + 3, applyAlpha(hoverNext ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, rightX, cycleY, arrowW, cycleH, hoverNext ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNext, false, alpha);
+        drawCenteredText(poseStack, font, "›", rightX + arrowW / 2, cycleY + 3, applyAlpha(hoverNext ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
-    private void renderConfigRowCycleDetailed(Object graphics, Font font, int x, int y, int w, int h, int clipY,
+    private void renderConfigRowCycleDetailed(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY,
                                               int clipH, String label, String description, String value,
                                               int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
-        renderConfigRowCycle(graphics, font, x, y, w, h, clipY, clipH, label, "", value, mouseX, mouseY, alpha);
+        renderConfigRowCycle(poseStack, font, x, y, w, h, clipY, clipH, label, "", value, mouseX, mouseY, alpha);
         int descriptionWidth = calculateCycleDescriptionWidth(w, 138);
         List<String> lines = wrapTextToLines(font, description, descriptionWidth, 2);
         for (int line = 0; line < lines.size(); line++) {
-            drawText(graphics, font, lines.get(line), x + 6, y + 15 + line * 9, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            drawText(poseStack, font, lines.get(line), x + 6, y + 15 + line * 9, applyAlpha(COLOR_TEXT_MUTED, alpha));
         }
     }
 
@@ -5206,10 +5202,10 @@ public class BuildScapeConfigScreen extends Screen {
         return lines;
     }
 
-    private void renderConfigRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String valText, int mouseX, int mouseY, float alpha) {
+    private void renderConfigRowCounter(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String valText, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
         hoverWorldOrPillarAccess(checkCounterClick(mouseX, mouseY, x, y, w, h, clipY, clipH) != 0, label);
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
+        renderRowCardBase(poseStack, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
 
         int counterW = 86;
         int counterH = 16;
@@ -5218,24 +5214,24 @@ public class BuildScapeConfigScreen extends Screen {
         int stepBtnW = 16;
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
-        drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepBtnW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepBtnW / 2, counterY + 4, applyAlpha(hoverMinus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, counterX, counterY, stepBtnW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
+        drawCenteredText(poseStack, font, "−", counterX + stepBtnW / 2, counterY + 4, applyAlpha(hoverMinus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         int valX = counterX + stepBtnW;
         int valW = counterW - stepBtnW * 2;
-        fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
-        drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        drawCenteredText(poseStackOrGraphics, font, valText, valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        fillBatched(poseStack, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
+        drawBorder(poseStack, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
+        drawCenteredText(poseStack, font, valText, valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepBtnW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
-        drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepBtnW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(hoverPlus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, plusX, counterY, stepBtnW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
+        drawCenteredText(poseStack, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(hoverPlus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     /** A particle counter: the value as stored, and its allowed range in the hover tooltip. */
-    private void renderConfigRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, ParticleRange range, double value, int mouseX, int mouseY, float alpha) {
-        renderConfigRowCounter(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, range.formatValue(value), mouseX, mouseY, alpha);
+    private void renderConfigRowCounter(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, ParticleRange range, double value, int mouseX, int mouseY, float alpha) {
+        renderConfigRowCounter(poseStack, font, x, y, w, h, clipY, clipH, label, desc, range.formatValue(value), mouseX, mouseY, alpha);
         if (y < clipY || y + h > clipY + clipH) return;
         int counterX = x + w - 86 - 8;
         int counterY = y + (h - 16) / 2;
@@ -5246,14 +5242,14 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
-    private void renderConfigRowButton(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String btnText, int mouseX, int mouseY, float alpha) {
-        renderConfigRowButton(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, btnText, null, mouseX, mouseY, alpha);
+    private void renderConfigRowButton(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String btnText, int mouseX, int mouseY, float alpha) {
+        renderConfigRowButton(poseStack, font, x, y, w, h, clipY, clipH, label, desc, btnText, null, mouseX, mouseY, alpha);
     }
 
-    private void renderConfigRowButton(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String btnText, ResourceLocation icon, int mouseX, int mouseY, float alpha) {
+    private void renderConfigRowButton(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String btnText, ResourceLocation icon, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
         hoverWorldOrPillarAccess(checkButtonClick(mouseX, mouseY, x, y, w, h, clipY, clipH, getConfigRowButtonWidth(font, btnText)), label);
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, icon, mouseX, mouseY, alpha);
+        renderRowCardBase(poseStack, font, x, y, w, h, clipY, clipH, label, desc, icon, mouseX, mouseY, alpha);
 
         int btnW = getConfigRowButtonWidth(font, btnText);
         int btnH = 14;
@@ -5261,17 +5257,17 @@ public class BuildScapeConfigScreen extends Screen {
         int btnY = y + (h - btnH) / 2;
 
         boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
-        drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBtn, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, btnText, btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, btnX, btnY, btnW, btnH, hoverBtn ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBtn, false, alpha);
+        drawCenteredText(poseStack, font, btnText, btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     private static int getConfigRowButtonWidth(Font font, String buttonText) {
         return Math.max(86, font.width(buttonText) + 14);
     }
 
-    private void renderConfigRowBadge(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String badgeText, float alpha) {
+    private void renderConfigRowBadge(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String badgeText, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, -1, -1, alpha);
+        renderRowCardBase(poseStack, font, x, y, w, h, clipY, clipH, label, desc, -1, -1, alpha);
 
         int textW = font.width(badgeText);
         int badgeW = textW + 10;
@@ -5279,15 +5275,15 @@ public class BuildScapeConfigScreen extends Screen {
         int badgeX = x + w - badgeW - 8;
         int badgeY = y + (h - badgeH) / 2;
 
-        fill(poseStackOrGraphics, badgeX, badgeY, badgeX + badgeW, badgeY + badgeH, applyAlpha(COLOR_SLOT_BG, alpha));
-        drawBorder(poseStackOrGraphics, badgeX, badgeY, badgeW, badgeH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        drawCenteredText(poseStackOrGraphics, font, badgeText, badgeX + badgeW / 2, badgeY + 3, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        fillBatched(poseStack, badgeX, badgeY, badgeX + badgeW, badgeY + badgeH, applyAlpha(COLOR_SLOT_BG, alpha));
+        drawBorder(poseStack, badgeX, badgeY, badgeW, badgeH, applyAlpha(COLOR_SLOT_BORDER, alpha));
+        drawCenteredText(poseStack, font, badgeText, badgeX + badgeW / 2, badgeY + 3, applyAlpha(COLOR_TEXT_SILVER, alpha));
     }
 
-    private void renderConfigRowPalette(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, List<String> colors, int maxColors, int mouseX, int mouseY, float alpha) {
+    private void renderConfigRowPalette(PoseStack poseStack, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, List<String> colors, int maxColors, int mouseX, int mouseY, float alpha) {
         if (y < clipY || y + h > clipY + clipH) return;
         hoverWorldOrPillarAccess(paletteControlHovered(mouseX, mouseY, x, y, w, h, clipY, clipH), label);
-        renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, "Max active colors: " + maxColors + " / 7", mouseX, mouseY, alpha);
+        renderRowCardBase(poseStack, font, x, y, w, h, clipY, clipH, label, "Max active colors: " + maxColors + " / 7", mouseX, mouseY, alpha);
 
         int counterW = 86;
         int counterH = 16;
@@ -5296,19 +5292,19 @@ public class BuildScapeConfigScreen extends Screen {
         int stepBtnW = 16;
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
-        drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepBtnW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepBtnW / 2, counterY + 4, applyAlpha(hoverMinus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, counterX, counterY, stepBtnW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
+        drawCenteredText(poseStack, font, "−", counterX + stepBtnW / 2, counterY + 4, applyAlpha(hoverMinus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         int valX = counterX + stepBtnW;
         int valW = counterW - stepBtnW * 2;
-        fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
-        drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        drawCenteredText(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        fillBatched(poseStack, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
+        drawBorder(poseStack, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
+        drawCenteredText(poseStack, font, String.valueOf(maxColors), valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepBtnW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
-        drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepBtnW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(hoverPlus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStack, plusX, counterY, stepBtnW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
+        drawCenteredText(poseStack, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(hoverPlus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // Clickable Swatches: all 7 slots
         int swatchSize = 13;
@@ -5328,9 +5324,9 @@ public class BuildScapeConfigScreen extends Screen {
             }
 
             boolean active = i < maxColors;
-            fill(poseStackOrGraphics, swX, swatchY, swX + swatchSize, swatchY + swatchSize, applyAlpha(colorInt, active ? alpha : alpha * 0.30f));
+            fillBatched(poseStack, swX, swatchY, swX + swatchSize, swatchY + swatchSize, applyAlpha(colorInt, active ? alpha : alpha * 0.30f));
             int borderCol = active ? COLOR_TEXT_WHITE : COLOR_SLOT_BORDER;
-            drawBorder(poseStackOrGraphics, swX, swatchY, swatchSize, swatchSize, applyAlpha(borderCol, alpha));
+            drawBorder(poseStack, swX, swatchY, swatchSize, swatchSize, applyAlpha(borderCol, alpha));
         }
     }
 
@@ -7688,61 +7684,47 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     // --- Forge 1.18.2 Direct Render and Platform Helpers ---
-    private static PoseStack asPose(Object poseStackOrGraphics) {
-        return (PoseStack) poseStackOrGraphics;
+    private static void fillBatched(PoseStack poseStack, int minX, int minY, int maxX, int maxY, int color) {
+        ConfigGuiBatch.fill(poseStack, minX, minY, maxX, maxY, color);
     }
 
-    private static void fill(Object poseStackOrGraphics, int minX, int minY, int maxX, int maxY, int color) {
-        ConfigGuiBatch.fill(asPose(poseStackOrGraphics), minX, minY, maxX, maxY, color);
-    }
-
-    private static void draw(Object poseStackOrGraphics, Font font, Component text, float x, float y, int color) {
+    private static void draw(PoseStack poseStack, Font font, Component text, float x, float y, int color) {
         ConfigGuiBatch.flush();
-        font.draw(asPose(poseStackOrGraphics), text, x, y, color);
+        font.draw(poseStack, text, x, y, color);
     }
 
-    private static void draw(Object poseStackOrGraphics, Font font, String text, float x, float y, int color) {
+    private static void draw(PoseStack poseStack, Font font, String text, float x, float y, int color) {
         ConfigGuiBatch.flush();
-        font.draw(asPose(poseStackOrGraphics), text, x, y, color);
+        font.draw(poseStack, text, x, y, color);
     }
 
-    private static void drawShadow(Object poseStackOrGraphics, Font font, Component text, float x, float y, int color) {
+    private static void drawShadow(PoseStack poseStack, Font font, Component text, float x, float y, int color) {
         ConfigGuiBatch.flush();
-        font.drawShadow(asPose(poseStackOrGraphics), text, x, y, color);
+        font.drawShadow(poseStack, text, x, y, color);
     }
 
-    private static void drawShadow(Object poseStackOrGraphics, Font font, String text, float x, float y, int color) {
+    private static void drawShadow(PoseStack poseStack, Font font, String text, float x, float y, int color) {
         ConfigGuiBatch.flush();
-        font.drawShadow(asPose(poseStackOrGraphics), text, x, y, color);
+        font.drawShadow(poseStack, text, x, y, color);
     }
 
-    private static void drawCenteredString(Object poseStackOrGraphics, Font font, Component text, int x, int y, int color) {
-        ConfigGuiBatch.flush();
-        GuiComponent.drawCenteredString(asPose(poseStackOrGraphics), font, text, x, y, color);
-    }
-
-    private static void drawCenteredString(Object poseStackOrGraphics, Font font, String text, int x, int y, int color) {
-        ConfigGuiBatch.flush();
-        GuiComponent.drawCenteredString(asPose(poseStackOrGraphics), font, text, x, y, color);
-    }
-
-    private static void blit(Object poseStackOrGraphics, ResourceLocation texture, int x, int y, float u, float v, int width, int height, int sheetW, int sheetH) {
+    private static void blit(PoseStack poseStack, ResourceLocation texture, int x, int y, float u, float v, int width, int height, int sheetW, int sheetH) {
         ConfigGuiBatch.flush();
         RenderSystem.setShaderTexture(0, texture);
-        GuiComponent.blit(asPose(poseStackOrGraphics), x, y, u, v, width, height, sheetW, sheetH);
+        GuiComponent.blit(poseStack, x, y, u, v, width, height, sheetW, sheetH);
     }
 
-    private static void blit(Object poseStackOrGraphics, ResourceLocation texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH) {
+    private static void blit(PoseStack poseStack, ResourceLocation texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH) {
         ConfigGuiBatch.flush();
         RenderSystem.setShaderTexture(0, texture);
-        GuiComponent.blit(asPose(poseStackOrGraphics), x, y, width, height, u, v, uWidth, vHeight, sheetW, sheetH);
+        GuiComponent.blit(poseStack, x, y, width, height, u, v, uWidth, vHeight, sheetW, sheetH);
     }
 
-    private static void drawTintedTexture(Object poseStackOrGraphics, ResourceLocation texture, int x, int y, int width, int height, int color, float alpha) {
-        drawTintedTexture(poseStackOrGraphics, texture, x, y, width, height, 0.0f, 0.0f, width, height, width, height, color, alpha);
+    private static void drawTintedTexture(PoseStack poseStack, ResourceLocation texture, int x, int y, int width, int height, int color, float alpha) {
+        drawTintedTexture(poseStack, texture, x, y, width, height, 0.0f, 0.0f, width, height, width, height, color, alpha);
     }
 
-    private static void drawTintedTexture(Object poseStackOrGraphics, ResourceLocation texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH, int color, float alpha) {
+    private static void drawTintedTexture(PoseStack poseStack, ResourceLocation texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH, int color, float alpha) {
         if (texture == null) return;
         ConfigGuiBatch.flush();
         int rawA = (color >> 24) & 0xFF;
@@ -7756,27 +7738,27 @@ public class BuildScapeConfigScreen extends Screen {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(r, g, b, a);
         RenderSystem.setShaderTexture(0, texture);
-        GuiComponent.blit(asPose(poseStackOrGraphics), x, y, width, height, u, v, uWidth, vHeight, sheetW, sheetH);
+        GuiComponent.blit(poseStack, x, y, width, height, u, v, uWidth, vHeight, sheetW, sheetH);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    private static void pushGuiPose(Object poseStackOrGraphics) {
-        asPose(poseStackOrGraphics).pushPose();
+    private static void pushGuiPose(PoseStack poseStack) {
+        poseStack.pushPose();
     }
 
-    private static void popGuiPose(Object poseStackOrGraphics) {
-        asPose(poseStackOrGraphics).popPose();
+    private static void popGuiPose(PoseStack poseStack) {
+        poseStack.popPose();
     }
 
-    private static void scaleGuiPose(Object poseStackOrGraphics, float x, float y) {
-        asPose(poseStackOrGraphics).scale(x, y, 1.0f);
+    private static void scaleGuiPose(PoseStack poseStack, float x, float y) {
+        poseStack.scale(x, y, 1.0f);
     }
 
-    private static void translateGuiPose(Object poseStackOrGraphics, float x, float y, float z) {
-        asPose(poseStackOrGraphics).translate(x, y, z);
+    private static void translateGuiPose(PoseStack poseStack, float x, float y, float z) {
+        poseStack.translate(x, y, z);
     }
 
-    private static void enableScissor(Object poseStackOrGraphics, int x, int y, int width, int height) {
+    private static void enableScissor(PoseStack poseStack, int x, int y, int width, int height) {
         ConfigGuiBatch.flush();
         RenderSystem.enableScissor(x, y, width, height);
     }
@@ -7791,7 +7773,7 @@ public class BuildScapeConfigScreen extends Screen {
      * shrink scale applied to the PoseStack in renderInternal does not reach them. Mirror it here
      * whenever it is active so icons land in their slots.
      */
-    private void renderGuiItem(Object poseStackOrGraphics, ItemStack stack, int x, int y) {
+    private void renderGuiItem(PoseStack poseStack, ItemStack stack, int x, int y) {
         ConfigGuiBatch.flush();
         float scale = scissorUiScale;
         if (!GuiScaleHelper.isShrunk(scale)) {
@@ -7808,11 +7790,6 @@ public class BuildScapeConfigScreen extends Screen {
             modelView.popPose();
             RenderSystem.applyModelViewMatrix();
         }
-    }
-
-    private void renderComponentTooltip(Object poseStackOrGraphics, List<Component> tooltips, int mouseX, int mouseY) {
-        ConfigGuiBatch.flush();
-        this.renderComponentTooltip(asPose(poseStackOrGraphics), tooltips, mouseX, mouseY);
     }
 
     private static String getClipboardText() {

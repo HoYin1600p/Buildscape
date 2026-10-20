@@ -1,5 +1,3 @@
-Sculk sounds: sculk spread and charge sounds from Minecraft 1.19 by Mojang Studios, used with permission; the catalyst bloom reuses vanilla Soul Speed sounds.
-
 Source: Minecraft 1.19 asset index
 Source path | SHA-1
 minecraft/sounds/block/sculk/spread1.ogg | db6baadfe50569202fbbc9312b8e8ca4592d116e

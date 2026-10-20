@@ -38,13 +38,15 @@ final class ConfigUploadBatch {
     private enum Field {
         PARTICLE_SPEED(ConfigSetting.PARTICLES, c -> c.particle_speed, (c, v) -> c.particle_speed = (Double) v),
         PARTICLE_SPREAD(ConfigSetting.PARTICLES, c -> c.particle_spread, (c, v) -> c.particle_spread = (Double) v),
-        PARTICLE_LIFETIME(ConfigSetting.PARTICLES, c -> c.particle_lifetime, (c, v) -> c.particle_lifetime = (Integer) v),
+        PARTICLE_LIFETIME(ConfigSetting.PARTICLES, c -> c.particle_lifetime,
+                (c, v) -> c.particle_lifetime = (Integer) v),
         PARTICLE_DENSITY(ConfigSetting.PARTICLES, c -> c.particle_density, (c, v) -> c.particle_density = (Integer) v),
         USE_PATTERN(ConfigSetting.PARTICLES, c -> c.use_pattern, (c, v) -> c.use_pattern = (Boolean) v),
         PATTERN(ConfigSetting.PARTICLES, c -> c.pattern, (c, v) -> c.pattern = (String) v),
         PATTERN_SPEED(ConfigSetting.PARTICLES, c -> c.pattern_speed, (c, v) -> c.pattern_speed = (Double) v),
         PATTERN_SPREAD(ConfigSetting.PARTICLES, c -> c.pattern_spread, (c, v) -> c.pattern_spread = (Double) v),
-        PATTERN_INTENSITY(ConfigSetting.PARTICLES, c -> c.pattern_intensity, (c, v) -> c.pattern_intensity = (Double) v),
+        PATTERN_INTENSITY(ConfigSetting.PARTICLES, c -> c.pattern_intensity,
+                (c, v) -> c.pattern_intensity = (Double) v),
         MAX_COLORS(ConfigSetting.COLORS, c -> c.max_particle_color, (c, v) -> c.max_particle_color = (Integer) v),
         EDIT_MODE(ConfigSetting.POLICY, c -> c.edit_permission_mode,
                 (c, v) -> c.edit_permission_mode = (PillarParticleConfig.EditPermissionMode) v);
@@ -54,7 +56,7 @@ final class ConfigUploadBatch {
         final BiConsumer<PillarParticleConfig, Object> write;
 
         Field(ConfigSetting group, Function<PillarParticleConfig, Object> read,
-              BiConsumer<PillarParticleConfig, Object> write) {
+                BiConsumer<PillarParticleConfig, Object> write) {
             this.group = group;
             this.read = read;
             this.write = write;
@@ -68,7 +70,9 @@ final class ConfigUploadBatch {
         final Set<String> items;
 
         Baseline(PillarParticleConfig config) {
-            for (Field field : Field.values()) fields.put(field, field.read.apply(config));
+            for (Field field : Field.values()) {
+                fields.put(field, field.read.apply(config));
+            }
             colors = new ArrayList<>(config.particle_color);
             items = new HashSet<>(config.items);
         }
@@ -118,7 +122,9 @@ final class ConfigUploadBatch {
      * is unanswered {@code config} holds its unconfirmed values, so only the baseline moves, never the server state.
      */
     void rebaseIfIdle(PillarParticleConfig config) {
-        if (!groups.isEmpty()) return;
+        if (!groups.isEmpty()) {
+            return;
+        }
         if (inFlight.groups.isEmpty() || authoritative == null) {
             rebase(config);
         } else {
@@ -140,16 +146,22 @@ final class ConfigUploadBatch {
     void edited(ConfigSetting setting, PillarParticleConfig config, long now) {
         groups.add(setting);
         lastEditAt = now;
-        if (baseline == null) return;
+        if (baseline == null) {
+            return;
+        }
         switch (setting) {
             case ITEMS -> {
                 itemsAdded.clear();
                 itemsRemoved.clear();
                 for (String item : config.items) {
-                    if (!baseline.items.contains(item)) itemsAdded.add(item);
+                    if (!baseline.items.contains(item)) {
+                        itemsAdded.add(item);
+                    }
                 }
                 for (String item : baseline.items) {
-                    if (!config.items.contains(item)) itemsRemoved.add(item);
+                    if (!config.items.contains(item)) {
+                        itemsRemoved.add(item);
+                    }
                 }
             }
             case COLORS -> {
@@ -160,7 +172,9 @@ final class ConfigUploadBatch {
                     colorList = new ArrayList<>(current);
                 } else {
                     for (int i = 0; i < current.size(); i++) {
-                        if (!Objects.equals(current.get(i), baseline.colors.get(i))) colorSlots.put(i, current.get(i));
+                        if (!Objects.equals(current.get(i), baseline.colors.get(i))) {
+                            colorSlots.put(i, current.get(i));
+                        }
                     }
                 }
                 recordFields(setting, config);
@@ -171,7 +185,9 @@ final class ConfigUploadBatch {
 
     private void recordFields(ConfigSetting setting, PillarParticleConfig config) {
         for (Field field : Field.values()) {
-            if (field.group != setting) continue;
+            if (field.group != setting) {
+                continue;
+            }
             Object value = field.read.apply(config);
             if (Objects.equals(value, baseline.fields.get(field))) {
                 fieldEdits.remove(field);
@@ -205,7 +221,9 @@ final class ConfigUploadBatch {
         } else if (!colorSlots.isEmpty()) {
             List<String> merged = new ArrayList<>(config.particle_color);
             for (Map.Entry<Integer, String> slot : colorSlots.entrySet()) {
-                if (slot.getKey() < merged.size()) merged.set(slot.getKey(), slot.getValue());
+                if (slot.getKey() < merged.size()) {
+                    merged.set(slot.getKey(), slot.getValue());
+                }
             }
             config.particle_color = merged;
         }
@@ -213,7 +231,9 @@ final class ConfigUploadBatch {
             List<String> merged = new ArrayList<>(config.items);
             merged.removeAll(itemsRemoved);
             for (String item : itemsAdded) {
-                if (!merged.contains(item)) merged.add(item);
+                if (!merged.contains(item)) {
+                    merged.add(item);
+                }
             }
             config.replaceItems(merged);
         }
@@ -229,10 +249,14 @@ final class ConfigUploadBatch {
      * back into {@code config} and forget the edits, so the screen does not keep showing a change the server never got.
      */
     void revert(ConfigSetting setting, PillarParticleConfig config) {
-        if (setting == null) return;
+        if (setting == null) {
+            return;
+        }
         if (authoritative != null) {
             for (Field field : fieldEdits.keySet()) {
-                if (field.group == setting) field.write.accept(config, authoritative.fields.get(field));
+                if (field.group == setting) {
+                    field.write.accept(config, authoritative.fields.get(field));
+                }
             }
             if (setting == ConfigSetting.COLORS && (colorList != null || !colorSlots.isEmpty())) {
                 config.particle_color = new ArrayList<>(authoritative.colors);
@@ -241,7 +265,9 @@ final class ConfigUploadBatch {
                 List<String> restored = new ArrayList<>(config.items);
                 restored.removeAll(itemsAdded);
                 for (String item : itemsRemoved) {
-                    if (!restored.contains(item)) restored.add(item);
+                    if (!restored.contains(item)) {
+                        restored.add(item);
+                    }
                 }
                 config.replaceItems(restored);
             }
@@ -258,7 +284,9 @@ final class ConfigUploadBatch {
     void refuse(ConfigSetting setting, PillarParticleConfig config) {
         Set<ConfigSetting> targets = EnumSet.noneOf(ConfigSetting.class);
         for (ConfigSetting group : inFlight.groups) {
-            if (setting == null || group == setting) targets.add(group);
+            if (setting == null || group == setting) {
+                targets.add(group);
+            }
         }
         if (authoritative != null) {
             for (Field field : inFlight.fields) {
@@ -266,14 +294,19 @@ final class ConfigUploadBatch {
                     field.write.accept(config, authoritative.fields.get(field));
                 }
             }
-            if (targets.contains(ConfigSetting.COLORS)) restoreColors(config);
+            if (targets.contains(ConfigSetting.COLORS)) {
+                restoreColors(config);
+            }
             if (targets.contains(ConfigSetting.ITEMS)) {
                 List<String> restored = new ArrayList<>(config.items);
                 for (String item : inFlight.itemsAdded) {
-                    if (!authoritative.items.contains(item) && !itemsAdded.contains(item)) restored.remove(item);
+                    if (!authoritative.items.contains(item) && !itemsAdded.contains(item)) {
+                        restored.remove(item);
+                    }
                 }
                 for (String item : inFlight.itemsRemoved) {
-                    if (authoritative.items.contains(item) && !itemsRemoved.contains(item) && !restored.contains(item)) {
+                    if (authoritative.items.contains(item) && !itemsRemoved.contains(item)
+                            && !restored.contains(item)) {
                         restored.add(item);
                     }
                 }
@@ -294,14 +327,20 @@ final class ConfigUploadBatch {
     }
 
     private void restoreColors(PillarParticleConfig config) {
-        if (!inFlight.colorList && inFlight.colorSlots.isEmpty()) return;
+        if (!inFlight.colorList && inFlight.colorSlots.isEmpty()) {
+            return;
+        }
         // A newer edit that replaced the whole list wins as it is.
-        if (colorList != null) return;
+        if (colorList != null) {
+            return;
+        }
         List<String> restored;
         if (inFlight.colorList) {
             restored = new ArrayList<>(authoritative.colors);
             for (Map.Entry<Integer, String> slot : colorSlots.entrySet()) {
-                if (slot.getKey() < restored.size()) restored.set(slot.getKey(), slot.getValue());
+                if (slot.getKey() < restored.size()) {
+                    restored.set(slot.getKey(), slot.getValue());
+                }
             }
         } else {
             restored = new ArrayList<>(config.particle_color);
@@ -343,7 +382,9 @@ final class ConfigUploadBatch {
         inFlight.groups.addAll(groups);
         inFlight.fields.addAll(fieldEdits.keySet());
         inFlight.colorSlots.addAll(colorSlots.keySet());
-        if (colorList != null) inFlight.colorList = true;
+        if (colorList != null) {
+            inFlight.colorList = true;
+        }
         inFlight.itemsAdded.addAll(itemsAdded);
         inFlight.itemsRemoved.addAll(itemsRemoved);
         dropPending(null);

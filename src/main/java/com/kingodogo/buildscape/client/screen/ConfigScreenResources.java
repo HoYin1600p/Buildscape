@@ -11,7 +11,9 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 public final class ConfigScreenResources {
     private static volatile long generation;
     private ConfigScreenResources() {}
-    static long generation() { return generation; }
+    static long generation() {
+        return generation;
+    }
 
     @SubscribeEvent
     public static void register(RegisterClientReloadListenersEvent event) {

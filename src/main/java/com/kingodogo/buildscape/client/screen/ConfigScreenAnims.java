@@ -39,15 +39,33 @@ public final class ConfigScreenAnims {
     }
 
     // Standard durations scaled by client speed setting
-    public static int getOpenAnimMs() { return Math.max(1, (int) (300 * getAnimSpeedMultiplier())); }
-    public static int getCloseAnimMs() { return Math.max(1, (int) (220 * getAnimSpeedMultiplier())); }
-    public static int getNavAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
-    public static int getNavIndicatorAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
-    public static int getTabTransitionAnimMs() { return Math.max(1, (int) (240 * getAnimSpeedMultiplier())); }
-    public static int getSidePanelAnimMs() { return Math.max(1, (int) (280 * getAnimSpeedMultiplier())); }
-    public static int getPillarRemovalAnimMs() { return Math.max(1, (int) (260 * getAnimSpeedMultiplier())); }
-    public static int getToggleAnimMs() { return Math.max(1, (int) (180 * getAnimSpeedMultiplier())); }
-    public static int getThemeSwitchAnimMs() { return Math.max(1, (int) (220 * getAnimSpeedMultiplier())); }
+    public static int getOpenAnimMs() {
+        return Math.max(1, (int) (300 * getAnimSpeedMultiplier()));
+    }
+    public static int getCloseAnimMs() {
+        return Math.max(1, (int) (220 * getAnimSpeedMultiplier()));
+    }
+    public static int getNavAnimMs() {
+        return Math.max(1, (int) (260 * getAnimSpeedMultiplier()));
+    }
+    public static int getNavIndicatorAnimMs() {
+        return Math.max(1, (int) (260 * getAnimSpeedMultiplier()));
+    }
+    public static int getTabTransitionAnimMs() {
+        return Math.max(1, (int) (240 * getAnimSpeedMultiplier()));
+    }
+    public static int getSidePanelAnimMs() {
+        return Math.max(1, (int) (280 * getAnimSpeedMultiplier()));
+    }
+    public static int getPillarRemovalAnimMs() {
+        return Math.max(1, (int) (260 * getAnimSpeedMultiplier()));
+    }
+    public static int getToggleAnimMs() {
+        return Math.max(1, (int) (180 * getAnimSpeedMultiplier()));
+    }
+    public static int getThemeSwitchAnimMs() {
+        return Math.max(1, (int) (220 * getAnimSpeedMultiplier()));
+    }
 
     // Easing curves
     public static float easeOutSine(float t) {
@@ -78,21 +96,32 @@ public final class ConfigScreenAnims {
 
     // Pillar table animations
     public static float calculatePillarRowShift(float startOffset, long startTime, int durationMs, long now) {
-        if (durationMs <= 0 || now >= startTime + durationMs) return 0.0f;
-        if (now <= startTime) return startOffset;
+        if (durationMs <= 0 || now >= startTime + durationMs) {
+            return 0.0f;
+        }
+        if (now <= startTime) {
+            return startOffset;
+        }
         float progress = (now - startTime) / (float) durationMs;
         return startOffset * (1.0f - easeOutCubic(progress));
     }
 
-    public static int calculatePillarRemovalSlideX(int colX, int slideDistance, long startTime, int durationMs, long now) {
-        if (durationMs <= 0 || now <= startTime) return colX;
+    public static int calculatePillarRemovalSlideX(int colX, int slideDistance, long startTime, int durationMs,
+            long now) {
+        if (durationMs <= 0 || now <= startTime) {
+            return colX;
+        }
         float progress = Math.min(1.0f, Math.max(0.0f, (now - startTime) / (float) durationMs));
         return colX + (int) (slideDistance * easeOutSine(progress));
     }
 
     public static float calculatePillarRemovalAlpha(float baseAlpha, long startTime, int durationMs, long now) {
-        if (durationMs <= 0 || now >= startTime + durationMs) return 0.0f;
-        if (now <= startTime) return baseAlpha;
+        if (durationMs <= 0 || now >= startTime + durationMs) {
+            return 0.0f;
+        }
+        if (now <= startTime) {
+            return baseAlpha;
+        }
         float progress = Math.min(1.0f, Math.max(0.0f, (now - startTime) / (float) durationMs));
         return baseAlpha * (1.0f - progress);
     }
@@ -131,7 +160,9 @@ public final class ConfigScreenAnims {
         }
 
         public float getProgress(long now) {
-            if (durationMs <= 0) return 1.0f;
+            if (durationMs <= 0) {
+                return 1.0f;
+            }
             float progress = (now - startTime) / (float) durationMs;
             return Math.min(1.0f, Math.max(0.0f, progress));
         }

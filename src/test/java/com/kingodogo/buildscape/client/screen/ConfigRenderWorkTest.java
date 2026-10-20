@@ -16,7 +16,10 @@ public class ConfigRenderWorkTest {
     @Test
     public void blankAndIdMatchingSearchesNeverResolveDisplayNames() {
         AtomicInteger calls = new AtomicInteger();
-        java.util.function.Supplier<String> name = () -> { calls.incrementAndGet(); return ConfigRenderWork.normalize("Diamond Pickaxe"); };
+        java.util.function.Supplier<String> name = () -> {
+            calls.incrementAndGet();
+            return ConfigRenderWork.normalize("Diamond Pickaxe");
+        };
         assertTrue(ConfigRenderWork.matches("minecraft:diamond_pickaxe", "", name));
         assertTrue(ConfigRenderWork.matches("minecraft:diamond_pickaxe", "diamond", name));
         assertEquals(0, calls.get());

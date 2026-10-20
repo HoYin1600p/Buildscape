@@ -39,7 +39,8 @@ public class ParticleRangeTest {
         assertEquals("Range: 0.1 - 5.0", ParticleRange.PATTERN_INTENSITY.tooltip(1.0D));
         assertEquals("Range: 5 - 120", ParticleRange.PARTICLE_LIFETIME.tooltip(20));
         assertEquals("Range: 1 - 16", ParticleRange.PARTICLE_DENSITY.tooltip(2));
-        assertEquals("Range: 0.01 - 0.50 (stored value 4.00 is outside it)", ParticleRange.PARTICLE_SPREAD.tooltip(4.0D));
+        assertEquals("Range: 0.01 - 0.50 (stored value 4.00 is outside it)",
+                ParticleRange.PARTICLE_SPREAD.tooltip(4.0D));
     }
 
     @Test
@@ -53,30 +54,43 @@ public class ParticleRangeTest {
         assertEquals(120.0D, ParticleRange.PARTICLE_LIFETIME.nearestInRange(12000), 0.0D);
 
         ParticleRange.Migration migration = new ParticleRange.Migration();
-        assertEquals(ParticleRange.Migration.Step.WARN, migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 1000L));
-        assertEquals(ParticleRange.Migration.Step.COMMIT, migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 2000L));
+        assertEquals(ParticleRange.Migration.Step.WARN,
+                migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 1000L));
+        assertEquals(ParticleRange.Migration.Step.COMMIT,
+                migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 2000L));
         // After the commit the value is in range and edits normally; a stale out-of-range value starts over.
-        assertEquals(ParticleRange.Migration.Step.EDIT, migration.click(ParticleRange.PARTICLE_SPEED, "global", 0.5D, 3000L));
-        assertEquals(ParticleRange.Migration.Step.WARN, migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 4000L));
+        assertEquals(ParticleRange.Migration.Step.EDIT,
+                migration.click(ParticleRange.PARTICLE_SPEED, "global", 0.5D, 3000L));
+        assertEquals(ParticleRange.Migration.Step.WARN,
+                migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 4000L));
     }
 
     @Test
     public void migrationIsPerSettingPerScopeAndExpires() {
         ParticleRange.Migration migration = new ParticleRange.Migration();
-        assertEquals(ParticleRange.Migration.Step.WARN, migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 0L));
-        // Another out-of-range setting is a different migration: its first click warns, and it re-arms only itself.
-        assertEquals(ParticleRange.Migration.Step.WARN, migration.click(ParticleRange.PARTICLE_SPREAD, "global", 16.0D, 100L));
-        assertEquals(ParticleRange.Migration.Step.WARN, migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 200L));
-        // The same setting on another pillar is separate too.
-        assertEquals(ParticleRange.Migration.Step.WARN, migration.click(ParticleRange.PATTERN_SPEED, "pillar-a", 2.0D, 300L));
-        assertEquals(ParticleRange.Migration.Step.WARN, migration.click(ParticleRange.PATTERN_SPEED, "pillar-b", 2.0D, 400L));
-        assertEquals(ParticleRange.Migration.Step.COMMIT, migration.click(ParticleRange.PATTERN_SPEED, "pillar-b", 2.0D, 500L));
-        // A second click after the window only warns again.
-        assertEquals(ParticleRange.Migration.Step.WARN, migration.click(ParticleRange.PARTICLE_LIFETIME, "global", 500, 1000L));
         assertEquals(ParticleRange.Migration.Step.WARN,
-                migration.click(ParticleRange.PARTICLE_LIFETIME, "global", 500, 1000L + ParticleRange.MIGRATION_WINDOW_MS + 1));
+                migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 0L));
+        // Another out-of-range setting is a different migration: its first click warns, and it re-arms only itself.
+        assertEquals(ParticleRange.Migration.Step.WARN,
+                migration.click(ParticleRange.PARTICLE_SPREAD, "global", 16.0D, 100L));
+        assertEquals(ParticleRange.Migration.Step.WARN,
+                migration.click(ParticleRange.PARTICLE_SPEED, "global", 4.0D, 200L));
+        // The same setting on another pillar is separate too.
+        assertEquals(ParticleRange.Migration.Step.WARN,
+                migration.click(ParticleRange.PATTERN_SPEED, "pillar-a", 2.0D, 300L));
+        assertEquals(ParticleRange.Migration.Step.WARN,
+                migration.click(ParticleRange.PATTERN_SPEED, "pillar-b", 2.0D, 400L));
+        assertEquals(ParticleRange.Migration.Step.COMMIT,
+                migration.click(ParticleRange.PATTERN_SPEED, "pillar-b", 2.0D, 500L));
+        // A second click after the window only warns again.
+        assertEquals(ParticleRange.Migration.Step.WARN,
+                migration.click(ParticleRange.PARTICLE_LIFETIME, "global", 500, 1000L));
+        assertEquals(ParticleRange.Migration.Step.WARN,
+                migration.click(ParticleRange.PARTICLE_LIFETIME, "global", 500,
+                        1000L + ParticleRange.MIGRATION_WINDOW_MS + 1));
         // An in-range value never warns and never touches another setting's pending migration.
-        assertEquals(ParticleRange.Migration.Step.EDIT, migration.click(ParticleRange.PARTICLE_DENSITY, "global", 2, 9000L));
+        assertEquals(ParticleRange.Migration.Step.EDIT,
+                migration.click(ParticleRange.PARTICLE_DENSITY, "global", 2, 9000L));
     }
 
     @Test

@@ -39,7 +39,8 @@ public class ConfigBackgrounds {
             this.renderer = renderer;
         }
 
-        public void draw(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        public void draw(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+                ConfigThemes.Theme theme) {
             if (renderer != null) {
                 renderer.render(poseStack, x, y, width, height, alpha, theme);
             }
@@ -71,113 +72,95 @@ public class ConfigBackgrounds {
 
     // 8x8 Creeper Face Mask: 1 = dark cutout, 0 = colored skin
     private static final int[][] CREEPER_MASK = {
-            { 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 1, 1, 0, 0, 1, 1, 0 },
-            { 0, 1, 1, 0, 0, 1, 1, 0 },
-            { 0, 0, 0, 1, 1, 0, 0, 0 },
-            { 0, 0, 1, 1, 1, 1, 0, 0 },
-            { 0, 0, 1, 1, 1, 1, 0, 0 },
-            { 0, 0, 1, 0, 0, 1, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0 }
+            {0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 1, 1, 0, 0, 1, 1, 0},
+            {0, 1, 1, 0, 0, 1, 1, 0},
+            {0, 0, 0, 1, 1, 0, 0, 0},
+            {0, 0, 1, 1, 1, 1, 0, 0},
+            {0, 0, 1, 1, 1, 1, 0, 0},
+            {0, 0, 1, 0, 0, 1, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0}
     };
 
     // --- Built-in Background Presets ---
 
     public static final Background NONE = new Background(
             "none", "None",
-            (poseStack, x, y, width, height, alpha, theme) -> {}
-    );
+            (poseStack, x, y, width, height, alpha, theme) -> {
+            });
 
     // Creeper Presets
     public static final Background GREEN_CREEPER = new Background(
             "green_creeper", "Green Creeper",
-            ConfigBackgrounds::drawGreenCreeperBackground
-    );
+            ConfigBackgrounds::drawGreenCreeperBackground);
 
     public static final Background GOLDEN_CREEPER = new Background(
             "golden_creeper", "Golden Creeper",
-            ConfigBackgrounds::drawGoldenCreeperBackground
-    );
+            ConfigBackgrounds::drawGoldenCreeperBackground);
 
     public static final Background CRIMSON_CREEPER = new Background(
             "crimson_creeper", "Crimson Creeper",
-            ConfigBackgrounds::drawCrimsonCreeperBackground
-    );
+            ConfigBackgrounds::drawCrimsonCreeperBackground);
 
     public static final Background WARPED_CREEPER = new Background(
             "warped_creeper", "Warped Creeper",
-            ConfigBackgrounds::drawWarpedCreeperBackground
-    );
+            ConfigBackgrounds::drawWarpedCreeperBackground);
 
     public static final Background BLUE_CREEPER = new Background(
             "blue_creeper", "Blue Creeper",
-            ConfigBackgrounds::drawBlueCreeperBackground
-    );
+            ConfigBackgrounds::drawBlueCreeperBackground);
 
     public static final Background PURPLE_CREEPER = new Background(
             "purple_creeper", "Purple Creeper",
-            ConfigBackgrounds::drawPurpleCreeperBackground
-    );
+            ConfigBackgrounds::drawPurpleCreeperBackground);
 
     public static final Background RED_CREEPER = new Background(
             "red_creeper", "Red Creeper",
-            ConfigBackgrounds::drawRedCreeperBackground
-    );
+            ConfigBackgrounds::drawRedCreeperBackground);
 
     public static final Background ORANGE_CREEPER = new Background(
             "orange_creeper", "Orange Creeper",
-            ConfigBackgrounds::drawOrangeCreeperBackground
-    );
+            ConfigBackgrounds::drawOrangeCreeperBackground);
 
     public static final Background WHITE_CREEPER = new Background(
             "white_creeper", "White Creeper",
-            ConfigBackgrounds::drawWhiteCreeperBackground
-    );
+            ConfigBackgrounds::drawWhiteCreeperBackground);
 
     public static final Background BLACK_CREEPER = new Background(
             "black_creeper", "Black Creeper",
-            ConfigBackgrounds::drawBlackCreeperBackground
-    );
+            ConfigBackgrounds::drawBlackCreeperBackground);
 
     public static final Background YELLOW_CREEPER = new Background(
             "yellow_creeper", "Yellow Creeper",
-            ConfigBackgrounds::drawYellowCreeperBackground
-    );
+            ConfigBackgrounds::drawYellowCreeperBackground);
 
     public static final Background LIME_CREEPER = new Background(
             "lime_creeper", "Lime Creeper",
-            ConfigBackgrounds::drawLimeCreeperBackground
-    );
+            ConfigBackgrounds::drawLimeCreeperBackground);
 
     public static final Background CYAN_CREEPER = new Background(
             "cyan_creeper", "Cyan Creeper",
-            ConfigBackgrounds::drawCyanCreeperBackground
-    );
+            ConfigBackgrounds::drawCyanCreeperBackground);
 
     public static final Background LIGHT_BLUE_CREEPER = new Background(
             "light_blue_creeper", "Light Blue Creeper",
-            ConfigBackgrounds::drawLightBlueCreeperBackground
-    );
+            ConfigBackgrounds::drawLightBlueCreeperBackground);
 
     public static final Background PINK_CREEPER = new Background(
             "pink_creeper", "Pink Creeper",
-            ConfigBackgrounds::drawPinkCreeperBackground
-    );
+            ConfigBackgrounds::drawPinkCreeperBackground);
 
     public static final Background MAGENTA_CREEPER = new Background(
             "magenta_creeper", "Magenta Creeper",
-            ConfigBackgrounds::drawMagentaCreeperBackground
-    );
+            ConfigBackgrounds::drawMagentaCreeperBackground);
 
     public static final Background BROWN_CREEPER = new Background(
             "brown_creeper", "Brown Creeper",
-            ConfigBackgrounds::drawBrownCreeperBackground
-    );
+            ConfigBackgrounds::drawBrownCreeperBackground);
 
     public static final Background GRAY_CREEPER = new Background(
             "gray_creeper", "Gray Creeper",
-            ConfigBackgrounds::drawGrayCreeperBackground
-    );
+            ConfigBackgrounds::drawGrayCreeperBackground);
 
     private static final List<Background> BACKGROUNDS = new java.util.ArrayList<>(Arrays.asList(
             NONE,
@@ -198,8 +181,7 @@ public class ConfigBackgrounds {
             PINK_CREEPER,
             MAGENTA_CREEPER,
             BROWN_CREEPER,
-            GRAY_CREEPER
-    ));
+            GRAY_CREEPER));
 
     private static final List<String> BUILT_IN_IDS;
     static {
@@ -217,7 +199,9 @@ public class ConfigBackgrounds {
     private static final long SCAN_INTERVAL_MS = 2000L;
 
     public static String formatDisplayName(String filenameOrId) {
-        if (filenameOrId == null || filenameOrId.isBlank()) return "Custom";
+        if (filenameOrId == null || filenameOrId.isBlank()) {
+            return "Custom";
+        }
         String s = filenameOrId.trim();
 
         int dot = s.lastIndexOf('.');
@@ -231,8 +215,12 @@ public class ConfigBackgrounds {
         String[] tokens = s.trim().split("\\s+");
         StringBuilder sb = new StringBuilder();
         for (String token : tokens) {
-            if (token.isEmpty()) continue;
-            if (sb.length() > 0) sb.append(' ');
+            if (token.isEmpty()) {
+                continue;
+            }
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
             sb.append(Character.toUpperCase(token.charAt(0)));
             if (token.length() > 1) {
                 sb.append(token.substring(1).toLowerCase(Locale.ROOT));
@@ -242,7 +230,9 @@ public class ConfigBackgrounds {
     }
 
     public static String sanitizeId(String filenameOrId) {
-        if (filenameOrId == null || filenameOrId.isBlank()) return "custom";
+        if (filenameOrId == null || filenameOrId.isBlank()) {
+            return "custom";
+        }
         String s = filenameOrId.trim();
         int dot = s.lastIndexOf('.');
         if (dot > 0) {
@@ -251,8 +241,12 @@ public class ConfigBackgrounds {
         s = s.toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9_]", "_")
                 .replaceAll("_+", "_");
-        if (s.startsWith("_")) s = s.substring(1);
-        if (s.endsWith("_")) s = s.substring(0, s.length() - 1);
+        if (s.startsWith("_")) {
+            s = s.substring(1);
+        }
+        if (s.endsWith("_")) {
+            s = s.substring(0, s.length() - 1);
+        }
         return s.isEmpty() ? "custom" : s;
     }
 
@@ -289,39 +283,52 @@ public class ConfigBackgrounds {
         List<Path> candidateDirs = new java.util.ArrayList<>();
         try {
             Path primary = getCustomBackgroundsDir();
-            if (primary != null) candidateDirs.add(primary);
-        } catch (Exception ignored) {}
+            if (primary != null) {
+                candidateDirs.add(primary);
+            }
+        } catch (Exception ignored) {
+        }
 
         try {
             Path rootBg = Path.of("backgrounds");
             if (Files.isDirectory(rootBg) && !candidateDirs.contains(rootBg)) {
                 candidateDirs.add(rootBg);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         try {
             Path configBg = Path.of("config", "buildscape", "backgrounds");
             if (Files.isDirectory(configBg) && !candidateDirs.contains(configBg)) {
                 candidateDirs.add(configBg);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         for (Path dir : candidateDirs) {
-            if (!Files.isDirectory(dir)) continue;
+            if (!Files.isDirectory(dir)) {
+                continue;
+            }
             try (Stream<Path> stream = Files.list(dir)) {
-                stream.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".png"))
+                stream.filter(p -> Files.isRegularFile(p)
+                        && p.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".png"))
                         .sorted(Comparator.comparing(p -> p.getFileName().toString()))
                         .forEach(ConfigBackgrounds::loadCustomBackgroundFile);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
     private static void loadCustomBackgroundFile(Path filePath) {
         String fileName = filePath.getFileName().toString();
         String id = sanitizeId(fileName);
-        if (id.isEmpty()) return;
+        if (id.isEmpty()) {
+            return;
+        }
 
-        if (REGISTERED_BACKGROUND_IDS.contains(id) || !LOADING_BACKGROUND_IDS.add(id)) return;
+        if (REGISTERED_BACKGROUND_IDS.contains(id) || !LOADING_BACKGROUND_IDS.add(id)) {
+            return;
+        }
 
         String displayName = formatDisplayName(fileName);
         try (InputStream in = Files.newInputStream(filePath)) {
@@ -330,11 +337,18 @@ public class ConfigBackgrounds {
                 DynamicTexture texture = null;
                 try {
                     texture = new DynamicTexture(image);
-                    ResourceLocation texId = Minecraft.getInstance().getTextureManager().register("custom_bg_" + id, texture);
+                    ResourceLocation texId = Minecraft.getInstance().getTextureManager().register("custom_bg_" + id,
+                            texture);
                     registerImageBackground(id, displayName, texId);
-                    if (id.equalsIgnoreCase(BuildscapeClientConfig.get().getUiBackground())) setBackgroundById(id);
+                    if (id.equalsIgnoreCase(BuildscapeClientConfig.get().getUiBackground())) {
+                        setBackgroundById(id);
+                    }
                 } catch (Exception ignored) {
-                    if (texture != null) texture.close(); else image.close();
+                    if (texture != null) {
+                        texture.close();
+                    } else {
+                        image.close();
+                    }
                 } finally {
                     LOADING_BACKGROUND_IDS.remove(id);
                 }
@@ -347,7 +361,8 @@ public class ConfigBackgrounds {
     public static Background registerImageBackground(String id, String displayName, ResourceLocation textureId) {
         String key = id.toLowerCase(Locale.ROOT);
         REGISTERED_BACKGROUND_IDS.add(key);
-        Background bg = new Background(id, displayName, (poseStack, x, y, w, h, a, t) -> drawImageBackground(poseStack, textureId, x, y, w, h, a, t));
+        Background bg = new Background(id, displayName,
+                (poseStack, x, y, w, h, a, t) -> drawImageBackground(poseStack, textureId, x, y, w, h, a, t));
         BACKGROUNDS.add(bg);
         return bg;
     }
@@ -361,12 +376,14 @@ public class ConfigBackgrounds {
 
         try {
             refreshCustomBackgrounds();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         try {
             String saved = BuildscapeClientConfig.get().getUiBackground();
             setBackgroundById(saved);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public static List<Background> getAllBackgrounds() {
@@ -391,7 +408,8 @@ public class ConfigBackgrounds {
         Background bg = getCurrentBackground();
         try {
             BuildscapeClientConfig.get().setUiBackground(bg.id);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return bg;
     }
 
@@ -401,13 +419,18 @@ public class ConfigBackgrounds {
         Background bg = getCurrentBackground();
         try {
             BuildscapeClientConfig.get().setUiBackground(bg.id);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return bg;
     }
 
     public static void setBackgroundById(String id) {
-        if (id == null) return;
-        if ("creeper".equalsIgnoreCase(id)) id = "green_creeper";
+        if (id == null) {
+            return;
+        }
+        if ("creeper".equalsIgnoreCase(id)) {
+            id = "green_creeper";
+        }
         for (int i = 0; i < BACKGROUNDS.size(); i++) {
             if (BACKGROUNDS.get(i).id.equalsIgnoreCase(id)) {
                 activeBackgroundIndex = i;
@@ -417,20 +440,28 @@ public class ConfigBackgrounds {
     }
 
     public static Background getById(String id) {
-        if ("creeper".equalsIgnoreCase(id)) return GREEN_CREEPER;
+        if ("creeper".equalsIgnoreCase(id)) {
+            return GREEN_CREEPER;
+        }
         for (Background b : BACKGROUNDS) {
-            if (b.id.equalsIgnoreCase(id)) return b;
+            if (b.id.equalsIgnoreCase(id)) {
+                return b;
+            }
         }
         return NONE;
     }
 
-    public static void drawCurrentBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawCurrentBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         getCurrentBackground().draw(poseStack, x, y, width, height, alpha, theme);
     }
 
     // External images are shaded to preserve control and text contrast.
-    public static void drawImageBackground(PoseStack poseStack, ResourceLocation texture, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
-        if (width <= 0 || height <= 0 || alpha <= 0.001f || texture == null) return;
+    public static void drawImageBackground(PoseStack poseStack, ResourceLocation texture, int x, int y, int width,
+            int height, float alpha, ConfigThemes.Theme theme) {
+        if (width <= 0 || height <= 0 || alpha <= 0.001f || texture == null) {
+            return;
+        }
         ConfigGuiBatch.flush();
         RenderSystem.setShaderTexture(0, texture);
         GuiComponent.blit(poseStack, x, y, width, height, 0.0f, 0.0f, width, height, width, height);
@@ -443,70 +474,109 @@ public class ConfigBackgrounds {
 
     // --- Creeper Palette Data ---
 
-    private static final int[] ROW_GREEN_TOP = { 0xFF22C55E, 0xFF16A34A, 0xFF15803D, 0xFF16A34A, 0xFF15803D, 0xFF14532D, 0xFF0F3D1E, 0xFF0B2E16 };
-    private static final int[] ROW_GREEN_ALT = { 0xFF4ADE80, 0xFF22C55E, 0xFF16A34A, 0xFF15803D, 0xFF16A34A, 0xFF15803D, 0xFF14532D, 0xFF0F3D1E };
+    private static final int[] ROW_GREEN_TOP = {0xFF22C55E, 0xFF16A34A, 0xFF15803D, 0xFF16A34A, 0xFF15803D, 0xFF14532D,
+            0xFF0F3D1E, 0xFF0B2E16};
+    private static final int[] ROW_GREEN_ALT = {0xFF4ADE80, 0xFF22C55E, 0xFF16A34A, 0xFF15803D, 0xFF16A34A, 0xFF15803D,
+            0xFF14532D, 0xFF0F3D1E};
 
-    private static final int[] ROW_GOLD_TOP = { 0xFFFDE047, 0xFFFBBF24, 0xFFF59E0B, 0xFFFBBF24, 0xFFF59E0B, 0xFFD97706, 0xFFB45309, 0xFF92400E };
-    private static final int[] ROW_GOLD_ALT = { 0xFFFEF08A, 0xFFFDE047, 0xFFFBBF24, 0xFFF59E0B, 0xFFD97706, 0xFFB45309, 0xFF92400E, 0xFF78350F };
+    private static final int[] ROW_GOLD_TOP = {0xFFFDE047, 0xFFFBBF24, 0xFFF59E0B, 0xFFFBBF24, 0xFFF59E0B, 0xFFD97706,
+            0xFFB45309, 0xFF92400E};
+    private static final int[] ROW_GOLD_ALT = {0xFFFEF08A, 0xFFFDE047, 0xFFFBBF24, 0xFFF59E0B, 0xFFD97706, 0xFFB45309,
+            0xFF92400E, 0xFF78350F};
 
-    private static final int[] ROW_CRIMSON_TOP = { 0xFFFB7185, 0xFFF43F5E, 0xFFE11D48, 0xFFF43F5E, 0xFFE11D48, 0xFFBE123C, 0xFF9F1239, 0xFF881337 };
-    private static final int[] ROW_CRIMSON_ALT = { 0xFFFDA4AF, 0xFFFB7185, 0xFFF43F5E, 0xFFE11D48, 0xFFBE123C, 0xFF9F1239, 0xFF881337, 0xFF4C0519 };
+    private static final int[] ROW_CRIMSON_TOP = {0xFFFB7185, 0xFFF43F5E, 0xFFE11D48, 0xFFF43F5E, 0xFFE11D48,
+            0xFFBE123C, 0xFF9F1239, 0xFF881337};
+    private static final int[] ROW_CRIMSON_ALT = {0xFFFDA4AF, 0xFFFB7185, 0xFFF43F5E, 0xFFE11D48, 0xFFBE123C,
+            0xFF9F1239, 0xFF881337, 0xFF4C0519};
 
-    private static final int[] ROW_WARPED_TOP = { 0xFF2DD4BF, 0xFF14B8A6, 0xFF0D9488, 0xFF14B8A6, 0xFF0D9488, 0xFF0F766E, 0xFF115E59, 0xFF134E4A };
-    private static final int[] ROW_WARPED_ALT = { 0xFF5EEAD4, 0xFF2DD4BF, 0xFF14B8A6, 0xFF0D9488, 0xFF0F766E, 0xFF115E59, 0xFF134E4A, 0xFF042F2E };
+    private static final int[] ROW_WARPED_TOP = {0xFF2DD4BF, 0xFF14B8A6, 0xFF0D9488, 0xFF14B8A6, 0xFF0D9488, 0xFF0F766E,
+            0xFF115E59, 0xFF134E4A};
+    private static final int[] ROW_WARPED_ALT = {0xFF5EEAD4, 0xFF2DD4BF, 0xFF14B8A6, 0xFF0D9488, 0xFF0F766E, 0xFF115E59,
+            0xFF134E4A, 0xFF042F2E};
 
-    private static final int[] ROW_BLUE_TOP = { 0xFF3B82F6, 0xFF2563EB, 0xFF1D4ED8, 0xFF2563EB, 0xFF1D4ED8, 0xFF1E40AF, 0xFF1E3A8A, 0xFF172554 };
-    private static final int[] ROW_BLUE_ALT = { 0xFF60A5FA, 0xFF3B82F6, 0xFF2563EB, 0xFF1D4ED8, 0xFF1E40AF, 0xFF1E3A8A, 0xFF172554, 0xFF0F172A };
+    private static final int[] ROW_BLUE_TOP = {0xFF3B82F6, 0xFF2563EB, 0xFF1D4ED8, 0xFF2563EB, 0xFF1D4ED8, 0xFF1E40AF,
+            0xFF1E3A8A, 0xFF172554};
+    private static final int[] ROW_BLUE_ALT = {0xFF60A5FA, 0xFF3B82F6, 0xFF2563EB, 0xFF1D4ED8, 0xFF1E40AF, 0xFF1E3A8A,
+            0xFF172554, 0xFF0F172A};
 
-    private static final int[] ROW_PURPLE_TOP = { 0xFFA855F7, 0xFF9333EA, 0xFF7E22CE, 0xFF9333EA, 0xFF7E22CE, 0xFF6B21A8, 0xFF581C87, 0xFF3B0764 };
-    private static final int[] ROW_PURPLE_ALT = { 0xFFC084FC, 0xFFA855F7, 0xFF9333EA, 0xFF7E22CE, 0xFF6B21A8, 0xFF581C87, 0xFF3B0764, 0xFF2E0854 };
+    private static final int[] ROW_PURPLE_TOP = {0xFFA855F7, 0xFF9333EA, 0xFF7E22CE, 0xFF9333EA, 0xFF7E22CE, 0xFF6B21A8,
+            0xFF581C87, 0xFF3B0764};
+    private static final int[] ROW_PURPLE_ALT = {0xFFC084FC, 0xFFA855F7, 0xFF9333EA, 0xFF7E22CE, 0xFF6B21A8, 0xFF581C87,
+            0xFF3B0764, 0xFF2E0854};
 
-    private static final int[] ROW_RED_TOP = { 0xFFEF4444, 0xFFDC2626, 0xFFB91C1C, 0xFFDC2626, 0xFFB91C1C, 0xFF991B1B, 0xFF7F1D1D, 0xFF450A0A };
-    private static final int[] ROW_RED_ALT = { 0xFFF87171, 0xFFEF4444, 0xFFDC2626, 0xFFB91C1C, 0xFF991B1B, 0xFF7F1D1D, 0xFF450A0A, 0xFF300606 };
+    private static final int[] ROW_RED_TOP = {0xFFEF4444, 0xFFDC2626, 0xFFB91C1C, 0xFFDC2626, 0xFFB91C1C, 0xFF991B1B,
+            0xFF7F1D1D, 0xFF450A0A};
+    private static final int[] ROW_RED_ALT = {0xFFF87171, 0xFFEF4444, 0xFFDC2626, 0xFFB91C1C, 0xFF991B1B, 0xFF7F1D1D,
+            0xFF450A0A, 0xFF300606};
 
-    private static final int[] ROW_ORANGE_TOP = { 0xFFF97316, 0xFFEA580C, 0xFFC2410C, 0xFFEA580C, 0xFFC2410C, 0xFF9A3412, 0xFF7C2D12, 0xFF431407 };
-    private static final int[] ROW_ORANGE_ALT = { 0xFFFB923C, 0xFFF97316, 0xFFEA580C, 0xFFC2410C, 0xFF9A3412, 0xFF7C2D12, 0xFF431407, 0xFF2E0E05 };
+    private static final int[] ROW_ORANGE_TOP = {0xFFF97316, 0xFFEA580C, 0xFFC2410C, 0xFFEA580C, 0xFFC2410C, 0xFF9A3412,
+            0xFF7C2D12, 0xFF431407};
+    private static final int[] ROW_ORANGE_ALT = {0xFFFB923C, 0xFFF97316, 0xFFEA580C, 0xFFC2410C, 0xFF9A3412, 0xFF7C2D12,
+            0xFF431407, 0xFF2E0E05};
 
-    private static final int[] ROW_WHITE_TOP = { 0xFFF8FAFC, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFCBD5E1, 0xFF94A3B8, 0xFF64748B };
-    private static final int[] ROW_WHITE_ALT = { 0xFFFFFFFF, 0xFFF8FAFC, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFCBD5E1, 0xFF94A3B8, 0xFF64748B, 0xFF475569 };
+    private static final int[] ROW_WHITE_TOP = {0xFFF8FAFC, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFCBD5E1,
+            0xFF94A3B8, 0xFF64748B};
+    private static final int[] ROW_WHITE_ALT = {0xFFFFFFFF, 0xFFF8FAFC, 0xFFF1F5F9, 0xFFE2E8F0, 0xFFCBD5E1, 0xFF94A3B8,
+            0xFF64748B, 0xFF475569};
 
-    private static final int[] ROW_BLACK_TOP = { 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF1E293B, 0xFF0F172A, 0xFF0B1120, 0xFF080C17, 0xFF05070E };
-    private static final int[] ROW_BLACK_ALT = { 0xFF475569, 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF0B1120, 0xFF080C17, 0xFF05070E, 0xFF030408 };
+    private static final int[] ROW_BLACK_TOP = {0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF1E293B, 0xFF0F172A, 0xFF0B1120,
+            0xFF080C17, 0xFF05070E};
+    private static final int[] ROW_BLACK_ALT = {0xFF475569, 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF0B1120, 0xFF080C17,
+            0xFF05070E, 0xFF030408};
 
-    private static final int[] ROW_YELLOW_TOP = { 0xFFFACC15, 0xFFEAB308, 0xFFCA8A04, 0xFFEAB308, 0xFFCA8A04, 0xFFA16207, 0xFF854D0E, 0xFF713F12 };
-    private static final int[] ROW_YELLOW_ALT = { 0xFFFEF08A, 0xFFFDE047, 0xFFFACC15, 0xFFEAB308, 0xFFCA8A04, 0xFFA16207, 0xFF854D0E, 0xFF582D09 };
+    private static final int[] ROW_YELLOW_TOP = {0xFFFACC15, 0xFFEAB308, 0xFFCA8A04, 0xFFEAB308, 0xFFCA8A04, 0xFFA16207,
+            0xFF854D0E, 0xFF713F12};
+    private static final int[] ROW_YELLOW_ALT = {0xFFFEF08A, 0xFFFDE047, 0xFFFACC15, 0xFFEAB308, 0xFFCA8A04, 0xFFA16207,
+            0xFF854D0E, 0xFF582D09};
 
-    private static final int[] ROW_LIME_TOP = { 0xFF84CC16, 0xFF65A30D, 0xFF4D7C0F, 0xFF65A30D, 0xFF4D7C0F, 0xFF3F6212, 0xFF365314, 0xFF1A2E05 };
-    private static final int[] ROW_LIME_ALT = { 0xFFA3E635, 0xFF84CC16, 0xFF65A30D, 0xFF4D7C0F, 0xFF3F6212, 0xFF365314, 0xFF1A2E05, 0xFF101D03 };
+    private static final int[] ROW_LIME_TOP = {0xFF84CC16, 0xFF65A30D, 0xFF4D7C0F, 0xFF65A30D, 0xFF4D7C0F, 0xFF3F6212,
+            0xFF365314, 0xFF1A2E05};
+    private static final int[] ROW_LIME_ALT = {0xFFA3E635, 0xFF84CC16, 0xFF65A30D, 0xFF4D7C0F, 0xFF3F6212, 0xFF365314,
+            0xFF1A2E05, 0xFF101D03};
 
-    private static final int[] ROW_CYAN_TOP = { 0xFF06B6D4, 0xFF0891B2, 0xFF0E7490, 0xFF0891B2, 0xFF0E7490, 0xFF155E75, 0xFF164E63, 0xFF083344 };
-    private static final int[] ROW_CYAN_ALT = { 0xFF22D3EE, 0xFF06B6D4, 0xFF0891B2, 0xFF0E7490, 0xFF155E75, 0xFF164E63, 0xFF083344, 0xFF04202C };
+    private static final int[] ROW_CYAN_TOP = {0xFF06B6D4, 0xFF0891B2, 0xFF0E7490, 0xFF0891B2, 0xFF0E7490, 0xFF155E75,
+            0xFF164E63, 0xFF083344};
+    private static final int[] ROW_CYAN_ALT = {0xFF22D3EE, 0xFF06B6D4, 0xFF0891B2, 0xFF0E7490, 0xFF155E75, 0xFF164E63,
+            0xFF083344, 0xFF04202C};
 
-    private static final int[] ROW_LIGHT_BLUE_TOP = { 0xFF38BDF8, 0xFF0284C7, 0xFF0369A1, 0xFF0284C7, 0xFF0369A1, 0xFF075985, 0xFF0C4A6E, 0xFF082F49 };
-    private static final int[] ROW_LIGHT_BLUE_ALT = { 0xFF7DD3FC, 0xFF38BDF8, 0xFF0284C7, 0xFF0369A1, 0xFF075985, 0xFF0C4A6E, 0xFF082F49, 0xFF051E30 };
+    private static final int[] ROW_LIGHT_BLUE_TOP = {0xFF38BDF8, 0xFF0284C7, 0xFF0369A1, 0xFF0284C7, 0xFF0369A1,
+            0xFF075985, 0xFF0C4A6E, 0xFF082F49};
+    private static final int[] ROW_LIGHT_BLUE_ALT = {0xFF7DD3FC, 0xFF38BDF8, 0xFF0284C7, 0xFF0369A1, 0xFF075985,
+            0xFF0C4A6E, 0xFF082F49, 0xFF051E30};
 
-    private static final int[] ROW_PINK_TOP = { 0xFFF472B6, 0xFFEC4899, 0xFFDB2777, 0xFFEC4899, 0xFFDB2777, 0xFFBE185D, 0xFF9D174D, 0xFF831843 };
-    private static final int[] ROW_PINK_ALT = { 0xFFF9A8D4, 0xFFF472B6, 0xFFEC4899, 0xFFDB2777, 0xFFBE185D, 0xFF9D174D, 0xFF831843, 0xFF500728 };
+    private static final int[] ROW_PINK_TOP = {0xFFF472B6, 0xFFEC4899, 0xFFDB2777, 0xFFEC4899, 0xFFDB2777, 0xFFBE185D,
+            0xFF9D174D, 0xFF831843};
+    private static final int[] ROW_PINK_ALT = {0xFFF9A8D4, 0xFFF472B6, 0xFFEC4899, 0xFFDB2777, 0xFFBE185D, 0xFF9D174D,
+            0xFF831843, 0xFF500728};
 
-    private static final int[] ROW_MAGENTA_TOP = { 0xFFE879F9, 0xFFD946EF, 0xFFC026D3, 0xFFD946EF, 0xFFC026D3, 0xFFA21CAF, 0xFF86198F, 0xFF701A75 };
-    private static final int[] ROW_MAGENTA_ALT = { 0xFFF0ABFC, 0xFFE879F9, 0xFFD946EF, 0xFFC026D3, 0xFFA21CAF, 0xFF86198F, 0xFF701A75, 0xFF4A044E };
+    private static final int[] ROW_MAGENTA_TOP = {0xFFE879F9, 0xFFD946EF, 0xFFC026D3, 0xFFD946EF, 0xFFC026D3,
+            0xFFA21CAF, 0xFF86198F, 0xFF701A75};
+    private static final int[] ROW_MAGENTA_ALT = {0xFFF0ABFC, 0xFFE879F9, 0xFFD946EF, 0xFFC026D3, 0xFFA21CAF,
+            0xFF86198F, 0xFF701A75, 0xFF4A044E};
 
-    private static final int[] ROW_BROWN_TOP = { 0xFF8D5B4C, 0xFF784537, 0xFF63372C, 0xFF784537, 0xFF63372C, 0xFF502B22, 0xFF3E1F18, 0xFF2C1510 };
-    private static final int[] ROW_BROWN_ALT = { 0xFFA67161, 0xFF8D5B4C, 0xFF784537, 0xFF63372C, 0xFF502B22, 0xFF3E1F18, 0xFF2C1510, 0xFF1D0D0A };
+    private static final int[] ROW_BROWN_TOP = {0xFF8D5B4C, 0xFF784537, 0xFF63372C, 0xFF784537, 0xFF63372C, 0xFF502B22,
+            0xFF3E1F18, 0xFF2C1510};
+    private static final int[] ROW_BROWN_ALT = {0xFFA67161, 0xFF8D5B4C, 0xFF784537, 0xFF63372C, 0xFF502B22, 0xFF3E1F18,
+            0xFF2C1510, 0xFF1D0D0A};
 
-    private static final int[] ROW_GRAY_TOP = { 0xFF64748B, 0xFF475569, 0xFF334155, 0xFF475569, 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF020617 };
-    private static final int[] ROW_GRAY_ALT = { 0xFF94A3B8, 0xFF64748B, 0xFF475569, 0xFF334155, 0xFF1E293B, 0xFF0F172A, 0xFF020617, 0xFF01030B };
+    private static final int[] ROW_GRAY_TOP = {0xFF64748B, 0xFF475569, 0xFF334155, 0xFF475569, 0xFF334155, 0xFF1E293B,
+            0xFF0F172A, 0xFF020617};
+    private static final int[] ROW_GRAY_ALT = {0xFF94A3B8, 0xFF64748B, 0xFF475569, 0xFF334155, 0xFF1E293B, 0xFF0F172A,
+            0xFF020617, 0xFF01030B};
 
     /**
      * Unified, high-performance Creeper backdrop renderer.
      * Combines Gouraud-shaded wash gradients with batch-optimized face and cutout geometry.
      */
-    private static void drawCreeperPreset(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme,
-                                         int topWash, int midWash, int botWash,
-                                         int[] rowTop, int[] rowAlt,
-                                         int borderLight, int borderDark,
-                                         int cutoutLight, int cutoutDark) {
-        if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
+    private static void drawCreeperPreset(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme,
+            int topWash, int midWash, int botWash,
+            int[] rowTop, int[] rowAlt,
+            int borderLight, int borderDark,
+            int cutoutLight, int cutoutDark) {
+        if (width <= 0 || height <= 0 || alpha <= 0.001f) {
+            return;
+        }
 
         boolean light = theme != null && theme.isLight();
         float washAlpha = light ? 0.08f : 0.14f;
@@ -546,12 +616,14 @@ public class ConfigBackgrounds {
 
         // 3. Border
         int borderCol = light ? borderLight : borderDark;
-        drawBorder(poseStack, b.x - 1, b.y - 1, b.size + 2, b.size + 2, applyAlpha(borderCol, alpha * (light ? 0.22f : 0.30f)));
+        drawBorder(poseStack, b.x - 1, b.y - 1, b.size + 2, b.size + 2,
+                applyAlpha(borderCol, alpha * (light ? 0.22f : 0.30f)));
     }
 
     // --- Creeper Background Implementations ---
 
-    public static void drawGreenCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawGreenCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF0B2914, 0xFF166534, 0xFF061A0C,
                 ROW_GREEN_TOP, ROW_GREEN_ALT,
@@ -559,7 +631,8 @@ public class ConfigBackgrounds {
                 0xFF0B2010, 0xFF030D06);
     }
 
-    public static void drawGoldenCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawGoldenCreeperBackground(PoseStack poseStack, int x, int y, int width, int height,
+            float alpha, ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF2B1D04, 0xFFB45309, 0xFF1C1202,
                 ROW_GOLD_TOP, ROW_GOLD_ALT,
@@ -567,7 +640,8 @@ public class ConfigBackgrounds {
                 0xFF261804, 0xFF140B02);
     }
 
-    public static void drawCrimsonCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawCrimsonCreeperBackground(PoseStack poseStack, int x, int y, int width, int height,
+            float alpha, ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF26050C, 0xFF9F1239, 0xFF140206,
                 ROW_CRIMSON_TOP, ROW_CRIMSON_ALT,
@@ -575,7 +649,8 @@ public class ConfigBackgrounds {
                 0xFF24040A, 0xFF120205);
     }
 
-    public static void drawWarpedCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawWarpedCreeperBackground(PoseStack poseStack, int x, int y, int width, int height,
+            float alpha, ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF042022, 0xFF0D6E6E, 0xFF031415,
                 ROW_WARPED_TOP, ROW_WARPED_ALT,
@@ -583,7 +658,8 @@ public class ConfigBackgrounds {
                 0xFF042224, 0xFF021314);
     }
 
-    public static void drawBlueCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawBlueCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF0B192C, 0xFF1E3A8A, 0xFF060D17,
                 ROW_BLUE_TOP, ROW_BLUE_ALT,
@@ -591,7 +667,8 @@ public class ConfigBackgrounds {
                 0xFF0F172A, 0xFF050811);
     }
 
-    public static void drawPurpleCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawPurpleCreeperBackground(PoseStack poseStack, int x, int y, int width, int height,
+            float alpha, ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF190B28, 0xFF581C87, 0xFF0D0517,
                 ROW_PURPLE_TOP, ROW_PURPLE_ALT,
@@ -599,7 +676,8 @@ public class ConfigBackgrounds {
                 0xFF1E0A33, 0xFF0A0214);
     }
 
-    public static void drawRedCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawRedCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF260808, 0xFF7F1D1D, 0xFF140303,
                 ROW_RED_TOP, ROW_RED_ALT,
@@ -607,7 +685,8 @@ public class ConfigBackgrounds {
                 0xFF200505, 0xFF0D0202);
     }
 
-    public static void drawOrangeCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawOrangeCreeperBackground(PoseStack poseStack, int x, int y, int width, int height,
+            float alpha, ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF251006, 0xFF7C2D12, 0xFF140803,
                 ROW_ORANGE_TOP, ROW_ORANGE_ALT,
@@ -615,7 +694,8 @@ public class ConfigBackgrounds {
                 0xFF240D05, 0xFF0E0502);
     }
 
-    public static void drawWhiteCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawWhiteCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF141923, 0xFF334155, 0xFF0D1117,
                 ROW_WHITE_TOP, ROW_WHITE_ALT,
@@ -623,7 +703,8 @@ public class ConfigBackgrounds {
                 0xFF1E293B, 0xFF0F172A);
     }
 
-    public static void drawBlackCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawBlackCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF0F1219, 0xFF1E2433, 0xFF080A0E,
                 ROW_BLACK_TOP, ROW_BLACK_ALT,
@@ -631,7 +712,8 @@ public class ConfigBackgrounds {
                 0xFF080B12, 0xFF020306);
     }
 
-    public static void drawYellowCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawYellowCreeperBackground(PoseStack poseStack, int x, int y, int width, int height,
+            float alpha, ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF2A2304, 0xFF713F12, 0xFF171302,
                 ROW_YELLOW_TOP, ROW_YELLOW_ALT,
@@ -639,7 +721,8 @@ public class ConfigBackgrounds {
                 0xFF2B2004, 0xFF140E02);
     }
 
-    public static void drawLimeCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawLimeCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF142006, 0xFF365314, 0xFF0A1003,
                 ROW_LIME_TOP, ROW_LIME_ALT,
@@ -647,7 +730,8 @@ public class ConfigBackgrounds {
                 0xFF192605, 0xFF0B1202);
     }
 
-    public static void drawCyanCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawCyanCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF061E28, 0xFF164E63, 0xFF030F14,
                 ROW_CYAN_TOP, ROW_CYAN_ALT,
@@ -655,7 +739,8 @@ public class ConfigBackgrounds {
                 0xFF08222E, 0xFF031017);
     }
 
-    public static void drawLightBlueCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawLightBlueCreeperBackground(PoseStack poseStack, int x, int y, int width, int height,
+            float alpha, ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF082030, 0xFF0C4A6E, 0xFF04111A,
                 ROW_LIGHT_BLUE_TOP, ROW_LIGHT_BLUE_ALT,
@@ -663,7 +748,8 @@ public class ConfigBackgrounds {
                 0xFF0A2336, 0xFF04121C);
     }
 
-    public static void drawPinkCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawPinkCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF280B1B, 0xFF831843, 0xFF14050D,
                 ROW_PINK_TOP, ROW_PINK_ALT,
@@ -671,7 +757,8 @@ public class ConfigBackgrounds {
                 0xFF2B0A1D, 0xFF13040D);
     }
 
-    public static void drawMagentaCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawMagentaCreeperBackground(PoseStack poseStack, int x, int y, int width, int height,
+            float alpha, ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF240726, 0xFF701A75, 0xFF120313,
                 ROW_MAGENTA_TOP, ROW_MAGENTA_ALT,
@@ -679,7 +766,8 @@ public class ConfigBackgrounds {
                 0xFF29082B, 0xFF120314);
     }
 
-    public static void drawBrownCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawBrownCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF1F100B, 0xFF3E1F18, 0xFF100805,
                 ROW_BROWN_TOP, ROW_BROWN_ALT,
@@ -687,7 +775,8 @@ public class ConfigBackgrounds {
                 0xFF24110C, 0xFF100705);
     }
 
-    public static void drawGrayCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+    public static void drawGrayCreeperBackground(PoseStack poseStack, int x, int y, int width, int height, float alpha,
+            ConfigThemes.Theme theme) {
         drawCreeperPreset(poseStack, x, y, width, height, alpha, theme,
                 0xFF141923, 0xFF1E293B, 0xFF0A0D12,
                 ROW_GRAY_TOP, ROW_GRAY_ALT,
@@ -723,7 +812,9 @@ public class ConfigBackgrounds {
     }
 
     public static void drawBorder(PoseStack poseStack, int x, int y, int w, int h, int color) {
-        if (w <= 0 || h <= 0) return;
+        if (w <= 0 || h <= 0) {
+            return;
+        }
         ConfigGuiBatch.fill(poseStack, x, y, x + w, y + 1, color);
         ConfigGuiBatch.fill(poseStack, x, y + h - 1, x + w, y + h, color);
         if (h > 2) {
@@ -736,8 +827,11 @@ public class ConfigBackgrounds {
      * Hardware Gouraud-shaded vertical 3-stop gradient rectangle.
      * Submits exactly 2 quads directly to the batch buffer without CPU per-strip rasterization.
      */
-    public static void drawVerticalGradientRect(PoseStack poseStack, int x, int y, int w, int h, int topCol, int midCol, int botCol, float alpha) {
-        if (h <= 0 || w <= 0 || alpha <= 0.001f) return;
+    public static void drawVerticalGradientRect(PoseStack poseStack, int x, int y, int w, int h, int topCol, int midCol,
+            int botCol, float alpha) {
+        if (h <= 0 || w <= 0 || alpha <= 0.001f) {
+            return;
+        }
 
         int halfH = h / 2;
         int topAlphaCol = applyAlpha(topCol, alpha);
@@ -745,10 +839,12 @@ public class ConfigBackgrounds {
         int botAlphaCol = applyAlpha(botCol, alpha);
 
         if (halfH > 0) {
-            ConfigGuiBatch.gradient(poseStack, x, y, x + w, y + halfH, topAlphaCol, topAlphaCol, midAlphaCol, midAlphaCol);
+            ConfigGuiBatch.gradient(poseStack, x, y, x + w, y + halfH, topAlphaCol, topAlphaCol, midAlphaCol,
+                    midAlphaCol);
         }
         if (h - halfH > 0) {
-            ConfigGuiBatch.gradient(poseStack, x, y + halfH, x + w, y + h, midAlphaCol, midAlphaCol, botAlphaCol, botAlphaCol);
+            ConfigGuiBatch.gradient(poseStack, x, y + halfH, x + w, y + h, midAlphaCol, midAlphaCol, botAlphaCol,
+                    botAlphaCol);
         }
     }
 }

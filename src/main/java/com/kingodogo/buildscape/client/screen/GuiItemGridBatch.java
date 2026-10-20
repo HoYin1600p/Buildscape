@@ -20,7 +20,8 @@ import java.util.function.Consumer;
 
 /** GUI item geometry shares a buffer submission instead of flushing once per visible slot. */
 final class GuiItemGridBatch {
-    record Icon(ItemStack stack, BakedModel model, int x, int y) {}
+    record Icon(ItemStack stack, BakedModel model, int x, int y) {
+    }
 
     private final List<Icon> blockLit = new ArrayList<>();
     private final List<Icon> flatLit = new ArrayList<>();
@@ -37,8 +38,11 @@ final class GuiItemGridBatch {
         // Resolve overrides every frame: clocks, compasses and other changing models must stay live.
         BakedModel model = renderer.getModel(stack, null, null, 0);
         Icon icon = new Icon(stack, model, x, y);
-        if (renderer.getClass() != ItemRenderer.class || !canBatch(model)) vanilla.add(icon);
-        else (model.usesBlockLight() ? blockLit : flatLit).add(icon);
+        if (renderer.getClass() != ItemRenderer.class || !canBatch(model)) {
+            vanilla.add(icon);
+        } else {
+            (model.usesBlockLight() ? blockLit : flatLit).add(icon);
+        }
     }
 
     static boolean canBatch(BakedModel model) {
@@ -57,13 +61,17 @@ final class GuiItemGridBatch {
             drawPass(blockLit, false, scale, renderer, buffers);
             drawPass(flatLit, true, scale, renderer, buffers);
         }
-        for (Icon icon : vanilla) renderVanilla.accept(icon);
+        for (Icon icon : vanilla) {
+            renderVanilla.accept(icon);
+        }
         clear();
     }
 
     private static void drawPass(List<Icon> icons, boolean flat, float scale,
-                                 ItemRenderer renderer, MultiBufferSource.BufferSource buffers) {
-        if (icons.isEmpty()) return;
+            ItemRenderer renderer, MultiBufferSource.BufferSource buffers) {
+        if (icons.isEmpty()) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         mc.getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
@@ -77,7 +85,11 @@ final class GuiItemGridBatch {
             // Keep the Y flip in the global matrix, as vanilla does, so model normals/light remain unchanged.
             applyGridTransform(modelView, scale);
             RenderSystem.applyModelViewMatrix();
-            if (flat) Lighting.setupForFlatItems(); else Lighting.setupFor3DItems();
+            if (flat) {
+                Lighting.setupForFlatItems();
+            } else {
+                Lighting.setupFor3DItems();
+            }
             PoseStack pose = new PoseStack();
             try {
                 for (Icon icon : icons) {

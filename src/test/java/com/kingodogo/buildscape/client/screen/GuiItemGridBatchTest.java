@@ -45,7 +45,8 @@ public class GuiItemGridBatchTest {
         SimpleBakedModel plain = new SimpleBakedModel(List.of(), Map.of(), false, true, true,
                 null, ItemTransforms.NO_TRANSFORMS, ItemOverrides.EMPTY);
         SimpleBakedModel wrapped = new SimpleBakedModel(List.of(), Map.of(), false, true, true,
-                null, ItemTransforms.NO_TRANSFORMS, ItemOverrides.EMPTY) {};
+                null, ItemTransforms.NO_TRANSFORMS, ItemOverrides.EMPTY) {
+        };
         assertTrue(GuiItemGridBatch.canBatch(plain));
         assertFalse(GuiItemGridBatch.canBatch(wrapped));
         assertFalse(GuiItemGridBatch.canBatch(null));

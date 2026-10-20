@@ -18,7 +18,7 @@ public class ConfigScissorScaleTest {
 
     @Test
     public void unscaledLayoutUsesTheWindowGuiScale() {
-        assertArrayEquals(new int[] {40, 1440 - 220, 200, 100},
+        assertArrayEquals(new int[]{40, 1440 - 220, 200, 100},
                 BuildScapeConfigScreen.scissorRect(20, 60, 100, 50, 2.0, 1440));
     }
 

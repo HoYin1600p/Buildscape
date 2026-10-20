@@ -23,8 +23,10 @@ final class ConfigGuiBatch {
 
     /** Colours in clockwise order starting at the top left. Positions are transformed when queued. */
     static void gradient(PoseStack pose, int x0, int y0, int x1, int y1,
-                         int topLeft, int topRight, int bottomRight, int bottomLeft) {
-        if (x0 == x1 || y0 == y1) return;
+            int topLeft, int topRight, int bottomRight, int bottomLeft) {
+        if (x0 == x1 || y0 == y1) {
+            return;
+        }
         if (!drawing) {
             BUFFER.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             drawing = true;
@@ -43,7 +45,9 @@ final class ConfigGuiBatch {
 
     static void flush() {
         BufferBuilder ready = finishPending();
-        if (ready == null) return;
+        if (ready == null) {
+            return;
+        }
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
         RenderSystem.defaultBlendFunc();
@@ -55,7 +59,9 @@ final class ConfigGuiBatch {
 
     /** BufferUploader consumes a completed draw state; it does not call BufferBuilder.end(). */
     static BufferBuilder finishPending() {
-        if (!drawing) return null;
+        if (!drawing) {
+            return null;
+        }
         drawing = false;
         BUFFER.end();
         return BUFFER;
@@ -63,7 +69,9 @@ final class ConfigGuiBatch {
 
     /** Two layered gradients produce the full HSV field without rasterising a thousand cells. */
     static void colorField(PoseStack pose, int x, int y, int width, int height, int hue, float alpha) {
-        if (width <= 0 || height <= 0 || alpha <= 0) return;
+        if (width <= 0 || height <= 0 || alpha <= 0) {
+            return;
+        }
         hue &= 0xFFFFFF;
         // During fades, draw a short strip mesh so every fragment has the requested opacity.
         // Layering two translucent quads would incorrectly make the bottom more opaque.

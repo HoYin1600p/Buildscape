@@ -11,10 +11,10 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class BuildersPouchScreen extends AbstractContainerScreen<BuildersPouchMenu> {
 
-    private static final ResourceLocation BACKGROUND =
-            new ResourceLocation("buildscape", "textures/gui/builders_pouch/builders_pouch_bg.png");
-    private static final ResourceLocation TITLE =
-            new ResourceLocation("buildscape", "textures/gui/builders_pouch/builders_pouch_title.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("buildscape",
+            "textures/gui/builders_pouch/builders_pouch_bg.png");
+    private static final ResourceLocation TITLE = new ResourceLocation("buildscape",
+            "textures/gui/builders_pouch/builders_pouch_title.png");
 
     private static final int GUI_WIDTH = 188;
     private static final int GUI_HEIGHT = 134;

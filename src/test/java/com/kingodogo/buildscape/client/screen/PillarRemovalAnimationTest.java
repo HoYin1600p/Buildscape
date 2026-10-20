@@ -13,8 +13,10 @@ public class PillarRemovalAnimationTest {
         float startOffset = 26.0f; // 1 row step
 
         // At start (t = 0)
-        assertEquals(26.0f, BuildScapeConfigScreen.calculatePillarRowShift(startOffset, start, duration, start), 0.001f);
-        assertEquals(26.0f, BuildScapeConfigScreen.calculatePillarRowShift(startOffset, start, duration, start - 100), 0.001f);
+        assertEquals(26.0f, BuildScapeConfigScreen.calculatePillarRowShift(startOffset, start, duration, start),
+                0.001f);
+        assertEquals(26.0f, BuildScapeConfigScreen.calculatePillarRowShift(startOffset, start, duration, start - 100),
+                0.001f);
 
         // At half time (t = 130ms): easeOutCubic(0.5) = 1 - 0.5^3 = 0.875
         // remaining offset factor = 1 - 0.875 = 0.125
@@ -22,10 +24,12 @@ public class PillarRemovalAnimationTest {
         assertEquals(26.0f * 0.125f, midShift, 0.01f);
 
         // At completion (t = 260ms)
-        assertEquals(0.0f, BuildScapeConfigScreen.calculatePillarRowShift(startOffset, start, duration, start + 260), 0.001f);
+        assertEquals(0.0f, BuildScapeConfigScreen.calculatePillarRowShift(startOffset, start, duration, start + 260),
+                0.001f);
 
         // Past completion
-        assertEquals(0.0f, BuildScapeConfigScreen.calculatePillarRowShift(startOffset, start, duration, start + 500), 0.001f);
+        assertEquals(0.0f, BuildScapeConfigScreen.calculatePillarRowShift(startOffset, start, duration, start + 500),
+                0.001f);
     }
 
     @Test
@@ -43,21 +47,26 @@ public class PillarRemovalAnimationTest {
         int slideDistance = 300;
 
         // At start
-        assertEquals(colX, BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start));
-        assertEquals(colX, BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start - 50));
+        assertEquals(colX,
+                BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start));
+        assertEquals(colX,
+                BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start - 50));
 
         // At half time (t = 130ms): easeOutSine(0.5) = sin(pi/4) ~= 0.7071
-        int midX = BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start + 130);
+        int midX = BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration,
+                start + 130);
         int expectedMidX = colX + (int) (slideDistance * (float) Math.sin(0.5f * Math.PI / 2.0));
         assertEquals(expectedMidX, midX);
         assertTrue(midX > colX);
         assertTrue(midX < colX + slideDistance);
 
         // At completion (t = 260ms)
-        assertEquals(colX + slideDistance, BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start + 260));
+        assertEquals(colX + slideDistance,
+                BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start + 260));
 
         // Past completion
-        assertEquals(colX + slideDistance, BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start + 400));
+        assertEquals(colX + slideDistance,
+                BuildScapeConfigScreen.calculatePillarRemovalSlideX(colX, slideDistance, start, duration, start + 400));
     }
 
     @Test
@@ -67,16 +76,20 @@ public class PillarRemovalAnimationTest {
         float baseAlpha = 1.0f;
 
         // At start
-        assertEquals(1.0f, BuildScapeConfigScreen.calculatePillarRemovalAlpha(baseAlpha, start, duration, start), 0.001f);
+        assertEquals(1.0f, BuildScapeConfigScreen.calculatePillarRemovalAlpha(baseAlpha, start, duration, start),
+                0.001f);
 
         // At half time
-        assertEquals(0.5f, BuildScapeConfigScreen.calculatePillarRemovalAlpha(baseAlpha, start, duration, start + 130), 0.001f);
+        assertEquals(0.5f, BuildScapeConfigScreen.calculatePillarRemovalAlpha(baseAlpha, start, duration, start + 130),
+                0.001f);
 
         // At completion
-        assertEquals(0.0f, BuildScapeConfigScreen.calculatePillarRemovalAlpha(baseAlpha, start, duration, start + 260), 0.001f);
+        assertEquals(0.0f, BuildScapeConfigScreen.calculatePillarRemovalAlpha(baseAlpha, start, duration, start + 260),
+                0.001f);
 
         // Past completion
-        assertEquals(0.0f, BuildScapeConfigScreen.calculatePillarRemovalAlpha(baseAlpha, start, duration, start + 500), 0.001f);
+        assertEquals(0.0f, BuildScapeConfigScreen.calculatePillarRemovalAlpha(baseAlpha, start, duration, start + 500),
+                0.001f);
     }
 
     @Test
@@ -107,9 +120,12 @@ public class PillarRemovalAnimationTest {
         assertEquals(52.0f, offset4, 0.001f);
 
         // At t = 0 (immediately when click occurs)
-        float visualY0_start = newTargets[0] + BuildScapeConfigScreen.calculatePillarRowShift(offset0, start, duration, start);
-        float visualY2_start = newTargets[1] + BuildScapeConfigScreen.calculatePillarRowShift(offset2, start, duration, start);
-        float visualY4_start = newTargets[2] + BuildScapeConfigScreen.calculatePillarRowShift(offset4, start, duration, start);
+        float visualY0_start = newTargets[0]
+                + BuildScapeConfigScreen.calculatePillarRowShift(offset0, start, duration, start);
+        float visualY2_start = newTargets[1]
+                + BuildScapeConfigScreen.calculatePillarRowShift(offset2, start, duration, start);
+        float visualY4_start = newTargets[2]
+                + BuildScapeConfigScreen.calculatePillarRowShift(offset4, start, duration, start);
 
         // Matches initial visual positions exactly (no visual jump!)
         assertEquals(initialContentY[0], visualY0_start, 0.001f);
@@ -117,9 +133,12 @@ public class PillarRemovalAnimationTest {
         assertEquals(initialContentY[4], visualY4_start, 0.001f);
 
         // At completion (t = 260ms)
-        float visualY0_end = newTargets[0] + BuildScapeConfigScreen.calculatePillarRowShift(offset0, start, duration, start + 260);
-        float visualY2_end = newTargets[1] + BuildScapeConfigScreen.calculatePillarRowShift(offset2, start, duration, start + 260);
-        float visualY4_end = newTargets[2] + BuildScapeConfigScreen.calculatePillarRowShift(offset4, start, duration, start + 260);
+        float visualY0_end = newTargets[0]
+                + BuildScapeConfigScreen.calculatePillarRowShift(offset0, start, duration, start + 260);
+        float visualY2_end = newTargets[1]
+                + BuildScapeConfigScreen.calculatePillarRowShift(offset2, start, duration, start + 260);
+        float visualY4_end = newTargets[2]
+                + BuildScapeConfigScreen.calculatePillarRowShift(offset4, start, duration, start + 260);
 
         // Reached exact target rows seamlessly
         assertEquals(newTargets[0], visualY0_end, 0.001f);
@@ -153,7 +172,8 @@ public class PillarRemovalAnimationTest {
     public void pillarRemovalEntrySlideAndAlpha() {
         long start = 3000L;
         int duration = 260;
-        ConfigScreenAnims.PillarRemovalEntry entry = new ConfigScreenAnims.PillarRemovalEntry(null, 50.0f, start, duration);
+        ConfigScreenAnims.PillarRemovalEntry entry = new ConfigScreenAnims.PillarRemovalEntry(null, 50.0f, start,
+                duration);
 
         assertFalse(entry.isFinished(start + 100));
         assertTrue(entry.isFinished(start + 260));

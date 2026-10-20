@@ -57,16 +57,16 @@ public class ConfigThemes {
         public final int colorAccentGlow;
 
         public Theme(String id, String displayName,
-                     int colorOverlay, int colorPanelBg, int colorChassisBody, int colorInnerDark, int colorHeaderBg,
-                     int colorFrameBlack, int colorBorderGradientStart, int colorBorderGradientEnd, int colorBorderShadow,
-                     int colorChassisBand, int colorBevelShadow, int colorBevelHighlight,
-                     int colorTextWhite, int colorTextSilver, int colorTextMuted,
-                     int colorRowBg, int colorRowBgHover, int colorRowBorder, int colorRowBorderHover,
-                     int colorToggleOnBg, int colorToggleOnBorder, int colorToggleOnText,
-                     int colorToggleOffBg, int colorToggleOffBorder, int colorToggleOffText,
-                     int colorBtnBg, int colorBtnBgHover, int colorBtnBgActive, int colorBtnBorder, int colorBtnBorderHover,
-                     int colorSlotBg, int colorSlotBgHover, int colorSlotBorder,
-                     int colorAccent, int colorAccentGlow) {
+                int colorOverlay, int colorPanelBg, int colorChassisBody, int colorInnerDark, int colorHeaderBg,
+                int colorFrameBlack, int colorBorderGradientStart, int colorBorderGradientEnd, int colorBorderShadow,
+                int colorChassisBand, int colorBevelShadow, int colorBevelHighlight,
+                int colorTextWhite, int colorTextSilver, int colorTextMuted,
+                int colorRowBg, int colorRowBgHover, int colorRowBorder, int colorRowBorderHover,
+                int colorToggleOnBg, int colorToggleOnBorder, int colorToggleOnText,
+                int colorToggleOffBg, int colorToggleOffBorder, int colorToggleOffText,
+                int colorBtnBg, int colorBtnBgHover, int colorBtnBgActive, int colorBtnBorder, int colorBtnBorderHover,
+                int colorSlotBg, int colorSlotBgHover, int colorSlotBorder,
+                int colorAccent, int colorAccentGlow) {
             this.id = id;
             this.displayName = displayName;
             this.colorOverlay = colorOverlay;
@@ -107,7 +107,9 @@ public class ConfigThemes {
         }
 
         public boolean isLight() {
-            if (this.id == null) return false;
+            if (this.id == null) {
+                return false;
+            }
             String lower = this.id.toLowerCase(java.util.Locale.ROOT);
             return "light".equals(lower)
                     || lower.startsWith("light_")
@@ -155,7 +157,7 @@ public class ConfigThemes {
             0xFF22222A, // slotBgHover
             0xFF262630, // slotBorder
             0xFF3CDFFF, // accent
-            0x603CDFFF  // accentGlow
+            0x603CDFFF // accentGlow
     );
 
     public static final Theme LIGHT = new Theme(
@@ -194,7 +196,7 @@ public class ConfigThemes {
             0xFFE5EBF4, // slotBgHover
             0xFFB4BED0, // slotBorder
             0xFF0284C7, // accent (calming azure blue)
-            0x400284C7  // accentGlow
+            0x400284C7 // accentGlow
     );
 
     public static final Theme LIGHT_BLUE = new Theme(
@@ -233,7 +235,7 @@ public class ConfigThemes {
             0xFFEAF4FB, // slotBgHover
             0xFFB6D4E8, // slotBorder
             0xFF0284C7, // accent
-            0x500284C7  // accentGlow
+            0x500284C7 // accentGlow
     );
 
     public static final Theme LIGHT_RED = new Theme(
@@ -272,7 +274,7 @@ public class ConfigThemes {
             0xFFFBEAF0, // slotBgHover
             0xFFE8B6BF, // slotBorder
             0xFFE11D48, // accent
-            0x50E11D48  // accentGlow
+            0x50E11D48 // accentGlow
     );
 
     public static final Theme LIGHT_ORANGE = new Theme(
@@ -311,7 +313,7 @@ public class ConfigThemes {
             0xFFFBEFE5, // slotBgHover
             0xFFE8C2A4, // slotBorder
             0xFFEA580C, // accent
-            0x50EA580C  // accentGlow
+            0x50EA580C // accentGlow
     );
 
     public static final Theme LIGHT_GREEN = new Theme(
@@ -350,7 +352,7 @@ public class ConfigThemes {
             0xFFEAF6EE, // slotBgHover
             0xFFB6D8BF, // slotBorder
             0xFF16A34A, // accent
-            0x5016A34A  // accentGlow
+            0x5016A34A // accentGlow
     );
 
     public static final Theme LIGHT_PURPLE = new Theme(
@@ -389,7 +391,7 @@ public class ConfigThemes {
             0xFFF4EAFB, // slotBgHover
             0xFFCEB8E3, // slotBorder
             0xFF9333EA, // accent
-            0x509333EA  // accentGlow
+            0x509333EA // accentGlow
     );
 
     public static final Theme GRAY = new Theme(
@@ -428,7 +430,7 @@ public class ConfigThemes {
             0xFF282B33, // slotBgHover
             0xFF373B46, // slotBorder
             0xFF94A3B8, // accent
-            0x5094A3B8  // accentGlow
+            0x5094A3B8 // accentGlow
     );
 
     public static final Theme LIGHT_GRAY = new Theme(
@@ -467,7 +469,7 @@ public class ConfigThemes {
             0xFFEBEBF2, // slotBgHover
             0xFFBCBCC8, // slotBorder
             0xFF64748B, // accent
-            0x5064748B  // accentGlow
+            0x5064748B // accentGlow
     );
 
     public static final Theme SILVER = new Theme(
@@ -506,7 +508,7 @@ public class ConfigThemes {
             0xFF202630, // slotBgHover
             0xFF303844, // slotBorder
             0xFF38BDF8, // accent
-            0x6038BDF8  // accentGlow
+            0x6038BDF8 // accentGlow
     );
 
     public static final Theme LIGHT_SILVER = new Theme(
@@ -545,7 +547,7 @@ public class ConfigThemes {
             0xFFE5EBF4, // slotBgHover
             0xFFB4BFD1, // slotBorder
             0xFF0284C7, // accent
-            0x5038BDF8  // accentGlow
+            0x5038BDF8 // accentGlow
     );
 
     public static final Theme GOLD = new Theme(
@@ -584,7 +586,7 @@ public class ConfigThemes {
             0xFF272012, // slotBgHover
             0xFF3F331A, // slotBorder
             0xFFF59E0B, // accent
-            0x60F59E0B  // accentGlow
+            0x60F59E0B // accentGlow
     );
 
     public static final Theme LIGHT_GOLD = new Theme(
@@ -623,7 +625,7 @@ public class ConfigThemes {
             0xFFFCF6E4, // slotBgHover
             0xFFDECB8E, // slotBorder
             0xFFD97706, // accent
-            0x50D97706  // accentGlow
+            0x50D97706 // accentGlow
     );
 
     public static final Theme RED = new Theme(
@@ -662,7 +664,7 @@ public class ConfigThemes {
             0xFF221016, // slotBgHover
             0xFF3B1520, // slotBorder
             0xFFE11D48, // accent
-            0x60E11D48  // accentGlow
+            0x60E11D48 // accentGlow
     );
 
     public static final Theme BLUE = new Theme(
@@ -701,7 +703,7 @@ public class ConfigThemes {
             0xFF152035, // slotBgHover
             0xFF1D2F4E, // slotBorder
             0xFF2563EB, // accent
-            0x603B82F6  // accentGlow
+            0x603B82F6 // accentGlow
     );
 
     public static final Theme GREEN = new Theme(
@@ -740,7 +742,7 @@ public class ConfigThemes {
             0xFF142B1B, // slotBgHover
             0xFF1C3A24, // slotBorder
             0xFF16A34A, // accent
-            0x6022C55E  // accentGlow
+            0x6022C55E // accentGlow
     );
 
     public static final Theme PURPLE = new Theme(
@@ -779,7 +781,7 @@ public class ConfigThemes {
             0xFF201332, // slotBgHover
             0xFF2E1B46, // slotBorder
             0xFF9333EA, // accent
-            0x60A855F7  // accentGlow
+            0x60A855F7 // accentGlow
     );
 
     public static final Theme ORANGE = new Theme(
@@ -818,7 +820,7 @@ public class ConfigThemes {
             0xFF2A170C, // slotBgHover
             0xFF3E1F0F, // slotBorder
             0xFFEA580C, // accent
-            0x60F97316  // accentGlow
+            0x60F97316 // accentGlow
     );
 
     public static final Theme CYAN = new Theme(
@@ -857,7 +859,7 @@ public class ConfigThemes {
             0xFF132A2F, // slotBgHover
             0xFF1A3B42, // slotBorder
             0xFF0D9488, // accent
-            0x6014B8A6  // accentGlow
+            0x6014B8A6 // accentGlow
     );
 
     public static final Theme LIGHT_CYAN = new Theme(
@@ -896,7 +898,7 @@ public class ConfigThemes {
             0xFFEAF8F6, // slotBgHover
             0xFFB0DFDA, // slotBorder
             0xFF0D9488, // accent
-            0x500D9488  // accentGlow
+            0x500D9488 // accentGlow
     );
 
     public static final Theme BLACK = new Theme(
@@ -935,7 +937,7 @@ public class ConfigThemes {
             0xFF131317, // slotBgHover
             0xFF202026, // slotBorder
             0xFFE4E4E7, // accent
-            0x60E4E4E7  // accentGlow
+            0x60E4E4E7 // accentGlow
     );
 
     public static final Theme WHITE = new Theme(
@@ -974,7 +976,7 @@ public class ConfigThemes {
             0xFFE9E8E2, // slotBgHover
             0xFFB7B5AC, // slotBorder
             0xFF0284C7, // accent
-            0x500284C7  // accentGlow
+            0x500284C7 // accentGlow
     );
 
     public static final Theme PINK = new Theme(
@@ -1013,7 +1015,7 @@ public class ConfigThemes {
             0xFF2A101E, // slotBgHover
             0xFF40182E, // slotBorder
             0xFFEC4899, // accent
-            0x60EC4899  // accentGlow
+            0x60EC4899 // accentGlow
     );
 
     public static final Theme LIGHT_PINK = new Theme(
@@ -1052,7 +1054,7 @@ public class ConfigThemes {
             0xFFFDF4F8, // slotBgHover
             0xFFF0BDD2, // slotBorder
             0xFFEC4899, // accent
-            0x50EC4899  // accentGlow
+            0x50EC4899 // accentGlow
     );
 
     public static final Theme BROWN = new Theme(
@@ -1091,7 +1093,7 @@ public class ConfigThemes {
             0xFF261B13, // slotBgHover
             0xFF3E2B20, // slotBorder
             0xFFD97706, // accent
-            0x60D97706  // accentGlow
+            0x60D97706 // accentGlow
     );
 
     public static final Theme LIGHT_BROWN = new Theme(
@@ -1130,7 +1132,7 @@ public class ConfigThemes {
             0xFFF7F2EC, // slotBgHover
             0xFFC6B4A3, // slotBorder
             0xFF92400E, // accent
-            0x5092400E  // accentGlow
+            0x5092400E // accentGlow
     );
 
     public static final Theme YELLOW = new Theme(
@@ -1169,7 +1171,7 @@ public class ConfigThemes {
             0xFF25210D, // slotBgHover
             0xFF3E3718, // slotBorder
             0xFFEAB308, // accent
-            0x60EAB308  // accentGlow
+            0x60EAB308 // accentGlow
     );
 
     public static final Theme LIGHT_YELLOW = new Theme(
@@ -1208,7 +1210,7 @@ public class ConfigThemes {
             0xFFFCF8E3, // slotBgHover
             0xFFDECFA0, // slotBorder
             0xFFCA8A04, // accent
-            0x50CA8A04  // accentGlow
+            0x50CA8A04 // accentGlow
     );
 
     public static final Theme LIME = new Theme(
@@ -1247,7 +1249,7 @@ public class ConfigThemes {
             0xFF1A2C14, // slotBgHover
             0xFF29461F, // slotBorder
             0xFF65A30D, // accent
-            0x6084CC16  // accentGlow
+            0x6084CC16 // accentGlow
     );
 
     public static final Theme LIGHT_LIME = new Theme(
@@ -1286,7 +1288,7 @@ public class ConfigThemes {
             0xFFEFF8EA, // slotBgHover
             0xFFBEDE9E, // slotBorder
             0xFF65A30D, // accent
-            0x5065A30D  // accentGlow
+            0x5065A30D // accentGlow
     );
 
     public static final Theme MAGENTA = new Theme(
@@ -1325,7 +1327,7 @@ public class ConfigThemes {
             0xFF2B0F27, // slotBgHover
             0xFF42173D, // slotBorder
             0xFFC026D3, // accent
-            0x60C026D3  // accentGlow
+            0x60C026D3 // accentGlow
     );
 
     public static final Theme LIGHT_MAGENTA = new Theme(
@@ -1364,7 +1366,7 @@ public class ConfigThemes {
             0xFFFCEBF8, // slotBgHover
             0xFFE0B8DC, // slotBorder
             0xFFC026D3, // accent
-            0x50C026D3  // accentGlow
+            0x50C026D3 // accentGlow
     );
 
     public static final List<Theme> BASE_THEMES = Arrays.asList(
@@ -1383,8 +1385,7 @@ public class ConfigThemes {
             GRAY,
             BLACK,
             SILVER,
-            GOLD
-    );
+            GOLD);
 
     private static final List<Theme> THEMES = Arrays.asList(
             DARK,
@@ -1418,15 +1419,15 @@ public class ConfigThemes {
             SILVER,
             LIGHT_SILVER,
             GOLD,
-            LIGHT_GOLD
-    );
+            LIGHT_GOLD);
     private static int activeThemeIndex = 0;
 
     static {
         try {
             String saved = BuildscapeClientConfig.get().getUiTheme();
             setThemeById(saved);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public static List<Theme> getAllThemes() {
@@ -1438,10 +1439,16 @@ public class ConfigThemes {
     }
 
     public static Theme getBaseTheme(Theme theme) {
-        if (theme == null) return DARK;
+        if (theme == null) {
+            return DARK;
+        }
         String id = theme.id.toLowerCase(java.util.Locale.ROOT);
-        if ("light".equals(id)) return DARK;
-        if ("white".equals(id)) return BLACK;
+        if ("light".equals(id)) {
+            return DARK;
+        }
+        if ("white".equals(id)) {
+            return BLACK;
+        }
         if (id.startsWith("light_")) {
             String baseId = id.substring("light_".length());
             for (Theme base : BASE_THEMES) {
@@ -1465,9 +1472,15 @@ public class ConfigThemes {
     public static Theme getLightVariant(Theme theme) {
         Theme base = getBaseTheme(theme);
         String baseId = base.id.toLowerCase(java.util.Locale.ROOT);
-        if ("dark".equals(baseId)) return LIGHT;
-        if ("black".equals(baseId)) return WHITE;
-        if ("gold".equals(baseId)) return LIGHT_GOLD;
+        if ("dark".equals(baseId)) {
+            return LIGHT;
+        }
+        if ("black".equals(baseId)) {
+            return WHITE;
+        }
+        if ("gold".equals(baseId)) {
+            return LIGHT_GOLD;
+        }
         String lightId = "light_" + baseId;
         for (Theme t : THEMES) {
             if (t.id.equalsIgnoreCase(lightId)) {
@@ -1492,7 +1505,9 @@ public class ConfigThemes {
     public static Theme cycleNextBaseTheme(Theme currentTheme) {
         Theme base = getBaseTheme(currentTheme);
         int idx = BASE_THEMES.indexOf(base);
-        if (idx < 0) idx = 0;
+        if (idx < 0) {
+            idx = 0;
+        }
         int nextIdx = (idx + 1) % BASE_THEMES.size();
         return BASE_THEMES.get(nextIdx);
     }
@@ -1500,7 +1515,9 @@ public class ConfigThemes {
     public static Theme cyclePrevBaseTheme(Theme currentTheme) {
         Theme base = getBaseTheme(currentTheme);
         int idx = BASE_THEMES.indexOf(base);
-        if (idx < 0) idx = 0;
+        if (idx < 0) {
+            idx = 0;
+        }
         int prevIdx = (idx - 1 + BASE_THEMES.size()) % BASE_THEMES.size();
         return BASE_THEMES.get(prevIdx);
     }
@@ -1541,7 +1558,9 @@ public class ConfigThemes {
     }
 
     public static void setThemeById(String id) {
-        if (id == null) return;
+        if (id == null) {
+            return;
+        }
         for (int i = 0; i < THEMES.size(); i++) {
             if (THEMES.get(i).id.equalsIgnoreCase(id)) {
                 activeThemeIndex = i;
@@ -1551,9 +1570,13 @@ public class ConfigThemes {
     }
 
     public static Theme getById(String id) {
-        if (id == null) return DARK;
+        if (id == null) {
+            return DARK;
+        }
         for (Theme t : THEMES) {
-            if (t.id.equalsIgnoreCase(id)) return t;
+            if (t.id.equalsIgnoreCase(id)) {
+                return t;
+            }
         }
         return DARK;
     }

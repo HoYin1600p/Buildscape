@@ -17,7 +17,9 @@ public final class GuiScaleHelper {
     private GuiScaleHelper() {}
 
     public static float calculateUiScale(int windowWidth, int windowHeight, double mcGuiScale) {
-        if (windowWidth <= 0 || windowHeight <= 0) return 1.0f;
+        if (windowWidth <= 0 || windowHeight <= 0) {
+            return 1.0f;
+        }
 
         float scaleX = (float) windowWidth / (float) REQUIRED_CANVAS_W;
         float scaleY = (float) windowHeight / (float) REQUIRED_CANVAS_H;
@@ -58,8 +60,8 @@ public final class GuiScaleHelper {
         public final int sidePanelH;
 
         public LayoutResult(int panelX, int panelY, int panelW, int panelH,
-                            int frameX, int frameY, int frameW, int frameH, int frameRight,
-                            int sidePanelX, int sidePanelY, int sidePanelW, int sidePanelH) {
+                int frameX, int frameY, int frameW, int frameH, int frameRight,
+                int sidePanelX, int sidePanelY, int sidePanelW, int sidePanelH) {
             this.panelX = panelX;
             this.panelY = panelY;
             this.panelW = panelW;
@@ -77,7 +79,7 @@ public final class GuiScaleHelper {
     }
 
     public static LayoutResult calculateLayout(int effW, int effH, float sidePanelProgress,
-                                              BuildScapeConfigScreen.SidePanelType sidePanelType) {
+            BuildScapeConfigScreen.SidePanelType sidePanelType) {
         int bevelExpansion = BEVEL_EXPANSION;
 
         // Gap on screen edges: 8px on left, right, bottom; top reserves room for crest overhang

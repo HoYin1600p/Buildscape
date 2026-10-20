@@ -222,7 +222,8 @@ public class UploadBatchingTest {
     @Test
     public void expiredRevisionHistoryRejectsStaleOverwrites() {
         PillarParticleConfig server = new PillarParticleConfig();
-        server.particle_color = new ArrayList<>(List.of("#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF"));
+        server.particle_color = new ArrayList<>(
+                List.of("#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF"));
         server.establishBaseline();
 
         PillarParticleConfig staleClient = copyOf(server);
@@ -299,8 +300,9 @@ public class UploadBatchingTest {
         local.particle_color = new ArrayList<>(List.of("#ABCDEF"));
         local.max_particle_color = 1;
         batch.edited(ConfigSetting.COLORS, local, 2L);
-        local.edit_permission_mode = PillarParticleConfig.EditPermissionMode.values()[
-                (local.edit_permission_mode.ordinal() + 1) % PillarParticleConfig.EditPermissionMode.values().length];
+        local.edit_permission_mode = PillarParticleConfig.EditPermissionMode
+                .values()[(local.edit_permission_mode.ordinal() + 1)
+                        % PillarParticleConfig.EditPermissionMode.values().length];
         batch.edited(ConfigSetting.POLICY, local, 3L);
         // A stored value outside the screen's range is carried as it is.
         local.particle_speed = 4.0D;

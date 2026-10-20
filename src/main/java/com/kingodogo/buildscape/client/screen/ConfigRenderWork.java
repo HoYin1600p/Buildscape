@@ -14,8 +14,10 @@ final class ConfigRenderWork {
     private ConfigRenderWork() {}
 
     static String normalize(String text) {
-        return text == null ? "" : WHITESPACE.matcher(text.trim().toLowerCase(Locale.ROOT)
-                .replace('_', ' ').replace('-', ' ')).replaceAll(" ");
+        return text == null
+                ? ""
+                : WHITESPACE.matcher(text.trim().toLowerCase(Locale.ROOT)
+                        .replace('_', ' ').replace('-', ' ')).replaceAll(" ");
     }
 
     /** Inputs are cached normalised strings; display names are resolved only if the ID did not match. */
@@ -35,13 +37,18 @@ final class ConfigRenderWork {
 
         Cache(int capacity) {
             entries = new LinkedHashMap<>(16, 0.75f, true) {
-                @Override protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
                     return size() > capacity;
                 }
             };
         }
 
-        V get(K key, Function<K, V> create) { return entries.computeIfAbsent(key, create); }
-        void clear() { entries.clear(); }
+        V get(K key, Function<K, V> create) {
+            return entries.computeIfAbsent(key, create);
+        }
+        void clear() {
+            entries.clear();
+        }
     }
 }

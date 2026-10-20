@@ -37,7 +37,8 @@ public class ConfigScreenConsistencyTest {
                 for (String tab : new String[]{"pillars", "world"}) {
                     ConfigSetting setting = BuildScapeConfigScreen.settingForTab(tab, false);
                     boolean serverAllows = PillarParticleConfig.canEdit(mode, level, setting.scope);
-                    boolean screenBlocks = BuildScapeConfigScreen.hoverRefusal(true, mode, level, setting, true) != null;
+                    boolean screenBlocks = BuildScapeConfigScreen.hoverRefusal(true, mode, level, setting,
+                            true) != null;
                     assertEquals(mode + "/" + level + "/" + tab, serverAllows, !screenBlocks);
                 }
             }
@@ -73,7 +74,8 @@ public class ConfigScreenConsistencyTest {
         assertEquals(Set.of(Items.DIAMOND), items);
         assertEquals(Set.of("#forge:gems"), tags);
         // Another administrator removed the diamond and the tag, and added an apple.
-        BuildScapeConfigScreen.collectActiveSelection(List.of("minecraft:apple", "minecraft:unknown_item"), items, tags);
+        BuildScapeConfigScreen.collectActiveSelection(List.of("minecraft:apple", "minecraft:unknown_item"), items,
+                tags);
         assertEquals(Set.of(Items.APPLE), items);
         assertTrue(tags.isEmpty());
     }

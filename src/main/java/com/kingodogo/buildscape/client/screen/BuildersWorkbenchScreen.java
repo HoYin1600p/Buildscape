@@ -92,7 +92,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         super.containerTick();
         if (initialDataSyncTicks > 0) {
             syncInitialMenuState();
-            if (!ClientBlockColorCatalog.ensureReady()) return;
+            if (!ClientBlockColorCatalog.ensureReady()) {
+                return;
+            }
             initialDataSyncTicks--;
             if (initialDataSyncTicks == 0) {
                 lastInputSignature = inputSignature();
@@ -108,7 +110,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             lastInputSignature = inputSignature();
             lastSentSignature = Integer.MIN_VALUE;
         }
-        if (!ClientBlockColorCatalog.ensureReady()) return;
+        if (!ClientBlockColorCatalog.ensureReady()) {
+            return;
+        }
 
         int inputSignature = inputSignature();
         if (inputSignature != lastInputSignature) {
@@ -117,7 +121,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             lastSentSignature = Integer.MIN_VALUE;
         }
         int solveSignature = solveSignature(inputSignature);
-        if (solveSignature != lastSentSignature) sendSolvedResults(solveSignature);
+        if (solveSignature != lastSentSignature) {
+            sendSolvedResults(solveSignature);
+        }
     }
 
     private void syncInitialMenuState() {
@@ -158,7 +164,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     }
 
     private static int stackHash(int hash, ItemStack stack) {
-        return 31 * hash + (stack == null || stack.isEmpty() ? 0 : net.minecraft.core.Registry.ITEM.getId(stack.getItem()) + 1);
+        return 31 * hash
+                + (stack == null || stack.isEmpty() ? 0 : net.minecraft.core.Registry.ITEM.getId(stack.getItem()) + 1);
     }
 
     private void sendSolvedResults(int solveSignature) {
@@ -266,12 +273,16 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         poseStack.translate(0.0f, 0.0f, REROLL_Z);
 
         if (activeTab == 0) {
-            for (int i = 0; i < 9; i++) drawRerollControl(poseStack, mouseX, mouseY,
-                    leftPos + COLOR_RESULT_X + i % 3 * 18, topPos + COLOR_RESULT_Y + i / 3 * 18,
-                    BuildersWorkbenchMenu.MENU_COLOR_RESULT_START + i);
+            for (int i = 0; i < 9; i++) {
+                drawRerollControl(poseStack, mouseX, mouseY,
+                        leftPos + COLOR_RESULT_X + i % 3 * 18, topPos + COLOR_RESULT_Y + i / 3 * 18,
+                        BuildersWorkbenchMenu.MENU_COLOR_RESULT_START + i);
+            }
         } else {
             for (int i = 0; i < 9; i++) {
-                if (isGradientAnchor(i)) continue;
+                if (isGradientAnchor(i)) {
+                    continue;
+                }
                 drawRerollControl(poseStack, mouseX, mouseY,
                         leftPos + GRADIENT_OUTPUT_X + i * 18, topPos + GRADIENT_OUTPUT_Y,
                         BuildersWorkbenchMenu.MENU_GRADIENT_OUTPUT_START + i);
@@ -282,7 +293,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     }
 
     private void drawRerollControl(PoseStack poseStack, int mouseX, int mouseY, int slotX, int slotY, int menuSlot) {
-        if (menuSlot < 0 || menuSlot >= menu.slots.size() || menu.getSlot(menuSlot).getItem().isEmpty()) return;
+        if (menuSlot < 0 || menuSlot >= menu.slots.size() || menu.getSlot(menuSlot).getItem().isEmpty()) {
+            return;
+        }
         boolean hovered = isIn(mouseX, mouseY, slotX + 11, slotY + 11, 5, 5);
         fill(poseStack, slotX + 11, slotY + 11, slotX + 16, slotY + 16,
                 hovered ? 0xFF00FFCC : 0xFF00AA88);
@@ -362,7 +375,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 }
             } else {
                 filterMask ^= categoryBit;
-                if ((filterMask & categoryBit) == 0) filterMask &= ~strictBit;
+                if ((filterMask & categoryBit) == 0) {
+                    filterMask &= ~strictBit;
+                }
             }
             resetAllResultOffsets();
             lastInputSignature = inputSignature();
@@ -394,8 +409,11 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         int result = hoveredReroll(mouseX, mouseY);
         if (result >= 0 && (button == 0 || button == 1)) {
             int[] resultOffsets = currentResultOffsets();
-            if (button == 1) resultOffsets[result]++;
-            else resultOffsets[result] = Math.max(0, resultOffsets[result] - 1);
+            if (button == 1) {
+                resultOffsets[result]++;
+            } else {
+                resultOffsets[result] = Math.max(0, resultOffsets[result] - 1);
+            }
             solveNow();
             playClick();
             return true;
@@ -404,7 +422,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     }
 
     private void switchTab(int tab) {
-        if (tab == activeTab) return;
+        if (tab == activeTab) {
+            return;
+        }
         activeTab = tab;
         lastInputSignature = inputSignature();
         lastSentSignature = Integer.MIN_VALUE;
@@ -420,14 +440,18 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     }
 
     private void resetAllResultOffsets() {
-        for (int[] offsets : resultOffsetsByTab) Arrays.fill(offsets, 0);
+        for (int[] offsets : resultOffsetsByTab) {
+            Arrays.fill(offsets, 0);
+        }
     }
 
     private int hoveredFilter(double mouseX, double mouseY) {
         int x = leftPos + filterX();
         int y = topPos + FILTER_Y;
         for (int i = 0; i < 3; i++) {
-            if (isIn(mouseX, mouseY, x, y + i * FILTER_SPACING, 18, 18)) return i;
+            if (isIn(mouseX, mouseY, x, y + i * FILTER_SPACING, 18, 18)) {
+                return i;
+            }
         }
         return -1;
     }
@@ -435,9 +459,13 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     private int hoveredModifier(double mouseX, double mouseY) {
         int y = topPos + MODIFIER_Y;
         if (isIn(mouseX, mouseY, leftPos + SINGLE_TEXTURE_X, y,
-                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE)) return 0;
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE)) {
+            return 0;
+        }
         if (isIn(mouseX, mouseY, leftPos + MATCH_SHAPE_X, y,
-                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE)) return 1;
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE)) {
+            return 1;
+        }
         return -1;
     }
 
@@ -447,7 +475,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 int slotX = leftPos + COLOR_RESULT_X + i % 3 * 18;
                 int slotY = topPos + COLOR_RESULT_Y + i / 3 * 18;
                 if (!menu.getSlot(BuildersWorkbenchMenu.MENU_COLOR_RESULT_START + i).getItem().isEmpty()
-                        && isIn(mouseX, mouseY, slotX + 11, slotY + 11, 5, 5)) return i;
+                        && isIn(mouseX, mouseY, slotX + 11, slotY + 11, 5, 5)) {
+                    return i;
+                }
             }
         } else {
             for (int i = 0; i < 9; i++) {
@@ -455,7 +485,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 int slotY = topPos + GRADIENT_OUTPUT_Y;
                 if (!isGradientAnchor(i)
                         && !menu.getSlot(BuildersWorkbenchMenu.MENU_GRADIENT_OUTPUT_START + i).getItem().isEmpty()
-                        && isIn(mouseX, mouseY, slotX + 11, slotY + 11, 5, 5)) return i;
+                        && isIn(mouseX, mouseY, slotX + 11, slotY + 11, 5, 5)) {
+                    return i;
+                }
             }
         }
         return -1;

@@ -180,7 +180,9 @@ public class WanderingHomemakerSpawningEvents {
                 double spawnZ = pos.getZ() + 0.5 + Math.sin(angle) * distance;
 
                 homemaker.moveTo(spawnX, spawnY, spawnZ, level.random.nextFloat() * 360F, 0.0F);
-                level.addFreshEntity(homemaker);
+                if (!level.addFreshEntity(homemaker)) {
+                    return;
+                }
 
                 BlockPos spawnPos = new BlockPos((int) spawnX, (int) spawnY, (int) spawnZ);
                 level.playSound(null, spawnPos, SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.NEUTRAL, 1.0F, 1.0F);

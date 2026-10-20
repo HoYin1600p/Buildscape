@@ -167,9 +167,11 @@ public class BuildscapeClientConfig {
                 for (Map.Entry<String, String> entry : uiEntries.entrySet()) {
                     values.putIfAbsent(entry.getKey(), entry.getValue());
                 }
-                Files.deleteIfExists(uiFile);
-                BuildScape.LOGGER.info(
-                        "BuildscapeClientConfig: Merged buildscape/ui-state.cfg into buildscape/buildscape.cfg and removed ui-state.cfg");
+                if (!readOnly) {
+                    Files.deleteIfExists(uiFile);
+                    BuildScape.LOGGER.info(
+                            "BuildscapeClientConfig: Merged buildscape/ui-state.cfg into buildscape/buildscape.cfg and removed ui-state.cfg");
+                }
                 if (file.exists() && !readOnly) {
                     save();
                 }

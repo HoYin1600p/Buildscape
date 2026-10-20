@@ -368,6 +368,9 @@ final class PillarFrames {
                 color = color.toLowerCase(Locale.ROOT);
             }
 
+            if (ResourceLocation.tryParse("buildscape:" + color + "_item_frame") == null) {
+                color = "white";
+            }
             ResourceLocation typeRL = new ResourceLocation("buildscape", color + "_item_frame");
             data.pillarType = typeRL.toString();
             data.facing = facing != null ? facing.getSerializedName() : null;

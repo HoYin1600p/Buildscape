@@ -573,7 +573,7 @@ public class ClientSetup {
                 List<String> dyeColors = glowBE.getDyeColors();
                 if (dyeColors != null && !dyeColors.isEmpty()) {
                     int hash = pos.hashCode() ^ state.hashCode();
-                    int colorIndex = Math.abs(hash) % dyeColors.size();
+                    int colorIndex = Math.abs(hash % dyeColors.size());
                     String colorCode = dyeColors.get(colorIndex);
 
                     try {

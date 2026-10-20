@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.block.storage.GlassJarBlockEntity;
+import com.kingodogo.buildscape.item.GlassJarItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
@@ -88,7 +89,7 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
             renderLiquid(blockEntity, poseStack, bufferSource, light, combinedOverlay);
         } else if (!blockEntity.isEmpty()) {
             ItemStack storedItem = blockEntity.getStoredItem();
-            if (storedItem != null && !storedItem.isEmpty()) {
+            if (storedItem != null && !storedItem.isEmpty() && !(storedItem.getItem() instanceof GlassJarItem)) {
                 int count = storedItem.getCount();
                 int renderCount = Math.min(32, count);
 

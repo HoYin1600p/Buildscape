@@ -333,6 +333,11 @@ public class ConfigBackgrounds {
         String displayName = formatDisplayName(fileName);
         try (InputStream in = Files.newInputStream(filePath)) {
             NativeImage image = NativeImage.read(in);
+            if (image.getWidth() > 4096 || image.getHeight() > 4096) {
+                image.close();
+                LOADING_BACKGROUND_IDS.remove(id);
+                return;
+            }
             Minecraft.getInstance().execute(() -> {
                 DynamicTexture texture = null;
                 try {

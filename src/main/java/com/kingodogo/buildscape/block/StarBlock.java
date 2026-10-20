@@ -40,11 +40,9 @@ import java.util.List;
 
 public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
-    public static final DirectionProperty VERTICAL_DIRECTION =
-            BlockStateProperties.VERTICAL_DIRECTION;
+    public static final DirectionProperty VERTICAL_DIRECTION = BlockStateProperties.VERTICAL_DIRECTION;
 
     protected static final VoxelShape SHAPE_UP = Block.box(
             2.0D,
@@ -52,16 +50,14 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
             2.0D,
             14.0D,
             13.0D,
-            14.0D
-    );
+            14.0D);
     protected static final VoxelShape SHAPE_DOWN = Block.box(
             2.0D,
             3.0D,
             2.0D,
             14.0D,
             16.0D,
-            14.0D
-    );
+            14.0D);
 
     public StarBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -70,14 +66,12 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
                         .setValue(LIT, false)
                         .setValue(WATERLOGGED, false)
                         .setValue(VERTICAL_DIRECTION, Direction.UP)
-                        .setValue(ON_FARMLAND, false)
-        );
+                        .setValue(ON_FARMLAND, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT, WATERLOGGED, VERTICAL_DIRECTION, ON_FARMLAND);
     }
 
@@ -86,8 +80,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         Direction direction = state.getValue(VERTICAL_DIRECTION);
         VoxelShape shape = direction == Direction.DOWN ? SHAPE_DOWN : SHAPE_UP;
         if (state.getValue(ON_FARMLAND) && direction == Direction.UP) {
@@ -100,8 +93,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
     protected boolean mayPlaceOn(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return !state.isAir() || state.is(Blocks.FARMLAND);
     }
 
@@ -138,12 +130,10 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
                 return null;
             }
 
-            boolean hasAboveSupport =
-                    !supportAbove.isAir() &&
-                            supportAbove.isFaceSturdy(level, placePos.above(), Direction.DOWN);
-            boolean hasBelowSupport =
-                    !supportBelow.isAir() &&
-                            supportBelow.isFaceSturdy(level, placePos.below(), Direction.UP);
+            boolean hasAboveSupport = !supportAbove.isAir() &&
+                    supportAbove.isFaceSturdy(level, placePos.above(), Direction.DOWN);
+            boolean hasBelowSupport = !supportBelow.isAir() &&
+                    supportBelow.isFaceSturdy(level, placePos.below(), Direction.UP);
 
             if (hasAboveSupport && !hasBelowSupport) {
                 verticalDirection = Direction.DOWN;
@@ -174,13 +164,13 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
         if (direction == Direction.DOWN) {
-            return state.setValue(ON_FARMLAND, state.getValue(VERTICAL_DIRECTION) == Direction.UP && shouldSink(level, pos));
+            return state.setValue(ON_FARMLAND,
+                    state.getValue(VERTICAL_DIRECTION) == Direction.UP && shouldSink(level, pos));
         }
         return super.updateShape(
                 state,
@@ -188,8 +178,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -203,8 +192,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
     public int getLightEmission(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.getValue(LIT) ? 15 : 0;
     }
 
@@ -215,8 +203,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -234,18 +221,14 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
                         : SoundEvents.STONE_BUTTON_CLICK_ON,
                 SoundSource.BLOCKS,
                 0.3f,
-                1.0f
-        );
+                1.0f);
 
-        TextComponent message =
-                new TextComponent(
-                        newLit ? "Turned On" : "Turned Off"
-                );
+        TextComponent message = new TextComponent(
+                newLit ? "Turned On" : "Turned Off");
         message.withStyle(
                 newLit
                         ? ChatFormatting.GREEN
-                        : ChatFormatting.RED
-        );
+                        : ChatFormatting.RED);
         player.displayClientMessage(message, true);
 
         return InteractionResult.SUCCESS;
@@ -256,8 +239,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
             BlockState state,
             Level level,
             BlockPos pos,
-            Entity entity
-    ) {
+            Entity entity) {
         if (entity instanceof Player) {
             Player player = (Player) entity;
             if (player.isOnGround() && level.isClientSide) {
@@ -269,8 +251,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
                     float volume = 0.15f;
                     float pitch = 1.0f;
 
-                    SoundEvent amethystStepSound =
-                            SoundType.AMETHYST.getStepSound();
+                    SoundEvent amethystStepSound = SoundType.AMETHYST.getStepSound();
 
                     level.playLocalSound(
                             pos.getX() + 0.5,
@@ -280,8 +261,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
                             SoundSource.BLOCKS,
                             volume,
                             pitch,
-                            false
-                    );
+                            false);
                 }
             }
         }
@@ -291,8 +271,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         return Collections.singletonList(new ItemStack(this));
     }
 }

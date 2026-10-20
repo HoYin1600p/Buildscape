@@ -23,10 +23,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModBiomeModifications {
 
     private static BlockPredicate matchesBlocksBelow(List<Block> blocks) {
@@ -40,8 +37,7 @@ public class ModBiomeModifications {
     private static void addFeatureToBiome(
             BiomeLoadingEvent event,
             ConfiguredFeature<?, ?> feature,
-            int rarity
-    ) {
+            int rarity) {
         if (feature != null) {
             PlacedFeature placed = new PlacedFeature(
                     Holder.direct(feature),
@@ -51,23 +47,16 @@ public class ModBiomeModifications {
                             HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
                             BlockPredicateFilter.forPredicate(
                                     BlockPredicate.matchesBlocks(
-                                            List.of(Blocks.AIR)
-                                    )
-                            ),
+                                            List.of(Blocks.AIR))),
                             BlockPredicateFilter.forPredicate(
                                     matchesBlocksBelow(
-                                            List.of(Blocks.GRASS_BLOCK)
-                                    )
-                            ),
-                            BiomeFilter.biome()
-                    )
-            );
+                                            List.of(Blocks.GRASS_BLOCK))),
+                            BiomeFilter.biome()));
             event
                     .getGeneration()
                     .addFeature(
                             GenerationStep.Decoration.VEGETAL_DECORATION,
-                            Holder.direct(placed)
-                    );
+                            Holder.direct(placed));
         }
     }
 
@@ -89,8 +78,7 @@ public class ModBiomeModifications {
             ConfiguredFeature<?, ?> state4S,
             ConfiguredFeature<?, ?> state4E,
             ConfiguredFeature<?, ?> state4W,
-            int rarity
-    ) {
+            int rarity) {
         addFeatureToBiome(event, state1N, rarity);
         addFeatureToBiome(event, state1S, rarity);
         addFeatureToBiome(event, state1E, rarity);
@@ -112,8 +100,7 @@ public class ModBiomeModifications {
     private static void addPropagulePatchToBiome(
             BiomeLoadingEvent event,
             ConfiguredFeature<?, ?> feature,
-            int rarity
-    ) {
+            int rarity) {
         if (feature != null) {
             PlacedFeature placed = new PlacedFeature(
                     Holder.direct(feature),
@@ -123,9 +110,7 @@ public class ModBiomeModifications {
                             HeightmapPlacement.onHeightmap(Heightmap.Types.OCEAN_FLOOR_WG),
                             BlockPredicateFilter.forPredicate(
                                     BlockPredicate.matchesBlocks(
-                                            List.of(Blocks.AIR)
-                                    )
-                            ),
+                                            List.of(Blocks.AIR))),
                             BlockPredicateFilter.forPredicate(
                                     matchesBlocksBelow(
                                             new ArrayList<Block>() {
@@ -133,32 +118,24 @@ public class ModBiomeModifications {
                                                     add(Blocks.GRASS_BLOCK);
                                                     add(ModBlocks.MUD.get());
                                                 }
-                                            }
-                                    )
-                            ),
+                                            })),
                             BlockPredicateFilter.forPredicate(
                                     BlockPredicate.wouldSurvive(
                                             ModBlocks.MANGROVE_PROPAGULE.get()
                                                     .defaultBlockState(),
-                                            BlockPos.ZERO
-                                    )
-                            ),
-                            BiomeFilter.biome()
-                    )
-            );
+                                            BlockPos.ZERO)),
+                            BiomeFilter.biome()));
             event
                     .getGeneration()
                     .addFeature(
                             GenerationStep.Decoration.VEGETAL_DECORATION,
-                            Holder.direct(placed)
-                    );
+                            Holder.direct(placed));
         }
     }
 
     private static void addCloverStatesToBiome(
             BiomeLoadingEvent event,
-            int rarity
-    ) {
+            int rarity) {
         addFeatureToBiome(event, ModConfiguredFeatures.CLOVER_1_N.get(), rarity);
         addFeatureToBiome(event, ModConfiguredFeatures.CLOVER_1_S.get(), rarity);
         addFeatureToBiome(event, ModConfiguredFeatures.CLOVER_1_E.get(), rarity);
@@ -189,16 +166,13 @@ public class ModBiomeModifications {
             addFeatureToBiome(
                     event,
                     ModConfiguredFeatures.LIGHT_BLUE_MONETS.get(),
-                    4
-            );
+                    4);
             addFeatureToBiome(event, ModConfiguredFeatures.PINK_MONETS.get(), 4);
             addFeatureToBiome(event, ModConfiguredFeatures.YELLOW_MONETS.get(), 4);
         }
 
-        if (
-                event.getName().equals(Biomes.BIRCH_FOREST.location()) ||
-                        event.getName().equals(Biomes.OLD_GROWTH_BIRCH_FOREST.location())
-        ) {
+        if (event.getName().equals(Biomes.BIRCH_FOREST.location()) ||
+                event.getName().equals(Biomes.OLD_GROWTH_BIRCH_FOREST.location())) {
             addFeatureToBiome(event, ModConfiguredFeatures.ALL_PETALS.get(), 11);
             addFeatureToBiome(event, ModConfiguredFeatures.CLOVER.get(), 32);
             addFeatureToBiome(event, ModConfiguredFeatures.WILDFLOWERS.get(), 11);
@@ -207,8 +181,7 @@ public class ModBiomeModifications {
 
         if (event.getName().equals(Biomes.LUSH_CAVES.location())) {
             if (ModConfiguredFeatures.ALL_COLORED_SPORE_BLOSSOM.isPresent()) {
-                ConfiguredFeature<?, ?> sporeBlossomFeature =
-                        ModConfiguredFeatures.ALL_COLORED_SPORE_BLOSSOM.get();
+                ConfiguredFeature<?, ?> sporeBlossomFeature = ModConfiguredFeatures.ALL_COLORED_SPORE_BLOSSOM.get();
 
                 PlacedFeature innerPlaced = new PlacedFeature(
                         Holder.direct(sporeBlossomFeature),
@@ -216,11 +189,7 @@ public class ModBiomeModifications {
                                 MossBlockCeilingPlacement.INSTANCE,
                                 BlockPredicateFilter.forPredicate(
                                         BlockPredicate.matchesBlocks(
-                                                List.of(Blocks.AIR)
-                                        )
-                                )
-                        )
-                );
+                                                List.of(Blocks.AIR)))));
 
                 ConfiguredFeature<?, ?> patchFeature = new ConfiguredFeature<>(
                         Feature.RANDOM_PATCH,
@@ -228,31 +197,25 @@ public class ModBiomeModifications {
                                 10,
                                 7,
                                 2,
-                                Holder.direct(innerPlaced)
-                        )
-                );
+                                Holder.direct(innerPlaced)));
 
                 PlacedFeature sporeBlossomPlaced = new PlacedFeature(
                         Holder.direct(patchFeature),
                         List.of(
                                 RarityFilter.onAverageOnceEvery(5),
                                 InSquarePlacement.spread(),
-                                BiomeFilter.biome()
-                        )
-                );
+                                BiomeFilter.biome()));
 
                 event
                         .getGeneration()
                         .addFeature(
                                 GenerationStep.Decoration.VEGETAL_DECORATION,
-                                Holder.direct(sporeBlossomPlaced)
-                        );
+                                Holder.direct(sporeBlossomPlaced));
             }
         }
 
         if (event.getName().equals(Biomes.SWAMP.location())) {
-            ConfiguredFeature<?, ?> cloverFeature =
-                    ModConfiguredFeatures.CLOVER.get();
+            ConfiguredFeature<?, ?> cloverFeature = ModConfiguredFeatures.CLOVER.get();
             if (cloverFeature != null) {
                 PlacedFeature cloverPlaced = new PlacedFeature(
                         Holder.direct(cloverFeature),
@@ -262,80 +225,61 @@ public class ModBiomeModifications {
                                 HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
                                 BlockPredicateFilter.forPredicate(
                                         BlockPredicate.matchesBlocks(
-                                                List.of(Blocks.AIR)
-                                        )
-                                ),
+                                                List.of(Blocks.AIR))),
                                 BlockPredicateFilter.forPredicate(
                                         matchesBlocksBelow(
-                                                new ArrayList<
-                                                        Block
-                                                        >() {
+                                                new ArrayList<Block>() {
                                                     {
                                                         add(Blocks.GRASS_BLOCK);
                                                         add(ModBlocks.MUD.get());
                                                     }
-                                                }
-                                        )
-                                ),
+                                                })),
                                 BlockPredicateFilter.forPredicate(
                                         BlockPredicate.wouldSurvive(
                                                 ModBlocks.CLOVER.get()
                                                         .defaultBlockState(),
-                                                BlockPos.ZERO
-                                        )
-                                ),
-                                BiomeFilter.biome()
-                        )
-                );
+                                                BlockPos.ZERO)),
+                                BiomeFilter.biome()));
                 event
                         .getGeneration()
                         .addFeature(
                                 GenerationStep.Decoration.VEGETAL_DECORATION,
-                                Holder.direct(cloverPlaced)
-                        );
+                                Holder.direct(cloverPlaced));
             }
 
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_1.get(),
-                    5
-            );
+                    5);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_2.get(),
-                    5
-            );
+                    5);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_3.get(),
-                    5
-            );
+                    5);
 
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_4.get(),
-                    40
-            );
+                    40);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_5.get(),
-                    53
-            );
+                    53);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_6.get(),
-                    107
-            );
+                    107);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_7.get(),
-                    160
-            );
+                    160);
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_8.get(),
-                    320
-            );
+                    320);
         }
     }
 }

@@ -29,11 +29,13 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
     private final Supplier<Block> sapling;
     private final Supplier<Block> flower;
 
-    public ColoredMossBlock(Properties properties, Supplier<Block> carpet, Supplier<Block> overlay, Supplier<Block> layers) {
+    public ColoredMossBlock(Properties properties, Supplier<Block> carpet, Supplier<Block> overlay,
+            Supplier<Block> layers) {
         this(properties, carpet, overlay, layers, () -> ModBlocks.POPLAR_SAPLING.get(), null);
     }
 
-    public ColoredMossBlock(Properties properties, Supplier<Block> carpet, Supplier<Block> overlay, Supplier<Block> layers, Supplier<Block> sapling, Supplier<Block> flower) {
+    public ColoredMossBlock(Properties properties, Supplier<Block> carpet, Supplier<Block> overlay,
+            Supplier<Block> layers, Supplier<Block> sapling, Supplier<Block> flower) {
         super(properties);
         this.carpet = carpet;
         this.overlay = overlay;
@@ -49,8 +51,7 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() instanceof BoneMealItem) {
             if (this.isValidBonemealTarget(level, pos, state, level.isClientSide)) {
@@ -60,8 +61,7 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
                                 (ServerLevel) level,
                                 level.getRandom(),
                                 pos,
-                                state
-                        );
+                                state);
                         if (!player.getAbilities().instabuild) {
                             itemStack.shrink(1);
                         }
@@ -74,8 +74,7 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
                         SoundEvents.BONE_MEAL_USE,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }

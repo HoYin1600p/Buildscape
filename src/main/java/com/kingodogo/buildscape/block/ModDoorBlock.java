@@ -19,8 +19,7 @@ public class ModDoorBlock extends DoorBlock {
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         if (state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
             return super.getDrops(state, builder);
         } else {

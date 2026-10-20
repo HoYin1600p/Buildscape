@@ -42,7 +42,8 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hitResult) {
         if (state.getValue(ACTIVE)) {
             if (!level.isClientSide && !level.getBlockTicks().hasScheduledTick(pos, this)) {
                 level.scheduleTick(pos, this, RESIN_COOLDOWN_TICKS);
@@ -64,7 +65,8 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
     }
 
     private void spawnResinOnHeart(Level level, BlockPos pos) {
-        List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN));
+        List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST,
+                Direction.WEST, Direction.UP, Direction.DOWN));
         Collections.shuffle(directions, level.random);
 
         int spawned = 0;

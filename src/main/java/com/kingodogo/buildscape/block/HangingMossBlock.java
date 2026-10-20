@@ -57,7 +57,8 @@ public class HangingMossBlock extends Block implements BonemealableBlock {
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
-        return aboveState.is(this) || aboveState.is(BlockTags.LEAVES) || aboveState.getBlock() instanceof LeavesBlock || aboveState.isFaceSturdy(level, abovePos, Direction.DOWN);
+        return aboveState.is(this) || aboveState.is(BlockTags.LEAVES) || aboveState.getBlock() instanceof LeavesBlock
+                || aboveState.isFaceSturdy(level, abovePos, Direction.DOWN);
     }
 
     @Override
@@ -72,7 +73,8 @@ public class HangingMossBlock extends Block implements BonemealableBlock {
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
         if (direction == Direction.UP && !state.canSurvive(level, pos)) {
             return Blocks.AIR.defaultBlockState();
         }
@@ -103,7 +105,8 @@ public class HangingMossBlock extends Block implements BonemealableBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit) {
         ItemStack held = player.getItemInHand(hand);
         if (held.getItem() instanceof ShearsItem) {
             BlockPos tipPos = pos;
@@ -172,4 +175,3 @@ public class HangingMossBlock extends Block implements BonemealableBlock {
         builder.add(TIP, SHEARED);
     }
 }
-

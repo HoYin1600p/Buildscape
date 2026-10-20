@@ -22,8 +22,7 @@ final class NetworkPacketLimits {
     static final int MAX_PARTICLE_LIFETIME = 12_000;
     static final int MAX_PARTICLE_DENSITY = 128;
 
-    private NetworkPacketLimits() {
-    }
+    private NetworkPacketLimits() {}
 
     static int readCount(FriendlyByteBuf buffer, int maximum, String field) {
         int count = buffer.readInt();

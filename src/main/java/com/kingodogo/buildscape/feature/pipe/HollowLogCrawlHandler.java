@@ -220,7 +220,8 @@ public class HollowLogCrawlHandler {
                         }
                     } else if (state.getBlock() instanceof HollowPipeBlock) {
                         Direction.Axis axis = HollowPipeBlock.getPrimaryAxis(state);
-                        boolean hasHorizontal = state.getValue(HollowPipeBlock.NORTH) || state.getValue(HollowPipeBlock.SOUTH)
+                        boolean hasHorizontal = state.getValue(HollowPipeBlock.NORTH)
+                                || state.getValue(HollowPipeBlock.SOUTH)
                                 || state.getValue(HollowPipeBlock.WEST) || state.getValue(HollowPipeBlock.EAST)
                                 || axis != Direction.Axis.Y;
                         if (!hasHorizontal) {
@@ -246,7 +247,7 @@ public class HollowLogCrawlHandler {
                             double maxInsideZ = connS ? (z + 1.0) : (hasS ? z + 0.65 : z + 0.875);
 
                             if (bb.maxX > minInsideX && bb.minX < maxInsideX &&
-                                bb.maxZ > minInsideZ && bb.minZ < maxInsideZ) {
+                                    bb.maxZ > minInsideZ && bb.minZ < maxInsideZ) {
                                 return true;
                             }
                         }
@@ -292,12 +293,14 @@ public class HollowLogCrawlHandler {
                             double cavityMinZ = z + 0.15;
                             double cavityMaxZ = z + 0.85;
                             if (bb.minZ < cavityMaxZ && bb.maxZ > cavityMinZ) {
-                                if (!state.getValue(HollowLogBlock.HAS_GLASS_NEG) && !isConnectingHollowEnd(level, mpos, Direction.WEST)) {
+                                if (!state.getValue(HollowLogBlock.HAS_GLASS_NEG)
+                                        && !isConnectingHollowEnd(level, mpos, Direction.WEST)) {
                                     if (bb.maxX >= x - 0.25 && bb.minX <= x + 0.25) {
                                         return true;
                                     }
                                 }
-                                if (!state.getValue(HollowLogBlock.HAS_GLASS_POS) && !isConnectingHollowEnd(level, mpos, Direction.EAST)) {
+                                if (!state.getValue(HollowLogBlock.HAS_GLASS_POS)
+                                        && !isConnectingHollowEnd(level, mpos, Direction.EAST)) {
                                     if (bb.minX <= x + 1.25 && bb.maxX >= x + 0.75) {
                                         return true;
                                     }
@@ -307,12 +310,14 @@ public class HollowLogCrawlHandler {
                             double cavityMinX = x + 0.15;
                             double cavityMaxX = x + 0.85;
                             if (bb.minX < cavityMaxX && bb.maxX > cavityMinX) {
-                                if (!state.getValue(HollowLogBlock.HAS_GLASS_NEG) && !isConnectingHollowEnd(level, mpos, Direction.NORTH)) {
+                                if (!state.getValue(HollowLogBlock.HAS_GLASS_NEG)
+                                        && !isConnectingHollowEnd(level, mpos, Direction.NORTH)) {
                                     if (bb.maxZ >= z - 0.25 && bb.minZ <= z + 0.25) {
                                         return true;
                                     }
                                 }
-                                if (!state.getValue(HollowLogBlock.HAS_GLASS_POS) && !isConnectingHollowEnd(level, mpos, Direction.SOUTH)) {
+                                if (!state.getValue(HollowLogBlock.HAS_GLASS_POS)
+                                        && !isConnectingHollowEnd(level, mpos, Direction.SOUTH)) {
                                     if (bb.minZ <= z + 1.25 && bb.maxZ >= z + 0.75) {
                                         return true;
                                     }
@@ -321,30 +326,39 @@ public class HollowLogCrawlHandler {
                         }
                     } else if (state.getBlock() instanceof HollowPipeBlock) {
                         Direction.Axis axis = HollowPipeBlock.getPrimaryAxis(state);
-                        boolean hasHorizontal = state.getValue(HollowPipeBlock.NORTH) || state.getValue(HollowPipeBlock.SOUTH)
+                        boolean hasHorizontal = state.getValue(HollowPipeBlock.NORTH)
+                                || state.getValue(HollowPipeBlock.SOUTH)
                                 || state.getValue(HollowPipeBlock.WEST) || state.getValue(HollowPipeBlock.EAST)
                                 || axis != Direction.Axis.Y;
                         if (!hasHorizontal) {
                             continue;
                         }
 
-                        if ((state.getValue(HollowPipeBlock.WEST) || axis == Direction.Axis.X) && !isConnectingHollowEnd(level, mpos, Direction.WEST)) {
-                            if (bb.minZ < z + 0.85 && bb.maxZ > z + 0.15 && bb.maxX >= x - 0.25 && bb.minX <= x + 0.25) {
+                        if ((state.getValue(HollowPipeBlock.WEST) || axis == Direction.Axis.X)
+                                && !isConnectingHollowEnd(level, mpos, Direction.WEST)) {
+                            if (bb.minZ < z + 0.85 && bb.maxZ > z + 0.15 && bb.maxX >= x - 0.25
+                                    && bb.minX <= x + 0.25) {
                                 return true;
                             }
                         }
-                        if ((state.getValue(HollowPipeBlock.EAST) || axis == Direction.Axis.X) && !isConnectingHollowEnd(level, mpos, Direction.EAST)) {
-                            if (bb.minZ < z + 0.85 && bb.maxZ > z + 0.15 && bb.minX <= x + 1.25 && bb.maxX >= x + 0.75) {
+                        if ((state.getValue(HollowPipeBlock.EAST) || axis == Direction.Axis.X)
+                                && !isConnectingHollowEnd(level, mpos, Direction.EAST)) {
+                            if (bb.minZ < z + 0.85 && bb.maxZ > z + 0.15 && bb.minX <= x + 1.25
+                                    && bb.maxX >= x + 0.75) {
                                 return true;
                             }
                         }
-                        if ((state.getValue(HollowPipeBlock.NORTH) || axis == Direction.Axis.Z) && !isConnectingHollowEnd(level, mpos, Direction.NORTH)) {
-                            if (bb.minX < x + 0.85 && bb.maxX > x + 0.15 && bb.maxZ >= z - 0.25 && bb.minZ <= z + 0.25) {
+                        if ((state.getValue(HollowPipeBlock.NORTH) || axis == Direction.Axis.Z)
+                                && !isConnectingHollowEnd(level, mpos, Direction.NORTH)) {
+                            if (bb.minX < x + 0.85 && bb.maxX > x + 0.15 && bb.maxZ >= z - 0.25
+                                    && bb.minZ <= z + 0.25) {
                                 return true;
                             }
                         }
-                        if ((state.getValue(HollowPipeBlock.SOUTH) || axis == Direction.Axis.Z) && !isConnectingHollowEnd(level, mpos, Direction.SOUTH)) {
-                            if (bb.minX < x + 0.85 && bb.maxX > x + 0.15 && bb.minZ <= z + 1.25 && bb.maxZ >= z + 0.75) {
+                        if ((state.getValue(HollowPipeBlock.SOUTH) || axis == Direction.Axis.Z)
+                                && !isConnectingHollowEnd(level, mpos, Direction.SOUTH)) {
+                            if (bb.minX < x + 0.85 && bb.maxX > x + 0.15 && bb.minZ <= z + 1.25
+                                    && bb.maxZ >= z + 0.75) {
                                 return true;
                             }
                         }

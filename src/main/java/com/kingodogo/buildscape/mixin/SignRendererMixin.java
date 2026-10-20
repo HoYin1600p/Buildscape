@@ -13,10 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SignRenderer.class)
 public class SignRendererMixin {
 
-    @Inject(
-            method = "render(Lnet/minecraft/world/level/block/entity/SignBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V",
-            at = @At("TAIL")
-    )
+    @Inject(method = "render(Lnet/minecraft/world/level/block/entity/SignBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V", at = @At("TAIL"))
     private void buildscape$renderSignFrame(
             SignBlockEntity blockEntity,
             float partialTicks,
@@ -24,8 +21,7 @@ public class SignRendererMixin {
             MultiBufferSource bufferSource,
             int combinedLight,
             int combinedOverlay,
-            CallbackInfo ci
-    ) {
+            CallbackInfo ci) {
         SignFrameRenderer.render(blockEntity, partialTicks, poseStack, bufferSource, combinedLight, combinedOverlay);
     }
 }

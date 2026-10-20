@@ -41,8 +41,7 @@ public class FallingIcicleEntity extends Entity {
             double x,
             double y,
             double z,
-            BlockState state
-    ) {
+            BlockState state) {
         this(ModEntities.FALLING_ICICLE.get(), level);
         this.blockState = state;
         this.setPos(x, y, z);
@@ -59,8 +58,7 @@ public class FallingIcicleEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-    }
+    protected void defineSynchedData() {}
 
     @Override
     public void tick() {
@@ -91,8 +89,7 @@ public class FallingIcicleEntity extends Entity {
                         this.getX(),
                         this.getY(),
                         this.getZ(),
-                        itemStack
-                );
+                        itemStack);
                 itemEntity.setDefaultPickUpDelay();
                 this.level.addFreshEntity(itemEntity);
 
@@ -102,14 +99,12 @@ public class FallingIcicleEntity extends Entity {
                         blockState.getSoundType().getBreakSound(),
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
 
                 this.level.levelEvent(
                         2001,
                         this.blockPosition(),
-                        Block.getId(blockState)
-                );
+                        Block.getId(blockState));
             }
 
             this.discard();
@@ -129,8 +124,7 @@ public class FallingIcicleEntity extends Entity {
             boundingBox = boundingBox.expandTowards(0, motion.y, 0);
         }
 
-        List<LivingEntity> entities =
-                this.level.getEntitiesOfClass(LivingEntity.class, boundingBox);
+        List<LivingEntity> entities = this.level.getEntitiesOfClass(LivingEntity.class, boundingBox);
 
         for (LivingEntity entity : entities) {
             float fallDistance = (float) (this.startPos != null
@@ -151,8 +145,7 @@ public class FallingIcicleEntity extends Entity {
                         this.getX(),
                         this.getY(),
                         this.getZ(),
-                        itemStack
-                );
+                        itemStack);
                 itemEntity.setDefaultPickUpDelay();
                 this.level.addFreshEntity(itemEntity);
 
@@ -162,14 +155,12 @@ public class FallingIcicleEntity extends Entity {
                         blockState.getSoundType().getBreakSound(),
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
 
                 this.level.levelEvent(
                         2001,
                         this.blockPosition(),
-                        Block.getId(blockState)
-                );
+                        Block.getId(blockState));
             }
 
             this.discard();
@@ -185,8 +176,7 @@ public class FallingIcicleEntity extends Entity {
             this.startPos = new BlockPos(
                     tag.getInt(NbtKeys.START_X),
                     tag.getInt("StartY"),
-                    tag.getInt("StartZ")
-            );
+                    tag.getInt("StartZ"));
         }
         if (this.blockState.isAir()) {
             this.blockState = Blocks.ICE.defaultBlockState();

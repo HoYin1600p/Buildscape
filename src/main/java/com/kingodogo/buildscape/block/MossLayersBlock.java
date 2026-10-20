@@ -43,21 +43,14 @@ public class MossLayersBlock extends SnowLayerBlock {
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos.below());
-        if (
-                !blockState.is(Blocks.ICE) &&
-                        !blockState.is(Blocks.PACKED_ICE) &&
-                        !blockState.is(Blocks.BARRIER)
-        ) {
-            if (
-                    !blockState.is(Blocks.HONEY_BLOCK) && !blockState.is(Blocks.SOUL_SAND)
-            ) {
-                return (
-                        Block.isFaceFull(
-                                blockState.getCollisionShape(level, pos.below()),
-                                Direction.UP
-                        ) ||
-                                (blockState.is(this) && blockState.getValue(LAYERS) == 8)
-                );
+        if (!blockState.is(Blocks.ICE) &&
+                !blockState.is(Blocks.PACKED_ICE) &&
+                !blockState.is(Blocks.BARRIER)) {
+            if (!blockState.is(Blocks.HONEY_BLOCK) && !blockState.is(Blocks.SOUL_SAND)) {
+                return (Block.isFaceFull(
+                        blockState.getCollisionShape(level, pos.below()),
+                        Direction.UP) ||
+                        (blockState.is(this) && blockState.getValue(LAYERS) == 8));
             } else {
                 return true;
             }
@@ -80,8 +73,7 @@ public class MossLayersBlock extends SnowLayerBlock {
 
         Item heldItem = context.getItemInHand().getItem();
         if (heldItem instanceof BlockItem) {
-            Block heldBlock =
-                    ((BlockItem) heldItem).getBlock();
+            Block heldBlock = ((BlockItem) heldItem).getBlock();
             if (heldBlock instanceof SnowLayerBlock && heldBlock != this) {
                 return false;
             }
@@ -107,8 +99,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             Level level,
             BlockPos pos,
             BlockState state,
-            Player player
-    ) {
+            Player player) {
         if (state.getValue(LAYERS) == 8) {
             level.setBlock(pos, fullBlock.get().defaultBlockState(), 3);
         }
@@ -125,8 +116,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         if (state.getValue(LAYERS) == 8) {
             level.setBlock(pos, fullBlock.get().defaultBlockState(), 3);
         }
@@ -138,8 +128,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             Level level,
             BlockPos pos,
             BlockState newState,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
@@ -153,8 +142,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return getCollisionShape(state, level, pos, context);
     }
 
@@ -163,8 +151,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         int i = state.getValue(LAYERS);
         if (i == 8) {
             return Shapes.block();
@@ -178,8 +165,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return getCollisionShape(state, level, pos, context);
     }
 
@@ -192,8 +178,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            PathComputationType type
-    ) {
+            PathComputationType type) {
         if (type == PathComputationType.LAND) {
             return state.getValue(LAYERS) < 5;
         }
@@ -203,8 +188,7 @@ public class MossLayersBlock extends SnowLayerBlock {
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         int layerCount = state.getValue(LAYERS);
 
         return List.of(new ItemStack(ModItems.MOSS_LAYERS.get(), layerCount));

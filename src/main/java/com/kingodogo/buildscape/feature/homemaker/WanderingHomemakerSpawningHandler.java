@@ -44,12 +44,7 @@ public class WanderingHomemakerSpawningHandler {
     }
 
     private enum BlockCategory {
-        DECORATED_POT,
-        BIG_CANDLE,
-        PILLAR,
-        STAR,
-        CUSHION,
-        NONE
+        DECORATED_POT, BIG_CANDLE, PILLAR, STAR, CUSHION, NONE
     }
 
     private static BlockCategory getCategory(Block block) {
@@ -166,9 +161,9 @@ public class WanderingHomemakerSpawningHandler {
                 }
             }
 
-            WanderingTrader homemaker = spawnFestive ?
-                    ModEntities.FESTIVE_WANDERING_HOMEMAKER.get().create(level) :
-                    ModEntities.WANDERING_HOMEMAKER.get().create(level);
+            WanderingTrader homemaker = spawnFestive
+                    ? ModEntities.FESTIVE_WANDERING_HOMEMAKER.get().create(level)
+                    : ModEntities.WANDERING_HOMEMAKER.get().create(level);
             if (homemaker != null) {
                 double angle = level.random.nextDouble() * 2.0D * Math.PI;
                 double distance = 2.0D + level.random.nextDouble() * 1.0D;
@@ -179,7 +174,7 @@ public class WanderingHomemakerSpawningHandler {
                 homemaker.moveTo(spawnX, spawnY, spawnZ, level.random.nextFloat() * 360F, 0.0F);
                 level.addFreshEntity(homemaker);
 
-                BlockPos spawnPos = new BlockPos((int)spawnX, (int)spawnY, (int)spawnZ);
+                BlockPos spawnPos = new BlockPos((int) spawnX, (int) spawnY, (int) spawnZ);
                 level.playSound(null, spawnPos, SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.NEUTRAL, 1.0F, 1.0F);
                 for (int i = 0; i < 20; i++) {
                     double px = spawnX + (level.random.nextDouble() - 0.5D) * 1.5D;
@@ -195,8 +190,7 @@ public class WanderingHomemakerSpawningHandler {
                 if (player instanceof ServerPlayer serverPlayer) {
                     ModMessages.INSTANCE.send(
                             PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new SyncHomemakerCooldownPacket(cooldownEnd)
-                    );
+                            new SyncHomemakerCooldownPacket(cooldownEnd));
                 }
             }
         }

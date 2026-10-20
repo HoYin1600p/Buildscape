@@ -38,8 +38,7 @@ public class GlowLightsBlockEntity extends SyncedBlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
         return true;
     }
@@ -64,8 +63,7 @@ public class GlowLightsBlockEntity extends SyncedBlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -86,8 +84,7 @@ public class GlowLightsBlockEntity extends SyncedBlockEntity {
         if (tag.contains(NbtKeys.DYE_COLORS, Tag.TAG_LIST)) {
             ListTag colorsList = tag.getList(
                     NbtKeys.DYE_COLORS,
-                    Tag.TAG_STRING
-            );
+                    Tag.TAG_STRING);
             for (int i = 0; i < colorsList.size(); i++) {
                 String color = colorsList.getString(i);
                 if (color != null && !color.isEmpty()) {

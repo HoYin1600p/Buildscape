@@ -33,14 +33,11 @@ import net.minecraftforge.registries.ForgeRegistries;
  */
 final class PillarWorldSync {
 
-    private PillarWorldSync() {
-    }
-
+    private PillarWorldSync() {}
 
     static void syncAllLoadedPillars(
             PillarIdManager m,
-            MinecraftServer server
-    ) {
+            MinecraftServer server) {
         if (server == null || !server.isRunning()) {
             return;
         }
@@ -81,35 +78,28 @@ final class PillarWorldSync {
                         }
 
                         ChunkAccess chunk = level.getChunk(
-                                pos
-                        );
-                        if (
-                                !(chunk instanceof LevelChunk)
-                        ) {
+                                pos);
+                        if (!(chunk instanceof LevelChunk)) {
                             skippedCount++;
                             continue;
                         }
 
-                        if (
-                                !chunk
-                                        .getStatus()
-                                        .isOrAfter(ChunkStatus.FULL)
-                        ) {
+                        if (!chunk
+                                .getStatus()
+                                .isOrAfter(ChunkStatus.FULL)) {
                             skippedCount++;
                             continue;
                         }
 
-                        BlockEntity be =
-                                level.getBlockEntity(pos);
-                        if (
-                                be instanceof PillarBlockEntity pillarBE
-                        ) {
+                        BlockEntity be = level.getBlockEntity(pos);
+                        if (be instanceof PillarBlockEntity pillarBE) {
 
                             pillarBE.syncFromData(data);
                             syncedCount++;
                         }
                     } catch (Exception e) {
-                        BuildScape.LOGGER.error("Error syncing pillar {}: {}", (data != null ? data.id : "unknown"), e.getMessage());
+                        BuildScape.LOGGER.error("Error syncing pillar {}: {}", (data != null ? data.id : "unknown"),
+                                e.getMessage());
                     }
                 }
             }
@@ -156,7 +146,8 @@ final class PillarWorldSync {
             }
             for (PillarData data : entry.getValue()) {
                 Direction facing = data.facing != null
-                        ? Direction.byName(data.facing) : null;
+                        ? Direction.byName(data.facing)
+                        : null;
                 if (!livePositions.contains(PillarRegistry.positionKey(dimension, data.getBlockPos(), facing))) {
                     changed |= m.registry.pillarData.remove(data.id, data);
                 }
@@ -175,7 +166,6 @@ final class PillarWorldSync {
         if (server == null) {
             return;
         }
-
 
         if (!m.hasLoaded()) {
             return;
@@ -385,8 +375,7 @@ final class PillarWorldSync {
 
     static boolean syncPatternSettingsFromNBT(
             PillarBlockEntity pillarBE,
-            PillarData data
-    ) {
+            PillarData data) {
         if (pillarBE == null || data == null) {
             return false;
         }

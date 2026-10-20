@@ -22,8 +22,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class IcicleCauldronBlockEntity
-        extends SyncedBlockEntity
-        implements WorldlyContainer {
+        extends
+            SyncedBlockEntity
+        implements
+            WorldlyContainer {
 
     private ItemStack storedIcicle = ItemStack.EMPTY;
 
@@ -52,8 +54,7 @@ public class IcicleCauldronBlockEntity
                         worldPosition,
                         getBlockState(),
                         getBlockState(),
-                        3
-                );
+                        3);
             }
         }
     }
@@ -70,8 +71,7 @@ public class IcicleCauldronBlockEntity
             level.setBlock(
                     worldPosition,
                     Blocks.CAULDRON.defaultBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -88,15 +88,11 @@ public class IcicleCauldronBlockEntity
     public boolean canPlaceItemThroughFace(
             int slot,
             ItemStack stack,
-            @Nullable Direction direction
-    ) {
+            @Nullable Direction direction) {
         if (direction != Direction.UP) {
             return false;
         }
-        if (
-                stack.getItem() !=
-                        ModItems.ICICLE_BLOCK.get()
-        ) {
+        if (stack.getItem() != ModItems.ICICLE_BLOCK.get()) {
             return false;
         }
         return storedIcicle.isEmpty();
@@ -106,8 +102,7 @@ public class IcicleCauldronBlockEntity
     public boolean canTakeItemThroughFace(
             int slot,
             ItemStack stack,
-            @Nullable Direction direction
-    ) {
+            @Nullable Direction direction) {
         return !storedIcicle.isEmpty();
     }
 
@@ -170,14 +165,10 @@ public class IcicleCauldronBlockEntity
         if (level == null || level.getBlockEntity(worldPosition) != this) {
             return false;
         }
-        return (
-                player.distanceToSqr(
-                        (double) worldPosition.getX() + 0.5D,
-                        (double) worldPosition.getY() + 0.5D,
-                        (double) worldPosition.getZ() + 0.5D
-                ) <=
-                        64.0D
-        );
+        return (player.distanceToSqr(
+                (double) worldPosition.getX() + 0.5D,
+                (double) worldPosition.getY() + 0.5D,
+                (double) worldPosition.getZ() + 0.5D) <= 64.0D);
     }
 
     @Override
@@ -217,17 +208,17 @@ public class IcicleCauldronBlockEntity
                 return itemHandlers[0].cast();
             }
             switch (side) {
-                case UP:
+                case UP :
                     return itemHandlers[0].cast();
-                case DOWN:
+                case DOWN :
                     return itemHandlers[1].cast();
-                case NORTH:
+                case NORTH :
                     return itemHandlers[2].cast();
-                case SOUTH:
+                case SOUTH :
                     return itemHandlers[3].cast();
-                case EAST:
+                case EAST :
                     return itemHandlers[4].cast();
-                case WEST:
+                case WEST :
                     return itemHandlers[5].cast();
             }
         }

@@ -15,7 +15,8 @@ import java.nio.file.Path;
 import static org.junit.Assert.*;
 
 public class ConfigPersistence405Test {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {
@@ -143,7 +144,8 @@ public class ConfigPersistence405Test {
         assertEquals("spiral", output.get("template").getAsString());
         config.pattern = "quote\"slash\\";
         config.savePropertiesToDisk();
-        assertEquals(config.pattern, ConfigLayoutIO.readProperties(Files.readString(file)).get("pattern").getAsString());
+        assertEquals(config.pattern,
+                ConfigLayoutIO.readProperties(Files.readString(file)).get("pattern").getAsString());
         assertEquals(original, Files.readString(file.resolveSibling("pillar-properties.json.pre-4.0.5.bak")));
         Files.writeString(file, "{\"pattern\":\"external\"}");
         config.savePropertiesToDisk();

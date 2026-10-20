@@ -23,8 +23,7 @@ public class MobState {
     public boolean fire;
     public boolean frozen;
 
-    public MobState() {
-    }
+    public MobState() {}
 
     @Override
     public boolean equals(Object o) {
@@ -54,7 +53,8 @@ public class MobState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(parsedStates, spin, upsideDown, baby, angry, sitting, charged, sheared, saddled, tamed, powered, invisible, glowing, fire, frozen);
+        return Objects.hash(parsedStates, spin, upsideDown, baby, angry, sitting, charged, sheared, saddled, tamed,
+                powered, invisible, glowing, fire, frozen);
     }
 
     @Override

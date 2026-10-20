@@ -75,7 +75,8 @@ public class StonecuttingCycleTest {
     @Test
     public void realPackKeepsUnitReversalsAndCutsBitGratesOneToOne() throws Exception {
         RecipeIR.CategoryPack pack;
-        try (var reader = Files.newBufferedReader(Path.of("src/main/resources/data/buildscape/recipes_pack/stonecutting.json"))) {
+        try (var reader = Files
+                .newBufferedReader(Path.of("src/main/resources/data/buildscape/recipes_pack/stonecutting.json"))) {
             pack = StreamingRecipeParser.parseCategory("stonecutting", reader);
         }
         assertTrue(hasConversion(pack, "BS:bit_copper_grate", "BS:bit_exposed_copper_grate"));

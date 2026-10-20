@@ -21,10 +21,14 @@ import java.util.List;
 
 @Mixin(value = Screen.class, priority = 900)
 public abstract class ScreenMixin {
-    @Shadow public int width;
-    @Shadow public int height;
-    @Shadow protected Font font;
-    @Shadow protected ItemRenderer itemRenderer;
+    @Shadow
+    public int width;
+    @Shadow
+    public int height;
+    @Shadow
+    protected Font font;
+    @Shadow
+    protected ItemRenderer itemRenderer;
 
     @Unique
     private ItemStack buildscape$currentHoverStack = ItemStack.EMPTY;
@@ -32,28 +36,25 @@ public abstract class ScreenMixin {
     @Unique
     private static boolean buildscape$isRenderingCustomTooltip = false;
 
-    @Inject(
-            method = "renderTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/item/ItemStack;II)V",
-            at = @At("HEAD")
-    )
-    private void buildscape$onRenderTooltipHead(PoseStack poseStack, ItemStack itemStack, int x, int y, CallbackInfo ci) {
+    @Inject(method = "renderTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/item/ItemStack;II)V", at = @At("HEAD"))
+    private void buildscape$onRenderTooltipHead(PoseStack poseStack, ItemStack itemStack, int x, int y,
+            CallbackInfo ci) {
         if (!buildscape$isRenderingCustomTooltip) {
             this.buildscape$currentHoverStack = itemStack != null ? itemStack : ItemStack.EMPTY;
         }
     }
 
-    @Inject(
-            method = "renderTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/item/ItemStack;II)V",
-            at = @At("TAIL")
-    )
-    private void buildscape$onRenderTooltipTail(PoseStack poseStack, ItemStack itemStack, int x, int y, CallbackInfo ci) {
+    @Inject(method = "renderTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/item/ItemStack;II)V", at = @At("TAIL"))
+    private void buildscape$onRenderTooltipTail(PoseStack poseStack, ItemStack itemStack, int x, int y,
+            CallbackInfo ci) {
         if (!buildscape$isRenderingCustomTooltip) {
             this.buildscape$currentHoverStack = ItemStack.EMPTY;
         }
     }
 
     @Inject(method = "renderTooltipInternal", at = @At("TAIL"))
-    private void renderCustomTooltipOutside(PoseStack poseStack, List<ClientTooltipComponent> components, int mouseX, int mouseY, CallbackInfo ci) {
+    private void renderCustomTooltipOutside(PoseStack poseStack, List<ClientTooltipComponent> components, int mouseX,
+            int mouseY, CallbackInfo ci) {
         if (buildscape$isRenderingCustomTooltip) {
             return;
         }
@@ -62,7 +63,8 @@ public abstract class ScreenMixin {
             return;
         }
 
-        if (!Screen.hasShiftDown() || this.buildscape$currentHoverStack == null || this.buildscape$currentHoverStack.isEmpty()) {
+        if (!Screen.hasShiftDown() || this.buildscape$currentHoverStack == null
+                || this.buildscape$currentHoverStack.isEmpty()) {
             return;
         }
 
@@ -70,11 +72,13 @@ public abstract class ScreenMixin {
             buildscape$isRenderingCustomTooltip = true;
 
             ClientTooltipComponent customComponent = null;
-            ShulkerBoxTooltipData shulkerData = TagTooltipHandler.getShulkerTooltipData(this.buildscape$currentHoverStack);
+            ShulkerBoxTooltipData shulkerData = TagTooltipHandler
+                    .getShulkerTooltipData(this.buildscape$currentHoverStack);
             if (shulkerData != null) {
                 customComponent = shulkerData;
             } else {
-                BuildersPouchTooltipData pouchData = TagTooltipHandler.getBuildersPouchTooltipData(this.buildscape$currentHoverStack);
+                BuildersPouchTooltipData pouchData = TagTooltipHandler
+                        .getBuildersPouchTooltipData(this.buildscape$currentHoverStack);
                 if (pouchData != null) {
                     customComponent = pouchData;
                 }

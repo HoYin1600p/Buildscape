@@ -23,8 +23,7 @@ public class TemplateEngine {
             String templateName,
             String inputItem,
             String outputItem,
-            int outputCount
-    ) {
+            int outputCount) {
         RecipeIR.TemplateSpec template = templates.get(templateName);
         if (template == null) {
             return null;
@@ -60,7 +59,6 @@ public class TemplateEngine {
                 inputItem,
                 result,
                 template.cookingTime(),
-                template.experience()
-        );
+                template.experience());
     }
 }

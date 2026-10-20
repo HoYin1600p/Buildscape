@@ -14,8 +14,7 @@ import java.util.function.Supplier;
 
 /** Reads the mod's registrations in unit tests without a running game, so tests need not parse source files. */
 public final class RegistryTestSupport {
-    private RegistryTestSupport() {
-    }
+    private RegistryTestSupport() {}
 
     public static void bootstrap() {
         RecipeCacheRegressionTest.bootstrap();
@@ -93,8 +92,8 @@ public final class RegistryTestSupport {
 
             Field field = DeferredRegister.class.getDeclaredField("entries");
             field.setAccessible(true);
-            Map<RegistryObject<T>, Supplier<? extends T>> entries =
-                    (Map<RegistryObject<T>, Supplier<? extends T>>) field.get(register);
+            Map<RegistryObject<T>, Supplier<? extends T>> entries = (Map<RegistryObject<T>, Supplier<? extends T>>) field
+                    .get(register);
             for (Map.Entry<RegistryObject<T>, Supplier<? extends T>> entry : entries.entrySet()) {
                 if (entry.getKey().getId().getPath().equals(path)) {
                     return entry.getValue().get();

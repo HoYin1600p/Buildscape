@@ -64,46 +64,41 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 public class PillarBlock
-        extends OpenWaterloggedBlock
-        implements EntityBlock, SimpleWaterloggedBlock {
+        extends
+            OpenWaterloggedBlock
+        implements
+            EntityBlock,
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
-    private static final ThreadLocal<Float> PLACING_PLAYER_YAW =
-            new ThreadLocal<>();
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    private static final ThreadLocal<Float> PLACING_PLAYER_YAW = new ThreadLocal<>();
 
     private static final VoxelShape SHAPE_SINGLE = Shapes.or(
             Block.box(2, 0, 2, 14, 2, 14),
             Block.box(3, 2, 3, 13, 14, 13),
-            Block.box(0, 14, 0, 16, 16, 16)
-    );
+            Block.box(0, 14, 0, 16, 16, 16));
     private static final VoxelShape SHAPE_BOTTOM = Shapes.or(
             Block.box(2, 0, 2, 14, 2, 14),
-            Block.box(3, 2, 3, 13, 16, 13)
-    );
+            Block.box(3, 2, 3, 13, 16, 13));
     private static final VoxelShape SHAPE_MIDDLE = Block.box(3, 0, 3, 13, 16, 13);
     private static final VoxelShape SHAPE_TOP = Shapes.or(
             Block.box(3, 0, 3, 13, 14, 13),
-            Block.box(0, 14, 0, 16, 16, 16)
-    );
+            Block.box(0, 14, 0, 16, 16, 16));
     public static final EnumProperty<PillarPart> PART = EnumProperty.create(
             "part",
-            PillarPart.class
-    );
+            PillarPart.class);
 
     public PillarBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition.any()
                         .setValue(PART, PillarPart.SINGLE)
-                        .setValue(WATERLOGGED, false)
-        );
+                        .setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(PART, WATERLOGGED);
     }
 
@@ -128,8 +123,10 @@ public class PillarBlock
             }
         }
 
-        boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
-        boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
+        boolean hasAbove = above.getBlock() instanceof PillarBlock
+                && !(above.getBlock() instanceof AshenKingPillarBlock);
+        boolean hasBelow = below.getBlock() instanceof PillarBlock
+                && !(below.getBlock() instanceof AshenKingPillarBlock);
 
         PillarPart part;
         if (hasAbove && hasBelow) {
@@ -157,8 +154,7 @@ public class PillarBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -166,8 +162,10 @@ public class PillarBlock
         if (direction == Direction.UP || direction == Direction.DOWN) {
             BlockState below = level.getBlockState(pos.below());
             BlockState above = level.getBlockState(pos.above());
-            boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
-            boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
+            boolean hasAbove = above.getBlock() instanceof PillarBlock
+                    && !(above.getBlock() instanceof AshenKingPillarBlock);
+            boolean hasBelow = below.getBlock() instanceof PillarBlock
+                    && !(below.getBlock() instanceof AshenKingPillarBlock);
 
             PillarPart newPart;
             if (hasAbove && hasBelow) {
@@ -188,8 +186,7 @@ public class PillarBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -203,8 +200,7 @@ public class PillarBlock
             Level level,
             BlockPos pos,
             BlockState oldState,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
 
         if (!level.isClientSide) {
             if (!oldState.is(state.getBlock())) {
@@ -230,34 +226,28 @@ public class PillarBlock
                         above,
                         level.getBlockState(above),
                         level.getBlockState(above),
-                        3
-                );
+                        3);
             }
             if (level.getBlockState(below).getBlock() instanceof PillarBlock) {
                 level.sendBlockUpdated(
                         below,
                         level.getBlockState(below),
                         level.getBlockState(below),
-                        3
-                );
+                        3);
             }
         }
     }
 
     private void syncNewPillarWithStack(Level level, BlockPos pos, boolean newlyPlaced) {
-        if (
-                !level.isClientSide &&
-                        !BuildScape.isServerFullyInitialized()
-        ) {
+        if (!level.isClientSide &&
+                !BuildScape.isServerFullyInitialized()) {
             return;
         }
 
-        if (
-                !level.isClientSide &&
-                        (level.getServer() == null ||
-                                !level.getServer().isRunning() ||
-                                level.getServer().getPlayerList().getPlayerCount() == 0)
-        ) {
+        if (!level.isClientSide &&
+                (level.getServer() == null ||
+                        !level.getServer().isRunning() ||
+                        level.getServer().getPlayerList().getPlayerCount() == 0)) {
             return;
         }
 
@@ -274,20 +264,15 @@ public class PillarBlock
             if (!level.isClientSide) {
                 if (level.hasChunkAt(above)) {
                     ChunkAccess chunk = level.getChunk(
-                            above
-                    );
-                    if (
-                            chunk instanceof LevelChunk &&
-                                    chunk
-                                            .getStatus()
-                                            .isOrAfter(ChunkStatus.FULL)
-                    ) {
+                            above);
+                    if (chunk instanceof LevelChunk &&
+                            chunk
+                                    .getStatus()
+                                    .isOrAfter(ChunkStatus.FULL)) {
                         if (level.getBlockState(above).getBlock() instanceof PillarBlock) {
                             BlockEntity aboveBE = level.getBlockEntity(above);
-                            if (
-                                    aboveBE instanceof PillarBlockEntity pillarBE &&
-                                            pillarBE.hasCustomColors()
-                            ) {
+                            if (aboveBE instanceof PillarBlockEntity pillarBE &&
+                                    pillarBE.hasCustomColors()) {
                                 existingPillar = pillarBE;
                             }
                         }
@@ -296,20 +281,15 @@ public class PillarBlock
 
                 if (existingPillar == null && level.hasChunkAt(below)) {
                     ChunkAccess chunk = level.getChunk(
-                            below
-                    );
-                    if (
-                            chunk instanceof LevelChunk &&
-                                    chunk
-                                            .getStatus()
-                                            .isOrAfter(ChunkStatus.FULL)
-                    ) {
+                            below);
+                    if (chunk instanceof LevelChunk &&
+                            chunk
+                                    .getStatus()
+                                    .isOrAfter(ChunkStatus.FULL)) {
                         if (level.getBlockState(below).getBlock() instanceof PillarBlock) {
                             BlockEntity belowBE = level.getBlockEntity(below);
-                            if (
-                                    belowBE instanceof PillarBlockEntity pillarBE &&
-                                            pillarBE.hasCustomColors()
-                            ) {
+                            if (belowBE instanceof PillarBlockEntity pillarBE &&
+                                    pillarBE.hasCustomColors()) {
                                 existingPillar = pillarBE;
                             }
                         }
@@ -318,22 +298,16 @@ public class PillarBlock
             } else {
                 if (level.getBlockState(above).getBlock() instanceof PillarBlock) {
                     BlockEntity aboveBE = level.getBlockEntity(above);
-                    if (
-                            aboveBE instanceof PillarBlockEntity pillarBE &&
-                                    pillarBE.hasCustomColors()
-                    ) {
+                    if (aboveBE instanceof PillarBlockEntity pillarBE &&
+                            pillarBE.hasCustomColors()) {
                         existingPillar = pillarBE;
                     }
                 }
-                if (
-                        existingPillar == null &&
-                                level.getBlockState(below).getBlock() instanceof PillarBlock
-                ) {
+                if (existingPillar == null &&
+                        level.getBlockState(below).getBlock() instanceof PillarBlock) {
                     BlockEntity belowBE = level.getBlockEntity(below);
-                    if (
-                            belowBE instanceof PillarBlockEntity pillarBE &&
-                                    pillarBE.hasCustomColors()
-                    ) {
+                    if (belowBE instanceof PillarBlockEntity pillarBE &&
+                            pillarBE.hasCustomColors()) {
                         existingPillar = pillarBE;
                     }
                 }
@@ -347,14 +321,10 @@ public class PillarBlock
             List<String> stackColors = existingPillar.getParticleColors();
 
             if (stackId != null && stackColors != null && !stackColors.isEmpty()) {
-                if (
-                        !level.isClientSide &&
-                                BuildScape.isServerFullyInitialized()
-                ) {
-                    PillarIdManager manager =
-                            PillarIdManager.get(level);
-                    PillarIdManager.PillarData data =
-                            manager.getPillarData(stackId);
+                if (!level.isClientSide &&
+                        BuildScape.isServerFullyInitialized()) {
+                    PillarIdManager manager = PillarIdManager.get(level);
+                    PillarIdManager.PillarData data = manager.getPillarData(stackId);
 
                     if (data != null) {
                         BlockPos bottom = findBottomBlock(level, pos);
@@ -384,31 +354,26 @@ public class PillarBlock
             Level level,
             BlockPos pos,
             BlockState newState,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (!level.isClientSide && !state.is(newState.getBlock())
                 && level.getBlockEntity(pos) instanceof PillarBlockEntity droppingBE
                 && droppingBE.hasDisplayItem()) {
             ItemStack displayedItem = droppingBE.getDisplayedItem().copy();
             if (!displayedItem.isEmpty()) {
-                ItemEntity itemEntity =
-                        new ItemEntity(
-                                level,
-                                pos.getX() + 0.5,
-                                pos.getY() + 0.5,
-                                pos.getZ() + 0.5,
-                                displayedItem
-                        );
+                ItemEntity itemEntity = new ItemEntity(
+                        level,
+                        pos.getX() + 0.5,
+                        pos.getY() + 0.5,
+                        pos.getZ() + 0.5,
+                        displayedItem);
                 itemEntity.setDefaultPickUpDelay();
                 level.addFreshEntity(itemEntity);
             }
         }
 
-        if (
-                !level.isClientSide &&
-                        !state.is(newState.getBlock()) &&
-                        BuildScape.isServerFullyInitialized()
-        ) {
+        if (!level.isClientSide &&
+                !state.is(newState.getBlock()) &&
+                BuildScape.isServerFullyInitialized()) {
             BlockEntity be = level.getBlockEntity(pos);
             String pillarIdToPreserve = null;
             List<String> colorsToPreserve = null;
@@ -422,36 +387,29 @@ public class PillarBlock
 
             BlockPos bottom = findBottomBlock(level, pos);
             BlockPos top = findTopBlock(level, pos);
-            PillarIdManager manager =
-                    PillarIdManager.get(level);
+            PillarIdManager manager = PillarIdManager.get(level);
             BlockPos firstRemainingPillar = manager.removePillarBlock(
                     level, pillarIdToPreserve, pos, bottom, top);
 
             if (firstRemainingPillar != null) {
                 BlockEntity remainingBe = level.getBlockEntity(firstRemainingPillar);
                 if (remainingBe instanceof PillarBlockEntity remainingPillarBE) {
-                    if (
-                            colorsToPreserve != null &&
-                                    !colorsToPreserve.isEmpty() &&
-                                    pillarIdToPreserve != null
-                    ) {
+                    if (colorsToPreserve != null &&
+                            !colorsToPreserve.isEmpty() &&
+                            pillarIdToPreserve != null) {
                         remainingPillarBE.forceSetColors(
                                 colorsToPreserve,
-                                pillarIdToPreserve
-                        );
+                                pillarIdToPreserve);
 
                         BlockPos current = bottom;
                         while (current.getY() <= top.getY()) {
                             if (!current.equals(pos)) {
                                 BlockEntity currentBe = level.getBlockEntity(current);
-                                if (
-                                        currentBe instanceof PillarBlockEntity stackPillarBE &&
-                                                !current.equals(firstRemainingPillar)
-                                ) {
+                                if (currentBe instanceof PillarBlockEntity stackPillarBE &&
+                                        !current.equals(firstRemainingPillar)) {
                                     stackPillarBE.forceSetColors(
                                             colorsToPreserve,
-                                            pillarIdToPreserve
-                                    );
+                                            pillarIdToPreserve);
                                 }
                             }
                             if (current.equals(top)) {
@@ -490,14 +448,15 @@ public class PillarBlock
             BlockPos pos,
             Block block,
             BlockPos neighborPos,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (neighborPos.equals(pos.above()) || neighborPos.equals(pos.below())) {
             if (!level.isClientSide) {
                 BlockState below = level.getBlockState(pos.below());
                 BlockState above = level.getBlockState(pos.above());
-                boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
-                boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
+                boolean hasAbove = above.getBlock() instanceof PillarBlock
+                        && !(above.getBlock() instanceof AshenKingPillarBlock);
+                boolean hasBelow = below.getBlock() instanceof PillarBlock
+                        && !(below.getBlock() instanceof AshenKingPillarBlock);
 
                 PillarPart newPart;
                 if (hasAbove && hasBelow) {
@@ -530,7 +489,8 @@ public class PillarBlock
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+            ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide) {
             PillarIdManager.get(level).getOrCreatePillarData(level, pos);
@@ -556,9 +516,9 @@ public class PillarBlock
 
     private static void applyPlacementNbt(PillarBlockEntity pillarBE, CompoundTag tag) {
         if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
-            ResourceLocation itemLocation =
-                    ResourceLocation.tryParse(tag.getString(NbtKeys.PILLAR_ITEM));
-            Item item = itemLocation == null ? null
+            ResourceLocation itemLocation = ResourceLocation.tryParse(tag.getString(NbtKeys.PILLAR_ITEM));
+            Item item = itemLocation == null
+                    ? null
                     : ForgeRegistries.ITEMS.getValue(itemLocation);
             if (item != null && item != Items.AIR) {
                 pillarBE.setDisplayedItem(new ItemStack(item));
@@ -586,21 +546,20 @@ public class PillarBlock
         if (level.getBlockEntity(neighborPos) instanceof PillarBlockEntity be && be.hasDisplayItem()) {
             ItemStack item = be.getDisplayedItem().copy();
             be.setDisplayedItem(ItemStack.EMPTY);
-            ItemEntity itemEntity =
-                    new ItemEntity(
-                            level,
-                            pos.getX() + 0.5,
-                            pos.getY() + 0.5,
-                            pos.getZ() + 0.5,
-                            item
-                    );
+            ItemEntity itemEntity = new ItemEntity(
+                    level,
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.5,
+                    pos.getZ() + 0.5,
+                    item);
             itemEntity.setDefaultPickUpDelay();
             level.addFreshEntity(itemEntity);
         }
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos,
+            Player player) {
         ItemStack stack = super.getCloneItemStack(state, target, level, pos, player);
 
         if (player != null && player.isShiftKeyDown()) {
@@ -612,8 +571,7 @@ public class PillarBlock
                 if (pillarBE.hasDisplayItem()) {
                     ItemStack displayedItem = pillarBE.getDisplayedItem();
                     if (!displayedItem.isEmpty()) {
-                        ResourceLocation itemId =
-                                ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
+                        ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
                         if (itemId != null) {
                             beTag.putString(NbtKeys.PILLAR_ITEM, itemId.toString());
                             hasCustomData = true;
@@ -639,19 +597,14 @@ public class PillarBlock
     }
 
     @Override
-    public <
-            T extends BlockEntity
-            > BlockEntityTicker<T> getTicker(
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
             Level level,
             BlockState state,
-            BlockEntityType<T> type
-    ) {
+            BlockEntityType<T> type) {
         if (type == ModBlockEntities.PILLAR_BLOCK_ENTITY.get()) {
             return level.isClientSide
-                    ? (lvl, p, s, t) ->
-                    PillarBlockEntity.clientTick(lvl, p, s, (PillarBlockEntity) t)
-                    : (lvl, p, s, t) ->
-                    PillarBlockEntity.serverTick(lvl, p, s, (PillarBlockEntity) t);
+                    ? (lvl, p, s, t) -> PillarBlockEntity.clientTick(lvl, p, s, (PillarBlockEntity) t)
+                    : (lvl, p, s, t) -> PillarBlockEntity.serverTick(lvl, p, s, (PillarBlockEntity) t);
         }
         return null;
     }
@@ -663,8 +616,7 @@ public class PillarBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -678,30 +630,23 @@ public class PillarBlock
 
         if (!heldItem.isEmpty()) {
             Map.Entry<String, String> dyeInfo = getDyeColorAndName(
-                    heldItem
-            );
+                    heldItem);
             if (dyeInfo != null) {
                 if (stackHasAnyItem(level, pos)) {
                     String dyeColor = dyeInfo.getKey();
                     String dyeName = dyeInfo.getValue();
 
                     if (!pillarBE.canAddMoreColors()) {
-                        TextComponent message =
-                                new TextComponent(
-                                        "Pillar already has " +
-                                                PillarBlockEntity.MAX_DYE_COLORS +
-                                                " colors! Break and replace to reset."
-                                );
+                        TextComponent message = new TextComponent(
+                                "Pillar already has " +
+                                        PillarBlockEntity.MAX_DYE_COLORS +
+                                        " colors! Break and replace to reset.");
                         message.withStyle(ChatFormatting.RED);
                         if (player instanceof ServerPlayer) {
                             ModMessages.INSTANCE.send(
-                                    PacketDistributor.PLAYER.with(() ->
-                                            (ServerPlayer) player
-                                    ),
+                                    PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
                                     new ActionBarMessagePacket(
-                                            message
-                                    )
-                            );
+                                            message));
                         }
                         return InteractionResult.CONSUME;
                     }
@@ -721,34 +666,26 @@ public class PillarBlock
                             SoundEvents.DYE_USE,
                             SoundSource.BLOCKS,
                             1.0f,
-                            1.0f
-                    );
+                            1.0f);
 
                     String pillarId = pillarBE.getPillarId();
                     int colorCount = pillarBE.getDyeColorCount();
 
-                    String progressText =
-                            " (" + colorCount + "/" + PillarBlockEntity.MAX_DYE_COLORS + ")";
+                    String progressText = " (" + colorCount + "/" + PillarBlockEntity.MAX_DYE_COLORS + ")";
                     TextComponent message;
                     if (pillarId != null) {
                         message = new TextComponent(
-                                "[" + pillarId + "] Dyed " + dyeName + progressText
-                        );
+                                "[" + pillarId + "] Dyed " + dyeName + progressText);
                     } else {
                         message = new TextComponent(
-                                "Pillar Dyed " + dyeName + progressText
-                        );
+                                "Pillar Dyed " + dyeName + progressText);
                     }
 
                     if (player instanceof ServerPlayer) {
                         ModMessages.INSTANCE.send(
-                                PacketDistributor.PLAYER.with(() ->
-                                        (ServerPlayer) player
-                                ),
+                                PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
                                 new ActionBarMessagePacket(
-                                        message
-                                )
-                        );
+                                        message));
                     }
 
                     return InteractionResult.SUCCESS;
@@ -758,20 +695,16 @@ public class PillarBlock
 
         if (player.isShiftKeyDown()) {
             ItemStack displayedItem = pillarBE.getDisplayedItem();
-            boolean isSpawnEgg =
-                    !displayedItem.isEmpty() &&
-                            displayedItem.getItem() instanceof
-                                    SpawnEggItem;
+            boolean isSpawnEgg = !displayedItem.isEmpty() &&
+                    displayedItem.getItem() instanceof SpawnEggItem;
 
             if (isSpawnEgg) {
                 pillarBE.rotateFacing();
                 float facingYaw = pillarBE.getFacingYaw();
 
                 String direction = getDirectionName(facingYaw);
-                TextComponent message =
-                        new TextComponent(
-                                "Mob facing: " + direction
-                        );
+                TextComponent message = new TextComponent(
+                        "Mob facing: " + direction);
                 message.withStyle(ChatFormatting.GREEN);
                 player.displayClientMessage(message, true);
 
@@ -781,23 +714,19 @@ public class PillarBlock
                         SoundEvents.UI_BUTTON_CLICK,
                         SoundSource.BLOCKS,
                         0.5f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.SUCCESS;
             } else {
                 pillarBE.cycleParticlePattern();
                 String pattern = pillarBE.getParticlePattern();
                 if (pattern == null) {
-                    pattern = PillarParticleConfig.get()
-                            .pattern;
+                    pattern = PillarParticleConfig.get().pattern;
                 }
 
                 ChatFormatting color = getPatternColor(pattern);
 
-                TextComponent patternText =
-                        (TextComponent) new TextComponent(
-                                pattern
-                        ).withStyle(color);
+                TextComponent patternText = (TextComponent) new TextComponent(
+                        pattern).withStyle(color);
                 player.displayClientMessage(patternText, true);
 
                 level.playSound(
@@ -806,8 +735,7 @@ public class PillarBlock
                         SoundEvents.UI_BUTTON_CLICK,
                         SoundSource.BLOCKS,
                         0.5f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.SUCCESS;
             }
         }
@@ -824,16 +752,13 @@ public class PillarBlock
                                 topBlockPos,
                                 level.getBlockState(topBlockPos),
                                 level.getBlockState(topBlockPos),
-                                3
-                        );
-                        ItemEntity itemEntity =
-                                new ItemEntity(
-                                        level,
-                                        pos.getX() + 0.5,
-                                        pos.getY() + 1.0,
-                                        pos.getZ() + 0.5,
-                                        displayedItem.copy()
-                                );
+                                3);
+                        ItemEntity itemEntity = new ItemEntity(
+                                level,
+                                pos.getX() + 0.5,
+                                pos.getY() + 1.0,
+                                pos.getZ() + 0.5,
+                                displayedItem.copy());
                         itemEntity.setDefaultPickUpDelay();
                         level.addFreshEntity(itemEntity);
                         level.playSound(
@@ -842,8 +767,7 @@ public class PillarBlock
                                 SoundEvents.ITEM_FRAME_REMOVE_ITEM,
                                 SoundSource.BLOCKS,
                                 1.0f,
-                                1.0f
-                        );
+                                1.0f);
                         return InteractionResult.SUCCESS;
                     }
                 }
@@ -852,8 +776,7 @@ public class PillarBlock
                         level,
                         topBlockPos,
                         player,
-                        hand
-                );
+                        hand);
             }
             return InteractionResult.PASS;
         }
@@ -866,16 +789,13 @@ public class PillarBlock
                         pos,
                         level.getBlockState(pos),
                         level.getBlockState(pos),
-                        3
-                );
-                ItemEntity itemEntity =
-                        new ItemEntity(
-                                level,
-                                pos.getX() + 0.5,
-                                pos.getY() + 1.0,
-                                pos.getZ() + 0.5,
-                                displayedItem.copy()
-                        );
+                        3);
+                ItemEntity itemEntity = new ItemEntity(
+                        level,
+                        pos.getX() + 0.5,
+                        pos.getY() + 1.0,
+                        pos.getZ() + 0.5,
+                        displayedItem.copy());
                 itemEntity.setDefaultPickUpDelay();
                 level.addFreshEntity(itemEntity);
                 level.playSound(
@@ -884,8 +804,7 @@ public class PillarBlock
                         SoundEvents.ITEM_FRAME_REMOVE_ITEM,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.SUCCESS;
             }
         }
@@ -898,8 +817,7 @@ public class PillarBlock
             Level level,
             BlockPos pos,
             Player player,
-            InteractionHand hand
-    ) {
+            InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
 
         if (!heldItem.isEmpty() && stackHasAnyItem(level, pos)) {
@@ -922,8 +840,7 @@ public class PillarBlock
             }
 
             if (blockEntity.getParticlePattern() == null) {
-                PillarParticleConfig cfg =
-                        PillarParticleConfig.get();
+                PillarParticleConfig cfg = PillarParticleConfig.get();
                 if (cfg.use_pattern && cfg.pattern != null) {
                 }
             }
@@ -940,8 +857,7 @@ public class PillarBlock
                     SoundEvents.ITEM_FRAME_ADD_ITEM,
                     SoundSource.BLOCKS,
                     1.0f,
-                    1.0f
-            );
+                    1.0f);
             return InteractionResult.SUCCESS;
         }
 
@@ -953,9 +869,7 @@ public class PillarBlock
         BlockPos current = bottom;
         while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
             BlockEntity be = level.getBlockEntity(current);
-            if (
-                    be instanceof PillarBlockEntity pillarBE && pillarBE.hasDisplayItem()
-            ) {
+            if (be instanceof PillarBlockEntity pillarBE && pillarBE.hasDisplayItem()) {
                 return true;
             }
             current = current.above();
@@ -976,7 +890,7 @@ public class PillarBlock
         ItemStack retained = topBE.getDisplayedItem().copy();
         BlockPos current = bottom;
         while (level.getBlockState(current).getBlock() instanceof PillarBlock &&
-               !(level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock)) {
+                !(level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock)) {
             if (!current.equals(top)
                     && level.getBlockEntity(current) instanceof PillarBlockEntity pillarBE
                     && pillarBE.hasDisplayItem()) {
@@ -996,7 +910,7 @@ public class PillarBlock
     private BlockPos findBottomBlock(Level level, BlockPos pos) {
         BlockPos current = pos;
         while (level.getBlockState(current.below()).getBlock() instanceof PillarBlock &&
-               !(level.getBlockState(current.below()).getBlock() instanceof AshenKingPillarBlock)) {
+                !(level.getBlockState(current.below()).getBlock() instanceof AshenKingPillarBlock)) {
             current = current.below();
         }
         return current;
@@ -1005,15 +919,14 @@ public class PillarBlock
     private BlockPos findTopBlock(Level level, BlockPos pos) {
         BlockPos current = pos;
         while (level.getBlockState(current.above()).getBlock() instanceof PillarBlock &&
-               !(level.getBlockState(current.above()).getBlock() instanceof AshenKingPillarBlock)) {
+                !(level.getBlockState(current.above()).getBlock() instanceof AshenKingPillarBlock)) {
             current = current.above();
         }
         return current;
     }
 
     private Map.Entry<String, String> getDyeColorAndName(
-            ItemStack stack
-    ) {
+            ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return null;
         }
@@ -1054,21 +967,21 @@ public class PillarBlock
         }
 
         switch (pattern) {
-            case ParticlePatterns.DEFAULT:
+            case ParticlePatterns.DEFAULT :
                 return ChatFormatting.WHITE;
-            case ParticlePatterns.BEAM:
+            case ParticlePatterns.BEAM :
                 return ChatFormatting.AQUA;
-            case ParticlePatterns.SPIRAL:
+            case ParticlePatterns.SPIRAL :
                 return ChatFormatting.LIGHT_PURPLE;
-            case ParticlePatterns.FOUNTAIN:
+            case ParticlePatterns.FOUNTAIN :
                 return ChatFormatting.BLUE;
-            case ParticlePatterns.PULSE:
+            case ParticlePatterns.PULSE :
                 return ChatFormatting.RED;
-            case ParticlePatterns.RING:
+            case ParticlePatterns.RING :
                 return ChatFormatting.GOLD;
-            case ParticlePatterns.BURST:
+            case ParticlePatterns.BURST :
                 return ChatFormatting.YELLOW;
-            default:
+            default :
                 return ChatFormatting.GRAY;
         }
     }
@@ -1078,8 +991,7 @@ public class PillarBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return switch (state.getValue(PART)) {
             case SINGLE -> SHAPE_SINGLE;
             case BOTTOM -> SHAPE_BOTTOM;
@@ -1093,8 +1005,7 @@ public class PillarBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return getShape(state, level, pos, context);
     }
 

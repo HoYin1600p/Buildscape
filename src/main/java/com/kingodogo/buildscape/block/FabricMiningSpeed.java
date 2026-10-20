@@ -10,8 +10,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 final class FabricMiningSpeed {
-    private FabricMiningSpeed() {
-    }
+    private FabricMiningSpeed() {}
 
     static float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
         float hardness = state.getDestroySpeed(level, pos);

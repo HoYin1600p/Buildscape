@@ -34,22 +34,25 @@ public class UpdatePillarDataPacket {
             Double patternSpread,
             Double patternIntensity,
             Integer maxParticleColor,
-            List<String> dyeColors
-    ) {
+            List<String> dyeColors) {
         this.pillarId = pillarId;
         this.pattern = pattern;
         this.usePattern = usePattern;
         this.patternSpeed = patternSpeed != null
                 ? NetworkPacketLimits.clamp(patternSpeed, NetworkPacketLimits.MIN_PARTICLE_RATE,
-                NetworkPacketLimits.MAX_PARTICLE_SPEED) : null;
+                        NetworkPacketLimits.MAX_PARTICLE_SPEED)
+                : null;
         this.patternSpread = patternSpread != null
                 ? NetworkPacketLimits.clamp(patternSpread, NetworkPacketLimits.MIN_PARTICLE_RATE,
-                NetworkPacketLimits.MAX_PARTICLE_SPREAD) : null;
+                        NetworkPacketLimits.MAX_PARTICLE_SPREAD)
+                : null;
         this.patternIntensity = patternIntensity != null
                 ? NetworkPacketLimits.clamp(patternIntensity, NetworkPacketLimits.MIN_PARTICLE_RATE,
-                NetworkPacketLimits.MAX_PARTICLE_INTENSITY) : null;
+                        NetworkPacketLimits.MAX_PARTICLE_INTENSITY)
+                : null;
         this.maxParticleColor = maxParticleColor != null
-                ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, maxParticleColor)) : null;
+                ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, maxParticleColor))
+                : null;
         this.dyeColors = dyeColors != null ? new ArrayList<>(dyeColors) : new ArrayList<>();
     }
 
@@ -62,32 +65,43 @@ public class UpdatePillarDataPacket {
                 data != null ? data.pattern_spread : null,
                 data != null ? data.pattern_intensity : null,
                 data != null ? data.max_particle_color : null,
-                data != null ? data.dyeColors : null
-        );
+                data != null ? data.dyeColors : null);
     }
 
     public UpdatePillarDataPacket(FriendlyByteBuf buf) {
         this.pillarId = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
 
         this.pattern = buf.readBoolean()
-                ? NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern") : null;
+                ? NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern")
+                : null;
 
         this.usePattern = buf.readBoolean() ? buf.readBoolean() : null;
 
-        this.patternSpeed = buf.readBoolean() ? NetworkPacketLimits.readBoundedDouble(buf,
-                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED, "pattern speed") : null;
-        this.patternSpread = buf.readBoolean() ? NetworkPacketLimits.readBoundedDouble(buf,
-                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD, "pattern spread") : null;
-        this.patternIntensity = buf.readBoolean() ? NetworkPacketLimits.readBoundedDouble(buf,
-                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY, "pattern intensity") : null;
+        this.patternSpeed = buf.readBoolean()
+                ? NetworkPacketLimits.readBoundedDouble(buf,
+                        NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED, "pattern speed")
+                : null;
+        this.patternSpread = buf.readBoolean()
+                ? NetworkPacketLimits.readBoundedDouble(buf,
+                        NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD,
+                        "pattern spread")
+                : null;
+        this.patternIntensity = buf.readBoolean()
+                ? NetworkPacketLimits.readBoundedDouble(buf,
+                        NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY,
+                        "pattern intensity")
+                : null;
 
         this.maxParticleColor = buf.readBoolean()
-                ? NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS, "maximum particle colors") : null;
+                ? NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS,
+                        "maximum particle colors")
+                : null;
 
         int colorCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_DYE_COLORS, "dye color");
         this.dyeColors = new ArrayList<>();
         for (int i = 0; i < colorCount; i++) {
-            this.dyeColors.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "dye color"));
+            this.dyeColors
+                    .add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "dye color"));
         }
     }
 

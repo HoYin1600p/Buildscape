@@ -33,9 +33,7 @@ import org.apache.logging.log4j.LogManager;
  */
 final class PillarStore {
 
-    private PillarStore() {
-    }
-
+    private PillarStore() {}
 
     static final Gson GSON = Json.PRETTY;
     static final String FILE_NAME = "pillar-ids.dat";
@@ -51,11 +49,9 @@ final class PillarStore {
             }
 
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (
-                    server != null &&
-                            server.isRunning() &&
-                            server.getPlayerList().getPlayerCount() > 0
-            ) {
+            if (server != null &&
+                    server.isRunning() &&
+                    server.getPlayerList().getPlayerCount() > 0) {
                 try {
                     Path worldPath = server.getWorldPath(LevelResource.ROOT);
                     if (worldPath != null) {
@@ -105,8 +101,7 @@ final class PillarStore {
             String configPath = Paths.get(
                     "config",
                     "buildscape",
-                    "pillar"
-            ).toString();
+                    "pillar").toString();
             File dir = new File(configPath);
             if (!dir.exists()) {
                 dir.mkdirs();
@@ -121,9 +116,9 @@ final class PillarStore {
         try (
                 FileInputStream fis = new FileInputStream(file);
                 InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-                BufferedReader reader = new BufferedReader(isr)
-        ) {
-            Type type = new TypeToken<Map<String, PillarData>>() {}.getType();
+                BufferedReader reader = new BufferedReader(isr)) {
+            Type type = new TypeToken<Map<String, PillarData>>() {
+            }.getType();
             return GSON.fromJson(reader, type);
         }
     }
@@ -139,7 +134,8 @@ final class PillarStore {
                     file.getName() + ".corrupted." + System.currentTimeMillis()).toPath());
             preserved = true;
         } catch (IOException e) {
-            LogManager.getLogger(PillarIdManager.class).error("Unable to preserve corrupted pillar data; saves are blocked", e);
+            LogManager.getLogger(PillarIdManager.class)
+                    .error("Unable to preserve corrupted pillar data; saves are blocked", e);
         }
         LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar data (" + errorType + ")", error);
         return preserved;
@@ -147,7 +143,7 @@ final class PillarStore {
 
     /** Writes the removed frames and the live records to a temp file and moves it over the target atomically. */
     static boolean write(File file, String tempFileName, Map<String, PillarData> removedFrames,
-                         Map<String, PillarData> pillarData) {
+            Map<String, PillarData> pillarData) {
         try {
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
@@ -160,10 +156,8 @@ final class PillarStore {
                     FileOutputStream fos = new FileOutputStream(tempFile);
                     OutputStreamWriter osw = new OutputStreamWriter(
                             fos,
-                            StandardCharsets.UTF_8
-                    );
-                    BufferedWriter writer = new BufferedWriter(osw)
-            ) {
+                            StandardCharsets.UTF_8);
+                    BufferedWriter writer = new BufferedWriter(osw)) {
                 Map<String, PillarData> savedData = new HashMap<>(removedFrames);
                 savedData.putAll(pillarData);
                 GSON.toJson(savedData, writer);

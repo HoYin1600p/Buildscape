@@ -19,9 +19,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import java.util.Random;
 
 public class MangroveLeavesBlock
-        extends LeavesBlock
-        implements BonemealableBlock {
-
+        extends
+            LeavesBlock
+        implements
+            BonemealableBlock {
 
     public MangroveLeavesBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -29,8 +30,7 @@ public class MangroveLeavesBlock
                 this.stateDefinition.any()
                         .setValue(BlockStateProperties.WATERLOGGED, false)
                         .setValue(DISTANCE, 7)
-                        .setValue(PERSISTENT, false)
-        );
+                        .setValue(PERSISTENT, false));
     }
 
     @Override
@@ -40,26 +40,21 @@ public class MangroveLeavesBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         return InteractionResult.PASS;
     }
-
 
     @Override
     public boolean isValidBonemealTarget(
             BlockGetter level,
             BlockPos pos,
             BlockState state,
-            boolean isClient
-    ) {
+            boolean isClient) {
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
 
-        if (
-                belowState.is(ModBlocks.MANGROVE_PROPAGULE.get()) &&
-                        belowState.getValue(MangrovePropaguleBlock.HANGING)
-        ) {
+        if (belowState.is(ModBlocks.MANGROVE_PROPAGULE.get()) &&
+                belowState.getValue(MangrovePropaguleBlock.HANGING)) {
             int currentAge = belowState.getValue(MangrovePropaguleBlock.AGE);
             return currentAge < 3;
         }
@@ -72,8 +67,7 @@ public class MangroveLeavesBlock
             Level level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         return true;
     }
 
@@ -82,22 +76,18 @@ public class MangroveLeavesBlock
             ServerLevel level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
 
-        if (
-                belowState.is(ModBlocks.MANGROVE_PROPAGULE.get()) &&
-                        belowState.getValue(MangrovePropaguleBlock.HANGING)
-        ) {
+        if (belowState.is(ModBlocks.MANGROVE_PROPAGULE.get()) &&
+                belowState.getValue(MangrovePropaguleBlock.HANGING)) {
             int currentAge = belowState.getValue(MangrovePropaguleBlock.AGE);
             if (currentAge < 3) {
                 level.setBlock(
                         belowPos,
                         belowState.setValue(MangrovePropaguleBlock.AGE, currentAge + 1),
-                        3
-                );
+                        3);
             }
             return;
         }
@@ -111,23 +101,19 @@ public class MangroveLeavesBlock
             if (belowState.is(Blocks.WATER)) {
                 propaguleState = propaguleState.setValue(
                         MangrovePropaguleBlock.WATERLOGGED,
-                        true
-                );
+                        true);
             }
 
             level.setBlock(belowPos, propaguleState, 3);
         }
     }
 
-
-
     @Override
     public void randomTick(
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         super.randomTick(state, level, pos, random);
     }
 }

@@ -76,8 +76,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (direction == Direction.UP) {
             return state.setValue(SNOWY, isSnowySetting(level, pos));
         }
@@ -103,8 +102,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
                 aboveState,
                 abovePos,
                 Direction.UP,
-                aboveState.getLightBlock(level, abovePos)
-        );
+                aboveState.getLightBlock(level, abovePos));
 
         return lightLevel < level.getMaxLightLevel();
     }
@@ -129,8 +127,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
                 BlockPos targetPos = pos.offset(
                         random.nextInt(3) - 1,
                         random.nextInt(5) - 3,
-                        random.nextInt(3) - 1
-                );
+                        random.nextInt(3) - 1);
 
                 BlockState targetState = level.getBlockState(targetPos);
 
@@ -140,7 +137,8 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
                             .setValue(WATERLOGGED, targetState.getValue(WATERLOGGED))
                             .setValue(SNOWY, isSnowySetting(level, targetPos));
                     level.setBlockAndUpdate(targetPos, grassSlabState);
-                } else if (targetState.is(Blocks.DIRT) && canPropagate(Blocks.GRASS_BLOCK.defaultBlockState(), level, targetPos)) {
+                } else if (targetState.is(Blocks.DIRT)
+                        && canPropagate(Blocks.GRASS_BLOCK.defaultBlockState(), level, targetPos)) {
                     level.setBlockAndUpdate(targetPos, Blocks.GRASS_BLOCK.defaultBlockState());
                 }
             }
@@ -149,7 +147,8 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        LootContext ctx = builder.withParameter(LootContextParams.BLOCK_STATE, state).create(LootContextParamSets.BLOCK);
+        LootContext ctx = builder.withParameter(LootContextParams.BLOCK_STATE, state)
+                .create(LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
 
         int count = state.getValue(TYPE) == SlabType.DOUBLE ? 2 : 1;
@@ -169,8 +168,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() instanceof BoneMealItem) {
             if (this.isValidBonemealTarget(level, pos, state, level.isClientSide)) {
@@ -189,8 +187,7 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
                         SoundEvents.BONE_MEAL_USE,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }

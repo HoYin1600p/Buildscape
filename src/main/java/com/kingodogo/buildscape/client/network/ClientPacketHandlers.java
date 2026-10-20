@@ -31,8 +31,7 @@ import java.util.List;
  */
 @OnlyIn(Dist.CLIENT)
 public final class ClientPacketHandlers {
-    private ClientPacketHandlers() {
-    }
+    private ClientPacketHandlers() {}
 
     public static void showActionBar(Component message) {
         if (Minecraft.getInstance().player != null) {
@@ -41,7 +40,7 @@ public final class ClientPacketHandlers {
     }
 
     public static void spawnConfettiBurst(double x, double y, double z, float lookX, float lookY, float lookZ,
-                                          int burstLevel, long seed) {
+            int burstLevel, long seed) {
         ConfettiBurstClient.spawn(x, y, z, lookX, lookY, lookZ, burstLevel, seed);
     }
 
@@ -61,8 +60,8 @@ public final class ClientPacketHandlers {
     }
 
     public static void applyGameRules(boolean fastLeafDecay, boolean disableEndermanGriefing,
-                                      boolean disableCreeperGriefing, boolean disableGhastGriefing,
-                                      boolean cakeStacking, boolean waterBottleStacking) {
+            boolean disableCreeperGriefing, boolean disableGhastGriefing,
+            boolean cakeStacking, boolean waterBottleStacking) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null) {
             mc.level.getGameRules().getRule(ModGameRules.FAST_LEAF_DECAY).set(fastLeafDecay, null);

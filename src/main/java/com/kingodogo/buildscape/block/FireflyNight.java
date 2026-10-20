@@ -12,8 +12,7 @@ import net.minecraft.world.level.Level;
 final class FireflyNight {
     private static final int DAY_DARKNESS_LIMIT = 4;
 
-    private FireflyNight() {
-    }
+    private FireflyNight() {}
 
     static boolean isNight(Level level) {
         if (level.dimensionType().hasFixedTime()) {

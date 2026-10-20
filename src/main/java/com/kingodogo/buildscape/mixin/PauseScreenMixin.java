@@ -65,8 +65,7 @@ public abstract class PauseScreenMixin extends Screen {
                 20,
                 20,
                 new TextComponent("B"),
-                (button) -> Minecraft.getInstance().setScreen(new BuildScapeConfigScreen(screen))
-        );
+                (button) -> Minecraft.getInstance().setScreen(new BuildScapeConfigScreen(screen)));
 
         this.addRenderableWidget(configButton);
     }

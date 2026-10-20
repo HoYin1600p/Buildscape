@@ -4,8 +4,7 @@ public final class SculkCharge {
     public static final int MAX_CURSORS = 32;
     public static final int MAX_CHARGE = 1000;
 
-    private SculkCharge() {
-    }
+    private SculkCharge() {}
 
     public static int[] split(int experience, int availableCursors) {
         int capacity = Math.max(0, Math.min(MAX_CURSORS, availableCursors));

@@ -16,13 +16,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class IcicleCauldronBlockEntityRenderer
-        implements BlockEntityRenderer<IcicleCauldronBlockEntity> {
+        implements
+            BlockEntityRenderer<IcicleCauldronBlockEntity> {
 
     private final BlockRenderDispatcher blockRenderer;
 
     public IcicleCauldronBlockEntityRenderer(
-            BlockEntityRendererProvider.Context context
-    ) {
+            BlockEntityRendererProvider.Context context) {
         this.blockRenderer = context.getBlockRenderDispatcher();
     }
 
@@ -33,8 +33,7 @@ public class IcicleCauldronBlockEntityRenderer
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (blockEntity.getLevel() == null) {
             return;
         }
@@ -44,8 +43,7 @@ public class IcicleCauldronBlockEntityRenderer
         BakedModel model = blockRenderer.getBlockModel(cauldronState);
         RenderType renderType = ItemBlockRenderTypes.getRenderType(
                 cauldronState,
-                true
-        );
+                true);
         blockRenderer
                 .getModelRenderer()
                 .renderModel(
@@ -58,17 +56,13 @@ public class IcicleCauldronBlockEntityRenderer
                         1.0f,
                         combinedLight,
                         combinedOverlay,
-                        EmptyModelData.INSTANCE
-                );
+                        EmptyModelData.INSTANCE);
         poseStack.popPose();
 
         ItemStack storedIcicle = blockEntity.getStoredIcicle();
-        if (
-                !storedIcicle.isEmpty() &&
-                        storedIcicle.getItem() instanceof BlockItem
-        ) {
-            BlockItem blockItem =
-                    (BlockItem) storedIcicle.getItem();
+        if (!storedIcicle.isEmpty() &&
+                storedIcicle.getItem() instanceof BlockItem) {
+            BlockItem blockItem = (BlockItem) storedIcicle.getItem();
             BlockState icicleBlockState = blockItem.getBlock().defaultBlockState();
 
             poseStack.pushPose();
@@ -78,8 +72,7 @@ public class IcicleCauldronBlockEntityRenderer
             BakedModel icicleModel = blockRenderer.getBlockModel(icicleBlockState);
             RenderType icicleRenderType = ItemBlockRenderTypes.getRenderType(
                     icicleBlockState,
-                    true
-            );
+                    true);
             blockRenderer
                     .getModelRenderer()
                     .renderModel(
@@ -92,8 +85,7 @@ public class IcicleCauldronBlockEntityRenderer
                             1.0f,
                             combinedLight,
                             combinedOverlay,
-                            EmptyModelData.INSTANCE
-                    );
+                            EmptyModelData.INSTANCE);
 
             poseStack.popPose();
         }

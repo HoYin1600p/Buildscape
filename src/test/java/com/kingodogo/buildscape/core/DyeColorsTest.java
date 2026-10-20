@@ -7,7 +7,6 @@ import net.minecraft.world.item.Items;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -28,7 +27,8 @@ public class DyeColorsTest {
             if (actual.length() > 0) {
                 actual.append(", ");
             }
-            actual.append(color.serializedName()).append(' ').append(color.hex()).append(' ').append(color.displayName());
+            actual.append(color.serializedName()).append(' ').append(color.hex()).append(' ')
+                    .append(color.displayName());
             assertEquals(Integer.parseInt(color.hex().substring(1), 16), color.rgb());
         }
         assertEquals(expected, actual.toString());

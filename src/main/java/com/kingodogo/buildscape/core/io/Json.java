@@ -15,10 +15,10 @@ public final class Json {
     /** Pretty printed with null fields written, HTML characters escaped. */
     public static final Gson PRETTY_WITH_NULLS = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     /** Pretty printed, nulls skipped, HTML characters kept as they are. */
-    public static final Gson PRETTY_NO_HTML_ESCAPING = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    public static final Gson PRETTY_NO_HTML_ESCAPING = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping()
+            .create();
     /** Compact output, nulls skipped, HTML characters kept as they are. */
     public static final Gson COMPACT_NO_HTML_ESCAPING = new GsonBuilder().disableHtmlEscaping().create();
 
-    private Json() {
-    }
+    private Json() {}
 }

@@ -12,8 +12,7 @@ import net.minecraft.world.level.ItemLike;
  */
 public final class TabOrder1 {
 
-    private TabOrder1() {
-    }
+    private TabOrder1() {}
 
     public static final List<Supplier<? extends ItemLike>> ITEMS = List.<Supplier<? extends ItemLike>>of(
             ModItems.BIT_COPPER_BLOCK,
@@ -1570,6 +1569,5 @@ public final class TabOrder1 {
             ModItems.WHITE_SMOOTH_SANDSTONE_STAIRS,
             ModItems.WHITE_SMOOTH_SANDSTONE_SLAB,
             ModItems.WHITE_SMOOTH_SANDSTONE_VERTICAL_SLAB,
-            ModItems.WHITE_SMOOTH_SANDSTONE_WALL
-    );
+            ModItems.WHITE_SMOOTH_SANDSTONE_WALL);
 }

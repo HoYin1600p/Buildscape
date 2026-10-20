@@ -16,12 +16,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 
 public class FestiveStockingRenderer
-        extends EntityRenderer<FestiveStockingEntity> {
+        extends
+            EntityRenderer<FestiveStockingEntity> {
 
     private static final ResourceLocation STOCKING_TEXTURE = new ResourceLocation(
             BuildScape.MODID,
-            "textures/entity/festive_stocking.png"
-    );
+            "textures/entity/festive_stocking.png");
 
     private ResourceLocation getTextureForColor(String color) {
         if (color == null || color.equals("festive")) {
@@ -29,8 +29,7 @@ public class FestiveStockingRenderer
         }
         return new ResourceLocation(
                 BuildScape.MODID,
-                "textures/entity/" + color + "_festive_stocking.png"
-        );
+                "textures/entity/" + color + "_festive_stocking.png");
     }
 
     public FestiveStockingRenderer(EntityRendererProvider.Context context) {
@@ -45,8 +44,7 @@ public class FestiveStockingRenderer
             float partialTicks,
             PoseStack poseStack,
             MultiBufferSource buffer,
-            int packedLight
-    ) {
+            int packedLight) {
         Direction direction = entity.getDirection();
         if (direction == null) {
             return;
@@ -78,8 +76,7 @@ public class FestiveStockingRenderer
 
         ResourceLocation texture = getTextureForColor(entity.getColorVariant());
         VertexConsumer vertexConsumer = buffer.getBuffer(
-                RenderType.entityCutoutNoCull(texture)
-        );
+                RenderType.entityCutoutNoCull(texture));
 
         float width = 0.5F;
         float height = 0.5F;
@@ -132,8 +129,7 @@ public class FestiveStockingRenderer
                 partialTicks,
                 poseStack,
                 buffer,
-                packedLight
-        );
+                packedLight);
     }
 
     @Override

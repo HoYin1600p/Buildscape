@@ -41,15 +41,11 @@ public class PillarParticleConfig {
     public static final int CONFIG_PERMISSION_LEVEL = 4;
 
     public enum EditPermissionMode {
-        STRICT,
-        STANDARD,
-        OPEN
+        STRICT, STANDARD, OPEN
     }
 
     public enum EditScope {
-        LIMITED,
-        GENERAL,
-        POLICY
+        LIMITED, GENERAL, POLICY
     }
 
     public static EditPermissionMode parseEditPermissionMode(String value) {
@@ -78,7 +74,8 @@ public class PillarParticleConfig {
     }
 
     public static boolean canPlayerEdit(Player player, EditPermissionMode mode, EditScope scope) {
-        int permissionLevel = player != null && player.hasPermissions(CONFIG_PERMISSION_LEVEL) ? CONFIG_PERMISSION_LEVEL
+        int permissionLevel = player != null && player.hasPermissions(CONFIG_PERMISSION_LEVEL)
+                ? CONFIG_PERMISSION_LEVEL
                 : player != null && player.hasPermissions(2) ? 2 : 0;
         return canEdit(mode, permissionLevel, scope);
     }
@@ -95,7 +92,6 @@ public class PillarParticleConfig {
     }
 
     public EditPermissionMode edit_permission_mode = EditPermissionMode.STRICT;
-
 
     private static final Gson GSON = Json.PRETTY;
     private static final String PROPERTIES_FILE_NAME = "pillar-properties.json";
@@ -624,7 +620,8 @@ public class PillarParticleConfig {
                 propertiesReadOnly = true;
                 originalProperties = null;
             }
-            Type mapType = new TypeToken<Map<String, Object>>() { }.getType();
+            Type mapType = new TypeToken<Map<String, Object>>() {
+            }.getType();
             Map<String, Object> jsonMap = GSON.fromJson(stripComments(propertiesSource), mapType);
             if (jsonMap == null) {
                 throw new IllegalArgumentException("Expected pillar properties");
@@ -685,7 +682,8 @@ public class PillarParticleConfig {
                             : this.pattern_intensity;
 
                     if (jsonMap.containsKey("edit_permission_mode")) {
-                        this.edit_permission_mode = parseEditPermissionMode(String.valueOf(jsonMap.get("edit_permission_mode")));
+                        this.edit_permission_mode = parseEditPermissionMode(
+                                String.valueOf(jsonMap.get("edit_permission_mode")));
                     } else if (loaded.edit_permission_mode != null) {
                         this.edit_permission_mode = loaded.edit_permission_mode;
                     }
@@ -825,7 +823,8 @@ public class PillarParticleConfig {
     }
 
     static JsonObject mergeDefaultItems(JsonObject document, boolean vaultLoaded) throws IOException {
-        JsonObject defaults = ConfigPaths.loadItemsTemplate(vaultLoaded ? "vault_pillar_items" : "vanilla_pillar_items");
+        JsonObject defaults = ConfigPaths
+                .loadItemsTemplate(vaultLoaded ? "vault_pillar_items" : "vanilla_pillar_items");
         int defaultsVersion = defaults.get("defaults_version").getAsInt();
         Set<String> offered = new HashSet<>();
         if (document.has("offered_defaults")) {
@@ -933,7 +932,8 @@ public class PillarParticleConfig {
     }
 
     private boolean migrateOldConfig() {
-        Path oldFile = configDirectory == null ? Paths.get("config", "buildscape", "pillar-particles.json")
+        Path oldFile = configDirectory == null
+                ? Paths.get("config", "buildscape", "pillar-particles.json")
                 : configDirectory.resolveSibling("pillar-particles.json");
         Path backup = oldFile.resolveSibling("pillar-particles.json.backup");
         Path completion = oldFile.resolveSibling("pillar-particles.json.backup.complete");
@@ -974,7 +974,8 @@ public class PillarParticleConfig {
                         Files.copy(oldFile, propertiesFile.toPath());
                     } else {
                         ConfigLayoutIO.write(propertiesFile.toPath(),
-                                ConfigLayoutIO.retainComments(source, groupedProperties(properties), true), null, false);
+                                ConfigLayoutIO.retainComments(source, groupedProperties(properties), true), null,
+                                false);
                     }
                 }
             } catch (Exception e) {
@@ -1077,7 +1078,8 @@ public class PillarParticleConfig {
         }
         clearMatchCache();
         if (itemsFileUnreadable || itemsReadOnly) {
-            BuildScape.LOGGER.warn("Not saving read-only items config; unreadable/legacy file kept as-is: {}", getItemsFile());
+            BuildScape.LOGGER.warn("Not saving read-only items config; unreadable/legacy file kept as-is: {}",
+                    getItemsFile());
             return false;
         }
         File file = getItemsFile();
@@ -1096,7 +1098,8 @@ public class PillarParticleConfig {
             json = mergeDefaultItems(json, vaultLoaded);
             String output = ConfigLayoutIO.retainComments(itemsSource, GSON.toJson(json), true);
             output = ConfigLayoutIO.retainInvalidItemTokens(itemsSource, output);
-            ConfigLayoutIO.writeItems(file.toPath(), output, itemsSource, itemsOnDiskIs405 || isLegacyItems(originalItems));
+            ConfigLayoutIO.writeItems(file.toPath(), output, itemsSource,
+                    itemsOnDiskIs405 || isLegacyItems(originalItems));
             itemsOnDiskIs405 = false;
             replaceItems(parseItems(output));
             itemsSource = output;
@@ -1133,7 +1136,8 @@ public class PillarParticleConfig {
             return false;
         }
         if (propertiesReadOnly) {
-            BuildScape.LOGGER.warn("Not saving read-only pillar properties; unreadable/legacy file kept as-is: {}", getPropertiesFile());
+            BuildScape.LOGGER.warn("Not saving read-only pillar properties; unreadable/legacy file kept as-is: {}",
+                    getPropertiesFile());
             return false;
         }
         File file = getPropertiesFile();
@@ -1143,7 +1147,8 @@ public class PillarParticleConfig {
                 String source = ConfigLayoutIO.readText(file.toPath());
                 if (ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                     propertiesReadOnly = true;
-                    BuildScape.LOGGER.warn("Not saving read-only pillar properties; replacement-decoded file kept as-is: {}", file);
+                    BuildScape.LOGGER.warn(
+                            "Not saving read-only pillar properties; replacement-decoded file kept as-is: {}", file);
                     return false;
                 }
                 JsonObject original = ConfigLayoutIO.readProperties(source);
@@ -1159,7 +1164,8 @@ public class PillarParticleConfig {
             JsonObject output = originalProperties == null ? new JsonObject() : originalProperties.deepCopy();
             for (Map.Entry<String, JsonElement> entry : current.entrySet()) {
                 String key = entry.getKey();
-                boolean changed = loadedPropertyValues == null || !entry.getValue().equals(loadedPropertyValues.get(key));
+                boolean changed = loadedPropertyValues == null
+                        || !entry.getValue().equals(loadedPropertyValues.get(key));
                 if ("edit_permission_mode".equals(key) && !output.has(key) && !changed && originalProperties != null) {
                     continue;
                 }
@@ -1280,7 +1286,8 @@ public class PillarParticleConfig {
         values.addProperty("pattern_intensity", pattern_intensity);
         values.addProperty("use_pattern", use_pattern);
         values.addProperty("particle_density", particle_density);
-        values.addProperty("edit_permission_mode", edit_permission_mode != null ? edit_permission_mode.name().toLowerCase(Locale.ROOT) : "strict");
+        values.addProperty("edit_permission_mode",
+                edit_permission_mode != null ? edit_permission_mode.name().toLowerCase(Locale.ROOT) : "strict");
         return values;
     }
 
@@ -1325,7 +1332,7 @@ public class PillarParticleConfig {
     }
 
     private static void appendProperties(StringBuilder text, JsonObject values, Set<String> written,
-                                         String section, String[][] entries) {
+            String section, String[][] entries) {
         text.append("\n  // --- ").append(section).append(" ---\n");
         for (String[] entry : entries) {
             written.add(entry[0]);

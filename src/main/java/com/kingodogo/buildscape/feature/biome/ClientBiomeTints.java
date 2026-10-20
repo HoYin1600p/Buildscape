@@ -24,7 +24,8 @@ import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
 public class ClientBiomeTints {
-    private record State(@Nullable ClientLevel level, Map<Long, Map<Integer, Biome>> chunks) {}
+    private record State(@Nullable ClientLevel level, Map<Long, Map<Integer, Biome>> chunks) {
+    }
     private static volatile State state = new State(null, Map.of());
 
     public static void apply(SyncBiomeTintPacket packet) {

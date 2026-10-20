@@ -40,7 +40,7 @@ public abstract class VineBlockMixin extends Block {
 
     @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
     private void buildscape$preventGrowthWhenSheared(BlockState state, ServerLevel level, BlockPos pos,
-                                                     Random random, CallbackInfo ci) {
+            Random random, CallbackInfo ci) {
         if (state.hasProperty(BUILDSCAPE_SHEARED) && state.getValue(BUILDSCAPE_SHEARED)) {
             ci.cancel();
         }

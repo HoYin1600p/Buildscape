@@ -24,7 +24,8 @@ public class UploadedItemOrderTest {
     public void aMergedUploadKeepsTheServerListOrderAndAppendsTheNewEntry() {
         List<String> serverFile = List.of("minecraft:stone", "minecraft:emerald", "minecraft:dirt", "not an id");
         Set<String> merged = Set.of("minecraft:dirt", "minecraft:stone", "minecraft:emerald", "minecraft:diamond");
-        assertEquals(List.of("minecraft:stone", "minecraft:emerald", "minecraft:dirt", "not an id", "minecraft:diamond"),
+        assertEquals(
+                List.of("minecraft:stone", "minecraft:emerald", "minecraft:dirt", "not an id", "minecraft:diamond"),
                 PillarParticleConfig.orderedItemsForSave(serverFile, merged));
     }
 }

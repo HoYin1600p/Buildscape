@@ -31,39 +31,39 @@ public class FestiveStockingItem extends BlockItem {
             return ModBlocks.FESTIVE_STOCKING.get();
         }
         switch (color) {
-            case "black":
+            case "black" :
                 return ModBlocks.BLACK_FESTIVE_STOCKING.get();
-            case "blue":
+            case "blue" :
                 return ModBlocks.BLUE_FESTIVE_STOCKING.get();
-            case "brown":
+            case "brown" :
                 return ModBlocks.BROWN_FESTIVE_STOCKING.get();
-            case "cyan":
+            case "cyan" :
                 return ModBlocks.CYAN_FESTIVE_STOCKING.get();
-            case "gray":
+            case "gray" :
                 return ModBlocks.GRAY_FESTIVE_STOCKING.get();
-            case "green":
+            case "green" :
                 return ModBlocks.GREEN_FESTIVE_STOCKING.get();
-            case "light_blue":
+            case "light_blue" :
                 return ModBlocks.LIGHT_BLUE_FESTIVE_STOCKING.get();
-            case "light_gray":
+            case "light_gray" :
                 return ModBlocks.LIGHT_GRAY_FESTIVE_STOCKING.get();
-            case "lime":
+            case "lime" :
                 return ModBlocks.LIME_FESTIVE_STOCKING.get();
-            case "magenta":
+            case "magenta" :
                 return ModBlocks.MAGENTA_FESTIVE_STOCKING.get();
-            case "orange":
+            case "orange" :
                 return ModBlocks.ORANGE_FESTIVE_STOCKING.get();
-            case "pink":
+            case "pink" :
                 return ModBlocks.PINK_FESTIVE_STOCKING.get();
-            case "purple":
+            case "purple" :
                 return ModBlocks.PURPLE_FESTIVE_STOCKING.get();
-            case "red":
+            case "red" :
                 return ModBlocks.RED_FESTIVE_STOCKING.get();
-            case "white":
+            case "white" :
                 return ModBlocks.WHITE_FESTIVE_STOCKING.get();
-            case "yellow":
+            case "yellow" :
                 return ModBlocks.YELLOW_FESTIVE_STOCKING.get();
-            default:
+            default :
                 return ModBlocks.FESTIVE_STOCKING.get();
         }
     }
@@ -78,18 +78,15 @@ public class FestiveStockingItem extends BlockItem {
             Level level,
             @Nullable Player player,
             ItemStack stack,
-            BlockState state
-    ) {
+            BlockState state) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
+            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
             CompoundTag tag = stack.getTag();
             if (tag != null && tag.contains(NbtKeys.STORED_ITEM, 10)) {
                 CompoundTag storedTag = tag.getCompound(NbtKeys.STORED_ITEM);
                 if (!storedTag.isEmpty()) {
-                    ItemStack storedItem =
-                            ItemStack.of(storedTag);
+                    ItemStack storedItem = ItemStack.of(storedTag);
                     stockingEntity.setStoredItem(storedItem, true);
                 }
             }
@@ -102,8 +99,7 @@ public class FestiveStockingItem extends BlockItem {
             ItemStack stack,
             @Nullable Level level,
             List<Component> tooltip,
-            TooltipFlag flag
-    ) {
+            TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
     }
 }

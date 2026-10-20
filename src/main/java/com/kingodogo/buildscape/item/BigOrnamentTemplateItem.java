@@ -19,6 +19,7 @@ public class BigOrnamentTemplateItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
-        tooltip.add(new TranslatableComponent("tooltip.buildscape.big_ornament_template").withStyle(ChatFormatting.GRAY));
+        tooltip.add(
+                new TranslatableComponent("tooltip.buildscape.big_ornament_template").withStyle(ChatFormatting.GRAY));
     }
 }

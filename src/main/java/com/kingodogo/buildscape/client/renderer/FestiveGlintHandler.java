@@ -11,15 +11,12 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
 public final class FestiveGlintHandler {
 
     private static final ThreadLocal<Deque<ItemStack>> STACK_TRACKER = ThreadLocal.withInitial(ArrayDeque::new);
 
-    private FestiveGlintHandler() {
-    }
+    private FestiveGlintHandler() {}
 
     @SubscribeEvent
     public static void onRenderTick(TickEvent.RenderTickEvent event) {

@@ -53,28 +53,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ItemFrameParticleHandler {
 
-    private static final String PARTICLE_PATTERN_KEY =
-            "BuildScapeParticlePattern";
-    private static final String PARTICLE_ENABLED_KEY =
-            "BuildScapeParticleEnabled";
+    private static final String PARTICLE_PATTERN_KEY = "BuildScapeParticlePattern";
+    private static final String PARTICLE_ENABLED_KEY = "BuildScapeParticleEnabled";
     private static final String PARTICLE_COLORS_KEY = NbtKeys.BUILD_SCAPE_PARTICLE_COLORS;
     private static final String FRAME_ID_KEY = NbtKeys.BUILD_SCAPE_FRAME_ID;
     private static final String FRAME_PREFIX = "F-";
 
-    private static final Map<Integer, String> CLIENT_PATTERN_CACHE =
-            new ConcurrentHashMap<>();
+    private static final Map<Integer, String> CLIENT_PATTERN_CACHE = new ConcurrentHashMap<>();
 
-    private static final Map<Integer, List<String>> CLIENT_COLOR_CACHE =
-            new ConcurrentHashMap<>();
+    private static final Map<Integer, List<String>> CLIENT_COLOR_CACHE = new ConcurrentHashMap<>();
 
-    private static final Map<Integer, String> CLIENT_FRAME_ID_CACHE =
-            new ConcurrentHashMap<>();
+    private static final Map<Integer, String> CLIENT_FRAME_ID_CACHE = new ConcurrentHashMap<>();
 
     private static final String PATTERN_NOT_SET = ParticlePatterns.NOT_SET;
     private static final String[] PATTERNS = {
@@ -163,8 +155,7 @@ public class ItemFrameParticleHandler {
 
     @SubscribeEvent
     public static void onEntityInteract(
-            PlayerInteractEvent.EntityInteract event
-    ) {
+            PlayerInteractEvent.EntityInteract event) {
         if (!(event.getTarget() instanceof ItemFrame) &&
                 !(event.getTarget() instanceof ColoredItemFrameEntity)) {
             return;
@@ -197,8 +188,7 @@ public class ItemFrameParticleHandler {
 
         if (!itemFrame.getItem().isEmpty() && !heldItem.isEmpty() && !player.isShiftKeyDown()) {
             Map.Entry<String, String> dyeInfo = getDyeColorAndName(
-                    heldItem
-            );
+                    heldItem);
             if (dyeInfo != null) {
                 String dyeColor = dyeInfo.getKey();
                 String dyeName = dyeInfo.getValue();
@@ -207,8 +197,7 @@ public class ItemFrameParticleHandler {
                 if (currentColors.size() >= MAX_DYE_COLORS) {
                     if (!level.isClientSide) {
                         TextComponent message = new TextComponent(
-                                "Item frame already has " + MAX_DYE_COLORS + " colors!"
-                        );
+                                "Item frame already has " + MAX_DYE_COLORS + " colors!");
                         message.withStyle(ChatFormatting.RED);
                         player.displayClientMessage(message, true);
                     }
@@ -232,8 +221,7 @@ public class ItemFrameParticleHandler {
                             SoundEvents.DYE_USE,
                             SoundSource.BLOCKS,
                             1.0f,
-                            1.0f
-                    );
+                            1.0f);
 
                     String frameId = getFrameId(itemFrame);
                     int colorCount = getParticleColors(itemFrame).size();
@@ -246,8 +234,7 @@ public class ItemFrameParticleHandler {
                                     colorCount +
                                     "/" +
                                     MAX_DYE_COLORS +
-                                    ")"
-                    );
+                                    ")");
                     player.displayClientMessage(message, true);
                 }
 
@@ -281,18 +268,14 @@ public class ItemFrameParticleHandler {
                     SoundEvents.UI_BUTTON_CLICK,
                     SoundSource.BLOCKS,
                     0.5f,
-                    1.0f
-            );
+                    1.0f);
 
             ChatFormatting color = getPatternColor(nextPattern);
             TextComponent patternText = (TextComponent) new TextComponent(
-                    nextPattern
-            ).withStyle(color);
+                    nextPattern).withStyle(color);
             player.displayClientMessage(patternText, true);
         }
     }
-
-
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
@@ -301,8 +284,7 @@ public class ItemFrameParticleHandler {
             return;
         }
 
-        Minecraft mc =
-                Minecraft.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) {
             return;
         }
@@ -337,8 +319,7 @@ public class ItemFrameParticleHandler {
                 String pattern = getParticlePattern(itemFrame);
 
                 spawnItemFrameParticles(level, itemFrame, pattern, cfg, gameTime);
-            }
-            else if (entity instanceof ColoredItemFrameEntity coloredFrame) {
+            } else if (entity instanceof ColoredItemFrameEntity coloredFrame) {
                 if (coloredFrame.getItem().isEmpty()) {
                     continue;
                 }
@@ -363,9 +344,8 @@ public class ItemFrameParticleHandler {
     }
 
     private static FrameSettings resolveFrameSettings(Level level, String frameId, String pattern,
-                                                       PillarParticleConfig cfg) {
-        PillarIdManager.PillarData data =
-                PillarIdManager.get(level).getPillarData(frameId);
+            PillarParticleConfig cfg) {
+        PillarIdManager.PillarData data = PillarIdManager.get(level).getPillarData(frameId);
         return resolveFrameSettings(data, pattern, cfg);
     }
 
@@ -382,12 +362,18 @@ public class ItemFrameParticleHandler {
             pattern = ParticlePatterns.NONE;
         }
         boolean usePattern = data != null && data.use_pattern != null ? data.use_pattern : cfg.use_pattern;
-        double intensity = data != null && data.pattern_intensity != null ? data.pattern_intensity : cfg.pattern_intensity;
+        double intensity = data != null && data.pattern_intensity != null
+                ? data.pattern_intensity
+                : cfg.pattern_intensity;
         double patternSpeed = data != null && data.pattern_speed != null ? data.pattern_speed : cfg.pattern_speed;
         double patternSpread = data != null && data.pattern_spread != null ? data.pattern_spread : cfg.pattern_spread;
-        int maxColors = data != null && data.max_particle_color != null ? data.max_particle_color : cfg.max_particle_color;
-        int count = cfg.particle_density <= 0 ? 0 : (int) Math.min(64L,
-                Math.max(0L, Math.round(cfg.particle_density * (usePattern ? intensity : 1.0))));
+        int maxColors = data != null && data.max_particle_color != null
+                ? data.max_particle_color
+                : cfg.max_particle_color;
+        int count = cfg.particle_density <= 0
+                ? 0
+                : (int) Math.min(64L,
+                        Math.max(0L, Math.round(cfg.particle_density * (usePattern ? intensity : 1.0))));
         if (ParticlePatterns.NONE.equals(pattern) || PATTERN_NOT_SET.equals(pattern)) {
             count = 0;
         }
@@ -401,8 +387,7 @@ public class ItemFrameParticleHandler {
             ItemFrame itemFrame,
             String pattern,
             PillarParticleConfig cfg,
-            long time
-    ) {
+            long time) {
         FrameSettings settings = resolveFrameSettings(level, getFrameId(itemFrame), pattern, cfg);
         if (settings.count() == 0) {
             return;
@@ -442,7 +427,7 @@ public class ItemFrameParticleHandler {
             double u, v, w, vu, vv, vw;
 
             switch (pattern) {
-                case ParticlePatterns.BEAM:
+                case ParticlePatterns.BEAM :
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 0.0;
@@ -450,9 +435,8 @@ public class ItemFrameParticleHandler {
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = speed * (0.8 + rand.nextDouble() * 0.4);
                     break;
-                case ParticlePatterns.SPIRAL:
-                    double angle =
-                            (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
+                case ParticlePatterns.SPIRAL :
+                    double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
                     u = Math.cos(angle) * radius;
                     v = Math.sin(angle) * radius;
@@ -461,7 +445,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(angle) * speed * 0.3;
                     vw = speed * 0.6;
                     break;
-                case ParticlePatterns.FOUNTAIN:
+                case ParticlePatterns.FOUNTAIN :
                     double fAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double fRadius = rand.nextDouble() * spread;
                     u = Math.cos(fAngle) * fRadius;
@@ -471,7 +455,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(fAngle) * speed * 0.5;
                     vw = speed * 0.3 - rand.nextDouble() * speed * 0.2;
                     break;
-                case ParticlePatterns.PULSE:
+                case ParticlePatterns.PULSE :
                     double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
                     double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
                     double pAngle = rand.nextDouble() * 2.0 * Math.PI;
@@ -482,7 +466,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
                     vw = speed * 0.2;
                     break;
-                case ParticlePatterns.RING:
+                case ParticlePatterns.RING :
                     double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
                     double rRadius = spread * 0.8;
                     u = Math.cos(rAngle) * rRadius;
@@ -492,7 +476,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
                     vw = speed * 0.3;
                     break;
-                case ParticlePatterns.BURST:
+                case ParticlePatterns.BURST :
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.7;
                     u = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.6;
@@ -502,7 +486,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(bAngle) * Math.cos(bElevation) * speed * 1.5;
                     vw = Math.sin(bElevation) * speed * 1.5;
                     break;
-                case ParticlePatterns.SNOWFLAKE:
+                case ParticlePatterns.SNOWFLAKE :
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 2.0;
@@ -510,7 +494,7 @@ public class ItemFrameParticleHandler {
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = -speed * (0.8 + rand.nextDouble() * 0.4);
                     break;
-                default:
+                default :
                     u = (rand.nextDouble() - 0.5) * spread;
                     v = (rand.nextDouble() - 0.5) * spread;
                     w = rand.nextDouble() * spread;
@@ -543,8 +527,7 @@ public class ItemFrameParticleHandler {
                         particleX,
                         particleY,
                         particleZ,
-                        colorCode
-                );
+                        colorCode);
             }
 
             level.addParticle(
@@ -554,13 +537,11 @@ public class ItemFrameParticleHandler {
                     particleZ,
                     vx,
                     vy,
-                    vz
-            );
+                    vz);
         }
     }
 
-    private static final Map<Integer, Integer> COLOR_COUNTERS =
-            new ConcurrentHashMap<>();
+    private static final Map<Integer, Integer> COLOR_COUNTERS = new ConcurrentHashMap<>();
 
     public static List<String> getParticleColors(ItemFrame itemFrame) {
         if (itemFrame.level.isClientSide) {
@@ -582,8 +563,7 @@ public class ItemFrameParticleHandler {
 
             String frameId = getFrameId(itemFrame);
             if (frameId != null && !frameId.startsWith("F-????")) {
-                PillarIdManager.PillarData managerData =
-                        PillarIdManager.get(itemFrame.level).getPillarData(frameId);
+                PillarIdManager.PillarData managerData = PillarIdManager.get(itemFrame.level).getPillarData(frameId);
                 if (managerData != null && managerData.dyeColors != null && !managerData.dyeColors.isEmpty()) {
                     List<String> mutableColors = new ArrayList<>(managerData.dyeColors);
                     CLIENT_COLOR_CACHE.put(itemFrame.getId(), mutableColors);
@@ -626,8 +606,7 @@ public class ItemFrameParticleHandler {
     private static String getNextColor(
             ItemFrame itemFrame,
             PillarParticleConfig cfg,
-            int colorLimit
-    ) {
+            int colorLimit) {
         int entityId = itemFrame.getId();
 
         List<String> customColors = getParticleColors(itemFrame);
@@ -649,8 +628,7 @@ public class ItemFrameParticleHandler {
 
         int maxColors = Math.max(
                 1,
-                Math.min(colorLimit, cfg.particle_color.size())
-        );
+                Math.min(colorLimit, cfg.particle_color.size()));
         int counter = COLOR_COUNTERS.getOrDefault(entityId, 0);
         int colorIndex = Math.floorMod(counter, maxColors);
         COLOR_COUNTERS.put(entityId, counter + 1);
@@ -684,8 +662,7 @@ public class ItemFrameParticleHandler {
 
             String frameId = getFrameId(itemFrame);
             if (frameId != null && !frameId.startsWith("F-????")) {
-                PillarIdManager.PillarData managerData =
-                        PillarIdManager.get(itemFrame.level).getPillarData(frameId);
+                PillarIdManager.PillarData managerData = PillarIdManager.get(itemFrame.level).getPillarData(frameId);
                 if (managerData != null && managerData.pattern != null && !managerData.pattern.isEmpty()) {
                     CLIENT_PATTERN_CACHE.put(itemFrame.getId(), managerData.pattern);
                     return managerData.pattern;
@@ -748,32 +725,31 @@ public class ItemFrameParticleHandler {
         }
 
         switch (pattern) {
-            case ParticlePatterns.NONE:
+            case ParticlePatterns.NONE :
                 return ChatFormatting.DARK_GRAY;
-            case ParticlePatterns.DEFAULT:
+            case ParticlePatterns.DEFAULT :
                 return ChatFormatting.WHITE;
-            case ParticlePatterns.BEAM:
+            case ParticlePatterns.BEAM :
                 return ChatFormatting.AQUA;
-            case ParticlePatterns.SPIRAL:
+            case ParticlePatterns.SPIRAL :
                 return ChatFormatting.LIGHT_PURPLE;
-            case ParticlePatterns.FOUNTAIN:
+            case ParticlePatterns.FOUNTAIN :
                 return ChatFormatting.BLUE;
-            case ParticlePatterns.PULSE:
+            case ParticlePatterns.PULSE :
                 return ChatFormatting.RED;
-            case ParticlePatterns.RING:
+            case ParticlePatterns.RING :
                 return ChatFormatting.GOLD;
-            case ParticlePatterns.BURST:
+            case ParticlePatterns.BURST :
                 return ChatFormatting.YELLOW;
-            case ParticlePatterns.SNOWFLAKE:
+            case ParticlePatterns.SNOWFLAKE :
                 return ChatFormatting.AQUA;
-            default:
+            default :
                 return ChatFormatting.GRAY;
         }
     }
 
     private static Map.Entry<String, String> getDyeColorAndName(
-            ItemStack stack
-    ) {
+            ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return null;
         }
@@ -826,7 +802,6 @@ public class ItemFrameParticleHandler {
         return frameId;
     }
 
-
     private static String generateFrameId(PillarIdManager manager) {
         return generateUniqueId(FRAME_PREFIX, manager);
     }
@@ -864,41 +839,41 @@ public class ItemFrameParticleHandler {
             return "W";
         }
         switch (colorName.toLowerCase(Locale.ROOT)) {
-            case "white":
+            case "white" :
                 return "W";
-            case "orange":
+            case "orange" :
                 return "O";
-            case "magenta":
+            case "magenta" :
                 return "M";
-            case "light_blue":
+            case "light_blue" :
                 return "LB";
-            case "yellow":
+            case "yellow" :
                 return "Y";
-            case "lime":
+            case "lime" :
                 return "L";
-            case "pink":
+            case "pink" :
                 return "P";
-            case "gray":
+            case "gray" :
                 return "GR";
-            case "light_gray":
+            case "light_gray" :
                 return "LG";
-            case "cyan":
+            case "cyan" :
                 return "C";
-            case "purple":
+            case "purple" :
                 return "PU";
-            case "blue":
+            case "blue" :
                 return "B";
-            case "brown":
+            case "brown" :
                 return "BR";
-            case "green":
+            case "green" :
                 return "G";
-            case "red":
+            case "red" :
                 return "R";
-            case "black":
+            case "black" :
                 return "BL";
-            case "invisible":
+            case "invisible" :
                 return "I";
-            default:
+            default :
                 return "W";
         }
     }
@@ -916,12 +891,9 @@ public class ItemFrameParticleHandler {
         COLOR_COUNTERS.clear();
     }
 
-
     private static void handleColoredItemFrameInteraction(
-            PlayerInteractEvent.EntityInteract event
-    ) {
-        ColoredItemFrameEntity coloredFrame =
-                (ColoredItemFrameEntity) event.getTarget();
+            PlayerInteractEvent.EntityInteract event) {
+        ColoredItemFrameEntity coloredFrame = (ColoredItemFrameEntity) event.getTarget();
 
         Player player = event.getPlayer();
         Level level = event.getWorld();
@@ -937,8 +909,7 @@ public class ItemFrameParticleHandler {
                 if (currentColors.size() >= MAX_DYE_COLORS) {
                     if (!level.isClientSide) {
                         TextComponent message = new TextComponent(
-                                "Item frame already has " + MAX_DYE_COLORS + " colors!"
-                        );
+                                "Item frame already has " + MAX_DYE_COLORS + " colors!");
                         message.withStyle(ChatFormatting.RED);
                         player.displayClientMessage(message, true);
                     }
@@ -962,14 +933,12 @@ public class ItemFrameParticleHandler {
                             SoundEvents.DYE_USE,
                             SoundSource.BLOCKS,
                             1.0f,
-                            1.0f
-                    );
+                            1.0f);
 
                     String frameId = getFrameIdColored(coloredFrame);
                     int colorCount = getParticleColorsColored(coloredFrame).size();
                     TextComponent message = new TextComponent(
-                            "[" + frameId + "] + " + dyeName + " (" + colorCount + "/" + MAX_DYE_COLORS + ")"
-                    );
+                            "[" + frameId + "] + " + dyeName + " (" + colorCount + "/" + MAX_DYE_COLORS + ")");
                     player.displayClientMessage(message, true);
                 }
 
@@ -1003,8 +972,7 @@ public class ItemFrameParticleHandler {
                     SoundEvents.UI_BUTTON_CLICK,
                     SoundSource.BLOCKS,
                     0.5f,
-                    1.0f
-            );
+                    1.0f);
 
             ChatFormatting color = getPatternColor(nextPattern);
             TextComponent patternText = (TextComponent) new TextComponent(nextPattern)
@@ -1014,8 +982,7 @@ public class ItemFrameParticleHandler {
     }
 
     public static String getParticlePatternColored(
-            ColoredItemFrameEntity frame
-    ) {
+            ColoredItemFrameEntity frame) {
         if (frame.level.isClientSide) {
             String cached = CLIENT_PATTERN_CACHE.get(frame.getId());
             if (cached != null) {
@@ -1029,10 +996,11 @@ public class ItemFrameParticleHandler {
 
             String frameId = getFrameIdColored(frame);
             if (frameId != null && !frameId.startsWith("F-????")) {
-                PillarIdManager.PillarData managerData =
-                        PillarIdManager.get(frame.level).getPillarData(frameId);
+                PillarIdManager.PillarData managerData = PillarIdManager.get(frame.level).getPillarData(frameId);
                 if (managerData != null) {
-                    pattern = (managerData.pattern == null || managerData.pattern.isEmpty()) ? ParticlePatterns.NONE : managerData.pattern;
+                    pattern = (managerData.pattern == null || managerData.pattern.isEmpty())
+                            ? ParticlePatterns.NONE
+                            : managerData.pattern;
                     CLIENT_PATTERN_CACHE.put(frame.getId(), pattern);
                     return pattern;
                 }
@@ -1055,8 +1023,7 @@ public class ItemFrameParticleHandler {
 
     public static void setParticlePatternColored(
             ColoredItemFrameEntity frame,
-            String pattern
-    ) {
+            String pattern) {
         CLIENT_PATTERN_CACHE.put(frame.getId(), pattern);
 
         frame.setParticlePattern(pattern);
@@ -1068,8 +1035,7 @@ public class ItemFrameParticleHandler {
     }
 
     public static List<String> getParticleColorsColored(
-            ColoredItemFrameEntity frame
-    ) {
+            ColoredItemFrameEntity frame) {
         if (frame.level.isClientSide) {
             List<String> cached = CLIENT_COLOR_CACHE.get(frame.getId());
             if (cached != null) {
@@ -1119,8 +1085,7 @@ public class ItemFrameParticleHandler {
 
     public static void addParticleColorColored(
             ColoredItemFrameEntity frame,
-            String color
-    ) {
+            String color) {
         List<String> colors = getParticleColorsColored(frame);
         if (colors.size() >= MAX_DYE_COLORS) {
             return;
@@ -1150,8 +1115,7 @@ public class ItemFrameParticleHandler {
     }
 
     public static String getFrameIdColored(
-            ColoredItemFrameEntity frame
-    ) {
+            ColoredItemFrameEntity frame) {
         if (frame.level.isClientSide) {
             String cached = CLIENT_FRAME_ID_CACHE.get(frame.getId());
             if (cached != null && !cached.equals("F-????")) {
@@ -1191,8 +1155,7 @@ public class ItemFrameParticleHandler {
     private static String getNextColorColored(
             ColoredItemFrameEntity frame,
             PillarParticleConfig cfg,
-            int colorLimit
-    ) {
+            int colorLimit) {
         int entityId = frame.getId();
 
         List<String> customColors = getParticleColorsColored(frame);
@@ -1214,8 +1177,7 @@ public class ItemFrameParticleHandler {
 
         int maxColors = Math.max(
                 1,
-                Math.min(colorLimit, cfg.particle_color.size())
-        );
+                Math.min(colorLimit, cfg.particle_color.size()));
         int counter = COLOR_COUNTERS.getOrDefault(entityId, 0);
         int colorIndex = Math.floorMod(counter, maxColors);
         COLOR_COUNTERS.put(entityId, counter + 1);
@@ -1236,8 +1198,7 @@ public class ItemFrameParticleHandler {
             ColoredItemFrameEntity coloredFrame,
             String pattern,
             PillarParticleConfig cfg,
-            long time
-    ) {
+            long time) {
         FrameSettings settings = resolveFrameSettings(level, getFrameIdColored(coloredFrame), pattern, cfg);
         if (settings.count() == 0) {
             return;
@@ -1277,7 +1238,7 @@ public class ItemFrameParticleHandler {
             double u, v, w, vu, vv, vw;
 
             switch (pattern) {
-                case ParticlePatterns.BEAM:
+                case ParticlePatterns.BEAM :
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 0.0;
@@ -1285,7 +1246,7 @@ public class ItemFrameParticleHandler {
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = speed * (0.8 + rand.nextDouble() * 0.4);
                     break;
-                case ParticlePatterns.SPIRAL:
+                case ParticlePatterns.SPIRAL :
                     double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
                     u = Math.cos(angle) * radius;
@@ -1295,7 +1256,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(angle) * speed * 0.3;
                     vw = speed * 0.6;
                     break;
-                case ParticlePatterns.FOUNTAIN:
+                case ParticlePatterns.FOUNTAIN :
                     double fAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double fRadius = rand.nextDouble() * spread;
                     u = Math.cos(fAngle) * fRadius;
@@ -1305,7 +1266,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(fAngle) * speed * 0.5;
                     vw = speed * 0.3 - rand.nextDouble() * speed * 0.2;
                     break;
-                case ParticlePatterns.PULSE:
+                case ParticlePatterns.PULSE :
                     double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
                     double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
                     double pAngle = rand.nextDouble() * 2.0 * Math.PI;
@@ -1316,7 +1277,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
                     vw = speed * 0.2;
                     break;
-                case ParticlePatterns.RING:
+                case ParticlePatterns.RING :
                     double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
                     double rRadius = spread * 0.8;
                     u = Math.cos(rAngle) * rRadius;
@@ -1326,7 +1287,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
                     vw = speed * 0.3;
                     break;
-                case ParticlePatterns.BURST:
+                case ParticlePatterns.BURST :
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.5;
                     u = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.3;
@@ -1336,7 +1297,7 @@ public class ItemFrameParticleHandler {
                     vv = Math.sin(bAngle) * Math.cos(bElevation) * speed;
                     vw = Math.sin(bElevation) * speed;
                     break;
-                case ParticlePatterns.SNOWFLAKE:
+                case ParticlePatterns.SNOWFLAKE :
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 2.0;
@@ -1344,7 +1305,7 @@ public class ItemFrameParticleHandler {
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = -speed * (0.8 + rand.nextDouble() * 0.4);
                     break;
-                default:
+                default :
                     u = (rand.nextDouble() - 0.5) * spread;
                     v = (rand.nextDouble() - 0.5) * spread;
                     w = rand.nextDouble() * spread;
@@ -1377,8 +1338,7 @@ public class ItemFrameParticleHandler {
                         particleX,
                         particleY,
                         particleZ,
-                        colorCode
-                );
+                        colorCode);
             }
 
             level.addParticle(
@@ -1388,8 +1348,7 @@ public class ItemFrameParticleHandler {
                     particleZ,
                     vx,
                     vy,
-                    vz
-            );
+                    vz);
         }
     }
 }

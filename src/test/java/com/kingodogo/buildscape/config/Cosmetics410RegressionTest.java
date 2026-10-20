@@ -16,7 +16,8 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 
 public class Cosmetics410RegressionTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {

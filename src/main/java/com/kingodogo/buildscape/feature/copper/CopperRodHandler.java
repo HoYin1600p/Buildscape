@@ -30,8 +30,7 @@ public class CopperRodHandler {
             ModBlocks.WEATHERED_COPPER_ROD,
             ModBlocks.WAXED_WEATHERED_COPPER_ROD,
             ModBlocks.OXIDIZED_COPPER_ROD,
-            ModBlocks.WAXED_OXIDIZED_COPPER_ROD
-    );
+            ModBlocks.WAXED_OXIDIZED_COPPER_ROD);
 
     public static void registerPoi() {
         try {
@@ -99,7 +98,8 @@ public class CopperRodHandler {
         }
     }
 
-    private static void randomWalkCleanCopper(Level level, BlockPos center, BlockPos.MutableBlockPos mutable, int maxSteps) {
+    private static void randomWalkCleanCopper(Level level, BlockPos center, BlockPos.MutableBlockPos mutable,
+            int maxSteps) {
         mutable.set(center);
         for (int i = 0; i < maxSteps; ++i) {
             Optional<BlockPos> opt = randomStepCleanCopper(level, mutable);

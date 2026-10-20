@@ -21,7 +21,8 @@ public final class PipeWaterSurface {
         if (source) {
             float sourceHeight = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
             return new Heights(sourceHeight, (flow == null || flow.getFlowDirections().size() != 1)
-                    ? sourceHeight : (sourceHeight + flowHeight(1)) * 0.5F);
+                    ? sourceHeight
+                    : (sourceHeight + flowHeight(1)) * 0.5F);
         }
         float floor = downwardChannel ? 0.0F : 0.125F;
         int distance = Math.min(7, Math.max(1, flow != null ? flow.getDistance() : 0));
@@ -31,7 +32,8 @@ public final class PipeWaterSurface {
     }
 
     private static float flowHeight(int distance) {
-        return distance <= 0 ? HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT
+        return distance <= 0
+                ? HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT
                 : Math.max(0.125F, Math.max(1, 8 - Math.min(7, distance)) / 9.0F);
     }
 }

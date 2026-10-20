@@ -20,8 +20,7 @@ public class ModBambooWallSignBlock extends WallSignBlock {
 
     public ModBambooWallSignBlock(
             BlockBehaviour.Properties properties,
-            WoodType woodType
-    ) {
+            WoodType woodType) {
         super(properties, woodType);
     }
 
@@ -42,26 +41,21 @@ public class ModBambooWallSignBlock extends WallSignBlock {
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         ItemStack heldItem = player.getItemInHand(hand);
 
         if (!heldItem.isEmpty()) {
-            if (
-                    heldItem.getItem() instanceof DyeItem ||
-                            heldItem.getItem() == Items.GLOW_INK_SAC ||
-                            heldItem.getItem() == Items.INK_SAC
-            ) {
+            if (heldItem.getItem() instanceof DyeItem ||
+                    heldItem.getItem() == Items.GLOW_INK_SAC ||
+                    heldItem.getItem() == Items.INK_SAC) {
                 return super.use(state, level, pos, player, hand, hit);
             }
         }
 
-        if (
-                blockEntity instanceof BambooSignBlockEntity &&
-                        !player.isCrouching() &&
-                        heldItem.isEmpty()
-        ) {
+        if (blockEntity instanceof BambooSignBlockEntity &&
+                !player.isCrouching() &&
+                heldItem.isEmpty()) {
             return super.use(state, level, pos, player, hand, hit);
         }
 

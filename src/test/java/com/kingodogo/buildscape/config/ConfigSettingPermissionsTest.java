@@ -17,7 +17,8 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class ConfigSettingPermissionsTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {
@@ -31,8 +32,8 @@ public class ConfigSettingPermissionsTest {
                 for (ConfigSetting setting : ConfigSetting.uploadable()) {
                     boolean expected = level == 4 || setting != ConfigSetting.POLICY
                             && (mode == PillarParticleConfig.EditPermissionMode.OPEN
-                            || mode == PillarParticleConfig.EditPermissionMode.STANDARD && level == 2
-                            && (setting == ConfigSetting.ITEMS || setting == ConfigSetting.COLORS));
+                                    || mode == PillarParticleConfig.EditPermissionMode.STANDARD && level == 2
+                                            && (setting == ConfigSetting.ITEMS || setting == ConfigSetting.COLORS));
                     assertEquals(mode + "/" + level + "/" + setting, expected, setting.canEdit(mode, level));
                     assertEquals(expected, ConfigSetting.allowed(mode, level).contains(setting));
                 }
@@ -66,7 +67,8 @@ public class ConfigSettingPermissionsTest {
 
     @Test
     public void operationsOutsideTheUploadPacketsNeverEnterUploadsOrMasks() {
-        assertEquals(EnumSet.of(ConfigSetting.ITEMS, ConfigSetting.COLORS, ConfigSetting.PARTICLES, ConfigSetting.POLICY),
+        assertEquals(
+                EnumSet.of(ConfigSetting.ITEMS, ConfigSetting.COLORS, ConfigSetting.PARTICLES, ConfigSetting.POLICY),
                 ConfigSetting.uploadable());
         for (PillarParticleConfig.EditPermissionMode mode : PillarParticleConfig.EditPermissionMode.values()) {
             assertTrue(ConfigSetting.uploadable().containsAll(ConfigSetting.allowed(mode, 4)));
@@ -128,7 +130,8 @@ public class ConfigSettingPermissionsTest {
             Path directory = temporary.newFolder().toPath();
             PillarParticleConfig server = new PillarParticleConfig(directory);
             server.edit_permission_mode = PillarParticleConfig.EditPermissionMode.STANDARD;
-            java.lang.reflect.Field field = PillarParticleConfig.class.getDeclaredField(protectItems ? "itemsReadOnly" : "propertiesReadOnly");
+            java.lang.reflect.Field field = PillarParticleConfig.class
+                    .getDeclaredField(protectItems ? "itemsReadOnly" : "propertiesReadOnly");
             field.setAccessible(true);
             field.setBoolean(server, true);
             SyncConfigPacket data = new SyncConfigPacket(new PillarParticleConfig());

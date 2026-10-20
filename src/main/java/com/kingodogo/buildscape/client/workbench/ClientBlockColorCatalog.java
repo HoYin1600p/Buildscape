@@ -40,8 +40,7 @@ public final class ClientBlockColorCatalog {
     private static boolean failed;
     private static int generation;
 
-    private ClientBlockColorCatalog() {
-    }
+    private ClientBlockColorCatalog() {}
 
     public static synchronized void invalidate() {
         ready = false;
@@ -125,7 +124,7 @@ public final class ClientBlockColorCatalog {
     }
 
     private static BlockSample sampleBlock(Minecraft minecraft, BlockColors blockColors, BlockState state,
-                                           Map<SpriteKey, PixelSample> spriteCache) {
+            Map<SpriteKey, PixelSample> spriteCache) {
         BakedModel model;
         try {
             model = minecraft.getBlockRenderer().getBlockModel(state);
@@ -151,7 +150,7 @@ public final class ClientBlockColorCatalog {
     }
 
     private static void sampleQuads(BakedModel model, BlockState state, Direction side, BlockColors blockColors,
-                                    Map<SpriteKey, PixelSample> spriteCache, BlockAccumulator accumulator) {
+            Map<SpriteKey, PixelSample> spriteCache, BlockAccumulator accumulator) {
         List<BakedQuad> quads;
         try {
             quads = model.getQuads(state, side, new Random(42L), EmptyModelData.INSTANCE);

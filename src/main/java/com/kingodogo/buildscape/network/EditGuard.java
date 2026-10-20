@@ -16,8 +16,7 @@ import net.minecraftforge.network.PacketDistributor;
  * config screen applies, and a refused sender is told why and given the server's current state again.
  */
 public final class EditGuard {
-    private EditGuard() {
-    }
+    private EditGuard() {}
 
     public static int permissionLevel(ServerPlayer player) {
         return ConfigSetting.permissionLevel(player.hasPermissions(2),
@@ -35,7 +34,8 @@ public final class EditGuard {
         }
         player.displayClientMessage(new TextComponent(refusalText(setting)).withStyle(ChatFormatting.RED), false);
         resync(player, setting);
-        refuse(player, setting == ConfigSetting.POLICY ? EditRefusedPacket.Reason.POLICY_LEVEL
+        refuse(player, setting == ConfigSetting.POLICY
+                ? EditRefusedPacket.Reason.POLICY_LEVEL
                 : EditRefusedPacket.Reason.LOCKED, setting);
         return false;
     }

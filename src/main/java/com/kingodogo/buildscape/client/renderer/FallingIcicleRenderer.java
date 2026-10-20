@@ -34,8 +34,7 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
             float partialTicks,
             PoseStack poseStack,
             MultiBufferSource bufferSource,
-            int packedLight
-    ) {
+            int packedLight) {
         BlockState blockState = entity.getBlockState();
         if (blockState.getRenderShape() == RenderShape.MODEL) {
             Level level = entity.level;
@@ -44,13 +43,11 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
                 BlockPos blockPos = new BlockPos(
                         entity.getX(),
                         entity.getBoundingBox().maxY,
-                        entity.getZ()
-                );
+                        entity.getZ());
                 poseStack.translate(-0.5D, 0.0D, -0.5D);
 
                 BlockRenderDispatcher blockRenderer = getBlockRenderer();
-                RenderType renderType =
-                        RenderType.cutout();
+                RenderType renderType = RenderType.cutout();
                 blockRenderer
                         .getModelRenderer()
                         .tesselateBlock(
@@ -63,8 +60,7 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
                                 false,
                                 level.random,
                                 blockState.getSeed(entity.getStartPos()),
-                                OverlayTexture.NO_OVERLAY
-                        );
+                                OverlayTexture.NO_OVERLAY);
 
                 poseStack.popPose();
                 super.render(
@@ -73,8 +69,7 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
                         partialTicks,
                         poseStack,
                         bufferSource,
-                        packedLight
-                );
+                        packedLight);
             }
         }
     }

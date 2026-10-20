@@ -20,7 +20,8 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 public class Config405MigrationTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {
@@ -62,8 +63,10 @@ public class Config405MigrationTest {
             config.loadItemsInternal(vault);
             assertTrue(config.items.containsAll(oldItems));
             assertTrue(config.items.containsAll(ConfigPaths.loadDefaultItems(vault)));
-            com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original)).getAsJsonArray("items");
-            com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file)).getAsJsonArray("items");
+            com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original))
+                    .getAsJsonArray("items");
+            com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file))
+                    .getAsJsonArray("items");
             for (int i = 0; i < before.size(); i++) {
                 assertEquals(before.get(i), after.get(i));
             }
@@ -148,7 +151,8 @@ public class Config405MigrationTest {
         Files.writeString(file, original);
         BuildscapeClientConfig config = new BuildscapeClientConfig(root);
         assertTrue(ConfigLayoutIO.readText(file).startsWith(original));
-        assertEquals(withNewDefaults(ConfigLayoutIO.readEntries(original)), ConfigLayoutIO.readEntries(ConfigLayoutIO.readText(file)));
+        assertEquals(withNewDefaults(ConfigLayoutIO.readEntries(original)),
+                ConfigLayoutIO.readEntries(ConfigLayoutIO.readText(file)));
         config.save();
         String saved = ConfigLayoutIO.readText(file);
         assertEquals(withNewDefaults(ConfigLayoutIO.readEntries(original)), ConfigLayoutIO.readEntries(saved));
@@ -180,7 +184,8 @@ public class Config405MigrationTest {
         new BuildscapeClientConfig(root);
         assertEquals(saved, ConfigLayoutIO.readText(file));
 
-        Files.writeString(legacy, fixture("old-buildscape.cfg").replace("MaxPipeNetworkSize = 64", "MaxPipeNetworkSize = 77"));
+        Files.writeString(legacy,
+                fixture("old-buildscape.cfg").replace("MaxPipeNetworkSize = 64", "MaxPipeNetworkSize = 77"));
         Files.delete(file);
         BuildscapeClientConfig reset = new BuildscapeClientConfig(root);
         assertEquals(64, reset.getMaxPipeNetworkSize());
@@ -406,7 +411,8 @@ public class Config405MigrationTest {
         PillarParticleConfig config = new PillarParticleConfig(directory);
         invoke(config, "migrateOldConfig");
         Path properties = directory.resolve("pillar-properties.json");
-        assertEquals("spiral", ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(properties)).get("pattern").getAsString());
+        assertEquals("spiral",
+                ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(properties)).get("pattern").getAsString());
         assertFalse(Files.exists(directory.resolve("pillar-items.json")));
         assertEquals(original, ConfigLayoutIO.readText(legacy));
         assertEquals(original, ConfigLayoutIO.readText(root.resolve("pillar-particles.json.backup")));
@@ -448,7 +454,8 @@ public class Config405MigrationTest {
         BuildscapeClientConfig clientConfig = new BuildscapeClientConfig(root);
         Files.delete(client);
         clientConfig.save();
-        assertEquals(64, Integer.parseInt(ConfigLayoutIO.readEntries(ConfigLayoutIO.readText(client)).get("MaxPipeNetworkSize")));
+        assertEquals(64, Integer
+                .parseInt(ConfigLayoutIO.readEntries(ConfigLayoutIO.readText(client)).get("MaxPipeNetworkSize")));
 
         Path directory = root.resolve("pillar");
         Files.createDirectories(directory);
@@ -459,7 +466,8 @@ public class Config405MigrationTest {
         Files.delete(properties);
         config.pattern = "spiral";
         assertTrue(config.savePropertiesToDisk());
-        assertEquals("spiral", ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(properties)).get("pattern").getAsString());
+        assertEquals("spiral",
+                ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(properties)).get("pattern").getAsString());
 
         Path items = directory.resolve("pillar-items.json");
         Files.writeString(items, "{\"items\":[\"minecraft:stick\"],\"defaults_version\":410}");
@@ -492,8 +500,10 @@ public class Config405MigrationTest {
             PillarParticleConfig config = new PillarParticleConfig(directory);
             config.loadItemsInternal(vault);
             assertEquals(PillarParticleConfig.parseItems(original), config.items);
-            com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original)).getAsJsonArray("items");
-            com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file)).getAsJsonArray("items");
+            com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original))
+                    .getAsJsonArray("items");
+            com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file))
+                    .getAsJsonArray("items");
             assertEquals(before, after);
             assertEquals(original, ConfigLayoutIO.readText(file));
             assertFalse(Files.exists(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));

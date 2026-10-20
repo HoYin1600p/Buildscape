@@ -39,8 +39,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         Direction direction = state.getValue(
-                BlockStateProperties.VERTICAL_DIRECTION
-        );
+                BlockStateProperties.VERTICAL_DIRECTION);
         BlockPos supportPos = direction == Direction.DOWN
                 ? pos.above()
                 : pos.below();
@@ -50,20 +49,16 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             return true;
         }
 
-        if (
-                supportState.isFaceSturdy(
-                        level,
-                        supportPos,
-                        direction == Direction.DOWN ? Direction.DOWN : Direction.UP
-                )
-        ) {
+        if (supportState.isFaceSturdy(
+                level,
+                supportPos,
+                direction == Direction.DOWN ? Direction.DOWN : Direction.UP)) {
             return true;
         }
 
         if (isDripstoneBlock(supportState)) {
             Direction supportDirection = supportState.getValue(
-                    BlockStateProperties.VERTICAL_DIRECTION
-            );
+                    BlockStateProperties.VERTICAL_DIRECTION);
             return supportDirection == direction;
         }
 
@@ -84,23 +79,16 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
         if (isSulfurSpikeBlock(clickedState)) {
             verticalDirection = clickedState.getValue(
-                    BlockStateProperties.VERTICAL_DIRECTION
-            );
+                    BlockStateProperties.VERTICAL_DIRECTION);
         } else if (clickedFace == Direction.UP) {
             verticalDirection = Direction.UP;
         } else if (clickedFace == Direction.DOWN) {
             verticalDirection = Direction.DOWN;
-        } else if (
-                isSulfurSpikeBlock(belowState) &&
-                        belowState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                Direction.UP
-        ) {
+        } else if (isSulfurSpikeBlock(belowState) &&
+                belowState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.UP) {
             verticalDirection = Direction.UP;
-        } else if (
-                isSulfurSpikeBlock(aboveState) &&
-                        aboveState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                Direction.DOWN
-        ) {
+        } else if (isSulfurSpikeBlock(aboveState) &&
+                aboveState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.DOWN) {
             verticalDirection = Direction.DOWN;
         } else {
             BlockState supportAbove = level.getBlockState(pos.above());
@@ -109,13 +97,11 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             boolean hasAboveSupport = supportAbove.isFaceSturdy(
                     level,
                     pos.above(),
-                    Direction.DOWN
-            );
+                    Direction.DOWN);
             boolean hasBelowSupport = supportBelow.isFaceSturdy(
                     level,
                     pos.below(),
-                    Direction.UP
-            );
+                    Direction.UP);
 
             if (hasAboveSupport && !hasBelowSupport) {
                 verticalDirection = Direction.DOWN;
@@ -126,9 +112,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             }
         }
 
-        BlockState state =
-                this.defaultBlockState()
-                        .setValue(BlockStateProperties.VERTICAL_DIRECTION, verticalDirection);
+        BlockState state = this.defaultBlockState()
+                .setValue(BlockStateProperties.VERTICAL_DIRECTION, verticalDirection);
 
         state = calculateCustomThickness(level, pos, state);
 
@@ -153,8 +138,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             Level level,
             BlockPos pos,
             BlockState oldState,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (!level.isClientSide) {
             BlockState validatedState = state;
             DripstoneThickness thickness = state.getValue(THICKNESS);
@@ -179,25 +163,21 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         if (!canSurvive(state, level, pos)) {
             Direction direction = state.getValue(
-                    BlockStateProperties.VERTICAL_DIRECTION
-            );
+                    BlockStateProperties.VERTICAL_DIRECTION);
 
             BlockPos supportPos = direction == Direction.DOWN
                     ? pos.above()
                     : pos.below();
             BlockState supportState = level.getBlockState(supportPos);
-            boolean supportGone =
-                    !supportState.isFaceSturdy(
-                            level,
-                            supportPos,
-                            direction == Direction.DOWN ? Direction.DOWN : Direction.UP
-                    ) &&
-                            !isDripstoneBlock(supportState) &&
-                            !(supportState.getBlock() instanceof SlabBlock);
+            boolean supportGone = !supportState.isFaceSturdy(
+                    level,
+                    supportPos,
+                    direction == Direction.DOWN ? Direction.DOWN : Direction.UP) &&
+                    !isDripstoneBlock(supportState) &&
+                    !(supportState.getBlock() instanceof SlabBlock);
 
             if (direction == Direction.DOWN) {
                 if (supportGone || isFree(level, pos)) {
@@ -227,12 +207,10 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             Level level,
             BlockPos pos,
             BlockState newState,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (!level.isClientSide && !isMoving && !newState.is(this)) {
             Direction direction = state.getValue(
-                    BlockStateProperties.VERTICAL_DIRECTION
-            );
+                    BlockStateProperties.VERTICAL_DIRECTION);
 
             Set<BlockPos> fallingBlocks = new HashSet<>();
             fallingBlocks.add(pos);
@@ -244,11 +222,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                         break;
                     }
                     BlockState currentState = level.getBlockState(currentPos);
-                    if (
-                            currentState.is(this) &&
-                                    currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                            direction
-                    ) {
+                    if (currentState.is(this) &&
+                            currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                         fallingBlocks.add(currentPos);
                         makeSulfurSpikeFall(level, currentPos, currentState);
                         currentPos = currentPos.below();
@@ -265,11 +240,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                         break;
                     }
                     BlockState currentState = level.getBlockState(currentPos);
-                    if (
-                            currentState.is(this) &&
-                                    currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                            direction
-                    ) {
+                    if (currentState.is(this) &&
+                            currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                         fallingBlocks.add(currentPos);
                         level.destroyBlock(currentPos, true);
                         currentPos = currentPos.above();
@@ -287,8 +259,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     private void updateRemainingStack(
             Level level,
             BlockPos startPos,
-            Direction direction
-    ) {
+            Direction direction) {
         BlockState startState = level.getBlockState(startPos);
         if (!startState.is(this)) {
             return;
@@ -299,11 +270,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             while (true) {
                 BlockPos nextPos = basePos.above();
                 BlockState nextState = level.getBlockState(nextPos);
-                if (
-                        nextState.is(this) &&
-                                nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                        direction
-                ) {
+                if (nextState.is(this) &&
+                        nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                     basePos = nextPos;
                 } else {
                     break;
@@ -313,11 +281,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             while (true) {
                 BlockPos nextPos = basePos.below();
                 BlockState nextState = level.getBlockState(nextPos);
-                if (
-                        nextState.is(this) &&
-                                nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                        direction
-                ) {
+                if (nextState.is(this) &&
+                        nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                     basePos = nextPos;
                 } else {
                     break;
@@ -331,22 +296,17 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                 : Direction.UP;
         while (true) {
             BlockState currentState = level.getBlockState(currentPos);
-            if (
-                    currentState.is(this) &&
-                            currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    direction
-            ) {
+            if (currentState.is(this) &&
+                    currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                 BlockState updatedState = calculateCustomThickness(
                         level,
                         currentPos,
-                        currentState
-                );
+                        currentState);
 
                 DripstoneThickness mergeThickness = checkForMerge(
                         level,
                         currentPos,
-                        updatedState
-                );
+                        updatedState);
                 if (mergeThickness != updatedState.getValue(THICKNESS)) {
                     updatedState = updatedState.setValue(THICKNESS, mergeThickness);
                 }
@@ -365,8 +325,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     private void breakAllConnectedBlocks(
             Level level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         Set<BlockPos> breakingBlocks = new HashSet<>();
         breakingBlocks.add(pos);
         level.destroyBlock(pos, true);
@@ -381,11 +340,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                 break;
             }
             BlockState currentState = level.getBlockState(currentPos);
-            if (
-                    currentState.is(this) &&
-                            currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    direction
-            ) {
+            if (currentState.is(this) &&
+                    currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                 breakingBlocks.add(currentPos);
                 level.destroyBlock(currentPos, true);
                 currentPos = currentPos.relative(tipDirection);
@@ -409,35 +365,28 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
         BlockState aboveState = level.getBlockState(pos.above());
         BlockState belowState = level.getBlockState(pos.below());
         Direction direction = currentState.getValue(
-                BlockStateProperties.VERTICAL_DIRECTION
-        );
+                BlockStateProperties.VERTICAL_DIRECTION);
 
-        if (
-                aboveState.getBlock() instanceof PointedDripstoneBlock &&
-                        !(aboveState.getBlock() instanceof SulfurSpikeBlock)
-        ) {
+        if (aboveState.getBlock() instanceof PointedDripstoneBlock &&
+                !(aboveState.getBlock() instanceof SulfurSpikeBlock)) {
             ((PointedDripstoneBlock) aboveState.getBlock()).neighborChanged(
                     aboveState,
                     level,
                     pos.above(),
                     this,
                     pos,
-                    false
-            );
+                    false);
         }
 
-        if (
-                belowState.getBlock() instanceof PointedDripstoneBlock &&
-                        !(belowState.getBlock() instanceof SulfurSpikeBlock)
-        ) {
+        if (belowState.getBlock() instanceof PointedDripstoneBlock &&
+                !(belowState.getBlock() instanceof SulfurSpikeBlock)) {
             ((PointedDripstoneBlock) belowState.getBlock()).neighborChanged(
                     belowState,
                     level,
                     pos.below(),
                     this,
                     pos,
-                    false
-            );
+                    false);
         }
     }
 
@@ -448,16 +397,14 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (direction == Direction.UP || direction == Direction.DOWN) {
             BlockState updatedState = calculateCustomThickness(level, pos, state);
 
             DripstoneThickness correctThickness = checkForMerge(
                     level,
                     pos,
-                    updatedState
-            );
+                    updatedState);
             updatedState = updatedState.setValue(THICKNESS, correctThickness);
 
             if (level instanceof Level) {
@@ -480,12 +427,10 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             BlockPos pos,
             Block neighborBlock,
             BlockPos neighborPos,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (!level.isClientSide) {
             Direction direction = state.getValue(
-                    BlockStateProperties.VERTICAL_DIRECTION
-            );
+                    BlockStateProperties.VERTICAL_DIRECTION);
             BlockPos supportPos = direction == Direction.DOWN
                     ? pos.above()
                     : pos.below();
@@ -509,14 +454,12 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                 BlockState updatedState = calculateCustomThickness(
                         level,
                         pos,
-                        currentState
-                );
+                        currentState);
 
                 DripstoneThickness mergeThickness = checkForMerge(
                         level,
                         pos,
-                        updatedState
-                );
+                        updatedState);
                 if (mergeThickness != updatedState.getValue(THICKNESS)) {
                     updatedState = updatedState.setValue(THICKNESS, mergeThickness);
                 }
@@ -535,11 +478,9 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     private BlockState calculateCustomThickness(
             LevelAccessor level,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         Direction direction = state.getValue(
-                BlockStateProperties.VERTICAL_DIRECTION
-        );
+                BlockStateProperties.VERTICAL_DIRECTION);
 
         int stackHeight = countStackHeight(level, pos, direction);
 
@@ -547,8 +488,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
         DripstoneThickness thickness = calculateThicknessForPosition(
                 stackHeight,
-                positionInStack
-        );
+                positionInStack);
 
         return state.setValue(THICKNESS, thickness);
     }
@@ -556,18 +496,15 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     private int countStackHeight(
             LevelAccessor level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         int height = 1;
         BlockPos currentPos = pos;
 
         while (true) {
             BlockPos nextPos = currentPos.relative(Direction.UP);
             BlockState nextState = level.getBlockState(nextPos);
-            if (
-                    isDripstoneBlock(nextState) &&
-                            nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction
-            ) {
+            if (isDripstoneBlock(nextState) &&
+                    nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                 height++;
                 currentPos = nextPos;
             } else {
@@ -579,10 +516,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
         while (true) {
             BlockPos nextPos = currentPos.relative(Direction.DOWN);
             BlockState nextState = level.getBlockState(nextPos);
-            if (
-                    isDripstoneBlock(nextState) &&
-                            nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction
-            ) {
+            if (isDripstoneBlock(nextState) &&
+                    nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                 height++;
                 currentPos = nextPos;
             } else {
@@ -596,8 +531,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     private int getPositionInStack(
             LevelAccessor level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         int position = 0;
         BlockPos currentPos = pos;
 
@@ -605,11 +539,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             while (true) {
                 BlockPos nextPos = currentPos.relative(Direction.UP);
                 BlockState nextState = level.getBlockState(nextPos);
-                if (
-                        isDripstoneBlock(nextState) &&
-                                nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                        direction
-                ) {
+                if (isDripstoneBlock(nextState) &&
+                        nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                     position++;
                     currentPos = nextPos;
                 } else {
@@ -620,11 +551,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             while (true) {
                 BlockPos nextPos = currentPos.relative(Direction.DOWN);
                 BlockState nextState = level.getBlockState(nextPos);
-                if (
-                        isDripstoneBlock(nextState) &&
-                                nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                        direction
-                ) {
+                if (isDripstoneBlock(nextState) &&
+                        nextState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction) {
                     position++;
                     currentPos = nextPos;
                 } else {
@@ -638,8 +566,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
     private DripstoneThickness calculateThicknessForPosition(
             int stackHeight,
-            int position
-    ) {
+            int position) {
         if (stackHeight == 1) {
             return DripstoneThickness.TIP;
         }
@@ -682,16 +609,13 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     private DripstoneThickness checkForMerge(
             LevelAccessor level,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         Direction currentDirection = state.getValue(
-                BlockStateProperties.VERTICAL_DIRECTION
-        );
+                BlockStateProperties.VERTICAL_DIRECTION);
         DripstoneThickness currentThickness = state.getValue(THICKNESS);
 
-        boolean isTip =
-                currentThickness == DripstoneThickness.TIP ||
-                        currentThickness == DripstoneThickness.TIP_MERGE;
+        boolean isTip = currentThickness == DripstoneThickness.TIP ||
+                currentThickness == DripstoneThickness.TIP_MERGE;
 
         if (!isTip) {
             return currentThickness;
@@ -707,25 +631,21 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
         }
 
         Direction adjacentDirection = adjacentState.getValue(
-                BlockStateProperties.VERTICAL_DIRECTION
-        );
+                BlockStateProperties.VERTICAL_DIRECTION);
         if (currentDirection == adjacentDirection) {
             return DripstoneThickness.TIP;
         }
 
-        boolean isOpposite =
-                (currentDirection == Direction.DOWN &&
-                        adjacentDirection == Direction.UP) ||
-                        (currentDirection == Direction.UP && adjacentDirection == Direction.DOWN);
+        boolean isOpposite = (currentDirection == Direction.DOWN &&
+                adjacentDirection == Direction.UP) ||
+                (currentDirection == Direction.UP && adjacentDirection == Direction.DOWN);
         if (!isOpposite) {
             return DripstoneThickness.TIP;
         }
 
         DripstoneThickness adjacentThickness = adjacentState.getValue(THICKNESS);
-        if (
-                adjacentThickness != DripstoneThickness.TIP &&
-                        adjacentThickness != DripstoneThickness.TIP_MERGE
-        ) {
+        if (adjacentThickness != DripstoneThickness.TIP &&
+                adjacentThickness != DripstoneThickness.TIP_MERGE) {
             return DripstoneThickness.TIP;
         }
 
@@ -738,14 +658,12 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             BlockState updatedState = calculateCustomThickness(
                     level,
                     pos,
-                    neighborState
-            );
+                    neighborState);
 
             DripstoneThickness correctThickness = checkForMerge(
                     level,
                     pos,
-                    updatedState
-            );
+                    updatedState);
             updatedState = updatedState.setValue(THICKNESS, correctThickness);
 
             if (updatedState != neighborState) {
@@ -759,11 +677,9 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         Direction direction = state.getValue(
-                BlockStateProperties.VERTICAL_DIRECTION
-        );
+                BlockStateProperties.VERTICAL_DIRECTION);
 
         if (direction == Direction.DOWN) {
             tryStalactiteGrowth(level, pos, random);
@@ -774,12 +690,10 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
     private boolean isSulfurSpikeSourceBlock(BlockState state) {
         Block block = state.getBlock();
-        return (
-                block == ModBlocks.SULFUR.get() ||
+        return (block == ModBlocks.SULFUR.get() ||
                 block == ModBlocks.POLISHED_SULFUR.get() ||
                 block == ModBlocks.CHISELED_SULFUR.get() ||
-                block == ModBlocks.SULFUR_BRICKS.get()
-        );
+                block == ModBlocks.SULFUR_BRICKS.get());
     }
 
     @Override
@@ -792,22 +706,18 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             BlockState state,
             Level level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         if (!level.isClientSide) {
             return;
         }
 
         Direction direction = state.getValue(
-                BlockStateProperties.VERTICAL_DIRECTION
-        );
+                BlockStateProperties.VERTICAL_DIRECTION);
         DripstoneThickness thickness = state.getValue(THICKNESS);
 
-        if (
-                direction == Direction.DOWN &&
-                        (thickness == DripstoneThickness.TIP ||
-                                thickness == DripstoneThickness.TIP_MERGE)
-        ) {
+        if (direction == Direction.DOWN &&
+                (thickness == DripstoneThickness.TIP ||
+                        thickness == DripstoneThickness.TIP_MERGE)) {
             Fluid fluid = getFluidAboveSulfurSpikeChain(level, pos);
 
             if (fluid != Fluids.EMPTY) {
@@ -823,8 +733,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                             tipZ,
                             0.0D,
                             0.0D,
-                            0.0D
-                    );
+                            0.0D);
                 }
             }
         }
@@ -832,8 +741,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
     private Fluid getFluidAboveSulfurSpikeChain(
             LevelAccessor level,
-            BlockPos tipPos
-    ) {
+            BlockPos tipPos) {
         BlockPos checkPos = tipPos.above();
         BlockState checkState = level.getBlockState(checkPos);
 
@@ -863,17 +771,13 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     private void tryStalactiteGrowth(
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         BlockPos rootPos = pos;
         for (int i = 0; i < 11; i++) {
             BlockPos above = rootPos.above();
             BlockState aboveState = level.getBlockState(above);
-            if (
-                    aboveState.is(this) &&
-                            aboveState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    Direction.DOWN
-            ) {
+            if (aboveState.is(this) &&
+                    aboveState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.DOWN) {
                 rootPos = above;
             } else {
                 break;
@@ -900,11 +804,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
         for (int i = 0; i < 11; i++) {
             BlockPos below = tipPos.below();
             BlockState belowState = level.getBlockState(below);
-            if (
-                    belowState.is(this) &&
-                            belowState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    Direction.DOWN
-            ) {
+            if (belowState.is(this) &&
+                    belowState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.DOWN) {
                 tipPos = below;
             } else {
                 break;
@@ -918,34 +819,28 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
         BlockPos growPos = tipPos.below();
         if (level.getBlockState(growPos).isAir()) {
-            BlockState newTip =
-                    this.defaultBlockState()
-                            .setValue(BlockStateProperties.VERTICAL_DIRECTION, Direction.DOWN)
-                            .setValue(THICKNESS, DripstoneThickness.TIP);
+            BlockState newTip = this.defaultBlockState()
+                    .setValue(BlockStateProperties.VERTICAL_DIRECTION, Direction.DOWN)
+                    .setValue(THICKNESS, DripstoneThickness.TIP);
 
             level.setBlock(growPos, newTip, 3);
             level.setBlock(
                     tipPos,
                     tipState.setValue(THICKNESS, DripstoneThickness.FRUSTUM),
-                    2
-            );
+                    2);
         }
     }
 
     private void tryStalagmiteGrowth(
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         BlockPos tipPos = pos;
         for (int i = 0; i < 11; i++) {
             BlockPos above = tipPos.above();
             BlockState aboveState = level.getBlockState(above);
-            if (
-                    aboveState.is(this) &&
-                            aboveState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    Direction.UP
-            ) {
+            if (aboveState.is(this) &&
+                    aboveState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.UP) {
                 tipPos = above;
             } else {
                 break;
@@ -968,11 +863,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                 continue;
             }
 
-            if (
-                    searchState.is(this) &&
-                            searchState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    Direction.DOWN
-            ) {
+            if (searchState.is(this) &&
+                    searchState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.DOWN) {
                 stalactiteTipPos = searchPos;
             }
             break;
@@ -986,11 +878,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
         for (int i = 0; i < 11; i++) {
             BlockPos above = stalactiteRoot.above();
             BlockState aboveState = level.getBlockState(above);
-            if (
-                    aboveState.is(this) &&
-                            aboveState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                    Direction.DOWN
-            ) {
+            if (aboveState.is(this) &&
+                    aboveState.getValue(BlockStateProperties.VERTICAL_DIRECTION) == Direction.DOWN) {
                 stalactiteRoot = above;
             } else {
                 break;
@@ -1015,28 +904,24 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
 
         BlockPos growPos = tipPos.above();
         if (level.getBlockState(growPos).isAir()) {
-            BlockState newTip =
-                    this.defaultBlockState()
-                            .setValue(BlockStateProperties.VERTICAL_DIRECTION, Direction.UP)
-                            .setValue(THICKNESS, DripstoneThickness.TIP);
+            BlockState newTip = this.defaultBlockState()
+                    .setValue(BlockStateProperties.VERTICAL_DIRECTION, Direction.UP)
+                    .setValue(THICKNESS, DripstoneThickness.TIP);
 
             level.setBlock(growPos, newTip, 3);
             level.setBlock(
                     tipPos,
                     tipState.setValue(THICKNESS, DripstoneThickness.FRUSTUM),
-                    2
-            );
+                    2);
         }
     }
-
 
     @Override
     public VoxelShape getVisualShape(
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -1054,8 +939,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     public boolean propagatesSkylightDown(
             BlockState state,
             BlockGetter reader,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return true;
     }
 
@@ -1063,8 +947,7 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     public float getShadeBrightness(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return 1.0F;
     }
 
@@ -1072,11 +955,8 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 }

@@ -86,25 +86,35 @@ public class AdvancementEvents {
                     }
 
                     switch (path) {
-                        case "put_it_on_display" -> giveItemReward(serverPlayer, ModBlocks.ASHENKING_GOLD_PILLAR.get().asItem(), 1);
-                        case "columnist" -> giveItemReward(serverPlayer, ModBlocks.ASHENKING_EMERALD_PILLAR.get().asItem(), 1);
-                        case "art_collector" -> giveItemReward(serverPlayer, ModBlocks.ASHENKING_DIAMOND_PILLAR.get().asItem(), 1);
-                        case "buildscape_museum" -> giveItemReward(serverPlayer, ModBlocks.ASHENKING_NETHERITE_PILLAR.get().asItem(), 1);
+                        case "put_it_on_display" ->
+                            giveItemReward(serverPlayer, ModBlocks.ASHENKING_GOLD_PILLAR.get().asItem(), 1);
+                        case "columnist" ->
+                            giveItemReward(serverPlayer, ModBlocks.ASHENKING_EMERALD_PILLAR.get().asItem(), 1);
+                        case "art_collector" ->
+                            giveItemReward(serverPlayer, ModBlocks.ASHENKING_DIAMOND_PILLAR.get().asItem(), 1);
+                        case "buildscape_museum" ->
+                            giveItemReward(serverPlayer, ModBlocks.ASHENKING_NETHERITE_PILLAR.get().asItem(), 1);
                         case "ornamental" -> giveItemReward(serverPlayer, ModItems.BIG_ORNAMENT_TEMPLATE.get(), 1);
                         case "jar_ring_display" -> giveItemReward(serverPlayer, ModItems.GOLDEN_JAR_PATTERN.get(), 1);
-                        case "christmas_every_day" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_SNOWFALL.get(), 1);
+                        case "christmas_every_day" ->
+                            giveItemReward(serverPlayer, ModItems.MUSIC_DISC_SNOWFALL.get(), 1);
                         case "light_em_up" -> giveItemReward(serverPlayer, ModItems.STRINGLIGHT_FRAME_PATTERN.get(), 1);
-                        case "santas_little_helper" -> giveItemReward(serverPlayer, ModItems.FESTIVE_STAR_PATTERN.get(), 1);
+                        case "santas_little_helper" ->
+                            giveItemReward(serverPlayer, ModItems.FESTIVE_STAR_PATTERN.get(), 1);
                         case "grand_celebration" -> {
                             ItemStack reward = InfinitePhoenixFireworkStarItem.createDefaultStack();
                             if (!serverPlayer.getInventory().add(reward)) {
                                 serverPlayer.drop(reward, false);
                             }
                         }
-                        case "celebrate_in_style" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_CELEBRATION.get(), 1);
-                        case "a_very_buildscape_christmas" -> giveItemReward(serverPlayer, ModItems.FESTIVE_GLINT_SHARD.get(), 1);
-                        case "a_full_buildscape_cube" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_BUILDER.get(), 1);
-                        default -> {}
+                        case "celebrate_in_style" ->
+                            giveItemReward(serverPlayer, ModItems.MUSIC_DISC_CELEBRATION.get(), 1);
+                        case "a_very_buildscape_christmas" ->
+                            giveItemReward(serverPlayer, ModItems.FESTIVE_GLINT_SHARD.get(), 1);
+                        case "a_full_buildscape_cube" ->
+                            giveItemReward(serverPlayer, ModItems.MUSIC_DISC_BUILDER.get(), 1);
+                        default -> {
+                        }
                     }
 
                     if (!"a_full_buildscape_cube".equals(path) && !path.startsWith("recipes/")) {
@@ -161,8 +171,10 @@ public class AdvancementEvents {
 
             if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "one_more_block", 100, placedCount)) {
             } else if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "okay_one_more", 1000, placedCount)) {
-            } else if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "actually_one_last", 10000, placedCount)) {
-            } else if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "one_last_one_i_promise", 100000, placedCount)) {
+            } else if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "actually_one_last", 10000,
+                    placedCount)) {
+            } else if (AdvancementGrants.checkRelativeMilestone(serverPlayer, "one_last_one_i_promise", 100000,
+                    placedCount)) {
             }
         }
 
@@ -216,7 +228,8 @@ public class AdvancementEvents {
             serverPlayer.awardStat(ModStats.FROSTY_ROSES_PLACED);
             int radius = 3;
             int roseCount = 0;
-            for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
+            for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius),
+                    pos.offset(radius, radius, radius))) {
                 if (level.getBlockState(p).getBlock() instanceof FrostRoseBlock) {
                     roseCount++;
                 }
@@ -272,12 +285,14 @@ public class AdvancementEvents {
 
         int height = 1;
         BlockPos current = pos.below();
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock || level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock) {
+        while (level.getBlockState(current).getBlock() instanceof PillarBlock
+                || level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock) {
             height++;
             current = current.below();
         }
         current = pos.above();
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock || level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock) {
+        while (level.getBlockState(current).getBlock() instanceof PillarBlock
+                || level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock) {
             height++;
             current = current.above();
         }

@@ -44,10 +44,12 @@ public class SculkSoundsTest {
         }
         for (String event : new String[]{"block.sculk_catalyst.bloom", "block.sculk.spread", "block.sculk.charge"}) {
             for (JsonElement element : sounds.getAsJsonObject(event).getAsJsonArray("sounds")) {
-                String name = element.isJsonPrimitive() ? element.getAsString()
+                String name = element.isJsonPrimitive()
+                        ? element.getAsString()
                         : element.getAsJsonObject().get("name").getAsString();
                 if (name.startsWith("buildscape:")) {
-                    try (InputStream stream = resource(ROOT + "sounds/" + name.substring("buildscape:".length()) + ".ogg")) {
+                    try (InputStream stream = resource(
+                            ROOT + "sounds/" + name.substring("buildscape:".length()) + ".ogg")) {
                         assertTrue("empty sound: " + name, stream.read() != -1);
                     }
                 }

@@ -21,111 +21,79 @@ import net.minecraftforge.registries.RegistryObject;
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEntities {
 
-    public static final DeferredRegister<EntityType<?>> ENTITIES =
-            DeferredRegister.create(ForgeRegistries.ENTITIES, BuildScape.MODID);
+    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITIES,
+            BuildScape.MODID);
 
-    public static final RegistryObject<
-            EntityType<FallingIcicleEntity>
-            > FALLING_ICICLE = ENTITIES.register("falling_icicle", () ->
-            EntityType.Builder.<FallingIcicleEntity>of(
-                            FallingIcicleEntity::new,
-                            MobCategory.MISC
-                    )
+    public static final RegistryObject<EntityType<FallingIcicleEntity>> FALLING_ICICLE = ENTITIES
+            .register("falling_icicle", () -> EntityType.Builder.<FallingIcicleEntity>of(
+                    FallingIcicleEntity::new,
+                    MobCategory.MISC)
                     .sized(0.98F, 0.98F)
                     .clientTrackingRange(10)
                     .updateInterval(20)
-                    .build("falling_icicle")
-    );
+                    .build("falling_icicle"));
 
-    public static final RegistryObject<
-            EntityType<FestiveStockingEntity>
-            > FESTIVE_STOCKING = ENTITIES.register("festive_stocking", () ->
-            EntityType.Builder.<FestiveStockingEntity>of(
-                            FestiveStockingEntity::new,
-                            MobCategory.MISC
-                    )
+    public static final RegistryObject<EntityType<FestiveStockingEntity>> FESTIVE_STOCKING = ENTITIES
+            .register("festive_stocking", () -> EntityType.Builder.<FestiveStockingEntity>of(
+                    FestiveStockingEntity::new,
+                    MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .clientTrackingRange(10)
                     .updateInterval(20)
-                    .build("festive_stocking")
-    );
+                    .build("festive_stocking"));
 
-    public static final RegistryObject<
-            EntityType<MangroveBoatEntity>
-            > MANGROVE_BOAT = ENTITIES.register("mangrove_boat", () ->
-            EntityType.Builder.<MangroveBoatEntity>of(
-                            MangroveBoatEntity::new,
-                            MobCategory.MISC
-                    )
+    public static final RegistryObject<EntityType<MangroveBoatEntity>> MANGROVE_BOAT = ENTITIES
+            .register("mangrove_boat", () -> EntityType.Builder.<MangroveBoatEntity>of(
+                    MangroveBoatEntity::new,
+                    MobCategory.MISC)
                     .sized(1.375F, 0.5625F)
                     .clientTrackingRange(10)
                     .updateInterval(3)
-                    .build("mangrove_boat")
-    );
+                    .build("mangrove_boat"));
 
-    public static final RegistryObject<
-            EntityType<ColoredItemFrameEntity>
-            > COLORED_ITEM_FRAME = ENTITIES.register("colored_item_frame", () ->
-            EntityType.Builder.<ColoredItemFrameEntity>of(
-                            ColoredItemFrameEntity::new,
-                            MobCategory.MISC
-                    )
+    public static final RegistryObject<EntityType<ColoredItemFrameEntity>> COLORED_ITEM_FRAME = ENTITIES
+            .register("colored_item_frame", () -> EntityType.Builder.<ColoredItemFrameEntity>of(
+                    ColoredItemFrameEntity::new,
+                    MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .clientTrackingRange(10)
                     .updateInterval(20)
-                    .build("colored_item_frame")
-    );
-    public static final RegistryObject<
-            EntityType<SeatEntity>
-            > SEAT_ENTITY = ENTITIES.register("seat", () ->
-            EntityType.Builder.<SeatEntity>of(
-                            SeatEntity::new,
-                            MobCategory.MISC
-                    )
+                    .build("colored_item_frame"));
+    public static final RegistryObject<EntityType<SeatEntity>> SEAT_ENTITY = ENTITIES.register("seat",
+            () -> EntityType.Builder.<SeatEntity>of(
+                    SeatEntity::new,
+                    MobCategory.MISC)
                     .sized(0.1F, 0.1F)
                     .clientTrackingRange(10)
                     .updateInterval(20)
-                    .build("seat")
-    );
+                    .build("seat"));
 
-    public static final RegistryObject<
-            EntityType<PoplarBoatEntity>
-            > POPLAR_BOAT = ENTITIES.register("poplar_boat", () ->
-            EntityType.Builder.<PoplarBoatEntity>of(
-                            PoplarBoatEntity::new,
-                            MobCategory.MISC
-                    )
+    public static final RegistryObject<EntityType<PoplarBoatEntity>> POPLAR_BOAT = ENTITIES.register("poplar_boat",
+            () -> EntityType.Builder.<PoplarBoatEntity>of(
+                    PoplarBoatEntity::new,
+                    MobCategory.MISC)
                     .sized(1.375F, 0.5625F)
                     .clientTrackingRange(10)
                     .updateInterval(3)
-                    .build("poplar_boat")
-    );
+                    .build("poplar_boat"));
 
-    public static final RegistryObject<
-            EntityType<WanderingHomemakerEntity>
-            > WANDERING_HOMEMAKER = ENTITIES.register("wandering_homemaker", () ->
-            EntityType.Builder.<WanderingHomemakerEntity>of(
-                            WanderingHomemakerEntity::new,
-                            MobCategory.CREATURE
-                    )
+    public static final RegistryObject<EntityType<WanderingHomemakerEntity>> WANDERING_HOMEMAKER = ENTITIES
+            .register("wandering_homemaker", () -> EntityType.Builder.<WanderingHomemakerEntity>of(
+                    WanderingHomemakerEntity::new,
+                    MobCategory.CREATURE)
                     .sized(0.6F, 1.95F)
                     .clientTrackingRange(10)
                     .updateInterval(3)
-                    .build("wandering_homemaker")
-    );
+                    .build("wandering_homemaker"));
 
-    public static final RegistryObject<
-            EntityType<FestiveWanderingHomemakerEntity>
-            > FESTIVE_WANDERING_HOMEMAKER = ENTITIES.register("festive_wandering_homemaker", () ->
-            EntityType.Builder.<FestiveWanderingHomemakerEntity>of(
-                            FestiveWanderingHomemakerEntity::new,
-                            MobCategory.CREATURE
-                    )
+    public static final RegistryObject<EntityType<FestiveWanderingHomemakerEntity>> FESTIVE_WANDERING_HOMEMAKER = ENTITIES
+            .register("festive_wandering_homemaker", () -> EntityType.Builder.<FestiveWanderingHomemakerEntity>of(
+                    FestiveWanderingHomemakerEntity::new,
+                    MobCategory.CREATURE)
                     .sized(0.6F, 1.95F)
                     .clientTrackingRange(10)
                     .updateInterval(3)
-                    .build("festive_wandering_homemaker")
-    );
+                    .build("festive_wandering_homemaker"));
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {

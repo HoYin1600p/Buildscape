@@ -31,7 +31,8 @@ public class CakeParticle extends TextureSheetParticle {
         }
     }
 
-    protected CakeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+    protected CakeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed,
+            SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
 
@@ -131,7 +132,8 @@ public class CakeParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z,
+                double xSpeed, double ySpeed, double zSpeed) {
             return new CakeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }

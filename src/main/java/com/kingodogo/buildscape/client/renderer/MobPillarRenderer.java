@@ -84,8 +84,7 @@ public class MobPillarRenderer {
             int combinedLight,
             float rotation,
             float gameTime,
-            float facingYaw
-    ) {
+            float facingYaw) {
         if (spawnEgg == null || level == null || pos == null) {
             return;
         }
@@ -96,7 +95,8 @@ public class MobPillarRenderer {
         }
 
         if (state.parsedStates.contains("giant") &&
-                (entityType == EntityType.ZOMBIE || entityType == EntityType.HUSK || entityType == EntityType.DROWNED)) {
+                (entityType == EntityType.ZOMBIE || entityType == EntityType.HUSK
+                        || entityType == EntityType.DROWNED)) {
             entityType = EntityType.GIANT;
         }
 
@@ -127,8 +127,9 @@ public class MobPillarRenderer {
 
             updateEntityTransform(entity, pos, facingYaw, rotation, gameTime, state);
 
-            boolean isJeb = entity.getType() == EntityType.SHEEP && (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb"));
-            float renderPartialTicks = isJeb ? (float)((gameTime * 20.0f) % 1.0f) : 0.0f;
+            boolean isJeb = entity.getType() == EntityType.SHEEP
+                    && (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb"));
+            float renderPartialTicks = isJeb ? (float) ((gameTime * 20.0f) % 1.0f) : 0.0f;
 
             renderEntity(entity, poseStack, bufferSource, combinedLight, renderPartialTicks, state);
         }
@@ -362,8 +363,8 @@ public class MobPillarRenderer {
             nbt.putBoolean("IsBaby", false);
         }
 
-
-        boolean isTameable = entityTypeName.equals("wolf") || entityTypeName.equals("cat") || entityTypeName.equals("parrot");
+        boolean isTameable = entityTypeName.equals("wolf") || entityTypeName.equals("cat")
+                || entityTypeName.equals("parrot");
         if (isTameable) {
             if (state.tamed) {
                 if (!nbt.hasUUID(NbtKeys.OWNER)) {
@@ -374,7 +375,6 @@ public class MobPillarRenderer {
             }
             nbt.putBoolean("Sitting", state.sitting);
         }
-
 
         if (state.saddled) {
             nbt.putBoolean("Saddle", true);
@@ -394,7 +394,6 @@ public class MobPillarRenderer {
             }
         }
 
-
         if (entityTypeName.equals("cat")) {
             int catType = getCatType(state);
             if (catType >= 0) {
@@ -406,8 +405,7 @@ public class MobPillarRenderer {
         } else if (entityTypeName.equals("wolf")) {
             if (state.angry) {
                 nbt.putInt(NbtKeys.ANGER_TIME, 999999);
-            }
-            else {
+            } else {
                 nbt.putInt(NbtKeys.ANGER_TIME, 0);
             }
             if (state.tamed) {
@@ -460,7 +458,8 @@ public class MobPillarRenderer {
             }
             nbt.putBoolean("Sitting", state.sitting);
             nbt.putBoolean("Sleeping", state.parsedStates.contains("sleeping") || state.parsedStates.contains("sleep"));
-            nbt.putBoolean("Crouching", state.parsedStates.contains("crouching") || state.parsedStates.contains("crouch"));
+            nbt.putBoolean("Crouching",
+                    state.parsedStates.contains("crouching") || state.parsedStates.contains("crouch"));
         } else if (entityTypeName.equals("mooshroom")) {
             String type = getMooshroomType(state);
             if (type != null) {
@@ -473,7 +472,8 @@ public class MobPillarRenderer {
                 nbt.putString("HiddenGene", gene);
             }
         } else if (entityTypeName.equals("goat")) {
-            nbt.putBoolean("IsScreamingGoat", state.parsedStates.contains("screaming") || state.parsedStates.contains("scream"));
+            nbt.putBoolean("IsScreamingGoat",
+                    state.parsedStates.contains("screaming") || state.parsedStates.contains("scream"));
             if (state.parsedStates.contains("no_horns") || state.parsedStates.contains("nohorns")) {
                 nbt.putBoolean("HasLeftHorn", false);
                 nbt.putBoolean("HasRightHorn", false);
@@ -484,8 +484,7 @@ public class MobPillarRenderer {
         } else if (entityTypeName.equals("bee")) {
             if (state.angry) {
                 nbt.putInt(NbtKeys.ANGER_TIME, 999999);
-            }
-            else {
+            } else {
                 nbt.putInt(NbtKeys.ANGER_TIME, 0);
             }
             nbt.putBoolean("HasNectar", state.parsedStates.contains("nectar"));
@@ -504,7 +503,8 @@ public class MobPillarRenderer {
             if (genericColor >= 0) {
                 nbt.putInt("DecorColor", genericColor);
             }
-        } else if (entityTypeName.contains("horse") || entityTypeName.equals("donkey") || entityTypeName.equals("mule")) {
+        } else if (entityTypeName.contains("horse") || entityTypeName.equals("donkey")
+                || entityTypeName.equals("mule")) {
             if (entityTypeName.equals("horse")) {
                 int variant = getHorseVariant(state);
                 if (variant >= 0) {
@@ -559,38 +559,30 @@ public class MobPillarRenderer {
             String type = "oak";
             if (state.parsedStates.contains("spruce")) {
                 type = "spruce";
-            }
-            else if (state.parsedStates.contains("birch")) {
+            } else if (state.parsedStates.contains("birch")) {
                 type = "birch";
-            }
-            else if (state.parsedStates.contains("jungle")) {
+            } else if (state.parsedStates.contains("jungle")) {
                 type = "jungle";
-            }
-            else if (state.parsedStates.contains("acacia")) {
+            } else if (state.parsedStates.contains("acacia")) {
                 type = "acacia";
-            }
-            else if (state.parsedStates.contains("dark_oak") || state.parsedStates.contains("darkoak")) {
+            } else if (state.parsedStates.contains("dark_oak") || state.parsedStates.contains("darkoak")) {
                 type = "dark_oak";
-            }
-            else if (state.parsedStates.contains("mangrove")) {
+            } else if (state.parsedStates.contains("mangrove")) {
                 type = "mangrove";
             }
             nbt.putString(NbtKeys.TYPE, type);
-        } else if (entityTypeName.equals("slime") || entityTypeName.equals("magma_cube") || entityTypeName.equals("phantom")) {
+        } else if (entityTypeName.equals("slime") || entityTypeName.equals("magma_cube")
+                || entityTypeName.equals("phantom")) {
             int size = 1;
             if (state.parsedStates.contains("tiny")) {
                 size = 0;
-            }
-            else if (state.parsedStates.contains("small")) {
+            } else if (state.parsedStates.contains("small")) {
                 size = 1;
-            }
-            else if (state.parsedStates.contains("medium")) {
+            } else if (state.parsedStates.contains("medium")) {
                 size = 2;
-            }
-            else if (state.parsedStates.contains("large")) {
+            } else if (state.parsedStates.contains("large")) {
                 size = 4;
-            }
-            else if (state.parsedStates.contains("huge") || state.parsedStates.contains("giant")) {
+            } else if (state.parsedStates.contains("huge") || state.parsedStates.contains("giant")) {
                 size = 8;
             }
 
@@ -602,44 +594,34 @@ public class MobPillarRenderer {
         } else if (entityTypeName.equals("tropical_fish")) {
             if (state.parsedStates.contains("kob")) {
                 nbt.putInt(NbtKeys.VARIANT, 65536);
-            }
-            else if (state.parsedStates.contains("sunstreak")) {
+            } else if (state.parsedStates.contains("sunstreak")) {
                 nbt.putInt(NbtKeys.VARIANT, 131072);
-            }
-            else if (state.parsedStates.contains("snooper")) {
+            } else if (state.parsedStates.contains("snooper")) {
                 nbt.putInt(NbtKeys.VARIANT, 196608);
-            }
-            else if (state.parsedStates.contains("dasher")) {
+            } else if (state.parsedStates.contains("dasher")) {
                 nbt.putInt(NbtKeys.VARIANT, 262144);
-            }
-            else if (state.parsedStates.contains("brinely")) {
+            } else if (state.parsedStates.contains("brinely")) {
                 nbt.putInt(NbtKeys.VARIANT, 327680);
-            }
-            else if (state.parsedStates.contains("spotty")) {
+            } else if (state.parsedStates.contains("spotty")) {
                 nbt.putInt(NbtKeys.VARIANT, 393216);
-            }
-            else if (state.parsedStates.contains("flopper")) {
+            } else if (state.parsedStates.contains("flopper")) {
                 nbt.putInt(NbtKeys.VARIANT, 458752);
-            }
-            else if (state.parsedStates.contains("stripey")) {
+            } else if (state.parsedStates.contains("stripey")) {
                 nbt.putInt(NbtKeys.VARIANT, 524288);
-            }
-            else if (state.parsedStates.contains("glitter")) {
+            } else if (state.parsedStates.contains("glitter")) {
                 nbt.putInt(NbtKeys.VARIANT, 589824);
-            }
-            else if (state.parsedStates.contains("blockfish")) {
+            } else if (state.parsedStates.contains("blockfish")) {
                 nbt.putInt(NbtKeys.VARIANT, 655360);
-            }
-            else if (state.parsedStates.contains("betty")) {
+            } else if (state.parsedStates.contains("betty")) {
                 nbt.putInt(NbtKeys.VARIANT, 720896);
-            }
-            else if (state.parsedStates.contains("clayfish")) {
+            } else if (state.parsedStates.contains("clayfish")) {
                 nbt.putInt(NbtKeys.VARIANT, 786432);
             }
         } else if (entityTypeName.equals("armor_stand")) {
             nbt.putBoolean("ShowArms", state.parsedStates.contains("arms") || state.parsedStates.contains("show_arms"));
             nbt.putBoolean("Small", state.parsedStates.contains("small") || state.baby);
-            nbt.putBoolean(NbtKeys.NO_BASE_PLATE, state.parsedStates.contains("no_base") || state.parsedStates.contains("nobase"));
+            nbt.putBoolean(NbtKeys.NO_BASE_PLATE,
+                    state.parsedStates.contains("no_base") || state.parsedStates.contains("nobase"));
         } else if (entityTypeName.equals("end_crystal")) {
             nbt.putBoolean("ShowBottom", !state.parsedStates.contains("no_bottom"));
         } else if (entityTypeName.equals("wither")) {
@@ -658,8 +640,7 @@ public class MobPillarRenderer {
             int puffState = 0;
             if (state.parsedStates.contains("half")) {
                 puffState = 1;
-            }
-            else if (state.parsedStates.contains("full") || state.parsedStates.contains("puff")) {
+            } else if (state.parsedStates.contains("full") || state.parsedStates.contains("puff")) {
                 puffState = 2;
             }
             nbt.putInt("PuffState", puffState);
@@ -724,7 +705,6 @@ public class MobPillarRenderer {
         return null;
     }
 
-
     private static void updateEntityFromState(Entity entity, MobState state) {
         try {
             CompoundTag nbt = new CompoundTag();
@@ -735,7 +715,6 @@ public class MobPillarRenderer {
         } catch (Exception e) {
         }
     }
-
 
     private static int getCatType(MobState state) {
         if (state.parsedStates.contains("tabby")) {
@@ -981,8 +960,7 @@ public class MobPillarRenderer {
             float facingYaw,
             float rotation,
             float gameTime,
-            MobState state
-    ) {
+            MobState state) {
         float finalYaw = facingYaw;
         if (state.upsideDown) {
             finalYaw = (finalYaw + 180.0f) % 360.0f;
@@ -1011,8 +989,9 @@ public class MobPillarRenderer {
         float bobAmount = (float) Math.sin(gameTime * 2.0f) * 0.05f;
         float baseY = pos.getY() + 1.125f;
 
-        if (entity.getType() == EntityType.SHEEP && (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb"))) {
-            entity.tickCount = (int)(gameTime * 20);
+        if (entity.getType() == EntityType.SHEEP
+                && (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb"))) {
+            entity.tickCount = (int) (gameTime * 20);
         } else {
             entity.tickCount = 0;
             if (entity instanceof LivingEntity livingEntity) {
@@ -1041,8 +1020,7 @@ public class MobPillarRenderer {
             MultiBufferSource bufferSource,
             int combinedLight,
             float partialTicks,
-            MobState state
-    ) {
+            MobState state) {
         float entityWidth = entity.getBbWidth();
         float entityHeight = entity.getBbHeight();
         float scale;
@@ -1111,11 +1089,11 @@ public class MobPillarRenderer {
                     partialTicks,
                     poseStack,
                     entityBuffers,
-                    combinedLight
-            );
+                    combinedLight);
 
             if (state.fire || entity.displayFireAnimation()) {
-                ((PillarEntityRenderDispatcherInvoker) dispatcher).buildscape$renderFlame(poseStack, bufferSource, entity);
+                ((PillarEntityRenderDispatcherInvoker) dispatcher).buildscape$renderFlame(poseStack, bufferSource,
+                        entity);
             }
 
             poseStack.popPose();

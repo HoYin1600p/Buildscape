@@ -80,7 +80,6 @@ public class ClientParticleSetup {
                 sprites -> new ColoredSmokeParticle.Provider(
                         sprites));
 
-
         Minecraft.getInstance().particleEngine.register(
                 ModParticles.TINTABLE_HEART.get(),
                 sprites -> new TintableHeartParticle.Provider(
@@ -96,76 +95,48 @@ public class ClientParticleSetup {
                 sprites -> new CherryParticle.Provider(
                         sprites));
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.CASCADE.get(),
-                        sprites ->
-                                new CascadeParticle.Provider(
-                                        sprites
-                                )
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.CASCADE.get(),
+                sprites -> new CascadeParticle.Provider(
+                        sprites));
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.NOXIOUS_GAS.get(),
-                        sprites ->
-                                new NoxiousGasParticle.Provider(
-                                        sprites
-                                )
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.NOXIOUS_GAS.get(),
+                sprites -> new NoxiousGasParticle.Provider(
+                        sprites));
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.FIREFLY.get(),
-                        sprites ->
-                                new FireflyParticle.Provider(
-                                        sprites
-                                )
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.FIREFLY.get(),
+                sprites -> new FireflyParticle.Provider(
+                        sprites));
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.HAZE.get(),
-                        sprites ->
-                                new HazeParticle.Provider(
-                                        sprites
-                                )
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.HAZE.get(),
+                sprites -> new HazeParticle.Provider(
+                        sprites));
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.SULFUR_BUBBLES.get(),
-                        SulfurBubbleParticle.Provider::new
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.SULFUR_BUBBLES.get(),
+                SulfurBubbleParticle.Provider::new);
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.GEYSER.get(),
-                        new GeyserEruptionParticle.Provider()
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.GEYSER.get(),
+                new GeyserEruptionParticle.Provider());
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.GEYSER_BASE.get(),
-                        GeyserBaseParticle.Provider::new
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.GEYSER_BASE.get(),
+                GeyserBaseParticle.Provider::new);
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.GEYSER_POOF.get(),
-                        GeyserBaseParticle.Provider::new
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.GEYSER_POOF.get(),
+                GeyserBaseParticle.Provider::new);
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.GEYSER_PLUME.get(),
-                        GeyserPlumeParticle.Provider::new
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.GEYSER_PLUME.get(),
+                GeyserPlumeParticle.Provider::new);
 
-        Minecraft.getInstance()
-                .particleEngine.register(
-                        ModParticles.XP_PARTICLE.get(),
-                        sprites -> new XpParticle.Provider(sprites)
-                );
+        Minecraft.getInstance().particleEngine.register(
+                ModParticles.XP_PARTICLE.get(),
+                sprites -> new XpParticle.Provider(sprites));
     }
 }

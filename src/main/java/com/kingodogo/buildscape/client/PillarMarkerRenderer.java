@@ -22,11 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.Map;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class PillarMarkerRenderer {
     private static final double MAX_RENDER_DISTANCE = 64.0;
 
@@ -60,8 +56,8 @@ public class PillarMarkerRenderer {
             }
 
             String dimension = level.dimension().location().toString();
-            Map<String, PillarMarkerManager.MarkedPillar> markedPillars =
-                PillarMarkerManager.get().getMarkedPillars(dimension);
+            Map<String, PillarMarkerManager.MarkedPillar> markedPillars = PillarMarkerManager.get()
+                    .getMarkedPillars(dimension);
 
             if (markedPillars == null || markedPillars.isEmpty()) {
                 return;
@@ -161,29 +157,41 @@ public class PillarMarkerRenderer {
 
         float gradientProgress = marked.getGradientProgress();
         int r = 255;
-        int g = (int)(255 * (1.0f - gradientProgress));
+        int g = (int) (255 * (1.0f - gradientProgress));
         int b = 0;
-        r = (int)(r * alpha);
-        g = (int)(g * alpha);
-        b = (int)(b * alpha);
+        r = (int) (r * alpha);
+        g = (int) (g * alpha);
+        b = (int) (b * alpha);
         int color = (r << 24) | (g << 16) | (b << 8) | 0xFF;
 
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
 
-        drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, minY + offsetY, minZ + offsetZ, color);
-        drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, minY + offsetY, maxZ + offsetZ, color);
-        drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, minY + offsetY, maxZ + offsetZ, color);
-        drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, minY + offsetY, minZ + offsetZ, color);
+        drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, minY + offsetY,
+                minZ + offsetZ, color);
+        drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, minY + offsetY,
+                maxZ + offsetZ, color);
+        drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, minY + offsetY,
+                maxZ + offsetZ, color);
+        drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, minY + offsetY,
+                minZ + offsetZ, color);
 
-        drawLine(buffer, poseStack, minX + offsetX, maxY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY, minZ + offsetZ, color);
-        drawLine(buffer, poseStack, maxX + offsetX, maxY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY, maxZ + offsetZ, color);
-        drawLine(buffer, poseStack, maxX + offsetX, maxY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY, maxZ + offsetZ, color);
-        drawLine(buffer, poseStack, minX + offsetX, maxY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY, minZ + offsetZ, color);
+        drawLine(buffer, poseStack, minX + offsetX, maxY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY,
+                minZ + offsetZ, color);
+        drawLine(buffer, poseStack, maxX + offsetX, maxY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY,
+                maxZ + offsetZ, color);
+        drawLine(buffer, poseStack, maxX + offsetX, maxY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY,
+                maxZ + offsetZ, color);
+        drawLine(buffer, poseStack, minX + offsetX, maxY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY,
+                minZ + offsetZ, color);
 
-        drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, minZ + offsetZ, minX + offsetX, maxY + offsetY, minZ + offsetZ, color);
-        drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY, minZ + offsetZ, color);
-        drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, maxZ + offsetZ, maxX + offsetX, maxY + offsetY, maxZ + offsetZ, color);
-        drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY, maxZ + offsetZ, color);
+        drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, minZ + offsetZ, minX + offsetX, maxY + offsetY,
+                minZ + offsetZ, color);
+        drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY,
+                minZ + offsetZ, color);
+        drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, maxZ + offsetZ, maxX + offsetX, maxY + offsetY,
+                maxZ + offsetZ, color);
+        drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY,
+                maxZ + offsetZ, color);
 
         bufferSource.endBatch(RenderType.lines());
         poseStack.popPose();
@@ -199,15 +207,14 @@ public class PillarMarkerRenderer {
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
 
-        buffer.vertex(pose, (float)x1, (float)y1, (float)z1)
-            .color(r, g, b, a)
-            .normal(normal, 0, 1, 0)
-            .endVertex();
-        buffer.vertex(pose, (float)x2, (float)y2, (float)z2)
-            .color(r, g, b, a)
-            .normal(normal, 0, 1, 0)
-            .endVertex();
+        buffer.vertex(pose, (float) x1, (float) y1, (float) z1)
+                .color(r, g, b, a)
+                .normal(normal, 0, 1, 0)
+                .endVertex();
+        buffer.vertex(pose, (float) x2, (float) y2, (float) z2)
+                .color(r, g, b, a)
+                .normal(normal, 0, 1, 0)
+                .endVertex();
     }
 
 }
-

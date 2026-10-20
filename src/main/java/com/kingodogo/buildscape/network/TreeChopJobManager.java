@@ -29,8 +29,7 @@ public final class TreeChopJobManager {
     private static final int MAX_BATCH_SIZE = 8;
     private static final Map<UUID, TreeChopJob> JOBS = new HashMap<>();
 
-    private TreeChopJobManager() {
-    }
+    private TreeChopJobManager() {}
 
     public static void start(ServerPlayer player, ServerLevel level, Block targetBlock, Iterable<BlockPos> blocks) {
         List<BlockPos> positions = new ArrayList<>();

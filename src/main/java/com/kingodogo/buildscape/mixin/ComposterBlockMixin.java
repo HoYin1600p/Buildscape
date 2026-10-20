@@ -38,12 +38,14 @@ public abstract class ComposterBlockMixin extends Block {
     }
 
     @Inject(method = "createBlockStateDefinition", at = @At("TAIL"))
-    protected void buildscape$createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder, CallbackInfo ci) {
+    protected void buildscape$createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder,
+            CallbackInfo ci) {
         pBuilder.add(PlanterHelper.PLANTER);
     }
 
     @Override
-    public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, Direction facing, IPlantable plantable) {
+    public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, Direction facing,
+            IPlantable plantable) {
         if (state.hasProperty(PlanterHelper.PLANTER) && state.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {
             return true;
         }
@@ -51,7 +53,8 @@ public abstract class ComposterBlockMixin extends Block {
     }
 
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
-    public void buildscape$use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
+    public void buildscape$use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
         if (state.hasProperty(PlanterHelper.PLANTER)) {
             PlanterType planter = state.getValue(PlanterHelper.PLANTER);
             if (planter != PlanterType.NONE) {
@@ -67,53 +70,37 @@ public abstract class ComposterBlockMixin extends Block {
 
                     if (block == Blocks.DIRT) {
                         newType = PlanterType.DIRT;
-                    }
-                    else if (block == Blocks.COARSE_DIRT) {
+                    } else if (block == Blocks.COARSE_DIRT) {
                         newType = PlanterType.COARSE_DIRT;
-                    }
-                    else if (block == ModBlocks.MUD.get()) {
+                    } else if (block == ModBlocks.MUD.get()) {
                         newType = PlanterType.MUD;
-                    }
-                    else if (block == Blocks.MOSS_BLOCK) {
+                    } else if (block == Blocks.MOSS_BLOCK) {
                         newType = PlanterType.MOSS_BLOCK;
-                    }
-                    else if (block == Blocks.ROOTED_DIRT) {
+                    } else if (block == Blocks.ROOTED_DIRT) {
                         newType = PlanterType.ROOTED_DIRT;
-                    }
-                    else if (block == ModBlocks.RED_MOSS_BLOCK.get()) {
+                    } else if (block == ModBlocks.RED_MOSS_BLOCK.get()) {
                         newType = PlanterType.RED_MOSS_BLOCK;
-                    }
-                    else if (block == ModBlocks.YELLOW_MOSS_BLOCK.get()) {
+                    } else if (block == ModBlocks.YELLOW_MOSS_BLOCK.get()) {
                         newType = PlanterType.YELLOW_MOSS_BLOCK;
-                    }
-                    else if (block == ModBlocks.ORANGE_MOSS_BLOCK.get()) {
+                    } else if (block == ModBlocks.ORANGE_MOSS_BLOCK.get()) {
                         newType = PlanterType.ORANGE_MOSS_BLOCK;
-                    }
-                    else if (block == ModBlocks.PALE_MOSS_BLOCK.get()) {
+                    } else if (block == ModBlocks.PALE_MOSS_BLOCK.get()) {
                         newType = PlanterType.PALE_MOSS_BLOCK;
-                    }
-                    else if (block == ModBlocks.MUDDY_MANGROVE_ROOTS.get()) {
+                    } else if (block == ModBlocks.MUDDY_MANGROVE_ROOTS.get()) {
                         newType = PlanterType.MUDDY_MANGROVE_ROOTS;
-                    }
-                    else if (block == Blocks.GRASS_BLOCK) {
+                    } else if (block == Blocks.GRASS_BLOCK) {
                         newType = PlanterType.GRASS_BLOCK;
-                    }
-                    else if (block == ModBlocks.SNOWY_GRASS_BLOCK.get()) {
+                    } else if (block == ModBlocks.SNOWY_GRASS_BLOCK.get()) {
                         newType = PlanterType.SNOWY_GRASS_BLOCK;
-                    }
-                    else if (block == Blocks.MYCELIUM) {
+                    } else if (block == Blocks.MYCELIUM) {
                         newType = PlanterType.MYCELIUM;
-                    }
-                    else if (block == Blocks.PODZOL) {
+                    } else if (block == Blocks.PODZOL) {
                         newType = PlanterType.PODZOL;
-                    }
-                    else if (block == Blocks.CRIMSON_NYLIUM) {
+                    } else if (block == Blocks.CRIMSON_NYLIUM) {
                         newType = PlanterType.CRIMSON_NYLIUM;
-                    }
-                    else if (block == Blocks.WARPED_NYLIUM) {
+                    } else if (block == Blocks.WARPED_NYLIUM) {
                         newType = PlanterType.WARPED_NYLIUM;
-                    }
-                    else if (block == Blocks.SAND) {
+                    } else if (block == Blocks.SAND) {
                         newType = PlanterType.SAND;
                     }
 
@@ -129,7 +116,8 @@ public abstract class ComposterBlockMixin extends Block {
                             level.setBlock(pos, state.setValue(PlanterHelper.PLANTER, newType), 3);
 
                             SoundType soundType = block.getSoundType(block.defaultBlockState(), level, pos, player);
-                            level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+                            level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS,
+                                    (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
 
                             if (!player.getAbilities().instabuild) {
                                 heldItem.shrink(1);
@@ -144,51 +132,69 @@ public abstract class ComposterBlockMixin extends Block {
 
     @Inject(method = "getContainer", at = @At("HEAD"), cancellable = true)
     private void buildscape$disablePlanterAutomation(BlockState state, LevelAccessor level, BlockPos pos,
-                                                     CallbackInfoReturnable<WorldlyContainer> cir) {
+            CallbackInfoReturnable<WorldlyContainer> cir) {
         if (state.hasProperty(PlanterHelper.PLANTER) && state.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {
             cir.setReturnValue(new WorldlyContainer() {
                 @Override
-                public int[] getSlotsForFace(Direction side) { return new int[0]; }
+                public int[] getSlotsForFace(Direction side) {
+                    return new int[0];
+                }
 
                 @Override
-                public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction side) { return false; }
+                public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction side) {
+                    return false;
+                }
 
                 @Override
-                public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) { return false; }
+                public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
+                    return false;
+                }
 
                 @Override
-                public int getContainerSize() { return 0; }
+                public int getContainerSize() {
+                    return 0;
+                }
 
                 @Override
-                public boolean isEmpty() { return true; }
+                public boolean isEmpty() {
+                    return true;
+                }
 
                 @Override
-                public ItemStack getItem(int slot) { return ItemStack.EMPTY; }
+                public ItemStack getItem(int slot) {
+                    return ItemStack.EMPTY;
+                }
 
                 @Override
-                public ItemStack removeItem(int slot, int count) { return ItemStack.EMPTY; }
+                public ItemStack removeItem(int slot, int count) {
+                    return ItemStack.EMPTY;
+                }
 
                 @Override
-                public ItemStack removeItemNoUpdate(int slot) { return ItemStack.EMPTY; }
+                public ItemStack removeItemNoUpdate(int slot) {
+                    return ItemStack.EMPTY;
+                }
 
                 @Override
-                public void setItem(int slot, ItemStack stack) { }
+                public void setItem(int slot, ItemStack stack) {}
 
                 @Override
-                public void setChanged() { }
+                public void setChanged() {}
 
                 @Override
-                public boolean stillValid(Player player) { return true; }
+                public boolean stillValid(Player player) {
+                    return true;
+                }
 
                 @Override
-                public void clearContent() { }
+                public void clearContent() {}
             });
         }
     }
 
-
     @Override
-    public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos pos, BlockPos facingPos) {
+    public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level,
+            BlockPos pos, BlockPos facingPos) {
         if (facing == Direction.UP && state.hasProperty(PlanterHelper.PLANTER)) {
             PlanterType planter = state.getValue(PlanterHelper.PLANTER);
             if (planter == PlanterType.GRASS_BLOCK || planter == PlanterType.SNOWY_GRASS_BLOCK) {

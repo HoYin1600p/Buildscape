@@ -58,14 +58,17 @@ public class ConfigAssembly {
             NetworkPacketLimits.checkCount(data.items.size(), NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
             buffer.writeInt(data.items.size());
             for (String item : data.items) {
-                NetworkPacketLimits.writeUtf(buffer, item, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item");
+                NetworkPacketLimits.writeUtf(buffer, item, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                        "configured item");
             }
         }
         if (settings.contains(ConfigSetting.COLORS)) {
-            NetworkPacketLimits.checkCount(data.particle_color.size(), NetworkPacketLimits.MAX_DYE_COLORS, "particle color");
+            NetworkPacketLimits.checkCount(data.particle_color.size(), NetworkPacketLimits.MAX_DYE_COLORS,
+                    "particle color");
             buffer.writeInt(data.particle_color.size());
             for (String color : data.particle_color) {
-                NetworkPacketLimits.writeUtf(buffer, color, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color");
+                NetworkPacketLimits.writeUtf(buffer, color, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                        "particle color");
             }
             buffer.writeInt(data.max_particle_color);
         }
@@ -92,30 +95,42 @@ public class ConfigAssembly {
             int count = NetworkPacketLimits.readCount(buffer, NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
             data.items = new HashSet<>();
             for (int i = 0; i < count; i++) {
-                data.items.add(NetworkPacketLimits.readUtf(buffer, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
+                data.items.add(NetworkPacketLimits.readUtf(buffer, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                        "configured item"));
             }
         }
         if (data.uploadSettings.contains(ConfigSetting.COLORS)) {
             int count = NetworkPacketLimits.readCount(buffer, NetworkPacketLimits.MAX_DYE_COLORS, "particle color");
             data.particle_color = new ArrayList<>();
             for (int i = 0; i < count; i++) {
-                data.particle_color.add(NetworkPacketLimits.readUtf(buffer, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color"));
+                data.particle_color.add(NetworkPacketLimits.readUtf(buffer, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                        "particle color"));
             }
-            data.max_particle_color = NetworkPacketLimits.readBoundedInt(buffer, 0, NetworkPacketLimits.MAX_DYE_COLORS, "maximum particle colors");
+            data.max_particle_color = NetworkPacketLimits.readBoundedInt(buffer, 0, NetworkPacketLimits.MAX_DYE_COLORS,
+                    "maximum particle colors");
         }
         if (data.uploadSettings.contains(ConfigSetting.PARTICLES)) {
-            data.particle_speed = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED, "particle speed");
-            data.particle_spread = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD, "particle spread");
-            data.particle_lifetime = NetworkPacketLimits.readBoundedInt(buffer, 1, NetworkPacketLimits.MAX_PARTICLE_LIFETIME, "particle lifetime");
-            data.particle_density = NetworkPacketLimits.readBoundedInt(buffer, 0, NetworkPacketLimits.MAX_PARTICLE_DENSITY, "particle density");
+            data.particle_speed = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                    NetworkPacketLimits.MAX_PARTICLE_SPEED, "particle speed");
+            data.particle_spread = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                    NetworkPacketLimits.MAX_PARTICLE_SPREAD, "particle spread");
+            data.particle_lifetime = NetworkPacketLimits.readBoundedInt(buffer, 1,
+                    NetworkPacketLimits.MAX_PARTICLE_LIFETIME, "particle lifetime");
+            data.particle_density = NetworkPacketLimits.readBoundedInt(buffer, 0,
+                    NetworkPacketLimits.MAX_PARTICLE_DENSITY, "particle density");
             data.use_pattern = buffer.readBoolean();
             data.pattern = NetworkPacketLimits.readUtf(buffer, NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern");
-            data.pattern_speed = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED, "pattern speed");
-            data.pattern_spread = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD, "pattern spread");
-            data.pattern_intensity = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY, "pattern intensity");
+            data.pattern_speed = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                    NetworkPacketLimits.MAX_PARTICLE_SPEED, "pattern speed");
+            data.pattern_spread = NetworkPacketLimits.readBoundedDouble(buffer, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                    NetworkPacketLimits.MAX_PARTICLE_SPREAD, "pattern spread");
+            data.pattern_intensity = NetworkPacketLimits.readBoundedDouble(buffer,
+                    NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY,
+                    "pattern intensity");
         }
         if (data.uploadSettings.contains(ConfigSetting.POLICY)) {
-            data.edit_permission_mode = PillarParticleConfig.parseEditPermissionMode(NetworkPacketLimits.readUtf(buffer, 16, "edit permission mode"));
+            data.edit_permission_mode = PillarParticleConfig
+                    .parseEditPermissionMode(NetworkPacketLimits.readUtf(buffer, 16, "edit permission mode"));
         }
         return data;
     }

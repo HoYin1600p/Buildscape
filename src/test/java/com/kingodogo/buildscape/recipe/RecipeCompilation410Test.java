@@ -21,8 +21,10 @@ public class RecipeCompilation410Test {
         RecipeIR.RecipeSpec one = parse("{\"stonecutting\":[[\"BS:copper_chest\",\"MC:stone\",1]]}").get(0);
         RecipeIR.RecipeSpec two = parse("{\"stonecutting\":[[\"BS:copper_chest\",\"MC:copper_block\",2]]}").get(0);
         AliasResolver aliases = new AliasResolver();
-        assertEquals("buildscape:autogen/crafting/copper_chest", new RecipeIdAllocator().allocate("crafting", one, aliases));
-        assertEquals("buildscape:autogen/crafting/copper_chest", new RecipeIdAllocator().allocate("crafting", two, aliases));
+        assertEquals("buildscape:autogen/crafting/copper_chest",
+                new RecipeIdAllocator().allocate("crafting", one, aliases));
+        assertEquals("buildscape:autogen/crafting/copper_chest",
+                new RecipeIdAllocator().allocate("crafting", two, aliases));
         RecipeIdAllocator ids = new RecipeIdAllocator();
         String first = ids.allocate("crafting", one, aliases);
         String collision = ids.allocate("crafting", two, aliases);

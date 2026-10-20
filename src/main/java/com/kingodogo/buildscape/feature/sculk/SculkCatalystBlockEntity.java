@@ -43,7 +43,8 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
         if (level.isClientSide || event != GameEvent.ENTITY_KILLED) {
             return false;
         }
-        SculkCatalystHandler.debug("listener received death at {} catalyst={} in {}", pos, worldPosition, level.dimension().location());
+        SculkCatalystHandler.debug("listener received death at {} catalyst={} in {}", pos, worldPosition,
+                level.dimension().location());
         return SculkCatalystHandler.offerDeath(this, entity, pos);
     }
 

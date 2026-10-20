@@ -18,11 +18,7 @@ import java.util.List;
 @Mixin(value = BeaconRenderer.class, priority = 900)
 public class BeaconBlockEntityRendererMixin {
 
-    @Inject(
-            method = "render(Lnet/minecraft/world/level/block/entity/BeaconBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V",
-            at = @At("HEAD"),
-            cancellable = true
-    )
+    @Inject(method = "render(Lnet/minecraft/world/level/block/entity/BeaconBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V", at = @At("HEAD"), cancellable = true)
     private void buildscape$renderClippedBeam(
             BeaconBlockEntity blockEntity,
             float partialTicks,
@@ -30,8 +26,7 @@ public class BeaconBlockEntityRendererMixin {
             MultiBufferSource bufferSource,
             int combinedLight,
             int combinedOverlay,
-            CallbackInfo callback
-    ) {
+            CallbackInfo callback) {
         int cutoff = BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos());
         if (cutoff >= BeaconBeamScanState.UNLIMITED) {
             return;
@@ -54,8 +49,7 @@ public class BeaconBlockEntityRendererMixin {
                     gameTime,
                     yOffset,
                     Math.min(sectionHeight, remaining),
-                    section.getColor()
-            );
+                    section.getColor());
             yOffset += sectionHeight;
         }
         callback.cancel();

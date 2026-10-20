@@ -34,8 +34,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
             2.0D,
             14.0D,
             13.0D,
-            14.0D
-    );
+            14.0D);
 
     public MonetFlowerBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -52,8 +51,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {
             return shape.move(0, -0.0625D, 0);
@@ -65,8 +63,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
     protected boolean mayPlaceOn(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.is(BlockTags.DIRT) || state.is(Blocks.FARMLAND);
     }
 
@@ -87,9 +84,11 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
         if (direction == Direction.DOWN) {
-            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState,
+                    level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
@@ -99,8 +98,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
             BlockGetter level,
             BlockPos pos,
             BlockState state,
-            boolean isClient
-    ) {
+            boolean isClient) {
         return true;
     }
 
@@ -109,8 +107,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
             Level level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         return true;
     }
 
@@ -119,16 +116,14 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
             ServerLevel level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         ItemStack flowerStack = new ItemStack(this);
         ItemEntity itemEntity = new ItemEntity(
                 level,
                 pos.getX() + 0.5D,
                 pos.getY() + 0.5D,
                 pos.getZ() + 0.5D,
-                flowerStack
-        );
+                flowerStack);
         itemEntity.setDefaultPickUpDelay();
         level.addFreshEntity(itemEntity);
     }
@@ -136,8 +131,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         return Collections.singletonList(new ItemStack(this));
     }
 }

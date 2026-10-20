@@ -49,14 +49,14 @@ public class SignFrameAttachment {
         }
         sign.setChanged();
 
-        if (sign.getLevel() != null && !sign.getLevel().isClientSide() && sign.getLevel() instanceof ServerLevel serverLevel) {
+        if (sign.getLevel() != null && !sign.getLevel().isClientSide()
+                && sign.getLevel() instanceof ServerLevel serverLevel) {
             BlockPos pos = sign.getBlockPos();
             BlockState state = sign.getBlockState();
             serverLevel.sendBlockUpdated(pos, state, state, 3);
             ModMessages.INSTANCE.send(
                     PacketDistributor.TRACKING_CHUNK.with(() -> serverLevel.getChunkAt(pos)),
-                    new SyncSignFramePacket(pos, frame.getId())
-            );
+                    new SyncSignFramePacket(pos, frame.getId()));
         }
     }
 }

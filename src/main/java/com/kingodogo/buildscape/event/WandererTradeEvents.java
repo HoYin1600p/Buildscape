@@ -315,8 +315,7 @@ public class WandererTradeEvents {
                                 new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
                                 1,
                                 1,
-                                0.0f
-                        );
+                                0.0f);
                     }
                     return null;
                 });

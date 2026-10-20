@@ -19,16 +19,14 @@ public class FenceBlockMixin {
 
     private static final TagKey<Block> FENCES_TAG = TagKey.create(
             Registry.BLOCK_REGISTRY,
-            new ResourceLocation("minecraft:fences")
-    );
+            new ResourceLocation("minecraft:fences"));
 
     @Inject(method = "connectsTo", at = @At("HEAD"), cancellable = true)
     private void connectsTo(
             BlockState state,
             boolean sideSolidFullSquare,
             Direction direction,
-            CallbackInfoReturnable<Boolean> cir
-    ) {
+            CallbackInfoReturnable<Boolean> cir) {
         Block block = state.getBlock();
         if (block instanceof FenceBlock) {
             cir.setReturnValue(true);

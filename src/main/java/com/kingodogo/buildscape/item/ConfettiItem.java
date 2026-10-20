@@ -38,9 +38,9 @@ public class ConfettiItem extends Item {
 
         if (!level.isClientSide) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 0.8F, 1.4F);
+                    SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 0.8F, 1.4F);
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.FIREWORK_ROCKET_TWINKLE, SoundSource.PLAYERS, 0.6F, 1.6F);
+                    SoundEvents.FIREWORK_ROCKET_TWINKLE, SoundSource.PLAYERS, 0.6F, 1.6F);
 
             spawnConfettiParticles((ServerLevel) level, player, itemstack);
 
@@ -69,9 +69,8 @@ public class ConfettiItem extends Item {
         }
 
         ModMessages.INSTANCE.send(
-                PacketDistributor.NEAR.with(() ->
-                        new PacketDistributor.TargetPoint(
-                                startX, startY, startZ, 32.0D, level.dimension())),
+                PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(
+                        startX, startY, startZ, 32.0D, level.dimension())),
                 new ConfettiBurstPacket(
                         startX, startY, startZ, (float) look.x, (float) look.y, (float) look.z,
                         burstLevel, level.random.nextLong()));
@@ -83,6 +82,7 @@ public class ConfettiItem extends Item {
         if (stack.hasTag() && stack.getTag().contains(NbtKeys.BURST_LEVEL)) {
             burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt(NbtKeys.BURST_LEVEL)));
         }
-        tooltip.add(new TranslatableComponent("tooltip.buildscape.confetti.burst_level", burstLevel).withStyle(ChatFormatting.GRAY));
+        tooltip.add(new TranslatableComponent("tooltip.buildscape.confetti.burst_level", burstLevel)
+                .withStyle(ChatFormatting.GRAY));
     }
 }

@@ -3,10 +3,7 @@ package com.kingodogo.buildscape.feature.pillar;
 import net.minecraft.util.StringRepresentable;
 
 public enum PillarPart implements StringRepresentable {
-    SINGLE("single"),
-    BOTTOM("bottom"),
-    MIDDLE("middle"),
-    TOP("top");
+    SINGLE("single"), BOTTOM("bottom"), MIDDLE("middle"), TOP("top");
 
     private final String name;
 

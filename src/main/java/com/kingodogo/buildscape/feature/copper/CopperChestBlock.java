@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.feature.copper;
 
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -16,7 +15,8 @@ import java.util.function.Supplier;
 public class CopperChestBlock extends ChestBlock {
     private final boolean isWaxed;
 
-    public CopperChestBlock(boolean isWaxed, BlockBehaviour.Properties properties, Supplier<BlockEntityType<? extends ChestBlockEntity>> blockEntityTypeSupplier) {
+    public CopperChestBlock(boolean isWaxed, BlockBehaviour.Properties properties,
+            Supplier<BlockEntityType<? extends ChestBlockEntity>> blockEntityTypeSupplier) {
         super(isWaxed ? properties : properties.randomTicks(), blockEntityTypeSupplier);
         this.isWaxed = isWaxed;
     }

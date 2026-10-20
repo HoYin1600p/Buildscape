@@ -6,7 +6,6 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
 
-
 public class PillarSparkleParticle extends TextureSheetParticle {
 
     private final TextureAtlasSprite baseSprite;
@@ -50,8 +49,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
             double dx,
             double dy,
             double dz,
-            SpriteSet sprites
-    ) {
+            SpriteSet sprites) {
         super(level, x, y, z, dx, dy, dz);
         this.setSpriteFromAge(sprites);
         this.baseSprite = this.sprite;
@@ -77,9 +75,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
     }
 
     public static float[] parseColorCode(String colorCode) {
-        if (
-                colorCode == null || colorCode.isEmpty() || !colorCode.startsWith("#")
-        ) {
+        if (colorCode == null || colorCode.isEmpty() || !colorCode.startsWith("#")) {
             return new float[]{1.0F, 1.0F, 1.0F};
         }
 
@@ -121,9 +117,8 @@ public class PillarSparkleParticle extends TextureSheetParticle {
 
         float fadeOut = 0.9F;
         if (this.age > this.lifetime * fadeOut) {
-            float fadeProgress =
-                    (this.age - this.lifetime * fadeOut) /
-                            (this.lifetime * (1.0F - fadeOut));
+            float fadeProgress = (this.age - this.lifetime * fadeOut) /
+                    (this.lifetime * (1.0F - fadeOut));
             this.alpha = 1.0F - fadeProgress;
         } else {
             this.alpha = 1.0F;
@@ -189,8 +184,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
                 double z,
                 double dx,
                 double dy,
-                double dz
-        ) {
+                double dz) {
             return new PillarSparkleParticle(level, x, y, z, dx, dy, dz, sprites);
         }
     }
@@ -199,8 +193,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
             double x,
             double y,
             double z,
-            String colorCode
-    ) {
+            String colorCode) {
         if (colorCode != null && !colorCode.isEmpty()) {
             PendingSpawn pending = PENDING.get();
             pending.target(x, y, z);
@@ -212,8 +205,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
             double x,
             double y,
             double z,
-            float sizeMultiplier
-    ) {
+            float sizeMultiplier) {
         if (sizeMultiplier > 0) {
             PendingSpawn pending = PENDING.get();
             pending.target(x, y, z);
@@ -222,6 +214,5 @@ public class PillarSparkleParticle extends TextureSheetParticle {
     }
 
     @Deprecated
-    public static void queueColor(String colorCode) {
-    }
+    public static void queueColor(String colorCode) {}
 }

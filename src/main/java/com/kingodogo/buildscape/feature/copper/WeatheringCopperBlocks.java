@@ -6,8 +6,7 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import java.util.function.Supplier;
 
 public final class WeatheringCopperBlocks {
-    private WeatheringCopperBlocks() {
-    }
+    private WeatheringCopperBlocks() {}
 
     public static class FreshBulb extends FreshCopperBulbBlock implements BuildscapeWeatheringCopper {
         public FreshBulb(Properties properties) {
@@ -34,7 +33,8 @@ public final class WeatheringCopperBlocks {
     }
 
     public static class Chest extends CopperChestBlock implements BuildscapeWeatheringCopper {
-        public Chest(Properties properties, Supplier<BlockEntityType<? extends ChestBlockEntity>> blockEntityTypeSupplier) {
+        public Chest(Properties properties,
+                Supplier<BlockEntityType<? extends ChestBlockEntity>> blockEntityTypeSupplier) {
             super(false, properties, blockEntityTypeSupplier);
         }
     }

@@ -34,8 +34,7 @@ public class SupportersApiCache {
     private final ConcurrentHashMap<UUID, CachedData<CosmeticData>> cosmeticsCache = new ConcurrentHashMap<>();
     private CachedData<TiersResponse> tiersCache;
 
-    private SupportersApiCache() {
-    }
+    private SupportersApiCache() {}
 
     public static SupportersApiCache getInstance() {
         return INSTANCE;
@@ -108,4 +107,3 @@ public class SupportersApiCache {
         }
     }
 }
-

@@ -33,13 +33,15 @@ public class HazeBushDyeRecipeTest {
         // Vanilla stand-ins keep these unit tests independent of mod registry startup.
         return new HazeBushDyeRecipe(new ResourceLocation("buildscape", "test_haze_dye"), "",
                 new ItemStack(Items.ORANGE_TULIP), NonNullList.of(Ingredient.EMPTY,
-                Ingredient.of(Items.WHITE_TULIP), Ingredient.of(Items.ORANGE_DYE)));
+                        Ingredient.of(Items.WHITE_TULIP), Ingredient.of(Items.ORANGE_DYE)));
     }
 
     private CraftingContainer grid(ItemStack bush) {
         AbstractContainerMenu menu = new AbstractContainerMenu(null, 0) {
             @Override
-            public boolean stillValid(net.minecraft.world.entity.player.Player player) { return true; }
+            public boolean stillValid(net.minecraft.world.entity.player.Player player) {
+                return true;
+            }
 
             @Override
             public ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int slot) {

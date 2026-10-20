@@ -3,10 +3,7 @@ package com.kingodogo.buildscape.block;
 import net.minecraft.util.StringRepresentable;
 
 public enum SideChainPart implements StringRepresentable {
-    UNCONNECTED("unconnected"),
-    RIGHT("right"),
-    CENTER("center"),
-    LEFT("left");
+    UNCONNECTED("unconnected"), RIGHT("right"), CENTER("center"), LEFT("left");
 
     private final String name;
 
@@ -38,52 +35,52 @@ public enum SideChainPart implements StringRepresentable {
 
     public SideChainPart whenConnectedToTheRight() {
         switch (this) {
-            case UNCONNECTED:
-            case LEFT:
+            case UNCONNECTED :
+            case LEFT :
                 return LEFT;
-            case RIGHT:
-            case CENTER:
+            case RIGHT :
+            case CENTER :
                 return CENTER;
-            default:
+            default :
                 throw new IllegalArgumentException();
         }
     }
 
     public SideChainPart whenConnectedToTheLeft() {
         switch (this) {
-            case UNCONNECTED:
-            case RIGHT:
+            case UNCONNECTED :
+            case RIGHT :
                 return RIGHT;
-            case CENTER:
-            case LEFT:
+            case CENTER :
+            case LEFT :
                 return CENTER;
-            default:
+            default :
                 throw new IllegalArgumentException();
         }
     }
 
     public SideChainPart whenDisconnectedFromTheRight() {
         switch (this) {
-            case UNCONNECTED:
-            case LEFT:
+            case UNCONNECTED :
+            case LEFT :
                 return UNCONNECTED;
-            case RIGHT:
-            case CENTER:
+            case RIGHT :
+            case CENTER :
                 return RIGHT;
-            default:
+            default :
                 throw new IllegalArgumentException();
         }
     }
 
     public SideChainPart whenDisconnectedFromTheLeft() {
         switch (this) {
-            case UNCONNECTED:
-            case RIGHT:
+            case UNCONNECTED :
+            case RIGHT :
                 return UNCONNECTED;
-            case CENTER:
-            case LEFT:
+            case CENTER :
+            case LEFT :
                 return LEFT;
-            default:
+            default :
                 throw new IllegalArgumentException();
         }
     }

@@ -14,7 +14,8 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID)
 public class ChainMobHandler {
-    private static final TagKey<Block> MOB_CHAINS = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(BuildScape.MODID, "mob_chains"));
+    private static final TagKey<Block> MOB_CHAINS = TagKey.create(Registry.BLOCK_REGISTRY,
+            new ResourceLocation(BuildScape.MODID, "mob_chains"));
 
     @SubscribeEvent
     public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {

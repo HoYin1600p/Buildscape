@@ -67,13 +67,13 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         @Override
         public int get(int index) {
             switch (index) {
-                case 0:
+                case 0 :
                     return copyProgress;
-                case 1:
+                case 1 :
                     return activeTab;
-                case 2:
+                case 2 :
                     return filterMask;
-                default:
+                default :
                     if (index >= 3 && index < 3 + TAB_COUNT * RESULT_COUNT) {
                         int offsetIndex = index - 3;
                         return resultOffsetsByTab[offsetIndex / RESULT_COUNT][offsetIndex % RESULT_COUNT];
@@ -85,16 +85,16 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         @Override
         public void set(int index, int value) {
             switch (index) {
-                case 0:
+                case 0 :
                     copyProgress = value;
                     break;
-                case 1:
+                case 1 :
                     activeTab = value;
                     break;
-                case 2:
+                case 2 :
                     filterMask = value;
                     break;
-                default:
+                default :
                     if (index >= 3 && index < 3 + TAB_COUNT * RESULT_COUNT) {
                         int offsetIndex = index - 3;
                         resultOffsetsByTab[offsetIndex / RESULT_COUNT][offsetIndex % RESULT_COUNT] = Math.max(0, value);
@@ -113,7 +113,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         super(ModBlockEntities.BUILDERS_WORKBENCH_BE.get(), pos, state);
     }
 
-
     @Override
     public Component getDisplayName() {
         return new TranslatableComponent("block.buildscape.builders_workbench");
@@ -124,7 +123,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     public AbstractContainerMenu createMenu(int windowId, Inventory playerInv, Player player) {
         return new BuildersWorkbenchMenu(windowId, playerInv, this);
     }
-
 
     @Override
     public int getContainerSize() {
@@ -306,8 +304,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     public boolean writeSolvedToPouch(ItemStack pouch) {
         List<ItemStack> solved = getSolvedItems();
         if (pouch.getItem() instanceof BuildersPouchItem) {
-            BuildersPouchInventory inventory =
-                    new BuildersPouchInventory(pouch);
+            BuildersPouchInventory inventory = new BuildersPouchInventory(pouch);
             for (int i = 0; i < solved.size(); i++) {
                 if (!inventory.getItem(i).isEmpty()) {
                     return false;
@@ -347,8 +344,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             filters.add(i < savedFilters.size() ? savedFilters.getString(i) : "");
             ItemStack item = shulkerItems.get(i);
             if (!item.isEmpty() && item.hasTag() && item.getTag().getBoolean(NbtKeys.GHOST)) {
-                ResourceLocation id =
-                        ForgeRegistries.ITEMS.getKey(item.getItem());
+                ResourceLocation id = ForgeRegistries.ITEMS.getKey(item.getItem());
                 if (filters.get(i).isEmpty() && id != null) {
                     filters.set(i, id.toString());
                 }
@@ -391,8 +387,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             int slot = targetRow * 9 + i;
             ItemStack solvedStack = solved.get(i);
             if (!solvedStack.isEmpty()) {
-                ResourceLocation itemId =
-                        ForgeRegistries.ITEMS.getKey(solvedStack.getItem());
+                ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(solvedStack.getItem());
                 if (itemId != null) {
                     filters.set(slot, itemId.toString());
                     wroteAnyFilter = true;
@@ -471,7 +466,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         items.clear();
         setChanged();
     }
-
 
     public int getActiveTab() {
         return activeTab;
@@ -577,13 +571,13 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         }
         for (int i = 0; i < first; i++) {
             if (!results.get(i).isEmpty()) {
-            return false;
-        }
+                return false;
+            }
         }
         for (int i = last + 1; i < 9; i++) {
             if (!results.get(i).isEmpty()) {
-            return false;
-        }
+                return false;
+            }
         }
         return true;
     }
@@ -647,7 +641,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         return tab == 1 ? 1 : 0;
     }
 
-
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
@@ -696,16 +689,16 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         tag.putInt(NbtKeys.COPY_PROGRESS, copyProgress);
         tag.putIntArray(NbtKeys.COLOR_RESULT_OFFSETS, resultOffsetsByTab[0]);
         tag.putIntArray(NbtKeys.GRADIENT_RESULT_OFFSETS, resultOffsetsByTab[1]);
-     }
+    }
 
-     public static boolean isPouch(ItemStack stack) {
-         if (stack.isEmpty()) {
-             return false;
-         }
-         if (stack.getItem() instanceof BuildersPouchItem) {
-             return true;
-         }
-         return stack.getItem() instanceof BlockItem bi
-                 && bi.getBlock() instanceof ShulkerBoxBlock;
-     }
+    public static boolean isPouch(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        if (stack.getItem() instanceof BuildersPouchItem) {
+            return true;
+        }
+        return stack.getItem() instanceof BlockItem bi
+                && bi.getBlock() instanceof ShulkerBoxBlock;
+    }
 }

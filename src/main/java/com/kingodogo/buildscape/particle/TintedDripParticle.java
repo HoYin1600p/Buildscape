@@ -17,8 +17,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class TintedDripParticle extends TextureSheetParticle {
 
-    private static final Map<ParticlePositionKey, ColorEntry> POSITION_COLOR_MAP =
-            new ConcurrentHashMap<>();
+    private static final Map<ParticlePositionKey, ColorEntry> POSITION_COLOR_MAP = new ConcurrentHashMap<>();
 
     private static class ColorEntry {
 
@@ -42,8 +41,7 @@ public class TintedDripParticle extends TextureSheetParticle {
             double xSpeed,
             double ySpeed,
             double zSpeed,
-            SpriteSet sprites
-    ) {
+            SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
         this.pickSprite(sprites);
@@ -126,16 +124,14 @@ public class TintedDripParticle extends TextureSheetParticle {
             double x,
             double y,
             double z,
-            String colorCode
-    ) {
+            String colorCode) {
         ParticlePositionKey posKey = ParticlePositionKey.of(x, y, z);
         POSITION_COLOR_MAP.put(posKey, new ColorEntry(colorCode));
     }
 
     static void cleanupOldEntries() {
         long now = System.currentTimeMillis();
-        Iterator<Map.Entry<ParticlePositionKey, ColorEntry>> iterator =
-                POSITION_COLOR_MAP.entrySet().iterator();
+        Iterator<Map.Entry<ParticlePositionKey, ColorEntry>> iterator = POSITION_COLOR_MAP.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<ParticlePositionKey, ColorEntry> entry = iterator.next();
             if (now - entry.getValue().timestamp > 1000) {
@@ -144,13 +140,10 @@ public class TintedDripParticle extends TextureSheetParticle {
         }
     }
 
-    public static void queueColor(String colorCode) {
-    }
+    public static void queueColor(String colorCode) {}
 
     private static float[] parseColorCode(String colorCode) {
-        if (
-                colorCode == null || colorCode.isEmpty() || !colorCode.startsWith("#")
-        ) {
+        if (colorCode == null || colorCode.isEmpty() || !colorCode.startsWith("#")) {
             return new float[]{0.92F, 0.58F, 0.84F};
         }
 
@@ -192,8 +185,7 @@ public class TintedDripParticle extends TextureSheetParticle {
                 double z,
                 double xSpeed,
                 double ySpeed,
-                double zSpeed
-        ) {
+                double zSpeed) {
             return new TintedDripParticle(
                     level,
                     x,
@@ -202,8 +194,7 @@ public class TintedDripParticle extends TextureSheetParticle {
                     xSpeed,
                     ySpeed,
                     zSpeed,
-                    sprites
-            );
+                    sprites);
         }
     }
 }

@@ -32,11 +32,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.List;
 import javax.annotation.Nullable;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class TagTooltipHandler {
 
     public static boolean isShulkerPreviewEnabled() {
@@ -72,14 +68,11 @@ public class TagTooltipHandler {
                                     new TranslatableComponent(
                                             "tooltip.buildscape.festive_stocking.contains",
                                             storedItem.getCount(),
-                                            storedItem.getDisplayName()
-                                    )
-                            );
+                                            storedItem.getDisplayName()));
                         }
                     }
                 }
             }
-
 
             if (!isShulkerPreviewEnabled()) {
                 return;
@@ -87,7 +80,8 @@ public class TagTooltipHandler {
 
             if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
                 CompoundTag blockEntityTag = stack.getTagElement(NbtKeys.BLOCK_ENTITY_TAG);
-                if (blockEntityTag != null && (blockEntityTag.contains(NbtKeys.GHOST_FILTERS, 9) || blockEntityTag.contains(NbtKeys.ITEMS, 9))) {
+                if (blockEntityTag != null && (blockEntityTag.contains(NbtKeys.GHOST_FILTERS, 9)
+                        || blockEntityTag.contains(NbtKeys.ITEMS, 9))) {
                     List<Component> tooltips = event.getToolTip();
                     if (tooltips.size() > 1) {
                         tooltips.removeIf(comp -> {
@@ -95,7 +89,8 @@ public class TagTooltipHandler {
                                 return false;
                             }
                             String key = translated.getKey();
-                            return "container.shulkerBox.itemCount".equals(key) || "container.shulkerBox.more".equals(key);
+                            return "container.shulkerBox.itemCount".equals(key)
+                                    || "container.shulkerBox.more".equals(key);
                         });
                     }
                     if (!Screen.hasShiftDown()) {
@@ -120,7 +115,8 @@ public class TagTooltipHandler {
             }
             if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock sbb) {
                 CompoundTag blockEntityTag = stack.getTagElement(NbtKeys.BLOCK_ENTITY_TAG);
-                if (blockEntityTag != null && (blockEntityTag.contains(NbtKeys.GHOST_FILTERS, 9) || blockEntityTag.contains(NbtKeys.ITEMS, 9))) {
+                if (blockEntityTag != null && (blockEntityTag.contains(NbtKeys.GHOST_FILTERS, 9)
+                        || blockEntityTag.contains(NbtKeys.ITEMS, 9))) {
                     NonNullList<ItemStack> filterStacks = NonNullList.withSize(27, ItemStack.EMPTY);
                     NonNullList<ItemStack> realStacks = NonNullList.withSize(27, ItemStack.EMPTY);
                     boolean hasAnyData = false;
@@ -169,7 +165,8 @@ public class TagTooltipHandler {
                 return null;
             }
             if (stack.getItem() instanceof BuildersPouchItem) {
-                NonNullList<ItemStack> filterStacks = NonNullList.withSize(BuildersPouchItem.SLOT_COUNT, ItemStack.EMPTY);
+                NonNullList<ItemStack> filterStacks = NonNullList.withSize(BuildersPouchItem.SLOT_COUNT,
+                        ItemStack.EMPTY);
                 NonNullList<ItemStack> realStacks = NonNullList.withSize(BuildersPouchItem.SLOT_COUNT, ItemStack.EMPTY);
 
                 List<String> filters = BuildersPouchItem.getFilters(stack);

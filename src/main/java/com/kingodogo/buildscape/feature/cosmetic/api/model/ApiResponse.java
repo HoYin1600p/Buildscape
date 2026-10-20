@@ -5,8 +5,7 @@ public class ApiResponse {
     private String message;
     private String error;
 
-    public ApiResponse() {
-    }
+    public ApiResponse() {}
 
     public ApiResponse(boolean success, String message) {
         this.success = success;
@@ -37,4 +36,3 @@ public class ApiResponse {
         this.error = error;
     }
 }
-

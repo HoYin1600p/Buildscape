@@ -16,8 +16,7 @@ public class ModWallBlock extends WallBlock {
 
     public ModWallBlock(
             BlockBehaviour.Properties properties,
-            RegistryObject<?> dropItem
-    ) {
+            RegistryObject<?> dropItem) {
         super(properties);
         this.dropItem = dropItem;
     }

@@ -33,7 +33,8 @@ public class PillarRegistryPersistenceTest {
         File backup = temporary.newFile("pillar-ids.bak.dat");
         String mainJson = "{\"S-P1\":{\"id\":\"S-P1\",\"dimension\":\"minecraft:overworld\",\"dyeColors\":[],\"modifiedTime\":200}}";
         Files.writeString(main.toPath(), mainJson);
-        Files.writeString(backup.toPath(), "{\"S-P2\":{\"id\":\"S-P2\",\"dyeColors\":[\"#123456\"],\"modifiedTime\":100}}");
+        Files.writeString(backup.toPath(),
+                "{\"S-P2\":{\"id\":\"S-P2\",\"dyeColors\":[\"#123456\"],\"modifiedTime\":100}}");
         Map<String, PillarIdManager.PillarData> selected = read(manager, main, backup);
         assertEquals(Set.of("S-P1"), selected.keySet());
         assertTrue(selected.get("S-P1").dyeColors.isEmpty());
@@ -94,7 +95,8 @@ public class PillarRegistryPersistenceTest {
         PillarIdManager.PillarData undyedPillar = frame("S-P1", null, 1);
         undyedPillar.pillarType = "buildscape:stone_pillar";
         undyedPillar.pattern = null;
-        for (PillarIdManager.PillarData data : List.of(older, newer, otherFacing, empty, removedDimension, undyedPillar)) {
+        for (PillarIdManager.PillarData data : List.of(older, newer, otherFacing, empty, removedDimension,
+                undyedPillar)) {
             manager.addPillarDataFromSync(data);
         }
         Method prune = PillarIdManager.class.getDeclaredMethod("pruneRegistry");
@@ -160,7 +162,7 @@ public class PillarRegistryPersistenceTest {
     public void frameRegistrationRequiresPatternOrColors() throws Exception {
         Method hasData = PillarIdManager.class.getDeclaredMethod("hasFrameParticleData", String.class, List.class);
         hasData.setAccessible(true);
-        for (String pattern : new String[] {null, "", "none", "__not_set__"}) {
+        for (String pattern : new String[]{null, "", "none", "__not_set__"}) {
             assertEquals(Boolean.FALSE, hasData.invoke(null, pattern, List.of()));
             assertEquals(Boolean.TRUE, hasData.invoke(null, pattern, List.of("#123456")));
         }
@@ -171,7 +173,8 @@ public class PillarRegistryPersistenceTest {
     public void replacementRemovesPreviousFrameAtSamePosition() throws Exception {
         PillarIdManager manager = manager();
         manager.addPillarDataFromSync(frame("I-F1", "north", 10));
-        Method remove = PillarIdManager.class.getDeclaredMethod("removeOtherFrameAtPosition", String.class, String.class);
+        Method remove = PillarIdManager.class.getDeclaredMethod("removeOtherFrameAtPosition", String.class,
+                String.class);
         remove.setAccessible(true);
         assertEquals(Boolean.TRUE, remove.invoke(manager, "minecraft:overworld:0:0:0:north", "I-F2"));
         assertNull(manager.getPillarData("I-F1"));
@@ -484,7 +487,7 @@ public class PillarRegistryPersistenceTest {
 
     @Test
     public void stackRegistrationPreservesDeterministicPositionOwner() throws Exception {
-        for (long firstTime : new long[] {10, 20, 30}) {
+        for (long firstTime : new long[]{10, 20, 30}) {
             PillarIdManager manager = manager();
             PillarIdManager.PillarData first = new PillarIdManager.PillarData(
                     "PillarA", "minecraft:overworld", new BlockPos(0, 64, 0));
@@ -541,7 +544,8 @@ public class PillarRegistryPersistenceTest {
         remove.invoke(manager, dimension, pos);
     }
 
-    private static BlockPos removeBlock(PillarIdManager manager, BlockPos pos, BlockPos bottom, BlockPos top) throws Exception {
+    private static BlockPos removeBlock(PillarIdManager manager, BlockPos pos, BlockPos bottom, BlockPos top)
+            throws Exception {
         Method remove = PillarIdManager.class.getDeclaredMethod("removePillarBlock",
                 String.class, String.class, BlockPos.class, BlockPos.class, BlockPos.class);
         remove.setAccessible(true);
@@ -550,7 +554,7 @@ public class PillarRegistryPersistenceTest {
 
     @Test
     public void joiningStacksRemovesReplacedEntryImmediatelyAndAfterReload() throws Exception {
-        for (long lowerTime : new long[] {10, 20, 30}) {
+        for (long lowerTime : new long[]{10, 20, 30}) {
             PillarIdManager manager = reloadedStack(1);
             BlockPos bottom = new BlockPos(0, 64, 0);
             manager.getPillarData("StackId").modifiedTime = lowerTime;
@@ -639,7 +643,8 @@ public class PillarRegistryPersistenceTest {
         assertNull(manager.getFrameIdForPosition(dimension, pos, net.minecraft.core.Direction.EAST));
         assertNull(manager.getFrameIdForPosition(dimension, pos, null));
 
-        Method remove = PillarIdManager.class.getDeclaredMethod("removeOtherFrameAtPosition", String.class, String.class);
+        Method remove = PillarIdManager.class.getDeclaredMethod("removeOtherFrameAtPosition", String.class,
+                String.class);
         remove.setAccessible(true);
         assertEquals(Boolean.TRUE, remove.invoke(manager, manager.positionKey(
                 dimension, pos, net.minecraft.core.Direction.NORTH), "F-N2"));
@@ -654,7 +659,8 @@ public class PillarRegistryPersistenceTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, PillarIdManager.PillarData> read(PillarIdManager manager, File main, File backup) throws Exception {
+    private static Map<String, PillarIdManager.PillarData> read(PillarIdManager manager, File main, File backup)
+            throws Exception {
         Method read = PillarIdManager.class.getDeclaredMethod("readSavedData", File.class, File.class);
         read.setAccessible(true);
         Object saved = read.invoke(manager, main, backup);
@@ -665,7 +671,7 @@ public class PillarRegistryPersistenceTest {
 
     @Test
     public void unloadedSwapAndRotationReconcileAfterSaveAndRestart() throws Exception {
-        for (int count : new int[] {2, 3}) {
+        for (int count : new int[]{2, 3}) {
             PillarIdManager manager = manager();
             java.util.ArrayList<EditPillarRowsPacket.Row> rows = new java.util.ArrayList<>();
             for (int i = 0; i < count; i++) {
@@ -705,7 +711,7 @@ public class PillarRegistryPersistenceTest {
         Method reconcile = PillarIdManager.class.getDeclaredMethod("reconcilePillarId",
                 String.class, String.class, BlockPos.class, BlockPos.class);
         reconcile.setAccessible(true);
-        for (long lowerTime : new long[] {10, 20, 30}) {
+        for (long lowerTime : new long[]{10, 20, 30}) {
             PillarIdManager manager = manager();
             PillarIdManager.PillarData lower = frame("PillarP", null, lowerTime);
             lower.pillarType = "buildscape:stone_pillar";
@@ -760,11 +766,16 @@ public class PillarRegistryPersistenceTest {
             Method reconcile = PillarIdManager.class.getDeclaredMethod("reconcileFrameId",
                     String.class, String.class, BlockPos.class, Direction.class);
             reconcile.setAccessible(true);
-            assertEquals("FrameB", reconcile.invoke(restarted, "FrameA", "minecraft:overworld", BlockPos.ZERO, Direction.NORTH));
-            assertEquals("FrameA", reconcile.invoke(restarted, "FrameB", "minecraft:overworld", BlockPos.ZERO, Direction.SOUTH));
-            assertEquals("SavedId", reconcile.invoke(restarted, "SavedId", "minecraft:overworld", BlockPos.ZERO, Direction.EAST));
-            assertEquals("SavedId", reconcile.invoke(restarted, "SavedId", "test:other", BlockPos.ZERO, Direction.NORTH));
-            assertEquals("FrameB", reconcile.invoke(restarted, "FrameB", "minecraft:overworld", BlockPos.ZERO, Direction.NORTH));
+            assertEquals("FrameB",
+                    reconcile.invoke(restarted, "FrameA", "minecraft:overworld", BlockPos.ZERO, Direction.NORTH));
+            assertEquals("FrameA",
+                    reconcile.invoke(restarted, "FrameB", "minecraft:overworld", BlockPos.ZERO, Direction.SOUTH));
+            assertEquals("SavedId",
+                    reconcile.invoke(restarted, "SavedId", "minecraft:overworld", BlockPos.ZERO, Direction.EAST));
+            assertEquals("SavedId",
+                    reconcile.invoke(restarted, "SavedId", "test:other", BlockPos.ZERO, Direction.NORTH));
+            assertEquals("FrameB",
+                    reconcile.invoke(restarted, "FrameB", "minecraft:overworld", BlockPos.ZERO, Direction.NORTH));
             assertEquals(java.util.Set.of("FrameA", "FrameB"), restarted.getAllPillarIds());
         }
     }

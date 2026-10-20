@@ -16,7 +16,8 @@ public class GeyserEruptionParticle extends NoRenderParticle {
     private final GeyserBaseParticleOptions baseParticle;
     private final GeyserBaseParticleOptions poofParticle;
 
-    protected GeyserEruptionParticle(final ClientLevel level, final double x, final double y, final double z, final double xAux, final double yAux, final double zAux, final GeyserParticleOptions options) {
+    protected GeyserEruptionParticle(final ClientLevel level, final double x, final double y, final double z,
+            final double xAux, final double yAux, final double zAux, final GeyserParticleOptions options) {
         super(level, x, y, z);
         this.xa = xAux;
         this.ya = yAux;
@@ -32,18 +33,21 @@ public class GeyserEruptionParticle extends NoRenderParticle {
     public void tick() {
         super.tick();
         if (this.age % 2 == 0) {
-            for(int i = 0; i < 2; ++i) {
-                this.level.addAlwaysVisibleParticle(this.baseParticle, true, this.x, this.y, this.z, this.xa, this.ya, this.za);
+            for (int i = 0; i < 2; ++i) {
+                this.level.addAlwaysVisibleParticle(this.baseParticle, true, this.x, this.y, this.z, this.xa, this.ya,
+                        this.za);
             }
         }
 
-        for(int i = 0; i < this.waterBlocks + 2; ++i) {
-            this.level.addAlwaysVisibleParticle(this.plumeParticle, true, this.x, this.y, this.z, this.xa, this.ya, this.za);
+        for (int i = 0; i < this.waterBlocks + 2; ++i) {
+            this.level.addAlwaysVisibleParticle(this.plumeParticle, true, this.x, this.y, this.z, this.xa, this.ya,
+                    this.za);
         }
 
         if (this.age % 10 == 0) {
-            for(int i = 0; i < 20; ++i) {
-                this.level.addAlwaysVisibleParticle(this.poofParticle, true, this.x, this.y, this.z, this.xa, this.ya, this.za);
+            for (int i = 0; i < 20; ++i) {
+                this.level.addAlwaysVisibleParticle(this.poofParticle, true, this.x, this.y, this.z, this.xa, this.ya,
+                        this.za);
             }
         }
     }
@@ -51,7 +55,8 @@ public class GeyserEruptionParticle extends NoRenderParticle {
     public static class Provider implements ParticleProvider<GeyserParticleOptions> {
         @Nullable
         @Override
-        public Particle createParticle(final GeyserParticleOptions options, final ClientLevel level, final double x, final double y, final double z, final double xAux, final double yAux, final double zAux) {
+        public Particle createParticle(final GeyserParticleOptions options, final ClientLevel level, final double x,
+                final double y, final double z, final double xAux, final double yAux, final double zAux) {
             return new GeyserEruptionParticle(level, x, y, z, xAux, yAux, zAux, options);
         }
     }

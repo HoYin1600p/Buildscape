@@ -47,7 +47,6 @@ public class CushionBlock extends WaterloggedBlock implements SimpleWaterloggedB
                 .setValue(WATERLOGGED, Boolean.valueOf(false)));
     }
 
-
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(HALF) == Half.TOP ? TOP_SHAPE : BOTTOM_SHAPE;
@@ -67,7 +66,8 @@ public class CushionBlock extends WaterloggedBlock implements SimpleWaterloggedB
 
         BlockState state = this.defaultBlockState().setValue(WATERLOGGED, Boolean.valueOf(isWater));
 
-        if (direction == Direction.DOWN || (direction != Direction.UP && context.getClickLocation().y - (double)blockpos.getY() > 0.5D)) {
+        if (direction == Direction.DOWN
+                || (direction != Direction.UP && context.getClickLocation().y - (double) blockpos.getY() > 0.5D)) {
             return state.setValue(HALF, Half.TOP);
         }
         return state.setValue(HALF, Half.BOTTOM);
@@ -79,7 +79,8 @@ public class CushionBlock extends WaterloggedBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level,
+            BlockPos currentPos, BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -113,7 +114,8 @@ public class CushionBlock extends WaterloggedBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit) {
         if (hand == InteractionHand.MAIN_HAND && !player.isShiftKeyDown()) {
             if (!player.getItemInHand(hand).isEmpty() && player.getItemInHand(hand).getItem() instanceof BlockItem) {
                 return InteractionResult.PASS;

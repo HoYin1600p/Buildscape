@@ -19,22 +19,19 @@ public abstract class CopperBulbBlock extends Block {
 
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
     public static final BooleanProperty POWERED = BooleanProperty.create(
-            "powered"
-    );
+            "powered");
     private final int lightLevel;
 
     public CopperBulbBlock(Properties properties, int lightLevel) {
         super(properties);
         this.lightLevel = lightLevel;
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(LIT, false).setValue(POWERED, false)
-        );
+                this.stateDefinition.any().setValue(LIT, false).setValue(POWERED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT, POWERED);
     }
 
@@ -61,8 +58,7 @@ public abstract class CopperBulbBlock extends Block {
     public int getLightEmission(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.getValue(LIT) ? lightLevel : 0;
     }
 
@@ -76,8 +72,7 @@ public abstract class CopperBulbBlock extends Block {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         return 0;
     }
 
@@ -86,8 +81,7 @@ public abstract class CopperBulbBlock extends Block {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         return true;
     }
 
@@ -98,8 +92,7 @@ public abstract class CopperBulbBlock extends Block {
             BlockPos pos,
             Block block,
             BlockPos fromPos,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (!level.isClientSide) {
             boolean powered = level.hasNeighborSignal(pos);
             if (powered != state.getValue(POWERED)) {
@@ -112,8 +105,7 @@ public abstract class CopperBulbBlock extends Block {
                             ModSounds.COPPER_BULB_TOGGLE.get(),
                             SoundSource.BLOCKS,
                             0.5f,
-                            1.0f
-                    );
+                            1.0f);
                 }
                 level.setBlock(pos, newState.setValue(POWERED, powered), 3);
             }
@@ -126,8 +118,7 @@ public abstract class CopperBulbBlock extends Block {
             Level level,
             BlockPos pos,
             BlockState oldState,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (!oldState.is(state.getBlock())) {
             if (!level.isClientSide) {
                 boolean powered = level.hasNeighborSignal(pos);
@@ -147,8 +138,7 @@ public abstract class CopperBulbBlock extends Block {
     public int getAnalogOutputSignal(
             BlockState state,
             Level level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.getValue(LIT) ? 15 : 0;
     }
 

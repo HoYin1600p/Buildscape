@@ -16,9 +16,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
  */
 final class PillarEntitySync {
 
-    private PillarEntitySync() {
-    }
-
+    private PillarEntitySync() {}
 
     static void syncPatternFromStack(PillarBlockEntity self) {
         final Level level = self.getLevel();
@@ -317,7 +315,6 @@ final class PillarEntitySync {
         } catch (Exception e) {
             return;
         }
-
 
         PillarIdManager manager = PillarIdManager.get(level);
 

@@ -30,8 +30,8 @@ public abstract class FireworkStarterMixin extends Particle {
     }
 
     @Shadow
-    private void createParticle(double x, double y, double z, double vx, double vy, double vz, int[] colors, int[] fadeColors, boolean trail, boolean flicker) {
-    }
+    private void createParticle(double x, double y, double z, double vx, double vy, double vz, int[] colors,
+            int[] fadeColors, boolean trail, boolean flicker) {}
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void buildscape$handleCustomFireworkShapes(CallbackInfo ci) {
@@ -68,8 +68,7 @@ public abstract class FireworkStarterMixin extends Particle {
                                 colors, fadeColors,
                                 trail, flicker,
                                 yaw,
-                                this::createParticle
-                        );
+                                this::createParticle);
                     }
                 } else {
                     vanillaExplosions.add(tag);

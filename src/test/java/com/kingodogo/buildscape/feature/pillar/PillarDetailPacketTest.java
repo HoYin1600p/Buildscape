@@ -19,7 +19,7 @@ public class PillarDetailPacketTest {
         Field colors = UpdatePillarDataPacket.class.getDeclaredField("dyeColors");
         colors.setAccessible(true);
         List<String> palette = new ArrayList<>(List.of("#111111", "#222222", "#333333", "#444444", "#555555"));
-        for (int value : new int[] {3, 1, 7}) {
+        for (int value : new int[]{3, 1, 7}) {
             UpdatePillarDataPacket packet = new UpdatePillarDataPacket("S-P1", "spiral", true,
                     1.0, 1.0, 1.0, value, palette);
             FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());

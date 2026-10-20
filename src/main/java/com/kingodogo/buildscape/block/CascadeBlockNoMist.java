@@ -59,8 +59,7 @@ public class CascadeBlockNoMist extends WaterloggedBlock implements EntityBlock,
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -101,7 +100,8 @@ public class CascadeBlockNoMist extends WaterloggedBlock implements EntityBlock,
                 if (!level.isClientSide) {
                     int newLevel = be.cycleParticleLevel();
                     int percentage = newLevel * 20;
-                    player.displayClientMessage(new TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
+                    player.displayClientMessage(
+                            new TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
                     float pitch = 0.6f + (newLevel * 0.16f);
                     level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.5f, pitch);
                 }

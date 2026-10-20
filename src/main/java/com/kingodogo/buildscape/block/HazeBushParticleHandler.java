@@ -27,11 +27,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.*;
 import javax.annotation.Nullable;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class HazeBushParticleHandler {
 
     private static final Map<Long, Set<BlockPos>> POSITIONS_BY_CHUNK = new HashMap<>();
@@ -77,7 +73,8 @@ public class HazeBushParticleHandler {
         LevelChunkSection[] sections = chunk.getSections();
         for (LevelChunkSection section : sections) {
             if (section == null || section.hasOnlyAir() ||
-                !section.maybeHas(state -> state.getBlock() instanceof HazeBushBlock || state.getBlock() instanceof PottedHazeBushBlock)) {
+                    !section.maybeHas(state -> state.getBlock() instanceof HazeBushBlock
+                            || state.getBlock() instanceof PottedHazeBushBlock)) {
                 continue;
             }
 
@@ -85,15 +82,15 @@ public class HazeBushParticleHandler {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BlockState state = section.getBlockState(x, y, z);
-                        if (state.getBlock() instanceof HazeBushBlock || state.getBlock() instanceof PottedHazeBushBlock) {
+                        if (state.getBlock() instanceof HazeBushBlock
+                                || state.getBlock() instanceof PottedHazeBushBlock) {
                             if (chunkPositions == null) {
                                 chunkPositions = new HashSet<>();
                             }
                             chunkPositions.add(new BlockPos(
                                     chunk.getPos().getMinBlockX() + x,
                                     section.bottomBlockY() + y,
-                                    chunk.getPos().getMinBlockZ() + z
-                            ).immutable());
+                                    chunk.getPos().getMinBlockZ() + z).immutable());
                         }
                     }
                 }
@@ -146,7 +143,8 @@ public class HazeBushParticleHandler {
         double minDistSq = (double) VANILLA_TICK_RANGE * VANILLA_TICK_RANGE;
         float chance = (mc.options.particles == ParticleStatus.DECREASED) ? 0.08F : 0.20F;
 
-        for (Iterator<Map.Entry<Long, Set<BlockPos>>> chunkIt = POSITIONS_BY_CHUNK.entrySet().iterator(); chunkIt.hasNext();) {
+        for (Iterator<Map.Entry<Long, Set<BlockPos>>> chunkIt = POSITIONS_BY_CHUNK.entrySet().iterator(); chunkIt
+                .hasNext();) {
             Map.Entry<Long, Set<BlockPos>> entry = chunkIt.next();
             Set<BlockPos> positions = entry.getValue();
 
@@ -183,7 +181,8 @@ public class HazeBushParticleHandler {
                 if (RANDOM.nextFloat() < chance) {
                     Vec3 particlePos = findHazeParticlePos(level, pos, RANDOM);
                     if (particlePos != null) {
-                        level.addAlwaysVisibleParticle(ModParticles.HAZE.get(), false, particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1], rgb[2]);
+                        level.addAlwaysVisibleParticle(ModParticles.HAZE.get(), false, particlePos.x, particlePos.y,
+                                particlePos.z, rgb[0], rgb[1], rgb[2]);
                     }
                 }
             }
@@ -230,7 +229,8 @@ public class HazeBushParticleHandler {
 
             Vec3 start = new Vec3(bushPos.getX() + 0.5D, bushPos.getY() + 0.4D, bushPos.getZ() + 0.5D);
             Vec3 end = new Vec3(px, py + 0.05D, pz);
-            BlockHitResult hit = level.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+            BlockHitResult hit = level
+                    .clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
             if (hit.getType() != HitResult.Type.MISS) {
                 if (hit.getBlockPos().getX() != blockX || hit.getBlockPos().getZ() != blockZ) {
                     continue;

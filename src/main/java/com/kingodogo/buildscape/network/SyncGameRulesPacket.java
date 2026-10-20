@@ -16,7 +16,8 @@ public class SyncGameRulesPacket {
     public final boolean cakeStacking;
     public final boolean waterBottleStacking;
 
-    public SyncGameRulesPacket(boolean fastLeafDecay, boolean disableEndermanGriefing, boolean disableCreeperGriefing, boolean disableGhastGriefing, boolean cakeStacking, boolean waterBottleStacking) {
+    public SyncGameRulesPacket(boolean fastLeafDecay, boolean disableEndermanGriefing, boolean disableCreeperGriefing,
+            boolean disableGhastGriefing, boolean cakeStacking, boolean waterBottleStacking) {
         this.fastLeafDecay = fastLeafDecay;
         this.disableEndermanGriefing = disableEndermanGriefing;
         this.disableCreeperGriefing = disableCreeperGriefing;
@@ -49,8 +50,8 @@ public class SyncGameRulesPacket {
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() ->
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.applyGameRules(
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.applyGameRules(
                         fastLeafDecay, disableEndermanGriefing, disableCreeperGriefing, disableGhastGriefing,
                         cakeStacking, waterBottleStacking)));
         context.setPacketHandled(true);

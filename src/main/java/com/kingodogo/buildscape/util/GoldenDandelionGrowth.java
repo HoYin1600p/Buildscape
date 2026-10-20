@@ -7,8 +7,7 @@ import net.minecraft.world.entity.AgeableMob;
 public final class GoldenDandelionGrowth {
     public static final String FROZEN_TAG = "buildscape:frozen_growth";
 
-    private GoldenDandelionGrowth() {
-    }
+    private GoldenDandelionGrowth() {}
 
     public static boolean isFrozen(AgeableMob mob) {
         return mob.getTags().contains(FROZEN_TAG);

@@ -106,7 +106,8 @@ public class TrophyFireworkShape extends CustomFireworkShape {
         return points;
     }
 
-    private void addTrophyHandle(List<FireworkPoint> points, int sideSign, double attachTopX, double attachTopY, double attachBotY, double maxOutwardX) {
+    private void addTrophyHandle(List<FireworkPoint> points, int sideSign, double attachTopX, double attachTopY,
+            double attachBotY, double maxOutwardX) {
         for (double t = 0; t <= 1.0; t += 0.08) {
             double angle = t * Math.PI;
             double handleX = sideSign * (attachTopX + Math.sin(angle) * (maxOutwardX - attachTopX));

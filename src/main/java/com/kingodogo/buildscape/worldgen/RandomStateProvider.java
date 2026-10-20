@@ -13,16 +13,12 @@ import java.util.Random;
 
 public class RandomStateProvider extends BlockStateProvider {
 
-    public static final Codec<RandomStateProvider> CODEC =
-            RecordCodecBuilder.create(instance ->
-                    instance
-                            .group(
-                                    BlockState.CODEC.listOf()
-                                            .fieldOf("states")
-                                            .forGetter(provider -> provider.states)
-                            )
-                            .apply(instance, RandomStateProvider::new)
-            );
+    public static final Codec<RandomStateProvider> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(
+                    BlockState.CODEC.listOf()
+                            .fieldOf("states")
+                            .forGetter(provider -> provider.states))
+            .apply(instance, RandomStateProvider::new));
 
     private final List<BlockState> states;
 

@@ -19,51 +19,36 @@ public class ModSounds {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
-            DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, BuildScape.MODID);
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister
+            .create(ForgeRegistries.SOUND_EVENTS, BuildScape.MODID);
 
-    public static final RegistryObject<SoundEvent> SCULK_CATALYST_BLOOM =
-            SOUND_EVENTS.register("block.sculk_catalyst.bloom", () ->
-                    new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk_catalyst.bloom")));
-    public static final RegistryObject<SoundEvent> SCULK_SPREAD =
-            SOUND_EVENTS.register("block.sculk.spread", () ->
-                    new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk.spread")));
-    public static final RegistryObject<SoundEvent> SCULK_CHARGE =
-            SOUND_EVENTS.register("block.sculk.charge", () ->
-                    new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk.charge")));
+    public static final RegistryObject<SoundEvent> SCULK_CATALYST_BLOOM = SOUND_EVENTS.register(
+            "block.sculk_catalyst.bloom",
+            () -> new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk_catalyst.bloom")));
+    public static final RegistryObject<SoundEvent> SCULK_SPREAD = SOUND_EVENTS.register("block.sculk.spread",
+            () -> new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk.spread")));
+    public static final RegistryObject<SoundEvent> SCULK_CHARGE = SOUND_EVENTS.register("block.sculk.charge",
+            () -> new SoundEvent(new ResourceLocation(BuildScape.MODID, "block.sculk.charge")));
 
-    public static final RegistryObject<SoundEvent> COPPER_GRATE_BREAK =
-            registerSoundEvent("block.copper_grate.break");
-    public static final RegistryObject<SoundEvent> COPPER_GRATE_STEP =
-            registerSoundEvent("block.copper_grate.step");
+    public static final RegistryObject<SoundEvent> COPPER_GRATE_BREAK = registerSoundEvent("block.copper_grate.break");
+    public static final RegistryObject<SoundEvent> COPPER_GRATE_STEP = registerSoundEvent("block.copper_grate.step");
 
-    public static final RegistryObject<SoundEvent> COPPER_GRATE_PLACE =
-            COPPER_GRATE_STEP;
-    public static final RegistryObject<SoundEvent> COPPER_GRATE_HIT =
-            COPPER_GRATE_STEP;
-    public static final RegistryObject<SoundEvent> COPPER_GRATE_FALL =
-            COPPER_GRATE_STEP;
+    public static final RegistryObject<SoundEvent> COPPER_GRATE_PLACE = COPPER_GRATE_STEP;
+    public static final RegistryObject<SoundEvent> COPPER_GRATE_HIT = COPPER_GRATE_STEP;
+    public static final RegistryObject<SoundEvent> COPPER_GRATE_FALL = COPPER_GRATE_STEP;
 
-    public static final RegistryObject<SoundEvent> COPPER_BULB_BREAK =
-            registerSoundEvent("block.copper_bulb.break");
-    public static final RegistryObject<SoundEvent> COPPER_BULB_PLACE =
-            registerSoundEvent("block.copper_bulb.place");
-    public static final RegistryObject<SoundEvent> COPPER_BULB_STEP =
-            registerSoundEvent("block.copper_bulb.step");
-    public static final RegistryObject<SoundEvent> COPPER_BULB_TOGGLE =
-            registerSoundEvent("block.copper_bulb.toggle");
+    public static final RegistryObject<SoundEvent> COPPER_BULB_BREAK = registerSoundEvent("block.copper_bulb.break");
+    public static final RegistryObject<SoundEvent> COPPER_BULB_PLACE = registerSoundEvent("block.copper_bulb.place");
+    public static final RegistryObject<SoundEvent> COPPER_BULB_STEP = registerSoundEvent("block.copper_bulb.step");
+    public static final RegistryObject<SoundEvent> COPPER_BULB_TOGGLE = registerSoundEvent("block.copper_bulb.toggle");
 
-    public static final RegistryObject<SoundEvent> COPPER_BULB_HIT =
-            COPPER_BULB_STEP;
-    public static final RegistryObject<SoundEvent> COPPER_BULB_FALL =
-            COPPER_BULB_STEP;
+    public static final RegistryObject<SoundEvent> COPPER_BULB_HIT = COPPER_BULB_STEP;
+    public static final RegistryObject<SoundEvent> COPPER_BULB_FALL = COPPER_BULB_STEP;
 
     public static final RegistryObject<SoundEvent> MUD_BREAK = registerSoundEvent(
-            "block.mud.break"
-    );
+            "block.mud.break");
     public static final RegistryObject<SoundEvent> MUD_STEP = registerSoundEvent(
-            "block.mud.step"
-    );
+            "block.mud.step");
 
     public static final RegistryObject<SoundEvent> MUD_PLACE = MUD_STEP;
     public static final RegistryObject<SoundEvent> MUD_HIT = MUD_STEP;
@@ -81,79 +66,63 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> MUD_BRICKS_HIT = registerSoundEvent("block.mud_bricks.hit");
     public static final RegistryObject<SoundEvent> MUD_BRICKS_FALL = registerSoundEvent("block.mud_bricks.fall");
 
-    public static final RegistryObject<SoundEvent> DECORATED_POT_PLACE =
-            registerSoundEvent("block.decorated_pot.place");
-    public static final RegistryObject<SoundEvent> DECORATED_POT_BREAK =
-            registerSoundEvent("block.decorated_pot.break");
-    public static final RegistryObject<SoundEvent> DECORATED_POT_HIT =
-            registerSoundEvent("block.decorated_pot.hit");
-    public static final RegistryObject<SoundEvent> DECORATED_POT_STEP =
-            registerSoundEvent("block.decorated_pot.step");
-    public static final RegistryObject<SoundEvent> DECORATED_POT_FALL =
-            registerSoundEvent("block.decorated_pot.fall");
-    public static final RegistryObject<SoundEvent> DECORATED_POT_INSERT_ITEM =
-            registerSoundEvent("block.decorated_pot.insert_item");
-    public static final RegistryObject<SoundEvent> DECORATED_POT_INSERT_FAIL =
-            registerSoundEvent("block.decorated_pot.insert_fail");
-    public static final RegistryObject<SoundEvent> DECORATED_POT_SHATTER =
-            registerSoundEvent("block.decorated_pot.shatter");
+    public static final RegistryObject<SoundEvent> DECORATED_POT_PLACE = registerSoundEvent(
+            "block.decorated_pot.place");
+    public static final RegistryObject<SoundEvent> DECORATED_POT_BREAK = registerSoundEvent(
+            "block.decorated_pot.break");
+    public static final RegistryObject<SoundEvent> DECORATED_POT_HIT = registerSoundEvent("block.decorated_pot.hit");
+    public static final RegistryObject<SoundEvent> DECORATED_POT_STEP = registerSoundEvent("block.decorated_pot.step");
+    public static final RegistryObject<SoundEvent> DECORATED_POT_FALL = registerSoundEvent("block.decorated_pot.fall");
+    public static final RegistryObject<SoundEvent> DECORATED_POT_INSERT_ITEM = registerSoundEvent(
+            "block.decorated_pot.insert_item");
+    public static final RegistryObject<SoundEvent> DECORATED_POT_INSERT_FAIL = registerSoundEvent(
+            "block.decorated_pot.insert_fail");
+    public static final RegistryObject<SoundEvent> DECORATED_POT_SHATTER = registerSoundEvent(
+            "block.decorated_pot.shatter");
 
-    public static final RegistryObject<SoundEvent> FLOWER_BED_BREAK =
-            registerSoundEvent("block.flower_bed.break");
-    public static final RegistryObject<SoundEvent> FLOWER_BED_STEP =
-            registerSoundEvent("block.flower_bed.step");
-    public static final RegistryObject<SoundEvent> FLOWER_BED_PLACE =
-            registerSoundEvent("block.flower_bed.place");
-    public static final RegistryObject<SoundEvent> FLOWER_BED_HIT =
-            registerSoundEvent("block.flower_bed.hit");
-    public static final RegistryObject<SoundEvent> FLOWER_BED_FALL =
-            registerSoundEvent("block.flower_bed.fall");
+    public static final RegistryObject<SoundEvent> FLOWER_BED_BREAK = registerSoundEvent("block.flower_bed.break");
+    public static final RegistryObject<SoundEvent> FLOWER_BED_STEP = registerSoundEvent("block.flower_bed.step");
+    public static final RegistryObject<SoundEvent> FLOWER_BED_PLACE = registerSoundEvent("block.flower_bed.place");
+    public static final RegistryObject<SoundEvent> FLOWER_BED_HIT = registerSoundEvent("block.flower_bed.hit");
+    public static final RegistryObject<SoundEvent> FLOWER_BED_FALL = registerSoundEvent("block.flower_bed.fall");
 
-    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_BREAK =
-            registerSoundEvent("block.mangrove_roots.break");
-    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_STEP =
-            registerSoundEvent("block.mangrove_roots.step");
-    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_PLACE =
-            registerSoundEvent("block.mangrove_roots.place");
-    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_HIT =
-            registerSoundEvent("block.mangrove_roots.hit");
-    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_FALL =
-            registerSoundEvent("block.mangrove_roots.fall");
+    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_BREAK = registerSoundEvent(
+            "block.mangrove_roots.break");
+    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_STEP = registerSoundEvent(
+            "block.mangrove_roots.step");
+    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_PLACE = registerSoundEvent(
+            "block.mangrove_roots.place");
+    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_HIT = registerSoundEvent("block.mangrove_roots.hit");
+    public static final RegistryObject<SoundEvent> MANGROVE_ROOTS_FALL = registerSoundEvent(
+            "block.mangrove_roots.fall");
 
-    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_BREAK =
-            registerSoundEvent("block.muddy_mangrove_roots.break");
-    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_STEP =
-            registerSoundEvent("block.muddy_mangrove_roots.step");
-    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_PLACE =
-            registerSoundEvent("block.muddy_mangrove_roots.place");
-    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_HIT =
-            registerSoundEvent("block.muddy_mangrove_roots.hit");
-    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_FALL =
-            registerSoundEvent("block.muddy_mangrove_roots.fall");
+    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_BREAK = registerSoundEvent(
+            "block.muddy_mangrove_roots.break");
+    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_STEP = registerSoundEvent(
+            "block.muddy_mangrove_roots.step");
+    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_PLACE = registerSoundEvent(
+            "block.muddy_mangrove_roots.place");
+    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_HIT = registerSoundEvent(
+            "block.muddy_mangrove_roots.hit");
+    public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_FALL = registerSoundEvent(
+            "block.muddy_mangrove_roots.fall");
 
-    public static final RegistryObject<SoundEvent> GEYSER_CONTINUOUS_START =
-            registerSoundEvent("block.geyser_continuous.start");
-    public static final RegistryObject<SoundEvent> GEYSER_CONTINUOUS_ACTIVE =
-            registerSoundEvent("block.geyser_continuous.active");
-    public static final RegistryObject<SoundEvent> GEYSER_ERUPTION_START =
-            registerSoundEvent("block.geyser_eruption.start");
-    public static final RegistryObject<SoundEvent> GEYSER_ERUPTION_ACTIVE =
-            registerSoundEvent("block.geyser_eruption.active");
-    public static final RegistryObject<SoundEvent> NOXIOUS_GAS =
-            registerSoundEvent("block.noxious_gas");
+    public static final RegistryObject<SoundEvent> GEYSER_CONTINUOUS_START = registerSoundEvent(
+            "block.geyser_continuous.start");
+    public static final RegistryObject<SoundEvent> GEYSER_CONTINUOUS_ACTIVE = registerSoundEvent(
+            "block.geyser_continuous.active");
+    public static final RegistryObject<SoundEvent> GEYSER_ERUPTION_START = registerSoundEvent(
+            "block.geyser_eruption.start");
+    public static final RegistryObject<SoundEvent> GEYSER_ERUPTION_ACTIVE = registerSoundEvent(
+            "block.geyser_eruption.active");
+    public static final RegistryObject<SoundEvent> NOXIOUS_GAS = registerSoundEvent("block.noxious_gas");
 
-    public static final RegistryObject<SoundEvent> SHELF_ACTIVATE =
-            registerSoundEvent("block.shelf.activate");
-    public static final RegistryObject<SoundEvent> SHELF_DEACTIVATE =
-            registerSoundEvent("block.shelf.deactivate");
-    public static final RegistryObject<SoundEvent> SHELF_PLACE_ITEM =
-            registerSoundEvent("block.shelf.place_item");
-    public static final RegistryObject<SoundEvent> SHELF_TAKE_ITEM =
-            registerSoundEvent("block.shelf.take_item");
-    public static final RegistryObject<SoundEvent> SHELF_SINGLE_SWAP =
-            registerSoundEvent("block.shelf.single_swap");
-    public static final RegistryObject<SoundEvent> SHELF_MULTI_SWAP =
-            registerSoundEvent("block.shelf.multi_swap");
+    public static final RegistryObject<SoundEvent> SHELF_ACTIVATE = registerSoundEvent("block.shelf.activate");
+    public static final RegistryObject<SoundEvent> SHELF_DEACTIVATE = registerSoundEvent("block.shelf.deactivate");
+    public static final RegistryObject<SoundEvent> SHELF_PLACE_ITEM = registerSoundEvent("block.shelf.place_item");
+    public static final RegistryObject<SoundEvent> SHELF_TAKE_ITEM = registerSoundEvent("block.shelf.take_item");
+    public static final RegistryObject<SoundEvent> SHELF_SINGLE_SWAP = registerSoundEvent("block.shelf.single_swap");
+    public static final RegistryObject<SoundEvent> SHELF_MULTI_SWAP = registerSoundEvent("block.shelf.multi_swap");
 
     private static ForgeSoundType copperGrateSounds = null;
     private static ForgeSoundType copperBulbSounds = null;
@@ -168,7 +137,8 @@ public class ModSounds {
                         if (COPPER_GRATE_BREAK != null && COPPER_GRATE_BREAK.isPresent()) {
                             return COPPER_GRATE_BREAK.get();
                         }
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) {
+                    }
                     return SoundEvents.COPPER_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
@@ -176,7 +146,8 @@ public class ModSounds {
                         if (COPPER_GRATE_STEP != null && COPPER_GRATE_STEP.isPresent()) {
                             return COPPER_GRATE_STEP.get();
                         }
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) {
+                    }
                     return SoundEvents.COPPER_STEP;
                 };
 
@@ -187,8 +158,7 @@ public class ModSounds {
                         stepSound,
                         stepSound,
                         stepSound,
-                        stepSound
-                );
+                        stepSound);
             } catch (Exception e) {
                 LOGGER.error("Failed to create copper grate sound type: {}", e.getMessage(), e);
                 return new ForgeSoundType(
@@ -198,8 +168,7 @@ public class ModSounds {
                         () -> SoundEvents.COPPER_STEP,
                         () -> SoundEvents.COPPER_STEP,
                         () -> SoundEvents.COPPER_STEP,
-                        () -> SoundEvents.COPPER_STEP
-                );
+                        () -> SoundEvents.COPPER_STEP);
             }
         }
         return copperGrateSounds;
@@ -213,7 +182,8 @@ public class ModSounds {
                         if (COPPER_BULB_BREAK != null && COPPER_BULB_BREAK.isPresent()) {
                             return COPPER_BULB_BREAK.get();
                         }
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) {
+                    }
                     return SoundEvents.COPPER_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
@@ -221,7 +191,8 @@ public class ModSounds {
                         if (COPPER_BULB_STEP != null && COPPER_BULB_STEP.isPresent()) {
                             return COPPER_BULB_STEP.get();
                         }
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) {
+                    }
                     return SoundEvents.COPPER_STEP;
                 };
                 Supplier<SoundEvent> placeSound = () -> {
@@ -229,7 +200,8 @@ public class ModSounds {
                         if (COPPER_BULB_PLACE != null && COPPER_BULB_PLACE.isPresent()) {
                             return COPPER_BULB_PLACE.get();
                         }
-                    } catch (Throwable ignored) {}
+                    } catch (Throwable ignored) {
+                    }
                     return SoundEvents.COPPER_STEP;
                 };
 
@@ -240,8 +212,7 @@ public class ModSounds {
                         stepSound,
                         placeSound,
                         stepSound,
-                        stepSound
-                );
+                        stepSound);
             } catch (Exception e) {
                 LOGGER.error("Failed to create copper bulb sound type: {}", e.getMessage(), e);
                 return new ForgeSoundType(
@@ -251,8 +222,7 @@ public class ModSounds {
                         () -> SoundEvents.COPPER_STEP,
                         () -> SoundEvents.COPPER_STEP,
                         () -> SoundEvents.COPPER_STEP,
-                        () -> SoundEvents.COPPER_STEP
-                );
+                        () -> SoundEvents.COPPER_STEP);
             }
         }
         return copperBulbSounds;
@@ -269,8 +239,7 @@ public class ModSounds {
                 () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_STEP,
                 () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_PLACE,
                 () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_HIT,
-                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_FALL
-        );
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : SoundEvents.GRAVEL_FALL);
     }
 
     public static CustomSoundType PACKED_MUD_SOUNDS() {
@@ -284,8 +253,7 @@ public class ModSounds {
                 () -> PACKED_MUD_STEP.isPresent() ? PACKED_MUD_STEP.get() : SoundEvents.GRAVEL_STEP,
                 () -> PACKED_MUD_PLACE.isPresent() ? PACKED_MUD_PLACE.get() : SoundEvents.GRAVEL_PLACE,
                 () -> PACKED_MUD_HIT.isPresent() ? PACKED_MUD_HIT.get() : SoundEvents.GRAVEL_HIT,
-                () -> PACKED_MUD_FALL.isPresent() ? PACKED_MUD_FALL.get() : SoundEvents.GRAVEL_FALL
-        );
+                () -> PACKED_MUD_FALL.isPresent() ? PACKED_MUD_FALL.get() : SoundEvents.GRAVEL_FALL);
     }
 
     public static CustomSoundType MUD_BRICKS_SOUNDS() {
@@ -299,8 +267,7 @@ public class ModSounds {
                 () -> MUD_BRICKS_STEP.isPresent() ? MUD_BRICKS_STEP.get() : SoundEvents.STONE_STEP,
                 () -> MUD_BRICKS_PLACE.isPresent() ? MUD_BRICKS_PLACE.get() : SoundEvents.STONE_PLACE,
                 () -> MUD_BRICKS_HIT.isPresent() ? MUD_BRICKS_HIT.get() : SoundEvents.STONE_HIT,
-                () -> MUD_BRICKS_FALL.isPresent() ? MUD_BRICKS_FALL.get() : SoundEvents.STONE_FALL
-        );
+                () -> MUD_BRICKS_FALL.isPresent() ? MUD_BRICKS_FALL.get() : SoundEvents.STONE_FALL);
     }
 
     public static CustomSoundType PETAL_CLOVER_SOUNDS() {
@@ -319,8 +286,7 @@ public class ModSounds {
                 () -> SoundEvents.FLOWERING_AZALEA_STEP,
                 () -> SoundEvents.FLOWERING_AZALEA_PLACE,
                 () -> SoundEvents.FLOWERING_AZALEA_HIT,
-                () -> SoundEvents.FLOWERING_AZALEA_FALL
-        );
+                () -> SoundEvents.FLOWERING_AZALEA_FALL);
     }
 
     public static CustomSoundType FLOWER_BED_SOUNDS() {
@@ -364,8 +330,7 @@ public class ModSounds {
                         return FLOWER_BED_FALL.get();
                     }
                     return SoundEvents.FLOWERING_AZALEA_FALL;
-                }
-        );
+                });
     }
 
     public static CustomSoundType VINE_SOUNDS() {
@@ -384,8 +349,7 @@ public class ModSounds {
                 () -> SoundEvents.VINE_STEP,
                 () -> SoundEvents.VINE_PLACE,
                 () -> SoundEvents.VINE_HIT,
-                () -> SoundEvents.VINE_FALL
-        );
+                () -> SoundEvents.VINE_FALL);
     }
 
     public static CustomSoundType AZALEA_SOUNDS() {
@@ -404,8 +368,7 @@ public class ModSounds {
                 () -> SoundEvents.AZALEA_STEP,
                 () -> SoundEvents.AZALEA_PLACE,
                 () -> SoundEvents.AZALEA_HIT,
-                () -> SoundEvents.AZALEA_FALL
-        );
+                () -> SoundEvents.AZALEA_FALL);
     }
 
     public static ForgeSoundType MANGROVE_ROOTS_SOUNDS() {
@@ -449,8 +412,7 @@ public class ModSounds {
                         stepSound,
                         placeSound,
                         hitSound,
-                        fallSound
-                );
+                        fallSound);
             } catch (Exception e) {
                 LOGGER.error("Failed to create mangrove roots sound type: {}", e.getMessage(), e);
                 return new ForgeSoundType(
@@ -460,8 +422,7 @@ public class ModSounds {
                         () -> SoundEvents.WOOD_STEP,
                         () -> SoundEvents.WOOD_STEP,
                         () -> SoundEvents.WOOD_STEP,
-                        () -> SoundEvents.WOOD_STEP
-                );
+                        () -> SoundEvents.WOOD_STEP);
             }
         }
         return mangroveRootsSounds;
@@ -508,8 +469,7 @@ public class ModSounds {
                         stepSound,
                         placeSound,
                         hitSound,
-                        fallSound
-                );
+                        fallSound);
             } catch (Exception e) {
                 LOGGER.error("Failed to create muddy mangrove roots sound type: {}", e.getMessage(), e);
                 return new ForgeSoundType(
@@ -519,8 +479,7 @@ public class ModSounds {
                         () -> SoundEvents.WOOD_STEP,
                         () -> SoundEvents.WOOD_STEP,
                         () -> SoundEvents.WOOD_STEP,
-                        () -> SoundEvents.WOOD_STEP
-                );
+                        () -> SoundEvents.WOOD_STEP);
             }
         }
         return muddyMangroveRootsSounds;
@@ -528,17 +487,14 @@ public class ModSounds {
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         String eventName = name.replace('.', '_');
-        return SOUND_EVENTS.register(eventName, () ->
-                new SoundEvent(new ResourceLocation(BuildScape.MODID, eventName))
-        );
+        return SOUND_EVENTS.register(eventName,
+                () -> new SoundEvent(new ResourceLocation(BuildScape.MODID, eventName)));
     }
 
-    public static final RegistryObject<SoundEvent> MUSIC_DISC_CELEBRATION =
-            registerSoundEvent("music_disc_celebration");
-    public static final RegistryObject<SoundEvent> MUSIC_DISC_SNOWFALL =
-            registerSoundEvent("music_disc_snowfall");
-    public static final RegistryObject<SoundEvent> MUSIC_DISC_BUILDER =
-            registerSoundEvent("music_disc_builder");
+    public static final RegistryObject<SoundEvent> MUSIC_DISC_CELEBRATION = registerSoundEvent(
+            "music_disc_celebration");
+    public static final RegistryObject<SoundEvent> MUSIC_DISC_SNOWFALL = registerSoundEvent("music_disc_snowfall");
+    public static final RegistryObject<SoundEvent> MUSIC_DISC_BUILDER = registerSoundEvent("music_disc_builder");
 
     public static void register(IEventBus eventBus) {
         SOUND_EVENTS.register(eventBus);

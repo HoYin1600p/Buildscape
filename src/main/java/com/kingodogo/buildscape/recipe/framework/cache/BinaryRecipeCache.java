@@ -64,7 +64,8 @@ public class BinaryRecipeCache {
                     return item;
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return Items.AIR;
     }
 
@@ -79,7 +80,8 @@ public class BinaryRecipeCache {
                     return key;
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return new ResourceLocation("minecraft", "air");
     }
 
@@ -140,7 +142,9 @@ public class BinaryRecipeCache {
             List<String> stringPool = new ArrayList<>();
             Map<String, Integer> stringIndexMap = new HashMap<>();
 
-            List<Recipe<?>> cacheable = recipes != null ? recipes.stream().filter(BinaryRecipeCache::isCacheable).toList() : List.of();
+            List<Recipe<?>> cacheable = recipes != null
+                    ? recipes.stream().filter(BinaryRecipeCache::isCacheable).toList()
+                    : List.of();
 
             recipeDataOut.writeInt(cacheable.size());
             for (Recipe<?> recipe : cacheable) {
@@ -178,7 +182,6 @@ public class BinaryRecipeCache {
             BuildScape.LOGGER.error("Failed to write BDRE Binary Cache", e);
         }
     }
-
 
     public static List<Recipe<?>> loadCache(String expectedHash) {
         Path cacheFile = getCacheDir().resolve("recipes.bscb");

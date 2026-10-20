@@ -13,18 +13,15 @@ public class RequestPillarIdsPacket {
     private static final String LAST_REQUEST_TIME = "BuildScapePillarSyncRequestTime";
     private static final long REQUEST_COOLDOWN_MS = 5_000L;
 
-    public RequestPillarIdsPacket() {
-    }
+    public RequestPillarIdsPacket() {}
 
-    public RequestPillarIdsPacket(FriendlyByteBuf buf) {
-    }
+    public RequestPillarIdsPacket(FriendlyByteBuf buf) {}
 
     public static RequestPillarIdsPacket decode(FriendlyByteBuf buf) {
         return new RequestPillarIdsPacket(buf);
     }
 
-    public void encode(FriendlyByteBuf buf) {
-    }
+    public void encode(FriendlyByteBuf buf) {}
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {

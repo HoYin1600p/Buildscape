@@ -18,15 +18,14 @@ import java.util.function.Function;
 
 public final class RecipeManagerInjector {
 
-    private RecipeManagerInjector() {
-    }
+    private RecipeManagerInjector() {}
 
     public static void inject(RecipeManager recipeManager, List<Recipe<?>> newRecipes) {
         inject(recipeManager, newRecipes, Set.of());
     }
 
     public static void inject(RecipeManager recipeManager, List<Recipe<?>> newRecipes,
-                              Set<ResourceLocation> disabledIds) {
+            Set<ResourceLocation> disabledIds) {
         if (recipeManager == null || newRecipes == null || newRecipes.isEmpty()) {
             return;
         }

@@ -31,7 +31,5 @@ public class ResinClumpBlock extends GlowLichenBlock {
     }
 
     @Override
-    public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {
-    }
+    public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {}
 }
-

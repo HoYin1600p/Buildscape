@@ -10,7 +10,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ColoredSmokeParticle extends TextureSheetParticle {
 
     protected ColoredSmokeParticle(ClientLevel level, double x, double y, double z,
-                                   double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+            double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z);
 
         this.quadSize = 0.3f;
@@ -88,7 +88,7 @@ public class ColoredSmokeParticle extends TextureSheetParticle {
 
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level,
-                                       double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+                double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new ColoredSmokeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }

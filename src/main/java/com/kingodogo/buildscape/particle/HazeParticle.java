@@ -20,7 +20,7 @@ public class HazeParticle extends TextureSheetParticle {
     private final float baseSize;
 
     protected HazeParticle(ClientLevel level, double x, double y, double z,
-                           double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+            double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z);
         this.sprites = sprites;
 
@@ -91,9 +91,9 @@ public class HazeParticle extends TextureSheetParticle {
     @Override
     public void render(VertexConsumer consumer, Camera camera, float partialTick) {
         Vec3 camPos = camera.getPosition();
-        float px = (float)(Mth.lerp((double)partialTick, this.xo, this.x) - camPos.x());
-        float py = (float)(Mth.lerp((double)partialTick, this.yo, this.y) - camPos.y());
-        float pz = (float)(Mth.lerp((double)partialTick, this.zo, this.z) - camPos.z());
+        float px = (float) (Mth.lerp((double) partialTick, this.xo, this.x) - camPos.x());
+        float py = (float) (Mth.lerp((double) partialTick, this.yo, this.y) - camPos.y());
+        float pz = (float) (Mth.lerp((double) partialTick, this.zo, this.z) - camPos.z());
 
         float size = this.getQuadSize(partialTick);
         float angle = Mth.lerp(partialTick, this.oRoll, this.roll);
@@ -118,16 +118,24 @@ public class HazeParticle extends TextureSheetParticle {
         float v1 = this.getV1();
 
         // Top Face (visible looking down)
-        consumer.vertex(p3.x(), p3.y(), p3.z()).uv(u0, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p2.x(), p2.y(), p2.z()).uv(u1, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p1.x(), p1.y(), p1.z()).uv(u1, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p0.x(), p0.y(), p0.z()).uv(u0, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
+        consumer.vertex(p3.x(), p3.y(), p3.z()).uv(u0, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light)
+                .endVertex();
+        consumer.vertex(p2.x(), p2.y(), p2.z()).uv(u1, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light)
+                .endVertex();
+        consumer.vertex(p1.x(), p1.y(), p1.z()).uv(u1, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light)
+                .endVertex();
+        consumer.vertex(p0.x(), p0.y(), p0.z()).uv(u0, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light)
+                .endVertex();
 
         // Bottom Face (visible looking up)
-        consumer.vertex(p0.x(), p0.y(), p0.z()).uv(u0, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p1.x(), p1.y(), p1.z()).uv(u1, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p2.x(), p2.y(), p2.z()).uv(u1, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p3.x(), p3.y(), p3.z()).uv(u0, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
+        consumer.vertex(p0.x(), p0.y(), p0.z()).uv(u0, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light)
+                .endVertex();
+        consumer.vertex(p1.x(), p1.y(), p1.z()).uv(u1, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light)
+                .endVertex();
+        consumer.vertex(p2.x(), p2.y(), p2.z()).uv(u1, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light)
+                .endVertex();
+        consumer.vertex(p3.x(), p3.y(), p3.z()).uv(u0, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light)
+                .endVertex();
     }
 
     @Override
@@ -145,7 +153,7 @@ public class HazeParticle extends TextureSheetParticle {
 
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level,
-                                       double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+                double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new HazeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }

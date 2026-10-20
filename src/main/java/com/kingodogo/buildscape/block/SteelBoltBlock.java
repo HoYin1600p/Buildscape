@@ -81,7 +81,8 @@ public class SteelBoltBlock extends WaterloggedBlock implements SimpleWaterlogge
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -93,7 +94,8 @@ public class SteelBoltBlock extends WaterloggedBlock implements SimpleWaterlogge
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        return (!context.isSecondaryUseActive() && context.getItemInHand().getItem() == this.asItem() && state.getValue(BOLTS) < 3) || super.canBeReplaced(state, context);
+        return (!context.isSecondaryUseActive() && context.getItemInHand().getItem() == this.asItem()
+                && state.getValue(BOLTS) < 3) || super.canBeReplaced(state, context);
     }
 
     @Override
@@ -111,7 +113,8 @@ public class SteelBoltBlock extends WaterloggedBlock implements SimpleWaterlogge
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() == this.asItem()) {
             int currentAmount = state.getValue(BOLTS);
@@ -123,7 +126,8 @@ public class SteelBoltBlock extends WaterloggedBlock implements SimpleWaterlogge
                     }
                 }
                 SoundType soundType = state.getSoundType();
-                level.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.getVolume(), soundType.getPitch());
+                level.playSound(player, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, soundType.getVolume(),
+                        soundType.getPitch());
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }

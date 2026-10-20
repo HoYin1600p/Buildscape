@@ -86,8 +86,7 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
 
         if (blockEntity.hasLiquid()) {
             renderLiquid(blockEntity, poseStack, bufferSource, light, combinedOverlay);
-        }
-        else if (!blockEntity.isEmpty()) {
+        } else if (!blockEntity.isEmpty()) {
             ItemStack storedItem = blockEntity.getStoredItem();
             if (storedItem != null && !storedItem.isEmpty()) {
                 int count = storedItem.getCount();

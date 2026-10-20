@@ -31,8 +31,7 @@ public class LiquidBlockRendererMixin {
             VertexConsumer buffer,
             BlockState state,
             FluidState fluidState,
-            CallbackInfoReturnable<Boolean> cir
-    ) {
+            CallbackInfoReturnable<Boolean> cir) {
         if (state.getBlock() instanceof HollowPipeBlock || state.getBlock() instanceof HollowLogBlock) {
             cir.setReturnValue(false);
         }
@@ -43,8 +42,7 @@ public class LiquidBlockRendererMixin {
             BlockAndTintGetter level,
             Fluid fluid,
             BlockPos pos,
-            CallbackInfoReturnable<Float> cir
-    ) {
+            CallbackInfoReturnable<Float> cir) {
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof HollowPipeBlock || state.getBlock() instanceof HollowLogBlock) {
             cir.setReturnValue(-1.0F);

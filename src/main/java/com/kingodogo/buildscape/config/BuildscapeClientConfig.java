@@ -141,7 +141,8 @@ public class BuildscapeClientConfig {
                     }
                 }
             }
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Config is read-only because it could not be parsed", e);
+            BuildScape.getLogger().warn("BuildscapeClientConfig: Config is read-only because it could not be parsed",
+                    e);
         }
 
         // Migrate and merge legacy buildscape/ui-state.cfg if it exists
@@ -155,12 +156,14 @@ public class BuildscapeClientConfig {
                     values.putIfAbsent(entry.getKey(), entry.getValue());
                 }
                 Files.deleteIfExists(uiFile);
-                BuildScape.getLogger().info("BuildscapeClientConfig: Merged buildscape/ui-state.cfg into buildscape/buildscape.cfg and removed ui-state.cfg");
+                BuildScape.getLogger().info(
+                        "BuildscapeClientConfig: Merged buildscape/ui-state.cfg into buildscape/buildscape.cfg and removed ui-state.cfg");
                 if (file.exists() && !readOnly) {
                     save();
                 }
             } catch (Exception e) {
-                BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to merge ui-state.cfg into buildscape.cfg", e);
+                BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to merge ui-state.cfg into buildscape.cfg",
+                        e);
             }
         }
 
@@ -211,21 +214,20 @@ public class BuildscapeClientConfig {
             }
             if (!Files.exists(backup)) {
                 Files.copy(legacy, backup);
-            }
-            else if (!Files.isRegularFile(backup) || Files.mismatch(legacy, backup) != -1) {
+            } else if (!Files.isRegularFile(backup) || Files.mismatch(legacy, backup) != -1) {
                 throw new IOException("Legacy backup does not match the original: " + backup);
             }
             if (output != null) {
                 if (replacementDecoded) {
                     Files.copy(legacy, file.toPath());
-                }
-                else {
+                } else {
                     ConfigLayoutIO.writeNew(file.toPath(), output);
                 }
             }
             Files.createFile(completion);
             if (output != null) {
-                BuildScape.getLogger().info("BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
+                BuildScape.getLogger().info(
+                        "BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
             }
         } catch (IOException e) {
             BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to migrate legacy config - {}", e.getMessage());
@@ -239,7 +241,8 @@ public class BuildscapeClientConfig {
 
     public void save() {
         if (readOnly) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Not saving read-only config; unreadable/legacy file kept as-is");
+            BuildScape.getLogger()
+                    .warn("BuildscapeClientConfig: Not saving read-only config; unreadable/legacy file kept as-is");
             return;
         }
         File file = getConfigFile();
@@ -256,7 +259,8 @@ public class BuildscapeClientConfig {
     }
 
     private static String groupedText(String source, Map<String, String> values) {
-        StringBuilder text = new StringBuilder("# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
+        StringBuilder text = new StringBuilder(
+                "# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
         for (String section : new String[]{"Gameplay", "Performance", "Visuals & particles", "Interface", "Other"}) {
             if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) {
                 continue;
@@ -277,10 +281,12 @@ public class BuildscapeClientConfig {
         return switch (key) {
             case KEY_CAKE_STACKING, KEY_WATER_BOTTLE_STACKING, KEY_MAX_PIPE_NETWORK_SIZE -> "Gameplay";
             case KEY_PARALLEL_MODEL_LOADING, KEY_CACHE_MODEL_MATERIALS,
-                    KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE -> "Performance";
+                    KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE ->
+                "Performance";
             case KEY_HIDE_CONFIG_BUTTON, KEY_UI_THEME, KEY_UI_BACKGROUND,
                     KEY_SIDE_PANEL_EXPANDED, KEY_NAVBAR_EXPANDED, KEY_ANIMATION_SPEED, KEY_LAST_ACTIVE_TAB,
-                    KEY_MAX_CUSTOM_PRESETS, KEY_LAST_PRESET -> "Interface";
+                    KEY_MAX_CUSTOM_PRESETS, KEY_LAST_PRESET ->
+                "Interface";
             default -> "Other";
         };
     }
@@ -296,12 +302,14 @@ public class BuildscapeClientConfig {
             case KEY_PARALLEL_BLOCK_STATE_CACHE -> "Build block-state caches in parallel.";
             case KEY_HIDE_CONFIG_BUTTON -> "Hide the BuildScape button on client screens.";
             case KEY_UI_THEME -> "Active theme for the BuildScape configuration screen (dark, light, cyber, etc.).";
-            case KEY_UI_BACKGROUND -> "Background style for the BuildScape configuration screen (none, blueprint, etc.).";
+            case KEY_UI_BACKGROUND ->
+                "Background style for the BuildScape configuration screen (none, blueprint, etc.).";
             case KEY_SIDE_PANEL_EXPANDED -> "Whether the configuration screen side panel is expanded.";
             case KEY_NAVBAR_EXPANDED -> "Whether the configuration screen navigation bar is expanded.";
             case KEY_ANIMATION_SPEED -> "UI animation speed index (0=normal, 1=fast, 2=instant).";
             case KEY_LAST_ACTIVE_TAB -> "Last selected tab index in the BuildScape configuration screen.";
-            case KEY_MAX_CUSTOM_PRESETS -> "Number of custom item presets that can be saved besides Default (1-32, default 4).";
+            case KEY_MAX_CUSTOM_PRESETS ->
+                "Number of custom item presets that can be saved besides Default (1-32, default 4).";
             case KEY_LAST_PRESET -> "Last applied item preset, shown as selected when the configuration screen opens.";
             default -> "Unrecognized setting retained with its original value.";
         };
@@ -374,7 +382,9 @@ public class BuildscapeClientConfig {
     }
 
     public boolean isSidePanelExpanded() {
-        return values.containsKey(KEY_SIDE_PANEL_EXPANDED) ? Boolean.parseBoolean(values.get(KEY_SIDE_PANEL_EXPANDED)) : true;
+        return values.containsKey(KEY_SIDE_PANEL_EXPANDED)
+                ? Boolean.parseBoolean(values.get(KEY_SIDE_PANEL_EXPANDED))
+                : true;
     }
 
     public void setSidePanelExpanded(boolean expanded) {

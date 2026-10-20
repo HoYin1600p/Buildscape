@@ -25,8 +25,7 @@ import java.util.Set;
 public final class EyeblossomTransitionHandler {
     private static final Map<ServerLevel, Tracker> TRACKERS = new IdentityHashMap<>();
 
-    private EyeblossomTransitionHandler() {
-    }
+    private EyeblossomTransitionHandler() {}
 
     static boolean shouldTransition(boolean currentlyOpen, boolean waxed, boolean night) {
         return !waxed && currentlyOpen != night;
@@ -120,8 +119,7 @@ public final class EyeblossomTransitionHandler {
                         BlockPos pos = new BlockPos(
                                 chunk.getPos().getMinBlockX() + x,
                                 section.bottomBlockY() + y,
-                                chunk.getPos().getMinBlockZ() + z
-                        );
+                                chunk.getPos().getMinBlockZ() + z);
                         track(level, pos);
                         level.scheduleTick(pos, state.getBlock(), 1);
                     }

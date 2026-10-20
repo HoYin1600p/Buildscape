@@ -51,6 +51,7 @@ public class CushionSupportTest {
     public void negativeCoordinatesFloorTowardTheCorrectColumn() {
         BlockPos cushion = new BlockPos(-3, 5, -9);
         BlockPos vanilla = new BlockPos(-3, 4, -9);
-        assertEquals(cushion, CushionSupport.supportingPos(vanilla, -2.5D, 5 + BOTTOM_CUSHION_TOP, -8.5D, Set.of(cushion)::contains));
+        assertEquals(cushion,
+                CushionSupport.supportingPos(vanilla, -2.5D, 5 + BOTTOM_CUSHION_TOP, -8.5D, Set.of(cushion)::contains));
     }
 }

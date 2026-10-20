@@ -27,35 +27,33 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import com.kingodogo.buildscape.core.OpenWaterloggedRotatedPillarBlock;
 
 public class ClimbableChainBlock
-        extends OpenWaterloggedRotatedPillarBlock
-        implements SimpleWaterloggedBlock {
+        extends
+            OpenWaterloggedRotatedPillarBlock
+        implements
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE_Y = Block.box(
             6.5D,
             0.0D,
             6.5D,
             9.5D,
             16.0D,
-            9.5D
-    );
+            9.5D);
     private static final VoxelShape SHAPE_X = Block.box(
             0.0D,
             6.5D,
             6.5D,
             16.0D,
             9.5D,
-            9.5D
-    );
+            9.5D);
     private static final VoxelShape SHAPE_Z = Block.box(
             6.5D,
             6.5D,
             0.0D,
             9.5D,
             9.5D,
-            16.0D
-    );
+            16.0D);
 
     private static final VoxelShape COLLISION_SHAPE_Y = Block.box(
             7.0D,
@@ -63,36 +61,31 @@ public class ClimbableChainBlock
             7.0D,
             9.0D,
             16.0D,
-            9.0D
-    );
+            9.0D);
     private static final VoxelShape COLLISION_SHAPE_X = Block.box(
             0.0D,
             6.5D,
             6.5D,
             16.0D,
             9.5D,
-            9.5D
-    );
+            9.5D);
     private static final VoxelShape COLLISION_SHAPE_Z = Block.box(
             6.5D,
             6.5D,
             0.0D,
             9.5D,
             9.5D,
-            16.0D
-    );
+            16.0D);
 
     public ClimbableChainBlock(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(WATERLOGGED, false)
-        );
+                this.stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(WATERLOGGED);
     }
@@ -115,8 +108,7 @@ public class ClimbableChainBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -126,8 +118,7 @@ public class ClimbableChainBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -135,16 +126,15 @@ public class ClimbableChainBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         Direction.Axis axis = state.getValue(AXIS);
         switch (axis) {
-            case X:
+            case X :
                 return SHAPE_X;
-            case Z:
+            case Z :
                 return SHAPE_Z;
-            case Y:
-            default:
+            case Y :
+            default :
                 return SHAPE_Y;
         }
     }
@@ -154,29 +144,23 @@ public class ClimbableChainBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
-        if (
-                context instanceof
-                        EntityCollisionContext entityContext
-        ) {
+            CollisionContext context) {
+        if (context instanceof EntityCollisionContext entityContext) {
             Entity entity = entityContext.getEntity();
-            if (
-                    entity != null &&
-                            !(entity instanceof Player)
-            ) {
+            if (entity != null &&
+                    !(entity instanceof Player)) {
                 return Shapes.empty();
             }
         }
 
         Direction.Axis axis = state.getValue(AXIS);
         switch (axis) {
-            case X:
+            case X :
                 return COLLISION_SHAPE_X;
-            case Z:
+            case Z :
                 return COLLISION_SHAPE_Z;
-            case Y:
-            default:
+            case Y :
+            default :
                 return COLLISION_SHAPE_Y;
         }
     }
@@ -186,12 +170,9 @@ public class ClimbableChainBlock
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            LivingEntity entity
-    ) {
-        return (
-                entity instanceof Player &&
-                        state.getValue(AXIS) == Direction.Axis.Y
-        );
+            LivingEntity entity) {
+        return (entity instanceof Player &&
+                state.getValue(AXIS) == Direction.Axis.Y);
     }
 
     @Override
@@ -199,8 +180,7 @@ public class ClimbableChainBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            PathComputationType type
-    ) {
+            PathComputationType type) {
         return true;
     }
 
@@ -218,11 +198,8 @@ public class ClimbableChainBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 }

@@ -27,7 +27,7 @@ public final class BuildersWorkbenchResultsPacket {
     private final List<ResourceLocation> results;
 
     public BuildersWorkbenchResultsPacket(BlockPos pos, int tab, int filterMask, int[] offsets,
-                                          List<ItemStack> results) {
+            List<ItemStack> results) {
         this.pos = pos;
         this.tab = tab;
         this.filterMask = filterMask;
@@ -51,7 +51,8 @@ public final class BuildersWorkbenchResultsPacket {
         for (int i = 0; i < RESULT_COUNT; i++) {
             results.add(buffer.readBoolean()
                     ? new ResourceLocation(NetworkPacketLimits.readUtf(buffer,
-                    NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "workbench result")) : null);
+                            NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "workbench result"))
+                    : null);
         }
     }
 

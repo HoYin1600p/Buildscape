@@ -37,8 +37,7 @@ public class ArmorPillarRenderer {
             float rotation,
             float gameTime,
             float facingYaw,
-            boolean isFixed
-    ) {
+            boolean isFixed) {
         if (itemStack == null || level == null || pos == null) {
             return;
         }
@@ -72,7 +71,6 @@ public class ArmorPillarRenderer {
 
         float scale = 0.85f;
         double yOffset = 0.0;
-
 
         double baseOffset = -0.42;
 
@@ -112,8 +110,7 @@ public class ArmorPillarRenderer {
                 partialTicks,
                 poseStack,
                 bufferSource,
-                combinedLight
-        );
+                combinedLight);
 
         poseStack.popPose();
     }
@@ -135,14 +132,13 @@ public class ArmorPillarRenderer {
         return armorStand;
     }
 
-    private static void updateArmorStandState(ArmorStand armorStand, ItemStack stack, EquipmentSlot slot, boolean isStandItem) {
+    private static void updateArmorStandState(ArmorStand armorStand, ItemStack stack, EquipmentSlot slot,
+            boolean isStandItem) {
         for (EquipmentSlot s : EquipmentSlot.values()) {
             armorStand.setItemSlot(s, ItemStack.EMPTY);
         }
 
-
         CompoundTag nbt = new CompoundTag();
-
 
         if (isStandItem) {
             nbt.putBoolean(NbtKeys.INVISIBLE, false);

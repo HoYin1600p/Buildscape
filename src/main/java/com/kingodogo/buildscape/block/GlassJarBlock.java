@@ -57,8 +57,7 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
     protected static final VoxelShape SHAPE = Shapes.or(
             Block.box(4.0D, 0.0D, 4.0D, 12.0D, 12.0D, 12.0D),
             Block.box(5.0D, 12.0D, 5.0D, 11.0D, 13.0D, 11.0D),
-            Block.box(4.5D, 13.0D, 4.5D, 11.5D, 14.0D, 11.5D)
-    );
+            Block.box(4.5D, 13.0D, 4.5D, 11.5D, 14.0D, 11.5D));
 
     public GlassJarBlock(Properties properties) {
         super(properties);
@@ -83,8 +82,7 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -107,7 +105,8 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+            ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (stack.hasTag() && stack.getTag().contains(NbtKeys.BLOCK_ENTITY_TAG, 10)) {
             BlockEntity be = level.getBlockEntity(pos);
@@ -140,8 +139,7 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
             ItemStack stack,
             @Nullable BlockGetter level,
             List<Component> tooltip,
-            TooltipFlag flag
-    ) {
+            TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         if (stack.hasTag() && stack.getTag().contains(NbtKeys.BLOCK_ENTITY_TAG, 10)) {
             CompoundTag beTag = stack.getTag().getCompound(NbtKeys.BLOCK_ENTITY_TAG);
@@ -152,7 +150,8 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
                     count = stored.getCount();
                 }
                 if (!stored.isEmpty() && count > 0) {
-                    tooltip.add(new TextComponent("Stored: ").append(stored.getHoverName()).append(" x" + count).withStyle(ChatFormatting.GRAY));
+                    tooltip.add(new TextComponent("Stored: ").append(stored.getHoverName()).append(" x" + count)
+                            .withStyle(ChatFormatting.GRAY));
                 }
             } else if (beTag.contains(NbtKeys.STORED_LIQUID_ITEM, 10)) {
                 ItemStack liquid = ItemStack.of(beTag.getCompound(NbtKeys.STORED_LIQUID_ITEM));
@@ -161,7 +160,8 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
                     int maxLevel = GlassJarBlockEntity.isXpLiquid(liquid)
                             ? GlassJarBlockEntity.XP_BOTTLE_MAX
                             : GlassJarBlockEntity.MAX_LIQUID_LEVEL;
-                    tooltip.add(new TextComponent("Stored Liquid: ").append(liquid.getHoverName()).append(" (" + levelAmount + "/" + maxLevel + ")").withStyle(ChatFormatting.GRAY));
+                    tooltip.add(new TextComponent("Stored Liquid: ").append(liquid.getHoverName())
+                            .append(" (" + levelAmount + "/" + maxLevel + ")").withStyle(ChatFormatting.GRAY));
                 }
             }
         }
@@ -174,8 +174,7 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof GlassJarBlockEntity jarBE)) {
             return InteractionResult.PASS;
@@ -196,7 +195,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
                 if (jarBE.addLiquid(copy)) {
                     if (!player.getAbilities().instabuild) {
                         handStack.shrink(1);
-                        ItemStack returnItem = isBucket ? new ItemStack(Items.BUCKET) : new ItemStack(Items.GLASS_BOTTLE);
+                        ItemStack returnItem = isBucket
+                                ? new ItemStack(Items.BUCKET)
+                                : new ItemStack(Items.GLASS_BOTTLE);
                         if (!player.getInventory().add(returnItem)) {
                             player.drop(returnItem, false);
                         }
@@ -344,7 +345,8 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
                     if (liquidItem.getItem() instanceof PotionItem) {
                         for (MobEffectInstance effect : PotionUtils.getMobEffects(liquidItem)) {
                             if (effect.getEffect().isInstantenous()) {
-                                effect.getEffect().applyInstantenousEffect(player, player, player, effect.getAmplifier(), 1.0D);
+                                effect.getEffect().applyInstantenousEffect(player, player, player,
+                                        effect.getAmplifier(), 1.0D);
                             } else {
                                 player.addEffect(new MobEffectInstance(effect));
                             }
@@ -384,8 +386,7 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
             Level level,
             BlockPos pos,
             BlockState newState,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             super.onRemove(state, level, pos, newState, isMoving);
         }

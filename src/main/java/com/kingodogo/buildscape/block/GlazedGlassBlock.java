@@ -18,14 +18,12 @@ import net.minecraft.world.level.material.FluidState;
 
 public class GlazedGlassBlock extends AbstractGlassBlock {
 
-    public static final DirectionProperty FACING =
-            BlockStateProperties.HORIZONTAL_FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public GlazedGlassBlock(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(FACING, Direction.NORTH)
-        );
+                this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -33,8 +31,7 @@ public class GlazedGlassBlock extends AbstractGlassBlock {
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            BlockPos beaconPos
-    ) {
+            BlockPos beaconPos) {
         int color = state.getMapColor(level, pos).col;
         return new float[]{
                 ((color >> 16) & 0xFF) / 255.0f,
@@ -45,11 +42,7 @@ public class GlazedGlassBlock extends AbstractGlassBlock {
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<
-                    Block,
-                    BlockState
-                    > builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
@@ -85,20 +78,16 @@ public class GlazedGlassBlock extends AbstractGlassBlock {
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 
     public boolean shouldDisplayFluidOverlay(
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            FluidState fluidState
-    ) {
+            FluidState fluidState) {
         return true;
     }
 }

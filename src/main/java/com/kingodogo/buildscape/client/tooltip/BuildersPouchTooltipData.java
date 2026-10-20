@@ -15,7 +15,8 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 
 public class BuildersPouchTooltipData implements TooltipComponent, ClientTooltipComponent {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(BuildScape.MODID, "textures/gui/shulker_box_tooltip.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(BuildScape.MODID,
+            "textures/gui/shulker_box_tooltip.png");
 
     public static final int COLOR_GOLD = 0xFBC02D;
 
@@ -105,7 +106,8 @@ public class BuildersPouchTooltipData implements TooltipComponent, ClientTooltip
                         itemRenderer.renderAndDecorateItem(mc.player, filter, itemX, itemY, col);
                     }
                 } catch (Throwable itemError) {
-                    BuildScape.getLogger().debug("BuildersPouchTooltipData: Error rendering item slot {}", col, itemError);
+                    BuildScape.getLogger().debug("BuildersPouchTooltipData: Error rendering item slot {}", col,
+                            itemError);
                 } finally {
                     itemRenderer.blitOffset = prevBlit;
                 }

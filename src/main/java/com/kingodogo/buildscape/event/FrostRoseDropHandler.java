@@ -145,7 +145,8 @@ public class FrostRoseDropHandler {
         boolean dropPending = true;
         int ticksRemaining;
 
-        TrackedDeath(ResourceKey<Level> dimension, BlockPos pos, double x, double y, double z, SnowGolem golem, int ticks) {
+        TrackedDeath(ResourceKey<Level> dimension, BlockPos pos, double x, double y, double z, SnowGolem golem,
+                int ticks) {
             this.dimension = dimension;
             this.pos = pos;
             this.x = x;

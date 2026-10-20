@@ -16,23 +16,20 @@ public class Trophies {
     private static final Map<String, TrophyDefinition> BY_ADVANCEMENT = new HashMap<>();
 
     private static final Map<Direction, VoxelShape> PEDESTAL_SHAPES = TrophyDefinition.createDirectionalShapes(
-        new double[]{4.0D, 0.0D, 4.0D, 12.0D, 1.0D, 12.0D},
-        new double[]{7.0D, 0.0D, 3.0D, 9.0D, 2.0D, 5.0D},
-        new double[]{3.0D, 0.0D, 7.0D, 5.0D, 2.0D, 9.0D},
-        new double[]{7.0D, 0.0D, 11.0D, 9.0D, 2.0D, 13.0D},
-        new double[]{11.0D, 0.0D, 7.0D, 13.0D, 2.0D, 9.0D},
-        new double[]{5.0D, 1.0D, 5.0D, 11.0D, 10.0D, 11.0D},
-        new double[]{4.375D, 9.85D, 4.125D, 11.625D, 11.85D, 11.875D},
-        new double[]{4.875D, 11.85D, 5.0D, 10.875D, 17.85D, 11.0D}
-    );
+            new double[]{4.0D, 0.0D, 4.0D, 12.0D, 1.0D, 12.0D},
+            new double[]{7.0D, 0.0D, 3.0D, 9.0D, 2.0D, 5.0D},
+            new double[]{3.0D, 0.0D, 7.0D, 5.0D, 2.0D, 9.0D},
+            new double[]{7.0D, 0.0D, 11.0D, 9.0D, 2.0D, 13.0D},
+            new double[]{11.0D, 0.0D, 7.0D, 13.0D, 2.0D, 9.0D},
+            new double[]{5.0D, 1.0D, 5.0D, 11.0D, 10.0D, 11.0D},
+            new double[]{4.375D, 9.85D, 4.125D, 11.625D, 11.85D, 11.875D},
+            new double[]{4.875D, 11.85D, 5.0D, 10.875D, 17.85D, 11.0D});
 
     private static final Map<Direction, VoxelShape> STAND_SHAPES = TrophyDefinition.createDirectionalShapes(
-        1.0D, 0.0D, 3.0D, 15.0D, 16.0D, 13.0D
-    );
+            1.0D, 0.0D, 3.0D, 15.0D, 16.0D, 13.0D);
 
     private static final Map<Direction, VoxelShape> BUILDSCAPE_TROPHY_SHAPES = TrophyDefinition.createDirectionalShapes(
-        1.0D, 0.0D, 1.0D, 15.0D, 30.0D, 15.0D
-    );
+            1.0D, 0.0D, 1.0D, 15.0D, 30.0D, 15.0D);
 
     public static final TrophyDefinition STONE_PILLAR = register(
             TrophyDefinition.builder("stone_pillar_trophy")
@@ -42,8 +39,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
                     .advancement("reach_for_the_sky")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition GOLD_PILLAR = register(
             TrophyDefinition.builder("gold_pillar_trophy")
@@ -53,8 +49,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
                     .advancement("put_it_on_display")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition DIAMOND_PILLAR = register(
             TrophyDefinition.builder("diamond_pillar_trophy")
@@ -64,8 +59,7 @@ public class Trophies {
                     .resistance(8.0F)
                     .shape(PEDESTAL_SHAPES)
                     .advancement("art_collector")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition NETHERITE_PILLAR = register(
             TrophyDefinition.builder("netherite_pillar_trophy")
@@ -75,8 +69,7 @@ public class Trophies {
                     .resistance(12.0F)
                     .shape(PEDESTAL_SHAPES)
                     .advancement("buildscape_museum")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition EMERALD_PILLAR = register(
             TrophyDefinition.builder("emerald_pillar_trophy")
@@ -86,8 +79,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
                     .advancement("columnist")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition GOLDEN_JAR = register(
             TrophyDefinition.builder("golden_jar_trophy")
@@ -97,8 +89,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
                     .advancement("jar_ring_display")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition GOLD_ORNAMENT = register(
             TrophyDefinition.builder("gold_ornament_trophy")
@@ -108,8 +99,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(STAND_SHAPES)
                     .advancement("ornamental")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition EMERALD_STOCKING = register(
             TrophyDefinition.builder("emerald_stocking_trophy")
@@ -119,8 +109,7 @@ public class Trophies {
                     .resistance(4.0F)
                     .shape(STAND_SHAPES)
                     .advancement("christmas_every_day")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition STAR = register(
             TrophyDefinition.builder("star_trophy")
@@ -131,8 +120,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(STAND_SHAPES)
                     .advancement("santas_little_helper")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition STRING_LIGHT = register(
             TrophyDefinition.builder("string_light_trophy")
@@ -143,8 +131,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(STAND_SHAPES)
                     .advancement("light_em_up")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition FIRELIGHT = register(
             TrophyDefinition.builder("firelight_trophy")
@@ -155,8 +142,7 @@ public class Trophies {
                     .resistance(8.0F)
                     .shape(PEDESTAL_SHAPES)
                     .advancement("rainbow_mood_light")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition DIAMOND_HAMMER = register(
             TrophyDefinition.builder("diamond_hammer_trophy")
@@ -166,8 +152,7 @@ public class Trophies {
                     .resistance(8.0F)
                     .shape(PEDESTAL_SHAPES)
                     .advancement("hammer_time")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition GOLD_BUILDSCAPE = register(
             TrophyDefinition.builder("gold_buildscape_trophy")
@@ -177,8 +162,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(BUILDSCAPE_TROPHY_SHAPES)
                     .advancement("one_more_block")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition EMERALD_BUILDSCAPE = register(
             TrophyDefinition.builder("emerald_buildscape_trophy")
@@ -188,8 +172,7 @@ public class Trophies {
                     .resistance(6.0F)
                     .shape(BUILDSCAPE_TROPHY_SHAPES)
                     .advancement("okay_one_more")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition DIAMOND_BUILDSCAPE = register(
             TrophyDefinition.builder("diamond_buildscape_trophy")
@@ -199,8 +182,7 @@ public class Trophies {
                     .resistance(8.0F)
                     .shape(BUILDSCAPE_TROPHY_SHAPES)
                     .advancement("actually_one_last")
-                    .build()
-    );
+                    .build());
 
     public static final TrophyDefinition NETHERITE_BUILDSCAPE = register(
             TrophyDefinition.builder("netherite_buildscape_trophy")
@@ -210,9 +192,7 @@ public class Trophies {
                     .resistance(12.0F)
                     .shape(BUILDSCAPE_TROPHY_SHAPES)
                     .advancement("one_last_one_i_promise")
-                    .build()
-    );
-
+                    .build());
 
     private static TrophyDefinition register(TrophyDefinition definition) {
         REGISTRY.put(definition.getId(), definition);
@@ -222,14 +202,13 @@ public class Trophies {
 
         RegistryObject<TrophyBlock> blockObj = ModBlocks.BLOCKS.register(
                 definition.getId(),
-                () -> new TrophyBlock(definition)
-        );
+                () -> new TrophyBlock(definition));
         definition.setBlockRegistryObject(blockObj);
 
         RegistryObject<Item> itemObj = ModItems.ITEMS.register(
                 definition.getId(),
-                () -> new TrophyBlockItem(blockObj.get(), definition, new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1))
-        );
+                () -> new TrophyBlockItem(blockObj.get(), definition,
+                        new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1)));
         definition.setItemRegistryObject(itemObj);
 
         return definition;
@@ -251,6 +230,5 @@ public class Trophies {
         return null;
     }
 
-    public static void init() {
-    }
+    public static void init() {}
 }

@@ -5,8 +5,7 @@ import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import java.util.Locale;
 
 public final class ShapedRecipeSymbols {
-    private ShapedRecipeSymbols() {
-    }
+    private ShapedRecipeSymbols() {}
 
     public static void validate(RecipeIR.RecipeSpec spec) {
         String type = spec.type() == null ? "" : spec.type().toLowerCase(Locale.ROOT);

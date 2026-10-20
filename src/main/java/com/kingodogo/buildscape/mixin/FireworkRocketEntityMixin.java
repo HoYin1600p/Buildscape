@@ -22,7 +22,8 @@ import com.kingodogo.buildscape.core.NbtKeys;
 @Mixin(FireworkRocketEntity.class)
 public abstract class FireworkRocketEntityMixin extends Projectile {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     private static EntityDataAccessor<ItemStack> DATA_ID_FIREWORKS_ITEM;
 
     @Shadow
@@ -49,14 +50,16 @@ public abstract class FireworkRocketEntityMixin extends Projectile {
     }
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/world/item/ItemStack;)V", at = @At("RETURN"))
-    private void buildscape$onConstructWithShooter(Level level, Entity shooter, double x, double y, double z, ItemStack stack, CallbackInfo ci) {
+    private void buildscape$onConstructWithShooter(Level level, Entity shooter, double x, double y, double z,
+            ItemStack stack, CallbackInfo ci) {
         if (shooter != null) {
             buildscape$applyShotYaw(shooter.getYRot());
         }
     }
 
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/Entity;DDDZ)V", at = @At("RETURN"))
-    private void buildscape$onConstructCrossbow(Level level, ItemStack stack, Entity shooter, double x, double y, double z, boolean shotAtAngle, CallbackInfo ci) {
+    private void buildscape$onConstructCrossbow(Level level, ItemStack stack, Entity shooter, double x, double y,
+            double z, boolean shotAtAngle, CallbackInfo ci) {
         if (shooter != null) {
             buildscape$applyShotYaw(shooter.getYRot());
         }

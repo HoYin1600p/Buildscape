@@ -22,16 +22,13 @@ public class SeatEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-    }
+    protected void defineSynchedData() {}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-    }
+    protected void readAdditionalSaveData(CompoundTag tag) {}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-    }
+    protected void addAdditionalSaveData(CompoundTag tag) {}
 
     @Override
     public void tick() {

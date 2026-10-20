@@ -177,7 +177,7 @@ public class FrameEditPersistenceTest {
 
     @Test
     public void resetAndRemovalStillClearEditedFramesAndAllowNewFramesAtTheFace() throws Exception {
-        for (boolean reset : new boolean[] {true, false}) {
+        for (boolean reset : new boolean[]{true, false}) {
             PillarIdManager manager = manager();
             load(manager, Map.of("FrameA", frame("FrameA", FRAME_TYPES[0])));
             edit(manager, "FrameA", "ring", "#445566");
@@ -200,7 +200,8 @@ public class FrameEditPersistenceTest {
         assertEquals("The frame is not loaded in a unit test", Boolean.TRUE, data.frameEditPending);
     }
 
-    private static boolean apply(PillarIdManager manager, String id, CompoundTag tag, boolean immediate) throws Exception {
+    private static boolean apply(PillarIdManager manager, String id, CompoundTag tag, boolean immediate)
+            throws Exception {
         Method apply = PillarIdManager.class.getDeclaredMethod("applyPendingFrameEdit",
                 PillarIdManager.PillarData.class, CompoundTag.class, boolean.class);
         apply.setAccessible(true);

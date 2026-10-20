@@ -68,8 +68,7 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
                 }
 
                 @Override
-                public void set(int index, int value) {
-                }
+                public void set(int index, int value) {}
 
                 @Override
                 public int getCount() {
@@ -85,7 +84,8 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     Item filter = BuildersPouchMenu.this.buildscape$getFilterItem(pouchSlot);
-                    return filter != null && stack.getItem() == filter && !(stack.getItem() instanceof BuildersPouchItem);
+                    return filter != null && stack.getItem() == filter
+                            && !(stack.getItem() instanceof BuildersPouchItem);
                 }
             });
         }
@@ -137,8 +137,7 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
 
         if (source.isEmpty()) {
             slot.set(ItemStack.EMPTY);
-        }
-        else {
+        } else {
             slot.setChanged();
         }
         slot.onTake(player, source);

@@ -54,7 +54,8 @@ public class BoneDiceBlock extends Block {
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+            ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         int roll = state.getValue(ROLL);
 
@@ -63,8 +64,7 @@ public class BoneDiceBlock extends Block {
                 player.displayClientMessage(
                         new TranslatableComponent("message.buildscape.bone_dice.rolled", roll)
                                 .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD),
-                        true
-                );
+                        true);
             }
             if (level instanceof ServerLevel serverLevel) {
                 spawnHighlightParticles(serverLevel, pos);
@@ -76,7 +76,8 @@ public class BoneDiceBlock extends Block {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit) {
         if (hand != InteractionHand.MAIN_HAND) {
             return InteractionResult.PASS;
         }
@@ -92,8 +93,7 @@ public class BoneDiceBlock extends Block {
                 player.displayClientMessage(
                         new TranslatableComponent("message.buildscape.bone_dice.rolled", newRoll)
                                 .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD),
-                        true
-                );
+                        true);
 
                 if (level instanceof ServerLevel serverLevel) {
                     spawnHighlightParticles(serverLevel, pos);
@@ -125,7 +125,8 @@ public class BoneDiceBlock extends Block {
             }
         }
 
-        level.sendParticles(ParticleTypes.GLOW, pos.getX() + 0.5, y + 0.05, pos.getZ() + 0.5, 6, 0.15, 0.02, 0.15, 0.02);
+        level.sendParticles(ParticleTypes.GLOW, pos.getX() + 0.5, y + 0.05, pos.getZ() + 0.5, 6, 0.15, 0.02, 0.15,
+                0.02);
     }
 
     @Override

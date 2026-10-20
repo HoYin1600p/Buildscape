@@ -17,8 +17,10 @@ import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 
 public class DecoratedPotBlockEntity
-        extends SyncedBlockEntity
-        implements WorldlyContainer {
+        extends
+            SyncedBlockEntity
+        implements
+            WorldlyContainer {
 
     private ItemStack storedItem = ItemStack.EMPTY;
 
@@ -28,9 +30,7 @@ public class DecoratedPotBlockEntity
     private static final int[] SLOTS = new int[]{0};
 
     public enum WobbleStyle {
-        NONE,
-        POSITIVE,
-        NEGATIVE,
+        NONE, POSITIVE, NEGATIVE,
     }
 
     public DecoratedPotBlockEntity(BlockPos pos, BlockState state) {
@@ -53,8 +53,7 @@ public class DecoratedPotBlockEntity
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -71,8 +70,7 @@ public class DecoratedPotBlockEntity
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -93,29 +91,23 @@ public class DecoratedPotBlockEntity
     public boolean canPlaceItemThroughFace(
             int slot,
             ItemStack stack,
-            @Nullable Direction direction
-    ) {
-        if (
-                stack.getItem() instanceof BlockItem blockItem
-        ) {
+            @Nullable Direction direction) {
+        if (stack.getItem() instanceof BlockItem blockItem) {
             if (blockItem.getBlock() instanceof DecoratedPotBlock) {
                 return false;
             }
         }
-        return (
-                direction != Direction.DOWN &&
-                        (storedItem.isEmpty() ||
-                                (ItemStack.isSameItemSameTags(storedItem, stack) &&
-                                        storedItem.getCount() < storedItem.getMaxStackSize()))
-        );
+        return (direction != Direction.DOWN &&
+                (storedItem.isEmpty() ||
+                        (ItemStack.isSameItemSameTags(storedItem, stack) &&
+                                storedItem.getCount() < storedItem.getMaxStackSize())));
     }
 
     @Override
     public boolean canTakeItemThroughFace(
             int slot,
             ItemStack stack,
-            Direction direction
-    ) {
+            Direction direction) {
         return direction == Direction.DOWN && !storedItem.isEmpty();
     }
 
@@ -154,14 +146,12 @@ public class DecoratedPotBlockEntity
             level.gameEvent(
                     null,
                     GameEvent.BLOCK_CHANGE,
-                    worldPosition
-            );
+                    worldPosition);
             level.sendBlockUpdated(
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
         return result;
     }
@@ -186,14 +176,12 @@ public class DecoratedPotBlockEntity
                 level.gameEvent(
                         null,
                         GameEvent.BLOCK_CHANGE,
-                        worldPosition
-                );
+                        worldPosition);
                 level.sendBlockUpdated(
                         worldPosition,
                         getBlockState(),
                         getBlockState(),
-                        3
-                );
+                        3);
             }
         }
     }
@@ -208,8 +196,7 @@ public class DecoratedPotBlockEntity
         if (storedItem.isEmpty()) {
             return 0;
         }
-        float fillRatio =
-                (float) storedItem.getCount() / (float) storedItem.getMaxStackSize();
+        float fillRatio = (float) storedItem.getCount() / (float) storedItem.getMaxStackSize();
         return Math.max(1, (int) Math.ceil(fillRatio * 15.0f));
     }
 
@@ -227,8 +214,7 @@ public class DecoratedPotBlockEntity
         if (tag.contains(NbtKeys.LAST_WOBBLE_STYLE)) {
             try {
                 this.lastWobbleStyle = WobbleStyle.valueOf(
-                        tag.getString(NbtKeys.LAST_WOBBLE_STYLE)
-                );
+                        tag.getString(NbtKeys.LAST_WOBBLE_STYLE));
             } catch (IllegalArgumentException e) {
                 this.lastWobbleStyle = WobbleStyle.NONE;
             }
@@ -252,8 +238,7 @@ public class DecoratedPotBlockEntity
                 NbtKeys.STORED_ITEM,
                 storedItem.isEmpty()
                         ? ItemStack.EMPTY.save(new CompoundTag())
-                        : storedItem.save(new CompoundTag())
-        );
+                        : storedItem.save(new CompoundTag()));
         tag.putLong(NbtKeys.WOBBLE_START_TICK, wobbleStartedAtTick);
         tag.putString(NbtKeys.LAST_WOBBLE_STYLE, lastWobbleStyle.name());
         return tag;

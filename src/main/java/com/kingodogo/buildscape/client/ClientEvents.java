@@ -33,11 +33,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEvents {
 
     private static boolean wasPressed = false;
@@ -68,14 +64,11 @@ public class ClientEvents {
             for (int z = -8; z <= 8; z++) {
                 LevelChunk chunk = mc.level.getChunk(
                         chunkX + x,
-                        chunkZ + z
-                );
+                        chunkZ + z);
                 if (chunk != null) {
                     for (BlockEntity be : chunk.getBlockEntities().values()) {
-                        if (
-                                be instanceof PillarBlockEntity pillarBE &&
-                                        pillarBE.hasDisplayItem()
-                        ) {
+                        if (be instanceof PillarBlockEntity pillarBE &&
+                                pillarBE.hasDisplayItem()) {
                             pillarBE.resetParticleTick(true);
                         }
                     }
@@ -145,8 +138,7 @@ public class ClientEvents {
                     overlayMessage,
                     x,
                     y,
-                    0xFFFF5555
-            );
+                    0xFFFF5555);
             RenderSystem.enableDepthTest();
 
             poseStack.popPose();
@@ -159,19 +151,16 @@ public class ClientEvents {
             return;
         }
 
-
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) {
             return;
         }
-
 
         Player player = mc.player;
         if (player.isOnGround()) {
             BlockPos playerBlockPos = player.blockPosition();
             BlockPos blockBelowPlayer = playerBlockPos.below();
             BlockState blockBelow = mc.level.getBlockState(blockBelowPlayer);
-
 
             if (blockBelow.getBlock() instanceof LeafHedgeBlock) {
                 double playerY = player.getY();
@@ -181,9 +170,7 @@ public class ClientEvents {
                     float stepInterval = 2.0f;
                     int currentStep = (int) (player.walkDist / stepInterval);
 
-                    if (
-                            currentStep != lastHedgeStep && player.walkDist > player.walkDistO
-                    ) {
+                    if (currentStep != lastHedgeStep && player.walkDist > player.walkDistO) {
                         lastHedgeStep = currentStep;
 
                         SoundType sounds = blockBelow.getSoundType();
@@ -191,9 +178,7 @@ public class ClientEvents {
                         float volume = 0.15f;
                         float pitch = 1.0f;
 
-                        if (
-                                sounds instanceof CustomSoundType customSounds
-                        ) {
+                        if (sounds instanceof CustomSoundType customSounds) {
                             volume = customSounds.getStepVolume();
                             pitch = customSounds.getStepPitch();
                         }
@@ -206,8 +191,7 @@ public class ClientEvents {
                                 SoundSource.BLOCKS,
                                 volume,
                                 pitch,
-                                false
-                        );
+                                false);
                     }
                 }
             } else {
@@ -220,8 +204,7 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onClientDisconnect(
-            ClientPlayerNetworkEvent.LoggedOutEvent event
-    ) {
+            ClientPlayerNetworkEvent.LoggedOutEvent event) {
         overlayMessage = null;
         overlayMessageTime = 0;
         wasPressed = false;

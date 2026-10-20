@@ -14,20 +14,21 @@ public class ConfettiParticle extends TextureSheetParticle {
     private final float rotationSpeed;
 
     private static final int[] VIBRANT_COLORS = {
-        0xFF0000,
-        0x00FFFF,
-        0x1919EA,
-        0x3CDFFF,
-        0xFFFF00,
-        0xFF5C00,
-        0xBFFE00,
-        0x39FF14,
-        0xF686B7,
-        0xAB87FF,
-        0xFF00FF
+            0xFF0000,
+            0x00FFFF,
+            0x1919EA,
+            0x3CDFFF,
+            0xFFFF00,
+            0xFF5C00,
+            0xBFFE00,
+            0x39FF14,
+            0xF686B7,
+            0xAB87FF,
+            0xFF00FF
     };
 
-    protected ConfettiParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+    protected ConfettiParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed,
+            double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
 
         this.pickSprite(sprites);
@@ -46,7 +47,7 @@ public class ConfettiParticle extends TextureSheetParticle {
 
         this.quadSize = 0.08F + rand.nextFloat() * 0.12F;
 
-        this.roll = rand.nextFloat() * (float)(Math.PI * 2);
+        this.roll = rand.nextFloat() * (float) (Math.PI * 2);
         this.oRoll = this.roll;
 
         this.rotationSpeed = (rand.nextFloat() - 0.5F) * 0.5F;
@@ -93,9 +94,9 @@ public class ConfettiParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z,
+                double xSpeed, double ySpeed, double zSpeed) {
             return new ConfettiParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }
 }
-

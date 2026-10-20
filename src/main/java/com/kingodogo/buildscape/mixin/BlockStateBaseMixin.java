@@ -38,7 +38,8 @@ public class BlockStateBaseMixin {
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
         if (belowState.is(Blocks.COMPOSTER)) {
-            if (belowState.hasProperty(PlanterHelper.PLANTER) && belowState.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {
+            if (belowState.hasProperty(PlanterHelper.PLANTER)
+                    && belowState.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {
                 cir.setReturnValue(true);
             }
         }
@@ -54,7 +55,8 @@ public class BlockStateBaseMixin {
     }
 
     @Inject(method = "onRemove", at = @At("HEAD"))
-    private void buildscape$onSignRemove(Level level, BlockPos pos, BlockState newState, boolean isMoving, CallbackInfo ci) {
+    private void buildscape$onSignRemove(Level level, BlockPos pos, BlockState newState, boolean isMoving,
+            CallbackInfo ci) {
         BlockState state = (BlockState) (Object) this;
         if (!state.is(newState.getBlock()) && !level.isClientSide()) {
             if (state.getBlock() instanceof SignBlock) {
@@ -67,8 +69,7 @@ public class BlockStateBaseMixin {
                                 (double) pos.getX() + 0.5D,
                                 (double) pos.getY() + 0.5D,
                                 (double) pos.getZ() + 0.5D,
-                                new ItemStack(frame.getItem())
-                        );
+                                new ItemStack(frame.getItem()));
                         SignFrameAttachment.setFrame(sign, SignFrameType.NONE);
                     }
                 }

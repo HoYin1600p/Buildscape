@@ -32,7 +32,8 @@ public class AdvancementGrants {
         if (serverPlayer == null || serverPlayer.getServer() == null) {
             return;
         }
-        Advancement cubeAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", "a_full_buildscape_cube"));
+        Advancement cubeAdv = serverPlayer.getServer().getAdvancements()
+                .getAdvancement(new ResourceLocation("buildscape", "a_full_buildscape_cube"));
         if (cubeAdv == null) {
             return;
         }
@@ -47,7 +48,8 @@ public class AdvancementGrants {
                 continue;
             }
 
-            Advancement reqAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", criterion));
+            Advancement reqAdv = serverPlayer.getServer().getAdvancements()
+                    .getAdvancement(new ResourceLocation("buildscape", criterion));
             if (reqAdv != null) {
                 AdvancementProgress reqProgress = serverPlayer.getAdvancements().getOrStartProgress(reqAdv);
                 if (reqProgress.isDone()) {
@@ -58,7 +60,8 @@ public class AdvancementGrants {
     }
 
     public static boolean checkRelativeMilestone(ServerPlayer player, String advId, int targetCount, int currentStat) {
-        Advancement adv = player.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", advId));
+        Advancement adv = player.getServer().getAdvancements()
+                .getAdvancement(new ResourceLocation("buildscape", advId));
         if (adv == null) {
             return false;
         }

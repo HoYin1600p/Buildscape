@@ -26,8 +26,7 @@ public class SignFrameRenderer {
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (blockEntity == null || blockEntity.getLevel() == null) {
             return;
         }
@@ -77,8 +76,7 @@ public class SignFrameRenderer {
                 1.0F, 1.0F, 1.0F,
                 combinedLight,
                 combinedOverlay,
-                EmptyModelData.INSTANCE
-        );
+                EmptyModelData.INSTANCE);
 
         poseStack.popPose();
     }

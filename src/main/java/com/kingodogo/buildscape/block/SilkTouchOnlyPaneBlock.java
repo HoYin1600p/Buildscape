@@ -34,8 +34,7 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            BlockPos beaconPos
-    ) {
+            BlockPos beaconPos) {
         int color = state.getMapColor(level, pos).col;
         return new float[]{
                 ((color >> 16) & 0xFF) / 255.0f,
@@ -53,8 +52,7 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
     public boolean propagatesSkylightDown(
             BlockState state,
             BlockGetter reader,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return true;
     }
 
@@ -62,8 +60,7 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
     public float getShadeBrightness(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return 1.0F;
     }
 
@@ -72,8 +69,7 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -86,20 +82,16 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 
     public boolean shouldDisplayFluidOverlay(
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            FluidState fluidState
-    ) {
+            FluidState fluidState) {
         return true;
     }
 
@@ -110,8 +102,7 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         ItemStack heldItem = player.getItemInHand(hand);
         if (heldItem.getItem() instanceof DyeItem dyeItem) {
             String dyeColorName = dyeItem.getDyeColor().getName();
@@ -128,8 +119,7 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
 
             if (newName != null) {
                 Block newBlock = ForgeRegistries.BLOCKS.getValue(
-                        new ResourceLocation("buildscape", newName)
-                );
+                        new ResourceLocation("buildscape", newName));
                 if (newBlock != null && newBlock != this) {
                     if (!level.isClientSide) {
                         BlockState newState = newBlock.defaultBlockState();
@@ -159,8 +149,7 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
                                 SoundEvents.DYE_USE,
                                 SoundSource.BLOCKS,
                                 1.0f,
-                                1.0f
-                        );
+                                1.0f);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }

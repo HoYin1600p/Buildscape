@@ -25,11 +25,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class PillarOverlayHandler {
 
     private static final int MARGIN_RIGHT = 5;
@@ -94,9 +90,8 @@ public class PillarOverlayHandler {
 
         ItemStack mainHand = mc.player.getMainHandItem();
         ItemStack offHand = mc.player.getOffhandItem();
-        boolean holdingDye =
-                mainHand.getItem() instanceof DyeItem ||
-                        offHand.getItem() instanceof DyeItem;
+        boolean holdingDye = mainHand.getItem() instanceof DyeItem ||
+                offHand.getItem() instanceof DyeItem;
         if (!holdingDye) {
             return;
         }
@@ -117,8 +112,7 @@ public class PillarOverlayHandler {
     private static void renderItemFrameOverlay(
             PoseStack poseStack,
             Minecraft mc,
-            ItemFrame itemFrame
-    ) {
+            ItemFrame itemFrame) {
         Font font = mc.font;
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
@@ -137,15 +131,13 @@ public class PillarOverlayHandler {
                 screenHeight,
                 frameId != null ? frameId : "Unknown",
                 colors,
-                ItemFrameParticleHandler.MAX_DYE_COLORS
-        );
+                ItemFrameParticleHandler.MAX_DYE_COLORS);
     }
 
     private static void renderPillarOverlay(
             PoseStack poseStack,
             Minecraft mc,
-            PillarBlockEntity pillarBE
-    ) {
+            PillarBlockEntity pillarBE) {
         Font font = mc.font;
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
@@ -164,8 +156,7 @@ public class PillarOverlayHandler {
                 screenHeight,
                 pillarId != null ? pillarId : "Unknown",
                 colors,
-                PillarBlockEntity.MAX_DYE_COLORS
-        );
+                PillarBlockEntity.MAX_DYE_COLORS);
     }
 
     private static void renderOverlay(
@@ -175,8 +166,7 @@ public class PillarOverlayHandler {
             int screenHeight,
             String id,
             List<String> colors,
-            int maxColors
-    ) {
+            int maxColors) {
         int numColors = colors != null ? colors.size() : 0;
         int swatchRowWidth = numColors > 0
                 ? numColors * (SWATCH_SIZE + SWATCH_SPACING) - SWATCH_SPACING
@@ -187,8 +177,7 @@ public class PillarOverlayHandler {
         String colorCountText = "Colors: " + numColors + "/" + maxColors;
         int colorCountWidth = font.width(colorCountText);
 
-        int overlayWidth =
-                Math.max(idWidth, Math.max(colorCountWidth, swatchRowWidth)) + 16;
+        int overlayWidth = Math.max(idWidth, Math.max(colorCountWidth, swatchRowWidth)) + 16;
         int overlayHeight = 10 + 12 + SWATCH_SIZE + 12 + 8;
 
         int x = screenWidth - overlayWidth - MARGIN_RIGHT;
@@ -202,24 +191,21 @@ public class PillarOverlayHandler {
                 y,
                 x + overlayWidth - CORNER_RADIUS,
                 y + overlayHeight,
-                bgColor
-        );
+                bgColor);
         GuiComponent.fill(
                 poseStack,
                 x,
                 y + CORNER_RADIUS,
                 x + CORNER_RADIUS,
                 y + overlayHeight - CORNER_RADIUS,
-                bgColor
-        );
+                bgColor);
         GuiComponent.fill(
                 poseStack,
                 x + overlayWidth - CORNER_RADIUS,
                 y + CORNER_RADIUS,
                 x + overlayWidth,
                 y + overlayHeight - CORNER_RADIUS,
-                bgColor
-        );
+                bgColor);
 
         GuiComponent.fill(
                 poseStack,
@@ -227,32 +213,28 @@ public class PillarOverlayHandler {
                 y + 1,
                 x + CORNER_RADIUS,
                 y + CORNER_RADIUS,
-                bgColor
-        );
+                bgColor);
         GuiComponent.fill(
                 poseStack,
                 x + overlayWidth - CORNER_RADIUS,
                 y + 1,
                 x + overlayWidth - 1,
                 y + CORNER_RADIUS,
-                bgColor
-        );
+                bgColor);
         GuiComponent.fill(
                 poseStack,
                 x + 1,
                 y + overlayHeight - CORNER_RADIUS,
                 x + CORNER_RADIUS,
                 y + overlayHeight - 1,
-                bgColor
-        );
+                bgColor);
         GuiComponent.fill(
                 poseStack,
                 x + overlayWidth - CORNER_RADIUS,
                 y + overlayHeight - CORNER_RADIUS,
                 x + overlayWidth - 1,
                 y + overlayHeight - 1,
-                bgColor
-        );
+                bgColor);
 
         drawRoundedBorder(
                 poseStack,
@@ -262,8 +244,7 @@ public class PillarOverlayHandler {
                 overlayHeight,
                 LIME_COLOR,
                 BORDER_WIDTH,
-                CORNER_RADIUS
-        );
+                CORNER_RADIUS);
 
         int textX = x + (overlayWidth - idWidth) / 2;
         int textY = y + 6;
@@ -284,8 +265,7 @@ public class PillarOverlayHandler {
                         swatchY - SWATCH_BORDER,
                         swatchX + SWATCH_SIZE + SWATCH_BORDER,
                         swatchY + SWATCH_SIZE + SWATCH_BORDER,
-                        0xFF000000
-                );
+                        0xFF000000);
 
                 GuiComponent.fill(
                         poseStack,
@@ -293,8 +273,7 @@ public class PillarOverlayHandler {
                         swatchY,
                         swatchX + SWATCH_SIZE,
                         swatchY + SWATCH_SIZE,
-                        0xFF000000 | color
-                );
+                        0xFF000000 | color);
             }
 
             int countY = swatchY + SWATCH_SIZE + 4;
@@ -311,8 +290,7 @@ public class PillarOverlayHandler {
             int height,
             int color,
             int borderWidth,
-            int cornerRadius
-    ) {
+            int cornerRadius) {
         for (int i = 0; i < borderWidth; i++) {
             GuiComponent.fill(
                     poseStack,
@@ -320,8 +298,7 @@ public class PillarOverlayHandler {
                     y + i,
                     x + width - cornerRadius,
                     y + i + 1,
-                    color
-            );
+                    color);
         }
 
         for (int i = 0; i < borderWidth; i++) {
@@ -331,8 +308,7 @@ public class PillarOverlayHandler {
                     y + height - borderWidth + i,
                     x + width - cornerRadius,
                     y + height - borderWidth + i + 1,
-                    color
-            );
+                    color);
         }
 
         for (int i = 0; i < borderWidth; i++) {
@@ -342,8 +318,7 @@ public class PillarOverlayHandler {
                     y + cornerRadius,
                     x + i + 1,
                     y + height - cornerRadius,
-                    color
-            );
+                    color);
         }
 
         for (int i = 0; i < borderWidth; i++) {
@@ -353,8 +328,7 @@ public class PillarOverlayHandler {
                     y + cornerRadius,
                     x + width - borderWidth + i + 1,
                     y + height - cornerRadius,
-                    color
-            );
+                    color);
         }
 
         GuiComponent.fill(
@@ -363,16 +337,14 @@ public class PillarOverlayHandler {
                 y,
                 x + cornerRadius,
                 y + borderWidth,
-                color
-        );
+                color);
         GuiComponent.fill(
                 poseStack,
                 x,
                 y + 1,
                 x + borderWidth,
                 y + cornerRadius,
-                color
-        );
+                color);
 
         GuiComponent.fill(
                 poseStack,
@@ -380,16 +352,14 @@ public class PillarOverlayHandler {
                 y,
                 x + width - 1,
                 y + borderWidth,
-                color
-        );
+                color);
         GuiComponent.fill(
                 poseStack,
                 x + width - borderWidth,
                 y + 1,
                 x + width,
                 y + cornerRadius,
-                color
-        );
+                color);
 
         GuiComponent.fill(
                 poseStack,
@@ -397,16 +367,14 @@ public class PillarOverlayHandler {
                 y + height - borderWidth,
                 x + cornerRadius,
                 y + height,
-                color
-        );
+                color);
         GuiComponent.fill(
                 poseStack,
                 x,
                 y + height - cornerRadius,
                 x + borderWidth,
                 y + height - 1,
-                color
-        );
+                color);
 
         GuiComponent.fill(
                 poseStack,
@@ -414,16 +382,14 @@ public class PillarOverlayHandler {
                 y + height - borderWidth,
                 x + width - 1,
                 y + height,
-                color
-        );
+                color);
         GuiComponent.fill(
                 poseStack,
                 x + width - borderWidth,
                 y + height - cornerRadius,
                 x + width,
                 y + height - 1,
-                color
-        );
+                color);
     }
 
     private static int parseColorCode(String colorCode) {

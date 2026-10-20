@@ -15,8 +15,7 @@ public class CosmeticAuthManager {
     private volatile long authTimestamp = 0;
     private CompletableFuture<CosmeticData> currentAuthFuture = null;
 
-    private CosmeticAuthManager() {
-    }
+    private CosmeticAuthManager() {}
 
     public static CosmeticAuthManager getInstance() {
         return INSTANCE;
@@ -70,7 +69,8 @@ public class CosmeticAuthManager {
                         return cosmeticData;
                     })
                     .exceptionally(throwable -> {
-                        BuildScape.getLogger().error("CosmeticAuthManager: Authentication failed with exception", throwable);
+                        BuildScape.getLogger().error("CosmeticAuthManager: Authentication failed with exception",
+                                throwable);
                         return null;
                     })
                     .whenComplete((result, throwable) -> {

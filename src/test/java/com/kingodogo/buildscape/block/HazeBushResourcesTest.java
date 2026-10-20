@@ -92,7 +92,8 @@ public final class HazeBushResourcesTest {
     private static void checkCommonLoot(JsonObject loot, String bush) {
         require("minecraft:block".equals(loot.get("type").getAsString()), bush + " must use block loot");
         String json = loot.toString();
-        for (String forbidden : new String[]{"minecraft:copy_state", "minecraft:match_tool", "minecraft:shears", "minecraft:silk_touch"}) {
+        for (String forbidden : new String[]{"minecraft:copy_state", "minecraft:match_tool", "minecraft:shears",
+                "minecraft:silk_touch"}) {
             require(!json.contains(forbidden), bush + " contains " + forbidden);
         }
     }

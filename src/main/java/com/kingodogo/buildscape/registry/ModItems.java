@@ -30,15 +30,15 @@ public class ModItems {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(
             ForgeRegistries.ITEMS,
-            BuildScape.MODID
-    );
+            BuildScape.MODID);
 
     public static Item.Properties createBlockItemProperties() {
         return new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB);
     }
 
     public static class WanderingHomemakerSpawnEggItem extends ForgeSpawnEggItem {
-        public WanderingHomemakerSpawnEggItem(Supplier<? extends EntityType<? extends Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
+        public WanderingHomemakerSpawnEggItem(Supplier<? extends EntityType<? extends Mob>> type, int backgroundColor,
+                int highlightColor, Item.Properties properties) {
             super(type, backgroundColor, highlightColor, properties);
         }
 
@@ -58,18 +58,21 @@ public class ModItems {
                     long totalSeconds = remainingMs / 1000;
                     long minutes = totalSeconds / 60;
                     long seconds = totalSeconds % 60;
-                    tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
+                    tooltip.add(new TranslatableComponent(
+                            "tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
                             .withStyle(ChatFormatting.RED));
                 } else {
-                    tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
-                            .withStyle(ChatFormatting.GREEN));
+                    tooltip.add(
+                            new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                                    .withStyle(ChatFormatting.GREEN));
                 }
             }
         }
     }
 
     public static class FestiveWanderingHomemakerSpawnEggItem extends ForgeSpawnEggItem {
-        public FestiveWanderingHomemakerSpawnEggItem(Supplier<? extends EntityType<? extends Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
+        public FestiveWanderingHomemakerSpawnEggItem(Supplier<? extends EntityType<? extends Mob>> type,
+                int backgroundColor, int highlightColor, Item.Properties properties) {
             super(type, backgroundColor, highlightColor, properties);
         }
 
@@ -80,7 +83,8 @@ public class ModItems {
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltip, flag);
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.festive_wandering_homemaker_spawn_egg.spawn_info"));
+            tooltip.add(
+                    new TranslatableComponent("tooltip.buildscape.festive_wandering_homemaker_spawn_egg.spawn_info"));
             if (level != null) {
                 long currentTime = System.currentTimeMillis();
                 long endTime = HomemakerCooldownTracker.cooldownEndTime;
@@ -89,11 +93,13 @@ public class ModItems {
                     long totalSeconds = remainingMs / 1000;
                     long minutes = totalSeconds / 60;
                     long seconds = totalSeconds % 60;
-                    tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
+                    tooltip.add(new TranslatableComponent(
+                            "tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
                             .withStyle(ChatFormatting.RED));
                 } else {
-                    tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
-                            .withStyle(ChatFormatting.GREEN));
+                    tooltip.add(
+                            new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                                    .withStyle(ChatFormatting.GREEN));
                 }
             }
         }
@@ -289,13 +295,11 @@ public class ModItems {
     public static final RegistryObject<Item> BLACK_SMOOTH_SANDSTONE_STAIRS = ItemsPart01.BLACK_SMOOTH_SANDSTONE_STAIRS;
     public static final RegistryObject<Item> BLUE_SMOOTH_SANDSTONE_STAIRS = ItemsPart01.BLUE_SMOOTH_SANDSTONE_STAIRS;
     public static final RegistryObject<Item> GREEN_SMOOTH_SANDSTONE_STAIRS = ItemsPart01.GREEN_SMOOTH_SANDSTONE_STAIRS;
-    public static final RegistryObject<Item> ORANGE_SMOOTH_SANDSTONE_STAIRS =
-            ItemsPart01.ORANGE_SMOOTH_SANDSTONE_STAIRS;
+    public static final RegistryObject<Item> ORANGE_SMOOTH_SANDSTONE_STAIRS = ItemsPart01.ORANGE_SMOOTH_SANDSTONE_STAIRS;
     public static final RegistryObject<Item> PINK_SMOOTH_SANDSTONE_STAIRS = ItemsPart01.PINK_SMOOTH_SANDSTONE_STAIRS;
     public static final RegistryObject<Item> RED_SMOOTH_SANDSTONE_STAIRS = ItemsPart01.RED_SMOOTH_SANDSTONE_STAIRS;
     public static final RegistryObject<Item> WHITE_SMOOTH_SANDSTONE_STAIRS = ItemsPart01.WHITE_SMOOTH_SANDSTONE_STAIRS;
-    public static final RegistryObject<Item> YELLOW_SMOOTH_SANDSTONE_STAIRS =
-            ItemsPart01.YELLOW_SMOOTH_SANDSTONE_STAIRS;
+    public static final RegistryObject<Item> YELLOW_SMOOTH_SANDSTONE_STAIRS = ItemsPart01.YELLOW_SMOOTH_SANDSTONE_STAIRS;
     public static final RegistryObject<Item> BLACK_TILES_STAIRS = ItemsPart01.BLACK_TILES_STAIRS;
     public static final RegistryObject<Item> BLUE_TILES_STAIRS = ItemsPart01.BLUE_TILES_STAIRS;
     public static final RegistryObject<Item> BROWN_TILES_STAIRS = ItemsPart01.BROWN_TILES_STAIRS;
@@ -398,34 +402,25 @@ public class ModItems {
     public static final RegistryObject<Item> BIT_COPPER_BLOCK_STAIRS = ItemsPart01.BIT_COPPER_BLOCK_STAIRS;
     public static final RegistryObject<Item> BIT_COPPER_BLOCK_SLAB = ItemsPart01.BIT_COPPER_BLOCK_SLAB;
     public static final RegistryObject<Item> BIT_COPPER_BLOCK_WALL = ItemsPart01.BIT_COPPER_BLOCK_WALL;
-    public static final RegistryObject<Item> BIT_EXPOSED_COPPER_BLOCK_STAIRS =
-            ItemsPart01.BIT_EXPOSED_COPPER_BLOCK_STAIRS;
+    public static final RegistryObject<Item> BIT_EXPOSED_COPPER_BLOCK_STAIRS = ItemsPart01.BIT_EXPOSED_COPPER_BLOCK_STAIRS;
     public static final RegistryObject<Item> BIT_EXPOSED_COPPER_BLOCK_SLAB = ItemsPart01.BIT_EXPOSED_COPPER_BLOCK_SLAB;
     public static final RegistryObject<Item> BIT_EXPOSED_COPPER_BLOCK_WALL = ItemsPart01.BIT_EXPOSED_COPPER_BLOCK_WALL;
-    public static final RegistryObject<Item> BIT_WEATHERED_COPPER_BLOCK_STAIRS =
-            ItemsPart01.BIT_WEATHERED_COPPER_BLOCK_STAIRS;
-    public static final RegistryObject<Item> BIT_WEATHERED_COPPER_BLOCK_SLAB =
-            ItemsPart01.BIT_WEATHERED_COPPER_BLOCK_SLAB;
-    public static final RegistryObject<Item> BIT_WEATHERED_COPPER_BLOCK_WALL =
-            ItemsPart01.BIT_WEATHERED_COPPER_BLOCK_WALL;
-    public static final RegistryObject<Item> BIT_OXIDIZED_COPPER_BLOCK_STAIRS =
-            ItemsPart01.BIT_OXIDIZED_COPPER_BLOCK_STAIRS;
-    public static final RegistryObject<Item> BIT_OXIDIZED_COPPER_BLOCK_SLAB =
-            ItemsPart01.BIT_OXIDIZED_COPPER_BLOCK_SLAB;
-    public static final RegistryObject<Item> BIT_OXIDIZED_COPPER_BLOCK_WALL =
-            ItemsPart01.BIT_OXIDIZED_COPPER_BLOCK_WALL;
+    public static final RegistryObject<Item> BIT_WEATHERED_COPPER_BLOCK_STAIRS = ItemsPart01.BIT_WEATHERED_COPPER_BLOCK_STAIRS;
+    public static final RegistryObject<Item> BIT_WEATHERED_COPPER_BLOCK_SLAB = ItemsPart01.BIT_WEATHERED_COPPER_BLOCK_SLAB;
+    public static final RegistryObject<Item> BIT_WEATHERED_COPPER_BLOCK_WALL = ItemsPart01.BIT_WEATHERED_COPPER_BLOCK_WALL;
+    public static final RegistryObject<Item> BIT_OXIDIZED_COPPER_BLOCK_STAIRS = ItemsPart01.BIT_OXIDIZED_COPPER_BLOCK_STAIRS;
+    public static final RegistryObject<Item> BIT_OXIDIZED_COPPER_BLOCK_SLAB = ItemsPart01.BIT_OXIDIZED_COPPER_BLOCK_SLAB;
+    public static final RegistryObject<Item> BIT_OXIDIZED_COPPER_BLOCK_WALL = ItemsPart01.BIT_OXIDIZED_COPPER_BLOCK_WALL;
     public static final RegistryObject<Item> BIT_CUT_COPPER_STAIRS = ItemsPart01.BIT_CUT_COPPER_STAIRS;
     public static final RegistryObject<Item> BIT_CUT_COPPER_SLAB = ItemsPart01.BIT_CUT_COPPER_SLAB;
     public static final RegistryObject<Item> BIT_CUT_COPPER_WALL = ItemsPart01.BIT_CUT_COPPER_WALL;
     public static final RegistryObject<Item> BIT_EXPOSED_CUT_COPPER_STAIRS = ItemsPart01.BIT_EXPOSED_CUT_COPPER_STAIRS;
     public static final RegistryObject<Item> BIT_EXPOSED_CUT_COPPER_SLAB = ItemsPart01.BIT_EXPOSED_CUT_COPPER_SLAB;
     public static final RegistryObject<Item> BIT_EXPOSED_CUT_COPPER_WALL = ItemsPart01.BIT_EXPOSED_CUT_COPPER_WALL;
-    public static final RegistryObject<Item> BIT_WEATHERED_CUT_COPPER_STAIRS =
-            ItemsPart01.BIT_WEATHERED_CUT_COPPER_STAIRS;
+    public static final RegistryObject<Item> BIT_WEATHERED_CUT_COPPER_STAIRS = ItemsPart01.BIT_WEATHERED_CUT_COPPER_STAIRS;
     public static final RegistryObject<Item> BIT_WEATHERED_CUT_COPPER_SLAB = ItemsPart01.BIT_WEATHERED_CUT_COPPER_SLAB;
     public static final RegistryObject<Item> BIT_WEATHERED_CUT_COPPER_WALL = ItemsPart01.BIT_WEATHERED_CUT_COPPER_WALL;
-    public static final RegistryObject<Item> BIT_OXIDIZED_CUT_COPPER_STAIRS =
-            ItemsPart01.BIT_OXIDIZED_CUT_COPPER_STAIRS;
+    public static final RegistryObject<Item> BIT_OXIDIZED_CUT_COPPER_STAIRS = ItemsPart01.BIT_OXIDIZED_CUT_COPPER_STAIRS;
     public static final RegistryObject<Item> BIT_OXIDIZED_CUT_COPPER_SLAB = ItemsPart01.BIT_OXIDIZED_CUT_COPPER_SLAB;
     public static final RegistryObject<Item> BIT_OXIDIZED_CUT_COPPER_WALL = ItemsPart01.BIT_OXIDIZED_CUT_COPPER_WALL;
     public static final RegistryObject<Item> MOSSY_CALCITE = ItemsPart01.MOSSY_CALCITE;
@@ -545,10 +540,8 @@ public class ModItems {
     public static final RegistryObject<Item> CYAN_TRAPPED_DECORATED_POT = ItemsPart01.CYAN_TRAPPED_DECORATED_POT;
     public static final RegistryObject<Item> GRAY_TRAPPED_DECORATED_POT = ItemsPart01.GRAY_TRAPPED_DECORATED_POT;
     public static final RegistryObject<Item> GREEN_TRAPPED_DECORATED_POT = ItemsPart01.GREEN_TRAPPED_DECORATED_POT;
-    public static final RegistryObject<Item> LIGHT_BLUE_TRAPPED_DECORATED_POT =
-            ItemsPart01.LIGHT_BLUE_TRAPPED_DECORATED_POT;
-    public static final RegistryObject<Item> LIGHT_GRAY_TRAPPED_DECORATED_POT =
-            ItemsPart01.LIGHT_GRAY_TRAPPED_DECORATED_POT;
+    public static final RegistryObject<Item> LIGHT_BLUE_TRAPPED_DECORATED_POT = ItemsPart01.LIGHT_BLUE_TRAPPED_DECORATED_POT;
+    public static final RegistryObject<Item> LIGHT_GRAY_TRAPPED_DECORATED_POT = ItemsPart01.LIGHT_GRAY_TRAPPED_DECORATED_POT;
     public static final RegistryObject<Item> LIME_TRAPPED_DECORATED_POT = ItemsPart01.LIME_TRAPPED_DECORATED_POT;
     public static final RegistryObject<Item> MAGENTA_TRAPPED_DECORATED_POT = ItemsPart01.MAGENTA_TRAPPED_DECORATED_POT;
     public static final RegistryObject<Item> ORANGE_TRAPPED_DECORATED_POT = ItemsPart01.ORANGE_TRAPPED_DECORATED_POT;
@@ -606,8 +599,7 @@ public class ModItems {
     public static final RegistryObject<Item> SNOWY_DARK_OAK_LEAF_LAYERS = ItemsPart01.SNOWY_DARK_OAK_LEAF_LAYERS;
     public static final RegistryObject<Item> SNOWY_MANGROVE_LEAF_LAYERS = ItemsPart01.SNOWY_MANGROVE_LEAF_LAYERS;
     public static final RegistryObject<Item> SNOWY_AZALEA_LEAF_LAYERS = ItemsPart01.SNOWY_AZALEA_LEAF_LAYERS;
-    public static final RegistryObject<Item> SNOWY_FLOWERING_AZALEA_LEAF_LAYERS =
-            ItemsPart01.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS;
+    public static final RegistryObject<Item> SNOWY_FLOWERING_AZALEA_LEAF_LAYERS = ItemsPart01.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS;
     public static final RegistryObject<Item> MANGROVE_LEAF_LAYERS = ItemsPart01.MANGROVE_LEAF_LAYERS;
     public static final RegistryObject<Item> ORANGE_POPLAR_LEAF_LAYERS = ItemsPart01.ORANGE_POPLAR_LEAF_LAYERS;
     public static final RegistryObject<Item> RED_POPLAR_LEAF_LAYERS = ItemsPart01.RED_POPLAR_LEAF_LAYERS;
@@ -616,11 +608,9 @@ public class ModItems {
     public static final RegistryObject<Item> PALE_OAK_LEAF_LAYERS = ItemsPart01.PALE_OAK_LEAF_LAYERS;
     public static final RegistryObject<Item> SNOWY_CHERRY_LEAF_LAYERS = ItemsPart01.SNOWY_CHERRY_LEAF_LAYERS;
     public static final RegistryObject<Item> SNOWY_PALE_OAK_LEAF_LAYERS = ItemsPart01.SNOWY_PALE_OAK_LEAF_LAYERS;
-    public static final RegistryObject<Item> SNOWY_ORANGE_POPLAR_LEAF_LAYERS =
-            ItemsPart01.SNOWY_ORANGE_POPLAR_LEAF_LAYERS;
+    public static final RegistryObject<Item> SNOWY_ORANGE_POPLAR_LEAF_LAYERS = ItemsPart01.SNOWY_ORANGE_POPLAR_LEAF_LAYERS;
     public static final RegistryObject<Item> SNOWY_RED_POPLAR_LEAF_LAYERS = ItemsPart01.SNOWY_RED_POPLAR_LEAF_LAYERS;
-    public static final RegistryObject<Item> SNOWY_YELLOW_POPLAR_LEAF_LAYERS =
-            ItemsPart01.SNOWY_YELLOW_POPLAR_LEAF_LAYERS;
+    public static final RegistryObject<Item> SNOWY_YELLOW_POPLAR_LEAF_LAYERS = ItemsPart01.SNOWY_YELLOW_POPLAR_LEAF_LAYERS;
     public static final RegistryObject<Item> OAK_LEAF_HEDGE = ItemsPart01.OAK_LEAF_HEDGE;
     public static final RegistryObject<Item> SPRUCE_LEAF_HEDGE = ItemsPart01.SPRUCE_LEAF_HEDGE;
     public static final RegistryObject<Item> BIRCH_LEAF_HEDGE = ItemsPart01.BIRCH_LEAF_HEDGE;
@@ -637,8 +627,7 @@ public class ModItems {
     public static final RegistryObject<Item> SNOWY_DARK_OAK_LEAF_HEDGE = ItemsPart01.SNOWY_DARK_OAK_LEAF_HEDGE;
     public static final RegistryObject<Item> SNOWY_MANGROVE_LEAF_HEDGE = ItemsPart01.SNOWY_MANGROVE_LEAF_HEDGE;
     public static final RegistryObject<Item> SNOWY_AZALEA_LEAF_HEDGE = ItemsPart01.SNOWY_AZALEA_LEAF_HEDGE;
-    public static final RegistryObject<Item> SNOWY_FLOWERING_AZALEA_LEAF_HEDGE =
-            ItemsPart01.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE;
+    public static final RegistryObject<Item> SNOWY_FLOWERING_AZALEA_LEAF_HEDGE = ItemsPart01.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE;
     public static final RegistryObject<Item> MANGROVE_LEAF_HEDGE = ItemsPart01.MANGROVE_LEAF_HEDGE;
     public static final RegistryObject<Item> ORANGE_POPLAR_LEAF_HEDGE = ItemsPart01.ORANGE_POPLAR_LEAF_HEDGE;
     public static final RegistryObject<Item> RED_POPLAR_LEAF_HEDGE = ItemsPart01.RED_POPLAR_LEAF_HEDGE;
@@ -647,11 +636,9 @@ public class ModItems {
     public static final RegistryObject<Item> PALE_OAK_LEAF_HEDGE = ItemsPart01.PALE_OAK_LEAF_HEDGE;
     public static final RegistryObject<Item> SNOWY_CHERRY_LEAF_HEDGE = ItemsPart01.SNOWY_CHERRY_LEAF_HEDGE;
     public static final RegistryObject<Item> SNOWY_PALE_OAK_LEAF_HEDGE = ItemsPart01.SNOWY_PALE_OAK_LEAF_HEDGE;
-    public static final RegistryObject<Item> SNOWY_ORANGE_POPLAR_LEAF_HEDGE =
-            ItemsPart01.SNOWY_ORANGE_POPLAR_LEAF_HEDGE;
+    public static final RegistryObject<Item> SNOWY_ORANGE_POPLAR_LEAF_HEDGE = ItemsPart01.SNOWY_ORANGE_POPLAR_LEAF_HEDGE;
     public static final RegistryObject<Item> SNOWY_RED_POPLAR_LEAF_HEDGE = ItemsPart01.SNOWY_RED_POPLAR_LEAF_HEDGE;
-    public static final RegistryObject<Item> SNOWY_YELLOW_POPLAR_LEAF_HEDGE =
-            ItemsPart01.SNOWY_YELLOW_POPLAR_LEAF_HEDGE;
+    public static final RegistryObject<Item> SNOWY_YELLOW_POPLAR_LEAF_HEDGE = ItemsPart01.SNOWY_YELLOW_POPLAR_LEAF_HEDGE;
     public static final RegistryObject<Item> HAY_BALE_SLAB = ItemsPart01.HAY_BALE_SLAB;
     public static final RegistryObject<Item> HAY_BALE_STAIRS = ItemsPart01.HAY_BALE_STAIRS;
     public static final RegistryObject<Item> BAMBOO_BLOCK = ItemsPart01.BAMBOO_BLOCK;
@@ -667,11 +654,8 @@ public class ModItems {
     public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_SLAB = ItemsPart01.STRIPPED_BAMBOO_BLOCK_SLAB;
     public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_STAIRS = ItemsPart01.STRIPPED_BAMBOO_BLOCK_STAIRS;
     public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_FENCE = ItemsPart01.STRIPPED_BAMBOO_BLOCK_FENCE;
-    public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_FENCE_GATE =
-            ItemsPart01.STRIPPED_BAMBOO_BLOCK_FENCE_GATE;
-    public static final RegistryObject<
-            Item
-            > STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE = ItemsPart01.STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE;
+    public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_FENCE_GATE = ItemsPart01.STRIPPED_BAMBOO_BLOCK_FENCE_GATE;
+    public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE = ItemsPart01.STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE;
     public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_BUTTON = ItemsPart01.STRIPPED_BAMBOO_BLOCK_BUTTON;
     public static final RegistryObject<Item> BAMBOO_DOOR = ItemsPart01.BAMBOO_DOOR;
     public static final RegistryObject<Item> BAMBOO_TRAPDOOR = ItemsPart01.BAMBOO_TRAPDOOR;
@@ -770,16 +754,14 @@ public class ModItems {
     public static final RegistryObject<Item> LIGHT_BLUE_ASHPEN_SLAB = ItemsPart01.LIGHT_BLUE_ASHPEN_SLAB;
     public static final RegistryObject<Item> LIGHT_BLUE_ASHPEN_FENCE = ItemsPart01.LIGHT_BLUE_ASHPEN_FENCE;
     public static final RegistryObject<Item> LIGHT_BLUE_ASHPEN_FENCE_GATE = ItemsPart01.LIGHT_BLUE_ASHPEN_FENCE_GATE;
-    public static final RegistryObject<Item> LIGHT_BLUE_ASHPEN_PRESSURE_PLATE =
-            ItemsPart01.LIGHT_BLUE_ASHPEN_PRESSURE_PLATE;
+    public static final RegistryObject<Item> LIGHT_BLUE_ASHPEN_PRESSURE_PLATE = ItemsPart01.LIGHT_BLUE_ASHPEN_PRESSURE_PLATE;
     public static final RegistryObject<Item> LIGHT_BLUE_ASHPEN_BUTTON = ItemsPart01.LIGHT_BLUE_ASHPEN_BUTTON;
     public static final RegistryObject<Item> LIGHT_GRAY_ASHPEN_PLANKS = ItemsPart01.LIGHT_GRAY_ASHPEN_PLANKS;
     public static final RegistryObject<Item> LIGHT_GRAY_ASHPEN_STAIRS = ItemsPart01.LIGHT_GRAY_ASHPEN_STAIRS;
     public static final RegistryObject<Item> LIGHT_GRAY_ASHPEN_SLAB = ItemsPart01.LIGHT_GRAY_ASHPEN_SLAB;
     public static final RegistryObject<Item> LIGHT_GRAY_ASHPEN_FENCE = ItemsPart01.LIGHT_GRAY_ASHPEN_FENCE;
     public static final RegistryObject<Item> LIGHT_GRAY_ASHPEN_FENCE_GATE = ItemsPart01.LIGHT_GRAY_ASHPEN_FENCE_GATE;
-    public static final RegistryObject<Item> LIGHT_GRAY_ASHPEN_PRESSURE_PLATE =
-            ItemsPart01.LIGHT_GRAY_ASHPEN_PRESSURE_PLATE;
+    public static final RegistryObject<Item> LIGHT_GRAY_ASHPEN_PRESSURE_PLATE = ItemsPart01.LIGHT_GRAY_ASHPEN_PRESSURE_PLATE;
     public static final RegistryObject<Item> LIGHT_GRAY_ASHPEN_BUTTON = ItemsPart01.LIGHT_GRAY_ASHPEN_BUTTON;
     public static final RegistryObject<Item> LIME_ASHPEN_PLANKS = ItemsPart02.LIME_ASHPEN_PLANKS;
     public static final RegistryObject<Item> LIME_ASHPEN_STAIRS = ItemsPart02.LIME_ASHPEN_STAIRS;
@@ -992,8 +974,7 @@ public class ModItems {
     public static final RegistryObject<Item> GLOW_LIGHTS = ItemsPart02.GLOW_LIGHTS;
     public static final RegistryObject<Item> MULTICOLOR_GLOW_LIGHTS = ItemsPart02.MULTICOLOR_GLOW_LIGHTS;
     public static final RegistryObject<Item> CONFETTI_ITEM = ItemsPart02.CONFETTI_ITEM;
-    public static final RegistryObject<Item> INFINITE_PHOENIX_FIREWORK_STAR =
-            ItemsPart02.INFINITE_PHOENIX_FIREWORK_STAR;
+    public static final RegistryObject<Item> INFINITE_PHOENIX_FIREWORK_STAR = ItemsPart02.INFINITE_PHOENIX_FIREWORK_STAR;
     public static final RegistryObject<Item> STEEL_BLOCK = ItemsPart02.STEEL_BLOCK;
     public static final RegistryObject<Item> STEEL_PIPE = ItemsPart02.STEEL_PIPE;
     public static final RegistryObject<Item> HOLLOW_STEEL_PIPE = ItemsPart02.HOLLOW_STEEL_PIPE;
@@ -1011,8 +992,7 @@ public class ModItems {
     public static final RegistryObject<Item> SCRAPED_STEEL_SLAB = ItemsPart02.SCRAPED_STEEL_SLAB;
     public static final RegistryObject<Item> SCRAPED_STEEL_VERTICAL_SLAB = ItemsPart02.SCRAPED_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> RUSTIC_SCRAPED_STEEL_SLAB = ItemsPart02.RUSTIC_SCRAPED_STEEL_SLAB;
-    public static final RegistryObject<Item> RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB =
-            ItemsPart02.RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB = ItemsPart02.RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> STACKED_STEEL_SLAB = ItemsPart02.STACKED_STEEL_SLAB;
     public static final RegistryObject<Item> STACKED_STEEL_VERTICAL_SLAB = ItemsPart02.STACKED_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> STACKED_STEEL_STAIRS = ItemsPart02.STACKED_STEEL_STAIRS;
@@ -1020,11 +1000,9 @@ public class ModItems {
     public static final RegistryObject<Item> STEEL_PANELS_VERTICAL_SLAB = ItemsPart02.STEEL_PANELS_VERTICAL_SLAB;
     public static final RegistryObject<Item> STEEL_PANELS_STAIRS = ItemsPart02.STEEL_PANELS_STAIRS;
     public static final RegistryObject<Item> CROSSED_STEEL_PANELS_SLAB = ItemsPart02.CROSSED_STEEL_PANELS_SLAB;
-    public static final RegistryObject<Item> CROSSED_STEEL_PANELS_VERTICAL_SLAB =
-            ItemsPart02.CROSSED_STEEL_PANELS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CROSSED_STEEL_PANELS_VERTICAL_SLAB = ItemsPart02.CROSSED_STEEL_PANELS_VERTICAL_SLAB;
     public static final RegistryObject<Item> STEEL_MESH_BLOCK_SLAB = ItemsPart02.STEEL_MESH_BLOCK_SLAB;
-    public static final RegistryObject<Item> STEEL_MESH_BLOCK_VERTICAL_SLAB =
-            ItemsPart02.STEEL_MESH_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STEEL_MESH_BLOCK_VERTICAL_SLAB = ItemsPart02.STEEL_MESH_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> STEEL_MESH_BLOCK_STAIRS = ItemsPart02.STEEL_MESH_BLOCK_STAIRS;
     public static final RegistryObject<Item> PRESSED_STEEL = ItemsPart02.PRESSED_STEEL;
     public static final RegistryObject<Item> CUT_STEEL = ItemsPart02.CUT_STEEL;
@@ -1136,8 +1114,7 @@ public class ModItems {
     public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS = ItemsPart02.MAGENTA_STAINED_BRICKS;
     public static final RegistryObject<Item> PINK_STAINED_BRICKS = ItemsPart02.PINK_STAINED_BRICKS;
     public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES = ItemsPart02.WHITE_STAINED_BRICK_TILES;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES =
-            ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES = ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES = ItemsPart02.GRAY_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES = ItemsPart02.BLACK_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES = ItemsPart02.BROWN_STAINED_BRICK_TILES;
@@ -1147,131 +1124,77 @@ public class ModItems {
     public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES = ItemsPart02.LIME_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES = ItemsPart02.GREEN_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES = ItemsPart02.CYAN_STAINED_BRICK_TILES;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES =
-            ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES = ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES = ItemsPart02.BLUE_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES = ItemsPart02.PURPLE_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES = ItemsPart02.MAGENTA_STAINED_BRICK_TILES;
     public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES = ItemsPart02.PINK_STAINED_BRICK_TILES;
-    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.WHITE_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.WHITE_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.WHITE_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.WHITE_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_SLAB = ItemsPart02.WHITE_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_STAIRS = ItemsPart02.WHITE_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_WALL = ItemsPart02.WHITE_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.WHITE_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_SLAB = ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_STAIRS = ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_WALL = ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.LIGHT_GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_SLAB = ItemsPart02.GRAY_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.GRAY_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_STAIRS = ItemsPart02.GRAY_STAINED_BRICK_TILES_STAIRS;
     public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_WALL = ItemsPart02.GRAY_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.BLACK_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.BLACK_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.BLACK_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.BLACK_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.BROWN_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.BROWN_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.BROWN_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.BROWN_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_SLAB = ItemsPart02.BLACK_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_STAIRS = ItemsPart02.BLACK_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_WALL = ItemsPart02.BLACK_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.BLACK_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_SLAB = ItemsPart02.BROWN_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_STAIRS = ItemsPart02.BROWN_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_WALL = ItemsPart02.BROWN_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.BROWN_STAINED_BRICK_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_SLAB = ItemsPart02.RED_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.RED_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_STAIRS = ItemsPart02.RED_STAINED_BRICK_TILES_STAIRS;
     public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_WALL = ItemsPart02.RED_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.RED_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.ORANGE_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.ORANGE_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.ORANGE_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.ORANGE_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.YELLOW_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.YELLOW_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.YELLOW_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.YELLOW_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.RED_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_SLAB = ItemsPart02.ORANGE_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_STAIRS = ItemsPart02.ORANGE_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_WALL = ItemsPart02.ORANGE_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.ORANGE_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_SLAB = ItemsPart02.YELLOW_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_STAIRS = ItemsPart02.YELLOW_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_WALL = ItemsPart02.YELLOW_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.YELLOW_STAINED_BRICK_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_SLAB = ItemsPart02.LIME_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.LIME_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_STAIRS = ItemsPart02.LIME_STAINED_BRICK_TILES_STAIRS;
     public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_WALL = ItemsPart02.LIME_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.LIME_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.GREEN_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.GREEN_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.GREEN_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.GREEN_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.LIME_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_SLAB = ItemsPart02.GREEN_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_STAIRS = ItemsPart02.GREEN_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_WALL = ItemsPart02.GREEN_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.GREEN_STAINED_BRICK_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_SLAB = ItemsPart02.CYAN_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.CYAN_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_STAIRS = ItemsPart02.CYAN_STAINED_BRICK_TILES_STAIRS;
     public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_WALL = ItemsPart02.CYAN_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.CYAN_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.CYAN_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_SLAB = ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_STAIRS = ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_WALL = ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.LIGHT_BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_SLAB = ItemsPart02.BLUE_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.BLUE_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_STAIRS = ItemsPart02.BLUE_STAINED_BRICK_TILES_STAIRS;
     public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_WALL = ItemsPart02.BLUE_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.PURPLE_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.PURPLE_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.PURPLE_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.PURPLE_STAINED_BRICK_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_SLAB =
-            ItemsPart02.MAGENTA_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.MAGENTA_STAINED_BRICK_TILES_STAIRS;
-    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_WALL =
-            ItemsPart02.MAGENTA_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.MAGENTA_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_SLAB = ItemsPart02.PURPLE_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_STAIRS = ItemsPart02.PURPLE_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_WALL = ItemsPart02.PURPLE_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.PURPLE_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_SLAB = ItemsPart02.MAGENTA_STAINED_BRICK_TILES_SLAB;
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_STAIRS = ItemsPart02.MAGENTA_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_WALL = ItemsPart02.MAGENTA_STAINED_BRICK_TILES_WALL;
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.MAGENTA_STAINED_BRICK_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_SLAB = ItemsPart02.PINK_STAINED_BRICK_TILES_SLAB;
-    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_STAIRS =
-            ItemsPart02.PINK_STAINED_BRICK_TILES_STAIRS;
+    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_STAIRS = ItemsPart02.PINK_STAINED_BRICK_TILES_STAIRS;
     public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_WALL = ItemsPart02.PINK_STAINED_BRICK_TILES_WALL;
-    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_VERTICAL_SLAB =
-            ItemsPart02.PINK_STAINED_BRICK_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_VERTICAL_SLAB = ItemsPart02.PINK_STAINED_BRICK_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> WHITE_STAINED_BRICKS_SLAB = ItemsPart02.WHITE_STAINED_BRICKS_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_SLAB =
-            ItemsPart02.LIGHT_GRAY_STAINED_BRICKS_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_SLAB = ItemsPart02.LIGHT_GRAY_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> GRAY_STAINED_BRICKS_SLAB = ItemsPart02.GRAY_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> BLACK_STAINED_BRICKS_SLAB = ItemsPart02.BLACK_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> BROWN_STAINED_BRICKS_SLAB = ItemsPart02.BROWN_STAINED_BRICKS_SLAB;
@@ -1281,15 +1204,13 @@ public class ModItems {
     public static final RegistryObject<Item> LIME_STAINED_BRICKS_SLAB = ItemsPart02.LIME_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> GREEN_STAINED_BRICKS_SLAB = ItemsPart02.GREEN_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> CYAN_STAINED_BRICKS_SLAB = ItemsPart02.CYAN_STAINED_BRICKS_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_SLAB =
-            ItemsPart02.LIGHT_BLUE_STAINED_BRICKS_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_SLAB = ItemsPart02.LIGHT_BLUE_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> BLUE_STAINED_BRICKS_SLAB = ItemsPart02.BLUE_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> PURPLE_STAINED_BRICKS_SLAB = ItemsPart02.PURPLE_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS_SLAB = ItemsPart02.MAGENTA_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> PINK_STAINED_BRICKS_SLAB = ItemsPart02.PINK_STAINED_BRICKS_SLAB;
     public static final RegistryObject<Item> WHITE_STAINED_BRICKS_STAIRS = ItemsPart02.WHITE_STAINED_BRICKS_STAIRS;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_STAIRS =
-            ItemsPart02.LIGHT_GRAY_STAINED_BRICKS_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_STAIRS = ItemsPart02.LIGHT_GRAY_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> GRAY_STAINED_BRICKS_STAIRS = ItemsPart02.GRAY_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> BLACK_STAINED_BRICKS_STAIRS = ItemsPart02.BLACK_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> BROWN_STAINED_BRICKS_STAIRS = ItemsPart02.BROWN_STAINED_BRICKS_STAIRS;
@@ -1299,15 +1220,13 @@ public class ModItems {
     public static final RegistryObject<Item> LIME_STAINED_BRICKS_STAIRS = ItemsPart02.LIME_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> GREEN_STAINED_BRICKS_STAIRS = ItemsPart02.GREEN_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> CYAN_STAINED_BRICKS_STAIRS = ItemsPart02.CYAN_STAINED_BRICKS_STAIRS;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_STAIRS =
-            ItemsPart02.LIGHT_BLUE_STAINED_BRICKS_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_STAIRS = ItemsPart02.LIGHT_BLUE_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> BLUE_STAINED_BRICKS_STAIRS = ItemsPart02.BLUE_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> PURPLE_STAINED_BRICKS_STAIRS = ItemsPart02.PURPLE_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS_STAIRS = ItemsPart02.MAGENTA_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> PINK_STAINED_BRICKS_STAIRS = ItemsPart02.PINK_STAINED_BRICKS_STAIRS;
     public static final RegistryObject<Item> WHITE_STAINED_BRICKS_WALL = ItemsPart02.WHITE_STAINED_BRICKS_WALL;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_WALL =
-            ItemsPart02.LIGHT_GRAY_STAINED_BRICKS_WALL;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_WALL = ItemsPart02.LIGHT_GRAY_STAINED_BRICKS_WALL;
     public static final RegistryObject<Item> GRAY_STAINED_BRICKS_WALL = ItemsPart02.GRAY_STAINED_BRICKS_WALL;
     public static final RegistryObject<Item> BLACK_STAINED_BRICKS_WALL = ItemsPart02.BLACK_STAINED_BRICKS_WALL;
     public static final RegistryObject<Item> BROWN_STAINED_BRICKS_WALL = ItemsPart02.BROWN_STAINED_BRICKS_WALL;
@@ -1317,8 +1236,7 @@ public class ModItems {
     public static final RegistryObject<Item> LIME_STAINED_BRICKS_WALL = ItemsPart02.LIME_STAINED_BRICKS_WALL;
     public static final RegistryObject<Item> GREEN_STAINED_BRICKS_WALL = ItemsPart02.GREEN_STAINED_BRICKS_WALL;
     public static final RegistryObject<Item> CYAN_STAINED_BRICKS_WALL = ItemsPart02.CYAN_STAINED_BRICKS_WALL;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_WALL =
-            ItemsPart02.LIGHT_BLUE_STAINED_BRICKS_WALL;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_WALL = ItemsPart02.LIGHT_BLUE_STAINED_BRICKS_WALL;
     public static final RegistryObject<Item> BLUE_STAINED_BRICKS_WALL = ItemsPart02.BLUE_STAINED_BRICKS_WALL;
     public static final RegistryObject<Item> PURPLE_STAINED_BRICKS_WALL = ItemsPart02.PURPLE_STAINED_BRICKS_WALL;
     public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS_WALL = ItemsPart02.MAGENTA_STAINED_BRICKS_WALL;
@@ -1357,28 +1275,19 @@ public class ModItems {
     public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE = ItemsPart02.POLISHED_GREEN_CONCRETE;
     public static final RegistryObject<Item> POLISHED_RED_CONCRETE = ItemsPart02.POLISHED_RED_CONCRETE;
     public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE = ItemsPart02.POLISHED_BLACK_CONCRETE;
-    public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_WHITE_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_STAIRS = ItemsPart02.POLISHED_WHITE_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_SLAB = ItemsPart02.POLISHED_WHITE_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_WALL = ItemsPart02.POLISHED_WHITE_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_ORANGE_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_STAIRS = ItemsPart02.POLISHED_ORANGE_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_SLAB = ItemsPart02.POLISHED_ORANGE_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_WALL = ItemsPart02.POLISHED_ORANGE_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_MAGENTA_CONCRETE_STAIRS;
-    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_SLAB =
-            ItemsPart02.POLISHED_MAGENTA_CONCRETE_SLAB;
-    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_WALL =
-            ItemsPart02.POLISHED_MAGENTA_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_LIGHT_BLUE_CONCRETE_STAIRS;
-    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_SLAB =
-            ItemsPart02.POLISHED_LIGHT_BLUE_CONCRETE_SLAB;
-    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_WALL =
-            ItemsPart02.POLISHED_LIGHT_BLUE_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_YELLOW_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_STAIRS = ItemsPart02.POLISHED_MAGENTA_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_SLAB = ItemsPart02.POLISHED_MAGENTA_CONCRETE_SLAB;
+    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_WALL = ItemsPart02.POLISHED_MAGENTA_CONCRETE_WALL;
+    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_STAIRS = ItemsPart02.POLISHED_LIGHT_BLUE_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_SLAB = ItemsPart02.POLISHED_LIGHT_BLUE_CONCRETE_SLAB;
+    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_WALL = ItemsPart02.POLISHED_LIGHT_BLUE_CONCRETE_WALL;
+    public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_STAIRS = ItemsPart02.POLISHED_YELLOW_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_SLAB = ItemsPart02.POLISHED_YELLOW_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_WALL = ItemsPart02.POLISHED_YELLOW_CONCRETE_WALL;
     public static final RegistryObject<Item> POLISHED_LIME_CONCRETE_STAIRS = ItemsPart02.POLISHED_LIME_CONCRETE_STAIRS;
@@ -1390,35 +1299,28 @@ public class ModItems {
     public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE_STAIRS = ItemsPart02.POLISHED_GRAY_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE_SLAB = ItemsPart02.POLISHED_GRAY_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE_WALL = ItemsPart02.POLISHED_GRAY_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_LIGHT_GRAY_CONCRETE_STAIRS;
-    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_SLAB =
-            ItemsPart02.POLISHED_LIGHT_GRAY_CONCRETE_SLAB;
-    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_WALL =
-            ItemsPart02.POLISHED_LIGHT_GRAY_CONCRETE_WALL;
+    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_STAIRS = ItemsPart02.POLISHED_LIGHT_GRAY_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_SLAB = ItemsPart02.POLISHED_LIGHT_GRAY_CONCRETE_SLAB;
+    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_WALL = ItemsPart02.POLISHED_LIGHT_GRAY_CONCRETE_WALL;
     public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE_STAIRS = ItemsPart02.POLISHED_CYAN_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE_SLAB = ItemsPart02.POLISHED_CYAN_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE_WALL = ItemsPart02.POLISHED_CYAN_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_PURPLE_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_STAIRS = ItemsPart02.POLISHED_PURPLE_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_SLAB = ItemsPart02.POLISHED_PURPLE_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_WALL = ItemsPart02.POLISHED_PURPLE_CONCRETE_WALL;
     public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE_STAIRS = ItemsPart02.POLISHED_BLUE_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE_SLAB = ItemsPart02.POLISHED_BLUE_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE_WALL = ItemsPart02.POLISHED_BLUE_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_BROWN_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_STAIRS = ItemsPart02.POLISHED_BROWN_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_SLAB = ItemsPart02.POLISHED_BROWN_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_WALL = ItemsPart02.POLISHED_BROWN_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_GREEN_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_STAIRS = ItemsPart02.POLISHED_GREEN_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_SLAB = ItemsPart02.POLISHED_GREEN_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_WALL = ItemsPart02.POLISHED_GREEN_CONCRETE_WALL;
     public static final RegistryObject<Item> POLISHED_RED_CONCRETE_STAIRS = ItemsPart02.POLISHED_RED_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_RED_CONCRETE_SLAB = ItemsPart02.POLISHED_RED_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_RED_CONCRETE_WALL = ItemsPart02.POLISHED_RED_CONCRETE_WALL;
-    public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_STAIRS =
-            ItemsPart02.POLISHED_BLACK_CONCRETE_STAIRS;
+    public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_STAIRS = ItemsPart02.POLISHED_BLACK_CONCRETE_STAIRS;
     public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_SLAB = ItemsPart02.POLISHED_BLACK_CONCRETE_SLAB;
     public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_WALL = ItemsPart02.POLISHED_BLACK_CONCRETE_WALL;
     public static final RegistryObject<Item> SMOKE_VENT = ItemsPart02.SMOKE_VENT;
@@ -1462,8 +1364,7 @@ public class ModItems {
     public static final RegistryObject<Item> GREEN_FACTORY_MESH_SLAB = ItemsPart03.GREEN_FACTORY_MESH_SLAB;
     public static final RegistryObject<Item> GREEN_FACTORY_MESH_WALL = ItemsPart03.GREEN_FACTORY_MESH_WALL;
     public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH = ItemsPart03.LIGHT_GRAY_FACTORY_MESH;
-    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_STAIRS =
-            ItemsPart03.LIGHT_GRAY_FACTORY_MESH_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_STAIRS = ItemsPart03.LIGHT_GRAY_FACTORY_MESH_STAIRS;
     public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_SLAB = ItemsPart03.LIGHT_GRAY_FACTORY_MESH_SLAB;
     public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_WALL = ItemsPart03.LIGHT_GRAY_FACTORY_MESH_WALL;
     public static final RegistryObject<Item> LIME_FACTORY_MESH = ItemsPart03.LIME_FACTORY_MESH;
@@ -1510,8 +1411,7 @@ public class ModItems {
     public static final RegistryObject<Item> PINK_STAINED_GLASS_SLAB = ItemsPart03.PINK_STAINED_GLASS_SLAB;
     public static final RegistryObject<Item> GLASS_STAIRS = ItemsPart03.GLASS_STAIRS;
     public static final RegistryObject<Item> WHITE_STAINED_GLASS_STAIRS = ItemsPart03.WHITE_STAINED_GLASS_STAIRS;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_GLASS_STAIRS =
-            ItemsPart03.LIGHT_GRAY_STAINED_GLASS_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_GLASS_STAIRS = ItemsPart03.LIGHT_GRAY_STAINED_GLASS_STAIRS;
     public static final RegistryObject<Item> GRAY_STAINED_GLASS_STAIRS = ItemsPart03.GRAY_STAINED_GLASS_STAIRS;
     public static final RegistryObject<Item> BLACK_STAINED_GLASS_STAIRS = ItemsPart03.BLACK_STAINED_GLASS_STAIRS;
     public static final RegistryObject<Item> BROWN_STAINED_GLASS_STAIRS = ItemsPart03.BROWN_STAINED_GLASS_STAIRS;
@@ -1521,8 +1421,7 @@ public class ModItems {
     public static final RegistryObject<Item> LIME_STAINED_GLASS_STAIRS = ItemsPart03.LIME_STAINED_GLASS_STAIRS;
     public static final RegistryObject<Item> GREEN_STAINED_GLASS_STAIRS = ItemsPart03.GREEN_STAINED_GLASS_STAIRS;
     public static final RegistryObject<Item> CYAN_STAINED_GLASS_STAIRS = ItemsPart03.CYAN_STAINED_GLASS_STAIRS;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_GLASS_STAIRS =
-            ItemsPart03.LIGHT_BLUE_STAINED_GLASS_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_GLASS_STAIRS = ItemsPart03.LIGHT_BLUE_STAINED_GLASS_STAIRS;
     public static final RegistryObject<Item> BLUE_STAINED_GLASS_STAIRS = ItemsPart03.BLUE_STAINED_GLASS_STAIRS;
     public static final RegistryObject<Item> PURPLE_STAINED_GLASS_STAIRS = ItemsPart03.PURPLE_STAINED_GLASS_STAIRS;
     public static final RegistryObject<Item> MAGENTA_STAINED_GLASS_STAIRS = ItemsPart03.MAGENTA_STAINED_GLASS_STAIRS;
@@ -1530,8 +1429,7 @@ public class ModItems {
     public static final RegistryObject<Item> WHITE_MOSAIC_GLASS_SLAB = ItemsPart03.WHITE_MOSAIC_GLASS_SLAB;
     public static final RegistryObject<Item> WHITE_MOSAIC_GLASS_STAIRS = ItemsPart03.WHITE_MOSAIC_GLASS_STAIRS;
     public static final RegistryObject<Item> LIGHT_GRAY_MOSAIC_GLASS_SLAB = ItemsPart03.LIGHT_GRAY_MOSAIC_GLASS_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_MOSAIC_GLASS_STAIRS =
-            ItemsPart03.LIGHT_GRAY_MOSAIC_GLASS_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_MOSAIC_GLASS_STAIRS = ItemsPart03.LIGHT_GRAY_MOSAIC_GLASS_STAIRS;
     public static final RegistryObject<Item> GRAY_MOSAIC_GLASS_SLAB = ItemsPart03.GRAY_MOSAIC_GLASS_SLAB;
     public static final RegistryObject<Item> GRAY_MOSAIC_GLASS_STAIRS = ItemsPart03.GRAY_MOSAIC_GLASS_STAIRS;
     public static final RegistryObject<Item> BLACK_MOSAIC_GLASS_SLAB = ItemsPart03.BLACK_MOSAIC_GLASS_SLAB;
@@ -1551,8 +1449,7 @@ public class ModItems {
     public static final RegistryObject<Item> CYAN_MOSAIC_GLASS_SLAB = ItemsPart03.CYAN_MOSAIC_GLASS_SLAB;
     public static final RegistryObject<Item> CYAN_MOSAIC_GLASS_STAIRS = ItemsPart03.CYAN_MOSAIC_GLASS_STAIRS;
     public static final RegistryObject<Item> LIGHT_BLUE_MOSAIC_GLASS_SLAB = ItemsPart03.LIGHT_BLUE_MOSAIC_GLASS_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_MOSAIC_GLASS_STAIRS =
-            ItemsPart03.LIGHT_BLUE_MOSAIC_GLASS_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_MOSAIC_GLASS_STAIRS = ItemsPart03.LIGHT_BLUE_MOSAIC_GLASS_STAIRS;
     public static final RegistryObject<Item> BLUE_MOSAIC_GLASS_SLAB = ItemsPart03.BLUE_MOSAIC_GLASS_SLAB;
     public static final RegistryObject<Item> BLUE_MOSAIC_GLASS_STAIRS = ItemsPart03.BLUE_MOSAIC_GLASS_STAIRS;
     public static final RegistryObject<Item> PURPLE_MOSAIC_GLASS_SLAB = ItemsPart03.PURPLE_MOSAIC_GLASS_SLAB;
@@ -1564,8 +1461,7 @@ public class ModItems {
     public static final RegistryObject<Item> FACTORY_WHITE_GLASS_SLAB = ItemsPart03.FACTORY_WHITE_GLASS_SLAB;
     public static final RegistryObject<Item> FACTORY_WHITE_GLASS_STAIRS = ItemsPart03.FACTORY_WHITE_GLASS_STAIRS;
     public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS_SLAB = ItemsPart03.FACTORY_LIGHT_GRAY_GLASS_SLAB;
-    public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS_STAIRS =
-            ItemsPart03.FACTORY_LIGHT_GRAY_GLASS_STAIRS;
+    public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS_STAIRS = ItemsPart03.FACTORY_LIGHT_GRAY_GLASS_STAIRS;
     public static final RegistryObject<Item> FACTORY_GRAY_GLASS_SLAB = ItemsPart03.FACTORY_GRAY_GLASS_SLAB;
     public static final RegistryObject<Item> FACTORY_GRAY_GLASS_STAIRS = ItemsPart03.FACTORY_GRAY_GLASS_STAIRS;
     public static final RegistryObject<Item> FACTORY_BLACK_GLASS_SLAB = ItemsPart03.FACTORY_BLACK_GLASS_SLAB;
@@ -1585,8 +1481,7 @@ public class ModItems {
     public static final RegistryObject<Item> FACTORY_CYAN_GLASS_SLAB = ItemsPart03.FACTORY_CYAN_GLASS_SLAB;
     public static final RegistryObject<Item> FACTORY_CYAN_GLASS_STAIRS = ItemsPart03.FACTORY_CYAN_GLASS_STAIRS;
     public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS_SLAB = ItemsPart03.FACTORY_LIGHT_BLUE_GLASS_SLAB;
-    public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS_STAIRS =
-            ItemsPart03.FACTORY_LIGHT_BLUE_GLASS_STAIRS;
+    public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS_STAIRS = ItemsPart03.FACTORY_LIGHT_BLUE_GLASS_STAIRS;
     public static final RegistryObject<Item> FACTORY_BLUE_GLASS_SLAB = ItemsPart03.FACTORY_BLUE_GLASS_SLAB;
     public static final RegistryObject<Item> FACTORY_BLUE_GLASS_STAIRS = ItemsPart03.FACTORY_BLUE_GLASS_STAIRS;
     public static final RegistryObject<Item> FACTORY_PURPLE_GLASS_SLAB = ItemsPart03.FACTORY_PURPLE_GLASS_SLAB;
@@ -1598,8 +1493,7 @@ public class ModItems {
     public static final RegistryObject<Item> WHITE_GLAZED_GLASS_SLAB = ItemsPart03.WHITE_GLAZED_GLASS_SLAB;
     public static final RegistryObject<Item> WHITE_GLAZED_GLASS_STAIRS = ItemsPart03.WHITE_GLAZED_GLASS_STAIRS;
     public static final RegistryObject<Item> LIGHT_GRAY_GLAZED_GLASS_SLAB = ItemsPart03.LIGHT_GRAY_GLAZED_GLASS_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_GLAZED_GLASS_STAIRS =
-            ItemsPart03.LIGHT_GRAY_GLAZED_GLASS_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_GLAZED_GLASS_STAIRS = ItemsPart03.LIGHT_GRAY_GLAZED_GLASS_STAIRS;
     public static final RegistryObject<Item> GRAY_GLAZED_GLASS_SLAB = ItemsPart03.GRAY_GLAZED_GLASS_SLAB;
     public static final RegistryObject<Item> GRAY_GLAZED_GLASS_STAIRS = ItemsPart03.GRAY_GLAZED_GLASS_STAIRS;
     public static final RegistryObject<Item> BLACK_GLAZED_GLASS_SLAB = ItemsPart03.BLACK_GLAZED_GLASS_SLAB;
@@ -1619,8 +1513,7 @@ public class ModItems {
     public static final RegistryObject<Item> CYAN_GLAZED_GLASS_SLAB = ItemsPart03.CYAN_GLAZED_GLASS_SLAB;
     public static final RegistryObject<Item> CYAN_GLAZED_GLASS_STAIRS = ItemsPart03.CYAN_GLAZED_GLASS_STAIRS;
     public static final RegistryObject<Item> LIGHT_BLUE_GLAZED_GLASS_SLAB = ItemsPart03.LIGHT_BLUE_GLAZED_GLASS_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_GLAZED_GLASS_STAIRS =
-            ItemsPart03.LIGHT_BLUE_GLAZED_GLASS_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_GLAZED_GLASS_STAIRS = ItemsPart03.LIGHT_BLUE_GLAZED_GLASS_STAIRS;
     public static final RegistryObject<Item> BLUE_GLAZED_GLASS_SLAB = ItemsPart03.BLUE_GLAZED_GLASS_SLAB;
     public static final RegistryObject<Item> BLUE_GLAZED_GLASS_STAIRS = ItemsPart03.BLUE_GLAZED_GLASS_STAIRS;
     public static final RegistryObject<Item> PURPLE_GLAZED_GLASS_SLAB = ItemsPart03.PURPLE_GLAZED_GLASS_SLAB;
@@ -1661,8 +1554,7 @@ public class ModItems {
     public static final RegistryObject<Item> STRIPPED_ASHPEN_LOG_STAIRS = ItemsPart03.STRIPPED_ASHPEN_LOG_STAIRS;
     public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_SLAB = ItemsPart03.STRIPPED_ASHPEN_WOOD_SLAB;
     public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_STAIRS = ItemsPart03.STRIPPED_ASHPEN_WOOD_STAIRS;
-    public static final RegistryObject<Item> BIT_POLISHED_TUFF_VERTICAL_SLAB =
-            ItemsPart03.BIT_POLISHED_TUFF_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BIT_POLISHED_TUFF_VERTICAL_SLAB = ItemsPart03.BIT_POLISHED_TUFF_VERTICAL_SLAB;
     public static final RegistryObject<Item> BIT_TUFF_BRICKS_VERTICAL_SLAB = ItemsPart03.BIT_TUFF_BRICKS_VERTICAL_SLAB;
     public static final RegistryObject<Item> PODZOL_VERTICAL_SLAB = ItemsPart03.PODZOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> DIRT_VERTICAL_SLAB = ItemsPart03.DIRT_VERTICAL_SLAB;
@@ -1671,39 +1563,27 @@ public class ModItems {
     public static final RegistryObject<Item> BLACK_SANDSTONE_VERTICAL_SLAB = ItemsPart03.BLACK_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLUE_SANDSTONE_VERTICAL_SLAB = ItemsPart03.BLUE_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> GREEN_SANDSTONE_VERTICAL_SLAB = ItemsPart03.GREEN_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.ORANGE_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_SANDSTONE_VERTICAL_SLAB = ItemsPart03.ORANGE_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> PINK_SANDSTONE_VERTICAL_SLAB = ItemsPart03.PINK_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> RED_SANDSTONE_VERTICAL_SLAB = ItemsPart03.RED_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> WHITE_SANDSTONE_VERTICAL_SLAB = ItemsPart03.WHITE_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.YELLOW_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.BLACK_SMOOTH_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.BLUE_SMOOTH_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.GREEN_SMOOTH_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.ORANGE_SMOOTH_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PINK_SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.PINK_SMOOTH_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.RED_SMOOTH_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WHITE_SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.WHITE_SMOOTH_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart03.YELLOW_SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_SANDSTONE_VERTICAL_SLAB = ItemsPart03.YELLOW_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart03.BLACK_SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart03.BLUE_SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart03.GREEN_SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart03.ORANGE_SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart03.PINK_SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart03.RED_SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WHITE_SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart03.WHITE_SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart03.YELLOW_SMOOTH_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLACK_TILES_VERTICAL_SLAB = ItemsPart03.BLACK_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLUE_TILES_VERTICAL_SLAB = ItemsPart03.BLUE_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> BROWN_TILES_VERTICAL_SLAB = ItemsPart03.BROWN_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> CYAN_TILES_VERTICAL_SLAB = ItemsPart03.CYAN_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> GRAY_TILES_VERTICAL_SLAB = ItemsPart03.GRAY_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> GREEN_TILES_VERTICAL_SLAB = ItemsPart03.GREEN_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_TILES_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_BLUE_TILES_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_TILES_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_GRAY_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_TILES_VERTICAL_SLAB = ItemsPart03.LIGHT_BLUE_TILES_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_TILES_VERTICAL_SLAB = ItemsPart03.LIGHT_GRAY_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIME_TILES_VERTICAL_SLAB = ItemsPart03.LIME_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> MAGENTA_TILES_VERTICAL_SLAB = ItemsPart03.MAGENTA_TILES_VERTICAL_SLAB;
     public static final RegistryObject<Item> ORANGE_TILES_VERTICAL_SLAB = ItemsPart03.ORANGE_TILES_VERTICAL_SLAB;
@@ -1727,34 +1607,24 @@ public class ModItems {
     public static final RegistryObject<Item> MOSS_BLOCK_VERTICAL_SLAB = ItemsPart03.MOSS_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> AMETHYST_BLOCK_VERTICAL_SLAB = ItemsPart03.AMETHYST_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> MOSSY_CALCITE_VERTICAL_SLAB = ItemsPart03.MOSSY_CALCITE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BIT_COPPER_BLOCK_VERTICAL_SLAB =
-            ItemsPart03.BIT_COPPER_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB =
-            ItemsPart03.BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB =
-            ItemsPart03.BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB =
-            ItemsPart03.BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BIT_COPPER_BLOCK_VERTICAL_SLAB = ItemsPart03.BIT_COPPER_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB = ItemsPart03.BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB = ItemsPart03.BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB = ItemsPart03.BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> BIT_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.BIT_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLACK_CONCRETE_VERTICAL_SLAB = ItemsPart03.BLACK_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLUE_CONCRETE_VERTICAL_SLAB = ItemsPart03.BLUE_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> BROWN_CONCRETE_VERTICAL_SLAB = ItemsPart03.BROWN_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> CYAN_CONCRETE_VERTICAL_SLAB = ItemsPart03.CYAN_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> GRAY_CONCRETE_VERTICAL_SLAB = ItemsPart03.GRAY_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> GREEN_CONCRETE_VERTICAL_SLAB = ItemsPart03.GREEN_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_BLUE_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_GRAY_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_CONCRETE_VERTICAL_SLAB = ItemsPart03.LIGHT_BLUE_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_CONCRETE_VERTICAL_SLAB = ItemsPart03.LIGHT_GRAY_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIME_CONCRETE_VERTICAL_SLAB = ItemsPart03.LIME_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.MAGENTA_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_CONCRETE_VERTICAL_SLAB = ItemsPart03.MAGENTA_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> ORANGE_CONCRETE_VERTICAL_SLAB = ItemsPart03.ORANGE_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> PINK_CONCRETE_VERTICAL_SLAB = ItemsPart03.PINK_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> PURPLE_CONCRETE_VERTICAL_SLAB = ItemsPart03.PURPLE_CONCRETE_VERTICAL_SLAB;
@@ -1763,8 +1633,7 @@ public class ModItems {
     public static final RegistryObject<Item> YELLOW_CONCRETE_VERTICAL_SLAB = ItemsPart03.YELLOW_CONCRETE_VERTICAL_SLAB;
     public static final RegistryObject<Item> HAY_BALE_VERTICAL_SLAB = ItemsPart03.HAY_BALE_VERTICAL_SLAB;
     public static final RegistryObject<Item> BAMBOO_BLOCK_VERTICAL_SLAB = ItemsPart03.BAMBOO_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_BAMBOO_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_BAMBOO_BLOCK_VERTICAL_SLAB = ItemsPart03.STRIPPED_BAMBOO_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_WHITE_VERTICAL_SLAB = ItemsPart03.ASHPEN_WHITE_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_BLACK_VERTICAL_SLAB = ItemsPart03.ASHPEN_BLACK_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_BLUE_VERTICAL_SLAB = ItemsPart03.ASHPEN_BLUE_VERTICAL_SLAB;
@@ -1772,10 +1641,8 @@ public class ModItems {
     public static final RegistryObject<Item> ASHPEN_CYAN_VERTICAL_SLAB = ItemsPart03.ASHPEN_CYAN_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_GRAY_VERTICAL_SLAB = ItemsPart03.ASHPEN_GRAY_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_GREEN_VERTICAL_SLAB = ItemsPart03.ASHPEN_GREEN_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ASHPEN_LIGHT_BLUE_VERTICAL_SLAB =
-            ItemsPart03.ASHPEN_LIGHT_BLUE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ASHPEN_LIGHT_GRAY_VERTICAL_SLAB =
-            ItemsPart03.ASHPEN_LIGHT_GRAY_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ASHPEN_LIGHT_BLUE_VERTICAL_SLAB = ItemsPart03.ASHPEN_LIGHT_BLUE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ASHPEN_LIGHT_GRAY_VERTICAL_SLAB = ItemsPart03.ASHPEN_LIGHT_GRAY_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_LIME_VERTICAL_SLAB = ItemsPart03.ASHPEN_LIME_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_MAGENTA_VERTICAL_SLAB = ItemsPart03.ASHPEN_MAGENTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_ORANGE_VERTICAL_SLAB = ItemsPart03.ASHPEN_ORANGE_VERTICAL_SLAB;
@@ -1785,8 +1652,7 @@ public class ModItems {
     public static final RegistryObject<Item> ASHPEN_YELLOW_VERTICAL_SLAB = ItemsPart03.ASHPEN_YELLOW_VERTICAL_SLAB;
     public static final RegistryObject<Item> SNOW_BRICKS_VERTICAL_SLAB = ItemsPart03.SNOW_BRICKS_VERTICAL_SLAB;
     public static final RegistryObject<Item> SNOW_VERTICAL_SLAB = ItemsPart03.SNOW_VERTICAL_SLAB;
-    public static final RegistryObject<Item> SNOWY_GRASS_BLOCK_VERTICAL_SLAB =
-            ItemsPart03.SNOWY_GRASS_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> SNOWY_GRASS_BLOCK_VERTICAL_SLAB = ItemsPart03.SNOWY_GRASS_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> MANGROVE_VERTICAL_SLAB = ItemsPart03.MANGROVE_VERTICAL_SLAB;
     public static final RegistryObject<Item> STEEL_BLOCK_VERTICAL_SLAB = ItemsPart03.STEEL_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> POLISHED_STEEL_VERTICAL_SLAB = ItemsPart03.POLISHED_STEEL_VERTICAL_SLAB;
@@ -1802,260 +1668,140 @@ public class ModItems {
     public static final RegistryObject<Item> CAUTION_PINK_VERTICAL_SLAB = ItemsPart03.CAUTION_PINK_VERTICAL_SLAB;
     public static final RegistryObject<Item> CAUTION_YELLOW_VERTICAL_SLAB = ItemsPart03.CAUTION_YELLOW_VERTICAL_SLAB;
     public static final RegistryObject<Item> CAUTION_CANDY_VERTICAL_SLAB = ItemsPart03.CAUTION_CANDY_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CAUTION_COTTONCANDY_VERTICAL_SLAB =
-            ItemsPart03.CAUTION_COTTONCANDY_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CAUTION_MINTCANDY_VERTICAL_SLAB =
-            ItemsPart03.CAUTION_MINTCANDY_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CAUTION_CITRUSCANDY_VERTICAL_SLAB =
-            ItemsPart03.CAUTION_CITRUSCANDY_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WHITE_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.WHITE_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_GRAY_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GRAY_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.GRAY_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.BLACK_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.BROWN_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.RED_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.ORANGE_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.YELLOW_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIME_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.LIME_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.GREEN_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CYAN_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.CYAN_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_BLUE_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.BLUE_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.PURPLE_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.MAGENTA_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PINK_STAINED_BRICKS_VERTICAL_SLAB =
-            ItemsPart03.PINK_STAINED_BRICKS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_WHITE_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_ORANGE_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_MAGENTA_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_LIGHT_BLUE_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_YELLOW_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_LIME_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_LIME_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_PINK_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_PINK_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_GRAY_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_LIGHT_GRAY_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_CYAN_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_PURPLE_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_BLUE_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_BROWN_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_GREEN_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_RED_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_RED_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_BLACK_CONCRETE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.BLACK_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.BLUE_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.BROWN_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GRAY_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.GRAY_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.GREEN_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_GRAY_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIME_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.LIME_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.ORANGE_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.RED_FACTORY_MESH_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_FACTORY_MESH_VERTICAL_SLAB =
-            ItemsPart03.YELLOW_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CAUTION_COTTONCANDY_VERTICAL_SLAB = ItemsPart03.CAUTION_COTTONCANDY_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CAUTION_MINTCANDY_VERTICAL_SLAB = ItemsPart03.CAUTION_MINTCANDY_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CAUTION_CITRUSCANDY_VERTICAL_SLAB = ItemsPart03.CAUTION_CITRUSCANDY_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WHITE_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.WHITE_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.LIGHT_GRAY_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.GRAY_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.BLACK_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.BROWN_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.RED_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.ORANGE_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.YELLOW_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.LIME_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.GREEN_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.CYAN_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.LIGHT_BLUE_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.BLUE_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.PURPLE_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.MAGENTA_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_STAINED_BRICKS_VERTICAL_SLAB = ItemsPart03.PINK_STAINED_BRICKS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_WHITE_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_ORANGE_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_MAGENTA_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_LIGHT_BLUE_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_YELLOW_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_LIME_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_LIME_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_PINK_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_PINK_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_GRAY_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_LIGHT_GRAY_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_CYAN_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_PURPLE_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_BLUE_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_BROWN_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_GREEN_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_RED_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_RED_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_VERTICAL_SLAB = ItemsPart03.POLISHED_BLACK_CONCRETE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.BLACK_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.BLUE_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.BROWN_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.GRAY_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.GREEN_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.LIGHT_GRAY_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.LIME_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.ORANGE_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.RED_FACTORY_MESH_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH_VERTICAL_SLAB = ItemsPart03.YELLOW_FACTORY_MESH_VERTICAL_SLAB;
     public static final RegistryObject<Item> PACKED_MUD_VERTICAL_SLAB = ItemsPart03.PACKED_MUD_VERTICAL_SLAB;
     public static final RegistryObject<Item> MUD_BRICK_VERTICAL_SLAB = ItemsPart03.MUD_BRICK_VERTICAL_SLAB;
     public static final RegistryObject<Item> GLASS_VERTICAL_SLAB = ItemsPart03.GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WHITE_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.WHITE_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_GRAY_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GRAY_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.GRAY_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BLACK_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BROWN_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.RED_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.ORANGE_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.YELLOW_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIME_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIME_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.GREEN_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CYAN_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.CYAN_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_BLUE_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BLUE_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.PURPLE_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.MAGENTA_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PINK_STAINED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.PINK_STAINED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WHITE_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.WHITE_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_GRAY_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GRAY_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.GRAY_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BLACK_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BROWN_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.RED_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.ORANGE_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.YELLOW_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIME_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIME_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.GREEN_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CYAN_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.CYAN_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_BLUE_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BLUE_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.PURPLE_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.MAGENTA_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PINK_MOSAIC_GLASS_VERTICAL_SLAB =
-            ItemsPart03.PINK_MOSAIC_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_WHITE_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_WHITE_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_LIGHT_GRAY_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_GRAY_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_GRAY_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_BLACK_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_BLACK_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_BROWN_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_BROWN_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_RED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_RED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_ORANGE_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_ORANGE_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_YELLOW_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_YELLOW_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_LIME_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_LIME_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_GREEN_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_GREEN_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_CYAN_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_CYAN_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_LIGHT_BLUE_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_BLUE_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_BLUE_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_PURPLE_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_PURPLE_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_MAGENTA_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_MAGENTA_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> FACTORY_PINK_GLASS_VERTICAL_SLAB =
-            ItemsPart03.FACTORY_PINK_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WHITE_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.WHITE_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_GRAY_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GRAY_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.GRAY_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BLACK_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BROWN_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.RED_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.ORANGE_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.YELLOW_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIME_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIME_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.GREEN_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CYAN_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.CYAN_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.LIGHT_BLUE_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.BLUE_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.PURPLE_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.MAGENTA_GLAZED_GLASS_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PINK_GLAZED_GLASS_VERTICAL_SLAB =
-            ItemsPart03.PINK_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WHITE_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.WHITE_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.LIGHT_GRAY_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.GRAY_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.BLACK_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.BROWN_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.RED_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.ORANGE_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.YELLOW_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.LIME_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.GREEN_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.CYAN_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.LIGHT_BLUE_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.BLUE_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.PURPLE_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.MAGENTA_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_STAINED_GLASS_VERTICAL_SLAB = ItemsPart03.PINK_STAINED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WHITE_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.WHITE_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.LIGHT_GRAY_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.GRAY_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.BLACK_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.BROWN_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.RED_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.ORANGE_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.YELLOW_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.LIME_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.GREEN_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.CYAN_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.LIGHT_BLUE_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.BLUE_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.PURPLE_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.MAGENTA_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_MOSAIC_GLASS_VERTICAL_SLAB = ItemsPart03.PINK_MOSAIC_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_WHITE_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_WHITE_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_LIGHT_GRAY_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_GRAY_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_GRAY_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_BLACK_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_BLACK_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_BROWN_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_BROWN_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_RED_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_RED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_ORANGE_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_ORANGE_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_YELLOW_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_YELLOW_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_LIME_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_LIME_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_GREEN_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_GREEN_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_CYAN_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_CYAN_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_LIGHT_BLUE_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_BLUE_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_BLUE_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_PURPLE_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_PURPLE_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_MAGENTA_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_MAGENTA_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FACTORY_PINK_GLASS_VERTICAL_SLAB = ItemsPart03.FACTORY_PINK_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WHITE_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.WHITE_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.LIGHT_GRAY_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.GRAY_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.BLACK_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.BROWN_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.RED_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.ORANGE_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.YELLOW_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.LIME_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.GREEN_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.CYAN_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.LIGHT_BLUE_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.BLUE_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.PURPLE_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.MAGENTA_GLAZED_GLASS_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_GLAZED_GLASS_VERTICAL_SLAB = ItemsPart03.PINK_GLAZED_GLASS_VERTICAL_SLAB;
     public static final RegistryObject<Item> OAK_LOG_VERTICAL_SLAB = ItemsPart03.OAK_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_OAK_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_OAK_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_OAK_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_OAK_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> SPRUCE_LOG_VERTICAL_SLAB = ItemsPart03.SPRUCE_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> BIRCH_LOG_VERTICAL_SLAB = ItemsPart03.BIRCH_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_BIRCH_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_BIRCH_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_BIRCH_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_BIRCH_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> JUNGLE_LOG_VERTICAL_SLAB = ItemsPart03.JUNGLE_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_JUNGLE_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_JUNGLE_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> ACACIA_LOG_VERTICAL_SLAB = ItemsPart03.ACACIA_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_ACACIA_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_ACACIA_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_ACACIA_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_ACACIA_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> DARK_OAK_LOG_VERTICAL_SLAB = ItemsPart03.DARK_OAK_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> CRIMSON_STEM_VERTICAL_SLAB = ItemsPart03.CRIMSON_STEM_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_CRIMSON_STEM_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_CRIMSON_STEM_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_CRIMSON_STEM_VERTICAL_SLAB = ItemsPart03.STRIPPED_CRIMSON_STEM_VERTICAL_SLAB;
     public static final RegistryObject<Item> WARPED_STEM_VERTICAL_SLAB = ItemsPart03.WARPED_STEM_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_WARPED_STEM_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_WARPED_STEM_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_WARPED_STEM_VERTICAL_SLAB = ItemsPart03.STRIPPED_WARPED_STEM_VERTICAL_SLAB;
     public static final RegistryObject<Item> MANGROVE_LOG_VERTICAL_SLAB = ItemsPart03.MANGROVE_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_MANGROVE_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_MANGROVE_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_MANGROVE_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_MANGROVE_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_LOG_VERTICAL_SLAB = ItemsPart03.ASHPEN_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> ASHPEN_WOOD_VERTICAL_SLAB = ItemsPart03.ASHPEN_WOOD_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_ASHPEN_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_ASHPEN_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_ASHPEN_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB = ItemsPart03.STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> SPOOL = ItemsPart03.SPOOL;
     public static final RegistryObject<Item> GLOWING_SPOOL = ItemsPart03.GLOWING_SPOOL;
     public static final RegistryObject<Item> WHITE_SPOOL = ItemsPart03.WHITE_SPOOL;
@@ -2243,10 +1989,8 @@ public class ModItems {
     public static final RegistryObject<Item> RED_WOOL_VERTICAL_SLAB = ItemsPart03.RED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLACK_WOOL_VERTICAL_SLAB = ItemsPart03.BLACK_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> RED_MOSS_BLOCK_VERTICAL_SLAB = ItemsPart03.RED_MOSS_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_VERTICAL_SLAB =
-            ItemsPart03.ORANGE_MOSS_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_VERTICAL_SLAB =
-            ItemsPart03.YELLOW_MOSS_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_VERTICAL_SLAB = ItemsPart03.ORANGE_MOSS_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_VERTICAL_SLAB = ItemsPart03.YELLOW_MOSS_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> TUFF_VERTICAL_SLAB = ItemsPart03.TUFF_VERTICAL_SLAB;
     public static final RegistryObject<Item> POLISHED_TUFF_VERTICAL_SLAB = ItemsPart03.POLISHED_TUFF_VERTICAL_SLAB;
     public static final RegistryObject<Item> TUFF_BRICK_VERTICAL_SLAB = ItemsPart03.TUFF_BRICK_VERTICAL_SLAB;
@@ -2254,16 +1998,13 @@ public class ModItems {
     public static final RegistryObject<Item> POLISHED_SULFUR_VERTICAL_SLAB = ItemsPart03.POLISHED_SULFUR_VERTICAL_SLAB;
     public static final RegistryObject<Item> SULFUR_BRICKS_VERTICAL_SLAB = ItemsPart03.SULFUR_BRICKS_VERTICAL_SLAB;
     public static final RegistryObject<Item> CINNABAR_VERTICAL_SLAB = ItemsPart03.CINNABAR_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_CINNABAR_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_CINNABAR_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_CINNABAR_VERTICAL_SLAB = ItemsPart03.POLISHED_CINNABAR_VERTICAL_SLAB;
     public static final RegistryObject<Item> CINNABAR_BRICKS_VERTICAL_SLAB = ItemsPart03.CINNABAR_BRICKS_VERTICAL_SLAB;
     public static final RegistryObject<Item> POPLAR_VERTICAL_SLAB = ItemsPart03.POPLAR_VERTICAL_SLAB;
     public static final RegistryObject<Item> POPLAR_LOG_VERTICAL_SLAB = ItemsPart03.POPLAR_LOG_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_POPLAR_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_VERTICAL_SLAB = ItemsPart03.STRIPPED_POPLAR_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> POPLAR_WOOD_VERTICAL_SLAB = ItemsPart03.POPLAR_WOOD_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD_VERTICAL_SLAB =
-            ItemsPart03.STRIPPED_POPLAR_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD_VERTICAL_SLAB = ItemsPart03.STRIPPED_POPLAR_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> OAK_VERTICAL_SLAB = ItemsPart03.OAK_VERTICAL_SLAB;
     public static final RegistryObject<Item> SPRUCE_VERTICAL_SLAB = ItemsPart03.SPRUCE_VERTICAL_SLAB;
     public static final RegistryObject<Item> BIRCH_VERTICAL_SLAB = ItemsPart03.BIRCH_VERTICAL_SLAB;
@@ -2275,53 +2016,35 @@ public class ModItems {
     public static final RegistryObject<Item> STONE_VERTICAL_SLAB = ItemsPart03.STONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> SMOOTH_STONE_VERTICAL_SLAB = ItemsPart03.SMOOTH_STONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> GRANITE_VERTICAL_SLAB = ItemsPart03.GRANITE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_GRANITE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_GRANITE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_GRANITE_VERTICAL_SLAB = ItemsPart03.POLISHED_GRANITE_VERTICAL_SLAB;
     public static final RegistryObject<Item> DIORITE_VERTICAL_SLAB = ItemsPart03.DIORITE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_DIORITE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_DIORITE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_DIORITE_VERTICAL_SLAB = ItemsPart03.POLISHED_DIORITE_VERTICAL_SLAB;
     public static final RegistryObject<Item> ANDESITE_VERTICAL_SLAB = ItemsPart03.ANDESITE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_ANDESITE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_ANDESITE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_ANDESITE_VERTICAL_SLAB = ItemsPart03.POLISHED_ANDESITE_VERTICAL_SLAB;
     public static final RegistryObject<Item> COBBLESTONE_VERTICAL_SLAB = ItemsPart03.COBBLESTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MOSSY_COBBLESTONE_VERTICAL_SLAB =
-            ItemsPart03.MOSSY_COBBLESTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MOSSY_COBBLESTONE_VERTICAL_SLAB = ItemsPart03.MOSSY_COBBLESTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> STONE_BRICK_VERTICAL_SLAB = ItemsPart03.STONE_BRICK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MOSSY_STONE_BRICK_VERTICAL_SLAB =
-            ItemsPart03.MOSSY_STONE_BRICK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MOSSY_STONE_BRICK_VERTICAL_SLAB = ItemsPart03.MOSSY_STONE_BRICK_VERTICAL_SLAB;
     public static final RegistryObject<Item> NETHER_BRICK_VERTICAL_SLAB = ItemsPart03.NETHER_BRICK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_NETHER_BRICK_VERTICAL_SLAB =
-            ItemsPart03.RED_NETHER_BRICK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_NETHER_BRICK_VERTICAL_SLAB = ItemsPart03.RED_NETHER_BRICK_VERTICAL_SLAB;
     public static final RegistryObject<Item> OAK_LOG_STAIRS = ItemsPart03.OAK_LOG_STAIRS;
     public static final RegistryObject<Item> CUT_COPPER_VERTICAL_SLAB = ItemsPart03.CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> EXPOSED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.EXPOSED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WEATHERED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.WEATHERED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> OXIDIZED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.OXIDIZED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WAXED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.WAXED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB =
-            ItemsPart03.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> COBBLED_DEEPSLATE_VERTICAL_SLAB =
-            ItemsPart03.COBBLED_DEEPSLATE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_DEEPSLATE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_DEEPSLATE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> EXPOSED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.EXPOSED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WEATHERED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.WEATHERED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> OXIDIZED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.OXIDIZED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WAXED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.WAXED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB = ItemsPart03.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> COBBLED_DEEPSLATE_VERTICAL_SLAB = ItemsPart03.COBBLED_DEEPSLATE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_DEEPSLATE_VERTICAL_SLAB = ItemsPart03.POLISHED_DEEPSLATE_VERTICAL_SLAB;
     public static final RegistryObject<Item> DEEPSLATE_BRICK_VERTICAL_SLAB = ItemsPart03.DEEPSLATE_BRICK_VERTICAL_SLAB;
     public static final RegistryObject<Item> DEEPSLATE_TILE_VERTICAL_SLAB = ItemsPart03.DEEPSLATE_TILE_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLACKSTONE_VERTICAL_SLAB = ItemsPart03.BLACKSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_BLACKSTONE_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_BLACKSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> POLISHED_BLACKSTONE_BRICK_VERTICAL_SLAB =
-            ItemsPart03.POLISHED_BLACKSTONE_BRICK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_BLACKSTONE_VERTICAL_SLAB = ItemsPart03.POLISHED_BLACKSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> POLISHED_BLACKSTONE_BRICK_VERTICAL_SLAB = ItemsPart03.POLISHED_BLACKSTONE_BRICK_VERTICAL_SLAB;
     public static final RegistryObject<Item> PRISMARINE_VERTICAL_SLAB = ItemsPart03.PRISMARINE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PRISMARINE_BRICK_VERTICAL_SLAB =
-            ItemsPart03.PRISMARINE_BRICK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PRISMARINE_BRICK_VERTICAL_SLAB = ItemsPart03.PRISMARINE_BRICK_VERTICAL_SLAB;
     public static final RegistryObject<Item> DARK_PRISMARINE_VERTICAL_SLAB = ItemsPart03.DARK_PRISMARINE_VERTICAL_SLAB;
     public static final RegistryObject<Item> BRICK_VERTICAL_SLAB = ItemsPart03.BRICK_VERTICAL_SLAB;
     public static final RegistryObject<Item> END_STONE_BRICK_VERTICAL_SLAB = ItemsPart03.END_STONE_BRICK_VERTICAL_SLAB;
@@ -2333,24 +2056,19 @@ public class ModItems {
     public static final RegistryObject<Item> TERRACOTTA_VERTICAL_SLAB = ItemsPart04.TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> WHITE_TERRACOTTA_SLAB = ItemsPart04.WHITE_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> WHITE_TERRACOTTA_STAIRS = ItemsPart04.WHITE_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> WHITE_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.WHITE_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WHITE_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.WHITE_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> ORANGE_TERRACOTTA_SLAB = ItemsPart04.ORANGE_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> ORANGE_TERRACOTTA_STAIRS = ItemsPart04.ORANGE_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> ORANGE_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.ORANGE_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.ORANGE_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> MAGENTA_TERRACOTTA_SLAB = ItemsPart04.MAGENTA_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> MAGENTA_TERRACOTTA_STAIRS = ItemsPart04.MAGENTA_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> MAGENTA_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.MAGENTA_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.MAGENTA_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIGHT_BLUE_TERRACOTTA_SLAB = ItemsPart04.LIGHT_BLUE_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> LIGHT_BLUE_TERRACOTTA_STAIRS = ItemsPart04.LIGHT_BLUE_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> LIGHT_BLUE_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.LIGHT_BLUE_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.LIGHT_BLUE_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> YELLOW_TERRACOTTA_SLAB = ItemsPart04.YELLOW_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> YELLOW_TERRACOTTA_STAIRS = ItemsPart04.YELLOW_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> YELLOW_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.YELLOW_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.YELLOW_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIME_TERRACOTTA_SLAB = ItemsPart04.LIME_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> LIME_TERRACOTTA_STAIRS = ItemsPart04.LIME_TERRACOTTA_STAIRS;
     public static final RegistryObject<Item> LIME_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.LIME_TERRACOTTA_VERTICAL_SLAB;
@@ -2362,33 +2080,28 @@ public class ModItems {
     public static final RegistryObject<Item> GRAY_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.GRAY_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIGHT_GRAY_TERRACOTTA_SLAB = ItemsPart04.LIGHT_GRAY_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> LIGHT_GRAY_TERRACOTTA_STAIRS = ItemsPart04.LIGHT_GRAY_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> LIGHT_GRAY_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.LIGHT_GRAY_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.LIGHT_GRAY_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> CYAN_TERRACOTTA_SLAB = ItemsPart04.CYAN_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> CYAN_TERRACOTTA_STAIRS = ItemsPart04.CYAN_TERRACOTTA_STAIRS;
     public static final RegistryObject<Item> CYAN_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.CYAN_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> PURPLE_TERRACOTTA_SLAB = ItemsPart04.PURPLE_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> PURPLE_TERRACOTTA_STAIRS = ItemsPart04.PURPLE_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> PURPLE_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.PURPLE_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.PURPLE_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLUE_TERRACOTTA_SLAB = ItemsPart04.BLUE_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> BLUE_TERRACOTTA_STAIRS = ItemsPart04.BLUE_TERRACOTTA_STAIRS;
     public static final RegistryObject<Item> BLUE_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.BLUE_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> BROWN_TERRACOTTA_SLAB = ItemsPart04.BROWN_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> BROWN_TERRACOTTA_STAIRS = ItemsPart04.BROWN_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> BROWN_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.BROWN_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.BROWN_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> GREEN_TERRACOTTA_SLAB = ItemsPart04.GREEN_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> GREEN_TERRACOTTA_STAIRS = ItemsPart04.GREEN_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> GREEN_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.GREEN_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.GREEN_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> RED_TERRACOTTA_SLAB = ItemsPart04.RED_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> RED_TERRACOTTA_STAIRS = ItemsPart04.RED_TERRACOTTA_STAIRS;
     public static final RegistryObject<Item> RED_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.RED_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLACK_TERRACOTTA_SLAB = ItemsPart04.BLACK_TERRACOTTA_SLAB;
     public static final RegistryObject<Item> BLACK_TERRACOTTA_STAIRS = ItemsPart04.BLACK_TERRACOTTA_STAIRS;
-    public static final RegistryObject<Item> BLACK_TERRACOTTA_VERTICAL_SLAB =
-            ItemsPart04.BLACK_TERRACOTTA_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_TERRACOTTA_VERTICAL_SLAB = ItemsPart04.BLACK_TERRACOTTA_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_OAK_LOG_STAIRS = ItemsPart04.STRIPPED_OAK_LOG_STAIRS;
     public static final RegistryObject<Item> SPRUCE_LOG_STAIRS = ItemsPart04.SPRUCE_LOG_STAIRS;
     public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_STAIRS = ItemsPart04.STRIPPED_SPRUCE_LOG_STAIRS;
@@ -2418,8 +2131,7 @@ public class ModItems {
     public static final RegistryObject<Item> CRYING_OBSIDIAN_STAIRS = ItemsPart04.CRYING_OBSIDIAN_STAIRS;
     public static final RegistryObject<Item> CRYING_OBSIDIAN_VERTICAL_SLAB = ItemsPart04.CRYING_OBSIDIAN_VERTICAL_SLAB;
     public static final RegistryObject<Item> CUT_RED_SANDSTONE_STAIRS = ItemsPart04.CUT_RED_SANDSTONE_STAIRS;
-    public static final RegistryObject<Item> CUT_RED_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart04.CUT_RED_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CUT_RED_SANDSTONE_VERTICAL_SLAB = ItemsPart04.CUT_RED_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> CUT_SANDSTONE_STAIRS = ItemsPart04.CUT_SANDSTONE_STAIRS;
     public static final RegistryObject<Item> CUT_SANDSTONE_VERTICAL_SLAB = ItemsPart04.CUT_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> DARK_OAK_WOOD_SLAB = ItemsPart04.DARK_OAK_WOOD_SLAB;
@@ -2436,46 +2148,35 @@ public class ModItems {
     public static final RegistryObject<Item> OAK_WOOD_VERTICAL_SLAB = ItemsPart04.OAK_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> PODZOL_STAIRS = ItemsPart04.PODZOL_STAIRS;
     public static final RegistryObject<Item> SANDSTONE_VERTICAL_SLAB = ItemsPart04.SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> SMOOTH_RED_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart04.SMOOTH_RED_SANDSTONE_VERTICAL_SLAB;
-    public static final RegistryObject<Item> SMOOTH_SANDSTONE_VERTICAL_SLAB =
-            ItemsPart04.SMOOTH_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> SMOOTH_RED_SANDSTONE_VERTICAL_SLAB = ItemsPart04.SMOOTH_RED_SANDSTONE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> SMOOTH_SANDSTONE_VERTICAL_SLAB = ItemsPart04.SMOOTH_SANDSTONE_VERTICAL_SLAB;
     public static final RegistryObject<Item> SPRUCE_WOOD_SLAB = ItemsPart04.SPRUCE_WOOD_SLAB;
     public static final RegistryObject<Item> SPRUCE_WOOD_STAIRS = ItemsPart04.SPRUCE_WOOD_STAIRS;
     public static final RegistryObject<Item> SPRUCE_WOOD_VERTICAL_SLAB = ItemsPart04.SPRUCE_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_ACACIA_WOOD_SLAB = ItemsPart04.STRIPPED_ACACIA_WOOD_SLAB;
     public static final RegistryObject<Item> STRIPPED_ACACIA_WOOD_STAIRS = ItemsPart04.STRIPPED_ACACIA_WOOD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_ACACIA_WOOD_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_ACACIA_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_ACACIA_WOOD_VERTICAL_SLAB = ItemsPart04.STRIPPED_ACACIA_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_BIRCH_WOOD_SLAB = ItemsPart04.STRIPPED_BIRCH_WOOD_SLAB;
     public static final RegistryObject<Item> STRIPPED_BIRCH_WOOD_STAIRS = ItemsPart04.STRIPPED_BIRCH_WOOD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_BIRCH_WOOD_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_BIRCH_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_BIRCH_WOOD_VERTICAL_SLAB = ItemsPart04.STRIPPED_BIRCH_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_CRIMSON_HYPHAE_SLAB = ItemsPart04.STRIPPED_CRIMSON_HYPHAE_SLAB;
-    public static final RegistryObject<Item> STRIPPED_CRIMSON_HYPHAE_STAIRS =
-            ItemsPart04.STRIPPED_CRIMSON_HYPHAE_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_CRIMSON_HYPHAE_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_CRIMSON_HYPHAE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_CRIMSON_HYPHAE_STAIRS = ItemsPart04.STRIPPED_CRIMSON_HYPHAE_STAIRS;
+    public static final RegistryObject<Item> STRIPPED_CRIMSON_HYPHAE_VERTICAL_SLAB = ItemsPart04.STRIPPED_CRIMSON_HYPHAE_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_DARK_OAK_WOOD_SLAB = ItemsPart04.STRIPPED_DARK_OAK_WOOD_SLAB;
     public static final RegistryObject<Item> STRIPPED_DARK_OAK_WOOD_STAIRS = ItemsPart04.STRIPPED_DARK_OAK_WOOD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_DARK_OAK_WOOD_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_DARK_OAK_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_DARK_OAK_WOOD_VERTICAL_SLAB = ItemsPart04.STRIPPED_DARK_OAK_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_JUNGLE_WOOD_SLAB = ItemsPart04.STRIPPED_JUNGLE_WOOD_SLAB;
     public static final RegistryObject<Item> STRIPPED_JUNGLE_WOOD_STAIRS = ItemsPart04.STRIPPED_JUNGLE_WOOD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_JUNGLE_WOOD_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_JUNGLE_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_JUNGLE_WOOD_VERTICAL_SLAB = ItemsPart04.STRIPPED_JUNGLE_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_OAK_WOOD_SLAB = ItemsPart04.STRIPPED_OAK_WOOD_SLAB;
     public static final RegistryObject<Item> STRIPPED_OAK_WOOD_STAIRS = ItemsPart04.STRIPPED_OAK_WOOD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_OAK_WOOD_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_OAK_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_OAK_WOOD_VERTICAL_SLAB = ItemsPart04.STRIPPED_OAK_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_SPRUCE_WOOD_SLAB = ItemsPart04.STRIPPED_SPRUCE_WOOD_SLAB;
     public static final RegistryObject<Item> STRIPPED_SPRUCE_WOOD_STAIRS = ItemsPart04.STRIPPED_SPRUCE_WOOD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_SPRUCE_WOOD_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_SPRUCE_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_SPRUCE_WOOD_VERTICAL_SLAB = ItemsPart04.STRIPPED_SPRUCE_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_WARPED_HYPHAE_SLAB = ItemsPart04.STRIPPED_WARPED_HYPHAE_SLAB;
     public static final RegistryObject<Item> STRIPPED_WARPED_HYPHAE_STAIRS = ItemsPart04.STRIPPED_WARPED_HYPHAE_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_WARPED_HYPHAE_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_WARPED_HYPHAE_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_WARPED_HYPHAE_VERTICAL_SLAB = ItemsPart04.STRIPPED_WARPED_HYPHAE_VERTICAL_SLAB;
     public static final RegistryObject<Item> TINTED_GLASS_SLAB = ItemsPart04.TINTED_GLASS_SLAB;
     public static final RegistryObject<Item> TINTED_GLASS_STAIRS = ItemsPart04.TINTED_GLASS_STAIRS;
     public static final RegistryObject<Item> TINTED_GLASS_VERTICAL_SLAB = ItemsPart04.TINTED_GLASS_VERTICAL_SLAB;
@@ -2502,17 +2203,13 @@ public class ModItems {
     public static final RegistryObject<Item> WHITE_WALLPAPER_SLAB = ItemsPart04.WHITE_WALLPAPER_SLAB;
     public static final RegistryObject<Item> WHITE_WALLPAPER_VERTICAL_SLAB = ItemsPart04.WHITE_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> ORANGE_WALLPAPER_SLAB = ItemsPart04.ORANGE_WALLPAPER_SLAB;
-    public static final RegistryObject<Item> ORANGE_WALLPAPER_VERTICAL_SLAB =
-            ItemsPart04.ORANGE_WALLPAPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_WALLPAPER_VERTICAL_SLAB = ItemsPart04.ORANGE_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> MAGENTA_WALLPAPER_SLAB = ItemsPart04.MAGENTA_WALLPAPER_SLAB;
-    public static final RegistryObject<Item> MAGENTA_WALLPAPER_VERTICAL_SLAB =
-            ItemsPart04.MAGENTA_WALLPAPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_WALLPAPER_VERTICAL_SLAB = ItemsPart04.MAGENTA_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_SLAB = ItemsPart04.LIGHT_BLUE_WALLPAPER_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB =
-            ItemsPart04.LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB = ItemsPart04.LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> YELLOW_WALLPAPER_SLAB = ItemsPart04.YELLOW_WALLPAPER_SLAB;
-    public static final RegistryObject<Item> YELLOW_WALLPAPER_VERTICAL_SLAB =
-            ItemsPart04.YELLOW_WALLPAPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_WALLPAPER_VERTICAL_SLAB = ItemsPart04.YELLOW_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIME_WALLPAPER_SLAB = ItemsPart04.LIME_WALLPAPER_SLAB;
     public static final RegistryObject<Item> LIME_WALLPAPER_VERTICAL_SLAB = ItemsPart04.LIME_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> PINK_WALLPAPER_SLAB = ItemsPart04.PINK_WALLPAPER_SLAB;
@@ -2520,13 +2217,11 @@ public class ModItems {
     public static final RegistryObject<Item> GRAY_WALLPAPER_SLAB = ItemsPart04.GRAY_WALLPAPER_SLAB;
     public static final RegistryObject<Item> GRAY_WALLPAPER_VERTICAL_SLAB = ItemsPart04.GRAY_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_SLAB = ItemsPart04.LIGHT_GRAY_WALLPAPER_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB =
-            ItemsPart04.LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB = ItemsPart04.LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> CYAN_WALLPAPER_SLAB = ItemsPart04.CYAN_WALLPAPER_SLAB;
     public static final RegistryObject<Item> CYAN_WALLPAPER_VERTICAL_SLAB = ItemsPart04.CYAN_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> PURPLE_WALLPAPER_SLAB = ItemsPart04.PURPLE_WALLPAPER_SLAB;
-    public static final RegistryObject<Item> PURPLE_WALLPAPER_VERTICAL_SLAB =
-            ItemsPart04.PURPLE_WALLPAPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_WALLPAPER_VERTICAL_SLAB = ItemsPart04.PURPLE_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLUE_WALLPAPER_SLAB = ItemsPart04.BLUE_WALLPAPER_SLAB;
     public static final RegistryObject<Item> BLUE_WALLPAPER_VERTICAL_SLAB = ItemsPart04.BLUE_WALLPAPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> BROWN_WALLPAPER_SLAB = ItemsPart04.BROWN_WALLPAPER_SLAB;
@@ -2607,13 +2302,11 @@ public class ModItems {
     public static final RegistryObject<Item> PALE_OAK_LOG_SLAB = ItemsPart04.PALE_OAK_LOG_SLAB;
     public static final RegistryObject<Item> PALE_OAK_LOG_VERTICAL_SLAB = ItemsPart04.PALE_OAK_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG_SLAB = ItemsPart04.STRIPPED_PALE_OAK_LOG_SLAB;
-    public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB = ItemsPart04.STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> PALE_OAK_WOOD_SLAB = ItemsPart04.PALE_OAK_WOOD_SLAB;
     public static final RegistryObject<Item> PALE_OAK_WOOD_VERTICAL_SLAB = ItemsPart04.PALE_OAK_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_SLAB = ItemsPart04.STRIPPED_PALE_OAK_WOOD_SLAB;
-    public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB = ItemsPart04.STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> CHERRY_LOG = ItemsPart04.CHERRY_LOG;
     public static final RegistryObject<Item> STRIPPED_CHERRY_LOG = ItemsPart04.STRIPPED_CHERRY_LOG;
     public static final RegistryObject<Item> CHERRY_WOOD = ItemsPart04.CHERRY_WOOD;
@@ -2633,13 +2326,11 @@ public class ModItems {
     public static final RegistryObject<Item> CHERRY_LOG_SLAB = ItemsPart04.CHERRY_LOG_SLAB;
     public static final RegistryObject<Item> CHERRY_LOG_VERTICAL_SLAB = ItemsPart04.CHERRY_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_CHERRY_LOG_SLAB = ItemsPart04.STRIPPED_CHERRY_LOG_SLAB;
-    public static final RegistryObject<Item> STRIPPED_CHERRY_LOG_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_CHERRY_LOG_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_CHERRY_LOG_VERTICAL_SLAB = ItemsPart04.STRIPPED_CHERRY_LOG_VERTICAL_SLAB;
     public static final RegistryObject<Item> CHERRY_WOOD_SLAB = ItemsPart04.CHERRY_WOOD_SLAB;
     public static final RegistryObject<Item> CHERRY_WOOD_VERTICAL_SLAB = ItemsPart04.CHERRY_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_SLAB = ItemsPart04.STRIPPED_CHERRY_WOOD_SLAB;
-    public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_VERTICAL_SLAB =
-            ItemsPart04.STRIPPED_CHERRY_WOOD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_VERTICAL_SLAB = ItemsPart04.STRIPPED_CHERRY_WOOD_VERTICAL_SLAB;
     public static final RegistryObject<Item> PALE_MOSS_BLOCK = ItemsPart04.PALE_MOSS_BLOCK;
     public static final RegistryObject<Item> PALE_MOSS_BLOCK_SLAB = ItemsPart04.PALE_MOSS_BLOCK_SLAB;
     public static final RegistryObject<Item> PALE_MOSS_BLOCK_STAIRS = ItemsPart04.PALE_MOSS_BLOCK_STAIRS;
@@ -2726,8 +2417,7 @@ public class ModItems {
     public static final RegistryObject<Item> EXPOSED_COPPER_LANTERN = ItemsPart04.EXPOSED_COPPER_LANTERN;
     public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_LANTERN = ItemsPart04.WAXED_EXPOSED_COPPER_LANTERN;
     public static final RegistryObject<Item> WEATHERED_COPPER_LANTERN = ItemsPart04.WEATHERED_COPPER_LANTERN;
-    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_LANTERN =
-            ItemsPart04.WAXED_WEATHERED_COPPER_LANTERN;
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_LANTERN = ItemsPart04.WAXED_WEATHERED_COPPER_LANTERN;
     public static final RegistryObject<Item> OXIDIZED_COPPER_LANTERN = ItemsPart04.OXIDIZED_COPPER_LANTERN;
     public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_LANTERN = ItemsPart04.WAXED_OXIDIZED_COPPER_LANTERN;
     public static final RegistryObject<Item> SLIT_COPPER = ItemsPart04.SLIT_COPPER;
@@ -2741,50 +2431,35 @@ public class ModItems {
     public static final RegistryObject<Item> SLIT_COPPER_STAIRS = ItemsPart04.SLIT_COPPER_STAIRS;
     public static final RegistryObject<Item> WAXED_SLIT_COPPER_STAIRS = ItemsPart04.WAXED_SLIT_COPPER_STAIRS;
     public static final RegistryObject<Item> EXPOSED_SLIT_COPPER_STAIRS = ItemsPart04.EXPOSED_SLIT_COPPER_STAIRS;
-    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_STAIRS =
-            ItemsPart04.WAXED_EXPOSED_SLIT_COPPER_STAIRS;
+    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_STAIRS = ItemsPart04.WAXED_EXPOSED_SLIT_COPPER_STAIRS;
     public static final RegistryObject<Item> WEATHERED_SLIT_COPPER_STAIRS = ItemsPart04.WEATHERED_SLIT_COPPER_STAIRS;
-    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_STAIRS =
-            ItemsPart04.WAXED_WEATHERED_SLIT_COPPER_STAIRS;
+    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_STAIRS = ItemsPart04.WAXED_WEATHERED_SLIT_COPPER_STAIRS;
     public static final RegistryObject<Item> OXIDIZED_SLIT_COPPER_STAIRS = ItemsPart04.OXIDIZED_SLIT_COPPER_STAIRS;
-    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_STAIRS =
-            ItemsPart04.WAXED_OXIDIZED_SLIT_COPPER_STAIRS;
+    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_STAIRS = ItemsPart04.WAXED_OXIDIZED_SLIT_COPPER_STAIRS;
     public static final RegistryObject<Item> SLIT_COPPER_SLAB = ItemsPart04.SLIT_COPPER_SLAB;
     public static final RegistryObject<Item> WAXED_SLIT_COPPER_SLAB = ItemsPart04.WAXED_SLIT_COPPER_SLAB;
     public static final RegistryObject<Item> EXPOSED_SLIT_COPPER_SLAB = ItemsPart04.EXPOSED_SLIT_COPPER_SLAB;
-    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_SLAB =
-            ItemsPart04.WAXED_EXPOSED_SLIT_COPPER_SLAB;
+    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_SLAB = ItemsPart04.WAXED_EXPOSED_SLIT_COPPER_SLAB;
     public static final RegistryObject<Item> WEATHERED_SLIT_COPPER_SLAB = ItemsPart04.WEATHERED_SLIT_COPPER_SLAB;
-    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_SLAB =
-            ItemsPart04.WAXED_WEATHERED_SLIT_COPPER_SLAB;
+    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_SLAB = ItemsPart04.WAXED_WEATHERED_SLIT_COPPER_SLAB;
     public static final RegistryObject<Item> OXIDIZED_SLIT_COPPER_SLAB = ItemsPart04.OXIDIZED_SLIT_COPPER_SLAB;
-    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_SLAB =
-            ItemsPart04.WAXED_OXIDIZED_SLIT_COPPER_SLAB;
+    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_SLAB = ItemsPart04.WAXED_OXIDIZED_SLIT_COPPER_SLAB;
     public static final RegistryObject<Item> SLIT_COPPER_VERTICAL_SLAB = ItemsPart04.SLIT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WAXED_SLIT_COPPER_VERTICAL_SLAB =
-            ItemsPart04.WAXED_SLIT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> EXPOSED_SLIT_COPPER_VERTICAL_SLAB =
-            ItemsPart04.EXPOSED_SLIT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB =
-            ItemsPart04.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WEATHERED_SLIT_COPPER_VERTICAL_SLAB =
-            ItemsPart04.WEATHERED_SLIT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB =
-            ItemsPart04.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> OXIDIZED_SLIT_COPPER_VERTICAL_SLAB =
-            ItemsPart04.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB;
-    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB =
-            ItemsPart04.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WAXED_SLIT_COPPER_VERTICAL_SLAB = ItemsPart04.WAXED_SLIT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> EXPOSED_SLIT_COPPER_VERTICAL_SLAB = ItemsPart04.EXPOSED_SLIT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB = ItemsPart04.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WEATHERED_SLIT_COPPER_VERTICAL_SLAB = ItemsPart04.WEATHERED_SLIT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB = ItemsPart04.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> OXIDIZED_SLIT_COPPER_VERTICAL_SLAB = ItemsPart04.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB = ItemsPart04.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB;
     public static final RegistryObject<Item> CHISELED_COPPER = ItemsPart04.CHISELED_COPPER;
     public static final RegistryObject<Item> WAXED_CHISELED_COPPER = ItemsPart04.WAXED_CHISELED_COPPER;
     public static final RegistryObject<Item> EXPOSED_CHISELED_COPPER = ItemsPart04.EXPOSED_CHISELED_COPPER;
     public static final RegistryObject<Item> WAXED_EXPOSED_CHISELED_COPPER = ItemsPart04.WAXED_EXPOSED_CHISELED_COPPER;
     public static final RegistryObject<Item> WEATHERED_CHISELED_COPPER = ItemsPart04.WEATHERED_CHISELED_COPPER;
-    public static final RegistryObject<Item> WAXED_WEATHERED_CHISELED_COPPER =
-            ItemsPart04.WAXED_WEATHERED_CHISELED_COPPER;
+    public static final RegistryObject<Item> WAXED_WEATHERED_CHISELED_COPPER = ItemsPart04.WAXED_WEATHERED_CHISELED_COPPER;
     public static final RegistryObject<Item> OXIDIZED_CHISELED_COPPER = ItemsPart04.OXIDIZED_CHISELED_COPPER;
-    public static final RegistryObject<Item> WAXED_OXIDIZED_CHISELED_COPPER =
-            ItemsPart04.WAXED_OXIDIZED_CHISELED_COPPER;
+    public static final RegistryObject<Item> WAXED_OXIDIZED_CHISELED_COPPER = ItemsPart04.WAXED_OXIDIZED_CHISELED_COPPER;
     public static final RegistryObject<Item> COPPER_GRATE = ItemsPart04.COPPER_GRATE;
     public static final RegistryObject<Item> WAXED_COPPER_GRATE = ItemsPart04.WAXED_COPPER_GRATE;
     public static final RegistryObject<Item> EXPOSED_COPPER_GRATE = ItemsPart04.EXPOSED_COPPER_GRATE;
@@ -2814,11 +2489,9 @@ public class ModItems {
     public static final RegistryObject<Item> EXPOSED_COPPER_TRAPDOOR = ItemsPart04.EXPOSED_COPPER_TRAPDOOR;
     public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_TRAPDOOR = ItemsPart04.WAXED_EXPOSED_COPPER_TRAPDOOR;
     public static final RegistryObject<Item> WEATHERED_COPPER_TRAPDOOR = ItemsPart04.WEATHERED_COPPER_TRAPDOOR;
-    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_TRAPDOOR =
-            ItemsPart04.WAXED_WEATHERED_COPPER_TRAPDOOR;
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_TRAPDOOR = ItemsPart04.WAXED_WEATHERED_COPPER_TRAPDOOR;
     public static final RegistryObject<Item> OXIDIZED_COPPER_TRAPDOOR = ItemsPart04.OXIDIZED_COPPER_TRAPDOOR;
-    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_TRAPDOOR =
-            ItemsPart04.WAXED_OXIDIZED_COPPER_TRAPDOOR;
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_TRAPDOOR = ItemsPart04.WAXED_OXIDIZED_COPPER_TRAPDOOR;
     public static final RegistryObject<Item> COPPER_BARS = ItemsPart04.COPPER_BARS;
     public static final RegistryObject<Item> WAXED_COPPER_BARS = ItemsPart04.WAXED_COPPER_BARS;
     public static final RegistryObject<Item> EXPOSED_COPPER_BARS = ItemsPart04.EXPOSED_COPPER_BARS;
@@ -2859,19 +2532,13 @@ public class ModItems {
     public static final RegistryObject<Item> COPPER_PRESSURE_PLATE = ItemsPart04.COPPER_PRESSURE_PLATE;
     public static final RegistryObject<Item> WAXED_COPPER_PRESSURE_PLATE = ItemsPart04.WAXED_COPPER_PRESSURE_PLATE;
     public static final RegistryObject<Item> EXPOSED_COPPER_PRESSURE_PLATE = ItemsPart04.EXPOSED_COPPER_PRESSURE_PLATE;
-    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_PRESSURE_PLATE =
-            ItemsPart04.WAXED_EXPOSED_COPPER_PRESSURE_PLATE;
-    public static final RegistryObject<Item> WEATHERED_COPPER_PRESSURE_PLATE =
-            ItemsPart04.WEATHERED_COPPER_PRESSURE_PLATE;
-    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_PRESSURE_PLATE =
-            ItemsPart04.WAXED_WEATHERED_COPPER_PRESSURE_PLATE;
-    public static final RegistryObject<Item> OXIDIZED_COPPER_PRESSURE_PLATE =
-            ItemsPart04.OXIDIZED_COPPER_PRESSURE_PLATE;
-    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE =
-            ItemsPart04.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE;
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_PRESSURE_PLATE = ItemsPart04.WAXED_EXPOSED_COPPER_PRESSURE_PLATE;
+    public static final RegistryObject<Item> WEATHERED_COPPER_PRESSURE_PLATE = ItemsPart04.WEATHERED_COPPER_PRESSURE_PLATE;
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_PRESSURE_PLATE = ItemsPart04.WAXED_WEATHERED_COPPER_PRESSURE_PLATE;
+    public static final RegistryObject<Item> OXIDIZED_COPPER_PRESSURE_PLATE = ItemsPart04.OXIDIZED_COPPER_PRESSURE_PLATE;
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = ItemsPart04.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE;
     public static final RegistryObject<Item> WANDERING_HOMEMAKER_SPAWN_EGG = ItemsPart04.WANDERING_HOMEMAKER_SPAWN_EGG;
-    public static final RegistryObject<Item> FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG =
-            ItemsPart04.FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG;
+    public static final RegistryObject<Item> FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG = ItemsPart04.FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG;
     public static final RegistryObject<Item> GLASS_JAR = ItemsPart04.GLASS_JAR;
     public static final RegistryObject<Item> WHITE_GLASS_JAR = ItemsPart04.WHITE_GLASS_JAR;
     public static final RegistryObject<Item> ORANGE_GLASS_JAR = ItemsPart04.ORANGE_GLASS_JAR;
@@ -2949,143 +2616,117 @@ public class ModItems {
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_WALL = ItemsPart04.WHITE_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_CARPET = ItemsPart04.WHITE_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> WHITE_LAYERED_WOOL_LAYERS = ItemsPart04.WHITE_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> WHITE_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.WHITE_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WHITE_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.WHITE_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_SLAB = ItemsPart04.ORANGE_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_STAIRS = ItemsPart04.ORANGE_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_WALL = ItemsPart04.ORANGE_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_CARPET = ItemsPart04.ORANGE_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_LAYERS = ItemsPart04.ORANGE_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.ORANGE_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.ORANGE_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_SLAB = ItemsPart04.MAGENTA_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_STAIRS = ItemsPart04.MAGENTA_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_WALL = ItemsPart04.MAGENTA_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_CARPET = ItemsPart04.MAGENTA_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_LAYERS = ItemsPart04.MAGENTA_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.MAGENTA_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.MAGENTA_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_SLAB = ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_STAIRS =
-            ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_STAIRS = ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_WALL = ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_WALL;
-    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_CARPET =
-            ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_CARPET;
-    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_LAYERS =
-            ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_CARPET = ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_CARPET;
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_LAYERS = ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_LAYERS;
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_SLAB = ItemsPart04.YELLOW_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_STAIRS = ItemsPart04.YELLOW_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_WALL = ItemsPart04.YELLOW_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_CARPET = ItemsPart04.YELLOW_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_LAYERS = ItemsPart04.YELLOW_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.YELLOW_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.YELLOW_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_SLAB = ItemsPart04.LIME_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_STAIRS = ItemsPart04.LIME_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_WALL = ItemsPart04.LIME_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_CARPET = ItemsPart04.LIME_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> LIME_LAYERED_WOOL_LAYERS = ItemsPart04.LIME_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> LIME_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.LIME_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.LIME_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_SLAB = ItemsPart04.PINK_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_STAIRS = ItemsPart04.PINK_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_WALL = ItemsPart04.PINK_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_CARPET = ItemsPart04.PINK_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> PINK_LAYERED_WOOL_LAYERS = ItemsPart04.PINK_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> PINK_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.PINK_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.PINK_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_SLAB = ItemsPart04.GRAY_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_STAIRS = ItemsPart04.GRAY_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_WALL = ItemsPart04.GRAY_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_CARPET = ItemsPart04.GRAY_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> GRAY_LAYERED_WOOL_LAYERS = ItemsPart04.GRAY_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> GRAY_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.GRAY_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.GRAY_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_SLAB = ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_STAIRS =
-            ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_STAIRS = ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_WALL = ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_WALL;
-    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_CARPET =
-            ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_CARPET;
-    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_LAYERS =
-            ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_CARPET = ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_CARPET;
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_LAYERS = ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_LAYERS;
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_SLAB = ItemsPart04.CYAN_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_STAIRS = ItemsPart04.CYAN_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_WALL = ItemsPart04.CYAN_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_CARPET = ItemsPart04.CYAN_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> CYAN_LAYERED_WOOL_LAYERS = ItemsPart04.CYAN_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> CYAN_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.CYAN_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.CYAN_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_SLAB = ItemsPart04.PURPLE_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_STAIRS = ItemsPart04.PURPLE_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_WALL = ItemsPart04.PURPLE_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_CARPET = ItemsPart04.PURPLE_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_LAYERS = ItemsPart04.PURPLE_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.PURPLE_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.PURPLE_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_SLAB = ItemsPart04.BLUE_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_STAIRS = ItemsPart04.BLUE_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_WALL = ItemsPart04.BLUE_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_CARPET = ItemsPart04.BLUE_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> BLUE_LAYERED_WOOL_LAYERS = ItemsPart04.BLUE_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> BLUE_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.BLUE_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.BLUE_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_SLAB = ItemsPart04.BROWN_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_STAIRS = ItemsPart04.BROWN_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_WALL = ItemsPart04.BROWN_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_CARPET = ItemsPart04.BROWN_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> BROWN_LAYERED_WOOL_LAYERS = ItemsPart04.BROWN_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> BROWN_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.BROWN_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.BROWN_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_SLAB = ItemsPart04.GREEN_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_STAIRS = ItemsPart04.GREEN_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_WALL = ItemsPart04.GREEN_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_CARPET = ItemsPart04.GREEN_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> GREEN_LAYERED_WOOL_LAYERS = ItemsPart04.GREEN_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> GREEN_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.GREEN_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.GREEN_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> RED_LAYERED_WOOL_SLAB = ItemsPart04.RED_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> RED_LAYERED_WOOL_STAIRS = ItemsPart04.RED_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> RED_LAYERED_WOOL_WALL = ItemsPart04.RED_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> RED_LAYERED_WOOL_CARPET = ItemsPart04.RED_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> RED_LAYERED_WOOL_LAYERS = ItemsPart04.RED_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> RED_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.RED_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.RED_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_SLAB = ItemsPart04.BLACK_LAYERED_WOOL_SLAB;
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_STAIRS = ItemsPart04.BLACK_LAYERED_WOOL_STAIRS;
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_WALL = ItemsPart04.BLACK_LAYERED_WOOL_WALL;
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_CARPET = ItemsPart04.BLACK_LAYERED_WOOL_CARPET;
     public static final RegistryObject<Item> BLACK_LAYERED_WOOL_LAYERS = ItemsPart04.BLACK_LAYERED_WOOL_LAYERS;
-    public static final RegistryObject<Item> BLACK_LAYERED_WOOL_VERTICAL_SLAB =
-            ItemsPart04.BLACK_LAYERED_WOOL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_LAYERED_WOOL_VERTICAL_SLAB = ItemsPart04.BLACK_LAYERED_WOOL_VERTICAL_SLAB;
     public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ItemsPart04.FLAMING_STEEL_INGOT;
     public static final RegistryObject<Item> FLAMING_STEEL_NUGGET = ItemsPart04.FLAMING_STEEL_NUGGET;
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK = ItemsPart04.FLAMING_STEEL_BLOCK;
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_SLAB = ItemsPart04.FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart04.FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart04.FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_STAIRS = ItemsPart04.FLAMING_STEEL_BLOCK_STAIRS;
     public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_WALL = ItemsPart04.FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> FLAMING_CUT_STEEL = ItemsPart04.FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> FLAMING_CUT_STEEL_SLAB = ItemsPart04.FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart04.FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart04.FLAMING_CUT_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> FLAMING_CUT_STEEL_STAIRS = ItemsPart04.FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> FLAMING_CUT_STEEL_WALL = ItemsPart04.FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL = ItemsPart04.FLAMING_POLISHED_STEEL;
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_SLAB = ItemsPart04.FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart04.FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart04.FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_STAIRS = ItemsPart04.FLAMING_POLISHED_STEEL_STAIRS;
     public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_WALL = ItemsPart04.FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL = ItemsPart04.FLAMING_PRESSED_STEEL;
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_SLAB = ItemsPart04.FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart04.FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart04.FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_STAIRS = ItemsPart04.FLAMING_PRESSED_STEEL_STAIRS;
     public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_WALL = ItemsPart04.FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> FLAMING_STEEL_CASING = ItemsPart04.FLAMING_STEEL_CASING;
@@ -3098,552 +2739,341 @@ public class ModItems {
     public static final RegistryObject<Item> FLAMING_STEEL_BUTTON = ItemsPart04.FLAMING_STEEL_BUTTON;
     public static final RegistryObject<Item> FLAMING_STEEL_PRESSURE_PLATE = ItemsPart04.FLAMING_STEEL_PRESSURE_PLATE;
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK = ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_SLAB =
-            ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK_STAIRS;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_WALL =
-            ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK_WALL;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_SLAB = ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK_SLAB;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_WALL = ItemsPart04.MAGENTA_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL = ItemsPart04.MAGENTA_FLAMING_CUT_STEEL;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_SLAB =
-            ItemsPart04.MAGENTA_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart04.MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_STAIRS =
-            ItemsPart04.MAGENTA_FLAMING_CUT_STEEL_STAIRS;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_WALL =
-            ItemsPart04.MAGENTA_FLAMING_CUT_STEEL_WALL;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL =
-            ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_SLAB = ItemsPart04.MAGENTA_FLAMING_CUT_STEEL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart04.MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_STAIRS = ItemsPart04.MAGENTA_FLAMING_CUT_STEEL_STAIRS;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_WALL = ItemsPart04.MAGENTA_FLAMING_CUT_STEEL_WALL;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL = ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_SLAB = ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_WALL = ItemsPart04.MAGENTA_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL = ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.MAGENTA_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_CASING = ItemsPart05.MAGENTA_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_GRATE = ItemsPart05.MAGENTA_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_PILLAR = ItemsPart05.MAGENTA_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> MAGENTA_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.MAGENTA_FLAMING_BOLTED_STEEL_PILLAR;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK =
-            ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB =
-            ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL =
-            ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL;
+    public static final RegistryObject<Item> MAGENTA_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.MAGENTA_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK = ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL = ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB =
-            ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS =
-            ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_WALL =
-            ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL_WALL;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL =
-            ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL =
-            ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_CASING =
-            ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_CASING;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_GRATE =
-            ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_GRATE;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_PILLAR =
-            ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB = ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_WALL = ItemsPart05.LIGHT_BLUE_FLAMING_CUT_STEEL_WALL;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL = ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL = ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_CASING = ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_CASING;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_GRATE = ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_GRATE;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_PILLAR = ItemsPart05.LIGHT_BLUE_FLAMING_STEEL_PILLAR;
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK = ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK;
-    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_SLAB =
-            ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK_STAIRS;
-    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_WALL =
-            ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK_WALL;
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK_SLAB;
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.YELLOW_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL = ItemsPart05.YELLOW_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_SLAB = ItemsPart05.YELLOW_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_STAIRS =
-            ItemsPart05.YELLOW_FLAMING_CUT_STEEL_STAIRS;
+    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.YELLOW_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_WALL = ItemsPart05.YELLOW_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL = ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.YELLOW_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL = ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.YELLOW_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_CASING = ItemsPart05.YELLOW_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_GRATE = ItemsPart05.YELLOW_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_PILLAR = ItemsPart05.YELLOW_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> YELLOW_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.YELLOW_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> YELLOW_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.YELLOW_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK = ItemsPart05.LIME_FLAMING_STEEL_BLOCK;
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.LIME_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.LIME_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.LIME_FLAMING_STEEL_BLOCK_STAIRS;
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.LIME_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL = ItemsPart05.LIME_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_SLAB = ItemsPart05.LIME_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.LIME_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_WALL = ItemsPart05.LIME_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL = ItemsPart05.LIME_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.LIME_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.LIME_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.LIME_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.LIME_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.LIME_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.LIME_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL = ItemsPart05.LIME_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.LIME_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.LIME_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.LIME_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.LIME_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.LIME_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.LIME_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_CASING = ItemsPart05.LIME_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_GRATE = ItemsPart05.LIME_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> LIME_FLAMING_STEEL_PILLAR = ItemsPart05.LIME_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> LIME_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.LIME_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> LIME_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.LIME_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK = ItemsPart05.PINK_FLAMING_STEEL_BLOCK;
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.PINK_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.PINK_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.PINK_FLAMING_STEEL_BLOCK_STAIRS;
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.PINK_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL = ItemsPart05.PINK_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_SLAB = ItemsPart05.PINK_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.PINK_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_WALL = ItemsPart05.PINK_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL = ItemsPart05.PINK_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.PINK_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.PINK_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.PINK_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.PINK_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.PINK_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.PINK_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL = ItemsPart05.PINK_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.PINK_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.PINK_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.PINK_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.PINK_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.PINK_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.PINK_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_CASING = ItemsPart05.PINK_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_GRATE = ItemsPart05.PINK_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> PINK_FLAMING_STEEL_PILLAR = ItemsPart05.PINK_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> PINK_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.PINK_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> PINK_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.PINK_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK = ItemsPart05.GRAY_FLAMING_STEEL_BLOCK;
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.GRAY_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.GRAY_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.GRAY_FLAMING_STEEL_BLOCK_STAIRS;
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.GRAY_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL = ItemsPart05.GRAY_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_SLAB = ItemsPart05.GRAY_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.GRAY_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_WALL = ItemsPart05.GRAY_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL = ItemsPart05.GRAY_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.GRAY_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.GRAY_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.GRAY_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.GRAY_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.GRAY_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.GRAY_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL = ItemsPart05.GRAY_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.GRAY_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.GRAY_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.GRAY_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.GRAY_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.GRAY_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.GRAY_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_CASING = ItemsPart05.GRAY_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_GRATE = ItemsPart05.GRAY_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> GRAY_FLAMING_STEEL_PILLAR = ItemsPart05.GRAY_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> GRAY_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.GRAY_FLAMING_BOLTED_STEEL_PILLAR;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK =
-            ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB =
-            ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL =
-            ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL;
+    public static final RegistryObject<Item> GRAY_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.GRAY_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK = ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL = ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB =
-            ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS =
-            ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_WALL =
-            ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL_WALL;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL =
-            ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL =
-            ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_CASING =
-            ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_CASING;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_GRATE =
-            ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_GRATE;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_PILLAR =
-            ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB = ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_WALL = ItemsPart05.LIGHT_GRAY_FLAMING_CUT_STEEL_WALL;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL = ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL = ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_CASING = ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_CASING;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_GRATE = ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_GRATE;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_PILLAR = ItemsPart05.LIGHT_GRAY_FLAMING_STEEL_PILLAR;
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK = ItemsPart05.CYAN_FLAMING_STEEL_BLOCK;
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.CYAN_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.CYAN_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.CYAN_FLAMING_STEEL_BLOCK_STAIRS;
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.CYAN_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL = ItemsPart05.CYAN_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_SLAB = ItemsPart05.CYAN_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.CYAN_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_WALL = ItemsPart05.CYAN_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL = ItemsPart05.CYAN_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.CYAN_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.CYAN_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.CYAN_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.CYAN_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.CYAN_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.CYAN_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL = ItemsPart05.CYAN_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.CYAN_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.CYAN_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.CYAN_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.CYAN_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.CYAN_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.CYAN_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_CASING = ItemsPart05.CYAN_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_GRATE = ItemsPart05.CYAN_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> CYAN_FLAMING_STEEL_PILLAR = ItemsPart05.CYAN_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> CYAN_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.CYAN_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> CYAN_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.CYAN_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK = ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK;
-    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_SLAB =
-            ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK_STAIRS;
-    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_WALL =
-            ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK_WALL;
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK_SLAB;
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.PURPLE_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL = ItemsPart05.PURPLE_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_SLAB = ItemsPart05.PURPLE_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_STAIRS =
-            ItemsPart05.PURPLE_FLAMING_CUT_STEEL_STAIRS;
+    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.PURPLE_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_WALL = ItemsPart05.PURPLE_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL = ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.PURPLE_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL = ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.PURPLE_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_CASING = ItemsPart05.PURPLE_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_GRATE = ItemsPart05.PURPLE_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_PILLAR = ItemsPart05.PURPLE_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> PURPLE_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.PURPLE_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> PURPLE_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.PURPLE_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK = ItemsPart05.BLUE_FLAMING_STEEL_BLOCK;
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.BLUE_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.BLUE_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.BLUE_FLAMING_STEEL_BLOCK_STAIRS;
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.BLUE_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL = ItemsPart05.BLUE_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_SLAB = ItemsPart05.BLUE_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.BLUE_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_WALL = ItemsPart05.BLUE_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL = ItemsPart05.BLUE_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.BLUE_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.BLUE_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.BLUE_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.BLUE_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.BLUE_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.BLUE_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL = ItemsPart05.BLUE_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.BLUE_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.BLUE_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.BLUE_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.BLUE_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.BLUE_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.BLUE_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_CASING = ItemsPart05.BLUE_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_GRATE = ItemsPart05.BLUE_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> BLUE_FLAMING_STEEL_PILLAR = ItemsPart05.BLUE_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> BLUE_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.BLUE_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> BLUE_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.BLUE_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK = ItemsPart05.BROWN_FLAMING_STEEL_BLOCK;
-    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_SLAB =
-            ItemsPart05.BROWN_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.BROWN_FLAMING_STEEL_BLOCK_STAIRS;
-    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_WALL =
-            ItemsPart05.BROWN_FLAMING_STEEL_BLOCK_WALL;
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.BROWN_FLAMING_STEEL_BLOCK_SLAB;
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.BROWN_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.BROWN_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL = ItemsPart05.BROWN_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_SLAB = ItemsPart05.BROWN_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_STAIRS =
-            ItemsPart05.BROWN_FLAMING_CUT_STEEL_STAIRS;
+    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.BROWN_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_WALL = ItemsPart05.BROWN_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL = ItemsPart05.BROWN_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.BROWN_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.BROWN_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.BROWN_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.BROWN_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.BROWN_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.BROWN_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL = ItemsPart05.BROWN_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.BROWN_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.BROWN_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.BROWN_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.BROWN_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.BROWN_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.BROWN_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_CASING = ItemsPart05.BROWN_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_GRATE = ItemsPart05.BROWN_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> BROWN_FLAMING_STEEL_PILLAR = ItemsPart05.BROWN_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> BROWN_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.BROWN_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> BROWN_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.BROWN_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK = ItemsPart05.GREEN_FLAMING_STEEL_BLOCK;
-    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_SLAB =
-            ItemsPart05.GREEN_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.GREEN_FLAMING_STEEL_BLOCK_STAIRS;
-    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_WALL =
-            ItemsPart05.GREEN_FLAMING_STEEL_BLOCK_WALL;
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.GREEN_FLAMING_STEEL_BLOCK_SLAB;
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.GREEN_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.GREEN_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL = ItemsPart05.GREEN_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_SLAB = ItemsPart05.GREEN_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_STAIRS =
-            ItemsPart05.GREEN_FLAMING_CUT_STEEL_STAIRS;
+    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.GREEN_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_WALL = ItemsPart05.GREEN_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL = ItemsPart05.GREEN_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.GREEN_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.GREEN_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.GREEN_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.GREEN_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.GREEN_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.GREEN_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL = ItemsPart05.GREEN_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.GREEN_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.GREEN_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.GREEN_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.GREEN_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.GREEN_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.GREEN_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_CASING = ItemsPart05.GREEN_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_GRATE = ItemsPart05.GREEN_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> GREEN_FLAMING_STEEL_PILLAR = ItemsPart05.GREEN_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> GREEN_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.GREEN_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> GREEN_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.GREEN_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK = ItemsPart05.RED_FLAMING_STEEL_BLOCK;
     public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.RED_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.RED_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.RED_FLAMING_STEEL_BLOCK_STAIRS;
     public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.RED_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL = ItemsPart05.RED_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_SLAB = ItemsPart05.RED_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.RED_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.RED_FLAMING_CUT_STEEL_VERTICAL_SLAB;
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.RED_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_WALL = ItemsPart05.RED_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL = ItemsPart05.RED_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.RED_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.RED_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.RED_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.RED_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.RED_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.RED_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL = ItemsPart05.RED_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.RED_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.RED_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.RED_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.RED_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.RED_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.RED_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> RED_FLAMING_STEEL_CASING = ItemsPart05.RED_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> RED_FLAMING_STEEL_GRATE = ItemsPart05.RED_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> RED_FLAMING_STEEL_PILLAR = ItemsPart05.RED_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> RED_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.RED_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> RED_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.RED_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK = ItemsPart05.BLACK_FLAMING_STEEL_BLOCK;
-    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_SLAB =
-            ItemsPart05.BLACK_FLAMING_STEEL_BLOCK_SLAB;
-    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB =
-            ItemsPart05.BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_STAIRS =
-            ItemsPart05.BLACK_FLAMING_STEEL_BLOCK_STAIRS;
-    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_WALL =
-            ItemsPart05.BLACK_FLAMING_STEEL_BLOCK_WALL;
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_SLAB = ItemsPart05.BLACK_FLAMING_STEEL_BLOCK_SLAB;
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ItemsPart05.BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_STAIRS = ItemsPart05.BLACK_FLAMING_STEEL_BLOCK_STAIRS;
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_WALL = ItemsPart05.BLACK_FLAMING_STEEL_BLOCK_WALL;
     public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL = ItemsPart05.BLACK_FLAMING_CUT_STEEL;
     public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_SLAB = ItemsPart05.BLACK_FLAMING_CUT_STEEL_SLAB;
-    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_STAIRS =
-            ItemsPart05.BLACK_FLAMING_CUT_STEEL_STAIRS;
+    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB = ItemsPart05.BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_STAIRS = ItemsPart05.BLACK_FLAMING_CUT_STEEL_STAIRS;
     public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_WALL = ItemsPart05.BLACK_FLAMING_CUT_STEEL_WALL;
     public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL = ItemsPart05.BLACK_FLAMING_POLISHED_STEEL;
-    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_SLAB =
-            ItemsPart05.BLACK_FLAMING_POLISHED_STEEL_SLAB;
-    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_STAIRS =
-            ItemsPart05.BLACK_FLAMING_POLISHED_STEEL_STAIRS;
-    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_WALL =
-            ItemsPart05.BLACK_FLAMING_POLISHED_STEEL_WALL;
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_SLAB = ItemsPart05.BLACK_FLAMING_POLISHED_STEEL_SLAB;
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ItemsPart05.BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_STAIRS = ItemsPart05.BLACK_FLAMING_POLISHED_STEEL_STAIRS;
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_WALL = ItemsPart05.BLACK_FLAMING_POLISHED_STEEL_WALL;
     public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL = ItemsPart05.BLACK_FLAMING_PRESSED_STEEL;
-    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_SLAB =
-            ItemsPart05.BLACK_FLAMING_PRESSED_STEEL_SLAB;
-    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB =
-            ItemsPart05.BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
-    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_STAIRS =
-            ItemsPart05.BLACK_FLAMING_PRESSED_STEEL_STAIRS;
-    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_WALL =
-            ItemsPart05.BLACK_FLAMING_PRESSED_STEEL_WALL;
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_SLAB = ItemsPart05.BLACK_FLAMING_PRESSED_STEEL_SLAB;
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ItemsPart05.BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_STAIRS = ItemsPart05.BLACK_FLAMING_PRESSED_STEEL_STAIRS;
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_WALL = ItemsPart05.BLACK_FLAMING_PRESSED_STEEL_WALL;
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_CASING = ItemsPart05.BLACK_FLAMING_STEEL_CASING;
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_GRATE = ItemsPart05.BLACK_FLAMING_STEEL_GRATE;
     public static final RegistryObject<Item> BLACK_FLAMING_STEEL_PILLAR = ItemsPart05.BLACK_FLAMING_STEEL_PILLAR;
-    public static final RegistryObject<Item> BLACK_FLAMING_BOLTED_STEEL_PILLAR =
-            ItemsPart05.BLACK_FLAMING_BOLTED_STEEL_PILLAR;
+    public static final RegistryObject<Item> BLACK_FLAMING_BOLTED_STEEL_PILLAR = ItemsPart05.BLACK_FLAMING_BOLTED_STEEL_PILLAR;
     public static final RegistryObject<Item> HOLLOW_OAK_LOG = ItemsPart05.HOLLOW_OAK_LOG;
     public static final RegistryObject<Item> STRIPPED_HOLLOW_OAK_LOG = ItemsPart05.STRIPPED_HOLLOW_OAK_LOG;
     public static final RegistryObject<Item> HOLLOW_SPRUCE_LOG = ItemsPart05.HOLLOW_SPRUCE_LOG;
@@ -3682,20 +3112,17 @@ public class ModItems {
     public static final RegistryObject<Item> SMOOTH_CARDBOARD_SLAB = ItemsPart05.SMOOTH_CARDBOARD_SLAB;
     public static final RegistryObject<Item> SMOOTH_CARDBOARD_STAIRS = ItemsPart05.SMOOTH_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> SMOOTH_CARDBOARD_WALL = ItemsPart05.SMOOTH_CARDBOARD_WALL;
-    public static final RegistryObject<Item> SMOOTH_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.SMOOTH_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> SMOOTH_CARDBOARD_VERTICAL_SLAB = ItemsPart05.SMOOTH_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> BUNDLED_CARDBOARD = ItemsPart05.BUNDLED_CARDBOARD;
     public static final RegistryObject<Item> BUNDLED_CARDBOARD_SLAB = ItemsPart05.BUNDLED_CARDBOARD_SLAB;
     public static final RegistryObject<Item> BUNDLED_CARDBOARD_STAIRS = ItemsPart05.BUNDLED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> BUNDLED_CARDBOARD_WALL = ItemsPart05.BUNDLED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> BUNDLED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.BUNDLED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BUNDLED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.BUNDLED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> PRESSED_CARDBOARD = ItemsPart05.PRESSED_CARDBOARD;
     public static final RegistryObject<Item> PRESSED_CARDBOARD_SLAB = ItemsPart05.PRESSED_CARDBOARD_SLAB;
     public static final RegistryObject<Item> PRESSED_CARDBOARD_STAIRS = ItemsPart05.PRESSED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> PRESSED_CARDBOARD_WALL = ItemsPart05.PRESSED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> PRESSED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.PRESSED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> PRESSED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.PRESSED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> THICK_CARDBOARD_BLOCK = ItemsPart05.THICK_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> THICK_CARDBOARD_SLAB = ItemsPart05.THICK_CARDBOARD_SLAB;
     public static final RegistryObject<Item> THICK_CARDBOARD_STAIRS = ItemsPart05.THICK_CARDBOARD_STAIRS;
@@ -3705,122 +3132,86 @@ public class ModItems {
     public static final RegistryObject<Item> STRIPPED_CARDBOARD_SLAB = ItemsPart05.STRIPPED_CARDBOARD_SLAB;
     public static final RegistryObject<Item> STRIPPED_CARDBOARD_STAIRS = ItemsPart05.STRIPPED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> STRIPPED_CARDBOARD_WALL = ItemsPart05.STRIPPED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> STRIPPED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.STRIPPED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.STRIPPED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_CARDBOARD_TRAPDOOR = ItemsPart05.STRIPPED_CARDBOARD_TRAPDOOR;
     public static final RegistryObject<Item> STRIPPED_CARDBOARD_BUTTON = ItemsPart05.STRIPPED_CARDBOARD_BUTTON;
-    public static final RegistryObject<Item> STRIPPED_CARDBOARD_PRESSURE_PLATE =
-            ItemsPart05.STRIPPED_CARDBOARD_PRESSURE_PLATE;
-    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_BLOCK =
-            ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_BLOCK;
-    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_SLAB =
-            ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_STAIRS =
-            ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_WALL =
-            ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_WALL;
-    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_PRESSURE_PLATE = ItemsPart05.STRIPPED_CARDBOARD_PRESSURE_PLATE;
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_BLOCK = ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_BLOCK;
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_SLAB = ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_SLAB;
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_STAIRS = ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_WALL = ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_WALL;
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_VERTICAL_SLAB = ItemsPart05.STRIPPED_SMOOTH_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD = ItemsPart05.STRIPPED_BUNDLED_CARDBOARD;
-    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_SLAB =
-            ItemsPart05.STRIPPED_BUNDLED_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_STAIRS =
-            ItemsPart05.STRIPPED_BUNDLED_CARDBOARD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_WALL =
-            ItemsPart05.STRIPPED_BUNDLED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.STRIPPED_BUNDLED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_SLAB = ItemsPart05.STRIPPED_BUNDLED_CARDBOARD_SLAB;
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_STAIRS = ItemsPart05.STRIPPED_BUNDLED_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_WALL = ItemsPart05.STRIPPED_BUNDLED_CARDBOARD_WALL;
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.STRIPPED_BUNDLED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD = ItemsPart05.STRIPPED_PRESSED_CARDBOARD;
-    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_SLAB =
-            ItemsPart05.STRIPPED_PRESSED_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_STAIRS =
-            ItemsPart05.STRIPPED_PRESSED_CARDBOARD_STAIRS;
-    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_WALL =
-            ItemsPart05.STRIPPED_PRESSED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.STRIPPED_PRESSED_CARDBOARD_VERTICAL_SLAB;
-    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_BLOCK =
-            ItemsPart05.STRIPPED_THICK_CARDBOARD_BLOCK;
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_SLAB = ItemsPart05.STRIPPED_PRESSED_CARDBOARD_SLAB;
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_STAIRS = ItemsPart05.STRIPPED_PRESSED_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_WALL = ItemsPart05.STRIPPED_PRESSED_CARDBOARD_WALL;
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.STRIPPED_PRESSED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_BLOCK = ItemsPart05.STRIPPED_THICK_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_SLAB = ItemsPart05.STRIPPED_THICK_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_STAIRS =
-            ItemsPart05.STRIPPED_THICK_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_STAIRS = ItemsPart05.STRIPPED_THICK_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_WALL = ItemsPart05.STRIPPED_THICK_CARDBOARD_WALL;
-    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.STRIPPED_THICK_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_VERTICAL_SLAB = ItemsPart05.STRIPPED_THICK_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> TINTED_CARDBOARD_BLOCK = ItemsPart05.TINTED_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> TINTED_CARDBOARD_SLAB = ItemsPart05.TINTED_CARDBOARD_SLAB;
     public static final RegistryObject<Item> TINTED_CARDBOARD_STAIRS = ItemsPart05.TINTED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> TINTED_CARDBOARD_WALL = ItemsPart05.TINTED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> TINTED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.TINTED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> TINTED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.TINTED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> TINTED_CARDBOARD_TRAPDOOR = ItemsPart05.TINTED_CARDBOARD_TRAPDOOR;
     public static final RegistryObject<Item> TINTED_CARDBOARD_BUTTON = ItemsPart05.TINTED_CARDBOARD_BUTTON;
-    public static final RegistryObject<Item> TINTED_CARDBOARD_PRESSURE_PLATE =
-            ItemsPart05.TINTED_CARDBOARD_PRESSURE_PLATE;
+    public static final RegistryObject<Item> TINTED_CARDBOARD_PRESSURE_PLATE = ItemsPart05.TINTED_CARDBOARD_PRESSURE_PLATE;
     public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_BLOCK = ItemsPart05.TINTED_SMOOTH_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_SLAB = ItemsPart05.TINTED_SMOOTH_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_STAIRS =
-            ItemsPart05.TINTED_SMOOTH_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_STAIRS = ItemsPart05.TINTED_SMOOTH_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_WALL = ItemsPart05.TINTED_SMOOTH_CARDBOARD_WALL;
-    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.TINTED_SMOOTH_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_VERTICAL_SLAB = ItemsPart05.TINTED_SMOOTH_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD = ItemsPart05.TINTED_BUNDLED_CARDBOARD;
     public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_SLAB = ItemsPart05.TINTED_BUNDLED_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_STAIRS =
-            ItemsPart05.TINTED_BUNDLED_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_STAIRS = ItemsPart05.TINTED_BUNDLED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_WALL = ItemsPart05.TINTED_BUNDLED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.TINTED_BUNDLED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.TINTED_BUNDLED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD = ItemsPart05.TINTED_PRESSED_CARDBOARD;
     public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_SLAB = ItemsPart05.TINTED_PRESSED_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_STAIRS =
-            ItemsPart05.TINTED_PRESSED_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_STAIRS = ItemsPart05.TINTED_PRESSED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_WALL = ItemsPart05.TINTED_PRESSED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.TINTED_PRESSED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.TINTED_PRESSED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_BLOCK = ItemsPart05.TINTED_THICK_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_SLAB = ItemsPart05.TINTED_THICK_CARDBOARD_SLAB;
     public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_STAIRS = ItemsPart05.TINTED_THICK_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_WALL = ItemsPart05.TINTED_THICK_CARDBOARD_WALL;
-    public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.TINTED_THICK_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_VERTICAL_SLAB = ItemsPart05.TINTED_THICK_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> WASHED_CARDBOARD_BLOCK = ItemsPart05.WASHED_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> WASHED_CARDBOARD_SLAB = ItemsPart05.WASHED_CARDBOARD_SLAB;
     public static final RegistryObject<Item> WASHED_CARDBOARD_STAIRS = ItemsPart05.WASHED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> WASHED_CARDBOARD_WALL = ItemsPart05.WASHED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> WASHED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.WASHED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WASHED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.WASHED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> WASHED_CARDBOARD_TRAPDOOR = ItemsPart05.WASHED_CARDBOARD_TRAPDOOR;
     public static final RegistryObject<Item> WASHED_CARDBOARD_BUTTON = ItemsPart05.WASHED_CARDBOARD_BUTTON;
-    public static final RegistryObject<Item> WASHED_CARDBOARD_PRESSURE_PLATE =
-            ItemsPart05.WASHED_CARDBOARD_PRESSURE_PLATE;
+    public static final RegistryObject<Item> WASHED_CARDBOARD_PRESSURE_PLATE = ItemsPart05.WASHED_CARDBOARD_PRESSURE_PLATE;
     public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_BLOCK = ItemsPart05.WASHED_SMOOTH_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_SLAB = ItemsPart05.WASHED_SMOOTH_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_STAIRS =
-            ItemsPart05.WASHED_SMOOTH_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_STAIRS = ItemsPart05.WASHED_SMOOTH_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_WALL = ItemsPart05.WASHED_SMOOTH_CARDBOARD_WALL;
-    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.WASHED_SMOOTH_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_VERTICAL_SLAB = ItemsPart05.WASHED_SMOOTH_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD = ItemsPart05.WASHED_BUNDLED_CARDBOARD;
     public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_SLAB = ItemsPart05.WASHED_BUNDLED_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_STAIRS =
-            ItemsPart05.WASHED_BUNDLED_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_STAIRS = ItemsPart05.WASHED_BUNDLED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_WALL = ItemsPart05.WASHED_BUNDLED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.WASHED_BUNDLED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.WASHED_BUNDLED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD = ItemsPart05.WASHED_PRESSED_CARDBOARD;
     public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_SLAB = ItemsPart05.WASHED_PRESSED_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_STAIRS =
-            ItemsPart05.WASHED_PRESSED_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_STAIRS = ItemsPart05.WASHED_PRESSED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_WALL = ItemsPart05.WASHED_PRESSED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.WASHED_PRESSED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.WASHED_PRESSED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_BLOCK = ItemsPart05.WASHED_THICK_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_SLAB = ItemsPart05.WASHED_THICK_CARDBOARD_SLAB;
     public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_STAIRS = ItemsPart05.WASHED_THICK_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_WALL = ItemsPart05.WASHED_THICK_CARDBOARD_WALL;
-    public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.WASHED_THICK_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_VERTICAL_SLAB = ItemsPart05.WASHED_THICK_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> BURNT_CARDBOARD_BLOCK = ItemsPart05.BURNT_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> BURNT_CARDBOARD_SLAB = ItemsPart05.BURNT_CARDBOARD_SLAB;
     public static final RegistryObject<Item> BURNT_CARDBOARD_STAIRS = ItemsPart05.BURNT_CARDBOARD_STAIRS;
@@ -3828,34 +3219,27 @@ public class ModItems {
     public static final RegistryObject<Item> BURNT_CARDBOARD_VERTICAL_SLAB = ItemsPart05.BURNT_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> BURNT_CARDBOARD_TRAPDOOR = ItemsPart05.BURNT_CARDBOARD_TRAPDOOR;
     public static final RegistryObject<Item> BURNT_CARDBOARD_BUTTON = ItemsPart05.BURNT_CARDBOARD_BUTTON;
-    public static final RegistryObject<Item> BURNT_CARDBOARD_PRESSURE_PLATE =
-            ItemsPart05.BURNT_CARDBOARD_PRESSURE_PLATE;
+    public static final RegistryObject<Item> BURNT_CARDBOARD_PRESSURE_PLATE = ItemsPart05.BURNT_CARDBOARD_PRESSURE_PLATE;
     public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_BLOCK = ItemsPart05.BURNT_SMOOTH_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_SLAB = ItemsPart05.BURNT_SMOOTH_CARDBOARD_SLAB;
     public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_STAIRS = ItemsPart05.BURNT_SMOOTH_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_WALL = ItemsPart05.BURNT_SMOOTH_CARDBOARD_WALL;
-    public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.BURNT_SMOOTH_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_VERTICAL_SLAB = ItemsPart05.BURNT_SMOOTH_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD = ItemsPart05.BURNT_BUNDLED_CARDBOARD;
     public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_SLAB = ItemsPart05.BURNT_BUNDLED_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_STAIRS =
-            ItemsPart05.BURNT_BUNDLED_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_STAIRS = ItemsPart05.BURNT_BUNDLED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_WALL = ItemsPart05.BURNT_BUNDLED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.BURNT_BUNDLED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.BURNT_BUNDLED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD = ItemsPart05.BURNT_PRESSED_CARDBOARD;
     public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_SLAB = ItemsPart05.BURNT_PRESSED_CARDBOARD_SLAB;
-    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_STAIRS =
-            ItemsPart05.BURNT_PRESSED_CARDBOARD_STAIRS;
+    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_STAIRS = ItemsPart05.BURNT_PRESSED_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_WALL = ItemsPart05.BURNT_PRESSED_CARDBOARD_WALL;
-    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.BURNT_PRESSED_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_VERTICAL_SLAB = ItemsPart05.BURNT_PRESSED_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_BLOCK = ItemsPart05.BURNT_THICK_CARDBOARD_BLOCK;
     public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_SLAB = ItemsPart05.BURNT_THICK_CARDBOARD_SLAB;
     public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_STAIRS = ItemsPart05.BURNT_THICK_CARDBOARD_STAIRS;
     public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_WALL = ItemsPart05.BURNT_THICK_CARDBOARD_WALL;
-    public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_VERTICAL_SLAB =
-            ItemsPart05.BURNT_THICK_CARDBOARD_VERTICAL_SLAB;
+    public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_VERTICAL_SLAB = ItemsPart05.BURNT_THICK_CARDBOARD_VERTICAL_SLAB;
     public static final RegistryObject<Item> OAK_SHELF = ItemsPart05.OAK_SHELF;
     public static final RegistryObject<Item> SPRUCE_SHELF = ItemsPart05.SPRUCE_SHELF;
     public static final RegistryObject<Item> BIRCH_SHELF = ItemsPart05.BIRCH_SHELF;

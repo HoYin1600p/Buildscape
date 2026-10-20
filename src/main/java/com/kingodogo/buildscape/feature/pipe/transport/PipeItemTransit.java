@@ -16,7 +16,8 @@ public class PipeItemTransit {
     private final long totalDurationTicks;
     private final Direction exitDirection;
 
-    public PipeItemTransit(ItemStack stack, List<BlockPos> path, long startTick, long totalDurationTicks, Direction exitDirection) {
+    public PipeItemTransit(ItemStack stack, List<BlockPos> path, long startTick, long totalDurationTicks,
+            Direction exitDirection) {
         this.stack = stack.copy();
         this.path = path != null ? Collections.unmodifiableList(path) : Collections.emptyList();
         this.startTick = startTick;

@@ -30,7 +30,8 @@ public class EditPillarRowsResultPacket {
         for (int i = 0; i < count; i++) {
             ids.add(NetworkPacketLimits.readUtf(buf, 32, "old pillar id"));
         }
-        return new EditPillarRowsResultPacket(batchId, ids, NetworkPacketLimits.readUtf(buf, MAX_REASON_LENGTH, "edit result reason"));
+        return new EditPillarRowsResultPacket(batchId, ids,
+                NetworkPacketLimits.readUtf(buf, MAX_REASON_LENGTH, "edit result reason"));
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -44,7 +45,8 @@ public class EditPillarRowsResultPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.pillarsSynced()));
+        ctx.get().enqueueWork(
+                () -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.pillarsSynced()));
         ctx.get().setPacketHandled(true);
     }
 }

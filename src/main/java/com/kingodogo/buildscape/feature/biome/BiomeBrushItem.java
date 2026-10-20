@@ -43,9 +43,7 @@ import javax.annotation.Nullable;
 public class BiomeBrushItem extends Item {
 
     public enum BiomeBrushTier {
-        COPPER(1024),
-        DIAMOND(2048),
-        NETHERITE(4096);
+        COPPER(1024), DIAMOND(2048), NETHERITE(4096);
 
         private final int durability;
 
@@ -121,17 +119,19 @@ public class BiomeBrushItem extends Item {
         stack.getOrCreateTag().putString(KEY_BIOME, biomeId);
     }
 
-
     public void clearCapturedBiome(ItemStack stack, Player player) {
         CompoundTag tag = stack.getTag();
         if (tag != null) {
             tag.remove(KEY_BIOME);
         }
         if (player.level.isClientSide()) {
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cleared").withStyle(ChatFormatting.YELLOW), true);
+            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cleared")
+                    .withStyle(ChatFormatting.YELLOW), true);
         } else {
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cleared").withStyle(ChatFormatting.YELLOW), true);
-            player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WOOL_BREAK, SoundSource.PLAYERS, 1.0f, 1.2f);
+            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cleared")
+                    .withStyle(ChatFormatting.YELLOW), true);
+            player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WOOL_BREAK,
+                    SoundSource.PLAYERS, 1.0f, 1.2f);
         }
     }
 
@@ -149,7 +149,10 @@ public class BiomeBrushItem extends Item {
     public void setPos1(ItemStack stack, BlockPos pos, Player player) {
         stack.getOrCreateTag().put(KEY_POS1, NbtUtils.writeBlockPos(pos));
         stack.getOrCreateTag().putString(KEY_POS1_DIMENSION, player.level.dimension().location().toString());
-        player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.pos1", pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.WHITE), true);
+        player.displayClientMessage(
+                new TranslatableComponent("message.buildscape.biome_brush.pos1", pos.getX(), pos.getY(), pos.getZ())
+                        .withStyle(ChatFormatting.WHITE),
+                true);
         player.level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.0f);
     }
 
@@ -162,7 +165,10 @@ public class BiomeBrushItem extends Item {
     public void setPos2(ItemStack stack, BlockPos pos, Player player) {
         stack.getOrCreateTag().put(KEY_POS2, NbtUtils.writeBlockPos(pos));
         stack.getOrCreateTag().putString(KEY_POS2_DIMENSION, player.level.dimension().location().toString());
-        player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.pos2", pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.WHITE), true);
+        player.displayClientMessage(
+                new TranslatableComponent("message.buildscape.biome_brush.pos2", pos.getX(), pos.getY(), pos.getZ())
+                        .withStyle(ChatFormatting.WHITE),
+                true);
         player.level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.2f);
 
         BlockPos pos1 = getPos1(stack);
@@ -171,8 +177,12 @@ public class BiomeBrushItem extends Item {
             int height = Math.abs(pos.getY() - pos1.getY()) + 1;
             int length = Math.abs(pos.getZ() - pos1.getZ()) + 1;
             long count = (long) width * height * length;
-            player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.5f, 0.8f);
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.selection", width, height, length, count).withStyle(ChatFormatting.AQUA), false);
+            player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP,
+                    SoundSource.PLAYERS, 0.5f, 0.8f);
+            player.displayClientMessage(
+                    new TranslatableComponent("message.buildscape.biome_brush.selection", width, height, length, count)
+                            .withStyle(ChatFormatting.AQUA),
+                    false);
         }
     }
 
@@ -188,8 +198,11 @@ public class BiomeBrushItem extends Item {
         BlockPos clickedPos = context.getClickedPos();
 
         if (stack.getDamageValue() >= stack.getMaxDamage()) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS, 1.0f, 0.8f);
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.broken").withStyle(ChatFormatting.RED), true);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.DISPENSER_FAIL,
+                    SoundSource.PLAYERS, 1.0f, 0.8f);
+            player.displayClientMessage(
+                    new TranslatableComponent("message.buildscape.biome_brush.broken").withStyle(ChatFormatting.RED),
+                    true);
             return InteractionResult.FAIL;
         }
 
@@ -203,7 +216,8 @@ public class BiomeBrushItem extends Item {
             BlockPos pos2 = getPos2(stack);
 
             if (biomeStr == null || pos1 == null || pos2 == null) {
-                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cannot_apply").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.cannot_apply")
+                        .withStyle(ChatFormatting.RED), true);
                 return InteractionResult.FAIL;
             }
 
@@ -218,7 +232,10 @@ public class BiomeBrushItem extends Item {
             Optional<Holder<Biome>> holderOpt = registry.getHolder(key);
 
             if (holderOpt.isEmpty()) {
-                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.invalid_biome", biomeStr).withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(
+                        new TranslatableComponent("message.buildscape.biome_brush.invalid_biome", biomeStr)
+                                .withStyle(ChatFormatting.RED),
+                        true);
                 return InteractionResult.FAIL;
             }
             int minX = Math.min(pos1.getX(), pos2.getX());
@@ -231,11 +248,15 @@ public class BiomeBrushItem extends Item {
             String currentDimension = serverLevel.dimension().location().toString();
             if (!isInDimension(stack, KEY_POS1_DIMENSION, currentDimension)
                     || !isInDimension(stack, KEY_POS2_DIMENSION, currentDimension)) {
-                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.wrong_dimension").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.wrong_dimension")
+                        .withStyle(ChatFormatting.RED), true);
                 return InteractionResult.FAIL;
             }
             if ((long) maxX - minX + 1 > MAX_HORIZONTAL_SIZE || (long) maxZ - minZ + 1 > MAX_HORIZONTAL_SIZE) {
-                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.too_large", MAX_HORIZONTAL_SIZE).withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(
+                        new TranslatableComponent("message.buildscape.biome_brush.too_large", MAX_HORIZONTAL_SIZE)
+                                .withStyle(ChatFormatting.RED),
+                        true);
                 return InteractionResult.FAIL;
             }
 
@@ -243,7 +264,9 @@ public class BiomeBrushItem extends Item {
                     || player.distanceToSqr(pos1.getX() + 0.5, pos1.getY() + 0.5, pos1.getZ() + 0.5) > 64.0 * 64.0
                     || player.distanceToSqr(pos2.getX() + 0.5, pos2.getY() + 0.5, pos2.getZ() + 0.5) > 64.0 * 64.0
                     || minY < level.getMinBuildHeight() || maxY >= level.getMaxBuildHeight()) {
-                player.displayClientMessage(new TextComponent("Cannot paint: both corners must be within 64 blocks and you must have build permission.").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(new TextComponent(
+                        "Cannot paint: both corners must be within 64 blocks and you must have build permission.")
+                        .withStyle(ChatFormatting.RED), true);
                 return InteractionResult.FAIL;
             }
 
@@ -253,14 +276,18 @@ public class BiomeBrushItem extends Item {
                     BlockPos top = new BlockPos(x, maxY, z);
                     boolean columnAllowed = level.hasChunkAt(bottom) && level.getWorldBorder().isWithinBounds(bottom)
                             && canPaintAt(level, serverPlayer, bottom, context.getClickedFace(), stack)
-                            && (bottom.equals(top) || canPaintAt(level, serverPlayer, top, context.getClickedFace(), stack));
+                            && (bottom.equals(top)
+                                    || canPaintAt(level, serverPlayer, top, context.getClickedFace(), stack));
                     for (int y = level.getMinBuildHeight(); y < level.getMaxBuildHeight() && columnAllowed; y += 16) {
                         if (y != minY && y != maxY) {
-                            columnAllowed = canPaintAt(level, serverPlayer, new BlockPos(x, y, z), context.getClickedFace(), stack);
+                            columnAllowed = canPaintAt(level, serverPlayer, new BlockPos(x, y, z),
+                                    context.getClickedFace(), stack);
                         }
                     }
                     if (!columnAllowed) {
-                        player.displayClientMessage(new TextComponent("Cannot paint: the selection includes an unloaded or protected column.").withStyle(ChatFormatting.RED), true);
+                        player.displayClientMessage(new TextComponent(
+                                "Cannot paint: the selection includes an unloaded or protected column.")
+                                .withStyle(ChatFormatting.RED), true);
                         return InteractionResult.FAIL;
                     }
                 }
@@ -292,11 +319,17 @@ public class BiomeBrushItem extends Item {
             for (ChunkPos chunk : modifiedChunks) {
                 BiomeTintSync.sync(serverLevel, chunk);
             }
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BONE_MEAL_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BONE_MEAL_USE,
+                    SoundSource.PLAYERS, 1.0f, 1.0f);
 
-            Component biomeName = new TranslatableComponent("biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.applied", biomeName).withStyle(ChatFormatting.GREEN), true);
-            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.applied_detail", affectedBlocks).withStyle(ChatFormatting.GREEN), false);
+            Component biomeName = new TranslatableComponent(
+                    "biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
+            player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.applied", biomeName)
+                    .withStyle(ChatFormatting.GREEN), true);
+            player.displayClientMessage(
+                    new TranslatableComponent("message.buildscape.biome_brush.applied_detail", affectedBlocks)
+                            .withStyle(ChatFormatting.GREEN),
+                    false);
 
             CompoundTag tag = stack.getTag();
             if (tag != null) {
@@ -319,11 +352,17 @@ public class BiomeBrushItem extends Item {
             ResourceLocation biomeKey = registryKey(level, biomeHolder.value());
             if (biomeKey != null) {
                 setCapturedBiome(stack, biomeKey.toString());
-                Component biomeName = new TranslatableComponent("biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
-                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.captured", biomeName).withStyle(ChatFormatting.GREEN), true);
-                level.playSound(null, clickedPos, SoundEvents.BOTTLE_FILL_DRAGONBREATH, SoundSource.PLAYERS, 1.0f, 1.2f);
+                Component biomeName = new TranslatableComponent(
+                        "biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
+                player.displayClientMessage(
+                        new TranslatableComponent("message.buildscape.biome_brush.captured", biomeName)
+                                .withStyle(ChatFormatting.GREEN),
+                        true);
+                level.playSound(null, clickedPos, SoundEvents.BOTTLE_FILL_DRAGONBREATH, SoundSource.PLAYERS, 1.0f,
+                        1.2f);
                 if (player instanceof ServerPlayer serverPlayer) {
-                    Advancement adv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", "touch_grass"));
+                    Advancement adv = serverPlayer.getServer().getAdvancements()
+                            .getAdvancement(new ResourceLocation("buildscape", "touch_grass"));
                     if (adv != null) {
                         serverPlayer.getAdvancements().award(adv, "capture_biome");
                     }
@@ -344,7 +383,8 @@ public class BiomeBrushItem extends Item {
         return level.mayInteract(player, pos)
                 && player.mayUseItemAt(pos, face, stack)
                 && !player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())
-                && !ForgeEventFactory.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP);
+                && !ForgeEventFactory.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, pos),
+                        Direction.UP);
     }
 
     @Override
@@ -353,13 +393,18 @@ public class BiomeBrushItem extends Item {
         if (biomeStr != null && !biomeStr.isEmpty()) {
             ResourceLocation biomeKey = ResourceLocation.tryParse(biomeStr);
             if (biomeKey != null) {
-                Component biomeName = new TranslatableComponent("biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
-                tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.biome", biomeName).withStyle(ChatFormatting.GREEN));
+                Component biomeName = new TranslatableComponent(
+                        "biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
+                tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.biome", biomeName)
+                        .withStyle(ChatFormatting.GREEN));
             } else {
-                tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.biome", new TranslatableComponent("tooltip.buildscape.biome_brush.none")).withStyle(ChatFormatting.GRAY));
+                tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.biome",
+                        new TranslatableComponent("tooltip.buildscape.biome_brush.none"))
+                        .withStyle(ChatFormatting.GRAY));
             }
         } else {
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.biome", new TranslatableComponent("tooltip.buildscape.biome_brush.none")).withStyle(ChatFormatting.GRAY));
+            tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.biome",
+                    new TranslatableComponent("tooltip.buildscape.biome_brush.none")).withStyle(ChatFormatting.GRAY));
         }
 
         tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.desc1").withStyle(ChatFormatting.GRAY));

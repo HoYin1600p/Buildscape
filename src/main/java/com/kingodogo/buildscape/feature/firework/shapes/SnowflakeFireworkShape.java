@@ -87,7 +87,8 @@ public class SnowflakeFireworkShape extends CustomFireworkShape {
         return points;
     }
 
-    private void addBranchPair(List<FireworkPoint> points, double sin, double cos, double branchY, double length, int color) {
+    private void addBranchPair(List<FireworkPoint> points, double sin, double cos, double branchY, double length,
+            int color) {
         double branchAngle = Math.PI / 4;
 
         for (int side : new int[]{-1, 1}) {

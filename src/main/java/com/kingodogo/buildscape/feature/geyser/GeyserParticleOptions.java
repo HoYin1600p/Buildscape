@@ -15,15 +15,14 @@ public class GeyserParticleOptions implements ParticleOptions {
     private final ParticleType<GeyserParticleOptions> type;
     private final int waterBlocks;
 
-    public static final Codec<GeyserParticleOptions> CODEC = RecordCodecBuilder.create(instance ->
-        instance.group(
-            Codec.INT.fieldOf("water_blocks").forGetter(o -> o.waterBlocks)
-        ).apply(instance, waterBlocks -> new GeyserParticleOptions(null, waterBlocks))
-    );
+    public static final Codec<GeyserParticleOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("water_blocks").forGetter(o -> o.waterBlocks))
+            .apply(instance, waterBlocks -> new GeyserParticleOptions(null, waterBlocks)));
 
     public static final ParticleOptions.Deserializer<GeyserParticleOptions> DESERIALIZER = new ParticleOptions.Deserializer<GeyserParticleOptions>() {
         @Override
-        public GeyserParticleOptions fromCommand(ParticleType<GeyserParticleOptions> type, StringReader reader) throws CommandSyntaxException {
+        public GeyserParticleOptions fromCommand(ParticleType<GeyserParticleOptions> type, StringReader reader)
+                throws CommandSyntaxException {
             reader.expect(' ');
             int waterBlocks = reader.readInt();
             return new GeyserParticleOptions(type, waterBlocks);

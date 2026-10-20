@@ -11,7 +11,8 @@ import java.nio.file.Path;
 import static org.junit.Assert.*;
 
 public class ConfigLayoutIO405Test {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @Test
     public void strictReadersRejectAmbiguousOrLegacyInput() throws Exception {

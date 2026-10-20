@@ -150,9 +150,11 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
     }
 
     public static String fluidId(Fluid fluid) {
-        Fluid canonical = fluid.isSame(Fluids.WATER) ? Fluids.WATER
-                : fluid.isSame(Fluids.LAVA) ? Fluids.LAVA
-                : ModFluids.isExperienceSame(fluid) ? ModFluids.experienceStillOrNull() : fluid;
+        Fluid canonical = fluid.isSame(Fluids.WATER)
+                ? Fluids.WATER
+                : fluid.isSame(Fluids.LAVA)
+                        ? Fluids.LAVA
+                        : ModFluids.isExperienceSame(fluid) ? ModFluids.experienceStillOrNull() : fluid;
         ResourceLocation key = ForgeRegistries.FLUIDS.getKey(canonical);
         return key == null ? "" : key.toString();
     }

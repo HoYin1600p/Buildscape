@@ -26,8 +26,8 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     private final BuildersWorkbenchBlockEntity blockEntity;
 
     public BuildersWorkbenchMenu(int windowId, Inventory playerInv, FriendlyByteBuf data) {
-        this(windowId, playerInv, (BuildersWorkbenchBlockEntity)
-                playerInv.player.level.getBlockEntity(data.readBlockPos()));
+        this(windowId, playerInv,
+                (BuildersWorkbenchBlockEntity) playerInv.player.level.getBlockEntity(data.readBlockPos()));
     }
 
     public BuildersWorkbenchMenu(int windowId, Inventory playerInv, BuildersWorkbenchBlockEntity be) {
@@ -36,7 +36,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
         checkContainerSize(be, BuildersWorkbenchBlockEntity.TOTAL_SLOTS);
         this.addDataSlots(be.dataAccess);
-
 
         this.addSlot(new Slot(be, 0, C_PICKER_X, C_PICKER_Y) {
             @Override
@@ -114,7 +113,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             });
         }
 
-
         for (int i = 0; i < 9; i++) {
             this.addSlot(new WbOutputSlot(be, 12 + i, G_OUTPUT_X + i * 18, G_OUTPUT_Y) {
                 @Override
@@ -177,8 +175,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         }
     }
 
-    public void setupSlotPositions() {
-    }
+    public void setupSlotPositions() {}
 
     public int getCopyProgress() {
         return this.blockEntity.dataAccess.get(0);
@@ -198,7 +195,8 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
     public int getResultOffset(int tab, int slot) {
         return tab >= 0 && tab < 2 && slot >= 0 && slot < 9
-                ? this.blockEntity.dataAccess.get(3 + tab * 9 + slot) : 0;
+                ? this.blockEntity.dataAccess.get(3 + tab * 9 + slot)
+                : 0;
     }
 
     @Override
@@ -213,7 +211,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     public BuildersWorkbenchBlockEntity getBlockEntity() {
         return blockEntity;
     }
-
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
@@ -262,8 +259,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
             if (stack.isEmpty()) {
                 slot.set(ItemStack.EMPTY);
-            }
-            else {
+            } else {
                 slot.setChanged();
             }
             if (stack.getCount() == result.getCount()) {
@@ -278,7 +274,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     public boolean stillValid(Player player) {
         return blockEntity.stillValid(player);
     }
-
 
     private static class WbInputSlot extends Slot {
         WbInputSlot(BuildersWorkbenchBlockEntity be, int index, int x, int y) {

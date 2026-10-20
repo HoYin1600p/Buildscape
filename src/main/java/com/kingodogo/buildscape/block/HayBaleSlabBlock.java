@@ -20,12 +20,10 @@ public class HayBaleSlabBlock extends SlabBlock {
             BlockState state,
             BlockPos pos,
             Entity entity,
-            float fallDistance
-    ) {
+            float fallDistance) {
         entity.causeFallDamage(
                 fallDistance,
                 0.2F,
-                DamageSource.FALL
-        );
+                DamageSource.FALL);
     }
 }

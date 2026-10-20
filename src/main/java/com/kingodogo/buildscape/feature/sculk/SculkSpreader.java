@@ -148,13 +148,16 @@ public final class SculkSpreader {
                     if (distance == 2) {
                         boolean blocked = true;
                         if (x != 0) {
-                            blocked &= level.getBlockState(pos.offset(x, 0, 0)).isCollisionShapeFullBlock(level, pos.offset(x, 0, 0));
+                            blocked &= level.getBlockState(pos.offset(x, 0, 0)).isCollisionShapeFullBlock(level,
+                                    pos.offset(x, 0, 0));
                         }
                         if (y != 0) {
-                            blocked &= level.getBlockState(pos.offset(0, y, 0)).isCollisionShapeFullBlock(level, pos.offset(0, y, 0));
+                            blocked &= level.getBlockState(pos.offset(0, y, 0)).isCollisionShapeFullBlock(level,
+                                    pos.offset(0, y, 0));
                         }
                         if (z != 0) {
-                            blocked &= level.getBlockState(pos.offset(0, 0, z)).isCollisionShapeFullBlock(level, pos.offset(0, 0, z));
+                            blocked &= level.getBlockState(pos.offset(0, 0, z)).isCollisionShapeFullBlock(level,
+                                    pos.offset(0, 0, z));
                         }
                         if (blocked) {
                             continue;
@@ -232,17 +235,19 @@ public final class SculkSpreader {
                 }
                 if (convertSubstrate(level, pos, random)) {
                     charge--;
-                }
-                else if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
+                } else if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
                     charge /= 2;
                 }
             } else if (state.is(ModBlocks.SCULK.get())) {
                 if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
                     if (pos.distSqr(origin) > NO_GROWTH_RADIUS * NO_GROWTH_RADIUS && canPlaceGrowth(level, pos)) {
                         if (random.nextInt(GROWTH_COST) < charge) {
-                            Block growth = random.nextInt(11) == 0 ? ModBlocks.SCULK_SHRIEKER.get() : ModBlocks.SCULK_SENSOR.get();
+                            Block growth = random.nextInt(11) == 0
+                                    ? ModBlocks.SCULK_SHRIEKER.get()
+                                    : ModBlocks.SCULK_SENSOR.get();
                             if (level.setBlock(pos.above(), growth.defaultBlockState(), 3)) {
-                                level.playSound(null, pos, ModSounds.SCULK_CHARGE.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                                level.playSound(null, pos, ModSounds.SCULK_CHARGE.get(), SoundSource.BLOCKS, 1.0F,
+                                        1.0F);
                             }
                         }
                         charge = Math.max(0, charge - GROWTH_COST);

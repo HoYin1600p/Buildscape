@@ -61,8 +61,8 @@ public class FireflyParticle extends TextureSheetParticle {
     }
 
     protected FireflyParticle(ClientLevel level, double x, double y, double z,
-                              double xSpeed, double ySpeed, double zSpeed,
-                              SpriteSet sprites) {
+            double xSpeed, double ySpeed, double zSpeed,
+            SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.lastTickTime = level.getGameTime();
         this.sprites = sprites;
@@ -183,8 +183,8 @@ public class FireflyParticle extends TextureSheetParticle {
 
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level,
-                                       double x, double y, double z,
-                                       double xSpeed, double ySpeed, double zSpeed) {
+                double x, double y, double z,
+                double xSpeed, double ySpeed, double zSpeed) {
             if (getFireflyCountInRange(level, x, y, z, RANGE_SQR) >= MAX_FIREFLIES_IN_RANGE) {
                 return null;
             }

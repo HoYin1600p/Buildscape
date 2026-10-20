@@ -29,25 +29,24 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.List;
 
 public class LeafLayersBlock
-        extends SnowLayerBlock
-        implements SimpleWaterloggedBlock {
+        extends
+            SnowLayerBlock
+        implements
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private final String leafType;
 
     public LeafLayersBlock(Properties properties, String leafType) {
         super(properties);
         this.leafType = leafType;
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(WATERLOGGED, false)
-        );
+                this.stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(WATERLOGGED);
     }
@@ -55,21 +54,14 @@ public class LeafLayersBlock
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos.below());
-        if (
-                !blockState.is(Blocks.ICE) &&
-                        !blockState.is(Blocks.PACKED_ICE) &&
-                        !blockState.is(Blocks.BARRIER)
-        ) {
-            if (
-                    !blockState.is(Blocks.HONEY_BLOCK) && !blockState.is(Blocks.SOUL_SAND)
-            ) {
-                return (
-                        Block.isFaceFull(
-                                blockState.getCollisionShape(level, pos.below()),
-                                Direction.UP
-                        ) ||
-                                (blockState.is(this) && blockState.getValue(LAYERS) == 8)
-                );
+        if (!blockState.is(Blocks.ICE) &&
+                !blockState.is(Blocks.PACKED_ICE) &&
+                !blockState.is(Blocks.BARRIER)) {
+            if (!blockState.is(Blocks.HONEY_BLOCK) && !blockState.is(Blocks.SOUL_SAND)) {
+                return (Block.isFaceFull(
+                        blockState.getCollisionShape(level, pos.below()),
+                        Direction.UP) ||
+                        (blockState.is(this) && blockState.getValue(LAYERS) == 8));
             } else {
                 return true;
             }
@@ -93,22 +85,17 @@ public class LeafLayersBlock
 
         Item heldItem = context.getItemInHand().getItem();
         if (heldItem instanceof BlockItem) {
-            Block heldBlock =
-                    ((BlockItem) heldItem).getBlock();
+            Block heldBlock = ((BlockItem) heldItem).getBlock();
 
             if (heldBlock instanceof LeafLayersBlock && heldBlock != this) {
                 return false;
             }
-            if (
-                    heldBlock instanceof SnowLayerBlock &&
-                            !(heldBlock instanceof LeafLayersBlock)
-            ) {
+            if (heldBlock instanceof SnowLayerBlock &&
+                    !(heldBlock instanceof LeafLayersBlock)) {
                 return false;
             }
-            if (
-                    !(heldBlock instanceof LeafLayersBlock ||
-                            heldBlock instanceof SnowLayerBlock)
-            ) {
+            if (!(heldBlock instanceof LeafLayersBlock ||
+                    heldBlock instanceof SnowLayerBlock)) {
                 return false;
             }
         } else {
@@ -146,8 +133,7 @@ public class LeafLayersBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -157,8 +143,7 @@ public class LeafLayersBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -173,8 +158,7 @@ public class LeafLayersBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return getCollisionShape(state, level, pos, context);
     }
 
@@ -183,8 +167,7 @@ public class LeafLayersBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         int i = state.getValue(LAYERS);
         if (i == 8) {
             return Shapes.block();
@@ -198,8 +181,7 @@ public class LeafLayersBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -217,8 +199,7 @@ public class LeafLayersBlock
     public boolean propagatesSkylightDown(
             BlockState state,
             BlockGetter reader,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return true;
     }
 
@@ -226,8 +207,7 @@ public class LeafLayersBlock
     public float getShadeBrightness(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return 1.0F;
     }
 
@@ -235,8 +215,7 @@ public class LeafLayersBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            PathComputationType type
-    ) {
+            PathComputationType type) {
         if (type == PathComputationType.LAND) {
             return state.getValue(LAYERS) < 5;
         }
@@ -246,100 +225,69 @@ public class LeafLayersBlock
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         int layerCount = state.getValue(LAYERS);
         return switch (leafType) {
             case "oak" -> List.of(
-                    new ItemStack(ModItems.OAK_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.OAK_LEAF_LAYERS.get(), layerCount));
             case "spruce" -> List.of(
-                    new ItemStack(ModItems.SPRUCE_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SPRUCE_LEAF_LAYERS.get(), layerCount));
             case "birch" -> List.of(
-                    new ItemStack(ModItems.BIRCH_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.BIRCH_LEAF_LAYERS.get(), layerCount));
             case "jungle" -> List.of(
-                    new ItemStack(ModItems.JUNGLE_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.JUNGLE_LEAF_LAYERS.get(), layerCount));
             case "acacia" -> List.of(
-                    new ItemStack(ModItems.ACACIA_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.ACACIA_LEAF_LAYERS.get(), layerCount));
             case "dark_oak" -> List.of(
-                    new ItemStack(ModItems.DARK_OAK_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.DARK_OAK_LEAF_LAYERS.get(), layerCount));
             case "azalea" -> List.of(
-                    new ItemStack(ModItems.AZALEA_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.AZALEA_LEAF_LAYERS.get(), layerCount));
             case "flowering_azalea" -> List.of(
-                    new ItemStack(ModItems.FLOWERING_AZALEA_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.FLOWERING_AZALEA_LEAF_LAYERS.get(), layerCount));
             case "snowy_oak" -> List.of(
-                    new ItemStack(ModItems.SNOWY_OAK_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_OAK_LEAF_LAYERS.get(), layerCount));
             case "snowy_spruce" -> List.of(
-                    new ItemStack(ModItems.SNOWY_SPRUCE_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_SPRUCE_LEAF_LAYERS.get(), layerCount));
             case "snowy_birch" -> List.of(
-                    new ItemStack(ModItems.SNOWY_BIRCH_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_BIRCH_LEAF_LAYERS.get(), layerCount));
             case "snowy_jungle" -> List.of(
-                    new ItemStack(ModItems.SNOWY_JUNGLE_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_JUNGLE_LEAF_LAYERS.get(), layerCount));
             case "snowy_acacia" -> List.of(
-                    new ItemStack(ModItems.SNOWY_ACACIA_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_ACACIA_LEAF_LAYERS.get(), layerCount));
             case "snowy_dark_oak" -> List.of(
-                    new ItemStack(ModItems.SNOWY_DARK_OAK_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_DARK_OAK_LEAF_LAYERS.get(), layerCount));
             case "snowy_mangrove" -> List.of(
-                    new ItemStack(ModItems.SNOWY_MANGROVE_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_MANGROVE_LEAF_LAYERS.get(), layerCount));
             case "snowy_azalea" -> List.of(
-                    new ItemStack(ModItems.SNOWY_AZALEA_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_AZALEA_LEAF_LAYERS.get(), layerCount));
             case "snowy_flowering_azalea" -> List.of(
                     new ItemStack(
                             ModItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get(),
-                            layerCount
-                    )
-            );
+                            layerCount));
             case "mangrove" -> List.of(
-                    new ItemStack(ModItems.MANGROVE_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.MANGROVE_LEAF_LAYERS.get(), layerCount));
             case "orange_poplar" -> List.of(
-                    new ItemStack(ModItems.ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "red_poplar" -> List.of(
-                    new ItemStack(ModItems.RED_POPLAR_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.RED_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "yellow_poplar" -> List.of(
-                    new ItemStack(ModItems.YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "cherry" -> List.of(
-                    new ItemStack(ModItems.CHERRY_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.CHERRY_LEAF_LAYERS.get(), layerCount));
             case "pale_oak" -> List.of(
-                    new ItemStack(ModItems.PALE_OAK_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.PALE_OAK_LEAF_LAYERS.get(), layerCount));
             case "snowy_cherry" -> List.of(
-                    new ItemStack(ModItems.SNOWY_CHERRY_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_CHERRY_LEAF_LAYERS.get(), layerCount));
             case "snowy_pale_oak" -> List.of(
-                    new ItemStack(ModItems.SNOWY_PALE_OAK_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_PALE_OAK_LEAF_LAYERS.get(), layerCount));
             case "snowy_orange_poplar" -> List.of(
-                    new ItemStack(ModItems.SNOWY_ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "snowy_red_poplar" -> List.of(
-                    new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAF_LAYERS.get(), layerCount));
             case "snowy_yellow_poplar" -> List.of(
-                    new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount));
             default -> List.of(
-                    new ItemStack(ModItems.OAK_LEAF_LAYERS.get(), layerCount)
-            );
+                    new ItemStack(ModItems.OAK_LEAF_LAYERS.get(), layerCount));
         };
     }
 

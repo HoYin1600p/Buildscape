@@ -40,8 +40,11 @@ import java.util.List;
 import java.util.Random;
 
 public class SnowyShortGrassBlock
-        extends BushBlock
-        implements SinksOnFarmland, BonemealableBlock {
+        extends
+            BushBlock
+        implements
+            SinksOnFarmland,
+            BonemealableBlock {
 
     protected static final VoxelShape SHAPE = Block.box(
             2.0D,
@@ -49,8 +52,7 @@ public class SnowyShortGrassBlock
             2.0D,
             14.0D,
             13.0D,
-            14.0D
-    );
+            14.0D);
 
     public SnowyShortGrassBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -67,8 +69,7 @@ public class SnowyShortGrassBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {
             return shape.move(0, -0.0625D, 0);
@@ -80,14 +81,11 @@ public class SnowyShortGrassBlock
     protected boolean mayPlaceOn(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
-        return (
-                state.is(BlockTags.DIRT) ||
-                        state.is(Blocks.FARMLAND) ||
-                        state.is(Blocks.SNOW_BLOCK) ||
-                        state.is(ModBlocks.SNOW_BRICKS.get())
-        );
+            BlockPos pos) {
+        return (state.is(BlockTags.DIRT) ||
+                state.is(Blocks.FARMLAND) ||
+                state.is(Blocks.SNOW_BLOCK) ||
+                state.is(ModBlocks.SNOW_BRICKS.get()));
     }
 
     @Override
@@ -100,9 +98,11 @@ public class SnowyShortGrassBlock
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
         if (direction == Direction.DOWN) {
-            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState,
+                    level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
@@ -114,8 +114,7 @@ public class SnowyShortGrassBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() instanceof BoneMealItem) {
             if (this.isValidBonemealTarget(level, pos, state, level.isClientSide)) {
@@ -125,8 +124,7 @@ public class SnowyShortGrassBlock
                                 (ServerLevel) level,
                                 level.getRandom(),
                                 pos,
-                                state
-                        );
+                                state);
                         if (!player.getAbilities().instabuild) {
                             itemStack.shrink(1);
                         }
@@ -139,8 +137,7 @@ public class SnowyShortGrassBlock
                         SoundEvents.BONE_MEAL_USE,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
@@ -153,8 +150,7 @@ public class SnowyShortGrassBlock
             BlockGetter level,
             BlockPos pos,
             BlockState state,
-            boolean isClient
-    ) {
+            boolean isClient) {
         BlockPos abovePos = pos.above();
         return level.getBlockState(abovePos).isAir();
     }
@@ -164,8 +160,7 @@ public class SnowyShortGrassBlock
             Level level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         return true;
     }
 
@@ -174,25 +169,21 @@ public class SnowyShortGrassBlock
             ServerLevel level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
-            BlockState tallGrassState =
-                    ModBlocks.SNOWY_TALL_GRASS.get()
-                            .defaultBlockState()
-                            .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
+            BlockState tallGrassState = ModBlocks.SNOWY_TALL_GRASS.get()
+                    .defaultBlockState()
+                    .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
             if (tallGrassState.canSurvive(level, pos)) {
                 level.setBlock(pos, tallGrassState, 3);
                 level.setBlock(
                         abovePos,
                         tallGrassState.setValue(
                                 DoublePlantBlock.HALF,
-                                DoubleBlockHalf.UPPER
-                        ),
-                        3
-                );
+                                DoubleBlockHalf.UPPER),
+                        3);
             }
         }
     }
@@ -200,25 +191,19 @@ public class SnowyShortGrassBlock
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         LootContext ctx = builder
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(
-                        LootContextParamSets.BLOCK
-                );
+                        LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
         if (tool != null && !tool.isEmpty()) {
             if (tool.is(Items.SHEARS)) {
                 return Collections.singletonList(new ItemStack(this));
             }
-            if (
-                    EnchantmentHelper.getItemEnchantmentLevel(
-                            Enchantments.SILK_TOUCH,
-                            tool
-                    ) >
-                            0
-            ) {
+            if (EnchantmentHelper.getItemEnchantmentLevel(
+                    Enchantments.SILK_TOUCH,
+                    tool) > 0) {
                 return Collections.singletonList(new ItemStack(this));
             }
         }

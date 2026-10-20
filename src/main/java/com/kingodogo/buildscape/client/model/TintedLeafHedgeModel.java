@@ -26,8 +26,7 @@ public class TintedLeafHedgeModel implements BakedModel {
     public @NotNull List<BakedQuad> getQuads(
             @Nullable BlockState state,
             @Nullable Direction side,
-            @NotNull Random rand
-    ) {
+            @NotNull Random rand) {
         List<BakedQuad> originalQuads = originalModel.getQuads(state, side, rand);
 
         boolean needsModification = false;
@@ -46,8 +45,7 @@ public class TintedLeafHedgeModel implements BakedModel {
 
         for (BakedQuad quad : originalQuads) {
             if (quad.getTintIndex() == -1) {
-                TextureAtlasSprite sprite =
-                        quad.getSprite();
+                TextureAtlasSprite sprite = quad.getSprite();
 
                 int[] vertexData = quad.getVertices().clone();
 
@@ -61,8 +59,7 @@ public class TintedLeafHedgeModel implements BakedModel {
                         0,
                         dir,
                         sprite,
-                        quad.isShade()
-                );
+                        quad.isShade());
                 tintedQuads.add(tintedQuad);
             } else {
                 tintedQuads.add(quad);

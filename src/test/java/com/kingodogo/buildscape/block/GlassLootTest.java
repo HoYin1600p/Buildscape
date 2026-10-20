@@ -152,14 +152,16 @@ public class GlassLootTest {
         for (JsonElement element : owner.getAsJsonArray("conditions")) {
             JsonObject condition = element.getAsJsonObject();
             switch (condition.get("condition").getAsString()) {
-                case "minecraft:survives_explosion" -> { /* Ordinary block breaking has no explosion. */ }
+                case "minecraft:survives_explosion" -> {
+                    /* Ordinary block breaking has no explosion. */ }
                 case "minecraft:block_state_property" -> {
                     if (!type.equals(condition.getAsJsonObject("properties").get("type").getAsString())) {
                         return false;
                     }
                 }
                 case "minecraft:match_tool" -> {
-                    for (JsonElement enchantmentElement : condition.getAsJsonObject("predicate").getAsJsonArray("enchantments")) {
+                    for (JsonElement enchantmentElement : condition.getAsJsonObject("predicate")
+                            .getAsJsonArray("enchantments")) {
                         JsonObject enchantment = enchantmentElement.getAsJsonObject();
                         assertEquals("minecraft:silk_touch", enchantment.get("enchantment").getAsString());
                         assertEquals(1, enchantment.getAsJsonObject("levels").get("min").getAsInt());

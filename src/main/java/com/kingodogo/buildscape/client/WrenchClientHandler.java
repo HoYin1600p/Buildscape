@@ -29,11 +29,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class WrenchClientHandler {
 
     @SubscribeEvent
@@ -51,7 +47,7 @@ public class WrenchClientHandler {
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
         boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
-                            (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
+                (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
         if (!hasWrench) {
             return;
         }
@@ -99,16 +95,14 @@ public class WrenchClientHandler {
                 poseStack, lines,
                 box.minX, box.minY, box.minZ,
                 box.maxX, box.maxY, box.maxZ,
-                r, g, b, a
-        );
+                r, g, b, a);
 
         AABB inflated = box.inflate(0.003);
         LevelRenderer.renderLineBox(
                 poseStack, lines,
                 inflated.minX, inflated.minY, inflated.minZ,
                 inflated.maxX, inflated.maxY, inflated.maxZ,
-                1.0f, 0.85f, 0.4f, 0.6f
-        );
+                1.0f, 0.85f, 0.4f, 0.6f);
     }
 
     @SubscribeEvent
@@ -130,7 +124,7 @@ public class WrenchClientHandler {
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
         boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
-                            (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
+                (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
         if (!hasWrench) {
             return;
         }

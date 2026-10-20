@@ -26,8 +26,7 @@ public class PackedIcicleBlock extends Block {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -45,8 +44,7 @@ public class PackedIcicleBlock extends Block {
     public boolean propagatesSkylightDown(
             BlockState state,
             BlockGetter reader,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return true;
     }
 
@@ -54,8 +52,7 @@ public class PackedIcicleBlock extends Block {
     public float getShadeBrightness(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return 1.0F;
     }
 
@@ -63,11 +60,8 @@ public class PackedIcicleBlock extends Block {
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 }

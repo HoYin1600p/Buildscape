@@ -72,11 +72,9 @@ public class TreeChopPacket {
     }
 
     private boolean isLog(BlockState state) {
-        return (
-                state.is(BlockTags.LOGS) ||
-                        state.is(BlockTags.WARPED_STEMS) ||
-                        state.is(BlockTags.CRIMSON_STEMS)
-        );
+        return (state.is(BlockTags.LOGS) ||
+                state.is(BlockTags.WARPED_STEMS) ||
+                state.is(BlockTags.CRIMSON_STEMS));
     }
 
 }

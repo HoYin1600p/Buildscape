@@ -14,7 +14,8 @@ import java.util.Comparator;
 public abstract class GeneralStatisticsListMixin {
 
     @Redirect(method = "<init>", require = 0, at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/ObjectArrayList;sort(Ljava/util/Comparator;)V", remap = false))
-    private void redirectSort(ObjectArrayList<Stat<ResourceLocation>> list, Comparator<Stat<ResourceLocation>> originalComparator) {
+    private void redirectSort(ObjectArrayList<Stat<ResourceLocation>> list,
+            Comparator<Stat<ResourceLocation>> originalComparator) {
         boolean hasOtherMods = false;
         for (Stat<ResourceLocation> s : list) {
             String ns = s.getValue().getNamespace();

@@ -22,22 +22,24 @@ public class GeyserPlumeParticle extends TextureSheetParticle {
     private final float maxSize;
     private boolean done;
 
-    private GeyserPlumeParticle(final ClientLevel level, final double x, final double y, final double z, final double xa, final double ya, final double za, final GeyserParticleOptions options, final SpriteSet sprites) {
+    private GeyserPlumeParticle(final ClientLevel level, final double x, final double y, final double z,
+            final double xa, final double ya, final double za, final GeyserParticleOptions options,
+            final SpriteSet sprites) {
         super(level, x, y, z, xa, ya, za);
         int plumeHeight = 5 * Math.max(1, options.getWaterBlocks());
         this.hasPhysics = true;
         this.lifetime = plumeHeight * 5;
         this.yd = 0.0D;
         this.startY = y;
-        this.maxY = this.startY + (double)plumeHeight - 1.0D;
+        this.maxY = this.startY + (double) plumeHeight - 1.0D;
         this.horizontalSprayX = (level.getRandom().nextFloat() - 0.5F) * 0.2F;
         this.horizontalSprayZ = (level.getRandom().nextFloat() - 0.5F) * 0.2F;
         this.friction = 1.0F;
-        this.initialPropulsion = (options.getWaterBlocks() == 1 ? 1.5F : 1.0F) * (float)plumeHeight * 1.45F;
+        this.initialPropulsion = (options.getWaterBlocks() == 1 ? 1.5F : 1.0F) * (float) plumeHeight * 1.45F;
         this.gravity = -this.initialPropulsion;
         float initiallyRandomizedSize = this.quadSize * 0.75F;
-        this.minSize = initiallyRandomizedSize * (2.0F + (float)plumeHeight / 8.0F);
-        this.maxSize = initiallyRandomizedSize * (3.0F + (float)plumeHeight / 8.0F);
+        this.minSize = initiallyRandomizedSize * (2.0F + (float) plumeHeight / 8.0F);
+        this.maxSize = initiallyRandomizedSize * (3.0F + (float) plumeHeight / 8.0F);
         this.quadSize = this.minSize;
         this.sprites = sprites;
         this.setSpriteFromAge(sprites);
@@ -54,11 +56,11 @@ public class GeyserPlumeParticle extends TextureSheetParticle {
 
         double yProgressLinear = Mth.clamp((this.y - this.startY) / (this.maxY - this.startY), 0.0D, 1.0D);
         double yProgressExponential = Math.pow(yProgressLinear, 3.0D);
-        this.gravity = this.initialPropulsion * (float)yProgressExponential * 0.12F;
-        this.xd = yProgressLinear * (double)this.horizontalSprayX;
-        this.zd = yProgressLinear * (double)this.horizontalSprayZ;
+        this.gravity = this.initialPropulsion * (float) yProgressExponential * 0.12F;
+        this.xd = yProgressLinear * (double) this.horizontalSprayX;
+        this.zd = yProgressLinear * (double) this.horizontalSprayZ;
         this.setSpriteFromAge(this.sprites);
-        this.quadSize = this.minSize + (float)(yProgressLinear * (double)(this.maxSize - this.minSize));
+        this.quadSize = this.minSize + (float) (yProgressLinear * (double) (this.maxSize - this.minSize));
     }
 
     @Override
@@ -75,11 +77,12 @@ public class GeyserPlumeParticle extends TextureSheetParticle {
 
         @Nullable
         @Override
-        public Particle createParticle(final GeyserParticleOptions options, final ClientLevel level, final double x, final double y, final double z, final double xAux, final double yAux, final double zAux) {
+        public Particle createParticle(final GeyserParticleOptions options, final ClientLevel level, final double x,
+                final double y, final double z, final double xAux, final double yAux, final double zAux) {
             Random random = level.getRandom();
-            double randomX = x + (double)((random.nextFloat() - 0.5F) * 0.2F);
-            double randomY = y + (double)random.nextFloat();
-            double randomZ = z + (double)((random.nextFloat() - 0.5F) * 0.2F);
+            double randomX = x + (double) ((random.nextFloat() - 0.5F) * 0.2F);
+            double randomY = y + (double) random.nextFloat();
+            double randomZ = z + (double) ((random.nextFloat() - 0.5F) * 0.2F);
             return new GeyserPlumeParticle(level, randomX, randomY, randomZ, xAux, yAux, zAux, options, this.sprites);
         }
     }

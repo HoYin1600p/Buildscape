@@ -39,8 +39,8 @@ public class BuildScapeRecipeCompiler {
     public record CompileResult(
             List<Recipe<?>> recipes,
             int totalProcessed,
-            int totalGeneratedFromFamilies
-    ) {}
+            int totalGeneratedFromFamilies) {
+    }
 
     public CompileResult compileCategory(RecipeIR.CategoryPack pack) {
         return compileCategory(pack, true);
@@ -97,28 +97,32 @@ public class BuildScapeRecipeCompiler {
 
         BuildScape.LOGGER.debug(
                 "BDRE Compiled Category [{}] - Total: {} (Direct: {}, Family Generated: {})",
-                pack.category(), compiledRecipes.size(), directCount, familyCount
-        );
+                pack.category(), compiledRecipes.size(), directCount, familyCount);
 
         return new CompileResult(compiledRecipes, directCount + familyCount, familyCount);
     }
 
     public Recipe<?> compileSingleRecipe(String category, RecipeIR.RecipeSpec spec) {
-        if ("confetti_configure".equalsIgnoreCase(spec.type()) || "buildscape:confetti_configure".equalsIgnoreCase(spec.type())) {
+        if ("confetti_configure".equalsIgnoreCase(spec.type())
+                || "buildscape:confetti_configure".equalsIgnoreCase(spec.type())) {
             ResourceLocation confettiId = new ResourceLocation(BuildScape.MODID, "autogen/special/confetti_configure");
             return new ConfettiConfigureRecipe(confettiId);
         }
-        if ("clear_shulker_filters".equalsIgnoreCase(spec.type()) || "buildscape:clear_shulker_filters".equalsIgnoreCase(spec.type())) {
-            ResourceLocation shulkerId = new ResourceLocation(BuildScape.MODID, "autogen/special/clear_shulker_filters");
+        if ("clear_shulker_filters".equalsIgnoreCase(spec.type())
+                || "buildscape:clear_shulker_filters".equalsIgnoreCase(spec.type())) {
+            ResourceLocation shulkerId = new ResourceLocation(BuildScape.MODID,
+                    "autogen/special/clear_shulker_filters");
             return new ClearShulkerFiltersRecipe(shulkerId);
         }
 
-        if (spec.rawJson() != null && ("forge:conditional".equalsIgnoreCase(spec.type()) || spec.rawJson().contains("\"conditions\"") || spec.rawJson().contains("\"botanypots:crop\""))) {
+        if (spec.rawJson() != null && ("forge:conditional".equalsIgnoreCase(spec.type())
+                || spec.rawJson().contains("\"conditions\"") || spec.rawJson().contains("\"botanypots:crop\""))) {
             try {
                 JsonObject json = JsonParser.parseString(spec.rawJson()).getAsJsonObject();
                 ResourceLocation recipeId = spec.id() != null
                         ? new ResourceLocation(spec.id().contains(":") ? spec.id() : BuildScape.MODID + ":" + spec.id())
-                        : new ResourceLocation(BuildScape.MODID, "autogen/" + category + "/" + Math.abs(spec.rawJson().hashCode()));
+                        : new ResourceLocation(BuildScape.MODID,
+                                "autogen/" + category + "/" + Math.abs(spec.rawJson().hashCode()));
 
                 if (!conditionsMet(json, recipeId)) {
                     return null;
@@ -133,13 +137,15 @@ public class BuildScapeRecipeCompiler {
                         }
                         if (entry.has("recipe")) {
                             JsonObject innerRecipeJson = entry.getAsJsonObject("recipe");
-                            ResourceLocation innerId = new ResourceLocation(recipeId.getNamespace(), recipeId.getPath() + (recipesArr.size() > 1 ? "_" + i : ""));
+                            ResourceLocation innerId = new ResourceLocation(recipeId.getNamespace(),
+                                    recipeId.getPath() + (recipesArr.size() > 1 ? "_" + i : ""));
                             try {
                                 Recipe<?> compiled = RecipeManager.fromJson(innerId, innerRecipeJson);
                                 if (compiled != null) {
                                     return compiled;
                                 }
-                            } catch (Throwable ignored) {}
+                            } catch (Throwable ignored) {
+                            }
                         }
                     }
                     return null;
@@ -179,7 +185,9 @@ public class BuildScapeRecipeCompiler {
         }
         String group = spec.group() != null ? spec.group() : "";
 
-        String recipeType = spec.type() != null ? spec.type().toLowerCase(Locale.ROOT) : category.toLowerCase(Locale.ROOT);
+        String recipeType = spec.type() != null
+                ? spec.type().toLowerCase(Locale.ROOT)
+                : category.toLowerCase(Locale.ROOT);
 
         switch (recipeType) {
             case "shaped" -> {
@@ -193,14 +201,16 @@ public class BuildScapeRecipeCompiler {
                 if (base == null) {
                     return null;
                 }
-                return new ShapedDurabilityRecipe(base.getId(), base.getGroup(), base.getWidth(), base.getHeight(), base.getIngredients(), base.getResultItem(), 1);
+                return new ShapedDurabilityRecipe(base.getId(), base.getGroup(), base.getWidth(), base.getHeight(),
+                        base.getIngredients(), base.getResultItem(), 1);
             }
             case "shapeless_durability", "buildscape:shapeless_durability" -> {
                 ShapelessRecipe base = compileShapeless(recipeId, group, spec, resultStack);
                 if (base == null) {
                     return null;
                 }
-                return new ShapelessDurabilityRecipe(base.getId(), base.getGroup(), base.getResultItem(), base.getIngredients(), 1);
+                return new ShapelessDurabilityRecipe(base.getId(), base.getGroup(), base.getResultItem(),
+                        base.getIngredients(), 1);
             }
             case "buildscape:haze_bush_dye" -> {
                 ShapelessRecipe base = compileShapeless(recipeId, group, spec, resultStack);
@@ -228,12 +238,14 @@ public class BuildScapeRecipeCompiler {
             }
             case "campfire", "campfire_cooking" -> {
                 Ingredient input = resolveIngredient(spec.input());
-                return new CampfireCookingRecipe(recipeId, group, input, resultStack, spec.experience(), spec.cookingTime());
+                return new CampfireCookingRecipe(recipeId, group, input, resultStack, spec.experience(),
+                        spec.cookingTime());
             }
             case "smithing" -> {
                 Ingredient base = resolveIngredient(spec.input());
                 Ingredient addition = spec.ingredients() != null && !spec.ingredients().isEmpty()
-                    ? resolveIngredient(spec.ingredients().get(0)) : Ingredient.EMPTY;
+                        ? resolveIngredient(spec.ingredients().get(0))
+                        : Ingredient.EMPTY;
                 return new UpgradeRecipe(recipeId, base, addition, resultStack);
             }
             default -> {
@@ -254,7 +266,8 @@ public class BuildScapeRecipeCompiler {
         try {
             return CraftingHelper.processConditions(json, "conditions");
         } catch (Throwable t) {
-            BuildScape.LOGGER.warn("BDRE Compiler: Could not evaluate conditions of recipe {}; skipping it.", recipeId, t);
+            BuildScape.LOGGER.warn("BDRE Compiler: Could not evaluate conditions of recipe {}; skipping it.", recipeId,
+                    t);
             return false;
         }
     }
@@ -301,7 +314,8 @@ public class BuildScapeRecipeCompiler {
         return new ShapedRecipe(id, group, trimmed.width(), trimmed.height(), trimmed.ingredients(), result);
     }
 
-    private ShapelessRecipe compileShapeless(ResourceLocation id, String group, RecipeIR.RecipeSpec spec, ItemStack result) {
+    private ShapelessRecipe compileShapeless(ResourceLocation id, String group, RecipeIR.RecipeSpec spec,
+            ItemStack result) {
         NonNullList<Ingredient> ingredients = NonNullList.create();
         if (spec.ingredients() != null) {
             for (String ingStr : spec.ingredients()) {

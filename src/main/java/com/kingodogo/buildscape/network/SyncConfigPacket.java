@@ -17,8 +17,7 @@ import java.util.function.Supplier;
 
 public class SyncConfigPacket {
     // Present only for assembled uploads; server-to-client sync always contains all settings.
-    public Set<ConfigSetting> uploadSettings =
-            ConfigSetting.uploadable();
+    public Set<ConfigSetting> uploadSettings = ConfigSetting.uploadable();
     public static final double MIN_PARTICLE_RATE = NetworkPacketLimits.MIN_PARTICLE_RATE;
     public static final double MAX_PARTICLE_SPEED = NetworkPacketLimits.MAX_PARTICLE_SPEED;
     public static final double MAX_PARTICLE_SPREAD = NetworkPacketLimits.MAX_PARTICLE_SPREAD;
@@ -47,8 +46,7 @@ public class SyncConfigPacket {
     public boolean itemsReadOnly;
     public boolean propertiesReadOnly;
 
-    public SyncConfigPacket() {
-    }
+    public SyncConfigPacket() {}
 
     public SyncConfigPacket(PillarParticleConfig config) {
         this.particle_speed = NetworkPacketLimits.clamp(config.particle_speed,
@@ -66,15 +64,13 @@ public class SyncConfigPacket {
         this.pattern_intensity = NetworkPacketLimits.clamp(config.pattern_intensity,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY);
         this.particle_color = new ArrayList<>(
-                config.particle_color != null ? config.particle_color : new ArrayList<>()
-        );
+                config.particle_color != null ? config.particle_color : new ArrayList<>());
         this.max_particle_color = clamp(config.max_particle_color, 0, NetworkPacketLimits.MAX_DYE_COLORS);
         this.edit_permission_mode = config.edit_permission_mode != null
                 ? config.edit_permission_mode
                 : PillarParticleConfig.EditPermissionMode.STRICT;
         this.items = new HashSet<>(
-                config.items != null ? config.items : new HashSet<>()
-        );
+                config.items != null ? config.items : new HashSet<>());
         this.itemsReadOnly = !config.canEditItems();
         this.propertiesReadOnly = !config.canEditProperties();
     }
@@ -100,16 +96,19 @@ public class SyncConfigPacket {
         int colorCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_DYE_COLORS, "particle color");
         this.particle_color = new ArrayList<>();
         for (int i = 0; i < colorCount; i++) {
-            this.particle_color.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color"));
+            this.particle_color.add(
+                    NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color"));
         }
-        this.max_particle_color = NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS, "maximum particle colors");
+        this.max_particle_color = NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS,
+                "maximum particle colors");
         this.edit_permission_mode = PillarParticleConfig.parseEditPermissionMode(
                 NetworkPacketLimits.readUtf(buf, 16, "edit permission mode"));
 
         int itemCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
         this.items = new HashSet<>();
         for (int i = 0; i < itemCount; i++) {
-            this.items.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
+            this.items.add(
+                    NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
         }
         this.itemsReadOnly = buf.readBoolean();
         this.propertiesReadOnly = buf.readBoolean();
@@ -163,8 +162,8 @@ public class SyncConfigPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() ->
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.applyServerConfig(this)));
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.applyServerConfig(this)));
         ctx.get().setPacketHandled(true);
     }
 }

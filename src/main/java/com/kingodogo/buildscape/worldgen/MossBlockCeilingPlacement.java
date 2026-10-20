@@ -16,35 +16,28 @@ import java.util.stream.Stream;
 public class MossBlockCeilingPlacement extends PlacementModifier {
 
     public static final Codec<MossBlockCeilingPlacement> CODEC = Codec.unit(
-            MossBlockCeilingPlacement::new
-    );
-    public static final MossBlockCeilingPlacement INSTANCE =
-            new MossBlockCeilingPlacement();
+            MossBlockCeilingPlacement::new);
+    public static final MossBlockCeilingPlacement INSTANCE = new MossBlockCeilingPlacement();
 
-    private MossBlockCeilingPlacement() {
-    }
+    private MossBlockCeilingPlacement() {}
 
     @Override
     public Stream<BlockPos> getPositions(
             PlacementContext context,
             Random random,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         WorldGenLevel level = context.getLevel();
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
         for (int y = pos.getY(); y < pos.getY() + 64; y++) {
             mutablePos.set(pos.getX(), y, pos.getZ());
 
-            if (
-                    level
-                            .getBlockState(mutablePos)
-                            .is(Blocks.MOSS_BLOCK)
-            ) {
+            if (level
+                    .getBlockState(mutablePos)
+                    .is(Blocks.MOSS_BLOCK)) {
                 BlockPos placePos = mutablePos.below();
                 if (level.getBlockState(placePos).isAir()) {
-                    BlockState mossState =
-                            level.getBlockState(mutablePos);
+                    BlockState mossState = level.getBlockState(mutablePos);
                     if (mossState.isFaceSturdy(level, mutablePos, Direction.DOWN)) {
                         return Stream.of(placePos);
                     }

@@ -11,8 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = "buildscape")
 public final class CopperToolActions {
-    private CopperToolActions() {
-    }
+    private CopperToolActions() {}
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onToolModification(BlockEvent.BlockToolModificationEvent event) {

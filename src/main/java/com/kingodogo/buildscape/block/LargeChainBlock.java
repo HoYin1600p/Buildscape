@@ -28,35 +28,33 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import com.kingodogo.buildscape.core.OpenWaterloggedRotatedPillarBlock;
 
 public class LargeChainBlock
-        extends OpenWaterloggedRotatedPillarBlock
-        implements SimpleWaterloggedBlock {
+        extends
+            OpenWaterloggedRotatedPillarBlock
+        implements
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE_Y = Block.box(
             4.0D,
             0.0D,
             4.0D,
             12.0D,
             16.0D,
-            12.0D
-    );
+            12.0D);
     private static final VoxelShape SHAPE_X = Block.box(
             0.0D,
             4.0D,
             4.0D,
             16.0D,
             12.0D,
-            12.0D
-    );
+            12.0D);
     private static final VoxelShape SHAPE_Z = Block.box(
             4.0D,
             4.0D,
             0.0D,
             12.0D,
             12.0D,
-            16.0D
-    );
+            16.0D);
 
     private static final VoxelShape COLLISION_SHAPE_Y = Block.box(
             7.0D,
@@ -64,36 +62,31 @@ public class LargeChainBlock
             7.0D,
             9.0D,
             16.0D,
-            9.0D
-    );
+            9.0D);
     private static final VoxelShape COLLISION_SHAPE_X = Block.box(
             0.0D,
             4.0D,
             4.0D,
             16.0D,
             12.0D,
-            12.0D
-    );
+            12.0D);
     private static final VoxelShape COLLISION_SHAPE_Z = Block.box(
             4.0D,
             4.0D,
             0.0D,
             12.0D,
             12.0D,
-            16.0D
-    );
+            16.0D);
 
     public LargeChainBlock(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(WATERLOGGED, false)
-        );
+                this.stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(WATERLOGGED);
     }
@@ -116,20 +109,15 @@ public class LargeChainBlock
                     .getLevel()
                     .getBlockState(context.getClickedPos());
 
-            if (
-                    Block.isFaceFull(
-                            aboveState.getCollisionShape(
-                                    context.getLevel(),
-                                    context.getClickedPos()
-                            ),
-                            Direction.DOWN
-                    )
-            ) {
+            if (Block.isFaceFull(
+                    aboveState.getCollisionShape(
+                            context.getLevel(),
+                            context.getClickedPos()),
+                    Direction.DOWN)) {
                 if (context.getLevel().getBlockState(placePos).canBeReplaced(context)) {
                     return (state != null ? state : this.defaultBlockState()).setValue(
                             AXIS,
-                            Direction.Axis.Y
-                    );
+                            Direction.Axis.Y);
                 }
             }
         }
@@ -144,8 +132,7 @@ public class LargeChainBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -155,8 +142,7 @@ public class LargeChainBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -164,16 +150,15 @@ public class LargeChainBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         Direction.Axis axis = state.getValue(AXIS);
         switch (axis) {
-            case X:
+            case X :
                 return SHAPE_X;
-            case Z:
+            case Z :
                 return SHAPE_Z;
-            case Y:
-            default:
+            case Y :
+            default :
                 return SHAPE_Y;
         }
     }
@@ -183,29 +168,23 @@ public class LargeChainBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
-        if (
-                context instanceof
-                        EntityCollisionContext entityContext
-        ) {
+            CollisionContext context) {
+        if (context instanceof EntityCollisionContext entityContext) {
             Entity entity = entityContext.getEntity();
-            if (
-                    entity != null &&
-                            !(entity instanceof Player)
-            ) {
+            if (entity != null &&
+                    !(entity instanceof Player)) {
                 return Shapes.empty();
             }
         }
 
         Direction.Axis axis = state.getValue(AXIS);
         switch (axis) {
-            case X:
+            case X :
                 return COLLISION_SHAPE_X;
-            case Z:
+            case Z :
                 return COLLISION_SHAPE_Z;
-            case Y:
-            default:
+            case Y :
+            default :
                 return COLLISION_SHAPE_Y;
         }
     }
@@ -215,12 +194,9 @@ public class LargeChainBlock
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            LivingEntity entity
-    ) {
-        return (
-                entity instanceof Player &&
-                        state.getValue(AXIS) == Direction.Axis.Y
-        );
+            LivingEntity entity) {
+        return (entity instanceof Player &&
+                state.getValue(AXIS) == Direction.Axis.Y);
     }
 
     @Override
@@ -228,8 +204,7 @@ public class LargeChainBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            PathComputationType type
-    ) {
+            PathComputationType type) {
         return true;
     }
 
@@ -247,12 +222,9 @@ public class LargeChainBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 
     @Override
@@ -262,27 +234,21 @@ public class LargeChainBlock
         if (axis == Direction.Axis.Y) {
             BlockPos below = pos.below();
             BlockState belowState = level.getBlockState(below);
-            boolean canHangFromBelow =
-                    Block.isFaceFull(
-                            belowState.getCollisionShape(level, below),
-                            Direction.UP
-                    ) ||
-                            belowState.getBlock() instanceof
-                                    ChainBlock ||
-                            belowState.getBlock() instanceof ClimbableChainBlock ||
-                            belowState.getBlock() instanceof LargeChainBlock;
+            boolean canHangFromBelow = Block.isFaceFull(
+                    belowState.getCollisionShape(level, below),
+                    Direction.UP) ||
+                    belowState.getBlock() instanceof ChainBlock ||
+                    belowState.getBlock() instanceof ClimbableChainBlock ||
+                    belowState.getBlock() instanceof LargeChainBlock;
 
             BlockPos above = pos.above();
             BlockState aboveState = level.getBlockState(above);
-            boolean canHangFromAbove =
-                    Block.isFaceFull(
-                            aboveState.getCollisionShape(level, above),
-                            Direction.DOWN
-                    ) ||
-                            aboveState.getBlock() instanceof
-                                    ChainBlock ||
-                            aboveState.getBlock() instanceof ClimbableChainBlock ||
-                            aboveState.getBlock() instanceof LargeChainBlock;
+            boolean canHangFromAbove = Block.isFaceFull(
+                    aboveState.getCollisionShape(level, above),
+                    Direction.DOWN) ||
+                    aboveState.getBlock() instanceof ChainBlock ||
+                    aboveState.getBlock() instanceof ClimbableChainBlock ||
+                    aboveState.getBlock() instanceof LargeChainBlock;
 
             return canHangFromBelow || canHangFromAbove;
         } else {
@@ -294,25 +260,19 @@ public class LargeChainBlock
             BlockState state1 = level.getBlockState(pos1);
             BlockState state2 = level.getBlockState(pos2);
 
-            boolean side1Valid =
-                    Block.isFaceFull(
-                            state1.getCollisionShape(level, pos1),
-                            dir1.getOpposite()
-                    ) ||
-                            state1.getBlock() instanceof
-                                    ChainBlock ||
-                            state1.getBlock() instanceof ClimbableChainBlock ||
-                            state1.getBlock() instanceof LargeChainBlock;
+            boolean side1Valid = Block.isFaceFull(
+                    state1.getCollisionShape(level, pos1),
+                    dir1.getOpposite()) ||
+                    state1.getBlock() instanceof ChainBlock ||
+                    state1.getBlock() instanceof ClimbableChainBlock ||
+                    state1.getBlock() instanceof LargeChainBlock;
 
-            boolean side2Valid =
-                    Block.isFaceFull(
-                            state2.getCollisionShape(level, pos2),
-                            dir2.getOpposite()
-                    ) ||
-                            state2.getBlock() instanceof
-                                    ChainBlock ||
-                            state2.getBlock() instanceof ClimbableChainBlock ||
-                            state2.getBlock() instanceof LargeChainBlock;
+            boolean side2Valid = Block.isFaceFull(
+                    state2.getCollisionShape(level, pos2),
+                    dir2.getOpposite()) ||
+                    state2.getBlock() instanceof ChainBlock ||
+                    state2.getBlock() instanceof ClimbableChainBlock ||
+                    state2.getBlock() instanceof LargeChainBlock;
 
             return side1Valid || side2Valid;
         }

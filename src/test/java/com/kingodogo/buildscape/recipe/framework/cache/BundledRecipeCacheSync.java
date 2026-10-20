@@ -16,7 +16,8 @@ public final class BundledRecipeCacheSync {
         Path bundledCache = args.length > 2 ? Path.of(args[2]) : Path.of(args[1]);
 
         if (localCache != null) {
-            RecipeCacheGenerator.main(new String[]{sourceDirectory.toString(), bundledCache.toString(), localCache.toString()});
+            RecipeCacheGenerator
+                    .main(new String[]{sourceDirectory.toString(), bundledCache.toString(), localCache.toString()});
         } else {
             RecipeCacheGenerator.main(new String[]{sourceDirectory.toString(), bundledCache.toString()});
         }

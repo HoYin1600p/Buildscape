@@ -41,7 +41,8 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
-    private static void buildscape$onTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
+    private static void buildscape$onTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity,
+            CallbackInfo ci) {
         BeaconScanContext.begin(blockEntity);
         if (((BeaconBlockEntityAccessor) blockEntity).getLastCheckY() < pos.getY()) {
             ((BeaconBeamHeightAccessor) blockEntity).buildscape$beginBeamScan();
@@ -49,7 +50,8 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
-    private static void buildscape$afterTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
+    private static void buildscape$afterTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity,
+            CallbackInfo ci) {
         if (((BeaconBlockEntityAccessor) blockEntity).getLastCheckY() < pos.getY()) {
             BeaconBeamHeightAccessor heightAccessor = (BeaconBeamHeightAccessor) blockEntity;
             heightAccessor.buildscape$completeBeamScan();

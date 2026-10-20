@@ -47,8 +47,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class TrappedDecoratedPotBlock
-        extends WaterloggedBlock
-        implements EntityBlock, SimpleWaterloggedBlock {
+        extends
+            WaterloggedBlock
+        implements
+            EntityBlock,
+            SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 16, 15);
@@ -58,11 +61,9 @@ public class TrappedDecoratedPotBlock
                 Properties.of(Material.STONE)
                         .strength(0.0f)
                         .sound(createPotSoundType())
-                        .noOcclusion()
-        );
+                        .noOcclusion());
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(WATERLOGGED, false)
-        );
+                this.stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -78,7 +79,7 @@ public class TrappedDecoratedPotBlock
 
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-                                  LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+            LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -125,10 +126,9 @@ public class TrappedDecoratedPotBlock
         return 0;
     }
 
-
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
-                                 Player player, InteractionHand hand, BlockHitResult hit) {
+            Player player, InteractionHand hand, BlockHitResult hit) {
 
         if (!(level.getBlockEntity(pos) instanceof TrappedDecoratedPotBlockEntity be)) {
             return InteractionResult.PASS;
@@ -161,7 +161,8 @@ public class TrappedDecoratedPotBlock
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
 
-            } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < TrappedDecoratedPotBlockEntity.maxStoredCount(stored)) {
+            } else if (ItemStack.isSameItemSameTags(stored, heldItem)
+                    && stored.getCount() < TrappedDecoratedPotBlockEntity.maxStoredCount(stored)) {
                 if (!level.isClientSide) {
                     int spaceAvailable = TrappedDecoratedPotBlockEntity.maxStoredCount(stored) - stored.getCount();
                     int canAdd = Math.min(heldItem.getCount(), spaceAvailable);
@@ -220,7 +221,8 @@ public class TrappedDecoratedPotBlock
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
 
-            } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < TrappedDecoratedPotBlockEntity.maxStoredCount(stored)) {
+            } else if (ItemStack.isSameItemSameTags(stored, heldItem)
+                    && stored.getCount() < TrappedDecoratedPotBlockEntity.maxStoredCount(stored)) {
                 if (!level.isClientSide) {
                     stored.grow(1);
                     be.setStoredItem(stored, true);
@@ -252,14 +254,12 @@ public class TrappedDecoratedPotBlock
                     spawnMobFromEgg(level, pos, stored);
                 } else {
                     if (!player.getInventory().add(stored)) {
-                        ItemEntity itemEntity =
-                                new ItemEntity(
-                                        level,
-                                        pos.getX() + 0.5,
-                                        pos.getY() + 0.5,
-                                        pos.getZ() + 0.5,
-                                        stored
-                                );
+                        ItemEntity itemEntity = new ItemEntity(
+                                level,
+                                pos.getX() + 0.5,
+                                pos.getY() + 0.5,
+                                pos.getZ() + 0.5,
+                                stored);
                         itemEntity.setDefaultPickUpDelay();
                         level.addFreshEntity(itemEntity);
                     }
@@ -272,25 +272,23 @@ public class TrappedDecoratedPotBlock
         return InteractionResult.PASS;
     }
 
-
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())
-                && level.getBlockEntity(pos) instanceof TrappedDecoratedPotBlockEntity potEntity && !potEntity.isEmpty()) {
+                && level.getBlockEntity(pos) instanceof TrappedDecoratedPotBlockEntity potEntity
+                && !potEntity.isEmpty()) {
             ItemStack stored = potEntity.getStoredItem().copy();
 
             if (!level.isClientSide) {
                 if (stored.getItem() instanceof SpawnEggItem spawnEgg) {
                     spawnMobFromEgg(level, pos, stored);
                 } else {
-                    ItemEntity itemEntity =
-                            new ItemEntity(
-                                    level,
-                                    pos.getX() + 0.5,
-                                    pos.getY() + 0.5,
-                                    pos.getZ() + 0.5,
-                                    stored
-                            );
+                    ItemEntity itemEntity = new ItemEntity(
+                            level,
+                            pos.getX() + 0.5,
+                            pos.getY() + 0.5,
+                            pos.getZ() + 0.5,
+                            stored);
                     itemEntity.setDefaultPickUpDelay();
                     level.addFreshEntity(itemEntity);
                 }
@@ -301,7 +299,7 @@ public class TrappedDecoratedPotBlock
 
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state,
-                               BlockEntity be, ItemStack tool) {
+            BlockEntity be, ItemStack tool) {
         level.playSound(null, pos, ModSounds.DECORATED_POT_BREAK.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
         super.playerDestroy(level, player, pos, state, be, tool);
     }
@@ -318,7 +316,6 @@ public class TrappedDecoratedPotBlock
         return Collections.singletonList(new ItemStack(this));
     }
 
-
     private static void spawnMobFromEgg(Level level, BlockPos pos, ItemStack stack) {
         if (level.isClientSide) {
             return;
@@ -334,14 +331,12 @@ public class TrappedDecoratedPotBlock
                     new BlockPos(spawnPos.x, spawnPos.y, spawnPos.z),
                     MobSpawnType.SPAWN_EGG,
                     true,
-                    false
-            );
+                    false);
             if (level instanceof ServerLevel serverLevel) {
                 serverLevel.sendParticles(
                         ParticleTypes.POOF,
                         spawnPos.x, spawnPos.y + 0.5, spawnPos.z,
-                        8, 0.3, 0.3, 0.3, 0.05
-                );
+                        8, 0.3, 0.3, 0.3, 0.05);
             }
         }
     }
@@ -370,7 +365,6 @@ public class TrappedDecoratedPotBlock
                 () -> ModSounds.DECORATED_POT_STEP.get(),
                 () -> ModSounds.DECORATED_POT_PLACE.get(),
                 () -> ModSounds.DECORATED_POT_HIT.get(),
-                () -> ModSounds.DECORATED_POT_FALL.get()
-        );
+                () -> ModSounds.DECORATED_POT_FALL.get());
     }
 }

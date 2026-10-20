@@ -48,8 +48,12 @@ public class TrophyBlockItem extends BlockItem {
         super.appendHoverText(stack, level, tooltip, flag);
 
         CompoundTag tag = stack.getTag();
-        String obtainedBy = (tag != null && tag.contains(NbtKeys.OBTAINED_BY)) ? tag.getString(NbtKeys.OBTAINED_BY) : null;
-        String obtainedOn = (tag != null && tag.contains(NbtKeys.OBTAINED_ON)) ? tag.getString(NbtKeys.OBTAINED_ON) : null;
+        String obtainedBy = (tag != null && tag.contains(NbtKeys.OBTAINED_BY))
+                ? tag.getString(NbtKeys.OBTAINED_BY)
+                : null;
+        String obtainedOn = (tag != null && tag.contains(NbtKeys.OBTAINED_ON))
+                ? tag.getString(NbtKeys.OBTAINED_ON)
+                : null;
 
         if (obtainedBy != null && !obtainedBy.isEmpty()) {
             tooltip.add(new TranslatableComponent("tooltip.buildscape.trophy.obtained_by_prefix")
@@ -64,7 +68,8 @@ public class TrophyBlockItem extends BlockItem {
         }
 
         if (definition.getCustomDescription() != null) {
-            tooltip.add(new TextComponent(definition.getCustomDescription()).withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
+            tooltip.add(new TextComponent(definition.getCustomDescription()).withStyle(ChatFormatting.ITALIC,
+                    ChatFormatting.DARK_GRAY));
         }
     }
 }

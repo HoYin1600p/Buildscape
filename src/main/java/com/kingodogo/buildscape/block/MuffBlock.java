@@ -54,7 +54,7 @@ public class MuffBlock extends Block implements EntityBlock {
     @Override
     @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
-                                 InteractionHand hand, BlockHitResult hit) {
+            InteractionHand hand, BlockHitResult hit) {
         int radius = state.getValue(RADIUS);
         int nextRadius = radius + 1;
         if (nextRadius > 32) {
@@ -80,19 +80,22 @@ public class MuffBlock extends Block implements EntityBlock {
                     1.0D);
         }
 
-        player.displayClientMessage(new TranslatableComponent("message.buildscape.muff_block.radius", nextRadius), true);
+        player.displayClientMessage(new TranslatableComponent("message.buildscape.muff_block.radius", nextRadius),
+                true);
 
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos,
+            boolean isMoving) {
         boolean hasSignal = level.hasNeighborSignal(pos);
         if (hasSignal != state.getValue(POWERED)) {
             level.setBlock(pos, state.setValue(POWERED, hasSignal), 3);
             if (hasSignal && !level.isClientSide) {
-                Player nearestPlayer = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 32.0, false);
+                Player nearestPlayer = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                        32.0, false);
                 if (nearestPlayer instanceof ServerPlayer serverPlayer) {
                     serverPlayer.awardStat(ModStats.MUFF_BLOCKS_ACTIVATED);
                     AdvancementGrants.grant(serverPlayer, "can_you_hear_me_now");

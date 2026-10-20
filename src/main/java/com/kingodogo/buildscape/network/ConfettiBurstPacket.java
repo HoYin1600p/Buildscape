@@ -19,7 +19,8 @@ public class ConfettiBurstPacket {
     private final int burstLevel;
     private final long seed;
 
-    public ConfettiBurstPacket(double x, double y, double z, float lookX, float lookY, float lookZ, int burstLevel, long seed) {
+    public ConfettiBurstPacket(double x, double y, double z, float lookX, float lookY, float lookZ, int burstLevel,
+            long seed) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -47,9 +48,12 @@ public class ConfettiBurstPacket {
     }
 
     public static void handle(ConfettiBurstPacket msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                ClientPacketHandlers.spawnConfettiBurst(
-                        msg.x, msg.y, msg.z, msg.lookX, msg.lookY, msg.lookZ, msg.burstLevel, msg.seed)));
+        ctx.get()
+                .enqueueWork(
+                        () -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                                () -> () -> ClientPacketHandlers.spawnConfettiBurst(
+                                        msg.x, msg.y, msg.z, msg.lookX, msg.lookY, msg.lookZ, msg.burstLevel,
+                                        msg.seed)));
         ctx.get().setPacketHandled(true);
     }
 }

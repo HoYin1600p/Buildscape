@@ -19,7 +19,7 @@ public class HazeBushDyeRecipe extends ShapelessRecipe {
     public static final Serializer SERIALIZER = new Serializer();
 
     public HazeBushDyeRecipe(ResourceLocation id, String group, ItemStack result,
-                             NonNullList<Ingredient> ingredients) {
+            NonNullList<Ingredient> ingredients) {
         super(id, group, result, ingredients);
     }
 
@@ -50,7 +50,8 @@ public class HazeBushDyeRecipe extends ShapelessRecipe {
     }
 
     public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>
-            implements RecipeSerializer<HazeBushDyeRecipe> {
+            implements
+                RecipeSerializer<HazeBushDyeRecipe> {
         private final ShapelessRecipe.Serializer delegate = new ShapelessRecipe.Serializer();
 
         private HazeBushDyeRecipe wrap(ShapelessRecipe recipe) {

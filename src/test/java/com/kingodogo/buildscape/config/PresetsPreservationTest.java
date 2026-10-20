@@ -15,7 +15,8 @@ import java.nio.file.Path;
 import static org.junit.Assert.*;
 
 public class PresetsPreservationTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {

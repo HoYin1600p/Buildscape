@@ -47,7 +47,8 @@ public class FamilyExpander {
                 // Ashpen has no door or trapdoor blocks; other wood families do.
                 targets = baseItem.contains(":ashpen_")
                         ? List.of("stairs", "slab", "fence", "fence_gate", "button", "pressure_plate")
-                        : List.of("stairs", "slab", "fence", "fence_gate", "door", "trapdoor", "button", "pressure_plate");
+                        : List.of("stairs", "slab", "fence", "fence_gate", "door", "trapdoor", "button",
+                                "pressure_plate");
             } else {
                 targets = List.of("stairs", "slab", "wall", "chiseled", "stonecutter");
             }
@@ -68,18 +69,24 @@ public class FamilyExpander {
                         List.of("XXX"), baseItem);
                 case "wall" -> addTemplateOrFallback(generated, recipeId, "wall", baseItem, outputItem, 6, "shaped",
                         List.of("XXX", "XXX"), baseItem);
-                case "fence" -> addCustomShaped(generated, recipeId, List.of("W#W", "W#W"), baseItem, "minecraft:stick", outputItem, 3);
-                case "gate", "fence_gate" -> addCustomShaped(generated, recipeId, List.of("#W#", "#W#"), baseItem, "minecraft:stick", outputItem, 1);
+                case "fence" -> addCustomShaped(generated, recipeId, List.of("W#W", "W#W"), baseItem, "minecraft:stick",
+                        outputItem, 3);
+                case "gate", "fence_gate" -> addCustomShaped(generated, recipeId, List.of("#W#", "#W#"), baseItem,
+                        "minecraft:stick", outputItem, 1);
                 case "door" -> addTemplateOrFallback(generated, recipeId, "door", baseItem, outputItem, 3, "shaped",
                         List.of("XX", "XX", "XX"), baseItem);
-                case "trapdoor" -> addTemplateOrFallback(generated, recipeId, "trapdoor", baseItem, outputItem, 2, "shaped",
-                        List.of("XXX", "XXX"), baseItem);
-                case "button" -> addTemplateOrFallback(generated, recipeId, "button", baseItem, outputItem, 1, "shapeless",
-                        List.of(), baseItem);
-                case "pressure_plate" -> addTemplateOrFallback(generated, recipeId, "pressure_plate", baseItem, outputItem, 1, "shaped",
-                        List.of("XX"), baseItem);
-                case "chiseled" -> addTemplateOrFallback(generated, recipeId, "chiseled", baseItem, outputItem, 1, "shaped",
-                        List.of("XX", "XX"), baseItem);
+                case "trapdoor" ->
+                    addTemplateOrFallback(generated, recipeId, "trapdoor", baseItem, outputItem, 2, "shaped",
+                            List.of("XXX", "XXX"), baseItem);
+                case "button" ->
+                    addTemplateOrFallback(generated, recipeId, "button", baseItem, outputItem, 1, "shapeless",
+                            List.of(), baseItem);
+                case "pressure_plate" ->
+                    addTemplateOrFallback(generated, recipeId, "pressure_plate", baseItem, outputItem, 1, "shaped",
+                            List.of("XX"), baseItem);
+                case "chiseled" ->
+                    addTemplateOrFallback(generated, recipeId, "chiseled", baseItem, outputItem, 1, "shaped",
+                            List.of("XX", "XX"), baseItem);
                 case "stonecutter" -> addStonecutterRecipe(generated, recipeId, baseItem, outputItem, 1);
                 default -> {
                     RecipeIR.RecipeSpec spec = templateEngine.expand(recipeId, target, baseItem, outputItem, 1);
@@ -112,8 +119,7 @@ public class FamilyExpander {
             int defaultCount,
             String defaultType,
             List<String> defaultPattern,
-            String inputItem
-    ) {
+            String inputItem) {
         RecipeIR.RecipeSpec spec = templateEngine.expand(recipeId, templateName, baseItem, outputItem, defaultCount);
         if (spec != null) {
             generated.add(spec);
@@ -121,8 +127,7 @@ public class FamilyExpander {
             Map<String, String> keys = Map.of("X", inputItem);
             generated.add(new RecipeIR.RecipeSpec(
                     recipeId, defaultType, "", defaultPattern, keys, List.of(inputItem), baseItem,
-                    new RecipeIR.ResultSpec(outputItem, defaultCount, null), 200, 0.1f
-            ));
+                    new RecipeIR.ResultSpec(outputItem, defaultCount, null), 200, 0.1f));
         }
     }
 
@@ -133,13 +138,11 @@ public class FamilyExpander {
             String mainItem,
             String stickItem,
             String outputItem,
-            int count
-    ) {
+            int count) {
         Map<String, String> keys = Map.of("W", mainItem, "#", stickItem);
         generated.add(new RecipeIR.RecipeSpec(
                 recipeId, "shaped", "", pattern, keys, List.of(), mainItem,
-                new RecipeIR.ResultSpec(outputItem, count, null), 200, 0.1f
-        ));
+                new RecipeIR.ResultSpec(outputItem, count, null), 200, 0.1f));
     }
 
     private void addStonecutterRecipe(
@@ -147,12 +150,10 @@ public class FamilyExpander {
             String recipeId,
             String baseItem,
             String outputItem,
-            int count
-    ) {
+            int count) {
         generated.add(new RecipeIR.RecipeSpec(
                 recipeId, "stonecutting", "", List.of(), Map.of(), List.of(), baseItem,
-                new RecipeIR.ResultSpec(outputItem, count, null), 0, 0.0f
-        ));
+                new RecipeIR.ResultSpec(outputItem, count, null), 0, 0.0f));
     }
 
     private String sanitizeId(String raw) {

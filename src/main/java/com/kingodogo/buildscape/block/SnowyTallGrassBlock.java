@@ -32,7 +32,8 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
 
     public SnowyTallGrassBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(HALF, DoubleBlockHalf.LOWER).setValue(ON_FARMLAND, false));
+        this.registerDefaultState(
+                this.stateDefinition.any().setValue(HALF, DoubleBlockHalf.LOWER).setValue(ON_FARMLAND, false));
     }
 
     @Override
@@ -53,14 +54,11 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
     protected boolean mayPlaceOn(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
-        return (
-                state.is(BlockTags.DIRT) ||
-                        state.is(Blocks.FARMLAND) ||
-                        state.is(Blocks.SNOW_BLOCK) ||
-                        state.is(ModBlocks.SNOW_BRICKS.get())
-        );
+            BlockPos pos) {
+        return (state.is(BlockTags.DIRT) ||
+                state.is(Blocks.FARMLAND) ||
+                state.is(Blocks.SNOW_BLOCK) ||
+                state.is(ModBlocks.SNOW_BRICKS.get()));
     }
 
     @Override
@@ -76,7 +74,8 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
-        if (pos.getY() < context.getLevel().getMaxBuildHeight() - 1 && context.getLevel().getBlockState(pos.above()).canBeReplaced(context)) {
+        if (pos.getY() < context.getLevel().getMaxBuildHeight() - 1
+                && context.getLevel().getBlockState(pos.above()).canBeReplaced(context)) {
             BlockState state = super.getStateForPlacement(context);
             if (state != null) {
                 return state.setValue(ON_FARMLAND, shouldSink(context.getLevel(), pos));
@@ -86,7 +85,8 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
         BlockState updatedState = super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
         if (!updatedState.isAir()) {
             BlockPos basePos = updatedState.getValue(HALF) == DoubleBlockHalf.UPPER ? pos.below() : pos;
@@ -98,8 +98,7 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         if (state.getValue(HALF) != DoubleBlockHalf.LOWER) {
             return Collections.emptyList();
         }
@@ -107,21 +106,16 @@ public class SnowyTallGrassBlock extends DoublePlantBlock implements SinksOnFarm
         LootContext ctx = builder
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(
-                        LootContextParamSets.BLOCK
-                );
+                        LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
 
         if (tool != null && !tool.isEmpty()) {
             if (tool.is(Items.SHEARS)) {
                 return Collections.singletonList(new ItemStack(this));
             }
-            if (
-                    EnchantmentHelper.getItemEnchantmentLevel(
-                            Enchantments.SILK_TOUCH,
-                            tool
-                    ) >
-                            0
-            ) {
+            if (EnchantmentHelper.getItemEnchantmentLevel(
+                    Enchantments.SILK_TOUCH,
+                    tool) > 0) {
                 return Collections.singletonList(new ItemStack(this));
             }
         }

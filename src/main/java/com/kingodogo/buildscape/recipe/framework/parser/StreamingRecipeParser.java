@@ -31,11 +31,15 @@ public class StreamingRecipeParser {
                     case "wood_families", "wood" -> parseFamilies(jsonReader, families, "wood");
                     case "stone_families", "stone" -> parseFamilies(jsonReader, families, "stone");
                     case "crafting_shaped", "shaped" -> parseSectionRecipes(jsonReader, recipes, "shaped", false);
-                    case "crafting_shapeless", "shapeless" -> parseSectionRecipes(jsonReader, recipes, "shapeless", false);
-                    case "crafting_shaped_durability", "shaped_durability" -> parseSectionRecipes(jsonReader, recipes, "shaped_durability", false);
-                    case "crafting_shapeless_durability", "shapeless_durability" -> parseSectionRecipes(jsonReader, recipes, "shapeless_durability", false);
+                    case "crafting_shapeless", "shapeless" ->
+                        parseSectionRecipes(jsonReader, recipes, "shapeless", false);
+                    case "crafting_shaped_durability", "shaped_durability" ->
+                        parseSectionRecipes(jsonReader, recipes, "shaped_durability", false);
+                    case "crafting_shapeless_durability", "shapeless_durability" ->
+                        parseSectionRecipes(jsonReader, recipes, "shapeless_durability", false);
                     case "stonecutting" -> parseSectionRecipes(jsonReader, recipes, "stonecutting", false);
-                    case "stonecutting_reversible", "reversals", "reversible" -> parseSectionRecipes(jsonReader, recipes, "stonecutting", true);
+                    case "stonecutting_reversible", "reversals", "reversible" ->
+                        parseSectionRecipes(jsonReader, recipes, "stonecutting", true);
                     case "smelting" -> parseSectionRecipes(jsonReader, recipes, "smelting", false);
                     case "blasting" -> parseSectionRecipes(jsonReader, recipes, "blasting", false);
                     case "smoking" -> parseSectionRecipes(jsonReader, recipes, "smoking", false);
@@ -70,7 +74,8 @@ public class StreamingRecipeParser {
         reader.endObject();
     }
 
-    private static void parseTemplates(JsonReader reader, Map<String, RecipeIR.TemplateSpec> templates) throws IOException {
+    private static void parseTemplates(JsonReader reader, Map<String, RecipeIR.TemplateSpec> templates)
+            throws IOException {
         reader.beginObject();
         while (reader.hasNext()) {
             String templateName = reader.nextName();
@@ -107,13 +112,15 @@ public class StreamingRecipeParser {
         return new RecipeIR.TemplateSpec(type, pattern, keys, ingredients, result, cookingTime, experience);
     }
 
-    private static void parseFamilies(JsonReader reader, List<RecipeIR.FamilySpec> families, String defaultFamilyType) throws IOException {
+    private static void parseFamilies(JsonReader reader, List<RecipeIR.FamilySpec> families, String defaultFamilyType)
+            throws IOException {
         reader.beginArray();
         while (reader.hasNext()) {
             JsonToken token = reader.peek();
             if (token == JsonToken.STRING) {
                 String baseItem = reader.nextString();
-                families.add(new RecipeIR.FamilySpec(defaultFamilyType, baseItem, "", Collections.emptyList(), Collections.emptyList(), false));
+                families.add(new RecipeIR.FamilySpec(defaultFamilyType, baseItem, "", Collections.emptyList(),
+                        Collections.emptyList(), false));
             } else if (token == JsonToken.BEGIN_ARRAY) {
                 reader.beginArray();
                 String baseItem = reader.nextString();
@@ -180,7 +187,8 @@ public class StreamingRecipeParser {
         return new RecipeIR.FamilySpec(type, base, prefix, generate, exclude, reversible);
     }
 
-    private static void parseSectionRecipes(JsonReader reader, List<RecipeIR.RecipeSpec> recipes, String defaultType, boolean isReversibleSection) throws IOException {
+    private static void parseSectionRecipes(JsonReader reader, List<RecipeIR.RecipeSpec> recipes, String defaultType,
+            boolean isReversibleSection) throws IOException {
         reader.beginArray();
         while (reader.hasNext()) {
             JsonToken token = reader.peek();
@@ -195,7 +203,8 @@ public class StreamingRecipeParser {
         reader.endArray();
     }
 
-    private static void parseAndAddCompactArrayRecipes(JsonReader reader, List<RecipeIR.RecipeSpec> recipes, String defaultType, boolean isReversibleSection) throws IOException {
+    private static void parseAndAddCompactArrayRecipes(JsonReader reader, List<RecipeIR.RecipeSpec> recipes,
+            String defaultType, boolean isReversibleSection) throws IOException {
         reader.beginArray();
         String resultItem = reader.nextString();
 
@@ -269,7 +278,8 @@ public class StreamingRecipeParser {
                 if (numIndex == 0) {
                     try {
                         count = Integer.parseInt(reader.nextString());
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                     numIndex++;
                 } else {
                     reader.skipValue();
@@ -287,7 +297,8 @@ public class StreamingRecipeParser {
         }
 
         RecipeIR.ResultSpec resultSpec = new RecipeIR.ResultSpec(resultItem, count, null);
-        recipes.add(new RecipeIR.RecipeSpec(null, type, "", pattern, keys, ingredients, input, resultSpec, cookingTime, experience));
+        recipes.add(new RecipeIR.RecipeSpec(null, type, "", pattern, keys, ingredients, input, resultSpec, cookingTime,
+                experience));
 
         if (isReversible && count != 1) {
             System.err.println("Skipping nonunit reversible conversion for " + resultItem + ": yield " + count);
@@ -295,7 +306,8 @@ public class StreamingRecipeParser {
         if (isReversible && count == 1 && input != null && !input.isEmpty()) {
             String reverseRecipeId = sanitizeId(input + "_from_" + resultItem + "_reversal");
             RecipeIR.ResultSpec reverseResultSpec = new RecipeIR.ResultSpec(input, 1, null);
-            recipes.add(new RecipeIR.RecipeSpec(reverseRecipeId, type, "", List.of(), Map.of(), List.of(resultItem), resultItem, reverseResultSpec, cookingTime, experience));
+            recipes.add(new RecipeIR.RecipeSpec(reverseRecipeId, type, "", List.of(), Map.of(), List.of(resultItem),
+                    resultItem, reverseResultSpec, cookingTime, experience));
         }
     }
 
@@ -334,7 +346,8 @@ public class StreamingRecipeParser {
     private static RecipeIR.RecipeSpec parseRecipeSpec(JsonReader reader, String defaultType) throws IOException {
         JsonElement jsonElement = JsonParser.parseReader(reader);
         if (!jsonElement.isJsonObject()) {
-            return new RecipeIR.RecipeSpec(null, defaultType, "", List.of(), Map.of(), List.of(), null, null, 200, 0.1f, null);
+            return new RecipeIR.RecipeSpec(null, defaultType, "", List.of(), Map.of(), List.of(), null, null, 200, 0.1f,
+                    null);
         }
         JsonObject json = jsonElement.getAsJsonObject();
         String rawJson = json.toString();
@@ -378,10 +391,13 @@ public class StreamingRecipeParser {
                 result = new RecipeIR.ResultSpec(item, count, nbt);
             }
         }
-        int cookingTime = json.has("cookingtime") ? json.get("cookingtime").getAsInt() : (json.has("cookingTime") ? json.get("cookingTime").getAsInt() : 200);
+        int cookingTime = json.has("cookingtime")
+                ? json.get("cookingtime").getAsInt()
+                : (json.has("cookingTime") ? json.get("cookingTime").getAsInt() : 200);
         float experience = json.has("experience") ? json.get("experience").getAsFloat() : 0.1f;
 
-        return new RecipeIR.RecipeSpec(id, type, group, pattern, keys, ingredients, input, result, cookingTime, experience, rawJson);
+        return new RecipeIR.RecipeSpec(id, type, group, pattern, keys, ingredients, input, result, cookingTime,
+                experience, rawJson);
     }
 
     private static RecipeIR.ResultSpec parseResultSpec(JsonReader reader) throws IOException {

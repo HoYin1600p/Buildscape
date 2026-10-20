@@ -33,8 +33,7 @@ public class CustomSoundType extends ForgeSoundType {
             Supplier<SoundEvent> stepSound,
             Supplier<SoundEvent> placeSound,
             Supplier<SoundEvent> hitSound,
-            Supplier<SoundEvent> fallSound
-    ) {
+            Supplier<SoundEvent> fallSound) {
         super(1.0f, 1.0f, breakSound, stepSound, placeSound, hitSound, fallSound);
         this.breakVolume = breakVolume;
         this.breakPitch = breakPitch;

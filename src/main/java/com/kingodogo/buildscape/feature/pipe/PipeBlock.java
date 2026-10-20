@@ -42,7 +42,8 @@ public class PipeBlock extends RotatedPillarBlock {
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level,
+            BlockPos pos, BlockPos neighborPos) {
         BlockState updated = super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         return updateConnections(level, pos, updated);
     }
@@ -52,15 +53,15 @@ public class PipeBlock extends RotatedPillarBlock {
         Direction negDir;
         Direction posDir;
         switch (axis) {
-            case X:
+            case X :
                 negDir = Direction.WEST;
                 posDir = Direction.EAST;
                 break;
-            case Z:
+            case Z :
                 negDir = Direction.NORTH;
                 posDir = Direction.SOUTH;
                 break;
-            default:
+            default :
                 negDir = Direction.DOWN;
                 posDir = Direction.UP;
                 break;

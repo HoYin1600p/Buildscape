@@ -44,8 +44,7 @@ import java.util.Map;
 
 public class AshenKingPillarBlock extends PillarBlock {
 
-    public static final DirectionProperty FACING =
-            BlockStateProperties.HORIZONTAL_FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static final VoxelShape[][] SHAPES = new VoxelShape[4][4];
 
@@ -78,16 +77,20 @@ public class AshenKingPillarBlock extends PillarBlock {
             result = Shapes.or(result, rotateBox(9.6, 1.5, 12.95, 12.6, 4.5, 13.95, facing));
         }
 
-
         return result.optimize();
     }
 
-    private static VoxelShape rotateBox(double x1, double y1, double z1, double x2, double y2, double z2, Direction facing) {
+    private static VoxelShape rotateBox(double x1, double y1, double z1, double x2, double y2, double z2,
+            Direction facing) {
         switch (facing) {
-            case EAST:  return Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
-            case SOUTH: return Block.box(16 - x2, y1, 16 - z2, 16 - x1, y2, 16 - z1);
-            case WEST:  return Block.box(z1, y1, 16 - x2, z2, y2, 16 - x1);
-            default:    return Block.box(x1, y1, z1, x2, y2, z2);
+            case EAST :
+                return Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
+            case SOUTH :
+                return Block.box(16 - x2, y1, 16 - z2, 16 - x1, y2, 16 - z1);
+            case WEST :
+                return Block.box(z1, y1, 16 - x2, z2, y2, 16 - x1);
+            default :
+                return Block.box(x1, y1, z1, x2, y2, z2);
         }
     }
 
@@ -97,10 +100,8 @@ public class AshenKingPillarBlock extends PillarBlock {
                 this.stateDefinition.any()
                         .setValue(PART, PillarPart.SINGLE)
                         .setValue(WATERLOGGED, false)
-                        .setValue(FACING, Direction.NORTH)
-        );
+                        .setValue(FACING, Direction.NORTH));
     }
-
 
     @Override
     protected void createBlockStateDefinition(
@@ -115,7 +116,8 @@ public class AshenKingPillarBlock extends PillarBlock {
         Direction facing = context.getHorizontalDirection().getOpposite();
         FluidState fluidstate = level.getFluidState(pos);
 
-        BlockState state = this.defaultBlockState().setValue(FACING, facing).setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
+        BlockState state = this.defaultBlockState().setValue(FACING, facing).setValue(WATERLOGGED,
+                fluidstate.getType() == Fluids.WATER);
 
         return state.setValue(PART, PillarPart.SINGLE);
     }
@@ -178,8 +180,8 @@ public class AshenKingPillarBlock extends PillarBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
-    }
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos,
+            boolean isMoving) {}
 
     @Override
     public InteractionResult use(
@@ -209,20 +211,15 @@ public class AshenKingPillarBlock extends PillarBlock {
                     String dyeName = dyeInfo.getValue();
 
                     if (!pillarBE.canAddMoreColors()) {
-                        TextComponent message =
-                                new TextComponent(
-                                        "Pillar already has " +
-                                                PillarBlockEntity.MAX_DYE_COLORS +
-                                                " colors! Break and replace to reset."
-                                );
+                        TextComponent message = new TextComponent(
+                                "Pillar already has " +
+                                        PillarBlockEntity.MAX_DYE_COLORS +
+                                        " colors! Break and replace to reset.");
                         message.withStyle(ChatFormatting.RED);
                         if (player instanceof ServerPlayer) {
                             ModMessages.INSTANCE.send(
-                                    PacketDistributor.PLAYER.with(() ->
-                                            (ServerPlayer) player
-                                    ),
-                                    new ActionBarMessagePacket(message)
-                            );
+                                    PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                                    new ActionBarMessagePacket(message));
                         }
                         return InteractionResult.CONSUME;
                     }
@@ -253,11 +250,8 @@ public class AshenKingPillarBlock extends PillarBlock {
 
                     if (player instanceof ServerPlayer) {
                         ModMessages.INSTANCE.send(
-                                PacketDistributor.PLAYER.with(() ->
-                                        (ServerPlayer) player
-                                ),
-                                new ActionBarMessagePacket(message)
-                        );
+                                PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                                new ActionBarMessagePacket(message));
                     }
 
                     return InteractionResult.SUCCESS;
@@ -274,8 +268,7 @@ public class AshenKingPillarBlock extends PillarBlock {
                 pillarBE.rotateFacing();
                 float facingYaw = pillarBE.getFacingYaw();
                 String direction = getDirectionName(facingYaw);
-                TextComponent message =
-                        new TextComponent("Mob facing: " + direction);
+                TextComponent message = new TextComponent("Mob facing: " + direction);
                 message.withStyle(ChatFormatting.GREEN);
                 player.displayClientMessage(message, true);
 
@@ -290,9 +283,8 @@ public class AshenKingPillarBlock extends PillarBlock {
                 }
 
                 ChatFormatting color = getPatternColor(pattern);
-                TextComponent patternText =
-                        (TextComponent) new TextComponent(pattern)
-                                .withStyle(color);
+                TextComponent patternText = (TextComponent) new TextComponent(pattern)
+                        .withStyle(color);
                 player.displayClientMessage(patternText, true);
 
                 level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK,
@@ -307,10 +299,9 @@ public class AshenKingPillarBlock extends PillarBlock {
                 pillarBE.setDisplayedItem(ItemStack.EMPTY);
                 level.sendBlockUpdated(pos, level.getBlockState(pos), level.getBlockState(pos), 3);
 
-                ItemEntity itemEntity =
-                        new ItemEntity(
-                                level, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5,
-                                displayedItem.copy());
+                ItemEntity itemEntity = new ItemEntity(
+                        level, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5,
+                        displayedItem.copy());
                 itemEntity.setDefaultPickUpDelay();
                 level.addFreshEntity(itemEntity);
 
@@ -336,8 +327,7 @@ public class AshenKingPillarBlock extends PillarBlock {
             }
 
             if (pillarBE.getParticlePattern() == null) {
-                PillarParticleConfig cfg =
-                        PillarParticleConfig.get();
+                PillarParticleConfig cfg = PillarParticleConfig.get();
                 if (cfg.use_pattern && cfg.pattern != null) {
                 }
             }
@@ -375,14 +365,11 @@ public class AshenKingPillarBlock extends PillarBlock {
 
         if (yaw >= 315 || yaw < 45) {
             return "South";
-        }
-        else if (yaw >= 45 && yaw < 135) {
+        } else if (yaw >= 45 && yaw < 135) {
             return "West";
-        }
-        else if (yaw >= 135 && yaw < 225) {
+        } else if (yaw >= 135 && yaw < 225) {
             return "North";
-        }
-        else {
+        } else {
             return "East";
         }
     }
@@ -393,14 +380,22 @@ public class AshenKingPillarBlock extends PillarBlock {
         }
 
         switch (pattern) {
-            case ParticlePatterns.DEFAULT: return ChatFormatting.WHITE;
-            case ParticlePatterns.BEAM: return ChatFormatting.AQUA;
-            case ParticlePatterns.SPIRAL: return ChatFormatting.LIGHT_PURPLE;
-            case ParticlePatterns.FOUNTAIN: return ChatFormatting.BLUE;
-            case ParticlePatterns.PULSE: return ChatFormatting.RED;
-            case ParticlePatterns.RING: return ChatFormatting.GOLD;
-            case ParticlePatterns.BURST: return ChatFormatting.YELLOW;
-            default: return ChatFormatting.GRAY;
+            case ParticlePatterns.DEFAULT :
+                return ChatFormatting.WHITE;
+            case ParticlePatterns.BEAM :
+                return ChatFormatting.AQUA;
+            case ParticlePatterns.SPIRAL :
+                return ChatFormatting.LIGHT_PURPLE;
+            case ParticlePatterns.FOUNTAIN :
+                return ChatFormatting.BLUE;
+            case ParticlePatterns.PULSE :
+                return ChatFormatting.RED;
+            case ParticlePatterns.RING :
+                return ChatFormatting.GOLD;
+            case ParticlePatterns.BURST :
+                return ChatFormatting.YELLOW;
+            default :
+                return ChatFormatting.GRAY;
         }
     }
 }

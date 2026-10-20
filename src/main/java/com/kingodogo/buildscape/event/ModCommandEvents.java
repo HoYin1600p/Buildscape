@@ -16,12 +16,13 @@ public class ModCommandEvents {
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         FireworkTestCommand.register(event.getDispatcher());
-        LiteralArgumentBuilder<CommandSourceStack> buildscapeCommand = LiteralArgumentBuilder.<CommandSourceStack>literal(
+        LiteralArgumentBuilder<CommandSourceStack> buildscapeCommand = LiteralArgumentBuilder
+                .<CommandSourceStack>literal(
                         "buildscape")
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal(
-                                "recover")
+                        "recover")
                         .then(LiteralArgumentBuilder.<CommandSourceStack>literal(
-                                        "PillarData")
+                                "PillarData")
                                 .requires(source -> source.hasPermission(2))
                                 .executes(context -> {
                                     CommandSourceStack source = context
@@ -75,11 +76,10 @@ public class ModCommandEvents {
                                 .requires(source -> source.hasPermission(2))
                                 .executes(context -> {
                                     CosmeticManager.getInstance().setDevUnlockAll(true);
-                                    context.getSource().sendSuccess(new TextComponent("All cosmetics unlocked for development!"), true);
+                                    context.getSource().sendSuccess(
+                                            new TextComponent("All cosmetics unlocked for development!"), true);
                                     return 1;
-                                })
-                        )
-                );
+                                })));
 
         event.getDispatcher().register(buildscapeCommand);
     }

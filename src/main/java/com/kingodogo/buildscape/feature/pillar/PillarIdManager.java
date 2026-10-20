@@ -732,8 +732,7 @@ public class PillarIdManager {
 
     public void scheduleRecoveryFromWorld(
             MinecraftServer server,
-            boolean clearColors
-    ) {
+            boolean clearColors) {
         if (!serverAuthoritative || server == null || !server.isRunning()) {
             return;
         }
@@ -821,7 +820,6 @@ public class PillarIdManager {
                 }
             }
 
-
             saveToFile(PillarStore.getBackupDataFile(), PillarStore.BACKUP_FILE_NAME);
         } catch (Throwable t) {
             BuildScape.LOGGER.error("Error saving backup file: {}", t.getMessage());
@@ -863,7 +861,8 @@ public class PillarIdManager {
         Map<String, PillarData> positions = new HashMap<>();
         for (PillarData data : finalData.values()) {
             Direction facing = data.facing != null
-                    ? Direction.byName(data.facing) : null;
+                    ? Direction.byName(data.facing)
+                    : null;
             PillarData conflict = positions.putIfAbsent(positionKey(data.dimension, data.getBlockPos(), facing), data);
             if (conflict != null) {
                 for (EditPillarRowsPacket.Row row : rows) {
@@ -945,8 +944,7 @@ public class PillarIdManager {
     public synchronized void trackLoadedChunk(LevelChunk chunk, boolean loaded) {
         if (loaded) {
             loadedChunks.add(chunk);
-        }
-        else {
+        } else {
             loadedChunks.remove(chunk);
         }
     }
@@ -1174,14 +1172,12 @@ public class PillarIdManager {
 
     public void recoverPillarsFromWorld(
             MinecraftServer server,
-            boolean clearColors
-    ) {
+            boolean clearColors) {
         PillarRecovery.recoverPillarsFromWorld(this, server, clearColors);
     }
 
     public void syncAllLoadedPillars(
-            MinecraftServer server
-    ) {
+            MinecraftServer server) {
         PillarWorldSync.syncAllLoadedPillars(this, server);
     }
 
@@ -1199,8 +1195,7 @@ public class PillarIdManager {
 
     public boolean syncPatternSettingsFromNBT(
             PillarBlockEntity pillarBE,
-            PillarData data
-    ) {
+            PillarData data) {
         return PillarWorldSync.syncPatternSettingsFromNBT(pillarBE, data);
     }
     // ---- Item frame registration delegation: the public API is unchanged ----
@@ -1232,12 +1227,9 @@ public class PillarIdManager {
     }
 
     private boolean prepareFrameRegistration(CompoundTag tag, String dimension, BlockPos pos,
-                                             Direction facing) {
+            Direction facing) {
         return PillarFrames.prepareFrameRegistration(this, tag, dimension, pos, facing);
     }
-
-
-
 
     public static class PillarData {
 
@@ -1263,8 +1255,7 @@ public class PillarIdManager {
         public String facing = null;
         public Float itemYaw = null;
 
-        public PillarData() {
-        }
+        public PillarData() {}
 
         public PillarData(String id, String dimension, BlockPos pos) {
             this.id = id;

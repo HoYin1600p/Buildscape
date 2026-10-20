@@ -17,9 +17,7 @@ import net.minecraftforge.registries.ForgeRegistries;
  */
 final class PillarEntityNbt {
 
-    private PillarEntityNbt() {
-    }
-
+    private PillarEntityNbt() {}
 
     static void read(PillarBlockEntity self, CompoundTag tag) {
 
@@ -31,8 +29,7 @@ final class PillarEntityNbt {
             if (tag.contains(NbtKeys.DISPLAYED_ITEM, 10)) {
                 ItemStack loaded = ItemStack.of(tag.getCompound(NbtKeys.DISPLAYED_ITEM));
                 self.displayedItem = loaded == null ? ItemStack.EMPTY : loaded;
-            }
-            else if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
+            } else if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
                 String itemId = tag.getString(NbtKeys.PILLAR_ITEM);
                 try {
                     ResourceLocation itemLocation = new ResourceLocation(
@@ -66,8 +63,7 @@ final class PillarEntityNbt {
             if (!valid) {
                 self.particlePattern = null;
             }
-        }
-        else if (tag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
+        } else if (tag.contains(NbtKeys.PILLAR_PATTERN, 8)) {
             self.particlePattern = tag.getString(NbtKeys.PILLAR_PATTERN);
             boolean valid = false;
             for (String p : PillarBlockEntity.PATTERNS) {

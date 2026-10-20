@@ -18,7 +18,8 @@ import static org.junit.Assert.*;
 
 public class LegacyEncodingMigrationTest {
     private static final Charset LEGACY = Charset.forName("windows-1252");
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {

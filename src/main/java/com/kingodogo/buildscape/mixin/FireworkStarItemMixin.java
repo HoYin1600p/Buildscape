@@ -20,14 +20,16 @@ import java.util.List;
 public abstract class FireworkStarItemMixin {
 
     @Inject(method = "appendHoverText(Lnet/minecraft/nbt/CompoundTag;Ljava/util/List;)V", at = @At("HEAD"), cancellable = true)
-    private static void buildscape$appendCustomShapeHoverText(CompoundTag tag, List<Component> tooltip, CallbackInfo ci) {
+    private static void buildscape$appendCustomShapeHoverText(CompoundTag tag, List<Component> tooltip,
+            CallbackInfo ci) {
         byte type = tag.getByte(NbtKeys.TYPE);
         if (CustomFireworkShapeRegistry.isCustomShape(type)) {
             String shapeTranslationKey = switch (type) {
                 case CustomFireworkShapeRegistry.CAKE_ID -> "item.minecraft.firework_star.shape.cake";
                 case CustomFireworkShapeRegistry.CROWN_ID -> "item.minecraft.firework_star.shape.crown";
                 case CustomFireworkShapeRegistry.TROPHY_ID -> "item.minecraft.firework_star.shape.trophy";
-                case CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID -> "item.minecraft.firework_star.shape.christmas_tree";
+                case CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID ->
+                    "item.minecraft.firework_star.shape.christmas_tree";
                 case CustomFireworkShapeRegistry.PRESENTS_ID -> "item.minecraft.firework_star.shape.presents";
                 case CustomFireworkShapeRegistry.CANDY_CANE_ID -> "item.minecraft.firework_star.shape.candy_cane";
                 case CustomFireworkShapeRegistry.PHOENIX_ID -> "item.minecraft.firework_star.shape.phoenix";
@@ -44,15 +46,18 @@ public abstract class FireworkStarItemMixin {
 
             int[] fadeColors = tag.getIntArray("FadeColors");
             if (fadeColors.length > 0) {
-                tooltip.add(appendColors((new TranslatableComponent("item.minecraft.firework_star.fade_to")).append(" ").withStyle(ChatFormatting.GRAY), fadeColors));
+                tooltip.add(appendColors((new TranslatableComponent("item.minecraft.firework_star.fade_to")).append(" ")
+                        .withStyle(ChatFormatting.GRAY), fadeColors));
             }
 
             if (tag.getBoolean(NbtKeys.FLICKER)) {
-                tooltip.add((new TranslatableComponent("item.minecraft.firework_star.flicker")).withStyle(ChatFormatting.GRAY));
+                tooltip.add((new TranslatableComponent("item.minecraft.firework_star.flicker"))
+                        .withStyle(ChatFormatting.GRAY));
             }
 
             if (tag.getBoolean(NbtKeys.TRAIL)) {
-                tooltip.add((new TranslatableComponent("item.minecraft.firework_star.trail")).withStyle(ChatFormatting.GRAY));
+                tooltip.add((new TranslatableComponent("item.minecraft.firework_star.trail"))
+                        .withStyle(ChatFormatting.GRAY));
             }
 
             ci.cancel();

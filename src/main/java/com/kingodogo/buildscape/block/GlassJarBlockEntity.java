@@ -173,9 +173,9 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
     private static boolean isPlainWater(ItemStack stack) {
         return stack.is(Items.WATER_BUCKET)
                 || (stack.getItem() instanceof PotionItem
-                && PotionUtils.getPotion(stack) == Potions.WATER
-                && (stack.getTag() == null || (!stack.getTag().contains("CustomPotionEffects")
-                && !stack.getTag().contains("CustomPotionColor"))));
+                        && PotionUtils.getPotion(stack) == Potions.WATER
+                        && (stack.getTag() == null || (!stack.getTag().contains("CustomPotionEffects")
+                                && !stack.getTag().contains("CustomPotionColor"))));
     }
 
     public static boolean isSameLiquid(ItemStack a, ItemStack b) {
@@ -266,7 +266,8 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
             triggerWobble();
             sync();
             return true;
-        } else if (stack.getItem() instanceof PotionItem || stack.getItem() instanceof HoneyBottleItem || stack.is(Items.EXPERIENCE_BOTTLE)) {
+        } else if (stack.getItem() instanceof PotionItem || stack.getItem() instanceof HoneyBottleItem
+                || stack.is(Items.EXPERIENCE_BOTTLE)) {
             if (isEmpty() || !hasLiquid()) {
                 storedLiquidItem = stack.copy();
                 storedLiquidItem.setCount(1);
@@ -366,7 +367,8 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
             if (tag.contains(NbtKeys.STORED_LIQUID_ITEM, 10)) {
                 CompoundTag liquidTag = tag.getCompound(NbtKeys.STORED_LIQUID_ITEM);
                 this.storedLiquidItem = ItemStack.of(liquidTag);
-                this.liquidLevel = Math.max(0, Math.min(getLiquidCap(this.storedLiquidItem), tag.getInt(NbtKeys.LIQUID_LEVEL)));
+                this.liquidLevel = Math.max(0,
+                        Math.min(getLiquidCap(this.storedLiquidItem), tag.getInt(NbtKeys.LIQUID_LEVEL)));
             } else {
                 this.storedLiquidItem = ItemStack.EMPTY;
                 this.liquidLevel = 0;

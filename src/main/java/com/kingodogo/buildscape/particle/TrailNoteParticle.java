@@ -32,7 +32,8 @@ public class TrailNoteParticle extends TextureSheetParticle {
         }
     }
 
-    protected TrailNoteParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+    protected TrailNoteParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed,
+            double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
 
@@ -137,7 +138,8 @@ public class TrailNoteParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z,
+                double xSpeed, double ySpeed, double zSpeed) {
             return new TrailNoteParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }

@@ -15,6 +15,8 @@ public abstract class WaterloggedGlassBlock extends AbstractGlassBlock {
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.getValue(BlockStateProperties.WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+        return state.getValue(BlockStateProperties.WATERLOGGED)
+                ? Fluids.WATER.getSource(false)
+                : super.getFluidState(state);
     }
 }

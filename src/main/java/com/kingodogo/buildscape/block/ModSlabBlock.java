@@ -18,8 +18,7 @@ public class ModSlabBlock extends SlabBlock {
 
     public ModSlabBlock(
             Block baseBlock,
-            BlockBehaviour.Properties properties
-    ) {
+            BlockBehaviour.Properties properties) {
         super(safeProperties(baseBlock, properties));
         this.baseBlock = baseBlock;
     }
@@ -27,15 +26,13 @@ public class ModSlabBlock extends SlabBlock {
     protected ModSlabBlock(
             Block baseBlock,
             BlockBehaviour.Properties properties,
-            boolean preserveProperties
-    ) {
+            boolean preserveProperties) {
         super(preserveProperties ? properties : safeProperties(baseBlock, properties));
         this.baseBlock = baseBlock;
     }
 
     public ModSlabBlock(
-            BlockBehaviour.Properties properties
-    ) {
+            BlockBehaviour.Properties properties) {
         super(properties);
         this.baseBlock = null;
     }
@@ -46,8 +43,7 @@ public class ModSlabBlock extends SlabBlock {
 
     private static BlockBehaviour.Properties safeProperties(
             Block baseBlock,
-            BlockBehaviour.Properties properties
-    ) {
+            BlockBehaviour.Properties properties) {
         if (baseBlock == null || baseBlock.defaultBlockState().getProperties().isEmpty()) {
             return properties;
         }
@@ -124,6 +120,7 @@ public class ModSlabBlock extends SlabBlock {
 
     @Override
     public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
-        return (this.isGlassLike() && adjacentBlockState.is(this)) || super.skipRendering(state, adjacentBlockState, side);
+        return (this.isGlassLike() && adjacentBlockState.is(this))
+                || super.skipRendering(state, adjacentBlockState, side);
     }
 }

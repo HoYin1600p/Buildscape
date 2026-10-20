@@ -64,15 +64,18 @@ public final class PipeSpillTest {
             double across = direction.getAxis() == Direction.Axis.X ? z : x;
             require(y >= base - 1e-6 && y <= lip + 1e-6, "bounded wedge height");
             if (distance == 0 && Math.abs(across - 0.5) < 1e-6) {
-                near(y, lip, "pipe lip matches"); lipSeen = true;
+                near(y, lip, "pipe lip matches");
+                lipSeen = true;
             }
             if (distance >= length - 1e-6) {
-                near(y, base, "taper joins original surface"); taperSeen = true;
+                near(y, base, "taper joins original surface");
+                taperSeen = true;
             }
             if (across == 0 || across == 1) {
                 near(y, base, "no side-edge cracks");
             }
-            near(v.u, x, "vanilla U retained"); near(v.v, z, "vanilla V retained");
+            near(v.u, x, "vanilla U retained");
+            near(v.v, z, "vanilla V retained");
             require(v.red == 47 && v.green == 105 && v.blue == 191 && v.alpha == 213,
                     "biome tint and alpha retained");
             require(v.lightU == 160 && v.lightV == 240, "lighting retained");
@@ -95,8 +98,10 @@ public final class PipeSpillTest {
         Capture output = new Capture();
         VertexConsumer c = new PipeSpillVertexConsumer(output, BlockPos.ZERO,
                 List.of(new PipeSpillVertexConsumer.Outlet(Direction.WEST, 0.7)));
-        point(c, 0, 0.4, 0, 0, 0); point(c, 0, 0.001, 0, 0, 1);
-        point(c, 1, 0.001, 0, 1, 1); point(c, 1, 0.4, 0, 1, 0);
+        point(c, 0, 0.4, 0, 0, 0);
+        point(c, 0, 0.001, 0, 0, 1);
+        point(c, 1, 0.001, 0, 1, 1);
+        point(c, 1, 0.4, 0, 1, 0);
         require(output.vertices.size() == 4, "side face preserved");
         near(output.vertices.get(1).y, 0.001, "side bottom unchanged");
     }
@@ -171,8 +176,10 @@ public final class PipeSpillTest {
         }
         require(neckVertices == 8 && perimeterVertices == 8, "each skirt connects both boundaries");
         int beforeSide = output.vertices.size();
-        point(c, x, y + 0.8, z + 0.001, 0, 0); point(c, x, y, z + 0.001, 0, 1);
-        point(c, x + 1, y, z + 0.001, 1, 1); point(c, x + 1, y + 0.75, z + 0.001, 1, 0);
+        point(c, x, y + 0.8, z + 0.001, 0, 0);
+        point(c, x, y, z + 0.001, 0, 1);
+        point(c, x + 1, y, z + 0.001, 1, 1);
+        point(c, x + 1, y + 0.75, z + 0.001, 1, 0);
         require(output.vertices.size() == beforeSide + 4, "vanilla side retained without duplicate geometry");
         near(output.vertices.get(beforeSide).y, y + 0.8, "vanilla side height preserved");
         near(output.vertices.get(beforeSide).z, z + 0.001, "vanilla side inset preserved");
@@ -184,7 +191,8 @@ public final class PipeSpillTest {
         }
     }
 
-    private static void top(VertexConsumer c, BlockPos pos, boolean reverse, double nw, double sw, double se, double ne) {
+    private static void top(VertexConsumer c, BlockPos pos, boolean reverse, double nw, double sw, double se,
+            double ne) {
         double x = pos.getX() & 15, y = pos.getY() & 15, z = pos.getZ() & 15;
         point(c, x, y + nw, z, 0, 0);
         if (reverse) {
@@ -215,21 +223,47 @@ public final class PipeSpillTest {
     }
 
     private record V(double x, double y, double z, float u, float v, int red, int green, int blue,
-                     int alpha, int lightU, int lightV) {}
+            int alpha, int lightU, int lightV) {
+    }
 
     private static final class Capture implements VertexConsumer {
         final List<V> vertices = new ArrayList<>();
         double x, y, z;
         float u, v;
         int r, g, b, a, lu, lv;
-        public VertexConsumer vertex(double x, double y, double z) { this.x=x; this.y=y; this.z=z; return this; }
-        public VertexConsumer color(int r, int g, int b, int a) { this.r=r; this.g=g; this.b=b; this.a=a; return this; }
-        public VertexConsumer uv(float u, float v) { this.u=u; this.v=v; return this; }
-        public VertexConsumer overlayCoords(int u, int v) { return this; }
-        public VertexConsumer uv2(int u, int v) { lu=u; lv=v; return this; }
-        public VertexConsumer normal(float x, float y, float z) { return this; }
+        public VertexConsumer vertex(double x, double y, double z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            return this;
+        }
+        public VertexConsumer color(int r, int g, int b, int a) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+            return this;
+        }
+        public VertexConsumer uv(float u, float v) {
+            this.u = u;
+            this.v = v;
+            return this;
+        }
+        public VertexConsumer overlayCoords(int u, int v) {
+            return this;
+        }
+        public VertexConsumer uv2(int u, int v) {
+            lu = u;
+            lv = v;
+            return this;
+        }
+        public VertexConsumer normal(float x, float y, float z) {
+            return this;
+        }
         public void defaultColor(int r, int g, int b, int a) {}
         public void unsetDefaultColor() {}
-        public void endVertex() { vertices.add(new V(x,y,z,u,v,r,g,b,a,lu,lv)); }
+        public void endVertex() {
+            vertices.add(new V(x, y, z, u, v, r, g, b, a, lu, lv));
+        }
     }
 }

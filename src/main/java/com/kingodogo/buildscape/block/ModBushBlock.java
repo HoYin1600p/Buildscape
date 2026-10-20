@@ -28,7 +28,8 @@ public class ModBushBlock extends BushBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hitResult) {
         ItemStack held = player.getItemInHand(hand);
         if (held.is(Items.BONE_MEAL)) {
             if (!level.isClientSide) {

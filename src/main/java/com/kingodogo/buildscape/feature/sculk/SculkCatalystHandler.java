@@ -18,15 +18,15 @@ public final class SculkCatalystHandler {
     private static final SculkDeathRules.ConsumptionGuard<LivingEntity> CONSUMPTION = new SculkDeathRules.ConsumptionGuard<>();
     private static final ThreadLocal<DeathCharge> ACTIVE_DEATH = new ThreadLocal<>();
 
-    private SculkCatalystHandler() {
-    }
+    private SculkCatalystHandler() {}
 
     public static void onDeath(LivingDeathEvent event) {
         LivingEntity entity = event.getEntityLiving();
         if (!(entity.level instanceof ServerLevel level) || event.isCanceled() || entity instanceof Player) {
             return;
         }
-        debug("death seen entity={} at {} in {}", entity.getUUID(), entity.blockPosition(), level.dimension().location());
+        debug("death seen entity={} at {} in {}", entity.getUUID(), entity.blockPosition(),
+                level.dimension().location());
         if (CONSUMPTION.isConsumed(entity)) {
             return;
         }
@@ -76,8 +76,7 @@ public final class SculkCatalystHandler {
         } finally {
             if (previous == null) {
                 ACTIVE_DEATH.remove();
-            }
-            else {
+            } else {
                 ACTIVE_DEATH.set(previous);
             }
         }
@@ -107,7 +106,8 @@ public final class SculkCatalystHandler {
             death.catalyst = catalyst;
             death.distance = distance;
         }
-        debug("catalyst offered entity={} catalyst={} distanceSquared={}", entity.getUUID(), catalyst.getBlockPos(), distance);
+        debug("catalyst offered entity={} catalyst={} distanceSquared={}", entity.getUUID(), catalyst.getBlockPos(),
+                distance);
         return true;
     }
 

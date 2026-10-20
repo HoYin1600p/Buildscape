@@ -84,8 +84,7 @@ public class ClientSetup {
     @SubscribeEvent
     public static void onRegisterClientReloadListeners(
             RegisterClientReloadListenersEvent event) {
-        ResourceManagerReloadListener listener = resourceManager ->
-                ClientBlockColorCatalog.invalidate();
+        ResourceManagerReloadListener listener = resourceManager -> ClientBlockColorCatalog.invalidate();
         event.registerReloadListener(listener);
     }
 
@@ -95,7 +94,6 @@ public class ClientSetup {
             ModWoodTypes.MANGROVE.getClass();
             ModWoodTypes.BAMBOO.getClass();
         });
-
 
         event.enqueueWork(() -> {
             ModKeyBinds.register();
@@ -108,8 +106,7 @@ public class ClientSetup {
         event.enqueueWork(() -> {
             MinecraftForgeClient.registerTooltipComponentFactory(
                     ShulkerBoxTooltipData.class,
-                    data -> data
-            );
+                    data -> data);
         });
 
         event.enqueueWork(() -> {
@@ -119,23 +116,10 @@ public class ClientSetup {
         event.enqueueWork(() -> {
             MenuScreens.register(
                     ModMenuTypes.BUILDERS_WORKBENCH_MENU.get(),
-                    BuildersWorkbenchScreen::new
-            );
+                    BuildersWorkbenchScreen::new);
             MenuScreens.register(
                     ModMenuTypes.BUILDERS_POUCH_MENU.get(),
-                    BuildersPouchScreen::new
-            );
-
-
-
-
-
-
-
-
-
-
-
+                    BuildersPouchScreen::new);
 
             BlockEntityRenderers.register(
                     ModBlockEntities.PILLAR_BLOCK_ENTITY
@@ -216,27 +200,6 @@ public class ClientSetup {
             EntityRenderers.register(
                     ModEntities.FESTIVE_WANDERING_HOMEMAKER.get(),
                     FestiveWanderingHomemakerRenderer::new);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             BlockColors blockColors = Minecraft
                     .getInstance().getBlockColors();
@@ -529,8 +492,7 @@ public class ClientSetup {
                         }
                         return 0x3F76E4;
                     },
-                    ModBlocks.CASCADE_BLOCK.get()
-            );
+                    ModBlocks.CASCADE_BLOCK.get());
 
             blockColors.register(
                     (state, reader, pos, tintIndex) -> {
@@ -542,8 +504,7 @@ public class ClientSetup {
                         }
                         return 0x3F76E4;
                     },
-                    ModBlocks.CASCADE_BLOCK_NO_MIST.get()
-            );
+                    ModBlocks.CASCADE_BLOCK_NO_MIST.get());
 
             blockColors.register(
                     (state, reader, pos, tintIndex) -> {
@@ -568,11 +529,11 @@ public class ClientSetup {
                                     try {
                                         if (colorCode != null
                                                 && colorCode.startsWith(
-                                                "#")
+                                                        "#")
                                                 && colorCode.length() == 7) {
                                             int color = Integer
                                                     .parseInt(colorCode
-                                                                    .substring(1),
+                                                            .substring(1),
                                                             16);
                                             return color | 0xFF000000;
                                         }
@@ -605,8 +566,7 @@ public class ClientSetup {
 
             itemColors.register(
                     (stack, tintIndex) -> tintIndex == 0 ? 0x3F76E4 : -1,
-                    ModItems.CASCADE_BLOCK.get()
-            );
+                    ModItems.CASCADE_BLOCK.get());
 
             itemColors.register(
                     (stack, tintIndex) -> {
@@ -629,13 +589,11 @@ public class ClientSetup {
                         }
                         return 0xFFB000;
                     },
-                    ModItems.INFINITE_PHOENIX_FIREWORK_STAR.get()
-            );
+                    ModItems.INFINITE_PHOENIX_FIREWORK_STAR.get());
 
             itemColors.register(
                     (stack, tintIndex) -> tintIndex == 0 ? 0x3F76E4 : -1,
-                    ModItems.CASCADE_BLOCK_NO_MIST.get()
-            );
+                    ModItems.CASCADE_BLOCK_NO_MIST.get());
 
             itemColors.register(
                     (stack, tintIndex) -> {
@@ -659,36 +617,36 @@ public class ClientSetup {
                                         0);
                             } else if (block == ModBlocks.JUNGLE_LEAF_HEDGE.get()
                                     || block == ModBlocks.JUNGLE_LEAF_LAYERS
-                                    .get()) {
+                                            .get()) {
                                 color = vanillaItemColors.getColor(
                                         new ItemStack(
                                                 Items.JUNGLE_LEAVES),
                                         0);
                             } else if (block == ModBlocks.ACACIA_LEAF_HEDGE.get()
                                     || block == ModBlocks.ACACIA_LEAF_LAYERS
-                                    .get()) {
+                                            .get()) {
                                 color = vanillaItemColors.getColor(
                                         new ItemStack(
                                                 Items.ACACIA_LEAVES),
                                         0);
                             } else if (block == ModBlocks.DARK_OAK_LEAF_HEDGE.get()
                                     || block == ModBlocks.DARK_OAK_LEAF_LAYERS
-                                    .get()) {
+                                            .get()) {
                                 color = vanillaItemColors.getColor(
                                         new ItemStack(
                                                 Items.DARK_OAK_LEAVES),
                                         0);
                             } else if (block == ModBlocks.SPRUCE_LEAF_HEDGE.get()
                                     || block == ModBlocks.SPRUCE_LEAF_LAYERS
-                                    .get()) {
+                                            .get()) {
                                 color = 0x619961;
                             } else if (block == ModBlocks.BIRCH_LEAF_HEDGE.get()
                                     || block == ModBlocks.BIRCH_LEAF_LAYERS
-                                    .get()) {
+                                            .get()) {
                                 color = 0x80a755;
                             } else if (block == ModBlocks.MANGROVE_LEAVES.get()
                                     || block == ModBlocks.MANGROVE_LEAF_LAYERS
-                                    .get()
+                                            .get()
                                     ||
                                     block == ModBlocks.MANGROVE_LEAF_HEDGE
                                             .get()) {
@@ -751,7 +709,8 @@ public class ClientSetup {
                                 if (biomeKey != null) {
                                     ClientLevel level = Minecraft.getInstance().level;
                                     if (level != null) {
-                                        Optional<? extends Registry<Biome>> registryOpt = level.registryAccess().registry(Registry.BIOME_REGISTRY);
+                                        Optional<? extends Registry<Biome>> registryOpt = level.registryAccess()
+                                                .registry(Registry.BIOME_REGISTRY);
                                         if (registryOpt.isPresent()) {
                                             Biome biome = registryOpt.get().get(biomeKey);
                                             if (biome != null) {
@@ -766,8 +725,7 @@ public class ClientSetup {
                     },
                     ModItems.COPPER_BIOME_BRUSH.get(),
                     ModItems.DIAMOND_BIOME_BRUSH.get(),
-                    ModItems.NETHERITE_BIOME_BRUSH.get()
-            );
+                    ModItems.NETHERITE_BIOME_BRUSH.get());
         });
     }
 
@@ -779,8 +737,7 @@ public class ClientSetup {
     @SubscribeEvent
     public static void onModelRegistry(ModelRegistryEvent event) {
         ForgeModelBakery.addSpecialModel(
-                new ResourceLocation(BuildScape.MODID, "block/stringlight_frame")
-        );
+                new ResourceLocation(BuildScape.MODID, "block/stringlight_frame"));
     }
 
     @SubscribeEvent

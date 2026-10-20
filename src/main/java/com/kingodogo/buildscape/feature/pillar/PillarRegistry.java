@@ -77,12 +77,11 @@ final class PillarRegistry {
             for (int j = 0; j < 36; j++) {
                 for (int k = 0; k < 36; k++) {
                     for (int l = 0; l < 36; l++) {
-                        String id =
-                                prefix +
-                                        c1 +
-                                        ALPHANUMERIC.charAt(j) +
-                                        ALPHANUMERIC.charAt(k) +
-                                        ALPHANUMERIC.charAt(l);
+                        String id = prefix +
+                                c1 +
+                                ALPHANUMERIC.charAt(j) +
+                                ALPHANUMERIC.charAt(k) +
+                                ALPHANUMERIC.charAt(l);
                         if (!pillarData.containsKey(id)) {
                             return id;
                         }
@@ -94,8 +93,7 @@ final class PillarRegistry {
         return prefix + Long.toString(System.currentTimeMillis(), 36);
     }
 
-    static final String ALPHANUMERIC =
-            "0123456789abcdefghijklmnopqrstuvwxyz";
+    static final String ALPHANUMERIC = "0123456789abcdefghijklmnopqrstuvwxyz";
 
     static String positionKey(String dimension, BlockPos pos) {
         return positionKey(dimension, pos, null);
@@ -199,7 +197,6 @@ final class PillarRegistry {
         return pillarData.size();
     }
 
-
     public Map<String, PillarData> copyDataSnapshot() {
         Map<String, PillarData> snapshot = new HashMap<>();
         for (Map.Entry<String, PillarData> entry : pillarData.entrySet()) {
@@ -279,7 +276,8 @@ final class PillarRegistry {
                 continue;
             }
             Direction facing = data.facing != null
-                    ? Direction.byName(data.facing) : null;
+                    ? Direction.byName(data.facing)
+                    : null;
             String key = positionKey(data.dimension, data.getBlockPos(), facing);
             PillarData previous = frames.get(key);
             if (previous == null) {
@@ -365,16 +363,13 @@ final class PillarRegistry {
         return false;
     }
 
-
     static String getVariantPrefix(Level level, BlockPos pos) {
         if (level == null || pos == null) {
             return PillarIdManager.PREFIX_STONE + "-P";
         }
 
-        if (
-                !level.isClientSide &&
-                        !BuildScape.isServerFullyInitialized()
-        ) {
+        if (!level.isClientSide &&
+                !BuildScape.isServerFullyInitialized()) {
             return PillarIdManager.PREFIX_STONE + "-P";
         }
 
@@ -388,11 +383,9 @@ final class PillarRegistry {
                 if (!(chunk instanceof LevelChunk)) {
                     return PillarIdManager.PREFIX_STONE + "-P";
                 }
-                if (
-                        !chunk
-                                .getStatus()
-                                .isOrAfter(ChunkStatus.FULL)
-                ) {
+                if (!chunk
+                        .getStatus()
+                        .isOrAfter(ChunkStatus.FULL)) {
                     return PillarIdManager.PREFIX_STONE + "-P";
                 }
             }
@@ -403,10 +396,8 @@ final class PillarRegistry {
         try {
             BlockState state = level.getBlockState(pos);
             Block block = state.getBlock();
-            String blockName =
-                    ForgeRegistries.BLOCKS.getKey(
-                            block
-                    ).getPath();
+            String blockName = ForgeRegistries.BLOCKS.getKey(
+                    block).getPath();
 
             if (blockName.contains("mossy")) {
                 return PillarIdManager.PREFIX_MOSSY + "-P";

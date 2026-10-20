@@ -17,16 +17,12 @@ import java.util.function.BiConsumer;
 
 public class MangroveLeaveVineDecorator extends TreeDecorator {
 
-    public static final Codec<MangroveLeaveVineDecorator> CODEC =
-            RecordCodecBuilder.create(instance ->
-                    instance
-                            .group(
-                                    Codec.floatRange(0.0F, 1.0F)
-                                            .fieldOf("probability")
-                                            .forGetter(decorator -> decorator.probability)
-                            )
-                            .apply(instance, MangroveLeaveVineDecorator::new)
-            );
+    public static final Codec<MangroveLeaveVineDecorator> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(
+                    Codec.floatRange(0.0F, 1.0F)
+                            .fieldOf("probability")
+                            .forGetter(decorator -> decorator.probability))
+            .apply(instance, MangroveLeaveVineDecorator::new));
 
     private final float probability;
 
@@ -45,8 +41,7 @@ public class MangroveLeaveVineDecorator extends TreeDecorator {
             BiConsumer<BlockPos, BlockState> blockSetter,
             Random random,
             List<BlockPos> logPositions,
-            List<BlockPos> leavesPositions
-    ) {
+            List<BlockPos> leavesPositions) {
         leavesPositions.forEach(pos -> {
             if (random.nextFloat() < probability) {
                 BlockPos belowPos = pos.below();

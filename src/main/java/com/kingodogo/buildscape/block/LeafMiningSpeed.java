@@ -18,8 +18,7 @@ public final class LeafMiningSpeed {
     private static final TagKey<Block> SHEARS_MINEABLE = BlockTags.create(
             new ResourceLocation(BuildScape.MODID, "shears_mineable"));
 
-    private LeafMiningSpeed() {
-    }
+    private LeafMiningSpeed() {}
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {

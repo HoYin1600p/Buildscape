@@ -23,7 +23,8 @@ public class BaseCoralPlantTypeBlockMixin {
     }
 
     @Inject(method = "scanForWater", at = @At("HEAD"), cancellable = true)
-    private static void onScanForWater(BlockState state, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+    private static void onScanForWater(BlockState state, BlockGetter level, BlockPos pos,
+            CallbackInfoReturnable<Boolean> cir) {
         for (Direction dir : Direction.values()) {
             if (level.getBlockState(pos.relative(dir)).is(ModBlocks.MUD.get())) {
                 cir.setReturnValue(true);

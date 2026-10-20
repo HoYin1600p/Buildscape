@@ -36,7 +36,8 @@ public class SmokeVentBlockEntity extends SyncedBlockEntity {
         int count = random.nextInt(2) + 2;
         for (int i = 0; i < count; i++) {
             double x = pos.getX() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);
-            double y = pos.getY() + SmokeVentBlock.SMOKE_SPAWN_BASE + random.nextDouble() * (2.0 - SmokeVentBlock.SMOKE_SPAWN_BASE);
+            double y = pos.getY() + SmokeVentBlock.SMOKE_SPAWN_BASE
+                    + random.nextDouble() * (2.0 - SmokeVentBlock.SMOKE_SPAWN_BASE);
             double z = pos.getZ() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);
             if (vent.getSmokeColor() != null) {
                 SmokeColorRegistry.registerColorForPosition(x, y, z, vent.getSmokeColor());

@@ -21,8 +21,7 @@ public class ColoredMossLayersBlock extends MossLayersBlock {
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         int layerCount = state.getValue(LAYERS);
         return List.of(new ItemStack(dropItem.get(), layerCount));
     }

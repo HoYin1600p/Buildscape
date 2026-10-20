@@ -22,7 +22,8 @@ public class CreakingHeartTreeDecorator extends TreeDecorator {
     }
 
     @Override
-    public void place(LevelSimulatedReader level, BiConsumer<BlockPos, BlockState> blockSetter, Random random, List<BlockPos> logPositions, List<BlockPos> leafPositions) {
+    public void place(LevelSimulatedReader level, BiConsumer<BlockPos, BlockState> blockSetter, Random random,
+            List<BlockPos> logPositions, List<BlockPos> leafPositions) {
         if (logPositions.isEmpty()) {
             return;
         }

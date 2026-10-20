@@ -24,11 +24,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.Set;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MuffBlockRenderer {
 
     private static final double MAX_RENDER_DISTANCE = 128.0;
@@ -118,7 +114,7 @@ public class MuffBlockRenderer {
     }
 
     private static void drawLine(VertexConsumer buffer, PoseStack poseStack,
-                                 double x1, double y1, double z1, double x2, double y2, double z2, int color) {
+            double x1, double y1, double z1, double x2, double y2, double z2, int color) {
         int r = (color >> 24) & 0xFF;
         int g = (color >> 16) & 0xFF;
         int b = (color >> 8) & 0xFF;

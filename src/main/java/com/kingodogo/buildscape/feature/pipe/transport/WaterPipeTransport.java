@@ -29,7 +29,8 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return Fluids.WATER;
     }
 
-    public record FlowStep(BlockPos pos, Direction arrivedFromDir, int distance) {}
+    public record FlowStep(BlockPos pos, Direction arrivedFromDir, int distance) {
+    }
 
     public Set<BlockPos> discoverComponent(PipeTopologyAccess topology, BlockPos startPos) {
         if (topology == null || startPos == null || !topology.isHollowPipe(startPos)) {
@@ -133,7 +134,7 @@ public class WaterPipeTransport extends PipeFluidTransport {
     }
 
     public boolean applyPreparedNetwork(Level level, PreparedNetwork prepared,
-                                        Map<BlockPos, PipeFlowState> newStates) {
+            Map<BlockPos, PipeFlowState> newStates) {
         if (level == null || level.isClientSide || prepared == null || newStates == null
                 || !prepared.matches(level)) {
             return false;
@@ -148,12 +149,14 @@ public class WaterPipeTransport extends PipeFluidTransport {
                         int delay = (oldState.getDistance() + 1) * 2;
                         hollowBe.setPendingFlowState(new PipeFlowState(), delay);
                         if (HollowPipeTransportManager.DEBUG_TRANSPORT) {
-                            HollowPipeTransportManager.logDebug(String.format("Draining fluid state at %s (delay: %d ticks)", pos, delay));
+                            HollowPipeTransportManager.logDebug(
+                                    String.format("Draining fluid state at %s (delay: %d ticks)", pos, delay));
                         }
                     }
                 }
                 BlockState pipeState = level.getBlockState(pos);
-                if (pipeState.hasProperty(HollowPipeBlock.WATER_LEVEL) && pipeState.getValue(HollowPipeBlock.WATER_LEVEL) > 0) {
+                if (pipeState.hasProperty(HollowPipeBlock.WATER_LEVEL)
+                        && pipeState.getValue(HollowPipeBlock.WATER_LEVEL) > 0) {
                     level.setBlock(pos, pipeState.setValue(HollowPipeBlock.WATER_LEVEL, 0), 2);
                 }
             }
@@ -194,7 +197,8 @@ public class WaterPipeTransport extends PipeFluidTransport {
             if (calculated.hasFluid()) {
                 handleOutflowToEndpoints(level, pos, pipeState, calculated);
                 Fluid flowingFluid = WorldPipeTopologyAccess.fluidById(calculated.getFluidId());
-                int delay = flowingFluid == Fluids.EMPTY ? Fluids.WATER.getTickDelay(level)
+                int delay = flowingFluid == Fluids.EMPTY
+                        ? Fluids.WATER.getTickDelay(level)
                         : flowingFluid.getTickDelay(level);
                 level.scheduleTick(pos, pipeState.getBlock(), delay);
             }
@@ -209,8 +213,7 @@ public class WaterPipeTransport extends PipeFluidTransport {
     public Map<BlockPos, PipeFlowState> calculateFlow(
             PipeTopologyAccess topology,
             Set<BlockPos> component,
-            List<BlockPos> sources
-    ) {
+            List<BlockPos> sources) {
         Map<BlockPos, PipeFlowState> newStates = new HashMap<>(component.size());
         for (BlockPos pos : component) {
             newStates.put(pos, new PipeFlowState());
@@ -234,7 +237,8 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 state.setInflowDirection(topology.getSourceInflowDirection(sourcePos));
 
                 BubbleColumnState baseState = state.hasWater()
-                        ? topology.getBubbleColumnBase(sourcePos) : BubbleColumnState.NONE;
+                        ? topology.getBubbleColumnBase(sourcePos)
+                        : BubbleColumnState.NONE;
                 if (baseState != null && baseState != BubbleColumnState.NONE) {
                     state.setBubbleColumn(baseState);
                 }
@@ -259,12 +263,15 @@ public class WaterPipeTransport extends PipeFluidTransport {
             }
 
             BubbleColumnState baseState = currFlow.hasWater()
-                    ? topology.getBubbleColumnBase(currPos) : BubbleColumnState.NONE;
-            if (baseState != null && baseState != BubbleColumnState.NONE && currFlow.getBubbleColumn() == BubbleColumnState.NONE) {
+                    ? topology.getBubbleColumnBase(currPos)
+                    : BubbleColumnState.NONE;
+            if (baseState != null && baseState != BubbleColumnState.NONE
+                    && currFlow.getBubbleColumn() == BubbleColumnState.NONE) {
                 currFlow.setBubbleColumn(baseState);
             }
 
-            List<Direction> prioritizedExits = getPrioritizedExitDirections(topology, currPos, inDir, currFlow.getBubbleColumn());
+            List<Direction> prioritizedExits = getPrioritizedExitDirections(topology, currPos, inDir,
+                    currFlow.getBubbleColumn());
 
             for (Direction exitDir : prioritizedExits) {
                 BlockPos nextPos = currPos.relative(exitDir);
@@ -272,7 +279,8 @@ public class WaterPipeTransport extends PipeFluidTransport {
 
                 if (nextFlow != null) {
                     boolean isDownwardDrop = (exitDir == Direction.DOWN);
-                    boolean isUpwardBubble = (exitDir == Direction.UP && currFlow.getBubbleColumn() == BubbleColumnState.UP);
+                    boolean isUpwardBubble = (exitDir == Direction.UP
+                            && currFlow.getBubbleColumn() == BubbleColumnState.UP);
 
                     int nextDist = (isDownwardDrop || isUpwardBubble) ? 0 : (dist + 1);
 
@@ -329,8 +337,8 @@ public class WaterPipeTransport extends PipeFluidTransport {
         }
 
         List<Map.Entry<BlockPos, PipeFlowState>> orderedStates = new ArrayList<>(newStates.entrySet());
-        orderedStates.sort(Comparator.comparingInt((Map.Entry<BlockPos, PipeFlowState> entry) ->
-                entry.getValue().getDistance()).reversed());
+        orderedStates.sort(Comparator
+                .comparingInt((Map.Entry<BlockPos, PipeFlowState> entry) -> entry.getValue().getDistance()).reversed());
         Map<BlockPos, Integer> branchMaxima = new HashMap<>(newStates.size());
         for (Map.Entry<BlockPos, PipeFlowState> entry : orderedStates) {
             PipeFlowState state = entry.getValue();
@@ -378,8 +386,7 @@ public class WaterPipeTransport extends PipeFluidTransport {
             PipeTopologyAccess topology,
             BlockPos pos,
             Direction inDir,
-            BubbleColumnState bubbleColumn
-    ) {
+            BubbleColumnState bubbleColumn) {
         List<Direction> validExits = new ArrayList<>();
 
         if (inDir != Direction.DOWN && topology.isConnected(pos, Direction.DOWN)) {
@@ -423,7 +430,7 @@ public class WaterPipeTransport extends PipeFluidTransport {
         private final boolean truncated;
 
         private PreparedNetwork(Set<BlockPos> component, List<BlockPos> sources, SnapshotTopology topology,
-                                boolean truncated) {
+                boolean truncated) {
             this.component = component;
             this.sources = sources;
             this.topology = topology;
@@ -460,8 +467,8 @@ public class WaterPipeTransport extends PipeFluidTransport {
     }
 
     private record SnapshotNode(Set<Direction> connections, Set<Direction> endpoints,
-                                BubbleColumnState bubbleColumn, String sourceFluidId,
-                                int initialDistance, Direction sourceInflow) {
+            BubbleColumnState bubbleColumn, String sourceFluidId,
+            int initialDistance, Direction sourceInflow) {
         private SnapshotNode {
             connections = Set.copyOf(connections);
             endpoints = Set.copyOf(endpoints);
@@ -543,14 +550,12 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 flow.getDistance(), flow.getFlowDirections());
     }
 
-    private void clearOutflow(Level level, BlockPos pos) {
-    }
+    private void clearOutflow(Level level, BlockPos pos) {}
 
     private void logPipeDebug(BlockPos pos, PipeFlowState flow, BlockState state, BubbleColumnState base) {
         HollowPipeTransportManager.logDebug(String.format(
                 "Conduit at %s: fluid=%s, isSource=%b, dist=%d, dirs=%s, bubble=%s, baseBelow=%s",
                 pos, flow.getFluidId(), flow.isSource(), flow.getDistance(),
-                flow.getFlowDirections(), flow.getBubbleColumn(), base
-        ));
+                flow.getFlowDirections(), flow.getBubbleColumn(), base));
     }
 }

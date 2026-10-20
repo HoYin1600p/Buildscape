@@ -18,16 +18,14 @@ public class WallBlockMixin {
 
     private static final TagKey<Block> WALLS_TAG = TagKey.create(
             Registry.BLOCK_REGISTRY,
-            new ResourceLocation("minecraft:walls")
-    );
+            new ResourceLocation("minecraft:walls"));
 
     @Inject(method = "connectsTo", at = @At("HEAD"), cancellable = true)
     private void connectsTo(
             BlockState state,
             boolean sideSolidFullSquare,
             Direction direction,
-            CallbackInfoReturnable<Boolean> cir
-    ) {
+            CallbackInfoReturnable<Boolean> cir) {
         Block block = state.getBlock();
         if (block instanceof WallBlock) {
             cir.setReturnValue(true);

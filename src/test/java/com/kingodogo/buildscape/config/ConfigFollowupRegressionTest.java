@@ -21,7 +21,8 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class ConfigFollowupRegressionTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {
@@ -46,7 +47,8 @@ public class ConfigFollowupRegressionTest {
         assertTrue(config.saveItemsToDisk(false));
         assertEquals(Set.of("Bad Id!", "#Bad Tag!", "minecraft:diamond", "#forge:gems"),
                 PillarParticleConfig.parseItems(Files.readString(file, StandardCharsets.UTF_8)));
-        assertEquals(original, Files.readString(directory.resolve("pillar-items.json.pre-4.0.5.bak"), StandardCharsets.UTF_8));
+        assertEquals(original,
+                Files.readString(directory.resolve("pillar-items.json.pre-4.0.5.bak"), StandardCharsets.UTF_8));
         config.loadItemsInternal(false);
         assertEquals(Set.of("Bad Id!", "#Bad Tag!"), config.getInvalidItems());
     }
@@ -101,22 +103,27 @@ public class ConfigFollowupRegressionTest {
         assertTrue(Files.readString(clientFile, StandardCharsets.UTF_8).contains("CustomLabel = \u96ea"));
         Path directory = temporary.newFolder().toPath();
         Path properties = directory.resolve("pillar-properties.json");
-        Files.writeString(properties, "{\"particle_density\":7,\"custom_label\":\"Caf\u00e9 \u96ea\"}", StandardCharsets.UTF_8);
+        Files.writeString(properties, "{\"particle_density\":7,\"custom_label\":\"Caf\u00e9 \u96ea\"}",
+                StandardCharsets.UTF_8);
         PillarParticleConfig config = new PillarParticleConfig(directory);
         loadProperties(config);
         assertTrue(config.canEditProperties());
         config.particle_density = 8;
         assertTrue(config.savePropertiesToDisk());
-        assertEquals("Caf\u00e9 \u96ea", ConfigLayoutIO.readProperties(Files.readString(properties, StandardCharsets.UTF_8))
-                .get("custom_label").getAsString());
+        assertEquals("Caf\u00e9 \u96ea",
+                ConfigLayoutIO.readProperties(Files.readString(properties, StandardCharsets.UTF_8))
+                        .get("custom_label").getAsString());
         Path items = directory.resolve("pillar-items.json");
-        Files.writeString(items, "{\"defaults_version\":405,\"items\":[\"Caf\u00e9 \u96ea\",\"minecraft:stick\"]}", StandardCharsets.UTF_8);
+        Files.writeString(items, "{\"defaults_version\":405,\"items\":[\"Caf\u00e9 \u96ea\",\"minecraft:stick\"]}",
+                StandardCharsets.UTF_8);
         config.loadItemsInternal(false);
         config.editItems(Set.of("minecraft:diamond"));
         assertTrue(config.saveItemsToDisk(false));
-        assertTrue(PillarParticleConfig.parseItems(Files.readString(items, StandardCharsets.UTF_8)).contains("Caf\u00e9 \u96ea"));
+        assertTrue(PillarParticleConfig.parseItems(Files.readString(items, StandardCharsets.UTF_8))
+                .contains("Caf\u00e9 \u96ea"));
         Path presets = directory.resolve("pillar-presets.json");
-        Files.writeString(presets, "{\"default\":{\"name\":\"Caf\u00e9 \u96ea\",\"items\":[]}}", StandardCharsets.UTF_8);
+        Files.writeString(presets, "{\"default\":{\"name\":\"Caf\u00e9 \u96ea\",\"items\":[]}}",
+                StandardCharsets.UTF_8);
         PresetsConfig presetConfig = new PresetsConfig(directory);
         presetConfig.load();
         assertTrue(presetConfig.canEdit());

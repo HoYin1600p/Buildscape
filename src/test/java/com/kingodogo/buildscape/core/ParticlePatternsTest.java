@@ -56,7 +56,8 @@ public class ParticlePatternsTest {
         if (element.isJsonObject()) {
             for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
                 JsonElement value = entry.getValue();
-                if (entry.getKey().equals("pattern") && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
+                if (entry.getKey().equals("pattern") && value.isJsonPrimitive()
+                        && value.getAsJsonPrimitive().isString()) {
                     into.add(value.getAsString());
                 } else {
                     collectPatterns(value, into);

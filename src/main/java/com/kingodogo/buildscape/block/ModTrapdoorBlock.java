@@ -22,8 +22,7 @@ public class ModTrapdoorBlock extends TrapDoorBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -31,8 +30,7 @@ public class ModTrapdoorBlock extends TrapDoorBlock {
     public float getShadeBrightness(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return 1.0F;
     }
 
@@ -40,8 +38,7 @@ public class ModTrapdoorBlock extends TrapDoorBlock {
     public boolean propagatesSkylightDown(
             BlockState state,
             BlockGetter reader,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return true;
     }
 
@@ -59,8 +56,7 @@ public class ModTrapdoorBlock extends TrapDoorBlock {
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentState,
-            Direction side
-    ) {
+            Direction side) {
         if (adjacentState.is(this)) {
             boolean stateOpen = state.getValue(TrapDoorBlock.OPEN);
             boolean adjacentOpen = adjacentState.getValue(TrapDoorBlock.OPEN);

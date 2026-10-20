@@ -53,8 +53,8 @@ public final class RecipeManagerInjectorTest {
                 "Named recipe index did not include the new recipe");
 
         PlainRecipe disabledPlain = new PlainRecipe("crafting", "buildscape:disabled");
-        RecipeManagerInjector.Indexes<String, String, PlainRecipe> withDisabled =
-                RecipeManagerInjector.mergeIndexesGeneric(
+        RecipeManagerInjector.Indexes<String, String, PlainRecipe> withDisabled = RecipeManagerInjector
+                .mergeIndexesGeneric(
                         Map.of("crafting", Map.of(vanillaPlain.id(), vanillaPlain)),
                         Map.of(vanillaPlain.id(), vanillaPlain),
                         List.of(disabledPlain, addedPlain), PlainRecipe::type, PlainRecipe::id,

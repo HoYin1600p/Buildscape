@@ -45,12 +45,14 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 public class GlowLightsBlock
-        extends VineBlock
-        implements EntityBlock, SimpleWaterloggedBlock {
+        extends
+            VineBlock
+        implements
+            EntityBlock,
+            SimpleWaterloggedBlock {
 
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 
     private static final VoxelShape SHAPE_NORTH = Block.box(
@@ -59,48 +61,42 @@ public class GlowLightsBlock
             0.0D,
             16.0D,
             16.0D,
-            1.0D
-    );
+            1.0D);
     private static final VoxelShape SHAPE_SOUTH = Block.box(
             0.0D,
             0.0D,
             15.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_EAST = Block.box(
             15.0D,
             0.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_WEST = Block.box(
             0.0D,
             0.0D,
             0.0D,
             1.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_UP = Block.box(
             0.0D,
             15.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_DOWN = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             1.0D,
-            16.0D
-    );
+            16.0D);
 
     public GlowLightsBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -113,14 +109,12 @@ public class GlowLightsBlock
                         .setValue(VineBlock.UP, false)
                         .setValue(DOWN, false)
                         .setValue(WATERLOGGED, false)
-                        .setValue(LIT, true)
-        );
+                        .setValue(LIT, true));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(DOWN, WATERLOGGED, LIT);
     }
@@ -129,8 +123,7 @@ public class GlowLightsBlock
     public int getLightEmission(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.getValue(LIT) ? 15 : 0;
     }
 
@@ -139,28 +132,22 @@ public class GlowLightsBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         VoxelShape shape = Shapes.empty();
         if (state.getValue(VineBlock.NORTH)) {
-            shape =
-                Shapes.or(shape, SHAPE_NORTH);
+            shape = Shapes.or(shape, SHAPE_NORTH);
         }
         if (state.getValue(VineBlock.SOUTH)) {
-            shape =
-                Shapes.or(shape, SHAPE_SOUTH);
+            shape = Shapes.or(shape, SHAPE_SOUTH);
         }
         if (state.getValue(VineBlock.EAST)) {
-            shape =
-                Shapes.or(shape, SHAPE_EAST);
+            shape = Shapes.or(shape, SHAPE_EAST);
         }
         if (state.getValue(VineBlock.WEST)) {
-            shape =
-                Shapes.or(shape, SHAPE_WEST);
+            shape = Shapes.or(shape, SHAPE_WEST);
         }
         if (state.getValue(VineBlock.UP)) {
-            shape =
-                Shapes.or(shape, SHAPE_UP);
+            shape = Shapes.or(shape, SHAPE_UP);
         }
         if (state.getValue(DOWN)) {
             shape = Shapes.or(shape, SHAPE_DOWN);
@@ -172,41 +159,30 @@ public class GlowLightsBlock
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos clickedPos = context.getClickedPos();
         BlockState blockState = context.getLevel().getBlockState(clickedPos);
-        boolean isExistingGlowLight = blockState.getBlock() instanceof
-                GlowLightsBlock;
+        boolean isExistingGlowLight = blockState.getBlock() instanceof GlowLightsBlock;
 
         Direction clickedFace = context.getClickedFace();
         Direction attachDirection = clickedFace.getOpposite();
 
-        if (
-                isExistingGlowLight &&
-                        context.getPlayer() != null &&
-                        context.getPlayer().isShiftKeyDown()
-        ) {
+        if (isExistingGlowLight &&
+                context.getPlayer() != null &&
+                context.getPlayer().isShiftKeyDown()) {
             return null;
         }
 
-        if (
-                isExistingGlowLight &&
-                        !(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())
-        ) {
+        if (isExistingGlowLight &&
+                !(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
             if (blockState.getBlock() == this) {
-                BooleanProperty property =
-                        VineBlock.getPropertyForFace(
-                                attachDirection
-                        );
-                if (
-                        property != null &&
-                                blockState.hasProperty(property) &&
-                                blockState.getValue(property)
-                ) {
+                BooleanProperty property = VineBlock.getPropertyForFace(
+                        attachDirection);
+                if (property != null &&
+                        blockState.hasProperty(property) &&
+                        blockState.getValue(property)) {
                     return null;
                 }
-                if (
-                        attachDirection == Direction.DOWN &&
-                                blockState.hasProperty(DOWN) &&
-                                blockState.getValue(DOWN)
-                ) {
+                if (attachDirection == Direction.DOWN &&
+                        blockState.hasProperty(DOWN) &&
+                        blockState.getValue(DOWN)) {
                     return null;
                 }
             }
@@ -220,14 +196,11 @@ public class GlowLightsBlock
                 BooleanProperty attachProperty = attachToGlow == Direction.DOWN
                         ? DOWN
                         : VineBlock.getPropertyForFace(
-                        attachToGlow
-                );
+                                attachToGlow);
 
-                if (
-                        attachProperty != null &&
-                                originalState.hasProperty(attachProperty) &&
-                                originalState.getValue(attachProperty)
-                ) {
+                if (attachProperty != null &&
+                        originalState.hasProperty(attachProperty) &&
+                        originalState.getValue(attachProperty)) {
                     return null;
                 }
 
@@ -250,59 +223,39 @@ public class GlowLightsBlock
                     state = blockState;
                 } else {
                     state = this.defaultBlockState();
-                    if (
-                            blockState.hasProperty(VineBlock.UP)
-                    ) {
+                    if (blockState.hasProperty(VineBlock.UP)) {
                         state = state.setValue(
-                            VineBlock.UP,
-                            blockState.getValue(VineBlock.UP)
-                    );
+                                VineBlock.UP,
+                                blockState.getValue(VineBlock.UP));
                     }
                     if (blockState.hasProperty(DOWN)) {
                         state = state.setValue(
-                            DOWN,
-                            blockState.getValue(DOWN)
-                    );
+                                DOWN,
+                                blockState.getValue(DOWN));
                     }
-                    if (
-                            blockState.hasProperty(
-                                    VineBlock.NORTH
-                            )
-                    ) {
+                    if (blockState.hasProperty(
+                            VineBlock.NORTH)) {
                         state = state.setValue(
-                            VineBlock.NORTH,
-                            blockState.getValue(VineBlock.NORTH)
-                    );
+                                VineBlock.NORTH,
+                                blockState.getValue(VineBlock.NORTH));
                     }
-                    if (
-                            blockState.hasProperty(
-                                    VineBlock.SOUTH
-                            )
-                    ) {
+                    if (blockState.hasProperty(
+                            VineBlock.SOUTH)) {
                         state = state.setValue(
-                            VineBlock.SOUTH,
-                            blockState.getValue(VineBlock.SOUTH)
-                    );
+                                VineBlock.SOUTH,
+                                blockState.getValue(VineBlock.SOUTH));
                     }
-                    if (
-                            blockState.hasProperty(
-                                    VineBlock.EAST
-                            )
-                    ) {
+                    if (blockState.hasProperty(
+                            VineBlock.EAST)) {
                         state = state.setValue(
-                            VineBlock.EAST,
-                            blockState.getValue(VineBlock.EAST)
-                    );
+                                VineBlock.EAST,
+                                blockState.getValue(VineBlock.EAST));
                     }
-                    if (
-                            blockState.hasProperty(
-                                    VineBlock.WEST
-                            )
-                    ) {
+                    if (blockState.hasProperty(
+                            VineBlock.WEST)) {
                         state = state.setValue(
-                            VineBlock.WEST,
-                            blockState.getValue(VineBlock.WEST)
-                    );
+                                VineBlock.WEST,
+                                blockState.getValue(VineBlock.WEST));
                     }
                 }
             } else {
@@ -324,59 +277,39 @@ public class GlowLightsBlock
                     state = blockState;
                 } else {
                     state = this.defaultBlockState();
-                    if (
-                            blockState.hasProperty(VineBlock.UP)
-                    ) {
+                    if (blockState.hasProperty(VineBlock.UP)) {
                         state = state.setValue(
-                            VineBlock.UP,
-                            blockState.getValue(VineBlock.UP)
-                    );
+                                VineBlock.UP,
+                                blockState.getValue(VineBlock.UP));
                     }
                     if (blockState.hasProperty(DOWN)) {
                         state = state.setValue(
-                            DOWN,
-                            blockState.getValue(DOWN)
-                    );
+                                DOWN,
+                                blockState.getValue(DOWN));
                     }
-                    if (
-                            blockState.hasProperty(
-                                    VineBlock.NORTH
-                            )
-                    ) {
+                    if (blockState.hasProperty(
+                            VineBlock.NORTH)) {
                         state = state.setValue(
-                            VineBlock.NORTH,
-                            blockState.getValue(VineBlock.NORTH)
-                    );
+                                VineBlock.NORTH,
+                                blockState.getValue(VineBlock.NORTH));
                     }
-                    if (
-                            blockState.hasProperty(
-                                    VineBlock.SOUTH
-                            )
-                    ) {
+                    if (blockState.hasProperty(
+                            VineBlock.SOUTH)) {
                         state = state.setValue(
-                            VineBlock.SOUTH,
-                            blockState.getValue(VineBlock.SOUTH)
-                    );
+                                VineBlock.SOUTH,
+                                blockState.getValue(VineBlock.SOUTH));
                     }
-                    if (
-                            blockState.hasProperty(
-                                    VineBlock.EAST
-                            )
-                    ) {
+                    if (blockState.hasProperty(
+                            VineBlock.EAST)) {
                         state = state.setValue(
-                            VineBlock.EAST,
-                            blockState.getValue(VineBlock.EAST)
-                    );
+                                VineBlock.EAST,
+                                blockState.getValue(VineBlock.EAST));
                     }
-                    if (
-                            blockState.hasProperty(
-                                    VineBlock.WEST
-                            )
-                    ) {
+                    if (blockState.hasProperty(
+                            VineBlock.WEST)) {
                         state = state.setValue(
-                            VineBlock.WEST,
-                            blockState.getValue(VineBlock.WEST)
-                    );
+                                VineBlock.WEST,
+                                blockState.getValue(VineBlock.WEST));
                     }
                 }
             } else {
@@ -385,8 +318,7 @@ public class GlowLightsBlock
 
             state = state.setValue(
                     VineBlock.UP,
-                    true
-            );
+                    true);
             BlockPos placePos = context.getClickedPos();
             FluidState fluidState = context.getLevel().getFluidState(placePos);
             return state
@@ -400,13 +332,10 @@ public class GlowLightsBlock
                 BooleanProperty property = attachDirection == Direction.DOWN
                         ? DOWN
                         : VineBlock.getPropertyForFace(
-                        attachDirection
-                );
-                if (
-                        property != null &&
-                                blockState.hasProperty(property) &&
-                                blockState.getValue(property)
-                ) {
+                                attachDirection);
+                if (property != null &&
+                        blockState.hasProperty(property) &&
+                        blockState.getValue(property)) {
                     return null;
                 }
             }
@@ -415,63 +344,44 @@ public class GlowLightsBlock
                 state = blockState;
             } else {
                 state = this.defaultBlockState();
-                if (
-                        blockState.hasProperty(VineBlock.UP)
-                ) {
+                if (blockState.hasProperty(VineBlock.UP)) {
                     state = state.setValue(
-                        VineBlock.UP,
-                        blockState.getValue(VineBlock.UP)
-                );
+                            VineBlock.UP,
+                            blockState.getValue(VineBlock.UP));
                 }
                 if (blockState.hasProperty(DOWN)) {
                     state = state.setValue(
-                        DOWN,
-                        blockState.getValue(DOWN)
-                );
+                            DOWN,
+                            blockState.getValue(DOWN));
                 }
-                if (
-                        blockState.hasProperty(
-                                VineBlock.NORTH
-                        )
-                ) {
+                if (blockState.hasProperty(
+                        VineBlock.NORTH)) {
                     state = state.setValue(
-                        VineBlock.NORTH,
-                        blockState.getValue(VineBlock.NORTH)
-                );
+                            VineBlock.NORTH,
+                            blockState.getValue(VineBlock.NORTH));
                 }
-                if (
-                        blockState.hasProperty(
-                                VineBlock.SOUTH
-                        )
-                ) {
+                if (blockState.hasProperty(
+                        VineBlock.SOUTH)) {
                     state = state.setValue(
-                        VineBlock.SOUTH,
-                        blockState.getValue(VineBlock.SOUTH)
-                );
+                            VineBlock.SOUTH,
+                            blockState.getValue(VineBlock.SOUTH));
                 }
-                if (
-                        blockState.hasProperty(VineBlock.EAST)
-                ) {
+                if (blockState.hasProperty(VineBlock.EAST)) {
                     state = state.setValue(
-                        VineBlock.EAST,
-                        blockState.getValue(VineBlock.EAST)
-                );
+                            VineBlock.EAST,
+                            blockState.getValue(VineBlock.EAST));
                 }
-                if (
-                        blockState.hasProperty(VineBlock.WEST)
-                ) {
+                if (blockState.hasProperty(VineBlock.WEST)) {
                     state = state.setValue(
-                        VineBlock.WEST,
-                        blockState.getValue(VineBlock.WEST)
-                );
+                            VineBlock.WEST,
+                            blockState.getValue(VineBlock.WEST));
                 }
             }
 
             BooleanProperty property = attachDirection == Direction.DOWN
                     ? DOWN
                     : VineBlock.getPropertyForFace(
-                    attachDirection
-            );
+                            attachDirection);
             if (property != null && state.hasProperty(property)) {
                 if (!state.getValue(property)) {
                     state = state.setValue(property, true);
@@ -505,29 +415,21 @@ public class GlowLightsBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
 
-        BooleanProperty faceProperty =
-                VineBlock.getPropertyForFace(direction);
-        if (
-                faceProperty != null &&
-                        state.hasProperty(faceProperty) &&
-                        state.getValue(faceProperty)
-        ) {
-            if (
-                    !canAttachTo(level, neighborState, neighborPos, direction.getOpposite())
-            ) {
+        BooleanProperty faceProperty = VineBlock.getPropertyForFace(direction);
+        if (faceProperty != null &&
+                state.hasProperty(faceProperty) &&
+                state.getValue(faceProperty)) {
+            if (!canAttachTo(level, neighborState, neighborPos, direction.getOpposite())) {
                 state = state.setValue(faceProperty, false);
             }
         }
         if (direction == Direction.DOWN && state.getValue(DOWN)) {
-            if (
-                    !canAttachTo(level, neighborState, neighborPos, direction.getOpposite())
-            ) {
+            if (!canAttachTo(level, neighborState, neighborPos, direction.getOpposite())) {
                 state = state.setValue(DOWN, false);
             }
         }
@@ -550,8 +452,7 @@ public class GlowLightsBlock
     public boolean canSurvive(
             BlockState state,
             LevelReader level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return hasAnyFace(state);
     }
 
@@ -559,8 +460,7 @@ public class GlowLightsBlock
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         Item heldItem = context.getItemInHand().getItem();
         if (heldItem instanceof BlockItem) {
-            Block heldBlock =
-                    ((BlockItem) heldItem).getBlock();
+            Block heldBlock = ((BlockItem) heldItem).getBlock();
 
             if (!(heldBlock instanceof GlowLightsBlock)) {
                 return false;
@@ -575,8 +475,7 @@ public class GlowLightsBlock
             BooleanProperty property = attachDirection == Direction.DOWN
                     ? DOWN
                     : VineBlock.getPropertyForFace(
-                    attachDirection
-            );
+                            attachDirection);
 
             if (property != null && state.getBlock() == heldBlock) {
                 return !state.hasProperty(property) || !state.getValue(property);
@@ -603,7 +502,8 @@ public class GlowLightsBlock
         int count = 0;
         for (Direction direction : Direction.values()) {
             BooleanProperty property = direction == Direction.DOWN
-                    ? DOWN : VineBlock.getPropertyForFace(direction);
+                    ? DOWN
+                    : VineBlock.getPropertyForFace(direction);
             if (state.getValue(property)) {
                 count++;
             }
@@ -612,22 +512,19 @@ public class GlowLightsBlock
     }
 
     private boolean hasAnyFace(BlockState state) {
-        return (
-                state.getValue(VineBlock.NORTH) ||
-                        state.getValue(VineBlock.EAST) ||
-                        state.getValue(VineBlock.SOUTH) ||
-                        state.getValue(VineBlock.WEST) ||
-                        state.getValue(VineBlock.UP) ||
-                        state.getValue(DOWN)
-        );
+        return (state.getValue(VineBlock.NORTH) ||
+                state.getValue(VineBlock.EAST) ||
+                state.getValue(VineBlock.SOUTH) ||
+                state.getValue(VineBlock.WEST) ||
+                state.getValue(VineBlock.UP) ||
+                state.getValue(DOWN));
     }
 
     private boolean canAttachTo(
             BlockGetter level,
             BlockState state,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         if (state.isAir()) {
             return false;
         }
@@ -647,8 +544,7 @@ public class GlowLightsBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -667,8 +563,7 @@ public class GlowLightsBlock
                         SoundEvents.STONE_BUTTON_CLICK_OFF,
                         SoundSource.BLOCKS,
                         0.3f,
-                        1.0f
-                );
+                        1.0f);
             } else {
                 level.playSound(
                         null,
@@ -676,8 +571,7 @@ public class GlowLightsBlock
                         SoundEvents.STONE_BUTTON_CLICK_ON,
                         SoundSource.BLOCKS,
                         0.3f,
-                        1.0f
-                );
+                        1.0f);
             }
 
             return InteractionResult.SUCCESS;
@@ -686,26 +580,19 @@ public class GlowLightsBlock
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof GlowLightsBlockEntity glowBE) {
             Map.Entry<String, String> dyeInfo = getDyeColorAndName(
-                    heldItem
-            );
+                    heldItem);
             if (dyeInfo != null) {
                 if (!glowBE.canAddMoreColors()) {
-                    TextComponent message =
-                            new TextComponent(
-                                    "Glow Lights already has " +
-                                            GlowLightsBlockEntity.MAX_DYE_COLORS +
-                                            " colors! Break and replace to reset."
-                            );
+                    TextComponent message = new TextComponent(
+                            "Glow Lights already has " +
+                                    GlowLightsBlockEntity.MAX_DYE_COLORS +
+                                    " colors! Break and replace to reset.");
                     message.withStyle(ChatFormatting.RED);
                     if (player instanceof ServerPlayer) {
                         ModMessages.INSTANCE.send(
-                                PacketDistributor.PLAYER.with(() ->
-                                        (ServerPlayer) player
-                                ),
+                                PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
                                 new ActionBarMessagePacket(
-                                        message
-                                )
-                        );
+                                        message));
                     }
                     return InteractionResult.CONSUME;
                 }
@@ -725,30 +612,22 @@ public class GlowLightsBlock
                             SoundEvents.DYE_USE,
                             SoundSource.BLOCKS,
                             1.0f,
-                            1.0f
-                    );
+                            1.0f);
 
                     int colorCount = glowBE.getDyeColorCount();
-                    String progressText =
-                            " (" +
-                                    colorCount +
-                                    "/" +
-                                    GlowLightsBlockEntity.MAX_DYE_COLORS +
-                                    ")";
-                    TextComponent message =
-                            new TextComponent(
-                                    "Glow Lights color added: " + dyeName + progressText
-                            );
+                    String progressText = " (" +
+                            colorCount +
+                            "/" +
+                            GlowLightsBlockEntity.MAX_DYE_COLORS +
+                            ")";
+                    TextComponent message = new TextComponent(
+                            "Glow Lights color added: " + dyeName + progressText);
                     message.withStyle(ChatFormatting.GREEN);
                     if (player instanceof ServerPlayer) {
                         ModMessages.INSTANCE.send(
-                                PacketDistributor.PLAYER.with(() ->
-                                        (ServerPlayer) player
-                                ),
+                                PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
                                 new ActionBarMessagePacket(
-                                        message
-                                )
-                        );
+                                        message));
                     }
 
                     return InteractionResult.SUCCESS;
@@ -761,8 +640,7 @@ public class GlowLightsBlock
 
     @Nullable
     private Map.Entry<String, String> getDyeColorAndName(
-            ItemStack stack
-    ) {
+            ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return null;
         }

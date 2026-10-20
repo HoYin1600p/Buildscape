@@ -27,10 +27,11 @@ public class PipeFlowState {
     private int maxDistance = 0;
     private boolean isOpenEndpoint = false;
 
-    public PipeFlowState() {
-    }
+    public PipeFlowState() {}
 
-    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, @Nullable Direction inflowDirection, BubbleColumnState bubbleColumn, int distance, int maxDistance, boolean isOpenEndpoint) {
+    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections,
+            @Nullable Direction inflowDirection, BubbleColumnState bubbleColumn, int distance, int maxDistance,
+            boolean isOpenEndpoint) {
         this.fluidId = hasWater ? WATER_FLUID_ID : "";
         this.isSource = isSource;
         if (flowDirections != null) {
@@ -43,11 +44,13 @@ public class PipeFlowState {
         this.isOpenEndpoint = isOpenEndpoint;
     }
 
-    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, BubbleColumnState bubbleColumn, int distance, int maxDistance, boolean isOpenEndpoint) {
+    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections,
+            BubbleColumnState bubbleColumn, int distance, int maxDistance, boolean isOpenEndpoint) {
         this(hasWater, isSource, flowDirections, null, bubbleColumn, distance, maxDistance, isOpenEndpoint);
     }
 
-    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, BubbleColumnState bubbleColumn, int distance) {
+    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections,
+            BubbleColumnState bubbleColumn, int distance) {
         this(hasWater, isSource, flowDirections, null, bubbleColumn, distance, 0, false);
     }
 
@@ -129,11 +132,19 @@ public class PipeFlowState {
         this.distance = distance;
     }
 
-    public int getMaxDistance() { return maxDistance; }
-    public void setMaxDistance(int maxDistance) { this.maxDistance = Math.max(0, maxDistance); }
+    public int getMaxDistance() {
+        return maxDistance;
+    }
+    public void setMaxDistance(int maxDistance) {
+        this.maxDistance = Math.max(0, maxDistance);
+    }
 
-    public boolean isOpenEndpoint() { return isOpenEndpoint; }
-    public void setOpenEndpoint(boolean openEndpoint) { isOpenEndpoint = openEndpoint; }
+    public boolean isOpenEndpoint() {
+        return isOpenEndpoint;
+    }
+    public void setOpenEndpoint(boolean openEndpoint) {
+        isOpenEndpoint = openEndpoint;
+    }
 
     public boolean isEmpty() {
         return !hasFluid() && !isSource && flowDirections.isEmpty() && inflowDirection == null
@@ -232,7 +243,8 @@ public class PipeFlowState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fluidId, isSource, flowDirections, inflowDirection, bubbleColumn, distance, maxDistance, isOpenEndpoint);
+        return Objects.hash(fluidId, isSource, flowDirections, inflowDirection, bubbleColumn, distance, maxDistance,
+                isOpenEndpoint);
     }
 
     @Override

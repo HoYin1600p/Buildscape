@@ -28,9 +28,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
  */
 final class PillarFrames {
 
-    private PillarFrames() {
-    }
-
+    private PillarFrames() {}
 
     static void clearFrameData(Entity frame) {
         clearFrameData(frame.getPersistentData());
@@ -59,7 +57,8 @@ final class PillarFrames {
             return;
         }
         for (ServerLevel level : server.getAllLevels()) {
-            if (!Objects.equals(PillarIdManager.getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) {
+            if (!Objects.equals(PillarIdManager.getDimensionKey(level), data.dimension)
+                    || !level.hasChunkAt(data.getBlockPos())) {
                 continue;
             }
             for (Entity entity : level.getEntities(null,
@@ -98,7 +97,8 @@ final class PillarFrames {
         }
         boolean written = false;
         for (ServerLevel level : server.getAllLevels()) {
-            if (!Objects.equals(PillarIdManager.getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) {
+            if (!Objects.equals(PillarIdManager.getDimensionKey(level), data.dimension)
+                    || !level.hasChunkAt(data.getBlockPos())) {
                 continue;
             }
             for (Entity entity : level.getEntities(null,
@@ -184,7 +184,7 @@ final class PillarFrames {
     }
 
     static boolean prepareFrameRegistration(PillarIdManager m, CompoundTag tag, String dimension, BlockPos pos,
-                                             Direction facing) {
+            Direction facing) {
         if (!m.registry.isRemovedFrame(tag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID), dimension, pos, facing)) {
             return true;
         }
@@ -303,7 +303,6 @@ final class PillarFrames {
         }
     }
 
-
     static void registerColoredItemFrame(PillarIdManager m, ColoredItemFrameEntity frame) {
         registerColoredItemFrame(m, frame, false);
     }
@@ -365,8 +364,7 @@ final class PillarFrames {
             String color = frame.getColorVariant();
             if (color == null || color.isEmpty()) {
                 color = "white";
-            }
-            else {
+            } else {
                 color = color.toLowerCase(Locale.ROOT);
             }
 
@@ -392,8 +390,7 @@ final class PillarFrames {
             String color = frame.getColorVariant();
             if (color == null || color.isEmpty()) {
                 color = "white";
-            }
-            else {
+            } else {
                 color = color.toLowerCase(Locale.ROOT);
             }
             String expectedType = "buildscape:" + color + "_item_frame";

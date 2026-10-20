@@ -38,16 +38,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.PacketDistributor;
 
 public class StringLightBlock
-        extends WaterloggedGlassBlock
-        implements SimpleWaterloggedBlock {
+        extends
+            WaterloggedGlassBlock
+        implements
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
-    public static final EnumProperty<StringColor> STRING_COLOR =
-            EnumProperty.create("string_color", StringColor.class);
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final EnumProperty<StringColor> STRING_COLOR = EnumProperty.create("string_color", StringColor.class);
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
-    public static final DirectionProperty FACING =
-            BlockStateProperties.HORIZONTAL_FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static final VoxelShape SHAPE_NORTH = Block.box(0, 12, 0, 16, 15, 2);
     private static final VoxelShape SHAPE_SOUTH = Block.box(
@@ -56,28 +55,16 @@ public class StringLightBlock
             14,
             16,
             15,
-            16
-    );
+            16);
     private static final VoxelShape SHAPE_EAST = Block.box(14, 12, 0, 16, 15, 16);
     private static final VoxelShape SHAPE_WEST = Block.box(0, 12, 0, 2, 15, 16);
 
     public enum StringColor implements StringRepresentable {
-        WHITE(DyeColors.WHITE),
-        ORANGE(DyeColors.ORANGE),
-        MAGENTA(DyeColors.MAGENTA),
-        LIGHT_BLUE(DyeColors.LIGHT_BLUE),
-        YELLOW(DyeColors.YELLOW),
-        LIME(DyeColors.LIME),
-        PINK(DyeColors.PINK),
-        GRAY(DyeColors.GRAY),
-        LIGHT_GRAY(DyeColors.LIGHT_GRAY),
-        CYAN(DyeColors.CYAN),
-        PURPLE(DyeColors.PURPLE),
-        BLUE(DyeColors.BLUE),
-        BROWN(DyeColors.BROWN),
-        GREEN(DyeColors.GREEN),
-        RED(DyeColors.RED),
-        BLACK(DyeColors.BLACK);
+        WHITE(DyeColors.WHITE), ORANGE(DyeColors.ORANGE), MAGENTA(DyeColors.MAGENTA), LIGHT_BLUE(
+                DyeColors.LIGHT_BLUE), YELLOW(DyeColors.YELLOW), LIME(DyeColors.LIME), PINK(DyeColors.PINK), GRAY(
+                        DyeColors.GRAY), LIGHT_GRAY(DyeColors.LIGHT_GRAY), CYAN(DyeColors.CYAN), PURPLE(
+                                DyeColors.PURPLE), BLUE(DyeColors.BLUE), BROWN(DyeColors.BROWN), GREEN(
+                                        DyeColors.GREEN), RED(DyeColors.RED), BLACK(DyeColors.BLACK);
 
         private final DyeColors dye;
 
@@ -106,14 +93,12 @@ public class StringLightBlock
                         .setValue(STRING_COLOR, StringColor.BLACK)
                         .setValue(LIT, false)
                         .setValue(FACING, Direction.NORTH)
-                        .setValue(WATERLOGGED, false)
-        );
+                        .setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(STRING_COLOR, LIT, FACING, WATERLOGGED);
     }
 
@@ -146,8 +131,7 @@ public class StringLightBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -157,8 +141,7 @@ public class StringLightBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -175,8 +158,7 @@ public class StringLightBlock
     public int getLightEmission(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.getValue(LIT) ? 15 : 0;
     }
 
@@ -189,12 +171,9 @@ public class StringLightBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 
     @Override
@@ -202,8 +181,7 @@ public class StringLightBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         Direction facing = state.getValue(FACING);
         return switch (facing) {
             case NORTH -> SHAPE_NORTH;
@@ -219,8 +197,7 @@ public class StringLightBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         Direction facing = state.getValue(FACING);
         return switch (facing) {
             case NORTH -> SHAPE_NORTH;
@@ -238,8 +215,7 @@ public class StringLightBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -258,20 +234,14 @@ public class StringLightBlock
                         SoundEvents.DYE_USE,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
-                TextComponent message =
-                        new TextComponent(
-                                "String colored: " + dyeColor.getDisplayName()
-                        );
+                        1.0f);
+                TextComponent message = new TextComponent(
+                        "String colored: " + dyeColor.getDisplayName());
                 message.withStyle(ChatFormatting.GREEN);
                 if (player instanceof ServerPlayer) {
                     ModMessages.INSTANCE.send(
-                            PacketDistributor.PLAYER.with(() ->
-                                    (ServerPlayer) player
-                            ),
-                            new ActionBarMessagePacket(message)
-                    );
+                            PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                            new ActionBarMessagePacket(message));
                 }
                 return InteractionResult.SUCCESS;
             }
@@ -288,17 +258,13 @@ public class StringLightBlock
                         : SoundEvents.STONE_BUTTON_CLICK_ON,
                 SoundSource.BLOCKS,
                 0.3f,
-                1.0f
-        );
-        TextComponent message =
-                new TextComponent(
-                        newLit ? "Turned On" : "Turned Off"
-                );
+                1.0f);
+        TextComponent message = new TextComponent(
+                newLit ? "Turned On" : "Turned Off");
         message.withStyle(
                 newLit
                         ? ChatFormatting.GREEN
-                        : ChatFormatting.RED
-        );
+                        : ChatFormatting.RED);
         player.displayClientMessage(message, true);
         return InteractionResult.SUCCESS;
     }

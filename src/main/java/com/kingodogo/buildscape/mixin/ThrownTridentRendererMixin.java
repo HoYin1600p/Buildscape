@@ -15,12 +15,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ThrownTridentRendererMixin {
 
     @Inject(method = "render(Lnet/minecraft/world/entity/projectile/ThrownTrident;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("HEAD"))
-    private void buildscape$pushTridentStack(ThrownTrident thrownTrident, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
+    private void buildscape$pushTridentStack(ThrownTrident thrownTrident, float entityYaw, float partialTicks,
+            PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
         FestiveGlintHandler.push(((ThrownTridentAccessor) thrownTrident).getTridentItem());
     }
 
     @Inject(method = "render(Lnet/minecraft/world/entity/projectile/ThrownTrident;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("RETURN"))
-    private void buildscape$popTridentStack(ThrownTrident thrownTrident, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
+    private void buildscape$popTridentStack(ThrownTrident thrownTrident, float entityYaw, float partialTicks,
+            PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
         FestiveGlintHandler.pop();
     }
 }

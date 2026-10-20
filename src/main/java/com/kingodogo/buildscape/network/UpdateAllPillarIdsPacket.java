@@ -78,16 +78,20 @@ public class UpdateAllPillarIdsPacket {
                 if (incoming.pattern != null && incoming.pattern.length() > NetworkPacketLimits.MAX_PATTERN_LENGTH) {
                     return;
                 }
-                if (incoming.pattern_speed != null && (!Double.isFinite(incoming.pattern_speed) || incoming.pattern_speed < 0)) {
+                if (incoming.pattern_speed != null
+                        && (!Double.isFinite(incoming.pattern_speed) || incoming.pattern_speed < 0)) {
                     return;
                 }
-                if (incoming.pattern_spread != null && (!Double.isFinite(incoming.pattern_spread) || incoming.pattern_spread < 0)) {
+                if (incoming.pattern_spread != null
+                        && (!Double.isFinite(incoming.pattern_spread) || incoming.pattern_spread < 0)) {
                     return;
                 }
-                if (incoming.pattern_intensity != null && (!Double.isFinite(incoming.pattern_intensity) || incoming.pattern_intensity < 0)) {
+                if (incoming.pattern_intensity != null
+                        && (!Double.isFinite(incoming.pattern_intensity) || incoming.pattern_intensity < 0)) {
                     return;
                 }
-                if (incoming.max_particle_color != null && (incoming.max_particle_color < 0 || incoming.max_particle_color > NetworkPacketLimits.MAX_DYE_COLORS)) {
+                if (incoming.max_particle_color != null && (incoming.max_particle_color < 0
+                        || incoming.max_particle_color > NetworkPacketLimits.MAX_DYE_COLORS)) {
                     return;
                 }
                 if (incoming.dyeColors != null) {
@@ -110,14 +114,21 @@ public class UpdateAllPillarIdsPacket {
                 if (existing != null) {
                     existing.pattern = incoming.pattern;
                     existing.pattern_speed = incoming.pattern_speed != null
-                            ? NetworkPacketLimits.clamp(incoming.pattern_speed, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED) : null;
+                            ? NetworkPacketLimits.clamp(incoming.pattern_speed, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                                    NetworkPacketLimits.MAX_PARTICLE_SPEED)
+                            : null;
                     existing.pattern_spread = incoming.pattern_spread != null
-                            ? NetworkPacketLimits.clamp(incoming.pattern_spread, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD) : null;
+                            ? NetworkPacketLimits.clamp(incoming.pattern_spread, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                                    NetworkPacketLimits.MAX_PARTICLE_SPREAD)
+                            : null;
                     existing.pattern_intensity = incoming.pattern_intensity != null
-                            ? NetworkPacketLimits.clamp(incoming.pattern_intensity, NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY) : null;
+                            ? NetworkPacketLimits.clamp(incoming.pattern_intensity,
+                                    NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY)
+                            : null;
                     existing.use_pattern = incoming.use_pattern;
                     existing.max_particle_color = incoming.max_particle_color != null
-                            ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, incoming.max_particle_color)) : null;
+                            ? Math.max(0, Math.min(NetworkPacketLimits.MAX_DYE_COLORS, incoming.max_particle_color))
+                            : null;
                     if (incoming.dyeColors != null) {
                         existing.dyeColors = new ArrayList<>(incoming.dyeColors);
                     }

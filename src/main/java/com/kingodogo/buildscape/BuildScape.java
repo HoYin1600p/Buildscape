@@ -85,12 +85,12 @@ public class BuildScape {
     public static final String MODID = "buildscape";
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static final Map<Item, CauldronInteraction> EXPERIENCE_CAULDRON_INTERACTIONS = CauldronInteraction.newInteractionMap();
+    public static final Map<Item, CauldronInteraction> EXPERIENCE_CAULDRON_INTERACTIONS = CauldronInteraction
+            .newInteractionMap();
 
     public static Logger getLogger() {
         return LOGGER;
     }
-
 
     private static final ExecutorService ASYNC_POOL = Executors
             .newCachedThreadPool(r -> {
@@ -163,9 +163,8 @@ public class BuildScape {
             // /give and other Item-level callers add single items that merge under those rules.
 
             try {
-                Map<SoundEvent, RecordItem> recordMap =
-                        ObfuscationReflectionHelper.getPrivateValue(
-                                RecordItem.class, null, "f_43032_");
+                Map<SoundEvent, RecordItem> recordMap = ObfuscationReflectionHelper.getPrivateValue(
+                        RecordItem.class, null, "f_43032_");
                 if (recordMap != null) {
                     recordMap.put(ModSounds.MUSIC_DISC_CELEBRATION.get(),
                             (RecordItem) ModItems.MUSIC_DISC_CELEBRATION.get());
@@ -246,8 +245,7 @@ public class BuildScape {
 
                             return stack;
                         }
-                    }
-            );
+                    });
 
             DispenserBlock.registerBehavior(
                     ModItems.CONFETTI_ITEM.get(),
@@ -270,7 +268,8 @@ public class BuildScape {
                                     if (itemInSlot == stack) {
                                         matchSlot = i;
                                         break;
-                                    } else if (matchSlot == -1 && !itemInSlot.isEmpty() && itemInSlot.getItem() == stack.getItem()) {
+                                    } else if (matchSlot == -1 && !itemInSlot.isEmpty()
+                                            && itemInSlot.getItem() == stack.getItem()) {
                                         matchSlot = i;
                                     }
                                 }
@@ -310,32 +309,32 @@ public class BuildScape {
                             }
 
                             if (level instanceof ServerLevel serverLevel) {
-                                 Random rand = level.random;
-                                 int burstLevel = 1;
-                                 if (stack.hasTag() && stack.getTag().contains(NbtKeys.BURST_LEVEL)) {
-                                     burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt(NbtKeys.BURST_LEVEL)));
-                                 }
-                                 int particleCount = (65 + rand.nextInt(36)) * burstLevel;
-                                 double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2D;
-                                 double spreadMultiplier = 1.0 + (burstLevel - 1) * 0.1D;
+                                Random rand = level.random;
+                                int burstLevel = 1;
+                                if (stack.hasTag() && stack.getTag().contains(NbtKeys.BURST_LEVEL)) {
+                                    burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt(NbtKeys.BURST_LEVEL)));
+                                }
+                                int particleCount = (65 + rand.nextInt(36)) * burstLevel;
+                                double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2D;
+                                double spreadMultiplier = 1.0 + (burstLevel - 1) * 0.1D;
 
-                                 for (int i = 0; i < particleCount; i++) {
-                                     double speed = (0.08D + rand.nextDouble() * 0.12D) * speedMultiplier;
-                                     double spread = (0.04D + rand.nextDouble() * 0.06D) * spreadMultiplier;
+                                for (int i = 0; i < particleCount; i++) {
+                                    double speed = (0.08D + rand.nextDouble() * 0.12D) * speedMultiplier;
+                                    double spread = (0.04D + rand.nextDouble() * 0.06D) * spreadMultiplier;
 
-                                     double vx = dirX * speed + (rand.nextDouble() - 0.5D) * spread;
-                                     double vy = dirY * speed + (rand.nextDouble() - 0.5D) * spread + (facing.getAxis().isHorizontal() ? 0.05D : 0.0D);
-                                     double vz = dirZ * speed + (rand.nextDouble() - 0.5D) * spread;
+                                    double vx = dirX * speed + (rand.nextDouble() - 0.5D) * spread;
+                                    double vy = dirY * speed + (rand.nextDouble() - 0.5D) * spread
+                                            + (facing.getAxis().isHorizontal() ? 0.05D : 0.0D);
+                                    double vz = dirZ * speed + (rand.nextDouble() - 0.5D) * spread;
 
-                                     double px = startX + (rand.nextDouble() - 0.5D) * 0.15D;
-                                     double py = startY + (rand.nextDouble() - 0.5D) * 0.15D;
-                                     double pz = startZ + (rand.nextDouble() - 0.5D) * 0.15D;
+                                    double px = startX + (rand.nextDouble() - 0.5D) * 0.15D;
+                                    double py = startY + (rand.nextDouble() - 0.5D) * 0.15D;
+                                    double pz = startZ + (rand.nextDouble() - 0.5D) * 0.15D;
 
-                                     serverLevel.sendParticles(
-                                             (SimpleParticleType) ModParticles.CONFETTI.get(),
-                                             px, py, pz, 0, vx, vy, vz, 1.0D
-                                     );
-                                 }
+                                    serverLevel.sendParticles(
+                                            (SimpleParticleType) ModParticles.CONFETTI.get(),
+                                            px, py, pz, 0, vx, vy, vz, 1.0D);
+                                }
 
                                 level.playSound(null, pos,
                                         SoundEvents.FIREWORK_ROCKET_BLAST,
@@ -348,8 +347,7 @@ public class BuildScape {
                             stack.shrink(1);
                             return stack;
                         }
-                    }
-            );
+                    });
         });
 
         event.enqueueWork(() -> {
@@ -396,7 +394,6 @@ public class BuildScape {
             vanillaPot.addPlant(ModBlocks.SNOWY_TALL_GRASS.getId(), ModBlocks.POTTED_SNOWY_TALL_GRASS);
             vanillaPot.addPlant(ModBlocks.SNOWY_FERN.getId(), ModBlocks.POTTED_SNOWY_FERN);
             vanillaPot.addPlant(ModBlocks.SNOWY_LARGE_FERN.getId(), ModBlocks.POTTED_SNOWY_LARGE_FERN);
-
 
             ComposterBlock.COMPOSTABLES.put(ModItems.RED_ROSE_VINES.get(),
                     0.5f);
@@ -485,22 +482,25 @@ public class BuildScape {
             ComposterBlock.COMPOSTABLES
                     .put(ModItems.RED_MUSHROOM_SHELVES.get(), 0.65f);
 
-            CauldronInteraction.EMPTY.put(ModItems.EXPERIENCE_BUCKET.get(), (state, level, pos, player, hand, stack) -> {
-                if (!level.isClientSide) {
-                    player.awardStat(Stats.FILL_CAULDRON);
-                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3));
-                    level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    if (!player.getAbilities().instabuild) {
-                        player.setItemInHand(hand, new ItemStack(Items.BUCKET));
-                    }
-                }
-                return InteractionResult.sidedSuccess(level.isClientSide);
-            });
+            CauldronInteraction.EMPTY.put(ModItems.EXPERIENCE_BUCKET.get(),
+                    (state, level, pos, player, hand, stack) -> {
+                        if (!level.isClientSide) {
+                            player.awardStat(Stats.FILL_CAULDRON);
+                            level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState()
+                                    .setValue(LayeredCauldronBlock.LEVEL, 3));
+                            level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                            if (!player.getAbilities().instabuild) {
+                                player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+                            }
+                        }
+                        return InteractionResult.sidedSuccess(level.isClientSide);
+                    });
 
             CauldronInteraction.EMPTY.put(Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
                 if (!level.isClientSide) {
                     player.awardStat(Stats.FILL_CAULDRON);
-                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 1));
+                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState()
+                            .setValue(LayeredCauldronBlock.LEVEL, 1));
                     level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
@@ -582,21 +582,22 @@ public class BuildScape {
                 return InteractionResult.PASS;
             });
 
-            EXPERIENCE_CAULDRON_INTERACTIONS.put(ModItems.EXPERIENCE_BUCKET.get(), (state, level, pos, player, hand, stack) -> {
-                int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
-                if (cauldronLevel < 3) {
-                    if (!level.isClientSide) {
-                        player.awardStat(Stats.FILL_CAULDRON);
-                        level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, 3));
-                        level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
-                        if (!player.getAbilities().instabuild) {
-                            player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+            EXPERIENCE_CAULDRON_INTERACTIONS.put(ModItems.EXPERIENCE_BUCKET.get(),
+                    (state, level, pos, player, hand, stack) -> {
+                        int cauldronLevel = state.getValue(LayeredCauldronBlock.LEVEL);
+                        if (cauldronLevel < 3) {
+                            if (!level.isClientSide) {
+                                player.awardStat(Stats.FILL_CAULDRON);
+                                level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, 3));
+                                level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                                if (!player.getAbilities().instabuild) {
+                                    player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+                                }
+                            }
+                            return InteractionResult.sidedSuccess(level.isClientSide);
                         }
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide);
-                }
-                return InteractionResult.PASS;
-            });
+                        return InteractionResult.PASS;
+                    });
         });
     }
 

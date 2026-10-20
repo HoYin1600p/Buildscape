@@ -47,11 +47,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class DecoratedPotBlock
-        extends WaterloggedBlock
-        implements EntityBlock, SimpleWaterloggedBlock {
+        extends
+            WaterloggedBlock
+        implements
+            EntityBlock,
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 16, 15);
 
     public DecoratedPotBlock() {
@@ -59,17 +61,14 @@ public class DecoratedPotBlock
                 Properties.of(Material.STONE)
                         .strength(0.0f)
                         .sound(createDecoratedPotSoundType())
-                        .noOcclusion()
-        );
+                        .noOcclusion());
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(WATERLOGGED, false)
-        );
+                this.stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(WATERLOGGED);
     }
 
@@ -89,8 +88,7 @@ public class DecoratedPotBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -100,8 +98,7 @@ public class DecoratedPotBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -109,8 +106,7 @@ public class DecoratedPotBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 
@@ -119,8 +115,7 @@ public class DecoratedPotBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 
@@ -135,13 +130,10 @@ public class DecoratedPotBlock
     }
 
     @Override
-    public <
-            T extends BlockEntity
-            > BlockEntityTicker<T> getTicker(
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
             Level level,
             BlockState state,
-            BlockEntityType<T> type
-    ) {
+            BlockEntityType<T> type) {
         return null;
     }
 
@@ -154,8 +146,7 @@ public class DecoratedPotBlock
     public int getAnalogOutputSignal(
             BlockState state,
             Level level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof DecoratedPotBlockEntity potEntity) {
             return potEntity.getComparatorOutput();
@@ -170,8 +161,7 @@ public class DecoratedPotBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.getBlockEntity(pos) instanceof DecoratedPotBlockEntity be) {
             ItemStack heldItem = player.getItemInHand(hand);
 
@@ -179,8 +169,7 @@ public class DecoratedPotBlock
                 ItemStack stored = be.getStoredItem();
 
                 if (heldItem.getItem() instanceof BlockItem) {
-                    Block heldBlock =
-                            ((BlockItem) heldItem.getItem()).getBlock();
+                    Block heldBlock = ((BlockItem) heldItem.getItem()).getBlock();
                     if (heldBlock instanceof DecoratedPotBlock) {
                         return InteractionResult.PASS;
                     }
@@ -203,17 +192,14 @@ public class DecoratedPotBlock
                                 ModSounds.DECORATED_POT_INSERT_ITEM.get(),
                                 SoundSource.BLOCKS,
                                 0.5f,
-                                1.0f
-                        );
+                                1.0f);
                         spawnInsertParticles(level, pos);
                         be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
                         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
-                } else if (
-                        ItemStack.isSameItemSameTags(stored, heldItem) &&
-                                stored.getCount() < stored.getMaxStackSize()
-                ) {
+                } else if (ItemStack.isSameItemSameTags(stored, heldItem) &&
+                        stored.getCount() < stored.getMaxStackSize()) {
                     if (!level.isClientSide) {
                         int maxStack = stored.getMaxStackSize();
                         int spaceAvailable = maxStack - stored.getCount();
@@ -231,8 +217,7 @@ public class DecoratedPotBlock
                                 ModSounds.DECORATED_POT_INSERT_ITEM.get(),
                                 SoundSource.BLOCKS,
                                 0.5f,
-                                1.0f
-                        );
+                                1.0f);
                         spawnInsertParticles(level, pos);
                         be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
                         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
@@ -246,8 +231,7 @@ public class DecoratedPotBlock
                             ModSounds.DECORATED_POT_INSERT_FAIL.get(),
                             SoundSource.BLOCKS,
                             0.5f,
-                            1.0f
-                    );
+                            1.0f);
                     be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.NEGATIVE);
                     level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                 }
@@ -262,20 +246,16 @@ public class DecoratedPotBlock
                             ModSounds.DECORATED_POT_HIT.get(),
                             SoundSource.BLOCKS,
                             0.5f,
-                            1.0f
-                    );
+                            1.0f);
                     be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
                     level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
 
-            if (
-                    !heldItem.isEmpty() &&
-                            heldItem.getItem() instanceof BlockItem
-            ) {
-                Block heldBlock =
-                        ((BlockItem) heldItem.getItem()).getBlock();
+            if (!heldItem.isEmpty() &&
+                    heldItem.getItem() instanceof BlockItem) {
+                Block heldBlock = ((BlockItem) heldItem.getItem()).getBlock();
                 if (heldBlock instanceof DecoratedPotBlock) {
                     return InteractionResult.PASS;
                 }
@@ -299,17 +279,14 @@ public class DecoratedPotBlock
                                 ModSounds.DECORATED_POT_INSERT_ITEM.get(),
                                 SoundSource.BLOCKS,
                                 0.5f,
-                                1.0f
-                        );
+                                1.0f);
                         spawnInsertParticles(level, pos);
                         be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
                         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
-                } else if (
-                        ItemStack.isSameItemSameTags(stored, heldItem) &&
-                                stored.getCount() < stored.getMaxStackSize()
-                ) {
+                } else if (ItemStack.isSameItemSameTags(stored, heldItem) &&
+                        stored.getCount() < stored.getMaxStackSize()) {
                     if (!level.isClientSide) {
                         int maxStack = stored.getMaxStackSize();
                         int spaceAvailable = maxStack - stored.getCount();
@@ -327,8 +304,7 @@ public class DecoratedPotBlock
                                 ModSounds.DECORATED_POT_INSERT_ITEM.get(),
                                 SoundSource.BLOCKS,
                                 0.5f,
-                                1.0f
-                        );
+                                1.0f);
                         spawnInsertParticles(level, pos);
                         be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.POSITIVE);
                         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
@@ -342,8 +318,7 @@ public class DecoratedPotBlock
                                 ModSounds.DECORATED_POT_INSERT_FAIL.get(),
                                 SoundSource.BLOCKS,
                                 0.5f,
-                                1.0f
-                        );
+                                1.0f);
                         be.triggerWobble(DecoratedPotBlockEntity.WobbleStyle.NEGATIVE);
                         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                     }
@@ -361,8 +336,7 @@ public class DecoratedPotBlock
                                 pos.getX() + 0.5,
                                 pos.getY() + 0.5,
                                 pos.getZ() + 0.5,
-                                stored
-                        );
+                                stored);
                         itemEntity.setDefaultPickUpDelay();
                         level.addFreshEntity(itemEntity);
                     }
@@ -380,8 +354,7 @@ public class DecoratedPotBlock
             Level level,
             BlockPos pos,
             BlockState state,
-            Player player
-    ) {
+            Player player) {
         super.playerWillDestroy(level, pos, state, player);
     }
 
@@ -394,8 +367,7 @@ public class DecoratedPotBlock
                     pos.getX() + 0.5,
                     pos.getY() + 0.5,
                     pos.getZ() + 0.5,
-                    potEntity.getStoredItem().copy()
-            );
+                    potEntity.getStoredItem().copy());
             itemEntity.setDefaultPickUpDelay();
             level.addFreshEntity(itemEntity);
         }
@@ -409,8 +381,7 @@ public class DecoratedPotBlock
             BlockPos pos,
             BlockState state,
             BlockEntity be,
-            ItemStack tool
-    ) {
+            ItemStack tool) {
         if (tool.isEmpty()) {
             level.playSound(
                     null,
@@ -418,8 +389,7 @@ public class DecoratedPotBlock
                     ModSounds.DECORATED_POT_BREAK.get(),
                     SoundSource.BLOCKS,
                     1.0f,
-                    1.0f
-            );
+                    1.0f);
         } else {
             level.playSound(
                     null,
@@ -427,8 +397,7 @@ public class DecoratedPotBlock
                     ModSounds.DECORATED_POT_BREAK.get(),
                     SoundSource.BLOCKS,
                     1.0f,
-                    1.0f
-            );
+                    1.0f);
         }
         super.playerDestroy(level, player, pos, state, be, tool);
     }
@@ -436,19 +405,15 @@ public class DecoratedPotBlock
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         LootContext ctx = builder
                 .withParameter(
                         LootContextParams.BLOCK_STATE,
-                        state
-                )
+                        state)
                 .create(
-                        LootContextParamSets.BLOCK
-                );
+                        LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(
-                LootContextParams.TOOL
-        );
+                LootContextParams.TOOL);
 
         if (tool != null && tool.is(ItemTags.CLUSTER_MAX_HARVESTABLES)) {
             return Collections.singletonList(new ItemStack(Items.BRICK, 4));
@@ -464,8 +429,7 @@ public class DecoratedPotBlock
                 () -> ModSounds.DECORATED_POT_STEP.get(),
                 () -> ModSounds.DECORATED_POT_PLACE.get(),
                 () -> ModSounds.DECORATED_POT_HIT.get(),
-                () -> ModSounds.DECORATED_POT_FALL.get()
-        );
+                () -> ModSounds.DECORATED_POT_FALL.get());
     }
 
     private void spawnInsertParticles(Level level, BlockPos pos) {
@@ -485,8 +449,7 @@ public class DecoratedPotBlock
                         0.0,
                         upwardVelocity,
                         0.0,
-                        1.0
-                );
+                        1.0);
             }
         } else if (level.isClientSide) {
             for (int i = 0; i < 2; i++) {
@@ -497,8 +460,7 @@ public class DecoratedPotBlock
                         centerZ,
                         0.0,
                         upwardVelocity,
-                        0.0
-                );
+                        0.0);
             }
         }
     }

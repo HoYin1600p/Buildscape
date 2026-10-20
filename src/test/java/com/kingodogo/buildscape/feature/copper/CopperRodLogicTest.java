@@ -46,11 +46,10 @@ public final class CopperRodLogicTest {
                     "every unwaxed stage participates in lightning walks: " + i);
             check(CopperOxidationHandler.getFirstStage(stages[i], next, previous) == fresh,
                     "every stage resolves to fresh copper, including fresh itself: " + i);
-            check(CopperOxidationHandler.getMappedStage(stages[i], previous)
-                            == (i == 0 ? null : stages[i - 1]),
+            check(CopperOxidationHandler.getMappedStage(stages[i], previous) == (i == 0 ? null : stages[i - 1]),
                     "one walk step removes exactly one stage: " + i);
-            check(CopperOxidationHandler.getMappedStage(stages[i], next)
-                            == (i == stages.length - 1 ? null : stages[i + 1]),
+            check(CopperOxidationHandler.getMappedStage(stages[i],
+                    next) == (i == stages.length - 1 ? null : stages[i + 1]),
                     "oxidation advances exactly one stage: " + i);
         }
         for (Object other : List.of(waxed, stone)) {
@@ -91,7 +90,7 @@ public final class CopperRodLogicTest {
             check(values.contains("buildscape:" + rodId), "stone tool requirement for " + rodId);
         }
         check(values.stream().filter(value -> value.startsWith("buildscape:") && value.endsWith("copper_rod"))
-                        .count() == 8,
+                .count() == 8,
                 "tool tag includes exactly the eight copper rod variants");
     }
 

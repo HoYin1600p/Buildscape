@@ -5,8 +5,7 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 public class ModWoodTypes {
 
     public static final WoodType MANGROVE = WoodType.create(
-            "buildscape:mangrove"
-    );
+            "buildscape:mangrove");
     public static final WoodType BAMBOO = WoodType.create("buildscape:bamboo");
 
     static {

@@ -42,8 +42,7 @@ public class BigOrnamentBlock extends WaterloggedGlassBlock implements SimpleWat
         this.registerDefaultState(
                 this.stateDefinition.any()
                         .setValue(LIT, true)
-                        .setValue(WATERLOGGED, false)
-        );
+                        .setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -66,8 +65,7 @@ public class BigOrnamentBlock extends WaterloggedGlassBlock implements SimpleWat
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -95,8 +93,7 @@ public class BigOrnamentBlock extends WaterloggedGlassBlock implements SimpleWat
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            BlockPos beaconPos
-    ) {
+            BlockPos beaconPos) {
         if (this.isTinted) {
             BeaconScanContext.markBlocking(level, pos, beaconPos);
             return new float[]{1.0F, 1.0F, 1.0F};
@@ -113,8 +110,7 @@ public class BigOrnamentBlock extends WaterloggedGlassBlock implements SimpleWat
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
+            Direction side) {
         return adjacentBlockState.is(this) || super.skipRendering(state, adjacentBlockState, side);
     }
 
@@ -125,8 +121,7 @@ public class BigOrnamentBlock extends WaterloggedGlassBlock implements SimpleWat
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -141,8 +136,7 @@ public class BigOrnamentBlock extends WaterloggedGlassBlock implements SimpleWat
                 currentLit ? SoundEvents.STONE_BUTTON_CLICK_OFF : SoundEvents.STONE_BUTTON_CLICK_ON,
                 SoundSource.BLOCKS,
                 0.3f,
-                1.0f
-        );
+                1.0f);
 
         return InteractionResult.CONSUME;
     }

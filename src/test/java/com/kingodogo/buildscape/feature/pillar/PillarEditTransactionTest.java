@@ -165,7 +165,8 @@ public class PillarEditTransactionTest {
     }
 
     private static String reconcile(PillarIdManager manager, String savedId, BlockPos bottom) throws Exception {
-        Method method = PillarIdManager.class.getDeclaredMethod("reconcilePillarId", String.class, String.class, BlockPos.class);
+        Method method = PillarIdManager.class.getDeclaredMethod("reconcilePillarId", String.class, String.class,
+                BlockPos.class);
         method.setAccessible(true);
         return (String) method.invoke(manager, savedId, "minecraft:overworld", bottom);
     }

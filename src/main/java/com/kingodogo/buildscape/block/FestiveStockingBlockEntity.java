@@ -17,8 +17,10 @@ import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 
 public class FestiveStockingBlockEntity
-        extends SyncedBlockEntity
-        implements WorldlyContainer {
+        extends
+            SyncedBlockEntity
+        implements
+            WorldlyContainer {
 
     private ItemStack storedItem = ItemStack.EMPTY;
     private boolean contentsHandled = false;
@@ -53,8 +55,7 @@ public class FestiveStockingBlockEntity
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -71,11 +72,9 @@ public class FestiveStockingBlockEntity
     public boolean canPlaceItemThroughFace(
             int slot,
             ItemStack stack,
-            @Nullable Direction direction
-    ) {
+            @Nullable Direction direction) {
         if (stack.getItem() instanceof BlockItem) {
-            BlockItem blockItem =
-                    (BlockItem) stack.getItem();
+            BlockItem blockItem = (BlockItem) stack.getItem();
             if (blockItem.getBlock() instanceof FestiveStockingBlock) {
                 return false;
             }
@@ -84,18 +83,15 @@ public class FestiveStockingBlockEntity
         if (storedItem.isEmpty()) {
             return true;
         }
-        return (
-                ItemStack.isSameItemSameTags(storedItem, stack) &&
-                        storedItem.getCount() < storedItem.getMaxStackSize()
-        );
+        return (ItemStack.isSameItemSameTags(storedItem, stack) &&
+                storedItem.getCount() < storedItem.getMaxStackSize());
     }
 
     @Override
     public boolean canTakeItemThroughFace(
             int slot,
             ItemStack stack,
-            Direction direction
-    ) {
+            Direction direction) {
         return !storedItem.isEmpty();
     }
 
@@ -134,14 +130,12 @@ public class FestiveStockingBlockEntity
             level.gameEvent(
                     null,
                     GameEvent.BLOCK_CHANGE,
-                    worldPosition
-            );
+                    worldPosition);
             level.sendBlockUpdated(
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
         return result;
     }
@@ -165,14 +159,12 @@ public class FestiveStockingBlockEntity
                 level.gameEvent(
                         null,
                         GameEvent.BLOCK_CHANGE,
-                        worldPosition
-                );
+                        worldPosition);
                 level.sendBlockUpdated(
                         worldPosition,
                         getBlockState(),
                         getBlockState(),
-                        3
-                );
+                        3);
             }
         }
     }
@@ -187,8 +179,7 @@ public class FestiveStockingBlockEntity
         if (storedItem.isEmpty()) {
             return 0;
         }
-        float fillRatio =
-                (float) storedItem.getCount() / (float) storedItem.getMaxStackSize();
+        float fillRatio = (float) storedItem.getCount() / (float) storedItem.getMaxStackSize();
         return Math.max(1, (int) Math.ceil(fillRatio * 15.0f));
     }
 
@@ -217,8 +208,7 @@ public class FestiveStockingBlockEntity
                 NbtKeys.STORED_ITEM,
                 storedItem.isEmpty()
                         ? ItemStack.EMPTY.save(new CompoundTag())
-                        : storedItem.save(new CompoundTag())
-        );
+                        : storedItem.save(new CompoundTag()));
         return tag;
     }
 }

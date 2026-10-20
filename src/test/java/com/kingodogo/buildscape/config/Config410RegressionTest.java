@@ -20,7 +20,8 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class Config410RegressionTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {
@@ -145,7 +146,8 @@ public class Config410RegressionTest {
                 "\"partial\":{\"name\":\"Partial\",\"items\":[\"minecraft:stick\",7,null]},"}) {
             Path directory = temporary.newFolder().toPath();
             Path file = directory.resolve("pillar-presets.json");
-            String source = "{" + malformed + "\"default\":{\"name\":\"Default\",\"items\":[]},\"_lastApplied\":\"default\"}";
+            String source = "{" + malformed
+                    + "\"default\":{\"name\":\"Default\",\"items\":[]},\"_lastApplied\":\"default\"}";
             Files.writeString(file, source);
             PresetsConfig config = new PresetsConfig(directory);
             config.load();

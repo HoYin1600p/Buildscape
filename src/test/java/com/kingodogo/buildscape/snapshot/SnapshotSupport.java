@@ -22,8 +22,7 @@ import static org.junit.Assert.assertNotNull;
 final class SnapshotSupport {
     private static final Path SNAPSHOT_DIR = Path.of("src", "test", "resources", "snapshot");
 
-    private SnapshotSupport() {
-    }
+    private SnapshotSupport() {}
 
     static void bootstrap() {
         RecipeCacheRegressionTest.bootstrap();
@@ -47,7 +46,9 @@ final class SnapshotSupport {
         try (InputStream stream = SnapshotSupport.class.getClassLoader().getResourceAsStream(resource)) {
             assertNotNull("missing expected snapshot " + resource, stream);
             String text = new String(stream.readAllBytes(), StandardCharsets.UTF_8).replace("\r\n", "\n");
-            List<String> expected = text.isEmpty() ? List.of() : List.of(text.substring(0, text.length() - 1).split("\n", -1));
+            List<String> expected = text.isEmpty()
+                    ? List.of()
+                    : List.of(text.substring(0, text.length() - 1).split("\n", -1));
             assertEquals(name + " line count", expected.size(), actual.size());
             for (int i = 0; i < expected.size(); i++) {
                 assertEquals(name + " line " + (i + 1), expected.get(i), actual.get(i));

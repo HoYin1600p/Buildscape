@@ -13,8 +13,7 @@ import java.util.Optional;
 
 @Mixin(ServerRecipeBook.class)
 public abstract class ServerRecipeBookMixin {
-    @Redirect(method = "loadRecipes", require = 1, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/item/crafting/RecipeManager;byKey(Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;"))
+    @Redirect(method = "loadRecipes", require = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/crafting/RecipeManager;byKey(Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;"))
     private Optional<? extends Recipe<?>> buildscape$migrateRecipeId(RecipeManager manager, ResourceLocation id) {
         Optional<? extends Recipe<?>> recipe = manager.byKey(id);
         if (recipe.isPresent()) {

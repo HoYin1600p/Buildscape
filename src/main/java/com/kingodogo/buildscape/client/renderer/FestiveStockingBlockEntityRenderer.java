@@ -18,12 +18,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class FestiveStockingBlockEntityRenderer
-        implements BlockEntityRenderer<FestiveStockingBlockEntity> {
+        implements
+            BlockEntityRenderer<FestiveStockingBlockEntity> {
 
     private static final ResourceLocation STOCKING_TEXTURE = new ResourceLocation(
             BuildScape.MODID,
-            "textures/entity/festive_stocking.png"
-    );
+            "textures/entity/festive_stocking.png");
 
     private ResourceLocation getTextureForColor(String color) {
         if (color == null || color.equals("festive")) {
@@ -31,14 +31,11 @@ public class FestiveStockingBlockEntityRenderer
         }
         return new ResourceLocation(
                 BuildScape.MODID,
-                "textures/entity/" + color + "_festive_stocking.png"
-        );
+                "textures/entity/" + color + "_festive_stocking.png");
     }
 
     public FestiveStockingBlockEntityRenderer(
-            BlockEntityRendererProvider.Context context
-    ) {
-    }
+            BlockEntityRendererProvider.Context context) {}
 
     @Override
     public void render(
@@ -47,8 +44,7 @@ public class FestiveStockingBlockEntityRenderer
             PoseStack poseStack,
             MultiBufferSource buffer,
             int packedLight,
-            int packedOverlay
-    ) {
+            int packedOverlay) {
         if (blockEntity == null || blockEntity.getLevel() == null) {
             return;
         }
@@ -72,38 +68,38 @@ public class FestiveStockingBlockEntityRenderer
         double forwardOffset = 0.001D;
 
         switch (facing) {
-            case NORTH:
+            case NORTH :
                 posX = 0.5D;
                 posY = 0.5D;
                 posZ = 1.0D - forwardOffset;
                 rotationY = 180.0F;
                 break;
-            case SOUTH:
+            case SOUTH :
                 posX = 0.5D;
                 posY = 0.5D;
                 posZ = forwardOffset;
                 rotationY = 0.0F;
                 break;
-            case WEST:
+            case WEST :
                 posX = 1.0D - forwardOffset;
                 posY = 0.5D;
                 posZ = 0.5D;
                 rotationY = 90.0F;
                 break;
-            case EAST:
+            case EAST :
                 posX = forwardOffset;
                 posY = 0.5D;
                 posZ = 0.5D;
                 rotationY = 270.0F;
                 break;
-            case UP:
+            case UP :
                 posX = 0.5D;
                 posY = 0.5D / 16.0D;
                 posZ = 0.5D;
                 rotationX = -90.0F;
                 rotationY = 180.0F;
                 break;
-            case DOWN:
+            case DOWN :
                 posX = 0.5D;
                 posY = 15.5D / 16.0D;
                 posZ = 0.5D;
@@ -118,8 +114,7 @@ public class FestiveStockingBlockEntityRenderer
 
         ResourceLocation texture = getTextureForColor(block.getColorVariant());
         VertexConsumer vertexConsumer = buffer.getBuffer(
-                RenderType.entityCutoutNoCull(texture)
-        );
+                RenderType.entityCutoutNoCull(texture));
 
         float width = 0.5F;
         float height = 0.5F;

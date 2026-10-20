@@ -26,7 +26,8 @@ public class BlockLootTest {
             "oak_wood_slab", "oak_wood_vertical_slab", "sandstone_vertical_slab", "smooth_red_sandstone_vertical_slab",
             "smooth_sandstone_vertical_slab", "spruce_wood_slab", "spruce_wood_vertical_slab",
             "stripped_acacia_wood_slab", "stripped_acacia_wood_vertical_slab", "stripped_birch_wood_slab",
-            "stripped_birch_wood_vertical_slab", "stripped_crimson_hyphae_slab", "stripped_crimson_hyphae_vertical_slab",
+            "stripped_birch_wood_vertical_slab", "stripped_crimson_hyphae_slab",
+            "stripped_crimson_hyphae_vertical_slab",
             "stripped_dark_oak_wood_slab", "stripped_dark_oak_wood_vertical_slab", "stripped_jungle_wood_slab",
             "stripped_jungle_wood_vertical_slab", "stripped_oak_wood_slab", "stripped_oak_wood_vertical_slab",
             "stripped_spruce_wood_slab", "stripped_spruce_wood_vertical_slab", "stripped_warped_hyphae_slab",
@@ -118,7 +119,8 @@ public class BlockLootTest {
         for (JsonElement element : entry.getAsJsonArray("conditions")) {
             JsonObject condition = element.getAsJsonObject();
             if ("minecraft:match_tool".equals(condition.get("condition").getAsString())) {
-                for (JsonElement enchantmentElement : condition.getAsJsonObject("predicate").getAsJsonArray("enchantments")) {
+                for (JsonElement enchantmentElement : condition.getAsJsonObject("predicate")
+                        .getAsJsonArray("enchantments")) {
                     JsonObject enchantment = enchantmentElement.getAsJsonObject();
                     if ("minecraft:silk_touch".equals(enchantment.get("enchantment").getAsString())) {
                         silkTouch |= enchantment.getAsJsonObject("levels").get("min").getAsInt() >= 1;

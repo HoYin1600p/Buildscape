@@ -35,8 +35,7 @@ public class RecipePackFormatter {
             "wood_families",
             "stone_families",
             "templates",
-            "families"
-    );
+            "families");
 
     public static String format(String jsonString) {
         validateJson(jsonString);
@@ -143,7 +142,8 @@ public class RecipePackFormatter {
         String content = Files.readString(path, StandardCharsets.UTF_8);
         String formatted = format(content);
         if (!content.equals(formatted)) {
-            Files.writeString(path, formatted, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(path, formatted, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
             return true;
         }
         return false;

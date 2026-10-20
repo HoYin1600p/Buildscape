@@ -21,31 +21,37 @@ public class FireworkTestCommand {
         LiteralArgumentBuilder<CommandSourceStack> fireworkCmd = Commands.literal("firework")
                 .requires(source -> source.hasPermission(2));
 
-        addShapeSubcommands(fireworkCmd, "cake", CustomFireworkShapeRegistry.CAKE_ID, new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55, 0xFFD700});
-        addShapeSubcommands(fireworkCmd, "crown", CustomFireworkShapeRegistry.CROWN_ID, new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF, 0x00FFFF});
-        addShapeSubcommands(fireworkCmd, "trophy", CustomFireworkShapeRegistry.TROPHY_ID, new int[]{0xFFD700, 0xFFFF88, 0xCC7700, 0x00FFFF});
-        addShapeSubcommands(fireworkCmd, "christmas_tree", CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID, new int[]{0x227733, 0xFF3030, 0xFFD700});
-        addShapeSubcommands(fireworkCmd, "presents", CustomFireworkShapeRegistry.PRESENTS_ID, new int[]{0xFF2233, 0xFFD700});
+        addShapeSubcommands(fireworkCmd, "cake", CustomFireworkShapeRegistry.CAKE_ID,
+                new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55, 0xFFD700});
+        addShapeSubcommands(fireworkCmd, "crown", CustomFireworkShapeRegistry.CROWN_ID,
+                new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF, 0x00FFFF});
+        addShapeSubcommands(fireworkCmd, "trophy", CustomFireworkShapeRegistry.TROPHY_ID,
+                new int[]{0xFFD700, 0xFFFF88, 0xCC7700, 0x00FFFF});
+        addShapeSubcommands(fireworkCmd, "christmas_tree", CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID,
+                new int[]{0x227733, 0xFF3030, 0xFFD700});
+        addShapeSubcommands(fireworkCmd, "presents", CustomFireworkShapeRegistry.PRESENTS_ID,
+                new int[]{0xFF2233, 0xFFD700});
         addShapeSubcommands(fireworkCmd, "candy_cane", CustomFireworkShapeRegistry.CANDY_CANE_ID, new int[]{0xFF0033});
-        addShapeSubcommands(fireworkCmd, "phoenix", CustomFireworkShapeRegistry.PHOENIX_ID, new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00});
-        addShapeSubcommands(fireworkCmd, "snowflake", CustomFireworkShapeRegistry.SNOWFLAKE_ID, new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF});
+        addShapeSubcommands(fireworkCmd, "phoenix", CustomFireworkShapeRegistry.PHOENIX_ID,
+                new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00});
+        addShapeSubcommands(fireworkCmd, "snowflake", CustomFireworkShapeRegistry.SNOWFLAKE_ID,
+                new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF});
 
         dispatcher.getRoot().addChild(
-                Commands.literal("buildscape").then(fireworkCmd).build()
-        );
+                Commands.literal("buildscape").then(fireworkCmd).build());
     }
 
     private static void addShapeSubcommands(
             LiteralArgumentBuilder<CommandSourceStack> parent,
             String shapeName,
             byte shapeId,
-            int[] defaultColors
-    ) {
+            int[] defaultColors) {
         parent.then(Commands.literal(shapeName)
-                .then(Commands.literal("give").executes(ctx -> giveFireworkRocket(ctx.getSource(), shapeName, shapeId, defaultColors)))
-                .then(Commands.literal("spawn").executes(ctx -> spawnFireworkExplosion(ctx.getSource(), shapeName, shapeId, defaultColors)))
-                .executes(ctx -> spawnFireworkExplosion(ctx.getSource(), shapeName, shapeId, defaultColors))
-        );
+                .then(Commands.literal("give")
+                        .executes(ctx -> giveFireworkRocket(ctx.getSource(), shapeName, shapeId, defaultColors)))
+                .then(Commands.literal("spawn")
+                        .executes(ctx -> spawnFireworkExplosion(ctx.getSource(), shapeName, shapeId, defaultColors)))
+                .executes(ctx -> spawnFireworkExplosion(ctx.getSource(), shapeName, shapeId, defaultColors)));
     }
 
     public static ItemStack createCustomFireworkRocket(byte shapeId, int[] colors) {
@@ -75,7 +81,9 @@ public class FireworkTestCommand {
                 player.drop(stack, false);
             }
 
-            source.sendSuccess(new TextComponent("§aGave 1x §6" + capitalize(shapeName) + " Firework Rocket§a to " + player.getScoreboardName()), true);
+            source.sendSuccess(new TextComponent(
+                    "§aGave 1x §6" + capitalize(shapeName) + " Firework Rocket§a to " + player.getScoreboardName()),
+                    true);
             return 1;
         } catch (Exception e) {
             source.sendFailure(new TextComponent("§cMust be executed by a player"));
@@ -90,13 +98,15 @@ public class FireworkTestCommand {
         FireworkRocketEntity rocket = new FireworkRocketEntity(
                 source.getLevel(),
                 pos.x, pos.y + 1.5D, pos.z,
-                stack
-        );
+                stack);
         source.getLevel().addFreshEntity(rocket);
         source.getLevel().broadcastEntityEvent(rocket, (byte) 17);
         rocket.discard();
 
-        source.sendSuccess(new TextComponent("§aSpawned §6" + capitalize(shapeName) + " Firework Explosion§a at " + new BlockPos(pos)), true);
+        source.sendSuccess(
+                new TextComponent(
+                        "§aSpawned §6" + capitalize(shapeName) + " Firework Explosion§a at " + new BlockPos(pos)),
+                true);
         return 1;
     }
 

@@ -13,8 +13,7 @@ public final class LaunchFasterInterop {
     private static final Set<String> REPORTED_FAILURES = ConcurrentHashMap.newKeySet();
     private static final boolean PRESENT = classExists(CONFIG_CLASS);
 
-    private LaunchFasterInterop() {
-    }
+    private LaunchFasterInterop() {}
 
     public static boolean isParallelModelLoadingEnabled() {
         return readBoolean("parallelModelLoading");
@@ -33,8 +32,7 @@ public final class LaunchFasterInterop {
             Class<?> configClass = Class.forName(
                     CONFIG_CLASS,
                     false,
-                    LaunchFasterInterop.class.getClassLoader()
-            );
+                    LaunchFasterInterop.class.getClassLoader());
             Field clientField = configClass.getField("CLIENT");
             Object clientConfig = clientField.get(null);
             Field settingField = clientConfig.getClass().getField(settingName);
@@ -42,20 +40,14 @@ public final class LaunchFasterInterop {
             Method getMethod = configValue.getClass().getMethod("get");
             return Boolean.TRUE.equals(getMethod.invoke(configValue));
         } catch (
-                ClassNotFoundException |
-                NoSuchFieldException |
-                NoSuchMethodException |
-                IllegalAccessException |
-                InvocationTargetException |
-                RuntimeException exception
-        ) {
+                ClassNotFoundException | NoSuchFieldException | NoSuchMethodException | IllegalAccessException
+                | InvocationTargetException | RuntimeException exception) {
             if (REPORTED_FAILURES.add(settingName)) {
                 BuildScape.LOGGER.warn(
                         "Could not read LaunchFaster setting {}; keeping the overlapping " +
                                 "Buildscape optimization disabled",
                         settingName,
-                        exception
-                );
+                        exception);
             }
             return true;
         }

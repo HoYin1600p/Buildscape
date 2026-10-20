@@ -31,8 +31,8 @@ public class ActionBarMessagePacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() ->
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.showActionBar(this.message)));
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.showActionBar(this.message)));
         ctx.get().setPacketHandled(true);
     }
 }

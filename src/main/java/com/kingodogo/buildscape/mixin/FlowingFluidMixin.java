@@ -25,13 +25,13 @@ public abstract class FlowingFluidMixin {
 
     @Shadow
     private boolean canPassThroughWall(Direction direction, BlockGetter level, BlockPos fromPos,
-                                       BlockState fromState, BlockPos toPos, BlockState toState) {
+            BlockState fromState, BlockPos toPos, BlockState toState) {
         throw new AssertionError();
     }
 
     @Inject(method = "getNewLiquid", at = @At("RETURN"), cancellable = true)
     private void buildscape$supplyFluidFromConduit(LevelReader level, BlockPos pos, BlockState state,
-                                                   CallbackInfoReturnable<FluidState> cir) {
+            CallbackInfoReturnable<FluidState> cir) {
         FlowingFluid flowingFluid = (FlowingFluid) (Object) this;
         if (!WorldPipeTopologyAccess.isTransportFluid(flowingFluid)
                 || state.getBlock() instanceof HollowPipeBlock || state.getBlock() instanceof HollowLogBlock) {
@@ -86,8 +86,7 @@ public abstract class FlowingFluidMixin {
             BlockState toBlockState,
             FluidState toFluidState,
             Fluid fluid,
-            CallbackInfoReturnable<Boolean> cir
-    ) {
+            CallbackInfoReturnable<Boolean> cir) {
         if (ModFluids.cannotMix(fluid, toFluidState.getType())) {
             cir.setReturnValue(false);
             return;
@@ -102,8 +101,7 @@ public abstract class FlowingFluidMixin {
                 cir.setReturnValue(false);
                 return;
             }
-        }
-        else if (fromBlockState.getBlock() instanceof HollowLogBlock) {
+        } else if (fromBlockState.getBlock() instanceof HollowLogBlock) {
             if (!HollowLogBlock.isOpenEnd(fromBlockState, direction)) {
                 cir.setReturnValue(false);
                 return;
@@ -115,8 +113,7 @@ public abstract class FlowingFluidMixin {
                 cir.setReturnValue(false);
                 return;
             }
-        }
-        else if (toBlockState.getBlock() instanceof HollowLogBlock) {
+        } else if (toBlockState.getBlock() instanceof HollowLogBlock) {
             if (!HollowLogBlock.isOpenEnd(toBlockState, direction.getOpposite())) {
                 cir.setReturnValue(false);
                 return;

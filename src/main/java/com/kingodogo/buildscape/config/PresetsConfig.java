@@ -35,7 +35,8 @@ public class PresetsConfig {
     }
 
     private File getConfigDir() {
-        String configPath = (configDirectory != null ? configDirectory : Paths.get("config", "buildscape", "pillar")).toString();
+        String configPath = (configDirectory != null ? configDirectory : Paths.get("config", "buildscape", "pillar"))
+                .toString();
         File dir = new File(configPath);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -57,7 +58,8 @@ public class PresetsConfig {
     public void load() {
         File file = getPresetsFile();
         if (!file.exists()) {
-            if (ConfigPaths.copyTemplateIfMissing(file.toPath(), "/data/buildscape/config/default_pillar_presets.json")) {
+            if (ConfigPaths.copyTemplateIfMissing(file.toPath(),
+                    "/data/buildscape/config/default_pillar_presets.json")) {
                 // Template copied from resources, proceed to parse from disk
             } else {
                 initializeDefaults();
@@ -186,14 +188,16 @@ public class PresetsConfig {
                         }
                     }
                     String name = value.getAsJsonObject().has("name")
-                            ? GSON.fromJson(value.getAsJsonObject().get("name"), String.class) : "";
+                            ? GSON.fromJson(value.getAsJsonObject().get("name"), String.class)
+                            : "";
                     if (name == null) {
                         throw new IllegalArgumentException("Expected a name for preset " + entry.getKey());
                     }
                     parsed.put(entry.getKey(), new Preset(name, items));
                 } catch (RuntimeException e) {
                     skippedEntries[0] = true;
-                    BuildScape.getLogger().warn("Skipped malformed preset {} in {}", entry.getKey(), PRESETS_FILE_NAME, e);
+                    BuildScape.getLogger().warn("Skipped malformed preset {} in {}", entry.getKey(), PRESETS_FILE_NAME,
+                            e);
                 }
             }
         }
@@ -296,7 +300,8 @@ public class PresetsConfig {
             return false;
         }
 
-        if (!presets.containsKey(key) && !preservedPresets.containsKey(key) && getCustomPresetCount() >= getCustomSlots()) {
+        if (!presets.containsKey(key) && !preservedPresets.containsKey(key)
+                && getCustomPresetCount() >= getCustomSlots()) {
             lastEditFailure = "limit";
             return false;
         }
@@ -308,8 +313,7 @@ public class PresetsConfig {
         }
         if (previous != null) {
             presets.put(key, previous);
-        }
-        else {
+        } else {
             presets.remove(key);
         }
         if (preserved != null) {

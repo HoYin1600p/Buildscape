@@ -35,7 +35,8 @@ public class BiomeBrushHandler {
 
             if (!player.level.isClientSide()) {
                 if (stack.getDamageValue() >= stack.getMaxDamage()) {
-                    player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS, 1.0f, 0.8f);
+                    player.level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS, 1.0f, 0.8f);
                     return;
                 }
 
@@ -58,7 +59,7 @@ public class BiomeBrushHandler {
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
         boolean holdingBrush = (!mainHand.isEmpty() && mainHand.getItem() instanceof BiomeBrushItem) ||
-                               (!offHand.isEmpty() && offHand.getItem() instanceof BiomeBrushItem);
+                (!offHand.isEmpty() && offHand.getItem() instanceof BiomeBrushItem);
 
         if (holdingBrush && player.isShiftKeyDown()) {
             ModMessages.INSTANCE.sendToServer(new ClearBiomeBrushPacket());

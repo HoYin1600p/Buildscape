@@ -106,18 +106,15 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     private static final VoxelShape Y_SHAPE = Shapes.join(
             Shapes.block(),
             Block.box(2, 0, 2, 14, 16, 14),
-            BooleanOp.ONLY_FIRST
-    );
+            BooleanOp.ONLY_FIRST);
     private static final VoxelShape X_SHAPE = Shapes.join(
             Shapes.block(),
             Block.box(0, 2, 2, 16, 14, 14),
-            BooleanOp.ONLY_FIRST
-    );
+            BooleanOp.ONLY_FIRST);
     private static final VoxelShape Z_SHAPE = Shapes.join(
             Shapes.block(),
             Block.box(2, 2, 0, 14, 14, 16),
-            BooleanOp.ONLY_FIRST
-    );
+            BooleanOp.ONLY_FIRST);
 
     public HollowLogBlock(Properties properties) {
         super(properties);
@@ -142,7 +139,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+            BlockEntityType<T> type) {
         if (level.isClientSide) {
             return null;
         }
@@ -244,7 +242,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit) {
         ItemStack held = player.getItemInHand(hand);
         BlockEntity be = level.getBlockEntity(pos);
         HollowLogBlockEntity hollowBe = (be instanceof HollowLogBlockEntity) ? (HollowLogBlockEntity) be : null;
@@ -277,8 +276,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         BlockState glassState = blockItem.getBlock().defaultBlockState();
                         if (targetPos) {
                             hollowBe.setGlassCoverPos(glassState);
-                        }
-                        else {
+                        } else {
                             hollowBe.setGlassCoverNeg(glassState);
                         }
                         hollowBe.setGlassPlacedByPlayer(player.getUUID());
@@ -341,7 +339,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     boolean isWater = (fluidInBucket == Fluids.WATER);
                     boolean isLava = (fluidInBucket == Fluids.LAVA);
                     if (hollowBe != null) {
-                        String fKey = isWater ? "water" : (isLava ? "lava" : ForgeRegistries.FLUIDS.getKey(fluidInBucket).toString());
+                        String fKey = isWater
+                                ? "water"
+                                : (isLava ? "lava" : ForgeRegistries.FLUIDS.getKey(fluidInBucket).toString());
                         hollowBe.setFluidType(fKey);
                         if (isLava) {
                             hollowBe.setLavaTicks(100 + level.random.nextInt(71901));
@@ -357,7 +357,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     HollowPipeTransportManager.onBucketUsed(level, pos, state);
 
                     if (!player.getAbilities().instabuild) {
-                        ItemStack emptyContainer = held.hasContainerItem() ? held.getContainerItem() : new ItemStack(Items.BUCKET);
+                        ItemStack emptyContainer = held.hasContainerItem()
+                                ? held.getContainerItem()
+                                : new ItemStack(Items.BUCKET);
                         held.shrink(1);
                         if (held.isEmpty()) {
                             player.setItemInHand(hand, emptyContainer);
@@ -367,7 +369,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     }
                     SoundEvent sound = fluidInBucket.getAttributes().getEmptySound();
                     if (sound == null) {
-                        sound = (fluidInBucket == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
+                        sound = (fluidInBucket == Fluids.LAVA)
+                                ? SoundEvents.BUCKET_EMPTY_LAVA
+                                : SoundEvents.BUCKET_EMPTY;
                     }
                     level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
@@ -438,8 +442,10 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
         if (held.isEmpty() || player.isShiftKeyDown()) {
             BooleanProperty glassProp = targetPos ? HAS_GLASS_POS : HAS_GLASS_NEG;
-            boolean hasTargetGlass = state.getValue(glassProp) || (hollowBe != null && (targetPos ? !hollowBe.getGlassCoverPos().isAir() : !hollowBe.getGlassCoverNeg().isAir()));
-            boolean hasAnyDecoration = state.getValue(HAS_DECORATION) || (hollowBe != null && !hollowBe.getDecorationState().isAir());
+            boolean hasTargetGlass = state.getValue(glassProp) || (hollowBe != null
+                    && (targetPos ? !hollowBe.getGlassCoverPos().isAir() : !hollowBe.getGlassCoverNeg().isAir()));
+            boolean hasAnyDecoration = state.getValue(HAS_DECORATION)
+                    || (hollowBe != null && !hollowBe.getDecorationState().isAir());
 
             if (hasTargetGlass) {
                 if (!level.isClientSide) {
@@ -454,8 +460,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         }
                         if (targetPos) {
                             hollowBe.setGlassCoverPos(Blocks.AIR.defaultBlockState());
-                        }
-                        else {
+                        } else {
                             hollowBe.setGlassCoverNeg(Blocks.AIR.defaultBlockState());
                         }
                         hollowBe.setChanged();
@@ -497,9 +502,12 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 return List.of(new ItemStack(Items.FLOWER_POT));
             } else {
                 Block content = potBlock.getContent();
-                ItemStack plantDrop = (content != null && content != Blocks.AIR) ? new ItemStack(content) : ItemStack.EMPTY;
+                ItemStack plantDrop = (content != null && content != Blocks.AIR)
+                        ? new ItemStack(content)
+                        : ItemStack.EMPTY;
                 if (!plantDrop.isEmpty()) {
-                    if (decState.hasProperty(PottedHazeBushBlock.HAS_HAZE) && !decState.getValue(PottedHazeBushBlock.HAS_HAZE)) {
+                    if (decState.hasProperty(PottedHazeBushBlock.HAS_HAZE)
+                            && !decState.getValue(PottedHazeBushBlock.HAS_HAZE)) {
                         CompoundTag blockStateTag = new CompoundTag();
                         blockStateTag.putString("has_haze", "false");
                         plantDrop.addTagElement("BlockStateTag", blockStateTag);
@@ -518,11 +526,13 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         if (stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem blockItem) {
             Block block = blockItem.getBlock();
 
-            if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof AbstractGlassBlock) {
+            if (block instanceof GlassBlock || block instanceof StainedGlassBlock
+                    || block instanceof AbstractGlassBlock) {
                 return true;
             }
 
-            if (stack.is(Tags.Items.GLASS) || stack.is(Tags.Items.GLASS_COLORLESS) || stack.is(Tags.Items.STAINED_GLASS)) {
+            if (stack.is(Tags.Items.GLASS) || stack.is(Tags.Items.GLASS_COLORLESS)
+                    || stack.is(Tags.Items.STAINED_GLASS)) {
                 return true;
             }
 
@@ -551,15 +561,19 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
         if (block instanceof SlabBlock || block instanceof StairBlock || block instanceof WallBlock
                 || block instanceof FenceBlock || block instanceof FenceGateBlock || block instanceof IronBarsBlock
-                || block instanceof ChainBlock || block instanceof ClimbableChainBlock || block instanceof LargeChainBlock
-                || block instanceof SideChainPartBlock || block instanceof WeatheringClimbableChainBlock || block instanceof WeatheringLargeChainBlock
+                || block instanceof ChainBlock || block instanceof ClimbableChainBlock
+                || block instanceof LargeChainBlock
+                || block instanceof SideChainPartBlock || block instanceof WeatheringClimbableChainBlock
+                || block instanceof WeatheringLargeChainBlock
                 || block instanceof TrapDoorBlock || block instanceof DoorBlock
                 || block instanceof LadderBlock || block instanceof LanternBlock || block instanceof TorchBlock
                 || block instanceof BushBlock || block instanceof FlowerBlock || block instanceof MushroomBlock
                 || block instanceof SaplingBlock || block instanceof FlowerPotBlock || block instanceof LiquidBlock
                 || block instanceof CarpetBlock || block instanceof ButtonBlock || block instanceof LeverBlock
-                || block instanceof PressurePlateBlock || block instanceof EndRodBlock || block instanceof LightningRodBlock
-                || block instanceof PointedDripstoneBlock || block instanceof PointedIcicleBlock || block instanceof SulfurSpikeBlock
+                || block instanceof PressurePlateBlock || block instanceof EndRodBlock
+                || block instanceof LightningRodBlock
+                || block instanceof PointedDripstoneBlock || block instanceof PointedIcicleBlock
+                || block instanceof SulfurSpikeBlock
                 || block instanceof ShelfBlock || block instanceof GlassJarBlock) {
             return false;
         }
@@ -797,7 +811,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 boolean hasNeg = !hollowBe.getGlassCoverNeg().isAir();
                 boolean hasPos = !hollowBe.getGlassCoverPos().isAir();
 
-                if (hasDec != state.getValue(HAS_DECORATION) || hasNeg != state.getValue(HAS_GLASS_NEG) || hasPos != state.getValue(HAS_GLASS_POS)) {
+                if (hasDec != state.getValue(HAS_DECORATION) || hasNeg != state.getValue(HAS_GLASS_NEG)
+                        || hasPos != state.getValue(HAS_GLASS_POS)) {
                     BlockState updated = state
                             .setValue(HAS_DECORATION, hasDec)
                             .setValue(HAS_GLASS_NEG, hasNeg)
@@ -810,7 +825,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level,
+            BlockPos pos, BlockPos neighborPos) {
         if (!level.isClientSide() && level instanceof Level lvl) {
             HollowPipeTransportManager.onNeighborChanged(lvl, pos, state, neighborPos);
         }
@@ -818,7 +834,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos,
+            boolean isMoving) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
         if (!level.isClientSide) {
             HollowPipeTransportManager.onNeighborChanged(level, pos, state, fromPos);

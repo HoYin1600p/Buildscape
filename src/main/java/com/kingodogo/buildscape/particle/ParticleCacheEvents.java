@@ -10,8 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
 public final class ParticleCacheEvents {
-    private ParticleCacheEvents() {
-    }
+    private ParticleCacheEvents() {}
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {

@@ -47,8 +47,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
             2.0D,
             14.0D,
             13.0D,
-            14.0D
-    );
+            14.0D);
 
     public SnowyFernBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -65,8 +64,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {
             return shape.move(0, -0.0625D, 0);
@@ -78,14 +76,11 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
     protected boolean mayPlaceOn(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
-        return (
-                state.is(BlockTags.DIRT) ||
-                        state.is(Blocks.FARMLAND) ||
-                        state.is(Blocks.SNOW_BLOCK) ||
-                        state.is(ModBlocks.SNOW_BRICKS.get())
-        );
+            BlockPos pos) {
+        return (state.is(BlockTags.DIRT) ||
+                state.is(Blocks.FARMLAND) ||
+                state.is(Blocks.SNOW_BLOCK) ||
+                state.is(ModBlocks.SNOW_BRICKS.get()));
     }
 
     @Override
@@ -98,9 +93,11 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
         if (direction == Direction.DOWN) {
-            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState,
+                    level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
@@ -112,8 +109,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() instanceof BoneMealItem) {
             if (this.isValidBonemealTarget(level, pos, state, level.isClientSide)) {
@@ -123,8 +119,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
                                 (ServerLevel) level,
                                 level.getRandom(),
                                 pos,
-                                state
-                        );
+                                state);
                         if (!player.getAbilities().instabuild) {
                             itemStack.shrink(1);
                         }
@@ -137,8 +132,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
                         SoundEvents.BONE_MEAL_USE,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
@@ -151,8 +145,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
             BlockGetter level,
             BlockPos pos,
             BlockState state,
-            boolean isClient
-    ) {
+            boolean isClient) {
         BlockPos abovePos = pos.above();
         return level.getBlockState(abovePos).isAir();
     }
@@ -162,8 +155,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
             Level level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         return true;
     }
 
@@ -172,25 +164,21 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
             ServerLevel level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
-            BlockState largeFernState =
-                    ModBlocks.SNOWY_LARGE_FERN.get()
-                            .defaultBlockState()
-                            .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
+            BlockState largeFernState = ModBlocks.SNOWY_LARGE_FERN.get()
+                    .defaultBlockState()
+                    .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
             if (largeFernState.canSurvive(level, pos)) {
                 level.setBlock(pos, largeFernState, 3);
                 level.setBlock(
                         abovePos,
                         largeFernState.setValue(
                                 DoublePlantBlock.HALF,
-                                DoubleBlockHalf.UPPER
-                        ),
-                        3
-                );
+                                DoubleBlockHalf.UPPER),
+                        3);
             }
         }
     }
@@ -198,25 +186,19 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         LootContext ctx = builder
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(
-                        LootContextParamSets.BLOCK
-                );
+                        LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
         if (tool != null && !tool.isEmpty()) {
             if (tool.is(Items.SHEARS)) {
                 return Collections.singletonList(new ItemStack(this));
             }
-            if (
-                    EnchantmentHelper.getItemEnchantmentLevel(
-                            Enchantments.SILK_TOUCH,
-                            tool
-                    ) >
-                            0
-            ) {
+            if (EnchantmentHelper.getItemEnchantmentLevel(
+                    Enchantments.SILK_TOUCH,
+                    tool) > 0) {
                 return Collections.singletonList(new ItemStack(this));
             }
         }

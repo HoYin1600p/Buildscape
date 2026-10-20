@@ -27,7 +27,8 @@ public class LogSlabBlock extends ModSlabBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit) {
         if (hand == InteractionHand.MAIN_HAND && !player.isShiftKeyDown()) {
 
             if (!player.getItemInHand(hand).isEmpty() && player.getItemInHand(hand).getItem() instanceof BlockItem) {

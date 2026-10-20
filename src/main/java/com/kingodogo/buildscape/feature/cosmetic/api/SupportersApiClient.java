@@ -30,8 +30,8 @@ public class SupportersApiClient {
 
     private SupportersApiClient() {
         this.httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
-            .build();
+                .connectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
+                .build();
 
         this.gson = Json.PRETTY;
     }
@@ -88,38 +88,38 @@ public class SupportersApiClient {
         }
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
-            .header("Accept", "application/json")
-            .header("User-Agent", "BuildScape-Mod/1.0")
-            .GET()
-            .build();
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
+                .header("Accept", "application/json")
+                .header("User-Agent", "BuildScape-Mod/1.0")
+                .GET()
+                .build();
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            .thenApply(response -> {
-                if (response.statusCode() != 200) {
-                    throw new ApiException("API returned status code: " + response.statusCode());
-                }
+                .thenApply(response -> {
+                    if (response.statusCode() != 200) {
+                        throw new ApiException("API returned status code: " + response.statusCode());
+                    }
 
-                String body = response.body();
-                if (body == null || body.isEmpty()) {
-                    throw new ApiException("Empty response body");
-                }
+                    String body = response.body();
+                    if (body == null || body.isEmpty()) {
+                        throw new ApiException("Empty response body");
+                    }
 
-                try {
-                    return gson.fromJson(body, responseClass);
-                } catch (Exception e) {
-                    BuildScape.getLogger().error("Failed to parse JSON response: {}", e.getMessage());
-                    throw new ApiException("Failed to parse response: " + e.getMessage(), e);
-                }
-            })
-            .exceptionally(throwable -> {
-                BuildScape.getLogger().error("API request failed: {}", throwable.getMessage());
-                if (throwable.getCause() != null) {
-                    BuildScape.getLogger().error("Cause: {}", throwable.getCause().getMessage());
-                }
-                return null;
-            });
+                    try {
+                        return gson.fromJson(body, responseClass);
+                    } catch (Exception e) {
+                        BuildScape.getLogger().error("Failed to parse JSON response: {}", e.getMessage());
+                        throw new ApiException("Failed to parse response: " + e.getMessage(), e);
+                    }
+                })
+                .exceptionally(throwable -> {
+                    BuildScape.getLogger().error("API request failed: {}", throwable.getMessage());
+                    if (throwable.getCause() != null) {
+                        BuildScape.getLogger().error("Cause: {}", throwable.getCause().getMessage());
+                    }
+                    return null;
+                });
     }
 
     private <T> CompletableFuture<T> postRequest(String endpoint, Object body, Class<T> responseClass) {
@@ -133,39 +133,39 @@ public class SupportersApiClient {
         String jsonBody = gson.toJson(body);
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .header("User-Agent", "BuildScape-Mod/1.0")
-            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-            .build();
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("User-Agent", "BuildScape-Mod/1.0")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            .thenApply(response -> {
-                if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                    throw new ApiException("API returned status code: " + response.statusCode());
-                }
+                .thenApply(response -> {
+                    if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                        throw new ApiException("API returned status code: " + response.statusCode());
+                    }
 
-                String bodyStr = response.body();
-                if (bodyStr == null || bodyStr.isEmpty()) {
-                    throw new ApiException("Empty response body");
-                }
+                    String bodyStr = response.body();
+                    if (bodyStr == null || bodyStr.isEmpty()) {
+                        throw new ApiException("Empty response body");
+                    }
 
-                try {
-                    return gson.fromJson(bodyStr, responseClass);
-                } catch (Exception e) {
-                    BuildScape.getLogger().error("Failed to parse JSON response: {}", e.getMessage());
-                    throw new ApiException("Failed to parse response: " + e.getMessage(), e);
-                }
-            })
-            .exceptionally(throwable -> {
-                BuildScape.getLogger().error("API POST request failed: {}", throwable.getMessage());
-                if (throwable.getCause() != null) {
-                    BuildScape.getLogger().error("Cause: {}", throwable.getCause().getMessage());
-                }
-                return null;
-            });
+                    try {
+                        return gson.fromJson(bodyStr, responseClass);
+                    } catch (Exception e) {
+                        BuildScape.getLogger().error("Failed to parse JSON response: {}", e.getMessage());
+                        throw new ApiException("Failed to parse response: " + e.getMessage(), e);
+                    }
+                })
+                .exceptionally(throwable -> {
+                    BuildScape.getLogger().error("API POST request failed: {}", throwable.getMessage());
+                    if (throwable.getCause() != null) {
+                        BuildScape.getLogger().error("Cause: {}", throwable.getCause().getMessage());
+                    }
+                    return null;
+                });
     }
 
     public CompletableFuture<SupporterStatus> getSupporterStatus(UUID uuid) {
@@ -246,4 +246,3 @@ public class SupportersApiClient {
         }
     }
 }
-

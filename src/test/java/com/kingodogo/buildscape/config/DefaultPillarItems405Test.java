@@ -172,14 +172,16 @@ public class DefaultPillarItems405Test {
             java.nio.file.Path file = dir.resolve("pillar-items.json");
             String name = vault ? "vault_pillar_items" : "vanilla_pillar_items";
             byte[] template;
-            try (java.io.InputStream input = getClass().getResourceAsStream("/data/buildscape/config/" + name + ".json")) {
+            try (java.io.InputStream input = getClass()
+                    .getResourceAsStream("/data/buildscape/config/" + name + ".json")) {
                 assertNotNull(input);
                 template = input.readAllBytes();
             }
             PillarParticleConfig config = new PillarParticleConfig(dir);
             config.loadItemsInternal(vault);
             assertArrayEquals(template, Files.readAllBytes(file));
-            assertTrue(ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(Files.readString(file))).has("offered_defaults"));
+            assertTrue(ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(Files.readString(file)))
+                    .has("offered_defaults"));
             assertFalse(Files.exists(dir.resolve("pillar-items.json.bak")));
             assertFalse(Files.exists(dir.resolve("pillar-items.json.pre-4.0.5.bak")));
             java.nio.file.attribute.FileTime modified = Files.getLastModifiedTime(file);
@@ -195,7 +197,8 @@ public class DefaultPillarItems405Test {
     @Test
     public void handRemovedFreshTemplateDefaultsStayRemovedWithoutRewriting() throws Exception {
         for (boolean vault : new boolean[]{false, true}) {
-            for (String removed : vault ? new String[]{"buildscape:confetti", "#the_vault:companion_relic"}
+            for (String removed : vault
+                    ? new String[]{"buildscape:confetti", "#the_vault:companion_relic"}
                     : new String[]{"buildscape:confetti"}) {
                 java.nio.file.Path dir = temporaryFolder.newFolder().toPath();
                 java.nio.file.Path file = dir.resolve("pillar-items.json");
@@ -221,10 +224,11 @@ public class DefaultPillarItems405Test {
                 document.remove("offered_defaults");
                 document.remove("vault_defaults_version");
                 document.addProperty("defaults_version", document.get("defaults_version").getAsInt() + versionOffset);
-                assertTrue(document.getAsJsonArray("items").remove(new com.google.gson.JsonPrimitive("buildscape:confetti")));
+                assertTrue(document.getAsJsonArray("items")
+                        .remove(new com.google.gson.JsonPrimitive("buildscape:confetti")));
                 if (vault) {
                     assertTrue(document.getAsJsonArray("items").remove(
-                        new com.google.gson.JsonPrimitive("#the_vault:companion_relic")));
+                            new com.google.gson.JsonPrimitive("#the_vault:companion_relic")));
                 }
                 String edited = document.toString();
                 Files.writeString(file, edited);
@@ -237,7 +241,7 @@ public class DefaultPillarItems405Test {
     }
 
     private void assertRemovedWithoutRewriting(java.nio.file.Path dir, boolean vault, String removed,
-                                               String edited) throws Exception {
+            String edited) throws Exception {
         java.nio.file.Path file = dir.resolve("pillar-items.json");
         Files.setLastModifiedTime(file, java.nio.file.attribute.FileTime.fromMillis(1_000_000));
         java.nio.file.attribute.FileTime modified = Files.getLastModifiedTime(file);
@@ -259,7 +263,8 @@ public class DefaultPillarItems405Test {
         config.items.add("minecraft:stick");
         assertTrue(config.saveItemsToDisk(true));
         assertTrue(config.items.contains("the_vault:echo_pog"));
-        assertTrue(ConfigLayoutIO.readProperties(Files.readString(dir.resolve("pillar-items.json"))).has("offered_defaults"));
+        assertTrue(ConfigLayoutIO.readProperties(Files.readString(dir.resolve("pillar-items.json")))
+                .has("offered_defaults"));
     }
 
     @Test
@@ -283,17 +288,21 @@ public class DefaultPillarItems405Test {
     @Test
     public void legacyListMatchesTheDefaultsTheReleased405JarWrote() throws Exception {
         java.util.List<String> names = new java.util.ArrayList<>();
-        for (com.google.gson.JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items").getAsJsonArray("items")) {
+        for (com.google.gson.JsonElement entry : ConfigPaths.loadItemsTemplate("legacy_pillar_items")
+                .getAsJsonArray("items")) {
             names.add(entry.getAsString());
         }
         assertEquals(154, names.size());
         assertEquals(154, new HashSet<>(names).size());
-        for (String item : new String[]{"buildscape:confetti", "buildscape:bone_dice", "buildscape:ashenking_gold_pillar",
-                "buildscape:music_disc_builder", "buildscape:star_trophy", "#the_vault:etching", "the_vault:greedy_meal"}) {
+        for (String item : new String[]{"buildscape:confetti", "buildscape:bone_dice",
+                "buildscape:ashenking_gold_pillar",
+                "buildscape:music_disc_builder", "buildscape:star_trophy", "#the_vault:etching",
+                "the_vault:greedy_meal"}) {
             assertTrue(item, names.contains(item));
         }
         String real;
-        try (java.io.InputStream input = DefaultPillarItems405Test.class.getResourceAsStream("/config405/old-pillar-items-vault.json")) {
+        try (java.io.InputStream input = DefaultPillarItems405Test.class
+                .getResourceAsStream("/config405/old-pillar-items-vault.json")) {
             real = new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
         }
         assertEquals(new HashSet<>(names), PillarParticleConfig.parseItems(real));

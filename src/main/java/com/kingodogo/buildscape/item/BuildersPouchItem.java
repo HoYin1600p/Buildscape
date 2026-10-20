@@ -37,8 +37,8 @@ public class BuildersPouchItem extends Item {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             Component title = new TranslatableComponent("container.buildscape.builders_pouch");
             NetworkHooks.openGui(serverPlayer,
-                    new SimpleMenuProvider((id, inventory, ignored) ->
-                            new BuildersPouchMenu(id, inventory, hand), title),
+                    new SimpleMenuProvider((id, inventory, ignored) -> new BuildersPouchMenu(id, inventory, hand),
+                            title),
                     buffer -> buffer.writeEnum(hand));
         }
         return InteractionResultHolder.sidedSuccess(pouch, level.isClientSide);
@@ -110,8 +110,8 @@ public class BuildersPouchItem extends Item {
         }
         if (create) {
             return root.getCompound(DATA_KEY).isEmpty()
-                ? createData(root)
-                : root.getCompound(DATA_KEY);
+                    ? createData(root)
+                    : root.getCompound(DATA_KEY);
         }
         return root.contains(DATA_KEY, 10) ? root.getCompound(DATA_KEY) : null;
     }

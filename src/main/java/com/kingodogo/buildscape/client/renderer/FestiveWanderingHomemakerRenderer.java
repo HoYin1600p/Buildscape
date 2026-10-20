@@ -7,8 +7,11 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-public class FestiveWanderingHomemakerRenderer extends MobRenderer<FestiveWanderingHomemakerEntity, WanderingHomemakerModel<FestiveWanderingHomemakerEntity>> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(BuildScape.MODID, "textures/entity/festive_wandering_homemaker.png");
+public class FestiveWanderingHomemakerRenderer
+        extends
+            MobRenderer<FestiveWanderingHomemakerEntity, WanderingHomemakerModel<FestiveWanderingHomemakerEntity>> {
+    private static final ResourceLocation TEXTURE = new ResourceLocation(BuildScape.MODID,
+            "textures/entity/festive_wandering_homemaker.png");
 
     public FestiveWanderingHomemakerRenderer(EntityRendererProvider.Context context) {
         super(context, new WanderingHomemakerModel<>(context.bakeLayer(WanderingHomemakerModel.LAYER_LOCATION)), 0.5F);

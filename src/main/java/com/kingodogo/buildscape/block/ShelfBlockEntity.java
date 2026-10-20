@@ -99,7 +99,8 @@ public class ShelfBlockEntity extends SyncedBlockEntity implements Container {
         if (this.level.getBlockEntity(this.worldPosition) != this) {
             return false;
         } else {
-            return player.distanceToSqr((double)this.worldPosition.getX() + 0.5D, (double)this.worldPosition.getY() + 0.5D, (double)this.worldPosition.getZ() + 0.5D) <= 64.0D;
+            return player.distanceToSqr((double) this.worldPosition.getX() + 0.5D,
+                    (double) this.worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D) <= 64.0D;
         }
     }
 
@@ -134,7 +135,7 @@ public class ShelfBlockEntity extends SyncedBlockEntity implements Container {
     }
 
     public float getVisualRotationYInDegrees() {
-        return ((Direction)this.getBlockState().getValue(ShelfBlock.FACING)).getOpposite().toYRot();
+        return ((Direction) this.getBlockState().getValue(ShelfBlock.FACING)).getOpposite().toYRot();
     }
 
     public boolean getAlignItemsToBottom() {

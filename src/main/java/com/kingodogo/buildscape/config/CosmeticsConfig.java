@@ -89,7 +89,8 @@ public class CosmeticsConfig {
                         if (!newFile.exists()) {
                             Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         } else {
-                            Files.move(oldFile.toPath(), oldFile.toPath().resolveSibling(oldFile.getName() + ".migrated"));
+                            Files.move(oldFile.toPath(),
+                                    oldFile.toPath().resolveSibling(oldFile.getName() + ".migrated"));
                         }
                     } catch (Exception e) {
                         BuildScape.getLogger().error("CosmeticsConfig: Failed to relocate {}", oldFile.getName(), e);
@@ -143,10 +144,12 @@ public class CosmeticsConfig {
             if (key.equals("global_settings")) {
                 if (val instanceof Map) {
                     Map<String, Object> globalData = (Map<String, Object>) val;
-                    if (globalData.containsKey("colorPickerX") && globalData.get(NbtKeys.COLOR_PICKER_X) instanceof Number) {
+                    if (globalData.containsKey("colorPickerX")
+                            && globalData.get(NbtKeys.COLOR_PICKER_X) instanceof Number) {
                         colorPickerX = ((Number) globalData.get(NbtKeys.COLOR_PICKER_X)).intValue();
                     }
-                    if (globalData.containsKey("colorPickerY") && globalData.get(NbtKeys.COLOR_PICKER_Y) instanceof Number) {
+                    if (globalData.containsKey("colorPickerY")
+                            && globalData.get(NbtKeys.COLOR_PICKER_Y) instanceof Number) {
                         colorPickerY = ((Number) globalData.get(NbtKeys.COLOR_PICKER_Y)).intValue();
                     }
                 }
@@ -155,7 +158,10 @@ public class CosmeticsConfig {
 
             UUID uuid = null;
             if (!key.equals(GLOBAL_SCOPE)) {
-                try { uuid = UUID.fromString(key); } catch (Exception ignored) {}
+                try {
+                    uuid = UUID.fromString(key);
+                } catch (Exception ignored) {
+                }
             }
 
             if (getPlayerFile(uuid).exists()) {
@@ -176,7 +182,8 @@ public class CosmeticsConfig {
                             if (cosEntry.getValue() instanceof String) {
                                 cosmetics.put(slot, (String) cosEntry.getValue());
                             }
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
 
@@ -229,7 +236,10 @@ public class CosmeticsConfig {
                 if (nbt.contains(NbtKeys.EQUIPPED_COSMETICS, 10)) {
                     CompoundTag equipped = nbt.getCompound(NbtKeys.EQUIPPED_COSMETICS);
                     for (String key : equipped.getAllKeys()) {
-                        try { cosmetics.put(Integer.parseInt(key), equipped.getString(key)); } catch (Exception ignored) {}
+                        try {
+                            cosmetics.put(Integer.parseInt(key), equipped.getString(key));
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
                 playerCosmetics.put(uuidStr, cosmetics);
@@ -306,7 +316,8 @@ public class CosmeticsConfig {
         try {
             AtomicFiles.write(file.toPath(), file.getName(),
                     temporary -> NbtIo.writeCompressed(nbt, temporary.toFile()),
-                    e -> BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr, e));
+                    e -> BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr,
+                            e));
         } catch (Exception e) {
             BuildScape.getLogger().error("CosmeticsConfig: Failed to write data for {}", uuidStr, e);
         }
@@ -323,7 +334,8 @@ public class CosmeticsConfig {
                 if (nbt.contains(NbtKeys.COLOR_PICKER_Y)) {
                     colorPickerY = nbt.getInt(NbtKeys.COLOR_PICKER_Y);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -339,7 +351,8 @@ public class CosmeticsConfig {
 
         try {
             NbtIo.writeCompressed(nbt, file);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public Map<Integer, String> getEquippedCosmetics(UUID playerUuid) {

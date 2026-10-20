@@ -154,8 +154,10 @@ public class RecipeCacheRegressionTest {
                     writeRecord(out, 3, 2, 6);
                 }
                 try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
-                    assertNull(BinaryRecipeCache.readRecipe(in, pool, ingredients, items, new ResourceLocation[pool.length]));
-                    assertNotNull(BinaryRecipeCache.readRecipe(in, pool, ingredients, items, new ResourceLocation[pool.length]));
+                    assertNull(BinaryRecipeCache.readRecipe(in, pool, ingredients, items,
+                            new ResourceLocation[pool.length]));
+                    assertNotNull(BinaryRecipeCache.readRecipe(in, pool, ingredients, items,
+                            new ResourceLocation[pool.length]));
                     assertEquals(0, in.available());
                 }
             }
@@ -189,7 +191,8 @@ public class RecipeCacheRegressionTest {
                 new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(
                         new ResourceLocation("buildscape:autogen/special/clear_shulker_filters")));
         byte[] cache = BinaryRecipeCache.serializeCache("dynamic-specials", cold);
-        List<Recipe<?>> warm = BinaryRecipeCache.loadCacheFromStream(new ByteArrayInputStream(cache), "dynamic-specials");
+        List<Recipe<?>> warm = BinaryRecipeCache.loadCacheFromStream(new ByteArrayInputStream(cache),
+                "dynamic-specials");
         assertEquals(cold.stream().map(Recipe::getId).toList(), warm.stream().map(Recipe::getId).toList());
         assertEquals(cold.stream().map(Object::getClass).toList(), warm.stream().map(Object::getClass).toList());
     }
@@ -200,13 +203,16 @@ public class RecipeCacheRegressionTest {
         java.lang.reflect.Method dissolve = serializer.getDeclaredMethod("dissolvePattern", String[].class,
                 Map.class, int.class, int.class);
         dissolve.setAccessible(true);
-        java.lang.reflect.InvocationTargetException undefined = assertThrows(java.lang.reflect.InvocationTargetException.class,
+        java.lang.reflect.InvocationTargetException undefined = assertThrows(
+                java.lang.reflect.InvocationTargetException.class,
                 () -> dissolve.invoke(null, new String[]{"AB"}, Map.of('A', Ingredient.of(Items.STONE)), 2, 1));
         assertTrue(undefined.getCause() instanceof com.google.gson.JsonParseException);
-        java.lang.reflect.Method pattern = serializer.getDeclaredMethod("deserializePattern", com.google.gson.JsonArray.class);
+        java.lang.reflect.Method pattern = serializer.getDeclaredMethod("deserializePattern",
+                com.google.gson.JsonArray.class);
         pattern.setAccessible(true);
         for (String source : List.of("[]", "[\"AAAA\"]", "[\"AA\",\"A\"]", "[\"A\",\"A\",\"A\",\"A\"]")) {
-            java.lang.reflect.InvocationTargetException dimensions = assertThrows(java.lang.reflect.InvocationTargetException.class,
+            java.lang.reflect.InvocationTargetException dimensions = assertThrows(
+                    java.lang.reflect.InvocationTargetException.class,
                     () -> pattern.invoke(null, com.google.gson.JsonParser.parseString(source).getAsJsonArray()));
             assertTrue(dimensions.getCause() instanceof com.google.gson.JsonParseException);
         }

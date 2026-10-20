@@ -56,7 +56,8 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
     }
 
     @Override
-    public void render(ShelfBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay) {
+    public void render(ShelfBlockEntity blockEntity, float partialTicks, PoseStack poseStack,
+            MultiBufferSource bufferSource, int combinedLight, int combinedOverlay) {
         Direction facing = blockEntity.getBlockState().getValue(ShelfBlock.FACING);
         float yRot = facing.getAxis().isHorizontal() ? -facing.toYRot() : 180.0F;
         boolean alignToBottom = blockEntity.getAlignItemsToBottom();
@@ -65,12 +66,15 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
         for (int slot = 0; slot < ShelfBlockEntity.MAX_ITEMS; slot++) {
             ItemStack stack = blockEntity.getItem(slot);
             if (!stack.isEmpty()) {
-                this.renderItem(blockEntity, stack, poseStack, bufferSource, combinedLight, combinedOverlay, slot, yRot, alignToBottom, seed + slot);
+                this.renderItem(blockEntity, stack, poseStack, bufferSource, combinedLight, combinedOverlay, slot, yRot,
+                        alignToBottom, seed + slot);
             }
         }
     }
 
-    private void renderItem(ShelfBlockEntity blockEntity, ItemStack stack, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay, int slot, float yRot, boolean alignToBottom, int seed) {
+    private void renderItem(ShelfBlockEntity blockEntity, ItemStack stack, PoseStack poseStack,
+            MultiBufferSource bufferSource, int combinedLight, int combinedOverlay, int slot, float yRot,
+            boolean alignToBottom, int seed) {
         BakedModel model = this.itemRenderer.getModel(stack, blockEntity.getLevel(), null, seed);
         OnShelf onShelf = getOnShelfTransform(stack, model);
         float[] box = onShelf.transformedBounds(this.getModelBounds(stack, model, seed));
@@ -85,13 +89,15 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
         poseStack.mulPose(Vector3f.YP.rotationDegrees(yRot));
-        poseStack.translate((float)(slot - 1) * SLOT_SPACING, alignToBottom ? ALIGN_ITEMS_TO_BOTTOM : 0.0F, ITEM_DEPTH);
+        poseStack.translate((float) (slot - 1) * SLOT_SPACING, alignToBottom ? ALIGN_ITEMS_TO_BOTTOM : 0.0F,
+                ITEM_DEPTH);
         poseStack.scale(ITEM_SIZE, ITEM_SIZE, ITEM_SIZE);
         poseStack.translate(dx, dy, dz);
 
         onShelf.apply(poseStack);
 
-        this.itemRenderer.renderStatic(stack, ItemTransforms.TransformType.NONE, combinedLight, combinedOverlay, poseStack, bufferSource, seed);
+        this.itemRenderer.renderStatic(stack, ItemTransforms.TransformType.NONE, combinedLight, combinedOverlay,
+                poseStack, bufferSource, seed);
         poseStack.popPose();
     }
 
@@ -103,7 +109,7 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
             return DRAGON_HEAD;
         }
 
-        Block block = stack.getItem() instanceof BlockItem ? ((BlockItem)stack.getItem()).getBlock() : null;
+        Block block = stack.getItem() instanceof BlockItem ? ((BlockItem) stack.getItem()).getBlock() : null;
         if (block instanceof AbstractSkullBlock) {
             return SKULL;
         }
@@ -142,7 +148,7 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
     }
 
     private static int long2int(long value) {
-        return (int)(value ^ value >>> 32);
+        return (int) (value ^ value >>> 32);
     }
 
     private static final class OnShelf {
@@ -227,9 +233,9 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
 
         @Override
         public VertexConsumer vertex(double x, double y, double z) {
-            float fx = (float)x;
-            float fy = (float)y;
-            float fz = (float)z;
+            float fx = (float) x;
+            float fy = (float) y;
+            float fz = (float) z;
             if (fx < this.minX) {
                 this.minX = fx;
             }
@@ -277,15 +283,12 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
         }
 
         @Override
-        public void endVertex() {
-        }
+        public void endVertex() {}
 
         @Override
-        public void defaultColor(int red, int green, int blue, int alpha) {
-        }
+        public void defaultColor(int red, int green, int blue, int alpha) {}
 
         @Override
-        public void unsetDefaultColor() {
-        }
+        public void unsetDefaultColor() {}
     }
 }

@@ -11,8 +11,7 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
     private static final Set<String> OVERLAPPING_CACHE_MIXINS = Set.of(
             "com.kingodogo.buildscape.mixin.BuildscapeBlockModelMixin",
             "com.kingodogo.buildscape.mixin.BuildscapeBlockStateCacheMixin",
-            "com.kingodogo.buildscape.mixin.BuildscapeForgeRegistryMixin"
-    );
+            "com.kingodogo.buildscape.mixin.BuildscapeForgeRegistryMixin");
 
     private boolean standaloneLaunchFasterPresent;
 
@@ -36,8 +35,7 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
-    }
+    public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {}
 
     @Override
     public List<String> getMixins() {
@@ -49,18 +47,14 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
             String targetClassName,
             ClassNode targetClass,
             String mixinClassName,
-            IMixinInfo mixinInfo
-    ) {
-    }
+            IMixinInfo mixinInfo) {}
 
     @Override
     public void postApply(
             String targetClassName,
             ClassNode targetClass,
             String mixinClassName,
-            IMixinInfo mixinInfo
-    ) {
-    }
+            IMixinInfo mixinInfo) {}
 
     private static boolean classExists(String className) {
         String resource = className.replace('.', '/') + ".class";

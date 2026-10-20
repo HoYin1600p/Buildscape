@@ -8,8 +8,7 @@ public final class ShapedPatternTrimmer {
     public record Trimmed(int width, int height, NonNullList<Ingredient> ingredients) {
     }
 
-    private ShapedPatternTrimmer() {
-    }
+    private ShapedPatternTrimmer() {}
 
     public static Trimmed trim(int width, int height, NonNullList<Ingredient> ingredients) {
         PatternBounds bounds = PatternBounds.of(width, height, index -> !ingredients.get(index).isEmpty());

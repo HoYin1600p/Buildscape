@@ -47,8 +47,7 @@ import java.util.regex.Pattern;
 @Mixin(ModelBakery.class)
 public abstract class BuildscapeModelBakeryMixin {
     @Unique
-    private static final Pattern BUILDSCAPE_CUSTOM_LOADER =
-            Pattern.compile("\"loader\"\\s*:");
+    private static final Pattern BUILDSCAPE_CUSTOM_LOADER = Pattern.compile("\"loader\"\\s*:");
 
     @Shadow
     @Final
@@ -81,12 +80,9 @@ public abstract class BuildscapeModelBakeryMixin {
     private void buildscape$parseModelsInParallel(
             ProfilerFiller profiler,
             int maxMipmapLevel,
-            CallbackInfo callback
-    ) {
-        if (
-                !BuildscapeClientConfig.get().isParallelModelLoadingEnabled() ||
-                LaunchFasterInterop.isParallelModelLoadingEnabled()
-        ) {
+            CallbackInfo callback) {
+        if (!BuildscapeClientConfig.get().isParallelModelLoadingEnabled() ||
+                LaunchFasterInterop.isParallelModelLoadingEnabled()) {
             return;
         }
 
@@ -100,8 +96,7 @@ public abstract class BuildscapeModelBakeryMixin {
             ResourceLocation fileLocation = modelFiles.get(index);
             try (
                     Resource resource = resourceManager.getResource(fileLocation);
-                    InputStream stream = resource.getInputStream()
-            ) {
+                    InputStream stream = resource.getInputStream()) {
                 String json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 
                 if (BUILDSCAPE_CUSTOM_LOADER.matcher(json).find()) {
@@ -118,8 +113,7 @@ public abstract class BuildscapeModelBakeryMixin {
                 BuildScape.LOGGER.debug(
                         "Buildscape model preload deferred {} to the normal loader",
                         fileLocation,
-                        exception
-                );
+                        exception);
             }
         });
 
@@ -129,15 +123,13 @@ public abstract class BuildscapeModelBakeryMixin {
                 "Buildscape startup parsed {} model files in parallel ({} ms, {} sequential fallbacks)",
                 parsedModels.size(),
                 elapsedMillis,
-                fallbackCount.get()
-        );
+                fallbackCount.get());
     }
 
     @Inject(method = "loadBlockModel", at = @At("HEAD"), cancellable = true)
     private void buildscape$useParsedModel(
             ResourceLocation location,
-            CallbackInfoReturnable<BlockModel> callback
-    ) {
+            CallbackInfoReturnable<BlockModel> callback) {
         Map<ResourceLocation, BlockModel> parsedModels = buildscape$parsedModels;
         if (parsedModels == null || !BuildScape.MODID.equals(location.getNamespace())) {
             return;
@@ -152,12 +144,9 @@ public abstract class BuildscapeModelBakeryMixin {
     @Inject(method = "loadBlockModel", at = @At("RETURN"))
     private void buildscape$detectCustomGeometry(
             ResourceLocation location,
-            CallbackInfoReturnable<BlockModel> callback
-    ) {
-        if (
-                BuildScape.MODID.equals(location.getNamespace()) &&
-                callback.getReturnValue().customData.hasCustomGeometry()
-        ) {
+            CallbackInfoReturnable<BlockModel> callback) {
+        if (BuildScape.MODID.equals(location.getNamespace()) &&
+                callback.getReturnValue().customData.hasCustomGeometry()) {
             buildscape$hasCustomGeometry = true;
         }
     }
@@ -166,36 +155,25 @@ public abstract class BuildscapeModelBakeryMixin {
     private void buildscape$releaseParsedModels(
             ProfilerFiller profiler,
             int maxMipmapLevel,
-            CallbackInfo callback
-    ) {
+            CallbackInfo callback) {
         buildscape$parsedModels = null;
     }
 
-    @Inject(
-            method = "uploadTextures",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/util/profiling/ProfilerFiller;" +
-                            "popPush(Ljava/lang/String;)V",
-                    shift = At.Shift.AFTER
-            )
-    )
+    @Inject(method = "uploadTextures", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;"
+            +
+            "popPush(Ljava/lang/String;)V", shift = At.Shift.AFTER))
     private void buildscape$bakeModelsInParallel(
             TextureManager textureManager,
             ProfilerFiller profiler,
-            CallbackInfoReturnable<AtlasSet> callback
-    ) {
-        if (
-                !BuildscapeClientConfig.get().isParallelModelBakingEnabled() ||
-                LaunchFasterInterop.isParallelModelBakingEnabled()
-        ) {
+            CallbackInfoReturnable<AtlasSet> callback) {
+        if (!BuildscapeClientConfig.get().isParallelModelBakingEnabled() ||
+                LaunchFasterInterop.isParallelModelBakingEnabled()) {
             return;
         }
 
         if (buildscape$hasCustomGeometry) {
             BuildScape.LOGGER.info(
-                    "Buildscape startup kept model baking sequential because custom geometry was detected"
-            );
+                    "Buildscape startup kept model baking sequential because custom geometry was detected");
             return;
         }
 
@@ -210,8 +188,7 @@ public abstract class BuildscapeModelBakeryMixin {
         for (ResourceLocation candidate : candidates) {
             if (!buildscape$hasCachedDependencies(candidate, checked)) {
                 BuildScape.LOGGER.info(
-                        "Buildscape startup kept model baking sequential because model dependencies were not safely cached"
-                );
+                        "Buildscape startup kept model baking sequential because model dependencies were not safely cached");
                 return;
             }
         }
@@ -235,8 +212,7 @@ public abstract class BuildscapeModelBakeryMixin {
                 BuildScape.LOGGER.debug(
                         "Buildscape model bake deferred {} to the normal loader",
                         location,
-                        exception
-                );
+                        exception);
             }
         });
 
@@ -245,8 +221,7 @@ public abstract class BuildscapeModelBakeryMixin {
                 "Buildscape startup baked {} top-level models in parallel ({} ms, {} sequential fallbacks)",
                 completed.size(),
                 elapsedMillis,
-                fallbackCount.get()
-        );
+                fallbackCount.get());
     }
 
     @Unique
@@ -291,15 +266,13 @@ public abstract class BuildscapeModelBakeryMixin {
                     .filter(path -> path.endsWith(".json"))
                     .map(path -> new ResourceLocation(
                             BuildScape.MODID,
-                            "models/" + path.replace('\\', '/')
-                    ))
+                            "models/" + path.replace('\\', '/')))
                     .sorted(Comparator.comparing(ResourceLocation::toString))
                     .toList();
         } catch (Exception exception) {
             BuildScape.LOGGER.warn(
                     "Buildscape model discovery fell back to the normal loader",
-                    exception
-            );
+                    exception);
             return List.of();
         }
     }

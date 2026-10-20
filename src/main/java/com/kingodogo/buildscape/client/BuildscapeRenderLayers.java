@@ -7,8 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.RegistryObject;
 
 public final class BuildscapeRenderLayers {
-    private BuildscapeRenderLayers() {
-    }
+    private BuildscapeRenderLayers() {}
 
     public static void register() {
         for (RegistryObject<Block> entry : ModBlocks.BLOCKS.getEntries()) {
@@ -20,14 +19,12 @@ public final class BuildscapeRenderLayers {
     }
 
     private static RenderType getRenderType(String path) {
-        if (
-                path.contains("glass") ||
+        if (path.contains("glass") ||
                 path.endsWith("_ornament") ||
                 path.endsWith("_string_light") ||
                 path.startsWith("bit_") && path.endsWith("copper_grate") ||
                 path.endsWith("flaming_steel_grate") ||
-                isTranslucentExact(path)
-        ) {
+                isTranslucentExact(path)) {
             return RenderType.translucent();
         }
 
@@ -35,8 +32,7 @@ public final class BuildscapeRenderLayers {
             return RenderType.cutoutMipped();
         }
 
-        if (
-                path.startsWith("potted_") ||
+        if (path.startsWith("potted_") ||
                 path.endsWith("_haze_bush") ||
                 path.contains("hollow") ||
                 path.contains("wallpaper_flat") ||
@@ -63,8 +59,7 @@ public final class BuildscapeRenderLayers {
                 path.endsWith("copper_lantern") ||
                 path.endsWith("copper_rod") ||
                 isBackportCutout(path) ||
-                isCutoutExact(path)
-        ) {
+                isCutoutExact(path)) {
             return RenderType.cutout();
         }
 
@@ -93,7 +88,8 @@ public final class BuildscapeRenderLayers {
                     "sculk_shrieker",
                     "sculk_vein",
                     "tall_dry_grass",
-                    "wildflowers" -> true;
+                    "wildflowers" ->
+                true;
             default -> false;
         };
     }
@@ -105,7 +101,8 @@ public final class BuildscapeRenderLayers {
                     "golden_jar",
                     "icicle_block",
                     "packed_icicle_block",
-                    "steel_grate" -> true;
+                    "steel_grate" ->
+                true;
             default -> false;
         };
     }
@@ -137,7 +134,8 @@ public final class BuildscapeRenderLayers {
                     "ashenking_diamond_pillar",
                     "ashenking_emerald_pillar",
                     "ashenking_gold_pillar",
-                    "ashenking_netherite_pillar" -> true;
+                    "ashenking_netherite_pillar" ->
+                true;
             default -> false;
         };
     }

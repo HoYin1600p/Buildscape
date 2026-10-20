@@ -39,17 +39,14 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
     public static final IntegerProperty FLOWER_AMOUNT = IntegerProperty.create(
             "flower_amount",
             1,
-            4
-    );
-    public static final DirectionProperty FACING =
-            BlockStateProperties.HORIZONTAL_FACING;
+            4);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static SoundType cachedSoundType = null;
 
     private static SoundType getFlowerBedSounds() {
         if (cachedSoundType == null) {
-            cachedSoundType =
-                    ModSounds.FLOWER_BED_SOUNDS();
+            cachedSoundType = ModSounds.FLOWER_BED_SOUNDS();
         }
         return cachedSoundType;
     }
@@ -60,32 +57,28 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             0.0D,
             8.0D,
             3.0D,
-            8.0D
-    );
+            8.0D);
     private static final VoxelShape SHAPE_2_SOUTH = Block.box(
             0.0D,
             0.0D,
             0.0D,
             8.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_3_SOUTH = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_4_SOUTH = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
 
     private static final VoxelShape COLLISION_SHAPE = Block.box(
             0.0D,
@@ -93,16 +86,14 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape INSIDE_SHAPE = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
 
     private static final VoxelShape SHAPE_1_NORTH = Block.box(
             8.0D,
@@ -110,32 +101,28 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             8.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_2_NORTH = Block.box(
             8.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_3_NORTH = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_4_NORTH = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
 
     private static final VoxelShape SHAPE_1_EAST = Block.box(
             0.0D,
@@ -143,32 +130,28 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             8.0D,
             8.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_2_EAST = Block.box(
             0.0D,
             0.0D,
             8.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_3_EAST = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_4_EAST = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
 
     private static final VoxelShape SHAPE_1_WEST = Block.box(
             8.0D,
@@ -176,32 +159,28 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             0.0D,
             16.0D,
             3.0D,
-            8.0D
-    );
+            8.0D);
     private static final VoxelShape SHAPE_2_WEST = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            8.0D
-    );
+            8.0D);
     private static final VoxelShape SHAPE_3_WEST = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_4_WEST = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             3.0D,
-            16.0D
-    );
+            16.0D);
 
     public PetalBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -209,8 +188,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
                 this.stateDefinition.any()
                         .setValue(FLOWER_AMOUNT, 1)
                         .setValue(FACING, Direction.SOUTH)
-                        .setValue(ON_FARMLAND, false)
-        );
+                        .setValue(ON_FARMLAND, false));
     }
 
     @Override
@@ -220,8 +198,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FLOWER_AMOUNT, FACING, ON_FARMLAND);
     }
 
@@ -230,8 +207,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         int stage = state.getValue(FLOWER_AMOUNT);
         Direction facing = state.getValue(FACING);
 
@@ -273,8 +249,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -283,13 +258,10 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             BlockState state,
             Level level,
             BlockPos pos,
-            Entity entity
-    ) {
-        if (
-                entity instanceof Player player &&
-                        player.isOnGround() &&
-                        level.isClientSide
-        ) {
+            Entity entity) {
+        if (entity instanceof Player player &&
+                player.isOnGround() &&
+                level.isClientSide) {
             float stepInterval = 2.0f;
             int currentStep = (int) (player.walkDist / stepInterval);
             int lastStep = (int) (player.walkDistO / stepInterval);
@@ -311,8 +283,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
                         SoundSource.BLOCKS,
                         volume,
                         pitch,
-                        false
-                );
+                        false);
             }
         }
         super.entityInside(state, level, pos, entity);
@@ -322,14 +293,14 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
     protected boolean mayPlaceOn(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.isFaceSturdy(level, pos, Direction.UP) || state.is(Blocks.FARMLAND);
     }
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        return (!context.isSecondaryUseActive() && context.getItemInHand().getItem() == this.asItem() && state.getValue(FLOWER_AMOUNT) < 4) || super.canBeReplaced(state, context);
+        return (!context.isSecondaryUseActive() && context.getItemInHand().getItem() == this.asItem()
+                && state.getValue(FLOWER_AMOUNT) < 4) || super.canBeReplaced(state, context);
     }
 
     @Override
@@ -349,9 +320,11 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
         if (direction == Direction.DOWN) {
-            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState,
+                    level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
@@ -373,24 +346,20 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
 
         if (itemStack.getItem() instanceof BlockItem) {
             BlockItem blockItem = (BlockItem) itemStack.getItem();
-            if (
-                    blockItem.getBlock() instanceof PetalBlock &&
-                            blockItem.getBlock() == this
-            ) {
+            if (blockItem.getBlock() instanceof PetalBlock &&
+                    blockItem.getBlock() == this) {
                 int currentAmount = state.getValue(FLOWER_AMOUNT);
                 if (currentAmount < 4) {
                     if (!level.isClientSide) {
                         level.setBlock(
                                 pos,
                                 state.setValue(FLOWER_AMOUNT, currentAmount + 1),
-                                3
-                        );
+                                3);
                         if (!player.getAbilities().instabuild) {
                             itemStack.shrink(1);
                         }
@@ -402,8 +371,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
                             sounds.getPlaceSound(),
                             SoundSource.BLOCKS,
                             sounds.getVolume(),
-                            sounds.getPitch()
-                    );
+                            sounds.getPitch());
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
@@ -417,8 +385,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             BlockGetter level,
             BlockPos pos,
             BlockState state,
-            boolean isClient
-    ) {
+            boolean isClient) {
         return true;
     }
 
@@ -427,8 +394,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             Level level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         return true;
     }
 
@@ -437,8 +403,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             ServerLevel level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         int currentStage = state.getValue(FLOWER_AMOUNT);
 
         if (currentStage < 4) {
@@ -450,8 +415,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
                     pos.getX() + 0.5D,
                     pos.getY() + 0.5D,
                     pos.getZ() + 0.5D,
-                    petalStack
-            );
+                    petalStack);
             itemEntity.setDefaultPickUpDelay();
             level.addFreshEntity(itemEntity);
         }
@@ -460,8 +424,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         int stage = state.getValue(FLOWER_AMOUNT);
         return Collections.singletonList(new ItemStack(this, stage));
     }
@@ -480,11 +443,8 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 }

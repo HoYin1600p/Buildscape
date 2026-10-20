@@ -18,7 +18,8 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class ConfigReadOnlyRegressionTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {
@@ -45,7 +46,8 @@ public class ConfigReadOnlyRegressionTest {
                 assertEquals(original + (trailingNewline ? "" : newline)
                         + "# Maximum number of pipes in one network." + newline
                         + "MaxPipeNetworkSize = 64" + newline
-                        + "# Number of custom item presets that can be saved besides Default (1-32, default 4)." + newline
+                        + "# Number of custom item presets that can be saved besides Default (1-32, default 4)."
+                        + newline
                         + "MaxCustomPresets = 4" + newline, ConfigLayoutIO.readText(file));
                 assertEquals(64, config.getMaxPipeNetworkSize());
                 assertFalse(config.isCakeStackingEnabled());

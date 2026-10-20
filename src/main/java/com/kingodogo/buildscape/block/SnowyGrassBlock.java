@@ -45,15 +45,12 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
     private static boolean canBeGrass(
             BlockState state,
             LevelReader level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
 
-        if (
-                aboveState.is(Blocks.SNOW) &&
-                        aboveState.getValue(SnowLayerBlock.LAYERS) == 1
-        ) {
+        if (aboveState.is(Blocks.SNOW) &&
+                aboveState.getValue(SnowLayerBlock.LAYERS) == 1) {
             return true;
         }
 
@@ -68,8 +65,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
                 aboveState,
                 abovePos,
                 Direction.UP,
-                aboveState.getLightBlock(level, abovePos)
-        );
+                aboveState.getLightBlock(level, abovePos));
 
         return lightLevel < level.getMaxLightLevel();
     }
@@ -77,13 +73,10 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
     private static boolean canPropagate(
             BlockState state,
             LevelReader level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         BlockPos abovePos = pos.above();
-        return (
-                canBeGrass(state, level, pos) &&
-                        !level.getFluidState(abovePos).is(FluidTags.WATER)
-        );
+        return (canBeGrass(state, level, pos) &&
+                !level.getFluidState(abovePos).is(FluidTags.WATER));
     }
 
     @Override
@@ -91,8 +84,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         if (!canBeGrass(state, level, pos)) {
             level.setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
             return;
@@ -106,8 +98,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
                 BlockPos targetPos = pos.offset(
                         random.nextInt(3) - 1,
                         random.nextInt(5) - 3,
-                        random.nextInt(3) - 1
-                );
+                        random.nextInt(3) - 1);
 
                 BlockState targetState = level.getBlockState(targetPos);
 
@@ -116,10 +107,8 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
                             .setValue(SlabBlock.TYPE, targetState.getValue(SlabBlock.TYPE))
                             .setValue(SlabBlock.WATERLOGGED, targetState.getValue(SlabBlock.WATERLOGGED));
                     level.setBlockAndUpdate(targetPos, grassSlabState);
-                } else if (
-                        targetState.is(Blocks.DIRT) &&
-                                canPropagate(snowyGrassState, level, targetPos)
-                ) {
+                } else if (targetState.is(Blocks.DIRT) &&
+                        canPropagate(snowyGrassState, level, targetPos)) {
                     level.setBlockAndUpdate(targetPos, snowyGrassState);
                 }
             }
@@ -129,23 +118,17 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         LootContext ctx = builder
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(
-                        LootContextParamSets.BLOCK
-                );
+                        LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(LootContextParams.TOOL);
 
         if (tool != null && !tool.isEmpty()) {
-            if (
-                    EnchantmentHelper.getItemEnchantmentLevel(
-                            Enchantments.SILK_TOUCH,
-                            tool
-                    ) >
-                            0
-            ) {
+            if (EnchantmentHelper.getItemEnchantmentLevel(
+                    Enchantments.SILK_TOUCH,
+                    tool) > 0) {
                 return Collections.singletonList(new ItemStack(this));
             }
         }
@@ -159,8 +142,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() instanceof BoneMealItem) {
             if (this.isValidBonemealTarget(level, pos, state, level.isClientSide)) {
@@ -170,8 +152,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
                                 (ServerLevel) level,
                                 level.getRandom(),
                                 pos,
-                                state
-                        );
+                                state);
                         if (!player.getAbilities().instabuild) {
                             itemStack.shrink(1);
                         }
@@ -184,8 +165,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
                         SoundEvents.BONE_MEAL_USE,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
@@ -198,8 +178,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
             BlockGetter level,
             BlockPos pos,
             BlockState state,
-            boolean isClient
-    ) {
+            boolean isClient) {
         BlockPos abovePos = pos.above();
         return level.getBlockState(abovePos).isAir();
     }
@@ -209,8 +188,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
             Level level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         return true;
     }
 
@@ -219,8 +197,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
             ServerLevel level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         int radius = 1 + random.nextInt(3);
         int spawnCount;
         int weight = random.nextInt(100);
@@ -250,21 +227,17 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
             if (foliageBlock != null) {
                 BlockState foliageState = foliageBlock.defaultBlockState();
                 if (foliageBlock instanceof BushBlock) {
-                    if (
-                            !((BushBlock) foliageBlock).canSurvive(
-                                    foliageState,
-                                    level,
-                                    abovePos
-                            )
-                    ) {
+                    if (!((BushBlock) foliageBlock).canSurvive(
+                            foliageState,
+                            level,
+                            abovePos)) {
                         continue;
                     }
                 }
                 if (foliageBlock instanceof DoublePlantBlock) {
                     foliageState = foliageState.setValue(
                             DoublePlantBlock.HALF,
-                            DoubleBlockHalf.LOWER
-                    );
+                            DoubleBlockHalf.LOWER);
                     BlockPos upperPos = abovePos.above();
                     if (!level.getBlockState(upperPos).isAir()) {
                         continue;
@@ -273,8 +246,7 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
                     level.setBlock(
                             upperPos,
                             foliageState.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER),
-                            3
-                    );
+                            3);
                 } else {
                     level.setBlock(abovePos, foliageState, 3);
                 }

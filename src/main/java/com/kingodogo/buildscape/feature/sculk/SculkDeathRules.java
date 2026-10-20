@@ -5,8 +5,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 public final class SculkDeathRules {
-    private SculkDeathRules() {
-    }
+    private SculkDeathRules() {}
 
     public static boolean isInRange(double distanceSquared) {
         return distanceSquared >= 0.0D && distanceSquared <= 64.0D;

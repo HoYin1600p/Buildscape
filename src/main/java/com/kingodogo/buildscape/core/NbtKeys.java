@@ -102,6 +102,5 @@ public final class NbtKeys {
     public static final String WANDERING_HOMEMAKER_UUID = "WanderingHomemakerUUID";
     public static final String WOBBLE_START_TICK = "WobbleStartTick";
 
-    private NbtKeys() {
-    }
+    private NbtKeys() {}
 }

@@ -72,37 +72,34 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     public static final float WATER_SOURCE_VISUAL_HEIGHT = 14.0F / 16.0F;
     public static final IntegerProperty WATER_LEVEL = IntegerProperty.create("water_level", 0, 7);
 
-    public static final BooleanProperty DOWN  = BlockStateProperties.DOWN;
-    public static final BooleanProperty UP    = BlockStateProperties.UP;
+    public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
+    public static final BooleanProperty UP = BlockStateProperties.UP;
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
     public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
-    public static final BooleanProperty WEST  = BlockStateProperties.WEST;
-    public static final BooleanProperty EAST  = BlockStateProperties.EAST;
+    public static final BooleanProperty WEST = BlockStateProperties.WEST;
+    public static final BooleanProperty EAST = BlockStateProperties.EAST;
 
     private static final VoxelShape BOX_NORTH = Block.box(0, 0, 0, 16, 16, 2);
     private static final VoxelShape BOX_SOUTH = Block.box(0, 0, 14, 16, 16, 16);
-    private static final VoxelShape BOX_WEST  = Block.box(0, 0, 0, 2, 16, 16);
-    private static final VoxelShape BOX_EAST  = Block.box(14, 0, 0, 16, 16, 16);
-    private static final VoxelShape BOX_DOWN  = Block.box(0, 0, 0, 16, 2, 16);
-    private static final VoxelShape BOX_UP    = Block.box(0, 14, 0, 16, 16, 16);
+    private static final VoxelShape BOX_WEST = Block.box(0, 0, 0, 2, 16, 16);
+    private static final VoxelShape BOX_EAST = Block.box(14, 0, 0, 16, 16, 16);
+    private static final VoxelShape BOX_DOWN = Block.box(0, 0, 0, 16, 2, 16);
+    private static final VoxelShape BOX_UP = Block.box(0, 14, 0, 16, 16, 16);
 
     private static final VoxelShape Y_SHAPE = Shapes.join(
-        Shapes.block(),
-        Block.box(2, 0, 2, 14, 16, 14),
-        BooleanOp.ONLY_FIRST
-    ).optimize();
+            Shapes.block(),
+            Block.box(2, 0, 2, 14, 16, 14),
+            BooleanOp.ONLY_FIRST).optimize();
 
     private static final VoxelShape X_SHAPE = Shapes.join(
-        Shapes.block(),
-        Block.box(0, 2, 2, 16, 14, 14),
-        BooleanOp.ONLY_FIRST
-    ).optimize();
+            Shapes.block(),
+            Block.box(0, 2, 2, 16, 14, 14),
+            BooleanOp.ONLY_FIRST).optimize();
 
     private static final VoxelShape Z_SHAPE = Shapes.join(
-        Shapes.block(),
-        Block.box(2, 2, 0, 14, 14, 16),
-        BooleanOp.ONLY_FIRST
-    ).optimize();
+            Shapes.block(),
+            Block.box(2, 2, 0, 14, 14, 16),
+            BooleanOp.ONLY_FIRST).optimize();
 
     private static final VoxelShape X_SHAPE_SNEAK = Shapes.or(BOX_NORTH, BOX_SOUTH, BOX_DOWN);
     private static final VoxelShape Z_SHAPE_SNEAK = Shapes.or(BOX_WEST, BOX_EAST, BOX_DOWN);
@@ -111,14 +108,15 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     static {
         for (int mask = 0; mask < 64; mask++) {
-            boolean down  = (mask & (1 << Direction.DOWN.get3DDataValue())) != 0;
-            boolean up    = (mask & (1 << Direction.UP.get3DDataValue())) != 0;
+            boolean down = (mask & (1 << Direction.DOWN.get3DDataValue())) != 0;
+            boolean up = (mask & (1 << Direction.UP.get3DDataValue())) != 0;
             boolean north = (mask & (1 << Direction.NORTH.get3DDataValue())) != 0;
             boolean south = (mask & (1 << Direction.SOUTH.get3DDataValue())) != 0;
-            boolean west  = (mask & (1 << Direction.WEST.get3DDataValue())) != 0;
-            boolean east  = (mask & (1 << Direction.EAST.get3DDataValue())) != 0;
+            boolean west = (mask & (1 << Direction.WEST.get3DDataValue())) != 0;
+            boolean east = (mask & (1 << Direction.EAST.get3DDataValue())) != 0;
 
-            int count = (down ? 1 : 0) + (up ? 1 : 0) + (north ? 1 : 0) + (south ? 1 : 0) + (west ? 1 : 0) + (east ? 1 : 0);
+            int count = (down ? 1 : 0) + (up ? 1 : 0) + (north ? 1 : 0) + (south ? 1 : 0) + (west ? 1 : 0)
+                    + (east ? 1 : 0);
 
             if (count == 0) {
                 SHAPES_BY_MASK[mask] = Y_SHAPE;
@@ -179,7 +177,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+            BlockEntityType<T> type) {
         if (level.isClientSide) {
             return null;
         }
@@ -203,7 +202,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             if ("lava".equals(ft)) {
                 return Fluids.LAVA;
             }
-            if ("experience".equals(ft) || "buildscape:experience_still".equals(ft) || "buildscape:experience".equals(ft)) {
+            if ("experience".equals(ft) || "buildscape:experience_still".equals(ft)
+                    || "buildscape:experience".equals(ft)) {
                 Fluid xp = ModFluids.experienceStillOrNull();
                 if (xp != null) {
                     return xp;
@@ -279,7 +279,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit) {
         ItemStack held = player.getItemInHand(hand);
         BlockEntity be = level.getBlockEntity(pos);
         HollowLogBlockEntity hollowBe = be instanceof HollowLogBlockEntity h ? h : null;
@@ -367,7 +368,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 }
 
                 if (!player.getAbilities().instabuild) {
-                    ItemStack emptyContainer = held.hasContainerItem() ? held.getContainerItem() : new ItemStack(Items.BUCKET);
+                    ItemStack emptyContainer = held.hasContainerItem()
+                            ? held.getContainerItem()
+                            : new ItemStack(Items.BUCKET);
                     held.shrink(1);
                     if (held.isEmpty()) {
                         player.setItemInHand(hand, emptyContainer);
@@ -427,7 +430,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public static boolean trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist,
-                                        @Nullable Set<Direction> allowedDirections) {
+            @Nullable Set<Direction> allowedDirections) {
         if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY || level.isClientSide) {
             return false;
         }
@@ -435,15 +438,16 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     static boolean trySpreadToWorld(LevelAccessor level, BlockPos pos, BlockState state, Fluid fluid, int dist,
-                                   @Nullable Set<Direction> allowedDirections) {
+            @Nullable Set<Direction> allowedDirections) {
         return trySpreadToWorld(level, pos, fluid, dist, allowedDirections,
                 dir -> state.getBlock() instanceof HollowLogBlock
-                        ? HollowLogBlock.isOpenEnd(state, dir) : isOpenEndpoint(state, dir));
+                        ? HollowLogBlock.isOpenEnd(state, dir)
+                        : isOpenEndpoint(state, dir));
     }
 
     static boolean trySpreadToWorld(LevelAccessor level, BlockPos pos, Fluid fluid, int dist,
-                                   @Nullable Set<Direction> allowedDirections,
-                                   Predicate<Direction> openEndpoint) {
+            @Nullable Set<Direction> allowedDirections,
+            Predicate<Direction> openEndpoint) {
         if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY) {
             return false;
         }
@@ -510,7 +514,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         return target.isAir() || target.equals(state) ? null : target;
     }
 
-    static boolean spreadToWorldBlock(LevelAccessor level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
+    static boolean spreadToWorldBlock(LevelAccessor level, BlockPos neighborPos, Fluid fluid, int amount,
+            boolean falling) {
         BlockState target = spillState(level, neighborPos, fluid, amount, falling);
         if (target == null || !level.setBlock(neighborPos, target, 3)) {
             return false;
@@ -558,8 +563,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         if (state.hasProperty(AXIS) && state.getValue(AXIS) == Direction.Axis.Y) {
             boolean north = state.hasProperty(NORTH) && state.getValue(NORTH);
             boolean south = state.hasProperty(SOUTH) && state.getValue(SOUTH);
-            boolean west  = state.hasProperty(WEST) && state.getValue(WEST);
-            boolean east  = state.hasProperty(EAST) && state.getValue(EAST);
+            boolean west = state.hasProperty(WEST) && state.getValue(WEST);
+            boolean east = state.hasProperty(EAST) && state.getValue(EAST);
             int count = (north ? 1 : 0) + (south ? 1 : 0) + (west ? 1 : 0) + (east ? 1 : 0);
             return count == 0;
         }
@@ -756,7 +761,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level,
+            BlockPos pos, BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -779,7 +785,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos,
+            boolean isMoving) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
         if (!level.isClientSide) {
             HollowPipeTransportManager.onNeighborChanged(level, pos, state, fromPos);
@@ -811,12 +818,12 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public BlockState updateConnections(BlockGetter level, BlockPos pos, BlockState state) {
-        boolean down  = canConnectTo(level, pos, state, Direction.DOWN);
-        boolean up    = canConnectTo(level, pos, state, Direction.UP);
+        boolean down = canConnectTo(level, pos, state, Direction.DOWN);
+        boolean up = canConnectTo(level, pos, state, Direction.UP);
         boolean north = canConnectTo(level, pos, state, Direction.NORTH);
         boolean south = canConnectTo(level, pos, state, Direction.SOUTH);
-        boolean west  = canConnectTo(level, pos, state, Direction.WEST);
-        boolean east  = canConnectTo(level, pos, state, Direction.EAST);
+        boolean west = canConnectTo(level, pos, state, Direction.WEST);
+        boolean east = canConnectTo(level, pos, state, Direction.EAST);
 
         return state
                 .setValue(DOWN, down)
@@ -836,18 +843,22 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         Direction.Axis myAxis = state.hasProperty(AXIS) ? state.getValue(AXIS) : Direction.Axis.Y;
 
         if (neighborBlock instanceof HollowPipeBlock) {
-            Direction.Axis neighborAxis = neighborState.hasProperty(AXIS) ? neighborState.getValue(AXIS) : Direction.Axis.Y;
+            Direction.Axis neighborAxis = neighborState.hasProperty(AXIS)
+                    ? neighborState.getValue(AXIS)
+                    : Direction.Axis.Y;
 
             boolean myChannelPointsToNeighbor = (myAxis == dirAxis);
             boolean neighborChannelPointsToMe = (neighborAxis == dirAxis);
 
             BooleanProperty neighborOppositeProp = getPropertyForDirection(dir.getOpposite());
-            boolean neighborAlreadyOpenToMe = neighborState.hasProperty(neighborOppositeProp) && neighborState.getValue(neighborOppositeProp);
+            boolean neighborAlreadyOpenToMe = neighborState.hasProperty(neighborOppositeProp)
+                    && neighborState.getValue(neighborOppositeProp);
 
             BooleanProperty myProp = getPropertyForDirection(dir);
             boolean myAlreadyOpenToNeighbor = state.hasProperty(myProp) && state.getValue(myProp);
 
-            return myChannelPointsToNeighbor || neighborChannelPointsToMe || neighborAlreadyOpenToMe || myAlreadyOpenToNeighbor;
+            return myChannelPointsToNeighbor || neighborChannelPointsToMe || neighborAlreadyOpenToMe
+                    || myAlreadyOpenToNeighbor;
         }
 
         if (neighborBlock instanceof HollowLogBlock) {
@@ -855,7 +866,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
 
         if (neighborBlock instanceof PipeBlock) {
-            return neighborState.getValue(PipeBlock.AXIS) == dirAxis && (myAxis == dirAxis || (state.hasProperty(getPropertyForDirection(dir)) && state.getValue(getPropertyForDirection(dir))));
+            return neighborState.getValue(PipeBlock.AXIS) == dirAxis
+                    && (myAxis == dirAxis || (state.hasProperty(getPropertyForDirection(dir))
+                            && state.getValue(getPropertyForDirection(dir))));
         }
 
         return false;

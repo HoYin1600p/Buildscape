@@ -18,8 +18,10 @@ import com.kingodogo.buildscape.core.SyncedBlockEntity;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 
 public class TrappedDecoratedPotBlockEntity
-        extends SyncedBlockEntity
-        implements WorldlyContainer {
+        extends
+            SyncedBlockEntity
+        implements
+            WorldlyContainer {
 
     private ItemStack storedItem = ItemStack.EMPTY;
 
@@ -29,15 +31,12 @@ public class TrappedDecoratedPotBlockEntity
     private static final int[] SLOTS = new int[]{0};
 
     public enum WobbleStyle {
-        NONE,
-        POSITIVE,
-        NEGATIVE,
+        NONE, POSITIVE, NEGATIVE,
     }
 
     public TrappedDecoratedPotBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.TRAPPED_DECORATED_POT_BLOCK_ENTITY.get(), pos, state);
     }
-
 
     public ItemStack getStoredItem() {
         return storedItem;
@@ -59,7 +58,6 @@ public class TrappedDecoratedPotBlockEntity
         return storedItem.isEmpty();
     }
 
-
     public void triggerWobble(WobbleStyle style) {
         if (level != null && !level.isClientSide && style != WobbleStyle.NONE) {
             this.wobbleStartedAtTick = level.getGameTime();
@@ -76,7 +74,6 @@ public class TrappedDecoratedPotBlockEntity
     public WobbleStyle getLastWobbleStyle() {
         return lastWobbleStyle;
     }
-
 
     @Override
     public int[] getSlotsForFace(Direction side) {
@@ -176,7 +173,6 @@ public class TrappedDecoratedPotBlockEntity
         return Math.max(1, (int) Math.ceil(fillRatio * 15.0f));
     }
 
-
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
@@ -212,8 +208,7 @@ public class TrappedDecoratedPotBlockEntity
         CompoundTag tag = super.getUpdateTag();
         tag.put(
                 NbtKeys.STORED_ITEM,
-                storedItem.isEmpty() ? ItemStack.EMPTY.save(new CompoundTag()) : storedItem.save(new CompoundTag())
-        );
+                storedItem.isEmpty() ? ItemStack.EMPTY.save(new CompoundTag()) : storedItem.save(new CompoundTag()));
         tag.putLong(NbtKeys.WOBBLE_START_TICK, wobbleStartedAtTick);
         tag.putString(NbtKeys.LAST_WOBBLE_STYLE, lastWobbleStyle.name());
         return tag;

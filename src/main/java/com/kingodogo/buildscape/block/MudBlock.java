@@ -23,8 +23,7 @@ public class MudBlock extends Block {
             0.0D,
             16.0D,
             15.0D,
-            16.0D
-    );
+            16.0D);
 
     public MudBlock(BlockBehaviour.Properties properties) {
         super(properties.randomTicks());
@@ -52,7 +51,7 @@ public class MudBlock extends Block {
 
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock,
-                                BlockPos neighborPos, boolean movedByPiston) {
+            BlockPos neighborPos, boolean movedByPiston) {
         super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
         scheduleDrying(level, pos);
     }
@@ -74,8 +73,7 @@ public class MudBlock extends Block {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 }

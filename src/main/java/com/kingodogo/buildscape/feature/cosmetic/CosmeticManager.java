@@ -41,7 +41,8 @@ public class CosmeticManager {
     }
 
     private void registerBuiltInCosmetics() {
-        registerRedeemableParticleTrail("buildscape:cosmatics/particle/heart_trail", "Heart Trail", "Hearts float behind you", 2,
+        registerRedeemableParticleTrail("buildscape:cosmatics/particle/heart_trail", "Heart Trail",
+                "Hearts float behind you", 2,
                 "heart");
         registerParticleTrail("buildscape:cosmatics/particle/sparkle_trail", "Sparkle Trail",
                 "Magical sparkles trail behind you", 1, "sparkle");
@@ -61,12 +62,10 @@ public class CosmeticManager {
 
         registerHeadCosmetic("buildscape:cosmatics/gear/builders_hat", "Builder's Hat", "A stylish builder's hat", 1);
 
-        cosmeticMetadata.put("buildscape:cosmatics/pets/kingodogo_pet", new CosmeticMetadata("Annoying Kingo Pet", "Adopt KingoDogo as your annoying loyal companion!", 1, CosmeticType.PET, null));
+        cosmeticMetadata.put("buildscape:cosmatics/pets/kingodogo_pet", new CosmeticMetadata("Annoying Kingo Pet",
+                "Adopt KingoDogo as your annoying loyal companion!", 1, CosmeticType.PET, null));
         allCosmetics.add("buildscape:cosmatics/pets/kingodogo_pet");
         defaultCosmetics.add("buildscape:cosmatics/pets/kingodogo_pet");
-
-
-
 
     }
 
@@ -78,7 +77,8 @@ public class CosmeticManager {
         particleShapes.put(cosmeticId, shape);
     }
 
-    private void registerRedeemableParticleTrail(String cosmeticId, String name, String description, int tier, String shape) {
+    private void registerRedeemableParticleTrail(String cosmeticId, String name, String description, int tier,
+            String shape) {
         allCosmetics.add(cosmeticId);
         cosmeticMetadata.put(cosmeticId,
                 new CosmeticMetadata(name, description, tier, CosmeticType.PARTICLE_TRAIL, null));
@@ -128,7 +128,8 @@ public class CosmeticManager {
 
     }
 
-    private void registerArmorCosmetic(String cosmeticId, String name, String description, int tier, CosmeticType type) {
+    private void registerArmorCosmetic(String cosmeticId, String name, String description, int tier,
+            CosmeticType type) {
         allCosmetics.add(cosmeticId);
         cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, type, null));
 
@@ -212,20 +213,10 @@ public class CosmeticManager {
                         idLower.contains("effect"));
     }
 
-        public record CosmeticMetadata(String name, String description, int tier, CosmeticType type, String legacyId) {
+    public record CosmeticMetadata(String name, String description, int tier, CosmeticType type, String legacyId) {
     }
 
     public enum CosmeticType {
-        ITEM,
-        BLOCK,
-        PARTICLE_TRAIL,
-        WINGS,
-        PARTICLE_WINGS,
-        EFFECT,
-        PET,
-        HEAD,
-        CHEST,
-        LEGS,
-        FEET
+        ITEM, BLOCK, PARTICLE_TRAIL, WINGS, PARTICLE_WINGS, EFFECT, PET, HEAD, CHEST, LEGS, FEET
     }
 }

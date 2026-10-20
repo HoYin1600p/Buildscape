@@ -47,8 +47,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             5.0D,
             11.0D,
             10.0D,
-            11.0D
-    );
+            11.0D);
 
     private static final String CONTACT_POSITION_KEY = "BuildscapeFrostRosePosition";
     private static final String CONTACT_DIMENSION_KEY = "BuildscapeFrostRoseDimension";
@@ -72,8 +71,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {
             return shape.move(0, -0.0625D, 0);
@@ -86,8 +84,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -95,20 +92,17 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
     protected boolean mayPlaceOn(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
-        return (
-                state.is(BlockTags.DIRT) ||
-                        state.is(Blocks.GRASS_BLOCK) ||
-                        state.is(Blocks.FARMLAND) ||
-                        state.is(Blocks.ICE) ||
-                        state.is(Blocks.PACKED_ICE) ||
-                        state.is(Blocks.BLUE_ICE) ||
-                        state.is(Blocks.SNOW) ||
-                        state.is(Blocks.SNOW_BLOCK) ||
-                        state.is(Blocks.POWDER_SNOW) ||
-                        state.is(ModBlocks.SNOW_BRICKS.get())
-        );
+            BlockPos pos) {
+        return (state.is(BlockTags.DIRT) ||
+                state.is(Blocks.GRASS_BLOCK) ||
+                state.is(Blocks.FARMLAND) ||
+                state.is(Blocks.ICE) ||
+                state.is(Blocks.PACKED_ICE) ||
+                state.is(Blocks.BLUE_ICE) ||
+                state.is(Blocks.SNOW) ||
+                state.is(Blocks.SNOW_BLOCK) ||
+                state.is(Blocks.POWDER_SNOW) ||
+                state.is(ModBlocks.SNOW_BRICKS.get()));
     }
 
     @Override
@@ -116,8 +110,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             BlockGetter level,
             BlockPos pos,
             BlockState state,
-            boolean isClient
-    ) {
+            boolean isClient) {
         return false;
     }
 
@@ -126,8 +119,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             Level level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         return false;
     }
 
@@ -136,9 +128,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             ServerLevel level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
-    }
+            BlockState state) {}
 
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
@@ -157,9 +147,11 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level,
+            BlockPos pos, BlockPos adjacentPos) {
         if (direction == Direction.DOWN) {
-            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState, level, pos, adjacentPos);
+            return super.updateShape(state.setValue(ON_FARMLAND, shouldSink(level, pos)), direction, adjacentState,
+                    level, pos, adjacentPos);
         }
         return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
@@ -169,8 +161,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             Level level,
             BlockPos pos,
             BlockState state,
-            Entity entity
-    ) {
+            Entity entity) {
         if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
             handleContact(level, pos, livingEntity);
         }
@@ -182,8 +173,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             BlockState state,
             Level level,
             BlockPos pos,
-            Entity entity
-    ) {
+            Entity entity) {
         if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
             handleContact(level, pos, livingEntity);
         }
@@ -258,18 +248,14 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentState,
-            Direction side
-    ) {
-        return (
-                adjacentState.is(this) || super.skipRendering(state, adjacentState, side)
-        );
+            Direction side) {
+        return (adjacentState.is(this) || super.skipRendering(state, adjacentState, side));
     }
 
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         return Collections.singletonList(new ItemStack(this));
     }
 
@@ -321,8 +307,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
                 level.addParticle(
                         ModParticles.SNOWFLAKE.get(),
                         spawnX, spawnY, spawnZ,
-                        xSpeed, ySpeed, zSpeed
-                );
+                        xSpeed, ySpeed, zSpeed);
             }
         }
     }

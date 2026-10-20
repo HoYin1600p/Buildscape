@@ -157,8 +157,11 @@ public class RecipeCacheGenerator {
                         continue;
                     }
 
-                    String specType = spec.type() != null ? spec.type().toLowerCase(Locale.ROOT) : category.toLowerCase(Locale.ROOT);
-                    if ("forge:conditional".equals(specType) || (spec.rawJson() != null && spec.rawJson().contains("\"conditions\""))) {
+                    String specType = spec.type() != null
+                            ? spec.type().toLowerCase(Locale.ROOT)
+                            : category.toLowerCase(Locale.ROOT);
+                    if ("forge:conditional".equals(specType)
+                            || (spec.rawJson() != null && spec.rawJson().contains("\"conditions\""))) {
                         continue;
                     }
 
@@ -179,9 +182,12 @@ public class RecipeCacheGenerator {
 
                     String group = spec.group() != null ? spec.group() : "";
                     String resultItemStr = (spec.result() != null && spec.result().item() != null)
-                            ? aliasResolver.resolveString(spec.result().item()) : "minecraft:air";
+                            ? aliasResolver.resolveString(spec.result().item())
+                            : "minecraft:air";
                     int count = spec.result() != null ? spec.result().count() : 1;
-                    String resultNbt = (spec.result() != null && spec.result().nbt() != null) ? spec.result().nbt() : "";
+                    String resultNbt = (spec.result() != null && spec.result().nbt() != null)
+                            ? spec.result().nbt()
+                            : "";
 
                     recipeDataOut.writeInt(getStringIndex(recipeId, stringPool, stringIndexMap));
                     recipeDataOut.writeInt(getStringIndex(group, stringPool, stringIndexMap));
@@ -239,7 +245,8 @@ public class RecipeCacheGenerator {
                             recipeDataOut.writeByte(8);
                             String baseIngJson = resolveIngredientJson(spec.input(), aliasResolver);
                             String addIngJson = (spec.ingredients() != null && !spec.ingredients().isEmpty())
-                                    ? resolveIngredientJson(spec.ingredients().get(0), aliasResolver) : "";
+                                    ? resolveIngredientJson(spec.ingredients().get(0), aliasResolver)
+                                    : "";
                             recipeDataOut.writeInt(getStringIndex(baseIngJson, stringPool, stringIndexMap));
                             recipeDataOut.writeInt(getStringIndex(addIngJson, stringPool, stringIndexMap));
                         }
@@ -428,9 +435,10 @@ public class RecipeCacheGenerator {
         return runtimeCategories;
     }
 
-
     public static void main(String[] args) throws Exception {
-        Path sourceDir = args.length > 0 ? Path.of(args[0]) : Path.of("src/main/resources/data/buildscape/recipes_pack");
+        Path sourceDir = args.length > 0
+                ? Path.of(args[0])
+                : Path.of("src/main/resources/data/buildscape/recipes_pack");
         Path targetBundledCache = args.length > 1 ? Path.of(args[1]) : sourceDir.resolve("recipes.bscb");
         Path targetLocalCache = args.length > 2 ? Path.of(args[2]) : null;
 
@@ -448,7 +456,8 @@ public class RecipeCacheGenerator {
         boolean localValid = targetLocalCache == null || isCacheValid(targetLocalCache, expectedHash);
 
         if (bundledValid && localValid) {
-            System.out.println("Recipe cache is already up to date with source hash: " + expectedHash + ". Skipping rebuild.");
+            System.out.println(
+                    "Recipe cache is already up to date with source hash: " + expectedHash + ". Skipping rebuild.");
             return;
         }
 
@@ -459,7 +468,8 @@ public class RecipeCacheGenerator {
             // Compile binary cache from JSON sources only when sources or hash changed
             cacheBytes = generateCache(sourceDir);
             AtomicFiles.write(targetBundledCache, cacheBytes);
-            System.out.println("Generated bundled binary recipe cache: " + targetBundledCache.toAbsolutePath() + " (" + cacheBytes.length + " bytes)");
+            System.out.println("Generated bundled binary recipe cache: " + targetBundledCache.toAbsolutePath() + " ("
+                    + cacheBytes.length + " bytes)");
         }
 
         if (targetLocalCache != null && !localValid) {
@@ -473,8 +483,10 @@ public class RecipeCacheGenerator {
 
         // Validate written cache matches computed source hash
         if (!isCacheValid(targetBundledCache, expectedHash)) {
-            throw new IllegalStateException("Integrity check failed: Written bundled cache does not match the source hash!");
+            throw new IllegalStateException(
+                    "Integrity check failed: Written bundled cache does not match the source hash!");
         }
-        System.out.println("Integrity verified: " + targetBundledCache.toAbsolutePath() + " matches live source hash " + expectedHash);
+        System.out.println("Integrity verified: " + targetBundledCache.toAbsolutePath() + " matches live source hash "
+                + expectedHash);
     }
 }

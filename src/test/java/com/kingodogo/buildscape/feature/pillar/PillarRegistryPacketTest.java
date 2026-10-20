@@ -60,8 +60,11 @@ public class PillarRegistryPacketTest {
             for (String name : List.of("batchId", "oldIds", "reason")) {
                 Field field = EditPillarRowsResultPacket.class.getDeclaredField(name);
                 field.setAccessible(true);
-                Object expected = name.equals("batchId") ? 456L : name.equals("oldIds")
-                        ? List.of("S-P1", "S-P2") : reason;
+                Object expected = name.equals("batchId")
+                        ? 456L
+                        : name.equals("oldIds")
+                                ? List.of("S-P1", "S-P2")
+                                : reason;
                 assertEquals(expected, field.get(decoded));
             }
         } finally {

@@ -23,8 +23,7 @@ import java.util.function.Predicate;
 
 public class MangroveBoatItem extends Item {
 
-    private static final Predicate<Entity> ENTITY_PREDICATE =
-            EntitySelector.NO_SPECTATORS.and(Entity::isPickable);
+    private static final Predicate<Entity> ENTITY_PREDICATE = EntitySelector.NO_SPECTATORS.and(Entity::isPickable);
 
     public MangroveBoatItem(Item.Properties properties) {
         super(properties);
@@ -34,14 +33,12 @@ public class MangroveBoatItem extends Item {
     public InteractionResultHolder<ItemStack> use(
             Level level,
             Player player,
-            InteractionHand hand
-    ) {
+            InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         HitResult hitresult = getPlayerPOVHitResult(
                 level,
                 player,
-                ClipContext.Fluid.ANY
-        );
+                ClipContext.Fluid.ANY);
         if (hitresult.getType() == HitResult.Type.MISS) {
             return InteractionResultHolder.pass(itemstack);
         } else {
@@ -49,8 +46,7 @@ public class MangroveBoatItem extends Item {
             List<Entity> list = level.getEntities(
                     player,
                     player.getBoundingBox().expandTowards(vec3.scale(5.0D)).inflate(1.0D),
-                    ENTITY_PREDICATE
-            );
+                    ENTITY_PREDICATE);
             if (!list.isEmpty()) {
                 Vec3 vec31 = player.getEyePosition();
 
@@ -69,8 +65,7 @@ public class MangroveBoatItem extends Item {
                         level,
                         hitresult.getLocation().x,
                         hitresult.getLocation().y,
-                        hitresult.getLocation().z
-                );
+                        hitresult.getLocation().z);
                 boat.setYRot(player.getYRot());
                 if (!level.noCollision(boat, boat.getBoundingBox())) {
                     return InteractionResultHolder.fail(itemstack);
@@ -80,8 +75,7 @@ public class MangroveBoatItem extends Item {
                         level.gameEvent(
                                 player,
                                 GameEvent.ENTITY_PLACE,
-                                new BlockPos(hitresult.getLocation())
-                        );
+                                new BlockPos(hitresult.getLocation()));
                         if (!player.getAbilities().instabuild) {
                             itemstack.shrink(1);
                         }
@@ -90,8 +84,7 @@ public class MangroveBoatItem extends Item {
                     player.awardStat(Stats.ITEM_USED.get(this));
                     return InteractionResultHolder.sidedSuccess(
                             itemstack,
-                            level.isClientSide()
-                    );
+                            level.isClientSide());
                 }
             } else {
                 return InteractionResultHolder.pass(itemstack);

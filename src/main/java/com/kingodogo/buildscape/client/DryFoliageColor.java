@@ -21,15 +21,13 @@ import java.io.InputStream;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.MOD,
-        value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class DryFoliageColor {
     private static final int[] pixels = new int[65536];
     private static volatile boolean loaded = false;
 
-    public static final ColorResolver DRY_FOLIAGE_RESOLVER = (biome, x, z) -> get(biome.getBaseTemperature(), biome.getDownfall());
+    public static final ColorResolver DRY_FOLIAGE_RESOLVER = (biome, x, z) -> get(biome.getBaseTemperature(),
+            biome.getDownfall());
 
     public static synchronized void init() {
         if (loaded) {

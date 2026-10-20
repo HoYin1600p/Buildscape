@@ -36,12 +36,14 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 
 public class MulticolorGlowLightsBlock
-        extends VineBlock
-        implements EntityBlock, SimpleWaterloggedBlock {
+        extends
+            VineBlock
+        implements
+            EntityBlock,
+            SimpleWaterloggedBlock {
 
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 
     private static final VoxelShape SHAPE_NORTH = Block.box(
@@ -50,48 +52,42 @@ public class MulticolorGlowLightsBlock
             0.0D,
             16.0D,
             16.0D,
-            1.0D
-    );
+            1.0D);
     private static final VoxelShape SHAPE_SOUTH = Block.box(
             0.0D,
             0.0D,
             15.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_EAST = Block.box(
             15.0D,
             0.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_WEST = Block.box(
             0.0D,
             0.0D,
             0.0D,
             1.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_UP = Block.box(
             0.0D,
             15.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_DOWN = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             1.0D,
-            16.0D
-    );
+            16.0D);
 
     public MulticolorGlowLightsBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -104,14 +100,12 @@ public class MulticolorGlowLightsBlock
                         .setValue(VineBlock.UP, false)
                         .setValue(DOWN, false)
                         .setValue(WATERLOGGED, false)
-                        .setValue(LIT, true)
-        );
+                        .setValue(LIT, true));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(DOWN, WATERLOGGED, LIT);
     }
@@ -120,8 +114,7 @@ public class MulticolorGlowLightsBlock
     public int getLightEmission(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.getValue(LIT) ? 15 : 0;
     }
 
@@ -130,28 +123,22 @@ public class MulticolorGlowLightsBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         VoxelShape shape = Shapes.empty();
         if (state.getValue(VineBlock.NORTH)) {
-            shape =
-                Shapes.or(shape, SHAPE_NORTH);
+            shape = Shapes.or(shape, SHAPE_NORTH);
         }
         if (state.getValue(VineBlock.SOUTH)) {
-            shape =
-                Shapes.or(shape, SHAPE_SOUTH);
+            shape = Shapes.or(shape, SHAPE_SOUTH);
         }
         if (state.getValue(VineBlock.EAST)) {
-            shape =
-                Shapes.or(shape, SHAPE_EAST);
+            shape = Shapes.or(shape, SHAPE_EAST);
         }
         if (state.getValue(VineBlock.WEST)) {
-            shape =
-                Shapes.or(shape, SHAPE_WEST);
+            shape = Shapes.or(shape, SHAPE_WEST);
         }
         if (state.getValue(VineBlock.UP)) {
-            shape =
-                Shapes.or(shape, SHAPE_UP);
+            shape = Shapes.or(shape, SHAPE_UP);
         }
         if (state.getValue(DOWN)) {
             shape = Shapes.or(shape, SHAPE_DOWN);
@@ -163,9 +150,8 @@ public class MulticolorGlowLightsBlock
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos clickedPos = context.getClickedPos();
         BlockState blockState = context.getLevel().getBlockState(clickedPos);
-        boolean isExistingGlowLight =
-                blockState.getBlock() instanceof MulticolorGlowLightsBlock ||
-                        blockState.getBlock() instanceof GlowLightsBlock;
+        boolean isExistingGlowLight = blockState.getBlock() instanceof MulticolorGlowLightsBlock ||
+                blockState.getBlock() instanceof GlowLightsBlock;
 
         Direction clickedFace = context.getClickedFace();
         Direction attachDirection = clickedFace.getOpposite();
@@ -173,7 +159,8 @@ public class MulticolorGlowLightsBlock
         if (isExistingGlowLight) {
             for (Direction face : Direction.values()) {
                 BooleanProperty property = face == Direction.DOWN
-                        ? DOWN : VineBlock.getPropertyForFace(face);
+                        ? DOWN
+                        : VineBlock.getPropertyForFace(face);
                 if (property != null && blockState.hasProperty(property)) {
                     placementState = placementState.setValue(property, blockState.getValue(property));
                 }
@@ -181,29 +168,22 @@ public class MulticolorGlowLightsBlock
             placementState = placementState.setValue(WATERLOGGED, blockState.getValue(WATERLOGGED));
         }
 
-        if (
-                isExistingGlowLight &&
-                        context.getPlayer() != null &&
-                        context.getPlayer().isShiftKeyDown()
-        ) {
+        if (isExistingGlowLight &&
+                context.getPlayer() != null &&
+                context.getPlayer().isShiftKeyDown()) {
             return null;
         }
 
-        if (
-                isExistingGlowLight &&
-                        !(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())
-        ) {
+        if (isExistingGlowLight &&
+                !(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
             if (blockState.getBlock() == this) {
                 BooleanProperty property = attachDirection == Direction.DOWN
                         ? DOWN
                         : VineBlock.getPropertyForFace(
-                        attachDirection
-                );
-                if (
-                        property != null &&
-                                blockState.hasProperty(property) &&
-                                blockState.getValue(property)
-                ) {
+                                attachDirection);
+                if (property != null &&
+                        blockState.hasProperty(property) &&
+                        blockState.getValue(property)) {
                     return null;
                 }
             }
@@ -212,22 +192,17 @@ public class MulticolorGlowLightsBlock
         if (!isExistingGlowLight) {
             BlockPos originalPos = clickedPos.relative(clickedFace.getOpposite());
             BlockState originalState = context.getLevel().getBlockState(originalPos);
-            if (
-                    originalState.getBlock() instanceof MulticolorGlowLightsBlock ||
-                            originalState.getBlock() instanceof GlowLightsBlock
-            ) {
+            if (originalState.getBlock() instanceof MulticolorGlowLightsBlock ||
+                    originalState.getBlock() instanceof GlowLightsBlock) {
                 Direction attachToGlow = clickedFace.getOpposite();
                 BooleanProperty attachProperty = attachToGlow == Direction.DOWN
                         ? DOWN
                         : VineBlock.getPropertyForFace(
-                        attachToGlow
-                );
+                                attachToGlow);
 
-                if (
-                        attachProperty != null &&
-                                originalState.hasProperty(attachProperty) &&
-                                originalState.getValue(attachProperty)
-                ) {
+                if (attachProperty != null &&
+                        originalState.hasProperty(attachProperty) &&
+                        originalState.getValue(attachProperty)) {
                     return null;
                 }
 
@@ -257,8 +232,7 @@ public class MulticolorGlowLightsBlock
             BlockState state = placementState;
             state = state.setValue(
                     VineBlock.UP,
-                    true
-            );
+                    true);
             BlockPos placePos = context.getClickedPos();
             FluidState fluidState = context.getLevel().getFluidState(placePos);
             return state
@@ -275,7 +249,8 @@ public class MulticolorGlowLightsBlock
         BlockPos placePos = context.getClickedPos();
         FluidState fluidState = context.getLevel().getFluidState(placePos);
         BooleanProperty property = attachDirection == Direction.DOWN
-                ? DOWN : VineBlock.getPropertyForFace(attachDirection);
+                ? DOWN
+                : VineBlock.getPropertyForFace(attachDirection);
         if (isExistingGlowLight && property != null) {
             state = state.setValue(property, true);
         }
@@ -291,29 +266,21 @@ public class MulticolorGlowLightsBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
 
-        BooleanProperty faceProperty =
-                VineBlock.getPropertyForFace(direction);
-        if (
-                faceProperty != null &&
-                        state.hasProperty(faceProperty) &&
-                        state.getValue(faceProperty)
-        ) {
-            if (
-                    !canAttachTo(level, neighborState, neighborPos, direction.getOpposite())
-            ) {
+        BooleanProperty faceProperty = VineBlock.getPropertyForFace(direction);
+        if (faceProperty != null &&
+                state.hasProperty(faceProperty) &&
+                state.getValue(faceProperty)) {
+            if (!canAttachTo(level, neighborState, neighborPos, direction.getOpposite())) {
                 state = state.setValue(faceProperty, false);
             }
         }
         if (direction == Direction.DOWN && state.getValue(DOWN)) {
-            if (
-                    !canAttachTo(level, neighborState, neighborPos, direction.getOpposite())
-            ) {
+            if (!canAttachTo(level, neighborState, neighborPos, direction.getOpposite())) {
                 state = state.setValue(DOWN, false);
             }
         }
@@ -336,8 +303,7 @@ public class MulticolorGlowLightsBlock
     public boolean canSurvive(
             BlockState state,
             LevelReader level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return hasAnyFace(state);
     }
 
@@ -345,13 +311,10 @@ public class MulticolorGlowLightsBlock
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         Item heldItem = context.getItemInHand().getItem();
         if (heldItem instanceof BlockItem) {
-            Block heldBlock =
-                    ((BlockItem) heldItem).getBlock();
+            Block heldBlock = ((BlockItem) heldItem).getBlock();
 
-            if (
-                    !(heldBlock instanceof MulticolorGlowLightsBlock ||
-                            heldBlock instanceof GlowLightsBlock)
-            ) {
+            if (!(heldBlock instanceof MulticolorGlowLightsBlock ||
+                    heldBlock instanceof GlowLightsBlock)) {
                 return false;
             }
 
@@ -364,17 +327,15 @@ public class MulticolorGlowLightsBlock
             BooleanProperty property = attachDirection == Direction.DOWN
                     ? DOWN
                     : VineBlock.getPropertyForFace(
-                    attachDirection
-            );
+                            attachDirection);
 
-            if (
-                    property != null &&
-                            (state.getBlock() == heldBlock ||
-                                    (state.getBlock() instanceof GlowLightsBlock &&
-                                            heldBlock instanceof MulticolorGlowLightsBlock) ||
-                                    (state.getBlock() instanceof MulticolorGlowLightsBlock &&
-                                            heldBlock instanceof GlowLightsBlock))
-            ) {
+            if (property != null &&
+                    (state.getBlock() == heldBlock ||
+                            (state.getBlock() instanceof GlowLightsBlock &&
+                                    heldBlock instanceof MulticolorGlowLightsBlock)
+                            ||
+                            (state.getBlock() instanceof MulticolorGlowLightsBlock &&
+                                    heldBlock instanceof GlowLightsBlock))) {
                 return !state.hasProperty(property) || !state.getValue(property);
             }
 
@@ -399,7 +360,8 @@ public class MulticolorGlowLightsBlock
         int count = 0;
         for (Direction direction : Direction.values()) {
             BooleanProperty property = direction == Direction.DOWN
-                    ? DOWN : VineBlock.getPropertyForFace(direction);
+                    ? DOWN
+                    : VineBlock.getPropertyForFace(direction);
             if (state.getValue(property)) {
                 count++;
             }
@@ -408,22 +370,19 @@ public class MulticolorGlowLightsBlock
     }
 
     private boolean hasAnyFace(BlockState state) {
-        return (
-                state.getValue(VineBlock.NORTH) ||
-                        state.getValue(VineBlock.EAST) ||
-                        state.getValue(VineBlock.SOUTH) ||
-                        state.getValue(VineBlock.WEST) ||
-                        state.getValue(VineBlock.UP) ||
-                        state.getValue(DOWN)
-        );
+        return (state.getValue(VineBlock.NORTH) ||
+                state.getValue(VineBlock.EAST) ||
+                state.getValue(VineBlock.SOUTH) ||
+                state.getValue(VineBlock.WEST) ||
+                state.getValue(VineBlock.UP) ||
+                state.getValue(DOWN));
     }
 
     private boolean canAttachTo(
             BlockGetter level,
             BlockState state,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         if (state.isAir()) {
             return false;
         }
@@ -443,8 +402,7 @@ public class MulticolorGlowLightsBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -463,8 +421,7 @@ public class MulticolorGlowLightsBlock
                         SoundEvents.STONE_BUTTON_CLICK_OFF,
                         SoundSource.BLOCKS,
                         0.3f,
-                        1.0f
-                );
+                        1.0f);
             } else {
                 level.playSound(
                         null,
@@ -472,8 +429,7 @@ public class MulticolorGlowLightsBlock
                         SoundEvents.STONE_BUTTON_CLICK_ON,
                         SoundSource.BLOCKS,
                         0.3f,
-                        1.0f
-                );
+                        1.0f);
             }
 
             return InteractionResult.SUCCESS;

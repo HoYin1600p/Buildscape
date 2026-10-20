@@ -91,7 +91,7 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SNOW_OVERLAY.get(), 4), 4, 1,
                 0.05f));
 
-        Supplier<Item>[] stockings = new Supplier[] {
+        Supplier<Item>[] stockings = new Supplier[]{
                 ModItems.BLACK_FESTIVE_STOCKING, ModItems.BLUE_FESTIVE_STOCKING, ModItems.BROWN_FESTIVE_STOCKING,
                 ModItems.CYAN_FESTIVE_STOCKING, ModItems.GRAY_FESTIVE_STOCKING, ModItems.GREEN_FESTIVE_STOCKING,
                 ModItems.LIGHT_BLUE_FESTIVE_STOCKING, ModItems.LIGHT_GRAY_FESTIVE_STOCKING,
@@ -103,7 +103,7 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(getRandom(stockings), 8), 4, 1,
                 0.05f));
 
-        Supplier<Item>[] stringLights = new Supplier[] {
+        Supplier<Item>[] stringLights = new Supplier[]{
                 ModItems.WHITE_STRING_LIGHT, ModItems.ORANGE_STRING_LIGHT, ModItems.MAGENTA_STRING_LIGHT,
                 ModItems.LIGHT_BLUE_STRING_LIGHT, ModItems.YELLOW_STRING_LIGHT, ModItems.LIME_STRING_LIGHT,
                 ModItems.PINK_STRING_LIGHT, ModItems.GRAY_STRING_LIGHT, ModItems.LIGHT_GRAY_STRING_LIGHT,
@@ -114,7 +114,7 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 2), new ItemStack(getRandom(stringLights), 16), 8, 1,
                 0.05f));
 
-        Supplier<Item>[] snowyLeaves = new Supplier[] {
+        Supplier<Item>[] snowyLeaves = new Supplier[]{
                 ModItems.SNOWY_LEAVES, ModItems.SNOWY_OAK_LEAVES, ModItems.SNOWY_SPRUCE_LEAVES,
                 ModItems.SNOWY_BIRCH_LEAVES, ModItems.SNOWY_JUNGLE_LEAVES, ModItems.SNOWY_ACACIA_LEAVES,
                 ModItems.SNOWY_DARK_OAK_LEAVES, ModItems.SNOWY_MANGROVE_LEAVES, ModItems.SNOWY_AZALEA_LEAVES,
@@ -125,7 +125,7 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(getRandom(snowyLeaves), 8), 8, 1,
                 0.05f));
 
-        Supplier<Item>[] ornaments = new Supplier[] {
+        Supplier<Item>[] ornaments = new Supplier[]{
                 ModItems.WHITE_ORNAMENT, ModItems.ORANGE_ORNAMENT, ModItems.MAGENTA_ORNAMENT,
                 ModItems.LIGHT_BLUE_ORNAMENT, ModItems.YELLOW_ORNAMENT, ModItems.LIME_ORNAMENT,
                 ModItems.PINK_ORNAMENT, ModItems.GRAY_ORNAMENT, ModItems.LIGHT_GRAY_ORNAMENT,
@@ -136,7 +136,7 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 2), new ItemStack(getRandom(ornaments), 16), 8, 1,
                 0.05f));
 
-        Supplier<Item>[] stars = new Supplier[] {
+        Supplier<Item>[] stars = new Supplier[]{
                 ModItems.WHITE_STAR, ModItems.ORANGE_STAR, ModItems.MAGENTA_STAR,
                 ModItems.LIGHT_BLUE_STAR, ModItems.YELLOW_STAR, ModItems.LIME_STAR,
                 ModItems.PINK_STAR, ModItems.GRAY_STAR, ModItems.LIGHT_GRAY_STAR,
@@ -149,7 +149,7 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
                 new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get(), 8), 8, 1, 0.05f));
 
-        Supplier<Item>[] glowLights = new Supplier[] {
+        Supplier<Item>[] glowLights = new Supplier[]{
                 ModItems.GLOW_LIGHTS, ModItems.MULTICOLOR_GLOW_LIGHTS
         };
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(getRandom(glowLights), 8), 8, 1,

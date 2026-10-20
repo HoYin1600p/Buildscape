@@ -12,8 +12,7 @@ import java.util.function.Consumer;
  * sees a half-written file.
  */
 public final class AtomicFiles {
-    private AtomicFiles() {
-    }
+    private AtomicFiles() {}
 
     /** Fills the temporary file with the new content. */
     @FunctionalInterface

@@ -11,8 +11,7 @@ public class MangroveBoatEntity extends Boat {
 
     public MangroveBoatEntity(
             EntityType<? extends Boat> entityType,
-            Level level
-    ) {
+            Level level) {
         super(entityType, level);
         this.setType(Boat.Type.OAK);
     }
@@ -20,8 +19,7 @@ public class MangroveBoatEntity extends Boat {
     public MangroveBoatEntity(Level level, double x, double y, double z) {
         this(
                 ModEntities.MANGROVE_BOAT.get(),
-                level
-        );
+                level);
         this.setPos(x, y, z);
         this.xo = x;
         this.yo = y;

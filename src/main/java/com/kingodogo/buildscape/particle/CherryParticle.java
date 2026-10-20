@@ -28,7 +28,8 @@ public class CherryParticle extends TextureSheetParticle {
         }
     }
 
-    protected CherryParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+    protected CherryParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed,
+            double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
 
@@ -37,13 +38,12 @@ public class CherryParticle extends TextureSheetParticle {
         this.hasPhysics = true;
 
         this.rotSpeed = (level.random.nextFloat() - 0.5F) * 0.1F;
-        this.roll = level.random.nextFloat() * ((float)Math.PI * 2F);
+        this.roll = level.random.nextFloat() * ((float) Math.PI * 2F);
         this.oRoll = this.roll;
 
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
-
 
         int totalThemes = 6;
         int currentTheme = level.random.nextInt(totalThemes);
@@ -142,7 +142,8 @@ public class CherryParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z,
+                double xSpeed, double ySpeed, double zSpeed) {
             return new CherryParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }

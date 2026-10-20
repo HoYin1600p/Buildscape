@@ -42,8 +42,7 @@ import com.kingodogo.buildscape.core.OpenWaterloggedBlock;
 
 public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
 
     private final int lightLevel;
@@ -51,14 +50,12 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
     private static final VoxelShape SHAPE = Shapes.or(
             Block.box(5.5, 0, 5.5, 10.5, 7, 10.5),
             Block.box(5.25, 7, 5.25, 10.75, 7.5, 10.75),
-            Block.box(7.625, 7, 8, 8.375, 10, 8)
-    );
+            Block.box(7.625, 7, 8, 8.375, 10, 8));
 
     private static final VoxelShape SHAPE_ON_CAKE = Shapes.or(
             Block.box(5.5, 0, 5.5, 10.5, 7, 10.5),
             Block.box(5.25, 7, 5.25, 10.75, 7.5, 10.75),
-            Block.box(7.625, 7, 8, 8.375, 10, 8)
-    );
+            Block.box(7.625, 7, 8, 8.375, 10, 8));
 
     public BigCandleBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -66,14 +63,12 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
         this.registerDefaultState(
                 this.stateDefinition.any()
                         .setValue(LIT, false)
-                        .setValue(WATERLOGGED, false)
-        );
+                        .setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT, WATERLOGGED);
     }
 
@@ -85,9 +80,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
         BlockPos clickedPos = context.getClickedPos();
         BlockState clickedState = context.getLevel().getBlockState(clickedPos);
 
-        if (
-                clickedState.is(Blocks.CAKE) && context.getClickedFace() == Direction.UP
-        ) {
+        if (clickedState.is(Blocks.CAKE) && context.getClickedFace() == Direction.UP) {
             BlockPos placePos = clickedPos.above();
             if (context.getLevel().getBlockState(placePos).canBeReplaced(context)) {
                 return this.defaultBlockState()
@@ -114,8 +107,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -125,16 +117,14 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
     public int getLightEmission(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.getValue(LIT) ? lightLevel : 0;
     }
 
@@ -145,8 +135,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -155,10 +144,8 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
         boolean currentlyLit = state.getValue(LIT);
         boolean isWaterlogged = state.getValue(WATERLOGGED);
 
-        if (
-                heldItem.getItem() == Items.FLINT_AND_STEEL ||
-                        heldItem.getItem() == Items.FIRE_CHARGE
-        ) {
+        if (heldItem.getItem() == Items.FLINT_AND_STEEL ||
+                heldItem.getItem() == Items.FIRE_CHARGE) {
             if (!currentlyLit && !isWaterlogged) {
                 level.setBlock(pos, state.setValue(LIT, true), 3);
                 if (!player.getAbilities().instabuild) {
@@ -174,8 +161,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
                         SoundEvents.FLINTANDSTEEL_USE,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.SUCCESS;
             }
         } else if (heldItem.isEmpty() || heldItem.getItem() == Items.WATER_BUCKET) {
@@ -187,8 +173,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
                         SoundEvents.CANDLE_EXTINGUISH,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
                 return InteractionResult.SUCCESS;
             }
         }
@@ -201,8 +186,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
             BlockState state,
             Level level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         if (state.getValue(LIT)) {
             BlockState belowState = level.getBlockState(pos.below());
             boolean onCake = belowState.is(Blocks.CAKE);
@@ -218,8 +202,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
                     wickZ + (random.nextDouble() - 0.5) * 0.05,
                     0.0,
                     0.0,
-                    0.0
-            );
+                    0.0);
 
             if (random.nextInt(10) == 0) {
                 level.addParticle(
@@ -229,18 +212,15 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
                         wickZ + (random.nextDouble() - 0.5) * 0.1,
                         0.0,
                         0.05,
-                        0.0
-                );
+                        0.0);
             }
 
             if (level.isClientSide && random.nextInt(35) == 0) {
                 ResourceLocation soundLocation = new ResourceLocation(
                         "minecraft",
-                        "block.candle.ambient"
-                );
+                        "block.candle.ambient");
                 SoundEvent candleAmbient = ForgeRegistries.SOUND_EVENTS.getValue(
-                        soundLocation
-                );
+                        soundLocation);
                 if (candleAmbient == null) {
                     candleAmbient = new SoundEvent(soundLocation);
                 }
@@ -253,8 +233,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
                         SoundSource.BLOCKS,
                         0.8f + random.nextFloat() * 0.2f,
                         0.8f + random.nextFloat() * 0.4f,
-                        false
-                );
+                        false);
             }
         }
     }
@@ -264,8 +243,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         BlockState belowState = level.getBlockState(pos.below());
         if (belowState.is(Blocks.CAKE)) {
             return SHAPE_ON_CAKE;
@@ -278,8 +256,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         BlockState belowState = level.getBlockState(pos.below());
         if (belowState.is(Blocks.CAKE)) {
             return SHAPE_ON_CAKE;
@@ -292,8 +269,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -311,12 +287,9 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 
     @Override
@@ -329,17 +302,14 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         if (state.getValue(LIT)) {
             if (random.nextInt(35) == 0) {
                 ResourceLocation soundLocation = new ResourceLocation(
                         "minecraft",
-                        "block.candle.ambient"
-                );
+                        "block.candle.ambient");
                 SoundEvent candleAmbient = ForgeRegistries.SOUND_EVENTS.getValue(
-                        soundLocation
-                );
+                        soundLocation);
                 if (candleAmbient == null) {
                     candleAmbient = new SoundEvent(soundLocation);
                 }
@@ -350,8 +320,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
                         candleAmbient,
                         SoundSource.BLOCKS,
                         0.8f + random.nextFloat() * 0.2f,
-                        0.8f + random.nextFloat() * 0.4f
-                );
+                        0.8f + random.nextFloat() * 0.4f);
             }
         }
     }
@@ -359,8 +328,7 @@ public class BigCandleBlock extends OpenWaterloggedBlock implements SimpleWaterl
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         return List.of(new ItemStack(this));
     }
 }

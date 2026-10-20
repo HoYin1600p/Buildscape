@@ -177,7 +177,8 @@ public class VerticalSlabBlock extends SlabBlock {
 
     @Override
     public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
-        return (this.isGlassLike() && adjacentBlockState.is(this)) || super.skipRendering(state, adjacentBlockState, side);
+        return (this.isGlassLike() && adjacentBlockState.is(this))
+                || super.skipRendering(state, adjacentBlockState, side);
     }
 
     @Override

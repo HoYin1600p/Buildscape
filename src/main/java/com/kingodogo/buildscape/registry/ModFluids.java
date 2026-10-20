@@ -48,26 +48,24 @@ public class ModFluids {
                 || (isExperience(second) && Fluids.LAVA.isSame(first));
     }
 
-    public static final DeferredRegister<Fluid> FLUIDS =
-            DeferredRegister.create(ForgeRegistries.FLUIDS, BuildScape.MODID);
+    public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(ForgeRegistries.FLUIDS,
+            BuildScape.MODID);
 
     public static final RegistryObject<ForgeFlowingFluid.Source> EXPERIENCE_STILL = FLUIDS.register(
             "experience_still",
-            () -> new ForgeFlowingFluid.Source(ModFluids.PROPERTIES)
-    );
+            () -> new ForgeFlowingFluid.Source(ModFluids.PROPERTIES));
 
     public static final RegistryObject<ForgeFlowingFluid.Flowing> EXPERIENCE_FLOWING = FLUIDS.register(
             "experience_flowing",
-            () -> new ForgeFlowingFluid.Flowing(ModFluids.PROPERTIES)
-    );
+            () -> new ForgeFlowingFluid.Flowing(ModFluids.PROPERTIES));
 
     public static final ForgeFlowingFluid.Properties PROPERTIES = new ForgeFlowingFluid.Properties(
             () -> EXPERIENCE_STILL.get(),
             () -> EXPERIENCE_FLOWING.get(),
             FluidAttributes.builder(
                     new ResourceLocation(BuildScape.MODID, "fluid/experience_still"),
-                    new ResourceLocation(BuildScape.MODID, "fluid/experience_flow")
-            ).luminosity(15).density(1000).viscosity(1000)
-    ).bucket(() -> (BucketItem) ModItems.EXPERIENCE_BUCKET.get())
-     .block(() -> (LiquidBlock) ModBlocks.EXPERIENCE_BLOCK.get());
+                    new ResourceLocation(BuildScape.MODID, "fluid/experience_flow")).luminosity(15).density(1000)
+                    .viscosity(1000))
+            .bucket(() -> (BucketItem) ModItems.EXPERIENCE_BUCKET.get())
+            .block(() -> (LiquidBlock) ModBlocks.EXPERIENCE_BLOCK.get());
 }

@@ -26,8 +26,7 @@ public class CopperChestRenderer extends ChestRenderer<CopperChestBlockEntity> {
             texture("weathered_copper_chest_right"),
             texture("oxidized_copper_chest"),
             texture("oxidized_copper_chest_left"),
-            texture("oxidized_copper_chest_right")
-    );
+            texture("oxidized_copper_chest_right"));
 
     private static final Material SINGLE = material(0);
     private static final Material LEFT = material(1);
@@ -82,11 +81,11 @@ public class CopperChestRenderer extends ChestRenderer<CopperChestBlockEntity> {
 
     private Material chooseMaterial(ChestType chestType, Material single, Material left, Material right) {
         switch (chestType) {
-            case LEFT:
+            case LEFT :
                 return left;
-            case RIGHT:
+            case RIGHT :
                 return right;
-            default:
+            default :
                 return single;
         }
     }

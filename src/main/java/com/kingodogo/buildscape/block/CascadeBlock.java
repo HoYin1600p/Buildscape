@@ -64,8 +64,7 @@ public class CascadeBlock extends WaterloggedBlock implements EntityBlock, Simpl
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -126,7 +125,8 @@ public class CascadeBlock extends WaterloggedBlock implements EntityBlock, Simpl
                 if (!level.isClientSide) {
                     int newLevel = be.cycleParticleLevel();
                     int percentage = newLevel * 20;
-                    player.displayClientMessage(new TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
+                    player.displayClientMessage(
+                            new TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
                     float pitch = 0.6f + (newLevel * 0.16f);
                     level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.5f, pitch);
                 }
@@ -137,7 +137,6 @@ public class CascadeBlock extends WaterloggedBlock implements EntityBlock, Simpl
         return InteractionResult.PASS;
     }
 
-
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -146,9 +145,11 @@ public class CascadeBlock extends WaterloggedBlock implements EntityBlock, Simpl
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+            BlockEntityType<T> type) {
         if (level.isClientSide) {
-            return createTickerHelper(type, ModBlockEntities.CASCADE_BLOCK_ENTITY.get(), CascadeBlockEntity::clientTick);
+            return createTickerHelper(type, ModBlockEntities.CASCADE_BLOCK_ENTITY.get(),
+                    CascadeBlockEntity::clientTick);
         }
         return null;
     }

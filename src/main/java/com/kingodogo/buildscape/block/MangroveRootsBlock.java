@@ -20,31 +20,29 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import com.kingodogo.buildscape.core.OpenWaterloggedRotatedPillarBlock;
 
 public class MangroveRootsBlock
-        extends OpenWaterloggedRotatedPillarBlock
-        implements SimpleWaterloggedBlock {
+        extends
+            OpenWaterloggedRotatedPillarBlock
+        implements
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
 
     public MangroveRootsBlock(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(WATERLOGGED, false)
-        );
+                this.stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(WATERLOGGED);
     }
@@ -56,8 +54,7 @@ public class MangroveRootsBlock
                 .getFluidState(context.getClickedPos());
         return super.getStateForPlacement(context).setValue(
                 WATERLOGGED,
-                fluidstate.getType() == Fluids.WATER
-        );
+                fluidstate.getType() == Fluids.WATER);
     }
 
     @Override
@@ -67,8 +64,7 @@ public class MangroveRootsBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -78,8 +74,7 @@ public class MangroveRootsBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -87,8 +82,7 @@ public class MangroveRootsBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 
@@ -97,8 +91,7 @@ public class MangroveRootsBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 
@@ -116,10 +109,7 @@ public class MangroveRootsBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentState,
-            Direction side
-    ) {
-        return (
-                adjacentState.is(this) || super.skipRendering(state, adjacentState, side)
-        );
+            Direction side) {
+        return (adjacentState.is(this) || super.skipRendering(state, adjacentState, side));
     }
 }

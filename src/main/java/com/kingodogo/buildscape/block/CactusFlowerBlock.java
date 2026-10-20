@@ -16,7 +16,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-
 public class CactusFlowerBlock extends BushBlock {
     protected static final VoxelShape SHAPE = box(3.0D, 0.0D, 3.0D, 13.0D, 12.0D, 13.0D);
 
@@ -35,7 +34,8 @@ public class CactusFlowerBlock extends BushBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hitResult) {
         ItemStack held = player.getItemInHand(hand);
         if (held.is(Items.BONE_MEAL)) {
             if (!level.isClientSide) {

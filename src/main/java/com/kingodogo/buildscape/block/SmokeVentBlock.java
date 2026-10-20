@@ -50,18 +50,17 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
     private static final VoxelShape SHAPE_SINGLE = Shapes.or(
             Block.box(4, 0, 4, 12, 7, 12),
-            Block.box(3, 7, 3, 13, 9, 13)
-    );
+            Block.box(3, 7, 3, 13, 9, 13));
     private static final VoxelShape SHAPE_TOP = Shapes.or(
             Block.box(4, 0, 4, 12, 7, 12),
-            Block.box(3, 7, 3, 13, 9, 13)
-    );
+            Block.box(3, 7, 3, 13, 9, 13));
     private static final VoxelShape SHAPE_MIDDLE = Block.box(4, 0, 4, 12, 16, 12);
     private static final VoxelShape SHAPE_BOTTOM = Block.box(4, 0, 4, 12, 16, 12);
 
     public SmokeVentBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(PART, PillarPart.SINGLE).setValue(POWERED, false));
+        this.registerDefaultState(
+                this.stateDefinition.any().setValue(PART, PillarPart.SINGLE).setValue(POWERED, false));
     }
 
     @Override
@@ -75,14 +74,15 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+            BlockEntityType<T> type) {
         PillarPart part = state.getValue(PART);
         if (!level.isClientSide || type != ModBlockEntities.SMOKE_VENT_BLOCK_ENTITY.get()
                 || (part != PillarPart.TOP && part != PillarPart.SINGLE)) {
             return null;
         }
-        return (tickLevel, pos, tickState, blockEntity) ->
-                SmokeVentBlockEntity.particleTick(tickLevel, pos, tickState, (SmokeVentBlockEntity) blockEntity);
+        return (tickLevel, pos, tickState, blockEntity) -> SmokeVentBlockEntity.particleTick(tickLevel, pos, tickState,
+                (SmokeVentBlockEntity) blockEntity);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
-                                  LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+            LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         if (direction == Direction.UP || direction == Direction.DOWN) {
             boolean hasAbove = level.getBlockState(pos.above()).getBlock() instanceof SmokeVentBlock;
             boolean hasBelow = level.getBlockState(pos.below()).getBlock() instanceof SmokeVentBlock;
@@ -147,7 +147,7 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos,
-                                Block block, BlockPos fromPos, boolean isMoving) {
+            Block block, BlockPos fromPos, boolean isMoving) {
         if (!level.isClientSide) {
             if (block instanceof SmokeVentBlock) {
                 return;
@@ -213,20 +213,20 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         switch (state.getValue(PART)) {
-            case TOP:
+            case TOP :
                 return SHAPE_TOP;
-            case MIDDLE:
+            case MIDDLE :
                 return SHAPE_MIDDLE;
-            case BOTTOM:
+            case BOTTOM :
                 return SHAPE_BOTTOM;
-            default:
+            default :
                 return SHAPE_SINGLE;
         }
     }
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
-                                 InteractionHand hand, BlockHitResult hit) {
+            InteractionHand hand, BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -248,8 +248,7 @@ public class SmokeVentBlock extends Block implements EntityBlock {
                 level.playSound(null, pos, SoundEvents.DYE_USE,
                         SoundSource.BLOCKS, 1.0f, 1.0f);
 
-                TextComponent message =
-                        new TextComponent("Smoke color: " + dyeName);
+                TextComponent message = new TextComponent("Smoke color: " + dyeName);
                 message.withStyle(ChatFormatting.GRAY);
                 if (player instanceof ServerPlayer serverPlayer) {
                     serverPlayer.awardStat(ModStats.SMOKE_VENTS_DYED);
@@ -277,13 +276,11 @@ public class SmokeVentBlock extends Block implements EntityBlock {
                 current = current.above();
             }
 
-            TextComponent message =
-                    new TextComponent(newActive ? "Smoke Vent: On" : "Smoke Vent: Off");
+            TextComponent message = new TextComponent(newActive ? "Smoke Vent: On" : "Smoke Vent: Off");
             message.withStyle(newActive ? ChatFormatting.GREEN : ChatFormatting.RED);
             if (player instanceof ServerPlayer) {
                 ModMessages.INSTANCE.send(
-                        PacketDistributor.PLAYER.with(() ->
-                                (ServerPlayer) player),
+                        PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
                         new ActionBarMessagePacket(message));
             }
 
@@ -297,13 +294,11 @@ public class SmokeVentBlock extends Block implements EntityBlock {
             level.playSound(null, pos, SoundEvents.BUCKET_EMPTY,
                     SoundSource.BLOCKS, 1.0f, 1.0f);
 
-            TextComponent message =
-                    new TextComponent("Smoke color cleared");
+            TextComponent message = new TextComponent("Smoke color cleared");
             message.withStyle(ChatFormatting.GRAY);
             if (player instanceof ServerPlayer) {
                 ModMessages.INSTANCE.send(
-                        PacketDistributor.PLAYER.with(() ->
-                                (ServerPlayer) player),
+                        PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
                         new ActionBarMessagePacket(message));
             }
 

@@ -63,7 +63,8 @@ public class BottleOfMistItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(new TranslatableComponent("tooltip.buildscape.bottle_of_mist.use").withStyle(ChatFormatting.GRAY));
-        tooltip.add(new TranslatableComponent("tooltip.buildscape.bottle_of_mist.collect").withStyle(ChatFormatting.GRAY));
+        tooltip.add(
+                new TranslatableComponent("tooltip.buildscape.bottle_of_mist.collect").withStyle(ChatFormatting.GRAY));
         tooltip.add(new TranslatableComponent("tooltip.buildscape.mist_toggle").withStyle(ChatFormatting.DARK_AQUA));
         super.appendHoverText(stack, level, tooltip, flag);
     }

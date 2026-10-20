@@ -315,7 +315,7 @@ public class RoseVinesBlock extends VineBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
-                                 InteractionHand hand, BlockHitResult hit) {
+            InteractionHand hand, BlockHitResult hit) {
         if (state.getValue(SHEARED)) {
             return InteractionResult.PASS;
         }

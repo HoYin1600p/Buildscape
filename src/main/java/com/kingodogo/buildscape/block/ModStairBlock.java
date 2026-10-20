@@ -18,8 +18,7 @@ public class ModStairBlock extends StairBlock {
 
     public ModStairBlock(
             BlockState baseState,
-            BlockBehaviour.Properties properties
-    ) {
+            BlockBehaviour.Properties properties) {
         super(safeBaseState(baseState), safeProperties(baseState, properties));
         this.dropItem = null;
         this.baseBlock = baseState.getBlock();
@@ -28,8 +27,7 @@ public class ModStairBlock extends StairBlock {
     protected ModStairBlock(
             BlockState baseState,
             BlockBehaviour.Properties properties,
-            boolean preserveProperties
-    ) {
+            boolean preserveProperties) {
         super(
                 preserveProperties ? baseState : safeBaseState(baseState),
                 preserveProperties ? properties : safeProperties(baseState, properties));
@@ -40,8 +38,7 @@ public class ModStairBlock extends StairBlock {
     public ModStairBlock(
             BlockState baseState,
             BlockBehaviour.Properties properties,
-            RegistryObject<?> dropItem
-    ) {
+            RegistryObject<?> dropItem) {
         super(safeBaseState(baseState), safeProperties(baseState, properties));
         this.dropItem = dropItem;
         this.baseBlock = baseState.getBlock();
@@ -57,8 +54,7 @@ public class ModStairBlock extends StairBlock {
 
     private static BlockBehaviour.Properties safeProperties(
             BlockState baseState,
-            BlockBehaviour.Properties properties
-    ) {
+            BlockBehaviour.Properties properties) {
         if (baseState.getProperties().isEmpty()) {
             return properties;
         }
@@ -113,8 +109,7 @@ public class ModStairBlock extends StairBlock {
     public boolean propagatesSkylightDown(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return !this.isTintedGlassLike() && super.propagatesSkylightDown(state, level, pos);
     }
 

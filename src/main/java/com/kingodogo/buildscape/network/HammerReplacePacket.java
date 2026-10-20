@@ -67,7 +67,8 @@ public class HammerReplacePacket {
             if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) {
                 return;
             }
-            if (!player.mayBuild() || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
+            if (!player.mayBuild()
+                    || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
                 return;
             }
             if (!level.mayInteract(player, pos)) {
@@ -177,8 +178,7 @@ public class HammerReplacePacket {
             level.sendParticles(
                     ParticleTypes.CRIT,
                     pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                    8, 0.3, 0.3, 0.3, 0.05
-            );
+                    8, 0.3, 0.3, 0.3, 0.05);
         });
         ctx.setPacketHandled(true);
     }

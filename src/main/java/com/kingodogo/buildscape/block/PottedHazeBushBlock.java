@@ -46,7 +46,8 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
     public static final BooleanProperty HAS_HAZE = BooleanProperty.create("has_haze");
     private final DyeColor color;
 
-    public PottedHazeBushBlock(DyeColor color, Supplier<FlowerPotBlock> emptyPot, Supplier<? extends Block> plant, BlockBehaviour.Properties properties) {
+    public PottedHazeBushBlock(DyeColor color, Supplier<FlowerPotBlock> emptyPot, Supplier<? extends Block> plant,
+            BlockBehaviour.Properties properties) {
         super(emptyPot, plant, properties);
         this.color = color;
         this.registerDefaultState(this.stateDefinition.any().setValue(HAS_HAZE, true));
@@ -89,13 +90,15 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
         for (int i = 0; i < count; i++) {
             Vec3 particlePos = HazeBushParticleHandler.findHazeParticlePos(level, pos, random);
             if (particlePos != null) {
-                level.addParticle(ModParticles.HAZE.get(), particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1], rgb[2]);
+                level.addParticle(ModParticles.HAZE.get(), particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1],
+                        rgb[2]);
             }
         }
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hitResult) {
         ItemStack held = player.getItemInHand(hand);
 
         if (held.is(Items.GLASS_BOTTLE) && state.getValue(HAS_HAZE)) {

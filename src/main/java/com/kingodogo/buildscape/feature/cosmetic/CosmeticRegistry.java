@@ -21,8 +21,7 @@ public class CosmeticRegistry {
 
     private final Map<String, CosmeticType> typeDefinitions = new HashMap<>();
 
-    private CosmeticRegistry() {
-    }
+    private CosmeticRegistry() {}
 
     public static CosmeticRegistry getInstance() {
         return INSTANCE;
@@ -216,15 +215,15 @@ public class CosmeticRegistry {
         }
 
         switch (info.type) {
-            case "item":
+            case "item" :
                 return resolveToItem(cosmeticId) != null;
-            case "block":
+            case "block" :
                 return resolveToBlock(cosmeticId) != null;
-            case "type":
+            case "type" :
                 return typeDefinitions.containsKey(info.id);
-            case "nbt":
+            case "nbt" :
                 return true;
-            default:
+            default :
                 return false;
         }
     }
@@ -235,7 +234,7 @@ public class CosmeticRegistry {
         itemStackCache.clear();
     }
 
-        public record CosmeticInfo(String type, String namespace, String id, String fullId) {
+    public record CosmeticInfo(String type, String namespace, String id, String fullId) {
     }
 
     public interface CosmeticType {

@@ -37,8 +37,9 @@ import java.util.TreeMap;
 final class ConfigLayoutIO {
     private static final Gson GSON = Json.PLAIN;
     private static final Map<Path, FailedMigration> failedMigrations = new LinkedHashMap<>();
-    private record FailedMigration(byte[] bytes, String text) { }
-    private ConfigLayoutIO() { }
+    private record FailedMigration(byte[] bytes, String text) {
+    }
+    private ConfigLayoutIO() {}
 
     static String readText(Path file) throws IOException {
         return readText(file, legacyCharset());
@@ -142,7 +143,8 @@ final class ConfigLayoutIO {
         } catch (IOException e) {
             BuildScape.getLogger().warn("Unable to back up unreadable config {}", file, e);
         }
-        BuildScape.getLogger().warn("Config contains invalid encoding or replacement characters; keeping it read-only: {}", file);
+        BuildScape.getLogger()
+                .warn("Config contains invalid encoding or replacement characters; keeping it read-only: {}", file);
         return true;
     }
 
@@ -156,8 +158,7 @@ final class ConfigLayoutIO {
         Path backup = file.resolveSibling(file.getFileName() + ".pre-4.0.5.bak");
         if (!Files.exists(backup)) {
             Files.copy(file, backup);
-        }
-        else if (!Files.isRegularFile(backup)) {
+        } else if (!Files.isRegularFile(backup)) {
             throw new IOException("Backup is not a regular file: " + backup);
         }
         Files.write(file, suffix.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
@@ -184,11 +185,9 @@ final class ConfigLayoutIO {
             if (quote != 0) {
                 if (escape) {
                     escape = false;
-                }
-                else if (c == '\\') {
+                } else if (c == '\\') {
                     escape = true;
-                }
-                else if (c == quote) {
+                } else if (c == quote) {
                     quote = 0;
                 }
             } else if (c == '"' || c == '\'') {
@@ -235,7 +234,7 @@ final class ConfigLayoutIO {
 
     private static JsonElement readJson(JsonReader reader) throws IOException {
         switch (reader.peek()) {
-            case BEGIN_OBJECT:
+            case BEGIN_OBJECT :
                 JsonObject object = new JsonObject();
                 reader.beginObject();
                 while (reader.hasNext()) {
@@ -247,7 +246,7 @@ final class ConfigLayoutIO {
                 }
                 reader.endObject();
                 return object;
-            case BEGIN_ARRAY:
+            case BEGIN_ARRAY :
                 JsonArray array = new JsonArray();
                 reader.beginArray();
                 while (reader.hasNext()) {
@@ -255,13 +254,17 @@ final class ConfigLayoutIO {
                 }
                 reader.endArray();
                 return array;
-            case STRING: return new JsonPrimitive(reader.nextString());
-            case NUMBER: return new JsonPrimitive(new BigDecimal(reader.nextString()));
-            case BOOLEAN: return new JsonPrimitive(reader.nextBoolean());
-            case NULL:
+            case STRING :
+                return new JsonPrimitive(reader.nextString());
+            case NUMBER :
+                return new JsonPrimitive(new BigDecimal(reader.nextString()));
+            case BOOLEAN :
+                return new JsonPrimitive(reader.nextBoolean());
+            case NULL :
                 reader.nextNull();
                 return JsonNull.INSTANCE;
-            default: throw new IOException("Expected JSON value");
+            default :
+                throw new IOException("Expected JSON value");
         }
     }
 
@@ -275,11 +278,9 @@ final class ConfigLayoutIO {
                 out.append(c);
                 if (escape) {
                     escape = false;
-                }
-                else if (c == '\\') {
+                } else if (c == '\\') {
                     escape = true;
-                }
-                else if (c == quote) {
+                } else if (c == quote) {
                     quote = 0;
                 }
             } else if (c == '"' || c == '\'') {
@@ -327,8 +328,7 @@ final class ConfigLayoutIO {
                 int count = remaining.getOrDefault(comment, 0);
                 if (count == 0) {
                     retained.add(comment);
-                }
-                else {
+                } else {
                     remaining.put(comment, count - 1);
                 }
             }
@@ -389,7 +389,8 @@ final class ConfigLayoutIO {
         for (Map.Entry<Integer, Setting> entry : retained.descendingMap().entrySet()) {
             Setting original = entry.getValue();
             Setting replacement = target.settings.get(original.key);
-            result.replace(replacement.valueStart, replacement.end, source.substring(original.valueStart, original.end));
+            result.replace(replacement.valueStart, replacement.end,
+                    source.substring(original.valueStart, original.end));
         }
         return result.toString();
     }
@@ -441,8 +442,9 @@ final class ConfigLayoutIO {
                         comments.add(new Token(source, start, start + trimmed.length()));
                     } else if (line.indexOf('=') > 0) {
                         String key = line.substring(0, line.indexOf('=')).trim();
-                        settings.put(key, new Setting(key, null, offset + line.indexOf(key), offset + line.indexOf('=') + 1,
-                                offset + line.length()));
+                        settings.put(key,
+                                new Setting(key, null, offset + line.indexOf(key), offset + line.indexOf('=') + 1,
+                                        offset + line.length()));
                     }
                     offset += line.length() + 1;
                 }
@@ -450,7 +452,10 @@ final class ConfigLayoutIO {
             }
             for (int i = 0; i < source.length();) {
                 char c = source.charAt(i);
-                if (Character.isWhitespace(c)) { i++; continue; }
+                if (Character.isWhitespace(c)) {
+                    i++;
+                    continue;
+                }
                 int start = i++;
                 boolean comment = false;
                 if (c == '"' || c == '\'') {
@@ -458,8 +463,7 @@ final class ConfigLayoutIO {
                         char next = source.charAt(i++);
                         if (next == '\\' && i < source.length()) {
                             i++;
-                        }
-                        else if (next == c) {
+                        } else if (next == c) {
                             break;
                         }
                     }
@@ -503,7 +507,10 @@ final class ConfigLayoutIO {
             Token first = tokens.get(cursor++);
             if (first.text.equals("{")) {
                 while (cursor < tokens.size() && !at("}")) {
-                    if (at(",")) { cursor++; continue; }
+                    if (at(",")) {
+                        cursor++;
+                        continue;
+                    }
                     Token key = tokens.get(cursor++);
                     if (at(":")) {
                         cursor++;
@@ -516,7 +523,10 @@ final class ConfigLayoutIO {
             } else if (first.text.equals("[")) {
                 Map<String, Integer> occurrences = new LinkedHashMap<>();
                 while (cursor < tokens.size() && !at("]")) {
-                    if (at(",")) { cursor++; continue; }
+                    if (at(",")) {
+                        cursor++;
+                        continue;
+                    }
                     Token item = tokens.get(cursor);
                     String id = canonical(item);
                     int occurrence = occurrences.merge(id, 1, Integer::sum);
@@ -580,7 +590,8 @@ final class ConfigLayoutIO {
                 // If a sorted item disappeared, retain its comments in order above the list.
                 if (!target.settings.containsKey(key)) {
                     key = attached != null && attached.array != null && target.settings.containsKey(attached.array)
-                            ? attached.array : "";
+                            ? attached.array
+                            : "";
                 }
                 result.computeIfAbsent(key, ignored -> new ArrayList<>()).add(comment.text);
             }
@@ -630,7 +641,8 @@ final class ConfigLayoutIO {
         write(file, text, expected, true, legacyCharset(), legacyItems ? ".pre-4.0.5.bak" : ".bak");
     }
 
-    private static void write(Path file, String text, String expected, boolean backup, Charset legacy, String backupSuffix) throws IOException {
+    private static void write(Path file, String text, String expected, boolean backup, Charset legacy,
+            String backupSuffix) throws IOException {
         if (Files.exists(file) && !isWritable(file)) {
             throw new IOException("Config is not writable: " + file);
         }
@@ -648,8 +660,7 @@ final class ConfigLayoutIO {
             Path original = file.resolveSibling(file.getFileName() + backupSuffix);
             if (!Files.exists(original)) {
                 Files.copy(file, original);
-            }
-            else if (!Files.isRegularFile(original)) {
+            } else if (!Files.isRegularFile(original)) {
                 throw new IOException("Backup is not a regular file: " + original);
             }
         }

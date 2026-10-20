@@ -14,7 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class TrappedDecoratedPotBlockEntityRenderer
-        implements BlockEntityRenderer<TrappedDecoratedPotBlockEntity> {
+        implements
+            BlockEntityRenderer<TrappedDecoratedPotBlockEntity> {
 
     private final BlockRenderDispatcher blockRenderer;
 
@@ -32,8 +33,7 @@ public class TrappedDecoratedPotBlockEntityRenderer
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (blockEntity.getLevel() == null) {
             return;
         }
@@ -73,8 +73,7 @@ public class TrappedDecoratedPotBlockEntityRenderer
                 1.0f, 1.0f, 1.0f,
                 combinedLight,
                 combinedOverlay,
-                EmptyModelData.INSTANCE
-        );
+                EmptyModelData.INSTANCE);
 
         poseStack.popPose();
     }

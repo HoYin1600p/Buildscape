@@ -35,8 +35,7 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
             int height,
             NonNullList<Ingredient> ingredients,
             ItemStack result,
-            int damageAmount
-    ) {
+            int damageAmount) {
         super(id, group, width, height, ingredients, result);
         this.damageAmount = damageAmount;
     }
@@ -50,8 +49,7 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
     public NonNullList<ItemStack> getRemainingItems(CraftingContainer container) {
         NonNullList<ItemStack> remaining = NonNullList.withSize(
                 container.getContainerSize(),
-                ItemStack.EMPTY
-        );
+                ItemStack.EMPTY);
 
         for (int i = 0; i < remaining.size(); i++) {
             ItemStack stack = container.getItem(i);
@@ -59,8 +57,7 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
                 if ((stack.isDamageableItem() || stack.getMaxDamage() > 0) && !(stack.getItem() instanceof ArmorItem)) {
                     ItemStack damagedStack = stack.copy();
                     int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(
-                            Enchantments.UNBREAKING, damagedStack
-                    );
+                            Enchantments.UNBREAKING, damagedStack);
                     boolean shouldDamage = true;
                     if (unbreakingLevel > 0) {
                         Random random = new Random();
@@ -92,15 +89,18 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
     }
 
     public static class Serializer
-            extends ForgeRegistryEntry<RecipeSerializer<?>>
-            implements RecipeSerializer<ShapedDurabilityRecipe> {
+            extends
+                ForgeRegistryEntry<RecipeSerializer<?>>
+            implements
+                RecipeSerializer<ShapedDurabilityRecipe> {
 
         private static Map<Character, Ingredient> deserializeKey(JsonObject json) {
             Map<Character, Ingredient> key = new HashMap<>();
 
             for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
                 if (entry.getKey().length() != 1) {
-                    throw new JsonParseException("Invalid key entry: '" + entry.getKey() + "' is not a single character");
+                    throw new JsonParseException(
+                            "Invalid key entry: '" + entry.getKey() + "' is not a single character");
                 }
                 char symbol = entry.getKey().charAt(0);
                 if (symbol == ' ') {
@@ -182,8 +182,7 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
                 String[] pattern,
                 Map<Character, Ingredient> key,
                 int width,
-                int height
-        ) {
+                int height) {
             NonNullList<Ingredient> ingredients = NonNullList.withSize(width * height, Ingredient.EMPTY);
 
             for (int row = 0; row < pattern.length; row++) {
@@ -204,8 +203,7 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
         @Override
         public ShapedDurabilityRecipe fromJson(
                 ResourceLocation recipeId,
-                JsonObject json
-        ) {
+                JsonObject json) {
             String group = GsonHelper.getAsString(json, "group", "");
             int damageAmount = GsonHelper.getAsInt(json, "damageAmount", 1);
 
@@ -219,8 +217,7 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
 
             ItemStack result = CraftingHelper.getItemStack(
                     GsonHelper.getAsJsonObject(json, "result"),
-                    true
-            );
+                    true);
 
             return new ShapedDurabilityRecipe(
                     recipeId,
@@ -229,23 +226,20 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
                     height,
                     ingredients,
                     result,
-                    damageAmount
-            );
+                    damageAmount);
         }
 
         @Override
         public ShapedDurabilityRecipe fromNetwork(
                 ResourceLocation recipeId,
-                FriendlyByteBuf buffer
-        ) {
+                FriendlyByteBuf buffer) {
             String group = buffer.readUtf();
             int width = buffer.readVarInt();
             int height = buffer.readVarInt();
 
             NonNullList<Ingredient> ingredients = NonNullList.withSize(
                     width * height,
-                    Ingredient.EMPTY
-            );
+                    Ingredient.EMPTY);
 
             for (int i = 0; i < ingredients.size(); i++) {
                 ingredients.set(i, Ingredient.fromNetwork(buffer));
@@ -261,15 +255,13 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
                     height,
                     ingredients,
                     result,
-                    damageAmount
-            );
+                    damageAmount);
         }
 
         @Override
         public void toNetwork(
                 FriendlyByteBuf buffer,
-                ShapedDurabilityRecipe recipe
-        ) {
+                ShapedDurabilityRecipe recipe) {
             buffer.writeUtf(recipe.getGroup());
             buffer.writeVarInt(recipe.getWidth());
             buffer.writeVarInt(recipe.getHeight());
@@ -283,4 +275,3 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
         }
     }
 }
-

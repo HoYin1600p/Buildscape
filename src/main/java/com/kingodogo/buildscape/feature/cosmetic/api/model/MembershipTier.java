@@ -6,8 +6,7 @@ public class MembershipTier {
     private int level;
     private String description;
 
-    public MembershipTier() {
-    }
+    public MembershipTier() {}
 
     public MembershipTier(String id, String name, int level, String description) {
         this.id = id;
@@ -48,4 +47,3 @@ public class MembershipTier {
         this.description = description;
     }
 }
-

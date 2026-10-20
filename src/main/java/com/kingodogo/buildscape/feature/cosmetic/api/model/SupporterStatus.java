@@ -9,8 +9,7 @@ public class SupporterStatus {
     private Integer tierLevel;
     private List<String> cosmetics;
 
-    public SupporterStatus() {
-    }
+    public SupporterStatus() {}
 
     public SupporterStatus(boolean connected, String username, String tier, Integer tierLevel, List<String> cosmetics) {
         this.connected = connected;
@@ -60,4 +59,3 @@ public class SupporterStatus {
         this.cosmetics = cosmetics;
     }
 }
-

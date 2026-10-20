@@ -13,7 +13,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class SnowflakeParticle extends TextureSheetParticle {
 
-    protected SnowflakeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+    protected SnowflakeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed,
+            double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
 
         this.setSpriteFromAge(sprites);
@@ -46,7 +47,7 @@ public class SnowflakeParticle extends TextureSheetParticle {
         this.roll += 0.1F;
 
         if (this.age > this.lifetime * 0.7F) {
-            float fadeProgress = (float)(this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);
+            float fadeProgress = (float) (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);
             this.alpha = (1.0F - fadeProgress) * 0.8F;
         }
     }
@@ -65,9 +66,9 @@ public class SnowflakeParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z,
+                double xSpeed, double ySpeed, double zSpeed) {
             return new SnowflakeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }
 }
-

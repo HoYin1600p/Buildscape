@@ -16,16 +16,16 @@ public class GeyserBaseParticleOptions implements ParticleOptions {
     private final int waterBlocks;
     private final float burstImpulseBase;
 
-    public static final Codec<GeyserBaseParticleOptions> CODEC = RecordCodecBuilder.create(instance ->
-        instance.group(
+    public static final Codec<GeyserBaseParticleOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("water_blocks").forGetter(o -> o.waterBlocks),
-            Codec.FLOAT.fieldOf("burst_impulse_base").forGetter(o -> o.burstImpulseBase)
-        ).apply(instance, (waterBlocks, burstImpulseBase) -> new GeyserBaseParticleOptions(null, waterBlocks, burstImpulseBase))
-    );
+            Codec.FLOAT.fieldOf("burst_impulse_base").forGetter(o -> o.burstImpulseBase))
+            .apply(instance, (waterBlocks, burstImpulseBase) -> new GeyserBaseParticleOptions(null, waterBlocks,
+                    burstImpulseBase)));
 
     public static final ParticleOptions.Deserializer<GeyserBaseParticleOptions> DESERIALIZER = new ParticleOptions.Deserializer<GeyserBaseParticleOptions>() {
         @Override
-        public GeyserBaseParticleOptions fromCommand(ParticleType<GeyserBaseParticleOptions> type, StringReader reader) throws CommandSyntaxException {
+        public GeyserBaseParticleOptions fromCommand(ParticleType<GeyserBaseParticleOptions> type, StringReader reader)
+                throws CommandSyntaxException {
             reader.expect(' ');
             int waterBlocks = reader.readInt();
             reader.expect(' ');
@@ -34,12 +34,14 @@ public class GeyserBaseParticleOptions implements ParticleOptions {
         }
 
         @Override
-        public GeyserBaseParticleOptions fromNetwork(ParticleType<GeyserBaseParticleOptions> type, FriendlyByteBuf buffer) {
+        public GeyserBaseParticleOptions fromNetwork(ParticleType<GeyserBaseParticleOptions> type,
+                FriendlyByteBuf buffer) {
             return new GeyserBaseParticleOptions(type, buffer.readInt(), buffer.readFloat());
         }
     };
 
-    public GeyserBaseParticleOptions(ParticleType<GeyserBaseParticleOptions> type, int waterBlocks, float burstImpulseBase) {
+    public GeyserBaseParticleOptions(ParticleType<GeyserBaseParticleOptions> type, int waterBlocks,
+            float burstImpulseBase) {
         this.type = type;
         this.waterBlocks = Math.max(0, Math.min(4, waterBlocks));
         this.burstImpulseBase = burstImpulseBase;

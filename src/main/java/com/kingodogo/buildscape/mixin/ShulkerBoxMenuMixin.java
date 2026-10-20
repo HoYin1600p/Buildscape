@@ -34,8 +34,7 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
         super(menuType, id);
     }
 
-    @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/Container;)V",
-            at = @At("TAIL"))
+    @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/Container;)V", at = @At("TAIL"))
     private void addFilterData(int id, Inventory inventory, Container container, CallbackInfo ci) {
         if (container instanceof GhostFilterable filterable) {
             buildscape$filterSource = filterable;
@@ -49,7 +48,8 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
                         String[] ghostFilters = buildscape$filterSource.buildscape$getGhostFilters();
                         if (ghostFilters != null && filterSlot < ghostFilters.length) {
                             String filter = ghostFilters[filterSlot];
-                            if (filter != null && !filter.isEmpty() && ResourceLocation.isValidResourceLocation(filter)) {
+                            if (filter != null && !filter.isEmpty()
+                                    && ResourceLocation.isValidResourceLocation(filter)) {
                                 Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(filter));
                                 if (item != null && item != Items.AIR) {
                                     return Registry.ITEM.getId(item) + 1;

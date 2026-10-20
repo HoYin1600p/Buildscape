@@ -17,9 +17,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
  */
 final class PillarStack {
 
-    private PillarStack() {
-    }
-
+    private PillarStack() {}
 
     static BlockPos findStackTop(PillarBlockEntity self) {
         final Level level = self.getLevel();

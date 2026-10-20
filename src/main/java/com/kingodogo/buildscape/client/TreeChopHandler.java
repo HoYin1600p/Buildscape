@@ -33,11 +33,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class TreeChopHandler {
 
     private static final long BREAK_DELAY_MS = 1000;
@@ -224,8 +220,7 @@ public class TreeChopHandler {
                         consumer,
                         aabb.minX - camX, aabb.minY - camY, aabb.minZ - camZ,
                         aabb.maxX - camX, aabb.maxY - camY, aabb.maxZ - camZ,
-                        0.0f, 1.0f, 1.0f, 0.8f
-                );
+                        0.0f, 1.0f, 1.0f, 0.8f);
             }
         }
 
@@ -242,7 +237,8 @@ public class TreeChopHandler {
             return;
         }
 
-        if (mc.player.isCreative() && mc.player.hasPermissions(2) && mc.player.mayBuild() && mc.player.isShiftKeyDown() &&
+        if (mc.player.isCreative() && mc.player.hasPermissions(2) && mc.player.mayBuild() && mc.player.isShiftKeyDown()
+                &&
                 CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID())) {
             HitResult hit = mc.hitResult;
             if (hit != null && hit.getType() == HitResult.Type.BLOCK) {

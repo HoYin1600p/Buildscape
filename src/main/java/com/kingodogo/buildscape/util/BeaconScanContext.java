@@ -22,8 +22,7 @@ public final class BeaconScanContext {
     private static final Map<Level, Map<BlockPos, CachedHeight>> CLIENT_HEIGHTS = new WeakHashMap<>();
     private static int cleanupTicks;
 
-    private BeaconScanContext() {
-    }
+    private BeaconScanContext() {}
 
     public static void begin(BeaconBlockEntity beacon) {
         ACTIVE_BEACON.set(beacon);
@@ -88,9 +87,7 @@ public final class BeaconScanContext {
         }
     }
 
-    @Mod.EventBusSubscriber(
-            modid = BuildScape.MODID,
-            value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
     public static final class ClientEvents {
         @SubscribeEvent
         public static void onClientTick(TickEvent.ClientTickEvent event) {

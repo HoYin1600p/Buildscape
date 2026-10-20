@@ -130,7 +130,8 @@ public class ModCreativeModeTab {
             return null;
         }
 
-        private void arrangeVariantGroup(ItemStackOrder ordered, Map<String, ItemStack> buildscapeItems, String basePath) {
+        private void arrangeVariantGroup(ItemStackOrder ordered, Map<String, ItemStack> buildscapeItems,
+                String basePath) {
             if ("quartz_pillar".equals(basePath)) {
                 return;
             }
@@ -274,22 +275,23 @@ public class ModCreativeModeTab {
             }
         }
 
-    private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
-        addOrdered(items, TabOrder1.ITEMS);
-        addOrdered(items, TabOrder2.ITEMS);
-        addFireworkItems(items);
-        addOrdered(items, TabOrder2.AFTER_FIREWORKS);
-        addTrophyItems(items);
-        addOrdered(items, TabOrder3.ITEMS);
-    }
-
-    private static void addOrdered(@NotNull NonNullList<ItemStack> items, List<Supplier<? extends ItemLike>> order) {
-        for (Supplier<? extends ItemLike> entry : order) {
-            items.add(new ItemStack(entry.get()));
+        private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
+            addOrdered(items, TabOrder1.ITEMS);
+            addOrdered(items, TabOrder2.ITEMS);
+            addFireworkItems(items);
+            addOrdered(items, TabOrder2.AFTER_FIREWORKS);
+            addTrophyItems(items);
+            addOrdered(items, TabOrder3.ITEMS);
         }
-    }
 
-    private void addFireworkItems(@NotNull NonNullList<ItemStack> items) {
+        private static void addOrdered(@NotNull NonNullList<ItemStack> items,
+                List<Supplier<? extends ItemLike>> order) {
+            for (Supplier<? extends ItemLike> entry : order) {
+                items.add(new ItemStack(entry.get()));
+            }
+        }
+
+        private void addFireworkItems(@NotNull NonNullList<ItemStack> items) {
             ItemStack cakeStar = new ItemStack(Items.FIREWORK_STAR);
             CompoundTag cakeExp = cakeStar.getOrCreateTagElement(NbtKeys.EXPLOSION);
             cakeExp.putByte(NbtKeys.TYPE, CustomFireworkShapeRegistry.CAKE_ID);
@@ -336,45 +338,37 @@ public class ModCreativeModeTab {
 
             items.add(FireworkTestCommand.createCustomFireworkRocket(
                     CustomFireworkShapeRegistry.CAKE_ID,
-                    new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55}
-            ));
+                    new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55}));
             items.add(FireworkTestCommand.createCustomFireworkRocket(
                     CustomFireworkShapeRegistry.CROWN_ID,
-                    new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF}
-            ));
+                    new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF}));
             items.add(FireworkTestCommand.createCustomFireworkRocket(
                     CustomFireworkShapeRegistry.TROPHY_ID,
-                    new int[]{0xFFD700, 0xFFFF88, 0x00FFFF}
-            ));
+                    new int[]{0xFFD700, 0xFFFF88, 0x00FFFF}));
             items.add(FireworkTestCommand.createCustomFireworkRocket(
                     CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID,
-                    new int[]{0x227733, 0xFF3030, 0xFFD700}
-            ));
+                    new int[]{0x227733, 0xFF3030, 0xFFD700}));
             items.add(FireworkTestCommand.createCustomFireworkRocket(
                     CustomFireworkShapeRegistry.PRESENTS_ID,
-                    new int[]{0xFF2233, 0xFFD700}
-            ));
+                    new int[]{0xFF2233, 0xFFD700}));
             items.add(FireworkTestCommand.createCustomFireworkRocket(
                     CustomFireworkShapeRegistry.CANDY_CANE_ID,
-                    new int[]{0xFF0033}
-            ));
+                    new int[]{0xFF0033}));
             items.add(FireworkTestCommand.createCustomFireworkRocket(
                     CustomFireworkShapeRegistry.PHOENIX_ID,
-                    new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00}
-            ));
+                    new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00}));
             items.add(FireworkTestCommand.createCustomFireworkRocket(
                     CustomFireworkShapeRegistry.SNOWFLAKE_ID,
-                    new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF}
-            ));
-    }
+                    new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF}));
+        }
 
-    private void addTrophyItems(@NotNull NonNullList<ItemStack> items) {
+        private void addTrophyItems(@NotNull NonNullList<ItemStack> items) {
             for (TrophyDefinition trophyDef : Trophies.getAll()) {
                 if (trophyDef.getItem() != null) {
                     items.add(new ItemStack(trophyDef.getItem()));
                 }
             }
-    }
+        }
     };
 
     public static void sortItems(NonNullList<ItemStack> items) {

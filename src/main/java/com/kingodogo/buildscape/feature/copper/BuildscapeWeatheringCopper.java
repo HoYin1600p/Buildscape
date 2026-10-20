@@ -41,8 +41,7 @@ public interface BuildscapeWeatheringCopper extends WeatheringCopper {
                         }
                         if (neighborOrdinal > age) {
                             ++older;
-                        }
-                        else {
+                        } else {
                             ++sameAge;
                         }
                     }
@@ -51,8 +50,8 @@ public interface BuildscapeWeatheringCopper extends WeatheringCopper {
         }
         float ratio = (float) (older + 1) / (float) (older + sameAge + 1);
         if (random.nextFloat() < ratio * ratio * this.getChanceModifier()) {
-            this.getNext(state).ifPresent(next ->
-                    CopperOxidationHandler.setBlockStateOrDoor(level, pos, state, next.getBlock()));
+            this.getNext(state)
+                    .ifPresent(next -> CopperOxidationHandler.setBlockStateOrDoor(level, pos, state, next.getBlock()));
         }
     }
 }

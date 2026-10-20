@@ -339,18 +339,19 @@ public class RuntimeRecipeCycleTest {
     }
 
     private static List<Recipe<?>> append(Map<String, String> sources, Set<String> categories,
-                                           List<Recipe<?>> cached) throws Exception {
+            List<Recipe<?>> cached) throws Exception {
         return append(sources, categories, cached, false);
     }
 
     @SuppressWarnings("unchecked")
     private static List<Recipe<?>> append(Map<String, String> sources, Set<String> categories,
-                                           List<Recipe<?>> cached, boolean trustedBundledCache) throws Exception {
+            List<Recipe<?>> cached, boolean trustedBundledCache) throws Exception {
         Map<String, byte[]> bytes = new java.util.LinkedHashMap<>();
         sources.forEach((category, source) -> bytes.put(category, source.getBytes(StandardCharsets.UTF_8)));
         Method append = BuildScapeRecipeLoader.class.getDeclaredMethod(
                 "appendRuntimeRecipes", Map.class, Set.class, List.class, boolean.class);
         append.setAccessible(true);
-        return (List<Recipe<?>>) append.invoke(BuildScapeRecipeLoader.INSTANCE, bytes, categories, cached, trustedBundledCache);
+        return (List<Recipe<?>>) append.invoke(BuildScapeRecipeLoader.INSTANCE, bytes, categories, cached,
+                trustedBundledCache);
     }
 }

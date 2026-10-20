@@ -9,11 +9,10 @@ import java.util.Random;
 
 public final class ConfettiBurstClient {
 
-    private ConfettiBurstClient() {
-    }
+    private ConfettiBurstClient() {}
 
     public static void spawn(double startX, double startY, double startZ,
-                             double lookX, double lookY, double lookZ, int burstLevel, long seed) {
+            double lookX, double lookY, double lookZ, int burstLevel, long seed) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) {
             return;

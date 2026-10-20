@@ -21,13 +21,19 @@ public class MistBlockItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (this.getBlock() == ModBlocks.CASCADE_BLOCK_NO_MIST.get()) {
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block_no_mist.info").withStyle(ChatFormatting.GRAY));
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block.tune").withStyle(ChatFormatting.GRAY));
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block_no_mist.obtain").withStyle(ChatFormatting.GRAY));
+            tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block_no_mist.info")
+                    .withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    new TranslatableComponent("tooltip.buildscape.cascade_block.tune").withStyle(ChatFormatting.GRAY));
+            tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block_no_mist.obtain")
+                    .withStyle(ChatFormatting.GRAY));
         } else {
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block.info").withStyle(ChatFormatting.GRAY));
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.cascade_block.tune").withStyle(ChatFormatting.GRAY));
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.mist_toggle").withStyle(ChatFormatting.DARK_AQUA));
+            tooltip.add(
+                    new TranslatableComponent("tooltip.buildscape.cascade_block.info").withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    new TranslatableComponent("tooltip.buildscape.cascade_block.tune").withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    new TranslatableComponent("tooltip.buildscape.mist_toggle").withStyle(ChatFormatting.DARK_AQUA));
         }
         super.appendHoverText(stack, level, tooltip, flag);
     }

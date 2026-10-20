@@ -23,7 +23,8 @@ import java.util.function.BiConsumer;
 import static org.junit.Assert.*;
 
 public class GameRuleDefaultsRegressionTest {
-    @Rule public TemporaryFolder temporary = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporary = new TemporaryFolder();
 
     @BeforeClass
     public static void bootstrap() {

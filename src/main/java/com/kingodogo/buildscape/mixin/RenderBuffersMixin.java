@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderBuffers.class)
 public abstract class RenderBuffersMixin {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     private SortedMap<RenderType, BufferBuilder> fixedBuffers;
 
     @Inject(method = "<init>", at = @At("TAIL"))

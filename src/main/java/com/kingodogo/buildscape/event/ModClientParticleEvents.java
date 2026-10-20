@@ -16,6 +16,7 @@ public class ModClientParticleEvents {
     @SubscribeEvent
     public static void registerParticleFactories(ParticleFactoryRegisterEvent event) {
         FireflyParticle.clearActiveParticles();
-        Minecraft.getInstance().particleEngine.register(ModParticles.COPPER_FIRE_FLAME.get(), FlameParticle.Provider::new);
+        Minecraft.getInstance().particleEngine.register(ModParticles.COPPER_FIRE_FLAME.get(),
+                FlameParticle.Provider::new);
     }
 }

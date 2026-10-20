@@ -11,8 +11,7 @@ import net.minecraft.world.level.ItemLike;
  */
 public final class TabOrder3 {
 
-    private TabOrder3() {
-    }
+    private TabOrder3() {}
 
     public static final List<Supplier<? extends ItemLike>> ITEMS = List.<Supplier<? extends ItemLike>>of(
             ModItems.BAMBOO_BLOCK,
@@ -1045,6 +1044,5 @@ public final class TabOrder3 {
             ModItems.SCULK_VEIN,
             ModItems.SCULK_CATALYST,
             ModItems.SCULK_SHRIEKER,
-            ModItems.SCULK_SENSOR
-    );
+            ModItems.SCULK_SENSOR);
 }

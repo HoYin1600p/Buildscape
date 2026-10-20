@@ -33,17 +33,14 @@ import javax.annotation.Nullable;
 
 public class FestiveStockingEntity extends HangingEntity {
 
-    private static final EntityDataAccessor<ItemStack> DATA_ITEM =
-            SynchedEntityData.defineId(
-                    FestiveStockingEntity.class,
-                    EntityDataSerializers.ITEM_STACK
-            );
+    private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(
+            FestiveStockingEntity.class,
+            EntityDataSerializers.ITEM_STACK);
     private String colorVariant = "festive";
 
     public FestiveStockingEntity(
             EntityType<? extends FestiveStockingEntity> entityType,
-            Level level
-    ) {
+            Level level) {
         super(entityType, level);
     }
 
@@ -61,8 +58,7 @@ public class FestiveStockingEntity extends HangingEntity {
             Level level,
             BlockPos pos,
             Direction direction,
-            String color
-    ) {
+            String color) {
         this(ModEntities.FESTIVE_STOCKING.get(), level, pos);
         this.colorVariant = color;
         if (direction != null) {
@@ -84,8 +80,7 @@ public class FestiveStockingEntity extends HangingEntity {
     public FestiveStockingEntity(
             EntityType<? extends FestiveStockingEntity> entityType,
             Level level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         super(entityType, level, pos);
     }
 
@@ -93,7 +88,6 @@ public class FestiveStockingEntity extends HangingEntity {
     public void setDirection(Direction direction) {
         if (direction != null) {
             this.direction = direction;
-
 
             if (this.pos != null) {
                 this.recalculateBoundingBox();
@@ -131,19 +125,19 @@ public class FestiveStockingEntity extends HangingEntity {
                 offsetDir = Direction.NORTH;
             } else {
                 switch (this.direction) {
-                    case NORTH:
+                    case NORTH :
                         offsetDir = Direction.EAST;
                         break;
-                    case SOUTH:
+                    case SOUTH :
                         offsetDir = Direction.WEST;
                         break;
-                    case EAST:
+                    case EAST :
                         offsetDir = Direction.SOUTH;
                         break;
-                    case WEST:
+                    case WEST :
                         offsetDir = Direction.NORTH;
                         break;
-                    default:
+                    default :
                         offsetDir = Direction.NORTH;
                         break;
                 }
@@ -182,9 +176,7 @@ public class FestiveStockingEntity extends HangingEntity {
                             d2 - d8,
                             d0 + d6,
                             d1 + d7,
-                            d2 + d8
-                    )
-            );
+                            d2 + d8));
         }
     }
 
@@ -214,13 +206,9 @@ public class FestiveStockingEntity extends HangingEntity {
             if (entity instanceof Player) {
                 Player player = (Player) entity;
                 ItemStack tool = player.getMainHandItem();
-                if (
-                        EnchantmentHelper.getItemEnchantmentLevel(
-                                Enchantments.SILK_TOUCH,
-                                tool
-                        ) >
-                                0
-                ) {
+                if (EnchantmentHelper.getItemEnchantmentLevel(
+                        Enchantments.SILK_TOUCH,
+                        tool) > 0) {
                     hasSilkTouch = true;
                 }
             }
@@ -252,9 +240,7 @@ public class FestiveStockingEntity extends HangingEntity {
         ItemStack heldItem = player.getItemInHand(hand);
         ItemStack storedItem = this.getItem();
 
-        if (
-                heldItem.isEmpty() && player.isShiftKeyDown() && !storedItem.isEmpty()
-        ) {
+        if (heldItem.isEmpty() && player.isShiftKeyDown() && !storedItem.isEmpty()) {
             if (!this.level.isClientSide) {
                 ItemStack toGive = storedItem.copy();
                 this.setItem(ItemStack.EMPTY);
@@ -265,8 +251,7 @@ public class FestiveStockingEntity extends HangingEntity {
                             this.getX(),
                             this.getY(),
                             this.getZ(),
-                            toGive
-                    );
+                            toGive);
                     itemEntity.setDefaultPickUpDelay();
                     this.level.addFreshEntity(itemEntity);
                 }
@@ -292,10 +277,8 @@ public class FestiveStockingEntity extends HangingEntity {
                     }
                 }
                 return InteractionResult.sidedSuccess(this.level.isClientSide);
-            } else if (
-                    ItemStack.isSameItemSameTags(storedItem, heldItem) &&
-                            storedItem.getCount() < storedItem.getMaxStackSize()
-            ) {
+            } else if (ItemStack.isSameItemSameTags(storedItem, heldItem) &&
+                    storedItem.getCount() < storedItem.getMaxStackSize()) {
                 if (!this.level.isClientSide) {
                     int maxStack = storedItem.getMaxStackSize();
                     int spaceAvailable = maxStack - storedItem.getCount();
@@ -377,13 +360,10 @@ public class FestiveStockingEntity extends HangingEntity {
             return false;
         } else {
             BlockPos blockpos = this.pos.relative(this.direction.getOpposite());
-            if (
-                    !this.level.getBlockState(blockpos).isSolidRender(this.level, blockpos)
-            ) {
+            if (!this.level.getBlockState(blockpos).isSolidRender(this.level, blockpos)) {
                 return false;
             } else {
-                List<Entity> entities =
-                        this.level.getEntities(this, this.getBoundingBox());
+                List<Entity> entities = this.level.getEntities(this, this.getBoundingBox());
                 for (Entity entity : entities) {
                     if (entity instanceof HangingEntity && entity != this) {
                         return false;
@@ -440,74 +420,57 @@ public class FestiveStockingEntity extends HangingEntity {
 
     private ItemStack getStockingItemForColor(String color) {
         switch (color) {
-            case "black":
+            case "black" :
                 return new ItemStack(
-                        ModItems.BLACK_FESTIVE_STOCKING.get()
-                );
-            case "blue":
+                        ModItems.BLACK_FESTIVE_STOCKING.get());
+            case "blue" :
                 return new ItemStack(
-                        ModItems.BLUE_FESTIVE_STOCKING.get()
-                );
-            case "brown":
+                        ModItems.BLUE_FESTIVE_STOCKING.get());
+            case "brown" :
                 return new ItemStack(
-                        ModItems.BROWN_FESTIVE_STOCKING.get()
-                );
-            case "cyan":
+                        ModItems.BROWN_FESTIVE_STOCKING.get());
+            case "cyan" :
                 return new ItemStack(
-                        ModItems.CYAN_FESTIVE_STOCKING.get()
-                );
-            case "gray":
+                        ModItems.CYAN_FESTIVE_STOCKING.get());
+            case "gray" :
                 return new ItemStack(
-                        ModItems.GRAY_FESTIVE_STOCKING.get()
-                );
-            case "green":
+                        ModItems.GRAY_FESTIVE_STOCKING.get());
+            case "green" :
                 return new ItemStack(
-                        ModItems.GREEN_FESTIVE_STOCKING.get()
-                );
-            case "light_blue":
+                        ModItems.GREEN_FESTIVE_STOCKING.get());
+            case "light_blue" :
                 return new ItemStack(
-                        ModItems.LIGHT_BLUE_FESTIVE_STOCKING.get()
-                );
-            case "light_gray":
+                        ModItems.LIGHT_BLUE_FESTIVE_STOCKING.get());
+            case "light_gray" :
                 return new ItemStack(
-                        ModItems.LIGHT_GRAY_FESTIVE_STOCKING.get()
-                );
-            case "lime":
+                        ModItems.LIGHT_GRAY_FESTIVE_STOCKING.get());
+            case "lime" :
                 return new ItemStack(
-                        ModItems.LIME_FESTIVE_STOCKING.get()
-                );
-            case "magenta":
+                        ModItems.LIME_FESTIVE_STOCKING.get());
+            case "magenta" :
                 return new ItemStack(
-                        ModItems.MAGENTA_FESTIVE_STOCKING.get()
-                );
-            case "orange":
+                        ModItems.MAGENTA_FESTIVE_STOCKING.get());
+            case "orange" :
                 return new ItemStack(
-                        ModItems.ORANGE_FESTIVE_STOCKING.get()
-                );
-            case "pink":
+                        ModItems.ORANGE_FESTIVE_STOCKING.get());
+            case "pink" :
                 return new ItemStack(
-                        ModItems.PINK_FESTIVE_STOCKING.get()
-                );
-            case "purple":
+                        ModItems.PINK_FESTIVE_STOCKING.get());
+            case "purple" :
                 return new ItemStack(
-                        ModItems.PURPLE_FESTIVE_STOCKING.get()
-                );
-            case "red":
+                        ModItems.PURPLE_FESTIVE_STOCKING.get());
+            case "red" :
                 return new ItemStack(
-                        ModItems.RED_FESTIVE_STOCKING.get()
-                );
-            case "white":
+                        ModItems.RED_FESTIVE_STOCKING.get());
+            case "white" :
                 return new ItemStack(
-                        ModItems.WHITE_FESTIVE_STOCKING.get()
-                );
-            case "yellow":
+                        ModItems.WHITE_FESTIVE_STOCKING.get());
+            case "yellow" :
                 return new ItemStack(
-                        ModItems.YELLOW_FESTIVE_STOCKING.get()
-                );
-            default:
+                        ModItems.YELLOW_FESTIVE_STOCKING.get());
+            default :
                 return new ItemStack(
-                        ModItems.FESTIVE_STOCKING.get()
-                );
+                        ModItems.FESTIVE_STOCKING.get());
         }
     }
 }

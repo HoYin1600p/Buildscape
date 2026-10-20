@@ -81,8 +81,10 @@ public class SculkVeinBlock extends GlowLichenBlock {
                 || !support.isFaceSturdy(level, supportPos, face.getOpposite())) {
             return false;
         }
-        BlockState vein = state.is(ModBlocks.SCULK_VEIN.get()) ? state : ModBlocks.SCULK_VEIN.get().defaultBlockState()
-                .setValue(BlockStateProperties.WATERLOGGED, state.getFluidState().is(Fluids.WATER));
+        BlockState vein = state.is(ModBlocks.SCULK_VEIN.get())
+                ? state
+                : ModBlocks.SCULK_VEIN.get().defaultBlockState()
+                        .setValue(BlockStateProperties.WATERLOGGED, state.getFluidState().is(Fluids.WATER));
         BooleanProperty property = getFaceProperty(face);
         return !vein.getValue(property) && level.setBlock(pos, vein.setValue(property, true), 3);
     }
@@ -104,7 +106,8 @@ public class SculkVeinBlock extends GlowLichenBlock {
         }
         if (!anyFace) {
             remaining = state.getValue(BlockStateProperties.WATERLOGGED)
-                ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
+                    ? Blocks.WATER.defaultBlockState()
+                    : Blocks.AIR.defaultBlockState();
         }
         if (remaining != state) {
             level.setBlock(pos, remaining, 3);
@@ -122,7 +125,5 @@ public class SculkVeinBlock extends GlowLichenBlock {
     }
 
     @Override
-    public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {
-    }
+    public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {}
 }
-

@@ -15,8 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class TintedSporeParticle extends TextureSheetParticle {
 
-    private static final ConcurrentLinkedQueue<String> COLOR_QUEUE =
-            new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<String> COLOR_QUEUE = new ConcurrentLinkedQueue<>();
 
     protected TintedSporeParticle(
             ClientLevel level,
@@ -26,8 +25,7 @@ public class TintedSporeParticle extends TextureSheetParticle {
             double xSpeed,
             double ySpeed,
             double zSpeed,
-            SpriteSet sprites
-    ) {
+            SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.setSpriteFromAge(sprites);
         this.gravity = 0.0F;
@@ -83,9 +81,7 @@ public class TintedSporeParticle extends TextureSheetParticle {
     }
 
     private static float[] parseColorCode(String colorCode) {
-        if (
-                colorCode == null || colorCode.isEmpty() || !colorCode.startsWith("#")
-        ) {
+        if (colorCode == null || colorCode.isEmpty() || !colorCode.startsWith("#")) {
             return new float[]{1.0F, 1.0F, 1.0F};
         }
 
@@ -123,8 +119,7 @@ public class TintedSporeParticle extends TextureSheetParticle {
                 double z,
                 double xSpeed,
                 double ySpeed,
-                double zSpeed
-        ) {
+                double zSpeed) {
             return new TintedSporeParticle(
                     level,
                     x,
@@ -133,8 +128,7 @@ public class TintedSporeParticle extends TextureSheetParticle {
                     xSpeed,
                     ySpeed,
                     zSpeed,
-                    sprites
-            );
+                    sprites);
         }
     }
 }

@@ -29,7 +29,7 @@ public class WrenchItem extends Item {
 
     @Override
     public boolean doesSneakBypassUse(ItemStack stack, LevelReader level,
-                                      BlockPos pos, Player player) {
+            BlockPos pos, Player player) {
         return level.getBlockState(pos).getBlock() instanceof HollowPipeBlock;
     }
 }

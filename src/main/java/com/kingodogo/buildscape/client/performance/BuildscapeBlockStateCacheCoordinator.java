@@ -17,8 +17,7 @@ public final class BuildscapeBlockStateCacheCoordinator {
     private static volatile Set<Block> buildscapeBlocks = Set.of();
     private static volatile boolean collecting;
 
-    private BuildscapeBlockStateCacheCoordinator() {
-    }
+    private BuildscapeBlockStateCacheCoordinator() {}
 
     public static synchronized void begin() {
         PENDING_STATES.clear();
@@ -71,8 +70,7 @@ public final class BuildscapeBlockStateCacheCoordinator {
         } catch (RuntimeException exception) {
             BuildScape.LOGGER.warn(
                     "Buildscape parallel block-state cache setup failed; retrying sequentially",
-                    exception
-            );
+                    exception);
             retrySequentially.clear();
             retrySequentially.addAll(states);
         }
@@ -86,7 +84,6 @@ public final class BuildscapeBlockStateCacheCoordinator {
                 "Buildscape startup initialized {} block-state caches in parallel ({} ms, {} sequential retries)",
                 states.size(),
                 elapsedMillis,
-                retrySequentially.size()
-        );
+                retrySequentially.size());
     }
 }

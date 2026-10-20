@@ -144,8 +144,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
             Level level,
             BlockPos pos,
             BlockState state,
-            PillarBlockEntity be
-    ) {
+            PillarBlockEntity be) {
         if (level == null || !level.isClientSide) {
             return;
         }
@@ -190,8 +189,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
                 0L,
                 settings.usePattern()
                         ? Math.round(baseCount * settings.intensity())
-                        : baseCount
-        ));
+                        : baseCount));
         if (count == 0) {
             return;
         }
@@ -213,8 +211,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
                 rand,
                 centerX,
                 centerY,
-                centerZ
-        );
+                centerZ);
     }
 
     public ItemStack getDisplayedItem() {
@@ -285,12 +282,14 @@ public class PillarBlockEntity extends SyncedBlockEntity {
                     3);
 
             if (this.pillarId != null) {
-                PillarIdManager.get(level).updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
+                PillarIdManager.get(level).updateDisplayedItem(this.pillarId, stack.isEmpty()
+                        ? null
                         : ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
             } else {
                 String stackId = getStackPillarId();
                 if (stackId != null) {
-                    PillarIdManager.get(level).updateDisplayedItem(stackId, stack.isEmpty() ? null
+                    PillarIdManager.get(level).updateDisplayedItem(stackId, stack.isEmpty()
+                            ? null
                             : ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 } else if (!stack.isEmpty()) {
                     PillarIdManager.get(level).updateDisplayedItemByPosition(level, worldPosition,
@@ -333,12 +332,14 @@ public class PillarBlockEntity extends SyncedBlockEntity {
                     3);
 
             if (this.pillarId != null) {
-                PillarIdManager.get(level).updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
+                PillarIdManager.get(level).updateDisplayedItem(this.pillarId, stack.isEmpty()
+                        ? null
                         : ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
             } else {
                 String stackId = getStackPillarId();
                 if (stackId != null) {
-                    PillarIdManager.get(level).updateDisplayedItem(stackId, stack.isEmpty() ? null
+                    PillarIdManager.get(level).updateDisplayedItem(stackId, stack.isEmpty()
+                            ? null
                             : ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 } else if (!stack.isEmpty()) {
                     PillarIdManager.get(level).updateDisplayedItemByPosition(level, worldPosition,
@@ -440,7 +441,8 @@ public class PillarBlockEntity extends SyncedBlockEntity {
     }
 
     public String getParticlePattern() {
-        if (particlePattern != null && !particlePattern.isEmpty() && !particlePattern.equals(ParticlePatterns.DEFAULT)) {
+        if (particlePattern != null && !particlePattern.isEmpty()
+                && !particlePattern.equals(ParticlePatterns.DEFAULT)) {
             return particlePattern;
         }
 
@@ -688,7 +690,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         PillarEntityNbt.read(this, tag);
     }
 
-
     public void clearParticleColors() {
         String idToRemove = this.pillarId;
 
@@ -741,7 +742,6 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         super.saveAdditional(tag);
         PillarEntityNbt.write(this, tag);
     }
-
 
     public void initializeDefaultColors() {
         if (!colorsInitialized && particleColors == null) {

@@ -41,7 +41,7 @@ public class PillarMarkerManager {
 
         public float getGradientProgress() {
             long elapsed = System.currentTimeMillis() - markTime;
-            return Math.min(1.0f, elapsed / (float)MARK_DURATION_MS);
+            return Math.min(1.0f, elapsed / (float) MARK_DURATION_MS);
         }
     }
 
@@ -56,9 +56,9 @@ public class PillarMarkerManager {
 
         for (MarkedPillar marked : markedPillars.values()) {
             if (marked.dimension.equals(dimension) &&
-                marked.pos.getX() == pos.getX() &&
-                marked.pos.getY() == pos.getY() &&
-                marked.pos.getZ() == pos.getZ()) {
+                    marked.pos.getX() == pos.getX() &&
+                    marked.pos.getY() == pos.getY() &&
+                    marked.pos.getZ() == pos.getZ()) {
                 if (!marked.isExpired()) {
                     return marked;
                 }
@@ -91,4 +91,3 @@ public class PillarMarkerManager {
         markedPillars.clear();
     }
 }
-

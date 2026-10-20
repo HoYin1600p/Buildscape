@@ -22,33 +22,35 @@ public interface SelectableSlotContainer {
         }).orElseGet(OptionalInt::empty);
     }
 
-    private static Optional<Vec2> getRelativeHitCoordinatesForBlockFace(final BlockHitResult hitResult, final Direction blockFacing) {
+    private static Optional<Vec2> getRelativeHitCoordinatesForBlockFace(final BlockHitResult hitResult,
+            final Direction blockFacing) {
         Direction hitDirection = hitResult.getDirection();
         if (blockFacing != hitDirection) {
             return Optional.empty();
         } else {
             BlockPos hitBlockPos = hitResult.getBlockPos().relative(hitDirection);
-            Vec3 relativeHit = hitResult.getLocation().subtract((double)hitBlockPos.getX(), (double)hitBlockPos.getY(), (double)hitBlockPos.getZ());
+            Vec3 relativeHit = hitResult.getLocation().subtract((double) hitBlockPos.getX(),
+                    (double) hitBlockPos.getY(), (double) hitBlockPos.getZ());
             double relativeX = relativeHit.x();
             double relativeY = relativeHit.y();
             double relativeZ = relativeHit.z();
             Optional<Vec2> hitPoint;
             switch (hitDirection) {
-                case NORTH:
-                    hitPoint = Optional.of(new Vec2((float)(1.0D - relativeX), (float)relativeY));
+                case NORTH :
+                    hitPoint = Optional.of(new Vec2((float) (1.0D - relativeX), (float) relativeY));
                     break;
-                case SOUTH:
-                    hitPoint = Optional.of(new Vec2((float)relativeX, (float)relativeY));
+                case SOUTH :
+                    hitPoint = Optional.of(new Vec2((float) relativeX, (float) relativeY));
                     break;
-                case WEST:
-                    hitPoint = Optional.of(new Vec2((float)relativeZ, (float)relativeY));
+                case WEST :
+                    hitPoint = Optional.of(new Vec2((float) relativeZ, (float) relativeY));
                     break;
-                case EAST:
-                    hitPoint = Optional.of(new Vec2((float)(1.0D - relativeZ), (float)relativeY));
+                case EAST :
+                    hitPoint = Optional.of(new Vec2((float) (1.0D - relativeZ), (float) relativeY));
                     break;
-                case DOWN:
-                case UP:
-                default:
+                case DOWN :
+                case UP :
+                default :
                     hitPoint = Optional.empty();
                     break;
             }
@@ -59,7 +61,7 @@ public interface SelectableSlotContainer {
 
     private static int getSection(final float relativeCoordinate, final int maxSections) {
         float targetedPixel = relativeCoordinate * 16.0F;
-        float sectionSize = 16.0F / (float)maxSections;
+        float sectionSize = 16.0F / (float) maxSections;
         return Mth.clamp(Mth.floor(targetedPixel / sectionSize), 0, maxSections - 1);
     }
 }

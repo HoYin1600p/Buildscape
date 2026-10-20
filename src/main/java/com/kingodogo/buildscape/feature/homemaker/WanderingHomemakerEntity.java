@@ -64,72 +64,130 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         offers.clear();
 
         List<MerchantOffer> list = new ArrayList<>();
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MANGROVE_PROPAGULE.get(), 5), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.POPLAR_SAPLING.get(), 4), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CHERRY_SAPLING.get(), 4), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PALE_OAK_SAPLING.get(), 4), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_MONETS.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_MONETS.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_MONETS.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIGHT_BLUE_MONETS.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PINK_MONETS.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.YELLOW_MONETS.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOVER.get(), 7), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_ROSE_VINES.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLACK_ROSE_VINES.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_ROSE_VINES.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WHITE_ROSE_VINES.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SNOWY_GRASS_BLOCK.get(), 2), 2, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CYAN_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ORANGE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ICICLE.get(), 32), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR_SPIKE.get(), 32), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get(), 4), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR.get(), 4), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CINNABAR.get(), 2), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WILDFLOWERS.get(), 4), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LEAF_LITTER.get(), 4), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MANGROVE_PROPAGULE.get(), 5),
+                8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.POPLAR_SAPLING.get(), 4), 8,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CHERRY_SAPLING.get(), 4), 8,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PALE_OAK_SAPLING.get(), 4),
+                8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_MONETS.get(), 2), 6, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_MONETS.get(), 2), 6, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_MONETS.get(), 2), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIGHT_BLUE_MONETS.get(), 2),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PINK_MONETS.get(), 2), 6, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.YELLOW_MONETS.get(), 2), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOVER.get(), 7), 6, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_ROSE_VINES.get(), 2), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLACK_ROSE_VINES.get(), 2),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_ROSE_VINES.get(), 2), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WHITE_ROSE_VINES.get(), 2),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SNOWY_GRASS_BLOCK.get(), 2),
+                2, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_SPORE_BLOSSOM.get(), 2),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CYAN_SPORE_BLOSSOM.get(), 2),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_SPORE_BLOSSOM.get(), 2),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ModItems.PURPLE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ModItems.ORANGE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ICICLE.get(), 32), 8, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR_SPIKE.get(), 32), 8,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get(), 4), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR.get(), 4), 8, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CINNABAR.get(), 2), 8, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WILDFLOWERS.get(), 4), 6, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LEAF_LITTER.get(), 4), 6, 1,
+                0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.DRY_GRASS.get(), 6), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.TALL_DRY_GRASS.get(), 6), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BUSH.get(), 6), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CACTUS_FLOWER.get(), 6), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_BUSH.get(), 6), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.FIREFLY_BUSH.get(), 6), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.OPEN_EYEBLOSSOM.get(), 6), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.DRY_GRASS.get(), 6), 8, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.TALL_DRY_GRASS.get(), 6), 8,
+                1, 0.05f));
+        list.add(
+                new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BUSH.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CACTUS_FLOWER.get(), 6), 8,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_BUSH.get(), 6), 8, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.FIREFLY_BUSH.get(), 6), 8, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.OPEN_EYEBLOSSOM.get(), 6), 8,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get(), 6),
+                8, 1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ORANGE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MAGENTA_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIGHT_BLUE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.YELLOW_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIME_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PINK_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GRAY_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIGHT_GRAY_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CYAN_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BROWN_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GREEN_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLACK_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ORANGE_HAZE_BUSH.get(), 6),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MAGENTA_HAZE_BUSH.get(), 6),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ModItems.LIGHT_BLUE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.YELLOW_HAZE_BUSH.get(), 6),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIME_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PINK_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GRAY_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
+                new ItemStack(ModItems.LIGHT_GRAY_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CYAN_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_HAZE_BUSH.get(), 6),
+                6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BROWN_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GREEN_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLACK_HAZE_BUSH.get(), 6), 6,
+                1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SCULK_CATALYST.get(), 2), 3, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SCULK_CATALYST.get(), 2), 3,
+                1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MUFF_BLOCK.get(), 2), 4, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MUFF_BLOCK.get(), 2), 4, 1,
+                0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BOTTLE_OF_MIST.get(), 16), 4, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BOTTLE_OF_MIST.get(), 16), 4,
+                1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CONFETTI_ITEM.get(), 32), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CONFETTI_ITEM.get(), 32), 6,
+                1, 0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_CLUMP.get(), 16), 8, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_BLOCK.get(), 16), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_CLUMP.get(), 16), 8, 1,
+                0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_BLOCK.get(), 16), 8, 1,
+                0.05f));
 
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CREAKING_HEART.get(), 2), 2, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CREAKING_HEART.get(), 2), 2,
+                1, 0.05f));
 
         Collections.shuffle(list, this.random);
         for (int j = 0; j < Math.min(5, list.size()); j++) {
@@ -137,7 +195,8 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         }
 
         if (this.random.nextInt(5000) == 0) {
-            offers.add(new MerchantOffer(new ItemStack(Items.DIAMOND, 12), new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1), 1, 1, 0.0f));
+            offers.add(new MerchantOffer(new ItemStack(Items.DIAMOND, 12),
+                    new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1), 1, 1, 0.0f));
         }
     }
 }

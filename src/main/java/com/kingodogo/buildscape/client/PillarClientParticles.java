@@ -21,9 +21,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public final class PillarClientParticles {
 
-    private PillarClientParticles() {
-    }
-
+    private PillarClientParticles() {}
 
     public static boolean isWithinRange(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
@@ -45,7 +43,8 @@ public final class PillarClientParticles {
             double centerZ) {
 
         boolean isSnowflake = ParticlePatterns.SNOWFLAKE.equals(settings.pattern());
-        SimpleParticleType particleType = isSnowflake ? ModParticles.SNOWFLAKE.get()
+        SimpleParticleType particleType = isSnowflake
+                ? ModParticles.SNOWFLAKE.get()
                 : ModParticles.GLOW_LIME_SPARKLE.get();
 
         Minecraft mc = Minecraft.getInstance();
@@ -138,7 +137,6 @@ public final class PillarClientParticles {
         }
     }
 
-
     private static ParticleSpawnData calculateParticleData(
             PillarParticleSettings settings,
             PillarParticleConfig cfg,
@@ -155,7 +153,7 @@ public final class PillarClientParticles {
             double spread = settings.spread();
 
             switch (pattern) {
-                case ParticlePatterns.BEAM:
+                case ParticlePatterns.BEAM :
                     sx = (rand.nextDouble() - 0.5) * spread * 0.3;
                     sy = 0.0;
                     sz = (rand.nextDouble() - 0.5) * spread * 0.3;
@@ -163,7 +161,7 @@ public final class PillarClientParticles {
                     vy = speed * (0.8 + rand.nextDouble() * 0.4);
                     vz = (rand.nextDouble() - 0.5) * speed * 0.2;
                     break;
-                case ParticlePatterns.SPIRAL:
+                case ParticlePatterns.SPIRAL :
                     double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
                     sx = Math.cos(angle) * radius;
@@ -173,7 +171,7 @@ public final class PillarClientParticles {
                     vy = speed * 0.6;
                     vz = Math.sin(angle) * speed * 0.3;
                     break;
-                case ParticlePatterns.FOUNTAIN:
+                case ParticlePatterns.FOUNTAIN :
                     double fAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double fRadius = rand.nextDouble() * spread;
                     sx = Math.cos(fAngle) * fRadius;
@@ -183,7 +181,7 @@ public final class PillarClientParticles {
                     vy = speed * 0.3 - rand.nextDouble() * speed * 0.2;
                     vz = Math.sin(fAngle) * speed * 0.5;
                     break;
-                case ParticlePatterns.PULSE:
+                case ParticlePatterns.PULSE :
                     double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
                     double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
                     double pAngle = rand.nextDouble() * 2.0 * Math.PI;
@@ -194,7 +192,7 @@ public final class PillarClientParticles {
                     vy = speed * 0.2;
                     vz = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
                     break;
-                case ParticlePatterns.RING:
+                case ParticlePatterns.RING :
                     double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
                     double rRadius = spread * 0.8;
                     sx = Math.cos(rAngle) * rRadius;
@@ -204,7 +202,7 @@ public final class PillarClientParticles {
                     vy = speed * 0.3;
                     vz = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
                     break;
-                case ParticlePatterns.BURST:
+                case ParticlePatterns.BURST :
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.5;
                     sx = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.3;
@@ -215,7 +213,7 @@ public final class PillarClientParticles {
                     vz = Math.sin(bAngle) * Math.cos(bElevation) * speed;
                     size = 0.5f;
                     break;
-                case ParticlePatterns.SNOWFLAKE:
+                case ParticlePatterns.SNOWFLAKE :
                     double sfAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double sfRadius = rand.nextDouble() * spread;
                     sx = Math.cos(sfAngle) * sfRadius;
@@ -226,7 +224,7 @@ public final class PillarClientParticles {
                     vz = (rand.nextDouble() - 0.5) * speed * 0.1;
                     size = 0.3f;
                     break;
-                default:
+                default :
                     sx = (rand.nextDouble() - 0.5) * spread;
                     sy = rand.nextDouble() * spread;
                     sz = (rand.nextDouble() - 0.5) * spread;

@@ -54,7 +54,8 @@ public class GlowLightsLootTest {
                         JsonObject condition = conditionElement.getAsJsonObject();
                         assertEquals("minecraft:block_state_property", condition.get("condition").getAsString());
                         assertEquals("buildscape:" + id, condition.get("block").getAsString());
-                        for (Map.Entry<String, JsonElement> property : condition.getAsJsonObject("properties").entrySet()) {
+                        for (Map.Entry<String, JsonElement> property : condition.getAsJsonObject("properties")
+                                .entrySet()) {
                             int face = FACES.indexOf(property.getKey());
                             assertTrue("unknown face " + property.getKey(), face >= 0);
                             boolean attached = (mask & (1 << face)) != 0;

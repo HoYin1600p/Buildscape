@@ -68,7 +68,8 @@ public class ColoredItemFrameItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         if (this.colorVariant.equals("invisible")) {
-            tooltip.add(new TranslatableComponent("item.buildscape.invisible_item_frame.tooltip").withStyle(ChatFormatting.GRAY));
+            tooltip.add(new TranslatableComponent("item.buildscape.invisible_item_frame.tooltip")
+                    .withStyle(ChatFormatting.GRAY));
         }
     }
 }

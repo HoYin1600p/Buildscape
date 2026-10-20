@@ -23,10 +23,10 @@ public final class ParticlePatterns {
     public static final String NOT_SET = "__not_set__";
 
     /** Every pattern in the order the pickers cycle through them. */
-    public static final List<String> ALL = List.of(NONE, DEFAULT, BEAM, SPIRAL, FOUNTAIN, PULSE, RING, BURST, SNOWFLAKE);
+    public static final List<String> ALL = List.of(NONE, DEFAULT, BEAM, SPIRAL, FOUNTAIN, PULSE, RING, BURST,
+            SNOWFLAKE);
 
-    private ParticlePatterns() {
-    }
+    private ParticlePatterns() {}
 
     /** Whether {@code name} is one of the stored pattern names. */
     public static boolean isKnown(String name) {

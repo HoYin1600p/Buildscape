@@ -37,7 +37,6 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
-
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -46,7 +45,8 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+            BlockEntityType<T> type) {
         return createTickerHelper(type, ModBlockEntities.BUILDERS_WORKBENCH_BE.get(),
                 (lvl, pos, st, be) -> be.tick(lvl, pos, st));
     }
@@ -56,10 +56,9 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
-                                 Player player, InteractionHand hand, BlockHitResult hit) {
+            Player player, InteractionHand hand, BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -71,10 +70,9 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
         return InteractionResult.CONSUME;
     }
 
-
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos,
-                         BlockState newState, boolean isMoving) {
+            BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof BuildersWorkbenchBlockEntity wbe) {

@@ -18,8 +18,7 @@ public class SnowyLeavesBlock extends LeavesBlock {
                 this.stateDefinition.any()
                         .setValue(BlockStateProperties.WATERLOGGED, false)
                         .setValue(DISTANCE, 7)
-                        .setValue(PERSISTENT, false)
-        );
+                        .setValue(PERSISTENT, false));
     }
 
     @Override
@@ -27,8 +26,7 @@ public class SnowyLeavesBlock extends LeavesBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -41,8 +39,7 @@ public class SnowyLeavesBlock extends LeavesBlock {
     public float getShadeBrightness(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return 1.0F;
     }
 
@@ -50,8 +47,7 @@ public class SnowyLeavesBlock extends LeavesBlock {
     public boolean propagatesSkylightDown(
             BlockState state,
             BlockGetter reader,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return true;
     }
 }

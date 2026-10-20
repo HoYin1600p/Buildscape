@@ -14,7 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class DecoratedPotBlockEntityRenderer
-        implements BlockEntityRenderer<DecoratedPotBlockEntity> {
+        implements
+            BlockEntityRenderer<DecoratedPotBlockEntity> {
 
     private final BlockRenderDispatcher blockRenderer;
 
@@ -22,8 +23,7 @@ public class DecoratedPotBlockEntityRenderer
     private static final float MAX_ROTATION_DEGREES = 8.0f;
 
     public DecoratedPotBlockEntityRenderer(
-            BlockEntityRendererProvider.Context context
-    ) {
+            BlockEntityRendererProvider.Context context) {
         this.blockRenderer = context.getBlockRenderDispatcher();
     }
 
@@ -34,24 +34,19 @@ public class DecoratedPotBlockEntityRenderer
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (blockEntity.getLevel() == null) {
             return;
         }
 
         long currentTick = blockEntity.getLevel().getGameTime();
         long wobbleStartTick = blockEntity.getWobbleStartedAtTick();
-        DecoratedPotBlockEntity.WobbleStyle wobbleStyle =
-                blockEntity.getLastWobbleStyle();
+        DecoratedPotBlockEntity.WobbleStyle wobbleStyle = blockEntity.getLastWobbleStyle();
 
         float wobbleProgress = 0.0f;
-        if (
-                wobbleStyle != DecoratedPotBlockEntity.WobbleStyle.NONE &&
-                        wobbleStartTick > 0
-        ) {
-            float ticksSinceWobble =
-                    (float) (currentTick - wobbleStartTick) + partialTicks;
+        if (wobbleStyle != DecoratedPotBlockEntity.WobbleStyle.NONE &&
+                wobbleStartTick > 0) {
+            float ticksSinceWobble = (float) (currentTick - wobbleStartTick) + partialTicks;
             if (ticksSinceWobble < WOBBLE_DURATION) {
                 wobbleProgress = ticksSinceWobble / WOBBLE_DURATION;
             }
@@ -73,8 +68,7 @@ public class DecoratedPotBlockEntityRenderer
         BakedModel model = blockRenderer.getBlockModel(blockState);
         RenderType renderType = ItemBlockRenderTypes.getRenderType(
                 blockState,
-                true
-        );
+                true);
         blockRenderer
                 .getModelRenderer()
                 .renderModel(
@@ -87,8 +81,7 @@ public class DecoratedPotBlockEntityRenderer
                         1.0f,
                         combinedLight,
                         combinedOverlay,
-                        EmptyModelData.INSTANCE
-                );
+                        EmptyModelData.INSTANCE);
 
         poseStack.popPose();
     }

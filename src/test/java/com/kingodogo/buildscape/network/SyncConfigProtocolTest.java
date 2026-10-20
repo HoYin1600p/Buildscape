@@ -42,7 +42,7 @@ public class SyncConfigProtocolTest {
     @Test
     public void editRefusedPacketRoundTrips() {
         for (EditRefusedPacket.Reason reason : EditRefusedPacket.Reason.values()) {
-            for (ConfigSetting setting : new ConfigSetting[] {null, ConfigSetting.ITEMS, ConfigSetting.WORLD_RULES}) {
+            for (ConfigSetting setting : new ConfigSetting[]{null, ConfigSetting.ITEMS, ConfigSetting.WORLD_RULES}) {
                 FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
                 new EditRefusedPacket(reason, setting).encode(buf);
                 EditRefusedPacket decoded = EditRefusedPacket.decode(buf);
@@ -58,7 +58,8 @@ public class SyncConfigProtocolTest {
         assertEquals(EditRefusedPacket.Reason.LOCKED,
                 EditGuard.reasonFor("BuildScape: This setting is locked by the server edit policy."));
         assertEquals(EditRefusedPacket.Reason.READ_ONLY,
-                EditGuard.reasonFor("BuildScape: Changes refused because the server config is read-only. Check the server log."));
+                EditGuard.reasonFor(
+                        "BuildScape: Changes refused because the server config is read-only. Check the server log."));
         assertEquals(EditRefusedPacket.Reason.INVALID,
                 EditGuard.reasonFor("BuildScape: Invalid item or tag refused: x"));
     }
@@ -105,7 +106,8 @@ public class SyncConfigProtocolTest {
         config.max_particle_color = 2;
         ConfigAssembly assembly = new ConfigAssembly();
         SyncConfigPacket decoded = null;
-        for (UpdateConfigPacket packet : UpdateConfigPacket.split(config, ConfigSetting.allowed(config.edit_permission_mode, 2))) {
+        for (UpdateConfigPacket packet : UpdateConfigPacket.split(config,
+                ConfigSetting.allowed(config.edit_permission_mode, 2))) {
             FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
             try {
                 packet.encode(buffer);

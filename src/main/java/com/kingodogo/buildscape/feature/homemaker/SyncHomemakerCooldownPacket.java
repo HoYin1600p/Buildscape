@@ -29,8 +29,8 @@ public class SyncHomemakerCooldownPacket {
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() ->
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.setHomemakerCooldown(this.cooldownTime)));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.setHomemakerCooldown(this.cooldownTime)));
         context.setPacketHandled(true);
     }
 }

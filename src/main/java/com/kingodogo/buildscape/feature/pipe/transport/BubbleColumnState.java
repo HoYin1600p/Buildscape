@@ -5,9 +5,7 @@ import net.minecraft.util.StringRepresentable;
 import java.util.Locale;
 
 public enum BubbleColumnState implements StringRepresentable {
-    NONE("none"),
-    UP("up"),
-    DOWN("down");
+    NONE("none"), UP("up"), DOWN("down");
 
     private final String name;
 

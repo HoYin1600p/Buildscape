@@ -24,7 +24,7 @@ public class MobGriefingEvents {
                     event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
                 }
             } else if (entity instanceof Ghast ||
-                       entity instanceof LargeFireball) {
+                    entity instanceof LargeFireball) {
                 if (entity.level.getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING)) {
                     event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
                 }

@@ -25,51 +25,45 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import com.kingodogo.buildscape.core.OpenWaterloggedBlock;
 
 public class MushroomShelvesBlock
-        extends OpenWaterloggedBlock
-        implements SimpleWaterloggedBlock {
+        extends
+            OpenWaterloggedBlock
+        implements
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
-    public static final DirectionProperty FACING =
-            BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static final VoxelShape SHAPE_SOUTH = Shapes.or(
             Block.box(7, 13, 13, 15, 13.25, 16),
             Block.box(8, 3, 13, 16, 3.25, 16),
-            Block.box(0, 8, 12, 10, 8.25, 16)
-    );
+            Block.box(0, 8, 12, 10, 8.25, 16));
 
     private static final VoxelShape SHAPE_NORTH = Shapes.or(
             Block.box(1, 13, 0, 9, 13.25, 3),
             Block.box(0, 3, 0, 8, 3.25, 3),
-            Block.box(6, 8, 0, 16, 8.25, 4)
-    );
+            Block.box(6, 8, 0, 16, 8.25, 4));
 
     private static final VoxelShape SHAPE_EAST = Shapes.or(
             Block.box(13, 13, 1, 16, 13.25, 9),
             Block.box(13, 3, 0, 16, 3.25, 8),
-            Block.box(12, 8, 6, 16, 8.25, 16)
-    );
+            Block.box(12, 8, 6, 16, 8.25, 16));
 
     private static final VoxelShape SHAPE_WEST = Shapes.or(
             Block.box(0, 13, 7, 3, 13.25, 15),
             Block.box(0, 3, 8, 3, 3.25, 16),
-            Block.box(0, 8, 0, 4, 8.25, 10)
-    );
+            Block.box(0, 8, 0, 4, 8.25, 10));
 
     public MushroomShelvesBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition.any()
                         .setValue(FACING, Direction.NORTH)
-                        .setValue(WATERLOGGED, false)
-        );
+                        .setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, WATERLOGGED);
     }
 
@@ -98,8 +92,7 @@ public class MushroomShelvesBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -109,8 +102,7 @@ public class MushroomShelvesBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -128,8 +120,7 @@ public class MushroomShelvesBlock
             BlockState state,
             BlockGetter worldIn,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return switch (state.getValue(FACING)) {
             case NORTH -> SHAPE_NORTH;
             case SOUTH -> SHAPE_SOUTH;
@@ -144,8 +135,7 @@ public class MushroomShelvesBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return getShape(state, level, pos, context);
     }
 
@@ -154,8 +144,7 @@ public class MushroomShelvesBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -173,12 +162,9 @@ public class MushroomShelvesBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 
     private boolean isMushroomShelf(BlockState state) {
@@ -213,8 +199,7 @@ public class MushroomShelvesBlock
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            LivingEntity entity
-    ) {
+            LivingEntity entity) {
         if (!hasVerticalStacking(level, pos)) {
             return false;
         }

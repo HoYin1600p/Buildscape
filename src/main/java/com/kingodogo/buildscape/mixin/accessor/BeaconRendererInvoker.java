@@ -10,14 +10,13 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface BeaconRendererInvoker {
     @Invoker("renderBeaconBeam")
     static void invokeRenderBeaconBeam(
-        PoseStack poseStack,
-        MultiBufferSource bufferSource,
-        float partialTicks,
-        long gameTime,
-        int yOffset,
-        int height,
-        float[] color
-    ) {
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            float partialTicks,
+            long gameTime,
+            int yOffset,
+            int height,
+            float[] color) {
         throw new AssertionError();
     }
 }

@@ -20,20 +20,46 @@ public final class EmbeddiumSpillBuffer implements VertexConsumer {
         offset = renderOffset.offset(-(worldPos.getX() & 15), -(worldPos.getY() & 15), -(worldPos.getZ() & 15));
     }
 
-    @Override public VertexConsumer vertex(double x, double y, double z) {
-        this.x = (float)x; this.y = (float)y; this.z = (float)z; return this;
+    @Override
+    public VertexConsumer vertex(double x, double y, double z) {
+        this.x = (float) x;
+        this.y = (float) y;
+        this.z = (float) z;
+        return this;
     }
-    @Override public VertexConsumer color(int r, int g, int b, int a) {
-        color = r | (g << 8) | (b << 16) | (a << 24); return this;
+    @Override
+    public VertexConsumer color(int r, int g, int b, int a) {
+        color = r | (g << 8) | (b << 16) | (a << 24);
+        return this;
     }
-    @Override public VertexConsumer uv(float u, float v) { this.u = u; this.v = v; return this; }
-    @Override public VertexConsumer uv2(int u, int v) { light = u | (v << 16); return this; }
-    @Override public VertexConsumer overlayCoords(int u, int v) { return this; }
-    @Override public VertexConsumer normal(float x, float y, float z) { return this; }
-    @Override public void defaultColor(int r, int g, int b, int a) { color(r, g, b, a); }
-    @Override public void unsetDefaultColor() {}
+    @Override
+    public VertexConsumer uv(float u, float v) {
+        this.u = u;
+        this.v = v;
+        return this;
+    }
+    @Override
+    public VertexConsumer uv2(int u, int v) {
+        light = u | (v << 16);
+        return this;
+    }
+    @Override
+    public VertexConsumer overlayCoords(int u, int v) {
+        return this;
+    }
+    @Override
+    public VertexConsumer normal(float x, float y, float z) {
+        return this;
+    }
+    @Override
+    public void defaultColor(int r, int g, int b, int a) {
+        color(r, g, b, a);
+    }
+    @Override
+    public void unsetDefaultColor() {}
 
-    @Override public void endVertex() {
+    @Override
+    public void endVertex() {
         if (count == 0) {
             sink.ensureCapacity(4);
             first = sink.getVertexCount();

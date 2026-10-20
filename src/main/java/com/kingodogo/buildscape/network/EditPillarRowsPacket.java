@@ -59,7 +59,8 @@ public class EditPillarRowsPacket {
             }
             NetworkPacketLimits.writeUtf(buf, row.oldId, 32, "old pillar id");
             NetworkPacketLimits.writeUtf(buf, row.newId, 32, "new pillar id");
-            NetworkPacketLimits.writeUtf(buf, row.dimension, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "pillar dimension");
+            NetworkPacketLimits.writeUtf(buf, row.dimension, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                    "pillar dimension");
             buf.writeInt(row.x);
             buf.writeInt(row.y);
             buf.writeInt(row.z);

@@ -7,9 +7,12 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(AbstractWidget.class)
 public abstract class AbstractWidgetBoundsMixin implements IWidgetBounds {
-    @Shadow public int x;
-    @Shadow public int y;
-    @Shadow protected int height;
+    @Shadow
+    public int x;
+    @Shadow
+    public int y;
+    @Shadow
+    protected int height;
 
     @Override
     public int buildscape$getX() {

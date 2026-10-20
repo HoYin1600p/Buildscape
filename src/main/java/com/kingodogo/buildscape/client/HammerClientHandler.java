@@ -29,11 +29,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class HammerClientHandler {
 
     @SubscribeEvent
@@ -94,23 +90,22 @@ public class HammerClientHandler {
         };
     }
 
-    private static void renderGlowingOutline(PoseStack poseStack, MultiBufferSource bufferSource, AABB box, float r, float g, float b) {
+    private static void renderGlowingOutline(PoseStack poseStack, MultiBufferSource bufferSource, AABB box, float r,
+            float g, float b) {
         VertexConsumer lines = bufferSource.getBuffer(RenderType.lines());
 
         LevelRenderer.renderLineBox(
                 poseStack, lines,
                 box.minX, box.minY, box.minZ,
                 box.maxX, box.maxY, box.maxZ,
-                r, g, b, 1.0f
-        );
+                r, g, b, 1.0f);
 
         AABB inflated = box.inflate(0.003);
         LevelRenderer.renderLineBox(
                 poseStack, lines,
                 inflated.minX, inflated.minY, inflated.minZ,
                 inflated.maxX, inflated.maxY, inflated.maxZ,
-                r, g, b, 0.5f
-        );
+                r, g, b, 0.5f);
     }
 
     @SubscribeEvent

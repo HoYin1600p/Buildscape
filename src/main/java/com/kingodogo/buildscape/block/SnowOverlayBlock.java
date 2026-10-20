@@ -22,8 +22,7 @@ public class SnowOverlayBlock extends Block {
             0.0D,
             16.0D,
             1.0D,
-            16.0D
-    );
+            16.0D);
 
     public SnowOverlayBlock(Properties properties) {
         super(properties);
@@ -34,8 +33,7 @@ public class SnowOverlayBlock extends Block {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 
@@ -44,8 +42,7 @@ public class SnowOverlayBlock extends Block {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -54,8 +51,7 @@ public class SnowOverlayBlock extends Block {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 
@@ -75,18 +71,16 @@ public class SnowOverlayBlock extends Block {
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         return !state.canSurvive(level, pos)
                 ? Blocks.AIR.defaultBlockState()
                 : super.updateShape(
-                state,
-                direction,
-                neighborState,
-                level,
-                pos,
-                neighborPos
-        );
+                        state,
+                        direction,
+                        neighborState,
+                        level,
+                        pos,
+                        neighborPos);
     }
 
     @Override
@@ -114,8 +108,7 @@ public class SnowOverlayBlock extends Block {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            PathComputationType type
-    ) {
+            PathComputationType type) {
         return type == PathComputationType.LAND;
     }
 

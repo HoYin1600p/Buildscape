@@ -17,16 +17,12 @@ import java.util.function.BiConsumer;
 
 public class MangroveMossCarpetDecorator extends TreeDecorator {
 
-    public static final Codec<MangroveMossCarpetDecorator> CODEC =
-            RecordCodecBuilder.create(instance ->
-                    instance
-                            .group(
-                                    Codec.floatRange(0.0F, 1.0F)
-                                            .fieldOf("probability")
-                                            .forGetter(decorator -> decorator.probability)
-                            )
-                            .apply(instance, MangroveMossCarpetDecorator::new)
-            );
+    public static final Codec<MangroveMossCarpetDecorator> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(
+                    Codec.floatRange(0.0F, 1.0F)
+                            .fieldOf("probability")
+                            .forGetter(decorator -> decorator.probability))
+            .apply(instance, MangroveMossCarpetDecorator::new));
 
     private final float probability;
 
@@ -45,8 +41,7 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
             BiConsumer<BlockPos, BlockState> blockSetter,
             Random random,
             List<BlockPos> logPositions,
-            List<BlockPos> leavesPositions
-    ) {
+            List<BlockPos> leavesPositions) {
         if (logPositions.isEmpty()) {
             return;
         }
@@ -69,14 +64,10 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
 
                     boolean isRoot = level.isStateAtPosition(
                             checkPos,
-                            state ->
+                            state -> state.is(
+                                    ModBlocks.MANGROVE_ROOTS.get()) ||
                                     state.is(
-                                            ModBlocks.MANGROVE_ROOTS.get()
-                                    ) ||
-                                            state.is(
-                                                    ModBlocks.MUDDY_MANGROVE_ROOTS.get()
-                                            )
-                    );
+                                            ModBlocks.MUDDY_MANGROVE_ROOTS.get()));
 
                     if (isRoot) {
                         BlockPos abovePos = checkPos.above();
@@ -86,8 +77,7 @@ public class MangroveMossCarpetDecorator extends TreeDecorator {
                                 blockSetter.accept(
                                         abovePos,
                                         ModBlocks.MOSS_OVERLAY.get()
-                                                .defaultBlockState()
-                                );
+                                                .defaultBlockState());
                             }
                         }
                     }

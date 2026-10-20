@@ -62,7 +62,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
     }
 
     public ColoredItemFrameEntity(EntityType<? extends ColoredItemFrameEntity> entityType, Level level, BlockPos pos,
-                                  Direction direction) {
+            Direction direction) {
         super(entityType, level, pos);
         this.setDirection(direction);
     }
@@ -121,13 +121,13 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
         Direction.Axis axis = this.direction.getAxis();
         switch (axis) {
-            case X:
+            case X :
                 w = 1.0D;
                 break;
-            case Y:
+            case Y :
                 h = 1.0D;
                 break;
-            case Z:
+            case Z :
                 d = 1.0D;
                 break;
         }
@@ -162,7 +162,8 @@ public class ColoredItemFrameEntity extends HangingEntity {
     }
 
     public void setParticlePattern(String pattern) {
-        this.getEntityData().set(DATA_PARTICLE_PATTERN, (pattern == null || pattern.isEmpty()) ? ParticlePatterns.NONE : pattern);
+        this.getEntityData().set(DATA_PARTICLE_PATTERN,
+                (pattern == null || pattern.isEmpty()) ? ParticlePatterns.NONE : pattern);
     }
 
     public String getParticleColorsRaw() {
@@ -384,14 +385,11 @@ public class ColoredItemFrameEntity extends HangingEntity {
             if (tag.contains(NbtKeys.ITEM_DROP_CHANCE, 99)) {
                 this.dropChance = tag.getFloat(NbtKeys.ITEM_DROP_CHANCE);
             }
-        }
-        else if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
+        } else if (tag.contains(NbtKeys.PILLAR_ITEM, 8)) {
             String itemId = tag.getString(NbtKeys.PILLAR_ITEM);
             try {
-                ResourceLocation itemLocation =
-                        new ResourceLocation(itemId);
-                Item item =
-                        ForgeRegistries.ITEMS.getValue(itemLocation);
+                ResourceLocation itemLocation = new ResourceLocation(itemId);
+                Item item = ForgeRegistries.ITEMS.getValue(itemLocation);
                 if (item != null && item != Items.AIR) {
                     ItemStack itemstack = new ItemStack(item);
                     this.setItem(itemstack, false);
@@ -456,8 +454,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
         boolean hasCustomData = false;
 
         if (!displayedItem.isEmpty()) {
-            ResourceLocation itemId =
-                    ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
+            ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
             if (itemId != null) {
                 tag.putString(NbtKeys.PILLAR_ITEM, itemId.toString());
                 hasCustomData = true;
@@ -491,41 +488,41 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
     private ItemStack getFrameItemForColor(String color) {
         switch (color) {
-            case "black":
+            case "black" :
                 return new ItemStack(ModItems.BLACK_ITEM_FRAME.get());
-            case "blue":
+            case "blue" :
                 return new ItemStack(ModItems.BLUE_ITEM_FRAME.get());
-            case "brown":
+            case "brown" :
                 return new ItemStack(ModItems.BROWN_ITEM_FRAME.get());
-            case "cyan":
+            case "cyan" :
                 return new ItemStack(ModItems.CYAN_ITEM_FRAME.get());
-            case "gray":
+            case "gray" :
                 return new ItemStack(ModItems.GRAY_ITEM_FRAME.get());
-            case "green":
+            case "green" :
                 return new ItemStack(ModItems.GREEN_ITEM_FRAME.get());
-            case "light_blue":
+            case "light_blue" :
                 return new ItemStack(ModItems.LIGHT_BLUE_ITEM_FRAME.get());
-            case "light_gray":
+            case "light_gray" :
                 return new ItemStack(ModItems.LIGHT_GRAY_ITEM_FRAME.get());
-            case "lime":
+            case "lime" :
                 return new ItemStack(ModItems.LIME_ITEM_FRAME.get());
-            case "magenta":
+            case "magenta" :
                 return new ItemStack(ModItems.MAGENTA_ITEM_FRAME.get());
-            case "orange":
+            case "orange" :
                 return new ItemStack(ModItems.ORANGE_ITEM_FRAME.get());
-            case "pink":
+            case "pink" :
                 return new ItemStack(ModItems.PINK_ITEM_FRAME.get());
-            case "purple":
+            case "purple" :
                 return new ItemStack(ModItems.PURPLE_ITEM_FRAME.get());
-            case "red":
+            case "red" :
                 return new ItemStack(ModItems.RED_ITEM_FRAME.get());
-            case "white":
+            case "white" :
                 return new ItemStack(ModItems.WHITE_ITEM_FRAME.get());
-            case "yellow":
+            case "yellow" :
                 return new ItemStack(ModItems.YELLOW_ITEM_FRAME.get());
-            case "invisible":
+            case "invisible" :
                 return new ItemStack(ModItems.INVISIBLE_ITEM_FRAME.get());
-            default:
+            default :
                 return new ItemStack(ModItems.WHITE_ITEM_FRAME.get());
         }
     }

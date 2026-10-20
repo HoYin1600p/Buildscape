@@ -39,8 +39,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
             double dx,
             double dy,
             double dz,
-            SpriteSet sprites
-    ) {
+            SpriteSet sprites) {
         super(level, x, y, z, dx, dy, dz);
         this.setSpriteFromAge(sprites);
         this.baseSprite = this.sprite;
@@ -103,7 +102,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
         }
 
         if (!colorCode.startsWith("#")) {
-             return new float[]{1.0F, 0.0F, 0.0F};
+            return new float[]{1.0F, 0.0F, 0.0F};
         }
 
         try {
@@ -129,16 +128,16 @@ public class TintableHeartParticle extends TextureSheetParticle {
         this.zo = this.z;
 
         if (this.age++ >= this.lifetime) {
-             this.remove();
+            this.remove();
         } else {
-             this.move(this.xd, this.yd, this.zd);
-             this.xd *= 0.99;
-             this.yd *= 0.99;
-             this.zd *= 0.99;
+            this.move(this.xd, this.yd, this.zd);
+            this.xd *= 0.99;
+            this.yd *= 0.99;
+            this.zd *= 0.99;
 
-             if (this.age > this.lifetime - 20) {
-                 this.alpha = (this.lifetime - this.age) / 20.0f;
-             }
+            if (this.age > this.lifetime - 20) {
+                this.alpha = (this.lifetime - this.age) / 20.0f;
+            }
         }
     }
 
@@ -149,7 +148,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
 
     @Override
     public int getLightColor(float partialTick) {
-         return 0xF000F0;
+        return 0xF000F0;
     }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {
@@ -168,8 +167,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
                 double z,
                 double dx,
                 double dy,
-                double dz
-        ) {
+                double dz) {
             return new TintableHeartParticle(level, x, y, z, dx, dy, dz, sprites);
         }
     }
@@ -178,8 +176,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
             double x,
             double y,
             double z,
-            String colorCode
-    ) {
+            String colorCode) {
         if (colorCode != null && !colorCode.isEmpty()) {
             String positionKey = String.format(Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
             POSITION_COLOR_MAP.put(positionKey, new ColorEntry(colorCode));

@@ -91,14 +91,12 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
                     night ? SoundEvents.AMETHYST_BLOCK_CHIME : SoundEvents.AZALEA_LEAVES_BREAK,
                     SoundSource.BLOCKS,
                     night ? 1.0F : 0.8F,
-                    night ? 1.2F : 0.9F
-            );
+                    night ? 1.2F : 0.9F);
         }
     }
 
     @Override
-    public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
-    }
+    public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {}
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -124,8 +122,7 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
                 pos.getX() + 0.5D,
                 pos.getY() + 0.5D,
                 pos.getZ() + 0.5D,
-                flowerStack
-        );
+                flowerStack);
         itemEntity.setDefaultPickUpDelay();
         level.addFreshEntity(itemEntity);
     }

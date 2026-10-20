@@ -45,14 +45,17 @@ import java.util.Random;
 import java.util.function.Predicate;
 
 public class PotentSulfurBlockEntity extends SyncedBlockEntity {
-    private static final Predicate<Entity> EFFECT_PREDICATE = EntitySelector.NO_SPECTATORS.and(EntitySelector.ENTITY_STILL_ALIVE);
+    private static final Predicate<Entity> EFFECT_PREDICATE = EntitySelector.NO_SPECTATORS
+            .and(EntitySelector.ENTITY_STILL_ALIVE);
 
     public int waitingCountdown = -1;
     public long eruptionTick = -1L;
 
-    public static final TagKey<EntityType<?>> NOT_AFFECTED_BY_GEYSERS = TagKey.create(Registry.ENTITY_TYPE_REGISTRY, new ResourceLocation("minecraft", "not_affected_by_geysers"));
+    public static final TagKey<EntityType<?>> NOT_AFFECTED_BY_GEYSERS = TagKey.create(Registry.ENTITY_TYPE_REGISTRY,
+            new ResourceLocation("minecraft", "not_affected_by_geysers"));
 
-    public static final BlockEntityTicker<PotentSulfurBlockEntity> SERVER_NAUSEA_EFFECT_TICKER = (level, pos, state, potentSulfur) -> {
+    public static final BlockEntityTicker<PotentSulfurBlockEntity> SERVER_NAUSEA_EFFECT_TICKER = (level, pos, state,
+            potentSulfur) -> {
         if (level.getGameTime() % 10L == 0L) {
             BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
             if (sourceBlock != null) {
@@ -65,7 +68,8 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
         }
     };
 
-    public static final BlockEntityTicker<PotentSulfurBlockEntity> CLIENT_NOXIOUS_GAS_TICKER = (level, pos, state, entity) -> {
+    public static final BlockEntityTicker<PotentSulfurBlockEntity> CLIENT_NOXIOUS_GAS_TICKER = (level, pos, state,
+            entity) -> {
         if (level.getGameTime() % 20L == 0L) {
             BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
             if (sourceBlock != null) {
@@ -74,15 +78,18 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
         }
     };
 
-    public static final BlockEntityTicker<PotentSulfurBlockEntity> CLIENT_GEYSER_PLUME_TICKER_ERUPTION = (level, pos, state, entity) -> {
+    public static final BlockEntityTicker<PotentSulfurBlockEntity> CLIENT_GEYSER_PLUME_TICKER_ERUPTION = (level, pos,
+            state, entity) -> {
         tickClientPlume(level, pos, state, entity, ModSounds.GEYSER_ERUPTION_ACTIVE.get());
     };
 
-    public static final BlockEntityTicker<PotentSulfurBlockEntity> CLIENT_GEYSER_PLUME_TICKER_CONTINUOUS = (level, pos, state, entity) -> {
+    public static final BlockEntityTicker<PotentSulfurBlockEntity> CLIENT_GEYSER_PLUME_TICKER_CONTINUOUS = (level, pos,
+            state, entity) -> {
         tickClientPlume(level, pos, state, entity, ModSounds.GEYSER_CONTINUOUS_ACTIVE.get());
     };
 
-    private static void tickClientPlume(Level level, BlockPos pos, BlockState state, PotentSulfurBlockEntity entity, SoundEvent sound) {
+    private static void tickClientPlume(Level level, BlockPos pos, BlockState state, PotentSulfurBlockEntity entity,
+            SoundEvent sound) {
         BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
         if (sourceBlock != null) {
             long eruptionTime = level.getGameTime() - entity.eruptionTick;
@@ -90,12 +97,14 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
                 spawnGeyserParticle(level, pos, sourceBlock);
             }
             if (eruptionTime % 40L == 0L) {
-                level.playLocalSound((double)sourceBlock.getX() + 0.5D, (double)sourceBlock.getY() + 0.5D, (double)sourceBlock.getZ() + 0.5D, sound, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+                level.playLocalSound((double) sourceBlock.getX() + 0.5D, (double) sourceBlock.getY() + 0.5D,
+                        (double) sourceBlock.getZ() + 0.5D, sound, SoundSource.BLOCKS, 1.0F, 1.0F, false);
             }
         }
     }
 
-    public static void tickClientPlumeDistant(Level level, BlockPos pos, BlockState state, PotentSulfurBlockEntity entity) {
+    public static void tickClientPlumeDistant(Level level, BlockPos pos, BlockState state,
+            PotentSulfurBlockEntity entity) {
         if (entity.eruptionTick == -1L) {
             entity.eruptionTick = level.getGameTime();
         }
@@ -108,7 +117,8 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
         }
     }
 
-    public static final BlockEntityTicker<PotentSulfurBlockEntity> SERVER_WAITING_COUNTDOWN_TICKER = (level, pos, state, entity) -> {
+    public static final BlockEntityTicker<PotentSulfurBlockEntity> SERVER_WAITING_COUNTDOWN_TICKER = (level, pos, state,
+            entity) -> {
         if (level.getGameTime() % 20L == 0L) {
             BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
             if (sourceBlock != null) {
@@ -129,7 +139,9 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
                 }
 
                 if (entity.waitingCountdown == 0) {
-                    PotentSulfurState stateToSet = state.getValue(PotentSulfurBlock.STATE) == PotentSulfurState.DORMANT ? PotentSulfurState.ERUPTING : PotentSulfurState.DORMANT;
+                    PotentSulfurState stateToSet = state.getValue(PotentSulfurBlock.STATE) == PotentSulfurState.DORMANT
+                            ? PotentSulfurState.ERUPTING
+                            : PotentSulfurState.DORMANT;
                     level.setBlockAndUpdate(pos, state.setValue(PotentSulfurBlock.STATE, stateToSet));
                     entity.setChanged();
                 }
@@ -137,7 +149,8 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
         }
     };
 
-    public static final BlockEntityTicker<PotentSulfurBlockEntity> LAUNCH_ENTITY_TICKER = (level, pos, state, entity) -> {
+    public static final BlockEntityTicker<PotentSulfurBlockEntity> LAUNCH_ENTITY_TICKER = (level, pos, state,
+            entity) -> {
         int topY = getLiftTop(level, pos);
         tickLivingLift(level, pos, topY);
         BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
@@ -146,9 +159,10 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
             int waterBlocks = Math.max(1, rawWaterBlocks);
             int geyserForceHeight = getUnobstructedBlockCount(level, pos.above(), waterBlocks);
 
-            double plumeTipY = (double)sourceBlock.getY() + (double)geyserForceHeight - 1.0D;
-            double particleSizeOffset = 1.18D + (double)(waterBlocks - 1) * 0.05D;
-            AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double)(geyserForceHeight + 3), 0.0D).inflate(0.45D, 0.0D, 0.45D);
+            double plumeTipY = (double) sourceBlock.getY() + (double) geyserForceHeight - 1.0D;
+            double particleSizeOffset = 1.18D + (double) (waterBlocks - 1) * 0.05D;
+            AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double) (geyserForceHeight + 3), 0.0D)
+                    .inflate(0.45D, 0.0D, 0.45D);
 
             for (Entity entityToBeLaunched : level.getEntitiesOfClass(Entity.class, aabb, EFFECT_PREDICATE)) {
                 if (entityToBeLaunched.blockPosition().getY() > topY) {
@@ -167,22 +181,25 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
                     boolean isPlayer = entityToBeLaunched instanceof Player;
 
                     double entityY = entityToBeLaunched.getY();
-                    double bobbingTime = (double)(level.getGameTime() + (long)entityToBeLaunched.getId() * 7L) * 0.4D;
+                    double bobbingTime = (double) (level.getGameTime() + (long) entityToBeLaunched.getId() * 7L) * 0.4D;
                     double bobbingOffset = Math.sin(bobbingTime) * 0.10D;
                     double bobbingVel = Math.cos(bobbingTime) * 0.07D;
                     double targetY = plumeTipY + particleSizeOffset + bobbingOffset;
 
                     Vec3 newVelocity;
                     if (entityY < targetY - 1.0D) {
-                        double targetSpeed = Math.min(0.65D, 0.4D + (double)waterBlocks * 0.06D);
+                        double targetSpeed = Math.min(0.65D, 0.4D + (double) waterBlocks * 0.06D);
                         double newY = Math.min(targetSpeed, Math.max(entityVelocity.y + 0.18D, 0.4D));
                         double horizDamping = isPlayer ? 1.0D : 0.9D;
                         newVelocity = new Vec3(entityVelocity.x * horizDamping, newY, entityVelocity.z * horizDamping);
                     } else if (entityY <= targetY + 1.8D) {
                         double hoverY = (targetY - entityY) * 0.45D + bobbingVel;
-                        double finalY = (isPlayer && entityVelocity.y > 0.2D) ? Math.max(hoverY, entityVelocity.y) : hoverY;
+                        double finalY = (isPlayer && entityVelocity.y > 0.2D)
+                                ? Math.max(hoverY, entityVelocity.y)
+                                : hoverY;
                         double horizDamping = isPlayer ? 1.0D : 0.85D;
-                        newVelocity = new Vec3(entityVelocity.x * horizDamping, finalY, entityVelocity.z * horizDamping);
+                        newVelocity = new Vec3(entityVelocity.x * horizDamping, finalY,
+                                entityVelocity.z * horizDamping);
                     } else {
                         continue;
                     }
@@ -235,7 +252,7 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
                 continue;
             }
             Vec3 entityVelocity = living.getDeltaMovement();
-            if (entityVelocity.y < 0.3D + (double)waterBlocks * 0.1D) {
+            if (entityVelocity.y < 0.3D + (double) waterBlocks * 0.1D) {
                 living.resetFallDistance();
                 living.setDeltaMovement(entityVelocity.add(0.0D, 0.2D, 0.0D));
                 living.hasImpulse = true;
@@ -306,7 +323,9 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
 
     private static void spawnGeyserParticle(final Level level, final BlockPos sulfurPos, final BlockPos sourcePos) {
         int waterBlocks = sourcePos.getY() - sulfurPos.getY() - 1;
-        level.addAlwaysVisibleParticle(new GeyserParticleOptions(ModParticles.GEYSER.get(), waterBlocks), true, (double)sourcePos.getX() + 0.5D, (double)sourcePos.getY(), (double)sourcePos.getZ() + 0.5D, 0.0D, 0.0D, 0.0D);
+        level.addAlwaysVisibleParticle(new GeyserParticleOptions(ModParticles.GEYSER.get(), waterBlocks), true,
+                (double) sourcePos.getX() + 0.5D, (double) sourcePos.getY(), (double) sourcePos.getZ() + 0.5D, 0.0D,
+                0.0D, 0.0D);
     }
 
     private static void spawnNoxiousGasCloudParticle(final Level level, final Vec3 pos) {
@@ -328,8 +347,11 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
         return geyserForceHeight;
     }
 
-    private static boolean isGeyserPassableBlock(final BlockState state, final Level level, final BlockPos pos, final CollisionContext context) {
-        return !state.isAir() && !state.is(Blocks.WATER) ? state.getCollisionShape(level, pos, context).isEmpty() : true;
+    private static boolean isGeyserPassableBlock(final BlockState state, final Level level, final BlockPos pos,
+            final CollisionContext context) {
+        return !state.isAir() && !state.is(Blocks.WATER)
+                ? state.getCollisionShape(level, pos, context).isEmpty()
+                : true;
     }
 
     private static @Nullable BlockPos findNoxiousGasSourceBlock(final Level level, final BlockPos origin) {
@@ -341,7 +363,8 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
             if (pos.getY() <= maxY) {
                 BlockState state = level.getBlockState(pos);
                 boolean isWaterLogged = level.getFluidState(pos).isSourceOfType(Fluids.WATER);
-                if (isWaterLogged && (state.is(Blocks.WATER) || isGeyserPassableBlock(state, level, pos, geyserPositionContext))) {
+                if (isWaterLogged && (state.is(Blocks.WATER)
+                        || isGeyserPassableBlock(state, level, pos, geyserPositionContext))) {
                     pos.move(Direction.UP);
                     continue;
                 }

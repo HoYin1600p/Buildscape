@@ -42,20 +42,21 @@ import java.util.Optional;
 import java.util.Random;
 
 public class MangrovePropaguleBlock
-        extends OpenBushBlock
-        implements SinksOnFarmland, BonemealableBlock, SimpleWaterloggedBlock {
+        extends
+            OpenBushBlock
+        implements
+            SinksOnFarmland,
+            BonemealableBlock,
+            SimpleWaterloggedBlock {
 
     public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 4);
     public static final IntegerProperty STAGE = IntegerProperty.create(
             "stage",
             0,
-            1
-    );
+            1);
     public static final BooleanProperty HANGING = BooleanProperty.create(
-            "hanging"
-    );
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+            "hanging");
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private static final VoxelShape SHAPE = Block.box(
             6.0D,
@@ -63,58 +64,51 @@ public class MangrovePropaguleBlock
             6.0D,
             10.0D,
             12.0D,
-            10.0D
-    );
+            10.0D);
     private static final VoxelShape HANGING_SHAPE_0 = Block.box(
             7.0D,
             13.0D,
             7.0D,
             9.0D,
             16.0D,
-            9.0D
-    );
+            9.0D);
     private static final VoxelShape HANGING_SHAPE_1 = Block.box(
             7.0D,
             10.0D,
             7.0D,
             9.0D,
             16.0D,
-            9.0D
-    );
+            9.0D);
     private static final VoxelShape HANGING_SHAPE_2 = Block.box(
             7.0D,
             7.0D,
             7.0D,
             9.0D,
             16.0D,
-            9.0D
-    );
+            9.0D);
     private static final VoxelShape HANGING_SHAPE_3 = Block.box(
             7.0D,
             3.0D,
             7.0D,
             9.0D,
             16.0D,
-            9.0D
-    );
+            9.0D);
     private static final int GROWTH_RADIUS = 32;
 
     public MangrovePropaguleBlock(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition.any()
-                        .setValue( AGE, 0 )
-                        .setValue( STAGE, 0 )
-                        .setValue( HANGING, false )
-                        .setValue( WATERLOGGED, false )
-                        .setValue( ON_FARMLAND, false )
-        );
+                        .setValue(AGE, 0)
+                        .setValue(STAGE, 0)
+                        .setValue(HANGING, false)
+                        .setValue(WATERLOGGED, false)
+                        .setValue(ON_FARMLAND, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(AGE, STAGE, HANGING, WATERLOGGED, ON_FARMLAND);
     }
 
@@ -123,20 +117,19 @@ public class MangrovePropaguleBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         if (state.getValue(HANGING)) {
             int age = state.getValue(AGE);
             switch (age) {
-                case 0:
+                case 0 :
                     return HANGING_SHAPE_0;
-                case 1:
+                case 1 :
                     return HANGING_SHAPE_1;
-                case 2:
+                case 2 :
                     return HANGING_SHAPE_2;
-                case 3:
+                case 3 :
                     return HANGING_SHAPE_3;
-                default:
+                default :
                     return HANGING_SHAPE_0;
             }
         }
@@ -154,9 +147,8 @@ public class MangrovePropaguleBlock
         BlockState aboveState = level.getBlockState(pos.above());
         FluidState fluidstate = level.getFluidState(pos);
 
-        boolean hanging =
-                aboveState.is(BlockTags.LEAVES) ||
-                        aboveState.is(ModBlocks.MANGROVE_LEAVES.get());
+        boolean hanging = aboveState.is(BlockTags.LEAVES) ||
+                aboveState.is(ModBlocks.MANGROVE_LEAVES.get());
 
         return this.defaultBlockState()
                 .setValue(HANGING, hanging)
@@ -170,21 +162,17 @@ public class MangrovePropaguleBlock
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         if (state.getValue(HANGING)) {
             BlockState aboveState = level.getBlockState(pos.above());
-            return (
-                    aboveState.is(BlockTags.LEAVES) ||
-                            aboveState.is(ModBlocks.MANGROVE_LEAVES.get())
-            );
+            return (aboveState.is(BlockTags.LEAVES) ||
+                    aboveState.is(ModBlocks.MANGROVE_LEAVES.get()));
         } else {
             BlockPos belowPos = pos.below();
             BlockState belowState = level.getBlockState(belowPos);
-            return (
-                    (belowState.is(BlockTags.DIRT) && !belowState.is(Blocks.DIRT_PATH)) ||
-                            belowState.is(Blocks.FARMLAND) ||
-                            belowState.is(Blocks.MOSS_BLOCK) ||
-                            belowState.is(ModBlocks.MUD.get()) ||
-                            belowState.is(Blocks.CLAY) ||
-                            belowState.is(ModBlocks.MUDDY_MANGROVE_ROOTS.get())
-            );
+            return ((belowState.is(BlockTags.DIRT) && !belowState.is(Blocks.DIRT_PATH)) ||
+                    belowState.is(Blocks.FARMLAND) ||
+                    belowState.is(Blocks.MOSS_BLOCK) ||
+                    belowState.is(ModBlocks.MUD.get()) ||
+                    belowState.is(Blocks.CLAY) ||
+                    belowState.is(ModBlocks.MUDDY_MANGROVE_ROOTS.get()));
         }
     }
 
@@ -195,8 +183,7 @@ public class MangrovePropaguleBlock
             BlockState adjacentState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos adjacentPos
-    ) {
+            BlockPos adjacentPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -204,10 +191,8 @@ public class MangrovePropaguleBlock
         if (state.getValue(HANGING)) {
             if (direction == Direction.UP) {
                 BlockState aboveState = level.getBlockState(pos.above());
-                if (
-                        !aboveState.is(BlockTags.LEAVES) &&
-                                !aboveState.is(ModBlocks.MANGROVE_LEAVES.get())
-                ) {
+                if (!aboveState.is(BlockTags.LEAVES) &&
+                        !aboveState.is(ModBlocks.MANGROVE_LEAVES.get())) {
                     return Blocks.AIR.defaultBlockState();
                 }
             }
@@ -226,8 +211,7 @@ public class MangrovePropaguleBlock
                 adjacentState,
                 level,
                 pos,
-                adjacentPos
-        );
+                adjacentPos);
     }
 
     @Override
@@ -247,8 +231,7 @@ public class MangrovePropaguleBlock
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         if (state.getValue(HANGING)) {
             return;
         }
@@ -271,8 +254,7 @@ public class MangrovePropaguleBlock
             BlockGetter level,
             BlockPos pos,
             BlockState state,
-            boolean isClient
-    ) {
+            boolean isClient) {
         if (state.getValue(HANGING)) {
             int age = state.getValue(AGE);
             return age < 3;
@@ -285,8 +267,7 @@ public class MangrovePropaguleBlock
             Level level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         return true;
     }
 
@@ -295,8 +276,7 @@ public class MangrovePropaguleBlock
             ServerLevel level,
             Random random,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         if (state.getValue(HANGING)) {
             int currentAge = state.getValue(AGE);
             if (currentAge < 3) {
@@ -315,8 +295,7 @@ public class MangrovePropaguleBlock
             ServerLevel level,
             BlockPos pos,
             BlockState state,
-            Random random
-    ) {
+            Random random) {
         advanceTree(level, pos, state, random, false);
     }
 
@@ -325,8 +304,7 @@ public class MangrovePropaguleBlock
             BlockPos pos,
             BlockState state,
             Random random,
-            boolean bonemeal
-    ) {
+            boolean bonemeal) {
         if (state.getValue(HANGING)) {
             return;
         }
@@ -339,43 +317,22 @@ public class MangrovePropaguleBlock
                 return;
             }
         }
-        String variant =
-                ModConfiguredFeatures.getRandomMangroveTreeVariant(
-                        random
-                );
-        ResourceLocation featureLocation =
-                ModConfiguredFeatures.getMangroveTreeResourceLocation(
-                        variant
-                );
-        Optional<
-                ? extends net.minecraft.core.Holder<
-                        ? extends ConfiguredFeature<
-                                ?,
-                                ?
-                                >
-                        >
-                > featureHolder = level
+        String variant = ModConfiguredFeatures.getRandomMangroveTreeVariant(
+                random);
+        ResourceLocation featureLocation = ModConfiguredFeatures.getMangroveTreeResourceLocation(
+                variant);
+        Optional<? extends net.minecraft.core.Holder<? extends ConfiguredFeature<?, ?>>> featureHolder = level
                 .registryAccess()
                 .registry(Registry.CONFIGURED_FEATURE_REGISTRY)
-                .flatMap(registry ->
-                        registry.getHolder(
-                                ResourceKey.create(
-                                        Registry.CONFIGURED_FEATURE_REGISTRY,
-                                        featureLocation
-                                )
-                        )
-                );
+                .flatMap(registry -> registry.getHolder(
+                        ResourceKey.create(
+                                Registry.CONFIGURED_FEATURE_REGISTRY,
+                                featureLocation)));
 
         if (featureHolder.isPresent()) {
-            ConfiguredFeature<
-                    ?,
-                    ?
-                    > feature = featureHolder.get().value();
+            ConfiguredFeature<?, ?> feature = featureHolder.get().value();
 
-            if (
-                    feature.feature() ==
-                            Feature.TREE
-            ) {
+            if (feature.feature() == Feature.TREE) {
                 BlockPos belowPos = pos.below();
                 BlockState belowState = level.getBlockState(belowPos);
                 if (belowState.is(Blocks.GRASS_BLOCK)) {
@@ -383,23 +340,16 @@ public class MangrovePropaguleBlock
                 }
                 level.setBlock(pos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
                 @SuppressWarnings("unchecked")
-                TreeConfiguration treeConfig =
-                        (TreeConfiguration) feature.config();
-                FeaturePlaceContext<
-                        TreeConfiguration
-                        > placeContext =
-                        new FeaturePlaceContext<>(
-                                Optional.empty(),
-                                level,
-                                level.getChunkSource().getGenerator(),
-                                random,
-                                pos,
-                                treeConfig
-                        );
-                boolean success =
-                        Feature.TREE.place(
-                                placeContext
-                        );
+                TreeConfiguration treeConfig = (TreeConfiguration) feature.config();
+                FeaturePlaceContext<TreeConfiguration> placeContext = new FeaturePlaceContext<>(
+                        Optional.empty(),
+                        level,
+                        level.getChunkSource().getGenerator(),
+                        random,
+                        pos,
+                        treeConfig);
+                boolean success = Feature.TREE.place(
+                        placeContext);
                 if (!success) {
                     level.setBlock(pos, state, Block.UPDATE_ALL);
                 }
@@ -407,16 +357,14 @@ public class MangrovePropaguleBlock
                 BuildScape.getLogger()
                         .warn(
                                 "Mangrove tree feature {} is not a tree feature!",
-                                featureLocation
-                        );
+                                featureLocation);
                 level.setBlock(pos, state, 4);
             }
         } else {
             BuildScape.getLogger()
                     .warn(
                             "Mangrove tree feature {} not found in registry! Cannot grow tree.",
-                            featureLocation
-                    );
+                            featureLocation);
             level.setBlock(pos, state, 4);
         }
     }
@@ -424,19 +372,16 @@ public class MangrovePropaguleBlock
     private boolean canGrowTree(
             LevelReader level,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         if (level.getMaxLocalRawBrightness(pos) < 9) {
             return false;
         }
         for (int y = 1; y <= 6; y++) {
             BlockPos checkPos = pos.above(y);
             BlockState checkState = level.getBlockState(checkPos);
-            if (
-                    !checkState.isAir() &&
-                            !checkState.is(BlockTags.DIRT) &&
-                            !isLogOrWood(checkState)
-            ) {
+            if (!checkState.isAir() &&
+                    !checkState.is(BlockTags.DIRT) &&
+                    !isLogOrWood(checkState)) {
                 return false;
             }
         }
@@ -490,29 +435,24 @@ public class MangrovePropaguleBlock
     }
 
     private boolean isLogOrWood(BlockState state) {
-        return (
-                state.is(BlockTags.LOGS) ||
-                        state.is(BlockTags.PLANKS) ||
-                        state.getBlock() == ModBlocks.MANGROVE_LOG.get() ||
-                        state.getBlock() == ModBlocks.MANGROVE_WOOD.get() ||
-                        state.getBlock() == ModBlocks.STRIPPED_MANGROVE_LOG.get() ||
-                        state.getBlock() == ModBlocks.STRIPPED_MANGROVE_WOOD.get()
-        );
+        return (state.is(BlockTags.LOGS) ||
+                state.is(BlockTags.PLANKS) ||
+                state.getBlock() == ModBlocks.MANGROVE_LOG.get() ||
+                state.getBlock() == ModBlocks.MANGROVE_WOOD.get() ||
+                state.getBlock() == ModBlocks.STRIPPED_MANGROVE_LOG.get() ||
+                state.getBlock() == ModBlocks.STRIPPED_MANGROVE_WOOD.get());
     }
 
     private boolean isSolidBlock(
             BlockGetter level,
             BlockPos pos,
-            BlockState state
-    ) {
+            BlockState state) {
         if (state.is(ModBlocks.MUD.get())) {
             return false;
         }
-        return (
-                state.isFaceSturdy(level, pos, Direction.UP) &&
-                        state.getMaterial().isSolid() &&
-                        !state.getMaterial().isReplaceable()
-        );
+        return (state.isFaceSturdy(level, pos, Direction.UP) &&
+                state.getMaterial().isSolid() &&
+                !state.getMaterial().isReplaceable());
     }
 
     @Override
@@ -529,10 +469,7 @@ public class MangrovePropaguleBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentState,
-            Direction side
-    ) {
-        return (
-                adjacentState.is(this) || super.skipRendering(state, adjacentState, side)
-        );
+            Direction side) {
+        return (adjacentState.is(this) || super.skipRendering(state, adjacentState, side));
     }
 }

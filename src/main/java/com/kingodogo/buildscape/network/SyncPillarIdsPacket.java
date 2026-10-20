@@ -45,7 +45,7 @@ public class SyncPillarIdsPacket {
     private final int encodedSize;
 
     private SyncPillarIdsPacket(long syncId, int chunkIndex, int chunkCount,
-                                Collection<PillarIdManager.PillarData> pillarDataList) {
+            Collection<PillarIdManager.PillarData> pillarDataList) {
         this.syncId = syncId;
         this.chunkIndex = chunkIndex;
         this.chunkCount = chunkCount;
@@ -188,15 +188,14 @@ public class SyncPillarIdsPacket {
     private static void expireClientState() {
         long now = System.currentTimeMillis();
         synchronized (CLIENT_ACCUMULATORS) {
-            if (CLIENT_ACCUMULATORS.entrySet().removeIf(entry ->
-                    now - entry.getValue().createdAt > ACCUMULATOR_TIMEOUT_MS)) {
+            if (CLIENT_ACCUMULATORS.entrySet()
+                    .removeIf(entry -> now - entry.getValue().createdAt > ACCUMULATOR_TIMEOUT_MS)) {
                 clientSyncDiscarded = true;
             }
         }
     }
 
-    @Mod.EventBusSubscriber(
-            modid = BuildScape.MODID, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
     public static final class ClientEvents {
         @SubscribeEvent
         public static void onClientTick(TickEvent.ClientTickEvent event) {
@@ -209,7 +208,8 @@ public class SyncPillarIdsPacket {
     private static PillarIdManager.PillarData readPillarData(FriendlyByteBuf buf) {
         PillarIdManager.PillarData data = new PillarIdManager.PillarData();
         data.id = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
-        data.dimension = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "pillar dimension");
+        data.dimension = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                "pillar dimension");
         data.x = buf.readInt();
         data.y = buf.readInt();
         data.z = buf.readInt();
@@ -253,7 +253,8 @@ public class SyncPillarIdsPacket {
             throw new EncoderException("pillar data is incomplete");
         }
         NetworkPacketLimits.writeUtf(buf, data.id, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
-        NetworkPacketLimits.writeUtf(buf, data.dimension, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "pillar dimension");
+        NetworkPacketLimits.writeUtf(buf, data.dimension, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH,
+                "pillar dimension");
         buf.writeInt(data.x);
         buf.writeInt(data.y);
         buf.writeInt(data.z);

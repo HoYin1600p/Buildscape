@@ -13,8 +13,7 @@ import java.util.Map;
 public final class RecipeIdMigration {
     private static final String TABLE = "/data/buildscape/recipes_pack/recipe_id_migration_405.txt";
 
-    private RecipeIdMigration() {
-    }
+    private RecipeIdMigration() {}
 
     public static ResourceLocation translate(ResourceLocation id) {
         if (!"buildscape".equals(id.getNamespace()) || !id.getPath().startsWith("buildscape_autogen/")) {

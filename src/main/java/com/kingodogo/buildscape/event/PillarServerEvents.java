@@ -103,21 +103,24 @@ public class PillarServerEvents {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server != null && server.isRunning()) {
                 ModMessages.INSTANCE.send(
-                    PacketDistributor.PLAYER.with(() -> serverPlayer),
-                    new SyncGameRulesPacket(
-                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY),
-                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.DISABLE_ENDERMAN_GRIEFING),
-                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING),
-                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING),
-                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.IS_CAKE_STACK),
-                        serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.IS_WATER_BOTTLE_STACK)
-                    )
-                );
+                        PacketDistributor.PLAYER.with(() -> serverPlayer),
+                        new SyncGameRulesPacket(
+                                serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY),
+                                serverPlayer.getLevel().getGameRules()
+                                        .getBoolean(ModGameRules.DISABLE_ENDERMAN_GRIEFING),
+                                serverPlayer.getLevel().getGameRules()
+                                        .getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING),
+                                serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING),
+                                serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.IS_CAKE_STACK),
+                                serverPlayer.getLevel().getGameRules().getBoolean(ModGameRules.IS_WATER_BOTTLE_STACK)));
 
                 schedulePillarIdSync(server, serverPlayer, manager, 0);
 
-                long cooldown = serverPlayer.getPersistentData().contains(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME)
-                        ? serverPlayer.getPersistentData().getLong(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME) : 0L;
+                long cooldown = serverPlayer.getPersistentData()
+                        .contains(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME)
+                                ? serverPlayer.getPersistentData()
+                                        .getLong(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME)
+                                : 0L;
                 ModMessages.INSTANCE.send(
                         PacketDistributor.PLAYER.with(() -> serverPlayer),
                         new SyncHomemakerCooldownPacket(cooldown));
@@ -127,9 +130,9 @@ public class PillarServerEvents {
     }
 
     private void schedulePillarIdSync(MinecraftServer server,
-                                      ServerPlayer player,
-                                      PillarIdManager manager,
-                                      int attempt) {
+            ServerPlayer player,
+            PillarIdManager manager,
+            int attempt) {
         final int MAX_ATTEMPTS = 10;
         final int RETRY_DELAY_MS = 500;
 
@@ -162,7 +165,7 @@ public class PillarServerEvents {
     }
 
     private void sendPillarIdsToPlayer(ServerPlayer player,
-                                       PillarIdManager manager) {
+            PillarIdManager manager) {
         try {
             SyncPillarIdsPacket.sendToPlayer(
                     player, manager.getAllPillarDataForSync());
@@ -176,7 +179,8 @@ public class PillarServerEvents {
             PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
             long cooldown = serverPlayer.getPersistentData().contains(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME)
-                    ? serverPlayer.getPersistentData().getLong(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME) : 0L;
+                    ? serverPlayer.getPersistentData().getLong(NbtKeys.WANDERING_HOMEMAKER_COOLDOWN_REAL_TIME)
+                    : 0L;
             ModMessages.INSTANCE.send(
                     PacketDistributor.PLAYER.with(() -> serverPlayer),
                     new SyncHomemakerCooldownPacket(cooldown));

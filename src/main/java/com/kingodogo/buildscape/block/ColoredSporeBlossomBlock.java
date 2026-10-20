@@ -13,7 +13,8 @@ import java.util.Locale;
 import java.util.Random;
 
 public class ColoredSporeBlossomBlock
-        extends SporeBlossomBlock {
+        extends
+            SporeBlossomBlock {
 
     private final Vector3f particleColor;
     private final int particleColorRGB;
@@ -21,8 +22,7 @@ public class ColoredSporeBlossomBlock
     public ColoredSporeBlossomBlock(
             BlockBehaviour.Properties properties,
             Vector3f particleColor,
-            int particleColorRGB
-    ) {
+            int particleColorRGB) {
         super(properties);
         this.particleColor = particleColor;
         this.particleColorRGB = particleColorRGB;
@@ -33,8 +33,7 @@ public class ColoredSporeBlossomBlock
             BlockState state,
             Level level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         int i = pos.getX();
         int j = pos.getY();
         int k = pos.getZ();
@@ -63,8 +62,7 @@ public class ColoredSporeBlossomBlock
                                 spawnX,
                                 centerY,
                                 spawnZ,
-                                colorHex
-                        );
+                                colorHex);
                     }
                     level.addParticle(
                             ModParticles.TINTED_DRIP_FALL.get(),
@@ -73,8 +71,7 @@ public class ColoredSporeBlossomBlock
                             spawnZ,
                             driftX,
                             fallSpeed,
-                            driftZ
-                    );
+                            driftZ);
                 }
             }
 
@@ -97,8 +94,7 @@ public class ColoredSporeBlossomBlock
                                 spreadX,
                                 spreadY,
                                 spreadZ,
-                                colorHex
-                        );
+                                colorHex);
                     }
                     level.addParticle(
                             ModParticles.TINTED_DRIP_FALL.get(),
@@ -107,8 +103,7 @@ public class ColoredSporeBlossomBlock
                             spreadZ,
                             velocityX,
                             velocityY,
-                            velocityZ
-                    );
+                            velocityZ);
                 }
             }
         }

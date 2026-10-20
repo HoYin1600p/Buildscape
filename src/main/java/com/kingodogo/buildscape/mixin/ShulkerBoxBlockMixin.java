@@ -21,7 +21,8 @@ import java.util.List;
 @Mixin(ShulkerBoxBlock.class)
 public class ShulkerBoxBlockMixin {
     @Inject(method = "getDrops", at = @At("RETURN"))
-    private void preserveGhostFiltersInDrops(BlockState state, LootContext.Builder builder, CallbackInfoReturnable<List<ItemStack>> cir) {
+    private void preserveGhostFiltersInDrops(BlockState state, LootContext.Builder builder,
+            CallbackInfoReturnable<List<ItemStack>> cir) {
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof GhostFilterable filterable) {
             String[] ghostFilters = filterable.buildscape$getGhostFilters();
@@ -39,7 +40,8 @@ public class ShulkerBoxBlockMixin {
                     List<ItemStack> drops = cir.getReturnValue();
                     for (ItemStack stack : drops) {
                         if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
-                            stack.getOrCreateTagElement(NbtKeys.BLOCK_ENTITY_TAG).put(NbtKeys.GHOST_FILTERS, filterList.copy());
+                            stack.getOrCreateTagElement(NbtKeys.BLOCK_ENTITY_TAG).put(NbtKeys.GHOST_FILTERS,
+                                    filterList.copy());
                         }
                     }
                 }

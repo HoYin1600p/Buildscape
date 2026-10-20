@@ -7,7 +7,8 @@ import static org.junit.Assert.assertEquals;
 public class SculkBreakExperienceTest {
     @Test
     public void decorativeSculkBlocksGiveOneExperienceIncludingPillar() {
-        for (String path : new String[]{"sculk", "sculk_slab", "sculk_stairs", "sculk_wall", "sculk_vertical_slab", "sculk_pillar"}) {
+        for (String path : new String[]{"sculk", "sculk_slab", "sculk_stairs", "sculk_wall", "sculk_vertical_slab",
+                "sculk_pillar"}) {
             assertEquals(path, 1, SculkBreakExperience.forBlock(path));
         }
     }

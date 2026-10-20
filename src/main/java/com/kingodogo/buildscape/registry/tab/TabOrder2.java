@@ -11,8 +11,7 @@ import net.minecraft.world.level.ItemLike;
  */
 public final class TabOrder2 {
 
-    private TabOrder2() {
-    }
+    private TabOrder2() {}
 
     public static final List<Supplier<? extends ItemLike>> ITEMS = List.<Supplier<? extends ItemLike>>of(
             ModItems.BLACK_SAND,
@@ -664,13 +663,11 @@ public final class TabOrder2 {
             ModItems.CONFETTI_ITEM,
             ModItems.MUSIC_DISC_CELEBRATION,
             ModItems.MUSIC_DISC_SNOWFALL,
-            ModItems.MUSIC_DISC_BUILDER
-    );
+            ModItems.MUSIC_DISC_BUILDER);
 
     /** Entries that follow the firework stars and rockets and precede the trophies. */
     public static final List<Supplier<? extends ItemLike>> AFTER_FIREWORKS = List.<Supplier<? extends ItemLike>>of(
             ModItems.EXPERIENCE_BUCKET,
             ModItems.WANDERING_HOMEMAKER_SPAWN_EGG,
-            ModItems.FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG
-    );
+            ModItems.FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG);
 }

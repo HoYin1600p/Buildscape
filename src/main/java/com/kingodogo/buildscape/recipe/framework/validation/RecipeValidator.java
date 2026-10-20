@@ -27,7 +27,8 @@ public class RecipeValidator {
         String resultItemStr = aliasResolver.resolveString(spec.result().item());
         ResourceLocation resultLoc = ResourceLocation.tryParse(resultItemStr);
         if (resultLoc == null || !ForgeRegistries.ITEMS.containsKey(resultLoc)) {
-            BuildScape.LOGGER.debug("BDRE Validator: Item {} not found in registry for recipe {}.", resultItemStr, spec.id());
+            BuildScape.LOGGER.debug("BDRE Validator: Item {} not found in registry for recipe {}.", resultItemStr,
+                    spec.id());
             return false;
         }
 
@@ -44,7 +45,8 @@ public class RecipeValidator {
                 }
             }
             case "shaped", "shaped_durability", "buildscape:shaped_durability" -> {
-                if (spec.pattern() == null || spec.pattern().isEmpty() || spec.keys() == null || spec.keys().isEmpty()) {
+                if (spec.pattern() == null || spec.pattern().isEmpty() || spec.keys() == null
+                        || spec.keys().isEmpty()) {
                     return false;
                 }
                 for (String ing : spec.keys().values()) {

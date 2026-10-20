@@ -17,8 +17,7 @@ public class FallingSandBlock extends Block {
 
     public FallingSandBlock(
             Properties properties,
-            RegistryObject<Item> dropItem
-    ) {
+            RegistryObject<Item> dropItem) {
         super(properties);
         this.dropItem = dropItem;
     }
@@ -34,17 +33,13 @@ public class FallingSandBlock extends Block {
             Level level,
             BlockPos pos,
             BlockState oldState,
-            boolean isMoving
-    ) {
-        if (
-                !level.isClientSide &&
-                        level instanceof ServerLevel
-        ) {
+            boolean isMoving) {
+        if (!level.isClientSide &&
+                level instanceof ServerLevel) {
             ((ServerLevel) level).scheduleTick(
                     pos,
                     this,
-                    this.getDelayAfterPlace()
-            );
+                    this.getDelayAfterPlace());
         }
     }
 
@@ -55,17 +50,13 @@ public class FallingSandBlock extends Block {
             BlockPos pos,
             Block neighborBlock,
             BlockPos neighborPos,
-            boolean movedByPiston
-    ) {
-        if (
-                !level.isClientSide &&
-                        level instanceof ServerLevel
-        ) {
+            boolean movedByPiston) {
+        if (!level.isClientSide &&
+                level instanceof ServerLevel) {
             ((ServerLevel) level).scheduleTick(
                     pos,
                     this,
-                    this.getDelayAfterPlace()
-            );
+                    this.getDelayAfterPlace());
         }
     }
 
@@ -74,8 +65,7 @@ public class FallingSandBlock extends Block {
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
         if (isFree(level, pos)) {
             FallingBlockEntity.fall(level, pos, state);
         }
@@ -88,10 +78,8 @@ public class FallingSandBlock extends Block {
     protected boolean isFree(Level level, BlockPos pos) {
         BlockPos below = pos.below();
         BlockState belowState = level.getBlockState(below);
-        return (
-                belowState.getMaterial().isReplaceable() &&
-                        belowState.getFluidState().isEmpty()
-        );
+        return (belowState.getMaterial().isReplaceable() &&
+                belowState.getFluidState().isEmpty());
     }
 
 }

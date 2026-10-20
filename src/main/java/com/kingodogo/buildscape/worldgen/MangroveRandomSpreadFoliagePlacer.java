@@ -22,21 +22,17 @@ import java.util.function.BiConsumer;
 
 public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
 
-    public static final Codec<MangroveRandomSpreadFoliagePlacer> CODEC =
-            RecordCodecBuilder.create(instance ->
-                    foliagePlacerParts(instance)
-                            .and(
-                                    IntProvider.codec(0, 16)
-                                            .fieldOf("foliage_height")
-                                            .forGetter(placer -> placer.foliageHeight)
-                            )
-                            .and(
-                                    Codec.intRange(0, 512)
-                                            .fieldOf("leaf_placement_attempts")
-                                            .forGetter(placer -> placer.leafPlacementAttempts)
-                            )
-                            .apply(instance, MangroveRandomSpreadFoliagePlacer::new)
-            );
+    public static final Codec<MangroveRandomSpreadFoliagePlacer> CODEC = RecordCodecBuilder
+            .create(instance -> foliagePlacerParts(instance)
+                    .and(
+                            IntProvider.codec(0, 16)
+                                    .fieldOf("foliage_height")
+                                    .forGetter(placer -> placer.foliageHeight))
+                    .and(
+                            Codec.intRange(0, 512)
+                                    .fieldOf("leaf_placement_attempts")
+                                    .forGetter(placer -> placer.leafPlacementAttempts))
+                    .apply(instance, MangroveRandomSpreadFoliagePlacer::new));
 
     private final IntProvider foliageHeight;
     private final int leafPlacementAttempts;
@@ -45,8 +41,7 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
             IntProvider radius,
             IntProvider offset,
             IntProvider foliageHeight,
-            int leafPlacementAttempts
-    ) {
+            int leafPlacementAttempts) {
         super(radius, offset);
         this.foliageHeight = foliageHeight;
         this.leafPlacementAttempts = leafPlacementAttempts;
@@ -67,8 +62,7 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
             FoliageAttachment attachment,
             int foliageHeight,
             int foliageRadius,
-            int offset
-    ) {
+            int offset) {
         BlockPos centerPos = attachment.pos();
         int actualFoliageHeight = this.foliageHeight.sample(random);
 
@@ -93,8 +87,7 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
 
             y = Math.max(
                     centerPos.getY(),
-                    Math.min(centerPos.getY() + actualFoliageHeight - 1, y)
-            );
+                    Math.min(centerPos.getY() + actualFoliageHeight - 1, y));
 
             BlockPos leafPos = new BlockPos(x, y, z);
 
@@ -106,8 +99,7 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
                 if (level.isStateAtPosition(leafPos, BlockState::isAir)) {
                     blockSetter.accept(
                             leafPos,
-                            config.foliageProvider.getState(random, leafPos)
-                    );
+                            config.foliageProvider.getState(random, leafPos));
                     placedLeaves.add(leafPos);
                 }
             }
@@ -123,20 +115,16 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
                     BlockPos leafPos = new BlockPos(
                             centerPos.getX() + xOffset,
                             currentY,
-                            centerPos.getZ() + zOffset
-                    );
+                            centerPos.getZ() + zOffset);
 
-                    if (
-                            level.isStateAtPosition(leafPos, BlockState::isAir) &&
-                                    !placedLeaves.contains(leafPos)
-                    ) {
+                    if (level.isStateAtPosition(leafPos, BlockState::isAir) &&
+                            !placedLeaves.contains(leafPos)) {
                         int adjacentLeaves = countAdjacentLeaves(
                                 level,
                                 leafPos,
                                 config,
                                 placedLeaves,
-                                random
-                        );
+                                random);
                         if (adjacentLeaves >= 4 && random.nextFloat() < 0.6F) {
                             candidates.add(leafPos);
                         }
@@ -151,15 +139,13 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
                     && isConnectedToLogOrLeaf(level, candidate, placedLeaves, config, random)) {
                 blockSetter.accept(
                         candidate,
-                        config.foliageProvider.getState(random, candidate)
-                );
+                        config.foliageProvider.getState(random, candidate));
                 placedLeaves.add(candidate);
             }
         }
 
         List<BlockPos> extensionCandidates = new ArrayList<>(
-                placedLeaves
-        );
+                placedLeaves);
         Collections.shuffle(extensionCandidates, random);
 
         for (int i = 0; i < Math.min(extensionCandidates.size() / 4, 20); i++) {
@@ -171,28 +157,24 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
                 }
 
                 BlockPos extensionPos = baseLeaf.relative(
-                        Direction.from3DDataValue(dir)
-                );
+                        Direction.from3DDataValue(dir));
 
                 int distFromCenter = (int) Math.sqrt(
                         (extensionPos.getX() - centerPos.getX()) *
                                 (extensionPos.getX() - centerPos.getX()) +
                                 (extensionPos.getZ() - centerPos.getZ()) *
-                                        (extensionPos.getZ() - centerPos.getZ()) +
+                                        (extensionPos.getZ() - centerPos.getZ())
+                                +
                                 (extensionPos.getY() - centerPos.getY()) *
-                                        (extensionPos.getY() - centerPos.getY())
-                );
+                                        (extensionPos.getY() - centerPos.getY()));
 
-                if (
-                        distFromCenter <= foliageRadius + 2 &&
-                                !placedLeaves.contains(extensionPos) &&
-                                level.isStateAtPosition(extensionPos, BlockState::isAir) &&
-                                isConnectedToLogOrLeaf(level, extensionPos, placedLeaves, config, random)
-                ) {
+                if (distFromCenter <= foliageRadius + 2 &&
+                        !placedLeaves.contains(extensionPos) &&
+                        level.isStateAtPosition(extensionPos, BlockState::isAir) &&
+                        isConnectedToLogOrLeaf(level, extensionPos, placedLeaves, config, random)) {
                     blockSetter.accept(
                             extensionPos,
-                            config.foliageProvider.getState(random, extensionPos)
-                    );
+                            config.foliageProvider.getState(random, extensionPos));
                     placedLeaves.add(extensionPos);
                     break;
                 }
@@ -205,8 +187,7 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
             BlockPos pos,
             Set<BlockPos> placedLeaves,
             TreeConfiguration config,
-            Random random
-    ) {
+            Random random) {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
@@ -216,15 +197,10 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
 
                     BlockPos checkPos = pos.offset(dx, dy, dz);
 
-                    if (
-                            level.isStateAtPosition(
-                                    checkPos,
-                                    state ->
-                                            state.is(BlockTags.LOGS) ||
-                                                    state.getBlock() ==
-                                                            config.trunkProvider.getState(random, checkPos).getBlock()
-                            )
-                    ) {
+                    if (level.isStateAtPosition(
+                            checkPos,
+                            state -> state.is(BlockTags.LOGS) ||
+                                    state.getBlock() == config.trunkProvider.getState(random, checkPos).getBlock())) {
                         return true;
                     }
 
@@ -232,14 +208,10 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
                         return true;
                     }
 
-                    if (
-                            level.isStateAtPosition(
-                                    checkPos,
-                                    state ->
-                                            state.getBlock() ==
-                                                    config.foliageProvider.getState(random, checkPos).getBlock()
-                            )
-                    ) {
+                    if (level.isStateAtPosition(
+                            checkPos,
+                            state -> state.getBlock() == config.foliageProvider.getState(random, checkPos)
+                                    .getBlock())) {
                         return true;
                     }
                 }
@@ -258,15 +230,10 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
                     }
 
                     BlockPos checkPos = pos.offset(dx, dy, dz);
-                    if (
-                            level.isStateAtPosition(
-                                    checkPos,
-                                    state ->
-                                            state.is(BlockTags.LOGS) ||
-                                                    state.getBlock() ==
-                                                            config.trunkProvider.getState(random, checkPos).getBlock()
-                            )
-                    ) {
+                    if (level.isStateAtPosition(
+                            checkPos,
+                            state -> state.is(BlockTags.LOGS) ||
+                                    state.getBlock() == config.trunkProvider.getState(random, checkPos).getBlock())) {
                         return true;
                     }
                 }
@@ -281,8 +248,7 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
             BlockPos pos,
             TreeConfiguration config,
             Set<BlockPos> placedLeaves,
-            Random random
-    ) {
+            Random random) {
         int count = 0;
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
@@ -294,14 +260,10 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
                     BlockPos checkPos = pos.offset(dx, dy, dz);
                     if (placedLeaves.contains(checkPos)) {
                         count++;
-                    } else if (
-                            level.isStateAtPosition(
-                                    checkPos,
-                                    state ->
-                                            state.getBlock() ==
-                                                    config.foliageProvider.getState(random, checkPos).getBlock()
-                            )
-                    ) {
+                    } else if (level.isStateAtPosition(
+                            checkPos,
+                            state -> state.getBlock() == config.foliageProvider.getState(random, checkPos)
+                                    .getBlock())) {
                         count++;
                     }
                 }
@@ -317,8 +279,7 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
             int x,
             int y,
             int z,
-            boolean large
-    ) {
+            boolean large) {
         if (x == 0 && z == 0) {
             return y == 0;
         }
@@ -329,8 +290,7 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
     public int foliageHeight(
             Random random,
             int height,
-            TreeConfiguration config
-    ) {
+            TreeConfiguration config) {
         return this.foliageHeight.sample(random);
     }
 }

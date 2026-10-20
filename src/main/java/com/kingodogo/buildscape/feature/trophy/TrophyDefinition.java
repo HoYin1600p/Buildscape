@@ -42,7 +42,9 @@ public class TrophyDefinition {
         this.soundType = builder.soundType != null ? builder.soundType : builder.tier.getDefaultSound();
         this.hardness = builder.hardness;
         this.resistance = builder.resistance;
-        this.directionalShapes = builder.directionalShapes != null ? builder.directionalShapes : createDirectionalShapes(new double[]{2.0D, 0.0D, 2.0D, 14.0D, 18.0D, 14.0D});
+        this.directionalShapes = builder.directionalShapes != null
+                ? builder.directionalShapes
+                : createDirectionalShapes(new double[]{2.0D, 0.0D, 2.0D, 14.0D, 18.0D, 14.0D});
         this.associatedAdvancement = builder.associatedAdvancement;
         this.customDisplayName = builder.customDisplayName;
         this.customDescription = builder.customDescription;
@@ -53,7 +55,8 @@ public class TrophyDefinition {
         return new Builder(id);
     }
 
-    public static Map<Direction, VoxelShape> createDirectionalShapes(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+    public static Map<Direction, VoxelShape> createDirectionalShapes(double minX, double minY, double minZ, double maxX,
+            double maxY, double maxZ) {
         return createDirectionalShapes(new double[]{minX, minY, minZ, maxX, maxY, maxZ});
     }
 

@@ -25,8 +25,10 @@ public class HazeBushItem extends BlockItem {
         if (stack.hasTag()) {
             CompoundTag tag = stack.getTag();
             if (tag != null) {
-                if (tag.contains(NbtKeys.BLOCK_STATE_TAG) && tag.getCompound(NbtKeys.BLOCK_STATE_TAG).contains(NbtKeys.HAS_HAZE_PROPERTY)) {
-                    return "false".equalsIgnoreCase(tag.getCompound(NbtKeys.BLOCK_STATE_TAG).getString(NbtKeys.HAS_HAZE_PROPERTY));
+                if (tag.contains(NbtKeys.BLOCK_STATE_TAG)
+                        && tag.getCompound(NbtKeys.BLOCK_STATE_TAG).contains(NbtKeys.HAS_HAZE_PROPERTY)) {
+                    return "false".equalsIgnoreCase(
+                            tag.getCompound(NbtKeys.BLOCK_STATE_TAG).getString(NbtKeys.HAS_HAZE_PROPERTY));
                 }
                 if (tag.contains(NbtKeys.HAS_HAZE)) {
                     return !tag.getBoolean(NbtKeys.HAS_HAZE);
@@ -55,7 +57,8 @@ public class HazeBushItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (isDrained(stack)) {
-            tooltip.add(new TranslatableComponent("tooltip.buildscape.haze_bush.drained").withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    new TranslatableComponent("tooltip.buildscape.haze_bush.drained").withStyle(ChatFormatting.GRAY));
         }
         super.appendHoverText(stack, level, tooltip, flag);
     }

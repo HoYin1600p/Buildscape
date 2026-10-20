@@ -24,8 +24,7 @@ public class LeafHedgeBlock extends WallBlock {
 
     public LeafHedgeBlock(
             BlockBehaviour.Properties properties,
-            RegistryObject<?> dropItem
-    ) {
+            RegistryObject<?> dropItem) {
         super(properties);
         this.dropItem = dropItem;
     }
@@ -35,8 +34,7 @@ public class LeafHedgeBlock extends WallBlock {
             Level level,
             BlockPos pos,
             BlockState state,
-            Entity entity
-    ) {
+            Entity entity) {
         if (entity instanceof Player) {
             Player player = (Player) entity;
             if (player.isOnGround() && level.isClientSide) {
@@ -56,8 +54,7 @@ public class LeafHedgeBlock extends WallBlock {
             BlockState state,
             Level level,
             BlockPos pos,
-            Entity entity
-    ) {
+            Entity entity) {
         if (entity instanceof Player) {
             Player player = (Player) entity;
             if (player.isOnGround() && level.isClientSide) {
@@ -100,8 +97,7 @@ public class LeafHedgeBlock extends WallBlock {
             Level level,
             BlockPos pos,
             BlockState state,
-            Player player
-    ) {
+            Player player) {
         float stepInterval = 2.0f;
         int currentStep = (int) (player.walkDist / stepInterval);
         int lastStep = (int) (player.walkDistO / stepInterval);
@@ -126,18 +122,15 @@ public class LeafHedgeBlock extends WallBlock {
                     SoundSource.BLOCKS,
                     volume,
                     pitch,
-                    false
-            );
+                    false);
         }
     }
-
 
     @Override
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
+            Direction side) {
         if (adjacentBlockState.is(this)) {
             return true;
         }
@@ -150,8 +143,7 @@ public class LeafHedgeBlock extends WallBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 

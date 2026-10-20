@@ -63,7 +63,8 @@ public class CandyCaneFireworkShape extends CustomFireworkShape {
             }
         }
 
-        points.add(new FireworkPoint(hookCenterX + hookRadius + 0.5, hookCenterY - 0.5, 0, COLOR_PURE_WHITE, true, 1.15f));
+        points.add(
+                new FireworkPoint(hookCenterX + hookRadius + 0.5, hookCenterY - 0.5, 0, COLOR_PURE_WHITE, true, 1.15f));
         points.add(new FireworkPoint(hookCenterX, hookCenterY + hookRadius + 0.8, 0, COLOR_PURE_WHITE, true, 1.2f));
 
         return points;

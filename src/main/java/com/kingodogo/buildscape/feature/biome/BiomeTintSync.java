@@ -19,8 +19,8 @@ public class BiomeTintSync {
 
     public static void sync(ServerLevel level, ChunkPos chunk) {
         SyncBiomeTintPacket packet = packet(level, chunk);
-        level.getChunkSource().chunkMap.getPlayers(chunk, false).forEach(player ->
-                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet));
+        level.getChunkSource().chunkMap.getPlayers(chunk, false)
+                .forEach(player -> ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet));
     }
 
     private static SyncBiomeTintPacket packet(ServerLevel level, ChunkPos chunk) {

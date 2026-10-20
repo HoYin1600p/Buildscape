@@ -54,7 +54,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
 public class PillarBlockEntityRenderer
-        implements BlockEntityRenderer<PillarBlockEntity> {
+        implements
+            BlockEntityRenderer<PillarBlockEntity> {
 
     private final ItemRenderer itemRenderer;
 
@@ -72,7 +73,7 @@ public class PillarBlockEntityRenderer
         final WeakReference<PillarBlockEntity> owner;
 
         DisplayInfo(ItemStack stack, long startTime, boolean renderAsItem, boolean isSpawnEgg,
-                    boolean isFixed, MobState mobState, PillarBlockEntity owner) {
+                boolean isFixed, MobState mobState, PillarBlockEntity owner) {
             this.stack = stack;
             this.startTime = startTime;
             this.renderAsItem = renderAsItem;
@@ -84,8 +85,7 @@ public class PillarBlockEntityRenderer
     }
 
     public PillarBlockEntityRenderer(
-            BlockEntityRendererProvider.Context context
-    ) {
+            BlockEntityRendererProvider.Context context) {
         this.itemRenderer = Minecraft.getInstance().getItemRenderer();
     }
 
@@ -146,8 +146,7 @@ public class PillarBlockEntityRenderer
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (blockEntity == null) {
             return;
         }
@@ -198,8 +197,7 @@ public class PillarBlockEntityRenderer
             boolean isSpawnEgg = info.isSpawnEgg;
 
             boolean isAshenKing = cachedIsAshenKing.computeIfAbsent(
-                    pos, k -> blockEntity.getBlockState().getBlock()
-                            instanceof AshenKingPillarBlock);
+                    pos, k -> blockEntity.getBlockState().getBlock() instanceof AshenKingPillarBlock);
             float hoverHeight;
             if (isAshenKing) {
                 hoverHeight = isSpawnEgg ? 0.875f : 1.0f;
@@ -254,8 +252,7 @@ public class PillarBlockEntityRenderer
                         rotation,
                         gameTime,
                         blockEntity.getFacingYaw(),
-                        isFixed
-                );
+                        isFixed);
                 return;
             }
 
@@ -273,15 +270,13 @@ public class PillarBlockEntityRenderer
                             combinedLight,
                             rotation,
                             gameTime,
-                            blockEntity.getFacingYaw()
-                    );
+                            blockEntity.getFacingYaw());
                 } catch (Exception e) {
                     logRenderFailure(displayedItem, e);
                     restorePose(poseStack, mobPose);
                     poseStack.scale(0.5f, 0.5f, 0.5f);
                     Level level = blockEntity.getLevel();
-                    BakedModel model =
-                            this.itemRenderer.getModel(displayedItem, level, null, 0);
+                    BakedModel model = this.itemRenderer.getModel(displayedItem, level, null, 0);
                     boolean hasGlint = displayedItem.hasFoil();
                     this.itemRenderer.render(
                             displayedItem,
@@ -291,8 +286,7 @@ public class PillarBlockEntityRenderer
                             bufferSource,
                             combinedLight,
                             combinedOverlay,
-                            model
-                    );
+                            model);
                 }
             } else {
                 if (isFixed) {
@@ -364,8 +358,7 @@ public class PillarBlockEntityRenderer
                             bufferSource,
                             combinedLight,
                             combinedOverlay,
-                            model
-                    );
+                            model);
                 } else {
                     poseStack.scale(0.5f, 0.5f, 0.5f);
 
@@ -381,8 +374,7 @@ public class PillarBlockEntityRenderer
                             bufferSource,
                             combinedLight,
                             combinedOverlay,
-                            model
-                    );
+                            model);
                 }
             }
 
@@ -426,7 +418,8 @@ public class PillarBlockEntityRenderer
         double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
 
         Random rand = new Random();
-        for (Direction dir : new Direction[]{null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST}) {
+        for (Direction dir : new Direction[]{null, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH,
+                Direction.WEST, Direction.EAST}) {
             rand.setSeed(42L);
             List<BakedQuad> quads = model.getQuads(null, dir, rand);
             for (BakedQuad quad : quads) {
@@ -496,8 +489,7 @@ public class PillarBlockEntityRenderer
         }
 
         try {
-            Component nameComponent =
-                    Component.Serializer.fromJson(nameJson);
+            Component nameComponent = Component.Serializer.fromJson(nameJson);
             if (nameComponent == null) {
                 return false;
             }
@@ -551,8 +543,7 @@ public class PillarBlockEntityRenderer
         }
 
         try {
-            Component nameComponent =
-                    Component.Serializer.fromJson(nameJson);
+            Component nameComponent = Component.Serializer.fromJson(nameJson);
             if (nameComponent == null) {
                 return false;
             }
@@ -604,8 +595,7 @@ public class PillarBlockEntityRenderer
         }
 
         try {
-            Component nameComponent =
-                    Component.Serializer.fromJson(nameJson);
+            Component nameComponent = Component.Serializer.fromJson(nameJson);
             if (nameComponent == null) {
                 return false;
             }

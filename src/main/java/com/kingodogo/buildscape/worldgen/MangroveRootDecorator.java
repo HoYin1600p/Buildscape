@@ -20,25 +20,21 @@ import java.util.function.BiConsumer;
 
 public class MangroveRootDecorator extends TreeDecorator {
 
-    public static final Codec<MangroveRootDecorator> CODEC =
-            RecordCodecBuilder.create(instance ->
-                    instance
-                            .group(
-                                    IntProvider.codec(1, 16)
-                                            .fieldOf("max_root_width")
-                                            .forGetter(decorator -> decorator.maxRootWidth),
-                                    IntProvider.codec(1, 16)
-                                            .fieldOf("max_root_length")
-                                            .forGetter(decorator -> decorator.maxRootLength),
-                                    Codec.floatRange(0.0F, 1.0F)
-                                            .fieldOf("random_skew_chance")
-                                            .forGetter(decorator -> decorator.randomSkewChance),
-                                    IntProvider.codec(0, 16)
-                                            .optionalFieldOf("trunk_offset_y", ConstantInt.of(0))
-                                            .forGetter(decorator -> decorator.trunkOffsetY)
-                            )
-                            .apply(instance, MangroveRootDecorator::new)
-            );
+    public static final Codec<MangroveRootDecorator> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(
+                    IntProvider.codec(1, 16)
+                            .fieldOf("max_root_width")
+                            .forGetter(decorator -> decorator.maxRootWidth),
+                    IntProvider.codec(1, 16)
+                            .fieldOf("max_root_length")
+                            .forGetter(decorator -> decorator.maxRootLength),
+                    Codec.floatRange(0.0F, 1.0F)
+                            .fieldOf("random_skew_chance")
+                            .forGetter(decorator -> decorator.randomSkewChance),
+                    IntProvider.codec(0, 16)
+                            .optionalFieldOf("trunk_offset_y", ConstantInt.of(0))
+                            .forGetter(decorator -> decorator.trunkOffsetY))
+            .apply(instance, MangroveRootDecorator::new));
 
     private final IntProvider maxRootWidth;
     private final IntProvider maxRootLength;
@@ -48,8 +44,7 @@ public class MangroveRootDecorator extends TreeDecorator {
     public MangroveRootDecorator(
             IntProvider maxRootWidth,
             IntProvider maxRootLength,
-            float randomSkewChance
-    ) {
+            float randomSkewChance) {
         this(maxRootWidth, maxRootLength, randomSkewChance, ConstantInt.of(0));
     }
 
@@ -57,8 +52,7 @@ public class MangroveRootDecorator extends TreeDecorator {
             IntProvider maxRootWidth,
             IntProvider maxRootLength,
             float randomSkewChance,
-            IntProvider trunkOffsetY
-    ) {
+            IntProvider trunkOffsetY) {
         this.maxRootWidth = maxRootWidth;
         this.maxRootLength = maxRootLength;
         this.randomSkewChance = randomSkewChance;
@@ -80,8 +74,7 @@ public class MangroveRootDecorator extends TreeDecorator {
             BiConsumer<BlockPos, BlockState> blockSetter,
             Random random,
             List<BlockPos> logPositions,
-            List<BlockPos> leavesPositions
-    ) {
+            List<BlockPos> leavesPositions) {
         if (logPositions.isEmpty()) {
             return;
         }
@@ -114,8 +107,7 @@ public class MangroveRootDecorator extends TreeDecorator {
                 BlockPos rootPos = new BlockPos(
                         basePos.getX() + direction.getStepX() * i,
                         rootStartLevel,
-                        basePos.getZ() + direction.getStepZ() * i
-                );
+                        basePos.getZ() + direction.getStepZ() * i);
                 horizontalRoots.add(rootPos);
             }
 
@@ -137,16 +129,12 @@ public class MangroveRootDecorator extends TreeDecorator {
                 }
             }
 
-            if (
-                    horizontalRoots.size() >= 2 && random.nextFloat() < randomSkewChance
-            ) {
+            if (horizontalRoots.size() >= 2 && random.nextFloat() < randomSkewChance) {
                 BlockPos secondLastPos = horizontalRoots.get(
-                        horizontalRoots.size() - 2
-                );
+                        horizontalRoots.size() - 2);
                 int secondDownDepth = Math.min(
                         Math.min(2 + random.nextInt(2), secondLastPos.getY() - groundLevel),
-                        rootLength - (horizontalDistance - 1)
-                );
+                        rootLength - (horizontalDistance - 1));
 
                 if (secondDownDepth > 0) {
                     for (int y = 1; y <= secondDownDepth; y++) {
@@ -168,27 +156,22 @@ public class MangroveRootDecorator extends TreeDecorator {
                 if (state.isAir() || state.is(Blocks.WATER)) {
                     return false;
                 }
-                boolean isTerrainBlock =
-                        state.is(Blocks.DIRT) ||
-                                state.is(Blocks.GRASS_BLOCK) ||
-                                state.is(Blocks.STONE) ||
-                                state.is(Blocks.SAND) ||
-                                state.is(Blocks.GRAVEL) ||
-                                state.is(Blocks.CLAY);
-                boolean isTreeBlock =
-                        state.is(BlockTags.LOGS) ||
-                                state.is(
-                                        ModBlocks.MANGROVE_ROOTS.get()
-                                ) ||
-                                state.is(
-                                        ModBlocks.MUDDY_MANGROVE_ROOTS.get()
-                                );
-                return (
-                        isTerrainBlock &&
-                                !isTreeBlock &&
-                                state.getMaterial().isSolid() &&
-                                !state.getMaterial().isReplaceable()
-                );
+                boolean isTerrainBlock = state.is(Blocks.DIRT) ||
+                        state.is(Blocks.GRASS_BLOCK) ||
+                        state.is(Blocks.STONE) ||
+                        state.is(Blocks.SAND) ||
+                        state.is(Blocks.GRAVEL) ||
+                        state.is(Blocks.CLAY);
+                boolean isTreeBlock = state.is(BlockTags.LOGS) ||
+                        state.is(
+                                ModBlocks.MANGROVE_ROOTS.get())
+                        ||
+                        state.is(
+                                ModBlocks.MUDDY_MANGROVE_ROOTS.get());
+                return (isTerrainBlock &&
+                        !isTreeBlock &&
+                        state.getMaterial().isSolid() &&
+                        !state.getMaterial().isReplaceable());
             });
 
             if (isTerrain) {
@@ -204,20 +187,15 @@ public class MangroveRootDecorator extends TreeDecorator {
             LevelSimulatedReader level,
             BiConsumer<BlockPos, BlockState> blockSetter,
             Random random,
-            BlockPos rootPos
-    ) {
+            BlockPos rootPos) {
         boolean canPlace = level.isStateAtPosition(rootPos, state -> {
             if (state.is(BlockTags.LOGS)) {
                 return false;
             }
-            if (
+            if (state.is(
+                    ModBlocks.MANGROVE_ROOTS.get()) ||
                     state.is(
-                            ModBlocks.MANGROVE_ROOTS.get()
-                    ) ||
-                            state.is(
-                                    ModBlocks.MUDDY_MANGROVE_ROOTS.get()
-                            )
-            ) {
+                            ModBlocks.MUDDY_MANGROVE_ROOTS.get())) {
                 return true;
             }
             return state.isAir() || state.is(Blocks.WATER);
@@ -227,13 +205,11 @@ public class MangroveRootDecorator extends TreeDecorator {
             return;
         }
 
-        BlockState rootState =
-                ModBlocks.MANGROVE_ROOTS.get()
-                        .defaultBlockState()
-                        .setValue(
-                                RotatedPillarBlock.AXIS,
-                                Direction.Axis.Y
-                        );
+        BlockState rootState = ModBlocks.MANGROVE_ROOTS.get()
+                .defaultBlockState()
+                .setValue(
+                        RotatedPillarBlock.AXIS,
+                        Direction.Axis.Y);
 
         blockSetter.accept(rootPos, rootState);
     }

@@ -8,10 +8,9 @@ import java.util.Set;
  * uploaded independently in the config packets; the rest are single-purpose operations on the server.
  */
 public enum ConfigSetting {
-    ITEMS(PillarParticleConfig.EditScope.LIMITED, true),
-    COLORS(PillarParticleConfig.EditScope.LIMITED, false),
-    PARTICLES(PillarParticleConfig.EditScope.GENERAL, false),
-    POLICY(PillarParticleConfig.EditScope.POLICY, false),
+    ITEMS(PillarParticleConfig.EditScope.LIMITED, true), COLORS(PillarParticleConfig.EditScope.LIMITED,
+            false), PARTICLES(PillarParticleConfig.EditScope.GENERAL,
+                    false), POLICY(PillarParticleConfig.EditScope.POLICY, false),
     /** Editing, resetting or removing individual pillars. */
     PILLAR_EDIT(PillarParticleConfig.EditScope.LIMITED, false),
     /** Replacing the whole pillar registry in one upload. */

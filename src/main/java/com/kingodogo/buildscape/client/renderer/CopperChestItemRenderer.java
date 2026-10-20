@@ -18,9 +18,7 @@ import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(
-        modid = BuildScape.MODID,
-        value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, value = Dist.CLIENT)
 public class CopperChestItemRenderer extends BlockEntityWithoutLevelRenderer {
     public static final CopperChestItemRenderer INSTANCE = new CopperChestItemRenderer();
     private CopperChestBlockEntity dummyBE;

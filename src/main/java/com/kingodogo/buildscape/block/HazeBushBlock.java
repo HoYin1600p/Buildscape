@@ -87,8 +87,10 @@ public class HazeBushBlock extends ModBushBlock {
         if (stack.hasTag()) {
             CompoundTag tag = stack.getTag();
             if (tag != null) {
-                if (tag.contains(NbtKeys.BLOCK_STATE_TAG) && tag.getCompound(NbtKeys.BLOCK_STATE_TAG).contains(NbtKeys.HAS_HAZE_PROPERTY)) {
-                    hasHaze = !"false".equalsIgnoreCase(tag.getCompound(NbtKeys.BLOCK_STATE_TAG).getString(NbtKeys.HAS_HAZE_PROPERTY));
+                if (tag.contains(NbtKeys.BLOCK_STATE_TAG)
+                        && tag.getCompound(NbtKeys.BLOCK_STATE_TAG).contains(NbtKeys.HAS_HAZE_PROPERTY)) {
+                    hasHaze = !"false".equalsIgnoreCase(
+                            tag.getCompound(NbtKeys.BLOCK_STATE_TAG).getString(NbtKeys.HAS_HAZE_PROPERTY));
                 } else if (tag.contains(NbtKeys.HAS_HAZE)) {
                     hasHaze = tag.getBoolean(NbtKeys.HAS_HAZE);
                 }
@@ -123,13 +125,15 @@ public class HazeBushBlock extends ModBushBlock {
         for (int i = 0; i < count; i++) {
             Vec3 particlePos = HazeBushParticleHandler.findHazeParticlePos(level, pos, random);
             if (particlePos != null) {
-                level.addParticle(ModParticles.HAZE.get(), particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1], rgb[2]);
+                level.addParticle(ModParticles.HAZE.get(), particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1],
+                        rgb[2]);
             }
         }
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hitResult) {
         ItemStack held = player.getItemInHand(hand);
 
         if (held.is(Items.GLASS_BOTTLE) && state.getValue(HAS_HAZE)) {

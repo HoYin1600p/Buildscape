@@ -39,56 +39,58 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import com.kingodogo.buildscape.registry.ModSounds;
 
-public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContainer, SideChainPartBlock, SimpleWaterloggedBlock {
+public class ShelfBlock extends BaseEntityBlock
+        implements
+            SelectableSlotContainer,
+            SideChainPartBlock,
+            SimpleWaterloggedBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public static final EnumProperty<SideChainPart> SIDE_CHAIN_PART = EnumProperty.create("side_chain", SideChainPart.class);
+    public static final EnumProperty<SideChainPart> SIDE_CHAIN_PART = EnumProperty.create("side_chain",
+            SideChainPart.class);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private static final VoxelShape SHAPE_NORTH = Shapes.or(
-        Block.box(0.0D, 12.0D, 11.0D, 16.0D, 16.0D, 13.0D),
-        Block.box(0.0D, 0.0D, 13.0D, 16.0D, 16.0D, 16.0D),
-        Block.box(0.0D, 0.0D, 11.0D, 16.0D, 4.0D, 13.0D)
-    );
+            Block.box(0.0D, 12.0D, 11.0D, 16.0D, 16.0D, 13.0D),
+            Block.box(0.0D, 0.0D, 13.0D, 16.0D, 16.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 11.0D, 16.0D, 4.0D, 13.0D));
 
     private static final VoxelShape SHAPE_SOUTH = Shapes.or(
-        Block.box(0.0D, 12.0D, 3.0D, 16.0D, 16.0D, 5.0D),
-        Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 3.0D),
-        Block.box(0.0D, 0.0D, 3.0D, 16.0D, 4.0D, 5.0D)
-    );
+            Block.box(0.0D, 12.0D, 3.0D, 16.0D, 16.0D, 5.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 3.0D),
+            Block.box(0.0D, 0.0D, 3.0D, 16.0D, 4.0D, 5.0D));
 
     private static final VoxelShape SHAPE_WEST = Shapes.or(
-        Block.box(11.0D, 12.0D, 0.0D, 13.0D, 16.0D, 16.0D),
-        Block.box(13.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D),
-        Block.box(11.0D, 0.0D, 0.0D, 13.0D, 4.0D, 16.0D)
-    );
+            Block.box(11.0D, 12.0D, 0.0D, 13.0D, 16.0D, 16.0D),
+            Block.box(13.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D),
+            Block.box(11.0D, 0.0D, 0.0D, 13.0D, 4.0D, 16.0D));
 
     private static final VoxelShape SHAPE_EAST = Shapes.or(
-        Block.box(3.0D, 12.0D, 0.0D, 5.0D, 16.0D, 16.0D),
-        Block.box(0.0D, 0.0D, 0.0D, 3.0D, 16.0D, 16.0D),
-        Block.box(3.0D, 0.0D, 0.0D, 5.0D, 4.0D, 16.0D)
-    );
+            Block.box(3.0D, 12.0D, 0.0D, 5.0D, 16.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 3.0D, 16.0D, 16.0D),
+            Block.box(3.0D, 0.0D, 0.0D, 5.0D, 4.0D, 16.0D));
 
     public ShelfBlock(final BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
-                  .setValue(FACING, Direction.NORTH)
-                  .setValue(POWERED, false)
-                  .setValue(SIDE_CHAIN_PART, SideChainPart.UNCONNECTED)
-                  .setValue(WATERLOGGED, false));
+                .setValue(FACING, Direction.NORTH)
+                .setValue(POWERED, false)
+                .setValue(SIDE_CHAIN_PART, SideChainPart.UNCONNECTED)
+                .setValue(WATERLOGGED, false));
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+    public VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos,
+            final CollisionContext context) {
         switch (state.getValue(FACING)) {
-            case SOUTH:
+            case SOUTH :
                 return SHAPE_SOUTH;
-            case EAST:
+            case EAST :
                 return SHAPE_EAST;
-            case WEST:
+            case WEST :
                 return SHAPE_WEST;
-            case NORTH:
-            default:
+            case NORTH :
+            default :
                 return SHAPE_NORTH;
         }
     }
@@ -114,7 +116,8 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block block, final BlockPos fromPos, final boolean movedByPiston) {
+    public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block block,
+            final BlockPos fromPos, final boolean movedByPiston) {
         if (!level.isClientSide()) {
             boolean signal = level.hasNeighborSignal(pos);
             if (state.getValue(POWERED) != signal) {
@@ -133,9 +136,9 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
     public BlockState getStateForPlacement(final BlockPlaceContext context) {
         FluidState replacedFluidState = context.getLevel().getFluidState(context.getClickedPos());
         return this.defaultBlockState()
-                  .setValue(FACING, context.getHorizontalDirection().getOpposite())
-                  .setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()))
-                  .setValue(WATERLOGGED, replacedFluidState.getType() == Fluids.WATER);
+                .setValue(FACING, context.getHorizontalDirection().getOpposite())
+                .setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()))
+                .setValue(WATERLOGGED, replacedFluidState.getType() == Fluids.WATER);
     }
 
     @Override
@@ -159,7 +162,8 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hitResult) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof ShelfBlockEntity shelfBlockEntity) {
             if (hand == InteractionHand.MAIN_HAND) {
@@ -174,13 +178,19 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
                     if (state.getValue(POWERED)) {
                         return InteractionResult.SUCCESS;
                     }
-                    return itemStack.isEmpty() && shelfBlockEntity.getItem(hitSlot.getAsInt()).isEmpty() ? InteractionResult.PASS : InteractionResult.SUCCESS;
+                    return itemStack.isEmpty() && shelfBlockEntity.getItem(hitSlot.getAsInt()).isEmpty()
+                            ? InteractionResult.PASS
+                            : InteractionResult.SUCCESS;
                 }
 
                 if (!state.getValue(POWERED)) {
-                    boolean itemRemoved = swapSingleItem(itemStack, player, shelfBlockEntity, hitSlot.getAsInt(), inventory);
+                    boolean itemRemoved = swapSingleItem(itemStack, player, shelfBlockEntity, hitSlot.getAsInt(),
+                            inventory);
                     if (itemRemoved) {
-                        this.playSound(level, pos, itemStack.isEmpty() ? ModSounds.SHELF_TAKE_ITEM.get() : ModSounds.SHELF_SINGLE_SWAP.get());
+                        this.playSound(level, pos,
+                                itemStack.isEmpty()
+                                        ? ModSounds.SHELF_TAKE_ITEM.get()
+                                        : ModSounds.SHELF_SINGLE_SWAP.get());
                     } else {
                         if (itemStack.isEmpty()) {
                             return InteractionResult.PASS;
@@ -204,9 +214,12 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
         return InteractionResult.PASS;
     }
 
-    private static boolean swapSingleItem(final ItemStack itemStack, final Player player, final ShelfBlockEntity shelfBlockEntity, final int hitSlot, final Inventory inventory) {
+    private static boolean swapSingleItem(final ItemStack itemStack, final Player player,
+            final ShelfBlockEntity shelfBlockEntity, final int hitSlot, final Inventory inventory) {
         ItemStack removedItem = shelfBlockEntity.swapItemNoUpdate(hitSlot, itemStack);
-        ItemStack newInventoryItem = player.getAbilities().instabuild && removedItem.isEmpty() ? itemStack.copy() : removedItem;
+        ItemStack newInventoryItem = player.getAbilities().instabuild && removedItem.isEmpty()
+                ? itemStack.copy()
+                : removedItem;
         inventory.setItem(inventory.selected, newInventoryItem);
         inventory.setChanged();
         shelfBlockEntity.setChanged();
@@ -220,11 +233,12 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
         } else {
             boolean anySwapped = false;
 
-            for(int shelfPartIndex = 0; shelfPartIndex < connectedBlocks.size(); ++shelfPartIndex) {
+            for (int shelfPartIndex = 0; shelfPartIndex < connectedBlocks.size(); ++shelfPartIndex) {
                 BlockEntity be = level.getBlockEntity(connectedBlocks.get(shelfPartIndex));
                 if (be instanceof ShelfBlockEntity shelfPart) {
-                    for(int slot = 0; slot < shelfPart.getContainerSize(); ++slot) {
-                        int inventorySlot = 9 - (connectedBlocks.size() - shelfPartIndex) * shelfPart.getContainerSize() + slot;
+                    for (int slot = 0; slot < shelfPart.getContainerSize(); ++slot) {
+                        int inventorySlot = 9 - (connectedBlocks.size() - shelfPartIndex) * shelfPart.getContainerSize()
+                                + slot;
                         if (inventorySlot >= 0 && inventorySlot < 9) {
                             ItemStack placedInventoryItem = inventory.removeItemNoUpdate(inventorySlot);
                             ItemStack removedShelfItem = shelfPart.swapItemNoUpdate(slot, placedInventoryItem);
@@ -270,7 +284,8 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
     }
 
     @Override
-    public void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
+    public void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState,
+            final boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (state.getValue(POWERED)) {
             this.updateSelfAndNeighborsOnPoweringUp(level, pos, state, oldState);
@@ -293,7 +308,7 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
     }
 
     private void playSound(final Level level, final BlockPos pos, final SoundEvent sound) {
-        level.playSound((Player)null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound((Player) null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
@@ -302,7 +317,8 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
     }
 
     @Override
-    public BlockState updateShape(final BlockState state, final Direction direction, final BlockState neighborState, final LevelAccessor level, final BlockPos pos, final BlockPos neighborPos) {
+    public BlockState updateShape(final BlockState state, final Direction direction, final BlockState neighborState,
+            final LevelAccessor level, final BlockPos pos, final BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }

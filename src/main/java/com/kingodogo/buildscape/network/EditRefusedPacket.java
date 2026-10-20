@@ -55,8 +55,8 @@ public class EditRefusedPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() ->
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.showEditRefusal(this.reason, this.setting())));
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandlers.showEditRefusal(this.reason, this.setting())));
         ctx.get().setPacketHandled(true);
     }
 }

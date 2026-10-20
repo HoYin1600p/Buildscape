@@ -13,8 +13,7 @@ public class CosmeticData {
     private Map<String, String> selectedCosmetics;
     private boolean isAdmin;
 
-    public CosmeticData() {
-    }
+    public CosmeticData() {}
 
     public CosmeticData(List<String> unlocked, List<String> locked, List<String> equipped) {
         this.unlocked = unlocked;
@@ -100,4 +99,3 @@ public class CosmeticData {
         return this.unlockedCosmetics != null || this.selectedCosmetics != null;
     }
 }
-

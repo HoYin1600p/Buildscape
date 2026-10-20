@@ -18,8 +18,7 @@ import java.util.stream.Stream;
 public final class ConfigPaths {
     private static final Path LEGACY_ROOT = Path.of("config");
 
-    private ConfigPaths() {
-    }
+    private ConfigPaths() {}
 
     public static Path root() {
         try {
@@ -42,7 +41,8 @@ public final class ConfigPaths {
         }
         try {
             Files.createDirectories(target);
-            if (!target.toAbsolutePath().normalize().equals(legacy.toAbsolutePath().normalize()) && Files.isDirectory(legacy)) {
+            if (!target.toAbsolutePath().normalize().equals(legacy.toAbsolutePath().normalize())
+                    && Files.isDirectory(legacy)) {
                 migrate(legacy, target);
             }
         } catch (IOException e) {
@@ -85,7 +85,9 @@ public final class ConfigPaths {
 
     /** Loads default items from bundled JSON template resources without modifying any files on disk. */
     public static Set<String> loadDefaultItems(boolean vaultLoaded) {
-        String template = vaultLoaded ? "/data/buildscape/config/vault_pillar_items.json" : "/data/buildscape/config/vanilla_pillar_items.json";
+        String template = vaultLoaded
+                ? "/data/buildscape/config/vault_pillar_items.json"
+                : "/data/buildscape/config/vanilla_pillar_items.json";
         try (InputStream input = BuildScape.class.getResourceAsStream(template)) {
             if (input != null) {
                 String json = new String(input.readAllBytes(), StandardCharsets.UTF_8);

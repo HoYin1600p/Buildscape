@@ -106,8 +106,8 @@ public class HollowPipeTransportManager {
             }
             ASYNC_NETWORKS.incrementAndGet();
             CompletableFuture.supplyAsync(
-                            () -> WaterPipeTransport.INSTANCE.calculatePreparedNetwork(prepared),
-                            BuildScape.getAsyncPool())
+                    () -> WaterPipeTransport.INSTANCE.calculatePreparedNetwork(prepared),
+                    BuildScape.getAsyncPool())
                     .whenComplete((states, error) -> {
                         ASYNC_NETWORKS.decrementAndGet();
                         COMPLETED.add(new CompletedJob(job, states, error));

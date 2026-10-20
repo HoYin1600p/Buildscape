@@ -74,4 +74,3 @@ public class PillarResetHandler {
         resetPillarToDefault(data.dimension, pos);
     }
 }
-

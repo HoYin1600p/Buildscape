@@ -77,7 +77,7 @@ public class RotateBlockPacket {
             ItemStack mainHand = player.getMainHandItem();
             ItemStack offHand = player.getOffhandItem();
             boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
-                                (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
+                    (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
             if (!hasWrench) {
                 return;
             }
@@ -125,8 +125,7 @@ public class RotateBlockPacket {
                 level.sendParticles(
                         ParticleTypes.WAX_OFF,
                         pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                        6, 0.25, 0.25, 0.25, 0.05
-                );
+                        6, 0.25, 0.25, 0.25, 0.05);
             }
         });
         ctx.setPacketHandled(true);
@@ -137,7 +136,8 @@ public class RotateBlockPacket {
         if (state.hasProperty(BlockStateProperties.BED_PART)
                 || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
                 || state.getBlock() instanceof PistonHeadBlock
-                || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED))) {
+                || (state.hasProperty(BlockStateProperties.EXTENDED)
+                        && state.getValue(BlockStateProperties.EXTENDED))) {
             return state;
         }
         BlockState newState = state;

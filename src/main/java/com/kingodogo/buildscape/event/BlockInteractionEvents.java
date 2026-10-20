@@ -93,12 +93,14 @@ public class BlockInteractionEvents {
 
         if (state.is(Blocks.FLOWER_POT) && !event.getPlayer().isSecondaryUseActive()) {
             if (heldItem.getItem() instanceof HazeBushItem && HazeBushItem.isDrained(heldItem)) {
-                if (heldItem.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof HazeBushBlock bushBlock) {
+                if (heldItem.getItem() instanceof BlockItem blockItem
+                        && blockItem.getBlock() instanceof HazeBushBlock bushBlock) {
                     DyeColor color = bushBlock.getColor();
                     RegistryObject<Block> pottedObj = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color);
                     if (pottedObj != null) {
                         if (!event.getWorld().isClientSide) {
-                            BlockState newState = pottedObj.get().defaultBlockState().setValue(PottedHazeBushBlock.HAS_HAZE, false);
+                            BlockState newState = pottedObj.get().defaultBlockState()
+                                    .setValue(PottedHazeBushBlock.HAS_HAZE, false);
                             event.getWorld().setBlock(event.getPos(), newState, 3);
                             event.getPlayer().awardStat(Stats.POT_FLOWER);
                             if (!event.getPlayer().getAbilities().instabuild) {
@@ -119,8 +121,10 @@ public class BlockInteractionEvents {
                 if (state.hasProperty(ModBlockProperties.SHEARED)) {
                     if (!state.getValue(ModBlockProperties.SHEARED)) {
                         if (!event.getWorld().isClientSide) {
-                            event.getWorld().setBlockAndUpdate(event.getPos(), state.setValue(ModBlockProperties.SHEARED, true));
-                            event.getWorld().playSound(null, event.getPos(), SoundEvents.GROWING_PLANT_CROP, SoundSource.BLOCKS, 1.0F, 1.0F);
+                            event.getWorld().setBlockAndUpdate(event.getPos(),
+                                    state.setValue(ModBlockProperties.SHEARED, true));
+                            event.getWorld().playSound(null, event.getPos(), SoundEvents.GROWING_PLANT_CROP,
+                                    SoundSource.BLOCKS, 1.0F, 1.0F);
                             event.getWorld().gameEvent(event.getPlayer(), GameEvent.SHEAR, event.getPos());
                             heldItem.hurtAndBreak(1, event.getPlayer(), (p) -> p.broadcastBreakEvent(event.getHand()));
                         }
@@ -131,7 +135,6 @@ public class BlockInteractionEvents {
                 }
             }
         }
-
 
         if (state.getBlock() == ModBlocks.BAMBOO_BLOCK.get()
                 && heldItem.getItem() instanceof AxeItem) {
@@ -352,7 +355,8 @@ public class BlockInteractionEvents {
                             }
                             BlockPos nearbyGround = pos.offset(dx, 0, dz);
                             BlockPos nearbyAbove = nearbyGround.above();
-                            if (level.getBlockState(nearbyGround).is(Blocks.PODZOL) && level.isEmptyBlock(nearbyAbove)) {
+                            if (level.getBlockState(nearbyGround).is(Blocks.PODZOL)
+                                    && level.isEmptyBlock(nearbyAbove)) {
                                 validPositions.add(nearbyAbove);
                             }
                         }
@@ -377,13 +381,16 @@ public class BlockInteractionEvents {
                 if (!level.isClientSide) {
                     final BlockPos finalPos = pos;
                     ((ServerLevel) level).getServer().execute(() -> {
-                        BlockPos.betweenClosedStream(finalPos.offset(-3, -1, -3), finalPos.offset(3, 1, 3)).forEach(checkPos -> {
-                            if (level.getBlockState(checkPos).is(Blocks.GRASS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
-                                if (level.random.nextFloat() < 0.05F) {
-                                    level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(), 3);
-                                }
-                            }
-                        });
+                        BlockPos.betweenClosedStream(finalPos.offset(-3, -1, -3), finalPos.offset(3, 1, 3))
+                                .forEach(checkPos -> {
+                                    if (level.getBlockState(checkPos).is(Blocks.GRASS_BLOCK)
+                                            && level.isEmptyBlock(checkPos.above())) {
+                                        if (level.random.nextFloat() < 0.05F) {
+                                            level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(),
+                                                    3);
+                                        }
+                                    }
+                                });
                     });
                 }
             }
@@ -392,24 +399,29 @@ public class BlockInteractionEvents {
                 if (!level.isClientSide) {
                     final BlockPos finalMossPos = pos;
                     ((ServerLevel) level).getServer().execute(() -> {
-                        BlockPos.betweenClosedStream(finalMossPos.offset(-3, -1, -3), finalMossPos.offset(3, 1, 3)).forEach(checkPos -> {
-                            if (level.getBlockState(checkPos).is(Blocks.MOSS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
-                                float roll = level.random.nextFloat();
-                                if (roll < 0.10F) {
-                                    level.setBlock(checkPos.above(), ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
-                                } else if (roll < 0.15F) {
-                                    BlockState saplingState = ModBlocks.CHERRY_SAPLING.get().defaultBlockState();
-                                    if (saplingState.canSurvive(level, checkPos.above())) {
-                                        level.setBlock(checkPos.above(), saplingState, 3);
+                        BlockPos.betweenClosedStream(finalMossPos.offset(-3, -1, -3), finalMossPos.offset(3, 1, 3))
+                                .forEach(checkPos -> {
+                                    if (level.getBlockState(checkPos).is(Blocks.MOSS_BLOCK)
+                                            && level.isEmptyBlock(checkPos.above())) {
+                                        float roll = level.random.nextFloat();
+                                        if (roll < 0.10F) {
+                                            level.setBlock(checkPos.above(),
+                                                    ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
+                                        } else if (roll < 0.15F) {
+                                            BlockState saplingState = ModBlocks.CHERRY_SAPLING.get()
+                                                    .defaultBlockState();
+                                            if (saplingState.canSurvive(level, checkPos.above())) {
+                                                level.setBlock(checkPos.above(), saplingState, 3);
+                                            }
+                                        } else if (roll < 0.20F) {
+                                            BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get()
+                                                    .defaultBlockState();
+                                            if (propaguleState.canSurvive(level, checkPos.above())) {
+                                                level.setBlock(checkPos.above(), propaguleState, 3);
+                                            }
+                                        }
                                     }
-                                } else if (roll < 0.20F) {
-                                    BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState();
-                                    if (propaguleState.canSurvive(level, checkPos.above())) {
-                                        level.setBlock(checkPos.above(), propaguleState, 3);
-                                    }
-                                }
-                            }
-                        });
+                                });
                     });
                 }
             }
@@ -421,7 +433,8 @@ public class BlockInteractionEvents {
                 }
                 if (level.isEmptyBlock(targetPos)) {
                     if (!level.isClientSide) {
-                        level.setBlock(targetPos, ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState().setValue(HangingMossBlock.TIP, true), 3);
+                        level.setBlock(targetPos, ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState()
+                                .setValue(HangingMossBlock.TIP, true), 3);
                         level.levelEvent(2005, pos, 0);
                         if (!event.getPlayer().getAbilities().instabuild) {
                             held.shrink(1);
@@ -439,7 +452,8 @@ public class BlockInteractionEvents {
                         level.setBlock(pos, state.setValue(CreakingHeartBlock.ACTIVE, true), 3);
                         level.scheduleTick(pos, heart, 40);
                     }
-                    List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN));
+                    List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH,
+                            Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN));
                     Collections.shuffle(directions, level.random);
                     int spawned = 0;
                     for (Direction dir : directions) {
@@ -454,7 +468,8 @@ public class BlockInteractionEvents {
                                 spawned++;
                             }
                         } else if (adjState.isAir()) {
-                            BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
+                            BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp,
+                                    true);
                             level.setBlock(adjPos, newState, 3);
                             spawned++;
                         }

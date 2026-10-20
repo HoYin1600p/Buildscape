@@ -88,8 +88,7 @@ public final class ColorGradientSolver {
     private static final Map<Item, BlockColor> REGISTRY = new LinkedHashMap<>();
     private static final List<BlockColor> ALL_BLOCKS = new ArrayList<>();
 
-    private ColorGradientSolver() {
-    }
+    private ColorGradientSolver() {}
 
     public static boolean isCandidateBlock(Item item) {
         if (!(item instanceof BlockItem blockItem)) {
@@ -186,7 +185,7 @@ public final class ColorGradientSolver {
     }
 
     public static List<ItemStack> solveColorPickerWithInventory(ItemStack target, List<ItemStack> inventory,
-                                                                 int[] offsets) {
+            int[] offsets) {
         ensureRegistryPopulated();
         Set<Item> availableItems = new HashSet<>();
         for (ItemStack stack : inventory) {
@@ -407,7 +406,8 @@ public final class ColorGradientSolver {
 
     private static ShapeFamily requiredShape(int filterMask, ItemStack input) {
         return (filterMask & FILTER_MATCH_SHAPE) == 0 || input == null || input.isEmpty()
-                ? null : shapeFor(input.getItem());
+                ? null
+                : shapeFor(input.getItem());
     }
 
     private static ShapeFamily requiredShape(int filterMask, List<ItemStack> inputs) {
@@ -595,7 +595,7 @@ public final class ColorGradientSolver {
     }
 
     private static List<BlockColor> excludingOtherDefaults(List<BlockColor> candidates, Item[] defaults,
-                                                            int currentSlot, Set<Item> additionallyExcluded) {
+            int currentSlot, Set<Item> additionallyExcluded) {
         Set<Item> excluded = new HashSet<>(additionallyExcluded);
         for (int slot = 0; slot < defaults.length; slot++) {
             if (slot != currentSlot && defaults[slot] != null) {
@@ -789,7 +789,8 @@ public final class ColorGradientSolver {
                 || block instanceof StonecutterBlock || block instanceof GrindstoneBlock
                 || block instanceof EnchantmentTableBlock || block instanceof SculkSensorBlock
                 || path.contains("decorated_pot") || path.contains("sculk_shrieker")
-                || path.endsWith("_star") || path.endsWith("_head") || path.contains("mob_head") || path.contains("_skull")
+                || path.endsWith("_star") || path.endsWith("_head") || path.contains("mob_head")
+                || path.contains("_skull")
                 || path.contains("scaffolding") || path.contains("daylight_detector")
                 || path.contains("tripwire")
                 || path.equals("comparator") || path.equals("bell")
@@ -857,55 +858,20 @@ public final class ColorGradientSolver {
     }
 
     private static float srgbToLinear(float value) {
-        return value <= 0.04045f ? value / 12.92f
+        return value <= 0.04045f
+                ? value / 12.92f
                 : (float) Math.pow((value + 0.055f) / 1.055f, 2.4);
     }
 
     private static float labF(float value) {
         float delta = 6.0f / 29.0f;
-        return value > delta * delta * delta ? (float) Math.cbrt(value)
+        return value > delta * delta * delta
+                ? (float) Math.cbrt(value)
                 : value / (3 * delta * delta) + 4.0f / 29.0f;
     }
 
     private enum ShapeFamily {
-        FULL_BLOCK,
-        GLASS,
-        PANE,
-        CARPET,
-        LAYER,
-        OVERLAY,
-        CHEST,
-        DOOR,
-        TRAPDOOR,
-        WALL,
-        SLAB,
-        STAIR,
-        BUTTON,
-        PRESSURE_PLATE,
-        VERTICAL_SLAB,
-        FENCE,
-        FENCE_GATE,
-        FLOWER,
-        FOLIAGE,
-        CHAIN,
-        ORNAMENT,
-        STAR,
-        STRING_LIGHT,
-        LIGHT_BLOCK,
-        VINE,
-        BED,
-        BANNER,
-        CANDLE,
-        CLUSTER,
-        SIGN,
-        LEAVES,
-        MESH,
-        LADDER,
-        DECORATED,
-        ITEM_FRAME,
-        STOCKING,
-        CUSHION,
-        JAR
+        FULL_BLOCK, GLASS, PANE, CARPET, LAYER, OVERLAY, CHEST, DOOR, TRAPDOOR, WALL, SLAB, STAIR, BUTTON, PRESSURE_PLATE, VERTICAL_SLAB, FENCE, FENCE_GATE, FLOWER, FOLIAGE, CHAIN, ORNAMENT, STAR, STRING_LIGHT, LIGHT_BLOCK, VINE, BED, BANNER, CANDLE, CLUSTER, SIGN, LEAVES, MESH, LADDER, DECORATED, ITEM_FRAME, STOCKING, CUSHION, JAR
     }
 
     public static final class BlockColor {

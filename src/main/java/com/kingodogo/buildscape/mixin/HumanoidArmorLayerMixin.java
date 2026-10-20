@@ -16,12 +16,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class HumanoidArmorLayerMixin<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> {
 
     @Inject(method = "renderArmorPiece", at = @At("HEAD"))
-    private void buildscape$pushArmorStack(PoseStack poseStack, MultiBufferSource bufferSource, T entity, EquipmentSlot slot, int combinedLight, A model, CallbackInfo ci) {
+    private void buildscape$pushArmorStack(PoseStack poseStack, MultiBufferSource bufferSource, T entity,
+            EquipmentSlot slot, int combinedLight, A model, CallbackInfo ci) {
         FestiveGlintHandler.push(entity.getItemBySlot(slot));
     }
 
     @Inject(method = "renderArmorPiece", at = @At("RETURN"))
-    private void buildscape$popArmorStack(PoseStack poseStack, MultiBufferSource bufferSource, T entity, EquipmentSlot slot, int combinedLight, A model, CallbackInfo ci) {
+    private void buildscape$popArmorStack(PoseStack poseStack, MultiBufferSource bufferSource, T entity,
+            EquipmentSlot slot, int combinedLight, A model, CallbackInfo ci) {
         FestiveGlintHandler.pop();
     }
 }

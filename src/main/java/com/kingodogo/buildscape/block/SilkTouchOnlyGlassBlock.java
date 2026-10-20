@@ -32,8 +32,7 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            BlockPos beaconPos
-    ) {
+            BlockPos beaconPos) {
         int color = state.getMapColor(level, pos).col;
         return new float[]{
                 ((color >> 16) & 0xFF) / 255.0f,
@@ -51,20 +50,16 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 
     public boolean shouldDisplayFluidOverlay(
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            FluidState fluidState
-    ) {
+            FluidState fluidState) {
         return true;
     }
 
@@ -75,8 +70,7 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         ItemStack heldItem = player.getItemInHand(hand);
         if (heldItem.getItem() instanceof DyeItem dyeItem) {
             String dyeColorName = dyeItem.getDyeColor().getName();
@@ -93,8 +87,7 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
 
             if (newName != null) {
                 Block newBlock = ForgeRegistries.BLOCKS.getValue(
-                        new ResourceLocation("buildscape", newName)
-                );
+                        new ResourceLocation("buildscape", newName));
                 if (newBlock != null && newBlock != this) {
                     if (!level.isClientSide) {
                         level.setBlock(pos, newBlock.defaultBlockState(), 3);
@@ -107,8 +100,7 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
                                 SoundEvents.DYE_USE,
                                 SoundSource.BLOCKS,
                                 1.0f,
-                                1.0f
-                        );
+                                1.0f);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }

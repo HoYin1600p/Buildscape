@@ -28,14 +28,22 @@ public class CustomFireworkShapeRegistry {
     public static final byte PHOENIX_ID = 11;
     public static final byte SNOWFLAKE_ID = 12;
 
-    public static final CustomFireworkShape CAKE = register(new CakeFireworkShape(new ResourceLocation(BuildScape.MODID, "cake"), CAKE_ID));
-    public static final CustomFireworkShape CROWN = register(new CrownFireworkShape(new ResourceLocation(BuildScape.MODID, "crown"), CROWN_ID));
-    public static final CustomFireworkShape TROPHY = register(new TrophyFireworkShape(new ResourceLocation(BuildScape.MODID, "trophy"), TROPHY_ID));
-    public static final CustomFireworkShape CHRISTMAS_TREE = register(new ChristmasTreeFireworkShape(new ResourceLocation(BuildScape.MODID, "christmas_tree"), CHRISTMAS_TREE_ID));
-    public static final CustomFireworkShape PRESENTS = register(new PresentsFireworkShape(new ResourceLocation(BuildScape.MODID, "presents"), PRESENTS_ID));
-    public static final CustomFireworkShape CANDY_CANE = register(new CandyCaneFireworkShape(new ResourceLocation(BuildScape.MODID, "candy_cane"), CANDY_CANE_ID));
-    public static final CustomFireworkShape PHOENIX = register(new PhoenixFireworkShape(new ResourceLocation(BuildScape.MODID, "phoenix"), PHOENIX_ID));
-    public static final CustomFireworkShape SNOWFLAKE = register(new SnowflakeFireworkShape(new ResourceLocation(BuildScape.MODID, "snowflake"), SNOWFLAKE_ID));
+    public static final CustomFireworkShape CAKE = register(
+            new CakeFireworkShape(new ResourceLocation(BuildScape.MODID, "cake"), CAKE_ID));
+    public static final CustomFireworkShape CROWN = register(
+            new CrownFireworkShape(new ResourceLocation(BuildScape.MODID, "crown"), CROWN_ID));
+    public static final CustomFireworkShape TROPHY = register(
+            new TrophyFireworkShape(new ResourceLocation(BuildScape.MODID, "trophy"), TROPHY_ID));
+    public static final CustomFireworkShape CHRISTMAS_TREE = register(new ChristmasTreeFireworkShape(
+            new ResourceLocation(BuildScape.MODID, "christmas_tree"), CHRISTMAS_TREE_ID));
+    public static final CustomFireworkShape PRESENTS = register(
+            new PresentsFireworkShape(new ResourceLocation(BuildScape.MODID, "presents"), PRESENTS_ID));
+    public static final CustomFireworkShape CANDY_CANE = register(
+            new CandyCaneFireworkShape(new ResourceLocation(BuildScape.MODID, "candy_cane"), CANDY_CANE_ID));
+    public static final CustomFireworkShape PHOENIX = register(
+            new PhoenixFireworkShape(new ResourceLocation(BuildScape.MODID, "phoenix"), PHOENIX_ID));
+    public static final CustomFireworkShape SNOWFLAKE = register(
+            new SnowflakeFireworkShape(new ResourceLocation(BuildScape.MODID, "snowflake"), SNOWFLAKE_ID));
 
     public static CustomFireworkShape register(CustomFireworkShape shape) {
         BY_NUMERIC_ID.put(shape.getNumericId(), shape);

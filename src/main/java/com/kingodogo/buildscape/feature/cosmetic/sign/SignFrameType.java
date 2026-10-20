@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public enum SignFrameType {
-    NONE("", () -> null, null),
-    STRINGLIGHT("stringlight", () -> ModItems.STRINGLIGHT_FRAME.get(), new ResourceLocation(BuildScape.MODID, "block/stringlight_frame"));
+    NONE("", () -> null, null), STRINGLIGHT("stringlight", () -> ModItems.STRINGLIGHT_FRAME.get(),
+            new ResourceLocation(BuildScape.MODID, "block/stringlight_frame"));
 
     private final String id;
     private final Supplier<Item> itemSupplier;

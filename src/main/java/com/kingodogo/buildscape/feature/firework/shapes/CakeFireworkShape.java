@@ -101,7 +101,8 @@ public class CakeFireworkShape extends CustomFireworkShape {
         return points;
     }
 
-    private void addCandle(List<FireworkPoint> points, double cx, double cz, double yStart, double yEnd, int candleColor) {
+    private void addCandle(List<FireworkPoint> points, double cx, double cz, double yStart, double yEnd,
+            int candleColor) {
         for (double y = yStart; y <= yEnd; y += 1.2) {
             points.add(new FireworkPoint(cx, y, cz, candleColor));
             points.add(new FireworkPoint(cx + 0.5, y, cz, candleColor));

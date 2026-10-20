@@ -8,7 +8,8 @@ public class CustomFireworkRenderer {
 
     @FunctionalInterface
     public interface SparkSpawner {
-        void spawnSpark(double x, double y, double z, double vx, double vy, double vz, int[] colors, int[] fadeColors, boolean trail, boolean flicker);
+        void spawnSpark(double x, double y, double z, double vx, double vy, double vz, int[] colors, int[] fadeColors,
+                boolean trail, boolean flicker);
     }
 
     public static void renderExplosion(
@@ -16,8 +17,7 @@ public class CustomFireworkRenderer {
             double centerX, double centerY, double centerZ,
             int[] itemColors, int[] fadeColors,
             boolean trail, boolean flicker,
-            SparkSpawner sparkSpawner
-    ) {
+            SparkSpawner sparkSpawner) {
         renderExplosion(shape, centerX, centerY, centerZ, itemColors, fadeColors, trail, flicker, 0.0F, sparkSpawner);
     }
 
@@ -27,8 +27,7 @@ public class CustomFireworkRenderer {
             int[] itemColors, int[] fadeColors,
             boolean trail, boolean flicker,
             float yaw,
-            SparkSpawner sparkSpawner
-    ) {
+            SparkSpawner sparkSpawner) {
         List<FireworkPoint> points = shape.generatePoints();
         double scale = shape.getBaseScale();
 
@@ -65,8 +64,7 @@ public class CustomFireworkRenderer {
                     centerX, centerY, centerZ,
                     velocity.x, velocity.y, velocity.z,
                     pointColors, fadeColors,
-                    trail, flicker
-            );
+                    trail, flicker);
         }
     }
 }

@@ -100,9 +100,6 @@ public class MobStateParser {
 
             statesLoaded = true;
 
-
-
-
         } catch (Exception e) {
             BuildScape.LOGGER.error("Failed to load states", e);
             addUniversalStates();
@@ -248,7 +245,6 @@ public class MobStateParser {
             }
 
             state.parsedStates.add(word);
-
 
             if (word.equals("spin")) {
                 state.spin = true;
@@ -417,8 +413,7 @@ public class MobStateParser {
         }
 
         try {
-            Component nameComponent =
-                    Component.Serializer.fromJson(nameJson);
+            Component nameComponent = Component.Serializer.fromJson(nameJson);
             if (nameComponent != null) {
                 String displayName = nameComponent.getString();
                 if (displayName != null && !displayName.isEmpty()) {

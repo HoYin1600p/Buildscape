@@ -18,24 +18,21 @@ public class MudSlabBlock extends SlabBlock {
             0.0D,
             16.0D,
             8.0D,
-            16.0D
-    );
+            16.0D);
     protected static final VoxelShape TOP_SHAPE = Block.box(
             0.0D,
             8.0D,
             0.0D,
             16.0D,
             15.0D,
-            16.0D
-    );
+            16.0D);
     protected static final VoxelShape DOUBLE_SHAPE = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             15.0D,
-            16.0D
-    );
+            16.0D);
 
     public MudSlabBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -46,8 +43,7 @@ public class MudSlabBlock extends SlabBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         SlabType type = state.getValue(TYPE);
         if (type == SlabType.TOP) {
             return TOP_SHAPE;

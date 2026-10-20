@@ -38,8 +38,7 @@ public abstract class AbstractContainerMenuMixin {
                     moveToFilteredSlots(containerMenu, filterMenu, source);
                     if (source.isEmpty()) {
                         sourceSlot.set(ItemStack.EMPTY);
-                    }
-                    else {
+                    } else {
                         sourceSlot.setChanged();
                     }
                     containerMenu.broadcastChanges();
@@ -76,7 +75,8 @@ public abstract class AbstractContainerMenuMixin {
 
                                 for (int i = 0; i < Inventory.INVENTORY_SIZE; i++) {
                                     ItemStack invStack = player.getInventory().getItem(i);
-                                    if (!invStack.isEmpty() && invStack.getItem() == inputItem && ItemStack.isSameItemSameTags(invStack, inputStack)) {
+                                    if (!invStack.isEmpty() && invStack.getItem() == inputItem
+                                            && ItemStack.isSameItemSameTags(invStack, inputStack)) {
                                         totalInputCount += invStack.getCount();
                                         playerInvSlots.add(i);
                                     }
@@ -119,7 +119,8 @@ public abstract class AbstractContainerMenuMixin {
 
                                     player.awardRecipes(Collections.singleton(recipe));
 
-                                    ((StonecutterMenuAccessor) menu).callSetupRecipeList(menu.container, menu.getSlot(0).getItem());
+                                    ((StonecutterMenuAccessor) menu).callSetupRecipeList(menu.container,
+                                            menu.getSlot(0).getItem());
 
                                     menu.broadcastChanges();
                                 }
@@ -180,7 +181,7 @@ public abstract class AbstractContainerMenuMixin {
     }
 
     private static boolean wouldInsertMismatchedItem(AbstractContainerMenu menu, Player player,
-                                                     ClickType clickType, int buttonId, Item filter) {
+            ClickType clickType, int buttonId, Item filter) {
         if (clickType == ClickType.PICKUP || clickType == ClickType.QUICK_CRAFT) {
             ItemStack carried = menu.getCarried();
             return !carried.isEmpty() && carried.getItem() != filter;

@@ -21,9 +21,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
  */
 final class PillarRecovery {
 
-    private PillarRecovery() {
-    }
-
+    private PillarRecovery() {}
 
     static boolean recoveryScheduled = false;
     static long recoveryScheduledTime = 0L;
@@ -47,7 +45,6 @@ final class PillarRecovery {
         recoveryScheduledTime = System.currentTimeMillis();
         recoveryClearColors = clearColors;
     }
-
 
     static void checkAndRunScheduledRecovery() {
         if (!recoveryScheduled) {
@@ -116,52 +113,34 @@ final class PillarRecovery {
                             ? new ChunkPos(spawnPos)
                             : new ChunkPos(0, 0);
 
-                    for (
-                            int chunkX = spawnChunk.x - chunkRange;
-                            chunkX <= spawnChunk.x + chunkRange;
-                            chunkX++
-                    ) {
-                        for (
-                                int chunkZ = spawnChunk.z - chunkRange;
-                                chunkZ <= spawnChunk.z + chunkRange;
-                                chunkZ++
-                        ) {
-                            ChunkPos chunkPos =
-                                    new ChunkPos(chunkX, chunkZ);
+                    for (int chunkX = spawnChunk.x - chunkRange; chunkX <= spawnChunk.x + chunkRange; chunkX++) {
+                        for (int chunkZ = spawnChunk.z - chunkRange; chunkZ <= spawnChunk.z + chunkRange; chunkZ++) {
+                            ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
 
                             if (!level.hasChunkAt(chunkPos.getWorldPosition())) {
                                 continue;
                             }
 
                             try {
-                                ChunkAccess chunkAccess =
-                                        level.getChunk(chunkX, chunkZ);
+                                ChunkAccess chunkAccess = level.getChunk(chunkX, chunkZ);
 
-                                if (
-                                        !(chunkAccess instanceof LevelChunk chunk)
-                                ) {
+                                if (!(chunkAccess instanceof LevelChunk chunk)) {
                                     continue;
                                 }
 
-                                if (
-                                        !chunkAccess
-                                                .getStatus()
-                                                .isOrAfter(ChunkStatus.FULL)
-                                ) {
+                                if (!chunkAccess
+                                        .getStatus()
+                                        .isOrAfter(ChunkStatus.FULL)) {
                                     continue;
                                 }
 
                                 for (BlockEntity be : chunk
                                         .getBlockEntities()
                                         .values()) {
-                                    if (
-                                            be instanceof PillarBlockEntity pillarBE
-                                    ) {
+                                    if (be instanceof PillarBlockEntity pillarBE) {
 
-                                        if (
-                                                pillarBE.getPillarId() != null &&
-                                                        !pillarBE.getPillarId().isEmpty()
-                                        ) {
+                                        if (pillarBE.getPillarId() != null &&
+                                                !pillarBE.getPillarId().isEmpty()) {
                                             pillarBE.clearLocalStateOnly();
                                             pillarBE.setChanged();
 
@@ -169,8 +148,7 @@ final class PillarRecovery {
                                                     be.getBlockPos(),
                                                     level.getBlockState(be.getBlockPos()),
                                                     level.getBlockState(be.getBlockPos()),
-                                                    3
-                                            );
+                                                    3);
 
                                             clearedCount++;
                                         }
@@ -196,8 +174,7 @@ final class PillarRecovery {
     static void recoverPillarsFromWorld(
             PillarIdManager m,
             MinecraftServer server,
-            boolean clearColors
-    ) {
+            boolean clearColors) {
         if (server == null || !server.isRunning()) {
             return;
         }
@@ -226,9 +203,7 @@ final class PillarRecovery {
                 String dimensionKey = PillarIdManager.getDimensionKey(level);
 
                 try {
-                    Set<
-                            BlockEntity
-                            > allBlockEntities = new HashSet<>();
+                    Set<BlockEntity> allBlockEntities = new HashSet<>();
 
                     int chunkRange = 64;
                     BlockPos spawnPos = level.getSharedSpawnPos();
@@ -236,48 +211,31 @@ final class PillarRecovery {
                             ? new ChunkPos(spawnPos)
                             : new ChunkPos(0, 0);
 
-                    for (
-                            int chunkX = spawnChunk.x - chunkRange;
-                            chunkX <= spawnChunk.x + chunkRange;
-                            chunkX++
-                    ) {
-                        for (
-                                int chunkZ = spawnChunk.z - chunkRange;
-                                chunkZ <= spawnChunk.z + chunkRange;
-                                chunkZ++
-                        ) {
-                            ChunkPos chunkPos =
-                                    new ChunkPos(chunkX, chunkZ);
+                    for (int chunkX = spawnChunk.x - chunkRange; chunkX <= spawnChunk.x + chunkRange; chunkX++) {
+                        for (int chunkZ = spawnChunk.z - chunkRange; chunkZ <= spawnChunk.z + chunkRange; chunkZ++) {
+                            ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
 
                             if (!level.hasChunkAt(chunkPos.getWorldPosition())) {
                                 continue;
                             }
 
                             try {
-                                ChunkAccess chunkAccess =
-                                        level.getChunk(chunkX, chunkZ);
+                                ChunkAccess chunkAccess = level.getChunk(chunkX, chunkZ);
 
-                                if (
-                                        !(chunkAccess instanceof LevelChunk chunk)
-                                ) {
+                                if (!(chunkAccess instanceof LevelChunk chunk)) {
                                     continue;
                                 }
 
-                                if (
-                                        !chunkAccess
-                                                .getStatus()
-                                                .isOrAfter(ChunkStatus.FULL)
-                                ) {
+                                if (!chunkAccess
+                                        .getStatus()
+                                        .isOrAfter(ChunkStatus.FULL)) {
                                     continue;
                                 }
 
                                 for (BlockEntity be : chunk
                                         .getBlockEntities()
                                         .values()) {
-                                    if (
-                                            be instanceof
-                                                    PillarBlockEntity
-                                    ) {
+                                    if (be instanceof PillarBlockEntity) {
                                         allBlockEntities.add(be);
                                     }
                                 }
@@ -288,9 +246,7 @@ final class PillarRecovery {
                     }
 
                     for (BlockEntity be : allBlockEntities) {
-                        if (
-                                be instanceof PillarBlockEntity pillarBE
-                        ) {
+                        if (be instanceof PillarBlockEntity pillarBE) {
                             try {
 
                                 String pillarId = pillarBE.getPillarId();
@@ -304,12 +260,10 @@ final class PillarRecovery {
                                 PillarData existingData = m.registry.pillarData.get(pillarId);
 
                                 if (existingData != null) {
-                                    boolean positionChanged = !(
-                                            existingData.dimension.equals(dimensionKey) &&
-                                                    existingData.x == pos.getX() &&
-                                                    existingData.y == pos.getY() &&
-                                                    existingData.z == pos.getZ()
-                                    );
+                                    boolean positionChanged = !(existingData.dimension.equals(dimensionKey) &&
+                                            existingData.x == pos.getX() &&
+                                            existingData.y == pos.getY() &&
+                                            existingData.z == pos.getZ());
 
                                     if (positionChanged) {
 
@@ -321,16 +275,18 @@ final class PillarRecovery {
                                     }
 
                                     if (!clearColors) {
-                                        List<String> pillarColors =
-                                                pillarBE.getParticleColors();
+                                        List<String> pillarColors = pillarBE.getParticleColors();
                                         if (pillarColors != null && !pillarColors.isEmpty()) {
                                             boolean colorsChanged = false;
-                                            if (existingData.dyeColors == null || existingData.dyeColors.size() != pillarColors.size()) {
+                                            if (existingData.dyeColors == null
+                                                    || existingData.dyeColors.size() != pillarColors.size()) {
                                                 colorsChanged = true;
                                             } else {
                                                 for (int i = 0; i < pillarColors.size(); i++) {
                                                     String nbtColor = pillarColors.get(i);
-                                                    String managerColor = i < existingData.dyeColors.size() ? existingData.dyeColors.get(i) : null;
+                                                    String managerColor = i < existingData.dyeColors.size()
+                                                            ? existingData.dyeColors.get(i)
+                                                            : null;
                                                     if (nbtColor == null || !nbtColor.equals(managerColor)) {
                                                         colorsChanged = true;
                                                         break;
@@ -361,8 +317,7 @@ final class PillarRecovery {
                                     data.clearColors();
                                     colorClearedCount++;
                                 } else {
-                                    List<String> pillarColors =
-                                            pillarBE.getParticleColors();
+                                    List<String> pillarColors = pillarBE.getParticleColors();
                                     if (pillarColors != null && !pillarColors.isEmpty()) {
                                         for (String color : pillarColors) {
                                             if (color != null && !color.isEmpty()) {

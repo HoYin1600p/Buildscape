@@ -5,8 +5,7 @@ import java.util.List;
 public class TiersResponse {
     private List<MembershipTier> tiers;
 
-    public TiersResponse() {
-    }
+    public TiersResponse() {}
 
     public TiersResponse(List<MembershipTier> tiers) {
         this.tiers = tiers;
@@ -20,4 +19,3 @@ public class TiersResponse {
         this.tiers = tiers;
     }
 }
-

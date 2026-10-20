@@ -19,25 +19,24 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class WaterloggableGrateBlock
-        extends HalfTransparentBlock
-        implements SimpleWaterloggedBlock {
+        extends
+            HalfTransparentBlock
+        implements
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private static final VoxelShape SHAPE = Shapes.block();
 
     public WaterloggableGrateBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(WATERLOGGED, false)
-        );
+                this.stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(WATERLOGGED);
     }
 
@@ -57,8 +56,7 @@ public class WaterloggableGrateBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -68,8 +66,7 @@ public class WaterloggableGrateBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -84,8 +81,7 @@ public class WaterloggableGrateBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 
@@ -94,8 +90,7 @@ public class WaterloggableGrateBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return SHAPE;
     }
 
@@ -108,8 +103,7 @@ public class WaterloggableGrateBlock
     public boolean propagatesSkylightDown(
             BlockState state,
             BlockGetter reader,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return !state.getValue(WATERLOGGED);
     }
 
@@ -117,8 +111,7 @@ public class WaterloggableGrateBlock
     public float getShadeBrightness(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         return state.getValue(WATERLOGGED) ? 0.2F : 1.0F;
     }
 
@@ -127,8 +120,7 @@ public class WaterloggableGrateBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return state.getValue(WATERLOGGED) ? SHAPE : Shapes.empty();
     }
 
@@ -141,13 +133,10 @@ public class WaterloggableGrateBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        if (
-                adjacentBlockState.is(this) &&
-                        !state.getValue(WATERLOGGED) &&
-                        !adjacentBlockState.getValue(WATERLOGGED)
-        ) {
+            Direction side) {
+        if (adjacentBlockState.is(this) &&
+                !state.getValue(WATERLOGGED) &&
+                !adjacentBlockState.getValue(WATERLOGGED)) {
             return true;
         }
         return super.skipRendering(state, adjacentBlockState, side);

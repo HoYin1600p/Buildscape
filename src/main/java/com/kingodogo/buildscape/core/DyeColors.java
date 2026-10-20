@@ -10,22 +10,14 @@ import javax.annotation.Nullable;
  * the English display name. These are BuildScape's own colours, not vanilla's {@code DyeColor} values.
  */
 public enum DyeColors {
-    WHITE("white", "#E8FEFD", "White"),
-    ORANGE("orange", "#FF5C00", "Orange"),
-    MAGENTA("magenta", "#FF00FF", "Magenta"),
-    LIGHT_BLUE("light_blue", "#3CDFFF", "Light Blue"),
-    YELLOW("yellow", "#FFFF00", "Yellow"),
-    LIME("lime", "#BFFE00", "Lime"),
-    PINK("pink", "#F686B7", "Pink"),
-    GRAY("gray", "#232526", "Gray"),
-    LIGHT_GRAY("light_gray", "#B1B8C5", "Light Gray"),
-    CYAN("cyan", "#00FFFF", "Cyan"),
-    PURPLE("purple", "#AB87FF", "Purple"),
-    BLUE("blue", "#1919EA", "Blue"),
-    BROWN("brown", "#411900", "Brown"),
-    GREEN("green", "#39FF14", "Green"),
-    RED("red", "#FF0000", "Red"),
-    BLACK("black", "#07010C", "Black");
+    WHITE("white", "#E8FEFD", "White"), ORANGE("orange", "#FF5C00", "Orange"), MAGENTA("magenta", "#FF00FF",
+            "Magenta"), LIGHT_BLUE("light_blue", "#3CDFFF", "Light Blue"), YELLOW("yellow", "#FFFF00", "Yellow"), LIME(
+                    "lime", "#BFFE00",
+                    "Lime"), PINK("pink", "#F686B7", "Pink"), GRAY("gray", "#232526", "Gray"), LIGHT_GRAY("light_gray",
+                            "#B1B8C5", "Light Gray"), CYAN("cyan", "#00FFFF", "Cyan"), PURPLE("purple", "#AB87FF",
+                                    "Purple"), BLUE("blue", "#1919EA", "Blue"), BROWN("brown", "#411900",
+                                            "Brown"), GREEN("green", "#39FF14", "Green"), RED("red", "#FF0000",
+                                                    "Red"), BLACK("black", "#07010C", "Black");
 
     private final String serializedName;
     private final String hex;

@@ -42,7 +42,7 @@ public class SyncBiomeTintPacketTest {
 
     @Test
     public void invalidCountsAndDuplicateColumnsAreRejected() {
-        for (int count : new int[] {-1, 257, 2}) {
+        for (int count : new int[]{-1, 257, 2}) {
             FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
             try {
                 buffer.writeResourceLocation(DIMENSION);

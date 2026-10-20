@@ -22,8 +22,10 @@ public abstract class GeneralStatisticsListEntryMixin {
     private Stat<ResourceLocation> stat;
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void onRender(PoseStack poseStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isHovered, float partialTick, CallbackInfo ci) {
-        if (this.stat == ModStats.HEADER_MINECRAFT_STAT || this.stat == ModStats.HEADER_BUILDSCAPE_STAT || this.stat == ModStats.HEADER_OTHER_STAT) {
+    public void onRender(PoseStack poseStack, int index, int top, int left, int width, int height, int mouseX,
+            int mouseY, boolean isHovered, float partialTick, CallbackInfo ci) {
+        if (this.stat == ModStats.HEADER_MINECRAFT_STAT || this.stat == ModStats.HEADER_BUILDSCAPE_STAT
+                || this.stat == ModStats.HEADER_OTHER_STAT) {
             Minecraft mc = Minecraft.getInstance();
             Component text;
             int color;

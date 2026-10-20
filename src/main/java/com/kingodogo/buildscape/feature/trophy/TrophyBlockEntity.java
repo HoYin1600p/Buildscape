@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 
-
 public class TrophyBlockEntity extends SyncedBlockEntity {
     private String obtainedBy = "";
     private String obtainedOn = "";

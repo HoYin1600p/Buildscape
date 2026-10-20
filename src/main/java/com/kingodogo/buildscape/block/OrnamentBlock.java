@@ -43,19 +43,17 @@ import net.minecraftforge.network.PacketDistributor;
 import java.util.Random;
 
 public class OrnamentBlock
-        extends WaterloggedGlassBlock
-        implements SimpleWaterloggedBlock {
+        extends
+            WaterloggedGlassBlock
+        implements
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
-    public static final EnumProperty<AttachmentType> ATTACHMENT =
-            EnumProperty.create("attachment", AttachmentType.class);
-    public static final DirectionProperty FACING =
-            BlockStateProperties.HORIZONTAL_FACING;
-    public static final EnumProperty<StringColor> STRING_COLOR =
-            EnumProperty.create("string_color", StringColor.class);
-    public static final BooleanProperty LIT =
-            BlockStateProperties.LIT;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final EnumProperty<AttachmentType> ATTACHMENT = EnumProperty.create("attachment",
+            AttachmentType.class);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<StringColor> STRING_COLOR = EnumProperty.create("string_color", StringColor.class);
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     private final boolean isTinted;
 
@@ -67,8 +65,7 @@ public class OrnamentBlock
             5,
             11,
             11,
-            11
-    );
+            11);
 
     private static final VoxelShape SHAPE_WALL_NORTH = Block.box(
             5,
@@ -76,37 +73,31 @@ public class OrnamentBlock
             9,
             11,
             10,
-            15
-    );
+            15);
     private static final VoxelShape SHAPE_WALL_SOUTH = Block.box(
             5,
             4,
             1,
             11,
             10,
-            7
-    );
+            7);
     private static final VoxelShape SHAPE_WALL_EAST = Block.box(
             1,
             4,
             5,
             7,
             10,
-            11
-    );
+            11);
     private static final VoxelShape SHAPE_WALL_WEST = Block.box(
             9,
             4,
             5,
             15,
             10,
-            11
-    );
+            11);
 
     public enum AttachmentType implements StringRepresentable {
-        FLOOR("floor"),
-        CEILING("ceiling"),
-        WALL("wall");
+        FLOOR("floor"), CEILING("ceiling"), WALL("wall");
 
         private final String name;
 
@@ -121,22 +112,11 @@ public class OrnamentBlock
     }
 
     public enum StringColor implements StringRepresentable {
-        WHITE(DyeColors.WHITE),
-        ORANGE(DyeColors.ORANGE),
-        MAGENTA(DyeColors.MAGENTA),
-        LIGHT_BLUE(DyeColors.LIGHT_BLUE),
-        YELLOW(DyeColors.YELLOW),
-        LIME(DyeColors.LIME),
-        PINK(DyeColors.PINK),
-        GRAY(DyeColors.GRAY),
-        LIGHT_GRAY(DyeColors.LIGHT_GRAY),
-        CYAN(DyeColors.CYAN),
-        PURPLE(DyeColors.PURPLE),
-        BLUE(DyeColors.BLUE),
-        BROWN(DyeColors.BROWN),
-        GREEN(DyeColors.GREEN),
-        RED(DyeColors.RED),
-        BLACK(DyeColors.BLACK);
+        WHITE(DyeColors.WHITE), ORANGE(DyeColors.ORANGE), MAGENTA(DyeColors.MAGENTA), LIGHT_BLUE(
+                DyeColors.LIGHT_BLUE), YELLOW(DyeColors.YELLOW), LIME(DyeColors.LIME), PINK(DyeColors.PINK), GRAY(
+                        DyeColors.GRAY), LIGHT_GRAY(DyeColors.LIGHT_GRAY), CYAN(DyeColors.CYAN), PURPLE(
+                                DyeColors.PURPLE), BLUE(DyeColors.BLUE), BROWN(DyeColors.BROWN), GREEN(
+                                        DyeColors.GREEN), RED(DyeColors.RED), BLACK(DyeColors.BLACK);
 
         private final DyeColors dye;
 
@@ -171,14 +151,12 @@ public class OrnamentBlock
                         .setValue(FACING, Direction.NORTH)
                         .setValue(STRING_COLOR, StringColor.WHITE)
                         .setValue(LIT, true)
-                        .setValue(WATERLOGGED, false)
-        );
+                        .setValue(WATERLOGGED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(ATTACHMENT, FACING, STRING_COLOR, LIT, WATERLOGGED);
     }
 
@@ -209,11 +187,9 @@ public class OrnamentBlock
         }
 
         BlockState placeState = level.getBlockState(placePos);
-        if (
-                placeState.isAir() ||
-                        placeState.canBeReplaced(context) ||
-                        placeState.is(this)
-        ) {
+        if (placeState.isAir() ||
+                placeState.canBeReplaced(context) ||
+                placeState.is(this)) {
             FluidState fluidstate = context.getLevel().getFluidState(placePos);
             return this.defaultBlockState()
                     .setValue(ATTACHMENT, attachment)
@@ -227,23 +203,18 @@ public class OrnamentBlock
     private boolean canAttachTo(
             LevelReader level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         BlockState state = level.getBlockState(pos);
         if (state.is(this)) {
             return true;
         }
-        if (
-                state.getBlock() instanceof FenceBlock ||
-                        state.getBlock() instanceof LeafHedgeBlock
-        ) {
+        if (state.getBlock() instanceof FenceBlock ||
+                state.getBlock() instanceof LeafHedgeBlock) {
             return true;
         }
-        if (
-                state.getMaterial().isSolid() &&
-                        !state.isAir() &&
-                        !state.is(Blocks.BARRIER)
-        ) {
+        if (state.getMaterial().isSolid() &&
+                !state.isAir() &&
+                !state.is(Blocks.BARRIER)) {
             return true;
         }
         return state.isFaceSturdy(level, pos, direction);
@@ -254,16 +225,16 @@ public class OrnamentBlock
         AttachmentType attachment = state.getValue(ATTACHMENT);
 
         switch (attachment) {
-            case FLOOR:
+            case FLOOR :
                 return canAttachTo(level, pos.below(), Direction.UP);
-            case CEILING:
+            case CEILING :
                 return canAttachTo(level, pos.above(), Direction.DOWN);
-            case WALL:
+            case WALL :
                 Direction facing = state.getValue(FACING);
                 BlockPos wallPos = pos.relative(facing.getOpposite());
                 Direction wallFaceDirection = facing;
                 return canAttachTo(level, wallPos, wallFaceDirection);
-            default:
+            default :
                 return false;
         }
     }
@@ -275,8 +246,7 @@ public class OrnamentBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -286,8 +256,7 @@ public class OrnamentBlock
                 level.scheduleTick(
                         pos,
                         this,
-                        1
-                );
+                        1);
             }
         }
         return super.updateShape(
@@ -296,13 +265,12 @@ public class OrnamentBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
     public void tick(BlockState state, ServerLevel level,
-                     BlockPos pos, Random random) {
+            BlockPos pos, Random random) {
         if (!canSurvive(state, level, pos)) {
             level.destroyBlock(pos, true);
         }
@@ -329,8 +297,7 @@ public class OrnamentBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         AttachmentType attachment = state.getValue(ATTACHMENT);
 
         if (attachment == AttachmentType.CEILING) {
@@ -338,15 +305,15 @@ public class OrnamentBlock
         } else if (attachment == AttachmentType.WALL) {
             Direction facing = state.getValue(FACING);
             switch (facing) {
-                case NORTH:
+                case NORTH :
                     return SHAPE_WALL_NORTH;
-                case SOUTH:
+                case SOUTH :
                     return SHAPE_WALL_SOUTH;
-                case EAST:
+                case EAST :
                     return SHAPE_WALL_EAST;
-                case WEST:
+                case WEST :
                     return SHAPE_WALL_WEST;
-                default:
+                default :
                     return SHAPE_FLOOR;
             }
         } else {
@@ -359,8 +326,7 @@ public class OrnamentBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return getShape(state, level, pos, context);
     }
 
@@ -369,8 +335,7 @@ public class OrnamentBlock
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            BlockPos beaconPos
-    ) {
+            BlockPos beaconPos) {
         if (this.isTinted) {
             BeaconScanContext.markBlocking(level, pos, beaconPos);
             return new float[]{1.0F, 1.0F, 1.0F};
@@ -388,8 +353,7 @@ public class OrnamentBlock
     public int getLightEmission(
             BlockState state,
             BlockGetter level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         if (!state.getValue(LIT)) {
             return 0;
         }
@@ -413,12 +377,9 @@ public class OrnamentBlock
     public boolean skipRendering(
             BlockState state,
             BlockState adjacentBlockState,
-            Direction side
-    ) {
-        return (
-                adjacentBlockState.is(this) ||
-                        super.skipRendering(state, adjacentBlockState, side)
-        );
+            Direction side) {
+        return (adjacentBlockState.is(this) ||
+                super.skipRendering(state, adjacentBlockState, side));
     }
 
     @Override
@@ -428,8 +389,7 @@ public class OrnamentBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -452,21 +412,15 @@ public class OrnamentBlock
                         SoundEvents.DYE_USE,
                         SoundSource.BLOCKS,
                         1.0f,
-                        1.0f
-                );
+                        1.0f);
 
-                TextComponent message =
-                        new TextComponent(
-                                "String colored: " + dyeColor.getDisplayName()
-                        );
+                TextComponent message = new TextComponent(
+                        "String colored: " + dyeColor.getDisplayName());
                 message.withStyle(ChatFormatting.GREEN);
                 if (player instanceof ServerPlayer) {
                     ModMessages.INSTANCE.send(
-                            PacketDistributor.PLAYER.with(() ->
-                                    (ServerPlayer) player
-                            ),
-                            new ActionBarMessagePacket(message)
-                    );
+                            PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
+                            new ActionBarMessagePacket(message));
                 }
 
                 return InteractionResult.SUCCESS;
@@ -485,8 +439,7 @@ public class OrnamentBlock
                         : SoundEvents.STONE_BUTTON_CLICK_ON,
                 SoundSource.BLOCKS,
                 0.3f,
-                1.0f
-        );
+                1.0f);
 
         return InteractionResult.SUCCESS;
     }

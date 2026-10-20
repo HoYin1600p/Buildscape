@@ -173,116 +173,102 @@ public class ModBlockEntities {
                     "smoke_vent_block_entity",
                     () -> BlockEntityType.Builder.of(
                             SmokeVentBlockEntity::new,
-                            ModBlocks.SMOKE_VENT.get()
-                    ).build(null)
-    );
+                            ModBlocks.SMOKE_VENT.get()).build(null));
 
-    public static final RegistryObject<
-            BlockEntityType<CascadeBlockEntity>
-            > CASCADE_BLOCK_ENTITY = BLOCK_ENTITIES.register(
-            "cascade_block_entity",
-            () ->
-                    BlockEntityType.Builder.of(
+    public static final RegistryObject<BlockEntityType<CascadeBlockEntity>> CASCADE_BLOCK_ENTITY = BLOCK_ENTITIES
+            .register(
+                    "cascade_block_entity",
+                    () -> BlockEntityType.Builder.of(
                             CascadeBlockEntity::new,
                             ModBlocks.CASCADE_BLOCK.get(),
-                            ModBlocks.CASCADE_BLOCK_NO_MIST.get()
-                    ).build(null)
-    );
+                            ModBlocks.CASCADE_BLOCK_NO_MIST.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<MuffBlockEntity>> MUFF_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "muff_block_entity",
             () -> BlockEntityType.Builder.of(
                     MuffBlockEntity::new,
-                    ModBlocks.MUFF_BLOCK.get()
-            ).build(null)
-    );
+                    ModBlocks.MUFF_BLOCK.get()).build(null));
 
-    public static final RegistryObject<BlockEntityType<GlassJarBlockEntity>> GLASS_JAR_BLOCK_ENTITY = BLOCK_ENTITIES.register(
-            "glass_jar_block_entity",
-            () -> BlockEntityType.Builder.of(
-                    GlassJarBlockEntity::new,
-                    ModBlocks.GLASS_JAR.get(),
-                    ModBlocks.WHITE_GLASS_JAR.get(),
-                    ModBlocks.ORANGE_GLASS_JAR.get(),
-                    ModBlocks.MAGENTA_GLASS_JAR.get(),
-                    ModBlocks.LIGHT_BLUE_GLASS_JAR.get(),
-                    ModBlocks.YELLOW_GLASS_JAR.get(),
-                    ModBlocks.LIME_GLASS_JAR.get(),
-                    ModBlocks.PINK_GLASS_JAR.get(),
-                    ModBlocks.GRAY_GLASS_JAR.get(),
-                    ModBlocks.LIGHT_GRAY_GLASS_JAR.get(),
-                    ModBlocks.CYAN_GLASS_JAR.get(),
-                    ModBlocks.PURPLE_GLASS_JAR.get(),
-                    ModBlocks.BLUE_GLASS_JAR.get(),
-                    ModBlocks.BROWN_GLASS_JAR.get(),
-                    ModBlocks.GREEN_GLASS_JAR.get(),
-                    ModBlocks.RED_GLASS_JAR.get(),
-                    ModBlocks.BLACK_GLASS_JAR.get(),
-                    ModBlocks.TINTED_GLASS_JAR.get(),
-                    ModBlocks.GOLDEN_JAR.get()
-            ).build(null)
-    );
+    public static final RegistryObject<BlockEntityType<GlassJarBlockEntity>> GLASS_JAR_BLOCK_ENTITY = BLOCK_ENTITIES
+            .register(
+                    "glass_jar_block_entity",
+                    () -> BlockEntityType.Builder.of(
+                            GlassJarBlockEntity::new,
+                            ModBlocks.GLASS_JAR.get(),
+                            ModBlocks.WHITE_GLASS_JAR.get(),
+                            ModBlocks.ORANGE_GLASS_JAR.get(),
+                            ModBlocks.MAGENTA_GLASS_JAR.get(),
+                            ModBlocks.LIGHT_BLUE_GLASS_JAR.get(),
+                            ModBlocks.YELLOW_GLASS_JAR.get(),
+                            ModBlocks.LIME_GLASS_JAR.get(),
+                            ModBlocks.PINK_GLASS_JAR.get(),
+                            ModBlocks.GRAY_GLASS_JAR.get(),
+                            ModBlocks.LIGHT_GRAY_GLASS_JAR.get(),
+                            ModBlocks.CYAN_GLASS_JAR.get(),
+                            ModBlocks.PURPLE_GLASS_JAR.get(),
+                            ModBlocks.BLUE_GLASS_JAR.get(),
+                            ModBlocks.BROWN_GLASS_JAR.get(),
+                            ModBlocks.GREEN_GLASS_JAR.get(),
+                            ModBlocks.RED_GLASS_JAR.get(),
+                            ModBlocks.BLACK_GLASS_JAR.get(),
+                            ModBlocks.TINTED_GLASS_JAR.get(),
+                            ModBlocks.GOLDEN_JAR.get()).build(null));
 
-    public static final RegistryObject<BlockEntityType<BuildersWorkbenchBlockEntity>> BUILDERS_WORKBENCH_BE =
-            BLOCK_ENTITIES.register("builders_workbench",
+    public static final RegistryObject<BlockEntityType<BuildersWorkbenchBlockEntity>> BUILDERS_WORKBENCH_BE = BLOCK_ENTITIES
+            .register("builders_workbench",
                     () -> BlockEntityType.Builder.of(
                             BuildersWorkbenchBlockEntity::new,
-                            ModBlocks.BUILDERS_WORKBENCH.get()
-                    ).build(null));
+                            ModBlocks.BUILDERS_WORKBENCH.get()).build(null));
 
-    public static final RegistryObject<BlockEntityType<CopperChestBlockEntity>> COPPER_CHEST =
-            BLOCK_ENTITIES.register("copper_chest",
-                    () -> BlockEntityType.Builder.of(
-                            CopperChestBlockEntity::new,
-                            ModBlocks.COPPER_CHEST.get(),
-                            ModBlocks.EXPOSED_COPPER_CHEST.get(),
-                            ModBlocks.WEATHERED_COPPER_CHEST.get(),
-                            ModBlocks.OXIDIZED_COPPER_CHEST.get(),
-                            ModBlocks.WAXED_COPPER_CHEST.get(),
-                            ModBlocks.WAXED_EXPOSED_COPPER_CHEST.get(),
-                            ModBlocks.WAXED_WEATHERED_COPPER_CHEST.get(),
-                            ModBlocks.WAXED_OXIDIZED_COPPER_CHEST.get()
-                    ).build(null));
+    public static final RegistryObject<BlockEntityType<CopperChestBlockEntity>> COPPER_CHEST = BLOCK_ENTITIES.register(
+            "copper_chest",
+            () -> BlockEntityType.Builder.of(
+                    CopperChestBlockEntity::new,
+                    ModBlocks.COPPER_CHEST.get(),
+                    ModBlocks.EXPOSED_COPPER_CHEST.get(),
+                    ModBlocks.WEATHERED_COPPER_CHEST.get(),
+                    ModBlocks.OXIDIZED_COPPER_CHEST.get(),
+                    ModBlocks.WAXED_COPPER_CHEST.get(),
+                    ModBlocks.WAXED_EXPOSED_COPPER_CHEST.get(),
+                    ModBlocks.WAXED_WEATHERED_COPPER_CHEST.get(),
+                    ModBlocks.WAXED_OXIDIZED_COPPER_CHEST.get()).build(null));
 
-    public static final RegistryObject<BlockEntityType<PotentSulfurBlockEntity>> POTENT_SULFUR =
-            BLOCK_ENTITIES.register("potent_sulfur",
+    public static final RegistryObject<BlockEntityType<PotentSulfurBlockEntity>> POTENT_SULFUR = BLOCK_ENTITIES
+            .register("potent_sulfur",
                     () -> BlockEntityType.Builder.of(
                             PotentSulfurBlockEntity::new,
-                            ModBlocks.POTENT_SULFUR.get()
-                    ).build(null));
+                            ModBlocks.POTENT_SULFUR.get()).build(null));
 
-    public static final RegistryObject<BlockEntityType<ShelfBlockEntity>> SHELF =
-            BLOCK_ENTITIES.register("shelf",
-                    () -> BlockEntityType.Builder.of(
-                            ShelfBlockEntity::new,
-                            ModBlocks.OAK_SHELF.get(),
-                            ModBlocks.SPRUCE_SHELF.get(),
-                            ModBlocks.BIRCH_SHELF.get(),
-                            ModBlocks.JUNGLE_SHELF.get(),
-                            ModBlocks.ACACIA_SHELF.get(),
-                            ModBlocks.DARK_OAK_SHELF.get(),
-                            ModBlocks.MANGROVE_SHELF.get(),
-                            ModBlocks.CHERRY_SHELF.get(),
-                            ModBlocks.CRIMSON_SHELF.get(),
-                            ModBlocks.WARPED_SHELF.get(),
-                            ModBlocks.BAMBOO_SHELF.get(),
-                            ModBlocks.STRIPPED_BAMBOO_SHELF.get(),
-                            ModBlocks.PALE_OAK_SHELF.get(),
-                            ModBlocks.POPLAR_SHELF.get()
-                    ).build(null));
+    public static final RegistryObject<BlockEntityType<ShelfBlockEntity>> SHELF = BLOCK_ENTITIES.register("shelf",
+            () -> BlockEntityType.Builder.of(
+                    ShelfBlockEntity::new,
+                    ModBlocks.OAK_SHELF.get(),
+                    ModBlocks.SPRUCE_SHELF.get(),
+                    ModBlocks.BIRCH_SHELF.get(),
+                    ModBlocks.JUNGLE_SHELF.get(),
+                    ModBlocks.ACACIA_SHELF.get(),
+                    ModBlocks.DARK_OAK_SHELF.get(),
+                    ModBlocks.MANGROVE_SHELF.get(),
+                    ModBlocks.CHERRY_SHELF.get(),
+                    ModBlocks.CRIMSON_SHELF.get(),
+                    ModBlocks.WARPED_SHELF.get(),
+                    ModBlocks.BAMBOO_SHELF.get(),
+                    ModBlocks.STRIPPED_BAMBOO_SHELF.get(),
+                    ModBlocks.PALE_OAK_SHELF.get(),
+                    ModBlocks.POPLAR_SHELF.get()).build(null));
 
-    public static final RegistryObject<BlockEntityType<TrophyBlockEntity>> TROPHY_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("trophy_block_entity",
+    public static final RegistryObject<BlockEntityType<TrophyBlockEntity>> TROPHY_BLOCK_ENTITY = BLOCK_ENTITIES
+            .register("trophy_block_entity",
                     () -> BlockEntityType.Builder.of(
                             TrophyBlockEntity::new,
                             Trophies.getAll().stream()
                                     .map(TrophyDefinition::getBlock)
                                     .filter(Objects::nonNull)
-                                    .toArray(Block[]::new)
-                    ).build(null));
+                                    .toArray(Block[]::new))
+                            .build(null));
 
-    public static final RegistryObject<BlockEntityType<HollowLogBlockEntity>> HOLLOW_LOG_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("hollow_log",
+    public static final RegistryObject<BlockEntityType<HollowLogBlockEntity>> HOLLOW_LOG_BLOCK_ENTITY = BLOCK_ENTITIES
+            .register("hollow_log",
                     () -> BlockEntityType.Builder.of(
                             HollowLogBlockEntity::new,
                             ModBlocks.HOLLOW_OAK_LOG.get(),
@@ -311,6 +297,5 @@ public class ModBlockEntities {
                             ModBlocks.STRIPPED_HOLLOW_PALE_OAK_LOG.get(),
                             ModBlocks.HOLLOW_CHERRY_LOG.get(),
                             ModBlocks.STRIPPED_HOLLOW_CHERRY_LOG.get(),
-                            ModBlocks.HOLLOW_STEEL_PIPE.get()
-                    ).build(null));
+                            ModBlocks.HOLLOW_STEEL_PIPE.get()).build(null));
 }

@@ -19,7 +19,8 @@ public final class StonecuttingCycleValidator {
     private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
     private final Set<String> registeredIds = new HashSet<>();
 
-    private record Edge(String input, String output, int count, String recipeId) {}
+    private record Edge(String input, String output, int count, String recipeId) {
+    }
 
     // Cycles through tag inputs are not detected by either the generator or runtime validation.
     public static List<String> inputNodes(JsonElement ingredient) {
@@ -64,7 +65,8 @@ public final class StonecuttingCycleValidator {
         outgoing.values().removeIf(List::isEmpty);
     }
 
-    private record SearchNode(String item, boolean gain) {}
+    private record SearchNode(String item, boolean gain) {
+    }
 
     /** Adds a candidate to an accepted graph that has no gain cycles. */
     public void addRecipeChecked(String id, List<String> inputs, String output, int count) {

@@ -42,7 +42,7 @@ public class HollowLogBlockEntity extends SyncedBlockEntity {
         super.onLoad();
         if (level != null && !level.isClientSide
                 && (getBlockState().getBlock() instanceof HollowPipeBlock
-                || getBlockState().getBlock() instanceof HollowLogBlock)) {
+                        || getBlockState().getBlock() instanceof HollowLogBlock)) {
             HollowPipeTransportManager.markDirty(level, worldPosition);
         }
     }
@@ -184,14 +184,17 @@ public class HollowLogBlockEntity extends SyncedBlockEntity {
                 if (blockEntity.lavaTicks > 0 && blockEntity.lavaTicks <= 100 && blockEntity.lavaTicks % 20 == 0) {
                     level.playSound(null, pos, SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS, 0.8F, 1.0F);
                     if (level instanceof ServerLevel serverLevel) {
-                        serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 4, 0.3, 0.2, 0.3, 0.02);
+                        serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.8,
+                                pos.getZ() + 0.5, 4, 0.3, 0.2, 0.3, 0.02);
                     }
                 }
                 if (blockEntity.lavaTicks <= 0) {
                     level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, 1.0F);
                     if (level instanceof ServerLevel serverLevel) {
-                        serverLevel.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 10, 0.3, 0.3, 0.3, 0.1);
-                        serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 5, 0.2, 0.2, 0.2, 0.05);
+                        serverLevel.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5,
+                                pos.getZ() + 0.5, 10, 0.3, 0.3, 0.3, 0.1);
+                        serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.5,
+                                pos.getZ() + 0.5, 5, 0.2, 0.2, 0.2, 0.05);
                     }
 
                     boolean hadGlass = false;
@@ -271,7 +274,7 @@ public class HollowLogBlockEntity extends SyncedBlockEntity {
         }
         if (level != null && level.isClientSide
                 && (getBlockState().getBlock() instanceof HollowPipeBlock
-                || getBlockState().getBlock() instanceof HollowLogBlock)
+                        || getBlockState().getBlock() instanceof HollowLogBlock)
                 && !previousFlow.equals(pipeFlowState)) {
             for (Direction direction : Direction.values()) {
                 if (direction == Direction.UP) {

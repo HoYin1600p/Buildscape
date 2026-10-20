@@ -29,8 +29,7 @@ public class GlassJarItemRenderer extends BlockEntityWithoutLevelRenderer {
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (stack.getItem() instanceof BlockItem blockItem) {
             BlockState state = blockItem.getBlock().defaultBlockState();
 

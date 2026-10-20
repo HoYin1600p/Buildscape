@@ -79,11 +79,10 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             ProfilerFiller preparationsProfiler,
             ProfilerFiller reloadProfiler,
             Executor backgroundExecutor,
-            Executor gameExecutor
-    ) {
+            Executor gameExecutor) {
         return CompletableFuture.supplyAsync(() -> new Prepared(
-                        prepareRecipes(resourceManager, preparationsProfiler),
-                        loadDisabledIds(resourceManager)), backgroundExecutor)
+                prepareRecipes(resourceManager, preparationsProfiler),
+                loadDisabledIds(resourceManager)), backgroundExecutor)
                 .thenCompose(barrier::wait)
                 .thenAcceptAsync(prepared -> applyRecipes(prepared.recipes(), prepared.disabledIds(), reloadProfiler),
                         gameExecutor);
@@ -107,11 +106,13 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                 }
                 try {
                     for (Resource resource : resourceManager.getResources(location)) {
-                        try (resource; Reader reader = new InputStreamReader(
-                                resource.getInputStream(), StandardCharsets.UTF_8)) {
+                        try (resource;
+                                Reader reader = new InputStreamReader(
+                                        resource.getInputStream(), StandardCharsets.UTF_8)) {
                             readDisabledIds(JsonParser.parseReader(reader), disabled, location);
                         } catch (Exception e) {
-                            BuildScape.LOGGER.warn("BDRE Loader: Could not read disabled recipe list [{}]", location, e);
+                            BuildScape.LOGGER.warn("BDRE Loader: Could not read disabled recipe list [{}]", location,
+                                    e);
                         }
                     }
                 } catch (Exception e) {
@@ -153,7 +154,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             try {
                 if (resourceManager.hasResource(location)) {
                     try (Resource resource = resourceManager.getResource(location);
-                         InputStream stream = resource.getInputStream()) {
+                            InputStream stream = resource.getInputStream()) {
                         rawCategoryData.put(category, stream.readAllBytes());
                     }
                 }
@@ -168,12 +169,13 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         ResourceLocation bundledLocation = new ResourceLocation(BuildScape.MODID, "recipes_pack/recipes.bscb");
         if (resourceManager.hasResource(bundledLocation)) {
             try (Resource res = resourceManager.getResource(bundledLocation);
-                 InputStream stream = res.getInputStream()) {
+                    InputStream stream = res.getInputStream()) {
                 List<Recipe<?>> bundled = BinaryRecipeCache.loadCacheFromStream(stream, contentHash);
                 if (!bundled.isEmpty()) {
                     List<Recipe<?>> recipes = appendRuntimeRecipes(rawCategoryData, runtimeCategories, bundled, true);
                     profiler.pop();
-                    BuildScape.LOGGER.info("BDRE Loader: Loaded {} recipes from binary cache in {} ms.", recipes.size(), System.currentTimeMillis() - startTime);
+                    BuildScape.LOGGER.info("BDRE Loader: Loaded {} recipes from binary cache in {} ms.", recipes.size(),
+                            System.currentTimeMillis() - startTime);
                     return recipes;
                 }
             } catch (Exception e) {
@@ -187,12 +189,14 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             if (!cached.isEmpty()) {
                 List<Recipe<?>> recipes = appendRuntimeRecipes(rawCategoryData, runtimeCategories, cached, false);
                 profiler.pop();
-                BuildScape.LOGGER.info("BDRE Loader: Loaded {} recipes from binary cache in {} ms.", recipes.size(), System.currentTimeMillis() - startTime);
+                BuildScape.LOGGER.info("BDRE Loader: Loaded {} recipes from binary cache in {} ms.", recipes.size(),
+                        System.currentTimeMillis() - startTime);
                 return recipes;
             }
         }
 
-        BuildScape.LOGGER.debug("BDRE Loader: Cache MISS/Invalid. Parallel streaming and compiling category source files...");
+        BuildScape.LOGGER
+                .debug("BDRE Loader: Cache MISS/Invalid. Parallel streaming and compiling category source files...");
         Map<String, List<Recipe<?>>> compiledByCategory = new ConcurrentHashMap<>();
 
         rawCategoryData.entrySet().parallelStream().forEach(entry -> {
@@ -219,16 +223,18 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         }
 
         long elapsed = System.currentTimeMillis() - startTime;
-        BuildScape.LOGGER.info("BDRE Loader: Successfully compiled {} recipes across {} categories in {} ms.", recipes.size(), rawCategoryData.size(), elapsed);
+        BuildScape.LOGGER.info("BDRE Loader: Successfully compiled {} recipes across {} categories in {} ms.",
+                recipes.size(), rawCategoryData.size(), elapsed);
 
         profiler.pop();
         return recipes;
     }
 
-    record CompiledRecipes(List<Recipe<?>> recipes, List<Recipe<?>> cacheableRecipes) { }
+    record CompiledRecipes(List<Recipe<?>> recipes, List<Recipe<?>> cacheableRecipes) {
+    }
 
     static CompiledRecipes validateCompiledRecipes(Map<String, List<Recipe<?>>> compiledByCategory,
-                                                   Set<String> runtimeCategories) {
+            Set<String> runtimeCategories) {
         List<Recipe<?>> ordered = new ArrayList<>();
         Set<Recipe<?>> cacheable = new HashSet<>();
         for (String category : CATEGORIES) {
@@ -284,8 +290,10 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
     static List<Recipe<?>> combineRuntimeRecipes(List<Recipe<?>> cachedRecipes, List<Recipe<?>> runtimeRecipes,
             boolean trustedBundledCache) {
-        return combineRuntimeRecipes(cachedRecipes, runtimeRecipes, trustedBundledCache, StonecuttingCycleValidator::validate,
-                message -> BuildScape.LOGGER.warn("BDRE Loader: Cached recipes contain a gain cycle; filtering cache: {}", message));
+        return combineRuntimeRecipes(cachedRecipes, runtimeRecipes, trustedBundledCache,
+                StonecuttingCycleValidator::validate,
+                message -> BuildScape.LOGGER
+                        .warn("BDRE Loader: Cached recipes contain a gain cycle; filtering cache: {}", message));
     }
 
     static List<Recipe<?>> combineRuntimeRecipes(List<Recipe<?>> cachedRecipes, List<Recipe<?>> runtimeRecipes,
@@ -319,7 +327,8 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         }
         if (runtimeRecipes.isEmpty()) {
             return new ArrayList<>(recipesById.values()).equals(cachedRecipes)
-                    ? cachedRecipes : new ArrayList<>(recipesById.values());
+                    ? cachedRecipes
+                    : new ArrayList<>(recipesById.values());
         }
         Map<ResourceLocation, Recipe<?>> additions = new LinkedHashMap<>();
         for (Recipe<?> recipe : runtimeRecipes) {
@@ -383,7 +392,8 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                 inputs.addAll(StonecuttingCycleValidator.inputNodes(ingredient.toJson()));
             }
         } catch (RuntimeException e) {
-            BuildScape.LOGGER.debug("BDRE Loader: Could not serialize ingredients for recipe [{}]; using expanded items.",
+            BuildScape.LOGGER.debug(
+                    "BDRE Loader: Could not serialize ingredients for recipe [{}]; using expanded items.",
                     recipe.getId(), e);
             inputs.clear();
             for (Ingredient ingredient : recipe.getIngredients()) {
@@ -395,8 +405,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         String output = ForgeRegistries.ITEMS.getKey(result.getItem()).toString();
         if (checked) {
             cycles.addRecipeChecked(recipe.getId().toString(), inputs, output, result.getCount());
-        }
-        else {
+        } else {
             cycles.addRecipe(recipe.getId().toString(), inputs, output, result.getCount());
         }
     }

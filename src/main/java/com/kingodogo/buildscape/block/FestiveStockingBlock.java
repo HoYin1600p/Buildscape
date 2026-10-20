@@ -44,15 +44,16 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.List;
 
 public class FestiveStockingBlock
-        extends WaterloggedBlock
-        implements EntityBlock, SimpleWaterloggedBlock {
+        extends
+            WaterloggedBlock
+        implements
+            EntityBlock,
+            SimpleWaterloggedBlock {
 
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty FLIPPED = BooleanProperty.create(
-            "flipped"
-    );
+            "flipped");
 
     private static final VoxelShape SHAPE_NORTH = Block.box(
             0.0D,
@@ -60,63 +61,55 @@ public class FestiveStockingBlock
             15.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_SOUTH = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             16.0D,
-            1.0D
-    );
+            1.0D);
     private static final VoxelShape SHAPE_EAST = Block.box(
             0.0D,
             0.0D,
             0.0D,
             1.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_WEST = Block.box(
             15.0D,
             0.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_UP = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             1.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape SHAPE_DOWN = Block.box(
             0.0D,
             15.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
 
     private final String colorVariant;
 
     public FestiveStockingBlock(
             BlockBehaviour.Properties properties,
-            String color
-    ) {
+            String color) {
         super(properties);
         this.colorVariant = color;
         this.registerDefaultState(
                 this.stateDefinition.any()
                         .setValue(FACING, Direction.NORTH)
                         .setValue(FLIPPED, false)
-                        .setValue(WATERLOGGED, false)
-        );
+                        .setValue(WATERLOGGED, false));
     }
 
     public String getColorVariant() {
@@ -125,8 +118,7 @@ public class FestiveStockingBlock
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
+            StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, FLIPPED, WATERLOGGED);
     }
 
@@ -172,8 +164,7 @@ public class FestiveStockingBlock
     private boolean canAttachTo(
             LevelReader level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         BlockState state = level.getBlockState(pos);
         return state.isFaceSturdy(level, pos, direction);
     }
@@ -185,8 +176,7 @@ public class FestiveStockingBlock
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -203,8 +193,7 @@ public class FestiveStockingBlock
                 neighborState,
                 level,
                 pos,
-                neighborPos
-        );
+                neighborPos);
     }
 
     @Override
@@ -212,23 +201,22 @@ public class FestiveStockingBlock
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         Direction facing = state.getValue(FACING);
         switch (facing) {
-            case NORTH:
+            case NORTH :
                 return SHAPE_NORTH;
-            case SOUTH:
+            case SOUTH :
                 return SHAPE_SOUTH;
-            case EAST:
+            case EAST :
                 return SHAPE_EAST;
-            case WEST:
+            case WEST :
                 return SHAPE_WEST;
-            case UP:
+            case UP :
                 return SHAPE_UP;
-            case DOWN:
+            case DOWN :
                 return SHAPE_DOWN;
-            default:
+            default :
                 return SHAPE_NORTH;
         }
     }
@@ -240,8 +228,7 @@ public class FestiveStockingBlock
             BlockPos pos,
             Block block,
             BlockPos fromPos,
-            boolean isMoving
-    ) {
+            boolean isMoving) {
         if (!canSurvive(state, level, pos)) {
             level.destroyBlock(pos, true);
         }
@@ -258,13 +245,10 @@ public class FestiveStockingBlock
     }
 
     @Override
-    public <
-            T extends BlockEntity
-            > BlockEntityTicker<T> getTicker(
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
             Level level,
             BlockState state,
-            BlockEntityType<T> type
-    ) {
+            BlockEntityType<T> type) {
         return null;
     }
 
@@ -277,12 +261,10 @@ public class FestiveStockingBlock
     public int getAnalogOutputSignal(
             BlockState state,
             Level level,
-            BlockPos pos
-    ) {
+            BlockPos pos) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
+            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
             return stockingEntity.getComparatorOutput();
         }
         return 0;
@@ -295,19 +277,15 @@ public class FestiveStockingBlock
             BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
-    ) {
+            BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
+            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
             ItemStack heldItem = player.getItemInHand(hand);
 
-            if (
-                    heldItem.isEmpty() &&
-                            !player.isShiftKeyDown() &&
-                            !stockingEntity.isEmpty()
-            ) {
+            if (heldItem.isEmpty() &&
+                    !player.isShiftKeyDown() &&
+                    !stockingEntity.isEmpty()) {
                 if (!level.isClientSide) {
                     ItemStack stored = stockingEntity.getStoredItem().copy();
                     stockingEntity.setStoredItem(ItemStack.EMPTY, true);
@@ -318,8 +296,7 @@ public class FestiveStockingBlock
                                 pos.getX() + 0.5,
                                 pos.getY() + 0.5,
                                 pos.getZ() + 0.5,
-                                stored
-                        );
+                                stored);
                         itemEntity.setDefaultPickUpDelay();
                         level.addFreshEntity(itemEntity);
                     }
@@ -329,8 +306,7 @@ public class FestiveStockingBlock
                             SoundEvents.ITEM_FRAME_REMOVE_ITEM,
                             SoundSource.BLOCKS,
                             0.5f,
-                            1.0f
-                    );
+                            1.0f);
                     level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
@@ -346,18 +322,15 @@ public class FestiveStockingBlock
                             SoundEvents.ITEM_FRAME_ROTATE_ITEM,
                             SoundSource.BLOCKS,
                             1.0f,
-                            1.0f
-                    );
+                            1.0f);
                     level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
 
-            if (
-                    player.isShiftKeyDown() &&
-                            !heldItem.isEmpty() &&
-                            !stockingEntity.isEmpty()
-            ) {
+            if (player.isShiftKeyDown() &&
+                    !heldItem.isEmpty() &&
+                    !stockingEntity.isEmpty()) {
                 if (!level.isClientSide) {
                     ItemStack stored = stockingEntity.getStoredItem().copy();
                     stockingEntity.setStoredItem(ItemStack.EMPTY, true);
@@ -368,8 +341,7 @@ public class FestiveStockingBlock
                                 pos.getX() + 0.5,
                                 pos.getY() + 0.5,
                                 pos.getZ() + 0.5,
-                                stored
-                        );
+                                stored);
                         itemEntity.setDefaultPickUpDelay();
                         level.addFreshEntity(itemEntity);
                     }
@@ -379,8 +351,7 @@ public class FestiveStockingBlock
                             SoundEvents.ITEM_FRAME_REMOVE_ITEM,
                             SoundSource.BLOCKS,
                             0.5f,
-                            1.0f
-                    );
+                            1.0f);
                     level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
@@ -388,8 +359,7 @@ public class FestiveStockingBlock
 
             if (!heldItem.isEmpty()) {
                 if (heldItem.getItem() instanceof BlockItem) {
-                    BlockItem blockItem =
-                            (BlockItem) heldItem.getItem();
+                    BlockItem blockItem = (BlockItem) heldItem.getItem();
                     if (blockItem.getBlock() instanceof FestiveStockingBlock) {
                         return InteractionResult.PASS;
                     }
@@ -416,15 +386,12 @@ public class FestiveStockingBlock
                                 ModSounds.DECORATED_POT_INSERT_ITEM.get(),
                                 SoundSource.BLOCKS,
                                 0.5f,
-                                1.0f
-                        );
+                                1.0f);
                         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
-                } else if (
-                        ItemStack.isSameItemSameTags(stored, heldItem) &&
-                                stored.getCount() < stored.getMaxStackSize()
-                ) {
+                } else if (ItemStack.isSameItemSameTags(stored, heldItem) &&
+                        stored.getCount() < stored.getMaxStackSize()) {
                     if (!level.isClientSide) {
                         int maxStack = stored.getMaxStackSize();
                         int spaceAvailable = maxStack - stored.getCount();
@@ -444,8 +411,7 @@ public class FestiveStockingBlock
                                 ModSounds.DECORATED_POT_INSERT_ITEM.get(),
                                 SoundSource.BLOCKS,
                                 0.5f,
-                                1.0f
-                        );
+                                1.0f);
                         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
@@ -457,8 +423,7 @@ public class FestiveStockingBlock
                                 ModSounds.DECORATED_POT_INSERT_FAIL.get(),
                                 SoundSource.BLOCKS,
                                 0.5f,
-                                1.0f
-                        );
+                                1.0f);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
@@ -473,20 +438,15 @@ public class FestiveStockingBlock
             Level level,
             BlockPos pos,
             BlockState state,
-            Player player
-    ) {
+            Player player) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
+            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
             if (!stockingEntity.isEmpty()) {
                 ItemStack tool = player.getMainHandItem();
-                boolean hasSilkTouch =
-                        EnchantmentHelper.getItemEnchantmentLevel(
-                                Enchantments.SILK_TOUCH,
-                                tool
-                        ) >
-                                0;
+                boolean hasSilkTouch = EnchantmentHelper.getItemEnchantmentLevel(
+                        Enchantments.SILK_TOUCH,
+                        tool) > 0;
 
                 if (!level.isClientSide && (!hasSilkTouch || player.isCreative())) {
                     ItemStack stored = stockingEntity.getStoredItem().copy();
@@ -495,8 +455,7 @@ public class FestiveStockingBlock
                             pos.getX() + 0.5,
                             pos.getY() + 0.5,
                             pos.getZ() + 0.5,
-                            stored
-                    );
+                            stored);
                     itemEntity.setDefaultPickUpDelay();
                     level.addFreshEntity(itemEntity);
                 }
@@ -516,8 +475,7 @@ public class FestiveStockingBlock
                     pos.getX() + 0.5,
                     pos.getY() + 0.5,
                     pos.getZ() + 0.5,
-                    stockingEntity.getStoredItem().copy()
-            );
+                    stockingEntity.getStoredItem().copy());
             itemEntity.setDefaultPickUpDelay();
             level.addFreshEntity(itemEntity);
         }
@@ -527,33 +485,24 @@ public class FestiveStockingBlock
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         LootContext ctx = builder
                 .withParameter(
                         LootContextParams.BLOCK_STATE,
-                        state
-                )
+                        state)
                 .create(
-                        LootContextParamSets.BLOCK
-                );
+                        LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(
-                LootContextParams.TOOL
-        );
+                LootContextParams.TOOL);
         BlockEntity be = ctx.getParamOrNull(
-                LootContextParams.BLOCK_ENTITY
-        );
+                LootContextParams.BLOCK_ENTITY);
         ItemStack result = new ItemStack(this);
 
-        if (
-                tool != null &&
-                        !tool.isEmpty() &&
-                        EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) >
-                                0 &&
-                        be instanceof FestiveStockingBlockEntity
-        ) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
+        if (tool != null &&
+                !tool.isEmpty() &&
+                EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0 &&
+                be instanceof FestiveStockingBlockEntity) {
+            FestiveStockingBlockEntity stockingEntity = (FestiveStockingBlockEntity) be;
             if (!stockingEntity.isEmpty()) {
                 CompoundTag tag = result.getOrCreateTag();
                 CompoundTag storedTag = new CompoundTag();

@@ -42,7 +42,8 @@ public class BubbleColumnHandler {
         return state.is(Blocks.SOUL_SAND) || state.is(Blocks.MAGMA_BLOCK);
     }
 
-    public static void handleEntityInside(Level level, BlockPos pos, BlockState state, Entity entity, PipeFlowState flowState) {
+    public static void handleEntityInside(Level level, BlockPos pos, BlockState state, Entity entity,
+            PipeFlowState flowState) {
         if (entity == null || flowState == null || !flowState.hasWater()) {
             return;
         }
@@ -155,12 +156,12 @@ public class BubbleColumnHandler {
                     SoundEvents.WATER_AMBIENT,
                     SoundSource.BLOCKS,
                     0.1F, 1.2F + (random.nextFloat() - random.nextFloat()) * 0.2F,
-                    false
-            );
+                    false);
         }
     }
 
-    private static void spawnDirectionalBubble(Level level, BlockPos pos, Random random, Direction dir, double waterTopY) {
+    private static void spawnDirectionalBubble(Level level, BlockPos pos, Random random, Direction dir,
+            double waterTopY) {
         double px, py, pz;
         double vx = 0.0D, vy = 0.0D, vz = 0.0D;
         double speed = 0.08D + random.nextDouble() * 0.04D;
@@ -219,7 +220,9 @@ public class BubbleColumnHandler {
                 vy = speed;
                 vz = jitter;
             }
-            default -> { return; }
+            default -> {
+                return;
+            }
         }
 
         level.addParticle(ParticleTypes.BUBBLE, px, py, pz, vx, vy, vz);
@@ -283,8 +286,7 @@ public class BubbleColumnHandler {
                         SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT,
                         SoundSource.BLOCKS,
                         0.2F, 1.0F + (random.nextFloat() - random.nextFloat()) * 0.2F,
-                        false
-                );
+                        false);
             }
         } else if (bubbleState == BubbleColumnState.DOWN) {
             for (int i = 0; i < 2; i++) {
@@ -300,8 +302,7 @@ public class BubbleColumnHandler {
                         SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_AMBIENT,
                         SoundSource.BLOCKS,
                         0.2F, 1.0F + (random.nextFloat() - random.nextFloat()) * 0.2F,
-                        false
-                );
+                        false);
             }
         }
     }

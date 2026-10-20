@@ -51,131 +51,172 @@ public class CopperOxidationHandler {
             if (initialized) {
                 return;
             }
-            registerChain(ModBlocks.CHISELED_COPPER, ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.OXIDIZED_CHISELED_COPPER);
+            registerChain(ModBlocks.CHISELED_COPPER, ModBlocks.EXPOSED_CHISELED_COPPER,
+                    ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.OXIDIZED_CHISELED_COPPER);
             registerWaxPair(ModBlocks.CHISELED_COPPER, ModBlocks.WAXED_CHISELED_COPPER);
             registerWaxPair(ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WAXED_EXPOSED_CHISELED_COPPER);
             registerWaxPair(ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.WAXED_WEATHERED_CHISELED_COPPER);
             registerWaxPair(ModBlocks.OXIDIZED_CHISELED_COPPER, ModBlocks.WAXED_OXIDIZED_CHISELED_COPPER);
 
-            registerChain(ModBlocks.COPPER_GRATE, ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.OXIDIZED_COPPER_GRATE);
+            registerChain(ModBlocks.COPPER_GRATE, ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WEATHERED_COPPER_GRATE,
+                    ModBlocks.OXIDIZED_COPPER_GRATE);
             registerWaxPair(ModBlocks.COPPER_GRATE, ModBlocks.WAXED_COPPER_GRATE);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WAXED_EXPOSED_COPPER_GRATE);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.WAXED_WEATHERED_COPPER_GRATE);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_GRATE, ModBlocks.WAXED_OXIDIZED_COPPER_GRATE);
 
-            registerChain(ModBlocks.COPPER_BULB, ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.OXIDIZED_COPPER_BULB);
+            registerChain(ModBlocks.COPPER_BULB, ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WEATHERED_COPPER_BULB,
+                    ModBlocks.OXIDIZED_COPPER_BULB);
             registerWaxPair(ModBlocks.COPPER_BULB, ModBlocks.WAXED_COPPER_BULB);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WAXED_EXPOSED_COPPER_BULB);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.WAXED_WEATHERED_COPPER_BULB);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_BULB, ModBlocks.WAXED_OXIDIZED_COPPER_BULB);
 
-            registerChain(ModBlocks.COPPER_ROD, ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.OXIDIZED_COPPER_ROD);
+            registerChain(ModBlocks.COPPER_ROD, ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WEATHERED_COPPER_ROD,
+                    ModBlocks.OXIDIZED_COPPER_ROD);
             registerWaxPair(ModBlocks.COPPER_ROD, ModBlocks.WAXED_COPPER_ROD);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WAXED_EXPOSED_COPPER_ROD);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.WAXED_WEATHERED_COPPER_ROD);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_ROD, ModBlocks.WAXED_OXIDIZED_COPPER_ROD);
 
-            registerChain(ModBlocks.COPPER_LANTERN, ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.OXIDIZED_COPPER_LANTERN);
+            registerChain(ModBlocks.COPPER_LANTERN, ModBlocks.EXPOSED_COPPER_LANTERN,
+                    ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.OXIDIZED_COPPER_LANTERN);
             registerWaxPair(ModBlocks.COPPER_LANTERN, ModBlocks.WAXED_COPPER_LANTERN);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WAXED_EXPOSED_COPPER_LANTERN);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.WAXED_WEATHERED_COPPER_LANTERN);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_LANTERN, ModBlocks.WAXED_OXIDIZED_COPPER_LANTERN);
 
-            registerChain(ModBlocks.COPPER_DOOR, ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.OXIDIZED_COPPER_DOOR);
+            registerChain(ModBlocks.COPPER_DOOR, ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WEATHERED_COPPER_DOOR,
+                    ModBlocks.OXIDIZED_COPPER_DOOR);
             registerWaxPair(ModBlocks.COPPER_DOOR, ModBlocks.WAXED_COPPER_DOOR);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WAXED_EXPOSED_COPPER_DOOR);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.WAXED_WEATHERED_COPPER_DOOR);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_DOOR, ModBlocks.WAXED_OXIDIZED_COPPER_DOOR);
 
-            registerChain(ModBlocks.COPPER_TRAPDOOR, ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.OXIDIZED_COPPER_TRAPDOOR);
+            registerChain(ModBlocks.COPPER_TRAPDOOR, ModBlocks.EXPOSED_COPPER_TRAPDOOR,
+                    ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.OXIDIZED_COPPER_TRAPDOOR);
             registerWaxPair(ModBlocks.COPPER_TRAPDOOR, ModBlocks.WAXED_COPPER_TRAPDOOR);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WAXED_EXPOSED_COPPER_TRAPDOOR);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.WAXED_WEATHERED_COPPER_TRAPDOOR);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_TRAPDOOR, ModBlocks.WAXED_OXIDIZED_COPPER_TRAPDOOR);
 
-            registerChain(ModBlocks.COPPER_BARS, ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.OXIDIZED_COPPER_BARS);
+            registerChain(ModBlocks.COPPER_BARS, ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WEATHERED_COPPER_BARS,
+                    ModBlocks.OXIDIZED_COPPER_BARS);
             registerWaxPair(ModBlocks.COPPER_BARS, ModBlocks.WAXED_COPPER_BARS);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WAXED_EXPOSED_COPPER_BARS);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.WAXED_WEATHERED_COPPER_BARS);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_BARS, ModBlocks.WAXED_OXIDIZED_COPPER_BARS);
 
-            registerChain(ModBlocks.COPPER_MESH, ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.OXIDIZED_COPPER_MESH);
+            registerChain(ModBlocks.COPPER_MESH, ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WEATHERED_COPPER_MESH,
+                    ModBlocks.OXIDIZED_COPPER_MESH);
             registerWaxPair(ModBlocks.COPPER_MESH, ModBlocks.WAXED_COPPER_MESH);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WAXED_EXPOSED_COPPER_MESH);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.WAXED_WEATHERED_COPPER_MESH);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_MESH, ModBlocks.WAXED_OXIDIZED_COPPER_MESH);
 
-            registerChain(ModBlocks.COPPER_BOLTS, ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.OXIDIZED_COPPER_BOLTS);
+            registerChain(ModBlocks.COPPER_BOLTS, ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WEATHERED_COPPER_BOLTS,
+                    ModBlocks.OXIDIZED_COPPER_BOLTS);
             registerWaxPair(ModBlocks.COPPER_BOLTS, ModBlocks.WAXED_COPPER_BOLTS);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WAXED_EXPOSED_COPPER_BOLTS);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.WAXED_WEATHERED_COPPER_BOLTS);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_BOLTS, ModBlocks.WAXED_OXIDIZED_COPPER_BOLTS);
 
-            registerChain(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerChain(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
             registerWaxPair(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
 
-            registerChain(ModBlocks.COPPER_BUTTON, ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.OXIDIZED_COPPER_BUTTON);
+            registerChain(ModBlocks.COPPER_BUTTON, ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WEATHERED_COPPER_BUTTON,
+                    ModBlocks.OXIDIZED_COPPER_BUTTON);
             registerWaxPair(ModBlocks.COPPER_BUTTON, ModBlocks.WAXED_COPPER_BUTTON);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WAXED_EXPOSED_COPPER_BUTTON);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.WAXED_WEATHERED_COPPER_BUTTON);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_BUTTON, ModBlocks.WAXED_OXIDIZED_COPPER_BUTTON);
 
-            registerChain(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE);
+            registerChain(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE,
+                    ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE);
             registerWaxPair(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.WAXED_COPPER_PRESSURE_PLATE);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE);
 
-            registerChain(ModBlocks.COPPER_CHEST, ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.OXIDIZED_COPPER_CHEST);
+            registerChain(ModBlocks.COPPER_CHEST, ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WEATHERED_COPPER_CHEST,
+                    ModBlocks.OXIDIZED_COPPER_CHEST);
             registerWaxPair(ModBlocks.COPPER_CHEST, ModBlocks.WAXED_COPPER_CHEST);
             registerWaxPair(ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WAXED_EXPOSED_COPPER_CHEST);
             registerWaxPair(ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.WAXED_WEATHERED_COPPER_CHEST);
             registerWaxPair(ModBlocks.OXIDIZED_COPPER_CHEST, ModBlocks.WAXED_OXIDIZED_COPPER_CHEST);
 
-            registerChain(ModBlocks.COPPER_CHAIN, ModBlocks.EXPOSED_COPPER_CHAIN, ModBlocks.WEATHERED_COPPER_CHAIN, ModBlocks.OXIDIZED_COPPER_CHAIN);
+            registerChain(ModBlocks.COPPER_CHAIN, ModBlocks.EXPOSED_COPPER_CHAIN, ModBlocks.WEATHERED_COPPER_CHAIN,
+                    ModBlocks.OXIDIZED_COPPER_CHAIN);
 
-            registerChain(ModBlocks.LARGE_COPPER_CHAIN, ModBlocks.LARGE_EXPOSED_COPPER_CHAIN, ModBlocks.LARGE_WEATHERED_COPPER_CHAIN, ModBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
+            registerChain(ModBlocks.LARGE_COPPER_CHAIN, ModBlocks.LARGE_EXPOSED_COPPER_CHAIN,
+                    ModBlocks.LARGE_WEATHERED_COPPER_CHAIN, ModBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
 
-            registerChain(ModBlocks.SLIT_COPPER, ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.OXIDIZED_SLIT_COPPER);
+            registerChain(ModBlocks.SLIT_COPPER, ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WEATHERED_SLIT_COPPER,
+                    ModBlocks.OXIDIZED_SLIT_COPPER);
             registerWaxPair(ModBlocks.SLIT_COPPER, ModBlocks.WAXED_SLIT_COPPER);
             registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WAXED_EXPOSED_SLIT_COPPER);
             registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.WAXED_WEATHERED_SLIT_COPPER);
             registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER);
 
-            registerChain(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS);
+            registerChain(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.EXPOSED_SLIT_COPPER_STAIRS,
+                    ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS);
             registerWaxPair(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.WAXED_SLIT_COPPER_STAIRS);
             registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_STAIRS);
             registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_STAIRS);
             registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_STAIRS);
 
-            registerChain(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_SLAB);
+            registerChain(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_SLAB,
+                    ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_SLAB);
             registerWaxPair(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.WAXED_SLIT_COPPER_SLAB);
             registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_SLAB);
             registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_SLAB);
             registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_SLAB);
 
-            registerChain(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
+            registerChain(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
             registerWaxPair(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_SLIT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB);
-            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB);
+            registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
 
-            registerChain(ModBlocks.BIT_CHISELED_COPPER, ModBlocks.BIT_EXPOSED_CHISELED_COPPER, ModBlocks.BIT_WEATHERED_CHISELED_COPPER, ModBlocks.BIT_OXIDIZED_CHISELED_COPPER);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK, ModBlocks.BIT_EXPOSED_COPPER_BLOCK, ModBlocks.BIT_WEATHERED_COPPER_BLOCK, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK_STAIRS, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_STAIRS, ModBlocks.BIT_WEATHERED_COPPER_BLOCK_STAIRS, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_STAIRS);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK_SLAB, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_SLAB, ModBlocks.BIT_WEATHERED_COPPER_BLOCK_SLAB, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_SLAB);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK_WALL, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_WALL, ModBlocks.BIT_WEATHERED_COPPER_BLOCK_WALL, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_WALL);
-            registerChain(ModBlocks.BIT_COPPER_BLOCK_VERTICAL_SLAB, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB, ModBlocks.BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB);
-            registerChain(ModBlocks.BIT_CUT_COPPER, ModBlocks.BIT_EXPOSED_CUT_COPPER, ModBlocks.BIT_WEATHERED_CUT_COPPER, ModBlocks.BIT_OXIDIZED_CUT_COPPER);
-            registerChain(ModBlocks.BIT_CUT_COPPER_STAIRS, ModBlocks.BIT_EXPOSED_CUT_COPPER_STAIRS, ModBlocks.BIT_WEATHERED_CUT_COPPER_STAIRS, ModBlocks.BIT_OXIDIZED_CUT_COPPER_STAIRS);
-            registerChain(ModBlocks.BIT_CUT_COPPER_SLAB, ModBlocks.BIT_EXPOSED_CUT_COPPER_SLAB, ModBlocks.BIT_WEATHERED_CUT_COPPER_SLAB, ModBlocks.BIT_OXIDIZED_CUT_COPPER_SLAB);
-            registerChain(ModBlocks.BIT_CUT_COPPER_WALL, ModBlocks.BIT_EXPOSED_CUT_COPPER_WALL, ModBlocks.BIT_WEATHERED_CUT_COPPER_WALL, ModBlocks.BIT_OXIDIZED_CUT_COPPER_WALL);
-            registerChain(ModBlocks.BIT_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
-            registerChain(ModBlocks.BIT_COPPER_BULB, ModBlocks.BIT_EXPOSED_COPPER_BULB, ModBlocks.BIT_WEATHERED_COPPER_BULB, ModBlocks.BIT_OXIDIZED_COPPER_BULB);
-            registerChain(ModBlocks.BIT_COPPER_GRATE, ModBlocks.BIT_EXPOSED_COPPER_GRATE, ModBlocks.BIT_WEATHERED_COPPER_GRATE, ModBlocks.BIT_OXIDIZED_COPPER_GRATE);            initialized = true;
+            registerChain(ModBlocks.BIT_CHISELED_COPPER, ModBlocks.BIT_EXPOSED_CHISELED_COPPER,
+                    ModBlocks.BIT_WEATHERED_CHISELED_COPPER, ModBlocks.BIT_OXIDIZED_CHISELED_COPPER);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK, ModBlocks.BIT_EXPOSED_COPPER_BLOCK,
+                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK_STAIRS, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_STAIRS,
+                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK_STAIRS, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_STAIRS);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK_SLAB, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_SLAB,
+                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK_SLAB, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_SLAB);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK_WALL, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_WALL,
+                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK_WALL, ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_WALL);
+            registerChain(ModBlocks.BIT_COPPER_BLOCK_VERTICAL_SLAB, ModBlocks.BIT_EXPOSED_COPPER_BLOCK_VERTICAL_SLAB,
+                    ModBlocks.BIT_WEATHERED_COPPER_BLOCK_VERTICAL_SLAB,
+                    ModBlocks.BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_SLAB);
+            registerChain(ModBlocks.BIT_CUT_COPPER, ModBlocks.BIT_EXPOSED_CUT_COPPER,
+                    ModBlocks.BIT_WEATHERED_CUT_COPPER, ModBlocks.BIT_OXIDIZED_CUT_COPPER);
+            registerChain(ModBlocks.BIT_CUT_COPPER_STAIRS, ModBlocks.BIT_EXPOSED_CUT_COPPER_STAIRS,
+                    ModBlocks.BIT_WEATHERED_CUT_COPPER_STAIRS, ModBlocks.BIT_OXIDIZED_CUT_COPPER_STAIRS);
+            registerChain(ModBlocks.BIT_CUT_COPPER_SLAB, ModBlocks.BIT_EXPOSED_CUT_COPPER_SLAB,
+                    ModBlocks.BIT_WEATHERED_CUT_COPPER_SLAB, ModBlocks.BIT_OXIDIZED_CUT_COPPER_SLAB);
+            registerChain(ModBlocks.BIT_CUT_COPPER_WALL, ModBlocks.BIT_EXPOSED_CUT_COPPER_WALL,
+                    ModBlocks.BIT_WEATHERED_CUT_COPPER_WALL, ModBlocks.BIT_OXIDIZED_CUT_COPPER_WALL);
+            registerChain(ModBlocks.BIT_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_EXPOSED_CUT_COPPER_VERTICAL_SLAB,
+                    ModBlocks.BIT_WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.BIT_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
+            registerChain(ModBlocks.BIT_COPPER_BULB, ModBlocks.BIT_EXPOSED_COPPER_BULB,
+                    ModBlocks.BIT_WEATHERED_COPPER_BULB, ModBlocks.BIT_OXIDIZED_COPPER_BULB);
+            registerChain(ModBlocks.BIT_COPPER_GRATE, ModBlocks.BIT_EXPOSED_COPPER_GRATE,
+                    ModBlocks.BIT_WEATHERED_COPPER_GRATE, ModBlocks.BIT_OXIDIZED_COPPER_GRATE);
+            initialized = true;
         }
     }
 
@@ -210,12 +251,13 @@ public class CopperOxidationHandler {
         init();
         return STAGES.next(state.getBlock()) != null
                 && (!(state.getBlock() instanceof DoorBlock)
-                || state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER);
+                        || state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER);
     }
 
     public static BlockState getToolModifiedState(BlockState state, ToolAction action) {
         init();
-        Block target = action == ToolActions.AXE_SCRAPE ? STAGES.previous(state.getBlock())
+        Block target = action == ToolActions.AXE_SCRAPE
+                ? STAGES.previous(state.getBlock())
                 : action == ToolActions.AXE_WAX_OFF ? STAGES.unwaxed(state.getBlock()) : null;
         return target == null ? null : copyStateProperties(state, target.defaultBlockState());
     }
@@ -244,8 +286,7 @@ public class CopperOxidationHandler {
                         ItemStack emptyBottle = new ItemStack(Items.GLASS_BOTTLE);
                         if (held.isEmpty()) {
                             player.setItemInHand(event.getHand(), emptyBottle);
-                        }
-                        else if (!player.getInventory().add(emptyBottle)) {
+                        } else if (!player.getInventory().add(emptyBottle)) {
                             player.drop(emptyBottle, false);
                         }
                     }
@@ -308,7 +349,7 @@ public class CopperOxidationHandler {
         if ((held.canPerformAction(ToolActions.AXE_SCRAPE)
                 && getToolModifiedState(state, ToolActions.AXE_SCRAPE) != null)
                 || (held.canPerformAction(ToolActions.AXE_WAX_OFF)
-                && getToolModifiedState(state, ToolActions.AXE_WAX_OFF) != null)) {
+                        && getToolModifiedState(state, ToolActions.AXE_WAX_OFF) != null)) {
             event.setUseBlock(Event.Result.DENY);
         }
         return false;
@@ -320,8 +361,10 @@ public class CopperOxidationHandler {
             BlockPos lowerPos = half == DoubleBlockHalf.LOWER ? pos : pos.below();
             BlockPos upperPos = half == DoubleBlockHalf.LOWER ? pos.above() : pos;
 
-            BlockState lowerState = copyStateProperties(level.getBlockState(lowerPos), targetBlock.defaultBlockState()).setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER);
-            BlockState upperState = copyStateProperties(level.getBlockState(upperPos), targetBlock.defaultBlockState()).setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER);
+            BlockState lowerState = copyStateProperties(level.getBlockState(lowerPos), targetBlock.defaultBlockState())
+                    .setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER);
+            BlockState upperState = copyStateProperties(level.getBlockState(upperPos), targetBlock.defaultBlockState())
+                    .setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER);
 
             level.setBlock(lowerPos, lowerState, 2 | 16);
             level.setBlock(upperPos, upperState, 3);
@@ -403,7 +446,7 @@ public class CopperOxidationHandler {
     }
 
     static <T> void registerChain(Map<Supplier<T>, Supplier<T>> next, Map<Supplier<T>, Supplier<T>> previous,
-                                  Supplier<T> b0, Supplier<T> b1, Supplier<T> b2, Supplier<T> b3) {
+            Supplier<T> b0, Supplier<T> b1, Supplier<T> b2, Supplier<T> b3) {
         Supplier<T> s0 = new StageSupplier<>(b0.get());
         Supplier<T> s1 = new StageSupplier<>(b1.get());
         Supplier<T> s2 = new StageSupplier<>(b2.get());
@@ -445,12 +488,12 @@ public class CopperOxidationHandler {
     }
 
     static <T> boolean isWeatheringStage(T stage, Map<Supplier<T>, Supplier<T>> next,
-                                         Map<Supplier<T>, Supplier<T>> previous) {
+            Map<Supplier<T>, Supplier<T>> previous) {
         return getMappedStage(stage, next) != null || getMappedStage(stage, previous) != null;
     }
 
     static <T> T getFirstStage(T stage, Map<Supplier<T>, Supplier<T>> next,
-                               Map<Supplier<T>, Supplier<T>> previous) {
+            Map<Supplier<T>, Supplier<T>> previous) {
         if (!isWeatheringStage(stage, next, previous)) {
             return null;
         }

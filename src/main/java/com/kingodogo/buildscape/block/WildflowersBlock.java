@@ -39,7 +39,8 @@ public class WildflowersBlock extends BushBlock implements BonemealableBlock {
 
     public WildflowersBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FLOWER_AMOUNT, 1).setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(
+                this.stateDefinition.any().setValue(FLOWER_AMOUNT, 1).setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -54,7 +55,8 @@ public class WildflowersBlock extends BushBlock implements BonemealableBlock {
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        return (!context.isSecondaryUseActive() && context.getItemInHand().getItem() == this.asItem() && state.getValue(FLOWER_AMOUNT) < 4) || super.canBeReplaced(state, context);
+        return (!context.isSecondaryUseActive() && context.getItemInHand().getItem() == this.asItem()
+                && state.getValue(FLOWER_AMOUNT) < 4) || super.canBeReplaced(state, context);
     }
 
     @Override
@@ -77,7 +79,8 @@ public class WildflowersBlock extends BushBlock implements BonemealableBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hitResult) {
         ItemStack held = player.getItemInHand(hand);
         if (held.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == this) {
             int currentAmount = state.getValue(FLOWER_AMOUNT);
@@ -89,7 +92,8 @@ public class WildflowersBlock extends BushBlock implements BonemealableBlock {
                     }
                 }
                 SoundType sounds = this.getSoundType(state);
-                level.playSound(player, pos, sounds.getPlaceSound(), SoundSource.BLOCKS, sounds.getVolume(), sounds.getPitch());
+                level.playSound(player, pos, sounds.getPlaceSound(), SoundSource.BLOCKS, sounds.getVolume(),
+                        sounds.getPitch());
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }

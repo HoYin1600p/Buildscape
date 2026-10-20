@@ -43,10 +43,18 @@ public class UpdateConfigPacket {
     private final int chunkCount;
     private final byte[] payload;
 
-    public UUID getTransferId() { return transferId; }
-    public int getChunkIndex() { return chunkIndex; }
-    public int getChunkCount() { return chunkCount; }
-    public byte[] getPayload() { return payload; }
+    public UUID getTransferId() {
+        return transferId;
+    }
+    public int getChunkIndex() {
+        return chunkIndex;
+    }
+    public int getChunkCount() {
+        return chunkCount;
+    }
+    public byte[] getPayload() {
+        return payload;
+    }
 
     private UpdateConfigPacket(UUID transferId, int chunkIndex, int chunkCount, byte[] payload) {
         this.transferId = transferId;
@@ -89,7 +97,8 @@ public class UpdateConfigPacket {
         }
     }
 
-    static List<UpdateConfigPacket> splitForClient(PillarParticleConfig config, int syncedLevel, boolean levelTwo, boolean levelFour) {
+    static List<UpdateConfigPacket> splitForClient(PillarParticleConfig config, int syncedLevel, boolean levelTwo,
+            boolean levelFour) {
         int level = PillarParticleConfig.resolveClientPermissionLevel(syncedLevel, levelTwo, levelFour);
         Set<ConfigSetting> settings = ConfigSetting.allowed(config.edit_permission_mode, level);
         settings.removeIf(setting -> setting.itemsFile ? !config.canEditItems() : !config.canEditProperties());
@@ -198,7 +207,7 @@ public class UpdateConfigPacket {
     }
 
     static <K> ConfigAssembly pendingAssembly(Map<K, ConfigAssembly> pending, K sender, UpdateConfigPacket packet,
-                                            PillarParticleConfig.EditPermissionMode mode, int permissionLevel) {
+            PillarParticleConfig.EditPermissionMode mode, int permissionLevel) {
         if (ConfigSetting.allowed(mode, permissionLevel).isEmpty()) {
             pending.remove(sender);
             return null;
@@ -219,11 +228,13 @@ public class UpdateConfigPacket {
 
             PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
             int permissionLevel = player.hasPermissions(PillarParticleConfig.CONFIG_PERMISSION_LEVEL)
-                    ? PillarParticleConfig.CONFIG_PERMISSION_LEVEL : player.hasPermissions(2) ? 2 : 0;
+                    ? PillarParticleConfig.CONFIG_PERMISSION_LEVEL
+                    : player.hasPermissions(2) ? 2 : 0;
             ConfigAssembly assembly = pendingAssembly(ServerPendingHolder.PENDING, player, this,
                     serverConfig.edit_permission_mode, permissionLevel);
             if (assembly == null) {
-                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+                        new SyncConfigPacket(serverConfig));
                 EditGuard.refuse(player, EditRefusedPacket.Reason.LOCKED, null);
                 return;
             }
@@ -236,7 +247,8 @@ public class UpdateConfigPacket {
                 player.displayClientMessage(new TextComponent(
                         "BuildScape: Config update refused because it contains invalid or incomplete data.")
                         .withStyle(ChatFormatting.RED), false);
-                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+                        new SyncConfigPacket(serverConfig));
                 EditGuard.refuse(player, EditRefusedPacket.Reason.INVALID, null);
                 return;
             }
@@ -251,12 +263,14 @@ public class UpdateConfigPacket {
             if (refusal != null) {
                 player.displayClientMessage(new TextComponent(refusal)
                         .withStyle(ChatFormatting.RED), false);
-                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+                        new SyncConfigPacket(serverConfig));
                 EditGuard.refuse(player, EditGuard.reasonFor(refusal), null);
             }
             if (data.uploadSettings.isEmpty()) {
                 if (refusal == null) {
-                    ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new SyncConfigPacket(serverConfig));
+                    ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+                            new SyncConfigPacket(serverConfig));
                 }
                 return;
             }
@@ -265,7 +279,8 @@ public class UpdateConfigPacket {
                     || serverConfig.savePropertiesToDisk();
             boolean itemsSaved = !data.uploadSettings.contains(ConfigSetting.ITEMS) || serverConfig.saveItemsToDisk();
             if (!propertiesSaved || !itemsSaved) {
-                String files = !propertiesSaved && !itemsSaved ? "pillar-properties.json and pillar-items.json"
+                String files = !propertiesSaved && !itemsSaved
+                        ? "pillar-properties.json and pillar-items.json"
                         : !propertiesSaved ? "pillar-properties.json" : "pillar-items.json";
                 player.displayClientMessage(new TextComponent(
                         "BuildScape: Changes to " + files + " are active but will not survive a restart: "
@@ -275,10 +290,10 @@ public class UpdateConfigPacket {
 
             ModMessages.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
-                    new SyncConfigPacket(serverConfig)
-            );
+                    new SyncConfigPacket(serverConfig));
 
-            if (!data.uploadSettings.contains(ConfigSetting.PARTICLES) && !data.uploadSettings.contains(ConfigSetting.COLORS)) {
+            if (!data.uploadSettings.contains(ConfigSetting.PARTICLES)
+                    && !data.uploadSettings.contains(ConfigSetting.COLORS)) {
                 return;
             }
 
@@ -288,11 +303,13 @@ public class UpdateConfigPacket {
                 boolean isPatternChanged = !serverConfig.pattern.equals(oldPattern);
 
                 for (PillarIdManager.PillarData pData : manager.getAllData()) {
-                    boolean hasPatternOverride = pData.pattern != null && !pData.pattern.equals(ParticlePatterns.DEFAULT);
+                    boolean hasPatternOverride = pData.pattern != null
+                            && !pData.pattern.equals(ParticlePatterns.DEFAULT);
                     boolean isCustomized = pData.hasColors() || hasPatternOverride;
 
                     if (isCustomized) {
-                        if (isPatternChanged && (pData.pattern == null || pData.pattern.equals(ParticlePatterns.DEFAULT))) {
+                        if (isPatternChanged
+                                && (pData.pattern == null || pData.pattern.equals(ParticlePatterns.DEFAULT))) {
                             pData.pattern = oldPattern;
                             updatedAny = true;
                         }

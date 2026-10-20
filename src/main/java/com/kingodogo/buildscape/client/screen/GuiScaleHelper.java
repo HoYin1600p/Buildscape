@@ -117,7 +117,7 @@ public final class GuiScaleHelper {
             sidePanelY = frameY + 36;
         } else {
             sidePanelW = Math.max(0, (frameX + fullFrameW) - sidePanelX);
-            int targetH = Math.min(334, frameH - 58);
+            int targetH = Math.min(TARGET_PANEL_H, frameH - 58);
             sidePanelH = Math.max(280, targetH);
             sidePanelY = frameY + 36;
         }

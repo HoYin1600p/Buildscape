@@ -1,5 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
+issueTrackerURL = "https://github.com/HoYin1600p/Buildscape/issues"
 license = "${mod_license}"
 [[mods]]
 modId = "${mod_id}"

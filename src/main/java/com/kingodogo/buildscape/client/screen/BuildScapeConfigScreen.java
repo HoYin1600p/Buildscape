@@ -38,6 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
+import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -608,6 +609,7 @@ public class BuildScapeConfigScreen extends Screen {
     private static final List<String> STATIC_ALL_REGISTERED_TAGS = new ArrayList<>();
     private static final Map<String, Integer> STATIC_TAG_ITEM_COUNTS = new HashMap<>();
     private static volatile boolean tagsCached = false;
+    private static WeakReference<Level> cachedTagLevel = new WeakReference<>(null);
 
     // Cooldown on disk synchronization for pillar markers
     private static long lastPillarsSyncTime = 0L;
@@ -1510,6 +1512,16 @@ public class BuildScapeConfigScreen extends Screen {
 
     @Override
     protected void init() {
+        Level level = Minecraft.getInstance().level;
+        if (cachedTagLevel.get() != level) {
+            cachedTagLevel = new WeakReference<>(level);
+            tagsCached = false;
+            allRegisteredTags.clear();
+            tagItemCounts.clear();
+            refreshTagNamespaces();
+            tagsListDirty = true;
+            inventoryTagsDirty = true;
+        }
         uploadBatch.rebaseIfIdle(PillarParticleConfig.get());
         super.init();
         initConfigState();
@@ -6523,7 +6535,9 @@ public class BuildScapeConfigScreen extends Screen {
                 PillarIdManager.clearPillarOverrides(PillarIdManager.getClient().getPillarData(id));
             }
             PillarIdManager.getClient().saveAllPillars();
-            ModMessages.INSTANCE.sendToServer(new ResetPillarsPacket(selectedPillarIds));
+            for (List<String> batch : removalBatches(new ArrayList<>(selectedPillarIds))) {
+                ModMessages.INSTANCE.sendToServer(new ResetPillarsPacket(batch));
+            }
             return true;
         }
 

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.feature.pillar;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.client.ClientSessionState;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.ParticlePatterns;
@@ -41,8 +42,6 @@ import net.minecraftforge.server.ServerLifecycleHooks;
  * registry is rebuilt from the loaded block entities. Ids start with a variant prefix (M, S, D, Q, or I-F for item frames).
  */
 public class PillarIdManager {
-    private static final PillarIdManager CLIENT_INSTANCE = new PillarIdManager(false);
-
     final boolean serverAuthoritative;
     final PillarRegistry registry = new PillarRegistry();
     private final Map<String, PillarData> removedFrames = registry.removedFrames;
@@ -90,17 +89,22 @@ public class PillarIdManager {
 
     /** The client copy, filled by {@code SyncPillarIdsPacket}. */
     public static PillarIdManager getClient() {
-        return CLIENT_INSTANCE;
+        return ClientSessionState.get().pillars();
+    }
+
+    /** A new, empty client copy; only {@link ClientSessionState} creates it. */
+    public static PillarIdManager newClientInstance() {
+        return new PillarIdManager(false);
     }
 
     /** The client copy for a client level, the server registry for any other level (and for null). */
     public static PillarIdManager get(Level level) {
-        return level != null && level.isClientSide ? CLIENT_INSTANCE : get();
+        return level != null && level.isClientSide ? getClient() : get();
     }
 
     /** Empties the client copy; the next sync from the server fills it again. */
     public static void resetClientCache() {
-        CLIENT_INSTANCE.resetState(true);
+        getClient().resetState(true);
     }
 
     private PillarIdManager(boolean serverAuthoritative) {

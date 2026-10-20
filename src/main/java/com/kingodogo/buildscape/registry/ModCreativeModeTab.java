@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -32,10 +33,15 @@ import java.util.function.Supplier;
 
 public class ModCreativeModeTab {
 
+    /** The item shown as the tab icon. A method, not a field, so the item holder loads when it is first used. */
+    public static RegistryObject<Item> iconItem() {
+        return ModItems.BIT_OXIDIZED_COPPER_BLOCK;
+    }
+
     public static final CreativeModeTab BUILDSCAPE_TAB = new CreativeModeTab(BuildScape.MODID) {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(ModItems.BIT_OXIDIZED_COPPER_BLOCK.get());
+            return new ItemStack(iconItem().get());
         }
 
         private boolean isCustomFireworkVariant(ItemStack stack) {

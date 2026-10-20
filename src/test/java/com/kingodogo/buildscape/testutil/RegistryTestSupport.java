@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /** Reads the mod's registrations in unit tests without a running game, so tests need not parse source files. */
@@ -38,6 +39,42 @@ public final class RegistryTestSupport {
             }
         }
         return result;
+    }
+
+    /**
+     * Binds the registry objects whose path matches to freshly created values, so game code that calls
+     * {@code RegistryObject.get()} works in a unit test. Returns the bound values by path; pair with {@link #unbind}.
+     */
+    public static <T> Map<String, T> bind(DeferredRegister<T> register, Predicate<String> paths) {
+        Map<String, T> bound = new LinkedHashMap<>();
+        for (RegistryObject<T> entry : register.getEntries()) {
+            String path = entry.getId().getPath();
+            if (paths.test(path)) {
+                T value = create(register, path);
+                setValue(entry, value);
+                bound.put(path, value);
+            }
+        }
+        return bound;
+    }
+
+    /** Clears the values {@link #bind} set. */
+    public static <T> void unbind(DeferredRegister<T> register, Predicate<String> paths) {
+        for (RegistryObject<T> entry : register.getEntries()) {
+            if (paths.test(entry.getId().getPath())) {
+                setValue(entry, null);
+            }
+        }
+    }
+
+    private static void setValue(RegistryObject<?> entry, Object value) {
+        try {
+            Field field = RegistryObject.class.getDeclaredField("value");
+            field.setAccessible(true);
+            field.set(entry, value);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**

@@ -2,70 +2,59 @@ package com.kingodogo.buildscape.feature.copper;
 
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.testutil.RegistryTestSupport;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.WeatheringCopper;
+import net.minecraft.world.level.block.state.BlockState;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
+/**
+ * Runs the real {@link CopperOxidationHandler} against the mod's copper blocks. The registry objects of the copper
+ * blocks are bound to freshly built blocks, so the handler registers its chains exactly as in game and the test
+ * reads the result through its public lookups instead of parsing source files.
+ */
 public class CopperRegistryMappingTest {
+    private static final String[] AGES = {"", "exposed_", "weathered_", "oxidized_"};
+    private static Map<String, Block> copperBlocks;
+
     @BeforeClass
     public static void bootstrap() {
         RegistryTestSupport.bootstrap();
+        copperBlocks = RegistryTestSupport.bind(ModBlocks.BLOCKS, path -> path.contains("copper"));
     }
 
-    private static final Path BLOCK_SOURCE = Path.of("src/main/java/com/kingodogo/buildscape/feature/copper");
-    private static final String[] AGES = {"", "exposed_", "weathered_", "oxidized_"};
+    @AfterClass
+    public static void unbind() {
+        RegistryTestSupport.unbind(ModBlocks.BLOCKS, path -> path.contains("copper"));
+    }
+
+    private static boolean isOutsideWeatheringChains(String id) {
+        // Copper pillars are BuildScape pillars (registry entry, colours, displayed item); swapping their block
+        // would run pillar removal, so they keep their stage like in 4.0.5.
+        return id.startsWith("waxed_") || id.equals("copper_torch") || id.equals("copper_wall_torch")
+                || id.endsWith("copper_pillar");
+    }
 
     @Test
-    public void everyRegisteredCopperStageResolvesInWeatheringTable() throws IOException {
-        Map<String, String> registry = registrations();
-        CopperTransitions<String> table = new CopperTransitions<>();
-        Set<String> mapped = new HashSet<>();
-        String handler = Files.readString(BLOCK_SOURCE.resolve("CopperOxidationHandler.java"));
-        Matcher chains = Pattern.compile("registerChain\\(ModBlocks\\.(\\w+),\\s*ModBlocks\\.(\\w+),"
-                + "\\s*ModBlocks\\.(\\w+),\\s*ModBlocks\\.(\\w+)\\);").matcher(handler);
-        int families = 0;
-        while (chains.find()) {
-            String[] stages = new String[4];
-            for (int i = 0; i < stages.length; i++) {
-                stages[i] = registry.get(chains.group(i + 1));
-                assertNotNull("unregistered weathering target: " + chains.group(i + 1), stages[i]);
-                assertTrue("stage belongs to multiple families: " + stages[i], mapped.add(stages[i]));
-            }
-            table.addChain(stages[0], stages[1], stages[2], stages[3]);
-            families++;
-        }
-        assertTrue("weathering families were found", families > 0);
-
-        Map<String, String> ids = new HashMap<>();
-        for (String id : registry.values()) {
-            ids.put(id, id);
-        }
-        int copperBlocks = 0;
-        for (String id : registry.values()) {
-            if (!id.contains("copper")) {
+    public void everyRegisteredCopperStageResolvesInWeatheringTable() {
+        assertTrue("registered copper blocks were bound", copperBlocks.size() > 100);
+        CopperOxidationHandler.init();
+        for (Map.Entry<String, Block> entry : copperBlocks.entrySet()) {
+            String id = entry.getKey();
+            BlockState state = entry.getValue().defaultBlockState();
+            Optional<BlockState> next = CopperOxidationHandler.getNext(state);
+            if (isOutsideWeatheringChains(id)) {
+                assertTrue("waxed or non-weathering block: " + id, next.isEmpty());
+                assertNull("waxed or non-weathering block has no age: " + id,
+                        CopperOxidationHandler.getAge(entry.getValue()));
                 continue;
             }
-            copperBlocks++;
-            // Copper pillars are BuildScape pillars (registry entry, colours, displayed item); swapping their block
-            // would run pillar removal, so they keep their stage like in 4.0.5.
-            if (id.startsWith("waxed_") || id.equals("copper_torch") || id.equals("copper_wall_torch")
-                    || id.endsWith("copper_pillar")) {
-                assertNull("waxed or non-weathering block: " + id, table.next(id));
-                assertFalse("waxed or non-weathering block in a chain: " + id, mapped.contains(id));
-                continue;
-            }
-            assertTrue("missing copper family: " + id, mapped.contains(id));
             String prefix = id.startsWith("bit_") ? "bit_" : id.startsWith("large_") ? "large_" : "";
             String base = id.substring(prefix.length());
             int age = 0;
@@ -76,30 +65,32 @@ public class CopperRegistryMappingTest {
                     break;
                 }
             }
+            assertSame("age of " + id, WeatheringCopper.WeatherState.values()[age],
+                    CopperOxidationHandler.getAge(entry.getValue()));
             if (age == AGES.length - 1) {
-                assertNull("oxidized block has no next stage: " + id, table.next(id));
+                assertTrue("oxidized block has no next stage: " + id, next.isEmpty());
             } else {
                 String nextId = prefix + AGES[age + 1] + base;
-                assertTrue("next stage must exist in registrations: " + nextId, ids.containsKey(nextId));
-                assertSame("next stage stays in its copper family: " + id, ids.get(nextId), table.next(id));
+                assertTrue("missing copper family: " + id, next.isPresent());
+                assertSame("next stage stays in its copper family: " + id,
+                        copperBlocks.get(nextId), next.get().getBlock());
             }
         }
-        assertTrue("registered copper blocks were inspected", copperBlocks > 100);
     }
 
     @Test
-    public void mistAndRandomWeatheringShareTheNextStageLookup() throws IOException {
-        String handler = Files.readString(BLOCK_SOURCE.resolve("CopperOxidationHandler.java"));
-        assertTrue(Pattern.compile("getNextOxidationState\\(BlockState state\\)\\s*\\{\\s*"
-                + "return getNext\\(state\\)\\.orElse\\(null\\);\\s*}").matcher(handler).find());
-        String weathering = Files.readString(BLOCK_SOURCE.resolve("BuildscapeWeatheringCopper.java"));
-        assertTrue(Pattern.compile("getNext\\(BlockState state\\)\\s*\\{\\s*"
-                + "return CopperOxidationHandler\\.getNext\\(state\\);\\s*}").matcher(weathering).find());
-    }
-
-    private static Map<String, String> registrations() {
-        Map<String, String> registry = RegistryTestSupport.pathsByField(ModBlocks.class);
-        assertFalse("block registrations were found", registry.isEmpty());
-        return registry;
+    public void mistAndRandomWeatheringShareTheNextStageLookup() {
+        CopperOxidationHandler.init();
+        int checked = 0;
+        for (Block block : copperBlocks.values()) {
+            BlockState state = block.defaultBlockState();
+            Optional<BlockState> expected = CopperOxidationHandler.getNext(state);
+            assertEquals(expected.orElse(null), CopperOxidationHandler.getNextOxidationState(state));
+            if (block instanceof BuildscapeWeatheringCopper weathering) {
+                assertEquals(expected, weathering.getNext(state));
+                checked++;
+            }
+        }
+        assertTrue("weathering copper blocks were checked", checked > 50);
     }
 }

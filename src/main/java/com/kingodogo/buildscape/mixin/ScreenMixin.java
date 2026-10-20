@@ -143,7 +143,7 @@ public abstract class ScreenMixin {
             }
         } catch (Throwable t) {
             // render guard: a tooltip error must never crash the client
-            BuildScape.getLogger().debug("Suppressed error during custom tooltip rendering", t);
+            BuildScape.LOGGER.debug("Suppressed error during custom tooltip rendering", t);
         } finally {
             buildscape$isRenderingCustomTooltip = false;
         }

@@ -109,7 +109,7 @@ public class PresetsConfig {
         } catch (Exception e) {
             fileUnreadable = true;
             PillarParticleConfig.backupUnreadableFile(file);
-            BuildScape.getLogger().error("Failed to load presets {}; keeping the last good presets", file, e);
+            BuildScape.LOGGER.error("Failed to load presets {}; keeping the last good presets", file, e);
             if (presets.isEmpty()) {
                 initializeDefaults();
             }
@@ -197,7 +197,7 @@ public class PresetsConfig {
                     parsed.put(entry.getKey(), new Preset(name, items));
                 } catch (RuntimeException e) {
                     skippedEntries[0] = true;
-                    BuildScape.getLogger().warn("Skipped malformed preset {} in {}", entry.getKey(), PRESETS_FILE_NAME,
+                    BuildScape.LOGGER.warn("Skipped malformed preset {} in {}", entry.getKey(), PRESETS_FILE_NAME,
                             e);
                 }
             }
@@ -214,14 +214,14 @@ public class PresetsConfig {
         File file = getPresetsFile();
         if (fileUnreadable) {
             lastEditFailure = "unreadable";
-            BuildScape.getLogger().error("Not overwriting unreadable presets {}", file);
+            BuildScape.LOGGER.error("Not overwriting unreadable presets {}", file);
             return false;
         }
         try {
             if (file.exists() && ConfigLayoutIO.protectInvalidEncoding(file.toPath())) {
                 fileUnreadable = true;
                 lastEditFailure = "unreadable";
-                BuildScape.getLogger().warn("Not overwriting replacement-decoded presets {}", file);
+                BuildScape.LOGGER.warn("Not overwriting replacement-decoded presets {}", file);
                 return false;
             }
             AtomicFiles.write(file.toPath(), PRESETS_FILE_NAME, temporary -> {
@@ -236,11 +236,11 @@ public class PresetsConfig {
                     toSave.putAll(preservedPresets);
                     GSON.toJson(toSave, writer);
                 }
-            }, e -> BuildScape.getLogger().warn("Failed to remove temporary presets file", e));
+            }, e -> BuildScape.LOGGER.warn("Failed to remove temporary presets file", e));
             lastEditFailure = "";
             return true;
         } catch (Exception e) {
-            BuildScape.getLogger().error("Failed to save presets {}", file, e);
+            BuildScape.LOGGER.error("Failed to save presets {}", file, e);
             return false;
         }
     }
@@ -389,7 +389,7 @@ public class PresetsConfig {
             PillarParticleConfig config = PillarParticleConfig.get();
             if (fileUnreadable || !config.canEditItems()) {
                 lastEditFailure = "unreadable";
-                BuildScape.getLogger().warn("Not applying a preset while its config files are read-only");
+                BuildScape.LOGGER.warn("Not applying a preset while its config files are read-only");
                 return;
             }
             config.editItems(preset.items);

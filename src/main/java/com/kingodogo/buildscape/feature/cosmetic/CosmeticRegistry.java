@@ -64,7 +64,7 @@ public class CosmeticRegistry {
 
         String[] parts = cosmeticId.split(":", 3);
         if (parts.length < 2) {
-            BuildScape.getLogger().warn("Invalid cosmetic ID format: {}", cosmeticId);
+            BuildScape.LOGGER.warn("Invalid cosmetic ID format: {}", cosmeticId);
             return null;
         }
 
@@ -96,7 +96,7 @@ public class CosmeticRegistry {
         if (item != null) {
             itemCache.put(cosmeticId, item);
         } else {
-            BuildScape.getLogger().warn("Could not resolve cosmetic item: {}", cosmeticId);
+            BuildScape.LOGGER.warn("Could not resolve cosmetic item: {}", cosmeticId);
         }
 
         return item;
@@ -123,7 +123,7 @@ public class CosmeticRegistry {
         if (block != null) {
             blockCache.put(cosmeticId, block);
         } else {
-            BuildScape.getLogger().warn("Could not resolve cosmetic block: {}", cosmeticId);
+            BuildScape.LOGGER.warn("Could not resolve cosmetic block: {}", cosmeticId);
         }
 
         return block;

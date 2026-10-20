@@ -37,20 +37,20 @@ public class CosmeticAuthManager {
 
             Minecraft mc = Minecraft.getInstance();
             if (mc.getUser() == null) {
-                BuildScape.getLogger().warn("CosmeticAuthManager: No user available, cannot authenticate");
+                BuildScape.LOGGER.warn("CosmeticAuthManager: No user available, cannot authenticate");
                 return CompletableFuture.completedFuture(null);
             }
 
             String uuid = mc.getUser().getUuid();
 
             if (uuid == null || uuid.isEmpty()) {
-                BuildScape.getLogger().warn("CosmeticAuthManager: UUID is null or empty");
+                BuildScape.LOGGER.warn("CosmeticAuthManager: UUID is null or empty");
                 return CompletableFuture.completedFuture(null);
             }
 
             UUID playerId = parseUuid(uuid);
             if (playerId == null) {
-                BuildScape.getLogger().warn("CosmeticAuthManager: UUID is invalid");
+                BuildScape.LOGGER.warn("CosmeticAuthManager: UUID is invalid");
                 return CompletableFuture.completedFuture(null);
             }
 
@@ -58,7 +58,7 @@ public class CosmeticAuthManager {
                     .getCosmetics(playerId)
                     .thenApply(cosmeticData -> {
                         if (cosmeticData == null) {
-                            BuildScape.getLogger().error("CosmeticAuthManager: Cosmetic lookup returned null");
+                            BuildScape.LOGGER.error("CosmeticAuthManager: Cosmetic lookup returned null");
                             return null;
                         }
 
@@ -69,7 +69,7 @@ public class CosmeticAuthManager {
                         return cosmeticData;
                     })
                     .exceptionally(throwable -> {
-                        BuildScape.getLogger().error("CosmeticAuthManager: Authentication failed with exception",
+                        BuildScape.LOGGER.error("CosmeticAuthManager: Authentication failed with exception",
                                 throwable);
                         return null;
                     })

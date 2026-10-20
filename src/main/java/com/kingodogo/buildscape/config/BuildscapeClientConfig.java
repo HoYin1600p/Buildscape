@@ -144,7 +144,7 @@ public class BuildscapeClientConfig {
                     }
                 }
             }
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Config is read-only because it could not be parsed",
+            BuildScape.LOGGER.warn("BuildscapeClientConfig: Config is read-only because it could not be parsed",
                     e);
         }
 
@@ -159,13 +159,13 @@ public class BuildscapeClientConfig {
                     values.putIfAbsent(entry.getKey(), entry.getValue());
                 }
                 Files.deleteIfExists(uiFile);
-                BuildScape.getLogger().info(
+                BuildScape.LOGGER.info(
                         "BuildscapeClientConfig: Merged buildscape/ui-state.cfg into buildscape/buildscape.cfg and removed ui-state.cfg");
                 if (file.exists() && !readOnly) {
                     save();
                 }
             } catch (Exception e) {
-                BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to merge ui-state.cfg into buildscape.cfg",
+                BuildScape.LOGGER.warn("BuildscapeClientConfig: Failed to merge ui-state.cfg into buildscape.cfg",
                         e);
             }
         }
@@ -229,11 +229,11 @@ public class BuildscapeClientConfig {
             }
             Files.createFile(completion);
             if (output != null) {
-                BuildScape.getLogger().info(
+                BuildScape.LOGGER.info(
                         "BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
             }
         } catch (IOException e) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to migrate legacy config - {}", e.getMessage(), e);
+            BuildScape.LOGGER.warn("BuildscapeClientConfig: Failed to migrate legacy config - {}", e.getMessage(), e);
             if (!file.exists()) {
                 readOnly = true;
                 return legacyFile;
@@ -244,7 +244,7 @@ public class BuildscapeClientConfig {
 
     public void save() {
         if (readOnly) {
-            BuildScape.getLogger()
+            BuildScape.LOGGER
                     .warn("BuildscapeClientConfig: Not saving read-only config; unreadable/legacy file kept as-is");
             return;
         }
@@ -257,7 +257,7 @@ public class BuildscapeClientConfig {
             ConfigLayoutIO.write(file.toPath(), output, source, true);
             source = output;
         } catch (IOException e) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to write config", e);
+            BuildScape.LOGGER.warn("BuildscapeClientConfig: Failed to write config", e);
         }
     }
 

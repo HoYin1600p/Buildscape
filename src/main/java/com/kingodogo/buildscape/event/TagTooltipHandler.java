@@ -105,7 +105,7 @@ public class TagTooltipHandler {
             }
         } catch (Throwable t) {
             // render guard: a tooltip error must never crash the client
-            BuildScape.getLogger().debug("TagTooltipHandler: Suppressed tooltip error", t);
+            BuildScape.LOGGER.debug("TagTooltipHandler: Suppressed tooltip error", t);
         }
     }
 
@@ -156,7 +156,7 @@ public class TagTooltipHandler {
             }
         } catch (Throwable t) {
             // render guard: a tooltip error must never crash the client
-            BuildScape.getLogger().debug("TagTooltipHandler: Error reading shulker tooltip data", t);
+            BuildScape.LOGGER.debug("TagTooltipHandler: Error reading shulker tooltip data", t);
         }
         return null;
     }
@@ -194,7 +194,7 @@ public class TagTooltipHandler {
             }
         } catch (Throwable t) {
             // render guard: a tooltip error must never crash the client
-            BuildScape.getLogger().debug("TagTooltipHandler: Error reading builder pouch tooltip data", t);
+            BuildScape.LOGGER.debug("TagTooltipHandler: Error reading builder pouch tooltip data", t);
         }
         return null;
     }

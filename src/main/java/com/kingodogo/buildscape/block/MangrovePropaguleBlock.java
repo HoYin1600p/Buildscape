@@ -349,14 +349,14 @@ public class MangrovePropaguleBlock
                     level.setBlock(pos, state, Block.UPDATE_ALL);
                 }
             } else {
-                BuildScape.getLogger()
+                BuildScape.LOGGER
                         .warn(
                                 "Mangrove tree feature {} is not a tree feature!",
                                 featureLocation);
                 level.setBlock(pos, state, 4);
             }
         } else {
-            BuildScape.getLogger()
+            BuildScape.LOGGER
                     .warn(
                             "Mangrove tree feature {} not found in registry! Cannot grow tree.",
                             featureLocation);

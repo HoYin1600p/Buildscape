@@ -93,7 +93,7 @@ public class CosmeticsConfig {
                                     oldFile.toPath().resolveSibling(oldFile.getName() + ".migrated"));
                         }
                     } catch (Exception e) {
-                        BuildScape.getLogger().error("CosmeticsConfig: Failed to relocate {}", oldFile.getName(), e);
+                        BuildScape.LOGGER.error("CosmeticsConfig: Failed to relocate {}", oldFile.getName(), e);
                     }
                 }
             }
@@ -113,7 +113,7 @@ public class CosmeticsConfig {
                 }
                 loadedSuccessfully = true;
             } catch (Exception e) {
-                BuildScape.getLogger().warn("CosmeticsConfig: Unable to read the legacy JSON cosmetics", e);
+                BuildScape.LOGGER.warn("CosmeticsConfig: Unable to read the legacy JSON cosmetics", e);
             }
 
             if (loadedSuccessfully) {
@@ -130,7 +130,7 @@ public class CosmeticsConfig {
                         }
                     }
                 } catch (Exception e) {
-                    BuildScape.getLogger().warn("Unable to retain legacy cosmetics backup: {}", legacyPath, e);
+                    BuildScape.LOGGER.warn("Unable to retain legacy cosmetics backup: {}", legacyPath, e);
                 }
             }
         }
@@ -225,7 +225,7 @@ public class CosmeticsConfig {
                 if (playerUuid != null && nbt.hasUUID(NbtKeys.PLAYER_UUID)) {
                     UUID storedUuid = nbt.getUUID(NbtKeys.PLAYER_UUID);
                     if (!storedUuid.equals(playerUuid)) {
-                        BuildScape.getLogger().error("CosmeticsConfig: SECURITY MISMATCH for {}", file.getName());
+                        BuildScape.LOGGER.error("CosmeticsConfig: SECURITY MISMATCH for {}", file.getName());
                         PillarParticleConfig.backupUnreadableFile(file);
                         playerCosmetics.putIfAbsent(uuidStr, null);
                         playerCosmeticColors.putIfAbsent(uuidStr, null);
@@ -270,7 +270,7 @@ public class CosmeticsConfig {
                 }
             }
         } catch (Exception e) {
-            BuildScape.getLogger().error("CosmeticsConfig: Failed to read data for {}", uuidStr, e);
+            BuildScape.LOGGER.error("CosmeticsConfig: Failed to read data for {}", uuidStr, e);
             PillarParticleConfig.backupUnreadableFile(file);
             playerCosmetics.putIfAbsent(uuidStr, null);
             playerCosmeticColors.putIfAbsent(uuidStr, null);
@@ -320,10 +320,10 @@ public class CosmeticsConfig {
         try {
             AtomicFiles.write(file.toPath(), file.getName(),
                     temporary -> NbtIo.writeCompressed(nbt, temporary.toFile()),
-                    e -> BuildScape.getLogger().warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr,
+                    e -> BuildScape.LOGGER.warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr,
                             e));
         } catch (Exception e) {
-            BuildScape.getLogger().error("CosmeticsConfig: Failed to write data for {}", uuidStr, e);
+            BuildScape.LOGGER.error("CosmeticsConfig: Failed to write data for {}", uuidStr, e);
         }
     }
 
@@ -339,7 +339,7 @@ public class CosmeticsConfig {
                     colorPickerY = nbt.getInt(NbtKeys.COLOR_PICKER_Y);
                 }
             } catch (Exception e) {
-                BuildScape.getLogger().debug("CosmeticsConfig: Unable to read the colour picker position", e);
+                BuildScape.LOGGER.debug("CosmeticsConfig: Unable to read the colour picker position", e);
             }
         }
     }
@@ -357,7 +357,7 @@ public class CosmeticsConfig {
         try {
             NbtIo.writeCompressed(nbt, file);
         } catch (Exception e) {
-            BuildScape.getLogger().warn("CosmeticsConfig: Unable to write the cosmetics file", e);
+            BuildScape.LOGGER.warn("CosmeticsConfig: Unable to write the cosmetics file", e);
         }
     }
 

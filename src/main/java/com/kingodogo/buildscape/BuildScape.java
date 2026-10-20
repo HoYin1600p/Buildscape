@@ -46,10 +46,6 @@ public class BuildScape {
     public static final Map<Item, CauldronInteraction> EXPERIENCE_CAULDRON_INTERACTIONS = CauldronInteraction
             .newInteractionMap();
 
-    public static Logger getLogger() {
-        return LOGGER;
-    }
-
     private static final ExecutorService ASYNC_POOL = Executors
             .newCachedThreadPool(r -> {
                 Thread t = new Thread(r, "BuildScape-Async");

@@ -84,7 +84,7 @@ public class SupportersApiClient {
         String url = BASE_URL + endpoint;
 
         if (!url.startsWith("https://")) {
-            BuildScape.getLogger().error("Rejected non-HTTPS URL: {}", url);
+            BuildScape.LOGGER.error("Rejected non-HTTPS URL: {}", url);
             return CompletableFuture.failedFuture(new SecurityException("HTTPS required"));
         }
 
@@ -110,14 +110,14 @@ public class SupportersApiClient {
                     try {
                         return gson.fromJson(body, responseClass);
                     } catch (JsonParseException e) {
-                        BuildScape.getLogger().error("Failed to parse JSON response", e);
+                        BuildScape.LOGGER.error("Failed to parse JSON response", e);
                         throw new ApiException("Failed to parse response: " + e.getMessage(), e);
                     }
                 })
                 .exceptionally(throwable -> {
-                    BuildScape.getLogger().error("API request failed", throwable);
+                    BuildScape.LOGGER.error("API request failed", throwable);
                     if (throwable.getCause() != null) {
-                        BuildScape.getLogger().error("Cause: {}", throwable.getCause().getMessage(),
+                        BuildScape.LOGGER.error("Cause: {}", throwable.getCause().getMessage(),
                                 throwable.getCause());
                     }
                     return null;
@@ -128,7 +128,7 @@ public class SupportersApiClient {
         String url = BASE_URL + endpoint;
 
         if (!url.startsWith("https://")) {
-            BuildScape.getLogger().error("Rejected non-HTTPS URL: {}", url);
+            BuildScape.LOGGER.error("Rejected non-HTTPS URL: {}", url);
             return CompletableFuture.failedFuture(new SecurityException("HTTPS required"));
         }
 
@@ -157,14 +157,14 @@ public class SupportersApiClient {
                     try {
                         return gson.fromJson(bodyStr, responseClass);
                     } catch (JsonParseException e) {
-                        BuildScape.getLogger().error("Failed to parse JSON response", e);
+                        BuildScape.LOGGER.error("Failed to parse JSON response", e);
                         throw new ApiException("Failed to parse response: " + e.getMessage(), e);
                     }
                 })
                 .exceptionally(throwable -> {
-                    BuildScape.getLogger().error("API POST request failed", throwable);
+                    BuildScape.LOGGER.error("API POST request failed", throwable);
                     if (throwable.getCause() != null) {
-                        BuildScape.getLogger().error("Cause: {}", throwable.getCause().getMessage(),
+                        BuildScape.LOGGER.error("Cause: {}", throwable.getCause().getMessage(),
                                 throwable.getCause());
                     }
                     return null;

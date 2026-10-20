@@ -113,9 +113,13 @@ public final class SculkSpreader {
         Collections.shuffle(faces, random);
         for (Direction face : faces) {
             BlockPos target = pos.relative(face);
-            if (state.getValue(GlowLichenBlock.getFaceProperty(face)) && level.hasChunkAt(target)
-                    && level.getBlockState(target).is(REPLACEABLE)
-                    && level.setBlock(target, CopperBlocks.SCULK.get().defaultBlockState(), 3)) {
+            if (!state.getValue(GlowLichenBlock.getFaceProperty(face)) || !level.hasChunkAt(target)) {
+                continue;
+            }
+            BlockState oldState = level.getBlockState(target);
+            BlockState newState = CopperBlocks.SCULK.get().defaultBlockState();
+            if (oldState.is(REPLACEABLE) && level.setBlock(target, newState, 3)) {
+                Block.pushEntitiesUp(oldState, newState, level, target);
                 level.playSound(null, target, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                 SculkVeinBlock.spread(level, target, random);
                 for (Direction direction : Direction.values()) {
@@ -157,12 +161,10 @@ public final class SculkSpreader {
     }
 
     static BlockState growthState(int choice, boolean water) {
-        BlockState state = choice == 0
+        BlockState state = choice == 0 && !water
                 ? CopperBlocks.SCULK_SHRIEKER.get().defaultBlockState()
                 : Blocks.SCULK_SENSOR.defaultBlockState();
-        return water && state.hasProperty(BlockStateProperties.WATERLOGGED)
-                ? state.setValue(BlockStateProperties.WATERLOGGED, true)
-                : state;
+        return water ? state.setValue(BlockStateProperties.WATERLOGGED, true) : state;
     }
 
     private static BlockPos movementPos(ServerLevel level, BlockPos pos, Random random) {

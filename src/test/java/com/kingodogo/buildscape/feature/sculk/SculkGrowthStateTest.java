@@ -48,14 +48,14 @@ public class SculkGrowthStateTest extends BootstrappedGameTest {
     }
 
     @Test
-    public void waterlogsOnlyGrowthWithAWaterloggedProperty() {
-        BlockState drySensor = SculkSpreader.growthState(1, false);
-        BlockState wetSensor = SculkSpreader.growthState(1, true);
-        assertFalse(drySensor.getValue(BlockStateProperties.WATERLOGGED));
-        assertTrue(wetSensor.getValue(BlockStateProperties.WATERLOGGED));
-        BlockState shrieker = SculkSpreader.growthState(0, true);
-        assertFalse(shrieker.hasProperty(BlockStateProperties.WATERLOGGED));
-        assertEquals(SculkSpreader.growthState(0, false), shrieker);
+    public void everyUnderwaterChoiceIsAWaterloggedFunctionalSensor() {
+        assertFalse(SculkSpreader.growthState(1, false).getValue(BlockStateProperties.WATERLOGGED));
+        for (int choice = 0; choice < 11; choice++) {
+            BlockState state = SculkSpreader.growthState(choice, true);
+            assertEquals(Blocks.SCULK_SENSOR, state.getBlock());
+            assertTrue(state.getValue(BlockStateProperties.WATERLOGGED));
+            assertEquals(Blocks.WATER.defaultBlockState().getFluidState(), state.getFluidState());
+        }
     }
 
     @Test

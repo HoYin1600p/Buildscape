@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.feature.biome;
 
+import com.kingodogo.buildscape.client.feature.biome.ClientBiomeTints;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
@@ -12,9 +13,9 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class SyncBiomeTintPacket {
-    final ResourceLocation dimension;
-    final ChunkPos chunk;
-    final Map<Integer, ResourceLocation> columns;
+    public final ResourceLocation dimension;
+    public final ChunkPos chunk;
+    public final Map<Integer, ResourceLocation> columns;
 
     public SyncBiomeTintPacket(ResourceLocation dimension, ChunkPos chunk, Map<Integer, ResourceLocation> columns) {
         if (columns.size() > 256 || columns.keySet().stream().anyMatch(index -> index < 0 || index >= 256)) {

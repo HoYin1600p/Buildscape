@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.biometint;
 
-import com.kingodogo.buildscape.feature.biome.ClientBiomeTints;
+import com.kingodogo.buildscape.client.feature.biome.ClientBiomeTints;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;

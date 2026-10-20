@@ -1,5 +1,7 @@
-package com.kingodogo.buildscape.feature.biome;
+package com.kingodogo.buildscape.client.feature.biome;
 
+import com.kingodogo.buildscape.feature.biome.SyncBiomeTintPacket;
+import com.kingodogo.buildscape.feature.biome.BiomeTintData;
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;

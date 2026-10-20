@@ -1,5 +1,7 @@
-package com.kingodogo.buildscape.block;
+package com.kingodogo.buildscape.client.feature.hazebush;
 
+import com.kingodogo.buildscape.block.PottedHazeBushBlock;
+import com.kingodogo.buildscape.block.HazeBushBlock;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.Minecraft;
@@ -7,6 +9,7 @@ import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -240,5 +243,30 @@ public class HazeBushParticleHandler {
             return new Vec3(px, py, pz);
         }
         return null;
+    }
+
+    /** Client side of the blocks' animateTick: tracks the bush and spawns its haze particles. */
+    public static void animateTick(Level level, BlockPos pos, Random random, DyeColor color) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.particles == ParticleStatus.MINIMAL) {
+            return;
+        }
+
+        track(pos);
+
+        if (mc.options.particles == ParticleStatus.DECREASED && random.nextFloat() > 0.5F) {
+            return;
+        }
+
+        float[] rgb = HazeBushBlock.getPastelColor(color);
+
+        int count = (mc.options.particles == ParticleStatus.DECREASED) ? 1 : (1 + random.nextInt(2));
+        for (int i = 0; i < count; i++) {
+            Vec3 particlePos = findHazeParticlePos(level, pos, random);
+            if (particlePos != null) {
+                level.addParticle(ModParticles.HAZE.get(), particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1],
+                        rgb[2]);
+            }
+        }
     }
 }

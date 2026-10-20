@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.MuffBlock;
-import com.kingodogo.buildscape.block.MuffBlockManager;
+import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;
 import com.mojang.blaze3d.vertex.PoseStack;

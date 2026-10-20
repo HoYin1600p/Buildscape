@@ -1,11 +1,9 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.client.feature.hazebush.HazeBushParticleHandler;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;
-import com.kingodogo.buildscape.registry.ModParticles;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.ParticleStatus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -26,7 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.RegistryObject;
@@ -108,27 +105,7 @@ public class HazeBushBlock extends ModBushBlock {
             return;
         }
 
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.options.particles == ParticleStatus.MINIMAL) {
-            return;
-        }
-
-        HazeBushParticleHandler.track(pos);
-
-        if (mc.options.particles == ParticleStatus.DECREASED && random.nextFloat() > 0.5F) {
-            return;
-        }
-
-        float[] rgb = getPastelColor(this.color);
-
-        int count = (mc.options.particles == ParticleStatus.DECREASED) ? 1 : (1 + random.nextInt(2));
-        for (int i = 0; i < count; i++) {
-            Vec3 particlePos = HazeBushParticleHandler.findHazeParticlePos(level, pos, random);
-            if (particlePos != null) {
-                level.addParticle(ModParticles.HAZE.get(), particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1],
-                        rgb[2]);
-            }
-        }
+        HazeBushParticleHandler.animateTick(level, pos, random, this.color);
     }
 
     @Override

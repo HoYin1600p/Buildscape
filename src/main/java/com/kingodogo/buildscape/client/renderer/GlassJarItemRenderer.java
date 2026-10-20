@@ -45,10 +45,9 @@ public class GlassJarItemRenderer extends BlockEntityWithoutLevelRenderer {
                 dummyBE.load(new CompoundTag());
             }
 
-            GlassJarBlockEntityRenderer renderer = (GlassJarBlockEntityRenderer) Minecraft.getInstance()
+            if (Minecraft.getInstance()
                     .getBlockEntityRenderDispatcher()
-                    .getRenderer(dummyBE);
-            if (renderer != null) {
+                    .getRenderer(dummyBE) instanceof GlassJarBlockEntityRenderer renderer) {
                 renderer.render(dummyBE, 0.0F, poseStack, bufferSource, combinedLight, combinedOverlay);
             }
         }

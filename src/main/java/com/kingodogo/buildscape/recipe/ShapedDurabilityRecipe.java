@@ -73,8 +73,8 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
 
                     if (shouldDamage) {
                         int currentDamage = damagedStack.getDamageValue();
-                        int newDamage = currentDamage + damageAmount;
-                        damagedStack.setDamageValue(newDamage);
+                        long newDamage = (long) currentDamage + damageAmount;
+                        damagedStack.setDamageValue((int) Math.min(newDamage, Integer.MAX_VALUE));
 
                         if (newDamage < damagedStack.getMaxDamage()) {
                             remaining.set(i, damagedStack);

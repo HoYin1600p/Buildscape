@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.feature.pillar;
 import com.kingodogo.buildscape.BuildScape;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -460,7 +461,7 @@ final class PillarEntitySync {
                 changed = true;
             } else {
                 for (int i = 0; i < newColors.size(); i++) {
-                    if (!newColors.get(i).equals(self.particleColors.get(i))) {
+                    if (!Objects.equals(newColors.get(i), self.particleColors.get(i))) {
                         self.particleColors = new ArrayList<>(newColors);
                         self.colorsInitialized = true;
                         self.particleColorCounter = 0;

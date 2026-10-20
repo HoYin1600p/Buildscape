@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.registry.ModMenuTypes;
+import com.kingodogo.buildscape.registry.blocks.SandstoneBlocks;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -26,8 +28,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     private final BuildersWorkbenchBlockEntity blockEntity;
 
     public BuildersWorkbenchMenu(int windowId, Inventory playerInv, FriendlyByteBuf data) {
-        this(windowId, playerInv,
-                (BuildersWorkbenchBlockEntity) playerInv.player.level.getBlockEntity(data.readBlockPos()));
+        this(windowId, playerInv, getClientBlockEntity(playerInv, data.readBlockPos()));
     }
 
     public BuildersWorkbenchMenu(int windowId, Inventory playerInv, BuildersWorkbenchBlockEntity be) {
@@ -173,6 +174,13 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
                 }
             });
         }
+    }
+
+    private static BuildersWorkbenchBlockEntity getClientBlockEntity(Inventory playerInv, BlockPos pos) {
+        if (playerInv.player.level.getBlockEntity(pos) instanceof BuildersWorkbenchBlockEntity be) {
+            return be;
+        }
+        return new BuildersWorkbenchBlockEntity(pos, SandstoneBlocks.BUILDERS_WORKBENCH.get().defaultBlockState());
     }
 
     public void setupSlotPositions() {}

@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.feature.pillar;
 import com.kingodogo.buildscape.core.NbtKeys;
 import java.util.ArrayList;
 import java.util.Locale;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -41,13 +42,14 @@ final class PillarEntityNbt {
                     } else {
                         self.displayedItem = ItemStack.EMPTY;
                     }
-                } catch (Exception e) {
+                } catch (ResourceLocationException e) {
                     self.displayedItem = ItemStack.EMPTY;
                 }
             } else {
                 self.displayedItem = ItemStack.EMPTY;
             }
         } catch (Exception e) {
+            // displayed item NBT may be malformed in any way; show no item
             self.displayedItem = ItemStack.EMPTY;
         }
 
@@ -116,6 +118,7 @@ final class PillarEntityNbt {
                                 self.particleColors.add(color.toUpperCase(Locale.ROOT));
                             }
                         } catch (Exception e) {
+                            // defensive guard around one colour entry
                             // skip a malformed colour entry
                         }
                     }
@@ -129,6 +132,7 @@ final class PillarEntityNbt {
                 self.particleColors = null;
             }
         } catch (Exception e) {
+            // colour list NBT may be malformed in any way; use the default colours
             self.particleColors = null;
         }
 

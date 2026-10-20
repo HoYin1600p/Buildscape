@@ -112,6 +112,7 @@ public class PresetsConfig {
             fileUnreadable = ConfigLayoutIO.protectInvalidEncoding(file.toPath())
                     || !ConfigLayoutIO.isWritable(file.toPath());
         } catch (Exception e) {
+            // the presets file may be malformed in any way; keep the last good presets
             fileUnreadable = true;
             PillarParticleConfig.backupUnreadableFile(file);
             BuildScape.LOGGER.error("Failed to load presets {}; keeping the last good presets", file, e);
@@ -245,6 +246,7 @@ public class PresetsConfig {
             lastEditFailure = "";
             return true;
         } catch (Exception e) {
+            // any save failure is logged and reported to the caller as false
             BuildScape.LOGGER.error("Failed to save presets {}", file, e);
             return false;
         }

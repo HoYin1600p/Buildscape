@@ -10,6 +10,7 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -99,6 +100,7 @@ public class CosmeticsConfig {
                                     oldFile.toPath().resolveSibling(oldFile.getName() + ".migrated"));
                         }
                     } catch (Exception e) {
+                        // relocating old files is best effort; any file system failure leaves the file in place
                         BuildScape.LOGGER.error("CosmeticsConfig: Failed to relocate {}", oldFile.getName(), e);
                     }
                 }
@@ -119,6 +121,7 @@ public class CosmeticsConfig {
                 }
                 loadedSuccessfully = true;
             } catch (Exception e) {
+                // the legacy JSON may be malformed in any way; keep the file and log
                 BuildScape.LOGGER.warn("CosmeticsConfig: Unable to read the legacy JSON cosmetics", e);
             }
 
@@ -136,6 +139,7 @@ public class CosmeticsConfig {
                         }
                     }
                 } catch (Exception e) {
+                    // keeping the backup is best effort; any file system failure is only logged
                     BuildScape.LOGGER.warn("Unable to retain legacy cosmetics backup: {}", legacyPath, e);
                 }
             }
@@ -276,6 +280,7 @@ public class CosmeticsConfig {
                 }
             }
         } catch (Exception e) {
+            // the player data file may be corrupt NBT or hold bad values; back it up and use defaults
             BuildScape.LOGGER.error("CosmeticsConfig: Failed to read data for {}", uuidStr, e);
             PillarParticleConfig.backupUnreadableFile(file);
             playerCosmetics.putIfAbsent(uuidStr, null);
@@ -328,7 +333,7 @@ public class CosmeticsConfig {
                     temporary -> NbtIo.writeCompressed(nbt, temporary.toFile()),
                     e -> BuildScape.LOGGER.warn("CosmeticsConfig: Failed to remove temporary data for {}", uuidStr,
                             e));
-        } catch (Exception e) {
+        } catch (IOException e) {
             BuildScape.LOGGER.error("CosmeticsConfig: Failed to write data for {}", uuidStr, e);
         }
     }
@@ -345,6 +350,7 @@ public class CosmeticsConfig {
                     colorPickerY = nbt.getInt(NbtKeys.COLOR_PICKER_Y);
                 }
             } catch (Exception e) {
+                // the position file may be corrupt NBT; keep the default position
                 BuildScape.LOGGER.debug("CosmeticsConfig: Unable to read the colour picker position", e);
             }
         }
@@ -362,7 +368,7 @@ public class CosmeticsConfig {
 
         try {
             NbtIo.writeCompressed(nbt, file);
-        } catch (Exception e) {
+        } catch (IOException e) {
             BuildScape.LOGGER.warn("CosmeticsConfig: Unable to write the cosmetics file", e);
         }
     }

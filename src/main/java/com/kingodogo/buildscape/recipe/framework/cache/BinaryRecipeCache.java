@@ -12,6 +12,7 @@ import com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe;
 import com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator;
 import com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
@@ -70,7 +71,7 @@ public class BinaryRecipeCache {
                 }
             }
         } catch (Throwable ignored) {
-            // registry not ready; fall back to air
+            // registry not ready, possibly as a linkage error; fall back to air
         }
         return Items.AIR;
     }
@@ -87,7 +88,7 @@ public class BinaryRecipeCache {
                 }
             }
         } catch (Throwable ignored) {
-            // registry not ready; fall back to minecraft:air
+            // registry not ready, possibly as a linkage error; fall back to minecraft:air
         }
         return new ResourceLocation("minecraft", "air");
     }
@@ -254,6 +255,7 @@ public class BinaryRecipeCache {
                             JsonElement jsonElement = JsonParser.parseString(s);
                             ingredientCache[i] = Ingredient.fromJson(jsonElement);
                         } catch (Exception e) {
+                            // ingredient JSON from the cache may be invalid; leave the slot uncached
                             ingredientCache[i] = null;
                         }
                     } else if (s.contains(":")) {
@@ -264,7 +266,7 @@ public class BinaryRecipeCache {
                             if (item != null && item != Items.AIR) {
                                 itemCache[i] = item;
                             }
-                        } catch (Exception ignored) {
+                        } catch (ResourceLocationException ignored) {
                             // unreadable id; leave this slot uncached
                         }
                     }
@@ -283,6 +285,7 @@ public class BinaryRecipeCache {
 
             BuildScape.LOGGER.info("BDRE Binary Cache stream loaded successfully ({} recipes).", recipes.size());
         } catch (Exception e) {
+            // any malformed cache content rejects the whole cache
             BuildScape.LOGGER.warn("BDRE Binary Cache rejected: {}; recompiling from compact sources.", e.getMessage(),
                     e);
             recipes.clear();
@@ -575,6 +578,7 @@ public class BinaryRecipeCache {
                 try {
                     ing = Ingredient.fromJson(JsonParser.parseString(jsonStr));
                 } catch (Exception e) {
+                    // modded ingredient serializers can throw anything on bad JSON; the recipe is dropped
                     validation.reason = "invalid ingredient: " + jsonStr;
                     // Do not cache failures as EMPTY: every referring recipe must be dropped.
                     return Ingredient.EMPTY;

@@ -319,6 +319,7 @@ public class PillarBlock
                 }
             }
         } catch (Exception e) {
+            // chunk access can fail while the area loads; treat the position as unavailable
             return;
         }
 

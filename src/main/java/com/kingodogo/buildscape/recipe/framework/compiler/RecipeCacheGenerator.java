@@ -485,7 +485,7 @@ public class RecipeCacheGenerator {
             try {
                 AtomicFiles.write(targetLocalCache, cacheBytes);
                 System.out.println("Synchronized local runtime cache: " + targetLocalCache.toAbsolutePath());
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.out.println("Note: Local runtime cache directory not present or skipped: " + e.getMessage());
             }
         }

@@ -236,6 +236,7 @@ public class ClientEvents {
             ItemFrameParticleHandler.clearCaches();
             MuffBlockManager.clear();
         } catch (Exception e) {
+            // cache clearers touch several renderer caches; one failure must not block the world unload
             BuildScape.LOGGER.error("Error clearing caches on world unload", e);
         }
     }

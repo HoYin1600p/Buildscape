@@ -168,6 +168,7 @@ public class RecipePackFormatter {
                             boolean changed = formatFile(p);
                             System.out.println((changed ? "Formatted: " : "Unchanged: ") + p.toAbsolutePath());
                         } catch (Exception e) {
+                            // wrap any failure with the file name
                             throw new IllegalStateException("Failed to format " + p + ": " + e.getMessage(), e);
                         }
                     });

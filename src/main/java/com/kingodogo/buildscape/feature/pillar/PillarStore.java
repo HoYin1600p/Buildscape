@@ -61,10 +61,11 @@ final class PillarStore {
                         cachedWorldSaveDir = buildscapeDir;
                     }
                 } catch (Exception e) {
+                    // creating the folder is best effort; any file system failure is only logged
                     BuildScape.LOGGER.warn("Unable to create the world data folder", e);
                 }
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             // best-effort cache refresh; getDataDir falls back to the config folder
         }
     }
@@ -96,6 +97,7 @@ final class PillarStore {
                         return buildscapeDir;
                     }
                 } catch (Exception e) {
+                    // creating the folder is best effort; any file system failure falls back to the config folder
                     BuildScape.LOGGER.warn("Unable to create the world data folder, falling back to the config folder",
                             e);
                 }
@@ -110,7 +112,7 @@ final class PillarStore {
                 dir.mkdirs();
             }
             return dir;
-        } catch (Throwable t) {
+        } catch (Exception t) {
             // top-level guard: fall back to a safe folder whatever fails
             return new File(".");
         }
@@ -171,7 +173,7 @@ final class PillarStore {
                 try {
                     FileChannel channel = fos.getChannel();
                     channel.force(true);
-                } catch (Exception forceEx) {
+                } catch (IOException forceEx) {
                     // force() is best effort; the data was already flushed
                 }
             }
@@ -179,6 +181,7 @@ final class PillarStore {
             AtomicFiles.moveReplacing(tempFile.toPath(), file.toPath());
             return true;
         } catch (Exception e) {
+            // any serialisation or file failure is logged and reported to the caller as false
             BuildScape.LOGGER.error("Error saving pillar data to {}", file.getAbsolutePath(), e);
             return false;
         }

@@ -272,6 +272,7 @@ public class PillarBlockEntityRenderer
                             gameTime,
                             blockEntity.getFacingYaw());
                 } catch (Exception e) {
+                    // mob rendering runs vanilla and mod entity code; fall back to the item model
                     logRenderFailure(displayedItem, e);
                     restorePose(poseStack, mobPose);
                     poseStack.scale(0.5f, 0.5f, 0.5f);
@@ -379,6 +380,7 @@ public class PillarBlockEntityRenderer
             }
 
         } catch (Exception e) {
+            // item model rendering runs mod code every frame; log and skip this item
             logRenderFailure(displayedItem, e);
         } finally {
             restorePose(poseStack, entryPose);
@@ -507,6 +509,7 @@ public class PillarBlockEntityRenderer
                 return lowerName.contains("grum") || lowerName.contains("dinnerbone");
             }
         } catch (Exception e) {
+            // custom names are arbitrary JSON from items; any parse failure uses the raw text
             String trimmedName = nameJson.trim();
             trimmedName = ChatFormatting.stripFormatting(trimmedName);
             if (trimmedName != null && !trimmedName.isEmpty()) {
@@ -560,6 +563,7 @@ public class PillarBlockEntityRenderer
                 return trimmedName.equalsIgnoreCase("item");
             }
         } catch (Exception e) {
+            // custom names are arbitrary JSON from items; any parse failure uses the raw text
             String trimmedName = nameJson.trim();
             trimmedName = ChatFormatting.stripFormatting(trimmedName);
             if (trimmedName != null && !trimmedName.isEmpty()) {
@@ -620,6 +624,7 @@ public class PillarBlockEntityRenderer
                 }
             }
         } catch (Exception e) {
+            // custom names are arbitrary JSON from items; any parse failure uses the raw text
             String trimmedName = nameJson.trim();
             trimmedName = ChatFormatting.stripFormatting(trimmedName);
             if (trimmedName != null && !trimmedName.isEmpty()) {

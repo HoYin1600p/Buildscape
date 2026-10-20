@@ -592,6 +592,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 return false;
             }
         } catch (Exception ignored) {
+            // the shape lookup can run arbitrary mod block code; treat a failure as not a full block
             return false;
         }
 

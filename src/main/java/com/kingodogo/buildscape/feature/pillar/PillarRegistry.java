@@ -242,6 +242,7 @@ final class PillarRegistry {
             try {
                 indexPosition(data);
             } catch (Exception e) {
+                // indexing one pillar must not stop the rest
                 BuildScape.LOGGER.debug("Skipped position index for pillar {}", data.id, e);
             }
         }
@@ -391,6 +392,7 @@ final class PillarRegistry {
                 }
             }
         } catch (Exception e) {
+            // chunk access can fail while the area loads; treat the position as unavailable
             return PillarIdManager.PREFIX_STONE + "-P";
         }
 
@@ -466,6 +468,7 @@ final class PillarRegistry {
                 return PillarIdManager.PREFIX_STONE + "-P";
             }
         } catch (Exception e) {
+            // block lookup failed; use the stone prefix
             return PillarIdManager.PREFIX_STONE + "-P";
         }
     }

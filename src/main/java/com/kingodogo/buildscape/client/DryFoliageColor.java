@@ -59,6 +59,7 @@ public class DryFoliageColor {
                 }
             }
         } catch (Exception e) {
+            // missing resource, undecodable image or one smaller than 256x256; use the default colour
             Arrays.fill(pixels, 0x867E36);
         } finally {
             loaded = true;

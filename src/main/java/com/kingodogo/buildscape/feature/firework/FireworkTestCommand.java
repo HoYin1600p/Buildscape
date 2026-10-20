@@ -86,6 +86,7 @@ public class FireworkTestCommand {
                     true);
             return 1;
         } catch (Exception e) {
+            // any failure is reported as the player-only message, as before
             source.sendFailure(new TextComponent("§cMust be executed by a player"));
             return 0;
         }

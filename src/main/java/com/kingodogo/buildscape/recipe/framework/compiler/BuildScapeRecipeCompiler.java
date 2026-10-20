@@ -98,6 +98,7 @@ public class BuildScapeRecipeCompiler {
                         }
                     }
                 } catch (Exception e) {
+                    // a family that fails to expand or compile is skipped; the rest still load
                     BuildScape.LOGGER.warn("BDRE Compiler: Exception expanding family base [{}]", family.base(), e);
                 }
             }
@@ -113,6 +114,7 @@ public class BuildScapeRecipeCompiler {
                         compiledRecipes.add(recipe);
                     }
                 } catch (Exception e) {
+                    // a recipe that fails to compile is skipped; the rest still load
                     BuildScape.LOGGER.warn("BDRE Compiler: Exception compiling single recipe [{}]", spec.id(), e);
                 }
             }

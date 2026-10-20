@@ -70,6 +70,7 @@ public class PillarServerEvents {
                 }
             }
         } catch (Exception e) {
+            // saving on stop must not block the shutdown
             BuildScape.LOGGER.error("Error saving pillar data on server stop", e);
         }
 
@@ -171,6 +172,7 @@ public class PillarServerEvents {
             SyncPillarIdsPacket.sendToPlayer(
                     player, manager.getAllPillarDataForSync());
         } catch (Exception e) {
+            // syncing one player must not break the login handler
             BuildScape.LOGGER.error("Error sending pillar IDs to player", e);
         }
     }
@@ -204,6 +206,7 @@ public class PillarServerEvents {
                     }
                 }
             } catch (Exception e) {
+                // saving before unload must not block the unload
                 BuildScape.LOGGER.error("Error syncing/saving colors before world unload", e);
             }
 

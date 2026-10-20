@@ -245,6 +245,7 @@ public class UpdateConfigPacket {
             try {
                 data = assembly.accept(this);
             } catch (Exception e) {
+                // the payload is untrusted; any failure rejects the update
                 ServerPendingHolder.PENDING.remove(player);
                 BuildScape.LOGGER.warn("Rejected config update from {}", player.getUUID(), e);
                 player.displayClientMessage(new TextComponent(
@@ -355,6 +356,7 @@ public class UpdateConfigPacket {
                                 level.sendBlockUpdated(pos, pillarBE.getBlockState(), pillarBE.getBlockState(), 3);
                             }
                         } catch (Exception e) {
+                            // one bad pillar must not stop the rest of the sync
                             BuildScape.LOGGER.debug("Unable to sync pillar block entity for {}", pData.id, e);
                         }
                     }

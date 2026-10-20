@@ -130,15 +130,18 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                                         resource.getInputStream(), StandardCharsets.UTF_8)) {
                             readDisabledIds(JsonParser.parseReader(reader), disabled, location);
                         } catch (Exception e) {
+                            // one unreadable list must not block the other lists
                             BuildScape.LOGGER.warn("BDRE Loader: Could not read disabled recipe list [{}]", location,
                                     e);
                         }
                     }
                 } catch (Exception e) {
+                    // one unreadable location must not block the other locations
                     BuildScape.LOGGER.warn("BDRE Loader: Could not read disabled recipe list [{}]", location, e);
                 }
             }
         } catch (Exception e) {
+            // the resource manager lookup failed; no recipes are disabled
             BuildScape.LOGGER.warn("BDRE Loader: Could not look up disabled recipe lists", e);
         }
         return Set.copyOf(disabled);
@@ -178,6 +181,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                     }
                 }
             } catch (Exception e) {
+                // an unreadable category file is skipped
                 BuildScape.LOGGER.error("BDRE Loader: Error reading category file [{}]", location, e);
             }
         }
@@ -198,6 +202,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                     return recipes;
                 }
             } catch (Exception e) {
+                // the bundled cache is unreadable; fall back to compiling the sources
                 BuildScape.LOGGER.warn("BDRE Loader: Exception reading bundled binary cache resource", e);
             }
         }
@@ -229,6 +234,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                 compiledByCategory.put(category, result.recipes());
                 compiler.clear();
             } catch (Exception e) {
+                // a category that fails to parse or compile is skipped; the others still load
                 BuildScape.LOGGER.error("BDRE Loader: Failure parsing category [{}]", category, e);
             }
         });
@@ -292,6 +298,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                 runtimeRecipes.addAll(result.recipes());
                 compiler.clear();
             } catch (Exception e) {
+                // a category that fails to parse or compile is skipped; the others still load
                 BuildScape.LOGGER.error("BDRE Loader: Failure parsing runtime-only category [{}]", category, e);
             }
         }

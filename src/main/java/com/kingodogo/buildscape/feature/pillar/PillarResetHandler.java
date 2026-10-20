@@ -56,10 +56,12 @@ public class PillarResetHandler {
                         }
                     }
                 } catch (Exception e) {
+                    // world and block entity access on the server thread; log and keep the server running
                     BuildScape.LOGGER.warn("Unable to reset the pillar stack at {}", pos, e);
                 }
             });
         } catch (Exception e) {
+            // scheduling must not break the caller
             BuildScape.LOGGER.warn("Unable to schedule the pillar reset", e);
         }
     }

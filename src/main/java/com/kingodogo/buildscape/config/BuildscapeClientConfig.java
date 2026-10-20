@@ -95,7 +95,7 @@ public class BuildscapeClientConfig {
                 configDir = FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable ignored) {
-            // FMLPaths is not ready yet; configDir stays null and the caller handles that
+            // FMLPaths is not ready yet, possibly as a linkage error; configDir stays null and the caller handles that
         }
         if (configDir == null) {
             configDir = ConfigPaths.root();
@@ -115,7 +115,7 @@ public class BuildscapeClientConfig {
                 configDir = FMLPaths.CONFIGDIR.get();
             }
         } catch (Throwable ignored) {
-            // FMLPaths is not ready yet; configDir stays null and the caller handles that
+            // FMLPaths is not ready yet, possibly as a linkage error; configDir stays null and the caller handles that
         }
         if (configDir == null) {
             configDir = ConfigPaths.root();
@@ -174,6 +174,7 @@ public class BuildscapeClientConfig {
                     save();
                 }
             } catch (Exception e) {
+                // merging the old ui-state file is best effort; any read or parse failure keeps both files
                 BuildScape.LOGGER.warn("BuildscapeClientConfig: Failed to merge ui-state.cfg into buildscape.cfg",
                         e);
             }

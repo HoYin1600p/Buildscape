@@ -61,6 +61,7 @@ public class ModCommandEvents {
                                                             "Pillar recovery completed. Check console for details."),
                                                     true);
                                         } catch (Exception e) {
+                                            // recovery walks live world data; report any failure to the command sender
                                             source.sendFailure(
                                                     new TextComponent(
                                                             "Error during recovery: "

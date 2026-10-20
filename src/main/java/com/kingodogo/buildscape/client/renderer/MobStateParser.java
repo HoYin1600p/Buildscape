@@ -102,6 +102,7 @@ public class MobStateParser {
             statesLoaded = true;
 
         } catch (Exception e) {
+            // the bundled states file may be missing or malformed; fall back to the universal states
             BuildScape.LOGGER.error("Failed to load states", e);
             addUniversalStates();
             statesLoaded = true;
@@ -422,6 +423,7 @@ public class MobStateParser {
                 }
             }
         } catch (Exception e) {
+            // custom names are arbitrary JSON from items; any parse failure uses the raw text
             return ChatFormatting.stripFormatting(nameJson.trim());
         }
 

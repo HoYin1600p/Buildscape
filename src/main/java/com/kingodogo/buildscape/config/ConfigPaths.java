@@ -95,6 +95,7 @@ public final class ConfigPaths {
                 return PillarParticleConfig.parseItems(json);
             }
         } catch (Exception e) {
+            // template read or parse failure; start with no default items
             BuildScape.LOGGER.warn("ConfigPaths: failed to load default items from template {}", template, e);
         }
         return Collections.emptySet();

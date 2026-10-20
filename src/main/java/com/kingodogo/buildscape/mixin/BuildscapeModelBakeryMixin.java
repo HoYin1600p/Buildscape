@@ -109,6 +109,7 @@ public abstract class BuildscapeModelBakeryMixin {
                 model.name = modelLocation.toString();
                 parsedModels.put(modelLocation, model);
             } catch (Exception exception) {
+                // an unreadable or unparsable model falls back to the normal loader
                 fallbackCount.incrementAndGet();
                 BuildScape.LOGGER.debug(
                         "Buildscape model preload deferred {} to the normal loader",
@@ -270,6 +271,7 @@ public abstract class BuildscapeModelBakeryMixin {
                     .sorted(Comparator.comparing(ResourceLocation::toString))
                     .toList();
         } catch (Exception exception) {
+            // directory walk or id parsing failed; fall back to the normal loader
             BuildScape.LOGGER.warn(
                     "Buildscape model discovery fell back to the normal loader",
                     exception);

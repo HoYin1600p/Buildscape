@@ -10,6 +10,7 @@ import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.core.io.Json;
 import com.kingodogo.buildscape.network.SyncConfigPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -161,6 +162,7 @@ public class PillarParticleConfig {
             try {
                 callback.accept(isRemote);
             } catch (Exception e) {
+                // callbacks are other code; one failing callback must not stop the rest
                 BuildScape.LOGGER.error("Config reload callback failed", e);
             }
         }
@@ -237,6 +239,7 @@ public class PillarParticleConfig {
                 Files.copy(file.toPath(), backup);
             }
         } catch (Exception e) {
+            // the backup is best effort; any file system failure is only logged
             BuildScape.LOGGER.error("Unable to back up unreadable config {}", file, e);
         }
     }
@@ -491,6 +494,7 @@ public class PillarParticleConfig {
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         } catch (Exception e) {
+                            // any watcher or reload failure is logged and ends the watcher thread
                             BuildScape.LOGGER.error("Error in config file watcher", e);
                         }
                     },
@@ -499,6 +503,7 @@ public class PillarParticleConfig {
             watchThread.setDaemon(true);
             watchThread.start();
         } catch (Exception e) {
+            // watcher setup can fail on unsupported file systems; the config then loads without live reload
             watcherInitialized.set(false);
         }
     }
@@ -536,6 +541,7 @@ public class PillarParticleConfig {
                     "#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF"));
             ConfigLayoutIO.write(f.toPath(), groupedProperties(defaults.propertyValues()), null, false);
         } catch (Exception e) {
+            // writing the default file is best effort; the defaults stay in memory
             BuildScape.LOGGER.error("Unable to create default pillar properties", e);
         }
     }
@@ -629,6 +635,7 @@ public class PillarParticleConfig {
             try {
                 originalProperties = ConfigLayoutIO.readProperties(propertiesSource);
             } catch (Exception e) {
+                // the properties file may be malformed in any way; load it read-only
                 propertiesReadOnly = true;
                 originalProperties = null;
             }
@@ -763,6 +770,7 @@ public class PillarParticleConfig {
             }
             loadedPropertyValues = propertyValues();
         } catch (Exception e) {
+            // the properties file may be malformed in any way; keep the original and make it read-only
             propertiesReadOnly = true;
             backupUnreadableFile(file);
             BuildScape.LOGGER.error("Unable to load pillar properties; retaining the original file", e);
@@ -794,6 +802,7 @@ public class PillarParticleConfig {
             try {
                 ConfigLayoutIO.readProperties(normalized);
             } catch (Exception e) {
+                // unparsable properties text only makes the items file read-only
                 itemsReadOnly = true;
             }
             // Non-string entries can be ignored in memory, but must not be lost in a rewrite.
@@ -817,6 +826,7 @@ public class PillarParticleConfig {
                     }
                     document = merged;
                 } catch (Exception e) {
+                    // merging new default items is best effort; keep the existing file
                     BuildScape.LOGGER.warn("Unable to merge new default items; retaining the existing file", e);
                 }
             }
@@ -825,6 +835,7 @@ public class PillarParticleConfig {
             replaceItems(parsed);
             itemsFileUnreadable = false;
         } catch (Exception e) {
+            // the items file may be malformed in any way; keep the last good item list
             itemsFileUnreadable = true;
             backupUnreadableFile(file);
             BuildScape.LOGGER.error("Unable to load items config {}; keeping the last good item list", file, e);
@@ -975,6 +986,7 @@ public class PillarParticleConfig {
                     }
                 }
             } catch (Exception e) {
+                // legacy migration is best effort; keep the original file
                 BuildScape.LOGGER.error("Unable to migrate legacy pillar items; retaining the original", e);
             }
             try {
@@ -991,6 +1003,7 @@ public class PillarParticleConfig {
                     }
                 }
             } catch (Exception e) {
+                // legacy migration is best effort; keep the original file
                 BuildScape.LOGGER.error("Unable to migrate legacy pillar properties; retaining the original", e);
             }
             boolean migrated = getPropertiesFile().exists() && (getItemsFile().exists() || !hasItems);
@@ -1002,6 +1015,7 @@ public class PillarParticleConfig {
             }
             return migrated;
         } catch (Exception e) {
+            // legacy migration is best effort; keep the original file
             BuildScape.LOGGER.error("Unable to migrate legacy pillar config; retaining the original", e);
             return false;
         }
@@ -1050,7 +1064,7 @@ public class PillarParticleConfig {
                     if (stack.getItem().builtInRegistryHolder().is(tagKey)) {
                         return true;
                     }
-                } catch (Exception e) {
+                } catch (ResourceLocationException e) {
                     // invalid tag id; treat it as not matching
                 }
             }
@@ -1120,6 +1134,7 @@ public class PillarParticleConfig {
             lastFileSizeItems = file.length();
             return true;
         } catch (Exception e) {
+            // any save failure is logged and reported to the caller as false
             BuildScape.LOGGER.error("Error saving items config", e);
             return false;
         }
@@ -1194,6 +1209,7 @@ public class PillarParticleConfig {
             lastFileSizeProperties = file.length();
             return true;
         } catch (Exception ignored) {
+            // any save failure is logged and reported to the caller as false
             BuildScape.LOGGER.warn("Unable to save pillar properties", ignored);
             return false;
         }

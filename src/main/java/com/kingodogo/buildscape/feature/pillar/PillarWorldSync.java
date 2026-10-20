@@ -98,6 +98,7 @@ final class PillarWorldSync {
                             syncedCount++;
                         }
                     } catch (Exception e) {
+                        // one bad pillar must not stop the rest of the sync
                         BuildScape.LOGGER.error("Error syncing pillar {}: {}", (data != null ? data.id : "unknown"),
                                 e.getMessage(), e);
                     }
@@ -105,6 +106,7 @@ final class PillarWorldSync {
             }
 
         } catch (Exception e) {
+            // the sync is best effort; a failure is logged and nothing else changes
             BuildScape.LOGGER.error("Error in syncAllLoadedPillars", e);
         }
     }
@@ -269,6 +271,7 @@ final class PillarWorldSync {
                             }
                         }
                     } catch (Exception e) {
+                        // one bad pillar must not stop the rest of the sync
                         preservedCount++;
                         BuildScape.LOGGER.error("Error syncing colors from NBT for pillar {}: {}",
                                 (data != null ? data.id : "unknown"),
@@ -282,6 +285,7 @@ final class PillarWorldSync {
             } else if (preservedCount > 0) {
             }
         } catch (Exception e) {
+            // the sync is best effort; a failure is logged and nothing else changes
             BuildScape.LOGGER.error("Error in syncColorsFromNBTToManager", e);
         }
     }
@@ -357,6 +361,7 @@ final class PillarWorldSync {
                             }
                         }
                     } catch (Exception e) {
+                        // one bad pillar must not stop the rest of the sync
                         BuildScape.LOGGER.error("Error loading colors from NBT for pillar {}: {}",
                                 (data != null ? data.id : "unknown"),
                                 e.getMessage(), e);
@@ -369,6 +374,7 @@ final class PillarWorldSync {
             } else {
             }
         } catch (Exception e) {
+            // the sync is best effort; a failure is logged and nothing else changes
             BuildScape.LOGGER.error("Error in loadColorsFromNBT", e);
         }
     }

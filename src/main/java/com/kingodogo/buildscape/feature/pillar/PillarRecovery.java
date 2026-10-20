@@ -155,16 +155,19 @@ final class PillarRecovery {
                                     }
                                 }
                             } catch (Exception e) {
+                                // an unreadable chunk is skipped
                                 continue;
                             }
                         }
                     }
                 } catch (Exception e) {
+                    // a failure scanning one level is logged; the other levels continue
                     BuildScape.LOGGER.error("Error scanning chunks to clear pillar IDs", e);
                 }
             }
 
         } catch (Exception e) {
+            // recovery runs on live world data; log the failure and return the count so far
             BuildScape.LOGGER.error("Error clearing pillar IDs from world", e);
         }
 
@@ -240,6 +243,7 @@ final class PillarRecovery {
                                     }
                                 }
                             } catch (Exception e) {
+                                // an unreadable chunk is skipped
                                 continue;
                             }
                         }
@@ -330,12 +334,14 @@ final class PillarRecovery {
                                 m.registry.pillarData.put(pillarId, data);
                                 recoveredCount++;
                             } catch (Exception e) {
+                                // one bad pillar is counted as skipped
                                 BuildScape.LOGGER.error("Error processing pillar", e);
                                 skippedCount++;
                             }
                         }
                     }
                 } catch (Exception e) {
+                    // a failure scanning one level is logged and counted as skipped
                     BuildScape.LOGGER.error("Error scanning chunks for pillars", e);
                     skippedCount++;
                 }
@@ -352,6 +358,7 @@ final class PillarRecovery {
             }
 
         } catch (Exception e) {
+            // recovery runs on live world data; log any failure (the flag is released below)
             BuildScape.LOGGER.error("Error during pillar recovery", e);
         } finally {
             recoveryInProgress = false;

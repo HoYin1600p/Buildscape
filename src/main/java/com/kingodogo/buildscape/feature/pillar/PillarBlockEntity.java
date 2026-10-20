@@ -276,6 +276,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
                 manager.load();
                 manager.registerPillar(this);
             } catch (Exception e) {
+                // registering during load must not break chunk loading
                 BuildScape.LOGGER.warn("Unable to register pillar at {} on load", worldPosition, e);
             }
         }

@@ -55,6 +55,7 @@ final class PillarStack {
                     }
                 }
             } catch (Exception e) {
+                // chunk access can fail while the area loads; treat the position as unavailable
                 break;
             }
 
@@ -111,6 +112,7 @@ final class PillarStack {
                         }
                     }
                 } catch (Exception e) {
+                    // chunk access can fail while the area loads; treat the position as unavailable
                     break;
                 }
 
@@ -126,6 +128,7 @@ final class PillarStack {
                 checked++;
             }
         } catch (Exception e) {
+            // the stack walk failed; fall back to this pillar's own value
             return self.particlePattern;
         }
 
@@ -168,6 +171,7 @@ final class PillarStack {
                     }
                 }
             } catch (Exception e) {
+                // chunk access can fail while the area loads; treat the position as unavailable
                 break;
             }
 
@@ -222,6 +226,7 @@ final class PillarStack {
                         }
                     }
                 } catch (Exception e) {
+                    // chunk access can fail while the area loads; treat the position as unavailable
                     break;
                 }
 
@@ -235,6 +240,7 @@ final class PillarStack {
                 checked++;
             }
         } catch (Exception e) {
+            // the stack walk failed; fall back to this pillar's own value
             return self.pillarId;
         }
 

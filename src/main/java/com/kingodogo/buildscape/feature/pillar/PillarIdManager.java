@@ -541,6 +541,7 @@ public class PillarIdManager {
                 try {
                     loadFileAsync(server);
                 } catch (Exception e) {
+                    // server-thread task; a failed load is logged and must not leave the load flag set
                     BuildScape.LOGGER.error("Error in async file load", e);
                     hasLoaded = true;
                 } finally {
@@ -688,6 +689,7 @@ public class PillarIdManager {
                     return new SavedData(file, loaded);
                 }
             } catch (Exception e) {
+                // the pillar file may be corrupt in any way; fall back to the backup
                 handleCorruptedFile(file, e, "parse");
             }
         }
@@ -698,6 +700,7 @@ public class PillarIdManager {
                     return new SavedData(backupFile, loaded);
                 }
             } catch (Exception e) {
+                // the backup may be corrupt too; start empty
                 BuildScape.LOGGER.error("Unable to read pillar backup", e);
             }
         }
@@ -1010,6 +1013,7 @@ public class PillarIdManager {
                 }
                 positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
             } catch (Exception e) {
+                // a bad entry only loses its index slot
                 BuildScape.LOGGER.debug("Skipped position index for pillar {}", data.id, e);
             }
         }

@@ -49,6 +49,7 @@ public class CopperRodHandler {
             ((PoiTypeAccessor) (Object) PoiType.LIGHTNING_ROD).setMatchingStates(immutableStates);
             PoiTypeAccessor.getAllStates().addAll(immutableStates);
         } catch (Exception e) {
+            // patches vanilla POI tables through an accessor; a failure only leaves rods without lightning behaviour
             BuildScape.LOGGER.error("Failed to register Copper Rods into PoiType.LIGHTNING_ROD", e);
         }
     }

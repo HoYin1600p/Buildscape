@@ -257,126 +257,14 @@ public class PillarBlockEntityRenderer
             }
 
             if (isSpawnEgg) {
-                PoseStack.Pose mobPose = poseStack.last();
-                try {
-                    MobPillarRenderer.renderMob(
-                            (SpawnEggItem) displayedItem.getItem(),
-                            info.mobState,
-                            pos,
-                            blockEntity.getLevel(),
-                            partialTicks,
-                            poseStack,
-                            bufferSource,
-                            combinedLight,
-                            rotation,
-                            gameTime,
-                            blockEntity.getFacingYaw());
-                } catch (Exception e) {
-                    // mob rendering runs vanilla and mod entity code; fall back to the item model
-                    logRenderFailure(displayedItem, e);
-                    restorePose(poseStack, mobPose);
-                    poseStack.scale(0.5f, 0.5f, 0.5f);
-                    Level level = blockEntity.getLevel();
-                    BakedModel model = this.itemRenderer.getModel(displayedItem, level, null, 0);
-                    boolean hasGlint = displayedItem.hasFoil();
-                    this.itemRenderer.render(
-                            displayedItem,
-                            ItemTransforms.TransformType.FIXED,
-                            hasGlint,
-                            poseStack,
-                            bufferSource,
-                            combinedLight,
-                            combinedOverlay,
-                            model);
-                }
+                renderSpawnEgg(blockEntity, info, displayedItem, partialTicks, poseStack, bufferSource,
+                        combinedLight, combinedOverlay, rotation, gameTime);
+            } else if (isFixed) {
+                renderFixedItem(blockEntity, displayedItem, poseStack, bufferSource, combinedLight,
+                        combinedOverlay);
             } else {
-                if (isFixed) {
-                    BakedModel model = this.itemRenderer.getModel(displayedItem, blockEntity.getLevel(), null, 0);
-                    AABB bounds = getOrCalculateBounds(model);
-
-                    double lenX = bounds.maxX - bounds.minX;
-                    double lenY = bounds.maxY - bounds.minY;
-                    double visualLength = Math.sqrt(lenX * lenX + lenY * lenY);
-                    if (visualLength < 0.1) {
-                        visualLength = 1.0;
-                    }
-
-                    float scale = 0.8f;
-                    double standardLength = 0.85;
-
-                    Item item = displayedItem.getItem();
-                    boolean isSword = item instanceof SwordItem ||
-                            item instanceof TridentItem ||
-                            item instanceof ShovelItem;
-                    boolean isAxe = item instanceof AxeItem ||
-                            item instanceof PickaxeItem ||
-                            item instanceof HoeItem;
-
-                    if (isSword) {
-                        double baseTransY = -0.5;
-
-                        double extraLength = Math.max(0, visualLength - standardLength);
-                        double transY = baseTransY + (extraLength * 0.7 * scale);
-
-                        double tipDist = (visualLength / 2.0) * scale;
-                        double tipY = (1.4625 + transY) - tipDist;
-
-                        if (tipY < 0.05) {
-                            double correctiveLift = 0.05 - tipY;
-                            transY += correctiveLift;
-                        }
-
-                        poseStack.translate(0, transY, 0);
-                        poseStack.mulPose(Vector3f.ZP.rotationDegrees(135));
-                        poseStack.scale(scale, scale, scale);
-
-                    } else if (isAxe) {
-                        double baseTransY = -0.55;
-
-                        double extraLength = Math.max(0, visualLength - standardLength);
-                        double transY = baseTransY + (extraLength * 0.7 * scale);
-
-                        double tipDist = (visualLength / 2.0) * scale;
-                        double tipY = (1.4625 + transY) - tipDist;
-
-                        if (tipY < 0.05) {
-                            double correctiveLift = 0.05 - tipY;
-                            transY += correctiveLift;
-                        }
-
-                        poseStack.translate(0, transY, 0);
-                        poseStack.mulPose(Vector3f.ZP.rotationDegrees(190));
-                        poseStack.scale(scale, scale, scale);
-                    } else {
-                        poseStack.scale(0.5f, 0.5f, 0.5f);
-                    }
-                    boolean hasGlint = displayedItem.hasFoil();
-                    this.itemRenderer.render(
-                            displayedItem,
-                            ItemTransforms.TransformType.FIXED,
-                            hasGlint,
-                            poseStack,
-                            bufferSource,
-                            combinedLight,
-                            combinedOverlay,
-                            model);
-                } else {
-                    poseStack.scale(0.5f, 0.5f, 0.5f);
-
-                    Level level = blockEntity.getLevel();
-                    BakedModel model = this.itemRenderer.getModel(displayedItem, level, null, 0);
-                    boolean hasGlint = displayedItem.hasFoil();
-
-                    this.itemRenderer.render(
-                            displayedItem,
-                            ItemTransforms.TransformType.FIXED,
-                            hasGlint,
-                            poseStack,
-                            bufferSource,
-                            combinedLight,
-                            combinedOverlay,
-                            model);
-                }
+                renderSpinningItem(blockEntity, displayedItem, poseStack, bufferSource, combinedLight,
+                        combinedOverlay);
             }
 
         } catch (Exception e) {
@@ -385,6 +273,146 @@ public class PillarBlockEntityRenderer
         } finally {
             restorePose(poseStack, entryPose);
         }
+    }
+
+    /** A spawn egg shows its mob; if the mob cannot render, the egg's item model is drawn instead. */
+    private void renderSpawnEgg(
+            PillarBlockEntity blockEntity,
+            DisplayInfo info,
+            ItemStack displayedItem,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int combinedLight,
+            int combinedOverlay,
+            float rotation,
+            float gameTime) {
+        BlockPos pos = blockEntity.getBlockPos();
+        PoseStack.Pose mobPose = poseStack.last();
+        try {
+            MobPillarRenderer.renderMob(
+                    (SpawnEggItem) displayedItem.getItem(),
+                    info.mobState,
+                    pos,
+                    blockEntity.getLevel(),
+                    partialTicks,
+                    poseStack,
+                    bufferSource,
+                    combinedLight,
+                    rotation,
+                    gameTime,
+                    blockEntity.getFacingYaw());
+        } catch (Exception e) {
+            // mob rendering runs vanilla and mod entity code; fall back to the item model
+            logRenderFailure(displayedItem, e);
+            restorePose(poseStack, mobPose);
+            poseStack.scale(0.5f, 0.5f, 0.5f);
+            Level level = blockEntity.getLevel();
+            BakedModel model = this.itemRenderer.getModel(displayedItem, level, null, 0);
+            boolean hasGlint = displayedItem.hasFoil();
+            this.itemRenderer.render(
+                    displayedItem,
+                    ItemTransforms.TransformType.FIXED,
+                    hasGlint,
+                    poseStack,
+                    bufferSource,
+                    combinedLight,
+                    combinedOverlay,
+                    model);
+        }
+    }
+
+    /** A fixed item faces the block's direction; swords and tools are tilted and lifted so the tip clears the floor. */
+    private void renderFixedItem(
+            PillarBlockEntity blockEntity,
+            ItemStack displayedItem,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int combinedLight,
+            int combinedOverlay) {
+        BakedModel model = this.itemRenderer.getModel(displayedItem, blockEntity.getLevel(), null, 0);
+        AABB bounds = getOrCalculateBounds(model);
+
+        double lenX = bounds.maxX - bounds.minX;
+        double lenY = bounds.maxY - bounds.minY;
+        double visualLength = Math.sqrt(lenX * lenX + lenY * lenY);
+        if (visualLength < 0.1) {
+            visualLength = 1.0;
+        }
+
+        float scale = 0.8f;
+
+        Item item = displayedItem.getItem();
+        boolean isSword = item instanceof SwordItem ||
+                item instanceof TridentItem ||
+                item instanceof ShovelItem;
+        boolean isAxe = item instanceof AxeItem ||
+                item instanceof PickaxeItem ||
+                item instanceof HoeItem;
+
+        if (isSword) {
+            tiltTool(poseStack, visualLength, scale, -0.5, 135);
+        } else if (isAxe) {
+            tiltTool(poseStack, visualLength, scale, -0.55, 190);
+        } else {
+            poseStack.scale(0.5f, 0.5f, 0.5f);
+        }
+        boolean hasGlint = displayedItem.hasFoil();
+        this.itemRenderer.render(
+                displayedItem,
+                ItemTransforms.TransformType.FIXED,
+                hasGlint,
+                poseStack,
+                bufferSource,
+                combinedLight,
+                combinedOverlay,
+                model);
+    }
+
+    /** Lifts a tool by its length (never below the floor), tilts it about Z and scales it. */
+    private static void tiltTool(PoseStack poseStack, double visualLength, float scale, double baseTransY,
+            float tiltDegrees) {
+        double standardLength = 0.85;
+
+        double extraLength = Math.max(0, visualLength - standardLength);
+        double transY = baseTransY + (extraLength * 0.7 * scale);
+
+        double tipDist = (visualLength / 2.0) * scale;
+        double tipY = (1.4625 + transY) - tipDist;
+
+        if (tipY < 0.05) {
+            double correctiveLift = 0.05 - tipY;
+            transY += correctiveLift;
+        }
+
+        poseStack.translate(0, transY, 0);
+        poseStack.mulPose(Vector3f.ZP.rotationDegrees(tiltDegrees));
+        poseStack.scale(scale, scale, scale);
+    }
+
+    /** A loose item spins at half size. */
+    private void renderSpinningItem(
+            PillarBlockEntity blockEntity,
+            ItemStack displayedItem,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int combinedLight,
+            int combinedOverlay) {
+        poseStack.scale(0.5f, 0.5f, 0.5f);
+
+        Level level = blockEntity.getLevel();
+        BakedModel model = this.itemRenderer.getModel(displayedItem, level, null, 0);
+        boolean hasGlint = displayedItem.hasFoil();
+
+        this.itemRenderer.render(
+                displayedItem,
+                ItemTransforms.TransformType.FIXED,
+                hasGlint,
+                poseStack,
+                bufferSource,
+                combinedLight,
+                combinedOverlay,
+                model);
     }
 
     private DisplayInfo createDisplayInfo(ItemStack displayedItem, long startTime, PillarBlockEntity owner) {

@@ -21,13 +21,20 @@ public class UploadBatchingTest {
     private static PillarParticleConfig copyOf(PillarParticleConfig source) {
         PillarParticleConfig copy = new PillarParticleConfig();
         copy.particle_speed = source.particle_speed;
+        copy.particle_spread = source.particle_spread;
         copy.particle_lifetime = source.particle_lifetime;
+        copy.particle_density = source.particle_density;
+        copy.use_pattern = source.use_pattern;
         copy.pattern = source.pattern;
+        copy.pattern_speed = source.pattern_speed;
+        copy.pattern_spread = source.pattern_spread;
+        copy.pattern_intensity = source.pattern_intensity;
         copy.particle_color = new ArrayList<>(source.particle_color);
         copy.max_particle_color = source.max_particle_color;
         copy.edit_permission_mode = source.edit_permission_mode;
         copy.replaceItems(source.items);
         copy.revision = source.revision;
+        copy.establishBaseline();
         return copy;
     }
 
@@ -181,6 +188,70 @@ public class UploadBatchingTest {
         upload(server, clientB, groupsB);
 
         assertEquals(Set.of("minecraft:stone", "minecraft:diamond", "minecraft:dirt"), server.items);
+    }
+
+    @Test
+    public void loadedConfigurationUsesLoadedValuesAsRevisionZeroBaseline() {
+        PillarParticleConfig server = new PillarParticleConfig();
+        server.particle_speed = 0.30D;
+        server.establishBaseline();
+
+        PillarParticleConfig clientA = copyOf(server);
+        PillarParticleConfig clientB = copyOf(server);
+        ConfigUploadBatch batchA = new ConfigUploadBatch();
+        batchA.rebase(clientA);
+        ConfigUploadBatch batchB = new ConfigUploadBatch();
+        batchB.rebase(clientB);
+
+        clientA.particle_speed = 0.40D;
+        batchA.edited(ConfigSetting.PARTICLES, clientA, 1000L);
+
+        clientB.particle_lifetime = 90;
+        batchB.edited(ConfigSetting.PARTICLES, clientB, 1000L);
+
+        Set<ConfigSetting> groupsA = batchA.take();
+        Set<ConfigSetting> groupsB = batchB.take();
+
+        upload(server, clientA, groupsA);
+        upload(server, clientB, groupsB);
+
+        assertEquals(0.40D, server.particle_speed, 0.0D);
+        assertEquals(90, server.particle_lifetime);
+    }
+
+    @Test
+    public void expiredRevisionHistoryRejectsStaleOverwrites() {
+        PillarParticleConfig server = new PillarParticleConfig();
+        server.particle_color = new ArrayList<>(List.of("#FFB81C", "#FFFFFF", "#FFFF00", "#E8FEFD", "#FF5C00", "#3CDFFF"));
+        server.establishBaseline();
+
+        PillarParticleConfig staleClient = copyOf(server);
+        ConfigUploadBatch staleBatch = new ConfigUploadBatch();
+        staleBatch.rebase(staleClient);
+
+        for (int i = 0; i < 51; i++) {
+            PillarParticleConfig peer = copyOf(server);
+            ConfigUploadBatch peerBatch = new ConfigUploadBatch();
+            peerBatch.rebase(peer);
+            peer.particle_lifetime = 20 + i + 1;
+            peerBatch.edited(ConfigSetting.PARTICLES, peer, 1000L);
+            if (i == 25) {
+                peer.particle_color.set(0, "#AABBCC");
+                peerBatch.edited(ConfigSetting.COLORS, peer, 1000L);
+            }
+            upload(server, peer, peerBatch.take());
+        }
+
+        assertEquals("#AABBCC", server.particle_color.get(0));
+
+        staleClient.particle_color.set(1, "#123456");
+        staleBatch.edited(ConfigSetting.COLORS, staleClient, 1000L);
+
+        Set<ConfigSetting> groups = staleBatch.take();
+        boolean applied = server.applyUpload(staleClient, groups);
+
+        assertFalse(applied);
+        assertEquals("#AABBCC", server.particle_color.get(0));
     }
 
     @Test

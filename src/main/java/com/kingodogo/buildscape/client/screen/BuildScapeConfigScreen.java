@@ -601,6 +601,14 @@ public class BuildScapeConfigScreen extends Screen {
     private long sidePanelAnimStartTime = 0L;
     private int sidePanelScrollOffset = 0;
     private int sidePanelMaxScroll = 0;
+    private boolean isDraggingSideScrollbar = false;
+    private double sideScrollDragStartY = 0.0;
+    private double sideScrollDragStartOffset = 0.0;
+    private int sideScrollbarTrackX = 0;
+    private int sideScrollbarTrackY = 0;
+    private int sideScrollbarTrackW = 0;
+    private int sideScrollbarTrackH = 0;
+    private int sideScrollbarThumbH = 18;
     private boolean pendingPresetsAutoOpen = false;
 
     // Sidenav expansion animation
@@ -800,6 +808,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
         isSidePanelClosing = true;
         isSidePanelOpening = false;
+        isDraggingSideScrollbar = false;
         int duration = getSidePanelAnimMs();
         sidePanelAnimStartTime = System.currentTimeMillis() - (long) ((1.0f - sidePanelProgress) * duration);
     }
@@ -4211,7 +4220,7 @@ public class BuildScapeConfigScreen extends Screen {
             int sbX = x + w - sbW - 1;
             int sbY = y + 2;
             int sbH = Math.max(1, h - 4);
-            renderCustomScrollbar(poseStackOrGraphics, sbX, sbY, sbW, sbH, sidePanelScrollOffset, sidePanelMaxScroll, mouseX, mouseY, alpha);
+            renderCustomScrollbar(poseStackOrGraphics, sbX, sbY, sbW, sbH, sidePanelScrollOffset, sidePanelMaxScroll, mouseX, mouseY, alpha, true);
         }
     }
 
@@ -4775,15 +4784,30 @@ public class BuildScapeConfigScreen extends Screen {
 
     // Shared custom scrollbar.
     private void renderCustomScrollbar(Object poseStackOrGraphics, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha) {
+        renderCustomScrollbar(poseStackOrGraphics, trackX, trackY, trackW, trackH, scroll, maxSc, mouseX, mouseY, alpha, false);
+    }
+
+    private void renderCustomScrollbar(Object poseStackOrGraphics, int trackX, int trackY, int trackW, int trackH, double scroll, double maxSc, int mouseX, int mouseY, float alpha, boolean isSidePanel) {
         if (maxSc <= 0) return;
 
-        currentScrollbarTrackX = trackX;
-        currentScrollbarTrackY = trackY;
-        currentScrollbarTrackW = trackW;
-        currentScrollbarTrackH = trackH;
+        if (isSidePanel) {
+            sideScrollbarTrackX = trackX;
+            sideScrollbarTrackY = trackY;
+            sideScrollbarTrackW = trackW;
+            sideScrollbarTrackH = trackH;
+        } else {
+            currentScrollbarTrackX = trackX;
+            currentScrollbarTrackY = trackY;
+            currentScrollbarTrackW = trackW;
+            currentScrollbarTrackH = trackH;
+        }
 
         int thumbH = Math.max(18, (int) ((trackH / (float) (trackH + maxSc)) * trackH));
-        currentScrollbarThumbH = thumbH;
+        if (isSidePanel) {
+            sideScrollbarThumbH = thumbH;
+        } else {
+            currentScrollbarThumbH = thumbH;
+        }
         int thumbY = trackY + (int) ((scroll / maxSc) * (trackH - thumbH));
 
         // Track: clean recessed slot
@@ -4792,7 +4816,8 @@ public class BuildScapeConfigScreen extends Screen {
 
         // Thumb: clean metallic button with bevels (no weird gradient banding)
         boolean hoverThumb = mouseX >= trackX && mouseX <= trackX + trackW && mouseY >= thumbY && mouseY <= thumbY + thumbH;
-        int thumbColor = isDraggingScrollbar ? COLOR_ACCENT : (hoverThumb ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE);
+        boolean dragging = isSidePanel ? isDraggingSideScrollbar : isDraggingScrollbar;
+        int thumbColor = dragging ? COLOR_ACCENT : (hoverThumb ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG_ACTIVE);
 
         // Thumb fill
         fill(poseStackOrGraphics, trackX + 1, thumbY + 1, trackX + trackW - 1, thumbY + thumbH - 1, applyAlpha(thumbColor, alpha));
@@ -6538,6 +6563,25 @@ public class BuildScapeConfigScreen extends Screen {
         int sContentW = geometry.contentWidth();
         int sContentH = geometry.contentHeight();
 
+        // Side scrollbar interaction (drag & page jump)
+        if (sidePanelMaxScroll > 0 && sideScrollbarTrackW > 0) {
+            int pad = 3;
+            if (mouseX >= sideScrollbarTrackX - pad && mouseX <= sideScrollbarTrackX + sideScrollbarTrackW + pad &&
+                    mouseY >= sideScrollbarTrackY && mouseY <= sideScrollbarTrackY + sideScrollbarTrackH) {
+                int thumbY = sideScrollbarTrackY + (int) ((sidePanelScrollOffset / (double) sidePanelMaxScroll) * (sideScrollbarTrackH - sideScrollbarThumbH));
+                if (mouseY >= thumbY && mouseY <= thumbY + sideScrollbarThumbH) {
+                    isDraggingSideScrollbar = true;
+                    sideScrollDragStartY = mouseY;
+                    sideScrollDragStartOffset = sidePanelScrollOffset;
+                } else if (mouseY < thumbY) {
+                    sidePanelScrollOffset = Math.max(0, (int) (sidePanelScrollOffset - sideScrollbarTrackH * 0.75));
+                } else {
+                    sidePanelScrollOffset = Math.min(sidePanelMaxScroll, (int) (sidePanelScrollOffset + sideScrollbarTrackH * 0.75));
+                }
+                return true;
+            }
+        }
+
         if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
             return handleSidePanelPillarClick(mouseX, mouseY, button, sContentX, sContentY, sContentW, sContentH);
         } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
@@ -7143,6 +7187,7 @@ public class BuildScapeConfigScreen extends Screen {
             mouseY /= uiScale;
         }
         isDraggingScrollbar = false;
+        isDraggingSideScrollbar = false;
         draggingGradient = false;
         draggingHue = false;
         if (activeTab != null && activeTab.mouseReleased(mouseX, mouseY, button)) {
@@ -7159,6 +7204,18 @@ public class BuildScapeConfigScreen extends Screen {
             mouseY /= uiScale;
             dragX /= uiScale;
             dragY /= uiScale;
+        }
+
+        if (isDraggingSideScrollbar && sidePanelMaxScroll > 0) {
+            int trackH = sideScrollbarTrackH;
+            int thumbH = sideScrollbarThumbH;
+            int usableTrack = trackH - thumbH;
+            if (usableTrack > 0) {
+                double deltaThumb = mouseY - sideScrollDragStartY;
+                double newOffset = sideScrollDragStartOffset + (deltaThumb / (double) usableTrack) * sidePanelMaxScroll;
+                sidePanelScrollOffset = Math.max(0, Math.min(sidePanelMaxScroll, (int) Math.round(newOffset)));
+            }
+            return true;
         }
 
         if (isDraggingScrollbar && maxScroll > 0) {

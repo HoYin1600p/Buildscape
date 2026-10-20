@@ -149,7 +149,12 @@ public class UpdateConfigPacket {
                 }
             }
         }
-        serverConfig.applyUpload(data, accepted);
+        if (!accepted.isEmpty()) {
+            boolean applied = serverConfig.applyUpload(data, accepted);
+            if (!applied && refusal == null) {
+                refusal = "BuildScape: Config update refused because your configuration is out of date. Please resync.";
+            }
+        }
         data.uploadSettings = accepted;
         return refusal;
     }

@@ -187,9 +187,35 @@ public class PillarParticleConfig {
 
     public int revision = 0;
     private final transient List<Snapshot> snapshotHistory = new ArrayList<>();
+    private transient boolean initialLoadDone = false;
+    private transient boolean isApplyingUpload = false;
+
+    public synchronized void establishBaseline() {
+        snapshotHistory.clear();
+        snapshotHistory.add(new Snapshot(revision, this));
+        initialLoadDone = true;
+    }
+
+    public synchronized void onReload() {
+        this.revision++;
+        recordSnapshot();
+    }
 
     public synchronized void recordSnapshot() {
-        if (snapshotHistory.isEmpty() || !isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+        if (isApplyingUpload) {
+            if (snapshotHistory.isEmpty() || !isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+                snapshotHistory.add(new Snapshot(revision, this));
+                if (snapshotHistory.size() > 50) {
+                    snapshotHistory.remove(0);
+                }
+            }
+            return;
+        }
+        if (snapshotHistory.isEmpty()) {
+            snapshotHistory.add(new Snapshot(revision, this));
+        } else if (snapshotHistory.size() == 1 && revision == 0 && !initialLoadDone) {
+            snapshotHistory.set(0, new Snapshot(revision, this));
+        } else if (!isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
             snapshotHistory.add(new Snapshot(revision, this));
             if (snapshotHistory.size() > 50) {
                 snapshotHistory.remove(0);
@@ -214,144 +240,123 @@ public class PillarParticleConfig {
                 && edit_permission_mode == s.edit_permission_mode;
     }
 
-    public synchronized Snapshot findBaseSnapshot(int baseRev, Set<ConfigSetting> groups, Double inSpeed, Integer inLifetime, Set<String> inItems) {
-        if (!snapshotHistory.isEmpty()) {
-            for (int i = snapshotHistory.size() - 1; i >= 0; i--) {
-                Snapshot s = snapshotHistory.get(i);
-                if (s.revision == baseRev) {
-                    return (s.revision < this.revision) ? s : null;
-                }
-            }
-        }
-        if (snapshotHistory.size() > 1) {
-            for (int i = snapshotHistory.size() - 2; i >= 0; i--) {
-                Snapshot s = snapshotHistory.get(i);
-                if (groups.contains(ConfigSetting.PARTICLES)) {
-                    if (inSpeed != null && Double.compare(inSpeed, s.particle_speed) == 0 && Double.compare(s.particle_speed, this.particle_speed) != 0) {
-                        return s;
-                    }
-                    if (inLifetime != null && inLifetime.intValue() == s.particle_lifetime && s.particle_lifetime != this.particle_lifetime) {
-                        return s;
-                    }
-                }
-                if (groups.contains(ConfigSetting.ITEMS) && inItems != null) {
-                    if (inItems.containsAll(s.items) && !inItems.containsAll(this.items)) {
-                        return s;
-                    }
-                }
+    public synchronized Snapshot findBaseSnapshot(int baseRev) {
+        for (int i = snapshotHistory.size() - 1; i >= 0; i--) {
+            Snapshot s = snapshotHistory.get(i);
+            if (s.revision == baseRev) {
+                return s;
             }
         }
         return null;
     }
 
-    public synchronized void applyUpload(PillarParticleConfig client, Set<ConfigSetting> groups) {
-        com.kingodogo.buildscape.network.SyncConfigPacket data = new com.kingodogo.buildscape.network.SyncConfigPacket(client);
-        data.baseRevision = client.revision;
-        applyUpload(data, groups);
-        client.revision = this.revision;
+    public synchronized Snapshot findBaseSnapshot(int baseRev, Set<ConfigSetting> groups, Double inSpeed, Integer inLifetime, Set<String> inItems) {
+        return findBaseSnapshot(baseRev);
     }
 
-    public synchronized void applyUpload(com.kingodogo.buildscape.network.SyncConfigPacket data, Set<ConfigSetting> groups) {
-        Snapshot base = findBaseSnapshot(data.baseRevision, groups, data.particle_speed, data.particle_lifetime, data.items);
+    public synchronized boolean applyUpload(PillarParticleConfig client, Set<ConfigSetting> groups) {
+        com.kingodogo.buildscape.network.SyncConfigPacket data = new com.kingodogo.buildscape.network.SyncConfigPacket(client);
+        data.baseRevision = client.revision;
+        boolean applied = applyUpload(data, groups);
+        if (applied) {
+            client.revision = this.revision;
+        }
+        return applied;
+    }
 
-        if (groups.contains(ConfigSetting.PARTICLES)) {
-            if (base != null) {
-                if (Double.compare(data.particle_speed, base.particle_speed) != 0) {
-                    this.particle_speed = data.particle_speed;
-                }
-                if (Double.compare(data.particle_spread, base.particle_spread) != 0) {
-                    this.particle_spread = data.particle_spread;
-                }
-                if (data.particle_lifetime != base.particle_lifetime) {
-                    this.particle_lifetime = data.particle_lifetime;
-                }
-                if (data.particle_density != base.particle_density) {
-                    this.particle_density = data.particle_density;
-                }
-                if (data.use_pattern != base.use_pattern) {
-                    this.use_pattern = data.use_pattern;
-                }
-                if (!Objects.equals(data.pattern, base.pattern) && data.pattern != null) {
-                    this.pattern = data.pattern;
-                }
-                if (Double.compare(data.pattern_speed, base.pattern_speed) != 0) {
-                    this.pattern_speed = data.pattern_speed;
-                }
-                if (Double.compare(data.pattern_spread, base.pattern_spread) != 0) {
-                    this.pattern_spread = data.pattern_spread;
-                }
-                if (Double.compare(data.pattern_intensity, base.pattern_intensity) != 0) {
-                    this.pattern_intensity = data.pattern_intensity;
-                }
-            } else {
+    public synchronized boolean applyUpload(com.kingodogo.buildscape.network.SyncConfigPacket data, Set<ConfigSetting> groups) {
+        if (groups == null || groups.isEmpty()) {
+            return true;
+        }
+        Snapshot base = findBaseSnapshot(data.baseRevision);
+        if (base == null) {
+            groups.clear();
+            return false;
+        }
+
+        isApplyingUpload = true;
+        try {
+            if (groups.contains(ConfigSetting.PARTICLES)) {
+            if (Double.compare(data.particle_speed, base.particle_speed) != 0) {
                 this.particle_speed = data.particle_speed;
+            }
+            if (Double.compare(data.particle_spread, base.particle_spread) != 0) {
                 this.particle_spread = data.particle_spread;
+            }
+            if (data.particle_lifetime != base.particle_lifetime) {
                 this.particle_lifetime = data.particle_lifetime;
+            }
+            if (data.particle_density != base.particle_density) {
                 this.particle_density = data.particle_density;
+            }
+            if (data.use_pattern != base.use_pattern) {
                 this.use_pattern = data.use_pattern;
-                if (data.pattern != null) this.pattern = data.pattern;
+            }
+            if (!Objects.equals(data.pattern, base.pattern) && data.pattern != null) {
+                this.pattern = data.pattern;
+            }
+            if (Double.compare(data.pattern_speed, base.pattern_speed) != 0) {
                 this.pattern_speed = data.pattern_speed;
+            }
+            if (Double.compare(data.pattern_spread, base.pattern_spread) != 0) {
                 this.pattern_spread = data.pattern_spread;
+            }
+            if (Double.compare(data.pattern_intensity, base.pattern_intensity) != 0) {
                 this.pattern_intensity = data.pattern_intensity;
             }
         }
 
         if (groups.contains(ConfigSetting.COLORS)) {
-            if (base != null) {
-                if (data.max_particle_color != base.max_particle_color) {
-                    this.max_particle_color = data.max_particle_color;
-                }
-                if (data.particle_color != null) {
-                    if (data.particle_color.size() != base.particle_color.size()) {
-                        this.particle_color = new ArrayList<>(data.particle_color);
-                    } else {
-                        List<String> merged = new ArrayList<>(this.particle_color);
-                        while (merged.size() < data.particle_color.size()) {
-                            merged.add(DEFAULT_COLORS[Math.min(merged.size(), DEFAULT_COLORS.length - 1)]);
-                        }
-                        for (int i = 0; i < data.particle_color.size(); i++) {
-                            if (!Objects.equals(data.particle_color.get(i), base.particle_color.get(i))) {
-                                if (i < merged.size()) merged.set(i, data.particle_color.get(i));
-                            }
-                        }
-                        this.particle_color = merged;
-                    }
-                }
-            } else {
+            if (data.max_particle_color != base.max_particle_color && data.max_particle_color > 0) {
                 this.max_particle_color = data.max_particle_color;
-                if (data.particle_color != null) {
+            }
+            if (data.particle_color != null) {
+                if (data.particle_color.size() != base.particle_color.size()) {
                     this.particle_color = new ArrayList<>(data.particle_color);
+                } else {
+                    List<String> merged = new ArrayList<>(this.particle_color);
+                    while (merged.size() < data.particle_color.size()) {
+                        merged.add(DEFAULT_COLORS[Math.min(merged.size(), DEFAULT_COLORS.length - 1)]);
+                    }
+                    for (int i = 0; i < data.particle_color.size(); i++) {
+                        if (!Objects.equals(data.particle_color.get(i), base.particle_color.get(i))) {
+                            if (i < merged.size()) merged.set(i, data.particle_color.get(i));
+                        }
+                    }
+                    this.particle_color = merged;
                 }
             }
         }
 
         if (groups.contains(ConfigSetting.ITEMS) && data.items != null) {
-            if (base != null) {
-                Set<String> added = new HashSet<>();
-                for (String item : data.items) {
-                    if (!base.items.contains(item)) added.add(item);
-                }
-                Set<String> removed = new HashSet<>();
-                for (String item : base.items) {
-                    if (!data.items.contains(item) && isValidItemId(item)) removed.add(item);
-                }
-
-                Set<String> merged = new HashSet<>(this.items);
-                merged.addAll(added);
-                merged.removeAll(removed);
-                this.editItems(merged);
-            } else {
-                this.editItems(data.items);
+            Set<String> added = new HashSet<>();
+            for (String item : data.items) {
+                if (!base.items.contains(item)) added.add(item);
             }
+            Set<String> removed = new HashSet<>();
+            for (String item : base.items) {
+                if (!data.items.contains(item) && isValidItemId(item)) removed.add(item);
+            }
+
+            Set<String> merged = new HashSet<>(this.items);
+            merged.addAll(added);
+            merged.removeAll(removed);
+            this.editItems(merged);
         }
 
         if (groups.contains(ConfigSetting.POLICY) && data.edit_permission_mode != null) {
-            this.edit_permission_mode = data.edit_permission_mode;
+            if (data.edit_permission_mode != base.edit_permission_mode) {
+                this.edit_permission_mode = data.edit_permission_mode;
+            }
         }
 
         this.revision++;
         data.baseRevision = this.revision;
         recordSnapshot();
+        return true;
+        } finally {
+            isApplyingUpload = false;
+        }
     }
 
 
@@ -365,6 +370,9 @@ public class PillarParticleConfig {
         }
         items = replacement;
         clearMatchCache();
+        if (!isApplyingUpload && !initialLoadDone && revision == 0 && snapshotHistory.size() <= 1) {
+            recordSnapshot();
+        }
     }
 
     public static boolean isValidItemId(String item) {
@@ -505,6 +513,9 @@ public class PillarParticleConfig {
                 if (reloadItems) {
                     INSTANCE.loadItemsInternal();
                 }
+                if (reloadProperties || reloadItems) {
+                    INSTANCE.onReload();
+                }
             }
             SNAPSHOT = INSTANCE;
         }
@@ -571,6 +582,7 @@ public class PillarParticleConfig {
                 : EditPermissionMode.STRICT;
 
         clearMatchCache();
+        SERVER_CONFIG.establishBaseline();
         notifyCallbacks(true);
         SNAPSHOT = SERVER_CONFIG;
     }
@@ -631,6 +643,7 @@ public class PillarParticleConfig {
                                             }
 
                                             if (reloaded) {
+                                                INSTANCE.onReload();
                                                 long currentTime = System.currentTimeMillis();
                                                 if (currentTime - lastNotifyTime > 500) {
                                                     lastNotifyTime = currentTime;
@@ -773,6 +786,7 @@ public class PillarParticleConfig {
     }
 
     private void loadInternal() {
+        boolean wasInitial = !initialLoadDone;
         File propertiesFile = getPropertiesFile();
         File itemsFile = getItemsFile();
         boolean migrationComplete = migrateOldConfig();
@@ -786,6 +800,12 @@ public class PillarParticleConfig {
             loadItemsInternal();
         } else {
             itemsFileUnreadable = true;
+        }
+
+        if (wasInitial) {
+            establishBaseline();
+        } else {
+            onReload();
         }
     }
 
@@ -930,6 +950,12 @@ public class PillarParticleConfig {
                 }
             }
             loadedPropertyValues = propertyValues();
+            if (!initialLoadDone) {
+                if (snapshotHistory.size() <= 1 && revision == 0) {
+                    snapshotHistory.clear();
+                    snapshotHistory.add(new Snapshot(revision, this));
+                }
+            }
         } catch (Exception e) {
             propertiesReadOnly = true;
             backupUnreadableFile(file);
@@ -990,6 +1016,12 @@ public class PillarParticleConfig {
             originalItems = document;
             replaceItems(parsed);
             itemsFileUnreadable = false;
+            if (!initialLoadDone) {
+                if (snapshotHistory.size() <= 1 && revision == 0) {
+                    snapshotHistory.clear();
+                    snapshotHistory.add(new Snapshot(revision, this));
+                }
+            }
         } catch (Exception e) {
             itemsFileUnreadable = true;
             backupUnreadableFile(file);

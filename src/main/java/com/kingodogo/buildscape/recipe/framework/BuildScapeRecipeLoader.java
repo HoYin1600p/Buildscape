@@ -369,7 +369,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                 if (previous != null) {
                     addCycleRecipe(cycles, previous);
                 }
-                BuildScape.LOGGER.error("BDRE Loader: Rejected recipe [{}]: {}", recipe.getId(), e.getMessage(), e);
+                BuildScape.LOGGER.error("BDRE Loader: Rejected recipe [{}]: {}", recipe.getId(), e.getMessage());
             }
         }
     }

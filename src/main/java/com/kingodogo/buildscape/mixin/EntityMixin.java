@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.CushionBlock;
-import com.kingodogo.buildscape.block.CushionSupport;
-import com.kingodogo.buildscape.block.ExperienceFluidBlock;
+import com.kingodogo.buildscape.block.decor.CushionBlock;
+import com.kingodogo.buildscape.block.decor.CushionSupport;
+import com.kingodogo.buildscape.block.water.ExperienceFluidBlock;
 import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;

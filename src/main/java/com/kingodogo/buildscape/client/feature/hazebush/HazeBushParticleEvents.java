@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.feature.hazebush;
 
-import com.kingodogo.buildscape.block.PottedHazeBushBlock;
-import com.kingodogo.buildscape.block.HazeBushBlock;
+import com.kingodogo.buildscape.block.plant.PottedHazeBushBlock;
+import com.kingodogo.buildscape.block.plant.HazeBushBlock;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.Minecraft;

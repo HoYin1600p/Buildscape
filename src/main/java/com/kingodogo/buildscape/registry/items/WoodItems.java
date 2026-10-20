@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.registry.items;
 
-import com.kingodogo.buildscape.block.FestiveStockingItem;
+import com.kingodogo.buildscape.block.decor.FestiveStockingItem;
 import com.kingodogo.buildscape.feature.biome.BiomeBrushItem;
 import com.kingodogo.buildscape.feature.pipe.WrenchItem;
 import com.kingodogo.buildscape.item.BuildersPouchItem;

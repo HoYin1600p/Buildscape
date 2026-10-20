@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import com.kingodogo.buildscape.block.decor.WoolLayersBlock;
 
 public class ToolSpeedTagsTest extends BootstrappedGameTest {
 

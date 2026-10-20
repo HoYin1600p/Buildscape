@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.DecoratedPotBlockEntity;
+import com.kingodogo.buildscape.block.storage.DecoratedPotBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;

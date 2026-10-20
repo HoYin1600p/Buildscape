@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.VerticalSlabBlock;
-
+import com.kingodogo.buildscape.block.building.VerticalSlabBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.feature.muff;
 
-import com.kingodogo.buildscape.block.MuffBlock;
+import com.kingodogo.buildscape.block.decor.MuffBlock;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.client.Minecraft;

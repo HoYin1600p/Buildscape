@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.feature.sculk;
 
-import com.kingodogo.buildscape.block.ModBlockProperties;
+import com.kingodogo.buildscape.block.base.ModBlockProperties;
 import com.kingodogo.buildscape.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

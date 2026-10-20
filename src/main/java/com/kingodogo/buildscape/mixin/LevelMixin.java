@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.ExperienceFluidBlock;
+import com.kingodogo.buildscape.block.water.ExperienceFluidBlock;
 import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;

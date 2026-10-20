@@ -1,0 +1,470 @@
+package com.kingodogo.buildscape.block.plant;
+
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.core.OpenBushBlock;
+import com.kingodogo.buildscape.registry.ModBlocks;
+import com.kingodogo.buildscape.worldgen.ModConfiguredFeatures;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
+public class MangrovePropaguleBlock
+        extends
+            OpenBushBlock
+        implements
+            SinksOnFarmland,
+            BonemealableBlock,
+            SimpleWaterloggedBlock {
+
+    public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 4);
+    public static final IntegerProperty STAGE = IntegerProperty.create(
+            "stage",
+            0,
+            1);
+    public static final BooleanProperty HANGING = BooleanProperty.create(
+            "hanging");
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+
+    private static final VoxelShape SHAPE = Block.box(
+            6.0,
+            0.0,
+            6.0,
+            10.0,
+            12.0,
+            10.0);
+    private static final VoxelShape HANGING_SHAPE_0 = Block.box(
+            7.0,
+            13.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
+    private static final VoxelShape HANGING_SHAPE_1 = Block.box(
+            7.0,
+            10.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
+    private static final VoxelShape HANGING_SHAPE_2 = Block.box(
+            7.0,
+            7.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
+    private static final VoxelShape HANGING_SHAPE_3 = Block.box(
+            7.0,
+            3.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
+    private static final int GROWTH_RADIUS = 32;
+
+    public MangrovePropaguleBlock(BlockBehaviour.Properties properties) {
+        super(properties);
+        this.registerDefaultState(
+                this.stateDefinition.any()
+                        .setValue(AGE, 0)
+                        .setValue(STAGE, 0)
+                        .setValue(HANGING, false)
+                        .setValue(WATERLOGGED, false)
+                        .setValue(ON_FARMLAND, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(
+            StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(AGE, STAGE, HANGING, WATERLOGGED, ON_FARMLAND);
+    }
+
+    @Override
+    public VoxelShape getShape(
+            BlockState state,
+            BlockGetter level,
+            BlockPos pos,
+            CollisionContext context) {
+        if (state.getValue(HANGING)) {
+            int age = state.getValue(AGE);
+            return switch (age) {
+                case 0 -> HANGING_SHAPE_0;
+                case 1 -> HANGING_SHAPE_1;
+                case 2 -> HANGING_SHAPE_2;
+                case 3 -> HANGING_SHAPE_3;
+                default -> HANGING_SHAPE_0;
+            };
+        }
+        VoxelShape shape = SHAPE;
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625, 0);
+        }
+        return shape;
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockPos pos = context.getClickedPos();
+        Level level = context.getLevel();
+        BlockState aboveState = level.getBlockState(pos.above());
+        FluidState fluidstate = level.getFluidState(pos);
+
+        boolean hanging = aboveState.is(BlockTags.LEAVES) ||
+                aboveState.is(ModBlocks.MANGROVE_LEAVES.get());
+
+        return this.defaultBlockState()
+                .setValue(HANGING, hanging)
+                .setValue(AGE, 0)
+                .setValue(STAGE, 0)
+                .setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER)
+                .setValue(ON_FARMLAND, !hanging && shouldSink(level, pos));
+    }
+
+    @Override
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        if (state.getValue(HANGING)) {
+            BlockState aboveState = level.getBlockState(pos.above());
+            return (aboveState.is(BlockTags.LEAVES) ||
+                    aboveState.is(ModBlocks.MANGROVE_LEAVES.get()));
+        } else {
+            BlockPos belowPos = pos.below();
+            BlockState belowState = level.getBlockState(belowPos);
+            return ((belowState.is(BlockTags.DIRT) && !belowState.is(Blocks.DIRT_PATH)) ||
+                    belowState.is(Blocks.FARMLAND) ||
+                    belowState.is(Blocks.MOSS_BLOCK) ||
+                    belowState.is(ModBlocks.MUD.get()) ||
+                    belowState.is(Blocks.CLAY) ||
+                    belowState.is(ModBlocks.MUDDY_MANGROVE_ROOTS.get()));
+        }
+    }
+
+    @Override
+    public BlockState updateShape(
+            BlockState state,
+            Direction direction,
+            BlockState adjacentState,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockPos adjacentPos) {
+        if (state.getValue(WATERLOGGED)) {
+            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
+
+        if (state.getValue(HANGING)) {
+            if (direction == Direction.UP) {
+                BlockState aboveState = level.getBlockState(pos.above());
+                if (!aboveState.is(BlockTags.LEAVES) &&
+                        !aboveState.is(ModBlocks.MANGROVE_LEAVES.get())) {
+                    return Blocks.AIR.defaultBlockState();
+                }
+            }
+        } else {
+            if (direction == Direction.DOWN) {
+                if (!this.canSurvive(state, level, pos)) {
+                    return Blocks.AIR.defaultBlockState();
+                }
+                return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+            }
+        }
+
+        return super.updateShape(
+                state,
+                direction,
+                adjacentState,
+                level,
+                pos,
+                adjacentPos);
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED)
+                ? Fluids.WATER.getSource(false)
+                : super.getFluidState(state);
+    }
+
+    @Override
+    public boolean isRandomlyTicking(BlockState state) {
+        return !state.getValue(HANGING);
+    }
+
+    @Override
+    public void randomTick(
+            BlockState state,
+            ServerLevel level,
+            BlockPos pos,
+            Random random) {
+        if (state.getValue(HANGING)) {
+            return;
+        }
+        if (!hasPlayerNearby(level, pos)) {
+            return;
+        }
+        if (random.nextInt(7) == 0) {
+            this.advanceTree(level, pos, state, random);
+        }
+    }
+
+    private boolean hasPlayerNearby(ServerLevel level, BlockPos pos) {
+        AABB searchBox = new AABB(pos).inflate(GROWTH_RADIUS);
+        List<Player> players = level.getEntitiesOfClass(Player.class, searchBox);
+        return !players.isEmpty();
+    }
+
+    @Override
+    public boolean isValidBonemealTarget(
+            BlockGetter level,
+            BlockPos pos,
+            BlockState state,
+            boolean isClient) {
+        if (state.getValue(HANGING)) {
+            int age = state.getValue(AGE);
+            return age < 3;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isBonemealSuccess(
+            Level level,
+            Random random,
+            BlockPos pos,
+            BlockState state) {
+        return true;
+    }
+
+    @Override
+    public void performBonemeal(
+            ServerLevel level,
+            Random random,
+            BlockPos pos,
+            BlockState state) {
+        if (state.getValue(HANGING)) {
+            int currentAge = state.getValue(AGE);
+            if (currentAge < 3) {
+                level.setBlock(pos, state.setValue(AGE, currentAge + 1), 4);
+            }
+            return;
+        }
+        if (state.getValue(STAGE) < 1) {
+            level.setBlock(pos, state.setValue(STAGE, state.getValue(STAGE) + 1), 4);
+        } else {
+            this.advanceTree(level, pos, state, random, true);
+        }
+    }
+
+    private void advanceTree(
+            ServerLevel level,
+            BlockPos pos,
+            BlockState state,
+            Random random) {
+        advanceTree(level, pos, state, random, false);
+    }
+
+    private void advanceTree(
+            ServerLevel level,
+            BlockPos pos,
+            BlockState state,
+            Random random,
+            boolean bonemeal) {
+        if (state.getValue(HANGING)) {
+            return;
+        }
+        if (state.getValue(STAGE) < 1) {
+            level.setBlock(pos, state.setValue(STAGE, state.getValue(STAGE) + 1), 4);
+            return;
+        }
+        if (!bonemeal) {
+            if (!canGrowTree(level, pos, state)) {
+                return;
+            }
+        }
+        String variant = ModConfiguredFeatures.getRandomMangroveTreeVariant(
+                random);
+        ResourceLocation featureLocation = ModConfiguredFeatures.getMangroveTreeResourceLocation(
+                variant);
+        Optional<? extends net.minecraft.core.Holder<? extends ConfiguredFeature<?, ?>>> featureHolder = level
+                .registryAccess()
+                .registry(Registry.CONFIGURED_FEATURE_REGISTRY)
+                .flatMap(registry -> registry.getHolder(
+                        ResourceKey.create(
+                                Registry.CONFIGURED_FEATURE_REGISTRY,
+                                featureLocation)));
+
+        if (featureHolder.isPresent()) {
+            ConfiguredFeature<?, ?> feature = featureHolder.get().value();
+
+            if (feature.feature() == Feature.TREE) {
+                BlockPos belowPos = pos.below();
+                BlockState belowState = level.getBlockState(belowPos);
+                if (belowState.is(Blocks.GRASS_BLOCK)) {
+                    level.setBlock(belowPos, Blocks.DIRT.defaultBlockState(), 3);
+                }
+                level.setBlock(pos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
+                @SuppressWarnings("unchecked")
+                TreeConfiguration treeConfig = (TreeConfiguration) feature.config();
+                FeaturePlaceContext<TreeConfiguration> placeContext = new FeaturePlaceContext<>(
+                        Optional.empty(),
+                        level,
+                        level.getChunkSource().getGenerator(),
+                        random,
+                        pos,
+                        treeConfig);
+                boolean success = Feature.TREE.place(
+                        placeContext);
+                if (!success) {
+                    level.setBlock(pos, state, Block.UPDATE_ALL);
+                }
+            } else {
+                BuildScape.LOGGER
+                        .warn(
+                                "Mangrove tree feature {} is not a tree feature!",
+                                featureLocation);
+                level.setBlock(pos, state, 4);
+            }
+        } else {
+            BuildScape.LOGGER
+                    .warn(
+                            "Mangrove tree feature {} not found in registry! Cannot grow tree.",
+                            featureLocation);
+            level.setBlock(pos, state, 4);
+        }
+    }
+
+    private boolean canGrowTree(
+            LevelReader level,
+            BlockPos pos,
+            BlockState state) {
+        if (level.getMaxLocalRawBrightness(pos) < 9) {
+            return false;
+        }
+        for (int y = 1; y <= 6; y++) {
+            BlockPos checkPos = pos.above(y);
+            BlockState checkState = level.getBlockState(checkPos);
+            if (!checkState.isAir() &&
+                    !checkState.is(BlockTags.DIRT) &&
+                    !isLogOrWood(checkState)) {
+                return false;
+            }
+        }
+        boolean hasSolidBlockBelow = false;
+        for (int x = -4; x <= 4; x++) {
+            for (int z = -4; z <= 4; z++) {
+                if (x == 0 && z == 0) {
+                    continue;
+                }
+                for (int y = -4; y <= 4; y++) {
+                    BlockPos checkPos = pos.offset(x, y, z);
+                    BlockState checkState = level.getBlockState(checkPos);
+                    if (isSolidBlock(level, checkPos, checkState)) {
+                        hasSolidBlockBelow = true;
+                        break;
+                    }
+                }
+                if (hasSolidBlockBelow) {
+                    break;
+                }
+            }
+            if (hasSolidBlockBelow) {
+                break;
+            }
+        }
+        if (!hasSolidBlockBelow) {
+            return false;
+        }
+        boolean hasRootLandingSpot = false;
+        for (int x = -4; x <= 4; x++) {
+            for (int z = -4; z <= 4; z++) {
+                for (int y = 1; y <= 11; y++) {
+                    BlockPos checkPos = pos.offset(x, -y, z);
+                    BlockState checkState = level.getBlockState(checkPos);
+
+                    if (isSolidBlock(level, checkPos, checkState)) {
+                        hasRootLandingSpot = true;
+                        break;
+                    }
+                }
+                if (hasRootLandingSpot) {
+                    break;
+                }
+            }
+            if (hasRootLandingSpot) {
+                break;
+            }
+        }
+
+        return hasRootLandingSpot;
+    }
+
+    private boolean isLogOrWood(BlockState state) {
+        return (state.is(BlockTags.LOGS) ||
+                state.is(BlockTags.PLANKS) ||
+                state.getBlock() == ModBlocks.MANGROVE_LOG.get() ||
+                state.getBlock() == ModBlocks.MANGROVE_WOOD.get() ||
+                state.getBlock() == ModBlocks.STRIPPED_MANGROVE_LOG.get() ||
+                state.getBlock() == ModBlocks.STRIPPED_MANGROVE_WOOD.get());
+    }
+
+    private boolean isSolidBlock(
+            BlockGetter level,
+            BlockPos pos,
+            BlockState state) {
+        if (state.is(ModBlocks.MUD.get())) {
+            return false;
+        }
+        return (state.isFaceSturdy(level, pos, Direction.UP) &&
+                state.getMaterial().isSolid() &&
+                !state.getMaterial().isReplaceable());
+    }
+
+    @Override
+    public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
+        return 0;
+    }
+
+    @Override
+    public boolean useShapeForLightOcclusion(BlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean skipRendering(
+            BlockState state,
+            BlockState adjacentState,
+            Direction side) {
+        return (adjacentState.is(this) || super.skipRendering(state, adjacentState, side));
+    }
+}

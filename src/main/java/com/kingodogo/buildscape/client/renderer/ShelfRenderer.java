@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.ShelfBlock;
-import com.kingodogo.buildscape.block.ShelfBlockEntity;
+import com.kingodogo.buildscape.block.storage.ShelfBlock;
+import com.kingodogo.buildscape.block.storage.ShelfBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Quaternion;

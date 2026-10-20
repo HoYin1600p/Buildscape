@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.worldgen;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.CloverBlock;
-import com.kingodogo.buildscape.block.LeafLitterBlock;
-import com.kingodogo.buildscape.block.PetalBlock;
-import com.kingodogo.buildscape.block.WildflowersBlock;
+import com.kingodogo.buildscape.block.plant.CloverBlock;
+import com.kingodogo.buildscape.block.plant.LeafLitterBlock;
+import com.kingodogo.buildscape.block.plant.PetalBlock;
+import com.kingodogo.buildscape.block.plant.WildflowersBlock;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;

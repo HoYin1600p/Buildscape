@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.core;
 
 import com.kingodogo.buildscape.testutil.BootstrappedGameTest;
-import com.kingodogo.buildscape.block.OrnamentBlock;
-import com.kingodogo.buildscape.block.StringLightBlock;
+import com.kingodogo.buildscape.block.decor.OrnamentBlock;
+import com.kingodogo.buildscape.block.light.StringLightBlock;
 import net.minecraft.world.item.Items;
 import org.junit.Test;
 

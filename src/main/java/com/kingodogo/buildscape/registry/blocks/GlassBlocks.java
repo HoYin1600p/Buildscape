@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.registry.blocks;
 
-import com.kingodogo.buildscape.block.ModBlock;
-import com.kingodogo.buildscape.block.ModSlabBlock;
-import com.kingodogo.buildscape.block.ModStairBlock;
-import com.kingodogo.buildscape.block.ModWallBlock;
+import com.kingodogo.buildscape.block.base.ModBlock;
+import com.kingodogo.buildscape.block.building.ModSlabBlock;
+import com.kingodogo.buildscape.block.building.ModStairBlock;
+import com.kingodogo.buildscape.block.building.ModWallBlock;
 import com.kingodogo.buildscape.registry.ModSounds;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;

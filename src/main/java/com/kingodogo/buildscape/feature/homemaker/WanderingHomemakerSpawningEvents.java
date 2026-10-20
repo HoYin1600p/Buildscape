@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.feature.homemaker;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.BigCandleBlock;
-import com.kingodogo.buildscape.block.CushionBlock;
-import com.kingodogo.buildscape.block.DecoratedPotBlock;
-import com.kingodogo.buildscape.block.StarBlock;
+import com.kingodogo.buildscape.block.light.BigCandleBlock;
+import com.kingodogo.buildscape.block.decor.CushionBlock;
+import com.kingodogo.buildscape.block.storage.DecoratedPotBlock;
+import com.kingodogo.buildscape.block.decor.StarBlock;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.feature.pillar.PillarBlock;
 import com.kingodogo.buildscape.network.ModMessages;

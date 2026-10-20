@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.PlanterHelper;
-import com.kingodogo.buildscape.block.PlanterHelper.PlanterType;
+import com.kingodogo.buildscape.block.plant.PlanterHelper;
+import com.kingodogo.buildscape.block.plant.PlanterHelper.PlanterType;
 import com.kingodogo.buildscape.feature.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.feature.cosmetic.sign.SignFrameType;
 import net.minecraft.core.BlockPos;

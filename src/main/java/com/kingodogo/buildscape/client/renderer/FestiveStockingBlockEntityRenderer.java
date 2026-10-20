@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.FestiveStockingBlock;
-import com.kingodogo.buildscape.block.FestiveStockingBlockEntity;
+import com.kingodogo.buildscape.block.decor.FestiveStockingBlock;
+import com.kingodogo.buildscape.block.decor.FestiveStockingBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix3f;

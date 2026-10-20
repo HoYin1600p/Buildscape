@@ -1,15 +1,15 @@
 package com.kingodogo.buildscape.event;
 
-import com.kingodogo.buildscape.block.CloverBlock;
-import com.kingodogo.buildscape.block.CreakingHeartBlock;
-import com.kingodogo.buildscape.block.CustomSoundType;
-import com.kingodogo.buildscape.block.HangingMossBlock;
-import com.kingodogo.buildscape.block.HazeBushBlock;
-import com.kingodogo.buildscape.block.LogStrippingHandler;
-import com.kingodogo.buildscape.block.ModBlockProperties;
-import com.kingodogo.buildscape.block.PetalBlock;
-import com.kingodogo.buildscape.block.PottedHazeBushBlock;
-import com.kingodogo.buildscape.block.RoseVinesBlock;
+import com.kingodogo.buildscape.block.plant.CloverBlock;
+import com.kingodogo.buildscape.block.plant.CreakingHeartBlock;
+import com.kingodogo.buildscape.block.base.CustomSoundType;
+import com.kingodogo.buildscape.block.plant.HangingMossBlock;
+import com.kingodogo.buildscape.block.plant.HazeBushBlock;
+import com.kingodogo.buildscape.block.plant.LogStrippingHandler;
+import com.kingodogo.buildscape.block.base.ModBlockProperties;
+import com.kingodogo.buildscape.block.plant.PetalBlock;
+import com.kingodogo.buildscape.block.plant.PottedHazeBushBlock;
+import com.kingodogo.buildscape.block.plant.RoseVinesBlock;
 import com.kingodogo.buildscape.feature.copper.CopperOxidationHandler;
 import com.kingodogo.buildscape.item.HazeBushItem;
 import com.kingodogo.buildscape.registry.ModBlocks;

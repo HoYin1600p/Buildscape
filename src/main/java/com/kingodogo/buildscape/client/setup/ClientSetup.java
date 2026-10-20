@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.client.setup;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.GlowLightsBlockEntity;
-import com.kingodogo.buildscape.block.ModWoodTypes;
-import com.kingodogo.buildscape.block.OrnamentBlock;
-import com.kingodogo.buildscape.block.StringLightBlock;
+import com.kingodogo.buildscape.block.light.GlowLightsBlockEntity;
+import com.kingodogo.buildscape.block.sign.ModWoodTypes;
+import com.kingodogo.buildscape.block.decor.OrnamentBlock;
+import com.kingodogo.buildscape.block.light.StringLightBlock;
 import com.kingodogo.buildscape.client.BuildscapeRenderLayers;
 import com.kingodogo.buildscape.client.ClientEvents;
 import com.kingodogo.buildscape.client.DryFoliageColor;

@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.ModStairBlock;
-
+import com.kingodogo.buildscape.block.building.ModStairBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockBehaviour;

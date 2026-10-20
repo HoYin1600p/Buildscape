@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.tooltip;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.FestiveStockingItem;
+import com.kingodogo.buildscape.block.decor.FestiveStockingItem;
 import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.item.BuildersPouchItem;

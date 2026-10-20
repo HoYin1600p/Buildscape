@@ -1,12 +1,12 @@
-com.kingodogo.buildscape.block.CascadeWaterManager bus=FORGE dist=CLIENT,DEDICATED_SERVER
-  onWorldUnload(net.minecraftforge.event.world.WorldEvent$Unload) NORMAL
-com.kingodogo.buildscape.block.EyeblossomTransitionEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
+com.kingodogo.buildscape.block.plant.EyeblossomTransitionEvents bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onChunkLoad(net.minecraftforge.event.world.ChunkEvent$Load) NORMAL
   onChunkUnload(net.minecraftforge.event.world.ChunkEvent$Unload) NORMAL
   onWorldTick(net.minecraftforge.event.TickEvent$WorldTickEvent) NORMAL
   onWorldUnload(net.minecraftforge.event.world.WorldEvent$Unload) NORMAL
-com.kingodogo.buildscape.block.LeafMiningSpeed bus=FORGE dist=CLIENT,DEDICATED_SERVER
+com.kingodogo.buildscape.block.plant.LeafMiningSpeed bus=FORGE dist=CLIENT,DEDICATED_SERVER
   onBreakSpeed(net.minecraftforge.event.entity.player.PlayerEvent$BreakSpeed) HIGHEST
+com.kingodogo.buildscape.block.water.CascadeWaterManager bus=FORGE dist=CLIENT,DEDICATED_SERVER
+  onWorldUnload(net.minecraftforge.event.world.WorldEvent$Unload) NORMAL
 com.kingodogo.buildscape.client.ClientAdvancementEvents bus=FORGE dist=CLIENT
   onMouseScroll(net.minecraftforge.client.event.ScreenEvent$MouseScrollEvent$Pre) NORMAL
 com.kingodogo.buildscape.client.ClientEvents bus=FORGE dist=CLIENT

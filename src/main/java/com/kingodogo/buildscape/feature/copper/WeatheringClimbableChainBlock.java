@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.feature.copper;
 
-import com.kingodogo.buildscape.block.ClimbableChainBlock;
-
+import com.kingodogo.buildscape.block.building.ClimbableChainBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockBehaviour;

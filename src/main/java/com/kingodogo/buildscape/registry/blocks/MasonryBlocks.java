@@ -1,14 +1,14 @@
 package com.kingodogo.buildscape.registry.blocks;
 
-import com.kingodogo.buildscape.block.CascadeBlock;
-import com.kingodogo.buildscape.block.CascadeBlockNoMist;
-import com.kingodogo.buildscape.block.ModBlock;
-import com.kingodogo.buildscape.block.ModSlabBlock;
-import com.kingodogo.buildscape.block.ModStairBlock;
-import com.kingodogo.buildscape.block.ModWallBlock;
-import com.kingodogo.buildscape.block.SilkTouchOnlyGlassBlock;
-import com.kingodogo.buildscape.block.SilkTouchOnlyPaneBlock;
-import com.kingodogo.buildscape.block.SmokeVentBlock;
+import com.kingodogo.buildscape.block.water.CascadeBlock;
+import com.kingodogo.buildscape.block.water.CascadeBlockNoMist;
+import com.kingodogo.buildscape.block.base.ModBlock;
+import com.kingodogo.buildscape.block.building.ModSlabBlock;
+import com.kingodogo.buildscape.block.building.ModStairBlock;
+import com.kingodogo.buildscape.block.building.ModWallBlock;
+import com.kingodogo.buildscape.block.building.SilkTouchOnlyGlassBlock;
+import com.kingodogo.buildscape.block.building.SilkTouchOnlyPaneBlock;
+import com.kingodogo.buildscape.block.decor.SmokeVentBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneLampBlock;

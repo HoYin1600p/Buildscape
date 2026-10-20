@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.CustomSoundType;
-import com.kingodogo.buildscape.block.LeafHedgeBlock;
+import com.kingodogo.buildscape.block.base.CustomSoundType;
+import com.kingodogo.buildscape.block.plant.LeafHedgeBlock;
 import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
 import com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer;
 import com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer;

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.core;
 
-import com.kingodogo.buildscape.block.FestiveStockingItem;
+import com.kingodogo.buildscape.block.decor.FestiveStockingItem;
 import com.kingodogo.buildscape.client.renderer.MobPillarRenderer;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.entity.FestiveStockingEntity;

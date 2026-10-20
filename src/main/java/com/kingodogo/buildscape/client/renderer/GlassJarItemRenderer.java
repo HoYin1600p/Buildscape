@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.GlassJarBlockEntity;
+import com.kingodogo.buildscape.block.storage.GlassJarBlockEntity;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;

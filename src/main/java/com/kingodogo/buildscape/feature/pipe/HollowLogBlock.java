@@ -1,11 +1,11 @@
 package com.kingodogo.buildscape.feature.pipe;
 
-import com.kingodogo.buildscape.block.ClimbableChainBlock;
-import com.kingodogo.buildscape.block.GlassJarBlock;
-import com.kingodogo.buildscape.block.LargeChainBlock;
-import com.kingodogo.buildscape.block.PottedHazeBushBlock;
-import com.kingodogo.buildscape.block.ShelfBlock;
-import com.kingodogo.buildscape.block.SideChainPartBlock;
+import com.kingodogo.buildscape.block.building.ClimbableChainBlock;
+import com.kingodogo.buildscape.block.storage.GlassJarBlock;
+import com.kingodogo.buildscape.block.building.LargeChainBlock;
+import com.kingodogo.buildscape.block.plant.PottedHazeBushBlock;
+import com.kingodogo.buildscape.block.storage.ShelfBlock;
+import com.kingodogo.buildscape.block.building.SideChainPartBlock;
 import com.kingodogo.buildscape.feature.geyser.SulfurSpikeBlock;
 import com.kingodogo.buildscape.feature.icicle.PointedIcicleBlock;
 import com.kingodogo.buildscape.feature.pipe.transport.HollowPipeTransportManager;

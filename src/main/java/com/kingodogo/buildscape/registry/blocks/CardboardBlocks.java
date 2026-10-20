@@ -1,13 +1,13 @@
 package com.kingodogo.buildscape.registry.blocks;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ExperienceCauldronBlock;
-import com.kingodogo.buildscape.block.ExperienceFluidBlock;
-import com.kingodogo.buildscape.block.ModBlock;
-import com.kingodogo.buildscape.block.ModStairBlock;
-import com.kingodogo.buildscape.block.ModTrapdoorBlock;
-import com.kingodogo.buildscape.block.ShelfBlock;
-import com.kingodogo.buildscape.block.VerticalSlabBlock;
+import com.kingodogo.buildscape.block.water.ExperienceCauldronBlock;
+import com.kingodogo.buildscape.block.water.ExperienceFluidBlock;
+import com.kingodogo.buildscape.block.base.ModBlock;
+import com.kingodogo.buildscape.block.building.ModStairBlock;
+import com.kingodogo.buildscape.block.building.ModTrapdoorBlock;
+import com.kingodogo.buildscape.block.storage.ShelfBlock;
+import com.kingodogo.buildscape.block.building.VerticalSlabBlock;
 import com.kingodogo.buildscape.feature.pipe.HollowLogBlock;
 import com.kingodogo.buildscape.registry.ModFluids;
 import net.minecraft.world.level.block.Block;

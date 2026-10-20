@@ -1,12 +1,12 @@
 package com.kingodogo.buildscape.registry.blocks;
 
-import com.kingodogo.buildscape.block.LogSlabBlock;
-import com.kingodogo.buildscape.block.ModSlabBlock;
-import com.kingodogo.buildscape.block.ModStairBlock;
-import com.kingodogo.buildscape.block.ModWallBlock;
-import com.kingodogo.buildscape.block.SoftFabricBlock;
-import com.kingodogo.buildscape.block.SpoolBlock;
-import com.kingodogo.buildscape.block.VerticalSlabBlock;
+import com.kingodogo.buildscape.block.building.LogSlabBlock;
+import com.kingodogo.buildscape.block.building.ModSlabBlock;
+import com.kingodogo.buildscape.block.building.ModStairBlock;
+import com.kingodogo.buildscape.block.building.ModWallBlock;
+import com.kingodogo.buildscape.block.decor.SoftFabricBlock;
+import com.kingodogo.buildscape.block.decor.SpoolBlock;
+import com.kingodogo.buildscape.block.building.VerticalSlabBlock;
 import com.kingodogo.buildscape.feature.geyser.PotentSulfurBlock;
 import com.kingodogo.buildscape.feature.geyser.SulfurSpikeBlock;
 import net.minecraft.world.level.block.Block;

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.setup;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.ModWoodTypes;
+import com.kingodogo.buildscape.block.sign.ModWoodTypes;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.feature.copper.CopperRodHandler;

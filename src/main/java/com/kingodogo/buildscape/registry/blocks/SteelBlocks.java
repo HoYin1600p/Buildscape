@@ -1,11 +1,11 @@
 package com.kingodogo.buildscape.registry.blocks;
 
-import com.kingodogo.buildscape.block.ModButtonBlock;
-import com.kingodogo.buildscape.block.ModPressurePlateBlock;
-import com.kingodogo.buildscape.block.ModStairBlock;
-import com.kingodogo.buildscape.block.SteelBoltBlock;
-import com.kingodogo.buildscape.block.VerticalSlabBlock;
-import com.kingodogo.buildscape.block.WaterloggableGrateBlock;
+import com.kingodogo.buildscape.block.building.ModButtonBlock;
+import com.kingodogo.buildscape.block.building.ModPressurePlateBlock;
+import com.kingodogo.buildscape.block.building.ModStairBlock;
+import com.kingodogo.buildscape.block.building.SteelBoltBlock;
+import com.kingodogo.buildscape.block.building.VerticalSlabBlock;
+import com.kingodogo.buildscape.block.building.WaterloggableGrateBlock;
 import com.kingodogo.buildscape.feature.copper.ModCopperDoorBlock;
 import com.kingodogo.buildscape.feature.copper.ModCopperTrapdoorBlock;
 import com.kingodogo.buildscape.feature.pipe.HollowLogBlock;

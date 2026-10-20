@@ -1,10 +1,10 @@
 package com.kingodogo.buildscape.registry.blocks;
 
-import com.kingodogo.buildscape.block.ModSlabBlock;
-import com.kingodogo.buildscape.block.ModStairBlock;
-import com.kingodogo.buildscape.block.ModWallBlock;
-import com.kingodogo.buildscape.block.VerticalSlabBlock;
-import com.kingodogo.buildscape.block.WoolLayersBlock;
+import com.kingodogo.buildscape.block.building.ModSlabBlock;
+import com.kingodogo.buildscape.block.building.ModStairBlock;
+import com.kingodogo.buildscape.block.building.ModWallBlock;
+import com.kingodogo.buildscape.block.building.VerticalSlabBlock;
+import com.kingodogo.buildscape.block.decor.WoolLayersBlock;
 import com.kingodogo.buildscape.feature.copper.WeatheringLargeChainBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;

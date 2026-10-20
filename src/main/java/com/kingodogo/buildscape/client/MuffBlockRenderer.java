@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.MuffBlock;
+import com.kingodogo.buildscape.block.decor.MuffBlock;
 import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
 import com.kingodogo.buildscape.registry.ModBlocks;
 import com.kingodogo.buildscape.registry.ModItems;

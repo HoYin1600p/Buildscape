@@ -821,7 +821,7 @@ public class PillarIdManager {
 
             saveToFile(PillarStore.getBackupDataFile(), PillarStore.BACKUP_FILE_NAME);
         } catch (Throwable t) {
-            BuildScape.LOGGER.error("Error saving backup file: {}", t.getMessage(), t);
+            BuildScape.LOGGER.error("Error saving backup file", t);
         }
     }
 

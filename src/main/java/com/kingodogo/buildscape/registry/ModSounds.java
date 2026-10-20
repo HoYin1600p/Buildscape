@@ -160,7 +160,7 @@ public class ModSounds {
                         stepSound,
                         stepSound);
             } catch (Exception e) {
-                LOGGER.error("Failed to create copper grate sound type: {}", e.getMessage(), e);
+                LOGGER.error("Failed to create copper grate sound type", e);
                 return new ForgeSoundType(
                         1f,
                         1f,
@@ -214,7 +214,7 @@ public class ModSounds {
                         stepSound,
                         stepSound);
             } catch (Exception e) {
-                LOGGER.error("Failed to create copper bulb sound type: {}", e.getMessage(), e);
+                LOGGER.error("Failed to create copper bulb sound type", e);
                 return new ForgeSoundType(
                         1f,
                         1f,
@@ -414,7 +414,7 @@ public class ModSounds {
                         hitSound,
                         fallSound);
             } catch (Exception e) {
-                LOGGER.error("Failed to create mangrove roots sound type: {}", e.getMessage(), e);
+                LOGGER.error("Failed to create mangrove roots sound type", e);
                 return new ForgeSoundType(
                         1f,
                         1f,
@@ -471,7 +471,7 @@ public class ModSounds {
                         hitSound,
                         fallSound);
             } catch (Exception e) {
-                LOGGER.error("Failed to create muddy mangrove roots sound type: {}", e.getMessage(), e);
+                LOGGER.error("Failed to create muddy mangrove roots sound type", e);
                 return new ForgeSoundType(
                         1f,
                         1f,

@@ -109,12 +109,12 @@ public class SupportersApiClient {
                     try {
                         return gson.fromJson(body, responseClass);
                     } catch (Exception e) {
-                        BuildScape.getLogger().error("Failed to parse JSON response: {}", e.getMessage(), e);
+                        BuildScape.getLogger().error("Failed to parse JSON response", e);
                         throw new ApiException("Failed to parse response: " + e.getMessage(), e);
                     }
                 })
                 .exceptionally(throwable -> {
-                    BuildScape.getLogger().error("API request failed: {}", throwable.getMessage(), throwable);
+                    BuildScape.getLogger().error("API request failed", throwable);
                     if (throwable.getCause() != null) {
                         BuildScape.getLogger().error("Cause: {}", throwable.getCause().getMessage(),
                                 throwable.getCause());
@@ -156,12 +156,12 @@ public class SupportersApiClient {
                     try {
                         return gson.fromJson(bodyStr, responseClass);
                     } catch (Exception e) {
-                        BuildScape.getLogger().error("Failed to parse JSON response: {}", e.getMessage(), e);
+                        BuildScape.getLogger().error("Failed to parse JSON response", e);
                         throw new ApiException("Failed to parse response: " + e.getMessage(), e);
                     }
                 })
                 .exceptionally(throwable -> {
-                    BuildScape.getLogger().error("API POST request failed: {}", throwable.getMessage(), throwable);
+                    BuildScape.getLogger().error("API POST request failed", throwable);
                     if (throwable.getCause() != null) {
                         BuildScape.getLogger().error("Cause: {}", throwable.getCause().getMessage(),
                                 throwable.getCause());

@@ -159,7 +159,7 @@ public class BuildScapeRecipeCompiler {
         try {
             ShapedRecipeSymbols.validate(spec);
         } catch (IllegalArgumentException e) {
-            BuildScape.LOGGER.warn("BDRE Compiler: Skipping recipe {}: {}", spec.id(), e.getMessage());
+            BuildScape.LOGGER.warn("BDRE Compiler: Skipping recipe {}: {}", spec.id(), e.getMessage(), e);
             return null;
         }
         ResourceLocation recipeId = new ResourceLocation(recipeIds.allocate(category, spec, aliasResolver));

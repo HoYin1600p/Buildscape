@@ -233,7 +233,7 @@ public class BuildscapeClientConfig {
                         "BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
             }
         } catch (IOException e) {
-            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to migrate legacy config - {}", e.getMessage());
+            BuildScape.getLogger().warn("BuildscapeClientConfig: Failed to migrate legacy config - {}", e.getMessage(), e);
             if (!file.exists()) {
                 readOnly = true;
                 return legacyFile;

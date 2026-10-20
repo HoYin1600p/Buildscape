@@ -70,7 +70,7 @@ public class PillarServerEvents {
                 }
             }
         } catch (Exception e) {
-            BuildScape.LOGGER.error("Error saving pillar data on server stop: {}", e.getMessage(), e);
+            BuildScape.LOGGER.error("Error saving pillar data on server stop", e);
         }
 
         serverFullyInitialized = false;
@@ -171,7 +171,7 @@ public class PillarServerEvents {
             SyncPillarIdsPacket.sendToPlayer(
                     player, manager.getAllPillarDataForSync());
         } catch (Exception e) {
-            BuildScape.LOGGER.error("Error sending pillar IDs to player: {}", e.getMessage(), e);
+            BuildScape.LOGGER.error("Error sending pillar IDs to player", e);
         }
     }
 

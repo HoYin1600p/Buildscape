@@ -265,7 +265,7 @@ public class BinaryRecipeCache {
 
             BuildScape.LOGGER.info("BDRE Binary Cache stream loaded successfully ({} recipes).", recipes.size());
         } catch (Exception e) {
-            BuildScape.LOGGER.warn("BDRE Binary Cache rejected: {}; recompiling from compact sources.", e.getMessage());
+            BuildScape.LOGGER.warn("BDRE Binary Cache rejected: {}; recompiling from compact sources.", e.getMessage(), e);
             recipes.clear();
         }
 

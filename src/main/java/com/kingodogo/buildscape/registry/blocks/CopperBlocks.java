@@ -336,23 +336,30 @@ public final class CopperBlocks {
             () -> new FroglightBlock(BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
 
     public static final RegistryObject<Block> SCULK = BLOCKS.register("sculk",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(0.2F)
+                    .lightLevel(state -> 0).color(MaterialColor.COLOR_BLACK)));
     public static final RegistryObject<Block> SCULK_SLAB = BLOCKS.register("sculk_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+            () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(0.2F)
+                    .lightLevel(state -> 0).color(MaterialColor.COLOR_BLACK)));
     public static final RegistryObject<Block> SCULK_STAIRS = BLOCKS.register("sculk_stairs",
             () -> new ModStairBlock(SCULK.get().defaultBlockState(),
-                    BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+                    BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(0.2F)
+                            .lightLevel(state -> 0).color(MaterialColor.COLOR_BLACK)));
     public static final RegistryObject<Block> SCULK_WALL = BLOCKS.register("sculk_wall",
-            () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+            () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(0.2F)
+                    .lightLevel(state -> 0).color(MaterialColor.COLOR_BLACK)));
     public static final RegistryObject<Block> SCULK_VERTICAL_SLAB = BLOCKS.register("sculk_vertical_slab",
-            () -> new VerticalSlabBlock(SCULK.get(), BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+            () -> new VerticalSlabBlock(SCULK.get(), BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(0.2F)
+                    .lightLevel(state -> 0).color(MaterialColor.COLOR_BLACK)));
     public static final RegistryObject<Block> SCULK_VEIN = BLOCKS.register("sculk_vein",
-            () -> new SculkVeinBlock(BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN)));
+            () -> new SculkVeinBlock(BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN).lightLevel(state -> 0)));
     public static final RegistryObject<Block> SCULK_CATALYST = BLOCKS.register("sculk_catalyst",
             () -> new SculkCatalystBlock(
-                    BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).lightLevel(state -> 6).randomTicks()));
+                    BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(3.0F, 3.0F)
+                            .lightLevel(state -> 6).randomTicks()));
     public static final RegistryObject<Block> SCULK_SHRIEKER = BLOCKS.register("sculk_shrieker",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).noOcclusion()));
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(3.0F, 3.0F)
+                    .lightLevel(state -> 0).noOcclusion()));
     public static final RegistryObject<Block> SCULK_SENSOR = BLOCKS.register("sculk_sensor",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).lightLevel(state -> 1).noOcclusion()));
 

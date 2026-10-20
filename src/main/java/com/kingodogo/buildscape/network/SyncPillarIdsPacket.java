@@ -256,6 +256,7 @@ public class SyncPillarIdsPacket {
             writePillarData(new FriendlyByteBuf(scratch), data);
             return true;
         } catch (RuntimeException e) {
+            // any write failure means the data cannot be encoded
             return false;
         } finally {
             scratch.release();

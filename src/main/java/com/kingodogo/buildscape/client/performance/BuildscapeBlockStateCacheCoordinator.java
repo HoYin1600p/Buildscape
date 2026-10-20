@@ -64,6 +64,7 @@ public final class BuildscapeBlockStateCacheCoordinator {
                 try {
                     state.initCache();
                 } catch (RuntimeException exception) {
+                    // retried on the calling thread below, where a real failure surfaces
                     retrySequentially.add(state);
                 }
             });

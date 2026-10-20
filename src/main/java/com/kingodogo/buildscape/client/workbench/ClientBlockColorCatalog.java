@@ -130,6 +130,7 @@ public final class ClientBlockColorCatalog {
         try {
             model = minecraft.getBlockRenderer().getBlockModel(state);
         } catch (RuntimeException ignored) {
+            // a model that cannot be fetched is left out of the catalog
             return null;
         }
 
@@ -156,6 +157,7 @@ public final class ClientBlockColorCatalog {
         try {
             quads = model.getQuads(state, side, new Random(42L), EmptyModelData.INSTANCE);
         } catch (RuntimeException ignored) {
+            // a model that cannot list its quads contributes no colour for this face
             return;
         }
 
@@ -238,6 +240,7 @@ public final class ClientBlockColorCatalog {
         try {
             full = Block.isShapeFullBlock(state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
         } catch (RuntimeException ignored) {
+            // a shape that cannot be read counts as not a full block
             full = false;
         }
         boolean transparent = sampledTransparency
@@ -250,6 +253,7 @@ public final class ClientBlockColorCatalog {
             int color = state.getMapColor(null, null).col;
             return color == 0 ? 0x808080 : color;
         } catch (RuntimeException ignored) {
+            // no map colour for this state; fall back to neutral grey
             return 0x808080;
         }
     }

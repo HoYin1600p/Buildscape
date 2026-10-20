@@ -105,6 +105,7 @@ public final class ColorGradientSolver {
             return !state.isAir() && state.getFluidState().isEmpty()
                     && state.getDestroySpeed(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) >= 0.0F;
         } catch (RuntimeException ignored) {
+            // a block whose default state cannot be built is not a candidate
             return false;
         }
     }
@@ -151,6 +152,7 @@ public final class ColorGradientSolver {
             try {
                 color = block.defaultBlockState().getMapColor(null, null).col;
             } catch (RuntimeException ignored) {
+                // no map colour for this block; fall back to neutral grey
                 color = 0x808080;
             }
             registerDynamicColor(item, color == 0 ? 0x808080 : color, categoriesFor(item));
@@ -636,6 +638,7 @@ public final class ColorGradientSolver {
             try {
                 color = blockItem.getBlock().defaultBlockState().getMapColor(null, null).col;
             } catch (RuntimeException ignored) {
+                // no map colour for this block; fall back to neutral grey
                 color = 0x808080;
             }
             if (color == 0) {
@@ -657,6 +660,7 @@ public final class ColorGradientSolver {
         try {
             full = Block.isShapeFullBlock(state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
         } catch (RuntimeException ignored) {
+            // a shape that cannot be read counts as not a full block
             full = false;
         }
         ResourceLocation id = block.getRegistryName();

@@ -10,14 +10,13 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
 public class ModSounds {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = BuildScape.LOGGER;
 
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister
             .create(ForgeRegistries.SOUND_EVENTS, BuildScape.MODID);

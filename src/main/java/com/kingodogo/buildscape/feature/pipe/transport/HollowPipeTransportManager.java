@@ -10,7 +10,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
@@ -23,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Mod.EventBusSubscriber(modid = "buildscape", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class HollowPipeTransportManager {
 
-    private static final Logger LOGGER = LogManager.getLogger("PipeTransport");
+    private static final Logger LOGGER = BuildScape.LOGGER;
     private static final long RECALCULATION_BUDGET_NANOS = 2_000_000L;
     private static final int MAX_NETWORKS_PER_TICK = 16;
     private static final int MAX_ASYNC_NETWORKS = Math.max(1,

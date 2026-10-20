@@ -36,8 +36,12 @@ public abstract class AbstractContainerMenuMixin {
                 ItemStack source = sourceSlot.getItem();
                 if (!source.isEmpty() && hasFilters(filterMenu)) {
                     moveToFilteredSlots(containerMenu, filterMenu, source);
-                    if (source.isEmpty()) sourceSlot.set(ItemStack.EMPTY);
-                    else sourceSlot.setChanged();
+                    if (source.isEmpty()) {
+                        sourceSlot.set(ItemStack.EMPTY);
+                    }
+                    else {
+                        sourceSlot.setChanged();
+                    }
                     containerMenu.broadcastChanges();
                     ci.cancel();
                     return;
@@ -88,7 +92,9 @@ public abstract class AbstractContainerMenuMixin {
                                     toConsume -= fromInput;
 
                                     for (int slotIdx : playerInvSlots) {
-                                        if (toConsume <= 0) break;
+                                        if (toConsume <= 0) {
+                                            break;
+                                        }
                                         ItemStack invStack = player.getInventory().getItem(slotIdx);
                                         int fromInv = Math.min(toConsume, invStack.getCount());
                                         invStack.shrink(fromInv);
@@ -127,7 +133,9 @@ public abstract class AbstractContainerMenuMixin {
 
     private static boolean hasFilters(GhostFilterMenu menu) {
         for (int i = 0; i < menu.buildscape$getFilterSlotCount(); i++) {
-            if (menu.buildscape$getFilterItem(i) != null) return true;
+            if (menu.buildscape$getFilterItem(i) != null) {
+                return true;
+            }
         }
         return false;
     }

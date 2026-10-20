@@ -25,7 +25,9 @@ public class DyeColorsTest {
                 + "brown #411900 Brown, green #39FF14 Green, red #FF0000 Red, black #07010C Black";
         StringBuilder actual = new StringBuilder();
         for (DyeColors color : DyeColors.values()) {
-            if (actual.length() > 0) actual.append(", ");
+            if (actual.length() > 0) {
+                actual.append(", ");
+            }
             actual.append(color.serializedName()).append(' ').append(color.hex()).append(' ').append(color.displayName());
             assertEquals(Integer.parseInt(color.hex().substring(1), 16), color.rgb());
         }

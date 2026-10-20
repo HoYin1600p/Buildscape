@@ -49,13 +49,19 @@ public class PipeItemTransit {
     }
 
     public BlockPos getDestination() {
-        if (path.isEmpty()) return null;
+        if (path.isEmpty()) {
+            return null;
+        }
         return path.get(path.size() - 1);
     }
 
     public BlockPos getCurrentBlockPos(long currentTick) {
-        if (path.isEmpty()) return null;
-        if (path.size() == 1) return path.get(0);
+        if (path.isEmpty()) {
+            return null;
+        }
+        if (path.size() == 1) {
+            return path.get(0);
+        }
 
         float progress = Math.min(1.0F, Math.max(0.0F, (float) (currentTick - startTick) / totalDurationTicks));
         int index = Math.min(path.size() - 1, (int) (progress * path.size()));
@@ -63,7 +69,9 @@ public class PipeItemTransit {
     }
 
     public Vec3 getInterpolatedPosition(long currentTick, float partialTicks) {
-        if (path.isEmpty()) return Vec3.ZERO;
+        if (path.isEmpty()) {
+            return Vec3.ZERO;
+        }
         if (path.size() == 1) {
             BlockPos p = path.get(0);
             return new Vec3(p.getX() + 0.5, p.getY() + 0.35, p.getZ() + 0.5);

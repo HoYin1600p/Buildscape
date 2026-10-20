@@ -8,7 +8,9 @@ final class GeyserLiftRules {
 
     static int unobstructedTop(int sulfurY, IntPredicate passableAtY) {
         for (int y = sulfurY + 1; y < sulfurY + 24; y++) {
-            if (!passableAtY.test(y)) return y - 1;
+            if (!passableAtY.test(y)) {
+                return y - 1;
+            }
         }
         return sulfurY + 23;
     }

@@ -166,7 +166,9 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
             BlockPos baseLeaf = extensionCandidates.get(i);
 
             for (int dir = 0; dir < 6; dir++) {
-                if (random.nextFloat() < 0.3F) continue;
+                if (random.nextFloat() < 0.3F) {
+                    continue;
+                }
 
                 BlockPos extensionPos = baseLeaf.relative(
                         Direction.from3DDataValue(dir)
@@ -208,7 +210,9 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) continue;
+                    if (dx == 0 && dy == 0 && dz == 0) {
+                        continue;
+                    }
 
                     BlockPos checkPos = pos.offset(dx, dy, dz);
 
@@ -245,9 +249,13 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
         for (int dx = -6; dx <= 6; dx++) {
             for (int dy = -6; dy <= 6; dy++) {
                 for (int dz = -6; dz <= 6; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) continue;
+                    if (dx == 0 && dy == 0 && dz == 0) {
+                        continue;
+                    }
                     int distanceSq = dx * dx + dy * dy + dz * dz;
-                    if (distanceSq > 36) continue;
+                    if (distanceSq > 36) {
+                        continue;
+                    }
 
                     BlockPos checkPos = pos.offset(dx, dy, dz);
                     if (
@@ -279,7 +287,9 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) continue;
+                    if (dx == 0 && dy == 0 && dz == 0) {
+                        continue;
+                    }
 
                     BlockPos checkPos = pos.offset(dx, dy, dz);
                     if (placedLeaves.contains(checkPos)) {

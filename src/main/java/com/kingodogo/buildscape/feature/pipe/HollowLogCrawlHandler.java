@@ -57,10 +57,14 @@ public class HollowLogCrawlHandler {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
 
         Player player = event.player;
-        if (player == null || player.isSpectator()) return;
+        if (player == null || player.isSpectator()) {
+            return;
+        }
 
         Level level = player.level;
 
@@ -181,7 +185,9 @@ public class HollowLogCrawlHandler {
 
                     if (state.getBlock() instanceof HollowLogBlock) {
                         Direction.Axis axis = state.getValue(RotatedPillarBlock.AXIS);
-                        if (axis == Direction.Axis.Y) continue;
+                        if (axis == Direction.Axis.Y) {
+                            continue;
+                        }
 
                         double cavityMinY = y + 0.125;
                         double cavityMaxY = y + 0.875;
@@ -217,7 +223,9 @@ public class HollowLogCrawlHandler {
                         boolean hasHorizontal = state.getValue(HollowPipeBlock.NORTH) || state.getValue(HollowPipeBlock.SOUTH)
                                 || state.getValue(HollowPipeBlock.WEST) || state.getValue(HollowPipeBlock.EAST)
                                 || axis != Direction.Axis.Y;
-                        if (!hasHorizontal) continue;
+                        if (!hasHorizontal) {
+                            continue;
+                        }
 
                         double cavityMinY = y + 0.125;
                         double cavityMaxY = y + 0.875;
@@ -276,7 +284,9 @@ public class HollowLogCrawlHandler {
 
                     if (state.getBlock() instanceof HollowLogBlock) {
                         Direction.Axis axis = state.getValue(RotatedPillarBlock.AXIS);
-                        if (axis == Direction.Axis.Y) continue;
+                        if (axis == Direction.Axis.Y) {
+                            continue;
+                        }
 
                         if (axis == Direction.Axis.X) {
                             double cavityMinZ = z + 0.15;
@@ -314,7 +324,9 @@ public class HollowLogCrawlHandler {
                         boolean hasHorizontal = state.getValue(HollowPipeBlock.NORTH) || state.getValue(HollowPipeBlock.SOUTH)
                                 || state.getValue(HollowPipeBlock.WEST) || state.getValue(HollowPipeBlock.EAST)
                                 || axis != Direction.Axis.Y;
-                        if (!hasHorizontal) continue;
+                        if (!hasHorizontal) {
+                            continue;
+                        }
 
                         if ((state.getValue(HollowPipeBlock.WEST) || axis == Direction.Axis.X) && !isConnectingHollowEnd(level, mpos, Direction.WEST)) {
                             if (bb.minZ < z + 0.85 && bb.maxZ > z + 0.15 && bb.maxX >= x - 0.25 && bb.minX <= x + 0.25) {

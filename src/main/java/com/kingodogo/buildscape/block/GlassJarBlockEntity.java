@@ -53,7 +53,9 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
     }
 
     public static boolean isXpLiquid(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return false;
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
         return stack.is(Items.EXPERIENCE_BOTTLE) || stack.is(ModItems.EXPERIENCE_BUCKET.get());
     }
 
@@ -62,13 +64,17 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
     }
 
     public boolean isBucketLiquid() {
-        if (!hasLiquid()) return false;
+        if (!hasLiquid()) {
+            return false;
+        }
         ItemStack bucket = getBucketRepresentation();
         return !bucket.isEmpty();
     }
 
     public ItemStack getBucketRepresentation() {
-        if (!hasLiquid()) return ItemStack.EMPTY;
+        if (!hasLiquid()) {
+            return ItemStack.EMPTY;
+        }
         if (isXpLiquid(storedLiquidItem)) {
             return new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
         }
@@ -90,7 +96,9 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
     }
 
     public ItemStack getBottleRepresentation() {
-        if (!hasLiquid()) return ItemStack.EMPTY;
+        if (!hasLiquid()) {
+            return ItemStack.EMPTY;
+        }
         if (isXpLiquid(storedLiquidItem)) {
             return new ItemStack(Items.EXPERIENCE_BOTTLE);
         }
@@ -171,29 +179,51 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
     }
 
     public static boolean isSameLiquid(ItemStack a, ItemStack b) {
-        if (a == null || b == null || a.isEmpty() || b.isEmpty()) return false;
-        if (isXpLiquid(a) && isXpLiquid(b)) return true;
+        if (a == null || b == null || a.isEmpty() || b.isEmpty()) {
+            return false;
+        }
+        if (isXpLiquid(a) && isXpLiquid(b)) {
+            return true;
+        }
         if (a.getItem() instanceof PotionItem && b.getItem() instanceof PotionItem) {
             return ItemStack.isSameItemSameTags(a, b);
         }
-        if (isPlainWater(a) && isPlainWater(b)) return true;
+        if (isPlainWater(a) && isPlainWater(b)) {
+            return true;
+        }
         return ItemStack.isSameItemSameTags(a, b);
     }
 
     public boolean canAcceptFood(ItemStack stack) {
-        if (hasLiquid()) return false;
-        if (!isFoodItem(stack)) return false;
-        if (isEmpty()) return true;
+        if (hasLiquid()) {
+            return false;
+        }
+        if (!isFoodItem(stack)) {
+            return false;
+        }
+        if (isEmpty()) {
+            return true;
+        }
         return ItemStack.isSameItemSameTags(storedItem, stack) && storedItem.getCount() < 64;
     }
 
     public boolean canAcceptLiquid(ItemStack stack) {
-        if (!isEmpty() && !storedItem.isEmpty()) return false;
-        if (!isLiquidItem(stack)) return false;
-        if (isEmpty() || !hasLiquid()) return true;
-        if (stack.getItem() instanceof BucketItem || stack.getItem() instanceof MilkBucketItem) return false;
+        if (!isEmpty() && !storedItem.isEmpty()) {
+            return false;
+        }
+        if (!isLiquidItem(stack)) {
+            return false;
+        }
+        if (isEmpty() || !hasLiquid()) {
+            return true;
+        }
+        if (stack.getItem() instanceof BucketItem || stack.getItem() instanceof MilkBucketItem) {
+            return false;
+        }
         int cap = getLiquidCap(stack);
-        if (liquidLevel >= cap) return false;
+        if (liquidLevel >= cap) {
+            return false;
+        }
         return isSameLiquid(storedLiquidItem, stack);
     }
 
@@ -296,7 +326,9 @@ public class GlassJarBlockEntity extends SyncedBlockEntity {
     }
 
     public void consumeLevel() {
-        if (!hasLiquid()) return;
+        if (!hasLiquid()) {
+            return;
+        }
         liquidLevel--;
         if (liquidLevel <= 0) {
             storedLiquidItem = ItemStack.EMPTY;

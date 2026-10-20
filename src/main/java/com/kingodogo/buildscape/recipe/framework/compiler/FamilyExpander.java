@@ -31,10 +31,14 @@ public class FamilyExpander {
         if (prefix == null || prefix.isEmpty()) {
             if (baseItem.endsWith("_planks")) {
                 prefix = baseItem.substring(0, baseItem.length() - "planks".length());
-                if ("auto".equals(familyType) || familyType.isEmpty()) familyType = "wood";
+                if ("auto".equals(familyType) || familyType.isEmpty()) {
+                    familyType = "wood";
+                }
             } else {
                 prefix = baseItem + "_";
-                if ("auto".equals(familyType) || familyType.isEmpty()) familyType = "stone";
+                if ("auto".equals(familyType) || familyType.isEmpty()) {
+                    familyType = "stone";
+                }
             }
         }
 
@@ -152,7 +156,9 @@ public class FamilyExpander {
     }
 
     private String sanitizeId(String raw) {
-        if (raw == null) return "unknown";
+        if (raw == null) {
+            return "unknown";
+        }
         return raw.toLowerCase(Locale.ROOT)
                 .replace(":", "_")
                 .replaceAll("[^a-z0-9_.-]", "_");

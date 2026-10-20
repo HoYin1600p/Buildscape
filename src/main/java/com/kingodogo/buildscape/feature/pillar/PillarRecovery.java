@@ -105,7 +105,9 @@ final class PillarRecovery {
         try {
 
             for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
+                if (level == null) {
+                    continue;
+                }
 
                 try {
                     int chunkRange = 64;
@@ -217,7 +219,9 @@ final class PillarRecovery {
             int colorClearedCount = 0;
 
             for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
+                if (level == null) {
+                    continue;
+                }
 
                 String dimensionKey = PillarIdManager.getDimensionKey(level);
 

@@ -133,16 +133,21 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
                 if (newBlock != null && newBlock != this) {
                     if (!level.isClientSide) {
                         BlockState newState = newBlock.defaultBlockState();
-                        if (state.hasProperty(NORTH))
+                        if (state.hasProperty(NORTH)) {
                             newState = newState.setValue(NORTH, state.getValue(NORTH));
-                        if (state.hasProperty(SOUTH))
+                        }
+                        if (state.hasProperty(SOUTH)) {
                             newState = newState.setValue(SOUTH, state.getValue(SOUTH));
-                        if (state.hasProperty(EAST))
+                        }
+                        if (state.hasProperty(EAST)) {
                             newState = newState.setValue(EAST, state.getValue(EAST));
-                        if (state.hasProperty(WEST))
+                        }
+                        if (state.hasProperty(WEST)) {
                             newState = newState.setValue(WEST, state.getValue(WEST));
-                        if (state.hasProperty(WATERLOGGED))
+                        }
+                        if (state.hasProperty(WATERLOGGED)) {
                             newState = newState.setValue(WATERLOGGED, state.getValue(WATERLOGGED));
+                        }
 
                         level.setBlock(pos, newState, 3);
                         if (!player.getAbilities().instabuild) {

@@ -69,7 +69,9 @@ public class UpdateAllPillarIdsPacket {
             boolean changed = false;
 
             for (PillarIdManager.PillarData incoming : packet.pillarDataList) {
-                if (incoming == null || incoming.id == null) continue;
+                if (incoming == null || incoming.id == null) {
+                    continue;
+                }
                 if (incoming.id.length() > NetworkPacketLimits.MAX_PILLAR_ID_LENGTH) {
                     return;
                 }
@@ -101,7 +103,9 @@ public class UpdateAllPillarIdsPacket {
             }
 
             for (PillarIdManager.PillarData incoming : packet.pillarDataList) {
-                if (incoming == null || incoming.id == null) continue;
+                if (incoming == null || incoming.id == null) {
+                    continue;
+                }
                 PillarIdManager.PillarData existing = manager.getPillarData(incoming.id);
                 if (existing != null) {
                     existing.pattern = incoming.pattern;

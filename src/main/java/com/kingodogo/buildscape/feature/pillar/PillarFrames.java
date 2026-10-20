@@ -55,18 +55,26 @@ final class PillarFrames {
 
     static void resetLoadedFrame(PillarIdManager m, PillarData data) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null) return;
+        if (server == null) {
+            return;
+        }
         for (ServerLevel level : server.getAllLevels()) {
-            if (!Objects.equals(PillarIdManager.getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
+            if (!Objects.equals(PillarIdManager.getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) {
+                continue;
+            }
             for (Entity entity : level.getEntities(null,
                     new AABB(data.getBlockPos()).inflate(1.0))) {
                 if (!(entity instanceof ItemFrame)
-                        && !(entity instanceof ColoredItemFrameEntity)) continue;
+                        && !(entity instanceof ColoredItemFrameEntity)) {
+                    continue;
+                }
                 Direction facing = entity instanceof ItemFrame itemFrame
                         ? itemFrame.getDirection()
                         : ((ColoredItemFrameEntity) entity).getDirection();
                 if (m.registry.isRemovedFrame(entity.getPersistentData().getString(NbtKeys.BUILD_SCAPE_FRAME_ID),
-                        data.dimension, entity.blockPosition(), facing)) clearFrameData(entity);
+                        data.dimension, entity.blockPosition(), facing)) {
+                    clearFrameData(entity);
+                }
             }
         }
     }
@@ -77,24 +85,34 @@ final class PillarFrames {
      * not loaded are marked pending and take the registry values when they register.
      */
     static void applyFrameEdit(PillarIdManager m, PillarData data) {
-        if (!m.serverAuthoritative || data == null || !PillarRegistry.isItemFrameData(data)) return;
+        if (!m.serverAuthoritative || data == null || !PillarRegistry.isItemFrameData(data)) {
+            return;
+        }
         data.frameEditPending = writeLoadedFrame(data) ? null : Boolean.TRUE;
     }
 
     static boolean writeLoadedFrame(PillarData data) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null) return false;
+        if (server == null) {
+            return false;
+        }
         boolean written = false;
         for (ServerLevel level : server.getAllLevels()) {
-            if (!Objects.equals(PillarIdManager.getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
+            if (!Objects.equals(PillarIdManager.getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) {
+                continue;
+            }
             for (Entity entity : level.getEntities(null,
                     new AABB(data.getBlockPos()).inflate(1.0))) {
                 if (!(entity instanceof ItemFrame)
-                        && !(entity instanceof ColoredItemFrameEntity)) continue;
+                        && !(entity instanceof ColoredItemFrameEntity)) {
+                    continue;
+                }
                 Direction facing = entity instanceof ItemFrame itemFrame
                         ? itemFrame.getDirection()
                         : ((ColoredItemFrameEntity) entity).getDirection();
-                if (!PillarRegistry.isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) continue;
+                if (!PillarRegistry.isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) {
+                    continue;
+                }
                 writeFrameData(entity.getPersistentData(), data.pattern, data.dyeColors);
                 if (entity instanceof ColoredItemFrameEntity coloredFrame) {
                     coloredFrame.setParticlePattern(framePattern(data.pattern));
@@ -114,12 +132,18 @@ final class PillarFrames {
     static void writeFrameData(CompoundTag tag, String pattern, List<String> colors) {
         ListTag colorList = new ListTag();
         if (colors != null) {
-            for (String color : colors) colorList.add(StringTag.valueOf(color));
+            for (String color : colors) {
+                colorList.add(StringTag.valueOf(color));
+            }
         }
         tag.putString(NbtKeys.BUILD_SCAPE_PARTICLE_PATTERN, framePattern(pattern));
         tag.put(NbtKeys.BUILD_SCAPE_PARTICLE_COLORS, colorList);
-        if (tag.contains(NbtKeys.PILLAR_PATTERN)) tag.putString(NbtKeys.PILLAR_PATTERN, framePattern(pattern));
-        if (tag.contains(NbtKeys.PILLAR_COLORS)) tag.put(NbtKeys.PILLAR_COLORS, colorList.copy());
+        if (tag.contains(NbtKeys.PILLAR_PATTERN)) {
+            tag.putString(NbtKeys.PILLAR_PATTERN, framePattern(pattern));
+        }
+        if (tag.contains(NbtKeys.PILLAR_COLORS)) {
+            tag.put(NbtKeys.PILLAR_COLORS, colorList.copy());
+        }
     }
 
     /**
@@ -128,10 +152,14 @@ final class PillarFrames {
      * entity is newer, so the pending edit is dropped. Returns true when the entity data was rewritten.
      */
     static boolean applyPendingFrameEdit(PillarIdManager m, PillarData existing, CompoundTag tag, boolean immediate) {
-        if (existing == null || existing.frameEditPending == null) return false;
+        if (existing == null || existing.frameEditPending == null) {
+            return false;
+        }
         existing.frameEditPending = null;
         m.requestSave();
-        if (immediate) return false;
+        if (immediate) {
+            return false;
+        }
         writeFrameData(tag, existing.pattern, existing.dyeColors);
         return true;
     }
@@ -148,14 +176,18 @@ final class PillarFrames {
             return true;
         }
         if (prepareFrameRegistration(m, frame.getPersistentData(), PillarIdManager.getDimensionKey(frame.level),
-                frame.blockPosition(), facing)) return true;
+                frame.blockPosition(), facing)) {
+            return true;
+        }
         clearColoredFrameData(frame);
         return false;
     }
 
     static boolean prepareFrameRegistration(PillarIdManager m, CompoundTag tag, String dimension, BlockPos pos,
                                              Direction facing) {
-        if (!m.registry.isRemovedFrame(tag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID), dimension, pos, facing)) return true;
+        if (!m.registry.isRemovedFrame(tag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID), dimension, pos, facing)) {
+            return true;
+        }
         clearFrameData(tag);
         return false;
     }
@@ -169,7 +201,9 @@ final class PillarFrames {
             return;
         }
 
-        if (!prepareFrameRegistration(m, frame, immediate)) return;
+        if (!prepareFrameRegistration(m, frame, immediate)) {
+            return;
+        }
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID);
 
@@ -183,7 +217,9 @@ final class PillarFrames {
         }
 
         if (id == null || id.isEmpty()) {
-            if (!PillarRegistry.hasFrameParticleData(pattern, colors)) return;
+            if (!PillarRegistry.hasFrameParticleData(pattern, colors)) {
+                return;
+            }
             id = ItemFrameParticleHandler.getFrameId(frame);
         }
 
@@ -195,7 +231,9 @@ final class PillarFrames {
         id = m.registry.reconcileFrameId(id, dimension, pos, facing);
         dataTag.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, id);
         PillarData existing = m.registry.pillarData.get(id);
-        if (existing == null && !PillarRegistry.hasFrameParticleData(pattern, colors)) return;
+        if (existing == null && !PillarRegistry.hasFrameParticleData(pattern, colors)) {
+            return;
+        }
         if (existing != null && !PillarRegistry.isSameFrameLocation(existing, dimension, pos, facing)) {
             id = ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
@@ -215,7 +253,9 @@ final class PillarFrames {
 
             if (!frame.getItem().isEmpty()) {
                 ResourceLocation itemRL = ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
-                if (itemRL != null) data.displayedItem = itemRL.toString();
+                if (itemRL != null) {
+                    data.displayedItem = itemRL.toString();
+                }
             }
 
             m.registry.pillarData.put(id, data);
@@ -273,7 +313,9 @@ final class PillarFrames {
             return;
         }
 
-        if (!prepareFrameRegistration(m, frame, immediate)) return;
+        if (!prepareFrameRegistration(m, frame, immediate)) {
+            return;
+        }
         CompoundTag dataTag = frame.getPersistentData();
         String id = dataTag.getString(NbtKeys.BUILD_SCAPE_FRAME_ID);
 
@@ -287,7 +329,9 @@ final class PillarFrames {
         }
 
         if (id == null || id.isEmpty()) {
-            if (!PillarRegistry.hasFrameParticleData(pattern, colors)) return;
+            if (!PillarRegistry.hasFrameParticleData(pattern, colors)) {
+                return;
+            }
             id = ItemFrameParticleHandler.getFrameIdColored(frame);
         }
 
@@ -299,7 +343,9 @@ final class PillarFrames {
         id = m.registry.reconcileFrameId(id, dimension, pos, facing);
         dataTag.putString(NbtKeys.BUILD_SCAPE_FRAME_ID, id);
         PillarData existing = m.registry.pillarData.get(id);
-        if (existing == null && !PillarRegistry.hasFrameParticleData(pattern, colors)) return;
+        if (existing == null && !PillarRegistry.hasFrameParticleData(pattern, colors)) {
+            return;
+        }
         if (existing != null && !PillarRegistry.isSameFrameLocation(existing, dimension, pos, facing)) {
             id = ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
@@ -317,8 +363,12 @@ final class PillarFrames {
             data.dyeColors = colors;
 
             String color = frame.getColorVariant();
-            if (color == null || color.isEmpty()) color = "white";
-            else color = color.toLowerCase(Locale.ROOT);
+            if (color == null || color.isEmpty()) {
+                color = "white";
+            }
+            else {
+                color = color.toLowerCase(Locale.ROOT);
+            }
 
             ResourceLocation typeRL = new ResourceLocation("buildscape", color + "_item_frame");
             data.pillarType = typeRL.toString();
@@ -340,8 +390,12 @@ final class PillarFrames {
             boolean changed = removedDuplicate;
 
             String color = frame.getColorVariant();
-            if (color == null || color.isEmpty()) color = "white";
-            else color = color.toLowerCase(Locale.ROOT);
+            if (color == null || color.isEmpty()) {
+                color = "white";
+            }
+            else {
+                color = color.toLowerCase(Locale.ROOT);
+            }
             String expectedType = "buildscape:" + color + "_item_frame";
 
             if (existing.pillarType == null || !existing.pillarType.equals(expectedType)) {

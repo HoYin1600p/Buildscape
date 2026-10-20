@@ -34,7 +34,9 @@ public class TrappedDecoratedPotBlockEntityRenderer
             int combinedLight,
             int combinedOverlay
     ) {
-        if (blockEntity.getLevel() == null) return;
+        if (blockEntity.getLevel() == null) {
+            return;
+        }
 
         long currentTick = blockEntity.getLevel().getGameTime();
         long wobbleStartTick = blockEntity.getWobbleStartedAtTick();

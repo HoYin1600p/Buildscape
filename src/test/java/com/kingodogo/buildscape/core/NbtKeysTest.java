@@ -32,7 +32,9 @@ public class NbtKeysTest {
     public void everyKeyIsAUniqueNonEmptyString() throws IllegalAccessException {
         Set<String> seen = new HashSet<>();
         for (Field field : NbtKeys.class.getDeclaredFields()) {
-            if (!Modifier.isPublic(field.getModifiers()) || !Modifier.isStatic(field.getModifiers())) continue;
+            if (!Modifier.isPublic(field.getModifiers()) || !Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
             String value = (String) field.get(null);
             assertTrue(field.getName(), !value.isEmpty());
             assertTrue("duplicate value " + value + " in " + field.getName(), seen.add(value));

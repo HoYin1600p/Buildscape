@@ -67,7 +67,9 @@ public class ConfigFollowupRegressionTest {
         assertTrue(saved.contains(escaped));
         int invalidCount = 0;
         for (com.google.gson.JsonElement entry : ConfigLayoutIO.readProperties(saved).getAsJsonArray("items")) {
-            if (entry.getAsString().equals("Bad Id!")) invalidCount++;
+            if (entry.getAsString().equals("Bad Id!")) {
+                invalidCount++;
+            }
         }
         assertEquals(2, invalidCount);
     }

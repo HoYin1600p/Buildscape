@@ -53,11 +53,21 @@ public class WanderingHomemakerSpawningHandler {
     }
 
     private static BlockCategory getCategory(Block block) {
-        if (block instanceof DecoratedPotBlock) return BlockCategory.DECORATED_POT;
-        if (block instanceof BigCandleBlock) return BlockCategory.BIG_CANDLE;
-        if (block instanceof PillarBlock) return BlockCategory.PILLAR;
-        if (block instanceof StarBlock) return BlockCategory.STAR;
-        if (block instanceof CushionBlock) return BlockCategory.CUSHION;
+        if (block instanceof DecoratedPotBlock) {
+            return BlockCategory.DECORATED_POT;
+        }
+        if (block instanceof BigCandleBlock) {
+            return BlockCategory.BIG_CANDLE;
+        }
+        if (block instanceof PillarBlock) {
+            return BlockCategory.PILLAR;
+        }
+        if (block instanceof StarBlock) {
+            return BlockCategory.STAR;
+        }
+        if (block instanceof CushionBlock) {
+            return BlockCategory.CUSHION;
+        }
         return BlockCategory.NONE;
     }
 
@@ -68,7 +78,9 @@ public class WanderingHomemakerSpawningHandler {
     private static final int[][][] ALL_SQUARES = {OFFSETS_1, OFFSETS_2, OFFSETS_3, OFFSETS_4};
 
     private static boolean formsSquare(Level level, BlockPos pos, BlockCategory category) {
-        if (category == BlockCategory.NONE) return false;
+        if (category == BlockCategory.NONE) {
+            return false;
+        }
 
         for (int[][] square : ALL_SQUARES) {
             boolean match = true;
@@ -102,14 +114,22 @@ public class WanderingHomemakerSpawningHandler {
 
     @SubscribeEvent
     public static void onBlockPlaced(BlockEvent.EntityPlaceEvent event) {
-        if (event.isCanceled()) return;
+        if (event.isCanceled()) {
+            return;
+        }
         LevelAccessor worldAccessor = event.getWorld();
-        if (!(worldAccessor instanceof ServerLevel level)) return;
-        if (!(event.getEntity() instanceof Player player)) return;
+        if (!(worldAccessor instanceof ServerLevel level)) {
+            return;
+        }
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
 
         BlockState placedState = event.getPlacedBlock();
         BlockCategory category = getCategory(placedState.getBlock());
-        if (category == BlockCategory.NONE) return;
+        if (category == BlockCategory.NONE) {
+            return;
+        }
 
         BlockPos pos = event.getPos();
         if (formsSquare(level, pos, category)) {

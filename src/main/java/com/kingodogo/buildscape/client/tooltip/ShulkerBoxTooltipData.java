@@ -45,7 +45,9 @@ public class ShulkerBoxTooltipData implements TooltipComponent, ClientTooltipCom
     });
 
     public static int getHexColor(@Nullable DyeColor dye) {
-        if (dye == null) return COLOR_UNCOLORED;
+        if (dye == null) {
+            return COLOR_UNCOLORED;
+        }
         return DYE_COLORS.getOrDefault(dye, COLOR_UNCOLORED);
     }
 

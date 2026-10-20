@@ -18,7 +18,9 @@ public class SyncBiomeTintPacketTest {
     @Test
     public void fullChunkAndEmptyReplacementRoundTrip() {
         Map<Integer, ResourceLocation> columns = new HashMap<>();
-        for (int i = 0; i < 256; i++) columns.put(i, BIOME);
+        for (int i = 0; i < 256; i++) {
+            columns.put(i, BIOME);
+        }
         roundTrip(columns);
         roundTrip(Map.of());
     }

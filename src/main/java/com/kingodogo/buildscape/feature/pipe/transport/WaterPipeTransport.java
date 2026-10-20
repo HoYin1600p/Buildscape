@@ -225,7 +225,9 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 int initialDistance = Math.min(MAX_HORIZONTAL_FLOW,
                         Math.max(0, topology.getInitialWaterFlowDistance(sourcePos)));
                 String sourceFluidId = topology.getSourceFluidId(sourcePos);
-                if (sourceFluidId == null || sourceFluidId.isEmpty()) continue;
+                if (sourceFluidId == null || sourceFluidId.isEmpty()) {
+                    continue;
+                }
                 state.setFluidId(sourceFluidId);
                 state.setSource(true);
                 state.setDistance(initialDistance);
@@ -394,8 +396,12 @@ public class WaterPipeTransport extends PipeFluidTransport {
         }
 
         for (Direction dir : HORIZONTAL_DIRECTIONS) {
-            if (dir == inDir) continue;
-            if (inDir != null && dir == inDir.getOpposite()) continue;
+            if (dir == inDir) {
+                continue;
+            }
+            if (inDir != null && dir == inDir.getOpposite()) {
+                continue;
+            }
             if (topology.isConnected(pos, dir)) {
                 validExits.add(dir);
             }
@@ -530,7 +536,9 @@ public class WaterPipeTransport extends PipeFluidTransport {
             return;
         }
         Fluid fluid = WorldPipeTopologyAccess.fluidById(flow.getFluidId());
-        if (fluid == Fluids.EMPTY) return;
+        if (fluid == Fluids.EMPTY) {
+            return;
+        }
         HollowPipeBlock.trySpreadToWorld(level, pos, state, fluid,
                 flow.getDistance(), flow.getFlowDirections());
     }

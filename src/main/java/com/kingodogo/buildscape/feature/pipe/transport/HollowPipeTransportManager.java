@@ -190,7 +190,9 @@ public class HollowPipeTransportManager {
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
 
         long deadlineNanos = System.nanoTime() + RECALCULATION_BUDGET_NANOS;
         int remainingNetworks = MAX_NETWORKS_PER_TICK;

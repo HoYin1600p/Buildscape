@@ -355,7 +355,9 @@ public class AshenKingPillarBlock extends PillarBlock {
     }
 
     private Map.Entry<String, String> getDyeColorAndName(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return null;
+        if (stack == null || stack.isEmpty()) {
+            return null;
+        }
 
         DyeColors dye = DyeColors.fromDyeItem(stack.getItem());
         if (dye != null) {
@@ -367,16 +369,28 @@ public class AshenKingPillarBlock extends PillarBlock {
 
     private String getDirectionName(float yaw) {
         yaw = yaw % 360.0f;
-        if (yaw < 0) yaw += 360.0f;
+        if (yaw < 0) {
+            yaw += 360.0f;
+        }
 
-        if (yaw >= 315 || yaw < 45) return "South";
-        else if (yaw >= 45 && yaw < 135) return "West";
-        else if (yaw >= 135 && yaw < 225) return "North";
-        else return "East";
+        if (yaw >= 315 || yaw < 45) {
+            return "South";
+        }
+        else if (yaw >= 45 && yaw < 135) {
+            return "West";
+        }
+        else if (yaw >= 135 && yaw < 225) {
+            return "North";
+        }
+        else {
+            return "East";
+        }
     }
 
     private ChatFormatting getPatternColor(String pattern) {
-        if (pattern == null) return ChatFormatting.WHITE;
+        if (pattern == null) {
+            return ChatFormatting.WHITE;
+        }
 
         switch (pattern) {
             case ParticlePatterns.DEFAULT: return ChatFormatting.WHITE;

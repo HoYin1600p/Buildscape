@@ -28,8 +28,12 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
         ItemStack filteredContainer = ItemStack.EMPTY;
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
-            if (stack.isEmpty()) continue;
-            if (!filteredContainer.isEmpty() || !isSupportedContainer(stack)) return false;
+            if (stack.isEmpty()) {
+                continue;
+            }
+            if (!filteredContainer.isEmpty() || !isSupportedContainer(stack)) {
+                return false;
+            }
             filteredContainer = stack;
         }
         return !filteredContainer.isEmpty() && hasFilters(filteredContainer);
@@ -69,18 +73,26 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
     }
 
     private static boolean hasFilters(ItemStack stack) {
-        if (stack.getItem() instanceof BuildersPouchItem) return BuildersPouchItem.hasFilters(stack);
+        if (stack.getItem() instanceof BuildersPouchItem) {
+            return BuildersPouchItem.hasFilters(stack);
+        }
         CompoundTag blockEntityTag = stack.getTagElement(BLOCK_ENTITY_TAG);
-        if (blockEntityTag == null) return false;
+        if (blockEntityTag == null) {
+            return false;
+        }
 
         if (blockEntityTag.contains(FILTERS_TAG, Tag.TAG_LIST)) {
             ListTag filters = blockEntityTag.getList(FILTERS_TAG, Tag.TAG_STRING);
             for (int i = 0; i < filters.size(); i++) {
-                if (!filters.getString(i).isEmpty()) return true;
+                if (!filters.getString(i).isEmpty()) {
+                    return true;
+                }
             }
         }
 
-        if (!blockEntityTag.contains(NbtKeys.ITEMS, Tag.TAG_LIST)) return false;
+        if (!blockEntityTag.contains(NbtKeys.ITEMS, Tag.TAG_LIST)) {
+            return false;
+        }
         ListTag items = blockEntityTag.getList(NbtKeys.ITEMS, Tag.TAG_COMPOUND);
         for (int i = 0; i < items.size(); i++) {
             CompoundTag item = items.getCompound(i);
@@ -98,10 +110,14 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
             return;
         }
         CompoundTag blockEntityTag = stack.getTagElement(BLOCK_ENTITY_TAG);
-        if (blockEntityTag == null) return;
+        if (blockEntityTag == null) {
+            return;
+        }
 
         blockEntityTag.remove(FILTERS_TAG);
-        if (!blockEntityTag.contains(NbtKeys.ITEMS, Tag.TAG_LIST)) return;
+        if (!blockEntityTag.contains(NbtKeys.ITEMS, Tag.TAG_LIST)) {
+            return;
+        }
 
         ListTag items = blockEntityTag.getList(NbtKeys.ITEMS, Tag.TAG_COMPOUND);
         for (int i = items.size() - 1; i >= 0; i--) {

@@ -40,20 +40,30 @@ public class HammerClientHandler {
     public static void onHighlightBlock(DrawSelectionEvent.HighlightBlock event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || mc.level == null) return;
+        if (player == null || mc.level == null) {
+            return;
+        }
 
         ItemStack mainHand = player.getMainHandItem();
-        if (mainHand.isEmpty() || !(mainHand.getItem() instanceof HammerItem hammer)) return;
+        if (mainHand.isEmpty() || !(mainHand.getItem() instanceof HammerItem hammer)) {
+            return;
+        }
 
         ItemStack offHand = player.getOffhandItem();
-        if (offHand.isEmpty() || !(offHand.getItem() instanceof BlockItem)) return;
+        if (offHand.isEmpty() || !(offHand.getItem() instanceof BlockItem)) {
+            return;
+        }
 
         HitResult target = event.getTarget();
-        if (target.getType() != HitResult.Type.BLOCK) return;
+        if (target.getType() != HitResult.Type.BLOCK) {
+            return;
+        }
 
         BlockPos pos = ((BlockHitResult) target).getBlockPos();
         BlockState state = mc.level.getBlockState(pos);
-        if (state.isAir()) return;
+        if (state.isAir()) {
+            return;
+        }
 
         event.setCanceled(true);
 
@@ -105,22 +115,34 @@ public class HammerClientHandler {
 
     @SubscribeEvent
     public static void onMouseInput(InputEvent.MouseInputEvent event) {
-        if (event.getButton() != GLFW.GLFW_MOUSE_BUTTON_RIGHT) return;
-        if (event.getAction() != GLFW.GLFW_PRESS) return;
+        if (event.getButton() != GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+            return;
+        }
+        if (event.getAction() != GLFW.GLFW_PRESS) {
+            return;
+        }
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc.screen != null || mc.player == null || mc.level == null) return;
+        if (mc.screen != null || mc.player == null || mc.level == null) {
+            return;
+        }
 
         LocalPlayer player = mc.player;
 
         ItemStack mainHand = player.getMainHandItem();
-        if (mainHand.isEmpty() || !(mainHand.getItem() instanceof HammerItem)) return;
+        if (mainHand.isEmpty() || !(mainHand.getItem() instanceof HammerItem)) {
+            return;
+        }
 
         ItemStack offHand = player.getOffhandItem();
-        if (offHand.isEmpty() || !(offHand.getItem() instanceof BlockItem)) return;
+        if (offHand.isEmpty() || !(offHand.getItem() instanceof BlockItem)) {
+            return;
+        }
 
         HitResult hit = mc.hitResult;
-        if (hit == null || hit.getType() != HitResult.Type.BLOCK) return;
+        if (hit == null || hit.getType() != HitResult.Type.BLOCK) {
+            return;
+        }
 
         BlockHitResult blockHit = (BlockHitResult) hit;
         BlockPos pos = blockHit.getBlockPos();

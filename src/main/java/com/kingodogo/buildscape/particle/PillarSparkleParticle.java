@@ -115,7 +115,9 @@ public class PillarSparkleParticle extends TextureSheetParticle {
     public void tick() {
         super.tick();
         this.currentFrame = (this.age * FRAME_COUNT) / this.lifetime;
-        if (this.currentFrame >= FRAME_COUNT) this.currentFrame = FRAME_COUNT - 1;
+        if (this.currentFrame >= FRAME_COUNT) {
+            this.currentFrame = FRAME_COUNT - 1;
+        }
 
         float fadeOut = 0.9F;
         if (this.age > this.lifetime * fadeOut) {

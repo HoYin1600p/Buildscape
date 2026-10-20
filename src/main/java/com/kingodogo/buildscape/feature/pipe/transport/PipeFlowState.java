@@ -183,7 +183,9 @@ public class PipeFlowState {
 
     public static PipeFlowState readFromNbt(CompoundTag tag) {
         PipeFlowState state = new PipeFlowState();
-        if (tag == null) return state;
+        if (tag == null) {
+            return state;
+        }
 
         state.fluidId = tag.contains(NbtKeys.FLUID_ID, Tag.TAG_STRING)
                 ? tag.getString(NbtKeys.FLUID_ID)
@@ -212,8 +214,12 @@ public class PipeFlowState {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PipeFlowState that)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PipeFlowState that)) {
+            return false;
+        }
         return Objects.equals(fluidId, that.fluidId) &&
                 isSource == that.isSource &&
                 distance == that.distance &&

@@ -143,7 +143,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide) return null;
+        if (level.isClientSide) {
+            return null;
+        }
         return type == ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY.get()
                 ? (lvl, pos, st, be) -> HollowLogBlockEntity.serverTick(lvl, pos, st, (HollowLogBlockEntity) be)
                 : null;
@@ -165,9 +167,13 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     public static boolean isOpenEnd(BlockState state, Direction dir) {
-        if (dir == null || !(state.getBlock() instanceof HollowLogBlock)) return false;
+        if (dir == null || !(state.getBlock() instanceof HollowLogBlock)) {
+            return false;
+        }
         Direction.Axis axis = state.getValue(AXIS);
-        if (dir.getAxis() != axis) return false;
+        if (dir.getAxis() != axis) {
+            return false;
+        }
         boolean isNeg = (dir == Direction.WEST || dir == Direction.NORTH || dir == Direction.DOWN);
         return isNeg ? !state.getValue(HAS_GLASS_NEG) : !state.getValue(HAS_GLASS_POS);
     }
@@ -213,14 +219,18 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     private static boolean isValidDecorationHolding(ItemStack stack, Direction.Axis axis, BlockState logState) {
-        if (stack == null || stack.isEmpty()) return false;
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
         Item item = stack.getItem();
 
         boolean hasGlassNeg = logState.getValue(HAS_GLASS_NEG);
         boolean isPotAllowed = (axis != Direction.Axis.Y) || hasGlassNeg;
         boolean hasDecoration = logState.getValue(HAS_DECORATION);
 
-        if (item == Items.FLOWER_POT && isPotAllowed && !hasDecoration) return true;
+        if (item == Items.FLOWER_POT && isPotAllowed && !hasDecoration) {
+            return true;
+        }
 
         if (hasDecoration) {
             return getPottedBlockState(item) != null;
@@ -265,8 +275,12 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     level.setBlock(pos, state, 3);
                     if (hollowBe != null && held.getItem() instanceof BlockItem blockItem) {
                         BlockState glassState = blockItem.getBlock().defaultBlockState();
-                        if (targetPos) hollowBe.setGlassCoverPos(glassState);
-                        else hollowBe.setGlassCoverNeg(glassState);
+                        if (targetPos) {
+                            hollowBe.setGlassCoverPos(glassState);
+                        }
+                        else {
+                            hollowBe.setGlassCoverNeg(glassState);
+                        }
                         hollowBe.setGlassPlacedByPlayer(player.getUUID());
                         hollowBe.setChanged();
                     }
@@ -309,7 +323,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         }
                     }
                     SoundEvent sound = sourceFluid.getAttributes().getFillSound();
-                    if (sound == null) sound = (sourceFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
+                    if (sound == null) {
+                        sound = (sourceFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
+                    }
                     level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
                     HollowPipeTransportManager.onBucketUsed(level, pos, state);
                 }
@@ -350,7 +366,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         }
                     }
                     SoundEvent sound = fluidInBucket.getAttributes().getEmptySound();
-                    if (sound == null) sound = (fluidInBucket == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
+                    if (sound == null) {
+                        sound = (fluidInBucket == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
+                    }
                     level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
@@ -434,8 +452,12 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         } else {
                             popResource(level, pos, new ItemStack(Items.GLASS));
                         }
-                        if (targetPos) hollowBe.setGlassCoverPos(Blocks.AIR.defaultBlockState());
-                        else hollowBe.setGlassCoverNeg(Blocks.AIR.defaultBlockState());
+                        if (targetPos) {
+                            hollowBe.setGlassCoverPos(Blocks.AIR.defaultBlockState());
+                        }
+                        else {
+                            hollowBe.setGlassCoverNeg(Blocks.AIR.defaultBlockState());
+                        }
                         hollowBe.setChanged();
                     }
                     level.playSound(null, pos, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -467,7 +489,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     private static List<ItemStack> getDecorationDrops(BlockState decState) {
-        if (decState == null || decState.isAir()) return Collections.emptyList();
+        if (decState == null || decState.isAir()) {
+            return Collections.emptyList();
+        }
         if (decState.getBlock() instanceof FlowerPotBlock potBlock) {
             if (potBlock == Blocks.FLOWER_POT) {
                 return List.of(new ItemStack(Items.FLOWER_POT));
@@ -515,9 +539,15 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     private static boolean isValidFullBlockDecoration(Block block) {
-        if (block == null) return false;
-        if (block instanceof EntityBlock) return false;
-        if (block instanceof HollowLogBlock || block instanceof HollowPipeBlock) return false;
+        if (block == null) {
+            return false;
+        }
+        if (block instanceof EntityBlock) {
+            return false;
+        }
+        if (block instanceof HollowLogBlock || block instanceof HollowPipeBlock) {
+            return false;
+        }
 
         if (block instanceof SlabBlock || block instanceof StairBlock || block instanceof WallBlock
                 || block instanceof FenceBlock || block instanceof FenceGateBlock || block instanceof IronBarsBlock
@@ -558,37 +588,99 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     public static BlockState getPottedBlockState(Item item) {
-        if (item == Items.POPPY) return Blocks.POTTED_POPPY.defaultBlockState();
-        if (item == Items.DANDELION) return Blocks.POTTED_DANDELION.defaultBlockState();
-        if (item == Items.BLUE_ORCHID) return Blocks.POTTED_BLUE_ORCHID.defaultBlockState();
-        if (item == Items.ALLIUM) return Blocks.POTTED_ALLIUM.defaultBlockState();
-        if (item == Items.AZURE_BLUET) return Blocks.POTTED_AZURE_BLUET.defaultBlockState();
-        if (item == Items.RED_TULIP) return Blocks.POTTED_RED_TULIP.defaultBlockState();
-        if (item == Items.ORANGE_TULIP) return Blocks.POTTED_ORANGE_TULIP.defaultBlockState();
-        if (item == Items.WHITE_TULIP) return Blocks.POTTED_WHITE_TULIP.defaultBlockState();
-        if (item == Items.PINK_TULIP) return Blocks.POTTED_PINK_TULIP.defaultBlockState();
-        if (item == Items.OXEYE_DAISY) return Blocks.POTTED_OXEYE_DAISY.defaultBlockState();
-        if (item == Items.CORNFLOWER) return Blocks.POTTED_CORNFLOWER.defaultBlockState();
-        if (item == Items.LILY_OF_THE_VALLEY) return Blocks.POTTED_LILY_OF_THE_VALLEY.defaultBlockState();
-        if (item == Items.WITHER_ROSE) return Blocks.POTTED_WITHER_ROSE.defaultBlockState();
-        if (item == Items.RED_MUSHROOM) return Blocks.POTTED_RED_MUSHROOM.defaultBlockState();
-        if (item == Items.BROWN_MUSHROOM) return Blocks.POTTED_BROWN_MUSHROOM.defaultBlockState();
-        if (item == Items.DEAD_BUSH) return Blocks.POTTED_DEAD_BUSH.defaultBlockState();
-        if (item == Items.CACTUS) return Blocks.POTTED_CACTUS.defaultBlockState();
-        if (item == Items.BAMBOO) return Blocks.POTTED_BAMBOO.defaultBlockState();
-        if (item == Items.OAK_SAPLING) return Blocks.POTTED_OAK_SAPLING.defaultBlockState();
-        if (item == Items.SPRUCE_SAPLING) return Blocks.POTTED_SPRUCE_SAPLING.defaultBlockState();
-        if (item == Items.BIRCH_SAPLING) return Blocks.POTTED_BIRCH_SAPLING.defaultBlockState();
-        if (item == Items.JUNGLE_SAPLING) return Blocks.POTTED_JUNGLE_SAPLING.defaultBlockState();
-        if (item == Items.ACACIA_SAPLING) return Blocks.POTTED_ACACIA_SAPLING.defaultBlockState();
-        if (item == Items.DARK_OAK_SAPLING) return Blocks.POTTED_DARK_OAK_SAPLING.defaultBlockState();
-        if (item == Items.CRIMSON_FUNGUS) return Blocks.POTTED_CRIMSON_FUNGUS.defaultBlockState();
-        if (item == Items.WARPED_FUNGUS) return Blocks.POTTED_WARPED_FUNGUS.defaultBlockState();
-        if (item == Items.CRIMSON_ROOTS) return Blocks.POTTED_CRIMSON_ROOTS.defaultBlockState();
-        if (item == Items.WARPED_ROOTS) return Blocks.POTTED_WARPED_ROOTS.defaultBlockState();
-        if (item == Items.AZALEA) return Blocks.POTTED_AZALEA.defaultBlockState();
-        if (item == Items.FLOWERING_AZALEA) return Blocks.POTTED_FLOWERING_AZALEA.defaultBlockState();
-        if (item == Items.FERN) return Blocks.POTTED_FERN.defaultBlockState();
+        if (item == Items.POPPY) {
+            return Blocks.POTTED_POPPY.defaultBlockState();
+        }
+        if (item == Items.DANDELION) {
+            return Blocks.POTTED_DANDELION.defaultBlockState();
+        }
+        if (item == Items.BLUE_ORCHID) {
+            return Blocks.POTTED_BLUE_ORCHID.defaultBlockState();
+        }
+        if (item == Items.ALLIUM) {
+            return Blocks.POTTED_ALLIUM.defaultBlockState();
+        }
+        if (item == Items.AZURE_BLUET) {
+            return Blocks.POTTED_AZURE_BLUET.defaultBlockState();
+        }
+        if (item == Items.RED_TULIP) {
+            return Blocks.POTTED_RED_TULIP.defaultBlockState();
+        }
+        if (item == Items.ORANGE_TULIP) {
+            return Blocks.POTTED_ORANGE_TULIP.defaultBlockState();
+        }
+        if (item == Items.WHITE_TULIP) {
+            return Blocks.POTTED_WHITE_TULIP.defaultBlockState();
+        }
+        if (item == Items.PINK_TULIP) {
+            return Blocks.POTTED_PINK_TULIP.defaultBlockState();
+        }
+        if (item == Items.OXEYE_DAISY) {
+            return Blocks.POTTED_OXEYE_DAISY.defaultBlockState();
+        }
+        if (item == Items.CORNFLOWER) {
+            return Blocks.POTTED_CORNFLOWER.defaultBlockState();
+        }
+        if (item == Items.LILY_OF_THE_VALLEY) {
+            return Blocks.POTTED_LILY_OF_THE_VALLEY.defaultBlockState();
+        }
+        if (item == Items.WITHER_ROSE) {
+            return Blocks.POTTED_WITHER_ROSE.defaultBlockState();
+        }
+        if (item == Items.RED_MUSHROOM) {
+            return Blocks.POTTED_RED_MUSHROOM.defaultBlockState();
+        }
+        if (item == Items.BROWN_MUSHROOM) {
+            return Blocks.POTTED_BROWN_MUSHROOM.defaultBlockState();
+        }
+        if (item == Items.DEAD_BUSH) {
+            return Blocks.POTTED_DEAD_BUSH.defaultBlockState();
+        }
+        if (item == Items.CACTUS) {
+            return Blocks.POTTED_CACTUS.defaultBlockState();
+        }
+        if (item == Items.BAMBOO) {
+            return Blocks.POTTED_BAMBOO.defaultBlockState();
+        }
+        if (item == Items.OAK_SAPLING) {
+            return Blocks.POTTED_OAK_SAPLING.defaultBlockState();
+        }
+        if (item == Items.SPRUCE_SAPLING) {
+            return Blocks.POTTED_SPRUCE_SAPLING.defaultBlockState();
+        }
+        if (item == Items.BIRCH_SAPLING) {
+            return Blocks.POTTED_BIRCH_SAPLING.defaultBlockState();
+        }
+        if (item == Items.JUNGLE_SAPLING) {
+            return Blocks.POTTED_JUNGLE_SAPLING.defaultBlockState();
+        }
+        if (item == Items.ACACIA_SAPLING) {
+            return Blocks.POTTED_ACACIA_SAPLING.defaultBlockState();
+        }
+        if (item == Items.DARK_OAK_SAPLING) {
+            return Blocks.POTTED_DARK_OAK_SAPLING.defaultBlockState();
+        }
+        if (item == Items.CRIMSON_FUNGUS) {
+            return Blocks.POTTED_CRIMSON_FUNGUS.defaultBlockState();
+        }
+        if (item == Items.WARPED_FUNGUS) {
+            return Blocks.POTTED_WARPED_FUNGUS.defaultBlockState();
+        }
+        if (item == Items.CRIMSON_ROOTS) {
+            return Blocks.POTTED_CRIMSON_ROOTS.defaultBlockState();
+        }
+        if (item == Items.WARPED_ROOTS) {
+            return Blocks.POTTED_WARPED_ROOTS.defaultBlockState();
+        }
+        if (item == Items.AZALEA) {
+            return Blocks.POTTED_AZALEA.defaultBlockState();
+        }
+        if (item == Items.FLOWERING_AZALEA) {
+            return Blocks.POTTED_FLOWERING_AZALEA.defaultBlockState();
+        }
+        if (item == Items.FERN) {
+            return Blocks.POTTED_FERN.defaultBlockState();
+        }
         if (item instanceof BlockItem bi) {
             Block b = bi.getBlock();
             if (b instanceof FlowerPotBlock pot && pot != Blocks.FLOWER_POT) {

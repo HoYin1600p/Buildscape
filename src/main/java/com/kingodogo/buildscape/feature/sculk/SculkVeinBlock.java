@@ -26,26 +26,40 @@ public class SculkVeinBlock extends GlowLichenBlock {
 
     public static boolean regrow(ServerLevel level, BlockPos pos) {
         boolean changed = false;
-        for (Direction face : Direction.values()) changed |= placeFace(level, pos, face);
+        for (Direction face : Direction.values()) {
+            changed |= placeFace(level, pos, face);
+        }
         return changed;
     }
 
     public static boolean spread(ServerLevel level, BlockPos pos, Random random) {
         BlockState state = level.getBlockState(pos);
-        if (!state.is(ModBlocks.SCULK_VEIN.get())) return false;
+        if (!state.is(ModBlocks.SCULK_VEIN.get())) {
+            return false;
+        }
         List<Direction> faces = Arrays.asList(Direction.values());
         List<Direction> directions = Arrays.asList(Direction.values());
         Collections.shuffle(faces, random);
         Collections.shuffle(directions, random);
         for (Direction face : faces) {
-            if (!state.getValue(getFaceProperty(face))) continue;
+            if (!state.getValue(getFaceProperty(face))) {
+                continue;
+            }
             for (Direction direction : directions) {
-                if (direction.getAxis() == face.getAxis()) continue;
-                if (placeFace(level, pos, direction)) return true;
+                if (direction.getAxis() == face.getAxis()) {
+                    continue;
+                }
+                if (placeFace(level, pos, direction)) {
+                    return true;
+                }
                 BlockPos adjacent = pos.relative(direction);
-                if (placeFace(level, adjacent, face)) return true;
+                if (placeFace(level, adjacent, face)) {
+                    return true;
+                }
                 if (level.getBlockState(adjacent).getCollisionShape(level, adjacent).isEmpty()
-                        && placeFace(level, adjacent.relative(face), direction.getOpposite())) return true;
+                        && placeFace(level, adjacent.relative(face), direction.getOpposite())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -53,14 +67,20 @@ public class SculkVeinBlock extends GlowLichenBlock {
 
     private static boolean placeFace(ServerLevel level, BlockPos pos, Direction face) {
         BlockPos supportPos = pos.relative(face);
-        if (!level.hasChunkAt(pos) || !level.hasChunkAt(supportPos) || level.isOutsideBuildHeight(pos)) return false;
+        if (!level.hasChunkAt(pos) || !level.hasChunkAt(supportPos) || level.isOutsideBuildHeight(pos)) {
+            return false;
+        }
         BlockState state = level.getBlockState(pos);
-        if (!state.isAir() && !state.is(Blocks.WATER) && !state.is(ModBlocks.SCULK_VEIN.get())) return false;
+        if (!state.isAir() && !state.is(Blocks.WATER) && !state.is(ModBlocks.SCULK_VEIN.get())) {
+            return false;
+        }
         BlockState support = level.getBlockState(supportPos);
         if (support.is(ModBlocks.SCULK.get()) || support.is(ModBlocks.SCULK_CATALYST.get())
                 || support.is(ModBlocks.SCULK_SENSOR.get()) || support.is(ModBlocks.SCULK_SHRIEKER.get())
                 || support.is(Blocks.MOVING_PISTON)
-                || !support.isFaceSturdy(level, supportPos, face.getOpposite())) return false;
+                || !support.isFaceSturdy(level, supportPos, face.getOpposite())) {
+            return false;
+        }
         BlockState vein = state.is(ModBlocks.SCULK_VEIN.get()) ? state : ModBlocks.SCULK_VEIN.get().defaultBlockState()
                 .setValue(BlockStateProperties.WATERLOGGED, state.getFluidState().is(Fluids.WATER));
         BooleanProperty property = getFaceProperty(face);
@@ -69,7 +89,9 @@ public class SculkVeinBlock extends GlowLichenBlock {
 
     public static void discharge(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        if (!state.is(ModBlocks.SCULK_VEIN.get())) return;
+        if (!state.is(ModBlocks.SCULK_VEIN.get())) {
+            return;
+        }
         BlockState remaining = state;
         boolean anyFace = false;
         for (Direction face : Direction.values()) {
@@ -80,9 +102,13 @@ public class SculkVeinBlock extends GlowLichenBlock {
             }
             anyFace |= remaining.getValue(property);
         }
-        if (!anyFace) remaining = state.getValue(BlockStateProperties.WATERLOGGED)
+        if (!anyFace) {
+            remaining = state.getValue(BlockStateProperties.WATERLOGGED)
                 ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
-        if (remaining != state) level.setBlock(pos, remaining, 3);
+        }
+        if (remaining != state) {
+            level.setBlock(pos, remaining, 3);
+        }
     }
 
     @Override

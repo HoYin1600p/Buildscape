@@ -426,7 +426,9 @@ public class StreamingRecipeParser {
     }
 
     private static String sanitizeId(String raw) {
-        if (raw == null) return "unknown";
+        if (raw == null) {
+            return "unknown";
+        }
         return raw.toLowerCase(Locale.ROOT)
                 .replace(":", "_")
                 .replaceAll("[^a-z0-9_.-]", "_");

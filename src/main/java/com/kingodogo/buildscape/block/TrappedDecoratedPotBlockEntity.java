@@ -169,7 +169,9 @@ public class TrappedDecoratedPotBlockEntity
     }
 
     public int getComparatorOutput() {
-        if (storedItem.isEmpty()) return 0;
+        if (storedItem.isEmpty()) {
+            return 0;
+        }
         float fillRatio = (float) storedItem.getCount() / (float) storedItem.getMaxStackSize();
         return Math.max(1, (int) Math.ceil(fillRatio * 15.0f));
     }

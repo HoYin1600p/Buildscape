@@ -134,7 +134,9 @@ public class RuntimeRecipeCycleTest {
     @Test
     public void hundredsOfSafeRuntimeRecipesUseOneBatchValidation() {
         List<Recipe<?>> runtime = new ArrayList<>();
-        for (int i = 0; i < 400; i++) runtime.add(cut("safe_" + i, Items.GRANITE, Items.DIORITE, 2));
+        for (int i = 0; i < 400; i++) {
+            runtime.add(cut("safe_" + i, Items.GRANITE, Items.DIORITE, 2));
+        }
         AtomicInteger validations = new AtomicInteger();
         AtomicInteger staleReports = new AtomicInteger();
         assertEquals(runtime, BuildScapeRecipeLoader.combineRuntimeRecipes(List.of(), runtime, cycles -> {
@@ -233,7 +235,9 @@ public class RuntimeRecipeCycleTest {
     @Test
     public void thousandsOfRecipesWithOneOffenderUseCheapFallbacks() {
         List<Recipe<?>> candidates = new ArrayList<>();
-        for (int i = 0; i < 4000; i++) candidates.add(cut("safe_" + i, Items.STONE, Items.GRANITE, 2));
+        for (int i = 0; i < 4000; i++) {
+            candidates.add(cut("safe_" + i, Items.STONE, Items.GRANITE, 2));
+        }
         List<Recipe<?>> expected = List.copyOf(candidates);
         candidates.add(2000, cut("offender", Items.GRANITE, Items.STONE, 1));
         for (boolean staleCache : List.of(false, true)) {

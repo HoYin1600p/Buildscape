@@ -11,7 +11,9 @@ public final class CopperTransitionsTest {
                 new String("copper"), new String("copper")};
         Object[] waxed = {new Object(), new Object(), new Object(), new Object()};
         table.addChain(stages[0], stages[1], stages[2], stages[3]);
-        for (int i = 0; i < stages.length; i++) table.addWaxPair(stages[i], waxed[i]);
+        for (int i = 0; i < stages.length; i++) {
+            table.addWaxPair(stages[i], waxed[i]);
+        }
         for (int i = 0; i < stages.length; i++) {
             check(table.next(stages[i]) == (i == 3 ? null : stages[i + 1]), "next stage " + i);
             check(table.previous(stages[i]) == (i == 0 ? null : stages[i - 1]), "previous stage " + i);
@@ -34,6 +36,8 @@ public final class CopperTransitionsTest {
     }
 
     private static void check(boolean condition, String description) {
-        if (!condition) throw new AssertionError(description);
+        if (!condition) {
+            throw new AssertionError(description);
+        }
     }
 }

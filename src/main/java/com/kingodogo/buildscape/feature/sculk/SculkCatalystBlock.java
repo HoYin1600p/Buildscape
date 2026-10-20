@@ -47,26 +47,34 @@ public class SculkCatalystBlock extends Block implements EntityBlock {
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
         ensureBlockEntity(level, pos, state);
-        if (state.getValue(BLOOM)) level.scheduleTick(pos, this, 8);
+        if (state.getValue(BLOOM)) {
+            level.scheduleTick(pos, this, 8);
+        }
     }
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moving) {
         super.onPlace(state, level, pos, oldState, moving);
-        if (!level.isClientSide && !oldState.is(this)) level.scheduleTick(pos, this, 1);
+        if (!level.isClientSide && !oldState.is(this)) {
+            level.scheduleTick(pos, this, 1);
+        }
     }
 
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean moving) {
         if (!level.isClientSide) {
             ensureBlockEntity(level, pos, state);
-            if (state.getValue(BLOOM)) level.scheduleTick(pos, this, 8);
+            if (state.getValue(BLOOM)) {
+                level.scheduleTick(pos, this, 8);
+            }
         }
     }
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide) ensureBlockEntity(level, pos, state);
+        if (!level.isClientSide) {
+            ensureBlockEntity(level, pos, state);
+        }
         return InteractionResult.PASS;
     }
 
@@ -95,7 +103,9 @@ public class SculkCatalystBlock extends Block implements EntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide || type != ModBlockEntities.SCULK_CATALYST_BLOCK_ENTITY.get()) return null;
+        if (level.isClientSide || type != ModBlockEntities.SCULK_CATALYST_BLOCK_ENTITY.get()) {
+            return null;
+        }
         return (tickLevel, pos, tickState, blockEntity) -> ((SculkCatalystBlockEntity) blockEntity).serverTick((ServerLevel) tickLevel);
     }
 }

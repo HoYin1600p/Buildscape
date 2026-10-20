@@ -94,10 +94,14 @@ public class ItemFrameParticleHandler {
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || ++registryCleanupTicks < 100) return;
+        if (event.phase != TickEvent.Phase.END || ++registryCleanupTicks < 100) {
+            return;
+        }
         registryCleanupTicks = 0;
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null || !server.isRunning() || !BuildScape.isServerFullyInitialized()) return;
+        if (server == null || !server.isRunning() || !BuildScape.isServerFullyInitialized()) {
+            return;
+        }
         PillarIdManager manager = PillarIdManager.get();
         Set<String> dimensions = new HashSet<>();
         for (PillarIdManager.PillarData data : manager.getAllData()) {
@@ -122,7 +126,9 @@ public class ItemFrameParticleHandler {
 
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinWorldEvent event) {
-        if (event.getWorld().isClientSide) return;
+        if (event.getWorld().isClientSide) {
+            return;
+        }
 
         Entity entity = event.getEntity();
         if (entity instanceof ItemFrame itemFrame) {
@@ -136,7 +142,9 @@ public class ItemFrameParticleHandler {
 
     @SubscribeEvent
     public static void onEntityLeaveLevel(EntityLeaveWorldEvent event) {
-        if (event.getWorld().isClientSide()) return;
+        if (event.getWorld().isClientSide()) {
+            return;
+        }
 
         Entity entity = event.getEntity();
         if (entity instanceof ItemFrame || entity instanceof ColoredItemFrameEntity) {
@@ -396,7 +404,9 @@ public class ItemFrameParticleHandler {
             long time
     ) {
         FrameSettings settings = resolveFrameSettings(level, getFrameId(itemFrame), pattern, cfg);
-        if (settings.count() == 0) return;
+        if (settings.count() == 0) {
+            return;
+        }
         pattern = settings.pattern();
         Random rand = new Random();
 
@@ -555,7 +565,9 @@ public class ItemFrameParticleHandler {
     public static List<String> getParticleColors(ItemFrame itemFrame) {
         if (itemFrame.level.isClientSide) {
             List<String> cached = CLIENT_COLOR_CACHE.get(itemFrame.getId());
-            if (cached != null) return cached;
+            if (cached != null) {
+                return cached;
+            }
 
             CompoundTag data = itemFrame.getPersistentData();
             if (data.contains(PARTICLE_COLORS_KEY)) {
@@ -595,7 +607,9 @@ public class ItemFrameParticleHandler {
 
     public static void addParticleColor(ItemFrame itemFrame, String color) {
         List<String> colors = getParticleColors(itemFrame);
-        if (colors.size() >= MAX_DYE_COLORS) return;
+        if (colors.size() >= MAX_DYE_COLORS) {
+            return;
+        }
 
         colors.add(color.toUpperCase(Locale.ROOT));
 
@@ -655,7 +669,9 @@ public class ItemFrameParticleHandler {
     public static String getParticlePattern(ItemFrame itemFrame) {
         if (itemFrame.level.isClientSide) {
             String cached = CLIENT_PATTERN_CACHE.get(itemFrame.getId());
-            if (cached != null) return cached;
+            if (cached != null) {
+                return cached;
+            }
 
             CompoundTag data = itemFrame.getPersistentData();
             if (data.contains(PARTICLE_PATTERN_KEY)) {
@@ -758,7 +774,9 @@ public class ItemFrameParticleHandler {
     private static Map.Entry<String, String> getDyeColorAndName(
             ItemStack stack
     ) {
-        if (stack == null || stack.isEmpty()) return null;
+        if (stack == null || stack.isEmpty()) {
+            return null;
+        }
 
         DyeColors dye = DyeColors.fromDyeItem(stack.getItem());
         if (dye != null) {
@@ -775,7 +793,9 @@ public class ItemFrameParticleHandler {
     public static String getFrameId(ItemFrame itemFrame) {
         if (itemFrame.level.isClientSide) {
             String cached = CLIENT_FRAME_ID_CACHE.get(itemFrame.getId());
-            if (cached != null && !cached.equals("F-????")) return cached;
+            if (cached != null && !cached.equals("F-????")) {
+                return cached;
+            }
 
             String dimension = PillarIdManager.getDimensionKey(itemFrame.level);
             BlockPos pos = itemFrame.blockPosition();
@@ -795,7 +815,9 @@ public class ItemFrameParticleHandler {
         CompoundTag data = itemFrame.getPersistentData();
         if (data.contains(FRAME_ID_KEY)) {
             String id = data.getString(FRAME_ID_KEY);
-            if (id != null && !id.isEmpty()) return id;
+            if (id != null && !id.isEmpty()) {
+                return id;
+            }
         }
 
         String frameId = generateFrameId(PillarIdManager.get(itemFrame.level));
@@ -838,7 +860,9 @@ public class ItemFrameParticleHandler {
     }
 
     private static String getColorCode(String colorName) {
-        if (colorName == null || colorName.isEmpty()) return "W";
+        if (colorName == null || colorName.isEmpty()) {
+            return "W";
+        }
         switch (colorName.toLowerCase(Locale.ROOT)) {
             case "white":
                 return "W";
@@ -1048,7 +1072,9 @@ public class ItemFrameParticleHandler {
     ) {
         if (frame.level.isClientSide) {
             List<String> cached = CLIENT_COLOR_CACHE.get(frame.getId());
-            if (cached != null) return cached;
+            if (cached != null) {
+                return cached;
+            }
 
             CompoundTag data = frame.getPersistentData();
             if (data.contains(PARTICLE_COLORS_KEY)) {
@@ -1096,7 +1122,9 @@ public class ItemFrameParticleHandler {
             String color
     ) {
         List<String> colors = getParticleColorsColored(frame);
-        if (colors.size() >= MAX_DYE_COLORS) return;
+        if (colors.size() >= MAX_DYE_COLORS) {
+            return;
+        }
 
         colors.add(color.toUpperCase(Locale.ROOT));
 
@@ -1126,7 +1154,9 @@ public class ItemFrameParticleHandler {
     ) {
         if (frame.level.isClientSide) {
             String cached = CLIENT_FRAME_ID_CACHE.get(frame.getId());
-            if (cached != null && !cached.equals("F-????")) return cached;
+            if (cached != null && !cached.equals("F-????")) {
+                return cached;
+            }
 
             String dimension = PillarIdManager.getDimensionKey(frame.level);
             BlockPos pos = frame.blockPosition();
@@ -1146,7 +1176,9 @@ public class ItemFrameParticleHandler {
         CompoundTag data = frame.getPersistentData();
         if (data.contains(FRAME_ID_KEY)) {
             String id = data.getString(FRAME_ID_KEY);
-            if (id != null && !id.isEmpty()) return id;
+            if (id != null && !id.isEmpty()) {
+                return id;
+            }
         }
 
         String colorVariant = frame.getColorVariant();
@@ -1207,7 +1239,9 @@ public class ItemFrameParticleHandler {
             long time
     ) {
         FrameSettings settings = resolveFrameSettings(level, getFrameIdColored(coloredFrame), pattern, cfg);
-        if (settings.count() == 0) return;
+        if (settings.count() == 0) {
+            return;
+        }
         pattern = settings.pattern();
         Random rand = new Random();
 

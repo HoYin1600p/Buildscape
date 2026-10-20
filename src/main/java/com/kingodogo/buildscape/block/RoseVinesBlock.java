@@ -160,30 +160,36 @@ public class RoseVinesBlock extends VineBlock {
                     state = blockState;
                 } else {
                     state = this.defaultBlockState();
-                    if (blockState.hasProperty(UP))
+                    if (blockState.hasProperty(UP)) {
                         state = state.setValue(
                                 UP,
                                 blockState.getValue(UP));
-                    if (blockState.hasProperty(DOWN))
+                    }
+                    if (blockState.hasProperty(DOWN)) {
                         state = state.setValue(
                                 DOWN,
                                 blockState.getValue(DOWN));
-                    if (blockState.hasProperty(NORTH))
+                    }
+                    if (blockState.hasProperty(NORTH)) {
                         state = state.setValue(
                                 NORTH,
                                 blockState.getValue(NORTH));
-                    if (blockState.hasProperty(SOUTH))
+                    }
+                    if (blockState.hasProperty(SOUTH)) {
                         state = state.setValue(
                                 SOUTH,
                                 blockState.getValue(SOUTH));
-                    if (blockState.hasProperty(EAST))
+                    }
+                    if (blockState.hasProperty(EAST)) {
                         state = state.setValue(
                                 EAST,
                                 blockState.getValue(EAST));
-                    if (blockState.hasProperty(WEST))
+                    }
+                    if (blockState.hasProperty(WEST)) {
                         state = state.setValue(
                                 WEST,
                                 blockState.getValue(WEST));
+                    }
                 }
             } else {
                 state = this.defaultBlockState();
@@ -200,30 +206,36 @@ public class RoseVinesBlock extends VineBlock {
                     state = blockState;
                 } else {
                     state = this.defaultBlockState();
-                    if (blockState.hasProperty(UP))
+                    if (blockState.hasProperty(UP)) {
                         state = state.setValue(
                                 UP,
                                 blockState.getValue(UP));
-                    if (blockState.hasProperty(DOWN))
+                    }
+                    if (blockState.hasProperty(DOWN)) {
                         state = state.setValue(
                                 DOWN,
                                 blockState.getValue(DOWN));
-                    if (blockState.hasProperty(NORTH))
+                    }
+                    if (blockState.hasProperty(NORTH)) {
                         state = state.setValue(
                                 NORTH,
                                 blockState.getValue(NORTH));
-                    if (blockState.hasProperty(SOUTH))
+                    }
+                    if (blockState.hasProperty(SOUTH)) {
                         state = state.setValue(
                                 SOUTH,
                                 blockState.getValue(SOUTH));
-                    if (blockState.hasProperty(EAST))
+                    }
+                    if (blockState.hasProperty(EAST)) {
                         state = state.setValue(
                                 EAST,
                                 blockState.getValue(EAST));
-                    if (blockState.hasProperty(WEST))
+                    }
+                    if (blockState.hasProperty(WEST)) {
                         state = state.setValue(
                                 WEST,
                                 blockState.getValue(WEST));
+                    }
                 }
             } else {
                 state = this.defaultBlockState();
@@ -246,30 +258,36 @@ public class RoseVinesBlock extends VineBlock {
                 state = blockState;
             } else {
                 state = this.defaultBlockState();
-                if (blockState.hasProperty(UP))
+                if (blockState.hasProperty(UP)) {
                     state = state.setValue(
                             UP,
                             blockState.getValue(UP));
-                if (blockState.hasProperty(DOWN))
+                }
+                if (blockState.hasProperty(DOWN)) {
                     state = state.setValue(
                             DOWN,
                             blockState.getValue(DOWN));
-                if (blockState.hasProperty(NORTH))
+                }
+                if (blockState.hasProperty(NORTH)) {
                     state = state.setValue(
                             NORTH,
                             blockState.getValue(NORTH));
-                if (blockState.hasProperty(SOUTH))
+                }
+                if (blockState.hasProperty(SOUTH)) {
                     state = state.setValue(
                             SOUTH,
                             blockState.getValue(SOUTH));
-                if (blockState.hasProperty(EAST))
+                }
+                if (blockState.hasProperty(EAST)) {
                     state = state.setValue(
                             EAST,
                             blockState.getValue(EAST));
-                if (blockState.hasProperty(WEST))
+                }
+                if (blockState.hasProperty(WEST)) {
                     state = state.setValue(
                             WEST,
                             blockState.getValue(WEST));
+                }
             }
 
             BooleanProperty property = getPropertyForFace(attachDirection);
@@ -568,17 +586,22 @@ public class RoseVinesBlock extends VineBlock {
     }
 
     private Direction getFacingDirection(BlockState state) {
-        if (state.getValue(NORTH))
+        if (state.getValue(NORTH)) {
             return Direction.NORTH;
-        if (state.getValue(SOUTH))
+        }
+        if (state.getValue(SOUTH)) {
             return Direction.SOUTH;
-        if (state.getValue(EAST))
+        }
+        if (state.getValue(EAST)) {
             return Direction.EAST;
-        if (state.getValue(WEST))
+        }
+        if (state.getValue(WEST)) {
             return Direction.WEST;
+        }
 
-        if (state.getValue(DOWN))
+        if (state.getValue(DOWN)) {
             return Direction.DOWN;
+        }
 
         return null;
     }

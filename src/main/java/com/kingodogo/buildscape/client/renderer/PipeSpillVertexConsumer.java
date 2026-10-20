@@ -98,11 +98,21 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                         || pipe.getValue(HollowPipeBlock.SOUTH))
                         && !pipe.getValue(HollowPipeBlock.WEST) && !pipe.getValue(HollowPipeBlock.EAST);
                 double height = straightX || straightZ ? heights.outlet() : heights.center();
-                if (straightX && exit == Direction.WEST && flow.getInflowDirection() == Direction.WEST) height = heights.inlet();
-                if (straightX && exit == Direction.EAST && flow.getInflowDirection() == Direction.EAST) height = heights.inlet();
-                if (straightZ && exit == Direction.NORTH && flow.getInflowDirection() == Direction.NORTH) height = heights.inlet();
-                if (straightZ && exit == Direction.SOUTH && flow.getInflowDirection() == Direction.SOUTH) height = heights.inlet();
-                if (outlets == null) outlets = new ArrayList<>(2);
+                if (straightX && exit == Direction.WEST && flow.getInflowDirection() == Direction.WEST) {
+                    height = heights.inlet();
+                }
+                if (straightX && exit == Direction.EAST && flow.getInflowDirection() == Direction.EAST) {
+                    height = heights.inlet();
+                }
+                if (straightZ && exit == Direction.NORTH && flow.getInflowDirection() == Direction.NORTH) {
+                    height = heights.inlet();
+                }
+                if (straightZ && exit == Direction.SOUTH && flow.getInflowDirection() == Direction.SOUTH) {
+                    height = heights.inlet();
+                }
+                if (outlets == null) {
+                    outlets = new ArrayList<>(2);
+                }
                 outlets.add(new Outlet(direction, height));
             }
         }
@@ -162,7 +172,9 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 double sideZ = outlet.direction.getAxis() == Direction.Axis.Z ? edgeZ : across;
                 gap = Math.max(gap, outlet.height - (sample(corners, sideX, sideZ).y - baseY));
             }
-            if (gap <= 0.001) continue;
+            if (gap <= 0.001) {
+                continue;
+            }
             double length = Math.min(0.875, Math.max(0.25, gap * 2.0));
             spills.add(new Spill(outlet, length));
             cuts.add(length);
@@ -231,7 +243,11 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 (float)(a.u * wa + b.u * wb + d.u * wd), (float)(a.v * wa + b.v * wb + d.v * wd));
     }
 
-    private void emitOriginal() { for (Vertex vertex : quad) emit(vertex); }
+    private void emitOriginal() {
+        for (Vertex vertex : quad) {
+            emit(vertex);
+        }
+    }
 
     private void emit(Vertex v) {
         delegate.vertex(v.x, v.y, v.z).color(v.red, v.green, v.blue, v.alpha).uv(v.u, v.v)

@@ -274,7 +274,9 @@ public class HollowLogBlockEntity extends SyncedBlockEntity {
                 || getBlockState().getBlock() instanceof HollowLogBlock)
                 && !previousFlow.equals(pipeFlowState)) {
             for (Direction direction : Direction.values()) {
-                if (direction == Direction.UP) continue;
+                if (direction == Direction.UP) {
+                    continue;
+                }
                 BlockPos neighbor = worldPosition.relative(direction);
                 BlockState neighborState = level.getBlockState(neighbor);
                 level.sendBlockUpdated(neighbor, neighborState, neighborState, Block.UPDATE_CLIENTS);

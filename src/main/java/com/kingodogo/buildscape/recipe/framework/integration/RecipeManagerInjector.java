@@ -93,7 +93,9 @@ public final class RecipeManagerInjector {
 
         if (newRecipes != null) {
             for (R recipe : newRecipes) {
-                if (recipe == null) continue;
+                if (recipe == null) {
+                    continue;
+                }
                 K recipeId = id.apply(recipe);
                 if (byName.containsKey(recipeId) || (disabledIds != null && disabledIds.contains(recipeId))) {
                     continue;

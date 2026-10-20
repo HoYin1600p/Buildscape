@@ -149,11 +149,15 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     public void neighborChanged(BlockState state, Level level, BlockPos pos,
                                 Block block, BlockPos fromPos, boolean isMoving) {
         if (!level.isClientSide) {
-            if (block instanceof SmokeVentBlock) return;
+            if (block instanceof SmokeVentBlock) {
+                return;
+            }
 
             boolean powered = hasRedstonePowerInStack(level, pos);
             boolean wasPowered = state.getValue(POWERED);
-            if (powered == wasPowered) return;
+            if (powered == wasPowered) {
+                return;
+            }
 
             setPoweredAndSync(level, pos, powered);
             applyActiveToStack(level, pos, powered);
@@ -198,7 +202,9 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     private boolean hasRedstonePowerInStack(Level level, BlockPos pos) {
         BlockPos current = findBottomBlock(level, pos);
         while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
-            if (level.hasNeighborSignal(current)) return true;
+            if (level.hasNeighborSignal(current)) {
+                return true;
+            }
             current = current.above();
         }
         return false;
@@ -357,7 +363,9 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     }
 
     private Map.Entry<String, String> getDyeColorAndName(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return null;
+        if (stack == null || stack.isEmpty()) {
+            return null;
+        }
 
         DyeColors dye = DyeColors.fromDyeItem(stack.getItem());
         if (dye != null) {

@@ -111,7 +111,9 @@ public class PresetSlotsAndItemOrderTest {
 
     private static int indexOf(com.google.gson.JsonArray array, String value) {
         for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).getAsString().equals(value)) return i;
+            if (array.get(i).getAsString().equals(value)) {
+                return i;
+            }
         }
         return -1;
     }

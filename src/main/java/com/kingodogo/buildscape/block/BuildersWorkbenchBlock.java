@@ -60,7 +60,9 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
                                  Player player, InteractionHand hand, BlockHitResult hit) {
-        if (level.isClientSide) return InteractionResult.SUCCESS;
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
 
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof BuildersWorkbenchBlockEntity wbe && player instanceof ServerPlayer sp) {

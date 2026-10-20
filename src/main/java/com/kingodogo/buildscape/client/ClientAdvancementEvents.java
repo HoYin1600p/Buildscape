@@ -19,7 +19,9 @@ public class ClientAdvancementEvents {
     private static boolean selectedTabLookupFailed;
 
     private static AdvancementTab getSelectedTab(AdvancementsScreen screen) {
-        if (selectedTabLookupFailed) return null;
+        if (selectedTabLookupFailed) {
+            return null;
+        }
         try {
             if (selectedTabField == null) {
                 selectedTabField = ObfuscationReflectionHelper.findField(AdvancementsScreen.class, "f_97336_");
@@ -37,7 +39,9 @@ public class ClientAdvancementEvents {
         if (event.getScreen() instanceof AdvancementsScreen screen) {
             double delta = event.getScrollDelta();
             AdvancementTab tab = getSelectedTab(screen);
-            if (tab == null) return;
+            if (tab == null) {
+                return;
+            }
             if (Screen.hasShiftDown()) {
                 tab.scroll(delta * 32.0, 0.0);
             } else {

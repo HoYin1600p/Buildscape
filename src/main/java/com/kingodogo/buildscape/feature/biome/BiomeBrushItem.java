@@ -179,7 +179,9 @@ public class BiomeBrushItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
-        if (player == null) return InteractionResult.PASS;
+        if (player == null) {
+            return InteractionResult.PASS;
+        }
 
         Level level = context.getLevel();
         ItemStack stack = context.getItemInHand();
@@ -206,7 +208,9 @@ public class BiomeBrushItem extends Item {
             }
 
             ResourceLocation biomeKey = ResourceLocation.tryParse(biomeStr);
-            if (biomeKey == null) return InteractionResult.FAIL;
+            if (biomeKey == null) {
+                return InteractionResult.FAIL;
+            }
 
             ServerLevel serverLevel = (ServerLevel) level;
             Registry<Biome> registry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
@@ -274,7 +278,9 @@ public class BiomeBrushItem extends Item {
                         broken = true;
                         break;
                     }
-                    if (!tints.putColumn(x, z, biomeKey)) continue;
+                    if (!tints.putColumn(x, z, biomeKey)) {
+                        continue;
+                    }
                     modifiedChunks.add(new ChunkPos(x >> 4, z >> 4));
                     affectedBlocks++;
                     if (BiomeBrushDurability.chargesDurability(creative, unbreakingLevel, level.random::nextInt)) {

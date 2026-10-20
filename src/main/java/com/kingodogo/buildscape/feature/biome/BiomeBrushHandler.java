@@ -24,7 +24,9 @@ public class BiomeBrushHandler {
     @SubscribeEvent
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         Player player = event.getPlayer();
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
 
         ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
         if (!stack.isEmpty() && stack.getItem() instanceof BiomeBrushItem brush) {
@@ -49,7 +51,9 @@ public class BiomeBrushHandler {
     @SubscribeEvent
     public static void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
         Player player = event.getPlayer();
-        if (player == null || !player.level.isClientSide()) return;
+        if (player == null || !player.level.isClientSide()) {
+            return;
+        }
 
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
@@ -63,10 +67,14 @@ public class BiomeBrushHandler {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
 
         Player player = event.player;
-        if (player == null || !player.level.isClientSide()) return;
+        if (player == null || !player.level.isClientSide()) {
+            return;
+        }
 
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
@@ -78,7 +86,9 @@ public class BiomeBrushHandler {
             brushStack = offHand;
         }
 
-        if (brushStack.isEmpty()) return;
+        if (brushStack.isEmpty()) {
+            return;
+        }
 
         BiomeBrushItem brush = (BiomeBrushItem) brushStack.getItem();
         BlockPos pos1 = brush.getPos1(brushStack);

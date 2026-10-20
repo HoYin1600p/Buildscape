@@ -16,6 +16,8 @@ public class BiomeColorsMixin {
     private static void buildscape$columnTint(BlockAndTintGetter level, BlockPos pos, ColorResolver resolver,
                                               CallbackInfoReturnable<Integer> callback) {
         Integer color = ClientBiomeTints.color(level, pos, resolver);
-        if (color != null) callback.setReturnValue(color);
+        if (color != null) {
+            callback.setReturnValue(color);
+        }
     }
 }

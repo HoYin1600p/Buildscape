@@ -213,7 +213,9 @@ public class RecipeCacheRegressionTest {
     }
 
     private static void writeRecord(DataOutputStream out, int type, int result, int ingredient) throws Exception {
-        for (int value : new int[]{0, 1, result, 1, 1}) out.writeInt(value);
+        for (int value : new int[]{0, 1, result, 1, 1}) {
+            out.writeInt(value);
+        }
         out.writeByte(type);
         if (type == 1 || type == 9) {
             out.writeInt(1);
@@ -223,7 +225,9 @@ public class RecipeCacheRegressionTest {
             out.writeInt(1);
         }
         out.writeInt(ingredient);
-        if (type == 8) out.writeInt(6);
+        if (type == 8) {
+            out.writeInt(6);
+        }
         if (type >= 4 && type <= 7) {
             out.writeFloat(0.1f);
             out.writeInt(200);

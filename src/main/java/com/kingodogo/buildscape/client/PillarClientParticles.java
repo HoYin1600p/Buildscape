@@ -58,8 +58,9 @@ public final class PillarClientParticles {
                         i,
                         count,
                         rand);
-                if (data == null)
+                if (data == null) {
                     continue;
+                }
 
                 double particleX = centerX + data.sx;
                 double particleY = centerY + data.sy;
@@ -101,8 +102,9 @@ public final class PillarClientParticles {
                     i,
                     count,
                     rand);
-            if (data == null)
+            if (data == null) {
                 continue;
+            }
 
             double particleX = centerX + data.sx;
             double particleY = centerY + data.sy;

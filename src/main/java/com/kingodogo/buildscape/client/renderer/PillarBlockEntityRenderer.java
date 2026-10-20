@@ -113,7 +113,9 @@ public class PillarBlockEntityRenderer
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
         Level level = Minecraft.getInstance().level;
         for (Map.Entry<BlockPos, DisplayInfo> entry : displayInfo.entrySet()) {
             PillarBlockEntity owner = entry.getValue().owner.get();
@@ -126,7 +128,9 @@ public class PillarBlockEntityRenderer
 
     @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
-        if (!event.getWorld().isClientSide()) return;
+        if (!event.getWorld().isClientSide()) {
+            return;
+        }
         ChunkPos chunk = event.getChunk().getPos();
         for (BlockPos pos : displayInfo.keySet()) {
             if ((pos.getX() >> 4) == chunk.x && (pos.getZ() >> 4) == chunk.z) {
@@ -159,7 +163,9 @@ public class PillarBlockEntityRenderer
         }
 
         if (displayedItem.isEmpty()) {
-            if (displayInfo.containsKey(pos)) clearEntityCache(pos);
+            if (displayInfo.containsKey(pos)) {
+                clearEntityCache(pos);
+            }
             return;
         }
 
@@ -179,7 +185,9 @@ public class PillarBlockEntityRenderer
         long currentRenderTime = System.currentTimeMillis();
         DisplayInfo info = displayInfo.get(pos);
         if (info == null || info.owner.get() != blockEntity || !ItemStack.matches(info.stack, displayedItem)) {
-            if (info != null) clearEntityCache(pos);
+            if (info != null) {
+                clearEntityCache(pos);
+            }
             info = createDisplayInfo(displayedItem, currentRenderTime, blockEntity);
             displayInfo.put(pos, info);
         }
@@ -294,7 +302,9 @@ public class PillarBlockEntityRenderer
                     double lenX = bounds.maxX - bounds.minX;
                     double lenY = bounds.maxY - bounds.minY;
                     double visualLength = Math.sqrt(lenX * lenX + lenY * lenY);
-                    if (visualLength < 0.1) visualLength = 1.0;
+                    if (visualLength < 0.1) {
+                        visualLength = 1.0;
+                    }
 
                     float scale = 0.8f;
                     double standardLength = 0.85;
@@ -428,12 +438,24 @@ public class PillarBlockEntityRenderer
                     float y = Float.intBitsToFloat(vertices[i * step + 1]);
                     float z = Float.intBitsToFloat(vertices[i * step + 2]);
 
-                    if (x < minX) minX = x;
-                    if (y < minY) minY = y;
-                    if (z < minZ) minZ = z;
-                    if (x > maxX) maxX = x;
-                    if (y > maxY) maxY = y;
-                    if (z > maxZ) maxZ = z;
+                    if (x < minX) {
+                        minX = x;
+                    }
+                    if (y < minY) {
+                        minY = y;
+                    }
+                    if (z < minZ) {
+                        minZ = z;
+                    }
+                    if (x > maxX) {
+                        maxX = x;
+                    }
+                    if (y > maxY) {
+                        maxY = y;
+                    }
+                    if (z > maxZ) {
+                        maxZ = z;
+                    }
                 }
             }
         }

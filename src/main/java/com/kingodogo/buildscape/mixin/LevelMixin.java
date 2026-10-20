@@ -39,7 +39,9 @@ public abstract class LevelMixin {
     }
 
     private static boolean isWaterParticle(ParticleOptions options) {
-        if (options == null) return false;
+        if (options == null) {
+            return false;
+        }
         return options.getType() == ParticleTypes.SPLASH ||
                options.getType() == ParticleTypes.BUBBLE ||
                options.getType() == ParticleTypes.BUBBLE_POP ||
@@ -50,7 +52,9 @@ public abstract class LevelMixin {
     }
 
     private static boolean isExperienceFluid(Level level, BlockPos pos) {
-        if (level == null || pos == null) return false;
+        if (level == null || pos == null) {
+            return false;
+        }
         return checkFluidOrBlock(level, pos);
     }
 

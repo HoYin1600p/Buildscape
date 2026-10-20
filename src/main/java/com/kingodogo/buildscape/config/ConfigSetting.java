@@ -41,7 +41,9 @@ public enum ConfigSetting {
     public static EnumSet<ConfigSetting> uploadable() {
         EnumSet<ConfigSetting> settings = EnumSet.noneOf(ConfigSetting.class);
         for (ConfigSetting setting : values()) {
-            if (setting.isUploaded()) settings.add(setting);
+            if (setting.isUploaded()) {
+                settings.add(setting);
+            }
         }
         return settings;
     }
@@ -54,14 +56,18 @@ public enum ConfigSetting {
     public static EnumSet<ConfigSetting> allowed(PillarParticleConfig.EditPermissionMode mode, int permissionLevel) {
         EnumSet<ConfigSetting> settings = EnumSet.noneOf(ConfigSetting.class);
         for (ConfigSetting setting : uploadable()) {
-            if (setting.canEdit(mode, permissionLevel)) settings.add(setting);
+            if (setting.canEdit(mode, permissionLevel)) {
+                settings.add(setting);
+            }
         }
         return settings;
     }
 
     public static int mask(Set<ConfigSetting> settings) {
         int mask = 0;
-        for (ConfigSetting setting : settings) mask |= 1 << setting.ordinal();
+        for (ConfigSetting setting : settings) {
+            mask |= 1 << setting.ordinal();
+        }
         return mask;
     }
 
@@ -71,7 +77,9 @@ public enum ConfigSetting {
         }
         EnumSet<ConfigSetting> settings = EnumSet.noneOf(ConfigSetting.class);
         for (ConfigSetting setting : uploadable()) {
-            if ((mask & (1 << setting.ordinal())) != 0) settings.add(setting);
+            if ((mask & (1 << setting.ordinal())) != 0) {
+                settings.add(setting);
+            }
         }
         return settings;
     }

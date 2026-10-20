@@ -33,9 +33,15 @@ public class FrostRoseDropHandler {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDeath(LivingDeathEvent event) {
-        if (!(event.getEntityLiving() instanceof SnowGolem)) return;
-        if (event.getEntityLiving().level.isClientSide) return;
-        if (!(event.getSource().getEntity() instanceof WitherBoss)) return;
+        if (!(event.getEntityLiving() instanceof SnowGolem)) {
+            return;
+        }
+        if (event.getEntityLiving().level.isClientSide) {
+            return;
+        }
+        if (!(event.getSource().getEntity() instanceof WitherBoss)) {
+            return;
+        }
 
         ServerLevel level = (ServerLevel) event.getEntityLiving().level;
         BlockPos deathPos = event.getEntityLiving().blockPosition();
@@ -49,14 +55,22 @@ public class FrostRoseDropHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onEntityJoinWorld(EntityJoinWorldEvent event) {
-        if (event.getWorld().isClientSide()) return;
-        if (!(event.getEntity() instanceof ItemEntity itemEntity)) return;
+        if (event.getWorld().isClientSide()) {
+            return;
+        }
+        if (!(event.getEntity() instanceof ItemEntity itemEntity)) {
+            return;
+        }
 
         ItemStack stack = itemEntity.getItem();
-        if (!stack.is(Items.WITHER_ROSE)) return;
+        if (!stack.is(Items.WITHER_ROSE)) {
+            return;
+        }
 
         for (TrackedDeath death : trackedDeaths) {
-            if (death.dimension != itemEntity.level.dimension()) continue;
+            if (death.dimension != itemEntity.level.dimension()) {
+                continue;
+            }
             double dx = itemEntity.getX() - death.x;
             double dy = itemEntity.getY() - death.y;
             double dz = itemEntity.getZ() - death.z;
@@ -74,8 +88,12 @@ public class FrostRoseDropHandler {
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-        if (trackedDeaths.isEmpty()) return;
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
+        if (trackedDeaths.isEmpty()) {
+            return;
+        }
 
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) {

@@ -588,10 +588,18 @@ public class PillarRegistryPersistenceTest {
         for (String id : List.of("OtherDimension", "OtherColumn", "AboveStack", "BelowStack", "Frame")) {
             PillarIdManager.PillarData data = new PillarIdManager.PillarData(id, "minecraft:overworld", bottom);
             data.pillarType = "buildscape:stone_pillar";
-            if (id.equals("OtherDimension")) data.dimension = "test:other";
-            if (id.equals("OtherColumn")) data.x = 1;
-            if (id.equals("AboveStack")) data.y = 68;
-            if (id.equals("BelowStack")) data.y = 63;
+            if (id.equals("OtherDimension")) {
+                data.dimension = "test:other";
+            }
+            if (id.equals("OtherColumn")) {
+                data.x = 1;
+            }
+            if (id.equals("AboveStack")) {
+                data.y = 68;
+            }
+            if (id.equals("BelowStack")) {
+                data.y = 63;
+            }
             if (id.equals("Frame")) {
                 data.pillarType = "minecraft:item_frame";
                 data.facing = "north";

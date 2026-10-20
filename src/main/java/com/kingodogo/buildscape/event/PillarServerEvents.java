@@ -135,7 +135,9 @@ public class PillarServerEvents {
 
         if (attempt >= MAX_ATTEMPTS) {
             server.execute(() -> {
-                if (player.hasDisconnected()) return;
+                if (player.hasDisconnected()) {
+                    return;
+                }
                 sendPillarIdsToPlayer(player, manager);
             });
             return;
@@ -143,7 +145,9 @@ public class PillarServerEvents {
 
         if (manager.hasLoaded()) {
             server.execute(() -> {
-                if (player.hasDisconnected()) return;
+                if (player.hasDisconnected()) {
+                    return;
+                }
                 sendPillarIdsToPlayer(player, manager);
             });
         } else {

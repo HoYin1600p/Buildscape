@@ -27,7 +27,9 @@ public class EditPillarRowsResultPacket {
         long batchId = buf.readLong();
         int count = NetworkPacketLimits.readCount(buf, EditPillarRowsPacket.MAX_ROWS, "pillar edit result");
         List<String> ids = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) ids.add(NetworkPacketLimits.readUtf(buf, 32, "old pillar id"));
+        for (int i = 0; i < count; i++) {
+            ids.add(NetworkPacketLimits.readUtf(buf, 32, "old pillar id"));
+        }
         return new EditPillarRowsResultPacket(batchId, ids, NetworkPacketLimits.readUtf(buf, MAX_REASON_LENGTH, "edit result reason"));
     }
 
@@ -35,7 +37,9 @@ public class EditPillarRowsResultPacket {
         buf.writeLong(batchId);
         NetworkPacketLimits.checkCount(oldIds.size(), EditPillarRowsPacket.MAX_ROWS, "pillar edit result");
         buf.writeInt(oldIds.size());
-        for (String id : oldIds) NetworkPacketLimits.writeUtf(buf, id, 32, "old pillar id");
+        for (String id : oldIds) {
+            NetworkPacketLimits.writeUtf(buf, id, 32, "old pillar id");
+        }
         NetworkPacketLimits.writeUtf(buf, reason, MAX_REASON_LENGTH, "edit result reason");
     }
 

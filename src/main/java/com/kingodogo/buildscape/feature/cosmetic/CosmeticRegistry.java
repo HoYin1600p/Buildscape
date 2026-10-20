@@ -42,8 +42,9 @@ public class CosmeticRegistry {
                 String id = parts[1];
 
                 String type = category;
-                if (category.equals("gear"))
+                if (category.equals("gear")) {
                     type = "item";
+                }
 
                 CosmeticManager.CosmeticMetadata metadata = CosmeticManager.getInstance().getMetadata(cosmeticId);
                 String legacyId = (metadata != null) ? metadata.legacyId() : null;

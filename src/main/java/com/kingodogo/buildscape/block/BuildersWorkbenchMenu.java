@@ -241,9 +241,13 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
                     }
                 } else if (stack.getItem() instanceof BlockItem) {
                     if (tab == 0) {
-                        if (!this.moveItemStackTo(stack, 0, 1, false)) return ItemStack.EMPTY;
+                        if (!this.moveItemStackTo(stack, 0, 1, false)) {
+                            return ItemStack.EMPTY;
+                        }
                     } else {
-                        if (!this.moveItemStackTo(stack, 59, 68, false)) return ItemStack.EMPTY;
+                        if (!this.moveItemStackTo(stack, 59, 68, false)) {
+                            return ItemStack.EMPTY;
+                        }
                     }
                 } else {
                     return ItemStack.EMPTY;
@@ -256,9 +260,15 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
                 }
             }
 
-            if (stack.isEmpty()) slot.set(ItemStack.EMPTY);
-            else slot.setChanged();
-            if (stack.getCount() == result.getCount()) return ItemStack.EMPTY;
+            if (stack.isEmpty()) {
+                slot.set(ItemStack.EMPTY);
+            }
+            else {
+                slot.setChanged();
+            }
+            if (stack.getCount() == result.getCount()) {
+                return ItemStack.EMPTY;
+            }
             slot.onTake(player, stack);
         }
         return result;

@@ -30,7 +30,9 @@ public class ShulkerBoxBlockMixin {
                 ListTag filterList = new ListTag();
                 for (int i = 0; i < 27; i++) {
                     String f = i < ghostFilters.length && ghostFilters[i] != null ? ghostFilters[i] : "";
-                    if (!f.isEmpty()) hasFilter = true;
+                    if (!f.isEmpty()) {
+                        hasFilter = true;
+                    }
                     filterList.add(StringTag.valueOf(f));
                 }
                 if (hasFilter) {

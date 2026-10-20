@@ -39,7 +39,9 @@ public class ArmorPillarRenderer {
             float facingYaw,
             boolean isFixed
     ) {
-        if (itemStack == null || level == null || pos == null) return;
+        if (itemStack == null || level == null || pos == null) {
+            return;
+        }
 
         ArmorStand armorStand = armorStandCache.get(pos);
         if (armorStand == null || !armorStand.isAlive() || armorStand.level != level) {

@@ -25,7 +25,9 @@ public class LogStrippingHandler {
     private static final Map<Supplier<Block>, Supplier<Block>> STRIP_MAP = new HashMap<>();
 
     public static void init() {
-        if (!STRIP_MAP.isEmpty()) return;
+        if (!STRIP_MAP.isEmpty()) {
+            return;
+        }
 
         registerPair(ModBlocks.POPLAR_LOG, ModBlocks.STRIPPED_POPLAR_LOG);
         registerPair(ModBlocks.POPLAR_WOOD, ModBlocks.STRIPPED_POPLAR_WOOD);
@@ -109,7 +111,9 @@ public class LogStrippingHandler {
 
     public static boolean handleAxeStrip(PlayerInteractEvent.RightClickBlock event) {
         ItemStack held = event.getItemStack();
-        if (!(held.getItem() instanceof AxeItem)) return false;
+        if (!(held.getItem() instanceof AxeItem)) {
+            return false;
+        }
 
         init();
         Level level = event.getWorld();

@@ -40,13 +40,17 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
 
     @Override
     public boolean handleGameEvent(Level level, GameEvent event, @Nullable Entity entity, BlockPos pos) {
-        if (level.isClientSide || event != GameEvent.ENTITY_KILLED) return false;
+        if (level.isClientSide || event != GameEvent.ENTITY_KILLED) {
+            return false;
+        }
         SculkCatalystHandler.debug("listener received death at {} catalyst={} in {}", pos, worldPosition, level.dimension().location());
         return SculkCatalystHandler.offerDeath(this, entity, pos);
     }
 
     public void absorbExperience(BlockPos deathPos, int experience) {
-        if (!(level instanceof ServerLevel serverLevel) || experience <= 0) return;
+        if (!(level instanceof ServerLevel serverLevel) || experience <= 0) {
+            return;
+        }
         spreader.addCursors(deathPos, experience);
         BlockState state = getBlockState();
         serverLevel.setBlock(worldPosition, state.setValue(SculkCatalystBlock.BLOOM, true), 3);
@@ -63,7 +67,9 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
             SculkCatalystHandler.debug("catalyst ticking at {} in {}", worldPosition, level.dimension().location());
             loggedServerTick = true;
         }
-        if (spreader.updateCursors(level, worldPosition)) setChanged();
+        if (spreader.updateCursors(level, worldPosition)) {
+            setChanged();
+        }
     }
 
     @Override

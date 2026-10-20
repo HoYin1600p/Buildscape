@@ -190,17 +190,23 @@ public class BuildScapeRecipeCompiler {
             }
             case "shaped_durability", "buildscape:shaped_durability" -> {
                 ShapedRecipe base = compileShaped(recipeId, group, spec, resultStack);
-                if (base == null) return null;
+                if (base == null) {
+                    return null;
+                }
                 return new ShapedDurabilityRecipe(base.getId(), base.getGroup(), base.getWidth(), base.getHeight(), base.getIngredients(), base.getResultItem(), 1);
             }
             case "shapeless_durability", "buildscape:shapeless_durability" -> {
                 ShapelessRecipe base = compileShapeless(recipeId, group, spec, resultStack);
-                if (base == null) return null;
+                if (base == null) {
+                    return null;
+                }
                 return new ShapelessDurabilityRecipe(base.getId(), base.getGroup(), base.getResultItem(), base.getIngredients(), 1);
             }
             case "buildscape:haze_bush_dye" -> {
                 ShapelessRecipe base = compileShapeless(recipeId, group, spec, resultStack);
-                if (base == null) return null;
+                if (base == null) {
+                    return null;
+                }
                 return new HazeBushDyeRecipe(
                         base.getId(), base.getGroup(), base.getResultItem(), base.getIngredients());
             }
@@ -255,7 +261,9 @@ public class BuildScapeRecipeCompiler {
 
     private ShapedRecipe compileShaped(ResourceLocation id, String group, RecipeIR.RecipeSpec spec, ItemStack result) {
         List<String> patternList = spec.pattern();
-        if (patternList == null || patternList.isEmpty()) return null;
+        if (patternList == null || patternList.isEmpty()) {
+            return null;
+        }
         int height = patternList.size();
         int width = 0;
         for (String line : patternList) {

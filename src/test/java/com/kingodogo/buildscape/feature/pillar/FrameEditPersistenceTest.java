@@ -218,7 +218,9 @@ public class FrameEditPersistenceTest {
     private static List<String> colors(CompoundTag tag) {
         List<String> result = new ArrayList<>();
         ListTag list = tag.getList("BuildScapeParticleColors", 8);
-        for (int i = 0; i < list.size(); i++) result.add(list.getString(i));
+        for (int i = 0; i < list.size(); i++) {
+            result.add(list.getString(i));
+        }
         return result;
     }
 

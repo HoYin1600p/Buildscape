@@ -66,26 +66,42 @@ public class RotateBlockPacket {
         NetworkEvent.Context ctx = ctxSupplier.get();
         ctx.enqueueWork(() -> {
             ServerPlayer player = ctx.getSender();
-            if (player == null || !player.mayBuild()) return;
+            if (player == null || !player.mayBuild()) {
+                return;
+            }
 
-            if (!player.isCrouching()) return;
+            if (!player.isCrouching()) {
+                return;
+            }
 
             ItemStack mainHand = player.getMainHandItem();
             ItemStack offHand = player.getOffhandItem();
             boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
                                 (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
-            if (!hasWrench) return;
+            if (!hasWrench) {
+                return;
+            }
 
             ServerLevel level = player.getLevel();
             BlockPos pos = msg.pos;
 
-            if (!level.isLoaded(pos)) return;
-            if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) return;
-            if (player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) return;
-            if (!level.mayInteract(player, pos)) return;
+            if (!level.isLoaded(pos)) {
+                return;
+            }
+            if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) {
+                return;
+            }
+            if (player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
+                return;
+            }
+            if (!level.mayInteract(player, pos)) {
+                return;
+            }
 
             BlockState state = level.getBlockState(pos);
-            if (state.isAir()) return;
+            if (state.isAir()) {
+                return;
+            }
 
             BlockState newState = calculateRotatedState(state, msg.direction, player.getDirection());
 

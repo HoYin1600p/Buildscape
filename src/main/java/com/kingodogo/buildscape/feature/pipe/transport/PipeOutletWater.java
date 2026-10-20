@@ -22,8 +22,12 @@ public final class PipeOutletWater {
 
     static int amount(PipeFlowState flow, Direction exit, boolean open, boolean wet) {
         if (!open || !wet || flow == null || !flow.hasFluid() || !flow.hasFlowDirection(exit)
-                || exit == Direction.UP) return 0;
-        if (exit == Direction.DOWN) return 8;
+                || exit == Direction.UP) {
+            return 0;
+        }
+        if (exit == Direction.DOWN) {
+            return 8;
+        }
         return Math.max(0, WaterPipeTransport.MAX_HORIZONTAL_FLOW - Math.max(0, flow.getDistance()));
     }
 }

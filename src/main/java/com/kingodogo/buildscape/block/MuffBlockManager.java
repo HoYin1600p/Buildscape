@@ -38,10 +38,14 @@ public class MuffBlockManager {
 
     @SubscribeEvent
     public static void onPlaySound(PlaySoundEvent event) {
-        if (event.getSound() == null) return;
+        if (event.getSound() == null) {
+            return;
+        }
 
         SoundInstance sound = event.getSound();
-        if (sound.isRelative()) return;
+        if (sound.isRelative()) {
+            return;
+        }
         if (sound.getSource() == SoundSource.PLAYERS || sound.getSource() == SoundSource.MASTER) {
             return;
         }
@@ -50,7 +54,9 @@ public class MuffBlockManager {
         double sz = sound.getZ();
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
+        if (mc.level == null) {
+            return;
+        }
 
         for (BlockPos pos : ACTIVE_MUFFS) {
             BlockState state = mc.level.getBlockState(pos);

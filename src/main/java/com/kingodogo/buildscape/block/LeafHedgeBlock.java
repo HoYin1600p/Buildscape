@@ -80,7 +80,9 @@ public class LeafHedgeBlock extends WallBlock {
                                 break;
                             }
                         }
-                        if (isOnTop) break;
+                        if (isOnTop) {
+                            break;
+                        }
                     }
                 }
 

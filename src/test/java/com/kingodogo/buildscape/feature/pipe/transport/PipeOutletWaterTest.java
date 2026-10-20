@@ -127,15 +127,21 @@ public final class PipeOutletWaterTest {
     }
 
     private static void expect(int expected, int actual, String label) {
-        if (expected != actual) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
+        if (expected != actual) {
+            throw new AssertionError(label + ": expected " + expected + ", got " + actual);
+        }
     }
 
     private static void expect(boolean expected, boolean actual, String label) {
-        if (expected != actual) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
+        if (expected != actual) {
+            throw new AssertionError(label + ": expected " + expected + ", got " + actual);
+        }
     }
 
     private static void expect(String expected, String actual, String label) {
-        if (!expected.equals(actual)) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
+        if (!expected.equals(actual)) {
+            throw new AssertionError(label + ": expected " + expected + ", got " + actual);
+        }
     }
 
     private static final class TestTopology implements PipeTopologyAccess {

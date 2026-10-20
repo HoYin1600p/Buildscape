@@ -29,6 +29,8 @@ public class SculkChargeTest {
         assertEquals(0, SculkCharge.split(100, -1).length);
         int[] charges = SculkCharge.split(Integer.MAX_VALUE, Integer.MAX_VALUE);
         assertEquals(32, charges.length);
-        for (int charge : charges) assertEquals(1000, charge);
+        for (int charge : charges) {
+            assertEquals(1000, charge);
+        }
     }
 }

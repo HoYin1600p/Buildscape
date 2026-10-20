@@ -20,7 +20,9 @@ import java.util.Set;
 public class BubbleColumnHandler {
 
     public static BubbleColumnState detectBubbleColumnBase(BlockGetter level, BlockPos pos) {
-        if (level == null || pos == null) return BubbleColumnState.NONE;
+        if (level == null || pos == null) {
+            return BubbleColumnState.NONE;
+        }
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
 
@@ -34,7 +36,9 @@ public class BubbleColumnHandler {
     }
 
     public static boolean isBubbleColumnBase(BlockState state) {
-        if (state == null) return false;
+        if (state == null) {
+            return false;
+        }
         return state.is(Blocks.SOUL_SAND) || state.is(Blocks.MAGMA_BLOCK);
     }
 

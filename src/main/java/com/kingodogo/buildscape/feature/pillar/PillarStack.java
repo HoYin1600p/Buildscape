@@ -24,8 +24,9 @@ final class PillarStack {
     static BlockPos findStackTop(PillarBlockEntity self) {
         final Level level = self.getLevel();
         final BlockPos worldPosition = self.getBlockPos();
-        if (level == null)
+        if (level == null) {
             return worldPosition;
+        }
 
         if (!level.isClientSide &&
                 !BuildScape.isServerFullyInitialized()) {
@@ -70,8 +71,9 @@ final class PillarStack {
 
     static String getStackParticlePattern(PillarBlockEntity self) {
         final Level level = self.getLevel();
-        if (level == null)
+        if (level == null) {
             return self.particlePattern;
+        }
 
         if (!level.isClientSide &&
                 !BuildScape.isServerFullyInitialized()) {
@@ -135,8 +137,9 @@ final class PillarStack {
     static BlockPos findStackBottom(PillarBlockEntity self) {
         final Level level = self.getLevel();
         final BlockPos worldPosition = self.getBlockPos();
-        if (level == null)
+        if (level == null) {
             return worldPosition;
+        }
 
         if (!level.isClientSide &&
                 !BuildScape.isServerFullyInitialized()) {
@@ -181,8 +184,9 @@ final class PillarStack {
 
     static String getStackPillarId(PillarBlockEntity self) {
         final Level level = self.getLevel();
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide) {
             return self.pillarId;
+        }
 
         if (!BuildScape.isServerFullyInitialized()) {
             return self.pillarId;
@@ -241,8 +245,9 @@ final class PillarStack {
 
     static void propagatePatternToStack(PillarBlockEntity self, String pattern) {
         final Level level = self.getLevel();
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide) {
             return;
+        }
 
         BlockPos bottom = findStackBottom(self);
         BlockPos current = bottom;
@@ -265,8 +270,9 @@ final class PillarStack {
 
     static void propagateToStack(PillarBlockEntity self, String stackId, List<String> colors) {
         final Level level = self.getLevel();
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide) {
             return;
+        }
 
         BlockPos bottom = findStackBottom(self);
         BlockPos current = bottom;
@@ -296,8 +302,9 @@ final class PillarStack {
     static PillarBlockEntity getTopPillar(PillarBlockEntity self) {
         final Level level = self.getLevel();
         final BlockPos worldPosition = self.getBlockPos();
-        if (level == null)
+        if (level == null) {
             return self;
+        }
         BlockPos current = worldPosition;
         try {
             while (level.getBlockState(current.above()).getBlock() instanceof PillarBlock &&

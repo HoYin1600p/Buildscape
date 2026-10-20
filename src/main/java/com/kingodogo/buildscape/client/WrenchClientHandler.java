@@ -40,22 +40,32 @@ public class WrenchClientHandler {
     public static void onHighlightBlock(DrawSelectionEvent.HighlightBlock event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || mc.level == null) return;
+        if (player == null || mc.level == null) {
+            return;
+        }
 
-        if (!player.isCrouching()) return;
+        if (!player.isCrouching()) {
+            return;
+        }
 
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
         boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
                             (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
-        if (!hasWrench) return;
+        if (!hasWrench) {
+            return;
+        }
 
         HitResult target = event.getTarget();
-        if (target.getType() != HitResult.Type.BLOCK) return;
+        if (target.getType() != HitResult.Type.BLOCK) {
+            return;
+        }
 
         BlockPos pos = ((BlockHitResult) target).getBlockPos();
         BlockState state = mc.level.getBlockState(pos);
-        if (state.isAir()) return;
+        if (state.isAir()) {
+            return;
+        }
 
         event.setCanceled(true);
 
@@ -103,22 +113,32 @@ public class WrenchClientHandler {
 
     @SubscribeEvent
     public static void onKeyInput(InputEvent.KeyInputEvent event) {
-        if (event.getAction() != GLFW.GLFW_PRESS) return;
+        if (event.getAction() != GLFW.GLFW_PRESS) {
+            return;
+        }
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc.screen != null || mc.player == null || mc.level == null) return;
+        if (mc.screen != null || mc.player == null || mc.level == null) {
+            return;
+        }
 
         LocalPlayer player = mc.player;
-        if (!player.isCrouching()) return;
+        if (!player.isCrouching()) {
+            return;
+        }
 
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
         boolean hasWrench = (!mainHand.isEmpty() && mainHand.getItem() == ModItems.WRENCH.get()) ||
                             (!offHand.isEmpty() && offHand.getItem() == ModItems.WRENCH.get());
-        if (!hasWrench) return;
+        if (!hasWrench) {
+            return;
+        }
 
         HitResult hit = mc.hitResult;
-        if (hit == null || hit.getType() != HitResult.Type.BLOCK) return;
+        if (hit == null || hit.getType() != HitResult.Type.BLOCK) {
+            return;
+        }
 
         BlockHitResult blockHit = (BlockHitResult) hit;
         BlockPos pos = blockHit.getBlockPos();

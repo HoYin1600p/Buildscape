@@ -56,7 +56,9 @@ public class TagTooltipHandler {
     public static void onItemTooltip(ItemTooltipEvent event) {
         try {
             ItemStack stack = event.getItemStack();
-            if (stack.isEmpty()) return;
+            if (stack.isEmpty()) {
+                return;
+            }
 
             if (stack.getItem() instanceof FestiveStockingItem) {
                 CompoundTag tag = stack.getTag();
@@ -89,7 +91,9 @@ public class TagTooltipHandler {
                     List<Component> tooltips = event.getToolTip();
                     if (tooltips.size() > 1) {
                         tooltips.removeIf(comp -> {
-                            if (!(comp instanceof TranslatableComponent translated)) return false;
+                            if (!(comp instanceof TranslatableComponent translated)) {
+                                return false;
+                            }
                             String key = translated.getKey();
                             return "container.shulkerBox.itemCount".equals(key) || "container.shulkerBox.more".equals(key);
                         });
@@ -111,7 +115,9 @@ public class TagTooltipHandler {
     @Nullable
     public static ShulkerBoxTooltipData getShulkerTooltipData(ItemStack stack) {
         try {
-            if (stack == null || stack.isEmpty()) return null;
+            if (stack == null || stack.isEmpty()) {
+                return null;
+            }
             if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock sbb) {
                 CompoundTag blockEntityTag = stack.getTagElement(NbtKeys.BLOCK_ENTITY_TAG);
                 if (blockEntityTag != null && (blockEntityTag.contains(NbtKeys.GHOST_FILTERS, 9) || blockEntityTag.contains(NbtKeys.ITEMS, 9))) {
@@ -159,7 +165,9 @@ public class TagTooltipHandler {
     @Nullable
     public static BuildersPouchTooltipData getBuildersPouchTooltipData(ItemStack stack) {
         try {
-            if (stack == null || stack.isEmpty()) return null;
+            if (stack == null || stack.isEmpty()) {
+                return null;
+            }
             if (stack.getItem() instanceof BuildersPouchItem) {
                 NonNullList<ItemStack> filterStacks = NonNullList.withSize(BuildersPouchItem.SLOT_COUNT, ItemStack.EMPTY);
                 NonNullList<ItemStack> realStacks = NonNullList.withSize(BuildersPouchItem.SLOT_COUNT, ItemStack.EMPTY);

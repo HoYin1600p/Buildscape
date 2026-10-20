@@ -285,43 +285,113 @@ public class MobStateParser {
     }
 
     private static String resolveAlias(String word) {
-        if (word.equals("sit")) return "sitting";
-        if (word.equals("tame")) return "tamed";
-        if (word.equals("power")) return "powered";
-        if (word.equals("charge")) return "charged";
-        if (word.equals("saddle")) return "saddled";
-        if (word.equals("shear")) return "sheared";
-        if (word.equals("ignite")) return "ignited";
-        if (word.equals("sleep")) return "sleeping";
-        if (word.equals("crouch")) return "crouching";
-        if (word.equals("scream")) return "screaming";
-        if (word.equals("aggro")) return "angry";
-        if (word.equals("grumm")) return "grum";
-        if (word.equals("jeb_")) return "jeb";
+        if (word.equals("sit")) {
+            return "sitting";
+        }
+        if (word.equals("tame")) {
+            return "tamed";
+        }
+        if (word.equals("power")) {
+            return "powered";
+        }
+        if (word.equals("charge")) {
+            return "charged";
+        }
+        if (word.equals("saddle")) {
+            return "saddled";
+        }
+        if (word.equals("shear")) {
+            return "sheared";
+        }
+        if (word.equals("ignite")) {
+            return "ignited";
+        }
+        if (word.equals("sleep")) {
+            return "sleeping";
+        }
+        if (word.equals("crouch")) {
+            return "crouching";
+        }
+        if (word.equals("scream")) {
+            return "screaming";
+        }
+        if (word.equals("aggro")) {
+            return "angry";
+        }
+        if (word.equals("grumm")) {
+            return "grum";
+        }
+        if (word.equals("jeb_")) {
+            return "jeb";
+        }
 
-        if (word.equals("beg")) return "begging";
-        if (word.equals("stand")) return "standing";
-        if (word.equals("chest")) return "chested";
-        if (word.equals("glow")) return "glowing";
-        if (word.equals("freeze")) return "frozen";
-        if (word.equals("hang")) return "hanging";
-        if (word.equals("roost")) return "roosting";
-        if (word.equals("climb")) return "climbing";
-        if (word.equals("cast")) return "casting";
-        if (word.equals("carry")) return "carrying";
-        if (word.equals("rear")) return "rearing";
-        if (word.equals("stare")) return "staring";
-        if (word.equals("crack")) return "cracked";
-        if (word.equals("break")) return "broken";
-        if (word.equals("damage")) return "hurt";
-        if (word.equals("puffed")) return "puff";
-        if (word.equals("opened")) return "open";
-        if (word.equals("invulnerable")) return "invul";
+        if (word.equals("beg")) {
+            return "begging";
+        }
+        if (word.equals("stand")) {
+            return "standing";
+        }
+        if (word.equals("chest")) {
+            return "chested";
+        }
+        if (word.equals("glow")) {
+            return "glowing";
+        }
+        if (word.equals("freeze")) {
+            return "frozen";
+        }
+        if (word.equals("hang")) {
+            return "hanging";
+        }
+        if (word.equals("roost")) {
+            return "roosting";
+        }
+        if (word.equals("climb")) {
+            return "climbing";
+        }
+        if (word.equals("cast")) {
+            return "casting";
+        }
+        if (word.equals("carry")) {
+            return "carrying";
+        }
+        if (word.equals("rear")) {
+            return "rearing";
+        }
+        if (word.equals("stare")) {
+            return "staring";
+        }
+        if (word.equals("crack")) {
+            return "cracked";
+        }
+        if (word.equals("break")) {
+            return "broken";
+        }
+        if (word.equals("damage")) {
+            return "hurt";
+        }
+        if (word.equals("puffed")) {
+            return "puff";
+        }
+        if (word.equals("opened")) {
+            return "open";
+        }
+        if (word.equals("invulnerable")) {
+            return "invul";
+        }
 
-        if (word.equals("no_pumpkin")) return "nopumpkin";
-        if (word.equals("no_horns")) return "nohorns";
-        if (word.equals("no_base")) return "nobase";
-        if (word.equals("no_bottom")) return "nobottom";
+        if (word.equals("no_pumpkin")) {
+            return "nopumpkin";
+        }
+        if (word.equals("no_horns")) {
+            return "nohorns";
+        }
+        if (word.equals("no_base")) {
+            return "nobase";
+        }
+        if (word.equals("no_bottom")) {
+            return "nobottom";
+        }
 
         return word;
     }

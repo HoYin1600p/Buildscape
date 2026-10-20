@@ -127,7 +127,9 @@ public class BuildscapeClientConfig {
                 readOnly |= ConfigLayoutIO.protectInvalidEncoding(file.toPath());
                 Map<String, String> loaded = ConfigLayoutIO.readEntries(source);
                 values.putAll(loaded);
-                if (!readOnly) appendMissingDefaults(file.toPath(), loaded);
+                if (!readOnly) {
+                    appendMissingDefaults(file.toPath(), loaded);
+                }
             }
         } catch (IOException e) {
             readOnly = true;
@@ -171,24 +173,32 @@ public class BuildscapeClientConfig {
         String newline = source.contains("\r\n") ? "\r\n" : source.contains("\r") ? "\r" : "\n";
         StringBuilder missing = new StringBuilder();
         for (Map.Entry<String, String> entry : DEFAULTS.entrySet()) {
-            if (loaded.containsKey(entry.getKey())) continue;
+            if (loaded.containsKey(entry.getKey())) {
+                continue;
+            }
             if (missing.length() == 0 && !source.isEmpty() && !source.endsWith("\n") && !source.endsWith("\r")) {
                 missing.append(newline);
             }
             missing.append("# ").append(description(entry.getKey())).append(newline);
             missing.append(entry.getKey()).append(" = ").append(entry.getValue()).append(newline);
         }
-        if (missing.length() == 0) return;
+        if (missing.length() == 0) {
+            return;
+        }
         ConfigLayoutIO.append(file, missing.toString(), source);
         source += missing;
     }
 
     private File migrateLegacyConfig(File file, File legacyFile) {
-        if (legacyFile == null || !legacyFile.exists()) return file;
+        if (legacyFile == null || !legacyFile.exists()) {
+            return file;
+        }
         Path legacy = legacyFile.toPath();
         Path backup = legacy.resolveSibling(legacyFile.getName() + ".backup");
         Path completion = legacy.resolveSibling(legacyFile.getName() + ".backup.complete");
-        if (Files.exists(completion)) return file;
+        if (Files.exists(completion)) {
+            return file;
+        }
         try {
             String output = null;
             boolean replacementDecoded = false;
@@ -199,13 +209,19 @@ public class BuildscapeClientConfig {
                 replacementDecoded = ConfigLayoutIO.protectInvalidEncoding(legacy);
                 output = groupedText(original, migrated);
             }
-            if (!Files.exists(backup)) Files.copy(legacy, backup);
+            if (!Files.exists(backup)) {
+                Files.copy(legacy, backup);
+            }
             else if (!Files.isRegularFile(backup) || Files.mismatch(legacy, backup) != -1) {
                 throw new IOException("Legacy backup does not match the original: " + backup);
             }
             if (output != null) {
-                if (replacementDecoded) Files.copy(legacy, file.toPath());
-                else ConfigLayoutIO.writeNew(file.toPath(), output);
+                if (replacementDecoded) {
+                    Files.copy(legacy, file.toPath());
+                }
+                else {
+                    ConfigLayoutIO.writeNew(file.toPath(), output);
+                }
             }
             Files.createFile(completion);
             if (output != null) {
@@ -227,7 +243,9 @@ public class BuildscapeClientConfig {
             return;
         }
         File file = getConfigFile();
-        if (file == null) return;
+        if (file == null) {
+            return;
+        }
         try {
             String output = groupedText(source, values);
             ConfigLayoutIO.write(file.toPath(), output, source, true);
@@ -240,10 +258,14 @@ public class BuildscapeClientConfig {
     private static String groupedText(String source, Map<String, String> values) {
         StringBuilder text = new StringBuilder("# BuildScape Configuration\n# Changes take effect on the next game launch.\n");
         for (String section : new String[]{"Gameplay", "Performance", "Visuals & particles", "Interface", "Other"}) {
-            if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) continue;
+            if (values.keySet().stream().noneMatch(key -> section.equals(section(key)))) {
+                continue;
+            }
             text.append("\n# --- ").append(section).append(" ---\n");
             for (Map.Entry<String, String> entry : values.entrySet()) {
-                if (!section.equals(section(entry.getKey()))) continue;
+                if (!section.equals(section(entry.getKey()))) {
+                    continue;
+                }
                 text.append("# ").append(description(entry.getKey())).append('\n');
                 text.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
             }
@@ -394,7 +416,9 @@ public class BuildscapeClientConfig {
 
     public void setLastPreset(String key) {
         String normalized = key == null || key.isBlank() ? "default" : key;
-        if (normalized.equals(getLastPreset())) return;
+        if (normalized.equals(getLastPreset())) {
+            return;
+        }
         values.put(KEY_LAST_PRESET, normalized);
         save();
     }

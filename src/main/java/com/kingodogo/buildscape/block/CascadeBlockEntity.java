@@ -98,9 +98,13 @@ public class CascadeBlockEntity extends SyncedBlockEntity {
             Minecraft minecraft = Minecraft.getInstance();
             ParticleStatus particleSetting = minecraft.options.particles;
             if (particleSetting == ParticleStatus.MINIMAL) {
-                if (level.getGameTime() % 10 != 0) return;
+                if (level.getGameTime() % 10 != 0) {
+                    return;
+                }
             } else if (particleSetting == ParticleStatus.DECREASED) {
-                if (level.getGameTime() % 2 != 0) return;
+                if (level.getGameTime() % 2 != 0) {
+                    return;
+                }
             }
 
             Player player = minecraft.player;
@@ -141,9 +145,13 @@ public class CascadeBlockEntity extends SyncedBlockEntity {
         }
 
         private static boolean isMistSuppressor(ItemStack stack) {
-            if (stack.isEmpty()) return false;
+            if (stack.isEmpty()) {
+                return false;
+            }
             Item item = stack.getItem();
-            if (item instanceof BottleOfMistItem) return true;
+            if (item instanceof BottleOfMistItem) {
+                return true;
+            }
             if (item instanceof BlockItem blockItem) {
                 return blockItem.getBlock() instanceof CascadeBlock;
             }

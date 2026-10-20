@@ -64,7 +64,9 @@ public class Config405MigrationTest {
             assertTrue(config.items.containsAll(ConfigPaths.loadDefaultItems(vault)));
             com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original)).getAsJsonArray("items");
             com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file)).getAsJsonArray("items");
-            for (int i = 0; i < before.size(); i++) assertEquals(before.get(i), after.get(i));
+            for (int i = 0; i < before.size(); i++) {
+                assertEquals(before.get(i), after.get(i));
+            }
 
             config.items.remove("minecraft:diamond");
             assertTrue(config.saveItemsToDisk(vault));
@@ -124,7 +126,9 @@ public class Config405MigrationTest {
         assertEquals(ConfigLayoutIO.readProperties(original), ConfigLayoutIO.readProperties(saved));
         for (String line : original.split("\\R")) {
             int comment = line.indexOf("//");
-            if (comment >= 0) assertTrue(line, saved.contains(line.substring(comment)));
+            if (comment >= 0) {
+                assertTrue(line, saved.contains(line.substring(comment)));
+            }
         }
         assertBeforeKey(saved, "// Base speed multiplier for particles", "particle_speed");
         assertBeforeKey(saved, "// How far particles spread from center", "particle_spread");
@@ -473,7 +477,9 @@ public class Config405MigrationTest {
         assertTrue(key, keyPosition >= 0);
         // No different setting may intervene between the old comment and its setting.
         String between = text.substring(commentPosition, keyPosition);
-        for (String line : between.split("\\R")) assertFalse(between, line.trim().startsWith("\""));
+        for (String line : between.split("\\R")) {
+            assertFalse(between, line.trim().startsWith("\""));
+        }
     }
 
     @Test

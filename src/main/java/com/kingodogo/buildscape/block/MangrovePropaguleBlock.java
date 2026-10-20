@@ -443,7 +443,9 @@ public class MangrovePropaguleBlock
         boolean hasSolidBlockBelow = false;
         for (int x = -4; x <= 4; x++) {
             for (int z = -4; z <= 4; z++) {
-                if (x == 0 && z == 0) continue;
+                if (x == 0 && z == 0) {
+                    continue;
+                }
                 for (int y = -4; y <= 4; y++) {
                     BlockPos checkPos = pos.offset(x, y, z);
                     BlockState checkState = level.getBlockState(checkPos);
@@ -452,9 +454,13 @@ public class MangrovePropaguleBlock
                         break;
                     }
                 }
-                if (hasSolidBlockBelow) break;
+                if (hasSolidBlockBelow) {
+                    break;
+                }
             }
-            if (hasSolidBlockBelow) break;
+            if (hasSolidBlockBelow) {
+                break;
+            }
         }
         if (!hasSolidBlockBelow) {
             return false;
@@ -471,9 +477,13 @@ public class MangrovePropaguleBlock
                         break;
                     }
                 }
-                if (hasRootLandingSpot) break;
+                if (hasRootLandingSpot) {
+                    break;
+                }
             }
-            if (hasRootLandingSpot) break;
+            if (hasRootLandingSpot) {
+                break;
+            }
         }
 
         return hasRootLandingSpot;

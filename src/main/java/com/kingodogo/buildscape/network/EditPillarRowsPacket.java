@@ -69,7 +69,9 @@ public class EditPillarRowsPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+            if (player == null) {
+                return;
+            }
             // Pillar identities are read-only; network requests attempting to rename or edit identities are rejected.
             String reason = "read_only";
             ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),

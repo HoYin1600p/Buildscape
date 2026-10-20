@@ -142,17 +142,29 @@ public class GlowLightsBlock
             CollisionContext context
     ) {
         VoxelShape shape = Shapes.empty();
-        if (state.getValue(VineBlock.NORTH)) shape =
+        if (state.getValue(VineBlock.NORTH)) {
+            shape =
                 Shapes.or(shape, SHAPE_NORTH);
-        if (state.getValue(VineBlock.SOUTH)) shape =
+        }
+        if (state.getValue(VineBlock.SOUTH)) {
+            shape =
                 Shapes.or(shape, SHAPE_SOUTH);
-        if (state.getValue(VineBlock.EAST)) shape =
+        }
+        if (state.getValue(VineBlock.EAST)) {
+            shape =
                 Shapes.or(shape, SHAPE_EAST);
-        if (state.getValue(VineBlock.WEST)) shape =
+        }
+        if (state.getValue(VineBlock.WEST)) {
+            shape =
                 Shapes.or(shape, SHAPE_WEST);
-        if (state.getValue(VineBlock.UP)) shape =
+        }
+        if (state.getValue(VineBlock.UP)) {
+            shape =
                 Shapes.or(shape, SHAPE_UP);
-        if (state.getValue(DOWN)) shape = Shapes.or(shape, SHAPE_DOWN);
+        }
+        if (state.getValue(DOWN)) {
+            shape = Shapes.or(shape, SHAPE_DOWN);
+        }
         return shape.isEmpty() ? Shapes.block() : shape;
     }
 
@@ -240,46 +252,58 @@ public class GlowLightsBlock
                     state = this.defaultBlockState();
                     if (
                             blockState.hasProperty(VineBlock.UP)
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.UP,
                             blockState.getValue(VineBlock.UP)
                     );
-                    if (blockState.hasProperty(DOWN)) state = state.setValue(
+                    }
+                    if (blockState.hasProperty(DOWN)) {
+                        state = state.setValue(
                             DOWN,
                             blockState.getValue(DOWN)
                     );
+                    }
                     if (
                             blockState.hasProperty(
                                     VineBlock.NORTH
                             )
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.NORTH,
                             blockState.getValue(VineBlock.NORTH)
                     );
+                    }
                     if (
                             blockState.hasProperty(
                                     VineBlock.SOUTH
                             )
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.SOUTH,
                             blockState.getValue(VineBlock.SOUTH)
                     );
+                    }
                     if (
                             blockState.hasProperty(
                                     VineBlock.EAST
                             )
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.EAST,
                             blockState.getValue(VineBlock.EAST)
                     );
+                    }
                     if (
                             blockState.hasProperty(
                                     VineBlock.WEST
                             )
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.WEST,
                             blockState.getValue(VineBlock.WEST)
                     );
+                    }
                 }
             } else {
                 state = this.defaultBlockState();
@@ -302,46 +326,58 @@ public class GlowLightsBlock
                     state = this.defaultBlockState();
                     if (
                             blockState.hasProperty(VineBlock.UP)
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.UP,
                             blockState.getValue(VineBlock.UP)
                     );
-                    if (blockState.hasProperty(DOWN)) state = state.setValue(
+                    }
+                    if (blockState.hasProperty(DOWN)) {
+                        state = state.setValue(
                             DOWN,
                             blockState.getValue(DOWN)
                     );
+                    }
                     if (
                             blockState.hasProperty(
                                     VineBlock.NORTH
                             )
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.NORTH,
                             blockState.getValue(VineBlock.NORTH)
                     );
+                    }
                     if (
                             blockState.hasProperty(
                                     VineBlock.SOUTH
                             )
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.SOUTH,
                             blockState.getValue(VineBlock.SOUTH)
                     );
+                    }
                     if (
                             blockState.hasProperty(
                                     VineBlock.EAST
                             )
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.EAST,
                             blockState.getValue(VineBlock.EAST)
                     );
+                    }
                     if (
                             blockState.hasProperty(
                                     VineBlock.WEST
                             )
-                    ) state = state.setValue(
+                    ) {
+                        state = state.setValue(
                             VineBlock.WEST,
                             blockState.getValue(VineBlock.WEST)
                     );
+                    }
                 }
             } else {
                 state = this.defaultBlockState();
@@ -381,42 +417,54 @@ public class GlowLightsBlock
                 state = this.defaultBlockState();
                 if (
                         blockState.hasProperty(VineBlock.UP)
-                ) state = state.setValue(
+                ) {
+                    state = state.setValue(
                         VineBlock.UP,
                         blockState.getValue(VineBlock.UP)
                 );
-                if (blockState.hasProperty(DOWN)) state = state.setValue(
+                }
+                if (blockState.hasProperty(DOWN)) {
+                    state = state.setValue(
                         DOWN,
                         blockState.getValue(DOWN)
                 );
+                }
                 if (
                         blockState.hasProperty(
                                 VineBlock.NORTH
                         )
-                ) state = state.setValue(
+                ) {
+                    state = state.setValue(
                         VineBlock.NORTH,
                         blockState.getValue(VineBlock.NORTH)
                 );
+                }
                 if (
                         blockState.hasProperty(
                                 VineBlock.SOUTH
                         )
-                ) state = state.setValue(
+                ) {
+                    state = state.setValue(
                         VineBlock.SOUTH,
                         blockState.getValue(VineBlock.SOUTH)
                 );
+                }
                 if (
                         blockState.hasProperty(VineBlock.EAST)
-                ) state = state.setValue(
+                ) {
+                    state = state.setValue(
                         VineBlock.EAST,
                         blockState.getValue(VineBlock.EAST)
                 );
+                }
                 if (
                         blockState.hasProperty(VineBlock.WEST)
-                ) state = state.setValue(
+                ) {
+                    state = state.setValue(
                         VineBlock.WEST,
                         blockState.getValue(VineBlock.WEST)
                 );
+                }
             }
 
             BooleanProperty property = attachDirection == Direction.DOWN
@@ -556,7 +604,9 @@ public class GlowLightsBlock
         for (Direction direction : Direction.values()) {
             BooleanProperty property = direction == Direction.DOWN
                     ? DOWN : VineBlock.getPropertyForFace(direction);
-            if (state.getValue(property)) count++;
+            if (state.getValue(property)) {
+                count++;
+            }
         }
         return count;
     }

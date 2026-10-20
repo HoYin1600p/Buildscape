@@ -38,6 +38,8 @@ public final class SmokeColorRegistryTest {
     }
 
     private static void check(boolean result, String description) {
-        if (!result) throw new AssertionError(description);
+        if (!result) {
+            throw new AssertionError(description);
+        }
     }
 }

@@ -41,13 +41,17 @@ public class HazeBushParticleHandler {
     private static final int HAZE_PARTICLE_RANGE = 32;
 
     public static void track(BlockPos pos) {
-        if (pos == null) return;
+        if (pos == null) {
+            return;
+        }
         long chunkKey = (new ChunkPos(pos)).toLong();
         POSITIONS_BY_CHUNK.computeIfAbsent(chunkKey, k -> new HashSet<>()).add(pos.immutable());
     }
 
     public static void untrack(BlockPos pos) {
-        if (pos == null) return;
+        if (pos == null) {
+            return;
+        }
         long chunkKey = (new ChunkPos(pos)).toLong();
         Set<BlockPos> set = POSITIONS_BY_CHUNK.get(chunkKey);
         if (set != null) {
@@ -60,8 +64,12 @@ public class HazeBushParticleHandler {
 
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load event) {
-        if (event.getWorld() == null || !event.getWorld().isClientSide()) return;
-        if (!(event.getChunk() instanceof LevelChunk chunk)) return;
+        if (event.getWorld() == null || !event.getWorld().isClientSide()) {
+            return;
+        }
+        if (!(event.getChunk() instanceof LevelChunk chunk)) {
+            return;
+        }
 
         long chunkKey = chunk.getPos().toLong();
         Set<BlockPos> chunkPositions = null;
@@ -115,12 +123,20 @@ public class HazeBushParticleHandler {
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null || mc.isPaused()) return;
-        if (mc.options.particles == ParticleStatus.MINIMAL) return;
-        if (POSITIONS_BY_CHUNK.isEmpty()) return;
+        if (mc.level == null || mc.player == null || mc.isPaused()) {
+            return;
+        }
+        if (mc.options.particles == ParticleStatus.MINIMAL) {
+            return;
+        }
+        if (POSITIONS_BY_CHUNK.isEmpty()) {
+            return;
+        }
 
         Level level = mc.level;
         BlockPos playerPos = mc.player.blockPosition();
@@ -138,8 +154,12 @@ public class HazeBushParticleHandler {
                 BlockPos pos = it.next();
                 double distSq = playerPos.distSqr(pos);
 
-                if (cameraPos.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.4D, pos.getZ() + 0.5D) > maxDistSq) continue;
-                if (distSq <= minDistSq) continue;
+                if (cameraPos.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.4D, pos.getZ() + 0.5D) > maxDistSq) {
+                    continue;
+                }
+                if (distSq <= minDistSq) {
+                    continue;
+                }
 
                 BlockState state = level.getBlockState(pos);
                 boolean hasHaze = false;
@@ -156,7 +176,9 @@ public class HazeBushParticleHandler {
                     continue;
                 }
 
-                if (!hasHaze || rgb == null) continue;
+                if (!hasHaze || rgb == null) {
+                    continue;
+                }
 
                 if (RANDOM.nextFloat() < chance) {
                     Vec3 particlePos = findHazeParticlePos(level, pos, RANDOM);

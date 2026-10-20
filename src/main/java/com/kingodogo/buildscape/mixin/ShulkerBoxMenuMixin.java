@@ -37,7 +37,9 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
     @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/Container;)V",
             at = @At("TAIL"))
     private void addFilterData(int id, Inventory inventory, Container container, CallbackInfo ci) {
-        if (container instanceof GhostFilterable filterable) buildscape$filterSource = filterable;
+        if (container instanceof GhostFilterable filterable) {
+            buildscape$filterSource = filterable;
+        }
         for (int slot = 0; slot < BUILDSCAPE_FILTER_SLOTS; slot++) {
             final int filterSlot = slot;
             addDataSlot(new DataSlot() {
@@ -69,20 +71,26 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
     @Nullable
     @Override
     public Item buildscape$getFilterItem(int menuSlot) {
-        if (menuSlot < 0 || menuSlot >= BUILDSCAPE_FILTER_SLOTS) return null;
+        if (menuSlot < 0 || menuSlot >= BUILDSCAPE_FILTER_SLOTS) {
+            return null;
+        }
         if (buildscape$filterSource != null) {
             String[] ghostFilters = buildscape$filterSource.buildscape$getGhostFilters();
             if (ghostFilters != null && menuSlot < ghostFilters.length) {
                 String filter = ghostFilters[menuSlot];
                 if (filter != null && !filter.isEmpty() && ResourceLocation.isValidResourceLocation(filter)) {
                     Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(filter));
-                    if (item != null && item != Items.AIR) return item;
+                    if (item != null && item != Items.AIR) {
+                        return item;
+                    }
                 }
             }
             return null;
         }
         int rawId = buildscape$filterIds[menuSlot] - 1;
-        if (rawId < 0) return null;
+        if (rawId < 0) {
+            return null;
+        }
         Item item = Registry.ITEM.byId(rawId);
         return (item == null || item == Items.AIR) ? null : item;
     }

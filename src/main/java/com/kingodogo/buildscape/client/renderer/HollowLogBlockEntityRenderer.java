@@ -91,7 +91,9 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
 
     @SubscribeEvent
     public static void onWorldUnload(WorldEvent.Unload event) {
-        if (event.getWorld().isClientSide()) FLUID_CACHE.clear();
+        if (event.getWorld().isClientSide()) {
+            FLUID_CACHE.clear();
+        }
     }
 
     @Mod.EventBusSubscriber(
@@ -484,7 +486,9 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
     public static float getOwnFluidHeight(BlockGetter level, BlockState state, BlockPos pos, Fluid fluid) {
         if (state.getBlock() instanceof HollowPipeBlock) {
             Fluid contained = HollowPipeBlock.getContainedFluid(state, level.getBlockEntity(pos));
-            if (!contained.isSame(fluid)) return -1.0F;
+            if (!contained.isSame(fluid)) {
+                return -1.0F;
+            }
             if (HollowPipeBlock.getSourceFluid(state, level.getBlockEntity(pos)) != Fluids.EMPTY) {
                 return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
             }
@@ -495,7 +499,9 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             }
         } else if (state.getBlock() instanceof HollowLogBlock) {
             Fluid contained = HollowPipeBlock.getContainedFluid(state, level.getBlockEntity(pos));
-            if (!contained.isSame(fluid)) return -1.0F;
+            if (!contained.isSame(fluid)) {
+                return -1.0F;
+            }
             if (level.getBlockEntity(pos) instanceof HollowLogBlockEntity entity
                     && entity.getPipeFlowState().hasFluid()) {
                 boolean source = HollowPipeBlock.getSourceFluid(state, entity) != Fluids.EMPTY;
@@ -512,13 +518,17 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
     }
 
     public static float getNeighborFluidHeight(BlockGetter level, BlockPos pos, Direction dir, Fluid fluid) {
-        if (level == null || pos == null) return -1.0F;
+        if (level == null || pos == null) {
+            return -1.0F;
+        }
         BlockPos neighborPos = pos.relative(dir);
         BlockState neighborState = level.getBlockState(neighborPos);
 
         if (neighborState.getBlock() instanceof HollowPipeBlock) {
             Fluid contained = HollowPipeBlock.getContainedFluid(neighborState, level.getBlockEntity(neighborPos));
-            if (!contained.isSame(fluid)) return -1.0F;
+            if (!contained.isSame(fluid)) {
+                return -1.0F;
+            }
             if (HollowPipeBlock.getSourceFluid(neighborState, level.getBlockEntity(neighborPos)) != Fluids.EMPTY) {
                 return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
             }
@@ -595,13 +605,17 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         int bit = 1 << dir.ordinal();
         if ((cache.checkedNeighbors & bit) == 0) {
             cache.checkedNeighbors |= bit;
-            if (queryNeighborFluid(level, pos, dir, fluid)) cache.fluidNeighbors |= bit;
+            if (queryNeighborFluid(level, pos, dir, fluid)) {
+                cache.fluidNeighbors |= bit;
+            }
         }
         return (cache.fluidNeighbors & bit) != 0;
     }
 
     private static boolean queryNeighborFluid(Level level, BlockPos pos, Direction dir, Fluid fluid) {
-        if (level == null || pos == null || dir == null) return false;
+        if (level == null || pos == null || dir == null) {
+            return false;
+        }
         BlockPos neighborPos = pos.relative(dir);
         BlockState neighborState = level.getBlockState(neighborPos);
         if (neighborState.getBlock() instanceof HollowPipeBlock) {

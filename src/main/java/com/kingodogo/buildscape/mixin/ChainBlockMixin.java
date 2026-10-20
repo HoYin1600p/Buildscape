@@ -26,7 +26,9 @@ public abstract class ChainBlockMixin extends RotatedPillarBlock {
             BlockPos pos,
             LivingEntity entity
     ) {
-        if (entity == null) return false;
+        if (entity == null) {
+            return false;
+        }
         return (
                 entity instanceof Player &&
                         state.getValue(ChainBlock.AXIS) == Direction.Axis.Y

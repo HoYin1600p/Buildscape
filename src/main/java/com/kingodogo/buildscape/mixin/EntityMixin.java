@@ -37,7 +37,9 @@ public abstract class EntityMixin {
     }
 
     private static boolean isEntityInExperienceFluid(Entity entity) {
-        if (entity == null || entity.level == null) return false;
+        if (entity == null || entity.level == null) {
+            return false;
+        }
         BlockPos pos = entity.blockPosition();
         return isExperienceFluid(entity.level.getFluidState(pos), entity.level.getBlockState(pos)) ||
                isExperienceFluid(entity.level.getFluidState(pos.above()), entity.level.getBlockState(pos.above())) ||

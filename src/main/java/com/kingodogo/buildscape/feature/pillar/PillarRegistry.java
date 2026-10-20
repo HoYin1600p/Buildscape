@@ -110,12 +110,16 @@ final class PillarRegistry {
     }
 
     public static String getDimensionKey(Level level) {
-        if (level == null) return "unknown";
+        if (level == null) {
+            return "unknown";
+        }
         return level.dimension().location().toString();
     }
 
     public String getIdForPosition(String posKey) {
-        if (posKey == null) return null;
+        if (posKey == null) {
+            return null;
+        }
         return positionIndex.get(posKey);
     }
 
@@ -124,7 +128,9 @@ final class PillarRegistry {
     }
 
     public PillarData getPillarData(String pillarId) {
-        if (pillarId == null) return null;
+        if (pillarId == null) {
+            return null;
+        }
         return pillarData.get(pillarId);
     }
 
@@ -144,8 +150,12 @@ final class PillarRegistry {
     }
 
     static boolean isSameFrameLocation(PillarData data, String dimension, BlockPos pos, Direction facing) {
-        if (!Objects.equals(data.dimension, dimension)) return false;
-        if (data.x != pos.getX() || data.y != pos.getY() || data.z != pos.getZ()) return false;
+        if (!Objects.equals(data.dimension, dimension)) {
+            return false;
+        }
+        if (data.x != pos.getX() || data.y != pos.getY() || data.z != pos.getZ()) {
+            return false;
+        }
         return data.facing == null || facing == null || data.facing.equals(facing.getSerializedName());
     }
 
@@ -168,7 +178,9 @@ final class PillarRegistry {
 
     boolean pruneRemovedFrames() {
         int excess = removedFrames.size() - MAX_REMOVED_FRAMES;
-        if (excess <= 0) return false;
+        if (excess <= 0) {
+            return false;
+        }
         List<PillarData> oldest = new ArrayList<>(removedFrames.values());
         oldest.sort(Comparator.comparingLong((PillarData data) -> data.modifiedTime)
                 .thenComparing(data -> data.id));
@@ -263,7 +275,9 @@ final class PillarRegistry {
     void deduplicateFramePositions() {
         Map<String, PillarData> frames = new HashMap<>();
         for (PillarData data : new ArrayList<>(pillarData.values())) {
-            if (!isItemFrameData(data)) continue;
+            if (!isItemFrameData(data)) {
+                continue;
+            }
             Direction facing = data.facing != null
                     ? Direction.byName(data.facing) : null;
             String key = positionKey(data.dimension, data.getBlockPos(), facing);
@@ -295,9 +309,13 @@ final class PillarRegistry {
 
     boolean removeOtherFrameAtPosition(String key, String id) {
         String previousId = positionIndex.get(key);
-        if (previousId == null || previousId.equals(id)) return false;
+        if (previousId == null || previousId.equals(id)) {
+            return false;
+        }
         PillarData previous = pillarData.get(previousId);
-        if (previous == null || !isItemFrameData(previous)) return false;
+        if (previous == null || !isItemFrameData(previous)) {
+            return false;
+        }
         pillarData.remove(previousId, previous);
         positionIndex.remove(key, previousId);
         return true;
@@ -308,7 +326,9 @@ final class PillarRegistry {
     }
 
     String reconcilePillarId(String savedId, String dimension, BlockPos pos, BlockPos basePos) {
-        if (savedId == null || savedId.isEmpty()) return savedId;
+        if (savedId == null || savedId.isEmpty()) {
+            return savedId;
+        }
         PillarData saved = pillarData.get(savedId);
         if (saved != null && Objects.equals(saved.dimension, dimension)
                 && saved.x == pos.getX() && saved.z == pos.getZ()
@@ -317,7 +337,9 @@ final class PillarRegistry {
         }
         for (BlockPos current = pos; current.getY() >= basePos.getY(); current = current.below()) {
             String authoritativeId = positionIndex.get(positionKey(dimension, current));
-            if (authoritativeId != null) return authoritativeId;
+            if (authoritativeId != null) {
+                return authoritativeId;
+            }
         }
         return savedId;
     }
@@ -329,17 +351,25 @@ final class PillarRegistry {
 
     boolean isRemovedFrame(String id, String dimension, BlockPos pos, Direction facing) {
         boolean hasId = id != null && !id.isEmpty();
-        if (hasId && removedFrames.containsKey(id)) return true;
-        if (getFrameIdForPosition(dimension, pos, facing) != null) return false;
+        if (hasId && removedFrames.containsKey(id)) {
+            return true;
+        }
+        if (getFrameIdForPosition(dimension, pos, facing) != null) {
+            return false;
+        }
         for (PillarData data : removedFrames.values()) {
-            if ((!hasId || id.equals(data.id)) && isSameFrameLocation(data, dimension, pos, facing)) return true;
+            if ((!hasId || id.equals(data.id)) && isSameFrameLocation(data, dimension, pos, facing)) {
+                return true;
+            }
         }
         return false;
     }
 
 
     static String getVariantPrefix(Level level, BlockPos pos) {
-        if (level == null || pos == null) return PillarIdManager.PREFIX_STONE + "-P";
+        if (level == null || pos == null) {
+            return PillarIdManager.PREFIX_STONE + "-P";
+        }
 
         if (
                 !level.isClientSide &&

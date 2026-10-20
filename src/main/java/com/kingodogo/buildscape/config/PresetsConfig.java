@@ -37,8 +37,9 @@ public class PresetsConfig {
     private File getConfigDir() {
         String configPath = (configDirectory != null ? configDirectory : Paths.get("config", "buildscape", "pillar")).toString();
         File dir = new File(configPath);
-        if (!dir.exists())
+        if (!dir.exists()) {
             dir.mkdirs();
+        }
         return dir;
     }
 
@@ -73,15 +74,21 @@ public class PresetsConfig {
             Map<String, Preset> loadedPresets = parsePresets(loaded, skippedEntries);
             Map<String, JsonElement> preserved = new HashMap<>();
             for (Map.Entry<String, JsonElement> entry : loaded.entrySet()) {
-                if (entry.getKey().equals(LAST_APPLIED_KEY) || entry.getKey().equals(UNNAMED_PRESET_KEY)) continue;
+                if (entry.getKey().equals(LAST_APPLIED_KEY) || entry.getKey().equals(UNNAMED_PRESET_KEY)) {
+                    continue;
+                }
                 Preset preset = loadedPresets.get(entry.getKey());
                 boolean partial = preset == null;
                 if (preset != null) {
                     for (JsonElement item : entry.getValue().getAsJsonObject().getAsJsonArray("items")) {
-                        if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) partial = true;
+                        if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) {
+                            partial = true;
+                        }
                     }
                 }
-                if (partial) preserved.put(entry.getKey(), entry.getValue().deepCopy());
+                if (partial) {
+                    preserved.put(entry.getKey(), entry.getValue().deepCopy());
+                }
             }
             if (skippedEntries[0]) {
                 PillarParticleConfig.backupUnreadableFile(file);
@@ -118,7 +125,9 @@ public class PresetsConfig {
 
     /** Number of custom presets that may exist besides Default (MaxCustomPresets in buildscape.cfg, default 4). */
     public int getCustomSlots() {
-        if (customSlotsOverride != null) return customSlotsOverride;
+        if (customSlotsOverride != null) {
+            return customSlotsOverride;
+        }
         try {
             return BuildscapeClientConfig.get().getMaxCustomPresets();
         } catch (Throwable e) {
@@ -133,7 +142,9 @@ public class PresetsConfig {
     public int getCustomPresetCount() {
         int count = 0;
         for (String k : getPresetKeys()) {
-            if (!k.equals(DEFAULT_PRESET_KEY) && !k.equals(UNNAMED_PRESET_KEY)) count++;
+            if (!k.equals(DEFAULT_PRESET_KEY) && !k.equals(UNNAMED_PRESET_KEY)) {
+                count++;
+            }
         }
         return count;
     }
@@ -250,7 +261,9 @@ public class PresetsConfig {
 
     public List<Preset> getPresets() {
         List<Preset> presetList = new ArrayList<>();
-        for (String key : getPresetKeys()) presetList.add(getPreset(key));
+        for (String key : getPresetKeys()) {
+            presetList.add(getPreset(key));
+        }
         return presetList;
     }
 
@@ -290,10 +303,18 @@ public class PresetsConfig {
 
         Preset previous = presets.put(key, new Preset(name, items));
         JsonElement preserved = preservedPresets.remove(key);
-        if (saveToDisk()) return true;
-        if (previous != null) presets.put(key, previous);
-        else presets.remove(key);
-        if (preserved != null) preservedPresets.put(key, preserved);
+        if (saveToDisk()) {
+            return true;
+        }
+        if (previous != null) {
+            presets.put(key, previous);
+        }
+        else {
+            presets.remove(key);
+        }
+        if (preserved != null) {
+            preservedPresets.put(key, preserved);
+        }
         return false;
     }
 
@@ -338,11 +359,19 @@ public class PresetsConfig {
         JsonElement preserved = preservedPresets.remove(key);
         if (previous != null || preserved != null) {
             String previousLastApplied = lastAppliedPreset;
-            if (key.equals(lastAppliedPreset)) lastAppliedPreset = DEFAULT_PRESET_KEY;
-            if (saveToDisk()) return true;
+            if (key.equals(lastAppliedPreset)) {
+                lastAppliedPreset = DEFAULT_PRESET_KEY;
+            }
+            if (saveToDisk()) {
+                return true;
+            }
             lastAppliedPreset = previousLastApplied;
-            if (previous != null) presets.put(key, previous);
-            if (preserved != null) preservedPresets.put(key, preserved);
+            if (previous != null) {
+                presets.put(key, previous);
+            }
+            if (preserved != null) {
+                preservedPresets.put(key, preserved);
+            }
             return false;
         }
         lastEditFailure = "missing";

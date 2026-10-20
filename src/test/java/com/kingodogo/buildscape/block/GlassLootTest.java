@@ -44,7 +44,9 @@ public class GlassLootTest {
                 "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black");
         var bases = new java.util.ArrayList<String>();
         bases.add("glass");
-        for (String color : colors) bases.add(color + "_stained_glass");
+        for (String color : colors) {
+            bases.add(color + "_stained_glass");
+        }
         for (String base : bases) {
             for (String suffix : List.of("_slab", "_vertical_slab")) {
                 String id = base + suffix;
@@ -97,7 +99,9 @@ public class GlassLootTest {
         for (JsonElement element : table.getAsJsonArray("pools")) {
             JsonObject pool = element.getAsJsonObject();
             assertEquals(id, 1, pool.get("rolls").getAsInt());
-            if (!matches(pool, silk, type)) continue;
+            if (!matches(pool, silk, type)) {
+                continue;
+            }
             for (JsonElement entry : pool.getAsJsonArray("entries")) {
                 count += entryCount(entry.getAsJsonObject(), id, silk, type);
             }
@@ -106,13 +110,19 @@ public class GlassLootTest {
     }
 
     private int entryCount(JsonObject entry, String id, boolean silk, String type) {
-        if (!matches(entry, silk, type)) return 0;
+        if (!matches(entry, silk, type)) {
+            return 0;
+        }
         String entryType = entry.get("type").getAsString();
-        if ("minecraft:empty".equals(entryType)) return 0;
+        if ("minecraft:empty".equals(entryType)) {
+            return 0;
+        }
         if ("minecraft:alternatives".equals(entryType)) {
             for (JsonElement element : entry.getAsJsonArray("children")) {
                 JsonObject child = element.getAsJsonObject();
-                if (matches(child, silk, type)) return entryCount(child, id, silk, type);
+                if (matches(child, silk, type)) {
+                    return entryCount(child, id, silk, type);
+                }
             }
             return 0;
         }
@@ -122,7 +132,9 @@ public class GlassLootTest {
         if (entry.has("functions")) {
             for (JsonElement element : entry.getAsJsonArray("functions")) {
                 JsonObject function = element.getAsJsonObject();
-                if ("minecraft:explosion_decay".equals(function.get("function").getAsString())) continue;
+                if ("minecraft:explosion_decay".equals(function.get("function").getAsString())) {
+                    continue;
+                }
                 assertEquals(id, "minecraft:set_count", function.get("function").getAsString());
                 if (matches(function, silk, type)) {
                     int value = function.get("count").getAsInt();
@@ -134,20 +146,26 @@ public class GlassLootTest {
     }
 
     private boolean matches(JsonObject owner, boolean silk, String type) {
-        if (!owner.has("conditions")) return true;
+        if (!owner.has("conditions")) {
+            return true;
+        }
         for (JsonElement element : owner.getAsJsonArray("conditions")) {
             JsonObject condition = element.getAsJsonObject();
             switch (condition.get("condition").getAsString()) {
                 case "minecraft:survives_explosion" -> { /* Ordinary block breaking has no explosion. */ }
                 case "minecraft:block_state_property" -> {
-                    if (!type.equals(condition.getAsJsonObject("properties").get("type").getAsString())) return false;
+                    if (!type.equals(condition.getAsJsonObject("properties").get("type").getAsString())) {
+                        return false;
+                    }
                 }
                 case "minecraft:match_tool" -> {
                     for (JsonElement enchantmentElement : condition.getAsJsonObject("predicate").getAsJsonArray("enchantments")) {
                         JsonObject enchantment = enchantmentElement.getAsJsonObject();
                         assertEquals("minecraft:silk_touch", enchantment.get("enchantment").getAsString());
                         assertEquals(1, enchantment.getAsJsonObject("levels").get("min").getAsInt());
-                        if (!silk) return false;
+                        if (!silk) {
+                            return false;
+                        }
                     }
                 }
                 default -> fail("Unsupported condition: " + condition);

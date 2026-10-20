@@ -151,7 +151,9 @@ public class PillarRegistryPacketTest {
     @Test
     public void syncBeyondOldRegistryLimitChunksAndCombines() throws Exception {
         List<PillarIdManager.PillarData> entries = new ArrayList<>();
-        for (int i = 0; i < 16_385; i++) entries.add(data("S-P" + i));
+        for (int i = 0; i < 16_385; i++) {
+            entries.add(data("S-P" + i));
+        }
         Method create = SyncPillarIdsPacket.class.getDeclaredMethod("createChunks", List.class);
         create.setAccessible(true);
         List<?> packets = (List<?>) create.invoke(null, entries);

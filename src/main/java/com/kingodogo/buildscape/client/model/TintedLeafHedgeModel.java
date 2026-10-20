@@ -52,7 +52,9 @@ public class TintedLeafHedgeModel implements BakedModel {
                 int[] vertexData = quad.getVertices().clone();
 
                 Direction dir = quad.getDirection();
-                if (dir == null) dir = Direction.NORTH;
+                if (dir == null) {
+                    dir = Direction.NORTH;
+                }
 
                 BakedQuad tintedQuad = new BakedQuad(
                         vertexData,

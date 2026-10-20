@@ -34,7 +34,9 @@ public class FireflyParticle extends TextureSheetParticle {
                 for (int cz = cellCoordinate(z - radius); cz <= cellCoordinate(z + radius); cz++) {
                     BlockPos cellPos = new BlockPos(cx, cy, cz);
                     Set<FireflyParticle> particles = ACTIVE_FIREFLIES.get(cellPos);
-                    if (particles == null) continue;
+                    if (particles == null) {
+                        continue;
+                    }
                     particles.removeIf(p -> !p.isAlive() || p.level != level
                             || level.getGameTime() - p.lastTickTime > 2L);
                     if (particles.isEmpty()) {
@@ -42,7 +44,9 @@ public class FireflyParticle extends TextureSheetParticle {
                         continue;
                     }
                     for (FireflyParticle p : particles) {
-                        if (!p.isAlive() || p.level != level) continue;
+                        if (!p.isAlive() || p.level != level) {
+                            continue;
+                        }
                         double dx = p.x - x;
                         double dy = p.y - y;
                         double dz = p.z - z;
@@ -93,18 +97,24 @@ public class FireflyParticle extends TextureSheetParticle {
         int cx = cellCoordinate(x);
         int cy = cellCoordinate(y);
         int cz = cellCoordinate(z);
-        if (cell != null && cell.getX() == cx && cell.getY() == cy && cell.getZ() == cz) return;
+        if (cell != null && cell.getX() == cx && cell.getY() == cy && cell.getZ() == cz) {
+            return;
+        }
         leaveCell();
         cell = new BlockPos(cx, cy, cz);
         ACTIVE_FIREFLIES.computeIfAbsent(cell, key -> ConcurrentHashMap.newKeySet()).add(this);
     }
 
     private void leaveCell() {
-        if (cell == null) return;
+        if (cell == null) {
+            return;
+        }
         Set<FireflyParticle> particles = ACTIVE_FIREFLIES.get(cell);
         if (particles != null) {
             particles.remove(this);
-            if (particles.isEmpty()) ACTIVE_FIREFLIES.remove(cell, particles);
+            if (particles.isEmpty()) {
+                ACTIVE_FIREFLIES.remove(cell, particles);
+            }
         }
         cell = null;
     }

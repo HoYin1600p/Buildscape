@@ -32,7 +32,9 @@ public class PillarMarkerRenderer {
 
     @SubscribeEvent
     public static void onWorldUnload(WorldEvent.Unload event) {
-        if (event.getWorld().isClientSide()) PillarMarkerManager.get().clearAll();
+        if (event.getWorld().isClientSide()) {
+            PillarMarkerManager.get().clearAll();
+        }
     }
 
     @SubscribeEvent

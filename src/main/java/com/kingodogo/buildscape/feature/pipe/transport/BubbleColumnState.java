@@ -33,7 +33,9 @@ public enum BubbleColumnState implements StringRepresentable {
     }
 
     public static BubbleColumnState byName(String name) {
-        if (name == null) return NONE;
+        if (name == null) {
+            return NONE;
+        }
         try {
             return BubbleColumnState.valueOf(name.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {

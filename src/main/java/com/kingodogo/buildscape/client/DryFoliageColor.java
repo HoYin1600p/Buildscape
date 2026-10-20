@@ -32,7 +32,9 @@ public class DryFoliageColor {
     public static final ColorResolver DRY_FOLIAGE_RESOLVER = (biome, x, z) -> get(biome.getBaseTemperature(), biome.getDownfall());
 
     public static synchronized void init() {
-        if (loaded) return;
+        if (loaded) {
+            return;
+        }
         reload(Minecraft.getInstance().getResourceManager());
     }
 

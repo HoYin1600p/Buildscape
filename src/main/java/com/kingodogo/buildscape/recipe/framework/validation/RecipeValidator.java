@@ -79,7 +79,9 @@ public class RecipeValidator {
     }
 
     public boolean checkDuplicate(ResourceLocation recipeId) {
-        if (recipeId == null) return true;
+        if (recipeId == null) {
+            return true;
+        }
         if (registeredIds.contains(recipeId)) {
             BuildScape.LOGGER.debug("BDRE Validator: Duplicate recipe ID detected: {}", recipeId);
             return true;

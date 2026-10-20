@@ -42,7 +42,9 @@ public class ColoredSmokeParticle extends TextureSheetParticle {
         }
         try {
             String hex = colorCode.substring(1);
-            if (hex.length() != 6) return new float[]{0.9f, 0.9f, 0.9f};
+            if (hex.length() != 6) {
+                return new float[]{0.9f, 0.9f, 0.9f};
+            }
             int r = Integer.parseInt(hex.substring(0, 2), 16);
             int g = Integer.parseInt(hex.substring(2, 4), 16);
             int b = Integer.parseInt(hex.substring(4, 6), 16);

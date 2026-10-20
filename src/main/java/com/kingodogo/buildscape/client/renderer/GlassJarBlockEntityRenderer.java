@@ -151,8 +151,9 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
             int overlay) {
         ItemStack liquidItem = blockEntity.getStoredLiquidItem();
         int level = blockEntity.getLiquidLevel();
-        if (liquidItem == null || liquidItem.isEmpty() || level <= 0)
+        if (liquidItem == null || liquidItem.isEmpty() || level <= 0) {
             return;
+        }
 
         ResourceLocation textureLoc = new ResourceLocation("minecraft", "block/water_still");
         int color = 0xFF3F76E4;
@@ -224,8 +225,9 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
         float g = ((color >> 8) & 0xFF) / 255.0F;
         float b = (color & 0xFF) / 255.0F;
         float a = ((color >> 24) & 0xFF) / 255.0F;
-        if (a == 0.0F)
+        if (a == 0.0F) {
             a = 0.88F;
+        }
 
         float u0 = sprite.getU0();
         float u1 = sprite.getU1();

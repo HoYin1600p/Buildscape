@@ -132,12 +132,24 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 VoxelShape outer = Shapes.block();
                 VoxelShape interior = Block.box(2, 2, 2, 14, 14, 14);
 
-                if (down)  interior = Shapes.or(interior, Block.box(2, 0, 2, 14, 2, 14));
-                if (up)    interior = Shapes.or(interior, Block.box(2, 14, 2, 14, 16, 14));
-                if (north) interior = Shapes.or(interior, Block.box(2, 2, 0, 14, 14, 2));
-                if (south) interior = Shapes.or(interior, Block.box(2, 2, 14, 14, 14, 16));
-                if (west)  interior = Shapes.or(interior, Block.box(0, 2, 2, 2, 14, 14));
-                if (east)  interior = Shapes.or(interior, Block.box(14, 2, 2, 16, 14, 14));
+                if (down) {
+                    interior = Shapes.or(interior, Block.box(2, 0, 2, 14, 2, 14));
+                }
+                if (up) {
+                    interior = Shapes.or(interior, Block.box(2, 14, 2, 14, 16, 14));
+                }
+                if (north) {
+                    interior = Shapes.or(interior, Block.box(2, 2, 0, 14, 14, 2));
+                }
+                if (south) {
+                    interior = Shapes.or(interior, Block.box(2, 2, 14, 14, 14, 16));
+                }
+                if (west) {
+                    interior = Shapes.or(interior, Block.box(0, 2, 2, 2, 14, 14));
+                }
+                if (east) {
+                    interior = Shapes.or(interior, Block.box(14, 2, 2, 16, 14, 14));
+                }
 
                 SHAPES_BY_MASK[mask] = Shapes.join(outer, interior, BooleanOp.ONLY_FIRST).optimize();
             }
@@ -168,7 +180,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide) return null;
+        if (level.isClientSide) {
+            return null;
+        }
         return type == ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY.get()
                 ? (lvl, pos, st, be) -> HollowLogBlockEntity.serverTick(lvl, pos, st, (HollowLogBlockEntity) be)
                 : null;
@@ -183,17 +197,25 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
         if (be instanceof HollowLogBlockEntity hollowBe) {
             String ft = hollowBe.getFluidType();
-            if ("water".equals(ft)) return Fluids.WATER;
-            if ("lava".equals(ft)) return Fluids.LAVA;
+            if ("water".equals(ft)) {
+                return Fluids.WATER;
+            }
+            if ("lava".equals(ft)) {
+                return Fluids.LAVA;
+            }
             if ("experience".equals(ft) || "buildscape:experience_still".equals(ft) || "buildscape:experience".equals(ft)) {
                 Fluid xp = ModFluids.experienceStillOrNull();
-                if (xp != null) return xp;
+                if (xp != null) {
+                    return xp;
+                }
             }
             if (!"none".equals(ft) && !ft.isEmpty()) {
                 ResourceLocation loc = ResourceLocation.tryParse(ft);
                 if (loc != null && ForgeRegistries.FLUIDS.containsKey(loc)) {
                     Fluid f = ForgeRegistries.FLUIDS.getValue(loc);
-                    if (f != null) return f;
+                    if (f != null) {
+                        return f;
+                    }
                 }
             }
         }
@@ -215,7 +237,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public static Fluid getFluidFromItem(ItemStack stack) {
-        if (stack.isEmpty()) return Fluids.EMPTY;
+        if (stack.isEmpty()) {
+            return Fluids.EMPTY;
+        }
         if (stack.getItem() instanceof BucketItem bucketItem && !(stack.getItem() instanceof MobBucketItem)) {
             return bucketItem.getFluid();
         }
@@ -223,8 +247,12 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public static ItemStack getFilledBucketForFluid(Fluid fluid) {
-        if (fluid == Fluids.WATER) return new ItemStack(Items.WATER_BUCKET);
-        if (fluid == Fluids.LAVA) return new ItemStack(Items.LAVA_BUCKET);
+        if (fluid == Fluids.WATER) {
+            return new ItemStack(Items.WATER_BUCKET);
+        }
+        if (fluid == Fluids.LAVA) {
+            return new ItemStack(Items.LAVA_BUCKET);
+        }
         if (ModFluids.isExperience(fluid)) {
             return new ItemStack(ModItems.EXPERIENCE_BUCKET.get());
         }
@@ -300,7 +328,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 }
 
                 SoundEvent sound = sourceFluid.getAttributes().getFillSound();
-                if (sound == null) sound = (sourceFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
+                if (sound == null) {
+                    sound = (sourceFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
+                }
                 level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
 
                 HollowPipeTransportManager.onBucketUsed(level, pos, state);
@@ -328,7 +358,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                         hollowBe.setLavaTicks(0);
                     } else {
                         ResourceLocation key = ForgeRegistries.FLUIDS.getKey(fluidInBucket);
-                        if (key != null) hollowBe.setFluidType(key.toString());
+                        if (key != null) {
+                            hollowBe.setFluidType(key.toString());
+                        }
                         hollowBe.setLavaTicks(0);
                     }
                     hollowBe.setChanged();
@@ -345,7 +377,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 }
 
                 SoundEvent sound = fluidInBucket.getAttributes().getEmptySound();
-                if (sound == null) sound = (fluidInBucket == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
+                if (sound == null) {
+                    sound = (fluidInBucket == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
+                }
                 level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
 
                 HollowPipeTransportManager.onBucketUsed(level, pos, state);
@@ -394,7 +428,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     public static boolean trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist,
                                         @Nullable Set<Direction> allowedDirections) {
-        if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY || level.isClientSide) return false;
+        if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY || level.isClientSide) {
+            return false;
+        }
         return trySpreadToWorld((LevelAccessor) level, pos, state, fluid, dist, allowedDirections);
     }
 
@@ -408,16 +444,24 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     static boolean trySpreadToWorld(LevelAccessor level, BlockPos pos, Fluid fluid, int dist,
                                    @Nullable Set<Direction> allowedDirections,
                                    Predicate<Direction> openEndpoint) {
-        if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY) return false;
+        if (!(fluid instanceof FlowingFluid) || fluid == Fluids.EMPTY) {
+            return false;
+        }
         boolean spread = false;
         int outflowAmount = WaterPipeTransport.MAX_HORIZONTAL_FLOW - dist;
         for (Direction dir : Direction.values()) {
-            if (dir == Direction.UP) continue;
-            if (allowedDirections != null && !allowedDirections.contains(dir)) continue;
+            if (dir == Direction.UP) {
+                continue;
+            }
+            if (allowedDirections != null && !allowedDirections.contains(dir)) {
+                continue;
+            }
             if (openEndpoint.test(dir)) {
                 boolean falling = dir == Direction.DOWN;
                 int amount = falling ? 8 : outflowAmount;
-                if (amount <= 0) continue;
+                if (amount <= 0) {
+                    continue;
+                }
                 spread |= spreadToWorldBlock(level, pos.relative(dir), fluid, amount, falling);
             }
         }
@@ -438,23 +482,39 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     @Nullable
     private static BlockState spillState(BlockGetter level, BlockPos pos, Fluid fluid, int amount, boolean falling) {
-        if (amount <= 0 || amount > 8 || !(fluid instanceof FlowingFluid flowing)) return null;
-        if (level instanceof LevelReader reader && !reader.hasChunkAt(pos)) return null;
+        if (amount <= 0 || amount > 8 || !(fluid instanceof FlowingFluid flowing)) {
+            return null;
+        }
+        if (level instanceof LevelReader reader && !reader.hasChunkAt(pos)) {
+            return null;
+        }
         BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock) return null;
-        if (state.getFluidState().isSource()) return null;
+        if (state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock) {
+            return null;
+        }
+        if (state.getFluidState().isSource()) {
+            return null;
+        }
         Fluid existing = state.getFluidState().getType();
-        if (existing != Fluids.EMPTY && !fluid.isSame(existing) && ModFluids.cannotMix(fluid, existing)) return null;
+        if (existing != Fluids.EMPTY && !fluid.isSame(existing) && ModFluids.cannotMix(fluid, existing)) {
+            return null;
+        }
         // Outlets emit flowing fluid; vanilla waterlogging requires a source.
-        if (state.getBlock() instanceof LiquidBlockContainer) return null;
-        if (!state.isAir() && !state.canBeReplaced(fluid) && !(state.getBlock() instanceof LiquidBlock)) return null;
+        if (state.getBlock() instanceof LiquidBlockContainer) {
+            return null;
+        }
+        if (!state.isAir() && !state.canBeReplaced(fluid) && !(state.getBlock() instanceof LiquidBlock)) {
+            return null;
+        }
         BlockState target = flowing.getFlowing(amount, falling).createLegacyBlock();
         return target.isAir() || target.equals(state) ? null : target;
     }
 
     static boolean spreadToWorldBlock(LevelAccessor level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
         BlockState target = spillState(level, neighborPos, fluid, amount, falling);
-        if (target == null || !level.setBlock(neighborPos, target, 3)) return false;
+        if (target == null || !level.setBlock(neighborPos, target, 3)) {
+            return false;
+        }
         Fluid placedFluid = target.getFluidState().getType();
         level.scheduleTick(neighborPos, placedFluid, placedFluid.getTickDelay(level));
         return true;
@@ -489,8 +549,12 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public static boolean hasVerticalChannel(BlockState state) {
-        if (state.hasProperty(UP) && state.getValue(UP)) return true;
-        if (state.hasProperty(DOWN) && state.getValue(DOWN)) return true;
+        if (state.hasProperty(UP) && state.getValue(UP)) {
+            return true;
+        }
+        if (state.hasProperty(DOWN) && state.getValue(DOWN)) {
+            return true;
+        }
         if (state.hasProperty(AXIS) && state.getValue(AXIS) == Direction.Axis.Y) {
             boolean north = state.hasProperty(NORTH) && state.getValue(NORTH);
             boolean south = state.hasProperty(SOUTH) && state.getValue(SOUTH);
@@ -532,9 +596,15 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public static Direction.Axis getPrimaryAxis(BlockState state) {
-        if (state.getValue(DOWN) || state.getValue(UP)) return Direction.Axis.Y;
-        if (state.getValue(NORTH) || state.getValue(SOUTH)) return Direction.Axis.Z;
-        if (state.getValue(WEST) || state.getValue(EAST)) return Direction.Axis.X;
+        if (state.getValue(DOWN) || state.getValue(UP)) {
+            return Direction.Axis.Y;
+        }
+        if (state.getValue(NORTH) || state.getValue(SOUTH)) {
+            return Direction.Axis.Z;
+        }
+        if (state.getValue(WEST) || state.getValue(EAST)) {
+            return Direction.Axis.X;
+        }
         return state.getValue(AXIS);
     }
 
@@ -550,12 +620,24 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
 
         int mask = 0;
-        if (state.getValue(DOWN))  mask |= (1 << Direction.DOWN.get3DDataValue());
-        if (state.getValue(UP))    mask |= (1 << Direction.UP.get3DDataValue());
-        if (state.getValue(NORTH)) mask |= (1 << Direction.NORTH.get3DDataValue());
-        if (state.getValue(SOUTH)) mask |= (1 << Direction.SOUTH.get3DDataValue());
-        if (state.getValue(WEST))  mask |= (1 << Direction.WEST.get3DDataValue());
-        if (state.getValue(EAST))  mask |= (1 << Direction.EAST.get3DDataValue());
+        if (state.getValue(DOWN)) {
+            mask |= (1 << Direction.DOWN.get3DDataValue());
+        }
+        if (state.getValue(UP)) {
+            mask |= (1 << Direction.UP.get3DDataValue());
+        }
+        if (state.getValue(NORTH)) {
+            mask |= (1 << Direction.NORTH.get3DDataValue());
+        }
+        if (state.getValue(SOUTH)) {
+            mask |= (1 << Direction.SOUTH.get3DDataValue());
+        }
+        if (state.getValue(WEST)) {
+            mask |= (1 << Direction.WEST.get3DDataValue());
+        }
+        if (state.getValue(EAST)) {
+            mask |= (1 << Direction.EAST.get3DDataValue());
+        }
 
         if (mask >= 0 && mask < 64) {
             return SHAPES_BY_MASK[mask];
@@ -632,7 +714,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                         hollowBe.setLavaTicks(0);
                     } else if (worldFluid != Fluids.WATER) {
                         ResourceLocation key = ForgeRegistries.FLUIDS.getKey(worldFluid);
-                        if (key != null) hollowBe.setFluidType(key.toString());
+                        if (key != null) {
+                            hollowBe.setFluidType(key.toString());
+                        }
                         hollowBe.setLavaTicks(0);
                     }
                     hollowBe.setChanged();
@@ -708,7 +792,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             PipeFlowState flow = hollowBe.getPipeFlowState();
             if (flow != null && flow.hasFluid()) {
                 Fluid fluid = WorldPipeTopologyAccess.fluidById(flow.getFluidId());
-                if (fluid instanceof FlowingFluid) level.scheduleTick(pos, this, fluid.getTickDelay(level));
+                if (fluid instanceof FlowingFluid) {
+                    level.scheduleTick(pos, this, fluid.getTickDelay(level));
+                }
             }
         }
     }

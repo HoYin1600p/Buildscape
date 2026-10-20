@@ -54,15 +54,23 @@ final class PillarWorldSync {
             int skippedCount = 0;
 
             for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
+                if (level == null) {
+                    continue;
+                }
 
-                if (!server.isRunning()) break;
+                if (!server.isRunning()) {
+                    break;
+                }
 
                 String dimensionKey = PillarIdManager.getDimensionKey(level);
 
                 for (PillarData data : m.registry.pillarData.values()) {
-                    if (data == null) continue;
-                    if (!data.dimension.equals(dimensionKey)) continue;
+                    if (data == null) {
+                        continue;
+                    }
+                    if (!data.dimension.equals(dimensionKey)) {
+                        continue;
+                    }
 
                     try {
                         BlockPos pos = data.getBlockPos();
@@ -118,9 +126,13 @@ final class PillarWorldSync {
         String dimension = PillarIdManager.getDimensionKey(level);
         Map<ChunkPos, List<PillarData>> chunks = new HashMap<>();
         for (PillarData data : m.registry.pillarData.values()) {
-            if (!PillarRegistry.isItemFrameData(data) || !Objects.equals(dimension, data.dimension)) continue;
+            if (!PillarRegistry.isItemFrameData(data) || !Objects.equals(dimension, data.dimension)) {
+                continue;
+            }
             BlockPos pos = data.getBlockPos();
-            if (!level.hasChunkAt(pos) || !serverLevel.areEntitiesLoaded(ChunkPos.asLong(pos))) continue;
+            if (!level.hasChunkAt(pos) || !serverLevel.areEntitiesLoaded(ChunkPos.asLong(pos))) {
+                continue;
+            }
             chunks.computeIfAbsent(new ChunkPos(pos), key -> new ArrayList<>()).add(data);
         }
         boolean changed = false;
@@ -152,7 +164,9 @@ final class PillarWorldSync {
         }
         if (changed) {
             m.registry.rebuildPositionIndex();
-            if (m.registry.pillarData.isEmpty()) m.allowEmptySave = true;
+            if (m.registry.pillarData.isEmpty()) {
+                m.allowEmptySave = true;
+            }
             m.requestSave();
         }
     }
@@ -173,13 +187,19 @@ final class PillarWorldSync {
             int patternSyncedCount = 0;
 
             for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
+                if (level == null) {
+                    continue;
+                }
 
                 String dimensionKey = PillarIdManager.getDimensionKey(level);
 
                 for (PillarData data : m.registry.pillarData.values()) {
-                    if (data == null) continue;
-                    if (!data.dimension.equals(dimensionKey)) continue;
+                    if (data == null) {
+                        continue;
+                    }
+                    if (!data.dimension.equals(dimensionKey)) {
+                        continue;
+                    }
 
                     int existingColorCount = (data.dyeColors != null) ? data.dyeColors.size() : 0;
 
@@ -289,13 +309,19 @@ final class PillarWorldSync {
             int loadedCount = 0;
 
             for (ServerLevel level : server.getAllLevels()) {
-                if (level == null) continue;
+                if (level == null) {
+                    continue;
+                }
 
                 String dimensionKey = PillarIdManager.getDimensionKey(level);
 
                 for (PillarData data : m.registry.pillarData.values()) {
-                    if (data == null) continue;
-                    if (!data.dimension.equals(dimensionKey)) continue;
+                    if (data == null) {
+                        continue;
+                    }
+                    if (!data.dimension.equals(dimensionKey)) {
+                        continue;
+                    }
 
                     try {
                         BlockPos pos = data.getBlockPos();
@@ -408,7 +434,9 @@ final class PillarWorldSync {
         Integer nbtMaxColor = pillarBE.getMaxParticleColor();
         if (nbtMaxColor == null && data.max_particle_color == null) {
             List<String> nbtColors = pillarBE.getParticleColors();
-            if (nbtColors != null && !nbtColors.isEmpty()) nbtMaxColor = nbtColors.size();
+            if (nbtColors != null && !nbtColors.isEmpty()) {
+                nbtMaxColor = nbtColors.size();
+            }
         }
         if (nbtMaxColor != null && !nbtMaxColor.equals(data.max_particle_color)) {
             data.max_particle_color = nbtMaxColor;

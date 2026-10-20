@@ -15,7 +15,9 @@ final class FabricMiningSpeed {
 
     static float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
         float hardness = state.getDestroySpeed(level, pos);
-        if (hardness == -1.0F) return 0.0F;
+        if (hardness == -1.0F) {
+            return 0.0F;
+        }
         ItemStack tool = player.getMainHandItem();
         boolean fabricTool = tool.getItem() instanceof ShearsItem || tool.getItem() instanceof HoeItem;
         float fabricSpeed = 2.5F;
@@ -27,8 +29,12 @@ final class FabricMiningSpeed {
         float toolSpeed = tool.isEmpty() ? 1.0F : tool.getDestroySpeed(state);
         int efficiency = EnchantmentHelper.getBlockEfficiency(player);
         float bonus = efficiency > 0 && !tool.isEmpty() ? efficiency * efficiency + 1.0F : 0.0F;
-        if (fabricTool) fabricSpeed += bonus;
-        if (toolSpeed > 1.0F) toolSpeed += bonus;
+        if (fabricTool) {
+            fabricSpeed += bonus;
+        }
+        if (toolSpeed > 1.0F) {
+            toolSpeed += bonus;
+        }
         float speed = player.getDigSpeed(state, pos) * fabricSpeed / Math.max(1.0F, toolSpeed);
         return speed / hardness / (fabricTool ? 30.0F : 100.0F);
     }

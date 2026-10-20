@@ -262,7 +262,9 @@ public class PillarBlock
         }
 
         BlockEntity be = level.getBlockEntity(pos);
-        if (!(be instanceof PillarBlockEntity newPillarBE)) return;
+        if (!(be instanceof PillarBlockEntity newPillarBE)) {
+            return;
+        }
 
         BlockPos above = pos.above();
         BlockPos below = pos.below();
@@ -452,7 +454,9 @@ public class PillarBlock
                                     );
                                 }
                             }
-                            if (current.equals(top)) break;
+                            if (current.equals(top)) {
+                                break;
+                            }
                             current = current.above();
                         }
                     }
@@ -960,10 +964,14 @@ public class PillarBlock
     }
 
     private void enforceSingleItemPerStack(Level level, BlockPos anyPosInStack) {
-        if (level.isClientSide) return;
+        if (level.isClientSide) {
+            return;
+        }
         BlockPos top = findTopBlock(level, anyPosInStack);
         BlockPos bottom = findBottomBlock(level, anyPosInStack);
-        if (!(level.getBlockEntity(top) instanceof PillarBlockEntity topBE)) return;
+        if (!(level.getBlockEntity(top) instanceof PillarBlockEntity topBE)) {
+            return;
+        }
 
         ItemStack retained = topBE.getDisplayedItem().copy();
         BlockPos current = bottom;

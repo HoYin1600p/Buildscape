@@ -146,22 +146,36 @@ public class PillarBlockEntity extends SyncedBlockEntity {
             BlockState state,
             PillarBlockEntity be
     ) {
-        if (level == null || !level.isClientSide) return;
-        if (!PillarClientParticles.isWithinRange(pos)) return;
-        if (!be.hasDisplayItem()) return;
+        if (level == null || !level.isClientSide) {
+            return;
+        }
+        if (!PillarClientParticles.isWithinRange(pos)) {
+            return;
+        }
+        if (!be.hasDisplayItem()) {
+            return;
+        }
 
         long time = level.getGameTime();
-        if ((time - be.lastParticleTick) < 5) return;
+        if ((time - be.lastParticleTick) < 5) {
+            return;
+        }
 
         PillarParticleConfig cfg = PillarParticleConfig.peek();
-        if (cfg.particle_density <= 0) return;
-        if (!cfg.matches(be.displayedItem)) return;
+        if (cfg.particle_density <= 0) {
+            return;
+        }
+        if (!cfg.matches(be.displayedItem)) {
+            return;
+        }
 
         String pattern = be.getParticlePattern();
         if (pattern == null || pattern.isEmpty() || ParticlePatterns.DEFAULT.equals(pattern)) {
             pattern = cfg.pattern != null ? cfg.pattern : ParticlePatterns.RING;
         }
-        if (ParticlePatterns.NONE.equals(pattern)) return;
+        if (ParticlePatterns.NONE.equals(pattern)) {
+            return;
+        }
         PillarParticleSettings settings = new PillarParticleSettings(
                 pattern,
                 be.usePattern != null ? be.usePattern : cfg.use_pattern,
@@ -178,7 +192,9 @@ public class PillarBlockEntity extends SyncedBlockEntity {
                         ? Math.round(baseCount * settings.intensity())
                         : baseCount
         ));
-        if (count == 0) return;
+        if (count == 0) {
+            return;
+        }
 
         Random rand = level.random;
         double centerX = pos.getX() + 0.5;

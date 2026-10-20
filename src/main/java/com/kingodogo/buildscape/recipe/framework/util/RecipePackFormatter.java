@@ -61,9 +61,13 @@ public class RecipePackFormatter {
                 String[] lines = prettyVal.split("\r?\n");
                 StringBuilder indented = new StringBuilder();
                 for (int l = 0; l < lines.length; l++) {
-                    if (l > 0) indented.append("  ");
+                    if (l > 0) {
+                        indented.append("  ");
+                    }
                     indented.append(lines[l]);
-                    if (l < lines.length - 1) indented.append("\n");
+                    if (l < lines.length - 1) {
+                        indented.append("\n");
+                    }
                 }
                 sb.append("  \"").append(key).append("\": ").append(indented).append(comma).append("\n");
             } else if (val.isJsonArray()) {
@@ -115,7 +119,9 @@ public class RecipePackFormatter {
             }
             case BEGIN_ARRAY -> {
                 reader.beginArray();
-                while (reader.hasNext()) validateValue(reader);
+                while (reader.hasNext()) {
+                    validateValue(reader);
+                }
                 reader.endArray();
             }
             case STRING, NUMBER, BOOLEAN, NULL -> reader.skipValue();

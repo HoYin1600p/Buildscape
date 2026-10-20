@@ -100,7 +100,9 @@ public class CosmeticManager {
 
     public boolean supportsColor(String cosmeticId) {
         CosmeticMetadata meta = cosmeticMetadata.get(cosmeticId);
-        if (meta == null) return false;
+        if (meta == null) {
+            return false;
+        }
 
         if (meta.type() == CosmeticType.PARTICLE_WINGS) {
             return true;
@@ -193,8 +195,9 @@ public class CosmeticManager {
     }
 
     public boolean isParticleTrail(String cosmeticId) {
-        if (cosmeticId == null || cosmeticId.isEmpty())
+        if (cosmeticId == null || cosmeticId.isEmpty()) {
             return false;
+        }
 
         CosmeticMetadata metadata = cosmeticMetadata.get(cosmeticId);
         if (metadata != null && metadata.type == CosmeticType.PARTICLE_TRAIL) {

@@ -48,10 +48,14 @@ public class CopperRegistryMappingTest {
         assertTrue("weathering families were found", families > 0);
 
         Map<String, String> ids = new HashMap<>();
-        for (String id : registry.values()) ids.put(id, id);
+        for (String id : registry.values()) {
+            ids.put(id, id);
+        }
         int copperBlocks = 0;
         for (String id : registry.values()) {
-            if (!id.contains("copper")) continue;
+            if (!id.contains("copper")) {
+                continue;
+            }
             copperBlocks++;
             // Copper pillars are BuildScape pillars (registry entry, colours, displayed item); swapping their block
             // would run pillar removal, so they keep their stage like in 4.0.5.

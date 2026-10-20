@@ -65,23 +65,57 @@ public abstract class ComposterBlockMixin extends Block {
                     Block block = blockItem.getBlock();
                     PlanterType newType = null;
 
-                    if (block == Blocks.DIRT) newType = PlanterType.DIRT;
-                    else if (block == Blocks.COARSE_DIRT) newType = PlanterType.COARSE_DIRT;
-                    else if (block == ModBlocks.MUD.get()) newType = PlanterType.MUD;
-                    else if (block == Blocks.MOSS_BLOCK) newType = PlanterType.MOSS_BLOCK;
-                    else if (block == Blocks.ROOTED_DIRT) newType = PlanterType.ROOTED_DIRT;
-                    else if (block == ModBlocks.RED_MOSS_BLOCK.get()) newType = PlanterType.RED_MOSS_BLOCK;
-                    else if (block == ModBlocks.YELLOW_MOSS_BLOCK.get()) newType = PlanterType.YELLOW_MOSS_BLOCK;
-                    else if (block == ModBlocks.ORANGE_MOSS_BLOCK.get()) newType = PlanterType.ORANGE_MOSS_BLOCK;
-                    else if (block == ModBlocks.PALE_MOSS_BLOCK.get()) newType = PlanterType.PALE_MOSS_BLOCK;
-                    else if (block == ModBlocks.MUDDY_MANGROVE_ROOTS.get()) newType = PlanterType.MUDDY_MANGROVE_ROOTS;
-                    else if (block == Blocks.GRASS_BLOCK) newType = PlanterType.GRASS_BLOCK;
-                    else if (block == ModBlocks.SNOWY_GRASS_BLOCK.get()) newType = PlanterType.SNOWY_GRASS_BLOCK;
-                    else if (block == Blocks.MYCELIUM) newType = PlanterType.MYCELIUM;
-                    else if (block == Blocks.PODZOL) newType = PlanterType.PODZOL;
-                    else if (block == Blocks.CRIMSON_NYLIUM) newType = PlanterType.CRIMSON_NYLIUM;
-                    else if (block == Blocks.WARPED_NYLIUM) newType = PlanterType.WARPED_NYLIUM;
-                    else if (block == Blocks.SAND) newType = PlanterType.SAND;
+                    if (block == Blocks.DIRT) {
+                        newType = PlanterType.DIRT;
+                    }
+                    else if (block == Blocks.COARSE_DIRT) {
+                        newType = PlanterType.COARSE_DIRT;
+                    }
+                    else if (block == ModBlocks.MUD.get()) {
+                        newType = PlanterType.MUD;
+                    }
+                    else if (block == Blocks.MOSS_BLOCK) {
+                        newType = PlanterType.MOSS_BLOCK;
+                    }
+                    else if (block == Blocks.ROOTED_DIRT) {
+                        newType = PlanterType.ROOTED_DIRT;
+                    }
+                    else if (block == ModBlocks.RED_MOSS_BLOCK.get()) {
+                        newType = PlanterType.RED_MOSS_BLOCK;
+                    }
+                    else if (block == ModBlocks.YELLOW_MOSS_BLOCK.get()) {
+                        newType = PlanterType.YELLOW_MOSS_BLOCK;
+                    }
+                    else if (block == ModBlocks.ORANGE_MOSS_BLOCK.get()) {
+                        newType = PlanterType.ORANGE_MOSS_BLOCK;
+                    }
+                    else if (block == ModBlocks.PALE_MOSS_BLOCK.get()) {
+                        newType = PlanterType.PALE_MOSS_BLOCK;
+                    }
+                    else if (block == ModBlocks.MUDDY_MANGROVE_ROOTS.get()) {
+                        newType = PlanterType.MUDDY_MANGROVE_ROOTS;
+                    }
+                    else if (block == Blocks.GRASS_BLOCK) {
+                        newType = PlanterType.GRASS_BLOCK;
+                    }
+                    else if (block == ModBlocks.SNOWY_GRASS_BLOCK.get()) {
+                        newType = PlanterType.SNOWY_GRASS_BLOCK;
+                    }
+                    else if (block == Blocks.MYCELIUM) {
+                        newType = PlanterType.MYCELIUM;
+                    }
+                    else if (block == Blocks.PODZOL) {
+                        newType = PlanterType.PODZOL;
+                    }
+                    else if (block == Blocks.CRIMSON_NYLIUM) {
+                        newType = PlanterType.CRIMSON_NYLIUM;
+                    }
+                    else if (block == Blocks.WARPED_NYLIUM) {
+                        newType = PlanterType.WARPED_NYLIUM;
+                    }
+                    else if (block == Blocks.SAND) {
+                        newType = PlanterType.SAND;
+                    }
 
                     if (newType != null) {
                         if (!level.isClientSide) {

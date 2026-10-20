@@ -24,12 +24,24 @@ public class TransparentMultiBufferSource implements MultiBufferSource {
                 || renderType == Sheets.translucentCullBlockSheet()) {
             return Sheets.translucentItemSheet();
         }
-        if (renderType == Sheets.chestSheet()) return RenderType.entityTranslucentCull(Sheets.CHEST_SHEET);
-        if (renderType == Sheets.shulkerBoxSheet()) return RenderType.entityTranslucentCull(Sheets.SHULKER_SHEET);
-        if (renderType == Sheets.signSheet()) return RenderType.entityTranslucentCull(Sheets.SIGN_SHEET);
-        if (renderType == Sheets.bannerSheet()) return RenderType.entityTranslucentCull(Sheets.BANNER_SHEET);
-        if (renderType == Sheets.shieldSheet()) return RenderType.entityTranslucentCull(Sheets.SHIELD_SHEET);
-        if (renderType == Sheets.bedSheet()) return RenderType.entityTranslucentCull(Sheets.BED_SHEET);
+        if (renderType == Sheets.chestSheet()) {
+            return RenderType.entityTranslucentCull(Sheets.CHEST_SHEET);
+        }
+        if (renderType == Sheets.shulkerBoxSheet()) {
+            return RenderType.entityTranslucentCull(Sheets.SHULKER_SHEET);
+        }
+        if (renderType == Sheets.signSheet()) {
+            return RenderType.entityTranslucentCull(Sheets.SIGN_SHEET);
+        }
+        if (renderType == Sheets.bannerSheet()) {
+            return RenderType.entityTranslucentCull(Sheets.BANNER_SHEET);
+        }
+        if (renderType == Sheets.shieldSheet()) {
+            return RenderType.entityTranslucentCull(Sheets.SHIELD_SHEET);
+        }
+        if (renderType == Sheets.bedSheet()) {
+            return RenderType.entityTranslucentCull(Sheets.BED_SHEET);
+        }
         return renderType;
     }
 

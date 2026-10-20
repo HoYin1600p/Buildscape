@@ -377,7 +377,9 @@ public class ClientSetup {
 
             blockColors.register(
                     (state, reader, pos, tintIndex) -> {
-                        if (tintIndex != 0) return -1;
+                        if (tintIndex != 0) {
+                            return -1;
+                        }
                         if (reader != null && pos != null) {
                             return BiomeColors.getAverageFoliageColor(reader, pos);
                         }
@@ -387,7 +389,9 @@ public class ClientSetup {
 
             blockColors.register(
                     (state, reader, pos, tintIndex) -> {
-                        if (tintIndex != 0) return -1;
+                        if (tintIndex != 0) {
+                            return -1;
+                        }
                         if (reader != null && pos != null) {
                             return DryFoliageColor.getDryFoliageColor(reader, pos);
                         }
@@ -606,11 +610,15 @@ public class ClientSetup {
 
             itemColors.register(
                     (stack, tintIndex) -> {
-                        if (tintIndex != 1) return -1;
+                        if (tintIndex != 1) {
+                            return -1;
+                        }
                         CompoundTag tag = stack.getTagElement(NbtKeys.EXPLOSION);
                         int[] colors = tag != null ? tag.getIntArray(NbtKeys.COLORS) : null;
                         if (colors != null && colors.length > 0) {
-                            if (colors.length == 1) return colors[0];
+                            if (colors.length == 1) {
+                                return colors[0];
+                            }
                             int r = 0, g = 0, b = 0;
                             for (int c : colors) {
                                 r += (c >> 16) & 0xFF;

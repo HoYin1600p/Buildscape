@@ -32,7 +32,9 @@ public abstract class PillarOutlineRendererMixin {
     @Redirect(method = "renderLevel", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/PostChain;process(F)V"))
     private void buildscape$processOutlines(PostChain chain, float partialTick) {
-        if (chain == entityEffect) buildscape$outlineProcessed = true;
+        if (chain == entityEffect) {
+            buildscape$outlineProcessed = true;
+        }
         chain.process(partialTick);
     }
 

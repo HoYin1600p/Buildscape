@@ -45,7 +45,9 @@ public class GameRuleDefaultsRegressionTest {
         }
         Field registry = null;
         for (Field field : GameRules.class.getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers()) && Map.class.isAssignableFrom(field.getType())) registry = field;
+            if (Modifier.isStatic(field.getModifiers()) && Map.class.isAssignableFrom(field.getType())) {
+                registry = field;
+            }
         }
         assertNotNull(registry);
         registry.setAccessible(true);
@@ -55,7 +57,9 @@ public class GameRuleDefaultsRegressionTest {
         for (Method method : GameRules.BooleanValue.class.getDeclaredMethods()) {
             if (method.getReturnType() == GameRules.Type.class && method.getParameterCount() == 2
                     && method.getParameterTypes()[0] == boolean.class
-                    && method.getParameterTypes()[1] == BiConsumer.class) factory = method;
+                    && method.getParameterTypes()[1] == BiConsumer.class) {
+                factory = method;
+            }
         }
         assertNotNull(factory);
         factory.setAccessible(true);
@@ -91,7 +95,9 @@ public class GameRuleDefaultsRegressionTest {
             types.clear();
             types.putAll(previousTypes);
             instance.set(null, previousConfig);
-            for (Map.Entry<Field, Object> entry : previousFields.entrySet()) entry.getKey().set(null, entry.getValue());
+            for (Map.Entry<Field, Object> entry : previousFields.entrySet()) {
+                entry.getKey().set(null, entry.getValue());
+            }
         }
     }
 }

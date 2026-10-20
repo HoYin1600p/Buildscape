@@ -53,11 +53,17 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
             this.filterData = new ContainerData() {
                 @Override
                 public int get(int index) {
-                    if (index < 0 || index >= filters.size() || filters.get(index).isEmpty()) return 0;
+                    if (index < 0 || index >= filters.size() || filters.get(index).isEmpty()) {
+                        return 0;
+                    }
                     String filterStr = filters.get(index);
-                    if (!ResourceLocation.isValidResourceLocation(filterStr)) return 0;
+                    if (!ResourceLocation.isValidResourceLocation(filterStr)) {
+                        return 0;
+                    }
                     Item item = Registry.ITEM.get(new ResourceLocation(filterStr));
-                    if (item == null || item == Items.AIR) return 0;
+                    if (item == null || item == Items.AIR) {
+                        return 0;
+                    }
                     return Registry.ITEM.getId(item) + 1;
                 }
 
@@ -112,19 +118,29 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        if (index < 0 || index >= slots.size()) return ItemStack.EMPTY;
+        if (index < 0 || index >= slots.size()) {
+            return ItemStack.EMPTY;
+        }
         Slot slot = slots.get(index);
-        if (!slot.hasItem()) return ItemStack.EMPTY;
+        if (!slot.hasItem()) {
+            return ItemStack.EMPTY;
+        }
 
         ItemStack source = slot.getItem();
         ItemStack original = source.copy();
         boolean moved = index < POUCH_SLOTS
                 ? moveItemStackTo(source, POUCH_SLOTS, slots.size(), true)
                 : moveItemStackTo(source, 0, POUCH_SLOTS, false);
-        if (!moved) return ItemStack.EMPTY;
+        if (!moved) {
+            return ItemStack.EMPTY;
+        }
 
-        if (source.isEmpty()) slot.set(ItemStack.EMPTY);
-        else slot.setChanged();
+        if (source.isEmpty()) {
+            slot.set(ItemStack.EMPTY);
+        }
+        else {
+            slot.setChanged();
+        }
         slot.onTake(player, source);
         return original;
     }
@@ -138,9 +154,13 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
     @Nullable
     @Override
     public Item buildscape$getFilterItem(int menuSlot) {
-        if (menuSlot < 0 || menuSlot >= POUCH_SLOTS) return null;
+        if (menuSlot < 0 || menuSlot >= POUCH_SLOTS) {
+            return null;
+        }
         int rawId = (filterData.get(menuSlot) & 0xFFFF) - 1;
-        if (rawId < 0) return null;
+        if (rawId < 0) {
+            return null;
+        }
         Item item = Registry.ITEM.byId(rawId);
         return (item == null || item == Items.AIR) ? null : item;
     }

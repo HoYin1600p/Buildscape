@@ -18,8 +18,12 @@ public final class CushionSupport {
      */
     public static BlockPos supportingPos(BlockPos vanilla, double x, double y, double z, Predicate<BlockPos> isCushion) {
         int probeY = Mth.floor(y - 0.01D);
-        if (probeY == vanilla.getY()) return vanilla;
-        if (isCushion.test(vanilla)) return vanilla;
+        if (probeY == vanilla.getY()) {
+            return vanilla;
+        }
+        if (isCushion.test(vanilla)) {
+            return vanilla;
+        }
         BlockPos probe = new BlockPos(Mth.floor(x), probeY, Mth.floor(z));
         return isCushion.test(probe) ? probe : vanilla;
     }

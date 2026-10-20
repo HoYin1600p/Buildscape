@@ -37,7 +37,9 @@ public class DefaultPillarItems405Test {
             }
             assertEquals(items, offered);
             assertEquals(410, template.get("defaults_version").getAsInt());
-            if (vaultLoaded) assertEquals(410, template.get("vault_defaults_version").getAsInt());
+            if (vaultLoaded) {
+                assertEquals(410, template.get("vault_defaults_version").getAsInt());
+            }
         }
     }
 
@@ -220,12 +222,16 @@ public class DefaultPillarItems405Test {
                 document.remove("vault_defaults_version");
                 document.addProperty("defaults_version", document.get("defaults_version").getAsInt() + versionOffset);
                 assertTrue(document.getAsJsonArray("items").remove(new com.google.gson.JsonPrimitive("buildscape:confetti")));
-                if (vault) assertTrue(document.getAsJsonArray("items").remove(
+                if (vault) {
+                    assertTrue(document.getAsJsonArray("items").remove(
                         new com.google.gson.JsonPrimitive("#the_vault:companion_relic")));
+                }
                 String edited = document.toString();
                 Files.writeString(file, edited);
                 assertRemovedWithoutRewriting(dir, vault, "buildscape:confetti", edited);
-                if (vault) assertRemovedWithoutRewriting(dir, true, "#the_vault:companion_relic", edited);
+                if (vault) {
+                    assertRemovedWithoutRewriting(dir, true, "#the_vault:companion_relic", edited);
+                }
             }
         }
     }

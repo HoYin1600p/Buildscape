@@ -69,7 +69,9 @@ public final class PipeSpillTest {
             if (distance >= length - 1e-6) {
                 near(y, base, "taper joins original surface"); taperSeen = true;
             }
-            if (across == 0 || across == 1) near(y, base, "no side-edge cracks");
+            if (across == 0 || across == 1) {
+                near(y, base, "no side-edge cracks");
+            }
             near(v.u, x, "vanilla U retained"); near(v.v, z, "vanilla V retained");
             require(v.red == 47 && v.green == 105 && v.blue == 191 && v.alpha == 213,
                     "biome tint and alpha retained");
@@ -84,7 +86,9 @@ public final class PipeSpillTest {
                 List.of(new PipeSpillVertexConsumer.Outlet(Direction.WEST, lip))),
                 BlockPos.ZERO, false, height, height, height, height);
         require(output.vertices.size() == 4, "unaffected surface passed through");
-        for (V v : output.vertices) near(v.y, height, "unaffected height preserved");
+        for (V v : output.vertices) {
+            near(v.y, height, "unaffected height preserved");
+        }
     }
 
     private static void verifySide() {
@@ -103,8 +107,12 @@ public final class PipeSpillTest {
                 List.of(new PipeSpillVertexConsumer.Outlet(Direction.WEST, 0.7))),
                 BlockPos.ZERO, false, 0.3, 0.4, 0.2, 0.1);
         for (V v : output.vertices) {
-            if (v.x == 1) near(v.y, 0.1 + v.z * 0.1, "sloping outside boundary unchanged");
-            if (v.x == 0 && v.z >= 0.127 && v.z <= 0.873) near(v.y, 0.7, "sloping receiver meets level lip");
+            if (v.x == 1) {
+                near(v.y, 0.1 + v.z * 0.1, "sloping outside boundary unchanged");
+            }
+            if (v.x == 0 && v.z >= 0.127 && v.z <= 0.873) {
+                near(v.y, 0.7, "sloping receiver meets level lip");
+            }
         }
     }
 
@@ -116,8 +124,12 @@ public final class PipeSpillTest {
                 BlockPos.ZERO, false, 0.4, 0.4, 0.4, 0.4);
         for (V v : output.vertices) {
             require(v.y <= 0.7 + 1e-6, "intersecting spills do not stack heights");
-            if (v.z == 0.5 && v.x == 0) near(v.y, 0.7, "west outlet retained");
-            if (v.z == 0.5 && v.x == 1) near(v.y, 0.6, "east outlet retained");
+            if (v.z == 0.5 && v.x == 0) {
+                near(v.y, 0.7, "west outlet retained");
+            }
+            if (v.z == 0.5 && v.x == 1) {
+                near(v.y, 0.6, "east outlet retained");
+            }
         }
     }
 
@@ -175,9 +187,17 @@ public final class PipeSpillTest {
     private static void top(VertexConsumer c, BlockPos pos, boolean reverse, double nw, double sw, double se, double ne) {
         double x = pos.getX() & 15, y = pos.getY() & 15, z = pos.getZ() & 15;
         point(c, x, y + nw, z, 0, 0);
-        if (reverse) point(c, x + 1, y + ne, z, 1, 0); else point(c, x, y + sw, z + 1, 0, 1);
+        if (reverse) {
+            point(c, x + 1, y + ne, z, 1, 0);
+        } else {
+            point(c, x, y + sw, z + 1, 0, 1);
+        }
         point(c, x + 1, y + se, z + 1, 1, 1);
-        if (reverse) point(c, x, y + sw, z + 1, 0, 1); else point(c, x + 1, y + ne, z, 1, 0);
+        if (reverse) {
+            point(c, x, y + sw, z + 1, 0, 1);
+        } else {
+            point(c, x + 1, y + ne, z, 1, 0);
+        }
     }
 
     private static void point(VertexConsumer c, double x, double y, double z, float u, float v) {
@@ -189,7 +209,9 @@ public final class PipeSpillTest {
     }
 
     private static void require(boolean value, String message) {
-        if (!value) throw new AssertionError(message);
+        if (!value) {
+            throw new AssertionError(message);
+        }
     }
 
     private record V(double x, double y, double z, float u, float v, int red, int green, int blue,

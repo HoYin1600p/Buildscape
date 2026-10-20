@@ -35,7 +35,9 @@ public class RecipeIdMigrationTest {
                 resource("recipe_id_migration_405.txt"), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.isBlank() || line.startsWith("#")) continue;
+                if (line.isBlank() || line.startsWith("#")) {
+                    continue;
+                }
                 String[] ids = line.split("\\s+");
                 assertEquals("Expected old and new recipe ids", 2, ids.length);
                 ResourceLocation oldId = new ResourceLocation(ids[0]);

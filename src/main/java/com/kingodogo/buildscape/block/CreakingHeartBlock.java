@@ -85,7 +85,9 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
                 spawned++;
             }
 
-            if (spawned >= 2) break;
+            if (spawned >= 2) {
+                break;
+            }
         }
     }
 

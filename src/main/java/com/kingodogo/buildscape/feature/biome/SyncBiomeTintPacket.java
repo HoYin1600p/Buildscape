@@ -39,7 +39,9 @@ public class SyncBiomeTintPacket {
         ResourceLocation dimension = buf.readResourceLocation();
         ChunkPos chunk = buf.readChunkPos();
         int count = buf.readVarInt();
-        if (count < 0 || count > 256) throw new IllegalArgumentException("Invalid biome tint count");
+        if (count < 0 || count > 256) {
+            throw new IllegalArgumentException("Invalid biome tint count");
+        }
         Map<Integer, ResourceLocation> columns = new HashMap<>();
         for (int i = 0; i < count; i++) {
             int index = buf.readUnsignedByte();

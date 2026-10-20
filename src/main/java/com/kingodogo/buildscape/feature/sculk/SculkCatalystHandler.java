@@ -23,13 +23,19 @@ public final class SculkCatalystHandler {
 
     public static void onDeath(LivingDeathEvent event) {
         LivingEntity entity = event.getEntityLiving();
-        if (!(entity.level instanceof ServerLevel level) || event.isCanceled() || entity instanceof Player) return;
+        if (!(entity.level instanceof ServerLevel level) || event.isCanceled() || entity instanceof Player) {
+            return;
+        }
         debug("death seen entity={} at {} in {}", entity.getUUID(), entity.blockPosition(), level.dimension().location());
-        if (CONSUMPTION.isConsumed(entity)) return;
+        if (CONSUMPTION.isConsumed(entity)) {
+            return;
+        }
 
         LivingEntityExperienceAccessor experience = (LivingEntityExperienceAccessor) entity;
         Player player = experience.getLastHurtByPlayer();
-        if (player == null && event.getSource().getEntity() instanceof Player killer) player = killer;
+        if (player == null && event.getSource().getEntity() instanceof Player killer) {
+            player = killer;
+        }
         if (player == null || !experience.callShouldDropExperience()
                 || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) {
             debug("death ineligible entity={} playerCredit={}", entity.getUUID(), player != null);
@@ -37,7 +43,9 @@ public final class SculkCatalystHandler {
         }
         int reward = experience.callGetExperienceReward(player);
         debug("XP read entity={} reward={}", entity.getUUID(), reward);
-        if (reward <= 0) return;
+        if (reward <= 0) {
+            return;
+        }
 
         DeathCharge previous = ACTIVE_DEATH.get();
         DeathCharge death = new DeathCharge(entity);
@@ -46,11 +54,17 @@ public final class SculkCatalystHandler {
             entity.gameEvent(GameEvent.ENTITY_KILLED);
             BlockPos deathPos = entity.blockPosition();
             for (BlockPos pos : BlockPos.betweenClosed(deathPos.offset(-8, -8, -8), deathPos.offset(8, 8, 8))) {
-                if (!SculkDeathRules.isInRange(pos.distSqr(deathPos)) || !level.hasChunkAt(pos)) continue;
+                if (!SculkDeathRules.isInRange(pos.distSqr(deathPos)) || !level.hasChunkAt(pos)) {
+                    continue;
+                }
                 BlockState state = level.getBlockState(pos);
-                if (!(state.getBlock() instanceof SculkCatalystBlock)) continue;
+                if (!(state.getBlock() instanceof SculkCatalystBlock)) {
+                    continue;
+                }
                 SculkCatalystBlockEntity catalyst = SculkCatalystBlock.ensureBlockEntity(level, pos.immutable(), state);
-                if (catalyst != null) offerDeath(catalyst, entity, deathPos);
+                if (catalyst != null) {
+                    offerDeath(catalyst, entity, deathPos);
+                }
             }
             if (death.catalyst == null) {
                 debug("no catalyst in range entity={}", entity.getUUID());
@@ -60,14 +74,20 @@ public final class SculkCatalystHandler {
                 debug("charge entity={} catalyst={} XP={}", entity.getUUID(), death.catalyst.getBlockPos(), reward);
             }
         } finally {
-            if (previous == null) ACTIVE_DEATH.remove();
-            else ACTIVE_DEATH.set(previous);
+            if (previous == null) {
+                ACTIVE_DEATH.remove();
+            }
+            else {
+                ACTIVE_DEATH.set(previous);
+            }
         }
     }
 
     public static void onExperienceDrop(LivingExperienceDropEvent event) {
         LivingEntity entity = event.getEntityLiving();
-        if (entity.level.isClientSide || event.isCanceled() || !CONSUMPTION.isConsumed(entity)) return;
+        if (entity.level.isClientSide || event.isCanceled() || !CONSUMPTION.isConsumed(entity)) {
+            return;
+        }
         int previous = event.getDroppedExperience();
         event.setDroppedExperience(CONSUMPTION.experienceToDrop(entity, previous));
         debug("drop zeroed entity={} previousXP={}", entity.getUUID(), previous);
@@ -75,9 +95,13 @@ public final class SculkCatalystHandler {
 
     public static boolean offerDeath(SculkCatalystBlockEntity catalyst, Entity entity, BlockPos deathPos) {
         DeathCharge death = ACTIVE_DEATH.get();
-        if (death == null || death.entity != entity || catalyst.isRemoved() || catalyst.getLevel() != entity.level) return false;
+        if (death == null || death.entity != entity || catalyst.isRemoved() || catalyst.getLevel() != entity.level) {
+            return false;
+        }
         double distance = catalyst.getBlockPos().distSqr(deathPos);
-        if (!SculkDeathRules.isInRange(distance)) return false;
+        if (!SculkDeathRules.isInRange(distance)) {
+            return false;
+        }
         if (SculkDeathRules.preferCatalyst(distance, death.distance,
                 death.catalyst == null ? -1 : catalyst.getBlockPos().compareTo(death.catalyst.getBlockPos()))) {
             death.catalyst = catalyst;
@@ -88,7 +112,9 @@ public final class SculkCatalystHandler {
     }
 
     static void debug(String message, Object... arguments) {
-        if (DEBUG) BuildScape.LOGGER.info("[Sculk debug] " + message, arguments);
+        if (DEBUG) {
+            BuildScape.LOGGER.info("[Sculk debug] " + message, arguments);
+        }
     }
 
     private static final class DeathCharge {

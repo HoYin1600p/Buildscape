@@ -304,7 +304,9 @@ public class BlockInteractionEvents {
                     if (!level.isClientSide) {
                         level.setBlock(above, ModBlocks.CACTUS_FLOWER.get().defaultBlockState(), 3);
                         level.levelEvent(2005, pos, 0);
-                        if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                        if (!event.getPlayer().getAbilities().instabuild) {
+                            held.shrink(1);
+                        }
                     }
                     event.setCanceled(true);
                     event.setCancellationResult(InteractionResult.SUCCESS);
@@ -318,7 +320,9 @@ public class BlockInteractionEvents {
                     if (!level.isClientSide) {
                         level.setBlock(above, ModBlocks.DRY_GRASS.get().defaultBlockState(), 3);
                         level.levelEvent(2005, pos, 0);
-                        if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                        if (!event.getPlayer().getAbilities().instabuild) {
+                            held.shrink(1);
+                        }
                     }
                     event.setCanceled(true);
                     event.setCancellationResult(InteractionResult.SUCCESS);
@@ -332,7 +336,9 @@ public class BlockInteractionEvents {
                     if (!level.isClientSide) {
                         level.setBlock(above, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
                         level.levelEvent(2005, pos, 0);
-                        if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                        if (!event.getPlayer().getAbilities().instabuild) {
+                            held.shrink(1);
+                        }
                     }
                     event.setCanceled(true);
                     event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
@@ -341,7 +347,9 @@ public class BlockInteractionEvents {
                     List<BlockPos> validPositions = new ArrayList<>();
                     for (int dx = -1; dx <= 1; dx++) {
                         for (int dz = -1; dz <= 1; dz++) {
-                            if (dx == 0 && dz == 0) continue;
+                            if (dx == 0 && dz == 0) {
+                                continue;
+                            }
                             BlockPos nearbyGround = pos.offset(dx, 0, dz);
                             BlockPos nearbyAbove = nearbyGround.above();
                             if (level.getBlockState(nearbyGround).is(Blocks.PODZOL) && level.isEmptyBlock(nearbyAbove)) {
@@ -354,7 +362,9 @@ public class BlockInteractionEvents {
                             BlockPos target = validPositions.get(level.random.nextInt(validPositions.size()));
                             level.setBlock(target, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
                             level.levelEvent(2005, pos, 0);
-                            if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                            if (!event.getPlayer().getAbilities().instabuild) {
+                                held.shrink(1);
+                            }
                         }
                         event.setCanceled(true);
                         event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
@@ -413,7 +423,9 @@ public class BlockInteractionEvents {
                     if (!level.isClientSide) {
                         level.setBlock(targetPos, ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState().setValue(HangingMossBlock.TIP, true), 3);
                         level.levelEvent(2005, pos, 0);
-                        if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                        if (!event.getPlayer().getAbilities().instabuild) {
+                            held.shrink(1);
+                        }
                     }
                     event.setCanceled(true);
                     event.setCancellationResult(InteractionResult.SUCCESS);
@@ -446,10 +458,14 @@ public class BlockInteractionEvents {
                             level.setBlock(adjPos, newState, 3);
                             spawned++;
                         }
-                        if (spawned >= 2) break;
+                        if (spawned >= 2) {
+                            break;
+                        }
                     }
                     level.levelEvent(2005, pos, 0);
-                    if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                    if (!event.getPlayer().getAbilities().instabuild) {
+                        held.shrink(1);
+                    }
                 }
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.SUCCESS);
@@ -463,7 +479,9 @@ public class BlockInteractionEvents {
                             new ItemStack(ModItems.DRY_GRASS.get(), 1));
                     level.addFreshEntity(item);
                     level.levelEvent(2005, pos, 0);
-                    if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                    if (!event.getPlayer().getAbilities().instabuild) {
+                        held.shrink(1);
+                    }
                 }
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.SUCCESS);

@@ -163,7 +163,9 @@ public class ConfigReadOnlyRegressionTest {
     private static byte[] badBytes(String text) {
         byte[] bytes = text.getBytes(StandardCharsets.US_ASCII);
         for (int i = 0; i < bytes.length; i++) {
-            if (bytes[i] == '@') bytes[i] = (byte) 0x81;
+            if (bytes[i] == '@') {
+                bytes[i] = (byte) 0x81;
+            }
         }
         return bytes;
     }

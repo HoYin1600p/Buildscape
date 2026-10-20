@@ -51,7 +51,9 @@ public class TreeChopHandler {
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
@@ -80,7 +82,9 @@ public class TreeChopHandler {
         }
 
         BlockPos pos = ((BlockHitResult) hit).getBlockPos();
-        if (mc.level == null) return;
+        if (mc.level == null) {
+            return;
+        }
         BlockState state = mc.level.getBlockState(pos);
 
         if (!isLog(state)) {
@@ -118,23 +122,36 @@ public class TreeChopHandler {
 
     @SubscribeEvent
     public static void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
-        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT) return;
+        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT) {
+            return;
+        }
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null || mc.level == null) return;
-        if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild() || !player.isShiftKeyDown()) return;
-        if (!CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
+        if (player == null || mc.level == null) {
             return;
+        }
+        if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild() || !player.isShiftKeyDown()) {
+            return;
+        }
+        if (!CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
+            return;
+        }
 
         HitResult hit = mc.hitResult;
-        if (hit == null || hit.getType() != HitResult.Type.BLOCK) return;
+        if (hit == null || hit.getType() != HitResult.Type.BLOCK) {
+            return;
+        }
 
         BlockPos pos = ((BlockHitResult) hit).getBlockPos();
         BlockState state = mc.level.getBlockState(pos);
-        if (!isLog(state)) return;
+        if (!isLog(state)) {
+            return;
+        }
 
-        if (connectedLogsCache.isEmpty()) return;
+        if (connectedLogsCache.isEmpty()) {
+            return;
+        }
 
         String blockName = state.getBlock().getName().getString();
         String text = blockName + ": " + connectedLogsCache.size();
@@ -154,19 +171,28 @@ public class TreeChopHandler {
     public static void onHighlightBlock(DrawSelectionEvent.HighlightBlock event) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
-        if (player == null || mc.level == null) return;
-
-        if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild() || !player.isShiftKeyDown()) return;
-        if (!CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
+        if (player == null || mc.level == null) {
             return;
+        }
+
+        if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild() || !player.isShiftKeyDown()) {
+            return;
+        }
+        if (!CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
+            return;
+        }
 
         HitResult target = event.getTarget();
-        if (target.getType() != HitResult.Type.BLOCK) return;
+        if (target.getType() != HitResult.Type.BLOCK) {
+            return;
+        }
 
         BlockPos pos = ((BlockHitResult) target).getBlockPos();
         BlockState state = mc.level.getBlockState(pos);
 
-        if (!isLog(state)) return;
+        if (!isLog(state)) {
+            return;
+        }
 
         if (!pos.equals(lastLookedAtPos) || System.currentTimeMillis() - lastCacheUpdate > 500) {
             if (mc.level != null) {
@@ -183,10 +209,14 @@ public class TreeChopHandler {
         double camZ = event.getCamera().getPosition().z;
 
         for (BlockPos logPos : connectedLogsCache) {
-            if (mc.level != null && !mc.level.isLoaded(logPos)) continue;
+            if (mc.level != null && !mc.level.isLoaded(logPos)) {
+                continue;
+            }
             if (mc.level != null) {
                 VoxelShape shape = mc.level.getBlockState(logPos).getShape(mc.level, logPos);
-                if (shape.isEmpty()) continue;
+                if (shape.isEmpty()) {
+                    continue;
+                }
 
                 AABB aabb = shape.bounds().move(logPos);
                 LevelRenderer.renderLineBox(
@@ -204,9 +234,13 @@ public class TreeChopHandler {
 
     @SubscribeEvent
     public static void onLeftClick(InputEvent.ClickInputEvent event) {
-        if (!event.isAttack()) return;
+        if (!event.isAttack()) {
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null) return;
+        if (mc.player == null || mc.level == null) {
+            return;
+        }
 
         if (mc.player.isCreative() && mc.player.hasPermissions(2) && mc.player.mayBuild() && mc.player.isShiftKeyDown() &&
                 CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID())) {

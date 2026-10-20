@@ -46,7 +46,9 @@ public abstract class AdvancementWidgetMixin {
 
     @Unique
     private static void buildscape$initIcons() {
-        if (!buildscape$STEEL_BLOCK_ICONS.isEmpty()) return;
+        if (!buildscape$STEEL_BLOCK_ICONS.isEmpty()) {
+            return;
+        }
 
         buildscape$STEEL_BLOCK_ICONS.add(new ItemStack(ModItems.STEEL_BLOCK.get()));
         buildscape$STEEL_BLOCK_ICONS.add(new ItemStack(ModItems.SCRAPED_STEEL.get()));

@@ -96,7 +96,9 @@ public class HazeBushDyeRecipeTest {
             in.readInt(); // version
             assertEquals("test", in.readUTF());
             String[] pool = new String[in.readInt()];
-            for (int i = 0; i < pool.length; i++) pool[i] = in.readUTF();
+            for (int i = 0; i < pool.length; i++) {
+                pool[i] = in.readUTF();
+            }
             assertEquals(1, in.readInt());
             in.mark(cache.length);
             in.readInt(); // id
@@ -111,8 +113,12 @@ public class HazeBushDyeRecipeTest {
             items[resultIndex] = Items.ORANGE_TULIP;
             Ingredient[] ingredients = new Ingredient[pool.length];
             for (int i = 0; i < pool.length; i++) {
-                if (pool[i].contains("minecraft:white_tulip")) ingredients[i] = Ingredient.of(Items.WHITE_TULIP);
-                if (pool[i].contains("minecraft:orange_dye")) ingredients[i] = Ingredient.of(Items.ORANGE_DYE);
+                if (pool[i].contains("minecraft:white_tulip")) {
+                    ingredients[i] = Ingredient.of(Items.WHITE_TULIP);
+                }
+                if (pool[i].contains("minecraft:orange_dye")) {
+                    ingredients[i] = Ingredient.of(Items.ORANGE_DYE);
+                }
             }
             assertTrue(BinaryRecipeCache.readRecipe(in, pool, ingredients, items,
                     new ResourceLocation[pool.length]) instanceof HazeBushDyeRecipe);
@@ -134,9 +140,13 @@ public class HazeBushDyeRecipeTest {
                 "src/main/resources/data/buildscape/recipes_pack/crafting.json"))).getAsJsonObject();
         int count = 0;
         for (var entry : pack.getAsJsonArray("crafting_shapeless")) {
-            if (!entry.isJsonObject()) continue;
+            if (!entry.isJsonObject()) {
+                continue;
+            }
             var json = entry.getAsJsonObject();
-            if (!json.has("type") || !"buildscape:haze_bush_dye".equals(json.get("type").getAsString())) continue;
+            if (!json.has("type") || !"buildscape:haze_bush_dye".equals(json.get("type").getAsString())) {
+                continue;
+            }
             var ingredients = json.getAsJsonArray("ingredients");
             assertEquals("BS:white_haze_bush", ingredients.get(0).getAsString());
             String color = ingredients.get(1).getAsString().replace("MC:", "").replace("_dye", "");

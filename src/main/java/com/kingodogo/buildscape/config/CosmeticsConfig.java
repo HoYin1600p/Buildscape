@@ -46,7 +46,9 @@ public class CosmeticsConfig {
         this.dataDirectory = dataDirectory;
         this.legacyConfigDirectory = legacyConfigDirectory;
         File dataDir = getDataDir();
-        if (!dataDir.exists()) dataDir.mkdirs();
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
 
         migrateLegacyData();
 
@@ -100,7 +102,9 @@ public class CosmeticsConfig {
             boolean loadedSuccessfully = false;
             try {
                 String source = ConfigLayoutIO.readText(legacyJson.toPath());
-                if (ConfigLayoutIO.protectInvalidEncoding(legacyJson.toPath())) return;
+                if (ConfigLayoutIO.protectInvalidEncoding(legacyJson.toPath())) {
+                    return;
+                }
                 @SuppressWarnings("unchecked")
                 Map<String, Object> loaded = GSON.fromJson(source, Map.class);
                 if (loaded != null) {
@@ -139,10 +143,12 @@ public class CosmeticsConfig {
             if (key.equals("global_settings")) {
                 if (val instanceof Map) {
                     Map<String, Object> globalData = (Map<String, Object>) val;
-                    if (globalData.containsKey("colorPickerX") && globalData.get(NbtKeys.COLOR_PICKER_X) instanceof Number)
+                    if (globalData.containsKey("colorPickerX") && globalData.get(NbtKeys.COLOR_PICKER_X) instanceof Number) {
                         colorPickerX = ((Number) globalData.get(NbtKeys.COLOR_PICKER_X)).intValue();
-                    if (globalData.containsKey("colorPickerY") && globalData.get(NbtKeys.COLOR_PICKER_Y) instanceof Number)
+                    }
+                    if (globalData.containsKey("colorPickerY") && globalData.get(NbtKeys.COLOR_PICKER_Y) instanceof Number) {
                         colorPickerY = ((Number) globalData.get(NbtKeys.COLOR_PICKER_Y)).intValue();
+                    }
                 }
                 continue;
             }
@@ -152,7 +158,9 @@ public class CosmeticsConfig {
                 try { uuid = UUID.fromString(key); } catch (Exception ignored) {}
             }
 
-            if (getPlayerFile(uuid).exists()) continue;
+            if (getPlayerFile(uuid).exists()) {
+                continue;
+            }
 
             Map<Integer, String> cosmetics = new HashMap<>();
             Map<String, String> colors = new HashMap<>();
@@ -165,7 +173,9 @@ public class CosmeticsConfig {
                     for (Map.Entry<String, Object> cosEntry : ((Map<String, Object>) cosObj).entrySet()) {
                         try {
                             int slot = Integer.parseInt(cosEntry.getKey());
-                            if (cosEntry.getValue() instanceof String) cosmetics.put(slot, (String) cosEntry.getValue());
+                            if (cosEntry.getValue() instanceof String) {
+                                cosmetics.put(slot, (String) cosEntry.getValue());
+                            }
                         } catch (Exception ignored) {}
                     }
                 }
@@ -173,7 +183,9 @@ public class CosmeticsConfig {
                 Object colObj = playerData.get("colors");
                 if (colObj instanceof Map) {
                     for (Map.Entry<String, Object> colEntry : ((Map<String, Object>) colObj).entrySet()) {
-                        if (colEntry.getValue() instanceof String) colors.put(colEntry.getKey(), (String) colEntry.getValue());
+                        if (colEntry.getValue() instanceof String) {
+                            colors.put(colEntry.getKey(), (String) colEntry.getValue());
+                        }
                     }
                 }
             }
@@ -261,7 +273,9 @@ public class CosmeticsConfig {
         Map<String, String> colors = playerCosmeticColors.get(uuidStr);
 
         CompoundTag nbt = new CompoundTag();
-        if (playerUuid != null) nbt.putUUID(NbtKeys.PLAYER_UUID, playerUuid);
+        if (playerUuid != null) {
+            nbt.putUUID(NbtKeys.PLAYER_UUID, playerUuid);
+        }
 
         CompoundTag equippedTag = new CompoundTag();
         if (cosmetics != null) {
@@ -303,8 +317,12 @@ public class CosmeticsConfig {
         if (file.exists()) {
             try {
                 CompoundTag nbt = NbtIo.readCompressed(file);
-                if (nbt.contains(NbtKeys.COLOR_PICKER_X)) colorPickerX = nbt.getInt(NbtKeys.COLOR_PICKER_X);
-                if (nbt.contains(NbtKeys.COLOR_PICKER_Y)) colorPickerY = nbt.getInt(NbtKeys.COLOR_PICKER_Y);
+                if (nbt.contains(NbtKeys.COLOR_PICKER_X)) {
+                    colorPickerX = nbt.getInt(NbtKeys.COLOR_PICKER_X);
+                }
+                if (nbt.contains(NbtKeys.COLOR_PICKER_Y)) {
+                    colorPickerY = nbt.getInt(NbtKeys.COLOR_PICKER_Y);
+                }
             } catch (Exception ignored) {}
         }
     }
@@ -312,8 +330,12 @@ public class CosmeticsConfig {
     private void saveGlobalSettings() {
         File file = getGlobalSettingsFile();
         CompoundTag nbt = new CompoundTag();
-        if (colorPickerX != null) nbt.putInt(NbtKeys.COLOR_PICKER_X, colorPickerX);
-        if (colorPickerY != null) nbt.putInt(NbtKeys.COLOR_PICKER_Y, colorPickerY);
+        if (colorPickerX != null) {
+            nbt.putInt(NbtKeys.COLOR_PICKER_X, colorPickerX);
+        }
+        if (colorPickerY != null) {
+            nbt.putInt(NbtKeys.COLOR_PICKER_Y, colorPickerY);
+        }
 
         try {
             NbtIo.writeCompressed(nbt, file);
@@ -322,7 +344,9 @@ public class CosmeticsConfig {
 
     public Map<Integer, String> getEquippedCosmetics(UUID playerUuid) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
-        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (!playerCosmetics.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
         Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
         return cosmetics != null ? new HashMap<>(cosmetics) : new HashMap<>();
     }
@@ -335,7 +359,9 @@ public class CosmeticsConfig {
 
     public void equipCosmetic(UUID playerUuid, int slotIndex, String cosmeticId) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
-        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (!playerCosmetics.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
 
         updateMap(playerCosmetics.computeIfAbsent(uuidStr, k -> new HashMap<>()), slotIndex, cosmeticId);
         savePlayer(playerUuid);
@@ -344,12 +370,16 @@ public class CosmeticsConfig {
     private void updateMap(Map<Integer, String> map, int slot, String id) {
         map.values().remove(id);
         map.remove(slot);
-        if (id != null && !id.isEmpty()) map.put(slot, id);
+        if (id != null && !id.isEmpty()) {
+            map.put(slot, id);
+        }
     }
 
     public void unequipCosmetic(UUID playerUuid, int slotIndex) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
-        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (!playerCosmetics.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
 
         Map<Integer, String> playerMap = playerCosmetics.get(uuidStr);
         if (playerMap != null) {
@@ -359,20 +389,32 @@ public class CosmeticsConfig {
     }
 
     public String getCosmeticColor(UUID playerUuid, String cosmeticId) {
-        if (cosmeticId == null) return null;
+        if (cosmeticId == null) {
+            return null;
+        }
         String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
-        if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (!playerCosmeticColors.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
         Map<String, String> colors = playerCosmeticColors.get(uuidStr);
-        if (colors != null && colors.containsKey(cosmeticId)) return colors.get(cosmeticId);
-        if (!playerCosmeticColors.containsKey(GLOBAL_SCOPE)) loadPlayer(null);
+        if (colors != null && colors.containsKey(cosmeticId)) {
+            return colors.get(cosmeticId);
+        }
+        if (!playerCosmeticColors.containsKey(GLOBAL_SCOPE)) {
+            loadPlayer(null);
+        }
         Map<String, String> globalColors = playerCosmeticColors.get(GLOBAL_SCOPE);
         return globalColors != null ? globalColors.get(cosmeticId) : null;
     }
 
     public void setCosmeticColor(UUID playerUuid, String cosmeticId, String hexColor) {
-        if (cosmeticId == null) return;
+        if (cosmeticId == null) {
+            return;
+        }
         String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
-        if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (!playerCosmeticColors.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
 
         Map<String, String> colors = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
         if (hexColor == null || hexColor.isEmpty()) {
@@ -385,7 +427,9 @@ public class CosmeticsConfig {
 
     public boolean getCreativeTreeBreaker(UUID playerUuid) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
-        if (!playerCreativeTreeBreaker.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (!playerCreativeTreeBreaker.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
         return playerCreativeTreeBreaker.getOrDefault(uuidStr, false);
     }
 
@@ -397,7 +441,9 @@ public class CosmeticsConfig {
 
     public boolean getShulkerPreview(UUID playerUuid) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : GLOBAL_SCOPE;
-        if (!playerShulkerPreview.containsKey(uuidStr)) loadPlayer(playerUuid);
+        if (!playerShulkerPreview.containsKey(uuidStr)) {
+            loadPlayer(playerUuid);
+        }
         return playerShulkerPreview.getOrDefault(uuidStr, true);
     }
 

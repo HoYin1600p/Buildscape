@@ -38,12 +38,22 @@ public abstract class GeneralStatisticsListMixin {
     }
 
     private static int getPriority(Stat<ResourceLocation> stat) {
-        if (stat == ModStats.HEADER_MINECRAFT_STAT) return 0;
+        if (stat == ModStats.HEADER_MINECRAFT_STAT) {
+            return 0;
+        }
         ResourceLocation id = stat.getValue();
-        if ("minecraft".equals(id.getNamespace())) return 1;
-        if (stat == ModStats.HEADER_BUILDSCAPE_STAT) return 2;
-        if ("buildscape".equals(id.getNamespace())) return 3;
-        if (stat == ModStats.HEADER_OTHER_STAT) return 4;
+        if ("minecraft".equals(id.getNamespace())) {
+            return 1;
+        }
+        if (stat == ModStats.HEADER_BUILDSCAPE_STAT) {
+            return 2;
+        }
+        if ("buildscape".equals(id.getNamespace())) {
+            return 3;
+        }
+        if (stat == ModStats.HEADER_OTHER_STAT) {
+            return 4;
+        }
         return 5;
     }
 }

@@ -50,7 +50,9 @@ public class MuffBlockRenderer {
 
         Level level = mc.level;
         Camera camera = event.getCamera();
-        if (camera == null) return;
+        if (camera == null) {
+            return;
+        }
 
         Vec3 cameraPos = camera.getPosition();
         PoseStack poseStack = event.getPoseStack();

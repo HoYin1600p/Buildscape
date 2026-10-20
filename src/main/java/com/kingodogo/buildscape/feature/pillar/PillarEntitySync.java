@@ -23,8 +23,9 @@ final class PillarEntitySync {
     static void syncPatternFromStack(PillarBlockEntity self) {
         final Level level = self.getLevel();
         final BlockPos worldPosition = self.getBlockPos();
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide) {
             return;
+        }
 
         if (self.particlePattern != null) {
             self.propagatePatternToStack(self.particlePattern);
@@ -46,8 +47,9 @@ final class PillarEntitySync {
     static void syncPatternFromManager(PillarBlockEntity self) {
         final Level level = self.getLevel();
         final BlockPos worldPosition = self.getBlockPos();
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide) {
             return;
+        }
 
         if (level.getServer() == null ||
                 !level.getServer().isRunning() ||
@@ -153,40 +155,48 @@ final class PillarEntitySync {
     static void syncBothFromManager(PillarBlockEntity self) {
         final Level level = self.getLevel();
         final BlockPos worldPosition = self.getBlockPos();
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide) {
             return;
+        }
 
         if (level.getServer() == null ||
                 !level.getServer().isRunning() ||
                 !BuildScape.isServerFullyInitialized()) {
             return;
         }
-        if (level.getServer().getPlayerList().getPlayerCount() == 0)
+        if (level.getServer().getPlayerList().getPlayerCount() == 0) {
             return;
-        if (!level.hasChunkAt(worldPosition))
+        }
+        if (!level.hasChunkAt(worldPosition)) {
             return;
+        }
         try {
             ChunkAccess chunk = level.getChunk(worldPosition);
-            if (!(chunk instanceof LevelChunk))
+            if (!(chunk instanceof LevelChunk)) {
                 return;
-            if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL))
+            }
+            if (!chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
                 return;
+            }
         } catch (Exception e) {
             return;
         }
 
         PillarIdManager manager = PillarIdManager.get(level);
-        if (!manager.hasLoaded())
+        if (!manager.hasLoaded()) {
             return;
+        }
 
         String expectedPrefix = PillarIdManager.getVariantPrefix(level, worldPosition);
         String idToSync = (self.pillarId != null && !self.pillarId.isEmpty())
                 ? self.pillarId
                 : self.getStackPillarId();
-        if (idToSync == null || idToSync.isEmpty())
+        if (idToSync == null || idToSync.isEmpty()) {
             return;
-        if (!idToSync.startsWith(expectedPrefix) && manager.getPillarData(idToSync) == null)
+        }
+        if (!idToSync.startsWith(expectedPrefix) && manager.getPillarData(idToSync) == null) {
             return;
+        }
 
         PillarIdManager.PillarData data = manager.getPillarData(idToSync);
         boolean changed = false;
@@ -275,8 +285,9 @@ final class PillarEntitySync {
     static void syncColorsFromManager(PillarBlockEntity self) {
         final Level level = self.getLevel();
         final BlockPos worldPosition = self.getBlockPos();
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide) {
             return;
+        }
 
         if (level.getServer() == null ||
                 !level.getServer().isRunning() ||
@@ -428,8 +439,9 @@ final class PillarEntitySync {
     static void syncFromData(PillarBlockEntity self, PillarIdManager.PillarData data) {
         final Level level = self.getLevel();
         final BlockPos worldPosition = self.getBlockPos();
-        if (data == null)
+        if (data == null) {
             return;
+        }
 
         boolean changed = false;
 

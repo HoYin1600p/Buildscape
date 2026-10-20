@@ -54,7 +54,9 @@ public class AdvancementEvents {
     }
 
     public static void giveItemReward(ServerPlayer player, Item item, int count) {
-        if (player == null || item == null || count <= 0) return;
+        if (player == null || item == null || count <= 0) {
+            return;
+        }
         ItemStack stack = new ItemStack(item, count);
         if (item instanceof TrophyBlockItem
                 || item == ModItems.GOLDEN_JAR.get() || item == ModItems.FESTIVE_STAR.get()
@@ -122,7 +124,9 @@ public class AdvancementEvents {
 
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-        if (!(event.getPlayer() instanceof ServerPlayer serverPlayer)) return;
+        if (!(event.getPlayer() instanceof ServerPlayer serverPlayer)) {
+            return;
+        }
 
         if (event.getTarget() instanceof WanderingHomemakerEntity) {
             AdvancementGrants.grant(serverPlayer, "the_homemaker_cometh");
@@ -133,7 +137,9 @@ public class AdvancementEvents {
 
     @SubscribeEvent
     public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
+        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
+            return;
+        }
 
         Level level = (Level) event.getWorld();
         BlockPos pos = event.getPos();
@@ -141,7 +147,9 @@ public class AdvancementEvents {
         Block block = state.getBlock();
         ResourceLocation reg = block.getRegistryName();
 
-        if (reg == null) return;
+        if (reg == null) {
+            return;
+        }
         String modId = reg.getNamespace();
         String path = reg.getPath();
 
@@ -285,11 +293,15 @@ public class AdvancementEvents {
 
     @SubscribeEvent
     public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
-        if (!(event.getPlayer() instanceof ServerPlayer serverPlayer)) return;
+        if (!(event.getPlayer() instanceof ServerPlayer serverPlayer)) {
+            return;
+        }
 
         ItemStack itemStack = event.getCrafting();
         ResourceLocation reg = itemStack.getItem().getRegistryName();
-        if (reg == null) return;
+        if (reg == null) {
+            return;
+        }
         String path = reg.getPath();
 
         if (path.contains("jar") && !path.contains("pattern")) {

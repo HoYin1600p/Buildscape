@@ -44,7 +44,9 @@ public final class BuildersWorkbenchResultsPacket {
         this.tab = buffer.readByte();
         this.filterMask = buffer.readUnsignedByte();
         this.offsets = new int[RESULT_COUNT];
-        for (int i = 0; i < RESULT_COUNT; i++) offsets[i] = NetworkPacketLimits.readResultOffset(buffer);
+        for (int i = 0; i < RESULT_COUNT; i++) {
+            offsets[i] = NetworkPacketLimits.readResultOffset(buffer);
+        }
         this.results = new ArrayList<>(RESULT_COUNT);
         for (int i = 0; i < RESULT_COUNT; i++) {
             results.add(buffer.readBoolean()
@@ -61,7 +63,9 @@ public final class BuildersWorkbenchResultsPacket {
         buffer.writeBlockPos(pos);
         buffer.writeByte(tab);
         buffer.writeByte(filterMask);
-        for (int offset : offsets) buffer.writeVarInt(Math.max(0, offset));
+        for (int offset : offsets) {
+            buffer.writeVarInt(Math.max(0, offset));
+        }
         for (ResourceLocation result : results) {
             buffer.writeBoolean(result != null);
             if (result != null) {
@@ -75,8 +79,12 @@ public final class BuildersWorkbenchResultsPacket {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null || player.level == null) return;
-            if (!(player.containerMenu instanceof BuildersWorkbenchMenu menu)) return;
+            if (player == null || player.level == null) {
+                return;
+            }
+            if (!(player.containerMenu instanceof BuildersWorkbenchMenu menu)) {
+                return;
+            }
             BuildersWorkbenchBlockEntity workbench = menu.getBlockEntity();
             if (workbench == null
                     || !workbench.getBlockPos().equals(pos)
@@ -94,10 +102,14 @@ public final class BuildersWorkbenchResultsPacket {
                     continue;
                 }
                 Item item = Registry.ITEM.getOptional(id).orElse(null);
-                if (!(item instanceof BlockItem) || !ColorGradientSolver.isCandidateBlock(item)) return;
+                if (!(item instanceof BlockItem) || !ColorGradientSolver.isCandidateBlock(item)) {
+                    return;
+                }
                 validated.add(new ItemStack(item));
             }
-            if (!workbench.resultsMatchInputs(tab, validated)) return;
+            if (!workbench.resultsMatchInputs(tab, validated)) {
+                return;
+            }
             workbench.applyClientResults(tab, filterMask, offsets, validated);
         });
         context.setPacketHandled(true);

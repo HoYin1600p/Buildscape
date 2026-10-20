@@ -36,8 +36,12 @@ public final class StairModelTest {
                             require(variant != null, path + ": missing " + key);
                             boolean top = half.equals("top");
                             int y = facing.getValue();
-                            if (!top && shape.endsWith("left")) y -= 90;
-                            if (top && shape.endsWith("right")) y += 90;
+                            if (!top && shape.endsWith("left")) {
+                                y -= 90;
+                            }
+                            if (top && shape.endsWith("right")) {
+                                y += 90;
+                            }
                             require(number(variant, "x") == (top ? 180 : 0)
                                             && number(variant, "y") == Math.floorMod(y, 360),
                                     path + ": incorrect rotation for " + key);
@@ -90,7 +94,9 @@ public final class StairModelTest {
                             double to = element.getAsJsonArray("to").get(axis).getAsDouble();
                             inside &= point[axis] + 0.5 >= from && point[axis] + 0.5 < to;
                         }
-                        if (inside) covering++;
+                        if (inside) {
+                            covering++;
+                        }
                     }
                     require(covering == (expected ? 1 : 0), kind + ": geometry mismatch at " + x + "," + y + "," + z);
                 }
@@ -109,6 +115,8 @@ public final class StairModelTest {
     }
 
     private static void require(boolean condition, String message) {
-        if (!condition) throw new AssertionError(message);
+        if (!condition) {
+            throw new AssertionError(message);
+        }
     }
 }

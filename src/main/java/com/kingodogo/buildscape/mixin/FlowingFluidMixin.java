@@ -34,30 +34,46 @@ public abstract class FlowingFluidMixin {
                                                    CallbackInfoReturnable<FluidState> cir) {
         FlowingFluid flowingFluid = (FlowingFluid) (Object) this;
         if (!WorldPipeTopologyAccess.isTransportFluid(flowingFluid)
-                || state.getBlock() instanceof HollowPipeBlock || state.getBlock() instanceof HollowLogBlock) return;
+                || state.getBlock() instanceof HollowPipeBlock || state.getBlock() instanceof HollowLogBlock) {
+            return;
+        }
         FluidState vanilla = cir.getReturnValue();
-        if (vanilla.isSource() || (!vanilla.isEmpty() && vanilla.getValue(FlowingFluid.FALLING))) return;
+        if (vanilla.isSource() || (!vanilla.isEmpty() && vanilla.getValue(FlowingFluid.FALLING))) {
+            return;
+        }
 
         int amount = vanilla.getAmount();
         for (Direction direction : Direction.values()) {
-            if (direction == Direction.DOWN) continue;
+            if (direction == Direction.DOWN) {
+                continue;
+            }
             BlockPos pipePos = pos.relative(direction);
             BlockState pipe = level.getBlockState(pipePos);
             if (!(pipe.getBlock() instanceof HollowPipeBlock)
-                    || !(level.getBlockEntity(pipePos) instanceof HollowLogBlockEntity entity)) continue;
+                    || !(level.getBlockEntity(pipePos) instanceof HollowLogBlockEntity entity)) {
+                continue;
+            }
             var flow = entity.getPipeFlowState();
-            if (flow == null || !flow.hasFluid()) continue;
+            if (flow == null || !flow.hasFluid()) {
+                continue;
+            }
             Fluid suppliedFluid = WorldPipeTopologyAccess.fluidById(flow.getFluidId());
-            if (!flowingFluid.isSame(suppliedFluid)) continue;
+            if (!flowingFluid.isSame(suppliedFluid)) {
+                continue;
+            }
             int supply = PipeOutletWater.amount(pipe, flow, direction.getOpposite());
-            if (supply == 0 || !canPassThroughWall(direction, level, pos, state, pipePos, pipe)) continue;
+            if (supply == 0 || !canPassThroughWall(direction, level, pos, state, pipePos, pipe)) {
+                continue;
+            }
             if (direction == Direction.UP) {
                 cir.setReturnValue(flowingFluid.getFlowing(8, true));
                 return;
             }
             amount = Math.max(amount, supply);
         }
-        if (amount > vanilla.getAmount()) cir.setReturnValue(flowingFluid.getFlowing(amount, false));
+        if (amount > vanilla.getAmount()) {
+            cir.setReturnValue(flowingFluid.getFlowing(amount, false));
+        }
     }
 
     @Inject(method = "canSpreadTo", at = @At("HEAD"), cancellable = true)

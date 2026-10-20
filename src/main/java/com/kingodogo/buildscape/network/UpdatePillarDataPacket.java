@@ -141,7 +141,9 @@ public class UpdatePillarDataPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null || !EditGuard.require(player, ConfigSetting.PILLAR_EDIT)) return;
+            if (player == null || !EditGuard.require(player, ConfigSetting.PILLAR_EDIT)) {
+                return;
+            }
 
             PillarIdManager manager = PillarIdManager.get();
             PillarIdManager.PillarData data = manager.getPillarData(pillarId);
@@ -204,7 +206,9 @@ public class UpdatePillarDataPacket {
         }
 
         for (ServerLevel level : server.getAllLevels()) {
-            if (level == null) continue;
+            if (level == null) {
+                continue;
+            }
 
             String dimensionKey = PillarIdManager.getDimensionKey(level);
             if (!dimensionKey.equals(data.dimension)) {
@@ -232,7 +236,9 @@ public class UpdatePillarDataPacket {
             boolean patternChanged = data.pattern != null && !data.pattern.isEmpty()
                     && !data.pattern.equals(bottomPillarBE.getParticlePattern());
             bottomPillarBE.syncFromData(data);
-            if (patternChanged) bottomPillarBE.setParticlePattern(data.pattern);
+            if (patternChanged) {
+                bottomPillarBE.setParticlePattern(data.pattern);
+            }
 
             break;
         }

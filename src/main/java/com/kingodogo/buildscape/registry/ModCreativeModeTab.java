@@ -46,7 +46,9 @@ public class ModCreativeModeTab {
             }
             if (stack.is(Items.FIREWORK_ROCKET)) {
                 CompoundTag fireworks = stack.getTagElement(NbtKeys.FIREWORKS);
-                if (fireworks == null || !fireworks.contains(NbtKeys.EXPLOSIONS, 9)) return false;
+                if (fireworks == null || !fireworks.contains(NbtKeys.EXPLOSIONS, 9)) {
+                    return false;
+                }
                 ListTag explosions = fireworks.getList(NbtKeys.EXPLOSIONS, 10);
                 for (int i = 0; i < explosions.size(); i++) {
                     if (CustomFireworkShapeRegistry.isCustomShape(
@@ -88,9 +90,13 @@ public class ModCreativeModeTab {
                 if (id != null && !BuildScape.MODID.equals(id.getNamespace()) && !customFireworkVariant) {
                     continue;
                 }
-                if (!customFireworkVariant && added.contains(item)) continue;
+                if (!customFireworkVariant && added.contains(item)) {
+                    continue;
+                }
                 items.add(stack);
-                if (!customFireworkVariant) added.add(item);
+                if (!customFireworkVariant) {
+                    added.add(item);
+                }
             }
             sortItems(items);
         }
@@ -119,7 +125,9 @@ public class ModCreativeModeTab {
         }
 
         private void arrangeVariantGroup(ItemStackOrder ordered, Map<String, ItemStack> buildscapeItems, String basePath) {
-            if ("quartz_pillar".equals(basePath)) return;
+            if ("quartz_pillar".equals(basePath)) {
+                return;
+            }
             ItemStack parent = buildscapeItems.get(basePath);
             ItemStack stairs = buildscapeItems.get(basePath + "_stairs");
             ItemStack slab = buildscapeItems.get(basePath + "_slab");
@@ -127,7 +135,9 @@ public class ModCreativeModeTab {
             ItemStack wall = buildscapeItems.get(basePath + "_wall");
 
             ItemStack anchor = firstPresent(parent, stairs, slab, verticalSlab, wall);
-            if (anchor == null) return;
+            if (anchor == null) {
+                return;
+            }
 
             if (parent != null && parent != anchor) {
                 moveAfter(ordered, parent, anchor);

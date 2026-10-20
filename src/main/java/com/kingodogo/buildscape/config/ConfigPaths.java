@@ -100,7 +100,9 @@ public final class ConfigPaths {
     static JsonObject loadItemsTemplate(String name) throws IOException {
         String resource = "/data/buildscape/config/" + name + ".json";
         try (InputStream input = BuildScape.class.getResourceAsStream(resource)) {
-            if (input == null) throw new IOException("Missing config template: " + resource);
+            if (input == null) {
+                throw new IOException("Missing config template: " + resource);
+            }
             String source = new String(input.readAllBytes(), StandardCharsets.UTF_8);
             return ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(source));
         }

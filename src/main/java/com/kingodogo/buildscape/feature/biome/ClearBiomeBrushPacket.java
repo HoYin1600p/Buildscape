@@ -21,7 +21,9 @@ public class ClearBiomeBrushPacket {
         NetworkEvent.Context ctx = ctxSupplier.get();
         ctx.enqueueWork(() -> {
             ServerPlayer player = ctx.getSender();
-            if (player == null) return;
+            if (player == null) {
+                return;
+            }
 
             ItemStack stack = player.getMainHandItem();
             if (stack.isEmpty() || !(stack.getItem() instanceof BiomeBrushItem)) {

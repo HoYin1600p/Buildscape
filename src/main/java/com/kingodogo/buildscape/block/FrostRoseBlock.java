@@ -288,7 +288,9 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
                     count++;
                 }
             }
-            if (counts.size() >= 4096) counts.clear();
+            if (counts.size() >= 4096) {
+                counts.clear();
+            }
             cached = new long[]{now, count};
             counts.put(pos.immutable(), cached);
         }

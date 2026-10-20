@@ -12,7 +12,9 @@ import net.minecraft.stats.Stats;
 public class AdvancementGrants {
 
     public static boolean grant(ServerPlayer player, String id) {
-        if (player == null || player.getServer() == null) return false;
+        if (player == null || player.getServer() == null) {
+            return false;
+        }
         Advancement adv = player.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", id));
         if (adv != null) {
             AdvancementProgress progress = player.getAdvancements().getOrStartProgress(adv);
@@ -27,15 +29,23 @@ public class AdvancementGrants {
     }
 
     public static void checkFullCubeAdvancement(ServerPlayer serverPlayer) {
-        if (serverPlayer == null || serverPlayer.getServer() == null) return;
+        if (serverPlayer == null || serverPlayer.getServer() == null) {
+            return;
+        }
         Advancement cubeAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", "a_full_buildscape_cube"));
-        if (cubeAdv == null) return;
+        if (cubeAdv == null) {
+            return;
+        }
         AdvancementProgress cubeProgress = serverPlayer.getAdvancements().getOrStartProgress(cubeAdv);
-        if (cubeProgress.isDone()) return;
+        if (cubeProgress.isDone()) {
+            return;
+        }
 
         for (String criterion : cubeAdv.getCriteria().keySet()) {
             CriterionProgress cp = cubeProgress.getCriterion(criterion);
-            if (cp != null && cp.isDone()) continue;
+            if (cp != null && cp.isDone()) {
+                continue;
+            }
 
             Advancement reqAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", criterion));
             if (reqAdv != null) {
@@ -49,9 +59,13 @@ public class AdvancementGrants {
 
     public static boolean checkRelativeMilestone(ServerPlayer player, String advId, int targetCount, int currentStat) {
         Advancement adv = player.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", advId));
-        if (adv == null) return false;
+        if (adv == null) {
+            return false;
+        }
         AdvancementProgress progress = player.getAdvancements().getOrStartProgress(adv);
-        if (progress.isDone()) return false;
+        if (progress.isDone()) {
+            return false;
+        }
 
         CompoundTag tag = player.getPersistentData();
         String baseKey = "BS_Base_" + advId;
@@ -80,7 +94,9 @@ public class AdvancementGrants {
     }
 
     public static void onPillarItemInserted(ServerPlayer serverPlayer) {
-        if (serverPlayer == null) return;
+        if (serverPlayer == null) {
+            return;
+        }
 
         serverPlayer.awardStat(ModStats.INTERACT_WITH_PILLAR);
         int count = serverPlayer.getStats().getValue(Stats.CUSTOM, ModStats.INTERACT_WITH_PILLAR);
@@ -100,7 +116,9 @@ public class AdvancementGrants {
     }
 
     public static void onHammerReplace(ServerPlayer player) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
         player.awardStat(ModStats.HAMMER_USED);
         int count = player.getStats().getValue(Stats.CUSTOM, ModStats.HAMMER_USED);
 
@@ -109,7 +127,9 @@ public class AdvancementGrants {
     }
 
     public static void onConfettiUsed(ServerPlayer player) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
         player.awardStat(ModStats.CONFETTI_USED);
         int count = player.getStats().getValue(Stats.CUSTOM, ModStats.CONFETTI_USED);
         checkRelativeMilestone(player, "celebrate_in_style", 20, count);

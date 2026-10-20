@@ -15,14 +15,18 @@ public final class ParticleCacheEvents {
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
         SmokeColorRegistry.cleanupOldEntries();
         TintedDripParticle.cleanupOldEntries();
     }
 
     @SubscribeEvent
     public static void onWorldUnload(WorldEvent.Unload event) {
-        if (event.getWorld().isClientSide()) clear();
+        if (event.getWorld().isClientSide()) {
+            clear();
+        }
     }
 
     @SubscribeEvent

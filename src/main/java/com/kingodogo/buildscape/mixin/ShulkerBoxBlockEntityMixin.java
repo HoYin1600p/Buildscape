@@ -19,11 +19,15 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
 
     @Inject(method = "load", at = @At("HEAD"))
     private void migrateStoredGhostItems(CompoundTag tag, CallbackInfo ci) {
-        if (tag.getBoolean(NbtKeys.GHOST_MIGRATED)) return;
+        if (tag.getBoolean(NbtKeys.GHOST_MIGRATED)) {
+            return;
+        }
         ListTag filters = tag.contains(NbtKeys.GHOST_FILTERS, 9)
                 ? tag.getList(NbtKeys.GHOST_FILTERS, 8).copy()
                 : new ListTag();
-        while (filters.size() < 27) filters.add(StringTag.valueOf(""));
+        while (filters.size() < 27) {
+            filters.add(StringTag.valueOf(""));
+        }
 
         if (tag.contains(NbtKeys.ITEMS, 9)) {
             ListTag items = tag.getList(NbtKeys.ITEMS, 10);
@@ -31,7 +35,9 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
                 CompoundTag item = items.getCompound(i);
                 int slot = item.getByte("Slot") & 255;
                 if (slot >= 27 || !item.contains(NbtKeys.TAG, 10)
-                        || !item.getCompound(NbtKeys.TAG).getBoolean(NbtKeys.GHOST)) continue;
+                        || !item.getCompound(NbtKeys.TAG).getBoolean(NbtKeys.GHOST)) {
+                    continue;
+                }
 
                 if (filters.getString(slot).isEmpty()) {
                     filters.set(slot, StringTag.valueOf(item.getString(NbtKeys.ID)));
@@ -46,7 +52,9 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
 
     @Inject(method = "load", at = @At("TAIL"))
     private void onLoad(CompoundTag tag, CallbackInfo ci) {
-        for (int i = 0; i < 27; i++) buildscape$ghostFilters[i] = "";
+        for (int i = 0; i < 27; i++) {
+            buildscape$ghostFilters[i] = "";
+        }
         if (tag.contains(NbtKeys.GHOST_FILTERS, 9)) {
             ListTag list = tag.getList(NbtKeys.GHOST_FILTERS, 8);
             for (int i = 0; i < 27; i++) {
@@ -65,7 +73,9 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
         ListTag list = new ListTag();
         for (int i = 0; i < 27; i++) {
             String filter = buildscape$ghostFilters[i] != null ? buildscape$ghostFilters[i] : "";
-            if (!filter.isEmpty()) hasFilter = true;
+            if (!filter.isEmpty()) {
+                hasFilter = true;
+            }
             list.add(StringTag.valueOf(filter));
         }
         if (hasFilter) {

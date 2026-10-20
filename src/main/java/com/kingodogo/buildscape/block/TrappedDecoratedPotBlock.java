@@ -151,7 +151,9 @@ public class TrappedDecoratedPotBlock
                     toStore.setCount(toTake);
                     be.setStoredItem(toStore, false);
                     heldItem.shrink(toTake);
-                    if (heldItem.isEmpty()) player.setItemInHand(hand, ItemStack.EMPTY);
+                    if (heldItem.isEmpty()) {
+                        player.setItemInHand(hand, ItemStack.EMPTY);
+                    }
                     playInsertSound(level, pos);
                     spawnInsertParticles(level, pos);
                     be.triggerWobble(TrappedDecoratedPotBlockEntity.WobbleStyle.POSITIVE);
@@ -166,7 +168,9 @@ public class TrappedDecoratedPotBlock
                     stored.grow(canAdd);
                     be.setStoredItem(stored, true);
                     heldItem.shrink(canAdd);
-                    if (heldItem.isEmpty()) player.setItemInHand(hand, ItemStack.EMPTY);
+                    if (heldItem.isEmpty()) {
+                        player.setItemInHand(hand, ItemStack.EMPTY);
+                    }
                     playInsertSound(level, pos);
                     spawnInsertParticles(level, pos);
                     be.triggerWobble(TrappedDecoratedPotBlockEntity.WobbleStyle.POSITIVE);
@@ -206,7 +210,9 @@ public class TrappedDecoratedPotBlock
                     toStore.setCount(1);
                     be.setStoredItem(toStore, true);
                     heldItem.shrink(1);
-                    if (heldItem.isEmpty()) player.setItemInHand(hand, ItemStack.EMPTY);
+                    if (heldItem.isEmpty()) {
+                        player.setItemInHand(hand, ItemStack.EMPTY);
+                    }
                     playInsertSound(level, pos);
                     spawnInsertParticles(level, pos);
                     be.triggerWobble(TrappedDecoratedPotBlockEntity.WobbleStyle.POSITIVE);
@@ -219,7 +225,9 @@ public class TrappedDecoratedPotBlock
                     stored.grow(1);
                     be.setStoredItem(stored, true);
                     heldItem.shrink(1);
-                    if (heldItem.isEmpty()) player.setItemInHand(hand, ItemStack.EMPTY);
+                    if (heldItem.isEmpty()) {
+                        player.setItemInHand(hand, ItemStack.EMPTY);
+                    }
                     playInsertSound(level, pos);
                     spawnInsertParticles(level, pos);
                     be.triggerWobble(TrappedDecoratedPotBlockEntity.WobbleStyle.POSITIVE);
@@ -312,7 +320,9 @@ public class TrappedDecoratedPotBlock
 
 
     private static void spawnMobFromEgg(Level level, BlockPos pos, ItemStack stack) {
-        if (level.isClientSide) return;
+        if (level.isClientSide) {
+            return;
+        }
         SpawnEggItem spawnEgg = (SpawnEggItem) stack.getItem();
         EntityType<?> entityType = spawnEgg.getType(stack.getTag());
         if (entityType != null) {

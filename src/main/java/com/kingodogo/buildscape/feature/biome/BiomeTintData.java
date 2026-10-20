@@ -25,7 +25,9 @@ public class BiomeTintData extends SavedData {
     public boolean putColumn(int x, int z, ResourceLocation biome) {
         Map<Integer, ResourceLocation> columns = chunks.computeIfAbsent(ChunkPos.asLong(x >> 4, z >> 4),
                 ignored -> new HashMap<>());
-        if (biome.equals(columns.put(columnIndex(x, z), biome))) return false;
+        if (biome.equals(columns.put(columnIndex(x, z), biome))) {
+            return false;
+        }
         setDirty();
         return true;
     }
@@ -45,9 +47,13 @@ public class BiomeTintData extends SavedData {
                 CompoundTag column = columnTags.getCompound(j);
                 int index = column.getInt("Index");
                 ResourceLocation biome = ResourceLocation.tryParse(column.getString("Biome"));
-                if (index >= 0 && index < 256 && biome != null) columns.put(index, biome);
+                if (index >= 0 && index < 256 && biome != null) {
+                    columns.put(index, biome);
+                }
             }
-            if (!columns.isEmpty()) data.chunks.put(chunkTag.getLong("Chunk"), columns);
+            if (!columns.isEmpty()) {
+                data.chunks.put(chunkTag.getLong("Chunk"), columns);
+            }
         }
         return data;
     }

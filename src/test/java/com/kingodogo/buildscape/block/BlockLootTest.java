@@ -43,7 +43,9 @@ public class BlockLootTest {
                 int count = evaluateCount(id, entry, Map.of("type", type));
                 assertEquals(id + " " + type, "double".equals(type) ? 2 : 1, count);
             }
-            if (id.startsWith("sculk_")) assertRequiresSilkTouch(entry);
+            if (id.startsWith("sculk_")) {
+                assertRequiresSilkTouch(entry);
+            }
         }
     }
 
@@ -85,7 +87,9 @@ public class BlockLootTest {
         for (JsonElement element : entry.getAsJsonArray("functions")) {
             JsonObject function = element.getAsJsonObject();
             String name = function.get("function").getAsString();
-            if ("minecraft:explosion_decay".equals(name)) continue;
+            if ("minecraft:explosion_decay".equals(name)) {
+                continue;
+            }
             assertEquals("minecraft:set_count", name);
             boolean matches = true;
             if (function.has("conditions")) {

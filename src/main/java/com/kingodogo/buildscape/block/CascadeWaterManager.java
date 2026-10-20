@@ -33,7 +33,9 @@ public class CascadeWaterManager {
     }
 
     public static void registerWaterTicket(Level level, BlockPos pos) {
-        if (level.isClientSide) return;
+        if (level.isClientSide) {
+            return;
+        }
         ResourceLocation dimension = level.dimension().location();
 
         Map<BlockPos, AABBTicket> dimensionTickets = TICKETS.computeIfAbsent(dimension, k -> new ConcurrentHashMap<>());
@@ -54,7 +56,9 @@ public class CascadeWaterManager {
     }
 
     public static void removeWaterTicket(Level level, BlockPos pos) {
-        if (level.isClientSide) return;
+        if (level.isClientSide) {
+            return;
+        }
         ResourceLocation dimension = level.dimension().location();
         Map<BlockPos, AABBTicket> dimensionTickets = TICKETS.get(dimension);
         if (dimensionTickets != null) {

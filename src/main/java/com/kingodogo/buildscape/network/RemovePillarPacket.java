@@ -48,8 +48,12 @@ public class RemovePillarPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
-            if (!EditGuard.require(player, ConfigSetting.PILLAR_EDIT)) return;
+            if (player == null) {
+                return;
+            }
+            if (!EditGuard.require(player, ConfigSetting.PILLAR_EDIT)) {
+                return;
+            }
 
             PillarIdManager manager = PillarIdManager.get();
             boolean changed = manager.removePillars(pillarIds);

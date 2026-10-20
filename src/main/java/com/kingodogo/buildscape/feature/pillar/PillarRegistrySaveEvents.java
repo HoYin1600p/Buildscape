@@ -13,7 +13,9 @@ import net.minecraftforge.fml.common.Mod;
 public class PillarRegistrySaveEvents {
     @SubscribeEvent
     public static void onWorldSave(WorldEvent.Save event) {
-        if (event.getWorld() instanceof ServerLevel) PillarIdManager.get().savePeriodic(false);
+        if (event.getWorld() instanceof ServerLevel) {
+            PillarIdManager.get().savePeriodic(false);
+        }
     }
 
     @SubscribeEvent

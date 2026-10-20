@@ -13,7 +13,9 @@ public final class BiomeBrushDurability {
      * {@code level / (level + 1)}.
      */
     public static boolean chargesDurability(boolean creative, int unbreakingLevel, IntUnaryOperator nextInt) {
-        if (creative) return false;
+        if (creative) {
+            return false;
+        }
         return unbreakingLevel <= 0 || nextInt.applyAsInt(unbreakingLevel + 1) == 0;
     }
 }

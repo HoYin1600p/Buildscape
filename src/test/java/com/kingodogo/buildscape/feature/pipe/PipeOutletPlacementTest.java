@@ -127,7 +127,9 @@ public class PipeOutletPlacementTest {
                             case "getBlockState" -> this.state;
                             case "hasChunkAt" -> loaded;
                             case "setBlock" -> {
-                                if (!acceptWrites) yield false;
+                                if (!acceptWrites) {
+                                    yield false;
+                                }
                                 this.state = (BlockState) args[1];
                                 writes++;
                                 yield true;

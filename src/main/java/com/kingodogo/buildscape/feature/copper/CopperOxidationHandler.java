@@ -44,9 +44,13 @@ public class CopperOxidationHandler {
     private static volatile boolean initialized;
 
     public static void init() {
-        if (initialized) return;
+        if (initialized) {
+            return;
+        }
         synchronized (STAGES) {
-            if (initialized) return;
+            if (initialized) {
+                return;
+            }
             registerChain(ModBlocks.CHISELED_COPPER, ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.OXIDIZED_CHISELED_COPPER);
             registerWaxPair(ModBlocks.CHISELED_COPPER, ModBlocks.WAXED_CHISELED_COPPER);
             registerWaxPair(ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WAXED_EXPOSED_CHISELED_COPPER);
@@ -229,15 +233,21 @@ public class CopperOxidationHandler {
             if (nextState != null && nextState.getBlock() != block) {
                 if (!level.isClientSide) {
                     setBlockStateOrDoor(level, pos, state, nextState.getBlock());
-                    if (level.getBlockState(pos).getBlock() != nextState.getBlock()) return false;
+                    if (level.getBlockState(pos).getBlock() != nextState.getBlock()) {
+                        return false;
+                    }
                     ((ServerLevel) level).sendParticles(ParticleTypes.SMOKE,
                             pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
                             8, 0.25D, 0.25D, 0.25D, 0.05D);
                     if (!player.getAbilities().instabuild) {
                         held.shrink(1);
                         ItemStack emptyBottle = new ItemStack(Items.GLASS_BOTTLE);
-                        if (held.isEmpty()) player.setItemInHand(event.getHand(), emptyBottle);
-                        else if (!player.getInventory().add(emptyBottle)) player.drop(emptyBottle, false);
+                        if (held.isEmpty()) {
+                            player.setItemInHand(event.getHand(), emptyBottle);
+                        }
+                        else if (!player.getInventory().add(emptyBottle)) {
+                            player.drop(emptyBottle, false);
+                        }
                     }
                 }
                 level.playSound(player, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.6F, 0.8F);
@@ -252,7 +262,9 @@ public class CopperOxidationHandler {
                 if (!level.isClientSide) {
                     level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, true), 3);
                     level.levelEvent(3003, pos, 0);
-                    if (!player.getAbilities().instabuild) held.shrink(1);
+                    if (!player.getAbilities().instabuild) {
+                        held.shrink(1);
+                    }
                 }
                 level.playSound(player, pos, SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0F, 1.0F);
                 event.setCanceled(true);
@@ -268,7 +280,9 @@ public class CopperOxidationHandler {
                     }
                     setBlockStateOrDoor(level, pos, state, target);
                     level.levelEvent(3003, pos, 0);
-                    if (!player.getAbilities().instabuild) held.shrink(1);
+                    if (!player.getAbilities().instabuild) {
+                        held.shrink(1);
+                    }
                 }
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
@@ -437,11 +451,15 @@ public class CopperOxidationHandler {
 
     static <T> T getFirstStage(T stage, Map<Supplier<T>, Supplier<T>> next,
                                Map<Supplier<T>, Supplier<T>> previous) {
-        if (!isWeatheringStage(stage, next, previous)) return null;
+        if (!isWeatheringStage(stage, next, previous)) {
+            return null;
+        }
         T current = stage;
         while (true) {
             T prev = getMappedStage(current, previous);
-            if (prev == null) break;
+            if (prev == null) {
+                break;
+            }
             current = prev;
         }
         return current;

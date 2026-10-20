@@ -27,16 +27,24 @@ public interface BuildscapeWeatheringCopper extends WeatheringCopper {
         int sameAge = 0;
         int older = 0;
         for (BlockPos neighborPos : BlockPos.withinManhattan(pos, 4, 4, 4)) {
-            if (neighborPos.distManhattan(pos) > 4) break;
+            if (neighborPos.distManhattan(pos) > 4) {
+                break;
+            }
             if (!neighborPos.equals(pos)) {
                 Block block = level.getBlockState(neighborPos).getBlock();
                 if (block instanceof ChangeOverTimeBlock<?> changing) {
                     Enum<?> neighborAge = changing.getAge();
                     if (this.getAge().getClass() == neighborAge.getClass()) {
                         int neighborOrdinal = neighborAge.ordinal();
-                        if (neighborOrdinal < age) return;
-                        if (neighborOrdinal > age) ++older;
-                        else ++sameAge;
+                        if (neighborOrdinal < age) {
+                            return;
+                        }
+                        if (neighborOrdinal > age) {
+                            ++older;
+                        }
+                        else {
+                            ++sameAge;
+                        }
                     }
                 }
             }

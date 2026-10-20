@@ -29,10 +29,14 @@ public abstract class PipeFluidTransport {
             return false;
         }
         if (stateFrom.getBlock() instanceof HollowLogBlock) {
-            if (!HollowLogBlock.isOpenEnd(stateFrom, dir)) return false;
+            if (!HollowLogBlock.isOpenEnd(stateFrom, dir)) {
+                return false;
+            }
         }
         if (stateTo.getBlock() instanceof HollowLogBlock) {
-            if (!HollowLogBlock.isOpenEnd(stateTo, dir.getOpposite())) return false;
+            if (!HollowLogBlock.isOpenEnd(stateTo, dir.getOpposite())) {
+                return false;
+            }
         }
         if (stateFrom.getBlock() instanceof HollowLogBlock && stateTo.getBlock() instanceof HollowLogBlock) {
             return true;
@@ -50,7 +54,9 @@ public abstract class PipeFluidTransport {
     }
 
     public static boolean isTopologyConnected(BlockGetter level, BlockPos fromPos, Direction dir) {
-        if (level == null || fromPos == null || dir == null) return false;
+        if (level == null || fromPos == null || dir == null) {
+            return false;
+        }
         BlockState fromState = level.getBlockState(fromPos);
         BlockState toState = level.getBlockState(fromPos.relative(dir));
         return arePipesConnected(fromState, dir, toState);
@@ -58,11 +64,15 @@ public abstract class PipeFluidTransport {
 
     public static List<Direction> getConnectedDirections(BlockState state) {
         List<Direction> dirs = new ArrayList<>(6);
-        if (!isHollowPipe(state)) return dirs;
+        if (!isHollowPipe(state)) {
+            return dirs;
+        }
 
         if (state.getBlock() instanceof HollowLogBlock) {
             for (Direction dir : Direction.values()) {
-                if (HollowLogBlock.isOpenEnd(state, dir)) dirs.add(dir);
+                if (HollowLogBlock.isOpenEnd(state, dir)) {
+                    dirs.add(dir);
+                }
             }
             return dirs;
         }
@@ -77,7 +87,9 @@ public abstract class PipeFluidTransport {
     }
 
     public static boolean isOpenEndpoint(BlockState state, Direction dir) {
-        if (!isHollowPipe(state) || dir == null) return false;
+        if (!isHollowPipe(state) || dir == null) {
+            return false;
+        }
         if (state.getBlock() instanceof HollowLogBlock) {
             return HollowLogBlock.isOpenEnd(state, dir);
         }

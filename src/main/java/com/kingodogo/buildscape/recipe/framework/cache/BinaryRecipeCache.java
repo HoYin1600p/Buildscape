@@ -54,22 +54,30 @@ public class BinaryRecipeCache {
     private static final int MAX_INGREDIENT_COUNT = 4_096;
 
     private static Item getItemFromRegistry(ResourceLocation rl) {
-        if (rl == null) return Items.AIR;
+        if (rl == null) {
+            return Items.AIR;
+        }
         try {
             if (ForgeRegistries.ITEMS != null) {
                 Item item = ForgeRegistries.ITEMS.getValue(rl);
-                if (item != null) return item;
+                if (item != null) {
+                    return item;
+                }
             }
         } catch (Throwable ignored) {}
         return Items.AIR;
     }
 
     private static ResourceLocation getItemKeyFromRegistry(Item item) {
-        if (item == null) return new ResourceLocation("minecraft", "air");
+        if (item == null) {
+            return new ResourceLocation("minecraft", "air");
+        }
         try {
             if (ForgeRegistries.ITEMS != null) {
                 ResourceLocation key = ForgeRegistries.ITEMS.getKey(item);
-                if (key != null) return key;
+                if (key != null) {
+                    return key;
+                }
             }
         } catch (Throwable ignored) {}
         return new ResourceLocation("minecraft", "air");
@@ -108,7 +116,9 @@ public class BinaryRecipeCache {
     }
 
     public static boolean isCacheable(Recipe<?> recipe) {
-        if (recipe == null) return false;
+        if (recipe == null) {
+            return false;
+        }
         return recipe instanceof ShapedRecipe
                 || recipe instanceof ShapelessRecipe
                 || recipe instanceof StonecutterRecipe
@@ -270,8 +280,9 @@ public class BinaryRecipeCache {
     }
 
     private static int getStringIndex(String str, List<String> stringPool, Map<String, Integer> stringIndexMap) {
-        if (str == null)
+        if (str == null) {
             str = "";
+        }
         return stringIndexMap.computeIfAbsent(str, s -> {
             int idx = stringPool.size();
             stringPool.add(s);
@@ -385,8 +396,9 @@ public class BinaryRecipeCache {
         Item resultItem = itemCache[itemIdx];
         if (resultItem == null) {
             resultItem = getItemFromRegistry(ResourceLocation.tryParse(stringPool[itemIdx]));
-            if (resultItem == null)
+            if (resultItem == null) {
                 resultItem = Items.AIR;
+            }
             itemCache[itemIdx] = resultItem;
         }
 

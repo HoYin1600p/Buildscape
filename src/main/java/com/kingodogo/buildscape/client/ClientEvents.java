@@ -56,7 +56,9 @@ public class ClientEvents {
 
     public static void resetAllPillarParticles() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) {
+            return;
+        }
 
         BlockPos playerPos = mc.player.blockPosition();
         int chunkX = playerPos.getX() >> 4;
@@ -95,7 +97,9 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
-        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
+        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) {
+            return;
+        }
 
         int screenWidth = event.getWindow().getGuiScaledWidth();
         int screenHeight = event.getWindow().getGuiScaledHeight();

@@ -153,7 +153,9 @@ public class RecipeCacheGenerator {
                 }
 
                 for (RecipeIR.RecipeSpec spec : allSpecs) {
-                    if (spec == null) continue;
+                    if (spec == null) {
+                        continue;
+                    }
 
                     String specType = spec.type() != null ? spec.type().toLowerCase(Locale.ROOT) : category.toLowerCase(Locale.ROOT);
                     if ("forge:conditional".equals(specType) || (spec.rawJson() != null && spec.rawJson().contains("\"conditions\""))) {
@@ -290,7 +292,9 @@ public class RecipeCacheGenerator {
             Map<String, Integer> stringIndexMap) throws IOException {
 
         List<String> patternList = spec.pattern();
-        if (patternList == null) patternList = List.of();
+        if (patternList == null) {
+            patternList = List.of();
+        }
         int height = patternList.size();
         int width = 0;
         for (String line : patternList) {
@@ -353,7 +357,9 @@ public class RecipeCacheGenerator {
             Map<String, Integer> stringIndexMap) throws IOException {
 
         List<String> ingredients = spec.ingredients();
-        if (ingredients == null) ingredients = List.of();
+        if (ingredients == null) {
+            ingredients = List.of();
+        }
 
         List<String> resolved = new ArrayList<>();
         for (String ingStr : ingredients) {
@@ -384,7 +390,9 @@ public class RecipeCacheGenerator {
                     entries.add(itemJson);
                 }
             }
-            if (entries.isEmpty()) return "";
+            if (entries.isEmpty()) {
+                return "";
+            }
             return "[" + String.join(",", entries) + "]";
         }
 
@@ -397,7 +405,9 @@ public class RecipeCacheGenerator {
     }
 
     private static int getStringIndex(String str, List<String> stringPool, Map<String, Integer> stringIndexMap) {
-        if (str == null) str = "";
+        if (str == null) {
+            str = "";
+        }
         return stringIndexMap.computeIfAbsent(str, s -> {
             int idx = stringPool.size();
             stringPool.add(s);

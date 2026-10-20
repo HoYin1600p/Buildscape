@@ -41,10 +41,14 @@ public final class SculkSpreader {
     }
 
     public boolean updateCursors(ServerLevel level, BlockPos origin) {
-        if (cursors.isEmpty()) return false;
+        if (cursors.isEmpty()) {
+            return false;
+        }
         boolean changed = false;
         for (ChargeCursor cursor : cursors) {
-            if (!isAreaLoaded(level, cursor.pos)) continue;
+            if (!isAreaLoaded(level, cursor.pos)) {
+                continue;
+            }
             changed = true;
             cursor.update(level, origin);
         }
@@ -72,18 +76,24 @@ public final class SculkSpreader {
     }
 
     private static boolean hasSubstrate(ServerLevel level, BlockPos pos, BlockState state) {
-        if (!state.is(ModBlocks.SCULK_VEIN.get())) return false;
+        if (!state.is(ModBlocks.SCULK_VEIN.get())) {
+            return false;
+        }
         for (Direction face : Direction.values()) {
             BlockPos target = pos.relative(face);
             if (state.getValue(GlowLichenBlock.getFaceProperty(face)) && level.hasChunkAt(target)
-                    && level.getBlockState(target).is(REPLACEABLE)) return true;
+                    && level.getBlockState(target).is(REPLACEABLE)) {
+                return true;
+            }
         }
         return false;
     }
 
     private static boolean convertSubstrate(ServerLevel level, BlockPos pos, Random random) {
         BlockState state = level.getBlockState(pos);
-        if (!state.is(ModBlocks.SCULK_VEIN.get())) return false;
+        if (!state.is(ModBlocks.SCULK_VEIN.get())) {
+            return false;
+        }
         List<Direction> faces = Arrays.asList(Direction.values());
         Collections.shuffle(faces, random);
         for (Direction face : faces) {
@@ -92,7 +102,9 @@ public final class SculkSpreader {
                     && level.getBlockState(target).is(REPLACEABLE)
                     && level.setBlock(target, ModBlocks.SCULK.get().defaultBlockState(), 3)) {
                 level.playSound(null, target, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
-                for (Direction direction : Direction.values()) SculkVeinBlock.regrow(level, target.relative(direction));
+                for (Direction direction : Direction.values()) {
+                    SculkVeinBlock.regrow(level, target.relative(direction));
+                }
                 return true;
             }
         }
@@ -100,12 +112,18 @@ public final class SculkSpreader {
     }
 
     private static boolean canPlaceGrowth(ServerLevel level, BlockPos pos) {
-        if (!level.isEmptyBlock(pos.above())) return false;
+        if (!level.isEmptyBlock(pos.above())) {
+            return false;
+        }
         int nearby = 0;
         for (BlockPos check : BlockPos.betweenClosed(pos.offset(-4, 0, -4), pos.offset(4, 2, 4))) {
-            if (!level.hasChunkAt(check)) return false;
+            if (!level.hasChunkAt(check)) {
+                return false;
+            }
             BlockState state = level.getBlockState(check);
-            if ((state.is(ModBlocks.SCULK_SENSOR.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get())) && ++nearby > 2) return false;
+            if ((state.is(ModBlocks.SCULK_SENSOR.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get())) && ++nearby > 2) {
+                return false;
+            }
         }
         return true;
     }
@@ -116,17 +134,31 @@ public final class SculkSpreader {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
                     int distance = Math.abs(x) + Math.abs(y) + Math.abs(z);
-                    if (distance == 0 || distance > 2) continue;
+                    if (distance == 0 || distance > 2) {
+                        continue;
+                    }
                     BlockPos target = pos.offset(x, y, z);
-                    if (level.isOutsideBuildHeight(target) || !level.hasChunkAt(target)) continue;
+                    if (level.isOutsideBuildHeight(target) || !level.hasChunkAt(target)) {
+                        continue;
+                    }
                     BlockState state = level.getBlockState(target);
-                    if (!state.is(ModBlocks.SCULK.get()) && !state.is(ModBlocks.SCULK_VEIN.get())) continue;
+                    if (!state.is(ModBlocks.SCULK.get()) && !state.is(ModBlocks.SCULK_VEIN.get())) {
+                        continue;
+                    }
                     if (distance == 2) {
                         boolean blocked = true;
-                        if (x != 0) blocked &= level.getBlockState(pos.offset(x, 0, 0)).isCollisionShapeFullBlock(level, pos.offset(x, 0, 0));
-                        if (y != 0) blocked &= level.getBlockState(pos.offset(0, y, 0)).isCollisionShapeFullBlock(level, pos.offset(0, y, 0));
-                        if (z != 0) blocked &= level.getBlockState(pos.offset(0, 0, z)).isCollisionShapeFullBlock(level, pos.offset(0, 0, z));
-                        if (blocked) continue;
+                        if (x != 0) {
+                            blocked &= level.getBlockState(pos.offset(x, 0, 0)).isCollisionShapeFullBlock(level, pos.offset(x, 0, 0));
+                        }
+                        if (y != 0) {
+                            blocked &= level.getBlockState(pos.offset(0, y, 0)).isCollisionShapeFullBlock(level, pos.offset(0, y, 0));
+                        }
+                        if (z != 0) {
+                            blocked &= level.getBlockState(pos.offset(0, 0, z)).isCollisionShapeFullBlock(level, pos.offset(0, 0, z));
+                        }
+                        if (blocked) {
+                            continue;
+                        }
                     }
                     candidates.add(target);
                 }
@@ -134,7 +166,9 @@ public final class SculkSpreader {
         }
         Collections.shuffle(candidates, random);
         for (BlockPos candidate : candidates) {
-            if (hasSubstrate(level, candidate, level.getBlockState(candidate))) return candidate;
+            if (hasSubstrate(level, candidate, level.getBlockState(candidate))) {
+                return candidate;
+            }
         }
         return candidates.isEmpty() ? null : candidates.get(0);
     }
@@ -158,7 +192,9 @@ public final class SculkSpreader {
         for (int i = 0; i < Math.min(list.size(), SculkCharge.MAX_CURSORS); i++) {
             CompoundTag saved = list.getCompound(i);
             int charge = Math.max(0, Math.min(saved.getInt("charge"), SculkCharge.MAX_CHARGE));
-            if (charge == 0 || !saved.contains(NbtKeys.POS, Tag.TAG_COMPOUND)) continue;
+            if (charge == 0 || !saved.contains(NbtKeys.POS, Tag.TAG_COMPOUND)) {
+                continue;
+            }
             ChargeCursor cursor = new ChargeCursor(NbtUtils.readBlockPos(saved.getCompound(NbtKeys.POS)), charge);
             cursor.updateDelay = Math.max(0, Math.min(saved.getInt("update_delay"), 1));
             cursor.decayDelay = Math.max(0, Math.min(saved.getInt("decay_delay"), 1));
@@ -194,8 +230,12 @@ public final class SculkSpreader {
                 if (spreadVeins) {
                     level.playSound(null, pos, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
-                if (convertSubstrate(level, pos, random)) charge--;
-                else if (random.nextInt(CHARGE_DECAY_RATE) == 0) charge /= 2;
+                if (convertSubstrate(level, pos, random)) {
+                    charge--;
+                }
+                else if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
+                    charge /= 2;
+                }
             } else if (state.is(ModBlocks.SCULK.get())) {
                 if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
                     if (pos.distSqr(origin) > NO_GROWTH_RADIUS * NO_GROWTH_RADIUS && canPlaceGrowth(level, pos)) {
@@ -216,7 +256,9 @@ public final class SculkSpreader {
             BlockPos next = charge > 0 ? movementPos(level, pos, random) : null;
             if (charge <= 0 || next != null) {
                 SculkVeinBlock.discharge(level, pos);
-                if (next != null) pos = next;
+                if (next != null) {
+                    pos = next;
+                }
             } else if (decayDelay > 0) {
                 decayDelay--;
             } else {

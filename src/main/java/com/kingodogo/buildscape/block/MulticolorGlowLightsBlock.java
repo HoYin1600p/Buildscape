@@ -133,17 +133,29 @@ public class MulticolorGlowLightsBlock
             CollisionContext context
     ) {
         VoxelShape shape = Shapes.empty();
-        if (state.getValue(VineBlock.NORTH)) shape =
+        if (state.getValue(VineBlock.NORTH)) {
+            shape =
                 Shapes.or(shape, SHAPE_NORTH);
-        if (state.getValue(VineBlock.SOUTH)) shape =
+        }
+        if (state.getValue(VineBlock.SOUTH)) {
+            shape =
                 Shapes.or(shape, SHAPE_SOUTH);
-        if (state.getValue(VineBlock.EAST)) shape =
+        }
+        if (state.getValue(VineBlock.EAST)) {
+            shape =
                 Shapes.or(shape, SHAPE_EAST);
-        if (state.getValue(VineBlock.WEST)) shape =
+        }
+        if (state.getValue(VineBlock.WEST)) {
+            shape =
                 Shapes.or(shape, SHAPE_WEST);
-        if (state.getValue(VineBlock.UP)) shape =
+        }
+        if (state.getValue(VineBlock.UP)) {
+            shape =
                 Shapes.or(shape, SHAPE_UP);
-        if (state.getValue(DOWN)) shape = Shapes.or(shape, SHAPE_DOWN);
+        }
+        if (state.getValue(DOWN)) {
+            shape = Shapes.or(shape, SHAPE_DOWN);
+        }
         return shape.isEmpty() ? Shapes.block() : shape;
     }
 
@@ -388,7 +400,9 @@ public class MulticolorGlowLightsBlock
         for (Direction direction : Direction.values()) {
             BooleanProperty property = direction == Direction.DOWN
                     ? DOWN : VineBlock.getPropertyForFace(direction);
-            if (state.getValue(property)) count++;
+            if (state.getValue(property)) {
+                count++;
+            }
         }
         return count;
     }

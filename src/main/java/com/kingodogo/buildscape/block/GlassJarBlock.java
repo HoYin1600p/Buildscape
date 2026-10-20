@@ -148,7 +148,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
             if (beTag.contains(NbtKeys.STORED_ITEM, 10)) {
                 ItemStack stored = ItemStack.of(beTag.getCompound(NbtKeys.STORED_ITEM));
                 int count = beTag.getCompound(NbtKeys.STORED_ITEM).getInt(NbtKeys.REAL_COUNT);
-                if (count <= 0) count = stored.getCount();
+                if (count <= 0) {
+                    count = stored.getCount();
+                }
                 if (!stored.isEmpty() && count > 0) {
                     tooltip.add(new TextComponent("Stored: ").append(stored.getHoverName()).append(" x" + count).withStyle(ChatFormatting.GRAY));
                 }
@@ -227,7 +229,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
             if (!jarBE.isEmpty() && !jarBE.hasLiquid()) {
                 ItemStack stored = jarBE.getStoredItem();
                 if (handStack.isEmpty()) {
-                    if (level.isClientSide) return InteractionResult.SUCCESS;
+                    if (level.isClientSide) {
+                        return InteractionResult.SUCCESS;
+                    }
                     ItemStack item = jarBE.extractFood(1);
                     if (!item.isEmpty()) {
                         player.setItemInHand(hand, item);
@@ -235,7 +239,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
                         return InteractionResult.SUCCESS;
                     }
                 } else if (ItemStack.isSameItemSameTags(handStack, stored)) {
-                    if (level.isClientSide) return InteractionResult.SUCCESS;
+                    if (level.isClientSide) {
+                        return InteractionResult.SUCCESS;
+                    }
                     ItemStack item = jarBE.extractFood(1);
                     if (!item.isEmpty()) {
                         if (handStack.getCount() < handStack.getMaxStackSize()) {
@@ -260,7 +266,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
             if (jarBE.getLiquidLevel() >= required) {
                 ItemStack bucketRepresentation = jarBE.getBucketRepresentation();
                 if (!bucketRepresentation.isEmpty()) {
-                    if (level.isClientSide) return InteractionResult.SUCCESS;
+                    if (level.isClientSide) {
+                        return InteractionResult.SUCCESS;
+                    }
                     ItemStack filledBucket = jarBE.extractBucket();
                     if (!filledBucket.isEmpty()) {
                         if (!player.getAbilities().instabuild) {
@@ -279,7 +287,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
         if (handStack.is(Items.GLASS_BOTTLE) && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0) {
             ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
             if (!bottleRepresentation.isEmpty()) {
-                if (level.isClientSide) return InteractionResult.SUCCESS;
+                if (level.isClientSide) {
+                    return InteractionResult.SUCCESS;
+                }
                 ItemStack filledBottle = jarBE.extractBottle();
                 if (!filledBottle.isEmpty()) {
                     if (!player.getAbilities().instabuild) {
@@ -297,7 +307,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
         if (!isSneaking && handStack.isEmpty()) {
             if (!jarBE.isEmpty() && !jarBE.hasLiquid()) {
                 if (player.canEat(false) || player.getAbilities().instabuild) {
-                    if (level.isClientSide) return InteractionResult.SUCCESS;
+                    if (level.isClientSide) {
+                        return InteractionResult.SUCCESS;
+                    }
 
                     ItemStack stored = jarBE.getStoredItem();
                     if (!stored.isEmpty()) {
@@ -325,7 +337,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
                         return InteractionResult.PASS;
                     }
 
-                    if (level.isClientSide) return InteractionResult.SUCCESS;
+                    if (level.isClientSide) {
+                        return InteractionResult.SUCCESS;
+                    }
 
                     if (liquidItem.getItem() instanceof PotionItem) {
                         for (MobEffectInstance effect : PotionUtils.getMobEffects(liquidItem)) {

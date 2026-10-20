@@ -204,14 +204,18 @@ public class UpdateConfigPacket {
             return null;
         }
         pending.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue().getStarted() > 30_000L);
-        if (packet.chunkIndex == 0) pending.put(sender, new ConfigAssembly());
+        if (packet.chunkIndex == 0) {
+            pending.put(sender, new ConfigAssembly());
+        }
         return pending.get(sender);
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+            if (player == null) {
+                return;
+            }
 
             PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
             int permissionLevel = player.hasPermissions(PillarParticleConfig.CONFIG_PERMISSION_LEVEL)
@@ -274,7 +278,9 @@ public class UpdateConfigPacket {
                     new SyncConfigPacket(serverConfig)
             );
 
-            if (!data.uploadSettings.contains(ConfigSetting.PARTICLES) && !data.uploadSettings.contains(ConfigSetting.COLORS)) return;
+            if (!data.uploadSettings.contains(ConfigSetting.PARTICLES) && !data.uploadSettings.contains(ConfigSetting.COLORS)) {
+                return;
+            }
 
             PillarIdManager manager = PillarIdManager.get();
             if (manager.hasLoaded()) {
@@ -307,15 +313,21 @@ public class UpdateConfigPacket {
                 }
 
                 for (ServerLevel level : player.getServer().getAllLevels()) {
-                    if (level == null) continue;
+                    if (level == null) {
+                        continue;
+                    }
                     String dimensionKey = PillarIdManager.getDimensionKey(level);
 
                     for (PillarIdManager.PillarData pData : manager.getAllData()) {
-                        if (pData == null || !pData.dimension.equals(dimensionKey)) continue;
+                        if (pData == null || !pData.dimension.equals(dimensionKey)) {
+                            continue;
+                        }
 
                         try {
                             BlockPos pos = pData.getBlockPos();
-                            if (!level.hasChunkAt(pos)) continue;
+                            if (!level.hasChunkAt(pos)) {
+                                continue;
+                            }
 
                             BlockEntity be = level.getBlockEntity(pos);
                             if (be instanceof PillarBlockEntity pillarBE) {

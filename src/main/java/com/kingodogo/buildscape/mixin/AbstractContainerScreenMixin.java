@@ -26,9 +26,13 @@ public abstract class AbstractContainerScreenMixin {
 
     @Inject(method = "renderSlot", at = @At("TAIL"))
     private void renderFilterPlaceholder(PoseStack poseStack, Slot slot, CallbackInfo ci) {
-        if (slot.hasItem() || !slot.isActive() || !(menu instanceof GhostFilterMenu filters)) return;
+        if (slot.hasItem() || !slot.isActive() || !(menu instanceof GhostFilterMenu filters)) {
+            return;
+        }
         Item filter = filters.buildscape$getFilterItem(slot.index);
-        if (filter == null) return;
+        if (filter == null) {
+            return;
+        }
 
         ItemStack placeholder = new ItemStack(filter);
         placeholder.getOrCreateTag().putBoolean(NbtKeys.GHOST, true);

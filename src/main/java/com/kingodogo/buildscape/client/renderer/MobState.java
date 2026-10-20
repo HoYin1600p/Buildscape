@@ -28,8 +28,12 @@ public class MobState {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MobState mobState = (MobState) o;
         return spin == mobState.spin &&
                 upsideDown == mobState.upsideDown &&

@@ -38,53 +38,49 @@ public enum SideChainPart implements StringRepresentable {
 
     public SideChainPart whenConnectedToTheRight() {
         switch (this) {
-            case UNCONNECTED :
-            case LEFT :
+            case UNCONNECTED, LEFT -> {
                 return LEFT;
-            case RIGHT :
-            case CENTER :
+            }
+            case RIGHT, CENTER -> {
                 return CENTER;
-            default :
-                throw new IllegalArgumentException();
+            }
+            default -> throw new IllegalArgumentException();
         }
     }
 
     public SideChainPart whenConnectedToTheLeft() {
         switch (this) {
-            case UNCONNECTED :
-            case RIGHT :
+            case UNCONNECTED, RIGHT -> {
                 return RIGHT;
-            case CENTER :
-            case LEFT :
+            }
+            case CENTER, LEFT -> {
                 return CENTER;
-            default :
-                throw new IllegalArgumentException();
+            }
+            default -> throw new IllegalArgumentException();
         }
     }
 
     public SideChainPart whenDisconnectedFromTheRight() {
         switch (this) {
-            case UNCONNECTED :
-            case LEFT :
+            case UNCONNECTED, LEFT -> {
                 return UNCONNECTED;
-            case RIGHT :
-            case CENTER :
+            }
+            case RIGHT, CENTER -> {
                 return RIGHT;
-            default :
-                throw new IllegalArgumentException();
+            }
+            default -> throw new IllegalArgumentException();
         }
     }
 
     public SideChainPart whenDisconnectedFromTheLeft() {
         switch (this) {
-            case UNCONNECTED :
-            case RIGHT :
+            case UNCONNECTED, RIGHT -> {
                 return UNCONNECTED;
-            case CENTER :
-            case LEFT :
+            }
+            case CENTER, LEFT -> {
                 return LEFT;
-            default :
-                throw new IllegalArgumentException();
+            }
+            default -> throw new IllegalArgumentException();
         }
     }
 }

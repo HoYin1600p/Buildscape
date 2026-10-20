@@ -166,37 +166,26 @@ public class PotentSulfurBlock extends BaseEntityBlock {
         boolean client = level.isClientSide();
         BlockEntityTicker<PotentSulfurBlockEntity> ticker;
         switch (blockState.getValue(STATE)) {
-            case DRY :
-                ticker = null;
-                break;
-            case WET :
-                ticker = client
-                        ? PotentSulfurBlockEntity.CLIENT_NOXIOUS_GAS_TICKER
-                        : PotentSulfurBlockEntity.SERVER_NAUSEA_EFFECT_TICKER;
-                break;
-            case DORMANT :
-                ticker = client ? PotentSulfurBlockEntity.CLIENT_NOXIOUS_GAS_TICKER : (l, p, s, e) -> {
-                    PotentSulfurBlockEntity.SERVER_WAITING_COUNTDOWN_TICKER.tick(l, p, s, e);
-                    PotentSulfurBlockEntity.SERVER_NAUSEA_EFFECT_TICKER.tick(l, p, s, e);
-                };
-                break;
-            case ERUPTING :
-                ticker = client ? (l, p, s, e) -> {
-                    PotentSulfurBlockEntity.CLIENT_GEYSER_PLUME_TICKER_ERUPTION.tick(l, p, s, e);
-                    PotentSulfurBlockEntity.LAUNCH_ENTITY_TICKER.tick(l, p, s, e);
-                } : (l, p, s, e) -> {
-                    PotentSulfurBlockEntity.LAUNCH_ENTITY_TICKER.tick(l, p, s, e);
-                    PotentSulfurBlockEntity.SERVER_WAITING_COUNTDOWN_TICKER.tick(l, p, s, e);
-                };
-                break;
-            case CONTINUOUS :
-                ticker = client ? (l, p, s, e) -> {
-                    PotentSulfurBlockEntity.CLIENT_GEYSER_PLUME_TICKER_CONTINUOUS.tick(l, p, s, e);
-                    PotentSulfurBlockEntity.LAUNCH_ENTITY_TICKER.tick(l, p, s, e);
-                } : PotentSulfurBlockEntity.LAUNCH_ENTITY_TICKER;
-                break;
-            default :
-                ticker = null;
+            case DRY -> ticker = null;
+            case WET -> ticker = client
+                    ? PotentSulfurBlockEntity.CLIENT_NOXIOUS_GAS_TICKER
+                    : PotentSulfurBlockEntity.SERVER_NAUSEA_EFFECT_TICKER;
+            case DORMANT -> ticker = client ? PotentSulfurBlockEntity.CLIENT_NOXIOUS_GAS_TICKER : (l, p, s, e) -> {
+                PotentSulfurBlockEntity.SERVER_WAITING_COUNTDOWN_TICKER.tick(l, p, s, e);
+                PotentSulfurBlockEntity.SERVER_NAUSEA_EFFECT_TICKER.tick(l, p, s, e);
+            };
+            case ERUPTING -> ticker = client ? (l, p, s, e) -> {
+                PotentSulfurBlockEntity.CLIENT_GEYSER_PLUME_TICKER_ERUPTION.tick(l, p, s, e);
+                PotentSulfurBlockEntity.LAUNCH_ENTITY_TICKER.tick(l, p, s, e);
+            } : (l, p, s, e) -> {
+                PotentSulfurBlockEntity.LAUNCH_ENTITY_TICKER.tick(l, p, s, e);
+                PotentSulfurBlockEntity.SERVER_WAITING_COUNTDOWN_TICKER.tick(l, p, s, e);
+            };
+            case CONTINUOUS -> ticker = client ? (l, p, s, e) -> {
+                PotentSulfurBlockEntity.CLIENT_GEYSER_PLUME_TICKER_CONTINUOUS.tick(l, p, s, e);
+                PotentSulfurBlockEntity.LAUNCH_ENTITY_TICKER.tick(l, p, s, e);
+            } : PotentSulfurBlockEntity.LAUNCH_ENTITY_TICKER;
+            default -> ticker = null;
         }
         return createTickerHelper(type, ModBlockEntities.POTENT_SULFUR.get(), ticker);
     }

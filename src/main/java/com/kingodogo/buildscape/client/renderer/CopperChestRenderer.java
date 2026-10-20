@@ -80,13 +80,10 @@ public class CopperChestRenderer extends ChestRenderer<CopperChestBlockEntity> {
     }
 
     private Material chooseMaterial(ChestType chestType, Material single, Material left, Material right) {
-        switch (chestType) {
-            case LEFT :
-                return left;
-            case RIGHT :
-                return right;
-            default :
-                return single;
-        }
+        return switch (chestType) {
+            case LEFT -> left;
+            case RIGHT -> right;
+            default -> single;
+        };
     }
 }

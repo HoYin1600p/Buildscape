@@ -427,15 +427,15 @@ public class ItemFrameParticleHandler {
             double u, v, w, vu, vv, vw;
 
             switch (pattern) {
-                case ParticlePatterns.BEAM :
+                case ParticlePatterns.BEAM -> {
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 0.0;
                     vu = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = speed * (0.8 + rand.nextDouble() * 0.4);
-                    break;
-                case ParticlePatterns.SPIRAL :
+                }
+                case ParticlePatterns.SPIRAL -> {
                     double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
                     u = Math.cos(angle) * radius;
@@ -444,8 +444,8 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(angle) * speed * 0.3;
                     vv = Math.sin(angle) * speed * 0.3;
                     vw = speed * 0.6;
-                    break;
-                case ParticlePatterns.FOUNTAIN :
+                }
+                case ParticlePatterns.FOUNTAIN -> {
                     double fAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double fRadius = rand.nextDouble() * spread;
                     u = Math.cos(fAngle) * fRadius;
@@ -454,8 +454,8 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(fAngle) * speed * 0.5;
                     vv = Math.sin(fAngle) * speed * 0.5;
                     vw = speed * 0.3 - rand.nextDouble() * speed * 0.2;
-                    break;
-                case ParticlePatterns.PULSE :
+                }
+                case ParticlePatterns.PULSE -> {
                     double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
                     double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
                     double pAngle = rand.nextDouble() * 2.0 * Math.PI;
@@ -465,8 +465,8 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(pAngle) * speed * Math.sin(pulsePhase);
                     vv = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
                     vw = speed * 0.2;
-                    break;
-                case ParticlePatterns.RING :
+                }
+                case ParticlePatterns.RING -> {
                     double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
                     double rRadius = spread * 0.8;
                     u = Math.cos(rAngle) * rRadius;
@@ -475,8 +475,8 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(rAngle + Math.PI / 2) * speed * 0.4;
                     vv = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
                     vw = speed * 0.3;
-                    break;
-                case ParticlePatterns.BURST :
+                }
+                case ParticlePatterns.BURST -> {
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.7;
                     u = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.6;
@@ -485,23 +485,23 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(bAngle) * Math.cos(bElevation) * speed * 1.5;
                     vv = Math.sin(bAngle) * Math.cos(bElevation) * speed * 1.5;
                     vw = Math.sin(bElevation) * speed * 1.5;
-                    break;
-                case ParticlePatterns.SNOWFLAKE :
+                }
+                case ParticlePatterns.SNOWFLAKE -> {
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 2.0;
                     vu = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = -speed * (0.8 + rand.nextDouble() * 0.4);
-                    break;
-                default :
+                }
+                default -> {
                     u = (rand.nextDouble() - 0.5) * spread;
                     v = (rand.nextDouble() - 0.5) * spread;
                     w = rand.nextDouble() * spread;
                     vu = (rand.nextDouble() - 0.5) * speed;
                     vv = (rand.nextDouble() - 0.5) * speed;
                     vw = rand.nextDouble() * speed;
-                    break;
+                }
             }
 
             double sx = rightVec.x * u + upVec.x * v + normal.x * w;
@@ -724,28 +724,18 @@ public class ItemFrameParticleHandler {
             return ChatFormatting.WHITE;
         }
 
-        switch (pattern) {
-            case ParticlePatterns.NONE :
-                return ChatFormatting.DARK_GRAY;
-            case ParticlePatterns.DEFAULT :
-                return ChatFormatting.WHITE;
-            case ParticlePatterns.BEAM :
-                return ChatFormatting.AQUA;
-            case ParticlePatterns.SPIRAL :
-                return ChatFormatting.LIGHT_PURPLE;
-            case ParticlePatterns.FOUNTAIN :
-                return ChatFormatting.BLUE;
-            case ParticlePatterns.PULSE :
-                return ChatFormatting.RED;
-            case ParticlePatterns.RING :
-                return ChatFormatting.GOLD;
-            case ParticlePatterns.BURST :
-                return ChatFormatting.YELLOW;
-            case ParticlePatterns.SNOWFLAKE :
-                return ChatFormatting.AQUA;
-            default :
-                return ChatFormatting.GRAY;
-        }
+        return switch (pattern) {
+            case ParticlePatterns.NONE -> ChatFormatting.DARK_GRAY;
+            case ParticlePatterns.DEFAULT -> ChatFormatting.WHITE;
+            case ParticlePatterns.BEAM -> ChatFormatting.AQUA;
+            case ParticlePatterns.SPIRAL -> ChatFormatting.LIGHT_PURPLE;
+            case ParticlePatterns.FOUNTAIN -> ChatFormatting.BLUE;
+            case ParticlePatterns.PULSE -> ChatFormatting.RED;
+            case ParticlePatterns.RING -> ChatFormatting.GOLD;
+            case ParticlePatterns.BURST -> ChatFormatting.YELLOW;
+            case ParticlePatterns.SNOWFLAKE -> ChatFormatting.AQUA;
+            default -> ChatFormatting.GRAY;
+        };
     }
 
     private static Map.Entry<String, String> getDyeColorAndName(
@@ -1206,15 +1196,15 @@ public class ItemFrameParticleHandler {
             double u, v, w, vu, vv, vw;
 
             switch (pattern) {
-                case ParticlePatterns.BEAM :
+                case ParticlePatterns.BEAM -> {
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 0.0;
                     vu = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = speed * (0.8 + rand.nextDouble() * 0.4);
-                    break;
-                case ParticlePatterns.SPIRAL :
+                }
+                case ParticlePatterns.SPIRAL -> {
                     double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
                     u = Math.cos(angle) * radius;
@@ -1223,8 +1213,8 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(angle) * speed * 0.3;
                     vv = Math.sin(angle) * speed * 0.3;
                     vw = speed * 0.6;
-                    break;
-                case ParticlePatterns.FOUNTAIN :
+                }
+                case ParticlePatterns.FOUNTAIN -> {
                     double fAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double fRadius = rand.nextDouble() * spread;
                     u = Math.cos(fAngle) * fRadius;
@@ -1233,8 +1223,8 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(fAngle) * speed * 0.5;
                     vv = Math.sin(fAngle) * speed * 0.5;
                     vw = speed * 0.3 - rand.nextDouble() * speed * 0.2;
-                    break;
-                case ParticlePatterns.PULSE :
+                }
+                case ParticlePatterns.PULSE -> {
                     double pulsePhase = (time * 0.2) % (2.0 * Math.PI);
                     double pulseRadius = spread * (0.3 + Math.sin(pulsePhase) * 0.7);
                     double pAngle = rand.nextDouble() * 2.0 * Math.PI;
@@ -1244,8 +1234,8 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(pAngle) * speed * Math.sin(pulsePhase);
                     vv = Math.sin(pAngle) * speed * Math.sin(pulsePhase);
                     vw = speed * 0.2;
-                    break;
-                case ParticlePatterns.RING :
+                }
+                case ParticlePatterns.RING -> {
                     double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
                     double rRadius = spread * 0.8;
                     u = Math.cos(rAngle) * rRadius;
@@ -1254,8 +1244,8 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(rAngle + Math.PI / 2) * speed * 0.4;
                     vv = Math.sin(rAngle + Math.PI / 2) * speed * 0.4;
                     vw = speed * 0.3;
-                    break;
-                case ParticlePatterns.BURST :
+                }
+                case ParticlePatterns.BURST -> {
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.5;
                     u = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.3;
@@ -1264,23 +1254,23 @@ public class ItemFrameParticleHandler {
                     vu = Math.cos(bAngle) * Math.cos(bElevation) * speed;
                     vv = Math.sin(bAngle) * Math.cos(bElevation) * speed;
                     vw = Math.sin(bElevation) * speed;
-                    break;
-                case ParticlePatterns.SNOWFLAKE :
+                }
+                case ParticlePatterns.SNOWFLAKE -> {
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
                     w = 2.0;
                     vu = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = -speed * (0.8 + rand.nextDouble() * 0.4);
-                    break;
-                default :
+                }
+                default -> {
                     u = (rand.nextDouble() - 0.5) * spread;
                     v = (rand.nextDouble() - 0.5) * spread;
                     w = rand.nextDouble() * spread;
                     vu = (rand.nextDouble() - 0.5) * speed;
                     vv = (rand.nextDouble() - 0.5) * speed;
                     vw = rand.nextDouble() * speed;
-                    break;
+                }
             }
 
             double sx = rightVec.x * u + upVec.x * v + normal.x * w;

@@ -214,18 +214,13 @@ public class CosmeticRegistry {
             return false;
         }
 
-        switch (info.type) {
-            case "item" :
-                return resolveToItem(cosmeticId) != null;
-            case "block" :
-                return resolveToBlock(cosmeticId) != null;
-            case "type" :
-                return typeDefinitions.containsKey(info.id);
-            case "nbt" :
-                return true;
-            default :
-                return false;
-        }
+        return switch (info.type) {
+            case "item" -> resolveToItem(cosmeticId) != null;
+            case "block" -> resolveToBlock(cosmeticId) != null;
+            case "type" -> typeDefinitions.containsKey(info.id);
+            case "nbt" -> true;
+            default -> false;
+        };
     }
 
     public void clearCache() {

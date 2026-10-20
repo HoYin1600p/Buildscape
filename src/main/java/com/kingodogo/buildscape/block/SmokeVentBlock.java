@@ -212,16 +212,12 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        switch (state.getValue(PART)) {
-            case TOP :
-                return SHAPE_TOP;
-            case MIDDLE :
-                return SHAPE_MIDDLE;
-            case BOTTOM :
-                return SHAPE_BOTTOM;
-            default :
-                return SHAPE_SINGLE;
-        }
+        return switch (state.getValue(PART)) {
+            case TOP -> SHAPE_TOP;
+            case MIDDLE -> SHAPE_MIDDLE;
+            case BOTTOM -> SHAPE_BOTTOM;
+            default -> SHAPE_SINGLE;
+        };
     }
 
     @Override

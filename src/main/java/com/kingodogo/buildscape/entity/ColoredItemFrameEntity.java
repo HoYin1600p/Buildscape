@@ -121,15 +121,9 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
         Direction.Axis axis = this.direction.getAxis();
         switch (axis) {
-            case X :
-                w = 1.0D;
-                break;
-            case Y :
-                h = 1.0D;
-                break;
-            case Z :
-                d = 1.0D;
-                break;
+            case X -> w = 1.0D;
+            case Y -> h = 1.0D;
+            case Z -> d = 1.0D;
         }
 
         w /= 32.0D;

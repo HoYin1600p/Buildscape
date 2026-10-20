@@ -120,18 +120,13 @@ public class MangrovePropaguleBlock
             CollisionContext context) {
         if (state.getValue(HANGING)) {
             int age = state.getValue(AGE);
-            switch (age) {
-                case 0 :
-                    return HANGING_SHAPE_0;
-                case 1 :
-                    return HANGING_SHAPE_1;
-                case 2 :
-                    return HANGING_SHAPE_2;
-                case 3 :
-                    return HANGING_SHAPE_3;
-                default :
-                    return HANGING_SHAPE_0;
-            }
+            return switch (age) {
+                case 0 -> HANGING_SHAPE_0;
+                case 1 -> HANGING_SHAPE_1;
+                case 2 -> HANGING_SHAPE_2;
+                case 3 -> HANGING_SHAPE_3;
+                default -> HANGING_SHAPE_0;
+            };
         }
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {

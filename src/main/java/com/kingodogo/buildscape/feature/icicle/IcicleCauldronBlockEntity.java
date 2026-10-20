@@ -208,18 +208,24 @@ public class IcicleCauldronBlockEntity
                 return itemHandlers[0].cast();
             }
             switch (side) {
-                case UP :
+                case UP -> {
                     return itemHandlers[0].cast();
-                case DOWN :
+                }
+                case DOWN -> {
                     return itemHandlers[1].cast();
-                case NORTH :
+                }
+                case NORTH -> {
                     return itemHandlers[2].cast();
-                case SOUTH :
+                }
+                case SOUTH -> {
                     return itemHandlers[3].cast();
-                case EAST :
+                }
+                case EAST -> {
                     return itemHandlers[4].cast();
-                case WEST :
+                }
+                case WEST -> {
                     return itemHandlers[5].cast();
+                }
             }
         }
         return super.getCapability(cap, side);

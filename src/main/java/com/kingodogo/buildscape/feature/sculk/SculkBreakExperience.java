@@ -8,23 +8,12 @@ public final class SculkBreakExperience {
         if (path == null) {
             return -1;
         }
-        switch (path) {
-            case "sculk" :
-            case "sculk_slab" :
-            case "sculk_stairs" :
-            case "sculk_wall" :
-            case "sculk_vertical_slab" :
-            case "sculk_pillar" :
-                return 1;
-            case "sculk_vein" :
-                return 0;
-            case "sculk_catalyst" :
-            case "sculk_shrieker" :
-            case "sculk_sensor" :
-                return 5;
-            default :
-                return -1;
-        }
+        return switch (path) {
+            case "sculk", "sculk_slab", "sculk_stairs", "sculk_wall", "sculk_vertical_slab", "sculk_pillar" -> 1;
+            case "sculk_vein" -> 0;
+            case "sculk_catalyst", "sculk_shrieker", "sculk_sensor" -> 5;
+            default -> -1;
+        };
     }
 
     public static int withTool(int experience, int silkTouchLevel) {

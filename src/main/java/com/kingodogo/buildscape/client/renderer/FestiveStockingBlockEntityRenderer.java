@@ -68,44 +68,44 @@ public class FestiveStockingBlockEntityRenderer
         double forwardOffset = 0.001D;
 
         switch (facing) {
-            case NORTH :
+            case NORTH -> {
                 posX = 0.5D;
                 posY = 0.5D;
                 posZ = 1.0D - forwardOffset;
                 rotationY = 180.0F;
-                break;
-            case SOUTH :
+            }
+            case SOUTH -> {
                 posX = 0.5D;
                 posY = 0.5D;
                 posZ = forwardOffset;
                 rotationY = 0.0F;
-                break;
-            case WEST :
+            }
+            case WEST -> {
                 posX = 1.0D - forwardOffset;
                 posY = 0.5D;
                 posZ = 0.5D;
                 rotationY = 90.0F;
-                break;
-            case EAST :
+            }
+            case EAST -> {
                 posX = forwardOffset;
                 posY = 0.5D;
                 posZ = 0.5D;
                 rotationY = 270.0F;
-                break;
-            case UP :
+            }
+            case UP -> {
                 posX = 0.5D;
                 posY = 0.5D / 16.0D;
                 posZ = 0.5D;
                 rotationX = -90.0F;
                 rotationY = 180.0F;
-                break;
-            case DOWN :
+            }
+            case DOWN -> {
                 posX = 0.5D;
                 posY = 15.5D / 16.0D;
                 posZ = 0.5D;
                 rotationX = 90.0F;
                 rotationY = 180.0F;
-                break;
+            }
         }
 
         poseStack.translate(posX, posY, posZ);

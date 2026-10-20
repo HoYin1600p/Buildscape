@@ -203,22 +203,15 @@ public class FestiveStockingBlock
             BlockPos pos,
             CollisionContext context) {
         Direction facing = state.getValue(FACING);
-        switch (facing) {
-            case NORTH :
-                return SHAPE_NORTH;
-            case SOUTH :
-                return SHAPE_SOUTH;
-            case EAST :
-                return SHAPE_EAST;
-            case WEST :
-                return SHAPE_WEST;
-            case UP :
-                return SHAPE_UP;
-            case DOWN :
-                return SHAPE_DOWN;
-            default :
-                return SHAPE_NORTH;
-        }
+        return switch (facing) {
+            case NORTH -> SHAPE_NORTH;
+            case SOUTH -> SHAPE_SOUTH;
+            case EAST -> SHAPE_EAST;
+            case WEST -> SHAPE_WEST;
+            case UP -> SHAPE_UP;
+            case DOWN -> SHAPE_DOWN;
+            default -> SHAPE_NORTH;
+        };
     }
 
     @Override

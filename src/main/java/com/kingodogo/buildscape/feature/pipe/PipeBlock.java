@@ -53,18 +53,18 @@ public class PipeBlock extends RotatedPillarBlock {
         Direction negDir;
         Direction posDir;
         switch (axis) {
-            case X :
+            case X -> {
                 negDir = Direction.WEST;
                 posDir = Direction.EAST;
-                break;
-            case Z :
+            }
+            case Z -> {
                 negDir = Direction.NORTH;
                 posDir = Direction.SOUTH;
-                break;
-            default :
+            }
+            default -> {
                 negDir = Direction.DOWN;
                 posDir = Direction.UP;
-                break;
+            }
         }
 
         BlockState negState = level.getBlockState(pos.relative(negDir));

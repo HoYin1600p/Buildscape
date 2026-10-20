@@ -966,24 +966,16 @@ public class PillarBlock
             return ChatFormatting.WHITE;
         }
 
-        switch (pattern) {
-            case ParticlePatterns.DEFAULT :
-                return ChatFormatting.WHITE;
-            case ParticlePatterns.BEAM :
-                return ChatFormatting.AQUA;
-            case ParticlePatterns.SPIRAL :
-                return ChatFormatting.LIGHT_PURPLE;
-            case ParticlePatterns.FOUNTAIN :
-                return ChatFormatting.BLUE;
-            case ParticlePatterns.PULSE :
-                return ChatFormatting.RED;
-            case ParticlePatterns.RING :
-                return ChatFormatting.GOLD;
-            case ParticlePatterns.BURST :
-                return ChatFormatting.YELLOW;
-            default :
-                return ChatFormatting.GRAY;
-        }
+        return switch (pattern) {
+            case ParticlePatterns.DEFAULT -> ChatFormatting.WHITE;
+            case ParticlePatterns.BEAM -> ChatFormatting.AQUA;
+            case ParticlePatterns.SPIRAL -> ChatFormatting.LIGHT_PURPLE;
+            case ParticlePatterns.FOUNTAIN -> ChatFormatting.BLUE;
+            case ParticlePatterns.PULSE -> ChatFormatting.RED;
+            case ParticlePatterns.RING -> ChatFormatting.GOLD;
+            case ParticlePatterns.BURST -> ChatFormatting.YELLOW;
+            default -> ChatFormatting.GRAY;
+        };
     }
 
     @Override

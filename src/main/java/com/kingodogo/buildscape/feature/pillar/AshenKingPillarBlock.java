@@ -82,16 +82,12 @@ public class AshenKingPillarBlock extends PillarBlock {
 
     private static VoxelShape rotateBox(double x1, double y1, double z1, double x2, double y2, double z2,
             Direction facing) {
-        switch (facing) {
-            case EAST :
-                return Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
-            case SOUTH :
-                return Block.box(16 - x2, y1, 16 - z2, 16 - x1, y2, 16 - z1);
-            case WEST :
-                return Block.box(z1, y1, 16 - x2, z2, y2, 16 - x1);
-            default :
-                return Block.box(x1, y1, z1, x2, y2, z2);
-        }
+        return switch (facing) {
+            case EAST -> Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
+            case SOUTH -> Block.box(16 - x2, y1, 16 - z2, 16 - x1, y2, 16 - z1);
+            case WEST -> Block.box(z1, y1, 16 - x2, z2, y2, 16 - x1);
+            default -> Block.box(x1, y1, z1, x2, y2, z2);
+        };
     }
 
     public AshenKingPillarBlock(Properties properties) {
@@ -379,23 +375,15 @@ public class AshenKingPillarBlock extends PillarBlock {
             return ChatFormatting.WHITE;
         }
 
-        switch (pattern) {
-            case ParticlePatterns.DEFAULT :
-                return ChatFormatting.WHITE;
-            case ParticlePatterns.BEAM :
-                return ChatFormatting.AQUA;
-            case ParticlePatterns.SPIRAL :
-                return ChatFormatting.LIGHT_PURPLE;
-            case ParticlePatterns.FOUNTAIN :
-                return ChatFormatting.BLUE;
-            case ParticlePatterns.PULSE :
-                return ChatFormatting.RED;
-            case ParticlePatterns.RING :
-                return ChatFormatting.GOLD;
-            case ParticlePatterns.BURST :
-                return ChatFormatting.YELLOW;
-            default :
-                return ChatFormatting.GRAY;
-        }
+        return switch (pattern) {
+            case ParticlePatterns.DEFAULT -> ChatFormatting.WHITE;
+            case ParticlePatterns.BEAM -> ChatFormatting.AQUA;
+            case ParticlePatterns.SPIRAL -> ChatFormatting.LIGHT_PURPLE;
+            case ParticlePatterns.FOUNTAIN -> ChatFormatting.BLUE;
+            case ParticlePatterns.PULSE -> ChatFormatting.RED;
+            case ParticlePatterns.RING -> ChatFormatting.GOLD;
+            case ParticlePatterns.BURST -> ChatFormatting.YELLOW;
+            default -> ChatFormatting.GRAY;
+        };
     }
 }

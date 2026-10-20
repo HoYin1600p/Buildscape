@@ -775,30 +775,30 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         double posOffset = 1.0D - 0.015625D - glassThickness;
 
         switch (axis) {
-            case X :
+            case X -> {
                 if (isPositive) {
                     poseStack.translate(posOffset, 0.125D, 0.125D);
                 } else {
                     poseStack.translate(negOffset, 0.125D, 0.125D);
                 }
                 poseStack.scale(glassThickness, 0.75F, 0.75F);
-                break;
-            case Z :
+            }
+            case Z -> {
                 if (isPositive) {
                     poseStack.translate(0.125D, 0.125D, posOffset);
                 } else {
                     poseStack.translate(0.125D, 0.125D, negOffset);
                 }
                 poseStack.scale(0.75F, 0.75F, glassThickness);
-                break;
-            default :
+            }
+            default -> {
                 if (isPositive) {
                     poseStack.translate(0.125D, posOffset, 0.125D);
                 } else {
                     poseStack.translate(0.125D, negOffset, 0.125D);
                 }
                 poseStack.scale(0.75F, glassThickness, 0.75F);
-                break;
+            }
         }
     }
 

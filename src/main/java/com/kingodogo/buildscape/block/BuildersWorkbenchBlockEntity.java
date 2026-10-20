@@ -67,39 +67,37 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         @Override
         public int get(int index) {
             switch (index) {
-                case 0 :
+                case 0 -> {
                     return copyProgress;
-                case 1 :
+                }
+                case 1 -> {
                     return activeTab;
-                case 2 :
+                }
+                case 2 -> {
                     return filterMask;
-                default :
+                }
+                default -> {
                     if (index >= 3 && index < 3 + TAB_COUNT * RESULT_COUNT) {
                         int offsetIndex = index - 3;
                         return resultOffsetsByTab[offsetIndex / RESULT_COUNT][offsetIndex % RESULT_COUNT];
                     }
                     return 0;
+                }
             }
         }
 
         @Override
         public void set(int index, int value) {
             switch (index) {
-                case 0 :
-                    copyProgress = value;
-                    break;
-                case 1 :
-                    activeTab = value;
-                    break;
-                case 2 :
-                    filterMask = value;
-                    break;
-                default :
+                case 0 -> copyProgress = value;
+                case 1 -> activeTab = value;
+                case 2 -> filterMask = value;
+                default -> {
                     if (index >= 3 && index < 3 + TAB_COUNT * RESULT_COUNT) {
                         int offsetIndex = index - 3;
                         resultOffsetsByTab[offsetIndex / RESULT_COUNT][offsetIndex % RESULT_COUNT] = Math.max(0, value);
                     }
-                    break;
+                }
             }
         }
 

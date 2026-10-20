@@ -125,21 +125,11 @@ public class FestiveStockingEntity extends HangingEntity {
                 offsetDir = Direction.NORTH;
             } else {
                 switch (this.direction) {
-                    case NORTH :
-                        offsetDir = Direction.EAST;
-                        break;
-                    case SOUTH :
-                        offsetDir = Direction.WEST;
-                        break;
-                    case EAST :
-                        offsetDir = Direction.SOUTH;
-                        break;
-                    case WEST :
-                        offsetDir = Direction.NORTH;
-                        break;
-                    default :
-                        offsetDir = Direction.NORTH;
-                        break;
+                    case NORTH -> offsetDir = Direction.EAST;
+                    case SOUTH -> offsetDir = Direction.WEST;
+                    case EAST -> offsetDir = Direction.SOUTH;
+                    case WEST -> offsetDir = Direction.NORTH;
+                    default -> offsetDir = Direction.NORTH;
                 }
             }
 

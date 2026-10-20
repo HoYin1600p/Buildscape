@@ -234,7 +234,7 @@ final class ConfigLayoutIO {
 
     private static JsonElement readJson(JsonReader reader) throws IOException {
         switch (reader.peek()) {
-            case BEGIN_OBJECT :
+            case BEGIN_OBJECT -> {
                 JsonObject object = new JsonObject();
                 reader.beginObject();
                 while (reader.hasNext()) {
@@ -246,7 +246,8 @@ final class ConfigLayoutIO {
                 }
                 reader.endObject();
                 return object;
-            case BEGIN_ARRAY :
+            }
+            case BEGIN_ARRAY -> {
                 JsonArray array = new JsonArray();
                 reader.beginArray();
                 while (reader.hasNext()) {
@@ -254,17 +255,21 @@ final class ConfigLayoutIO {
                 }
                 reader.endArray();
                 return array;
-            case STRING :
+            }
+            case STRING -> {
                 return new JsonPrimitive(reader.nextString());
-            case NUMBER :
+            }
+            case NUMBER -> {
                 return new JsonPrimitive(new BigDecimal(reader.nextString()));
-            case BOOLEAN :
+            }
+            case BOOLEAN -> {
                 return new JsonPrimitive(reader.nextBoolean());
-            case NULL :
+            }
+            case NULL -> {
                 reader.nextNull();
                 return JsonNull.INSTANCE;
-            default :
-                throw new IOException("Expected JSON value");
+            }
+            default -> throw new IOException("Expected JSON value");
         }
     }
 

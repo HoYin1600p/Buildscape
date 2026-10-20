@@ -238,17 +238,21 @@ public class OrnamentBlock
         AttachmentType attachment = state.getValue(ATTACHMENT);
 
         switch (attachment) {
-            case FLOOR :
+            case FLOOR -> {
                 return canAttachTo(level, pos.below(), Direction.UP);
-            case CEILING :
+            }
+            case CEILING -> {
                 return canAttachTo(level, pos.above(), Direction.DOWN);
-            case WALL :
+            }
+            case WALL -> {
                 Direction facing = state.getValue(FACING);
                 BlockPos wallPos = pos.relative(facing.getOpposite());
                 Direction wallFaceDirection = facing;
                 return canAttachTo(level, wallPos, wallFaceDirection);
-            default :
+            }
+            default -> {
                 return false;
+            }
         }
     }
 
@@ -317,18 +321,13 @@ public class OrnamentBlock
             return SHAPE_CEILING;
         } else if (attachment == AttachmentType.WALL) {
             Direction facing = state.getValue(FACING);
-            switch (facing) {
-                case NORTH :
-                    return SHAPE_WALL_NORTH;
-                case SOUTH :
-                    return SHAPE_WALL_SOUTH;
-                case EAST :
-                    return SHAPE_WALL_EAST;
-                case WEST :
-                    return SHAPE_WALL_WEST;
-                default :
-                    return SHAPE_FLOOR;
-            }
+            return switch (facing) {
+                case NORTH -> SHAPE_WALL_NORTH;
+                case SOUTH -> SHAPE_WALL_SOUTH;
+                case EAST -> SHAPE_WALL_EAST;
+                case WEST -> SHAPE_WALL_WEST;
+                default -> SHAPE_FLOOR;
+            };
         } else {
             return SHAPE_FLOOR;
         }

@@ -10,33 +10,51 @@ import javax.annotation.Nullable;
  * the English display name. These are BuildScape's own colours, not vanilla's {@code DyeColor} values.
  */
 public enum DyeColors {
-    WHITE("white", "#E8FEFD", "White"),
-    ORANGE("orange", "#FF5C00", "Orange"),
-    MAGENTA("magenta", "#FF00FF", "Magenta"),
-    LIGHT_BLUE("light_blue", "#3CDFFF", "Light Blue"),
-    YELLOW("yellow", "#FFFF00", "Yellow"),
-    LIME("lime", "#BFFE00", "Lime"),
-    PINK("pink", "#F686B7", "Pink"),
-    GRAY("gray", "#232526", "Gray"),
-    LIGHT_GRAY("light_gray", "#B1B8C5", "Light Gray"),
-    CYAN("cyan", "#00FFFF", "Cyan"),
-    PURPLE("purple", "#AB87FF", "Purple"),
-    BLUE("blue", "#1919EA", "Blue"),
-    BROWN("brown", "#411900", "Brown"),
-    GREEN("green", "#39FF14", "Green"),
-    RED("red", "#FF0000", "Red"),
-    BLACK("black", "#07010C", "Black");
+    WHITE("white", "#E8FEFD", "White", "W"),
+    ORANGE("orange", "#FF5C00", "Orange", "O"),
+    MAGENTA("magenta", "#FF00FF", "Magenta", "M"),
+    LIGHT_BLUE("light_blue", "#3CDFFF", "Light Blue", "LB"),
+    YELLOW("yellow", "#FFFF00", "Yellow", "Y"),
+    LIME("lime", "#BFFE00", "Lime", "L"),
+    PINK("pink", "#F686B7", "Pink", "P"),
+    GRAY("gray", "#232526", "Gray", "GR"),
+    LIGHT_GRAY("light_gray", "#B1B8C5", "Light Gray", "LG"),
+    CYAN("cyan", "#00FFFF", "Cyan", "C"),
+    PURPLE("purple", "#AB87FF", "Purple", "PU"),
+    BLUE("blue", "#1919EA", "Blue", "B"),
+    BROWN("brown", "#411900", "Brown", "BR"),
+    GREEN("green", "#39FF14", "Green", "G"),
+    RED("red", "#FF0000", "Red", "R"),
+    BLACK("black", "#07010C", "Black", "BL");
 
     private final String serializedName;
     private final String hex;
     private final int rgb;
     private final String displayName;
+    private final String shortCode;
 
-    DyeColors(String serializedName, String hex, String displayName) {
+    DyeColors(String serializedName, String hex, String displayName, String shortCode) {
         this.serializedName = serializedName;
         this.hex = hex;
         this.rgb = Integer.parseInt(hex.substring(1), 16);
         this.displayName = displayName;
+        this.shortCode = shortCode;
+    }
+
+    /** The colour with this {@link #serializedName()}, or {@code null} for any other text (including null). */
+    @Nullable
+    public static DyeColors fromName(@Nullable String name) {
+        for (DyeColors color : values()) {
+            if (color.serializedName.equals(name)) {
+                return color;
+            }
+        }
+        return null;
+    }
+
+    /** Short code such as {@code LB} that item frame ids use for the colour. */
+    public String shortCode() {
+        return shortCode;
     }
 
     /** Lower-case id such as {@code light_blue}. */

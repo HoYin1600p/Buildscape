@@ -27,7 +27,6 @@ import com.kingodogo.buildscape.block.base.ModBlockProperties;
 
 public class CreakingHeartBlock extends RotatedPillarBlock {
     public static final BooleanProperty ACTIVE = ModBlockProperties.ACTIVE;
-    private static final int RESIN_COOLDOWN_TICKS = 1200;
 
     public CreakingHeartBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -45,21 +44,15 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
             BlockHitResult hitResult) {
-        if (state.getValue(ACTIVE)) {
-            if (!level.isClientSide && !level.getBlockTicks().hasScheduledTick(pos, this)) {
-                level.scheduleTick(pos, this, RESIN_COOLDOWN_TICKS);
-            }
-            return InteractionResult.PASS;
-        }
         if (!level.isClientSide) {
-            level.setBlock(pos, state.setValue(ACTIVE, true), 3);
+            if (state.getValue(ACTIVE)) {
+                level.setBlock(pos, state.setValue(ACTIVE, false), 3);
+            }
 
             spawnResinOnHeart(level, pos);
 
             level.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.levelEvent(2005, pos, 0);
-
-            level.scheduleTick(pos, this, RESIN_COOLDOWN_TICKS);
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);

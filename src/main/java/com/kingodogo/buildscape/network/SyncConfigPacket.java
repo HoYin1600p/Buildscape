@@ -22,6 +22,7 @@ import java.util.function.Supplier;
  */
 public class SyncConfigPacket {
     // Present only for assembled uploads; server-to-client sync always contains all settings.
+    /** Which setting groups an upload carries; all groups for a packet built on the server. */
     public Set<ConfigSetting> uploadSettings = ConfigSetting.uploadable();
     public static final double MIN_PARTICLE_RATE = NetworkPacketLimits.MIN_PARTICLE_RATE;
     public static final double MAX_PARTICLE_SPEED = NetworkPacketLimits.MAX_PARTICLE_SPEED;
@@ -30,6 +31,7 @@ public class SyncConfigPacket {
     public static final int MAX_PARTICLE_LIFETIME = NetworkPacketLimits.MAX_PARTICLE_LIFETIME;
     public static final int MAX_PARTICLE_DENSITY = NetworkPacketLimits.MAX_PARTICLE_DENSITY;
 
+    /** Limits a particle rate to the range from {@link #MIN_PARTICLE_RATE} up to {@code maximum}. */
     public static double clampParticleValue(double value, double maximum) {
         return NetworkPacketLimits.clamp(value, MIN_PARTICLE_RATE, maximum);
     }
@@ -47,12 +49,16 @@ public class SyncConfigPacket {
     public int max_particle_color;
     public PillarParticleConfig.EditPermissionMode edit_permission_mode = PillarParticleConfig.EditPermissionMode.STRICT;
 
+    /** Item ids that show particles on a pillar. */
     public Set<String> items;
+    /** True when the receiving player may not edit the item list. */
     public boolean itemsReadOnly;
+    /** True when the receiving player may not edit the particle properties. */
     public boolean propertiesReadOnly;
 
     public SyncConfigPacket() {}
 
+    /** Builds the snapshot from the server config, clamping values to the packet limits. */
     public SyncConfigPacket(PillarParticleConfig config) {
         this.particle_speed = NetworkPacketLimits.clamp(config.particle_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
@@ -166,6 +172,7 @@ public class SyncConfigPacket {
         return Math.max(minimum, Math.min(maximum, value));
     }
 
+    /** Client side: applies the received config on the main thread. */
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
                 () -> () -> ClientPacketHandlers.applyServerConfig(this)));

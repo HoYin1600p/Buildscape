@@ -42,6 +42,7 @@ public class HollowPipeTransportManager {
     private static final int MAX_NETWORKS_PER_TICK = 16;
     private static final int MAX_ASYNC_NETWORKS = Math.max(1,
             Math.min(4, Runtime.getRuntime().availableProcessors() / 2));
+    /** When true, {@link #logDebug(String)} and the transport code write extra lines to the log. Off by default; there is no setting for it. */
     public static boolean DEBUG_TRANSPORT = false;
     private static final Map<Level, Set<BlockPos>> PENDING_DIRTY = new ConcurrentHashMap<>();
     private static final Map<Level, Map<BlockPos, NetworkJob>> IN_FLIGHT = new ConcurrentHashMap<>();
@@ -206,6 +207,7 @@ public class HollowPipeTransportManager {
         }
     }
 
+    /** End of every server tick: applies finished calculations first, then starts queued ones, within the time and network budget. */
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) {
@@ -225,6 +227,7 @@ public class HollowPipeTransportManager {
         }
     }
 
+    /** Drops the queued positions of an unloading level and cancels its running calculations. */
     @SubscribeEvent
     public static void onLevelUnload(WorldEvent.Unload event) {
         if (event.getWorld() instanceof Level level) {
@@ -255,6 +258,7 @@ public class HollowPipeTransportManager {
     private record CompletedJob(NetworkJob job, Map<BlockPos, PipeFlowState> states, Throwable error) {
     }
 
+    /** Server only: queues a placed pipe and the hollow pipes next to it. */
     public static void onBlockPlaced(Level level, BlockPos pos, BlockState state) {
         if (level == null || level.isClientSide || pos == null || state == null) {
             return;
@@ -269,6 +273,7 @@ public class HollowPipeTransportManager {
         }
     }
 
+    /** Server only: queues the hollow pipes next to a removed pipe. */
     public static void onBlockRemoved(Level level, BlockPos pos, BlockState state) {
         if (level == null || level.isClientSide || pos == null || state == null) {
             return;
@@ -282,6 +287,7 @@ public class HollowPipeTransportManager {
         }
     }
 
+    /** Server only: queues the pipe at {@code pos} when the changed neighbour is a hollow pipe, a transport fluid, or an open end of this pipe. */
     public static void onNeighborChanged(Level level, BlockPos pos, BlockState state, BlockPos neighborPos) {
         if (level == null || level.isClientSide || pos == null) {
             return;
@@ -308,10 +314,12 @@ public class HollowPipeTransportManager {
         }
     }
 
+    /** Queues the pipe at {@code pos} after a bucket was used on it. */
     public static void onBucketUsed(Level level, BlockPos pos, BlockState state) {
         markDirty(level, pos);
     }
 
+    /** Logs the message at info level, only while {@link #DEBUG_TRANSPORT} is on. */
     public static void logDebug(String message) {
         if (DEBUG_TRANSPORT) {
             LOGGER.info(message);

@@ -49,6 +49,7 @@ public class PillarIdManager {
     private final Map<String, PillarData> removedFrames = registry.removedFrames;
     private final Map<String, String> positionIndex = registry.positionIndex;
 
+    /** Shape an id must have: a capital letter, then letters, digits or dashes, 2 to 32 characters in all. */
     public static final String VALID_ID_PATTERN = "^[A-Z][A-Za-z0-9-]{1,31}$";
     private final Set<LevelChunk> loadedChunks = Collections.newSetFromMap(new WeakHashMap<>());
     private volatile List<PillarData> syncSnapshot = Collections.emptyList();
@@ -70,6 +71,7 @@ public class PillarIdManager {
     public static final String PREFIX_QUARTZ = "Q";
     public static final String PREFIX_ITEM_FRAME = "I-F";
 
+    /** Forgets the cached world folder and any scheduled recovery, and empties the server registry. */
     public static void resetWorldCache() {
         PillarStore.resetCachedWorldDir();
         PillarRecovery.reset();
@@ -77,18 +79,22 @@ public class PillarIdManager {
         SERVER_INSTANCE.resetState(false);
     }
 
+    /** The server registry. On a client use {@link #getClient()} or {@link #get(Level)} for the synced copy. */
     public static PillarIdManager get() {
         return SERVER_INSTANCE;
     }
 
+    /** The client copy, filled by {@code SyncPillarIdsPacket}. */
     public static PillarIdManager getClient() {
         return CLIENT_INSTANCE;
     }
 
+    /** The client copy for a client level, the server registry for any other level (and for null). */
     public static PillarIdManager get(Level level) {
         return level != null && level.isClientSide ? CLIENT_INSTANCE : SERVER_INSTANCE;
     }
 
+    /** Empties the client copy; the next sync from the server fills it again. */
     public static void resetClientCache() {
         CLIENT_INSTANCE.resetState(true);
     }
@@ -117,21 +123,27 @@ public class PillarIdManager {
         syncSnapshot = Collections.emptyList();
     }
 
+    /** True once the registry file has been read (server) or a sync from the server has arrived (client). */
     public boolean hasLoaded() {
         return hasLoaded;
     }
 
+    /** True while the registry file is being read on the server thread. */
     public boolean isLoadInProgress() {
         return loadInProgress;
     }
 
+    /** Server only: true when the registry file was deleted and nothing is registered, so the records have to be rebuilt from the world. */
     public boolean needsWorldRecovery() {
         return serverAuthoritative && hasLoaded && fileWasDeleted && registry.pillarData.isEmpty();
     }
+
+    /** The id prefix ({@code PREFIX_*}) that fits the pillar variant at {@code pos}. */
     public static String getVariantPrefix(Level level, BlockPos pos) {
         return PillarRegistry.getVariantPrefix(level, pos);
     }
 
+    /** Same reset as {@link #resetWorldCache()}. */
     public static void fullReset() {
         PillarStore.resetCachedWorldDir();
         PillarRecovery.reset();
@@ -139,10 +151,16 @@ public class PillarIdManager {
         SERVER_INSTANCE.resetState(false);
     }
 
+    /** A new unused id with the default {@code S-P} prefix. */
     public String generatePillarId() {
         return generatePillarId(PREFIX_STONE + "-P");
     }
 
+    /**
+     * The record of the pillar stack that contains {@code pos}, found through its lowest block. A missing record is created
+     * with a new id: the id is written to the block entity, and the block entity's pattern settings and colours are
+     * copied into the record. A new record asks for a save.
+     */
     public PillarData getOrCreatePillarData(Level level, BlockPos pos) {
         BlockPos basePos = pos;
         BlockState state = level.getBlockState(pos);
@@ -196,6 +214,11 @@ public class PillarIdManager {
         return newData;
     }
 
+    /**
+     * Adds a dye colour to the pillar's record, creating the record if needed, and asks for a save. A record without a
+     * pattern, or with the default one, takes the pattern from the particle config. Returns the pillar id, or null when
+     * the record already holds the maximum number of colours.
+     */
     public String addDyeColor(Level level, BlockPos pos, String colorCode) {
         PillarData data = getOrCreatePillarData(level, pos);
 
@@ -230,6 +253,10 @@ public class PillarIdManager {
         saveRequested = true;
     }
 
+    /**
+     * Performs a save asked for by {@link #requestSave()}; a refused save stays requested for the next call. When the
+     * registry was saved since the last broadcast, also sends it to all players.
+     */
     public void flushRequestedSave() {
         if (saveRequested) {
             saveRequested = false;
@@ -248,14 +275,17 @@ public class PillarIdManager {
         }
     }
 
+    /** Deletes one record; see {@link #removePillars(Collection)}. */
     public void removePillar(String pillarId) {
         removePillars(Collections.singleton(pillarId));
     }
 
+    /** Deletes the record of an item frame that was destroyed. Unlike a removal, the frame is not remembered as removed. */
     public void unregisterDestroyedFrame(String frameId) {
         removePillars(Collections.singleton(frameId), false);
     }
 
+    /** Same as {@link #removePillar(String)}. */
     public void removePillarData(String pillarId) {
         removePillar(pillarId);
     }
@@ -267,6 +297,7 @@ public class PillarIdManager {
         saveImmediate();
     }
 
+    /** Stores the record under its id, stamps its modified time and saves at once. Ignores null data or data without an id. */
     public void updatePillarData(PillarData data) {
         if (data != null && data.id != null) {
             registry.pillarData.put(data.id, data);
@@ -304,7 +335,9 @@ public class PillarIdManager {
     }
 
     /**
-     * Deletes the listed pillar records. Returns true if anything changed.
+     * Deletes the listed pillar records. Returns true if anything changed. On the server a removed pillar is reset
+     * in the world through {@code PillarResetHandler}, and a removed item frame is remembered so it is not registered
+     * again.
      */
     public boolean removePillars(Collection<String> pillarIds) {
         return removePillars(pillarIds, true);
@@ -353,6 +386,7 @@ public class PillarIdManager {
         return changed;
     }
 
+    /** Sets the displayed item of a record (null or empty clears it) and asks for a save when the value changed. */
     public void updateDisplayedItem(String pillarId, String itemResourceId) {
         if (pillarId == null) {
             return;
@@ -377,6 +411,7 @@ public class PillarIdManager {
         }
     }
 
+    /** Deletes the record indexed at {@code pos}, if the record's stored dimension and position still match. */
     public void removePillarByPosition(Level level, BlockPos pos) {
         removePillarByPosition(getDimensionKey(level), pos);
     }
@@ -394,6 +429,7 @@ public class PillarIdManager {
         }
     }
 
+    /** Drops the position-index entry at {@code pos} when its record is missing or has moved. The record itself is not touched. */
     public void removeStalePillarPositionIndex(Level level, BlockPos pos) {
         String dimension = getDimensionKey(level);
         String key = positionKey(dimension, pos);
@@ -407,6 +443,7 @@ public class PillarIdManager {
         }
     }
 
+    /** Moves a record to {@code pos}, rebuilds the position index and asks for a save. Does nothing if it is already there. */
     public void updatePillarPosition(String pillarId, BlockPos pos) {
         PillarData data = registry.pillarData.get(pillarId);
         if (data != null && !data.getBlockPos().equals(pos)) {
@@ -418,6 +455,10 @@ public class PillarIdManager {
         }
     }
 
+    /**
+     * Updates the registry after the block at {@code pos} was removed from a stack running from {@code bottom} to
+     * {@code top}. Returns where the record now sits, or null when the stack is gone and its record was deleted.
+     */
     public BlockPos removePillarBlock(Level level, String pillarId, BlockPos pos, BlockPos bottom, BlockPos top) {
         return removePillarBlock(getDimensionKey(level), pillarId, pos, bottom, top);
     }
@@ -435,6 +476,10 @@ public class PillarIdManager {
         return remaining;
     }
 
+    /**
+     * Joins pillars into one stack: the record keeps its id and moves to {@code bottom}, and the other pillar records
+     * (not item frames) in that column between {@code bottom} and {@code top} are deleted.
+     */
     public void mergePillarStack(String pillarId, BlockPos bottom, BlockPos top) {
         PillarData data = registry.pillarData.get(pillarId);
         if (data == null) {
@@ -462,6 +507,7 @@ public class PillarIdManager {
         }
     }
 
+    /** Clears the dye colours of a record and asks for a save. */
     public void clearPillarColors(String pillarId) {
         PillarData data = registry.pillarData.get(pillarId);
         if (data != null) {
@@ -470,11 +516,16 @@ public class PillarIdManager {
         }
     }
 
+    /** True if the record at {@code pos} has dye colours. */
     public boolean hasCustomColors(Level level, BlockPos pos) {
         PillarData data = getPillarDataByPosition(level, pos);
         return data != null && data.hasColors();
     }
 
+    /**
+     * Like {@link #updateDisplayedItem(String, String)} for the pillar at {@code pos}. The record is created if missing,
+     * and the block entity's pattern settings are copied into it first.
+     */
     public void updateDisplayedItemByPosition(Level level, BlockPos pos, String itemResourceId) {
         PillarData data = getOrCreatePillarData(level, pos);
         if (data != null) {
@@ -707,6 +758,11 @@ public class PillarIdManager {
         return new SavedData(file, Collections.emptyMap());
     }
 
+    /**
+     * Writes the registry file now. Returns false when nothing was written: while a recovery runs, before the server is
+     * fully started, when an empty registry would replace a non-empty file, or when the write fails. A write marks the
+     * registry as needing a broadcast to players. Always true and a no-op on the client copy.
+     */
     public synchronized boolean saveImmediate() {
         if (!serverAuthoritative) {
             return true;
@@ -755,6 +811,11 @@ public class PillarIdManager {
         }
     }
 
+    /**
+     * Server only: asks for a recovery from the loaded block entities. It runs later from
+     * {@link #checkAndRunScheduledRecovery()}, once players are online and the world has been loaded for a while.
+     * With {@code clearColors} the run clears the pillar ids stored in the world instead of recovering them.
+     */
     public void scheduleRecoveryFromWorld(
             MinecraftServer server,
             boolean clearColors) {
@@ -764,10 +825,15 @@ public class PillarIdManager {
         PillarRecovery.schedule(clearColors);
     }
 
+    /** Same as {@link #requestSave()}. */
     public void save() {
         requestSave();
     }
 
+    /**
+     * Server only: writes the registry file if it changed, and also the backup file when {@code includeBackup} is set.
+     * Skips while a recovery runs, before the first load, and when an empty registry would replace a non-empty file.
+     */
     public void savePeriodic(boolean includeBackup) {
         if (!serverAuthoritative) {
             return;
@@ -799,6 +865,7 @@ public class PillarIdManager {
         }
     }
 
+    /** Server only: reads the file again when its modified time or size differs from the last read or write. */
     public void checkAndReload() {
         if (!serverAuthoritative) {
             return;
@@ -822,10 +889,12 @@ public class PillarIdManager {
         return PillarStore.write(file, tempFileName, registry.removedFrames, registry.pillarData);
     }
 
+    /** Same as {@link #load()}. */
     public void forceReload() {
         load();
     }
 
+    /** Writes the backup file if the registry is loaded and the server is running. */
     public void saveBackupFile() {
         try {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -852,6 +921,13 @@ public class PillarIdManager {
         }
     }
 
+    /**
+     * Applies id and position edits for several records as one all-or-nothing change. Returns an empty string on success,
+     * otherwise a reason: {@code invalid}, {@code missing}, or {@code id_conflict} / {@code position_conflict} (the last two
+     * followed by {@code :oldId:newId} of the row at fault). On success the new ids are written to loaded pillar block
+     * entities and item frames, and the registry is saved at once. No game code calls this now that the screen shows
+     * ids as read-only; tests cover it.
+     */
     public synchronized String editPillarRows(List<EditPillarRowsPacket.Row> rows) {
         if (!serverAuthoritative || rows == null
                 || rows.size() > EditPillarRowsPacket.MAX_ROWS) {
@@ -967,6 +1043,7 @@ public class PillarIdManager {
         return reason + ":" + row.oldId + ":" + row.newId;
     }
 
+    /** Remembers (or forgets) a loaded chunk so {@link #editPillarRows} can reach its pillar block entities. Chunks are held weakly. */
     public synchronized void trackLoadedChunk(LevelChunk chunk, boolean loaded) {
         if (loaded) {
             loadedChunks.add(chunk);
@@ -975,6 +1052,7 @@ public class PillarIdManager {
         }
     }
 
+    /** Client only: replaces every record with the list from the server and marks the copy loaded. Throws on the server registry. */
     public synchronized void replaceFromServerSync(Collection<PillarData> syncedData) {
         if (serverAuthoritative) {
             throw new IllegalStateException("Cannot replace authoritative pillar data from a client sync");
@@ -993,6 +1071,7 @@ public class PillarIdManager {
         isServerSynced = true;
     }
 
+    /** Client: empties the records and the position index and marks the copy as not loaded until the next sync. */
     public void clearForServerSync() {
         registry.pillarData.clear();
         positionIndex.clear();
@@ -1000,6 +1079,7 @@ public class PillarIdManager {
         hasLoaded = false;
     }
 
+    /** Adds or replaces one record received from the server and indexes its position. */
     public void addPillarDataFromSync(PillarData data) {
         if (data == null || data.id == null) {
             return;
@@ -1082,11 +1162,13 @@ public class PillarIdManager {
         return data;
     }
 
+    /** Marks the registry as loaded and server-synced without reading a file. */
     public void markAsLoaded() {
         hasLoaded = true;
         isServerSynced = true;
     }
 
+    /** The records to send to players: on the server the last snapshot taken when a broadcast was prepared, on the client a copy of the current records. */
     public List<PillarData> getAllPillarDataForSync() {
         return serverAuthoritative ? syncSnapshot : new ArrayList<>(registry.pillarData.values());
     }
@@ -1096,6 +1178,7 @@ public class PillarIdManager {
     }
     // ---- Registry delegation: the public API of the pillar records ----
 
+    /** A new id not used by any record: the prefix plus four digits, or four letters and digits if the digit ids are taken. An empty prefix becomes {@code S-P}. */
     public String generatePillarId(String expectedPrefix) {
         return registry.generatePillarId(expectedPrefix);
     }
@@ -1104,18 +1187,22 @@ public class PillarIdManager {
         return PillarRegistry.positionKey(dimension, pos);
     }
 
+    /** The key of the position index: dimension and coordinates, plus the facing for an item frame. */
     public String positionKey(String dimension, BlockPos pos, Direction facing) {
         return PillarRegistry.positionKey(dimension, pos, facing);
     }
 
+    /** The dimension id as text, or {@code unknown} for a null level. */
     public static String getDimensionKey(Level level) {
         return PillarRegistry.getDimensionKey(level);
     }
 
+    /** The id indexed under a {@link #positionKey} value, or null. */
     public String getIdForPosition(String posKey) {
         return registry.getIdForPosition(posKey);
     }
 
+    /** The live records, not a copy; use {@link #copyDataSnapshot()} to keep them. */
     public Collection<PillarData> getAllData() {
         return registry.getAllData();
     }
@@ -1124,6 +1211,7 @@ public class PillarIdManager {
         return registry.getPillarData(pillarId);
     }
 
+    /** The record indexed at exactly {@code pos}, or null. Unlike {@link #getOrCreatePillarData} this does not look down the stack or create anything. */
     public PillarData getPillarDataByPosition(Level level, BlockPos pos) {
         return registry.getPillarDataByPosition(level, pos);
     }
@@ -1132,10 +1220,12 @@ public class PillarIdManager {
         return registry.getPillarIdByPosition(level, pos);
     }
 
+    /** True if the id belongs to a record or to a removed item frame. */
     public boolean isIdTaken(String id) {
         return registry.isIdTaken(id);
     }
 
+    /** Clears the colours, pattern and pattern settings of a record. Does not save, and leaves the world untouched. */
     public static void clearPillarOverrides(PillarData data) {
         PillarRegistry.clearPillarOverrides(data);
     }
@@ -1176,6 +1266,7 @@ public class PillarIdManager {
         return registry.isRemovedFrame(id, dimension, pos, facing);
     }
 
+    /** A read-only live view of every record id. */
     public Set<String> getAllPillarIds() {
         return registry.getAllPillarIds();
     }
@@ -1184,46 +1275,62 @@ public class PillarIdManager {
         return registry.getPillarCount();
     }
 
+    /** A copy of every record, with new record objects that are safe to change. */
     public Map<String, PillarData> copyDataSnapshot() {
         return registry.copyDataSnapshot();
     }
 
+    /** The id of the item frame record at that position and facing, or null (also for a null facing). */
     public String getFrameIdForPosition(String dimension, BlockPos pos, Direction facing) {
         return registry.getFrameIdForPosition(dimension, pos, facing);
     }
     // ---- Recovery and world sync delegation: the public API is unchanged ----
 
+    /**
+     * Runs a recovery asked for by {@link #scheduleRecoveryFromWorld}. It waits until the delay has passed, the registry is
+     * loaded, a player is online and the world has been loaded for a while; until then each call does nothing.
+     */
     public static void checkAndRunScheduledRecovery() {
         PillarRecovery.checkAndRunScheduledRecovery();
     }
 
+    /** Clears the pillar ids stored in the loaded chunks of every level and returns how many were cleared. Returns 0 when no player is online. */
     public int clearAllPillarIdsFromWorld(MinecraftServer server) {
         return PillarRecovery.clearAllPillarIdsFromWorld(server);
     }
 
+    /**
+     * Rebuilds records from the pillar block entities in loaded chunks, then copies colours from the block entities to
+     * the records. Needs a player online. With {@code clearColors} it only clears the ids stored in the world.
+     */
     public void recoverPillarsFromWorld(
             MinecraftServer server,
             boolean clearColors) {
         PillarRecovery.recoverPillarsFromWorld(this, server, clearColors);
     }
 
+    /** Pushes the records' settings into the loaded pillar block entities of every level. Needs a player online. */
     public void syncAllLoadedPillars(
             MinecraftServer server) {
         PillarWorldSync.syncAllLoadedPillars(this, server);
     }
 
+    /** Deletes item frame records in {@code level} whose frame is no longer in the world. Only checks chunks whose entities are loaded. */
     public void cleanupOrphans(Level level) {
         PillarWorldSync.cleanupOrphans(this, level);
     }
 
+    /** Copies colours and pattern settings from loaded pillar block entities into the records. */
     public void syncColorsFromNBTToManager(MinecraftServer server) {
         PillarWorldSync.syncColorsFromNBTToManager(this, server);
     }
 
+    /** Replaces each record's colours with those of the bottom block entity of its stack, where that chunk is loaded. Needs a player online. */
     public void loadColorsFromNBT(MinecraftServer server) {
         PillarWorldSync.loadColorsFromNBT(this, server);
     }
 
+    /** Copies the pillar type and pattern settings from the block entity into the record. Returns true if the record changed. */
     public boolean syncPatternSettingsFromNBT(
             PillarBlockEntity pillarBE,
             PillarData data) {
@@ -1231,10 +1338,12 @@ public class PillarIdManager {
     }
     // ---- Item frame registration delegation: the public API is unchanged ----
 
+    /** Server only: writes an edited item frame record to the frame entity if it is loaded, otherwise marks the edit pending until the frame loads. */
     public void applyFrameEdit(PillarData data) {
         PillarFrames.applyFrameEdit(this, data);
     }
 
+    /** Server only: adds or reconciles the record of an item frame that carries a pattern or colours. */
     public void registerItemFrame(ItemFrame frame) {
         PillarFrames.registerItemFrame(this, frame);
     }
@@ -1243,6 +1352,7 @@ public class PillarIdManager {
         PillarFrames.registerItemFrame(this, frame, immediate);
     }
 
+    /** Server only: same as {@link #registerItemFrame(ItemFrame)} for a coloured item frame. */
     public void registerColoredItemFrame(ColoredItemFrameEntity frame) {
         PillarFrames.registerColoredItemFrame(this, frame);
     }
@@ -1264,16 +1374,23 @@ public class PillarIdManager {
 
     public static class PillarData {
 
+        /** The pillar id, unique in the registry. */
         public String id;
+        /** True on the record of a removed item frame, which is kept so the frame is not registered again. */
         public Boolean removed = null;
         /** Set on a frame whose pattern or colours were edited while its entity was not loaded. */
         public Boolean frameEditPending = null;
+        /** Dye colours in the order they were added, at most five. */
         public List<String> dyeColors = new ArrayList<>();
+        /** Dimension id as text, for example {@code minecraft:overworld}. */
         public String dimension;
+        /** Block position; for a pillar stack the lowest block. */
         public int x, y, z;
+        /** Creation and last change, in milliseconds since the epoch. */
         public long createdTime;
         public long modifiedTime;
 
+        // The pattern fields below are null when the pillar has no setting of its own and the global particle config applies.
         public Boolean use_pattern = null;
         public String pattern = null;
         public Double pattern_speed = null;
@@ -1281,9 +1398,13 @@ public class PillarIdManager {
         public Double pattern_intensity = null;
         public Integer max_particle_color = null;
 
+        /** Registry id of the displayed item, or null. */
         public String displayedItem = null;
+        /** Registry id of the pillar block's item, or {@code minecraft:item_frame} for an item frame record. */
         public String pillarType = null;
+        /** Facing of an item frame; null for a pillar. */
         public String facing = null;
+        /** Facing yaw of the pillar's displayed item. */
         public Float itemYaw = null;
 
         public PillarData() {}
@@ -1302,6 +1423,7 @@ public class PillarIdManager {
             return new BlockPos(x, y, z);
         }
 
+        /** Adds a colour in upper case. Returns false, adding nothing, when the record already has five. */
         public boolean addColor(String colorCode) {
             if (dyeColors.size() >= 5) {
                 return false;
@@ -1316,6 +1438,7 @@ public class PillarIdManager {
             modifiedTime = System.currentTimeMillis();
         }
 
+        /** A read-only view of the dye colours. */
         public List<String> getColors() {
             return Collections.unmodifiableList(dyeColors);
         }

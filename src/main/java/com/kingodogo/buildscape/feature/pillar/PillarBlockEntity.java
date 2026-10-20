@@ -115,6 +115,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
 
     private static final int MAX_SYNC_ATTEMPTS = 5;
 
+    /** Most dye colours one pillar can hold. */
     public static final int MAX_DYE_COLORS = 5;
 
     float facingYaw = 0.0f;
@@ -148,6 +149,10 @@ public class PillarBlockEntity extends SyncedBlockEntity {
     private static final int SYNC_INTERVAL = 100;
     Boolean usePattern = null;
 
+    /**
+     * Client tick: every few ticks, and only for a pillar in range that shows an item allowed by the particle config,
+     * spawns the pillar's particles. The pillar's own pattern settings win over the config's.
+     */
     public static void clientTick(
             Level level,
             BlockPos pos,
@@ -227,10 +232,12 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return displayedItem;
     }
 
+    /** Rotation of the displayed item, in degrees from 0 up to 360. */
     public float getFacingYaw() {
         return facingYaw;
     }
 
+    /** Sets the item's rotation (wrapped into 0 to 360 degrees), marks the block entity changed and updates clients. */
     public void setFacingYaw(float yaw) {
         this.facingYaw = yaw % 360.0f;
         if (this.facingYaw < 0) {
@@ -246,6 +253,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /** Turns the displayed item by 180 degrees and updates clients. */
     public void rotateFacing() {
         this.facingYaw = (this.facingYaw + 180.0f) % 360.0f;
         this.setChanged();
@@ -282,6 +290,10 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /**
+     * Sets the displayed item (a copy is kept) and updates clients. On the server the item is also written to the
+     * pillar's record in the {@link PillarIdManager}.
+     */
     public void setDisplayedItem(ItemStack stack) {
         this.displayedItem = stack.isEmpty() ? ItemStack.EMPTY : stack.copy();
         this.setChanged();
@@ -310,6 +322,10 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /**
+     * Server tick: registers the pillar in the {@link PillarIdManager} once the registry is loaded, and every 100 ticks
+     * pulls the pattern and colours from the registry.
+     */
     public static void serverTick(
             Level level,
             BlockPos pos,
@@ -328,6 +344,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /** Like {@link #setDisplayedItem(ItemStack)}, and sets the item's rotation in the same step. */
     public void setDisplayedItem(ItemStack stack, float facingYaw) {
         this.displayedItem = stack.isEmpty() ? ItemStack.EMPTY : stack.copy();
         this.facingYaw = facingYaw % 360.0f;
@@ -360,6 +377,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    // The four pattern settings below are null when this pillar has no value of its own; the particle config then applies.
     public Double getPatternSpeed() {
         return patternSpeed;
     }
@@ -413,6 +431,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /** Switches to the next pattern in the fixed list, wrapping at the end, and stores it like {@link #setParticlePattern(String)}. */
     public void cycleParticlePattern() {
         PillarParticleConfig cfg = PillarParticleConfig.get();
         String currentPattern = getParticlePattern();
@@ -437,10 +456,12 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         setParticlePattern(PATTERNS[nextIndex]);
     }
 
+    /** Restarts the particle timer and the colour rotation. */
     public void resetParticleTick() {
         resetParticleTick(false);
     }
 
+    /** Like {@link #resetParticleTick()}; with {@code useConfigColors} colours that were never set by a player are dropped so the config colours apply. */
     public void resetParticleTick(boolean useConfigColors) {
         this.lastParticleTick = 0L;
         this.particleColorCounter = 0;
@@ -451,6 +472,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /** This pillar's pattern, or the stack's if it has none of its own. Null when neither is set or the pattern is the default one. */
     public String getParticlePattern() {
         if (particlePattern != null && !particlePattern.isEmpty()
                 && !particlePattern.equals(ParticlePatterns.DEFAULT)) {
@@ -467,6 +489,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return null;
     }
 
+    /** Sets the pattern. On the server it is also applied to the whole stack and written to the registry record, and clients are updated. */
     public void setParticlePattern(String pattern) {
         this.particlePattern = pattern;
         this.setChanged();
@@ -483,6 +506,10 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /**
+     * The next particle colour as {@code #RRGGBB}. Each call advances a counter, so repeated calls rotate through the
+     * pillar's own colours, or through the config's colours when it has none. Falls back to white.
+     */
     public String getParticleColor(PillarParticleConfig cfg) {
         if (particleColors != null && !particleColors.isEmpty()) {
             int numColors = particleColors.size();
@@ -523,6 +550,10 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return "#FFFFFF";
     }
 
+    /**
+     * Adds a dye colour given as hex with or without {@code #}. Returns false for a malformed colour or when the pillar is
+     * full. On the server the colour goes to the stack's registry record and is copied to every block of the stack.
+     */
     public boolean addParticleColor(String color) {
         if (color == null || color.isEmpty()) {
             return false;
@@ -582,6 +613,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         this.usePattern = use;
     }
 
+    /** Replaces the pillar's own colours with the one colour. */
     public void setParticleColor(String color) {
         if (this.particleColors != null) {
             this.particleColors.clear();
@@ -590,10 +622,12 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         addParticleColor(color);
     }
 
+    /** The id of this block's record in the {@link PillarIdManager}, or null if it has none. */
     public String getPillarId() {
         return pillarId;
     }
 
+    /** Stores the id on the block entity and updates clients. The registry is not changed. */
     public void setPillarId(String id) {
         this.pillarId = id;
         this.setChanged();
@@ -606,10 +640,12 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /** True if this block entity itself holds dye colours. */
     public boolean hasCustomColors() {
         return particleColors != null && !particleColors.isEmpty();
     }
 
+    /** Number of dye colours: this block's own, or on the server the stack's record when it has none. */
     public int getDyeColorCount() {
         if (particleColors != null && !particleColors.isEmpty()) {
             return particleColors.size();
@@ -633,6 +669,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return getDyeColorCount() < MAX_DYE_COLORS;
     }
 
+    /** Replaces the colours with a copy of the list (empty entries skipped, at most seven). A null or empty list clears them. Updates clients; the registry is not changed. */
     public void setParticleColors(List<String> colors) {
         if (colors == null || colors.isEmpty()) {
             this.particleColors = null;
@@ -664,6 +701,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /** Clears this block's colours and id without touching the registry or clients. */
     public void clearLocalStateOnly() {
         this.particleColors = null;
         this.pillarId = null;
@@ -672,6 +710,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         this.setChanged();
     }
 
+    /** Clears colours, pattern settings and id so the pillar looks as if freshly placed, marks the chunk unsaved and updates clients. The registry is not changed. */
     public void resetToDefaultAppearance() {
         this.particleColors = null;
         this.particlePattern = null;
@@ -701,6 +740,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         PillarEntityNbt.read(this, tag);
     }
 
+    /** Clears this block's colours and id, and on the server deletes its record from the registry. */
     public void clearParticleColors() {
         String idToRemove = this.pillarId;
 
@@ -723,10 +763,12 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         }
     }
 
+    /** This block's own colours (the live list, may be null), without the stack or config fallbacks. */
     public List<String> getParticleColors() {
         return particleColors;
     }
 
+    /** Sets colours and id directly (ignored for an empty list), restarts the colour rotation, marks the chunk unsaved and updates clients. */
     public void forceSetColors(List<String> colors, String id) {
         if (colors == null || colors.isEmpty()) {
             return;
@@ -754,6 +796,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         PillarEntityNbt.write(this, tag);
     }
 
+    /** Marks the colours as initialised when the pillar has none, so the config colours stay in use. */
     public void initializeDefaultColors() {
         if (!colorsInitialized && particleColors == null) {
             colorsInitialized = true;
@@ -829,6 +872,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         itemHandler.invalidate();
     }
 
+    /** Position of the highest pillar block directly above this one. */
     public BlockPos findStackTop() {
         return PillarStack.findStackTop(this);
     }
@@ -837,10 +881,12 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         return PillarStack.getStackParticlePattern(this);
     }
 
+    /** Position of the lowest pillar block directly below this one. */
     public BlockPos findStackBottom() {
         return PillarStack.findStackBottom(this);
     }
 
+    /** The stack's pillar id, searched from the bottom on the server. On the client, or before the server is ready, it is this block's own id. */
     public String getStackPillarId() {
         return PillarStack.getStackPillarId(this);
     }
@@ -853,10 +899,12 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         PillarStack.propagateToStack(this, stackId, colors);
     }
 
+    /** The block entity at the top of the stack above this block (an Ashen King pillar ends the walk); this one if the walk fails. */
     public PillarBlockEntity getTopPillar() {
         return PillarStack.getTopPillar(this);
     }
 
+    /** Server only: copies the pattern settings from the registry record into this block entity. */
     public void syncPatternFromManager() {
         PillarEntitySync.syncPatternFromManager(this);
     }
@@ -865,10 +913,12 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         PillarEntitySync.syncBothFromManager(this);
     }
 
+    /** Server only: copies the colours from the registry record into this block entity. */
     public void syncColorsFromManager() {
         PillarEntitySync.syncColorsFromManager(this);
     }
 
+    /** Overwrites the id, colours and pattern settings with those of the given record; settings the record leaves null are cleared here. */
     public void syncFromData(PillarIdManager.PillarData data) {
         PillarEntitySync.syncFromData(this, data);
     }

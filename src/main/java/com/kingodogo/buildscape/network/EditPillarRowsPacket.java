@@ -20,6 +20,7 @@ import java.util.function.Supplier;
  */
 public class EditPillarRowsPacket {
 
+    /** Most rows one request may carry. */
     public static final int MAX_ROWS = 80;
     private final long batchId;
     private final List<Row> rows;
@@ -72,6 +73,7 @@ public class EditPillarRowsPacket {
         }
     }
 
+    /** Server side: changes nothing and answers the sender with a {@code read_only} result for the requested ids. */
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
@@ -101,6 +103,7 @@ public class EditPillarRowsPacket {
             this.z = z;
         }
 
+        /** True if both ids match the pillar id pattern and the dimension is a valid resource id of reasonable length. */
         public boolean isValid() {
             return oldId != null && oldId.matches(PillarIdManager.VALID_ID_PATTERN)
                     && newId != null && newId.matches(PillarIdManager.VALID_ID_PATTERN)

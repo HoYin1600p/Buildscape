@@ -23,8 +23,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -148,7 +150,8 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         if (level == null || !level.isClientSide) {
             return;
         }
-        if (!PillarClientParticles.isWithinRange(pos)) {
+        if (!Boolean.TRUE.equals(DistExecutor.unsafeCallWhenOn(Dist.CLIENT,
+                () -> () -> PillarClientParticles.isWithinRange(pos)))) {
             return;
         }
         if (!be.hasDisplayItem()) {
@@ -200,7 +203,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
         double centerY = pos.getY() + (isAshenKing ? 0.75 : 1.0);
         double centerZ = pos.getZ() + 0.5;
 
-        PillarClientParticles.spawnParticles(
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> PillarClientParticles.spawnParticles(
                 level,
                 pos,
                 be,
@@ -211,7 +214,7 @@ public class PillarBlockEntity extends SyncedBlockEntity {
                 rand,
                 centerX,
                 centerY,
-                centerZ);
+                centerZ));
     }
 
     public ItemStack getDisplayedItem() {

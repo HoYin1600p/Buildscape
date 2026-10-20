@@ -1458,9 +1458,11 @@ public class BuildScapeConfigScreen extends Screen {
         currentInstance = this;
         this.pillarRowShiftAnims.clear();
         this.activePillarRemovals.clear();
-        this.openStartTime = 0L;
-        this.isOpening = true;
-        this.openProgress = 0.0f;
+        if (this.isOpening || this.openProgress < 0.99f) {
+            this.openStartTime = 0L;
+            this.isOpening = true;
+            this.openProgress = 0.0f;
+        }
 
         this.addWidgetConsumer = addWidget;
         this.removeWidgetConsumer = removeWidget;
@@ -1714,7 +1716,7 @@ public class BuildScapeConfigScreen extends Screen {
                     openSidePanel(SidePanelType.PRESETS);
                 }
             } else {
-                openProgress = easeOutSine(elapsed);
+                openProgress = easeOutCubic(elapsed);
             }
         }
 
@@ -2130,29 +2132,36 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
+    private void renderParentBackground(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
+        if (parent == null || closeToWorld) return;
+        ConfigGuiBatch.flush();
+        PoseStack parentPose = asPose(poseStackOrGraphics);
+        parentPose.pushPose();
+        try {
+            parent.render(parentPose, mouseX, mouseY, partialTick);
+        } catch (Exception ignored) {
+        } finally {
+            ConfigGuiBatch.flush();
+            parentPose.popPose();
+        }
+    }
+
     private void renderInternal(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
         if (isClosing && closeProgress <= 0.001f && closeStartTime > 0L) {
+            renderParentBackground(poseStackOrGraphics, mouseX, mouseY, partialTick);
             return;
         }
 
         float alpha = updateAnimations();
         if (isClosing && closeProgress <= 0.001f) {
+            renderParentBackground(poseStackOrGraphics, mouseX, mouseY, partialTick);
             return;
         }
         if (alpha <= 0.001f && !isOpening) return;
         alpha = Math.max(0.01f, Math.min(1.0f, alpha));
 
-        // If closing and parent screen exists, render parent behind the shrinking panel
-        if (isClosing && parent != null) {
-            PoseStack parentPose = asPose(poseStackOrGraphics);
-            parentPose.pushPose();
-            try {
-                parent.render(parentPose, -999, -999, partialTick);
-            } catch (Exception ignored) {
-            } finally {
-                parentPose.popPose();
-            }
-        }
+        // Render parent behind the config screen so transitions and backdrop are seamless
+        renderParentBackground(poseStackOrGraphics, -999, -999, partialTick);
 
         this.rawMouseX = mouseX;
         this.rawMouseY = mouseY;
@@ -2164,9 +2173,11 @@ public class BuildScapeConfigScreen extends Screen {
         // 1. Full-screen dimmed backdrop (draw before pose scaling to cover physical window)
         fill(poseStackOrGraphics, 0, 0, width, height, applyAlpha(COLOR_OVERLAY, alpha));
 
-        // Compute B button center for closing zoom animation
+        // Compute B button center for opening/closing zoom animation
         boolean applyClosingTransform = isClosing && closeStartTime > 0L;
-        if (applyClosingTransform) {
+        boolean applyOpeningTransform = isOpening && openStartTime > 0L;
+        boolean applyTransitionTransform = applyClosingTransform || applyOpeningTransform;
+        if (applyTransitionTransform) {
             int bCenterX = width / 2 + 104 + 10;
             int bCenterY = height / 4 + 72 + 10;
             if (parent != null) {
@@ -2184,25 +2195,34 @@ public class BuildScapeConfigScreen extends Screen {
             }
 
             long now = System.currentTimeMillis();
-            int duration = getCloseAnimMs();
-            float t = Math.min(1.0f, (now - closeStartTime) / (float) duration);
-            float ease = easeInCubic(t);
-
-            // Zoom out scale: from 1.0 down to 0.04
-            float zoomScale = Math.max(0.04f, 1.0f - 0.96f * ease);
-
-            // Geometry center in screen coordinates
             SidePanelLayout baseLayout = calculateLayout();
             float panelCenterX = baseLayout.frameX + baseLayout.frameW / 2.0f;
             float panelCenterY = baseLayout.frameY + baseLayout.frameH / 2.0f;
 
-            float curX = panelCenterX + (bCenterX - panelCenterX) * ease;
-            float curY = panelCenterY + (bCenterY - panelCenterY) * ease;
+            float zoomScale;
+            float curX;
+            float curY;
 
-            // Flush queued geometry (e.g. backdrop) before changing global ModelView matrix
+            if (applyClosingTransform) {
+                int duration = getCloseAnimMs();
+                float t = Math.min(1.0f, (now - closeStartTime) / (float) duration);
+                float ease = easeInCubic(t);
+                zoomScale = Math.max(0.04f, 1.0f - 0.96f * ease);
+                curX = panelCenterX + (bCenterX - panelCenterX) * ease;
+                curY = panelCenterY + (bCenterY - panelCenterY) * ease;
+            } else {
+                int duration = getOpenAnimMs();
+                float t = Math.min(1.0f, (now - openStartTime) / (float) duration);
+                float ease = easeOutCubic(t);
+                zoomScale = Math.min(1.0f, 0.04f + 0.96f * ease);
+                curX = bCenterX + (panelCenterX - bCenterX) * ease;
+                curY = bCenterY + (panelCenterY - bCenterY) * ease;
+            }
+
+            // Flush queued geometry (e.g. parent background and backdrop) before changing global ModelView matrix
             ConfigGuiBatch.flush();
 
-            // Apply closing transform ONCE globally on ModelViewStack so both ordinary geometry and item icons zoom cleanly
+            // Apply transition transform ONCE globally on ModelViewStack so both ordinary geometry and item icons zoom cleanly
             PoseStack modelView = RenderSystem.getModelViewStack();
             modelView.pushPose();
             modelView.translate(curX, curY, 0);
@@ -2226,7 +2246,7 @@ public class BuildScapeConfigScreen extends Screen {
         updateSidePanelAnimation();
         SidePanelLayout layout = calculateLayout();
 
-        int offsetY = isClosing ? 0 : Math.round((1.0f - alpha) * 8.0f);
+        int offsetY = 0;
         int panelX = layout.panelX;
         int panelY = layout.panelY + offsetY;
         int panelW = layout.panelW;
@@ -2323,7 +2343,7 @@ public class BuildScapeConfigScreen extends Screen {
             scissorUiScale = 1.0f;
         }
 
-        if (applyClosingTransform) {
+        if (applyTransitionTransform) {
             ConfigGuiBatch.flush();
             PoseStack modelView = RenderSystem.getModelViewStack();
             modelView.popPose();
@@ -4769,7 +4789,7 @@ public class BuildScapeConfigScreen extends Screen {
     private float scissorUiScale = 1.0f;
 
     private void enableGuiScissor(Object poseStackOrGraphics, int guiX, int guiY, int guiW, int guiH) {
-        if (isClosing) return;
+        if (isClosing || (isOpening && openProgress < 0.99f)) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.getWindow() == null) return;
         int[] rect = scissorRect(guiX, guiY, guiW, guiH, mc.getWindow().getGuiScale() * scissorUiScale,
@@ -4789,7 +4809,7 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     private void disableGuiScissor(Object poseStackOrGraphics) {
-        if (isClosing) return;
+        if (isClosing || (isOpening && openProgress < 0.99f)) return;
         disableScissor();
     }
 
@@ -5413,7 +5433,7 @@ public class BuildScapeConfigScreen extends Screen {
     // Mouse and keyboard event handling.
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (isClosing) return true;
+        if (isClosing || (isOpening && openProgress < 0.2f)) return true;
 
         float uiScale = getGuiUiScale();
         if (Math.abs(uiScale - 1.0f) > 0.001f) {

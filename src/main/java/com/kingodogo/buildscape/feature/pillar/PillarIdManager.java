@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import org.apache.logging.log4j.LogManager;
 
 public class PillarIdManager {
     private static final PillarIdManager SERVER_INSTANCE = new PillarIdManager(true);
@@ -677,7 +676,7 @@ public class PillarIdManager {
                     return new SavedData(backupFile, loaded);
                 }
             } catch (Exception e) {
-                LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar backup", e);
+                BuildScape.LOGGER.error("Unable to read pillar backup", e);
             }
         }
         return new SavedData(file, Collections.emptyMap());
@@ -822,7 +821,7 @@ public class PillarIdManager {
 
             saveToFile(PillarStore.getBackupDataFile(), PillarStore.BACKUP_FILE_NAME);
         } catch (Throwable t) {
-            BuildScape.LOGGER.error("Error saving backup file: {}", t.getMessage());
+            BuildScape.LOGGER.error("Error saving backup file: {}", t.getMessage(), t);
         }
     }
 

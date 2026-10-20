@@ -25,7 +25,6 @@ import java.util.Map;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import org.apache.logging.log4j.LogManager;
 
 /**
  * Where the pillar data file lives and how it is read and written: the world folder when a server is
@@ -134,10 +133,9 @@ final class PillarStore {
                     file.getName() + ".corrupted." + System.currentTimeMillis()).toPath());
             preserved = true;
         } catch (IOException e) {
-            LogManager.getLogger(PillarIdManager.class)
-                    .error("Unable to preserve corrupted pillar data; saves are blocked", e);
+            BuildScape.LOGGER.error("Unable to preserve corrupted pillar data; saves are blocked", e);
         }
-        LogManager.getLogger(PillarIdManager.class).error("Unable to read pillar data (" + errorType + ")", error);
+        BuildScape.LOGGER.error("Unable to read pillar data ({})", errorType, error);
         return preserved;
     }
 

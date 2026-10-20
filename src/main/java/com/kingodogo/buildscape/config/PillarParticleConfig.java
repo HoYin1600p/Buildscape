@@ -470,7 +470,7 @@ public class PillarParticleConfig {
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         } catch (Exception e) {
-                            BuildScape.LOGGER.error("Error in config file watcher: {}", e.getMessage());
+                            BuildScape.LOGGER.error("Error in config file watcher: {}", e.getMessage(), e);
                         }
                     },
                     "BuildScape-ConfigWatcher");
@@ -1112,7 +1112,7 @@ public class PillarParticleConfig {
             lastFileSizeItems = file.length();
             return true;
         } catch (Exception e) {
-            BuildScape.LOGGER.error("Error saving items config: {}", e.getMessage());
+            BuildScape.LOGGER.error("Error saving items config: {}", e.getMessage(), e);
             return false;
         }
     }

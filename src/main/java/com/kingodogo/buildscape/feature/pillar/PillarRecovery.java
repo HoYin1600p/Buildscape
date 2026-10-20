@@ -160,7 +160,7 @@ final class PillarRecovery {
                         }
                     }
                 } catch (Exception e) {
-                    BuildScape.LOGGER.error("Error scanning chunks to clear pillar IDs: {}", e.getMessage());
+                    BuildScape.LOGGER.error("Error scanning chunks to clear pillar IDs: {}", e.getMessage(), e);
                 }
             }
 
@@ -330,13 +330,13 @@ final class PillarRecovery {
                                 m.registry.pillarData.put(pillarId, data);
                                 recoveredCount++;
                             } catch (Exception e) {
-                                BuildScape.LOGGER.error("Error processing pillar: {}", e.getMessage());
+                                BuildScape.LOGGER.error("Error processing pillar: {}", e.getMessage(), e);
                                 skippedCount++;
                             }
                         }
                     }
                 } catch (Exception e) {
-                    BuildScape.LOGGER.error("Error scanning chunks for pillars: {}", e.getMessage());
+                    BuildScape.LOGGER.error("Error scanning chunks for pillars: {}", e.getMessage(), e);
                     skippedCount++;
                 }
             }

@@ -99,7 +99,7 @@ final class PillarWorldSync {
                         }
                     } catch (Exception e) {
                         BuildScape.LOGGER.error("Error syncing pillar {}: {}", (data != null ? data.id : "unknown"),
-                                e.getMessage());
+                                e.getMessage(), e);
                     }
                 }
             }
@@ -272,7 +272,7 @@ final class PillarWorldSync {
                         preservedCount++;
                         BuildScape.LOGGER.error("Error syncing colors from NBT for pillar {}: {}",
                                 (data != null ? data.id : "unknown"),
-                                e.getMessage());
+                                e.getMessage(), e);
                     }
                 }
             }
@@ -359,7 +359,7 @@ final class PillarWorldSync {
                     } catch (Exception e) {
                         BuildScape.LOGGER.error("Error loading colors from NBT for pillar {}: {}",
                                 (data != null ? data.id : "unknown"),
-                                e.getMessage());
+                                e.getMessage(), e);
                     }
                 }
             }

@@ -113,7 +113,7 @@ public final class SculkCatalystHandler {
 
     static void debug(String message, Object... arguments) {
         if (DEBUG) {
-            BuildScape.LOGGER.info("[Sculk debug] " + message, arguments);
+            BuildScape.LOGGER.debug("[Sculk debug] " + message, arguments);
         }
     }
 

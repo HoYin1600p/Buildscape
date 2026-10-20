@@ -50,41 +50,29 @@ def devRegistryLogging = providers.gradleProperty('dev_registry_logging').getOrE
 
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
-
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
     runs {
         configureEach {
             workingDirectory project.file('run')
-
             // Registry debug dumps are expensive for the large block catalogue; enable when diagnosing registration.
             if (devRegistryLogging) property 'forge.logging.markers', 'REGISTRIES'
-
             property 'forge.logging.console.level', 'info'
         }
-
         client {
             property 'forge.enabledGameTestNamespaces', mod_id
-
             args '--username', 'Dev'
-
             jvmArgs "-Xmx${devClientMaxHeap}", "-Xms${devClientMinHeap}", '-XX:+UseG1GC'
         }
-
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
             args '--nogui'
-
             jvmArgs '-Xmx4G', '-Xms2G'
         }
-
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
-
         data {
             workingDirectory project.file('run-data')
-
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
         }
     }
@@ -96,16 +84,9 @@ mixin {
     config "${mod_id}.mixins.json"
 }
 
-sourceSets {
-    main {
-        resources { srcDir 'src/generated/resources' }
-    }
-}
-
 repositories {
     maven { url = 'https://www.cursemaven.com' }
     maven { url = 'https://maven.blamejared.com' }
-    maven { url = 'https://dvs1.progwml6.com/files/maven/' }
     maven { url = 'https://modmaven.dev' }
     mavenCentral()
 }
@@ -122,15 +103,10 @@ if (!rendererApiCoordinates.containsKey(rendererApi)) {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
-
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.7.1.255")
-
     compileOnly fg.deobf(rendererApiCoordinates[rendererApi])
-
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
 }
 
@@ -223,7 +199,6 @@ tasks.named('jar', Jar).configure {
                     "Implementation-Title"    : project.name,
                     "Implementation-Version"  : "${version}",
                     "Implementation-Vendor"   : "kingodogo",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                     "MixinConfigs"            : "${mod_id}.mixins.json"])
     }
 

@@ -1,5 +1,3 @@
-# A little cleanup never hurt. Much prettier now, right? -KyroWasHere
-
 # Build & Runtime Outputs
 build/
 run/
@@ -24,12 +22,7 @@ logs/
 /.vscode/*
 !/.vscode/settings.json
 
-# AI Assistants & Local Tooling
-.claude/
-/.agents/
-/.gemini/
-/.qoder/
-/.codex-artifacts/
+# Local Tooling
 /scratch/
 *.local.json
 .env*.local
@@ -41,7 +34,6 @@ nul
 Thumbs.db
 Desktop.ini
 *.log
-*.html
 old_*.java
 temp_*.java
 recent_*.java
@@ -55,7 +47,6 @@ MOB_PILLAR_STATES_DOCUMENTATION.md
 MISSING_RECIPES.md
 ADDED_RECIPES.md
 VERTICAL_VARIANTS_ADDED.md
-THIRD_PARTY_NOTICES.md
 buildscape-3.0.9-to-4.0.0.md
 buildscape-4.0.0-to-4.0.1.md
 buildscape-4.0.1-to-4.0.2.md

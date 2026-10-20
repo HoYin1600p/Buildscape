@@ -60,9 +60,9 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
     @Override
     public Vec3 getRenderOffset(ColoredItemFrameEntity entity, float partialTicks) {
         return new Vec3(
-                (double) entity.getDirection().getStepX() * 0.3D,
-                -0.25D,
-                (double) entity.getDirection().getStepZ() * 0.3D);
+                (double) entity.getDirection().getStepX() * 0.3,
+                -0.25,
+                (double) entity.getDirection().getStepZ() * 0.3);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         Vec3 renderOffset = this.getRenderOffset(entity, partialTicks);
         poseStack.translate(-renderOffset.x(), -renderOffset.y(), -renderOffset.z());
 
-        double wallOffset = 0.469D;
+        double wallOffset = 0.469;
         poseStack.translate(
                 (double) direction.getStepX() * wallOffset,
                 (double) direction.getStepY() * wallOffset,
@@ -117,7 +117,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
     private void renderNormalFrame(PoseStack poseStack, MultiBufferSource buffer, int packedLight,
             ResourceLocation backTexture) {
         poseStack.pushPose();
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
+        poseStack.translate(-0.5, -0.5, -0.5);
 
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
@@ -170,7 +170,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
     private void renderMapFrame(PoseStack poseStack, MultiBufferSource buffer, int packedLight,
             ResourceLocation backTexture) {
         poseStack.pushPose();
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
+        poseStack.translate(-0.5, -0.5, -0.5);
 
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
@@ -283,7 +283,7 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
             PoseStack poseStack, MultiBufferSource buffer, int packedLight, boolean isMap, boolean isInvisible) {
         MapItemSavedData mapData = isMap ? MapItem.getSavedData(itemStack, entity.level) : null;
 
-        poseStack.translate(0.0D, 0.0D, isInvisible ? 0.5D : 0.4375D);
+        poseStack.translate(0.0, 0.0, isInvisible ? 0.5 : 0.4375);
 
         int rotation;
         if (mapData != null) {
@@ -296,8 +296,8 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         if (mapData != null) {
             poseStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
             poseStack.scale(0.0078125F, 0.0078125F, 0.0078125F);
-            poseStack.translate(-64.0D, -64.0D, 0.0D);
-            poseStack.translate(0.0D, 0.0D, -1.0D);
+            poseStack.translate(-64.0, -64.0, 0.0);
+            poseStack.translate(0.0, 0.0, -1.0);
             Integer mapId = MapItem.getMapId(itemStack);
             if (mapId != null && mapData != null) {
                 Minecraft.getInstance().gameRenderer.getMapRenderer()

@@ -490,7 +490,7 @@ public class BlockInteractionEvents {
             if (state.is(ModBlocks.TALL_DRY_GRASS.get())) {
                 if (!level.isClientSide) {
                     ItemEntity item = new ItemEntity(
-                            level, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                            level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                             new ItemStack(ModItems.DRY_GRASS.get(), 1));
                     level.addFreshEntity(item);
                     level.levelEvent(2005, pos, 0);

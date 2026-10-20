@@ -19,7 +19,7 @@ public class PresentsFireworkShape extends CustomFireworkShape {
 
     @Override
     public double getBaseScale() {
-        return 0.40D;
+        return 0.40;
     }
 
     @Override

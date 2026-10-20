@@ -62,47 +62,47 @@ public class FestiveStockingBlockEntityRenderer
 
         float rotationY = 0.0F;
         float rotationX = 0.0F;
-        double posX = 0.5D;
-        double posY = 0.5D;
-        double posZ = 0.0D;
-        double forwardOffset = 0.001D;
+        double posX = 0.5;
+        double posY = 0.5;
+        double posZ = 0.0;
+        double forwardOffset = 0.001;
 
         switch (facing) {
             case NORTH -> {
-                posX = 0.5D;
-                posY = 0.5D;
-                posZ = 1.0D - forwardOffset;
+                posX = 0.5;
+                posY = 0.5;
+                posZ = 1.0 - forwardOffset;
                 rotationY = 180.0F;
             }
             case SOUTH -> {
-                posX = 0.5D;
-                posY = 0.5D;
+                posX = 0.5;
+                posY = 0.5;
                 posZ = forwardOffset;
                 rotationY = 0.0F;
             }
             case WEST -> {
-                posX = 1.0D - forwardOffset;
-                posY = 0.5D;
-                posZ = 0.5D;
+                posX = 1.0 - forwardOffset;
+                posY = 0.5;
+                posZ = 0.5;
                 rotationY = 90.0F;
             }
             case EAST -> {
                 posX = forwardOffset;
-                posY = 0.5D;
-                posZ = 0.5D;
+                posY = 0.5;
+                posZ = 0.5;
                 rotationY = 270.0F;
             }
             case UP -> {
-                posX = 0.5D;
-                posY = 0.5D / 16.0D;
-                posZ = 0.5D;
+                posX = 0.5;
+                posY = 0.5 / 16.0;
+                posZ = 0.5;
                 rotationX = -90.0F;
                 rotationY = 180.0F;
             }
             case DOWN -> {
-                posX = 0.5D;
-                posY = 15.5D / 16.0D;
-                posZ = 0.5D;
+                posX = 0.5;
+                posY = 15.5 / 16.0;
+                posZ = 0.5;
                 rotationX = 90.0F;
                 rotationY = 180.0F;
             }

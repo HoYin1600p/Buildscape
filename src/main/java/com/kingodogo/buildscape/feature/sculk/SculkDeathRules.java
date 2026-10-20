@@ -8,7 +8,7 @@ public final class SculkDeathRules {
     private SculkDeathRules() {}
 
     public static boolean isInRange(double distanceSquared) {
-        return distanceSquared >= 0.0D && distanceSquared <= 64.0D;
+        return distanceSquared >= 0.0 && distanceSquared <= 64.0;
     }
 
     public static boolean preferCatalyst(double distanceSquared, double nearestDistanceSquared, int positionOrder) {

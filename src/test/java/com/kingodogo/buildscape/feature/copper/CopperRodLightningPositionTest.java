@@ -10,7 +10,7 @@ public class CopperRodLightningPositionTest {
     @Test
     public void summonAtRodBottomSelectsCopperBase() {
         BlockPos rod = new BlockPos(20, -59, 130);
-        Vec3 bolt = new Vec3(20.5D, -59.0D, 130.5D);
+        Vec3 bolt = new Vec3(20.5, -59.0, 130.5);
 
         assertEquals(rod.below(), strikePosition(bolt));
     }
@@ -18,7 +18,7 @@ public class CopperRodLightningPositionTest {
     @Test
     public void summonAboveRodSelectsRod() {
         BlockPos rod = new BlockPos(20, -59, 130);
-        Vec3 bolt = new Vec3(20.5D, -58.0D, 130.5D);
+        Vec3 bolt = new Vec3(20.5, -58.0, 130.5);
 
         assertEquals(rod, strikePosition(bolt));
     }
@@ -34,6 +34,6 @@ public class CopperRodLightningPositionTest {
     }
 
     private static BlockPos strikePosition(Vec3 bolt) {
-        return new BlockPos(bolt.x, bolt.y - 1.0E-6D, bolt.z);
+        return new BlockPos(bolt.x, bolt.y - 1.0E-6, bolt.z);
     }
 }

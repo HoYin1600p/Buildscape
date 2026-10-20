@@ -4,7 +4,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -30,9 +34,9 @@ public class HazeParticle extends TextureSheetParticle {
         this.gravity = 0.0F;
         this.hasPhysics = false;
 
-        this.xd = (level.random.nextFloat() - 0.5D) * 0.0003D;
-        this.yd = 0.0D;
-        this.zd = (level.random.nextFloat() - 0.5D) * 0.0003D;
+        this.xd = (level.random.nextFloat() - 0.5) * 0.0003;
+        this.yd = 0.0;
+        this.zd = (level.random.nextFloat() - 0.5) * 0.0003;
 
         this.rotSpeed = (level.random.nextFloat() - 0.5F) * 0.0006F;
         this.roll = level.random.nextFloat() * ((float) Math.PI * 2.0F);

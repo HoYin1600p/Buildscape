@@ -166,9 +166,9 @@ public class IcicleCauldronBlockEntity
             return false;
         }
         return (player.distanceToSqr(
-                (double) worldPosition.getX() + 0.5D,
-                (double) worldPosition.getY() + 0.5D,
-                (double) worldPosition.getZ() + 0.5D) <= 64.0D);
+                (double) worldPosition.getX() + 0.5,
+                (double) worldPosition.getY() + 0.5,
+                (double) worldPosition.getZ() + 0.5) <= 64.0);
     }
 
     @Override

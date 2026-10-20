@@ -720,9 +720,9 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
             Fluid fluid = getFluidAboveSulfurSpikeChain(level, pos);
 
             if (fluid != Fluids.EMPTY) {
-                double tipX = pos.getX() + 0.5D;
-                double tipY = pos.getY() + 0.1D;
-                double tipZ = pos.getZ() + 0.5D;
+                double tipX = pos.getX() + 0.5;
+                double tipY = pos.getY() + 0.1;
+                double tipZ = pos.getZ() + 0.5;
 
                 if (random.nextInt(3) == 0) {
                     level.addParticle(
@@ -730,9 +730,9 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                             tipX,
                             tipY,
                             tipZ,
-                            0.0D,
-                            0.0D,
-                            0.0D);
+                            0.0,
+                            0.0,
+                            0.0);
                 }
             }
         }

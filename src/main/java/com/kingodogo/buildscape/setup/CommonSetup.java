@@ -217,7 +217,7 @@ public final class CommonSetup {
                             }
                         }
 
-                        double yawOffset = (slotIndex - 4) * 0.15D;
+                        double yawOffset = (slotIndex - 4) * 0.15;
 
                         double forwardX = facing.getStepX();
                         double forwardY = facing.getStepY();
@@ -241,7 +241,7 @@ public final class CommonSetup {
                         double dirZ = forwardZ + rightZ * yawOffset;
 
                         double len = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-                        if (len > 0.0001D) {
+                        if (len > 0.0001) {
                             dirX /= len;
                             dirY /= len;
                             dirZ /= len;
@@ -254,25 +254,25 @@ public final class CommonSetup {
                                 burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt(NbtKeys.BURST_LEVEL)));
                             }
                             int particleCount = (65 + rand.nextInt(36)) * burstLevel;
-                            double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2D;
-                            double spreadMultiplier = 1.0 + (burstLevel - 1) * 0.1D;
+                            double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2;
+                            double spreadMultiplier = 1.0 + (burstLevel - 1) * 0.1;
 
                             for (int i = 0; i < particleCount; i++) {
-                                double speed = (0.08D + rand.nextDouble() * 0.12D) * speedMultiplier;
-                                double spread = (0.04D + rand.nextDouble() * 0.06D) * spreadMultiplier;
+                                double speed = (0.08 + rand.nextDouble() * 0.12) * speedMultiplier;
+                                double spread = (0.04 + rand.nextDouble() * 0.06) * spreadMultiplier;
 
-                                double vx = dirX * speed + (rand.nextDouble() - 0.5D) * spread;
-                                double vy = dirY * speed + (rand.nextDouble() - 0.5D) * spread
-                                        + (facing.getAxis().isHorizontal() ? 0.05D : 0.0D);
-                                double vz = dirZ * speed + (rand.nextDouble() - 0.5D) * spread;
+                                double vx = dirX * speed + (rand.nextDouble() - 0.5) * spread;
+                                double vy = dirY * speed + (rand.nextDouble() - 0.5) * spread
+                                        + (facing.getAxis().isHorizontal() ? 0.05 : 0.0);
+                                double vz = dirZ * speed + (rand.nextDouble() - 0.5) * spread;
 
-                                double px = startX + (rand.nextDouble() - 0.5D) * 0.15D;
-                                double py = startY + (rand.nextDouble() - 0.5D) * 0.15D;
-                                double pz = startZ + (rand.nextDouble() - 0.5D) * 0.15D;
+                                double px = startX + (rand.nextDouble() - 0.5) * 0.15;
+                                double py = startY + (rand.nextDouble() - 0.5) * 0.15;
+                                double pz = startZ + (rand.nextDouble() - 0.5) * 0.15;
 
                                 serverLevel.sendParticles(
                                         (SimpleParticleType) ModParticles.CONFETTI.get(),
-                                        px, py, pz, 0, vx, vy, vz, 1.0D);
+                                        px, py, pz, 0, vx, vy, vz, 1.0);
                             }
 
                             level.playSound(null, pos,

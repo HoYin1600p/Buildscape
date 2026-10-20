@@ -51,24 +51,24 @@ public class ShelfBlock extends BaseEntityBlock
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private static final VoxelShape SHAPE_NORTH = Shapes.or(
-            Block.box(0.0D, 12.0D, 11.0D, 16.0D, 16.0D, 13.0D),
-            Block.box(0.0D, 0.0D, 13.0D, 16.0D, 16.0D, 16.0D),
-            Block.box(0.0D, 0.0D, 11.0D, 16.0D, 4.0D, 13.0D));
+            Block.box(0.0, 12.0, 11.0, 16.0, 16.0, 13.0),
+            Block.box(0.0, 0.0, 13.0, 16.0, 16.0, 16.0),
+            Block.box(0.0, 0.0, 11.0, 16.0, 4.0, 13.0));
 
     private static final VoxelShape SHAPE_SOUTH = Shapes.or(
-            Block.box(0.0D, 12.0D, 3.0D, 16.0D, 16.0D, 5.0D),
-            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 3.0D),
-            Block.box(0.0D, 0.0D, 3.0D, 16.0D, 4.0D, 5.0D));
+            Block.box(0.0, 12.0, 3.0, 16.0, 16.0, 5.0),
+            Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 3.0),
+            Block.box(0.0, 0.0, 3.0, 16.0, 4.0, 5.0));
 
     private static final VoxelShape SHAPE_WEST = Shapes.or(
-            Block.box(11.0D, 12.0D, 0.0D, 13.0D, 16.0D, 16.0D),
-            Block.box(13.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D),
-            Block.box(11.0D, 0.0D, 0.0D, 13.0D, 4.0D, 16.0D));
+            Block.box(11.0, 12.0, 0.0, 13.0, 16.0, 16.0),
+            Block.box(13.0, 0.0, 0.0, 16.0, 16.0, 16.0),
+            Block.box(11.0, 0.0, 0.0, 13.0, 4.0, 16.0));
 
     private static final VoxelShape SHAPE_EAST = Shapes.or(
-            Block.box(3.0D, 12.0D, 0.0D, 5.0D, 16.0D, 16.0D),
-            Block.box(0.0D, 0.0D, 0.0D, 3.0D, 16.0D, 16.0D),
-            Block.box(3.0D, 0.0D, 0.0D, 5.0D, 4.0D, 16.0D));
+            Block.box(3.0, 12.0, 0.0, 5.0, 16.0, 16.0),
+            Block.box(0.0, 0.0, 0.0, 3.0, 16.0, 16.0),
+            Block.box(3.0, 0.0, 0.0, 5.0, 4.0, 16.0));
 
     public ShelfBlock(final BlockBehaviour.Properties properties) {
         super(properties);

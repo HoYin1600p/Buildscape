@@ -35,7 +35,7 @@ public class WildflowersBlock extends BushBlock implements BonemealableBlock {
     public static final IntegerProperty FLOWER_AMOUNT = IntegerProperty.create("flower_amount", 1, 4);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    protected static final VoxelShape SHAPE = box(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D);
+    protected static final VoxelShape SHAPE = box(0.0, 0.0, 0.0, 16.0, 3.0, 16.0);
 
     public WildflowersBlock(BlockBehaviour.Properties properties) {
         super(properties);

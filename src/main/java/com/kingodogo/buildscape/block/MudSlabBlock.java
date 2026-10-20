@@ -13,26 +13,26 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class MudSlabBlock extends SlabBlock {
 
     protected static final VoxelShape BOTTOM_SHAPE = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            8.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            8.0,
+            16.0);
     protected static final VoxelShape TOP_SHAPE = Block.box(
-            0.0D,
-            8.0D,
-            0.0D,
-            16.0D,
-            15.0D,
-            16.0D);
+            0.0,
+            8.0,
+            0.0,
+            16.0,
+            15.0,
+            16.0);
     protected static final VoxelShape DOUBLE_SHAPE = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            15.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            15.0,
+            16.0);
 
     public MudSlabBlock(BlockBehaviour.Properties properties) {
         super(properties);

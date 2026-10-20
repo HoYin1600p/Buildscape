@@ -45,7 +45,7 @@ public class SnowyLargeFernBlock extends DoublePlantBlock implements SinksOnFarm
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         VoxelShape shape = super.getShape(state, level, pos, context);
         if (state.getValue(ON_FARMLAND)) {
-            return shape.move(0, -0.0625D, 0);
+            return shape.move(0, -0.0625, 0);
         }
         return shape;
     }

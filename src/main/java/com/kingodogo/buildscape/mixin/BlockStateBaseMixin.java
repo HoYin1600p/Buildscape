@@ -66,9 +66,9 @@ public class BlockStateBaseMixin {
                     if (frame != SignFrameType.NONE && frame.getItem() != null) {
                         Containers.dropItemStack(
                                 level,
-                                (double) pos.getX() + 0.5D,
-                                (double) pos.getY() + 0.5D,
-                                (double) pos.getZ() + 0.5D,
+                                (double) pos.getX() + 0.5,
+                                (double) pos.getY() + 0.5,
+                                (double) pos.getZ() + 0.5,
                                 new ItemStack(frame.getItem()));
                         SignFrameAttachment.setFrame(sign, SignFrameType.NONE);
                     }

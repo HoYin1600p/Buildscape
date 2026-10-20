@@ -17,12 +17,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class SnowOverlayBlock extends Block {
 
     protected static final VoxelShape SHAPE = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            1.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            1.0,
+            16.0);
 
     public SnowOverlayBlock(Properties properties) {
         super(properties);

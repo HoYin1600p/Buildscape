@@ -24,7 +24,7 @@ public class CrownFireworkShape extends CustomFireworkShape {
 
     @Override
     public double getBaseScale() {
-        return 0.38D;
+        return 0.38;
     }
 
     @Override

@@ -41,21 +41,21 @@ public class ColoredSporeBlossomBlock
         String colorHex = String.format(Locale.ROOT, "#%06x", particleColorRGB);
 
         if (level.isClientSide) {
-            double centerX = (double) i + 0.5D;
-            double centerY = (double) j + 0.5D;
-            double centerZ = (double) k + 0.5D;
+            double centerX = (double) i + 0.5;
+            double centerY = (double) j + 0.5;
+            double centerZ = (double) k + 0.5;
 
             if (random.nextFloat() < 0.50F) {
                 int centerParticleCount = 1 + random.nextInt(3);
                 for (int c = 0; c < centerParticleCount; c++) {
-                    double offsetX = (random.nextDouble() - 0.5D) * 1.6D;
-                    double offsetZ = (random.nextDouble() - 0.5D) * 1.6D;
+                    double offsetX = (random.nextDouble() - 0.5) * 1.6;
+                    double offsetZ = (random.nextDouble() - 0.5) * 1.6;
                     double spawnX = centerX + offsetX;
                     double spawnZ = centerZ + offsetZ;
 
-                    double driftX = (random.nextDouble() - 0.5D) * 0.02D;
-                    double driftZ = (random.nextDouble() - 0.5D) * 0.02D;
-                    double fallSpeed = -0.007D - random.nextDouble() * 0.006D;
+                    double driftX = (random.nextDouble() - 0.5) * 0.02;
+                    double driftZ = (random.nextDouble() - 0.5) * 0.02;
+                    double fallSpeed = -0.007 - random.nextDouble() * 0.006;
 
                     if (level.isClientSide) {
                         TintedDripParticle.registerColorForPosition(
@@ -78,16 +78,16 @@ public class ColoredSporeBlossomBlock
             if (random.nextFloat() < 0.60F) {
                 int spreadParticleCount = 10 + random.nextInt(25);
                 for (int p = 0; p < spreadParticleCount; p++) {
-                    double distance = 3.0D + random.nextDouble() * 16.0D;
-                    double angle = random.nextDouble() * 2.0D * Math.PI;
+                    double distance = 3.0 + random.nextDouble() * 16.0;
+                    double angle = random.nextDouble() * 2.0 * Math.PI;
 
                     double spreadX = centerX + Math.cos(angle) * distance;
                     double spreadZ = centerZ + Math.sin(angle) * distance;
-                    double spreadY = centerY + (random.nextDouble() * 9.0D - 3.0D);
+                    double spreadY = centerY + (random.nextDouble() * 9.0 - 3.0);
 
-                    double velocityX = (random.nextDouble() - 0.5D) * 0.04D;
-                    double velocityY = (random.nextDouble() - 0.125D) * 0.04D;
-                    double velocityZ = (random.nextDouble() - 0.5D) * 0.04D;
+                    double velocityX = (random.nextDouble() - 0.5) * 0.04;
+                    double velocityY = (random.nextDouble() - 0.125) * 0.04;
+                    double velocityZ = (random.nextDouble() - 0.5) * 0.04;
 
                     if (level.isClientSide) {
                         TintedDripParticle.registerColorForPosition(

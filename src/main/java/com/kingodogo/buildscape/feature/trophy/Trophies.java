@@ -9,27 +9,31 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class Trophies {
     private static final Map<String, TrophyDefinition> REGISTRY = new LinkedHashMap<>();
     private static final Map<String, TrophyDefinition> BY_ADVANCEMENT = new HashMap<>();
 
     private static final Map<Direction, VoxelShape> PEDESTAL_SHAPES = TrophyDefinition.createDirectionalShapes(
-            new double[]{4.0D, 0.0D, 4.0D, 12.0D, 1.0D, 12.0D},
-            new double[]{7.0D, 0.0D, 3.0D, 9.0D, 2.0D, 5.0D},
-            new double[]{3.0D, 0.0D, 7.0D, 5.0D, 2.0D, 9.0D},
-            new double[]{7.0D, 0.0D, 11.0D, 9.0D, 2.0D, 13.0D},
-            new double[]{11.0D, 0.0D, 7.0D, 13.0D, 2.0D, 9.0D},
-            new double[]{5.0D, 1.0D, 5.0D, 11.0D, 10.0D, 11.0D},
-            new double[]{4.375D, 9.85D, 4.125D, 11.625D, 11.85D, 11.875D},
-            new double[]{4.875D, 11.85D, 5.0D, 10.875D, 17.85D, 11.0D});
+            new double[]{4.0, 0.0, 4.0, 12.0, 1.0, 12.0},
+            new double[]{7.0, 0.0, 3.0, 9.0, 2.0, 5.0},
+            new double[]{3.0, 0.0, 7.0, 5.0, 2.0, 9.0},
+            new double[]{7.0, 0.0, 11.0, 9.0, 2.0, 13.0},
+            new double[]{11.0, 0.0, 7.0, 13.0, 2.0, 9.0},
+            new double[]{5.0, 1.0, 5.0, 11.0, 10.0, 11.0},
+            new double[]{4.375, 9.85, 4.125, 11.625, 11.85, 11.875},
+            new double[]{4.875, 11.85, 5.0, 10.875, 17.85, 11.0});
 
     private static final Map<Direction, VoxelShape> STAND_SHAPES = TrophyDefinition.createDirectionalShapes(
-            1.0D, 0.0D, 3.0D, 15.0D, 16.0D, 13.0D);
+            1.0, 0.0, 3.0, 15.0, 16.0, 13.0);
 
     private static final Map<Direction, VoxelShape> BUILDSCAPE_TROPHY_SHAPES = TrophyDefinition.createDirectionalShapes(
-            1.0D, 0.0D, 1.0D, 15.0D, 30.0D, 15.0D);
+            1.0, 0.0, 1.0, 15.0, 30.0, 15.0);
 
     public static final TrophyDefinition STONE_PILLAR = register(
             TrophyDefinition.builder("stone_pillar_trophy")

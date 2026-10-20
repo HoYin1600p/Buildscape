@@ -110,9 +110,9 @@ public class ColoredItemFrameEntity extends HangingEntity {
             return;
         }
 
-        double x = (double) this.pos.getX() + 0.5D - (double) this.direction.getStepX() * 0.46875D;
-        double y = (double) this.pos.getY() + 0.5D - (double) this.direction.getStepY() * 0.46875D;
-        double z = (double) this.pos.getZ() + 0.5D - (double) this.direction.getStepZ() * 0.46875D;
+        double x = (double) this.pos.getX() + 0.5 - (double) this.direction.getStepX() * 0.46875;
+        double y = (double) this.pos.getY() + 0.5 - (double) this.direction.getStepY() * 0.46875;
+        double z = (double) this.pos.getZ() + 0.5 - (double) this.direction.getStepZ() * 0.46875;
         this.setPosRaw(x, y, z);
 
         double w = this.getWidth();
@@ -121,14 +121,14 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
         Direction.Axis axis = this.direction.getAxis();
         switch (axis) {
-            case X -> w = 1.0D;
-            case Y -> h = 1.0D;
-            case Z -> d = 1.0D;
+            case X -> w = 1.0;
+            case Y -> h = 1.0;
+            case Z -> d = 1.0;
         }
 
-        w /= 32.0D;
-        h /= 32.0D;
-        d /= 32.0D;
+        w /= 32.0;
+        h /= 32.0;
+        d /= 32.0;
 
         this.setBoundingBox(new AABB(x - w, y - h, z - d, x + w, y + h, z + d));
     }

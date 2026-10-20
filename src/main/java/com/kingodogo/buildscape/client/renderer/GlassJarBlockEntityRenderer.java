@@ -79,9 +79,9 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
             float oscillation = (float) Math.sin(wobbleProgress * Math.PI * 6);
             float rotationAngle = 8.0F * dampening * oscillation;
 
-            poseStack.translate(0.5D, 0.0D, 0.5D);
+            poseStack.translate(0.5, 0.0, 0.5);
             poseStack.mulPose(Vector3f.ZP.rotationDegrees(rotationAngle));
-            poseStack.translate(-0.5D, 0.0D, -0.5D);
+            poseStack.translate(-0.5, 0.0, -0.5);
         }
 
         if (blockEntity.hasLiquid()) {
@@ -103,7 +103,7 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
                     float offsetZ = getJitter(pos, i, 2) * 0.025F;
                     float currentY = startY + (i * yStep);
 
-                    poseStack.translate(0.5D + offsetX, currentY, 0.5D + offsetZ);
+                    poseStack.translate(0.5 + offsetX, currentY, 0.5 + offsetZ);
 
                     float randomAngle = getDeterministicRandomAngle(pos, i);
                     poseStack.mulPose(Vector3f.YP.rotationDegrees(randomAngle));

@@ -35,12 +35,12 @@ import javax.annotation.Nullable;
 public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
 
     private static final VoxelShape INSIDE = Block.box(
-            2.0D,
-            4.0D,
-            2.0D,
-            14.0D,
-            16.0D,
-            14.0D);
+            2.0,
+            4.0,
+            2.0,
+            14.0,
+            16.0,
+            14.0);
     protected static final VoxelShape SHAPE = Shapes.join(
             Shapes.block(),
             INSIDE,

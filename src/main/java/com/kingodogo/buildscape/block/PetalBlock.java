@@ -17,7 +17,12 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -52,135 +57,135 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
     }
 
     private static final VoxelShape SHAPE_1_SOUTH = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            8.0D,
-            3.0D,
-            8.0D);
+            0.0,
+            0.0,
+            0.0,
+            8.0,
+            3.0,
+            8.0);
     private static final VoxelShape SHAPE_2_SOUTH = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            8.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            8.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_3_SOUTH = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_4_SOUTH = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
 
     private static final VoxelShape COLLISION_SHAPE = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
     private static final VoxelShape INSIDE_SHAPE = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            16.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            16.0,
+            16.0);
 
     private static final VoxelShape SHAPE_1_NORTH = Block.box(
-            8.0D,
-            0.0D,
-            8.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            8.0,
+            0.0,
+            8.0,
+            16.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_2_NORTH = Block.box(
-            8.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            8.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_3_NORTH = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_4_NORTH = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
 
     private static final VoxelShape SHAPE_1_EAST = Block.box(
-            0.0D,
-            0.0D,
-            8.0D,
-            8.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            8.0,
+            8.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_2_EAST = Block.box(
-            0.0D,
-            0.0D,
-            8.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            8.0,
+            16.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_3_EAST = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_4_EAST = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
 
     private static final VoxelShape SHAPE_1_WEST = Block.box(
-            8.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            8.0D);
+            8.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            8.0);
     private static final VoxelShape SHAPE_2_WEST = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            8.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            8.0);
     private static final VoxelShape SHAPE_3_WEST = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
     private static final VoxelShape SHAPE_4_WEST = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            3.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            3.0,
+            16.0);
 
     public PetalBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -239,7 +244,7 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
         };
 
         if (state.getValue(ON_FARMLAND)) {
-            return shape.move(0, -0.0625D, 0);
+            return shape.move(0, -0.0625, 0);
         }
         return shape;
     }
@@ -412,9 +417,9 @@ public class PetalBlock extends OpenBushBlock implements SinksOnFarmland, Boneme
             ItemStack petalStack = new ItemStack(this, 1);
             ItemEntity itemEntity = new ItemEntity(
                     level,
-                    pos.getX() + 0.5D,
-                    pos.getY() + 0.5D,
-                    pos.getZ() + 0.5D,
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.5,
+                    pos.getZ() + 0.5,
                     petalStack);
             itemEntity.setDefaultPickUpDelay();
             level.addFreshEntity(itemEntity);

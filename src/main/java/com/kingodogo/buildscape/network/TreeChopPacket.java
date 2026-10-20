@@ -51,7 +51,7 @@ public class TreeChopPacket {
             }
 
             if (!level.isLoaded(pos)
-                    || player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) > 64.0D
+                    || player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0
                     || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
                 return;
             }

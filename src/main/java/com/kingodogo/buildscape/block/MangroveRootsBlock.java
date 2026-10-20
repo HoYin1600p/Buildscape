@@ -27,12 +27,12 @@ public class MangroveRootsBlock
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            16.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            16.0,
+            16.0);
 
     public MangroveRootsBlock(BlockBehaviour.Properties properties) {
         super(properties);

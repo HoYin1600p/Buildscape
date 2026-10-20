@@ -56,8 +56,8 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
         BlockState state = getBlockState();
         serverLevel.setBlock(worldPosition, state.setValue(SculkCatalystBlock.BLOOM, true), 3);
         serverLevel.scheduleTick(worldPosition, state.getBlock(), 8);
-        serverLevel.sendParticles(ParticleTypes.SOUL, worldPosition.getX() + 0.5D,
-                worldPosition.getY() + 1.15D, worldPosition.getZ() + 0.5D, 2, 0.2D, 0.0D, 0.2D, 0.0D);
+        serverLevel.sendParticles(ParticleTypes.SOUL, worldPosition.getX() + 0.5,
+                worldPosition.getY() + 1.15, worldPosition.getZ() + 0.5, 2, 0.2, 0.0, 0.2, 0.0);
         serverLevel.playSound(null, worldPosition, ModSounds.SCULK_CATALYST_BLOOM.get(), SoundSource.BLOCKS,
                 2.0F, 0.6F + serverLevel.random.nextFloat() * 0.4F);
         setChanged();

@@ -30,9 +30,9 @@ public class GeyserPlumeParticle extends TextureSheetParticle {
         int plumeHeight = 5 * Math.max(1, options.getWaterBlocks());
         this.hasPhysics = true;
         this.lifetime = plumeHeight * 5;
-        this.yd = 0.0D;
+        this.yd = 0.0;
         this.startY = y;
-        this.maxY = this.startY + (double) plumeHeight - 1.0D;
+        this.maxY = this.startY + (double) plumeHeight - 1.0;
         this.horizontalSprayX = (level.getRandom().nextFloat() - 0.5F) * 0.2F;
         this.horizontalSprayZ = (level.getRandom().nextFloat() - 0.5F) * 0.2F;
         this.friction = 1.0F;
@@ -49,14 +49,14 @@ public class GeyserPlumeParticle extends TextureSheetParticle {
     @Override
     public void tick() {
         super.tick();
-        if (!this.done && (this.yd < 0.0D || this.y > this.maxY || this.y == this.yo)) {
+        if (!this.done && (this.yd < 0.0 || this.y > this.maxY || this.y == this.yo)) {
             this.lifetime = Math.min(this.lifetime, this.age + 5);
             this.friction = 0.0F;
             this.done = true;
         }
 
-        double yProgressLinear = Mth.clamp((this.y - this.startY) / (this.maxY - this.startY), 0.0D, 1.0D);
-        double yProgressExponential = Math.pow(yProgressLinear, 3.0D);
+        double yProgressLinear = Mth.clamp((this.y - this.startY) / (this.maxY - this.startY), 0.0, 1.0);
+        double yProgressExponential = Math.pow(yProgressLinear, 3.0);
         this.gravity = this.initialPropulsion * (float) yProgressExponential * 0.12F;
         this.xd = yProgressLinear * (double) this.horizontalSprayX;
         this.zd = yProgressLinear * (double) this.horizontalSprayZ;

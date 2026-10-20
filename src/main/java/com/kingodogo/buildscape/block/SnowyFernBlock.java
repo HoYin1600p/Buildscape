@@ -42,12 +42,12 @@ import java.util.Random;
 public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
     protected static final VoxelShape SHAPE = Block.box(
-            2.0D,
-            0.0D,
-            2.0D,
-            14.0D,
-            13.0D,
-            14.0D);
+            2.0,
+            0.0,
+            2.0,
+            14.0,
+            13.0,
+            14.0);
 
     public SnowyFernBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -67,7 +67,7 @@ public class SnowyFernBlock extends BushBlock implements SinksOnFarmland, Boneme
             CollisionContext context) {
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {
-            return shape.move(0, -0.0625D, 0);
+            return shape.move(0, -0.0625, 0);
         }
         return shape;
     }

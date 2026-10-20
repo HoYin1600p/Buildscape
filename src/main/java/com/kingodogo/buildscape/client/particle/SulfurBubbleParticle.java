@@ -27,13 +27,13 @@ public class SulfurBubbleParticle extends TextureSheetParticle {
         this.gravity = -0.04F;
         this.friction = 0.85F;
         this.setSize(0.02F, 0.02F);
-        this.xd = xa * 0.2D + (double) ((this.random.nextFloat() * 2.0F - 1.0F) * 0.02F);
-        this.zd = za * 0.2D + (double) ((this.random.nextFloat() * 2.0F - 1.0F) * 0.02F);
+        this.xd = xa * 0.2 + (double) ((this.random.nextFloat() * 2.0F - 1.0F) * 0.02F);
+        this.zd = za * 0.2 + (double) ((this.random.nextFloat() * 2.0F - 1.0F) * 0.02F);
         this.sizeStart = 0.02F + 0.02F * this.random.nextFloat();
         this.quadSize = this.sizeStart;
         this.lifetime = Integer.MAX_VALUE;
         this.yStart = this.yo;
-        this.yEnd = this.yo + 4.0D - 1.0D;
+        this.yEnd = this.yo + 4.0 - 1.0;
         this.yPrev = y;
     }
 
@@ -55,14 +55,14 @@ public class SulfurBubbleParticle extends TextureSheetParticle {
 
         this.xd += this.randomHorizontalWiggling();
         this.zd += this.randomHorizontalWiggling();
-        this.move(this.xd, 0.0D, this.zd);
+        this.move(this.xd, 0.0, this.zd);
         float travelProgress = (float) ((this.y - this.yStart) / (this.yEnd - this.yStart));
         this.quadSize = this.sizeStart + travelProgress * (0.15F - this.sizeStart);
         this.yPrev = this.y;
     }
 
     private double randomHorizontalWiggling() {
-        return (double) (this.random.nextFloat() * 0.003F * (float) (this.random.nextBoolean() ? 1 : -1)) * 0.5D;
+        return (double) (this.random.nextFloat() * 0.003F * (float) (this.random.nextBoolean() ? 1 : -1)) * 0.5;
     }
 
     @Override

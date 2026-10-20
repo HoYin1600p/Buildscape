@@ -59,9 +59,9 @@ public class CopperChestItemRenderer extends BlockEntityWithoutLevelRenderer {
                     .getRenderer(dummyBE);
             if (renderer != null) {
                 poseStack.pushPose();
-                poseStack.translate(0.5D, 0.5D, 0.5D);
+                poseStack.translate(0.5, 0.5, 0.5);
                 poseStack.mulPose(Vector3f.YP.rotationDegrees(270.0F));
-                poseStack.translate(-0.5D, -0.5D, -0.5D);
+                poseStack.translate(-0.5, -0.5, -0.5);
 
                 renderer.render(dummyBE, 0.0F, poseStack, bufferSource, combinedLight, combinedOverlay);
 

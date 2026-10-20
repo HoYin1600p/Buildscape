@@ -34,48 +34,48 @@ public class ClimbableChainBlock
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE_Y = Block.box(
-            6.5D,
-            0.0D,
-            6.5D,
-            9.5D,
-            16.0D,
-            9.5D);
+            6.5,
+            0.0,
+            6.5,
+            9.5,
+            16.0,
+            9.5);
     private static final VoxelShape SHAPE_X = Block.box(
-            0.0D,
-            6.5D,
-            6.5D,
-            16.0D,
-            9.5D,
-            9.5D);
+            0.0,
+            6.5,
+            6.5,
+            16.0,
+            9.5,
+            9.5);
     private static final VoxelShape SHAPE_Z = Block.box(
-            6.5D,
-            6.5D,
-            0.0D,
-            9.5D,
-            9.5D,
-            16.0D);
+            6.5,
+            6.5,
+            0.0,
+            9.5,
+            9.5,
+            16.0);
 
     private static final VoxelShape COLLISION_SHAPE_Y = Block.box(
-            7.0D,
-            0.0D,
-            7.0D,
-            9.0D,
-            16.0D,
-            9.0D);
+            7.0,
+            0.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
     private static final VoxelShape COLLISION_SHAPE_X = Block.box(
-            0.0D,
-            6.5D,
-            6.5D,
-            16.0D,
-            9.5D,
-            9.5D);
+            0.0,
+            6.5,
+            6.5,
+            16.0,
+            9.5,
+            9.5);
     private static final VoxelShape COLLISION_SHAPE_Z = Block.box(
-            6.5D,
-            6.5D,
-            0.0D,
-            9.5D,
-            9.5D,
-            16.0D);
+            6.5,
+            6.5,
+            0.0,
+            9.5,
+            9.5,
+            16.0);
 
     public ClimbableChainBlock(BlockBehaviour.Properties properties) {
         super(properties);

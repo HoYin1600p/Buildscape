@@ -26,7 +26,7 @@ public final class PillarClientParticles {
     public static boolean isWithinRange(BlockPos pos) {
         Minecraft mc = Minecraft.getInstance();
         return mc != null && mc.gameRenderer.getMainCamera().getPosition().distanceToSqr(
-                pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 32.0D * 32.0D;
+                pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 32.0 * 32.0;
     }
 
     public static void spawnParticles(

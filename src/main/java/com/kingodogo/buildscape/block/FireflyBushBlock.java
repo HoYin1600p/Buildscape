@@ -20,7 +20,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.Random;
 
 public class FireflyBushBlock extends BushBlock {
-    protected static final VoxelShape SHAPE = box(2.0D, 0.0D, 2.0D, 14.0D, 14.0D, 14.0D);
+    protected static final VoxelShape SHAPE = box(2.0, 0.0, 2.0, 14.0, 14.0, 14.0);
 
     public FireflyBushBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -46,9 +46,9 @@ public class FireflyBushBlock extends BushBlock {
                         targetPos.getX() + random.nextDouble(),
                         targetPos.getY() + random.nextDouble(),
                         targetPos.getZ() + random.nextDouble(),
-                        (random.nextFloat() - 0.5F) * 0.01D,
-                        (random.nextFloat() - 0.5F) * 0.005D,
-                        (random.nextFloat() - 0.5F) * 0.01D);
+                        (random.nextFloat() - 0.5F) * 0.01,
+                        (random.nextFloat() - 0.5F) * 0.005,
+                        (random.nextFloat() - 0.5F) * 0.01);
                 return;
             }
         }

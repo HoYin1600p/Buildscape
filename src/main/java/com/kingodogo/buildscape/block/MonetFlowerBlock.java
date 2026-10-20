@@ -29,12 +29,12 @@ import java.util.Random;
 public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
     protected static final VoxelShape SHAPE = Block.box(
-            2.0D,
-            0.0D,
-            2.0D,
-            14.0D,
-            13.0D,
-            14.0D);
+            2.0,
+            0.0,
+            2.0,
+            14.0,
+            13.0,
+            14.0);
 
     public MonetFlowerBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -54,7 +54,7 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
             CollisionContext context) {
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {
-            return shape.move(0, -0.0625D, 0);
+            return shape.move(0, -0.0625, 0);
         }
         return shape;
     }
@@ -120,9 +120,9 @@ public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, Bone
         ItemStack flowerStack = new ItemStack(this);
         ItemEntity itemEntity = new ItemEntity(
                 level,
-                pos.getX() + 0.5D,
-                pos.getY() + 0.5D,
-                pos.getZ() + 0.5D,
+                pos.getX() + 0.5,
+                pos.getY() + 0.5,
+                pos.getZ() + 0.5,
                 flowerStack);
         itemEntity.setDefaultPickUpDelay();
         level.addFreshEntity(itemEntity);

@@ -23,12 +23,12 @@ final class FireflyNight {
 
     /** Same result as vanilla {@code !Level.isDay()} on a server, from a time of day in [0, 1) plus rain and thunder in [0, 1]. */
     static boolean isNight(float timeOfDay, float rainLevel, float thunderLevel) {
-        double brightness = 1.0D - (Math.cos(timeOfDay * (Math.PI * 2.0D)) * 2.0D + 0.2D);
-        brightness = Math.min(1.0D, Math.max(0.0D, brightness));
-        brightness = 1.0D - brightness;
-        brightness *= 1.0D - rainLevel * 5.0D / 16.0D;
-        brightness *= 1.0D - thunderLevel * 5.0D / 16.0D;
-        brightness = 1.0D - brightness;
-        return (int) (brightness * 11.0D) >= DAY_DARKNESS_LIMIT;
+        double brightness = 1.0 - (Math.cos(timeOfDay * (Math.PI * 2.0)) * 2.0 + 0.2);
+        brightness = Math.min(1.0, Math.max(0.0, brightness));
+        brightness = 1.0 - brightness;
+        brightness *= 1.0 - rainLevel * 5.0 / 16.0;
+        brightness *= 1.0 - thunderLevel * 5.0 / 16.0;
+        brightness = 1.0 - brightness;
+        return (int) (brightness * 11.0) >= DAY_DARKNESS_LIMIT;
     }
 }

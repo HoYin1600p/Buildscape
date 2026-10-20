@@ -97,8 +97,8 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
                 spawnGeyserParticle(level, pos, sourceBlock);
             }
             if (eruptionTime % 40L == 0L) {
-                level.playLocalSound((double) sourceBlock.getX() + 0.5D, (double) sourceBlock.getY() + 0.5D,
-                        (double) sourceBlock.getZ() + 0.5D, sound, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+                level.playLocalSound((double) sourceBlock.getX() + 0.5, (double) sourceBlock.getY() + 0.5,
+                        (double) sourceBlock.getZ() + 0.5, sound, SoundSource.BLOCKS, 1.0F, 1.0F, false);
             }
         }
     }
@@ -159,10 +159,10 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
             int waterBlocks = Math.max(1, rawWaterBlocks);
             int geyserForceHeight = getUnobstructedBlockCount(level, pos.above(), waterBlocks);
 
-            double plumeTipY = (double) sourceBlock.getY() + (double) geyserForceHeight - 1.0D;
-            double particleSizeOffset = 1.18D + (double) (waterBlocks - 1) * 0.05D;
-            AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double) (geyserForceHeight + 3), 0.0D)
-                    .inflate(0.45D, 0.0D, 0.45D);
+            double plumeTipY = (double) sourceBlock.getY() + (double) geyserForceHeight - 1.0;
+            double particleSizeOffset = 1.18 + (double) (waterBlocks - 1) * 0.05;
+            AABB aabb = (new AABB(pos.above())).expandTowards(0.0, (double) (geyserForceHeight + 3), 0.0)
+                    .inflate(0.45, 0.0, 0.45);
 
             for (Entity entityToBeLaunched : level.getEntitiesOfClass(Entity.class, aabb, EFFECT_PREDICATE)) {
                 if (entityToBeLaunched.blockPosition().getY() > topY) {
@@ -181,23 +181,23 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
                     boolean isPlayer = entityToBeLaunched instanceof Player;
 
                     double entityY = entityToBeLaunched.getY();
-                    double bobbingTime = (double) (level.getGameTime() + (long) entityToBeLaunched.getId() * 7L) * 0.4D;
-                    double bobbingOffset = Math.sin(bobbingTime) * 0.10D;
-                    double bobbingVel = Math.cos(bobbingTime) * 0.07D;
+                    double bobbingTime = (double) (level.getGameTime() + (long) entityToBeLaunched.getId() * 7L) * 0.4;
+                    double bobbingOffset = Math.sin(bobbingTime) * 0.10;
+                    double bobbingVel = Math.cos(bobbingTime) * 0.07;
                     double targetY = plumeTipY + particleSizeOffset + bobbingOffset;
 
                     Vec3 newVelocity;
-                    if (entityY < targetY - 1.0D) {
-                        double targetSpeed = Math.min(0.65D, 0.4D + (double) waterBlocks * 0.06D);
-                        double newY = Math.min(targetSpeed, Math.max(entityVelocity.y + 0.18D, 0.4D));
-                        double horizDamping = isPlayer ? 1.0D : 0.9D;
+                    if (entityY < targetY - 1.0) {
+                        double targetSpeed = Math.min(0.65, 0.4 + (double) waterBlocks * 0.06);
+                        double newY = Math.min(targetSpeed, Math.max(entityVelocity.y + 0.18, 0.4));
+                        double horizDamping = isPlayer ? 1.0 : 0.9;
                         newVelocity = new Vec3(entityVelocity.x * horizDamping, newY, entityVelocity.z * horizDamping);
-                    } else if (entityY <= targetY + 1.8D) {
-                        double hoverY = (targetY - entityY) * 0.45D + bobbingVel;
-                        double finalY = (isPlayer && entityVelocity.y > 0.2D)
+                    } else if (entityY <= targetY + 1.8) {
+                        double hoverY = (targetY - entityY) * 0.45 + bobbingVel;
+                        double finalY = (isPlayer && entityVelocity.y > 0.2)
                                 ? Math.max(hoverY, entityVelocity.y)
                                 : hoverY;
-                        double horizDamping = isPlayer ? 1.0D : 0.85D;
+                        double horizDamping = isPlayer ? 1.0 : 0.85;
                         newVelocity = new Vec3(entityVelocity.x * horizDamping, finalY,
                                 entityVelocity.z * horizDamping);
                     } else {
@@ -209,7 +209,7 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
 
                     if (entityToBeLaunched instanceof ServerPlayer serverPlayer) {
                         serverPlayer.hurtMarked = true;
-                        if (entityY < targetY - 1.0D && entityVelocity.y < 0.2D) {
+                        if (entityY < targetY - 1.0 && entityVelocity.y < 0.2) {
                             serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
                         }
                     }
@@ -229,7 +229,7 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
     }
 
     private static void tickLivingLift(final Level level, final BlockPos pos, final int topY) {
-        AABB column = new AABB(pos).expandTowards(0.0D, 23.0D, 0.0D);
+        AABB column = new AABB(pos).expandTowards(0.0, 23.0, 0.0);
         List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, column, living -> {
             BlockPos livingPos = living.blockPosition();
             return livingPos.getX() == pos.getX() && livingPos.getZ() == pos.getZ()
@@ -252,9 +252,9 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
                 continue;
             }
             Vec3 entityVelocity = living.getDeltaMovement();
-            if (entityVelocity.y < 0.3D + (double) waterBlocks * 0.1D) {
+            if (entityVelocity.y < 0.3 + (double) waterBlocks * 0.1) {
                 living.resetFallDistance();
-                living.setDeltaMovement(entityVelocity.add(0.0D, 0.2D, 0.0D));
+                living.setDeltaMovement(entityVelocity.add(0.0, 0.2, 0.0));
                 living.hasImpulse = true;
                 if (!level.isClientSide()) {
                     living.hurtMarked = true;
@@ -312,7 +312,7 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
     }
 
     private static List<LivingEntity> getNearbyLivingEntities(final Level level, final BlockPos pos) {
-        AABB aabb = (new AABB(pos)).inflate(2.5D, 0.0D, 2.5D);
+        AABB aabb = (new AABB(pos)).inflate(2.5, 0.0, 2.5);
         return level.getEntitiesOfClass(LivingEntity.class, aabb, EFFECT_PREDICATE);
     }
 
@@ -324,12 +324,12 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
     private static void spawnGeyserParticle(final Level level, final BlockPos sulfurPos, final BlockPos sourcePos) {
         int waterBlocks = sourcePos.getY() - sulfurPos.getY() - 1;
         level.addAlwaysVisibleParticle(new GeyserParticleOptions(ModParticles.GEYSER.get(), waterBlocks), true,
-                (double) sourcePos.getX() + 0.5D, (double) sourcePos.getY(), (double) sourcePos.getZ() + 0.5D, 0.0D,
-                0.0D, 0.0D);
+                (double) sourcePos.getX() + 0.5, (double) sourcePos.getY(), (double) sourcePos.getZ() + 0.5, 0.0,
+                0.0, 0.0);
     }
 
     private static void spawnNoxiousGasCloudParticle(final Level level, final Vec3 pos) {
-        level.addParticle(ModParticles.NOXIOUS_GAS.get(), pos.x, pos.y, pos.z, 0.0D, 0.0D, 0.0D);
+        level.addParticle(ModParticles.NOXIOUS_GAS.get(), pos.x, pos.y, pos.z, 0.0, 0.0, 0.0);
     }
 
     private static int getUnobstructedBlockCount(final Level level, final BlockPos pos, final int waterBlocks) {
@@ -382,11 +382,11 @@ public class PotentSulfurBlockEntity extends SyncedBlockEntity {
         CollisionContext geyserPositionContext = CollisionContext.empty();
         if (!isGeyserPassableBlock(level.getBlockState(blockPos), level, blockPos, geyserPositionContext)) {
             return false;
-        } else if (pos.distanceToSqr(Vec3.atCenterOf(sourceBlock)) > 9.0D) {
+        } else if (pos.distanceToSqr(Vec3.atCenterOf(sourceBlock)) > 9.0) {
             return false;
         } else {
             Vec3 belowSource = Vec3.atCenterOf(sourceBlock.below());
-            Vec3 belowPos = pos.with(Axis.Y, pos.y - 1.0D);
+            Vec3 belowPos = pos.with(Axis.Y, pos.y - 1.0);
             return isWater(level, belowPos) && haveLineOfSight(level, belowSource, belowPos);
         }
     }

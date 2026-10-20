@@ -37,7 +37,7 @@ public interface SelectableSlotContainer {
             Optional<Vec2> hitPoint;
             switch (hitDirection) {
                 case NORTH:
-                    hitPoint = Optional.of(new Vec2((float) (1.0D - relativeX), (float) relativeY));
+                    hitPoint = Optional.of(new Vec2((float) (1.0 - relativeX), (float) relativeY));
                     break;
                 case SOUTH:
                     hitPoint = Optional.of(new Vec2((float) relativeX, (float) relativeY));
@@ -46,7 +46,7 @@ public interface SelectableSlotContainer {
                     hitPoint = Optional.of(new Vec2((float) relativeZ, (float) relativeY));
                     break;
                 case EAST:
-                    hitPoint = Optional.of(new Vec2((float) (1.0D - relativeZ), (float) relativeY));
+                    hitPoint = Optional.of(new Vec2((float) (1.0 - relativeZ), (float) relativeY));
                     break;
                 case DOWN:
                 case UP:

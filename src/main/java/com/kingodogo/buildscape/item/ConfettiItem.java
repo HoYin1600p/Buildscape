@@ -59,9 +59,9 @@ public class ConfettiItem extends Item {
 
     private void spawnConfettiParticles(ServerLevel level, Player player, ItemStack stack) {
         Vec3 look = player.getLookAngle();
-        double startX = player.getX() + look.x * 0.9D;
-        double startY = player.getEyeY() + look.y * 0.9D;
-        double startZ = player.getZ() + look.z * 0.9D;
+        double startX = player.getX() + look.x * 0.9;
+        double startY = player.getEyeY() + look.y * 0.9;
+        double startZ = player.getZ() + look.z * 0.9;
 
         int burstLevel = 1;
         if (stack.hasTag() && stack.getTag().contains(NbtKeys.BURST_LEVEL)) {
@@ -70,7 +70,7 @@ public class ConfettiItem extends Item {
 
         ModMessages.INSTANCE.send(
                 PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(
-                        startX, startY, startZ, 32.0D, level.dimension())),
+                        startX, startY, startZ, 32.0, level.dimension())),
                 new ConfettiBurstPacket(
                         startX, startY, startZ, (float) look.x, (float) look.y, (float) look.z,
                         burstLevel, level.random.nextLong()));

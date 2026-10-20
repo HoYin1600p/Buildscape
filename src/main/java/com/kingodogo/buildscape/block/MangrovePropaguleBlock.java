@@ -59,40 +59,40 @@ public class MangrovePropaguleBlock
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private static final VoxelShape SHAPE = Block.box(
-            6.0D,
-            0.0D,
-            6.0D,
-            10.0D,
-            12.0D,
-            10.0D);
+            6.0,
+            0.0,
+            6.0,
+            10.0,
+            12.0,
+            10.0);
     private static final VoxelShape HANGING_SHAPE_0 = Block.box(
-            7.0D,
-            13.0D,
-            7.0D,
-            9.0D,
-            16.0D,
-            9.0D);
+            7.0,
+            13.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
     private static final VoxelShape HANGING_SHAPE_1 = Block.box(
-            7.0D,
-            10.0D,
-            7.0D,
-            9.0D,
-            16.0D,
-            9.0D);
+            7.0,
+            10.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
     private static final VoxelShape HANGING_SHAPE_2 = Block.box(
-            7.0D,
-            7.0D,
-            7.0D,
-            9.0D,
-            16.0D,
-            9.0D);
+            7.0,
+            7.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
     private static final VoxelShape HANGING_SHAPE_3 = Block.box(
-            7.0D,
-            3.0D,
-            7.0D,
-            9.0D,
-            16.0D,
-            9.0D);
+            7.0,
+            3.0,
+            7.0,
+            9.0,
+            16.0,
+            9.0);
     private static final int GROWTH_RADIUS = 32;
 
     public MangrovePropaguleBlock(BlockBehaviour.Properties properties) {
@@ -130,7 +130,7 @@ public class MangrovePropaguleBlock
         }
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {
-            return shape.move(0, -0.0625D, 0);
+            return shape.move(0, -0.0625, 0);
         }
         return shape;
     }

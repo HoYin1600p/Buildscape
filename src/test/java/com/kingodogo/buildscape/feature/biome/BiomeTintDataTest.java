@@ -8,7 +8,10 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class BiomeTintDataTest {
     private static final ResourceLocation SWAMP = new ResourceLocation("minecraft", "swamp");

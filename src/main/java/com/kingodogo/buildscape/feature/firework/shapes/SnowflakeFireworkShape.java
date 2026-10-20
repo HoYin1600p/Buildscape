@@ -21,7 +21,7 @@ public class SnowflakeFireworkShape extends CustomFireworkShape {
 
     @Override
     public double getBaseScale() {
-        return 0.45D;
+        return 0.45;
     }
 
     @Override

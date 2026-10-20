@@ -42,12 +42,12 @@ import java.util.WeakHashMap;
 public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, BonemealableBlock {
 
     protected static final VoxelShape SHAPE = Block.box(
-            5.0D,
-            0.0D,
-            5.0D,
-            11.0D,
-            10.0D,
-            11.0D);
+            5.0,
+            0.0,
+            5.0,
+            11.0,
+            10.0,
+            11.0);
 
     private static final String CONTACT_POSITION_KEY = "BuildscapeFrostRosePosition";
     private static final String CONTACT_DIMENSION_KEY = "BuildscapeFrostRoseDimension";
@@ -74,7 +74,7 @@ public class FrostRoseBlock extends OpenBushBlock implements SinksOnFarmland, Bo
             CollisionContext context) {
         VoxelShape shape = SHAPE;
         if (state.getValue(ON_FARMLAND)) {
-            return shape.move(0, -0.0625D, 0);
+            return shape.move(0, -0.0625, 0);
         }
         return shape;
     }

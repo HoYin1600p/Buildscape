@@ -16,7 +16,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.Random;
 
 public class DryGrassBlock extends BushBlock implements BonemealableBlock {
-    protected static final VoxelShape SHAPE = box(2.0D, 0.0D, 2.0D, 14.0D, 12.0D, 14.0D);
+    protected static final VoxelShape SHAPE = box(2.0, 0.0, 2.0, 14.0, 12.0, 14.0);
 
     public DryGrassBlock(BlockBehaviour.Properties properties) {
         super(properties);

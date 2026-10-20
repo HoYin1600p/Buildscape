@@ -51,9 +51,9 @@ public class BubbleColumnHandler {
         Vec3 delta = entity.getDeltaMovement();
         BubbleColumnState bubble = flowState.getBubbleColumn();
 
-        double flowX = 0.0D;
-        double flowY = 0.0D;
-        double flowZ = 0.0D;
+        double flowX = 0.0;
+        double flowY = 0.0;
+        double flowZ = 0.0;
         Set<Direction> flowDirs = flowState.getFlowDirections();
         if (!flowDirs.isEmpty()) {
             for (Direction dir : flowDirs) {
@@ -68,8 +68,8 @@ public class BubbleColumnHandler {
         }
 
         if (bubble == BubbleColumnState.UP) {
-            double newY = Math.min(delta.y + 0.1D, 0.7D);
-            entity.setDeltaMovement(delta.x + flowX * 0.03D, newY, delta.z + flowZ * 0.03D);
+            double newY = Math.min(delta.y + 0.1, 0.7);
+            entity.setDeltaMovement(delta.x + flowX * 0.03, newY, delta.z + flowZ * 0.03);
             entity.resetFallDistance();
 
             if (entity instanceof LivingEntity living) {
@@ -77,22 +77,22 @@ public class BubbleColumnHandler {
             }
             return;
         } else if (bubble == BubbleColumnState.DOWN) {
-            double newY = Math.max(delta.y - 0.08D, -0.7D);
-            entity.setDeltaMovement(delta.x + flowX * 0.03D, newY, delta.z + flowZ * 0.03D);
+            double newY = Math.max(delta.y - 0.08, -0.7);
+            entity.setDeltaMovement(delta.x + flowX * 0.03, newY, delta.z + flowZ * 0.03);
             return;
         }
 
         boolean isItem = entity instanceof ItemEntity;
-        double pushStrength = isItem ? 0.07D : 0.03D;
+        double pushStrength = isItem ? 0.07 : 0.03;
 
-        double newX = delta.x * (isItem ? 0.85D : 0.95D) + flowX * pushStrength;
-        double newZ = delta.z * (isItem ? 0.85D : 0.95D) + flowZ * pushStrength;
+        double newX = delta.x * (isItem ? 0.85 : 0.95) + flowX * pushStrength;
+        double newZ = delta.z * (isItem ? 0.85 : 0.95) + flowZ * pushStrength;
         double newY = delta.y;
 
         if (flowY < 0) {
-            newY = Math.max(delta.y - 0.06D, -0.4D);
+            newY = Math.max(delta.y - 0.06, -0.4);
         } else if (isItem) {
-            newY = Math.max(delta.y * 0.8D, -0.03D);
+            newY = Math.max(delta.y * 0.8, -0.03);
         }
 
         entity.setDeltaMovement(newX, newY, newZ);
@@ -111,27 +111,27 @@ public class BubbleColumnHandler {
         Set<Direction> flowDirs = flowState.getFlowDirections();
         if (flowDirs.isEmpty()) {
             if (random.nextInt(4) == 0) {
-                double px = pos.getX() + 0.3D + random.nextDouble() * 0.4D;
-                double py = pos.getY() + 0.2D + random.nextDouble() * 0.3D;
-                double pz = pos.getZ() + 0.3D + random.nextDouble() * 0.4D;
-                level.addParticle(ParticleTypes.UNDERWATER, px, py, pz, 0.0D, 0.0D, 0.0D);
+                double px = pos.getX() + 0.3 + random.nextDouble() * 0.4;
+                double py = pos.getY() + 0.2 + random.nextDouble() * 0.3;
+                double pz = pos.getZ() + 0.3 + random.nextDouble() * 0.4;
+                level.addParticle(ParticleTypes.UNDERWATER, px, py, pz, 0.0, 0.0, 0.0);
             }
             return;
         }
 
         double waterTopY;
         if (flowState.isSource()) {
-            waterTopY = 0.75D;
+            waterTopY = 0.75;
         } else {
             waterTopY = switch (flowState.getDistance()) {
-                case 1 -> 0.70D;
-                case 2 -> 0.61D;
-                case 3 -> 0.52D;
-                case 4 -> 0.43D;
-                case 5 -> 0.34D;
-                case 6 -> 0.25D;
-                case 7 -> 0.16D;
-                default -> 0.13D;
+                case 1 -> 0.70;
+                case 2 -> 0.61;
+                case 3 -> 0.52;
+                case 4 -> 0.43;
+                case 5 -> 0.34;
+                case 6 -> 0.25;
+                case 7 -> 0.16;
+                default -> 0.13;
             };
         }
 
@@ -152,7 +152,7 @@ public class BubbleColumnHandler {
 
         if (random.nextInt(60) == 0) {
             level.playLocalSound(
-                    pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                    pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                     SoundEvents.WATER_AMBIENT,
                     SoundSource.BLOCKS,
                     0.1F, 1.2F + (random.nextFloat() - random.nextFloat()) * 0.2F,
@@ -163,50 +163,50 @@ public class BubbleColumnHandler {
     private static void spawnDirectionalBubble(Level level, BlockPos pos, Random random, Direction dir,
             double waterTopY) {
         double px, py, pz;
-        double vx = 0.0D, vy = 0.0D, vz = 0.0D;
-        double speed = 0.08D + random.nextDouble() * 0.04D;
-        double jitter = (random.nextDouble() - 0.5D) * 0.008D;
+        double vx = 0.0, vy = 0.0, vz = 0.0;
+        double speed = 0.08 + random.nextDouble() * 0.04;
+        double jitter = (random.nextDouble() - 0.5) * 0.008;
 
-        double csX = 0.25D + random.nextDouble() * 0.50D;
-        double csZ = 0.25D + random.nextDouble() * 0.50D;
-        double csY = Math.max(0.13D, waterTopY - 0.02D);
+        double csX = 0.25 + random.nextDouble() * 0.50;
+        double csZ = 0.25 + random.nextDouble() * 0.50;
+        double csY = Math.max(0.13, waterTopY - 0.02);
 
         switch (dir) {
             case EAST -> {
-                px = pos.getX() + 0.20D + random.nextDouble() * 0.10D;
+                px = pos.getX() + 0.20 + random.nextDouble() * 0.10;
                 py = pos.getY() + csY;
                 pz = pos.getZ() + csZ;
                 vx = speed;
-                vy = 0.0D;
+                vy = 0.0;
                 vz = jitter;
             }
             case WEST -> {
-                px = pos.getX() + 0.80D - random.nextDouble() * 0.10D;
+                px = pos.getX() + 0.80 - random.nextDouble() * 0.10;
                 py = pos.getY() + csY;
                 pz = pos.getZ() + csZ;
                 vx = -speed;
-                vy = 0.0D;
+                vy = 0.0;
                 vz = jitter;
             }
             case SOUTH -> {
                 px = pos.getX() + csX;
                 py = pos.getY() + csY;
-                pz = pos.getZ() + 0.20D + random.nextDouble() * 0.10D;
+                pz = pos.getZ() + 0.20 + random.nextDouble() * 0.10;
                 vx = jitter;
-                vy = 0.0D;
+                vy = 0.0;
                 vz = speed;
             }
             case NORTH -> {
                 px = pos.getX() + csX;
                 py = pos.getY() + csY;
-                pz = pos.getZ() + 0.80D - random.nextDouble() * 0.10D;
+                pz = pos.getZ() + 0.80 - random.nextDouble() * 0.10;
                 vx = jitter;
-                vy = 0.0D;
+                vy = 0.0;
                 vz = -speed;
             }
             case DOWN -> {
                 px = pos.getX() + csX;
-                py = pos.getY() + 0.75D - random.nextDouble() * 0.10D;
+                py = pos.getY() + 0.75 - random.nextDouble() * 0.10;
                 pz = pos.getZ() + csZ;
                 vx = jitter;
                 vy = -speed;
@@ -214,7 +214,7 @@ public class BubbleColumnHandler {
             }
             case UP -> {
                 px = pos.getX() + csX;
-                py = pos.getY() + 0.20D + random.nextDouble() * 0.10D;
+                py = pos.getY() + 0.20 + random.nextDouble() * 0.10;
                 pz = pos.getZ() + csZ;
                 vx = jitter;
                 vy = speed;
@@ -227,31 +227,31 @@ public class BubbleColumnHandler {
 
         level.addParticle(ParticleTypes.BUBBLE, px, py, pz, vx, vy, vz);
         if (random.nextInt(5) == 0 && dir != Direction.DOWN && dir != Direction.UP) {
-            level.addParticle(ParticleTypes.BUBBLE_POP, px, py + 0.01D, pz, vx * 0.3D, 0.005D, vz * 0.3D);
+            level.addParticle(ParticleTypes.BUBBLE_POP, px, py + 0.01, pz, vx * 0.3, 0.005, vz * 0.3);
         }
     }
 
     private static void spawnExitSpray(Level level, BlockPos pos, Random random, Direction dir, double waterTopY) {
-        double cx = pos.getX() + 0.5D;
-        double cy = pos.getY() + Math.max(0.13D, waterTopY - 0.02D);
-        double cz = pos.getZ() + 0.5D;
+        double cx = pos.getX() + 0.5;
+        double cy = pos.getY() + Math.max(0.13, waterTopY - 0.02);
+        double cz = pos.getZ() + 0.5;
 
-        cx += dir.getStepX() * 0.5D;
-        cz += dir.getStepZ() * 0.5D;
+        cx += dir.getStepX() * 0.5;
+        cz += dir.getStepZ() * 0.5;
 
-        double spread = 0.18D;
+        double spread = 0.18;
 
         int count = 1 + random.nextInt(2);
         for (int i = 0; i < count; i++) {
-            double outDist = 0.05D + random.nextDouble() * 0.20D;
-            double px = cx + dir.getStepX() * outDist + (random.nextDouble() - 0.5D) * spread;
-            double py = cy + (random.nextDouble() - 0.5D) * 0.02D;
-            double pz = cz + dir.getStepZ() * outDist + (random.nextDouble() - 0.5D) * spread;
+            double outDist = 0.05 + random.nextDouble() * 0.20;
+            double px = cx + dir.getStepX() * outDist + (random.nextDouble() - 0.5) * spread;
+            double py = cy + (random.nextDouble() - 0.5) * 0.02;
+            double pz = cz + dir.getStepZ() * outDist + (random.nextDouble() - 0.5) * spread;
 
-            double speed = 0.06D + random.nextDouble() * 0.04D;
-            double vx = dir.getStepX() * speed + (random.nextDouble() - 0.5D) * 0.02D;
-            double vy = 0.0D;
-            double vz = dir.getStepZ() * speed + (random.nextDouble() - 0.5D) * 0.02D;
+            double speed = 0.06 + random.nextDouble() * 0.04;
+            double vx = dir.getStepX() * speed + (random.nextDouble() - 0.5) * 0.02;
+            double vy = 0.0;
+            double vz = dir.getStepZ() * speed + (random.nextDouble() - 0.5) * 0.02;
 
             level.addParticle(ParticleTypes.BUBBLE, px, py, pz, vx, vy, vz);
         }
@@ -262,27 +262,27 @@ public class BubbleColumnHandler {
             return;
         }
 
-        double minX = pos.getX() + 0.25D;
-        double minZ = pos.getZ() + 0.25D;
+        double minX = pos.getX() + 0.25;
+        double minZ = pos.getZ() + 0.25;
 
         if (bubbleState == BubbleColumnState.UP) {
             for (int i = 0; i < 2; i++) {
-                double px = minX + random.nextDouble() * 0.5D;
-                double py = pos.getY() + 0.15D + random.nextDouble() * 0.35D;
-                double pz = minZ + random.nextDouble() * 0.5D;
-                level.addParticle(ParticleTypes.BUBBLE, px, py, pz, 0.0D, 0.01D, 0.0D);
+                double px = minX + random.nextDouble() * 0.5;
+                double py = pos.getY() + 0.15 + random.nextDouble() * 0.35;
+                double pz = minZ + random.nextDouble() * 0.5;
+                level.addParticle(ParticleTypes.BUBBLE, px, py, pz, 0.0, 0.01, 0.0);
             }
 
             if (random.nextInt(6) == 0) {
-                double px = minX + random.nextDouble() * 0.5D;
-                double py = pos.getY() + 0.40D + random.nextDouble() * 0.1D;
-                double pz = minZ + random.nextDouble() * 0.5D;
-                level.addParticle(ParticleTypes.BUBBLE_POP, px, py, pz, 0.0D, 0.01D, 0.0D);
+                double px = minX + random.nextDouble() * 0.5;
+                double py = pos.getY() + 0.40 + random.nextDouble() * 0.1;
+                double pz = minZ + random.nextDouble() * 0.5;
+                level.addParticle(ParticleTypes.BUBBLE_POP, px, py, pz, 0.0, 0.01, 0.0);
             }
 
             if (random.nextInt(50) == 0) {
                 level.playLocalSound(
-                        pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                        pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                         SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT,
                         SoundSource.BLOCKS,
                         0.2F, 1.0F + (random.nextFloat() - random.nextFloat()) * 0.2F,
@@ -290,15 +290,15 @@ public class BubbleColumnHandler {
             }
         } else if (bubbleState == BubbleColumnState.DOWN) {
             for (int i = 0; i < 2; i++) {
-                double px = minX + random.nextDouble() * 0.5D;
-                double py = pos.getY() + 0.15D + random.nextDouble() * 0.35D;
-                double pz = minZ + random.nextDouble() * 0.5D;
-                level.addParticle(ParticleTypes.CURRENT_DOWN, px, py, pz, 0.0D, -0.02D, 0.0D);
+                double px = minX + random.nextDouble() * 0.5;
+                double py = pos.getY() + 0.15 + random.nextDouble() * 0.35;
+                double pz = minZ + random.nextDouble() * 0.5;
+                level.addParticle(ParticleTypes.CURRENT_DOWN, px, py, pz, 0.0, -0.02, 0.0);
             }
 
             if (random.nextInt(50) == 0) {
                 level.playLocalSound(
-                        pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                        pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                         SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_AMBIENT,
                         SoundSource.BLOCKS,
                         0.2F, 1.0F + (random.nextFloat() - random.nextFloat()) * 0.2F,

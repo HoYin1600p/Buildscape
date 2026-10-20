@@ -22,7 +22,7 @@ public class TrophyFireworkShape extends CustomFireworkShape {
 
     @Override
     public double getBaseScale() {
-        return 0.36D;
+        return 0.36;
     }
 
     @Override

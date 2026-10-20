@@ -37,8 +37,8 @@ import java.util.List;
 public class CushionBlock extends WaterloggedBlock implements SimpleWaterloggedBlock {
     public static final EnumProperty<Half> HALF = BlockStateProperties.HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    protected static final VoxelShape BOTTOM_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D);
-    protected static final VoxelShape TOP_SHAPE = Block.box(0.0D, 13.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+    protected static final VoxelShape BOTTOM_SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 3.0, 16.0);
+    protected static final VoxelShape TOP_SHAPE = Block.box(0.0, 13.0, 0.0, 16.0, 16.0, 16.0);
 
     public CushionBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -67,7 +67,7 @@ public class CushionBlock extends WaterloggedBlock implements SimpleWaterloggedB
         BlockState state = this.defaultBlockState().setValue(WATERLOGGED, Boolean.valueOf(isWater));
 
         if (direction == Direction.DOWN
-                || (direction != Direction.UP && context.getClickLocation().y - (double) blockpos.getY() > 0.5D)) {
+                || (direction != Direction.UP && context.getClickLocation().y - (double) blockpos.getY() > 0.5)) {
             return state.setValue(HALF, Half.TOP);
         }
         return state.setValue(HALF, Half.BOTTOM);
@@ -107,8 +107,8 @@ public class CushionBlock extends WaterloggedBlock implements SimpleWaterloggedB
 
     private void bounceUp(Entity entity) {
         Vec3 vec3 = entity.getDeltaMovement();
-        if (vec3.y < 0.0D) {
-            double d0 = entity instanceof LivingEntity ? 0.6D : 0.48D;
+        if (vec3.y < 0.0) {
+            double d0 = entity instanceof LivingEntity ? 0.6 : 0.48;
             entity.setDeltaMovement(vec3.x, -vec3.y * d0, vec3.z);
         }
     }

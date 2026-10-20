@@ -1,7 +1,11 @@
 package com.kingodogo.buildscape.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -16,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FireflyParticle extends TextureSheetParticle {
 
     public static final int MAX_FIREFLIES_IN_RANGE = 500;
-    public static final double RANGE = 10.0D;
+    public static final double RANGE = 10.0;
     public static final double RANGE_SQR = RANGE * RANGE;
 
     private static final Map<BlockPos, Set<FireflyParticle>> ACTIVE_FIREFLIES = new ConcurrentHashMap<>();

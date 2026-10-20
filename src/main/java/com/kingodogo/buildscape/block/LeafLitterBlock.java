@@ -35,8 +35,8 @@ public class LeafLitterBlock extends BushBlock implements BonemealableBlock {
     public static final IntegerProperty FLOWER_AMOUNT = IntegerProperty.create("flower_amount", 1, 4);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    protected static final VoxelShape ONE_SHAPE = box(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D);
-    protected static final VoxelShape TWO_SHAPE = box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D);
+    protected static final VoxelShape ONE_SHAPE = box(0.0, 0.0, 0.0, 16.0, 1.0, 16.0);
+    protected static final VoxelShape TWO_SHAPE = box(0.0, 0.0, 0.0, 16.0, 2.0, 16.0);
 
     public LeafLitterBlock(BlockBehaviour.Properties properties) {
         super(properties);

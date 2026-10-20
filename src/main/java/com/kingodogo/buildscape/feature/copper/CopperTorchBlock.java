@@ -17,10 +17,10 @@ public class CopperTorchBlock extends TorchBlock {
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
-        double x = (double) pos.getX() + 0.5D;
-        double y = (double) pos.getY() + 0.7D;
-        double z = (double) pos.getZ() + 0.5D;
-        level.addParticle(ParticleTypes.SMOKE, x, y, z, 0.0D, 0.0D, 0.0D);
-        level.addParticle(ModParticles.COPPER_FIRE_FLAME.get(), x, y, z, 0.0D, 0.0D, 0.0D);
+        double x = (double) pos.getX() + 0.5;
+        double y = (double) pos.getY() + 0.7;
+        double z = (double) pos.getZ() + 0.5;
+        level.addParticle(ParticleTypes.SMOKE, x, y, z, 0.0, 0.0, 0.0);
+        level.addParticle(ModParticles.COPPER_FIRE_FLAME.get(), x, y, z, 0.0, 0.0, 0.0);
     }
 }

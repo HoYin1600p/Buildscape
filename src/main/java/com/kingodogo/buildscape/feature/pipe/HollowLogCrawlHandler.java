@@ -128,7 +128,7 @@ public class HollowLogCrawlHandler {
                 player.setPose(Pose.CROUCHING);
             } else {
                 AABB standingBox = player.getDimensions(Pose.STANDING).makeBoundingBox(player.position());
-                if (player.level.noCollision(player, standingBox.deflate(1.0E-7D))) {
+                if (player.level.noCollision(player, standingBox.deflate(1.0E-7))) {
                     player.setPose(Pose.STANDING);
                 }
             }

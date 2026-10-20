@@ -42,7 +42,7 @@ public class GeyserBaseParticle extends BaseAshSmokeParticle {
                 final double y, final double z, final double xAux, final double yAux, final double zAux) {
             Random random = level.getRandom();
             double randomX = x + (double) ((random.nextFloat() - 0.5F) * 0.5F);
-            double randomY = y + (double) ((random.nextFloat() - 0.5F) * 0.5F) + 0.2D;
+            double randomY = y + (double) ((random.nextFloat() - 0.5F) * 0.5F) + 0.2;
             double randomZ = z + (double) ((random.nextFloat() - 0.5F) * 0.5F);
             return new GeyserBaseParticle(level, randomX, randomY, randomZ, xAux, yAux, zAux, options.getWaterBlocks(),
                     options.getBurstImpulseBase(), this.sprites);

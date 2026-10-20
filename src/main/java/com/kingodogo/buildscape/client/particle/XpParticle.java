@@ -26,7 +26,7 @@ public class XpParticle extends TextureSheetParticle {
         this.gravity = 0.0F;
 
         this.xd = xSpeed;
-        this.yd = ySpeed + 0.02D + level.random.nextDouble() * 0.02D;
+        this.yd = ySpeed + 0.02 + level.random.nextDouble() * 0.02;
         this.zd = zSpeed;
 
         this.setColor(1.0F, 1.0F, 1.0F);
@@ -42,11 +42,11 @@ public class XpParticle extends TextureSheetParticle {
             this.remove();
         } else {
             this.setSpriteFromAge(this.sprites);
-            this.yd += 0.005D;
+            this.yd += 0.005;
             this.move(this.xd, this.yd, this.zd);
-            this.xd *= 0.85D;
-            this.yd *= 0.85D;
-            this.zd *= 0.85D;
+            this.xd *= 0.85;
+            this.yd *= 0.85;
+            this.zd *= 0.85;
         }
     }
 

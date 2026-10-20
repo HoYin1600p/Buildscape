@@ -56,47 +56,47 @@ public class GlowLightsBlock
     public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 
     private static final VoxelShape SHAPE_NORTH = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            16.0D,
-            1.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            16.0,
+            1.0);
     private static final VoxelShape SHAPE_SOUTH = Block.box(
-            0.0D,
-            0.0D,
-            15.0D,
-            16.0D,
-            16.0D,
-            16.0D);
+            0.0,
+            0.0,
+            15.0,
+            16.0,
+            16.0,
+            16.0);
     private static final VoxelShape SHAPE_EAST = Block.box(
-            15.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            16.0D,
-            16.0D);
+            15.0,
+            0.0,
+            0.0,
+            16.0,
+            16.0,
+            16.0);
     private static final VoxelShape SHAPE_WEST = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            1.0D,
-            16.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            16.0,
+            16.0);
     private static final VoxelShape SHAPE_UP = Block.box(
-            0.0D,
-            15.0D,
-            0.0D,
-            16.0D,
-            16.0D,
-            16.0D);
+            0.0,
+            15.0,
+            0.0,
+            16.0,
+            16.0,
+            16.0);
     private static final VoxelShape SHAPE_DOWN = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            1.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            1.0,
+            16.0);
 
     public GlowLightsBlock(BlockBehaviour.Properties properties) {
         super(properties);

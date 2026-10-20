@@ -569,7 +569,7 @@ public class ClientSetup {
                         if (reader != null && pos != null) {
                             return BiomeColors.getAverageGrassColor(reader, pos);
                         }
-                        return GrassColor.get(0.5D, 1.0D);
+                        return GrassColor.get(0.5, 1.0);
                     }
                     return -1;
                 },

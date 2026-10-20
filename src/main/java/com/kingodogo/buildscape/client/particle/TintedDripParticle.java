@@ -47,7 +47,7 @@ public class TintedDripParticle extends TextureSheetParticle {
         this.sprites = sprites;
         this.pickSprite(sprites);
 
-        this.isFloating = ySpeed > -0.006D;
+        this.isFloating = ySpeed > -0.006;
 
         if (this.isFloating) {
             this.gravity = 0.0F;
@@ -84,23 +84,23 @@ public class TintedDripParticle extends TextureSheetParticle {
             this.remove();
         } else {
             if (this.isFloating) {
-                this.xd += (this.random.nextDouble() - 0.5D) * 0.002D;
-                this.yd += (this.random.nextDouble() - 0.5D) * 0.002D;
-                this.zd += (this.random.nextDouble() - 0.5D) * 0.002D;
+                this.xd += (this.random.nextDouble() - 0.5) * 0.002;
+                this.yd += (this.random.nextDouble() - 0.5) * 0.002;
+                this.zd += (this.random.nextDouble() - 0.5) * 0.002;
 
-                double maxVel = 0.03D;
+                double maxVel = 0.03;
                 this.xd = Math.max(-maxVel, Math.min(maxVel, this.xd));
                 this.yd = Math.max(-maxVel, Math.min(maxVel, this.yd));
                 this.zd = Math.max(-maxVel, Math.min(maxVel, this.zd));
 
-                this.xd *= 0.995D;
-                this.yd *= 0.995D;
-                this.zd *= 0.995D;
+                this.xd *= 0.995;
+                this.yd *= 0.995;
+                this.zd *= 0.995;
             } else {
                 this.yd -= this.gravity;
 
-                this.xd *= 0.98D;
-                this.zd *= 0.98D;
+                this.xd *= 0.98;
+                this.zd *= 0.98;
             }
 
             this.move(this.xd, this.yd, this.zd);

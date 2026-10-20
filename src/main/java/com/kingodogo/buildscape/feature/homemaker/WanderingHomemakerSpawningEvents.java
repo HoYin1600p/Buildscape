@@ -1,7 +1,10 @@
 package com.kingodogo.buildscape.feature.homemaker;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.block.*;
+import com.kingodogo.buildscape.block.BigCandleBlock;
+import com.kingodogo.buildscape.block.CushionBlock;
+import com.kingodogo.buildscape.block.DecoratedPotBlock;
+import com.kingodogo.buildscape.block.StarBlock;
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.feature.pillar.PillarBlock;
 import com.kingodogo.buildscape.network.ModMessages;
@@ -170,11 +173,11 @@ public class WanderingHomemakerSpawningEvents {
                     ? ModEntities.FESTIVE_WANDERING_HOMEMAKER.get().create(level)
                     : ModEntities.WANDERING_HOMEMAKER.get().create(level);
             if (homemaker != null) {
-                double angle = level.random.nextDouble() * 2.0D * Math.PI;
-                double distance = 2.0D + level.random.nextDouble() * 1.0D;
-                double spawnX = pos.getX() + 0.5D + Math.cos(angle) * distance;
+                double angle = level.random.nextDouble() * 2.0 * Math.PI;
+                double distance = 2.0 + level.random.nextDouble() * 1.0;
+                double spawnX = pos.getX() + 0.5 + Math.cos(angle) * distance;
                 double spawnY = pos.getY();
-                double spawnZ = pos.getZ() + 0.5D + Math.sin(angle) * distance;
+                double spawnZ = pos.getZ() + 0.5 + Math.sin(angle) * distance;
 
                 homemaker.moveTo(spawnX, spawnY, spawnZ, level.random.nextFloat() * 360F, 0.0F);
                 level.addFreshEntity(homemaker);
@@ -182,10 +185,10 @@ public class WanderingHomemakerSpawningEvents {
                 BlockPos spawnPos = new BlockPos((int) spawnX, (int) spawnY, (int) spawnZ);
                 level.playSound(null, spawnPos, SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.NEUTRAL, 1.0F, 1.0F);
                 for (int i = 0; i < 20; i++) {
-                    double px = spawnX + (level.random.nextDouble() - 0.5D) * 1.5D;
-                    double py = spawnY + 0.5D + level.random.nextDouble() * 2.0D;
-                    double pz = spawnZ + (level.random.nextDouble() - 0.5D) * 1.5D;
-                    level.sendParticles(ParticleTypes.CLOUD, px, py, pz, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                    double px = spawnX + (level.random.nextDouble() - 0.5) * 1.5;
+                    double py = spawnY + 0.5 + level.random.nextDouble() * 2.0;
+                    double pz = spawnZ + (level.random.nextDouble() - 0.5) * 1.5;
+                    level.sendParticles(ParticleTypes.CLOUD, px, py, pz, 1, 0.0, 0.0, 0.0, 0.0);
                 }
 
                 long cooldownEnd = currentTime + 1800000L;

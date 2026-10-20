@@ -9,12 +9,12 @@ import static org.junit.Assert.assertTrue;
 public class FireflyNightTest {
     private static float timeOfDay(long dayTime) {
         // Vanilla DimensionType.timeOfDay for a normal overworld day cycle.
-        double d = (dayTime / 24000.0D) - 0.25D;
-        if (d < 0.0D) {
-            d += 1.0D;
+        double d = (dayTime / 24000.0) - 0.25;
+        if (d < 0.0) {
+            d += 1.0;
         }
-        double e = 0.5D - Math.cos(d * Math.PI) / 2.0D;
-        return (float) ((d * 2.0D + e) / 3.0D);
+        double e = 0.5 - Math.cos(d * Math.PI) / 2.0;
+        return (float) ((d * 2.0 + e) / 3.0);
     }
 
     @Test

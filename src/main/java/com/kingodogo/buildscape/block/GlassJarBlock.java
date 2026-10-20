@@ -55,9 +55,9 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     protected static final VoxelShape SHAPE = Shapes.or(
-            Block.box(4.0D, 0.0D, 4.0D, 12.0D, 12.0D, 12.0D),
-            Block.box(5.0D, 12.0D, 5.0D, 11.0D, 13.0D, 11.0D),
-            Block.box(4.5D, 13.0D, 4.5D, 11.5D, 14.0D, 11.5D));
+            Block.box(4.0, 0.0, 4.0, 12.0, 12.0, 12.0),
+            Block.box(5.0, 12.0, 5.0, 11.0, 13.0, 11.0),
+            Block.box(4.5, 13.0, 4.5, 11.5, 14.0, 11.5));
 
     public GlassJarBlock(Properties properties) {
         super(properties);
@@ -346,7 +346,7 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
                         for (MobEffectInstance effect : PotionUtils.getMobEffects(liquidItem)) {
                             if (effect.getEffect().isInstantenous()) {
                                 effect.getEffect().applyInstantenousEffect(player, player, player,
-                                        effect.getAmplifier(), 1.0D);
+                                        effect.getAmplifier(), 1.0);
                             } else {
                                 player.addEffect(new MobEffectInstance(effect));
                             }

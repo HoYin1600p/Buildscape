@@ -45,7 +45,7 @@ public class MangroveBoatItem extends Item {
             Vec3 vec3 = player.getViewVector(1.0F);
             List<Entity> list = level.getEntities(
                     player,
-                    player.getBoundingBox().expandTowards(vec3.scale(5.0D)).inflate(1.0D),
+                    player.getBoundingBox().expandTowards(vec3.scale(5.0)).inflate(1.0),
                     ENTITY_PREDICATE);
             if (!list.isEmpty()) {
                 Vec3 vec31 = player.getEyePosition();

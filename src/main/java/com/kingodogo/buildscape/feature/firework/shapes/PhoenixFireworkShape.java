@@ -22,7 +22,7 @@ public class PhoenixFireworkShape extends CustomFireworkShape {
 
     @Override
     public double getBaseScale() {
-        return 0.85D;
+        return 0.85;
     }
 
     @Override

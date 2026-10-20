@@ -27,7 +27,12 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -155,7 +160,7 @@ public class HazeBushParticleHandler {
                 BlockPos pos = it.next();
                 double distSq = playerPos.distSqr(pos);
 
-                if (cameraPos.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.4D, pos.getZ() + 0.5D) > maxDistSq) {
+                if (cameraPos.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.4, pos.getZ() + 0.5) > maxDistSq) {
                     continue;
                 }
                 if (distSq <= minDistSq) {
@@ -195,10 +200,10 @@ public class HazeBushParticleHandler {
     @Nullable
     public static Vec3 findHazeParticlePos(Level level, BlockPos bushPos, Random random) {
         for (int attempt = 0; attempt < 3; attempt++) {
-            double offsetX = (random.nextDouble() - 0.5D) * 5.0D;
-            double offsetZ = (random.nextDouble() - 0.5D) * 5.0D;
-            double px = bushPos.getX() + 0.5D + offsetX;
-            double pz = bushPos.getZ() + 0.5D + offsetZ;
+            double offsetX = (random.nextDouble() - 0.5) * 5.0;
+            double offsetZ = (random.nextDouble() - 0.5) * 5.0;
+            double px = bushPos.getX() + 0.5 + offsetX;
+            double pz = bushPos.getZ() + 0.5 + offsetZ;
 
             int blockX = Mth.floor(px);
             int blockZ = Mth.floor(pz);
@@ -218,7 +223,7 @@ public class HazeBushParticleHandler {
                 continue;
             }
 
-            double py = floorY + 0.02D + random.nextDouble() * 0.30D;
+            double py = floorY + 0.02 + random.nextDouble() * 0.30;
 
             BlockPos particleBlockPos = new BlockPos(blockX, Mth.floor(py), blockZ);
             BlockState pState = level.getBlockState(particleBlockPos);
@@ -230,8 +235,8 @@ public class HazeBushParticleHandler {
                 continue;
             }
 
-            Vec3 start = new Vec3(bushPos.getX() + 0.5D, bushPos.getY() + 0.4D, bushPos.getZ() + 0.5D);
-            Vec3 end = new Vec3(px, py + 0.05D, pz);
+            Vec3 start = new Vec3(bushPos.getX() + 0.5, bushPos.getY() + 0.4, bushPos.getZ() + 0.5);
+            Vec3 end = new Vec3(px, py + 0.05, pz);
             BlockHitResult hit = level
                     .clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
             if (hit.getType() != HitResult.Type.MISS) {

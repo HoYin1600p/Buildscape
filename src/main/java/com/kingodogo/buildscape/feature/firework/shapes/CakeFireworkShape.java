@@ -26,7 +26,7 @@ public class CakeFireworkShape extends CustomFireworkShape {
 
     @Override
     public double getBaseScale() {
-        return 0.35D;
+        return 0.35;
     }
 
     @Override

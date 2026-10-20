@@ -32,8 +32,8 @@ public class SpoolBlock extends RotatedPillarBlock {
             Vector3f color = this.getDyeColor(registryName);
             if (color != null) {
                 DustParticleOptions particleOptions = new DustParticleOptions(color, 0.5F);
-                serverLevel.sendParticles(particleOptions, pos.getX() + 0.5D, pos.getY() + 1.05D,
-                        pos.getZ() + 0.5D, 4, 0.2D, 0.025D, 0.2D, 0.0D);
+                serverLevel.sendParticles(particleOptions, pos.getX() + 0.5, pos.getY() + 1.05,
+                        pos.getZ() + 0.5, 4, 0.2, 0.025, 0.2, 0.0);
             }
         }
     }
@@ -54,11 +54,11 @@ public class SpoolBlock extends RotatedPillarBlock {
                 DustParticleOptions particleOptions = new DustParticleOptions(color, 0.5F);
                 Random random = level.random;
                 for (int i = 0; i < 8; i++) {
-                    double px = pos.getX() + 0.1D + random.nextDouble() * 0.8D;
-                    double py = pos.getY() + 0.1D + random.nextDouble() * 0.8D;
-                    double pz = pos.getZ() + 0.1D + random.nextDouble() * 0.8D;
+                    double px = pos.getX() + 0.1 + random.nextDouble() * 0.8;
+                    double py = pos.getY() + 0.1 + random.nextDouble() * 0.8;
+                    double pz = pos.getZ() + 0.1 + random.nextDouble() * 0.8;
 
-                    serverLevel.sendParticles(particleOptions, px, py, pz, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                    serverLevel.sendParticles(particleOptions, px, py, pz, 1, 0.0, 0.0, 0.0, 0.0);
                 }
             }
         }

@@ -162,14 +162,14 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         if (hasDecoration) {
             poseStack.pushPose();
             if (decoration.getBlock() instanceof FlowerPotBlock) {
-                poseStack.translate(0.5D, 0.125D, 0.5D);
+                poseStack.translate(0.5, 0.125, 0.5);
                 poseStack.scale(0.85F, 0.85F, 0.85F);
-                poseStack.translate(-0.5D, 0.0D, -0.5D);
+                poseStack.translate(-0.5, 0.0, -0.5);
                 renderBlockState(decoration, pos, level, poseStack, bufferSource, light, combinedOverlay);
             } else if (decoration.getBlock() instanceof HollowLogBlock) {
                 renderBlockState(decoration, pos, level, poseStack, bufferSource, light, combinedOverlay);
             } else {
-                poseStack.translate(0.0625D, 0.0625D, 0.0625D);
+                poseStack.translate(0.0625, 0.0625, 0.0625);
                 poseStack.scale(0.875F, 0.875F, 0.875F);
                 renderBlockState(decoration, pos, level, poseStack, bufferSource, light, combinedOverlay);
             }
@@ -771,31 +771,31 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
 
     private void positionGlassCover(PoseStack poseStack, Direction.Axis axis, boolean isPositive) {
         float glassThickness = 0.0625F;
-        double negOffset = 0.015625D;
-        double posOffset = 1.0D - 0.015625D - glassThickness;
+        double negOffset = 0.015625;
+        double posOffset = 1.0 - 0.015625 - glassThickness;
 
         switch (axis) {
             case X -> {
                 if (isPositive) {
-                    poseStack.translate(posOffset, 0.125D, 0.125D);
+                    poseStack.translate(posOffset, 0.125, 0.125);
                 } else {
-                    poseStack.translate(negOffset, 0.125D, 0.125D);
+                    poseStack.translate(negOffset, 0.125, 0.125);
                 }
                 poseStack.scale(glassThickness, 0.75F, 0.75F);
             }
             case Z -> {
                 if (isPositive) {
-                    poseStack.translate(0.125D, 0.125D, posOffset);
+                    poseStack.translate(0.125, 0.125, posOffset);
                 } else {
-                    poseStack.translate(0.125D, 0.125D, negOffset);
+                    poseStack.translate(0.125, 0.125, negOffset);
                 }
                 poseStack.scale(0.75F, 0.75F, glassThickness);
             }
             default -> {
                 if (isPositive) {
-                    poseStack.translate(0.125D, posOffset, 0.125D);
+                    poseStack.translate(0.125, posOffset, 0.125);
                 } else {
-                    poseStack.translate(0.125D, negOffset, 0.125D);
+                    poseStack.translate(0.125, negOffset, 0.125);
                 }
                 poseStack.scale(0.75F, glassThickness, 0.75F);
             }

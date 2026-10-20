@@ -69,10 +69,10 @@ public class FestiveStockingRenderer
             rotationY = 180.0F;
         }
 
-        poseStack.translate(0.0D, 0.0D, 0.0D);
+        poseStack.translate(0.0, 0.0, 0.0);
         poseStack.mulPose(Vector3f.YP.rotationDegrees(rotationY));
         poseStack.mulPose(Vector3f.XP.rotationDegrees(rotationX));
-        poseStack.translate(0.0D, 0.0D, 0.0625D);
+        poseStack.translate(0.0, 0.0, 0.0625);
 
         ResourceLocation texture = getTextureForColor(entity.getColorVariant());
         VertexConsumer vertexConsumer = buffer.getBuffer(

@@ -60,7 +60,7 @@ public abstract class FireworkStarterMixin extends Particle {
                             yaw = Minecraft.getInstance().player.getYRot();
                         }
 
-                        this.setBoundingBox(this.getBoundingBox().inflate(120.0D, 120.0D, 120.0D));
+                        this.setBoundingBox(this.getBoundingBox().inflate(120.0, 120.0, 120.0));
 
                         CustomFireworkRenderer.renderExplosion(
                                 shape,

@@ -24,6 +24,6 @@ public abstract class CustomFireworkShape {
     public abstract List<FireworkPoint> generatePoints();
 
     public double getBaseScale() {
-        return 0.5D;
+        return 0.5;
     }
 }

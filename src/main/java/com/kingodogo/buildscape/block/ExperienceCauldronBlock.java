@@ -26,11 +26,11 @@ public class ExperienceCauldronBlock extends LayeredCauldronBlock {
     public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
         int levelVal = state.getValue(LEVEL);
         if (levelVal > 0 && random.nextInt(25 - levelVal * 5) == 0) {
-            double fillHeight = 0.4375D + (double) levelVal * 0.1875D;
-            double x = (double) pos.getX() + 0.2D + random.nextDouble() * 0.6D;
+            double fillHeight = 0.4375 + (double) levelVal * 0.1875;
+            double x = (double) pos.getX() + 0.2 + random.nextDouble() * 0.6;
             double y = (double) pos.getY() + fillHeight;
-            double z = (double) pos.getZ() + 0.2D + random.nextDouble() * 0.6D;
-            level.addParticle(ModParticles.XP_PARTICLE.get(), x, y, z, 0.0D, 0.0D, 0.0D);
+            double z = (double) pos.getZ() + 0.2 + random.nextDouble() * 0.6;
+            level.addParticle(ModParticles.XP_PARTICLE.get(), x, y, z, 0.0, 0.0, 0.0);
         }
     }
 

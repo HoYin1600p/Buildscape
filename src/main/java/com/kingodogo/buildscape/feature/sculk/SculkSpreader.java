@@ -271,8 +271,8 @@ public final class SculkSpreader {
                 decayDelay = 1;
             }
             if (charge > 0 && random.nextInt(5) == 0) {
-                level.sendParticles(ParticleTypes.SOUL, pos.getX() + 0.5D, pos.getY() + 0.5D,
-                        pos.getZ() + 0.5D, 1, 0.2D, 0.2D, 0.2D, 0.0D);
+                level.sendParticles(ParticleTypes.SOUL, pos.getX() + 0.5, pos.getY() + 0.5,
+                        pos.getZ() + 0.5, 1, 0.2, 0.2, 0.2, 0.0);
             }
             updateDelay = 1;
         }

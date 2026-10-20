@@ -49,7 +49,7 @@ public class CustomFireworkRenderer {
             double length = scaledPos.length();
 
             Vec3 direction = length > 0.0001 ? scaledPos.normalize() : new Vec3(0, 1, 0);
-            double speed = length * 0.08D * pt.getSpeedScale();
+            double speed = length * 0.08 * pt.getSpeedScale();
 
             Vec3 velocity = direction.scale(speed);
 

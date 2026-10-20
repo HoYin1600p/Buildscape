@@ -27,10 +27,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class VerticalSlabBlock extends SlabBlock {
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
 
-    private static final VoxelShape NORTH = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 8.0D);
-    private static final VoxelShape SOUTH = Block.box(0.0D, 0.0D, 8.0D, 16.0D, 16.0D, 16.0D);
-    private static final VoxelShape WEST = Block.box(0.0D, 0.0D, 0.0D, 8.0D, 16.0D, 16.0D);
-    private static final VoxelShape EAST = Block.box(8.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+    private static final VoxelShape NORTH = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 8.0);
+    private static final VoxelShape SOUTH = Block.box(0.0, 0.0, 8.0, 16.0, 16.0, 16.0);
+    private static final VoxelShape WEST = Block.box(0.0, 0.0, 0.0, 8.0, 16.0, 16.0);
+    private static final VoxelShape EAST = Block.box(8.0, 0.0, 0.0, 16.0, 16.0, 16.0);
 
     @SuppressWarnings("unused")
     private final Block baseBlock;
@@ -118,8 +118,8 @@ public class VerticalSlabBlock extends SlabBlock {
         BlockPos pos = context.getClickedPos();
         Vec3 hit = context.getClickLocation()
                 .subtract(pos.getX(), pos.getY(), pos.getZ())
-                .subtract(0.5D, 0.0D, 0.5D);
-        double angle = Math.atan2(hit.x, hit.z) * -180.0D / Math.PI;
+                .subtract(0.5, 0.0, 0.5);
+        double angle = Math.atan2(hit.x, hit.z) * -180.0 / Math.PI;
         return Direction.fromYRot(angle).getOpposite();
     }
 

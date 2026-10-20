@@ -279,8 +279,8 @@ public class CopperOxidationHandler {
                         return false;
                     }
                     ((ServerLevel) level).sendParticles(ParticleTypes.SMOKE,
-                            pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
-                            8, 0.25D, 0.25D, 0.25D, 0.05D);
+                            pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                            8, 0.25, 0.25, 0.25, 0.05);
                     if (!player.getAbilities().instabuild) {
                         held.shrink(1);
                         ItemStack emptyBottle = new ItemStack(Items.GLASS_BOTTLE);

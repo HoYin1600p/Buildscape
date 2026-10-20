@@ -109,16 +109,16 @@ public class FestiveStockingEntity extends HangingEntity {
     @Override
     protected void recalculateBoundingBox() {
         if (this.direction != null && this.pos != null) {
-            double d0 = (double) this.pos.getX() + 0.5D;
-            double d1 = (double) this.pos.getY() + 0.5D;
-            double d2 = (double) this.pos.getZ() + 0.5D;
-            double d3 = 0.46875D;
+            double d0 = (double) this.pos.getX() + 0.5;
+            double d1 = (double) this.pos.getY() + 0.5;
+            double d2 = (double) this.pos.getZ() + 0.5;
+            double d3 = 0.46875;
             double d4 = this.offs(this.getWidth());
             double d5 = this.offs(this.getHeight());
 
-            d0 -= (double) this.direction.getStepX() * 0.46875D;
-            d1 -= (double) this.direction.getStepY() * 0.46875D;
-            d2 -= (double) this.direction.getStepZ() * 0.46875D;
+            d0 -= (double) this.direction.getStepX() * 0.46875;
+            d1 -= (double) this.direction.getStepY() * 0.46875;
+            d2 -= (double) this.direction.getStepZ() * 0.46875;
 
             Direction offsetDir;
             if (this.direction.getAxis() == Direction.Axis.Y) {
@@ -144,20 +144,20 @@ public class FestiveStockingEntity extends HangingEntity {
             if (this.direction.getAxis() == Direction.Axis.Z) {
                 d6 = (double) this.getWidth();
                 d7 = (double) this.getHeight();
-                d8 = 2.0D;
+                d8 = 2.0;
             } else if (this.direction.getAxis() == Direction.Axis.X) {
-                d6 = 2.0D;
+                d6 = 2.0;
                 d7 = (double) this.getHeight();
                 d8 = (double) this.getWidth();
             } else {
                 d6 = (double) this.getWidth();
-                d7 = 2.0D;
+                d7 = 2.0;
                 d8 = (double) this.getHeight();
             }
 
-            d6 /= 32.0D;
-            d7 /= 32.0D;
-            d8 /= 32.0D;
+            d6 /= 32.0;
+            d7 /= 32.0;
+            d8 /= 32.0;
 
             this.setBoundingBox(
                     new AABB(
@@ -171,7 +171,7 @@ public class FestiveStockingEntity extends HangingEntity {
     }
 
     private double offs(int index) {
-        return index % 32 == 0 ? 0.5D : 0.0D;
+        return index % 32 == 0 ? 0.5 : 0.0;
     }
 
     @Override

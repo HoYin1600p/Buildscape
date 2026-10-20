@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class TrophyDefinition {
-    public static final VoxelShape DEFAULT_SHAPE = Block.box(2.0D, 0.0D, 2.0D, 14.0D, 18.0D, 14.0D);
+    public static final VoxelShape DEFAULT_SHAPE = Block.box(2.0, 0.0, 2.0, 14.0, 18.0, 14.0);
 
     private final String id;
     private final TrophyTier tier;
@@ -44,7 +44,7 @@ public class TrophyDefinition {
         this.resistance = builder.resistance;
         this.directionalShapes = builder.directionalShapes != null
                 ? builder.directionalShapes
-                : createDirectionalShapes(new double[]{2.0D, 0.0D, 2.0D, 14.0D, 18.0D, 14.0D});
+                : createDirectionalShapes(new double[]{2.0, 0.0, 2.0, 14.0, 18.0, 14.0});
         this.associatedAdvancement = builder.associatedAdvancement;
         this.customDisplayName = builder.customDisplayName;
         this.customDescription = builder.customDescription;
@@ -76,9 +76,9 @@ public class TrophyDefinition {
             double maxZ = box[5];
 
             north = Shapes.or(north, Block.box(minX, minY, minZ, maxX, maxY, maxZ));
-            south = Shapes.or(south, Block.box(16.0D - maxX, minY, 16.0D - maxZ, 16.0D - minX, maxY, 16.0D - minZ));
-            west = Shapes.or(west, Block.box(minZ, minY, 16.0D - maxX, maxZ, maxY, 16.0D - minX));
-            east = Shapes.or(east, Block.box(16.0D - maxZ, minY, minX, 16.0D - minZ, maxY, maxX));
+            south = Shapes.or(south, Block.box(16.0 - maxX, minY, 16.0 - maxZ, 16.0 - minX, maxY, 16.0 - minZ));
+            west = Shapes.or(west, Block.box(minZ, minY, 16.0 - maxX, maxZ, maxY, 16.0 - minX));
+            east = Shapes.or(east, Block.box(16.0 - maxZ, minY, minX, 16.0 - minZ, maxY, maxX));
         }
 
         map.put(Direction.NORTH, north);

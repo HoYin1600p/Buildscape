@@ -44,7 +44,7 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
                         entity.getX(),
                         entity.getBoundingBox().maxY,
                         entity.getZ());
-                poseStack.translate(-0.5D, 0.0D, -0.5D);
+                poseStack.translate(-0.5, 0.0, -0.5);
 
                 BlockRenderDispatcher blockRenderer = getBlockRenderer();
                 RenderType renderType = RenderType.cutout();

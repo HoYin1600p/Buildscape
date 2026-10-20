@@ -47,15 +47,15 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
     public static final BooleanProperty ATTACHED = BlockStateProperties.ATTACHED;
     public static final BooleanProperty SIDELESS = BooleanProperty.create("sideless");
 
-    private static final VoxelShape ATTACHED_BASE_DOWN = Block.box(0.0D, 14.0D, 0.0D, 16.0D, 16.0D, 16.0D);
-    private static final VoxelShape ATTACHED_BASE_UP = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D);
+    private static final VoxelShape ATTACHED_BASE_DOWN = Block.box(0.0, 14.0, 0.0, 16.0, 16.0, 16.0);
+    private static final VoxelShape ATTACHED_BASE_UP = Block.box(0.0, 0.0, 0.0, 16.0, 2.0, 16.0);
 
-    private static final VoxelShape TIP_MERGE_SHAPE = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 16.0D, 11.0D);
-    private static final VoxelShape TIP_SHAPE_UP = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 13.0D, 11.0D);
-    private static final VoxelShape TIP_SHAPE_DOWN = Block.box(5.0D, 3.0D, 5.0D, 11.0D, 16.0D, 11.0D);
-    private static final VoxelShape FRUSTUM_SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 16.0D, 12.0D);
-    private static final VoxelShape MIDDLE_SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 16.0D, 13.0D);
-    private static final VoxelShape BASE_SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
+    private static final VoxelShape TIP_MERGE_SHAPE = Block.box(5.0, 0.0, 5.0, 11.0, 16.0, 11.0);
+    private static final VoxelShape TIP_SHAPE_UP = Block.box(5.0, 0.0, 5.0, 11.0, 13.0, 11.0);
+    private static final VoxelShape TIP_SHAPE_DOWN = Block.box(5.0, 3.0, 5.0, 11.0, 16.0, 11.0);
+    private static final VoxelShape FRUSTUM_SHAPE = Block.box(4.0, 0.0, 4.0, 12.0, 16.0, 12.0);
+    private static final VoxelShape MIDDLE_SHAPE = Block.box(3.0, 0.0, 3.0, 13.0, 16.0, 13.0);
+    private static final VoxelShape BASE_SHAPE = Block.box(1.0, 0.0, 1.0, 15.0, 16.0, 15.0);
 
     private static final VoxelShape TIP_MERGE_ATTACHED_DOWN = Shapes.or(TIP_MERGE_SHAPE, ATTACHED_BASE_DOWN);
     private static final VoxelShape TIP_MERGE_ATTACHED_UP = Shapes.or(TIP_MERGE_SHAPE, ATTACHED_BASE_UP);
@@ -265,9 +265,9 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
     private void makeIcicleFall(Level level, BlockPos pos, BlockState state) {
         FallingIcicleEntity fallingEntity = new FallingIcicleEntity(
                 level,
-                (double) pos.getX() + 0.5D,
+                (double) pos.getX() + 0.5,
                 (double) pos.getY(),
-                (double) pos.getZ() + 0.5D,
+                (double) pos.getZ() + 0.5,
                 state.setValue(ATTACHED, false).setValue(SIDELESS, false));
 
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
@@ -1056,9 +1056,9 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             boolean hasWaterAboveIcicle = checkWaterAboveIcicleChain(level, pos);
 
             if (hasWaterAboveIcicle) {
-                double tipX = pos.getX() + 0.5D;
-                double tipY = pos.getY() + 0.1D;
-                double tipZ = pos.getZ() + 0.5D;
+                double tipX = pos.getX() + 0.5;
+                double tipY = pos.getY() + 0.1;
+                double tipZ = pos.getZ() + 0.5;
 
                 if (random.nextInt(3) == 0) {
                     level.addParticle(
@@ -1066,9 +1066,9 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                             tipX,
                             tipY,
                             tipZ,
-                            0.0D,
-                            0.0D,
-                            0.0D);
+                            0.0,
+                            0.0,
+                            0.0);
                 }
             }
         }

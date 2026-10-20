@@ -17,7 +17,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class GoldenDandelionBlock extends FlowerBlock {
-    protected static final VoxelShape SHAPE = box(4.0D, 0.0D, 4.0D, 12.0D, 10.0D, 12.0D);
+    protected static final VoxelShape SHAPE = box(4.0, 0.0, 4.0, 12.0, 10.0, 12.0);
 
     public GoldenDandelionBlock(BlockBehaviour.Properties properties) {
         super(MobEffects.SATURATION, 7, properties);

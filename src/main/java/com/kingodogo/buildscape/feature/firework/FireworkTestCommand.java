@@ -97,7 +97,7 @@ public class FireworkTestCommand {
 
         FireworkRocketEntity rocket = new FireworkRocketEntity(
                 source.getLevel(),
-                pos.x, pos.y + 1.5D, pos.z,
+                pos.x, pos.y + 1.5, pos.z,
                 stack);
         source.getLevel().addFreshEntity(rocket);
         source.getLevel().broadcastEntityEvent(rocket, (byte) 17);

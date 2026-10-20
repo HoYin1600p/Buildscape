@@ -26,7 +26,7 @@ import java.util.Random;
 public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
     public static final BooleanProperty WAXED = BooleanProperty.create("waxed");
     private final boolean isOpen;
-    protected static final VoxelShape SHAPE = box(3.0D, 0.0D, 3.0D, 13.0D, 10.0D, 13.0D);
+    protected static final VoxelShape SHAPE = box(3.0, 0.0, 3.0, 13.0, 10.0, 13.0);
 
     public EyeblossomBlock(boolean isOpen, MobEffect effect, int duration, BlockBehaviour.Properties properties) {
         super(effect, duration, properties);
@@ -119,9 +119,9 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
         ItemStack flowerStack = new ItemStack(this);
         ItemEntity itemEntity = new ItemEntity(
                 level,
-                pos.getX() + 0.5D,
-                pos.getY() + 0.5D,
-                pos.getZ() + 0.5D,
+                pos.getX() + 0.5,
+                pos.getY() + 0.5,
+                pos.getZ() + 0.5,
                 flowerStack);
         itemEntity.setDefaultPickUpDelay();
         level.addFreshEntity(itemEntity);

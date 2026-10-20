@@ -52,7 +52,7 @@ public class CascadeWaterManager {
 
     static AABB hydrationArea(BlockPos pos) {
         // Vanilla farmland searches four blocks sideways and one block above itself for water.
-        return new AABB(pos).inflate(4.0D, 0.0D, 4.0D).expandTowards(0.0D, -1.0D, 0.0D);
+        return new AABB(pos).inflate(4.0, 0.0, 4.0).expandTowards(0.0, -1.0, 0.0);
     }
 
     public static void removeWaterTicket(Level level, BlockPos pos) {

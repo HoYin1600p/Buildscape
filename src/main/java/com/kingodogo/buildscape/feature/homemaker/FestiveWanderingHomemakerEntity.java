@@ -30,9 +30,9 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
-                .add(Attributes.MOVEMENT_SPEED, 0.5D)
-                .add(Attributes.MAX_HEALTH, 20.0D)
-                .add(Attributes.FOLLOW_RANGE, 16.0D);
+                .add(Attributes.MOVEMENT_SPEED, 0.5)
+                .add(Attributes.MAX_HEALTH, 20.0)
+                .add(Attributes.FOLLOW_RANGE, 16.0);
     }
 
     @Override

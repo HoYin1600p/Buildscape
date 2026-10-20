@@ -45,19 +45,19 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
     public static final DirectionProperty VERTICAL_DIRECTION = BlockStateProperties.VERTICAL_DIRECTION;
 
     protected static final VoxelShape SHAPE_UP = Block.box(
-            2.0D,
-            0.0D,
-            2.0D,
-            14.0D,
-            13.0D,
-            14.0D);
+            2.0,
+            0.0,
+            2.0,
+            14.0,
+            13.0,
+            14.0);
     protected static final VoxelShape SHAPE_DOWN = Block.box(
-            2.0D,
-            3.0D,
-            2.0D,
-            14.0D,
-            16.0D,
-            14.0D);
+            2.0,
+            3.0,
+            2.0,
+            14.0,
+            16.0,
+            14.0);
 
     public StarBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -84,7 +84,7 @@ public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWater
         Direction direction = state.getValue(VERTICAL_DIRECTION);
         VoxelShape shape = direction == Direction.DOWN ? SHAPE_DOWN : SHAPE_UP;
         if (state.getValue(ON_FARMLAND) && direction == Direction.UP) {
-            return shape.move(0, -0.0625D, 0);
+            return shape.move(0, -0.0625, 0);
         }
         return shape;
     }

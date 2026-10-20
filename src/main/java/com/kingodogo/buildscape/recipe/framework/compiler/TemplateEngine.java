@@ -2,7 +2,11 @@ package com.kingodogo.buildscape.recipe.framework.compiler;
 
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TemplateEngine {
 

@@ -12,7 +12,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class CosmeticsRecordRecoveryTest extends BootstrappedGameTest {
     @Rule

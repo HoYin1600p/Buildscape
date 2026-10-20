@@ -21,9 +21,9 @@ public class ExperienceFluidBlock extends LiquidBlock {
         super.animateTick(state, level, pos, random);
         if (random.nextInt(30) == 0) {
             double x = (double) pos.getX() + random.nextDouble();
-            double y = (double) pos.getY() + 1.0D;
+            double y = (double) pos.getY() + 1.0;
             double z = (double) pos.getZ() + random.nextDouble();
-            level.addParticle(ModParticles.XP_PARTICLE.get(), x, y, z, 0.0D, 0.0D, 0.0D);
+            level.addParticle(ModParticles.XP_PARTICLE.get(), x, y, z, 0.0, 0.0, 0.0);
         }
     }
 }

@@ -145,8 +145,8 @@ public class PlayerEvents {
                         }
                         ((ServerLevel) level).sendParticles(
                                 ParticleTypes.WAX_OFF,
-                                mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
-                                12, 0.3D, 0.3D, 0.3D, 0.05D);
+                                mob.getX(), mob.getY() + mob.getBbHeight() * 0.5, mob.getZ(),
+                                12, 0.3, 0.3, 0.3, 0.05);
                         level.playSound(null, mob.blockPosition(),
                                 SoundEvents.HONEYCOMB_WAX_ON,
                                 SoundSource.NEUTRAL, 1.0F, 1.0F);
@@ -154,8 +154,8 @@ public class PlayerEvents {
                         GoldenDandelionGrowth.setFrozen(mob, false);
                         ((ServerLevel) level).sendParticles(
                                 ParticleTypes.HAPPY_VILLAGER,
-                                mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
-                                12, 0.3D, 0.3D, 0.3D, 0.05D);
+                                mob.getX(), mob.getY() + mob.getBbHeight() * 0.5, mob.getZ(),
+                                12, 0.3, 0.3, 0.3, 0.05);
                         level.playSound(null, mob.blockPosition(),
                                 SoundEvents.VILLAGER_YES,
                                 SoundSource.NEUTRAL, 1.0F, 1.0F);
@@ -177,7 +177,7 @@ public class PlayerEvents {
         if (ModFluids.isExperience(fluid.getType())) {
             if (living.isSwimming() || living.isInWater()) {
                 Vec3 delta = living.getDeltaMovement();
-                living.setDeltaMovement(delta.x * 1.175D, delta.y * 1.06D, delta.z * 1.175D);
+                living.setDeltaMovement(delta.x * 1.175, delta.y * 1.06, delta.z * 1.175);
             }
         }
     }

@@ -13,7 +13,11 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class LegacyEncodingMigrationTest extends BootstrappedGameTest {
     private static final Charset LEGACY = Charset.forName("windows-1252");

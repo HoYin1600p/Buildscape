@@ -18,12 +18,12 @@ import java.util.Random;
 public class MudBlock extends Block {
 
     protected static final VoxelShape SHAPE = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            15.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            15.0,
+            16.0);
 
     public MudBlock(BlockBehaviour.Properties properties) {
         super(properties.randomTicks());

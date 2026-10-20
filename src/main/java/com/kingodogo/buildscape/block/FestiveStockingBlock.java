@@ -21,7 +21,11 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -56,47 +60,47 @@ public class FestiveStockingBlock
             "flipped");
 
     private static final VoxelShape SHAPE_NORTH = Block.box(
-            0.0D,
-            0.0D,
-            15.0D,
-            16.0D,
-            16.0D,
-            16.0D);
+            0.0,
+            0.0,
+            15.0,
+            16.0,
+            16.0,
+            16.0);
     private static final VoxelShape SHAPE_SOUTH = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            16.0D,
-            1.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            16.0,
+            1.0);
     private static final VoxelShape SHAPE_EAST = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            1.0D,
-            16.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            16.0,
+            16.0);
     private static final VoxelShape SHAPE_WEST = Block.box(
-            15.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            16.0D,
-            16.0D);
+            15.0,
+            0.0,
+            0.0,
+            16.0,
+            16.0,
+            16.0);
     private static final VoxelShape SHAPE_UP = Block.box(
-            0.0D,
-            0.0D,
-            0.0D,
-            16.0D,
-            1.0D,
-            16.0D);
+            0.0,
+            0.0,
+            0.0,
+            16.0,
+            1.0,
+            16.0);
     private static final VoxelShape SHAPE_DOWN = Block.box(
-            0.0D,
-            15.0D,
-            0.0D,
-            16.0D,
-            16.0D,
-            16.0D);
+            0.0,
+            15.0,
+            0.0,
+            16.0,
+            16.0,
+            16.0);
 
     private final String colorVariant;
 

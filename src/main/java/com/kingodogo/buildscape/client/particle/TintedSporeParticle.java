@@ -50,17 +50,17 @@ public class TintedSporeParticle extends TextureSheetParticle {
         if (this.age++ >= this.lifetime) {
             this.remove();
         } else {
-            this.yd -= 0.0005D;
+            this.yd -= 0.0005;
 
             if (this.level.random.nextInt(8) == 0) {
-                this.xd += (this.level.random.nextDouble() - 0.5D) * 0.001D;
-                this.zd += (this.level.random.nextDouble() - 0.5D) * 0.001D;
+                this.xd += (this.level.random.nextDouble() - 0.5) * 0.001;
+                this.zd += (this.level.random.nextDouble() - 0.5) * 0.001;
 
-                this.yd += (this.level.random.nextDouble() - 0.5D) * 0.0005D;
+                this.yd += (this.level.random.nextDouble() - 0.5) * 0.0005;
             }
 
-            this.xd *= 0.999D;
-            this.zd *= 0.999D;
+            this.xd *= 0.999;
+            this.zd *= 0.999;
 
             this.move(this.xd, this.yd, this.zd);
 

@@ -17,7 +17,7 @@ public class CandyCaneFireworkShape extends CustomFireworkShape {
 
     @Override
     public double getBaseScale() {
-        return 0.42D;
+        return 0.42;
     }
 
     @Override

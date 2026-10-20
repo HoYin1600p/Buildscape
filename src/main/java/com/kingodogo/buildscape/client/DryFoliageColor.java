@@ -70,8 +70,8 @@ public class DryFoliageColor {
             init();
         }
         humidity *= temperature;
-        int i = (int) ((1.0D - temperature) * 255.0D);
-        int j = (int) ((1.0D - humidity) * 255.0D);
+        int i = (int) ((1.0 - temperature) * 255.0);
+        int j = (int) ((1.0 - humidity) * 255.0);
         i = Math.max(0, Math.min(255, i));
         j = Math.max(0, Math.min(255, j));
         int index = j << 8 | i;
@@ -79,7 +79,7 @@ public class DryFoliageColor {
     }
 
     public static int getDefaultColor() {
-        return get(0.5D, 1.0D);
+        return get(0.5, 1.0);
     }
 
     public static int getDryFoliageColor(BlockAndTintGetter level, BlockPos pos) {

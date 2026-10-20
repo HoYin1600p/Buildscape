@@ -35,8 +35,8 @@ import java.util.Random;
 public class HangingMossBlock extends Block implements BonemealableBlock {
     public static final BooleanProperty TIP = BooleanProperty.create("tip");
     public static final BooleanProperty SHEARED = ModBlockProperties.SHEARED;
-    protected static final VoxelShape TIP_SHAPE = box(1.0D, 2.0D, 1.0D, 15.0D, 16.0D, 15.0D);
-    protected static final VoxelShape BODY_SHAPE = box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
+    protected static final VoxelShape TIP_SHAPE = box(1.0, 2.0, 1.0, 15.0, 16.0, 15.0);
+    protected static final VoxelShape BODY_SHAPE = box(1.0, 0.0, 1.0, 15.0, 16.0, 15.0);
 
     public HangingMossBlock(BlockBehaviour.Properties properties) {
         super(properties);

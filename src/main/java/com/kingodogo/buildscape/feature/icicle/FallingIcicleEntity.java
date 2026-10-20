@@ -63,7 +63,7 @@ public class FallingIcicleEntity extends Entity {
     @Override
     public void tick() {
         if (!this.isNoGravity()) {
-            this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -0.04D, 0.0D));
+            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.04, 0.0));
         }
 
         this.move(MoverType.SELF, this.getDeltaMovement());
@@ -75,7 +75,7 @@ public class FallingIcicleEntity extends Entity {
             }
         }
 
-        this.setDeltaMovement(this.getDeltaMovement().scale(0.98D));
+        this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
 
         fallTime++;
 

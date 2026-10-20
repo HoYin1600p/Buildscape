@@ -146,7 +146,7 @@ public class PotentSulfurBlock extends BaseEntityBlock {
     private static void spawnBubbleParticlesAt(final Level level, final Random random, final double x, final double y,
             final double z) {
         level.addAlwaysVisibleParticle(ModParticles.SULFUR_BUBBLES.get(), x + (double) random.nextFloat(),
-                y + (double) random.nextFloat(), z + (double) random.nextFloat(), 0.0D, 0.0D, 0.0D);
+                y + (double) random.nextFloat(), z + (double) random.nextFloat(), 0.0, 0.0, 0.0);
     }
 
     @Override

@@ -178,7 +178,7 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
 
         private void apply(PoseStack poseStack) {
             if (this.z != 0.0F) {
-                poseStack.translate(0.0D, 0.0D, this.z / 16.0F);
+                poseStack.translate(0.0, 0.0, this.z / 16.0F);
             }
             if (this.xRot != 0.0F || this.yRot != 0.0F || this.zRot != 0.0F) {
                 poseStack.mulPose(this.rotation());

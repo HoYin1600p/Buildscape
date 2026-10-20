@@ -70,14 +70,14 @@ public class MuffBlock extends Block implements EntityBlock {
 
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.NOTE,
-                    (double) pos.getX() + 0.5D,
-                    (double) pos.getY() + 1.2D,
-                    (double) pos.getZ() + 0.5D,
+                    (double) pos.getX() + 0.5,
+                    (double) pos.getY() + 1.2,
+                    (double) pos.getZ() + 0.5,
                     0,
-                    (double) note / 24.0D,
-                    0.0D,
-                    0.0D,
-                    1.0D);
+                    (double) note / 24.0,
+                    0.0,
+                    0.0,
+                    1.0);
         }
 
         player.displayClientMessage(new TranslatableComponent("message.buildscape.muff_block.radius", nextRadius),

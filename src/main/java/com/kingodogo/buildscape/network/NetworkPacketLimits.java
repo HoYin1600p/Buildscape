@@ -15,10 +15,10 @@ final class NetworkPacketLimits {
     static final int MAX_RULE_NAME_LENGTH = 64;
     static final int MAX_PILLAR_JSON_LENGTH = 32_767;
     static final int MAX_RESULT_OFFSET = 1_000_000;
-    static final double MIN_PARTICLE_RATE = 0.001D;
-    static final double MAX_PARTICLE_SPEED = 4.0D;
-    static final double MAX_PARTICLE_SPREAD = 16.0D;
-    static final double MAX_PARTICLE_INTENSITY = 64.0D;
+    static final double MIN_PARTICLE_RATE = 0.001;
+    static final double MAX_PARTICLE_SPEED = 4.0;
+    static final double MAX_PARTICLE_SPREAD = 16.0;
+    static final double MAX_PARTICLE_INTENSITY = 64.0;
     static final int MAX_PARTICLE_LIFETIME = 12_000;
     static final int MAX_PARTICLE_DENSITY = 128;
 

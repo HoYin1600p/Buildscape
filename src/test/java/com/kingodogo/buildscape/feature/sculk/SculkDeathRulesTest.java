@@ -33,22 +33,22 @@ public class SculkDeathRulesTest {
 
     @Test
     public void rangeIncludesExactlyEightBlocksAndRejectsCubeCorners() {
-        assertTrue(SculkDeathRules.isInRange(0.0D));
-        assertTrue(SculkDeathRules.isInRange(64.0D));
-        assertFalse(SculkDeathRules.isInRange(65.0D));
-        assertFalse(SculkDeathRules.isInRange(192.0D));
-        assertFalse(SculkDeathRules.isInRange(-1.0D));
+        assertTrue(SculkDeathRules.isInRange(0.0));
+        assertTrue(SculkDeathRules.isInRange(64.0));
+        assertFalse(SculkDeathRules.isInRange(65.0));
+        assertFalse(SculkDeathRules.isInRange(192.0));
+        assertFalse(SculkDeathRules.isInRange(-1.0));
         assertFalse(SculkDeathRules.isInRange(Double.NaN));
     }
 
     @Test
     public void nearestCatalystWinsWithStablePositionOrderForTies() {
-        assertTrue(SculkDeathRules.preferCatalyst(64.0D, Double.MAX_VALUE, -1));
-        assertTrue(SculkDeathRules.preferCatalyst(9.0D, 16.0D, 1));
-        assertFalse(SculkDeathRules.preferCatalyst(16.0D, 9.0D, -1));
-        assertTrue(SculkDeathRules.preferCatalyst(9.0D, 9.0D, -1));
-        assertFalse(SculkDeathRules.preferCatalyst(9.0D, 9.0D, 1));
-        assertFalse(SculkDeathRules.preferCatalyst(9.0D, 9.0D, 0));
-        assertFalse(SculkDeathRules.preferCatalyst(65.0D, Double.MAX_VALUE, -1));
+        assertTrue(SculkDeathRules.preferCatalyst(64.0, Double.MAX_VALUE, -1));
+        assertTrue(SculkDeathRules.preferCatalyst(9.0, 16.0, 1));
+        assertFalse(SculkDeathRules.preferCatalyst(16.0, 9.0, -1));
+        assertTrue(SculkDeathRules.preferCatalyst(9.0, 9.0, -1));
+        assertFalse(SculkDeathRules.preferCatalyst(9.0, 9.0, 1));
+        assertFalse(SculkDeathRules.preferCatalyst(9.0, 9.0, 0));
+        assertFalse(SculkDeathRules.preferCatalyst(65.0, Double.MAX_VALUE, -1));
     }
 }

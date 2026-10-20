@@ -30,7 +30,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class WanderingHomemakerSpawningHandler {
+public class WanderingHomemakerSpawningEvents {
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {

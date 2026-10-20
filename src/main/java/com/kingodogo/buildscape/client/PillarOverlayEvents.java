@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class PillarOverlayHandler {
+public class PillarOverlayEvents {
 
     private static final int MARGIN_RIGHT = 5;
     private static final int MARGIN_BOTTOM = 5;

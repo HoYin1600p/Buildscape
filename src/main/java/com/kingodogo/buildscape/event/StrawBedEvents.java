@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID)
-public class StrawBedHandler {
+public class StrawBedEvents {
 
     @SubscribeEvent
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {

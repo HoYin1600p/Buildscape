@@ -34,7 +34,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class TreeChopHandler {
+public class TreeChopEvents {
 
     private static final long BREAK_DELAY_MS = 1000;
     private static final int MAX_LOGS = 200;

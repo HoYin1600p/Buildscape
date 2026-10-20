@@ -13,7 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID)
-public class ChainMobHandler {
+public class ChainMobEvents {
     private static final TagKey<Block> MOB_CHAINS = TagKey.create(Registry.BLOCK_REGISTRY,
             new ResourceLocation(BuildScape.MODID, "mob_chains"));
 

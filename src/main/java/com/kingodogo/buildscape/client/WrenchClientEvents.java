@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class WrenchClientHandler {
+public class WrenchClientEvents {
 
     @SubscribeEvent
     public static void onHighlightBlock(DrawSelectionEvent.HighlightBlock event) {

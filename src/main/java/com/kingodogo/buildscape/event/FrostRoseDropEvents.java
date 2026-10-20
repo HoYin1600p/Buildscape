@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID)
-public class FrostRoseDropHandler {
+public class FrostRoseDropEvents {
 
     private static final List<TrackedDeath> trackedDeaths = new ArrayList<>();
 

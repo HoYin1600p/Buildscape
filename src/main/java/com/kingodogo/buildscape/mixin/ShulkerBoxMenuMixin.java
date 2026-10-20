@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.menu.GhostFilterMenu;
+import com.kingodogo.buildscape.item.GhostFilterMenu;
 import com.kingodogo.buildscape.util.GhostFilterable;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;

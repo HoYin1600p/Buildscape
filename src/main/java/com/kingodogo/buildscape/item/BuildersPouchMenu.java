@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.menu.GhostFilterMenu;
 import com.kingodogo.buildscape.registry.ModMenuTypes;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;

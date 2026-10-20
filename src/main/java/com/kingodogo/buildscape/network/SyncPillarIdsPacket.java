@@ -26,6 +26,11 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client transfer of the pillar registry, cut into chunks of 64 pillars that share a sync id.
+ * The client collects the chunks per sync id, ignores older syncs, discards a sync that is inconsistent, too large or
+ * older than 30 seconds, and replaces its pillar list only once every chunk of the newest sync has arrived.
+ */
 public class SyncPillarIdsPacket {
 
     private static final int PILLARS_PER_CHUNK = 64;
@@ -90,12 +95,18 @@ public class SyncPillarIdsPacket {
         ctx.get().setPacketHandled(true);
     }
 
+    /**
+     * Chunks the list and sends it to every connected player. Sends nothing when the list is over the 65,536 entry limit.
+     */
     public static void sendToAll(List<PillarIdManager.PillarData> data) {
         for (SyncPillarIdsPacket packet : createChunks(data)) {
             ModMessages.INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
         }
     }
 
+    /**
+     * Chunks the list and sends it to one player, skipping a disconnected one.
+     */
     public static void sendToPlayer(ServerPlayer player, List<PillarIdManager.PillarData> data) {
         if (player == null || player.hasDisconnected()) {
             return;
@@ -105,6 +116,9 @@ public class SyncPillarIdsPacket {
         }
     }
 
+    /**
+     * Client side: forgets partly received syncs, for example when leaving a world.
+     */
     public static void clearClientState() {
         synchronized (CLIENT_ACCUMULATORS) {
             CLIENT_ACCUMULATORS.clear();

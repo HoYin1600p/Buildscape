@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to delete a list of pillar records (at most 256 ids) from the server's pillar registry.
+ * Needs the pillar-edit permission; on success the server re-syncs pillar data to every player.
+ */
 public class RemovePillarPacket {
 
     public static final int MAX_IDS = 256;

@@ -8,6 +8,10 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client packet that tells clients to spawn a confetti burst at a position, aimed along a look vector.
+ * The burst level is clamped to 1-5 and the seed makes every client draw the same particle spread.
+ */
 public class ConfettiBurstPacket {
 
     private final double x;

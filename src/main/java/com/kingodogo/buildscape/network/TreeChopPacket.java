@@ -12,6 +12,11 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to chop a whole tree starting at a log position. Only creative operators who may build
+ * can use it. The server collects up to 200 connected logs of the same block and hands them to
+ * {@link TreeChopJobManager}.
+ */
 public class TreeChopPacket {
 
     private static final int MAX_LOGS = 200;

@@ -10,6 +10,10 @@ import net.minecraftforge.network.NetworkEvent;
 
 import com.kingodogo.buildscape.client.network.ClientPacketHandlers;
 
+/**
+ * Server-to-client packet that shows a text component on the receiving player's action bar.
+ * The handler runs on the client only and forwards to {@code ClientPacketHandlers.showActionBar}.
+ */
 public class ActionBarMessagePacket {
 
     private final Component message;

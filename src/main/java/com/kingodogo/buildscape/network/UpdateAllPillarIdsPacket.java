@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server bulk update of pillar records, sent as one JSON string per pillar. Needs the bulk pillar-edit
+ * permission. The server checks id, pattern and numeric fields of each entry and stops at the first
+ * out-of-range value.
+ */
 public class UpdateAllPillarIdsPacket {
 
     private static final Gson GSON = Json.PLAIN;

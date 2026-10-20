@@ -15,6 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server update of one pillar's particle settings (pattern, speeds, color count, dye colors).
+ * Null fields mean "leave unchanged". Numbers are clamped on both ends, and the server needs the pillar-edit
+ * permission and saves the registry immediately after applying a change.
+ */
 public class UpdatePillarDataPacket {
 
     private final String pillarId;

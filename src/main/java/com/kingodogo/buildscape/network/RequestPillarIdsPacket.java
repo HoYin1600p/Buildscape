@@ -8,6 +8,10 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request for the full pillar list. The server limits each player to one request per five seconds,
+ * loads the registry first if it is not loaded yet, and answers with {@link SyncPillarIdsPacket} chunks.
+ */
 public class RequestPillarIdsPacket {
 
     private static final String LAST_REQUEST_TIME = "BuildScapePillarSyncRequestTime";

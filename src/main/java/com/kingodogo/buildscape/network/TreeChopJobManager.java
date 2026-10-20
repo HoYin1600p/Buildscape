@@ -22,6 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Server-side queue of tree-chop jobs, one per player. A job removes the collected logs in small batches every few
+ * ticks instead of all at once, and is dropped when the player logs out, leaves creative, loses permission or
+ * changes level, and when the server stops. State is in memory only.
+ */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class TreeChopJobManager {
 
@@ -31,6 +36,9 @@ public final class TreeChopJobManager {
 
     private TreeChopJobManager() {}
 
+    /**
+     * Queues a job for the player, replacing any job already running for them. Does nothing for an empty block list.
+     */
     public static void start(ServerPlayer player, ServerLevel level, Block targetBlock, Iterable<BlockPos> blocks) {
         List<BlockPos> positions = new ArrayList<>();
         for (BlockPos block : blocks) {

@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server packet carrying the nine result items the Builder's Workbench screen computed for a tab.
+ * Results travel as item ids; the server only applies them after it re-checks that the player has this workbench
+ * open, the tab and filter mask are valid and the results match the inputs, so a client cannot inject items.
+ */
 public final class BuildersWorkbenchResultsPacket {
     private static final int RESULT_COUNT = 9;
 

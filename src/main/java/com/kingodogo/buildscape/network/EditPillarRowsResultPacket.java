@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client reply to {@link EditPillarRowsPacket}: the batch id, the old ids it covered and a short reason.
+ * On the client it only triggers a refresh of the pillar list.
+ */
 public class EditPillarRowsResultPacket {
     private static final int MAX_REASON_LENGTH = 96;
     private final long batchId;

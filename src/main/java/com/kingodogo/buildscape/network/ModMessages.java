@@ -15,6 +15,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * Declares the mod's single network channel and registers every packet with its numeric id and direction.
+ * Ids are part of the wire protocol: do not reorder them, and change {@code PROTOCOL_VERSION} when a packet layout
+ * changes so mismatched client and server versions refuse each other.
+ */
 public class ModMessages {
 
     static final String PROTOCOL_VERSION = "12";
@@ -24,6 +29,9 @@ public class ModMessages {
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals);
 
+    /**
+     * Registers all packets on {@link #INSTANCE}. Called once during mod setup on both sides.
+     */
     public static void register() {
         register(ActionBarMessagePacket.class, 1, NetworkDirection.PLAY_TO_CLIENT,
                 ActionBarMessagePacket::encode, ActionBarMessagePacket::decode, ActionBarMessagePacket::handle);

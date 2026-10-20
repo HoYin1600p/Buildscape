@@ -11,6 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Server-side reassembly buffer for one player's chunked config upload ({@link UpdateConfigPacket}).
+ * Chunks must arrive in order within one transfer id, inside 30 seconds and under 2 MiB in total; anything else
+ * throws. The joined bytes are decoded into a {@link SyncConfigPacket} that lists which settings were uploaded.
+ */
 public class ConfigAssembly {
     private static final int MAX_UPDATE_BYTES = 2 * 1024 * 1024;
     private UUID transferId;
@@ -23,6 +28,11 @@ public class ConfigAssembly {
         return started;
     }
 
+    /**
+     * Adds one chunk. Returns null while chunks are missing; returns the decoded upload once the last chunk arrives.
+     * Throws {@link IllegalArgumentException} for a chunk that is out of order, from another transfer, late or oversized,
+     * or for trailing bytes after the upload.
+     */
     public SyncConfigPacket accept(UpdateConfigPacket packet) {
         long now = System.currentTimeMillis();
         if (nextIndex == 0) {
@@ -52,6 +62,10 @@ public class ConfigAssembly {
         }
     }
 
+    /**
+     * Writes only the groups named in {@code settings} (items, colors, particles, policy) behind a bit mask of those groups.
+     * The read side in this class expects exactly this layout.
+     */
     static void writeUpload(FriendlyByteBuf buffer, SyncConfigPacket data, Set<ConfigSetting> settings) {
         buffer.writeInt(ConfigSetting.mask(settings));
         if (settings.contains(ConfigSetting.ITEMS)) {

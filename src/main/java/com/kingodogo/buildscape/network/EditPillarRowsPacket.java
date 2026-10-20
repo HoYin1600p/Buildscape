@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to rename pillar identities in bulk. Pillar ids are now read-only, so the server answers
+ * every request with an {@link EditPillarRowsResultPacket} that carries the reason {@code read_only} and changes nothing.
+ * The packet stays so older screens get a defined reply.
+ */
 public class EditPillarRowsPacket {
 
     public static final int MAX_ROWS = 80;

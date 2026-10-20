@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client snapshot of the shared pillar particle config (speeds, pattern, colors, edit policy, item list and
+ * the read-only flags). The same class carries the decoded form of a client upload in {@link #uploadSettings},
+ * which then names only the groups the client sent. Values are clamped to the limits in {@link NetworkPacketLimits}.
+ */
 public class SyncConfigPacket {
     // Present only for assembled uploads; server-to-client sync always contains all settings.
     public Set<ConfigSetting> uploadSettings = ConfigSetting.uploadable();

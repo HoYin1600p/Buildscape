@@ -8,6 +8,9 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client snapshot of the six BuildScape game rules, so the client can show and use their current values.
+ */
 public class SyncGameRulesPacket {
     public final boolean fastLeafDecay;
     public final boolean disableEndermanGriefing;

@@ -4,6 +4,11 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.network.FriendlyByteBuf;
 
+/**
+ * Shared size and range limits for packet fields, plus read/write helpers that enforce them.
+ * Decoders throw {@code DecoderException} and encoders throw {@code EncoderException} on a violation, so a malformed
+ * or hostile packet is dropped instead of allocating unbounded lists or strings.
+ */
 final class NetworkPacketLimits {
     static final int MAX_PILLARS = 16_384;
     static final int MAX_CONFIG_ITEMS = 65_536;

@@ -29,6 +29,12 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
 
+/**
+ * One chunk of a client-to-server config upload. A config upload is encoded once, cut into chunks of 24,000 bytes
+ * tagged with a transfer id and index, and reassembled by {@link ConfigAssembly} on the server.
+ * The server then applies only the settings the sender's permission and the edit policy allow, saves them, and
+ * refuses the rest with an {@code EditRefusedPacket}.
+ */
 public class UpdateConfigPacket {
 
     private static final int CHUNK_BYTES = 24_000;
@@ -64,6 +70,10 @@ public class UpdateConfigPacket {
         return split(config, ConfigSetting.uploadable());
     }
 
+    /**
+     * Encodes the chosen setting groups of {@code config} and cuts them into ordered chunks.
+     * Throws {@link IllegalArgumentException} when the upload exceeds 2 MiB.
+     */
     public static List<UpdateConfigPacket> split(PillarParticleConfig config, Set<ConfigSetting> settings) {
         SyncConfigPacket data = new SyncConfigPacket(config);
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
@@ -139,6 +149,10 @@ public class UpdateConfigPacket {
         return applyValues(serverConfig, data, PillarParticleConfig.CONFIG_PERMISSION_LEVEL);
     }
 
+    /**
+     * Copies the allowed groups from {@code data} into the server config and trims {@code data.uploadSettings} to the groups
+     * that were accepted. Returns a refusal message for the last refused group, or null when everything was accepted.
+     */
     public static String applyValues(PillarParticleConfig serverConfig, SyncConfigPacket data, int permissionLevel) {
         String refusal = null;
         Set<ConfigSetting> accepted = EnumSet.noneOf(ConfigSetting.class);

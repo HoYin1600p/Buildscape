@@ -25,6 +25,12 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request from the wrench arrows to rotate the block at a position.
+ * The server requires a sneaking player with a wrench in either hand, in reach and allowed to build, then picks the
+ * new state from the arrow and the player's facing (half, slab type, facing or axis properties). Beds, doors and
+ * other two-part blocks are left alone.
+ */
 public class RotateBlockPacket {
 
     public enum ArrowDirection {

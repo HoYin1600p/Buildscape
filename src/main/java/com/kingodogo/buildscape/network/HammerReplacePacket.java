@@ -34,6 +34,12 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Client-to-server request to swap the block at a position for the block item in the player's off hand, using
+ * a hammer in the main hand. The server re-checks reach, build permission, hammer tier hardness limit,
+ * correct-tool rules, protected multi-block parts and block-place events before it replaces the block, drops the old
+ * block's loot, consumes the off-hand item and wears the hammer (survival only).
+ */
 public class HammerReplacePacket {
 
     private final BlockPos pos;

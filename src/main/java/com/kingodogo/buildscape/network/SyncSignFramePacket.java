@@ -9,6 +9,10 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
+/**
+ * Server-to-client packet that sets the frame id of the sign at a position on the client.
+ * An empty id means no frame.
+ */
 public class SyncSignFramePacket {
 
     private final BlockPos pos;

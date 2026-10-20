@@ -1,5 +1,7 @@
-package com.kingodogo.buildscape.feature.geyser;
+package com.kingodogo.buildscape.client.particle;
 
+import com.kingodogo.buildscape.feature.geyser.GeyserBaseParticleOptions;
+import com.kingodogo.buildscape.feature.geyser.GeyserParticleOptions;
 import com.kingodogo.buildscape.registry.ModParticles;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.NoRenderParticle;

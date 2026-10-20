@@ -4,7 +4,7 @@ import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.core.ParticlePatterns;
 import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
 import com.kingodogo.buildscape.feature.pillar.PillarParticleSettings;
-import com.kingodogo.buildscape.particle.PillarSparkleParticle;
+import com.kingodogo.buildscape.client.particle.PillarSparkleParticle;
 import com.kingodogo.buildscape.registry.ModParticles;
 import java.util.Random;
 import net.minecraft.client.Minecraft;

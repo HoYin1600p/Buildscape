@@ -1,5 +1,6 @@
-package com.kingodogo.buildscape.particle;
+package com.kingodogo.buildscape.client.particle;
 
+import com.kingodogo.buildscape.particle.SmokeColorRegistry;
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;

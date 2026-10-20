@@ -1,5 +1,6 @@
-package com.kingodogo.buildscape.particle;
+package com.kingodogo.buildscape.client.particle;
 
+import com.kingodogo.buildscape.particle.SmokeColorRegistry;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;

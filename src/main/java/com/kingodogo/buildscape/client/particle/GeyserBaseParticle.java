@@ -1,5 +1,6 @@
-package com.kingodogo.buildscape.feature.geyser;
+package com.kingodogo.buildscape.client.particle;
 
+import com.kingodogo.buildscape.feature.geyser.GeyserBaseParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.BaseAshSmokeParticle;
 import net.minecraft.client.particle.Particle;

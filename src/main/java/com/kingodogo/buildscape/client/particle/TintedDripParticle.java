@@ -1,5 +1,6 @@
-package com.kingodogo.buildscape.particle;
+package com.kingodogo.buildscape.client.particle;
 
+import com.kingodogo.buildscape.particle.ParticlePositionKey;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

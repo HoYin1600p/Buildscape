@@ -11,7 +11,7 @@ import com.kingodogo.buildscape.feature.pillar.ItemFrameParticleHandler;
 import com.kingodogo.buildscape.feature.pillar.PillarBlockEntity;
 import com.kingodogo.buildscape.feature.pillar.PillarIdManager;
 import com.kingodogo.buildscape.network.SyncPillarIdsPacket;
-import com.kingodogo.buildscape.particle.TintedDripParticle;
+import com.kingodogo.buildscape.client.particle.TintedDripParticle;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;

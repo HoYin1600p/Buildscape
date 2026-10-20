@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.particle;
+package com.kingodogo.buildscape.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
@@ -10,13 +10,12 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.awt.Color;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @OnlyIn(Dist.CLIENT)
-public class TrailNoteParticle extends TextureSheetParticle {
+public class CakeParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;
 
@@ -32,8 +31,8 @@ public class TrailNoteParticle extends TextureSheetParticle {
         }
     }
 
-    protected TrailNoteParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed,
-            double zSpeed, SpriteSet sprites) {
+    protected CakeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed,
+            SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
 
@@ -60,12 +59,7 @@ public class TrailNoteParticle extends TextureSheetParticle {
             float[] color = parseColorCode(colorCode);
             this.setColor(color[0], color[1], color[2]);
         } else {
-            float hue = level.random.nextFloat();
-            int rgb = Color.HSBtoRGB(hue, 0.8f, 0.9f);
-            float r = ((rgb >> 16) & 0xFF) / 255.0f;
-            float g = ((rgb >> 8) & 0xFF) / 255.0f;
-            float b = (rgb & 0xFF) / 255.0f;
-            this.setColor(r, g, b);
+            this.setColor(1.0F, 1.0F, 1.0F);
         }
 
         if (POSITION_COLOR_MAP.size() > 1000) {
@@ -140,7 +134,7 @@ public class TrailNoteParticle extends TextureSheetParticle {
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z,
                 double xSpeed, double ySpeed, double zSpeed) {
-            return new TrailNoteParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
+            return new CakeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }
 }

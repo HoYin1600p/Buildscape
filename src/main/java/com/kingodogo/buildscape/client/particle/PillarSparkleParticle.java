@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.particle;
+package com.kingodogo.buildscape.client.particle;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import net.minecraft.client.multiplayer.ClientLevel;

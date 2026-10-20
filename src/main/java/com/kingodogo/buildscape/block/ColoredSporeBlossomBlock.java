@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.particle.TintedDripParticle;
+import com.kingodogo.buildscape.client.particle.TintedDripParticle;
 import com.kingodogo.buildscape.registry.ModParticles;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;

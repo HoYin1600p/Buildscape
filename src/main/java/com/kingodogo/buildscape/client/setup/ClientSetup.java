@@ -710,190 +710,32 @@ public class ClientSetup {
     }
 
     @SubscribeEvent
-    public static void onModelBake(
-            ModelBakeEvent event) {
-        Set<ResourceLocation> leafHedgeModels = new HashSet<>();
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/oak_leaf_hedge_post"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/oak_leaf_hedge_side"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/oak_leaf_hedge_side_tall"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/oak_leaf_hedge_inventory"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/spruce_leaf_hedge_post"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/spruce_leaf_hedge_side"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/spruce_leaf_hedge_side_tall"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/spruce_leaf_hedge_inventory"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/birch_leaf_hedge_post"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/birch_leaf_hedge_side"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/birch_leaf_hedge_side_tall"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/birch_leaf_hedge_inventory"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/jungle_leaf_hedge_post"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/jungle_leaf_hedge_side"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/jungle_leaf_hedge_side_tall"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/jungle_leaf_hedge_inventory"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/acacia_leaf_hedge_post"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/acacia_leaf_hedge_side"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/acacia_leaf_hedge_side_tall"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/acacia_leaf_hedge_inventory"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/dark_oak_leaf_hedge_post"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/dark_oak_leaf_hedge_side"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/dark_oak_leaf_hedge_side_tall"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/dark_oak_leaf_hedge_inventory"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/azalea_leaf_hedge_post"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/azalea_leaf_hedge_side"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/azalea_leaf_hedge_side_tall"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/azalea_leaf_hedge_inventory"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/flowering_azalea_leaf_hedge_post"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/flowering_azalea_leaf_hedge_side"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/flowering_azalea_leaf_hedge_side_tall"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "block/flowering_azalea_leaf_hedge_inventory"));
-
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "item/oak_leaf_hedge"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "item/spruce_leaf_hedge"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "item/birch_leaf_hedge"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "item/jungle_leaf_hedge"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "item/acacia_leaf_hedge"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "item/dark_oak_leaf_hedge"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "item/azalea_leaf_hedge"));
-        leafHedgeModels.add(
-                new ResourceLocation(
-                        BuildScape.MODID,
-                        "item/flowering_azalea_leaf_hedge"));
-
-        int wrappedCount = 0;
-        int notFoundCount = 0;
-        for (ResourceLocation modelLocation : leafHedgeModels) {
-            BakedModel originalModel = event
-                    .getModelRegistry()
-                    .get(modelLocation);
+    public static void onModelBake(ModelBakeEvent event) {
+        for (ResourceLocation modelLocation : leafHedgeModelLocations()) {
+            BakedModel originalModel = event.getModelRegistry().get(modelLocation);
             if (originalModel != null) {
-                event
-                        .getModelRegistry()
-                        .put(
-                                modelLocation,
-                                new TintedLeafHedgeModel(
-                                        originalModel));
-                wrappedCount++;
-            } else {
-                notFoundCount++;
+                event.getModelRegistry().put(modelLocation, new TintedLeafHedgeModel(originalModel));
             }
         }
+    }
 
+    private static final List<String> LEAF_HEDGE_WOODS = List.of(
+            "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "azalea", "flowering_azalea");
+
+    private static final List<String> LEAF_HEDGE_BLOCK_PARTS = List.of("post", "side", "side_tall", "inventory");
+
+    /** Every hedge block part model and hedge item model that gets the tint wrapper. */
+    private static Set<ResourceLocation> leafHedgeModelLocations() {
+        Set<ResourceLocation> leafHedgeModels = new HashSet<>();
+        for (String wood : LEAF_HEDGE_WOODS) {
+            for (String part : LEAF_HEDGE_BLOCK_PARTS) {
+                leafHedgeModels.add(new ResourceLocation(BuildScape.MODID, "block/" + wood + "_leaf_hedge_" + part));
+            }
+        }
+        for (String wood : LEAF_HEDGE_WOODS) {
+            leafHedgeModels.add(new ResourceLocation(BuildScape.MODID, "item/" + wood + "_leaf_hedge"));
+        }
+        return leafHedgeModels;
     }
 
 }

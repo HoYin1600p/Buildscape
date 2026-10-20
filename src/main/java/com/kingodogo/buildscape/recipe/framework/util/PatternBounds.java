@@ -2,6 +2,9 @@ package com.kingodogo.buildscape.recipe.framework.util;
 
 import java.util.function.IntPredicate;
 
+/**
+ * Bounding box of the filled cells of a shaped pattern grid, used to trim empty rows and columns.
+ */
 public record PatternBounds(int minRow, int minCol, int width, int height) {
 
     public static PatternBounds of(int width, int height, IntPredicate filledAt) {

@@ -41,6 +41,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Turns a parsed {@link RecipeIR.CategoryPack} into vanilla {@code Recipe} objects: registers its aliases and templates,
+ * expands families into specs and builds each recipe, including conditional recipes whose Forge conditions are met.
+ * A recipe that fails validation or construction is skipped and logged, not fatal for the pack.
+ */
 public class BuildScapeRecipeCompiler {
 
     private final AliasResolver aliasResolver = new AliasResolver();
@@ -60,6 +65,10 @@ public class BuildScapeRecipeCompiler {
         return compileCategory(pack, true);
     }
 
+    /**
+     * Compiles one category. With {@code validateCycles} the stonecutting recipes are also checked for conversion loops that
+     * would create items.
+     */
     public CompileResult compileCategory(RecipeIR.CategoryPack pack, boolean validateCycles) {
         List<Recipe<?>> compiledRecipes = new ArrayList<>();
 

@@ -15,8 +15,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Streaming reader for the recipe pack JSON format. It reads aliases, templates, families and the compact recipe arrays
+ * token by token into {@link RecipeIR} records, so large category files are not built as a full JSON tree.
+ */
 public class StreamingRecipeParser {
 
+    /**
+     * Parses one category file from the reader. Throws {@link IOException} on malformed JSON.
+     */
     public static RecipeIR.CategoryPack parseCategory(String categoryName, Reader reader) throws IOException {
         try (JsonReader jsonReader = new JsonReader(reader)) {
             jsonReader.setLenient(true);

@@ -8,6 +8,10 @@ import net.minecraft.world.level.ItemLike;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Thread-safe cache of ingredients by item or tag, so thousands of recipes share ingredient objects.
+ * Cleared at the start of each recipe reload.
+ */
 public class IngredientCache {
 
     private static final Map<Item, Ingredient> ITEM_INGREDIENT_CACHE = new ConcurrentHashMap<>();

@@ -23,6 +23,10 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 // Formats BDRE recipe JSON files into compact format single-line recipe entries.
+/**
+ * Development tool that rewrites recipe pack JSON into the compact one-line-per-recipe layout and checks files for
+ * duplicate JSON members. It runs from Gradle tasks, not at game runtime.
+ */
 public class RecipePackFormatter {
 
     private static final Gson PRETTY_GSON = Json.PRETTY_NO_HTML_ESCAPING;
@@ -90,6 +94,9 @@ public class RecipePackFormatter {
     }
 
     // Validate before Gson constructs objects and overwrites duplicate members.
+    /**
+     * Throws if the text has a duplicate object member, which the JSON parser would otherwise silently overwrite.
+     */
     public static void validateJson(String content) {
         try (JsonReader reader = new JsonReader(new StringReader(content))) {
             reader.setLenient(false);

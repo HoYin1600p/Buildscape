@@ -4,6 +4,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+/**
+ * Build-time check: regenerates the cache from the recipe sources and fails unless the bundled {@code recipes.bscb} is
+ * byte-for-byte identical.
+ */
 public final class BundledRecipeCacheVerify {
     public static void main(String[] args) throws Exception {
         if (args.length != 2) {

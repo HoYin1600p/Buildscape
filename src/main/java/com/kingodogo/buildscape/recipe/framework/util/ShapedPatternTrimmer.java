@@ -3,6 +3,9 @@ package com.kingodogo.buildscape.recipe.framework.util;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.crafting.Ingredient;
 
+/**
+ * Removes empty outer rows and columns from a shaped recipe grid and returns the smaller width, height and ingredient list.
+ */
 public final class ShapedPatternTrimmer {
 
     public record Trimmed(int width, int height, NonNullList<Ingredient> ingredients) {

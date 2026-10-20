@@ -11,6 +11,10 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
+/**
+ * Crafting recipe: one confetti item plus one or more gunpowder raises its burst level by the gunpowder count, up to 5.
+ * The result is a copy of the confetti item with the new level in its NBT.
+ */
 public class ConfettiConfigureRecipe extends CustomRecipe {
     public ConfettiConfigureRecipe(ResourceLocation id) {
         super(id);

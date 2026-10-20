@@ -4,6 +4,10 @@ import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 
 import java.util.Locale;
 
+/**
+ * Checks that every non-space symbol in a shaped recipe's pattern has a key; throws {@link IllegalArgumentException}
+ * otherwise. Other recipe types pass unchecked.
+ */
 public final class ShapedRecipeSymbols {
     private ShapedRecipeSymbols() {}
 

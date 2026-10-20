@@ -3,6 +3,10 @@ package com.kingodogo.buildscape.recipe.framework.parser;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Plain data records for a parsed recipe pack: category pack, templates, families, recipe specs and result specs.
+ * They carry the file's values unchanged and are validated later by the compiler.
+ */
 public class RecipeIR {
 
     public record CategoryPack(

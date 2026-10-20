@@ -16,10 +16,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * Adds the pack's recipes to a {@code RecipeManager} after vanilla has loaded its own. Existing ids win over the pack
+ * (so a datapack can override a recipe), disabled ids are skipped, and insertion order is kept so recipe lookups give
+ * the same result every launch.
+ */
 public final class RecipeManagerInjector {
 
     private RecipeManagerInjector() {}
 
+    /**
+     * Merges the recipes into the manager's recipe tables through a mixin accessor. A failure is logged, not thrown.
+     */
     public static void inject(RecipeManager recipeManager, List<Recipe<?>> newRecipes) {
         inject(recipeManager, newRecipes, Set.of());
     }

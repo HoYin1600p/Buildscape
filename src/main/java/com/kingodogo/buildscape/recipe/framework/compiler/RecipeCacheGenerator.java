@@ -30,6 +30,11 @@ import java.util.Map;
 import java.util.Set;
 
 // Compiles BDRE recipe pack JSON sources into binary cache (recipes.bscb) with SHA-256 integrity validation.
+/**
+ * Build-time tool that compiles the recipe pack JSON into the bundled {@code recipes.bscb} and can sync a local copy.
+ * Its main method skips work when the existing cache already matches the source hash and checks the written file.
+ * {@code GENERATOR_VERSION} must be bumped whenever compile logic changes, since the cache would otherwise look current.
+ */
 public class RecipeCacheGenerator {
 
     public static final int MAGIC_HEADER = 0x4B59524F;
@@ -90,6 +95,10 @@ public class RecipeCacheGenerator {
         }
     }
 
+    /**
+     * Compiles every category found in the source directory and returns the cache file bytes.
+     * BundledRecipeCacheVerify compares these bytes with the bundled file.
+     */
     public static byte[] generateCache(Path sourceDirectory) throws IOException {
         Map<String, byte[]> rawCategoryData = new LinkedHashMap<>();
         StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();

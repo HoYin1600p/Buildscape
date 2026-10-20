@@ -15,6 +15,10 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
+/**
+ * Crafting recipe: a single filtered shulker box (or supported container) alone in the grid comes back as one copy with
+ * its ghost filters removed.
+ */
 public class ClearShulkerFiltersRecipe extends CustomRecipe {
     private static final String BLOCK_ENTITY_TAG = NbtKeys.BLOCK_ENTITY_TAG;
     private static final String FILTERS_TAG = NbtKeys.GHOST_FILTERS;

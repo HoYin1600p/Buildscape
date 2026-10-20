@@ -42,6 +42,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
+/**
+ * Reload listener that supplies most of the mod's crafting, stonecutting and similar recipes from the compact pack
+ * files {@code data/buildscape/recipes_pack/<category>.json}, instead of thousands of single JSON files.
+ * On each reload it tries, in order, the bundled binary cache {@code recipes_pack/recipes.bscb}, then the local cache
+ * in {@code <game dir>/buildscape/cache}, and compiles the JSON sources (in parallel by category) only if both miss.
+ * Categories with conditional recipes are always compiled at load time, because conditions depend on the loaded mods. Recipes listed in
+ * {@code buildscape/disabled_recipes.json} files are skipped, and the result is injected into the reload's
+ * {@code RecipeManager}.
+ */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
@@ -78,6 +87,10 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         event.addListener(forReload(event.getServerResources().getRecipeManager()));
     }
 
+    /**
+     * Reads and compiles recipes on the background executor, then applies them on the game thread once the reload barrier
+     * allows it.
+     */
     @Override
     public CompletableFuture<Void> reload(
             PreparationBarrier barrier,

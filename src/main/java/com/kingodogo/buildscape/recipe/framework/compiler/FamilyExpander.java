@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Expands a family entry (one base item and a list of targets, optionally reversible) into individual recipe specs by
+ * filling the family's templates.
+ */
 public class FamilyExpander {
 
     private final TemplateEngine templateEngine;

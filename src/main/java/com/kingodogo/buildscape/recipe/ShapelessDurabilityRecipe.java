@@ -20,6 +20,10 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import java.util.Random;
 
+/**
+ * Shapeless counterpart of {@link ShapedDurabilityRecipe}, with the same durability handling. Registered as
+ * {@code shapeless_durability}.
+ */
 public class ShapelessDurabilityRecipe extends ShapelessRecipe {
 
     private final int damageAmount;

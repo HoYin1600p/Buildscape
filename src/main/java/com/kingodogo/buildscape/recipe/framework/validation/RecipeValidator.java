@@ -10,10 +10,17 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Checks a recipe spec before it is compiled: the result item exists in the registry and the ingredients for the recipe
+ * type are present and resolvable. {@link #checkDuplicate} also rejects an id seen before.
+ */
 public class RecipeValidator {
 
     private final Set<ResourceLocation> registeredIds = new HashSet<>();
 
+    /**
+     * Returns false and logs at debug level for a spec that cannot be built; true if it can.
+     */
     public boolean validate(RecipeIR.RecipeSpec spec, AliasResolver aliasResolver) {
         if (spec == null) {
             return false;

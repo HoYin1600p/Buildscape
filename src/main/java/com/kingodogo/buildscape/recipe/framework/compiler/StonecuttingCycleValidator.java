@@ -14,6 +14,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Detects stonecutting loops that would multiply items: a graph of input to output edges weighted by output count,
+ * searched for a cycle whose conversion gains items. Tag inputs are not followed, so cycles through tags are not found.
+ */
 public final class StonecuttingCycleValidator {
     private final Map<String, List<Edge>> outgoing = new LinkedHashMap<>();
     private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
@@ -155,6 +159,9 @@ public final class StonecuttingCycleValidator {
         outgoing.computeIfAbsent(resolved, key -> new ArrayList<>()).add(new Edge(resolved, output, count, id));
     }
 
+    /**
+     * Throws {@link IllegalArgumentException} naming the recipes in the first gain cycle found.
+     */
     public void validate() {
         for (List<Edge> edges : outgoing.values()) {
             for (Edge gain : edges) {

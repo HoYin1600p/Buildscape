@@ -45,6 +45,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+/**
+ * Reads and writes the binary recipe cache ({@code recipes.bscb}). The file holds a magic number, a format version, the
+ * SHA-256 of the recipe sources and a string pool followed by the recipes. A cache is used only when the magic number,
+ * version and source hash all match; any problem returns an empty list so the caller recompiles from the sources.
+ */
 public class BinaryRecipeCache {
 
     private static final int MAGIC_HEADER = 0x4B59524F;
@@ -87,6 +92,9 @@ public class BinaryRecipeCache {
         return new ResourceLocation("minecraft", "air");
     }
 
+    /**
+     * The local cache folder {@code <game dir>/buildscape/cache}, created if missing.
+     */
     public static Path getCacheDir() {
         Path dir = FMLPaths.GAMEDIR.get().resolve("buildscape").resolve("cache");
         try {
@@ -97,6 +105,9 @@ public class BinaryRecipeCache {
         return dir;
     }
 
+    /**
+     * SHA-256 of the category sources, in category order, used as the cache key.
+     */
     public static String computeSourceHash(String[] categoryOrder, Map<String, byte[]> categoryData) {
         return RecipeCacheGenerator
                 .computeSourceHash(categoryOrder, categoryData);
@@ -175,6 +186,9 @@ public class BinaryRecipeCache {
         AtomicFiles.write(targetFile, fullCacheData);
     }
 
+    /**
+     * Writes the local cache file atomically. An I/O failure is logged, not thrown.
+     */
     public static void saveCache(String hash, List<Recipe<?>> recipes) {
         try {
             byte[] fullCacheData = serializeCache(hash, recipes);
@@ -185,6 +199,10 @@ public class BinaryRecipeCache {
         }
     }
 
+    /**
+     * Loads {@code recipes.bscb} from the local cache folder. Returns an empty list if it is missing, unreadable or has
+     * another hash.
+     */
     public static List<Recipe<?>> loadCache(String expectedHash) {
         Path cacheFile = getCacheDir().resolve("recipes.bscb");
         if (!Files.exists(cacheFile)) {

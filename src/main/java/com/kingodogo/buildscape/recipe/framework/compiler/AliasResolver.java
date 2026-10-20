@@ -3,6 +3,10 @@ package com.kingodogo.buildscape.recipe.framework.compiler;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Expands the short names used in recipe packs. An exact alias is replaced first, then an alias ending in {@code :}
+ * replaces a prefix, and a name without a namespace gets {@code buildscape:}. A leading {@code #} (tag) is kept.
+ */
 public class AliasResolver {
 
     private final Map<String, String> aliases = new HashMap<>();

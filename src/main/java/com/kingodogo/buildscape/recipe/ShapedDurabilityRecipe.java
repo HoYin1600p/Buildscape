@@ -23,6 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Shaped recipe that damages its tools instead of consuming them. Each damageable non-armor ingredient is returned
+ * with the recipe's damage added (Unbreaking can skip the damage) and disappears when it would break; other
+ * ingredients keep their normal container item. The serializer is registered as {@code shaped_durability}.
+ */
 public class ShapedDurabilityRecipe extends ShapedRecipe {
 
     public static final Serializer SERIALIZER = new Serializer();

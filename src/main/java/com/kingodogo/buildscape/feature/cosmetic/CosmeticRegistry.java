@@ -153,55 +153,59 @@ public class CosmeticRegistry {
             } else if (info.type.equals("pets") || cosmeticId.contains("/pets/")) {
                 return null;
             } else if (info.type.equals("wings") || cosmeticId.contains("/wings/")) {
-                if (meta != null && meta.legacyId() != null && !meta.legacyId().isEmpty()) {
-                    Item legacyItem = resolveToItem(meta.legacyId());
-                    if (legacyItem != null) {
-                        result = new ItemStack(legacyItem);
-                    }
-                }
-                if (result == null) {
-                    Item item = resolveToItem(cosmeticId);
-                    if (item != null) {
-                        result = new ItemStack(item);
-                    } else {
-                        result = new ItemStack(Items.FEATHER);
-                    }
-                }
+                result = wingsStack(cosmeticId, meta);
             } else {
-                Item item = resolveToItem(cosmeticId);
-                if (item != null) {
-                    result = new ItemStack(item);
-                } else {
-                    Block block = resolveToBlock(cosmeticId);
-                    if (block != null) {
-                        result = new ItemStack(block.asItem());
-                    } else {
-                        if (info.type.equals("type")) {
-                            CosmeticType typeDef = typeDefinitions.get(info.id);
-                            if (typeDef != null) {
-                                result = typeDef.createItemStack();
-                            }
-                        } else {
-                            if (meta != null && meta.legacyId() != null && !meta.legacyId().isEmpty()) {
-                                Item legacyItem = resolveToItem(meta.legacyId());
-                                if (legacyItem == null) {
-                                    Block legacyBlock = resolveToBlock(meta.legacyId());
-                                    if (legacyBlock != null) {
-                                        result = new ItemStack(legacyBlock.asItem());
-                                    }
-                                } else {
-                                    result = new ItemStack(legacyItem);
-                                }
-                            }
-                        }
-                    }
-                }
+                result = defaultStack(info, cosmeticId, meta);
             }
         }
 
         itemStackCache.put(cosmeticId, result != null ? result.copy() : null);
 
         return result != null ? result.copy() : null;
+    }
+
+    /** Wings show their legacy item when it resolves, else the cosmetic's own item, else a feather. */
+    private ItemStack wingsStack(String cosmeticId, CosmeticManager.CosmeticMetadata meta) {
+        if (meta != null && meta.legacyId() != null && !meta.legacyId().isEmpty()) {
+            Item legacyItem = resolveToItem(meta.legacyId());
+            if (legacyItem != null) {
+                return new ItemStack(legacyItem);
+            }
+        }
+        Item item = resolveToItem(cosmeticId);
+        if (item != null) {
+            return new ItemStack(item);
+        }
+        return new ItemStack(Items.FEATHER);
+    }
+
+    /** Item, then block, then a registered type definition or the legacy id; null when nothing resolves. */
+    private ItemStack defaultStack(CosmeticInfo info, String cosmeticId, CosmeticManager.CosmeticMetadata meta) {
+        Item item = resolveToItem(cosmeticId);
+        if (item != null) {
+            return new ItemStack(item);
+        }
+        Block block = resolveToBlock(cosmeticId);
+        if (block != null) {
+            return new ItemStack(block.asItem());
+        }
+        if (info.type.equals("type")) {
+            CosmeticType typeDef = typeDefinitions.get(info.id);
+            return typeDef != null ? typeDef.createItemStack() : null;
+        }
+        return legacyStack(meta);
+    }
+
+    private ItemStack legacyStack(CosmeticManager.CosmeticMetadata meta) {
+        if (meta == null || meta.legacyId() == null || meta.legacyId().isEmpty()) {
+            return null;
+        }
+        Item legacyItem = resolveToItem(meta.legacyId());
+        if (legacyItem != null) {
+            return new ItemStack(legacyItem);
+        }
+        Block legacyBlock = resolveToBlock(meta.legacyId());
+        return legacyBlock != null ? new ItemStack(legacyBlock.asItem()) : null;
     }
 
     public boolean isValid(String cosmeticId) {

@@ -65,12 +65,13 @@ jobs:
             IS_RELEASE="false"
             IS_PRERELEASE="true"
             BUILD_TYPE="Development Build [ Dev ]"
-            # Approach B: Monotonically incrementing GitHub run number
+            # SemVer hyphenated dev counter: e.g. 4.1.0-dev.1, 4.1.0-dev.2
             RUN_NUM="${{ github.run_number }}"
-            EFFECTIVE_VER="${MOD_VER}${RUN_NUM}-Dev"
+            EFFECTIVE_VER="${MOD_VER}-dev.${RUN_NUM}"
             JAR_NAME="buildscape-${MC_VER}-${EFFECTIVE_VER}.jar"
-            TAG_NAME="v${MC_VER}-${EFFECTIVE_VER}"
-            RELEASE_TITLE="[ Dev ] Buildscape ${MC_VER}-${EFFECTIVE_VER}"
+            # Single grouped tag for the entire development cycle
+            TAG_NAME="v${MC_VER}-${MOD_VER}-Dev"
+            RELEASE_TITLE="[ Dev ] Buildscape ${MC_VER}-${MOD_VER} (Latest: ${EFFECTIVE_VER})"
             ARTIFACT_NAME="[ Dev ] buildscape-${MC_VER}-${EFFECTIVE_VER}"
           fi
 
@@ -117,30 +118,72 @@ jobs:
 
       - name: Generate Release Description
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.version_info.outputs.tag_name }}
+          IS_RELEASE: ${{ steps.version_info.outputs.is_release }}
+          EFFECTIVE_VER: ${{ steps.version_info.outputs.effective_version }}
+          JAR_NAME: ${{ steps.version_info.outputs.jar_name }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          COMMIT_SHA: ${{ github.sha }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
-          if [ "${{ steps.version_info.outputs.is_release }}" = "false" ]; then
-            cat << 'EOF' > release_body.md
-          ### 📦 Development Build Details
-          - **Source Branch**: `${{ github.ref_name }}`
-          - **Commit**: [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
-          - **Build Version**: `${{ steps.version_info.outputs.effective_version }}`
-          - **Jar File**: `${{ steps.version_info.outputs.jar_name }}`
-
-          EOF
-          else
-            # Release builds stay clean with official release notes
+          if [ "$IS_RELEASE" = "true" ]; then
             touch release_body.md
+          else
+            python3 - << 'EOF'
+          import os, subprocess, re
+
+          tag = os.environ.get('TAG_NAME', '')
+          version = os.environ.get('EFFECTIVE_VER', '')
+          jar = os.environ.get('JAR_NAME', '')
+          branch = os.environ.get('BRANCH_NAME', '')
+          commit = os.environ.get('COMMIT_SHA', '')
+          repo_url = os.environ.get('REPO_URL', '')
+          commit_short = commit[:7] if commit else ''
+          download_url = f"{repo_url}/releases/download/{tag}/{jar}"
+
+          new_entry = (
+              f"### Build: `{version}`\n"
+              f"- **Download**: [`{jar}`]({download_url})\n"
+              f"- **Branch**: `{branch}`\n"
+              f"- **Commit**: [`{commit_short}`]({repo_url}/commit/{commit})"
+          )
+
+          existing_history = ""
+          try:
+              output = subprocess.check_output(
+                  ["gh", "release", "view", tag, "--json", "body", "--jq", ".body"],
+                  stderr=subprocess.DEVNULL,
+                  text=True
+              ).strip()
+              if output and output != "null":
+                  parts = re.split(r'\n##\s+', output)
+                  existing_history = parts[0].strip()
+          except Exception:
+              pass
+
+          if existing_history:
+              combined = f"{new_entry}\n\n---\n\n{existing_history}\n"
+          else:
+              combined = f"{new_entry}\n"
+
+          with open("release_body.md", "w", encoding="utf-8") as f:
+              f.write(combined)
+          EOF
           fi
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version_info.outputs.tag_name }}
+          target_commitish: ${{ github.sha }}
           name: ${{ steps.version_info.outputs.release_title }}
           body_path: release_body.md
           files: build/libs/${{ steps.version_info.outputs.jar_name }}
           generate_release_notes: true
           draft: false
           prerelease: ${{ steps.version_info.outputs.is_prerelease == 'true' }}
+          make_latest: ${{ steps.version_info.outputs.is_release == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

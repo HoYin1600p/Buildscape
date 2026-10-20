@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class SculkVeinBlock extends GlowLichenBlock {
     public SculkVeinBlock(BlockBehaviour.Properties properties) {
@@ -25,8 +26,12 @@ public class SculkVeinBlock extends GlowLichenBlock {
     }
 
     public static boolean regrow(ServerLevel level, BlockPos pos) {
+        return regrow(level, pos, null);
+    }
+
+    public static boolean regrow(ServerLevel level, BlockPos pos, Set<Direction> facings) {
         boolean changed = false;
-        for (Direction face : Direction.values()) {
+        for (Direction face : facings == null ? Arrays.asList(Direction.values()) : facings) {
             changed |= placeFace(level, pos, face);
         }
         return changed;
@@ -34,15 +39,17 @@ public class SculkVeinBlock extends GlowLichenBlock {
 
     public static boolean spread(ServerLevel level, BlockPos pos, Random random) {
         BlockState state = level.getBlockState(pos);
-        if (!state.is(CopperBlocks.SCULK_VEIN.get())) {
+        boolean sculk = state.is(CopperBlocks.SCULK.get());
+        if (!sculk && !state.is(CopperBlocks.SCULK_VEIN.get())) {
             return false;
         }
         List<Direction> faces = Arrays.asList(Direction.values());
         List<Direction> directions = Arrays.asList(Direction.values());
         Collections.shuffle(faces, random);
         Collections.shuffle(directions, random);
+        boolean changed = false;
         for (Direction face : faces) {
-            if (!state.getValue(getFaceProperty(face))) {
+            if (!sculk && !state.getValue(getFaceProperty(face))) {
                 continue;
             }
             for (Direction direction : directions) {
@@ -50,19 +57,21 @@ public class SculkVeinBlock extends GlowLichenBlock {
                     continue;
                 }
                 if (placeFace(level, pos, direction)) {
-                    return true;
+                    changed = true;
+                    continue;
                 }
                 BlockPos adjacent = pos.relative(direction);
                 if (placeFace(level, adjacent, face)) {
-                    return true;
+                    changed = true;
+                    continue;
                 }
                 if (level.getBlockState(adjacent).getCollisionShape(level, adjacent).isEmpty()
                         && placeFace(level, adjacent.relative(face), direction.getOpposite())) {
-                    return true;
+                    changed = true;
                 }
             }
         }
-        return false;
+        return changed;
     }
 
     private static boolean placeFace(ServerLevel level, BlockPos pos, Direction face) {
@@ -77,6 +86,7 @@ public class SculkVeinBlock extends GlowLichenBlock {
         BlockState support = level.getBlockState(supportPos);
         if (support.is(CopperBlocks.SCULK.get()) || support.is(CopperBlocks.SCULK_CATALYST.get())
                 || support.is(CopperBlocks.SCULK_SENSOR.get()) || support.is(CopperBlocks.SCULK_SHRIEKER.get())
+                || support.is(Blocks.SCULK_SENSOR)
                 || support.is(Blocks.MOVING_PISTON)
                 || !support.isFaceSturdy(level, supportPos, face.getOpposite())) {
             return false;

@@ -10,28 +10,32 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.GlowLichenBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluids;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public final class SculkSpreader {
     public static final TagKey<Block> REPLACEABLE = TagKey.create(Registry.BLOCK_REGISTRY,
             new ResourceLocation("buildscape", "sculk_replaceable"));
-    private static final int GROWTH_COST = 10;
-    private static final int NO_GROWTH_RADIUS = 4;
-    private static final int CHARGE_DECAY_RATE = 10;
-    private static final int ADDITIONAL_DECAY_RATE = 5;
     private final List<ChargeCursor> cursors = new ArrayList<>();
 
     public void addCursors(BlockPos pos, int experience) {
@@ -46,6 +50,13 @@ public final class SculkSpreader {
         }
         boolean changed = false;
         for (ChargeCursor cursor : cursors) {
+            if (Math.max(Math.abs((long) cursor.pos.getX() - origin.getX()),
+                    Math.max(Math.abs((long) cursor.pos.getY() - origin.getY()),
+                            Math.abs((long) cursor.pos.getZ() - origin.getZ()))) > 1024) {
+                cursor.charge = 0;
+                changed = true;
+                continue;
+            }
             if (!isAreaLoaded(level, cursor.pos)) {
                 continue;
             }
@@ -53,19 +64,23 @@ public final class SculkSpreader {
             cursor.update(level, origin);
         }
         cursors.removeIf(cursor -> cursor.charge <= 0);
-        for (int i = 0; i < cursors.size(); i++) {
-            ChargeCursor first = cursors.get(i);
-            for (int j = cursors.size() - 1; j > i; j--) {
-                ChargeCursor second = cursors.get(j);
-                if (first.pos.equals(second.pos) && first.charge + second.charge <= SculkCharge.MAX_CHARGE) {
-                    first.charge += second.charge;
-                    first.updateDelay = Math.min(first.updateDelay, second.updateDelay);
-                    first.decayDelay = Math.min(first.decayDelay, second.decayDelay);
-                    cursors.remove(j);
-                    changed = true;
+        Map<BlockPos, ChargeCursor> mergeTargets = new HashMap<>();
+        List<ChargeCursor> remaining = new ArrayList<>();
+        for (ChargeCursor cursor : cursors) {
+            ChargeCursor target = mergeTargets.get(cursor.pos);
+            if (target != null && target.charge + cursor.charge <= SculkCharge.MAX_CHARGE) {
+                target.charge += cursor.charge;
+                target.updateDelay = Math.min(target.updateDelay, cursor.updateDelay);
+                changed = true;
+            } else {
+                remaining.add(cursor);
+                if (target == null || cursor.charge < target.charge) {
+                    mergeTargets.put(cursor.pos, cursor);
                 }
             }
         }
+        cursors.clear();
+        cursors.addAll(remaining);
         return changed;
     }
 
@@ -102,8 +117,11 @@ public final class SculkSpreader {
                     && level.getBlockState(target).is(REPLACEABLE)
                     && level.setBlock(target, CopperBlocks.SCULK.get().defaultBlockState(), 3)) {
                 level.playSound(null, target, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                SculkVeinBlock.spread(level, target, random);
                 for (Direction direction : Direction.values()) {
-                    SculkVeinBlock.regrow(level, target.relative(direction));
+                    if (direction != face.getOpposite()) {
+                        SculkVeinBlock.discharge(level, target.relative(direction));
+                    }
                 }
                 return true;
             }
@@ -112,7 +130,7 @@ public final class SculkSpreader {
     }
 
     private static boolean canPlaceGrowth(ServerLevel level, BlockPos pos) {
-        if (!level.isEmptyBlock(pos.above())) {
+        if (!isGrowthSpace(level.getBlockState(pos.above()))) {
             return false;
         }
         int nearby = 0;
@@ -121,12 +139,30 @@ public final class SculkSpreader {
                 return false;
             }
             BlockState state = level.getBlockState(check);
-            if ((state.is(CopperBlocks.SCULK_SENSOR.get()) || state.is(CopperBlocks.SCULK_SHRIEKER.get()))
-                    && ++nearby > 2) {
+            if (isGrowth(state) && !SculkGrowthRules.hasGrowthCapacity(++nearby)) {
                 return false;
             }
         }
         return true;
+    }
+
+    static boolean isGrowthSpace(BlockState state) {
+        return state.isAir() || state.is(Blocks.WATER) && state.getFluidState().is(Fluids.WATER)
+                && state.getFluidState().isSource();
+    }
+
+    static boolean isGrowth(BlockState state) {
+        return state.is(Blocks.SCULK_SENSOR) || state.is(CopperBlocks.SCULK_SENSOR.get())
+                || state.is(CopperBlocks.SCULK_SHRIEKER.get());
+    }
+
+    static BlockState growthState(int choice, boolean water) {
+        BlockState state = choice == 0
+                ? CopperBlocks.SCULK_SHRIEKER.get().defaultBlockState()
+                : Blocks.SCULK_SENSOR.defaultBlockState();
+        return water && state.hasProperty(BlockStateProperties.WATERLOGGED)
+                ? state.setValue(BlockStateProperties.WATERLOGGED, true)
+                : state;
     }
 
     private static BlockPos movementPos(ServerLevel level, BlockPos pos, Random random) {
@@ -149,16 +185,13 @@ public final class SculkSpreader {
                     if (distance == 2) {
                         boolean blocked = true;
                         if (x != 0) {
-                            blocked &= level.getBlockState(pos.offset(x, 0, 0)).isCollisionShapeFullBlock(level,
-                                    pos.offset(x, 0, 0));
+                            blocked &= isMovementBlocked(level, pos, x < 0 ? Direction.WEST : Direction.EAST);
                         }
                         if (y != 0) {
-                            blocked &= level.getBlockState(pos.offset(0, y, 0)).isCollisionShapeFullBlock(level,
-                                    pos.offset(0, y, 0));
+                            blocked &= isMovementBlocked(level, pos, y < 0 ? Direction.DOWN : Direction.UP);
                         }
                         if (z != 0) {
-                            blocked &= level.getBlockState(pos.offset(0, 0, z)).isCollisionShapeFullBlock(level,
-                                    pos.offset(0, 0, z));
+                            blocked &= isMovementBlocked(level, pos, z < 0 ? Direction.NORTH : Direction.SOUTH);
                         }
                         if (blocked) {
                             continue;
@@ -174,7 +207,12 @@ public final class SculkSpreader {
                 return candidate;
             }
         }
-        return candidates.isEmpty() ? null : candidates.get(0);
+        return candidates.isEmpty() ? null : candidates.get(candidates.size() - 1);
+    }
+
+    private static boolean isMovementBlocked(ServerLevel level, BlockPos pos, Direction direction) {
+        BlockPos adjacent = pos.relative(direction);
+        return level.getBlockState(adjacent).isFaceSturdy(level, adjacent, direction.getOpposite());
     }
 
     public void save(CompoundTag tag) {
@@ -185,6 +223,13 @@ public final class SculkSpreader {
             saved.putInt("charge", cursor.charge);
             saved.putInt("update_delay", cursor.updateDelay);
             saved.putInt("decay_delay", cursor.decayDelay);
+            if (cursor.facings != null) {
+                ListTag facings = new ListTag();
+                for (Direction face : cursor.facings) {
+                    facings.add(StringTag.valueOf(face.getName()));
+                }
+                saved.put("facings", facings);
+            }
             list.add(saved);
         }
         tag.put("cursors", list);
@@ -200,8 +245,20 @@ public final class SculkSpreader {
                 continue;
             }
             ChargeCursor cursor = new ChargeCursor(NbtUtils.readBlockPos(saved.getCompound(NbtKeys.POS)), charge);
-            cursor.updateDelay = Math.max(0, Math.min(saved.getInt("update_delay"), 1));
-            cursor.decayDelay = Math.max(0, Math.min(saved.getInt("decay_delay"), 1));
+            cursor.updateDelay = Math.max(0, saved.getInt("update_delay"));
+            cursor.decayDelay = saved.contains("decay_delay", Tag.TAG_ANY_NUMERIC)
+                    ? Math.max(0, Math.min(saved.getInt("decay_delay"), 1))
+                    : 1;
+            if (saved.contains("facings", Tag.TAG_LIST)) {
+                cursor.facings = EnumSet.noneOf(Direction.class);
+                ListTag facings = saved.getList("facings", Tag.TAG_STRING);
+                for (int j = 0; j < facings.size(); j++) {
+                    Direction face = Direction.byName(facings.getString(j));
+                    if (face != null) {
+                        cursor.facings.add(face);
+                    }
+                }
+            }
             cursors.add(cursor);
         }
     }
@@ -211,6 +268,7 @@ public final class SculkSpreader {
         private int charge;
         private int updateDelay;
         private int decayDelay = 1;
+        private Set<Direction> facings;
 
         private ChargeCursor(BlockPos pos, int charge) {
             this.pos = pos.immutable();
@@ -224,52 +282,59 @@ public final class SculkSpreader {
             }
             Random random = level.random;
             BlockState state = level.getBlockState(pos);
+            boolean spreadFromBlock = state.is(CopperBlocks.SCULK.get()) || state.is(CopperBlocks.SCULK_VEIN.get());
             boolean spreadVeins = false;
-            if (!state.is(CopperBlocks.SCULK.get()) && !state.is(CopperBlocks.SCULK_VEIN.get())) {
-                spreadVeins = SculkVeinBlock.regrow(level, pos);
+            if (!spreadFromBlock) {
+                spreadVeins = SculkVeinBlock.regrow(level, pos, facings);
                 state = level.getBlockState(pos);
             }
-            if (state.is(CopperBlocks.SCULK_VEIN.get())) {
+            boolean sculk = state.is(CopperBlocks.SCULK.get());
+            boolean vein = state.is(CopperBlocks.SCULK_VEIN.get());
+            if (spreadFromBlock) {
                 spreadVeins |= SculkVeinBlock.spread(level, pos, random);
-                if (spreadVeins) {
-                    level.playSound(null, pos, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
-                }
+            }
+            if (vein) {
                 if (convertSubstrate(level, pos, random)) {
                     charge--;
-                } else if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
+                } else if (random.nextInt(SculkGrowthRules.CHARGE_DECAY_RATE) == 0) {
                     charge /= 2;
                 }
-            } else if (state.is(CopperBlocks.SCULK.get())) {
-                if (random.nextInt(CHARGE_DECAY_RATE) == 0) {
-                    if (pos.distSqr(origin) > NO_GROWTH_RADIUS * NO_GROWTH_RADIUS && canPlaceGrowth(level, pos)) {
-                        if (random.nextInt(GROWTH_COST) < charge) {
-                            Block growth = random.nextInt(11) == 0
-                                    ? CopperBlocks.SCULK_SHRIEKER.get()
-                                    : CopperBlocks.SCULK_SENSOR.get();
-                            if (level.setBlock(pos.above(), growth.defaultBlockState(), 3)) {
-                                level.playSound(null, pos, ModSounds.SCULK_CHARGE.get(), SoundSource.BLOCKS, 1.0F,
-                                        1.0F);
-                            }
-                        }
-                        charge = Math.max(0, charge - GROWTH_COST);
-                    } else if (random.nextInt(ADDITIONAL_DECAY_RATE) == 0) {
-                        charge /= 2;
-                    }
+            } else if (sculk) {
+                double distanceSquared = pos.distSqr(origin);
+                SculkGrowthRules.ChargeUse use = SculkGrowthRules.useCharge(charge, distanceSquared,
+                        () -> canPlaceGrowth(level, pos), random);
+                if (use.grow()) {
+                    BlockState growth = growthState(random.nextInt(11), !level.getFluidState(pos.above()).isEmpty());
+                    level.setBlock(pos.above(), growth, 3);
+                    level.playSound(null, pos, growth.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
+                charge = use.remainingCharge();
+            } else {
+                charge = SculkGrowthRules.chargeOnDefaultCell(charge, decayDelay);
             }
-            // Any other cell (for example the air a mob died in, above sculk that refuses a vein) keeps its
-            // charge: it moves onto adjacent sculk below, or halves with the normal decay delay, as in vanilla 1.19.
+            if (spreadVeins) {
+                level.playSound(null, pos, ModSounds.SCULK_SPREAD.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+            }
             BlockPos next = charge > 0 ? movementPos(level, pos, random) : null;
             if (charge <= 0 || next != null) {
                 SculkVeinBlock.discharge(level, pos);
                 if (next != null) {
                     pos = next;
                 }
-            } else if (decayDelay > 0) {
-                decayDelay--;
-            } else {
-                charge /= 2;
-                decayDelay = 1;
+            }
+            if (charge > 0) {
+                BlockState current = level.getBlockState(pos);
+                if (current.is(CopperBlocks.SCULK.get()) || current.is(CopperBlocks.SCULK_VEIN.get())) {
+                    facings = EnumSet.noneOf(Direction.class);
+                    if (current.is(CopperBlocks.SCULK_VEIN.get())) {
+                        for (Direction face : Direction.values()) {
+                            if (current.getValue(GlowLichenBlock.getFaceProperty(face))) {
+                                facings.add(face);
+                            }
+                        }
+                    }
+                }
+                decayDelay = SculkGrowthRules.nextDecayDelay(sculk || vein, decayDelay);
             }
             if (charge > 0 && random.nextInt(5) == 0) {
                 level.sendParticles(ParticleTypes.SOUL, pos.getX() + 0.5, pos.getY() + 0.5,

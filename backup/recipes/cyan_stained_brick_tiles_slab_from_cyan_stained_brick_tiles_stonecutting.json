@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:cyan_stained_brick_tiles"
-  },
-  "result": "buildscape:cyan_stained_brick_tiles_slab",
-  "count": 2
-}

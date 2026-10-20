@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:lime_factory_mesh"
-  },
-  "result": "buildscape:orange_factory_mesh",
-  "count": 1
-}

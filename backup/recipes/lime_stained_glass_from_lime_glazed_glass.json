@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:lime_glazed_glass"
-  },
-  "result": "minecraft:lime_stained_glass",
-  "count": 1
-}

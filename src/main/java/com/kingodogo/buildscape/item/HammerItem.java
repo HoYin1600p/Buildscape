@@ -102,8 +102,12 @@ public class HammerItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        if (player == null) {
+            return InteractionResult.PASS;
+        }
         if (context.getHand() == InteractionHand.MAIN_HAND) {
-            ItemStack offHand = context.getPlayer().getOffhandItem();
+            ItemStack offHand = player.getOffhandItem();
             if (!offHand.isEmpty() && offHand.getItem() instanceof BlockItem) {
                 return InteractionResult.sidedSuccess(context.getLevel().isClientSide());
             }

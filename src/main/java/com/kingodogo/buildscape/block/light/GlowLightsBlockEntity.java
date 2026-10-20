@@ -87,7 +87,7 @@ public class GlowLightsBlockEntity extends SyncedBlockEntity {
                     Tag.TAG_STRING);
             for (int i = 0; i < colorsList.size(); i++) {
                 String color = colorsList.getString(i);
-                if (color != null && !color.isEmpty()) {
+                if (color != null && !color.isEmpty() && dyeColors.size() < MAX_DYE_COLORS) {
                     dyeColors.add(color);
                 }
             }

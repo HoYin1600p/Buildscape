@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.mixin;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.performance.BuildscapeStartupWork;
 import com.kingodogo.buildscape.client.performance.LaunchFasterInterop;
+import com.kingodogo.buildscape.client.performance.VhaModelBakeryIntegration;
 import com.kingodogo.buildscape.config.BuildscapeClientConfig;
 import com.kingodogo.buildscape.resources.bundle.adapter.BlockStateAdapter;
 import com.kingodogo.buildscape.resources.bundle.adapter.ModelAdapter;
@@ -168,6 +169,11 @@ public abstract class BuildscapeModelBakeryMixin {
     private void buildscape$loadBlockModel(
             ResourceLocation location,
             CallbackInfoReturnable<BlockModel> callback) {
+        BlockModel integrated = VhaModelBakeryIntegration.model(this, location);
+        if (integrated != null) {
+            callback.setReturnValue(integrated);
+            return;
+        }
         ResourcePackPrecedenceTracker.ensureInitialized(this.resourceManager);
         BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
         String id = location.toString();
@@ -218,6 +224,10 @@ public abstract class BuildscapeModelBakeryMixin {
     @Redirect(method = "loadModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/ResourceManager;getResources(Lnet/minecraft/resources/ResourceLocation;)Ljava/util/List;"))
     private List<Resource> buildscape$suppressBlockStateNotFound(ResourceManager manager, ResourceLocation fileLoc)
             throws IOException {
+        List<Resource> integrated = VhaModelBakeryIntegration.resources(this, manager, fileLoc);
+        if (integrated != null) {
+            return integrated;
+        }
         String path = fileLoc.getPath();
         if (path.startsWith("blockstates/") && path.endsWith(".json")) {
             String stateId = fileLoc.getNamespace() + ":"
@@ -255,6 +265,9 @@ public abstract class BuildscapeModelBakeryMixin {
                                 (Collector<Pair<String, BlockModelDefinition>, ?, List<Pair<String, BlockModelDefinition>>>) collector));
 
         ResourceLocation location = BUILDSCAPE$CURRENT_LOADING_LOCATION.get();
+        if (location != null && VhaModelBakeryIntegration.hasBlockState(this, location)) {
+            return list;
+        }
         if (location != null) {
             String namespace = location.getNamespace();
             String path = location.getPath();

@@ -64,7 +64,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
-@Mixin(ModelBakery.class)
+// Above VHA's priority (500) so this getResources redirect replaces VHA's and forwards to it through its model API.
+@Mixin(value = ModelBakery.class, priority = 1100)
 public abstract class BuildscapeModelBakeryMixin {
     @Unique
     private static final Pattern BUILDSCAPE_CUSTOM_LOADER = Pattern.compile("\"loader\"\\s*:");

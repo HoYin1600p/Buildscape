@@ -28,6 +28,7 @@ public final class VhaModelBakeryIntegration {
     private static volatile Method resourceLookup;
     private static volatile Method modelLookup;
     private static volatile Method blockStateLookup;
+    private static volatile PackCache packCache;
 
     private VhaModelBakeryIntegration() {}
 
@@ -59,19 +60,20 @@ public final class VhaModelBakeryIntegration {
                         }
                         ResourceManager manager = (ResourceManager) arguments[0];
                         if (method.getName().equals("beforePreparation")) {
+                            packCache = null;
                             BundledResourceRegistry.getInstance().ensureInitialized();
                             ResourcePackPrecedenceTracker.ensureInitialized(manager);
-                            return null;
-                        }
-                        String pack = bundlePack(manager);
-                        if (pack == null) {
                             return null;
                         }
                         BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
                         if (method.getName().equals("model")) {
                             ResourceLocation id = (ResourceLocation) arguments[1];
-                            var ir = registry.getModels().get(id.toString());
+                            var ir = registry.getModel(id.toString());
                             if (ir == null) {
+                                return null;
+                            }
+                            String pack = bundlePack(manager);
+                            if (pack == null) {
                                 return null;
                             }
                             long started = System.nanoTime();
@@ -83,6 +85,10 @@ public final class VhaModelBakeryIntegration {
                             ResourceLocation id = (ResourceLocation) arguments[1];
                             var ir = registry.getBlockStates().get(id.toString());
                             if (ir == null) {
+                                return null;
+                            }
+                            String pack = bundlePack(manager);
+                            if (pack == null) {
                                 return null;
                             }
                             @SuppressWarnings("unchecked")
@@ -112,9 +118,19 @@ public final class VhaModelBakeryIntegration {
     }
 
     private static String bundlePack(ResourceManager resources) {
+        // The pack list is fixed for one reload; scanning it on every model callback serialises behind VHA's lock.
+        PackCache cached = packCache;
+        if (cached != null && cached.manager() == resources) {
+            return cached.pack();
+        }
         List<PackResources> packs = resources.listPacks().toList();
         int index = ResourcePackPrecedenceTracker.findClientBundlePackIndex(packs);
-        return index < 0 ? null : packs.get(index).getName();
+        String pack = index < 0 ? null : packs.get(index).getName();
+        packCache = new PackCache(resources, pack);
+        return pack;
+    }
+
+    private record PackCache(ResourceManager manager, String pack) {
     }
 
     public static BlockModel model(Object bakery, ResourceLocation location) {

@@ -44,7 +44,8 @@
     "LightningBoltMixin",
     "accessor.PoiTypeAccessor",
     "accessor.RecipeManagerAccessor",
-    "ServerRecipeBookMixin"
+    "ServerRecipeBookMixin",
+    "TagLoaderMixin"
   ],
   "client": [
     "accessor.PillarEntityRenderDispatcherInvoker",
@@ -60,6 +61,7 @@
     "BuildscapeBlockStateCacheMixin",
     "BuildscapeForgeRegistryMixin",
     "BuildscapeModelBakeryMixin",
+    "ModelManagerMixin",
     "ElytraLayerMixin",
     "GeneralStatisticsListMixin",
     "GeneralStatisticsListEntryMixin",

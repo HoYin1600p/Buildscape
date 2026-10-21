@@ -26,14 +26,20 @@ public abstract class PathResourcePackMixin {
     protected abstract Path resolve(String... paths);
 
     @Unique
-    private BundledJsonPack buildscape$jsonPack;
+    private volatile BundledJsonPack buildscape$jsonPack;
 
     @Unique
-    private synchronized BundledJsonPack buildscape$jsonPack() {
-        if (buildscape$jsonPack == null) {
-            buildscape$jsonPack = new BundledJsonPack(path -> resolve(path));
+    private BundledJsonPack buildscape$jsonPack() {
+        BundledJsonPack pack = buildscape$jsonPack;
+        if (pack != null) {
+            return pack;
         }
-        return buildscape$jsonPack;
+        synchronized (this) {
+            if (buildscape$jsonPack == null) {
+                buildscape$jsonPack = new BundledJsonPack(path -> resolve(path));
+            }
+            return buildscape$jsonPack;
+        }
     }
 
     @Inject(method = {"getResource(Ljava/lang/String;)Ljava/io/InputStream;",

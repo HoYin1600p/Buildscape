@@ -18,8 +18,8 @@ import java.util.function.Function;
 
 public final class BundledJsonPack {
     private final Function<String, Path> resolve;
-    private BundledJsonResources resources;
-    private boolean loaded;
+    private volatile BundledJsonResources resources;
+    private volatile boolean loaded;
 
     public BundledJsonPack(Path source) {
         this(source::resolve);
@@ -29,7 +29,15 @@ public final class BundledJsonPack {
         this.resolve = resolve;
     }
 
-    private synchronized BundledJsonResources resources() {
+    private BundledJsonResources resources() {
+        // Resource reload workers ask every pack at once; after the first load no lock is needed.
+        if (loaded) {
+            return resources;
+        }
+        return loadResources();
+    }
+
+    private synchronized BundledJsonResources loadResources() {
         if (!loaded) {
             Path bundle = resolve.apply(BundledJsonResources.FILE);
             if (Files.isRegularFile(bundle)) {
@@ -45,11 +53,12 @@ public final class BundledJsonPack {
     }
 
     public boolean contains(String path) {
-        if (!path.startsWith("assets/") || Files.exists(resolve.apply(path))) {
+        if (!path.startsWith("assets/")) {
             return false;
         }
+        // Every mod's pack is asked; most have no bundle, so check that before touching the file system.
         BundledJsonResources bundle = resources();
-        return bundle != null && bundle.contains(path);
+        return bundle != null && bundle.contains(path) && !Files.exists(resolve.apply(path));
     }
 
     public InputStream open(String path) throws IOException {

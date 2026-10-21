@@ -134,12 +134,12 @@ public class DefaultPillarItemsTest extends BootstrappedGameTest {
     public void olderVersionStampsWithoutAnOfferedListStillMergeAndUseANormalBackup() throws Exception {
         java.nio.file.Path dir = temporaryFolder.newFolder().toPath();
         java.nio.file.Path file = dir.resolve("pillar-items.json");
-        String original = "{\"items\":[\"minecraft:stick\"],\"defaults_version\":409,\"vault_defaults_version\":409}";
+        String original = "{\"items\":[\"minecraft:stick\"],\"defaults_version\":409}";
         Files.writeString(file, original);
         PillarParticleConfig config = new PillarParticleConfig(dir);
         config.loadItemsInternal(true);
         assertTrue(config.items.contains("minecraft:stick"));
-        assertTrue(config.items.contains("buildscape:bone_dice"));
+        assertFalse(config.items.contains("buildscape:bone_dice"));
         assertTrue(config.items.contains("the_vault:echo_pog"));
         assertFalse(config.items.contains("minecraft:diamond"));
         assertTrue(ConfigLayoutIO.readProperties(Files.readString(file)).has("offered_defaults"));
@@ -148,6 +148,99 @@ public class DefaultPillarItemsTest extends BootstrappedGameTest {
         Set<String> loaded = Set.copyOf(config.items);
         config.loadItemsInternal(true);
         assertEquals(loaded, config.items);
+    }
+
+    @Test
+    public void explicit405VersionPreservesRemovedBoneDiceWithoutAny405Items() throws Exception {
+        java.nio.file.Path dir = temporaryFolder.newFolder().toPath();
+        java.nio.file.Path file = dir.resolve("pillar-items.json");
+        String original = "{\"items\":[\"minecraft:stick\"],\"defaults_version\":405}";
+        Files.writeString(file, original);
+        PillarParticleConfig config = new PillarParticleConfig(dir);
+        config.loadItemsInternal(false);
+        assertEquals(Set.of("minecraft:stick"), config.items);
+        assertFalse(config.items.contains("buildscape:bone_dice"));
+        assertEquals(original, Files.readString(file));
+        assertFalse(Files.exists(dir.resolve("pillar-items.json.pre-4.0.5.bak")));
+        assertTrue(config.saveItemsToDisk(false));
+        String saved = Files.readString(file);
+        PillarParticleConfig reloaded = new PillarParticleConfig(dir);
+        reloaded.loadItemsInternal(false);
+        assertEquals(Set.of("minecraft:stick"), reloaded.items);
+        assertEquals(saved, Files.readString(file));
+    }
+
+    @Test
+    public void explicit405VaultVersionPreservesAllRemovalsThroughSaveAndReload() throws Exception {
+        java.nio.file.Path dir = temporaryFolder.newFolder().toPath();
+        java.nio.file.Path file = dir.resolve("pillar-items.json");
+        String original = "{\"items\":[\"minecraft:stick\"],\"defaults_version\":405,\"vault_defaults_version\":405}";
+        Files.writeString(file, original);
+        PillarParticleConfig config = new PillarParticleConfig(dir);
+        config.loadItemsInternal(true);
+        assertEquals(Set.of("minecraft:stick"), config.items);
+        assertEquals(original, Files.readString(file));
+        assertTrue(config.saveItemsToDisk(true));
+        assertEquals(Set.of("minecraft:stick"), config.items);
+        String saved = Files.readString(file);
+        PillarParticleConfig reloaded = new PillarParticleConfig(dir);
+        reloaded.loadItemsInternal(true);
+        assertEquals(Set.of("minecraft:stick"), reloaded.items);
+        assertEquals(saved, Files.readString(file));
+    }
+
+    @Test
+    public void explicit405RemovalsSurviveLoadSaveAndReloadWithVaultFiltering() throws Exception {
+        for (boolean hadVaultItems : new boolean[]{false, true}) {
+            java.nio.file.Path dir = temporaryFolder.newFolder().toPath();
+            java.nio.file.Path file = dir.resolve("pillar-items.json");
+            String original = "{\"items\":[\"minecraft:stick\""
+                    + (hadVaultItems ? ",\"the_vault:echo_pog\"" : "") + "],\"defaults_version\":405}";
+            Files.writeString(file, original);
+            PillarParticleConfig config = new PillarParticleConfig(dir);
+            config.loadItemsInternal(true);
+            assertFalse(config.items.contains("buildscape:bone_dice"));
+            assertFalse(config.items.contains("minecraft:diamond"));
+            assertEquals(!hadVaultItems, config.items.contains("#the_vault:companion_relic"));
+            assertTrue(config.saveItemsToDisk(true));
+            String saved = Files.readString(file);
+            assertEquals(original, Files.readString(dir.resolve("pillar-items.json.pre-4.0.5.bak")));
+            PillarParticleConfig reloaded = new PillarParticleConfig(dir);
+            reloaded.loadItemsInternal(true);
+            assertEquals(config.items, reloaded.items);
+            assertFalse(reloaded.items.contains("buildscape:bone_dice"));
+            assertEquals(!hadVaultItems, reloaded.items.contains("#the_vault:companion_relic"));
+            assertEquals(saved, Files.readString(file));
+        }
+    }
+
+    @Test
+    public void explicitPre405VersionOffersNewDefaultsOnceEvenWithA405OnlyItem() throws Exception {
+        for (boolean vault : new boolean[]{false, true}) {
+            java.nio.file.Path dir = temporaryFolder.newFolder().toPath();
+            java.nio.file.Path file = dir.resolve("pillar-items.json");
+            String original = "{\"items\":[\"minecraft:stick\",\"buildscape:confetti\"],\"defaults_version\":404}";
+            Files.writeString(file, original);
+            PillarParticleConfig config = new PillarParticleConfig(dir);
+            config.loadItemsInternal(vault);
+            assertTrue(config.items.contains("buildscape:bone_dice"));
+            assertFalse(config.items.contains("minecraft:diamond"));
+            assertEquals(vault, config.items.contains("#the_vault:companion_relic"));
+            assertEquals(original, Files.readString(dir.resolve("pillar-items.json.pre-4.0.5.bak")));
+            String merged = Files.readString(file);
+            PillarParticleConfig reloaded = new PillarParticleConfig(dir);
+            reloaded.loadItemsInternal(vault);
+            assertEquals(config.items, reloaded.items);
+            assertEquals(merged, Files.readString(file));
+            assertTrue(reloaded.items.remove("buildscape:bone_dice"));
+            assertTrue(reloaded.saveItemsToDisk(vault));
+            String saved = Files.readString(file);
+            PillarParticleConfig loadedAgain = new PillarParticleConfig(dir);
+            loadedAgain.loadItemsInternal(vault);
+            assertFalse(loadedAgain.items.contains("buildscape:bone_dice"));
+            assertEquals(saved, Files.readString(file));
+            assertEquals(original, Files.readString(dir.resolve("pillar-items.json.pre-4.0.5.bak")));
+        }
     }
 
     @Test

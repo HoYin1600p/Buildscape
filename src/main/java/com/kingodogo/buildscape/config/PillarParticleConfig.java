@@ -1110,7 +1110,8 @@ public class PillarParticleConfig {
         } else {
             Set<String> pre405 = parseItems(ConfigPaths.loadItemsTemplate("legacy_pillar_items_pre405").toString());
             Set<String> legacy405 = parseItems(ConfigPaths.loadItemsTemplate("legacy_pillar_items").toString());
-            boolean hadVaultItems = false;
+            boolean hadVaultItems = document.has("vault_defaults_version")
+                    && document.get("vault_defaults_version").getAsInt() >= 405;
             boolean has405OnlyItem = false;
             for (JsonElement entry : document.getAsJsonArray("items")) {
                 String item = entry.getAsString();
@@ -1121,8 +1122,12 @@ public class PillarParticleConfig {
                     has405OnlyItem = true;
                 }
             }
+            // An explicit version takes precedence over guessing from the remaining items.
+            boolean had405Defaults = document.has("defaults_version")
+                    ? document.get("defaults_version").getAsInt() >= 405
+                    : has405OnlyItem;
             // Infer removals only from defaults the old installation could have offered.
-            for (String item : has405OnlyItem ? legacy405 : pre405) {
+            for (String item : had405Defaults ? legacy405 : pre405) {
                 if (!isVaultItem(item) || hadVaultItems) {
                     offered.add(item);
                 }

@@ -103,7 +103,13 @@ if (!rendererApiCoordinates.containsKey(rendererApi)) {
 }
 
 dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'junit:junit:4.13.2'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.ow2.asm:asm:9.7.1'
+    testImplementation 'org.ow2.asm:asm-tree:9.7.1'
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.7.1.255")
     compileOnly fg.deobf(rendererApiCoordinates[rendererApi])
@@ -111,8 +117,61 @@ dependencies {
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
 }
 
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+    maxParallelForks = 1
+    classpath = files('src/main/resources') + classpath
+}
+
+def resourceBundleDir = layout.buildDirectory.dir('generated/resourceBundle')
+def compileResourceBundle = tasks.register('compileResourceBundle', JavaExec) {
+    dependsOn 'compileJava', 'syncBundledRecipeCache'
+    classpath = files(tasks.compileJava.destinationDirectory) + sourceSets.main.compileClasspath
+    mainClass = 'com.kingodogo.buildscape.resources.bundle.compiler.ResourceBundleCompiler'
+    args = [
+        resourceBundleDir.get().file('assets/buildscape/resources.bsrb').asFile.absolutePath,
+        resourceBundleDir.get().file('data/buildscape/data.bsrb').asFile.absolutePath,
+        resourceBundleDir.get().file('coverage.manifest').asFile.absolutePath,
+        file('src/main/resources').absolutePath
+    ]
+    inputs.dir file('src/main/resources')
+    outputs.dir resourceBundleDir
+}
+
+def verifyJarCoverage = { File jarFile ->
+    if (!jarFile.exists()) return
+    def zip = new java.util.zip.ZipFile(jarFile)
+    try {
+        def hasResourcesBsrb = zip.getEntry('assets/buildscape/resources.bsrb') != null
+        def hasDataBsrb = zip.getEntry('data/buildscape/data.bsrb') != null
+        if (!hasResourcesBsrb || !hasDataBsrb) {
+            throw new GradleException('Fail-closed: Release jar missing .bsrb bundle! resources.bsrb=' + hasResourcesBsrb + ', data.bsrb=' + hasDataBsrb + ' in ' + jarFile.name)
+        }
+        def manifestFile = resourceBundleDir.get().file('coverage.manifest').asFile
+        if (!manifestFile.exists()) {
+            throw new GradleException('Fail-closed: coverage.manifest is missing for verification of ' + jarFile.name)
+        }
+        int checked = 0
+        manifestFile.eachLine { line ->
+            line = line.trim()
+            if (line && !line.startsWith('#') && !line.startsWith('era=') && !line.startsWith('count=')) {
+                def parts = line.split('\t')
+                if (parts.length > 0) {
+                    checked++
+                    if (zip.getEntry(parts[0]) != null) {
+                        throw new GradleException('Fail-closed: Covered JSON still present in release jar (' + jarFile.name + '): ' + parts[0])
+                    }
+                }
+            }
+        }
+        logger.lifecycle('Verified fail-closed coverage on ' + jarFile.name + ': ' + checked + ' covered files stripped.')
+    } finally {
+        zip.close()
+    }
+}
+
 tasks.named('processResources', ProcessResources).configure {
-    dependsOn 'syncBundledRecipeCache'
+    dependsOn 'syncBundledRecipeCache', compileResourceBundle
     // Keep Gradle's input/output tracking: unchanged launches must not recopy the entire resource catalogue.
     // File-system watching retains snapshots between daemon runs; metadata inputs below still invalidate this task.
 
@@ -129,6 +188,34 @@ tasks.named('processResources', ProcessResources).configure {
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
+    }
+
+    from(resourceBundleDir) {
+        include '**/*.bsrb'
+        include 'coverage.manifest'
+    }
+
+    Set<String> covered = []
+    doFirst {
+        def manifestFile = resourceBundleDir.get().file('coverage.manifest').asFile
+        if (!manifestFile.exists()) {
+            throw new GradleException('Fail-closed: coverage.manifest is missing from bundle build!')
+        }
+        manifestFile.eachLine { line ->
+            line = line.trim()
+            if (!line.isEmpty() && !line.startsWith('#') && !line.startsWith('era=') && !line.startsWith('count=')) {
+                def parts = line.split('\t')
+                if (parts.length > 0) {
+                    covered.add(parts[0])
+                }
+            }
+        }
+    }
+    eachFile { f ->
+        String normPath = f.path.replace('\\', '/')
+        if (covered.contains(normPath)) {
+            f.exclude()
+        }
     }
 }
 
@@ -156,7 +243,7 @@ configurations.checkstyle {
 }
 tasks.withType(Checkstyle).configureEach {
     reports {
-        xml.required = false
+        xml.required = true
         html.required = false
     }
 }
@@ -200,7 +287,17 @@ tasks.named('jar', Jar).configure {
 
     exclude { it.path.startsWith('.') || it.path.contains('..') }
 
+    doLast {
+        verifyJarCoverage(archiveFile.get().asFile)
+    }
+
     finalizedBy 'reobfJar'
+}
+
+tasks.matching { it.name == 'reobfJar' }.configureEach {
+    doLast {
+        verifyJarCoverage(tasks.jar.archiveFile.get().asFile)
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {

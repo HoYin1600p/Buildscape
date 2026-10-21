@@ -46,7 +46,9 @@ public class MixinConfigSmokeTest {
             "me.jellysquid.mods.sodium.client.world.biome.BiomeColorCache",
             "Embeddium/Sodium is an optional third-party mod (the mixin is @Pseudo)",
             "me.jellysquid.mods.sodium.client.render.pipeline.FluidRenderer",
-            "Embeddium/Sodium is an optional third-party mod (the mixin is @Pseudo)");
+            "Embeddium/Sodium is an optional third-party mod (the mixin is @Pseudo)",
+            "vazkii.quark.content.tools.module.BeaconRedirectionModule",
+            "Quark is an optional third-party mod (the mixin is @Pseudo)");
 
     private static final class MixinClass {
         String name;

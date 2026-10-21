@@ -13,6 +13,10 @@ public final class BeaconBeamScanState {
         return this.pendingStopped;
     }
 
+    public boolean shouldClearBeam(boolean blocked) {
+        return blocked && !this.pendingStopped;
+    }
+
     public void beginScan() {
         this.pendingStopped = false;
         this.scanning = true;

@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -19,6 +20,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Random;
 
@@ -26,8 +29,23 @@ public class SculkCatalystBlock extends Block implements EntityBlock {
     public static final BooleanProperty BLOOM = ModBlockProperties.BLOOM;
 
     public SculkCatalystBlock(BlockBehaviour.Properties properties) {
-        super(properties);
+        super(properties.noOcclusion());
         this.registerDefaultState(this.defaultBlockState().setValue(BLOOM, Boolean.FALSE));
+    }
+
+    @Override
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+        return Shapes.empty();
+    }
+
+    @Override
+    public boolean useShapeForLightOcclusion(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
+        return 1.0F;
     }
 
     @Override

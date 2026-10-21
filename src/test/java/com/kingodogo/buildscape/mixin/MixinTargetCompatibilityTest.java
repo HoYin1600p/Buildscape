@@ -51,7 +51,11 @@ class MixinTargetCompatibilityTest {
     // alongside ItemStack's Mojang-named getMaxStackSize. Invalid callbacks/@At sites still fail.
     private static final Set<String> EXPECTED_MISSING_METHODS = Set.of(
             "com/kingodogo/buildscape/mixin/BuildscapeModelBakeryMixin -> net/minecraft/client/resources/model/ModelBakery#buildscape$parseModelsInParallel#processLoading",
-            "com/kingodogo/buildscape/mixin/BuildscapeModelBakeryMixin -> net/minecraft/client/resources/model/ModelBakery#buildscape$releaseParsedModels#processLoading");
+            "com/kingodogo/buildscape/mixin/BuildscapeModelBakeryMixin -> net/minecraft/client/resources/model/ModelBakery#buildscape$releaseParsedModels#processLoading",
+            "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$openJson#m_5541_(Ljava/lang/String;)Ljava/io/InputStream;",
+            "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$hasJson#m_6105_(Ljava/lang/String;)Z",
+            "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$listJson#m_7466_",
+            "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$jsonNamespaces#m_5698_");
 
     @Test
     void allConfiguredTargetsMatchMinecraft1182() throws IOException {

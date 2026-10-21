@@ -62,6 +62,7 @@
     "BuildscapeBlockStateCacheMixin",
     "BuildscapeForgeRegistryMixin",
     "BuildscapeModelBakeryMixin",
+    "PathResourcePackMixin",
     "ModelManagerMixin",
     "ElytraLayerMixin",
     "GeneralStatisticsListMixin",

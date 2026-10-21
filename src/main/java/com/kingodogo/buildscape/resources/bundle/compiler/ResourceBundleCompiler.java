@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.resources.bundle.compiler;
 
 import com.kingodogo.buildscape.resources.bundle.ResourceBundleContainer;
+import com.kingodogo.buildscape.resources.bundle.BundledJsonResources;
 import com.kingodogo.buildscape.resources.bundle.blockstate.BlockStateIR;
 import com.kingodogo.buildscape.resources.bundle.manifest.ResourceCoverageManifest;
 import com.kingodogo.buildscape.resources.bundle.manifest.ResourceCoverageManifest.ResourceKind;
@@ -48,6 +49,7 @@ public final class ResourceBundleCompiler {
         }
 
         ResourceCoverageManifest manifest = new ResourceCoverageManifest();
+        Map<String, byte[]> sourceResources = new TreeMap<>();
         ResourceBundleContainer.Writer assetsWriter = new ResourceBundleContainer.Writer();
         ResourceBundleContainer.Writer dataWriter = dataBundle != null
                 ? new ResourceBundleContainer.Writer()
@@ -71,6 +73,10 @@ public final class ResourceBundleCompiler {
             String top = parts[0]; // "assets" or "data"
             String namespace = parts[1];
             String category = parts[2];
+
+            if ("assets".equals(top)) {
+                sourceResources.put(rel, fileBytes);
+            }
 
             if ("assets".equals(top) && "models".equals(category)) {
                 String modelPath = rel.substring(("assets/" + namespace + "/models/").length(), rel.length() - 5);
@@ -133,6 +139,9 @@ public final class ResourceBundleCompiler {
             }
             byte[] bundleBytes = assetsWriter.write(contentDigest);
             Files.write(assetsBundle, bundleBytes);
+            try (var sourceOutput = Files.newOutputStream(assetsBundle.resolveSibling("resources.bsrc"))) {
+                BundledJsonResources.write(sourceResources, sourceOutput);
+            }
         }
 
         if (dataBundle != null) {

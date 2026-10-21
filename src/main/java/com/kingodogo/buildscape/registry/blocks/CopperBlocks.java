@@ -356,7 +356,7 @@ public final class CopperBlocks {
     public static final RegistryObject<Block> SCULK_CATALYST = BLOCKS.register("sculk_catalyst",
             () -> new SculkCatalystBlock(
                     BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(3.0F, 3.0F)
-                            .lightLevel(state -> 6).randomTicks()));
+                            .lightLevel(state -> 6).randomTicks().noOcclusion()));
     public static final RegistryObject<Block> SCULK_SHRIEKER = BLOCKS.register("sculk_shrieker",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(3.0F, 3.0F)
                     .lightLevel(state -> 0).noOcclusion()));

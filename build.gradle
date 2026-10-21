@@ -147,6 +147,9 @@ def verifyJarCoverage = { File jarFile ->
         if (!hasResourcesBsrb || !hasDataBsrb) {
             throw new GradleException('Fail-closed: Release jar missing .bsrb bundle! resources.bsrb=' + hasResourcesBsrb + ', data.bsrb=' + hasDataBsrb + ' in ' + jarFile.name)
         }
+        if (zip.getEntry('assets/buildscape/resources.bsrc') == null) {
+            throw new GradleException('Fail-closed: Release jar missing bundled JSON compatibility resources: ' + jarFile.name)
+        }
         def manifestFile = resourceBundleDir.get().file('coverage.manifest').asFile
         if (!manifestFile.exists()) {
             throw new GradleException('Fail-closed: coverage.manifest is missing for verification of ' + jarFile.name)
@@ -192,6 +195,7 @@ tasks.named('processResources', ProcessResources).configure {
 
     from(resourceBundleDir) {
         include '**/*.bsrb'
+        include '**/*.bsrc'
         include 'coverage.manifest'
     }
 

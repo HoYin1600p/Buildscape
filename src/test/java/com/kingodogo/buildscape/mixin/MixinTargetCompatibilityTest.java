@@ -45,7 +45,8 @@ class MixinTargetCompatibilityTest {
     private static final Set<String> EXPECTED_MISSING_CLASSES = Set.of(
             "com/kingodogo/buildscape/mixin/BuildscapeForgeRegistryMixin -> net.minecraftforge.registries.ForgeRegistry",
             "com/kingodogo/buildscape/mixin/EmbeddiumPipeSpillMixin -> me.jellysquid.mods.sodium.client.render.pipeline.FluidRenderer",
-            "com/kingodogo/buildscape/mixin/biometint/EmbeddiumBiomeColorMixin -> me.jellysquid.mods.sodium.client.world.biome.BiomeColorCache");
+            "com/kingodogo/buildscape/mixin/biometint/EmbeddiumBiomeColorMixin -> me.jellysquid.mods.sodium.client.world.biome.BiomeColorCache",
+            "com/kingodogo/buildscape/mixin/compat/QuarkBeaconRedirectionMixin -> vazkii.quark.content.tools.module.BeaconRedirectionModule");
     // Only these selectors may miss: 26.2's parallel-model lifecycle and the production SRG alias
     // alongside ItemStack's Mojang-named getMaxStackSize. Invalid callbacks/@At sites still fail.
     private static final Set<String> EXPECTED_MISSING_METHODS = Set.of(
@@ -399,7 +400,7 @@ class MixinTargetCompatibilityTest {
                         String expected = site.getOpcode() == Opcodes.INVOKESTATIC
                                 ? site.desc
                                 : "(L" + site.owner + ";" + site.desc.substring(1);
-                        if (!handlerDescriptorMatches(handler, expected)) {
+                        if (!handlerDescriptorMatches(handler, expected, method.desc)) {
                             problem(optional, context + "redirect descriptor must match " + expected);
                         }
                     }
@@ -457,15 +458,24 @@ class MixinTargetCompatibilityTest {
             return isStatic(handler.access) == isStatic(target.access);
         }
 
-        boolean handlerDescriptorMatches(MethodNode handler, String expectedDescriptor) throws IOException {
+        // A @Redirect handler may also capture the target method's arguments after the redirected
+        // call's own arguments (Mixin argument capture); those must match the target's leading parameters.
+        boolean handlerDescriptorMatches(MethodNode handler, String expectedDescriptor, String targetDescriptor)
+                throws IOException {
             Type[] actual = Type.getArgumentTypes(handler.desc);
             Type[] expected = Type.getArgumentTypes(expectedDescriptor);
-            if (actual.length != expected.length
+            Type[] captured = Type.getArgumentTypes(targetDescriptor);
+            if (actual.length < expected.length || actual.length > expected.length + captured.length
                     || !Type.getReturnType(handler.desc).equals(Type.getReturnType(expectedDescriptor))) {
                 return false;
             }
-            for (int i = 0; i < actual.length; i++) {
+            for (int i = 0; i < expected.length; i++) {
                 if (!parameterMatches(handler, i, actual[i], expected[i])) {
+                    return false;
+                }
+            }
+            for (int i = expected.length; i < actual.length; i++) {
+                if (!actual[i].equals(captured[i - expected.length])) {
                     return false;
                 }
             }

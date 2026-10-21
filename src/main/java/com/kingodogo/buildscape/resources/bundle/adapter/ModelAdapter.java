@@ -124,8 +124,13 @@ public final class ModelAdapter {
             return ItemTransform.NO_TRANSFORM;
         }
         Vector3f rot = new Vector3f(t.rotation()[0], t.rotation()[1], t.rotation()[2]);
-        Vector3f trans = new Vector3f(t.translation()[0], t.translation()[1], t.translation()[2]);
+        Vector3f trans = new Vector3f(
+                t.translation()[0] * 0.0625f,
+                t.translation()[1] * 0.0625f,
+                t.translation()[2] * 0.0625f);
+        trans.clamp(-5.0f, 5.0f);
         Vector3f scale = new Vector3f(t.scale()[0], t.scale()[1], t.scale()[2]);
+        scale.clamp(-4.0f, 4.0f);
         return new ItemTransform(rot, trans, scale);
     }
 }

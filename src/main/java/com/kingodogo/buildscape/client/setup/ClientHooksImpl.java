@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client.setup;
 import com.kingodogo.buildscape.client.feature.hazebush.HazeBushParticleEvents;
 import com.kingodogo.buildscape.client.feature.muff.MuffBlockManager;
 import com.kingodogo.buildscape.client.network.ClientConfigHooks;
+import com.kingodogo.buildscape.client.performance.VhaModelBakeryIntegration;
 import com.kingodogo.buildscape.client.particle.TintedDripParticle;
 import com.kingodogo.buildscape.core.ClientHooks;
 import net.minecraft.core.BlockPos;
@@ -19,6 +20,7 @@ public final class ClientHooksImpl implements ClientHooks {
 
     public static void install() {
         ClientHooks.install(new ClientHooksImpl());
+        VhaModelBakeryIntegration.register();
     }
 
     @Override

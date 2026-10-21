@@ -7,9 +7,12 @@ import com.kingodogo.buildscape.resources.bundle.blockstate.BlockStateIR;
 import com.kingodogo.buildscape.resources.bundle.compiler.BlockStateCompiler;
 import com.kingodogo.buildscape.resources.bundle.compiler.ModelCompiler;
 import com.kingodogo.buildscape.resources.bundle.model.ModelIR;
+import com.kingodogo.buildscape.resources.bundle.runtime.BundledResourceRegistry;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.BlockModelDefinition;
+import net.minecraft.client.renderer.block.model.ItemTransform;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
@@ -148,5 +151,82 @@ public class BundledModelRoundTripTest {
         assertTrue(def.hasVariant("facing=west,half=top,shape=inner_left"));
         assertEquals(1, def.getVariant("facing=west,half=top,shape=inner_left").getVariants().size());
         assertTrue(def.getVariant("facing=west,half=top,shape=inner_left").getVariants().get(0).isUvLocked());
+    }
+
+    @Test
+    void testTransformsSemanticEquivalenceAndScaling() {
+        String json = """
+                {
+                  "display": {
+                    "gui": {
+                      "rotation": [ 30, 315, 0 ],
+                      "translation": [ -2, 0, 4 ],
+                      "scale": [ 0.625, 0.625, 0.625 ]
+                    },
+                    "ground": {
+                      "rotation": [ 0, 0, 0 ],
+                      "translation": [ 0, 3, 0 ],
+                      "scale": [ 0.25, 0.25, 0.25 ]
+                    }
+                  }
+                }
+                """;
+
+        // 1. Vanilla parsing
+        BlockModel vanilla = BlockModel.fromString(json);
+
+        // 2. Binary IR compilation
+        ModelIR compiledIR = ModelCompiler.compile("buildscape:block/test_transforms", json);
+
+        // 3. Native adapter instantiation
+        BlockModel nativeModel = ModelAdapter.toBlockModel(compiledIR);
+
+        // 4. Assert strict semantic equivalence for display transforms
+        ItemTransform vGui = vanilla.getTransforms().gui;
+        ItemTransform nGui = nativeModel.getTransforms().gui;
+
+        assertEquals(vGui.rotation, nGui.rotation);
+        assertEquals(vGui.translation, nGui.translation);
+        assertEquals(vGui.scale, nGui.scale);
+
+        // Specifically assert that translations were correctly converted to block units (multiplied by 0.0625)
+        assertEquals(-2.0f * 0.0625f, nGui.translation.x(), 1e-6f);
+        assertEquals(0.0f, nGui.translation.y(), 1e-6f);
+        assertEquals(4.0f * 0.0625f, nGui.translation.z(), 1e-6f);
+
+        ItemTransform vGround = vanilla.getTransforms().ground;
+        ItemTransform nGround = nativeModel.getTransforms().ground;
+        assertEquals(vGround.rotation, nGround.rotation);
+        assertEquals(vGround.translation, nGround.translation);
+        assertEquals(vGround.scale, nGround.scale);
+        assertEquals(3.0f * 0.0625f, nGround.translation.y(), 1e-6f);
+    }
+
+    @Test
+    void testVerticalSlabDisplayInheritance() throws Exception {
+        BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
+        registry.ensureInitialized();
+
+        ModelIR itemIR = registry.getModel("buildscape:item/bit_exposed_cut_copper_vertical_slab");
+        ModelIR blockIR = registry.getModel("buildscape:block/bit_exposed_cut_copper_vertical_slab");
+        ModelIR templateIR = registry.getModel("buildscape:block/template_vertical_slab");
+
+        assertNotNull(itemIR);
+        assertNotNull(blockIR);
+        assertNotNull(templateIR);
+
+        BlockModel nativeItem = ModelAdapter.toBlockModel(itemIR);
+        BlockModel nativeBlock = ModelAdapter.toBlockModel(blockIR);
+        BlockModel nativeTemplate = ModelAdapter.toBlockModel(templateIR);
+
+        Field parentField = BlockModel.class.getDeclaredField("parent");
+        parentField.setAccessible(true);
+        parentField.set(nativeItem, nativeBlock);
+        parentField.set(nativeBlock, nativeTemplate);
+
+        ItemTransforms transforms = nativeItem.getTransforms();
+        assertEquals(new com.mojang.math.Vector3f(30.0f, 315.0f, 0.0f), transforms.gui.rotation);
+        assertEquals(new com.mojang.math.Vector3f(-0.125f, 0.0f, 0.25f), transforms.gui.translation);
+        assertEquals(new com.mojang.math.Vector3f(0.625f, 0.625f, 0.625f), transforms.gui.scale);
     }
 }

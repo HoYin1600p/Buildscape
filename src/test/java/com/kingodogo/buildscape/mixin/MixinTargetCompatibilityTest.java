@@ -53,7 +53,9 @@ class MixinTargetCompatibilityTest {
             "com/kingodogo/buildscape/mixin/BuildscapeModelBakeryMixin -> net/minecraft/client/resources/model/ModelBakery#buildscape$parseModelsInParallel#processLoading",
             "com/kingodogo/buildscape/mixin/BuildscapeModelBakeryMixin -> net/minecraft/client/resources/model/ModelBakery#buildscape$releaseParsedModels#processLoading",
             "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$openJson#m_5541_(Ljava/lang/String;)Ljava/io/InputStream;",
+            "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$openLocation#m_8031_(Lnet/minecraft/server/packs/PackType;Lnet/minecraft/resources/ResourceLocation;)Ljava/io/InputStream;",
             "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$hasJson#m_6105_(Ljava/lang/String;)Z",
+            "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$hasLocation#m_7211_(Lnet/minecraft/server/packs/PackType;Lnet/minecraft/resources/ResourceLocation;)Z",
             "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$listJson#m_7466_",
             "com/kingodogo/buildscape/mixin/PathResourcePackMixin -> net/minecraftforge/resource/PathResourcePack#buildscape$jsonNamespaces#m_5698_");
 

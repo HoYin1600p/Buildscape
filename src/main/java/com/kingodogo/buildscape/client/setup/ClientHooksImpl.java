@@ -19,8 +19,27 @@ import java.util.Random;
 public final class ClientHooksImpl implements ClientHooks {
 
     public static void install() {
+        repairLightspeedCache();
         ClientHooks.install(new ClientHooksImpl());
         VhaModelBakeryIntegration.register();
+    }
+
+    private static void repairLightspeedCache() {
+        try {
+            Class<?> gc = Class.forName("com.ccr4ft3r.lightspeed.cache.GlobalCache");
+            Object mapObj = gc.getField("PERSISTED_EXISTENCES_BY_MOD").get(null);
+            if (mapObj instanceof java.util.Map<?, ?> map) {
+                for (var entry : map.entrySet()) {
+                    if (entry.getKey() != null && entry.getKey().toString().contains("buildscape")) {
+                        if (entry.getValue() instanceof java.util.Map modMap) {
+                            modMap.put("assets/buildscape/resources.bsrb", Boolean.TRUE);
+                            modMap.put("data/buildscape/data.bsrb", Boolean.TRUE);
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override

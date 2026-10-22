@@ -19,6 +19,10 @@ public final class ResourcePackPrecedenceTracker {
     public static final ResourceLocation SERVER_DATA_BUNDLE_LOCATION = new ResourceLocation("buildscape", "data.bsrb");
 
     private static volatile ResourceManager lastResourceManager;
+    private static volatile PackOrder lastPackOrder;
+
+    private record PackOrder(ResourceManager manager, List<PackResources> packs, int bundleIndex) {
+    }
 
     private ResourcePackPrecedenceTracker() {}
 
@@ -42,9 +46,10 @@ public final class ResourcePackPrecedenceTracker {
      * Re-evaluates all active packs in the ResourceManager and updates BundledResourceRegistry overrides.
      */
     public static synchronized void updateOverrides(ResourceManager resourceManager) {
-        lastResourceManager = resourceManager;
+        lastResourceManager = null;
         BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
         if (resourceManager == null) {
+            lastPackOrder = null;
             registry.clearOverrides();
             return;
         }
@@ -52,11 +57,13 @@ public final class ResourcePackPrecedenceTracker {
         long start = System.nanoTime();
         List<PackResources> packs = resourceManager.listPacks().toList();
         int bundlePackIndex = findBundlePackIndex(packs);
+        lastPackOrder = new PackOrder(resourceManager, packs, bundlePackIndex);
 
         if (bundlePackIndex < 0) {
             // If bundle owner pack is missing or disabled, mark all bundled resources inactive/overridden
             registry.setOverrides(registry.getModels().keySet(), registry.getBlockStates().keySet());
             registry.setOverrideDiscoveryDuration(System.nanoTime() - start);
+            lastResourceManager = resourceManager;
             return;
         }
 
@@ -64,6 +71,7 @@ public final class ResourcePackPrecedenceTracker {
             // Buildscape is the highest-priority pack; no higher packs can override
             registry.setOverrides(Collections.emptySet(), Collections.emptySet());
             registry.setOverrideDiscoveryDuration(System.nanoTime() - start);
+            lastResourceManager = resourceManager;
             return;
         }
 
@@ -103,11 +111,18 @@ public final class ResourcePackPrecedenceTracker {
 
         registry.setOverrides(overriddenModels, overriddenBlockStates);
         registry.setOverrideDiscoveryDuration(System.nanoTime() - start);
+        lastResourceManager = resourceManager;
     }
 
     public static boolean isResourceOverridden(ResourceManager resourceManager, ResourceLocation fileLoc) {
-        List<PackResources> packs = resourceManager.listPacks().toList();
-        int bundlePackIndex = findBundlePackIndex(packs);
+        PackOrder order = lastPackOrder;
+        if (order == null || order.manager() != resourceManager) {
+            List<PackResources> current = resourceManager.listPacks().toList();
+            order = new PackOrder(resourceManager, current, findBundlePackIndex(current));
+            lastPackOrder = order;
+        }
+        List<PackResources> packs = order.packs();
+        int bundlePackIndex = order.bundleIndex();
         if (bundlePackIndex < 0) {
             return true;
         }
@@ -135,15 +150,37 @@ public final class ResourcePackPrecedenceTracker {
 
     public static int findBundlePackIndex(List<PackResources> packs, PackType packType,
             ResourceLocation bundleLocation) {
+        // Pass 1: standard check - does a pack advertise the namespace and confirm hasResource for the bundle?
         for (int i = 0; i < packs.size(); i++) {
             PackResources pack = packs.get(i);
             try {
-                if (pack.hasResource(packType, bundleLocation)) {
+                // Vanilla's classpath lookup can see mod files outside its advertised namespaces.
+                if (pack.getNamespaces(packType).contains(bundleLocation.getNamespace())
+                        && pack.hasResource(packType, bundleLocation)) {
                     return i;
                 }
             } catch (Exception ignored) {
             }
         }
+
+        // Pass 2: In Forge, all mod resources are aggregated in "Mod Resources" (DelegatingResourcePack / DelegatingPackResources).
+        // If an external cache wrapper or interceptor fails to report binary bundle paths,
+        // identify the Mod Resources pack (or the base mod pack) that owns the buildscape namespace.
+        for (int i = 0; i < packs.size(); i++) {
+            PackResources pack = packs.get(i);
+            try {
+                if (pack.getNamespaces(packType).contains(bundleLocation.getNamespace())) {
+                    String name = pack.getName();
+                    String className = pack.getClass().getName();
+                    if ("Mod Resources".equals(name) || "buildscape".equalsIgnoreCase(name)
+                            || className.contains("Delegating")) {
+                        return i;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
         return -1;
     }
 

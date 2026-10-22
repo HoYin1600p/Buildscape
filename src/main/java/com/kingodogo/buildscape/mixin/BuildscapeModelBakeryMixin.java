@@ -117,6 +117,7 @@ public abstract class BuildscapeModelBakeryMixin {
         long startedAt = System.nanoTime();
         List<ResourceLocation> modelFiles = buildscape$listBundledModels();
         if (modelFiles.isEmpty()) {
+            VhaModelBakeryIntegration.prepareModels(this.resourceManager);
             return;
         }
 
@@ -178,6 +179,12 @@ public abstract class BuildscapeModelBakeryMixin {
         ResourcePackPrecedenceTracker.ensureInitialized(this.resourceManager);
         BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
         String id = location.toString();
+        BlockModel prepared = VhaModelBakeryIntegration.getPreparedModel(id);
+        if (prepared != null) {
+            registry.recordServedModel(id);
+            callback.setReturnValue(prepared);
+            return;
+        }
         if (registry.hasModel(id)) {
             ModelIR ir = registry.getModel(id);
             if (ir != null) {

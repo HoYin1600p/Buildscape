@@ -261,6 +261,10 @@ public final class BundledResourceRegistry {
         }
     }
 
+    public boolean isInitialized() {
+        return initialized;
+    }
+
     public void ensureInitialized() {
         if (initialized) {
             return;
@@ -272,6 +276,11 @@ public final class BundledResourceRegistry {
             ClassLoader cl = getClass().getClassLoader();
             InputStream assetsIn = cl.getResourceAsStream("assets/buildscape/resources.bsrb");
             InputStream dataIn = cl.getResourceAsStream("data/buildscape/data.bsrb");
+            if (assetsIn == null && dataIn == null) {
+                // JSON-only builds have nothing to initialize; avoid probing the classpath for every model.
+                initialized = true;
+                return;
+            }
             if (assetsIn != null || dataIn != null) {
                 try {
                     loadBundles(assetsIn, dataIn, null);
@@ -574,6 +583,13 @@ public final class BundledResourceRegistry {
     public boolean isBlockStateOverridden(String id) {
         ensureInitialized();
         return snapshot.get().overriddenBlockStates().contains(id);
+    }
+
+    public void recordServedModel(String id) {
+        servedModels.increment();
+        if (id != null) {
+            uniqueServedModels.add(id);
+        }
     }
 
     public List<TagIR> getTags() {

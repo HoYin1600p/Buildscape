@@ -72,14 +72,20 @@ public class ResourcePackPrecedenceTest {
     private static final class MockPack implements PackResources {
         private final String name;
         private final boolean hasBundle;
+        private final java.util.Set<String> namespaces;
 
         MockPack(String name) {
             this(name, "buildscape".equalsIgnoreCase(name));
         }
 
         MockPack(String name, boolean hasBundle) {
+            this(name, hasBundle, java.util.Set.of("buildscape"));
+        }
+
+        MockPack(String name, boolean hasBundle, java.util.Set<String> namespaces) {
             this.name = name;
             this.hasBundle = hasBundle;
+            this.namespaces = namespaces;
         }
 
         @Override
@@ -110,7 +116,7 @@ public class ResourcePackPrecedenceTest {
         }
         @Override
         public java.util.Set<String> getNamespaces(net.minecraft.server.packs.PackType packType) {
-            return java.util.Set.of();
+            return namespaces;
         }
         @Override
         public <T> T getMetadataSection(net.minecraft.server.packs.metadata.MetadataSectionSerializer<T> serializer) {
@@ -289,6 +295,38 @@ public class ResourcePackPrecedenceTest {
 
         int bundleIdx = ResourcePackPrecedenceTracker.findBundlePackIndex(packs);
         assertEquals(1, bundleIdx, "Bundle index must point to the actual bundle-owning pack, not the misleading name");
+    }
+
+    @Test
+    void classpathVisibleBundleDoesNotMakeVanillaTheOwner() {
+        // Vanilla's classpath probe can see mod files outside its advertised namespaces.
+        PackResources vanilla = new MockPack("Default", true, java.util.Set.of("minecraft", "realms"));
+        PackResources modResources = new MockPack("Mod Resources", true);
+        assertEquals(1, ResourcePackPrecedenceTracker.findClientBundlePackIndex(List.of(vanilla, modResources)));
+        assertEquals(1, ResourcePackPrecedenceTracker.findServerBundlePackIndex(List.of(vanilla, modResources)));
+    }
+
+    @Test
+    void ownJsonIsNotAnOverrideButUserPackStillWins() throws IOException {
+        String id = "buildscape:block/test";
+        ResourceBundleContainer.Writer writer = new ResourceBundleContainer.Writer();
+        writer.addModel(new ModelIR(id, "minecraft:block/cube_all", true, ModelIR.GUI_LIGHT_SIDE,
+                Map.of("all", "minecraft:block/stone"), -1, List.of(), List.of()));
+        BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
+        registry.initializeFromStream(new ByteArrayInputStream(writer.write(DIGEST)));
+        PackResources vanilla = new MockPack("Default", true, java.util.Set.of("minecraft"));
+        PackResources mod = new MockPack("Mod Resources", true);
+        PackResources user = new MockPack("User pack", false);
+        MockResourceManager resources = new MockResourceManager(List.of(vanilla, mod, user));
+        ResourceLocation location = new ResourceLocation("buildscape", "models/block/test.json");
+        resources.addResource(location, new MockResource("Mod Resources", location, "{}"));
+        ResourcePackPrecedenceTracker.updateOverrides(resources);
+        assertTrue(registry.hasModel(id));
+        assertFalse(ResourcePackPrecedenceTracker.isResourceOverridden(resources, location));
+        resources.addResource(location, new MockResource("User pack", location, "{}"));
+        ResourcePackPrecedenceTracker.updateOverrides(resources);
+        assertFalse(registry.hasModel(id));
+        assertTrue(ResourcePackPrecedenceTracker.isResourceOverridden(resources, location));
     }
 
     @Test

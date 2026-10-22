@@ -77,7 +77,12 @@ public class BundledTagEquivalenceTest {
         }
         @Override
         public java.util.Set<String> getNamespaces(PackType packType) {
-            return java.util.Set.of();
+            java.util.Set<String> namespaces = new java.util.HashSet<>();
+            jsonResources.keySet().forEach(location -> namespaces.add(location.getNamespace()));
+            if ("buildscape".equals(name)) {
+                namespaces.add("buildscape");
+            }
+            return namespaces;
         }
         @Override
         public <T> T getMetadataSection(net.minecraft.server.packs.metadata.MetadataSectionSerializer<T> serializer) {

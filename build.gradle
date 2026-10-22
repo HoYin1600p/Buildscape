@@ -103,12 +103,20 @@ if (!rendererApiCoordinates.containsKey(rendererApi)) {
 }
 
 dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'junit:junit:4.13.2'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.7.1.255")
     compileOnly fg.deobf(rendererApiCoordinates[rendererApi])
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
 }
 
 tasks.named('processResources', ProcessResources).configure {

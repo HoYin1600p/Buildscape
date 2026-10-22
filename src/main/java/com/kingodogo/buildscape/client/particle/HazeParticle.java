@@ -24,8 +24,6 @@ import java.util.List;
 public class HazeParticle extends TextureSheetParticle {
 
     private static final float CELL_SIZE = 0.5F;
-    // How far the haze reaches past a see-through or thin block's face, so no gap shows there (DGA).
-    private static final double FACE_OVERLAP = 1.0 / 16.0;
 
     private final SpriteSet sprites;
     private final float rotSpeed;
@@ -33,11 +31,8 @@ public class HazeParticle extends TextureSheetParticle {
     private final float baseSize;
     private final double originX;
     private final double originZ;
-    private final float maskMinX;
-    private final float maskMinZ;
+    private final float maskMin;
     private final HazeMask mask;
-    /** Per drawn area (mask rectangles, then edge strips): min X, max X, min Z, max Z relative to the origin. */
-    private final float[][] edges;
     private final float[][] clipA = new float[8][2];
     private final float[][] clipB = new float[8][2];
 
@@ -79,30 +74,10 @@ public class HazeParticle extends TextureSheetParticle {
         // Cover the final size at every rotation, plus the total damped drift (less than 0.015).
         int radius = Math.min((HazeMask.MAX_GRID_SIZE - 1) / 2,
                 Mth.ceil((this.baseSize * 1.2 * Math.sqrt(2.0) + 0.02) / CELL_SIZE));
-        // The grid follows the world's half-block lines, so cell edges sit on block faces. The centre
-        // cell holds the origin, leaving at least radius cells of cover on every side.
-        this.maskMinX = (float) (HazeMask.gridMin(x, radius, CELL_SIZE) - x);
-        this.maskMinZ = (float) (HazeMask.gridMin(z, radius, CELL_SIZE) - z);
+        this.maskMin = -(radius + 0.5F) * CELL_SIZE;
         this.mask = createMask(level, radius);
         if (this.mask.rectangles().isEmpty()) {
             this.remove();
-        }
-        List<HazeMask.Rectangle> rectangles = this.mask.drawRectangles();
-        List<HazeMask.Strip> strips = this.mask.strips();
-        this.edges = new float[rectangles.size() + strips.size()][];
-        for (int i = 0; i < rectangles.size(); i++) {
-            HazeMask.Rectangle rectangle = rectangles.get(i);
-            this.edges[i] = new float[]{
-                    this.maskMinX + rectangle.minX() * CELL_SIZE, this.maskMinX + rectangle.maxX() * CELL_SIZE,
-                    this.maskMinZ + rectangle.minZ() * CELL_SIZE, this.maskMinZ + rectangle.maxZ() * CELL_SIZE};
-        }
-        for (int i = 0; i < strips.size(); i++) {
-            HazeMask.Strip strip = strips.get(i);
-            this.edges[rectangles.size() + i] = new float[]{
-                    (float) (this.maskMinX + strip.minX() * CELL_SIZE),
-                    (float) (this.maskMinX + strip.maxX() * CELL_SIZE),
-                    (float) (this.maskMinZ + strip.minZ() * CELL_SIZE),
-                    (float) (this.maskMinZ + strip.maxZ() * CELL_SIZE)};
         }
 
         this.setSpriteFromAge(sprites);
@@ -112,15 +87,13 @@ public class HazeParticle extends TextureSheetParticle {
         Long2ObjectMap<List<AABB>> shapes = new Long2ObjectOpenHashMap<>();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         int gridSize = radius * 2 + 1;
-        // Computed from the aligned grid in doubles, so a cell edge equals a block face exactly.
-        double gridMinX = HazeMask.gridMin(this.originX, radius, CELL_SIZE);
-        double gridMinZ = HazeMask.gridMin(this.originZ, radius, CELL_SIZE);
         return HazeMask.compute(gridSize, gridSize, radius, radius, (cellX, cellZ) -> {
-            double minX = gridMinX + cellX * CELL_SIZE;
-            double minZ = gridMinZ + cellZ * CELL_SIZE;
-            return HazeMask.blocksCell(level, pos, shapes, minX, minZ, minX + CELL_SIZE, minZ + CELL_SIZE, this.y);
-        }, (cellX, cellZ, side) -> HazeMask.entryDepth(level, pos, shapes, gridMinX + cellX * CELL_SIZE,
-                gridMinZ + cellZ * CELL_SIZE, CELL_SIZE, this.y, side, FACE_OVERLAP));
+            double minX = this.originX + this.maskMin + cellX * CELL_SIZE;
+            double minZ = this.originZ + this.maskMin + cellZ * CELL_SIZE;
+            double maxX = minX + CELL_SIZE;
+            double maxZ = minZ + CELL_SIZE;
+            return HazeMask.blocksCell(level, pos, shapes, minX, minZ, maxX, maxZ, this.y);
+        });
     }
 
     @Override
@@ -167,16 +140,16 @@ public class HazeParticle extends TextureSheetParticle {
         float cos = Mth.cos(angle) * size;
         float sin = Mth.sin(angle) * size;
         int light = this.getLightColor(partialTick);
-        for (float[] edge : this.edges) {
+        for (HazeMask.Rectangle rectangle : this.mask.rectangles()) {
             // Clockwise as seen from above, preserving the original top face and texture orientation.
             setPoint(this.clipA[0], dx - cos - sin, dz - sin + cos);
             setPoint(this.clipA[1], dx + cos - sin, dz + sin + cos);
             setPoint(this.clipA[2], dx + cos + sin, dz + sin - cos);
             setPoint(this.clipA[3], dx - cos + sin, dz - sin - cos);
-            int count = clip(this.clipA, this.clipB, 4, 0, edge[0], true);
-            count = clip(this.clipB, this.clipA, count, 0, edge[1], false);
-            count = clip(this.clipA, this.clipB, count, 1, edge[2], true);
-            count = clip(this.clipB, this.clipA, count, 1, edge[3], false);
+            int count = clip(this.clipA, this.clipB, 4, 0, this.maskMin + rectangle.minX() * CELL_SIZE, true);
+            count = clip(this.clipB, this.clipA, count, 0, this.maskMin + rectangle.maxX() * CELL_SIZE, false);
+            count = clip(this.clipA, this.clipB, count, 1, this.maskMin + rectangle.minZ() * CELL_SIZE, true);
+            count = clip(this.clipB, this.clipA, count, 1, this.maskMin + rectangle.maxZ() * CELL_SIZE, false);
             if (count == 4) {
                 for (int i = 0; i < 4; i++) {
                     emitVertex(consumer, camPos, py, this.clipA[i], dx, dz, cos, sin, light);

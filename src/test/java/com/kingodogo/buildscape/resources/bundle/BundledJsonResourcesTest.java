@@ -35,6 +35,172 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BundledJsonResourcesTest {
 
     @Test
+    void binaryBundleOwnershipUsesTheForgeResolverWithoutAJsonArchive(@TempDir Path directory) throws IOException {
+        Path jar = directory.resolve("buildscape.jar");
+        byte[] payload = {0x42, 0x53, 0x52, 0x42};
+        String[] paths = {"assets/buildscape/resources.bsrb", "data/buildscape/data.bsrb"};
+        try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(jar))) {
+            for (String path : paths) {
+                zip.putNextEntry(new ZipEntry(path));
+                zip.write(payload);
+                zip.closeEntry();
+            }
+        }
+        try (var fs = FileSystems.newFileSystem(jar)) {
+            BundledJsonPack pack = new BundledJsonPack(path -> fs.getPath("/" + path));
+            for (String path : paths) {
+                assertTrue(pack.contains(path));
+                try (var in = pack.open(path)) {
+                    assertArrayEquals(payload, in.readAllBytes());
+                }
+            }
+            assertFalse(pack.contains("assets/other/resources.bsrb"));
+            assertNull(pack.open("data/other/data.bsrb"));
+        }
+    }
+
+    @Test
+    void parallelPreloadAndReadersPreserveEveryResource() throws Exception {
+        Map<String, byte[]> input = new LinkedHashMap<>();
+        for (int i = 0; i < 600; i++) {
+            input.put("assets/example/models/block/m" + i + ".json",
+                    ("{\"parent\":\"example:block/m" + i + "\"}" + " ".repeat(i % 300))
+                            .getBytes(StandardCharsets.UTF_8));
+        }
+        ByteArrayOutputStream archive = new ByteArrayOutputStream();
+        BundledJsonResources.write(input, archive);
+        BundledJsonResources resources = BundledJsonResources.read(new ByteArrayInputStream(archive.toByteArray()));
+        var executor = java.util.concurrent.Executors.newFixedThreadPool(4);
+        try {
+            var prepare = executor.submit(() -> {
+                resources.preload();
+                return null;
+            });
+            var readers = new java.util.ArrayList<java.util.concurrent.Future<?>>();
+            for (int worker = 0; worker < 3; worker++) {
+                readers.add(executor.submit(() -> {
+                    for (var entry : input.entrySet()) {
+                        try (var first = resources.open(entry.getKey());
+                                var second = resources.open(entry.getKey())) {
+                            assertEquals(entry.getValue()[0], first.read());
+                            assertArrayEquals(entry.getValue(), second.readAllBytes());
+                            assertArrayEquals(
+                                    java.util.Arrays.copyOfRange(entry.getValue(), 1, entry.getValue().length),
+                                    first.readAllBytes());
+                        }
+                    }
+                    return null;
+                }));
+            }
+            prepare.get();
+            for (var reader : readers) {
+                reader.get();
+            }
+        } finally {
+            executor.shutdownNow();
+        }
+        assertNull(resources.open("assets/example/models/block/missing.json"));
+    }
+
+    @Test
+    void preloadLeavesCorruptEntryErrorsLocalToThatResource() throws IOException {
+        ByteArrayOutputStream archive = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(archive);
+        out.writeInt(0x42534a31);
+        out.writeInt(2);
+        out.writeUTF("assets/example/models/bad.json");
+        out.writeInt(1);
+        out.writeInt(1);
+        out.writeByte(255);
+        ByteArrayOutputStream payload = new ByteArrayOutputStream();
+        try (var deflater = new java.util.zip.DeflaterOutputStream(payload)) {
+            deflater.write("{}".getBytes(StandardCharsets.UTF_8));
+        }
+        out.writeUTF("assets/example/models/good.json");
+        out.writeInt(2);
+        out.writeInt(payload.size());
+        out.write(payload.toByteArray());
+        BundledJsonResources resources = BundledJsonResources.read(new ByteArrayInputStream(archive.toByteArray()));
+        resources.preload();
+        try (var good = resources.open("assets/example/models/good.json")) {
+            assertArrayEquals("{}".getBytes(StandardCharsets.UTF_8), good.readAllBytes());
+        }
+        assertThrows(IOException.class, () -> resources.open("assets/example/models/bad.json"));
+    }
+
+    @Test
+    void listingWorkIsLimitedToTheRequestedPrefix(@TempDir Path directory) throws IOException {
+        Map<String, byte[]> paths = new LinkedHashMap<>();
+        for (int group = 0; group < 100; group++) {
+            for (int model = 0; model < 100; model++) {
+                paths.put("assets/example/models/block/group" + group + "/m" + model + ".json", new byte[0]);
+            }
+        }
+        Path archive = directory.resolve(BundledJsonResources.FILE);
+        Files.createDirectories(archive.getParent());
+        try (var out = Files.newOutputStream(archive)) {
+            BundledJsonResources.write(paths, out);
+        }
+        BundledJsonPack pack = new BundledJsonPack(directory);
+        pack.namespaces(PackType.CLIENT_RESOURCES);
+        long[] scanned = new long[10];
+        long[] indexed = new long[10];
+        for (int run = 0; run < 10; run++) {
+            long start = System.nanoTime();
+            int referenceCount = 0;
+            for (int query = 0; query < 100; query++) {
+                for (String path : paths.keySet()) {
+                    if (path.startsWith("assets/example/models/block/group42/") && path.endsWith(".json")) {
+                        referenceCount++;
+                    }
+                }
+            }
+            scanned[run] = System.nanoTime() - start;
+            start = System.nanoTime();
+            int actualCount = 0;
+            for (int query = 0; query < 100; query++) {
+                actualCount += pack.list(PackType.CLIENT_RESOURCES, "example", "models/block/group42", 9,
+                        name -> name.endsWith(".json")).size();
+            }
+            indexed[run] = System.nanoTime() - start;
+            assertEquals(referenceCount, actualCount);
+        }
+        java.util.Arrays.sort(scanned);
+        java.util.Arrays.sort(indexed);
+        System.out.println("Listing 100 queries over 10000 paths, 10 trials; scan median ns="
+                + (scanned[4] + scanned[5]) / 2 + "; indexed median ns=" + (indexed[4] + indexed[5]) / 2);
+    }
+
+    @Test
+    void indexedListingPreservesNamespacePrefixDepthAndReload(@TempDir Path directory) throws IOException {
+        Map<String, byte[]> paths = new LinkedHashMap<>();
+        paths.put("assets/example/models/block/a.json", "{}".getBytes(StandardCharsets.UTF_8));
+        paths.put("assets/example/models/block/nested/b.json", "{}".getBytes(StandardCharsets.UTF_8));
+        paths.put("assets/example/models/block_extra/c.json", "{}".getBytes(StandardCharsets.UTF_8));
+        paths.put("assets/other/models/block/d.json", "{}".getBytes(StandardCharsets.UTF_8));
+        Path archive = directory.resolve(BundledJsonResources.FILE);
+        Files.createDirectories(archive.getParent());
+        try (var out = Files.newOutputStream(archive)) {
+            BundledJsonResources.write(paths, out);
+        }
+        BundledJsonPack pack = new BundledJsonPack(directory);
+        assertEquals(Set.of(new ResourceLocation("example", "models/block/a.json")),
+                Set.copyOf(
+                        pack.list(PackType.CLIENT_RESOURCES, "example", "models/block", 3, n -> n.endsWith(".json"))));
+        assertEquals(2, pack.list(PackType.CLIENT_RESOURCES, "example", "models/block/", 4, n -> true).size());
+        assertEquals(0, pack.list(PackType.SERVER_DATA, "example", "models", 9, n -> true).size());
+        assertEquals(Set.of("example", "other"), pack.namespaces(PackType.CLIENT_RESOURCES));
+        paths.clear();
+        paths.put("assets/reloaded/models/new.json", "{}".getBytes(StandardCharsets.UTF_8));
+        try (var out = Files.newOutputStream(archive)) {
+            BundledJsonResources.write(paths, out);
+        }
+        pack.close();
+        assertEquals(Set.of("reloaded"), pack.namespaces(PackType.CLIENT_RESOURCES));
+        assertTrue(pack.list(PackType.CLIENT_RESOURCES, "example", "", 9, n -> true).isEmpty());
+    }
+
+    @Test
     void packagedWoodResourcesUseForgeResolverRatherThanJarFilename(@TempDir Path tempDir) throws IOException {
         Map<String, byte[]> json = new LinkedHashMap<>();
         String[] woods = {"cherry", "mangrove", "pale_oak", "poplar"};

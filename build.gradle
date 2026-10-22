@@ -123,6 +123,11 @@ tasks.named('test', Test).configure {
     classpath = files('src/main/resources') + classpath
 }
 
+def resourceCacheSetting = providers.gradleProperty('resource_cache_enabled').getOrElse('false')
+if (!(resourceCacheSetting in ['true', 'false'])) {
+    throw new GradleException('resource_cache_enabled must be true or false')
+}
+def resourceCacheEnabled = resourceCacheSetting == 'true'
 def resourceBundleDir = layout.buildDirectory.dir('generated/resourceBundle')
 def compileResourceBundle = tasks.register('compileResourceBundle', JavaExec) {
     dependsOn 'compileJava', 'syncBundledRecipeCache'
@@ -136,12 +141,29 @@ def compileResourceBundle = tasks.register('compileResourceBundle', JavaExec) {
     ]
     inputs.dir file('src/main/resources')
     outputs.dir resourceBundleDir
+    onlyIf { resourceCacheEnabled }
 }
 
 def verifyJarCoverage = { File jarFile ->
     if (!jarFile.exists()) return
     def zip = new java.util.zip.ZipFile(jarFile)
     try {
+        if (zip.getEntry('data/buildscape/recipes_pack/recipes.bscb') == null) {
+            throw new GradleException('Recipe cache must remain packaged in both resource-cache modes: ' + jarFile.name)
+        }
+        if (!resourceCacheEnabled) {
+            if (zip.stream().anyMatch { it.name.endsWith('.bsrb') || it.name.endsWith('.bsrc') }) {
+                throw new GradleException('Resource cache disabled but bundles remain in ' + jarFile.name)
+            }
+            fileTree('src/main/resources').matching { include '**/*.json' }.files.each { source ->
+                def path = file('src/main/resources').toPath().relativize(source.toPath()).toString().replace('\\', '/')
+                if (zip.getEntry(path) == null) {
+                    throw new GradleException('Resource cache disabled but JSON is missing: ' + path)
+                }
+            }
+            logger.lifecycle('Verified original JSON resource packaging: ' + jarFile.name)
+            return
+        }
         def hasResourcesBsrb = zip.getEntry('assets/buildscape/resources.bsrb') != null
         def hasDataBsrb = zip.getEntry('data/buildscape/data.bsrb') != null
         if (!hasResourcesBsrb || !hasDataBsrb) {
@@ -185,6 +207,7 @@ tasks.named('processResources', ProcessResources).configure {
                              mod_authors         : mod_authors, mod_description: mod_description, mod_display_url: mod_display_url,]
 
     inputs.properties replaceProperties
+    inputs.property 'resource_cache_enabled', resourceCacheEnabled
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     exclude '**/*.refmap.json'
@@ -193,7 +216,7 @@ tasks.named('processResources', ProcessResources).configure {
         expand replaceProperties + [project: project]
     }
 
-    from(resourceBundleDir) {
+    from({ resourceCacheEnabled ? resourceBundleDir.get().asFile : [] }) {
         include '**/*.bsrb'
         include '**/*.bsrc'
         include 'coverage.manifest'
@@ -201,6 +224,17 @@ tasks.named('processResources', ProcessResources).configure {
 
     Set<String> covered = []
     doFirst {
+        // Copy tasks retain removed outputs: clear only this task's verified build output when the mode changes.
+        def output = destinationDir.toPath().toAbsolutePath().normalize()
+        def expected = layout.buildDirectory.dir('resources/main').get().asFile.toPath().toAbsolutePath().normalize()
+        if (output != expected) {
+            throw new GradleException('Unexpected resource output directory: ' + output)
+        }
+        project.delete(output.toFile())
+        covered.clear()
+        if (!resourceCacheEnabled) {
+            return
+        }
         def manifestFile = resourceBundleDir.get().file('coverage.manifest').asFile
         if (!manifestFile.exists()) {
             throw new GradleException('Fail-closed: coverage.manifest is missing from bundle build!')

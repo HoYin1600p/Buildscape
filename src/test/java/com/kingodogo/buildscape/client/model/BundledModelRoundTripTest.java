@@ -204,12 +204,9 @@ public class BundledModelRoundTripTest {
 
     @Test
     void testVerticalSlabDisplayInheritance() throws Exception {
-        BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
-        registry.ensureInitialized();
-
-        ModelIR itemIR = registry.getModel("buildscape:item/bit_exposed_cut_copper_vertical_slab");
-        ModelIR blockIR = registry.getModel("buildscape:block/bit_exposed_cut_copper_vertical_slab");
-        ModelIR templateIR = registry.getModel("buildscape:block/template_vertical_slab");
+        ModelIR itemIR = compileSourceModel("item/bit_exposed_cut_copper_vertical_slab");
+        ModelIR blockIR = compileSourceModel("block/bit_exposed_cut_copper_vertical_slab");
+        ModelIR templateIR = compileSourceModel("block/template_vertical_slab");
 
         assertNotNull(itemIR);
         assertNotNull(blockIR);
@@ -228,5 +225,10 @@ public class BundledModelRoundTripTest {
         assertEquals(new com.mojang.math.Vector3f(30.0f, 315.0f, 0.0f), transforms.gui.rotation);
         assertEquals(new com.mojang.math.Vector3f(-0.125f, 0.0f, 0.25f), transforms.gui.translation);
         assertEquals(new com.mojang.math.Vector3f(0.625f, 0.625f, 0.625f), transforms.gui.scale);
+    }
+
+    private static ModelIR compileSourceModel(String path) throws IOException {
+        var file = java.nio.file.Path.of("src/main/resources/assets/buildscape/models", path + ".json");
+        return ModelCompiler.compile("buildscape:" + path, java.nio.file.Files.readString(file));
     }
 }

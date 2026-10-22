@@ -13,7 +13,7 @@ plugins {
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0,7)'
     id 'checkstyle'
-    id 'com.diffplug.spotless' version '6.25.0'
+    id 'com.diffplug.spotless' version '8.10.4'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -138,7 +138,7 @@ spotless {
     lineEndings = com.diffplug.spotless.LineEnding.UNIX
     java {
         target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
-        eclipse().configFile('config/spotless/eclipse-formatter.xml')
+        eclipse('4.29').configFile('config/spotless/eclipse-formatter.xml')
     }
 }
 

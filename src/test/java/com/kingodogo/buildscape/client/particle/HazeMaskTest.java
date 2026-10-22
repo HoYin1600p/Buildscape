@@ -21,6 +21,126 @@ import static org.junit.Assert.assertTrue;
 public final class HazeMaskTest extends BootstrappedGameTest {
 
     @Test
+    public void hazeReachesIntoTheBlockedCellUpToTheGivenDepth() {
+        // One row with a block at x = 3, entered from its min X side (the visible cell x = 2).
+        HazeMask row = HazeMask.compute(5, 1, 0, 0, (x, z) -> x == 3, (x, z, side) -> {
+            assertEquals(3, (int) x);
+            assertEquals(0, side);
+            return 0.375;
+        });
+        assertEquals(List.of(new HazeMask.Rectangle(0, 0, 3, 1)), row.rectangles());
+        assertEquals(List.of(new HazeMask.Strip(3.0, 0.0, 3.375, 1.0)), row.strips());
+        // Without a depth function nothing is added, as before.
+        assertTrue(HazeMask.compute(5, 1, 0, 0, (x, z) -> x == 3).strips().isEmpty());
+    }
+
+    @Test
+    public void depthsAreClampedToTheCellAndOppositeSidesNeverOverlap() {
+        boolean[] visible = {true, false, true};
+        boolean[] occupied = {false, true, false};
+        // 0.75 from each side covers the whole cell: it is drawn whole, merged into the rectangles.
+        HazeMask.EdgeFill fill = HazeMask.edgeFill(3, 1, visible, occupied, (x, z, side) -> 0.75);
+        assertTrue(fill.strips().isEmpty());
+        assertTrue(fill.whole()[1]);
+        HazeMask whole = HazeMask.compute(3, 1, 0, 0, (x, z) -> x == 1, (x, z, side) -> 1.0);
+        assertEquals(List.of(new HazeMask.Rectangle(0, 0, 1, 1)), whole.rectangles());
+        assertEquals(List.of(new HazeMask.Rectangle(0, 0, 2, 1)), whole.drawRectangles());
+        // Negative depths add nothing.
+        HazeMask.EdgeFill none = HazeMask.edgeFill(3, 1, visible, occupied, (x, z, side) -> -1.0);
+        assertTrue(none.strips().isEmpty());
+        assertFalse(none.whole()[1]);
+    }
+
+    @Test
+    public void cellsWithoutAVisibleNeighbourGetNothingAndStripsMergeAcrossCells() {
+        // A blocked row z = 1 under a visible row z = 0; row z = 2 is hidden (not visible, not blocked).
+        boolean[] visible = {true, true, true, false, false, false, false, false, false};
+        boolean[] occupied = {false, false, false, true, true, true, false, false, false};
+        HazeMask.EdgeFill fill = HazeMask.edgeFill(3, 3, visible, occupied, (x, z, side) -> {
+            assertEquals("only entered from the visible row", 2, side);
+            return 0.5;
+        });
+        // Three equal strips along the row join into one.
+        assertEquals(List.of(new HazeMask.Strip(0.0, 1.0, 3.0, 1.5)), fill.strips());
+    }
+
+    @Test
+    public void gridFollowsHalfBlockLinesAndCoversTheRadiusOnBothSides() {
+        for (double origin : new double[]{-0.3, -2.75, 0.0, 0.49, 7.51, 1234.999}) {
+            double min = HazeMask.gridMin(origin, 12, 0.5);
+            assertEquals(origin + " on a half-block line", 0.0, Math.abs(min * 2.0 - Math.rint(min * 2.0)), 0.0);
+            assertTrue(origin + " cover below", origin - min >= 12 * 0.5);
+            assertTrue(origin + " cover above", min + 25 * 0.5 - origin >= 12 * 0.5);
+        }
+    }
+
+    @Test
+    public void entryDepthCoversOpaqueCellsAndStopsJustPastThinFaces() {
+        Long2ObjectMap<List<AABB>> shapes = new Long2ObjectOpenHashMap<>();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        double overlap = 1.0 / 16.0;
+        SingleBlockLookup stone = new SingleBlockLookup(BlockPos.ZERO, Blocks.STONE.defaultBlockState());
+        assertEquals(1.0, HazeMask.entryDepth(stone, pos, shapes, 0.0, 0.0, 0.5, 0.2, 0, overlap), 0.0);
+
+        // A closed door facing west sits at x 13/16..1: from the cell x 0.5..1 it is 5/16 in, plus 1/16.
+        SingleBlockLookup door = new SingleBlockLookup(BlockPos.ZERO, Blocks.OAK_DOOR.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.DoorBlock.FACING, net.minecraft.core.Direction.WEST));
+        shapes.clear();
+        assertEquals((5.0 / 16.0 + overlap) / 0.5,
+                HazeMask.entryDepth(door, pos, shapes, 0.5, 0.0, 0.5, 0.2, 0, overlap),
+                1e-9);
+
+        // A lone glass pane post at 7/16..9/16: 7/16 in from x = 0, plus 1/16, is the whole cell.
+        SingleBlockLookup pane = new SingleBlockLookup(BlockPos.ZERO, Blocks.GLASS_PANE.defaultBlockState());
+        shapes.clear();
+        assertEquals(1.0, HazeMask.entryDepth(pane, pos, shapes, 0.0, 0.0, 0.5, 0.2, 0, overlap), 1e-9);
+    }
+
+    @Test
+    public void stripsEnteringFromFourSidesCoverTheirAreasWithoutOverlap() {
+        // A blocked cell at the centre of a 3 x 3 grid with all four neighbours visible.
+        boolean[] visible = new boolean[9];
+        visible[1] = visible[3] = visible[5] = visible[7] = true;
+        boolean[] occupied = new boolean[9];
+        occupied[4] = true;
+        List<HazeMask.Strip> strips = HazeMask.edgeFill(3, 3, visible, occupied, (x, z, side) -> 0.25).strips();
+        double area = 0.0;
+        for (int i = 0; i < strips.size(); i++) {
+            HazeMask.Strip a = strips.get(i);
+            area += (a.maxX() - a.minX()) * (a.maxZ() - a.minZ());
+            for (int j = i + 1; j < strips.size(); j++) {
+                HazeMask.Strip b = strips.get(j);
+                boolean overlap = a.minX() < b.maxX() && b.minX() < a.maxX() && a.minZ() < b.maxZ()
+                        && b.minZ() < a.maxZ();
+                assertFalse(a + " overlaps " + b, overlap);
+            }
+        }
+        // Two full-height X strips (2 x 0.25) plus two Z strips over the remaining 0.5 width (2 x 0.125).
+        assertEquals(0.75, area, 1e-9);
+    }
+
+    @Test
+    public void faceDistanceMeasuresToTheRealCollisionFace() {
+        BlockGetter level = new SingleBlockLookup(BlockPos.ZERO, Blocks.COBBLESTONE_WALL.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.WallBlock.EAST_WALL,
+                        net.minecraft.world.level.block.state.properties.WallSide.LOW)
+                .setValue(net.minecraft.world.level.block.WallBlock.WEST_WALL,
+                        net.minecraft.world.level.block.state.properties.WallSide.LOW)
+                .setValue(net.minecraft.world.level.block.WallBlock.UP, false));
+        Long2ObjectMap<List<AABB>> shapes = new Long2ObjectOpenHashMap<>();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        // A wall running along X: its arm spans z 5/16 to 11/16. Entering the cell z 0..0.5 from min Z.
+        double distance = HazeMask.faceDistance(level, pos, shapes, 0.0, 0.0, 0.5, 0.5, 0.2, 2);
+        assertEquals(5.0 / 16.0, distance, 1e-9);
+        // From max Z into the cell z 0.5..1: the arm ends at 11/16, so 5/16 in from z = 1.
+        assertEquals(5.0 / 16.0, HazeMask.faceDistance(level, pos, shapes, 0.0, 0.5, 0.5, 1.0, 0.2, 3), 1e-9);
+        // Along the arm (from min X) the face is the cell edge itself.
+        assertEquals(0.0, HazeMask.faceDistance(level, pos, shapes, 0.0, 0.0, 0.5, 0.5, 0.2, 0), 1e-9);
+        // Nothing to hit in an empty cell.
+        assertEquals(Double.MAX_VALUE, HazeMask.faceDistance(level, pos, shapes, 2.0, 2.0, 2.5, 2.5, 0.2, 2), 0.0);
+    }
+
+    @Test
     public void openFieldKeepsEveryCellAndMergesIntoOneRectangle() {
         HazeMask mask = HazeMask.compute(25, 25, 12, 12, (x, z) -> false);
         assertAllVisible(mask, 25, 25);

@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public final class ModelAdapter {
                 Vector3f from = new Vector3f(el.from()[0], el.from()[1], el.from()[2]);
                 Vector3f to = new Vector3f(el.to()[0], el.to()[1], el.to()[2]);
 
-                Map<Direction, BlockElementFace> faces = new HashMap<>();
+                Map<Direction, BlockElementFace> faces = new EnumMap<>(Direction.class);
                 for (Map.Entry<Byte, ModelIR.FaceIR> fEntry : el.faces().entrySet()) {
                     Direction dir = Direction.from3DDataValue(fEntry.getKey());
                     ModelIR.FaceIR faceIR = fEntry.getValue();
@@ -109,8 +110,14 @@ public final class ModelAdapter {
 
         ItemTransform thirdperson_r = toItemTransform(transforms.get("thirdperson_righthand"));
         ItemTransform thirdperson_l = toItemTransform(transforms.get("thirdperson_lefthand"));
+        if (!transforms.containsKey("thirdperson_lefthand")) {
+            thirdperson_l = thirdperson_r;
+        }
         ItemTransform firstperson_r = toItemTransform(transforms.get("firstperson_righthand"));
         ItemTransform firstperson_l = toItemTransform(transforms.get("firstperson_lefthand"));
+        if (!transforms.containsKey("firstperson_lefthand")) {
+            firstperson_l = firstperson_r;
+        }
         ItemTransform head = toItemTransform(transforms.get("head"));
         ItemTransform gui = toItemTransform(transforms.get("gui"));
         ItemTransform ground = toItemTransform(transforms.get("ground"));

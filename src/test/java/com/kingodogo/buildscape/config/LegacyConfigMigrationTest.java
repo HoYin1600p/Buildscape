@@ -45,12 +45,25 @@ public class LegacyConfigMigrationTest extends BootstrappedGameTest {
         method.invoke(config);
     }
 
+    private static String pre405Items(boolean vault) throws Exception {
+        com.google.gson.JsonObject document = ConfigPaths.loadItemsTemplate("legacy_pillar_items_pre405");
+        com.google.gson.JsonArray items = new com.google.gson.JsonArray();
+        for (com.google.gson.JsonElement entry : document.getAsJsonArray("items")) {
+            String item = entry.getAsString();
+            if (vault || !item.startsWith("the_vault:") && !item.startsWith("#the_vault:")) {
+                items.add(entry.deepCopy());
+            }
+        }
+        document.add("items", items);
+        return new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(document);
+    }
+
     @Test
     public void exactOldItemsGainNewDefaultsWithoutReorderingOnLoad() throws Exception {
         for (boolean vault : new boolean[]{false, true}) {
             Path directory = temporary.newFolder().toPath();
             Path file = directory.resolve("pillar-items.json");
-            String original = fixture("old-pillar-items-" + (vault ? "vault" : "vanilla") + ".json");
+            String original = pre405Items(vault);
             Set<String> oldItems = PillarParticleConfig.parseItems(original);
             assertTrue(oldItems.contains("minecraft:diamond"));
             assertTrue(oldItems.contains("buildscape:ancient_ashen_scroll"));
@@ -60,6 +73,10 @@ public class LegacyConfigMigrationTest extends BootstrappedGameTest {
             config.loadItemsInternal(vault);
             assertTrue(config.items.containsAll(oldItems));
             assertTrue(config.items.containsAll(ConfigPaths.loadDefaultItems(vault)));
+            com.google.gson.JsonObject merged = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file));
+            assertTrue(merged.has("offered_defaults"));
+            assertEquals(410, merged.get("defaults_version").getAsInt());
+            assertEquals(original, ConfigLayoutIO.readText(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));
             com.google.gson.JsonArray before = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(original))
                     .getAsJsonArray("items");
             com.google.gson.JsonArray after = ConfigLayoutIO.readProperties(ConfigLayoutIO.readText(file))
@@ -69,12 +86,14 @@ public class LegacyConfigMigrationTest extends BootstrappedGameTest {
             }
 
             config.items.remove("minecraft:diamond");
+            assertTrue(config.items.remove("buildscape:bone_dice"));
             assertTrue(config.saveItemsToDisk(vault));
             assertEquals(original, ConfigLayoutIO.readText(file.resolveSibling("pillar-items.json.pre-4.0.5.bak")));
             String saved = ConfigLayoutIO.readText(file);
             PillarParticleConfig reloaded = new PillarParticleConfig(directory);
             reloaded.loadItemsInternal(vault);
             assertFalse(reloaded.items.contains("minecraft:diamond"));
+            assertFalse(reloaded.items.contains("buildscape:bone_dice"));
             assertEquals(saved, ConfigLayoutIO.readText(file));
         }
     }
@@ -84,7 +103,7 @@ public class LegacyConfigMigrationTest extends BootstrappedGameTest {
         for (boolean vault : new boolean[]{false, true}) {
             Path directory = temporary.newFolder().toPath();
             Path file = directory.resolve("pillar-items.json");
-            String original = fixture("old-pillar-items-" + (vault ? "vault" : "vanilla") + ".json")
+            String original = pre405Items(vault)
                     .replaceAll("(?m)^\\s*\"minecraft:diamond\",\\R", "")
                     .replaceAll("(?m)^\\s*\"the_vault:echo_pog\",\\R", "");
             Files.writeString(file, original);

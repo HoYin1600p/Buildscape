@@ -61,13 +61,19 @@ public class PresetsConfig {
     private transient Integer customSlotsOverride;
 
     public void load() {
+        ModList mods = ModList.get();
+        load(mods != null && mods.isLoaded("the_vault"));
+    }
+
+    void load(boolean vaultLoaded) {
+        Set<String> defaultItems = ConfigPaths.loadDefaultItems(vaultLoaded);
         File file = getPresetsFile();
         if (!file.exists()) {
             if (ConfigPaths.copyTemplateIfMissing(file.toPath(),
                     "/data/buildscape/config/default_pillar_presets.json")) {
                 // Template copied from resources, proceed to parse from disk
             } else {
-                initializeDefaults();
+                initializeDefaults(defaultItems);
                 fileUnreadable = false;
                 save();
                 return;
@@ -117,14 +123,13 @@ public class PresetsConfig {
             PillarParticleConfig.backupUnreadableFile(file);
             BuildScape.LOGGER.error("Failed to load presets {}; keeping the last good presets", file, e);
             if (presets.isEmpty()) {
-                initializeDefaults();
+                initializeDefaults(defaultItems);
             }
+            rebuildDefaultPreset(defaultItems);
             return;
         }
 
-        if (!presets.containsKey(DEFAULT_PRESET_KEY)) {
-            presets.put(DEFAULT_PRESET_KEY, new Preset("Default", getDefaultItems()));
-        }
+        rebuildDefaultPreset(defaultItems);
 
         if (lastAppliedPreset == null || lastAppliedPreset.isEmpty()) {
             lastAppliedPreset = DEFAULT_PRESET_KEY;
@@ -262,16 +267,18 @@ public class PresetsConfig {
         }
     }
 
-    private void initializeDefaults() {
+    private void initializeDefaults(Set<String> defaultItems) {
         presets.clear();
         preservedPresets.clear();
 
-        Preset defaultPreset = new Preset("Default", getDefaultItems());
+        Preset defaultPreset = new Preset("Default", defaultItems);
         presets.put(DEFAULT_PRESET_KEY, defaultPreset);
     }
 
-    private Set<String> getDefaultItems() {
-        return ConfigPaths.loadDefaultItems(ModList.get().isLoaded("the_vault"));
+    private void rebuildDefaultPreset(Set<String> defaultItems) {
+        Preset previous = presets.get(DEFAULT_PRESET_KEY);
+        presets.put(DEFAULT_PRESET_KEY, new Preset(previous == null ? "Default" : previous.name, defaultItems));
+        preservedPresets.remove(DEFAULT_PRESET_KEY);
     }
 
     public List<Preset> getPresets() {

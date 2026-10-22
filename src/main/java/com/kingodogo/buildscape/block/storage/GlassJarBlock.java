@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -47,6 +48,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Random;
 
 import com.kingodogo.buildscape.core.NbtKeys;
 import com.kingodogo.buildscape.core.WaterloggedBlock;
@@ -54,19 +56,20 @@ import com.kingodogo.buildscape.core.WaterloggedBlock;
 public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty GLOWING = BooleanProperty.create("glowing");
     protected static final VoxelShape SHAPE = Shapes.or(
             Block.box(4.0, 0.0, 4.0, 12.0, 12.0, 12.0),
             Block.box(5.0, 12.0, 5.0, 11.0, 13.0, 11.0),
             Block.box(4.5, 13.0, 4.5, 11.5, 14.0, 11.5));
 
     public GlassJarBlock(Properties properties) {
-        super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false));
+        super(properties.lightLevel(state -> state.getValue(GLOWING) ? 15 : 0));
+        this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false).setValue(GLOWING, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WATERLOGGED);
+        builder.add(WATERLOGGED, GLOWING);
     }
 
     @Override
@@ -102,6 +105,13 @@ public class GlassJarBlock extends WaterloggedBlock implements EntityBlock, Simp
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new GlassJarBlockEntity(pos, state);
+    }
+
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+        if (level.getBlockEntity(pos) instanceof GlassJarBlockEntity jarBE) {
+            jarBE.updateGlowingState();
+        }
     }
 
     @Override

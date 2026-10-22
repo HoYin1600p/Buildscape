@@ -70,7 +70,8 @@ public final class SculkCatalystHandler {
                 debug("no catalyst in range entity={}", entity.getUUID());
             } else if (!death.catalyst.isRemoved() && CONSUMPTION.tryConsume(entity)) {
                 debug("catalyst found entity={} catalyst={}", entity.getUUID(), death.catalyst.getBlockPos());
-                death.catalyst.absorbExperience(deathPos, reward);
+                death.catalyst.absorbExperience(new BlockPos(entity.getX(), entity.getY() + 0.5, entity.getZ()),
+                        reward);
                 debug("charge entity={} catalyst={} XP={}", entity.getUUID(), death.catalyst.getBlockPos(), reward);
             }
         } finally {

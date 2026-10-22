@@ -1,8 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.mixin.accessor.BeaconRendererInvoker;
-import com.kingodogo.buildscape.util.BeaconBeamScanState;
-import com.kingodogo.buildscape.util.BeaconScanContext;
+import com.kingodogo.buildscape.util.BeaconBeamHeightAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
@@ -27,8 +26,7 @@ public class BeaconBlockEntityRendererMixin {
             int combinedLight,
             int combinedOverlay,
             CallbackInfo callback) {
-        int cutoff = BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos());
-        if (cutoff >= BeaconBeamScanState.UNLIMITED) {
+        if (!((BeaconBeamHeightAccessor) blockEntity).buildscape$getBeamScanState().confirmedStopped()) {
             return;
         }
 
@@ -36,11 +34,6 @@ public class BeaconBlockEntityRendererMixin {
         List<BeaconBeamSection> sections = blockEntity.getBeamSections();
         int yOffset = 0;
         for (BeaconBeamSection section : sections) {
-            int remaining = cutoff - yOffset;
-            if (remaining <= 0) {
-                break;
-            }
-
             int sectionHeight = section.getHeight();
             BeaconRendererInvoker.invokeRenderBeaconBeam(
                     poseStack,
@@ -48,7 +41,7 @@ public class BeaconBlockEntityRendererMixin {
                     partialTicks,
                     gameTime,
                     yOffset,
-                    Math.min(sectionHeight, remaining),
+                    sectionHeight,
                     section.getColor());
             yOffset += sectionHeight;
         }

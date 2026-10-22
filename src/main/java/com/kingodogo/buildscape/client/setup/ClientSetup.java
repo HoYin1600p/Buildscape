@@ -390,7 +390,6 @@ public class ClientSetup {
                         MasonryItems.CASCADE_BLOCK_NO_MIST),
                 itemTint(leafItemTint(vanillaItemColors),
                         WoodItems.OAK_LEAF_LAYERS,
-                        CopperItems.LEAF_LITTER,
                         WoodItems.SPRUCE_LEAF_LAYERS,
                         WoodItems.BIRCH_LEAF_LAYERS,
                         WoodItems.JUNGLE_LEAF_LAYERS,
@@ -647,9 +646,7 @@ public class ClientSetup {
                 Block block = blockItem.getBlock();
 
                 int color = -1;
-                if (block == CopperBlocks.LEAF_LITTER.get()) {
-                    color = DryFoliageColor.getDefaultColor();
-                } else if (block == CopperBlocks.BUSH.get()
+                if (block == CopperBlocks.BUSH.get()
                         || block == WoodBlocks.OAK_LEAF_HEDGE.get()
                         || block == WoodBlocks.OAK_LEAF_LAYERS.get()) {
                     color = vanillaItemColors.getColor(new ItemStack(Items.OAK_LEAVES), 0);

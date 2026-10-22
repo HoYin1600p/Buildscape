@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.recipe;
 
 import com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver;
 import com.kingodogo.buildscape.recipe.framework.compiler.FamilyExpander;
+import com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator;
 import com.kingodogo.buildscape.recipe.framework.compiler.RecipeIdAllocator;
 import com.kingodogo.buildscape.recipe.framework.compiler.ShapedRecipeSymbols;
 import com.kingodogo.buildscape.recipe.framework.compiler.TemplateEngine;
@@ -10,14 +11,33 @@ import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class RecipeCompilationTest {
+    @Test
+    public void bundledPackContainsShapedPoplarBoat() throws Exception {
+        Path directory = Path.of("src/main/resources/data/buildscape/recipes_pack");
+        List<RecipeIR.RecipeSpec> boats = parse(Files.readString(directory.resolve("crafting.json"))).stream()
+                .filter(spec -> spec.result() != null && "BS:poplar_boat".equals(spec.result().item()))
+                .toList();
+        assertEquals(1, boats.size());
+        RecipeIR.RecipeSpec boat = boats.get(0);
+        assertEquals("shaped", boat.type());
+        assertEquals(List.of("# #", "###"), boat.pattern());
+        assertEquals(Map.of("#", "BS:poplar_planks"), boat.keys());
+        assertEquals(1, boat.result().count());
+        assertArrayEquals(RecipeCacheGenerator.generateCache(directory),
+                Files.readAllBytes(directory.resolve("recipes.bscb")));
+    }
+
     @Test
     public void outputIdsRemainStableWhenRecipeContentsChange() throws Exception {
         RecipeIR.RecipeSpec one = parse("{\"stonecutting\":[[\"BS:copper_chest\",\"MC:stone\",1]]}").get(0);

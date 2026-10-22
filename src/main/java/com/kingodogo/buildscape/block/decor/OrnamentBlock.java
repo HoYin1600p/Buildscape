@@ -4,7 +4,6 @@ import com.kingodogo.buildscape.core.DyeColors;
 import com.kingodogo.buildscape.core.WaterloggedGlassBlock;
 import com.kingodogo.buildscape.network.ActionBarMessagePacket;
 import com.kingodogo.buildscape.network.ModMessages;
-import com.kingodogo.buildscape.util.BeaconScanContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -355,8 +354,7 @@ public class OrnamentBlock
             BlockPos pos,
             BlockPos beaconPos) {
         if (this.isTinted) {
-            BeaconScanContext.markBlocking(level, pos, beaconPos);
-            return new float[]{1.0F, 1.0F, 1.0F};
+            return null;
         }
 
         int color = state.getMapColor(level, pos).col;

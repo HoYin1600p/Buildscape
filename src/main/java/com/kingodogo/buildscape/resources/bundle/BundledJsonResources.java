@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.resources.bundle;
 
 import java.io.ByteArrayInputStream;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -12,7 +13,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
+import java.util.zip.DataFormatException;
 import java.util.zip.DeflaterOutputStream;
+import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 public final class BundledJsonResources {
@@ -20,9 +30,57 @@ public final class BundledJsonResources {
     private static final int MAGIC = 0x42534a31;
     private static final int MAX_BYTES = 64 * 1024 * 1024;
     private static final int MAX_FILE_BYTES = 4 * 1024 * 1024;
+    private static final Pattern RESOURCE_PATH = Pattern.compile(
+            "assets/[a-z0-9_.-]+/(models|blockstates)/[a-z0-9_./-]+\\.json");
     private final Map<String, Entry> entries;
 
-    private record Entry(int length, byte[] compressed) {
+    private static final class Entry {
+        private final int length;
+        private byte[] compressed;
+        private volatile byte[] decoded;
+
+        private Entry(int length, byte[] compressed) {
+            this.length = length;
+            this.compressed = compressed;
+        }
+
+        private byte[] bytes() throws IOException {
+            byte[] result = decoded;
+            if (result != null) {
+                return result;
+            }
+            synchronized (this) {
+                if (decoded == null) {
+                    byte[] bytes = new byte[length];
+                    if (length > 0) {
+                        Inflater inflater = new Inflater();
+                        try {
+                            inflater.setInput(compressed);
+                            int actual = inflater.inflate(bytes);
+                            if (actual != length || !inflater.finished()) {
+                                throw new IOException(
+                                        "Bundled JSON length mismatch: expected " + length + ", got " + actual);
+                            }
+                        } catch (DataFormatException e) {
+                            throw new IOException("Decompression error for bundled JSON", e);
+                        } finally {
+                            inflater.end();
+                        }
+                    }
+                    compressed = null;
+                    decoded = bytes;
+                }
+                return decoded;
+            }
+        }
+
+        private void preload() {
+            try {
+                bytes();
+            } catch (IOException ignored) {
+                // Preserve lazy error handling: an unread corrupt resource must not hide valid resources.
+            }
+        }
     }
 
     private BundledJsonResources(Map<String, Entry> entries) {
@@ -58,7 +116,7 @@ public final class BundledJsonResources {
     }
 
     public static BundledJsonResources read(InputStream stream) throws IOException {
-        DataInputStream in = new DataInputStream(stream);
+        DataInputStream in = new DataInputStream(new BufferedInputStream(stream, 64 * 1024));
         if (in.readInt() != MAGIC) {
             throw new IOException("Invalid bundled JSON header");
         }
@@ -103,22 +161,60 @@ public final class BundledJsonResources {
         return entries.containsKey(path);
     }
 
+    public void preload() throws IOException {
+        List<Entry> batch = List.copyOf(entries.values());
+        int workers = Math.min(4, Math.max(1, Runtime.getRuntime().availableProcessors() / 2));
+        if (workers == 1 || batch.size() < 256) {
+            batch.forEach(Entry::preload);
+            return;
+        }
+        ExecutorService executor = Executors.newFixedThreadPool(workers, task -> {
+            Thread thread = new Thread(task, "Buildscape resource decode");
+            thread.setDaemon(true);
+            return thread;
+        });
+        List<Future<?>> tasks = new ArrayList<>(workers);
+        try {
+            for (int worker = 0; worker < workers; worker++) {
+                int start = batch.size() * worker / workers;
+                int end = batch.size() * (worker + 1) / workers;
+                tasks.add(executor.submit(() -> {
+                    for (int i = start; i < end && !Thread.currentThread().isInterrupted(); i++) {
+                        batch.get(i).preload();
+                    }
+                }));
+            }
+            for (Future<?> task : tasks) {
+                task.get();
+            }
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Interrupted while preparing bundled JSON", interrupted);
+        } catch (ExecutionException failure) {
+            if (failure.getCause() instanceof Error error) {
+                throw error;
+            }
+            throw new IOException("Unable to prepare bundled JSON", failure.getCause());
+        } finally {
+            tasks.forEach(task -> task.cancel(true));
+            executor.shutdownNow();
+        }
+    }
+
     public InputStream open(String path) throws IOException {
         Entry entry = entries.get(path);
         if (entry == null) {
             return null;
         }
-        try (InflaterInputStream inflater = new InflaterInputStream(new ByteArrayInputStream(entry.compressed()))) {
-            byte[] bytes = inflater.readNBytes(entry.length() + 1);
-            if (bytes.length != entry.length() || inflater.read() != -1) {
-                throw new IOException("Bundled JSON length mismatch: " + path);
-            }
-            return new ByteArrayInputStream(bytes);
+        try {
+            return new ByteArrayInputStream(entry.bytes());
+        } catch (IOException failure) {
+            throw new IOException("Unable to decode bundled JSON: " + path, failure);
         }
     }
 
     private static void validatePath(String path) throws IOException {
-        if (!path.matches("assets/[a-z0-9_.-]+/(models|blockstates)/[a-z0-9_./-]+\\.json")
+        if (!RESOURCE_PATH.matcher(path).matches()
                 || path.contains("/../") || path.contains("/./") || path.contains("//")) {
             throw new IOException("Invalid bundled JSON resource path: " + path);
         }

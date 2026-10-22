@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.resources.bundle.adapter.BlockStateAdapter;
 import com.kingodogo.buildscape.resources.bundle.adapter.ModelAdapter;
 import com.kingodogo.buildscape.resources.bundle.adapter.ResourcePackPrecedenceTracker;
+import com.kingodogo.buildscape.resources.bundle.model.ModelIR;
 import com.kingodogo.buildscape.resources.bundle.runtime.BundledResourceRegistry;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.BlockModelDefinition;
@@ -19,12 +20,19 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class VhaModelBakeryIntegration {
+    public static final boolean ENABLE_VHA_NATIVE = Boolean.parseBoolean(
+            System.getProperty("buildscape.vha.native", "false"));
     private static final String API = "dev.hoyin1600p.vhaccelerator.api.client.ModelBakeryEvents";
     private static final AtomicBoolean REPORTED_FAILURE = new AtomicBoolean();
+    private static final ConcurrentMap<String, BlockModel> PREPARED_MODELS = new ConcurrentHashMap<>();
     private static volatile Method resourceLookup;
     private static volatile Method modelLookup;
     private static volatile Method blockStateLookup;
@@ -32,7 +40,47 @@ public final class VhaModelBakeryIntegration {
 
     private VhaModelBakeryIntegration() {}
 
+    public static BlockModel getPreparedModel(String id) {
+        return PREPARED_MODELS.get(id);
+    }
+
+    public static void prepareModels(ResourceManager manager) {
+        BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
+        registry.ensureInitialized();
+        ResourcePackPrecedenceTracker.ensureInitialized(manager);
+        bundlePack(manager);
+
+        Map<String, ModelIR> models = registry.getModels();
+        if (models.isEmpty()) {
+            return;
+        }
+
+        List<Map.Entry<String, ModelIR>> entries = new ArrayList<>(models.entrySet());
+        long start = System.nanoTime();
+        BuildscapeStartupWork.forEachIndex(entries.size(), index -> {
+            Map.Entry<String, ModelIR> entry = entries.get(index);
+            String id = entry.getKey();
+            if (!registry.isModelOverridden(id)) {
+                BlockModel nativeModel = ModelAdapter.toBlockModel(entry.getValue());
+                if (nativeModel != null) {
+                    nativeModel.name = id;
+                    PREPARED_MODELS.put(id, nativeModel);
+                }
+            }
+        });
+        long elapsed = (System.nanoTime() - start) / 1_000_000L;
+        BuildScape.LOGGER.info("Prepared {} bundled models in parallel ({} ms)", PREPARED_MODELS.size(), elapsed);
+    }
+
     public static void register() {
+        if (!ENABLE_VHA_NATIVE) {
+            BuildScape.LOGGER.info(
+                    "Buildscape VHA native model provider is disabled (serving bundled resources via ResourceManager)");
+            return;
+        }
+        if (BundledResourceRegistry.getInstance().getModels().isEmpty()) {
+            return;
+        }
         try {
             ClassLoader loader = VhaModelBakeryIntegration.class.getClassLoader();
             Class<?> api = Class.forName(API, false, loader);
@@ -61,25 +109,38 @@ public final class VhaModelBakeryIntegration {
                         ResourceManager manager = (ResourceManager) arguments[0];
                         if (method.getName().equals("beforePreparation")) {
                             packCache = null;
-                            BundledResourceRegistry.getInstance().ensureInitialized();
-                            ResourcePackPrecedenceTracker.ensureInitialized(manager);
+                            PREPARED_MODELS.clear();
+                            prepareModels(manager);
                             return null;
                         }
                         BundledResourceRegistry registry = BundledResourceRegistry.getInstance();
                         if (method.getName().equals("model")) {
                             ResourceLocation id = (ResourceLocation) arguments[1];
-                            var ir = registry.getModel(id.toString());
-                            if (ir == null) {
+                            String idStr = id.toString();
+                            BlockModel nativeModel = PREPARED_MODELS.get(idStr);
+                            if (nativeModel == null) {
+                                var ir = registry.getModel(idStr);
+                                if (ir == null) {
+                                    return null;
+                                }
+                                long started = System.nanoTime();
+                                nativeModel = ModelAdapter.toBlockModel(ir);
+                                registry.recordNativeConversionNanos(System.nanoTime() - started);
+                                if (nativeModel != null) {
+                                    nativeModel.name = idStr;
+                                    PREPARED_MODELS.put(idStr, nativeModel);
+                                }
+                            } else {
+                                registry.recordServedModel(idStr);
+                            }
+                            if (nativeModel == null) {
                                 return null;
                             }
                             String pack = bundlePack(manager);
                             if (pack == null) {
                                 return null;
                             }
-                            long started = System.nanoTime();
-                            BlockModel nativeModel = ModelAdapter.toBlockModel(ir);
-                            registry.recordNativeConversionNanos(System.nanoTime() - started);
-                            return nativeModel == null ? null : model.newInstance(pack, nativeModel);
+                            return model.newInstance(pack, nativeModel);
                         }
                         if (method.getName().equals("blockState")) {
                             ResourceLocation id = (ResourceLocation) arguments[1];

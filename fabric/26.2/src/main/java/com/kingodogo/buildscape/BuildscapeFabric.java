@@ -40,14 +40,12 @@ public class BuildscapeFabric implements ModInitializer {
             ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(
                     Identifier.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "dynamic_recipes"),
                     new net.minecraft.server.packs.resources.PreparableReloadListener() {
-                        private final net.minecraft.server.packs.resources.PreparableReloadListener delegate =
-                                Services.PLATFORM.createRecipeReloadListener();
                         @Override
                         public java.util.concurrent.CompletableFuture<Void> reload(SharedState state,
                                 java.util.concurrent.Executor prepareExecutor, PreparationBarrier barrier,
                                 java.util.concurrent.Executor applyExecutor) {
-                            BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(state.get(
-                                    net.fabricmc.fabric.api.resource.v1.DataResourceLoader.RECIPE_MANAGER_KEY));
+                            var delegate = Services.PLATFORM.createRecipeReloadListener(BuildScapeRecipeLoader.forReload(
+                                    state.get(net.fabricmc.fabric.api.resource.v1.DataResourceLoader.RECIPE_MANAGER_KEY)));
                             return delegate.reload(state, prepareExecutor, barrier, applyExecutor);
                         }
                     });

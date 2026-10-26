@@ -37,9 +37,9 @@ public class BuildscapeNeoForge {
     }
     private void registerServerRecipeReloading() {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.AddReloadListenerEvent event) -> {
-            com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE
-                    .setCurrentRecipeManager(event.getServerResources().getRecipeManager());
-            event.addListener(com.kingodogo.buildscape.platform.Services.PLATFORM.createRecipeReloadListener());
+            event.addListener(com.kingodogo.buildscape.platform.Services.PLATFORM.createRecipeReloadListener(
+                    com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.forReload(
+                            event.getServerResources().getRecipeManager())));
         });
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent event) -> {
             com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE

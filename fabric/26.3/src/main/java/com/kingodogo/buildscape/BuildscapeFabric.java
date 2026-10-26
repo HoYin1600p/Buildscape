@@ -66,7 +66,7 @@ public class BuildscapeFabric implements ModInitializer {
 
     private static void useRecipeManager(net.minecraft.server.MinecraftServer server,
             net.minecraft.world.item.crafting.RecipeManager manager) {
-        BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(manager);
+        BuildScapeRecipeLoader.bindResourceManager(server.getResourceManager(), manager);
         // The server finalized the manager before this point; rebuild the recipe-book, property and
         // stonecutter tables so they include the injected recipes.
         manager.finalizeRecipeLoading(server.getWorldData().enabledFeatures());

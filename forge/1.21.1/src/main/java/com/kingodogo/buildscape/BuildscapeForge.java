@@ -62,8 +62,8 @@ public final class BuildscapeForge {
     }
 
     private static void addReloadListeners(AddReloadListenerEvent event) {
-        BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(event.getServerResources().getRecipeManager());
-        event.addListener(Services.PLATFORM.createRecipeReloadListener());
+        event.addListener(Services.PLATFORM.createRecipeReloadListener(
+                BuildScapeRecipeLoader.forReload(event.getServerResources().getRecipeManager())));
     }
 
     private static void serverStarted(ServerStartedEvent event) {

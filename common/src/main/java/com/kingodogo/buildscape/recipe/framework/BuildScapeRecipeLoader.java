@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.lang.ref.WeakReference;
 
 public class BuildScapeRecipeLoader {
 
@@ -33,8 +34,91 @@ public class BuildScapeRecipeLoader {
 
     private volatile RecipeManager currentRecipeManager;
     private volatile List<RecipeIR.CompiledRecipe> preparedRecipes = List.of();
+    private final RecipeManager boundRecipeManager;
+    private final WeakReference<ResourceManager> resourceScope;
+    private volatile WeakReference<RecipeManager> deferredRecipeManager = new WeakReference<>(null);
+    private boolean recipesReady;
+    private boolean recipesApplied;
+    private static final Map<ResourceManager, PendingReload> RESOURCE_RELOADS = new WeakHashMap<>();
+
+    private static final class PendingReload {
+        WeakReference<RecipeManager> manager = new WeakReference<>(null);
+        // Keep prepared recipes alive until the late manager callback; the resource key remains weak.
+        BuildScapeRecipeLoader loader;
+    }
+
+    public BuildScapeRecipeLoader() { this.boundRecipeManager = null; this.resourceScope = null; }
+
+    private BuildScapeRecipeLoader(RecipeManager recipeManager) {
+        this.boundRecipeManager = Objects.requireNonNull(recipeManager);
+        this.resourceScope = null;
+    }
+
+    private BuildScapeRecipeLoader(ResourceManager resources) {
+        this.boundRecipeManager = null;
+        this.resourceScope = new WeakReference<>(Objects.requireNonNull(resources));
+    }
+
+    public static BuildScapeRecipeLoader forReload(RecipeManager recipeManager) {
+        return new BuildScapeRecipeLoader(recipeManager);
+    }
+
+    public static BuildScapeRecipeLoader forResourceReload(ResourceManager resources) {
+        BuildScapeRecipeLoader loader = new BuildScapeRecipeLoader(resources);
+        RecipeManager manager;
+        synchronized (RESOURCE_RELOADS) {
+            PendingReload pending = RESOURCE_RELOADS.computeIfAbsent(resources, ignored -> new PendingReload());
+            if (pending.loader != null) throw new IllegalStateException("Resource reload already registered");
+            pending.loader = loader;
+            manager = pending.manager.get();
+        }
+        if (manager != null) loader.bindDeferredManager(manager);
+        return loader;
+    }
+
+    public static void bindResourceManager(ResourceManager resources, RecipeManager manager) {
+        Objects.requireNonNull(resources);
+        Objects.requireNonNull(manager);
+        BuildScapeRecipeLoader loader;
+        synchronized (RESOURCE_RELOADS) {
+            PendingReload pending = RESOURCE_RELOADS.computeIfAbsent(resources, ignored -> new PendingReload());
+            pending.manager = new WeakReference<>(manager);
+            loader = pending.loader;
+        }
+        if (loader != null) loader.bindDeferredManager(manager);
+    }
+
+    private void bindDeferredManager(RecipeManager manager) {
+        synchronized (this) {
+            RecipeManager existing = deferredRecipeManager.get();
+            if (existing != null && existing != manager)
+                throw new IllegalStateException("Resource reload manager is already bound");
+            deferredRecipeManager = new WeakReference<>(manager);
+        }
+        finishDeferredReload();
+    }
+
+    private void finishDeferredReload() {
+        List<RecipeIR.CompiledRecipe> ready;
+        RecipeManager manager;
+        synchronized (this) {
+            manager = deferredRecipeManager.get();
+            if (!recipesReady || recipesApplied || manager == null) return;
+            recipesApplied = true;
+            ready = preparedRecipes;
+        }
+        RecipeManagerInjector.inject(manager, ready);
+        ResourceManager resources = resourceScope.get();
+        if (resources != null) {
+            synchronized (RESOURCE_RELOADS) {
+                PendingReload pending = RESOURCE_RELOADS.get(resources);
+                if (pending != null && pending.loader == this) RESOURCE_RELOADS.remove(resources);
+            }
+        }
+    }
 
     public void setCurrentRecipeManager(RecipeManager recipeManager) {
+        if (boundRecipeManager != null || resourceScope != null) throw new IllegalStateException("Reload manager is already bound");
         this.currentRecipeManager = recipeManager;
         List<RecipeIR.CompiledRecipe> ready = preparedRecipes;
         if (recipeManager != null && !ready.isEmpty()) {
@@ -43,7 +127,8 @@ public class BuildScapeRecipeLoader {
     }
 
     public RecipeManager getCurrentRecipeManager() {
-        return this.currentRecipeManager;
+        return boundRecipeManager != null ? boundRecipeManager
+                : resourceScope != null ? deferredRecipeManager.get() : currentRecipeManager;
     }
 
     public List<RecipeIR.CompiledRecipe> prepareRecipes(ResourceManager resourceManager) {
@@ -196,10 +281,19 @@ public class BuildScapeRecipeLoader {
     }
 
     public void applyRecipes(List<RecipeIR.CompiledRecipe> recipes) {
-        preparedRecipes = recipes == null ? List.of() : List.copyOf(RecipeValidator.filterCompiled(recipes));
-        RecipeManager recipeManager = currentRecipeManager;
-        if (recipeManager != null && !preparedRecipes.isEmpty()) {
-            RecipeManagerInjector.inject(recipeManager, preparedRecipes);
+        List<RecipeIR.CompiledRecipe> ready = recipes == null ? List.of() : List.copyOf(RecipeValidator.filterCompiled(recipes));
+        if (resourceScope != null) {
+            synchronized (this) {
+                preparedRecipes = ready;
+                recipesReady = true;
+            }
+            finishDeferredReload();
+            return;
+        }
+        if (boundRecipeManager == null) preparedRecipes = ready;
+        RecipeManager recipeManager = getCurrentRecipeManager();
+        if (recipeManager != null && !ready.isEmpty()) {
+            RecipeManagerInjector.inject(recipeManager, ready);
         }
     }
 }

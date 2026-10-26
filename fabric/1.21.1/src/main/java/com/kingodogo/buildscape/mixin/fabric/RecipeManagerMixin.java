@@ -16,6 +16,6 @@ public abstract class RecipeManagerMixin {
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))
     private void buildscape$recipes(java.util.Map<ResourceLocation, JsonElement> recipes,
             ResourceManager manager, ProfilerFiller profiler, CallbackInfo ci) {
-        BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager((RecipeManager) (Object) this);
+        BuildScapeRecipeLoader.bindResourceManager(manager, (RecipeManager) (Object) this);
     }
 }

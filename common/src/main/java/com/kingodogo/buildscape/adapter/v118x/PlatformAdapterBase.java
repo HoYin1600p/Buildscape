@@ -918,7 +918,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public net.minecraft.server.packs.resources.PreparableReloadListener createRecipeReloadListener() {
+    public net.minecraft.server.packs.resources.PreparableReloadListener createRecipeReloadListener(
+            com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader loader) {
         return new net.minecraft.server.packs.resources.PreparableReloadListener() {
             @Override
             public java.util.concurrent.CompletableFuture<Void> reload(
@@ -929,9 +930,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     java.util.concurrent.Executor backgroundExecutor,
                     java.util.concurrent.Executor gameExecutor
             ) {
-                return java.util.concurrent.CompletableFuture.supplyAsync(() -> com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE.prepareRecipes(resourceManager), backgroundExecutor)
+                var reloadLoader = loader == com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE
+                        ? com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.forResourceReload(resourceManager) : loader;
+                return java.util.concurrent.CompletableFuture.supplyAsync(() -> reloadLoader.prepareRecipes(resourceManager), backgroundExecutor)
                         .thenCompose(barrier::wait)
-                        .thenAcceptAsync(recipes -> com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE.applyRecipes(recipes), gameExecutor);
+                        .thenAcceptAsync(reloadLoader::applyRecipes, gameExecutor);
             }
         };
     }

@@ -66,9 +66,9 @@ public class BuildscapeNeoForge {
                 event.register(Identifier.withDefaultNamespace("empty"), item, interaction));
     }
     private static void addReloadListeners(AddServerReloadListenersEvent event) {
-        BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(event.getServerResources().getRecipeManager());
         event.addListener(Identifier.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "dynamic_recipes"),
-                Services.PLATFORM.createRecipeReloadListener());
+                Services.PLATFORM.createRecipeReloadListener(
+                        BuildScapeRecipeLoader.forReload(event.getServerResources().getRecipeManager())));
     }
     private static void serverStarted(ServerStartedEvent event) {
         com.kingodogo.buildscape.adapter.v26x.PacketFactory.setServer(event.getServer());

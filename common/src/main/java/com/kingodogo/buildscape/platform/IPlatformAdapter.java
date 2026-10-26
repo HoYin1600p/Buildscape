@@ -209,7 +209,11 @@ public interface IPlatformAdapter {
     void renderItemStatic(net.minecraft.world.item.ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, int seed);
     void registerRecipeSerializers();
     byte[] readResourceBytes(net.minecraft.server.packs.resources.ResourceManager resourceManager, CommonId location);
-    net.minecraft.server.packs.resources.PreparableReloadListener createRecipeReloadListener();
+    default net.minecraft.server.packs.resources.PreparableReloadListener createRecipeReloadListener() {
+        return createRecipeReloadListener(com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE);
+    }
+    net.minecraft.server.packs.resources.PreparableReloadListener createRecipeReloadListener(
+            com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader loader);
     void injectRecipes(net.minecraft.world.item.crafting.RecipeManager recipeManager, java.util.List<com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe> recipes);
 
     net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createRandomStateProvider(java.util.List<net.minecraft.world.level.block.state.BlockState> states);

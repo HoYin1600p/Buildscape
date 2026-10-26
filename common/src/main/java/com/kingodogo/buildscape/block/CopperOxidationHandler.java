@@ -29,11 +29,24 @@ public final class CopperOxidationHandler {
     private static final Map<String, String> PREV_STAGE = new HashMap<>();
     private static final Map<String, String> WAXED_MAP = new HashMap<>();
     private static final Map<String, String> UNWAXED_MAP = new HashMap<>();
+    /** Stage 0-3 of each block that weathers by itself; mist- and axe-only chains are left out. */
+    private static final Map<String, Integer> NATURAL_AGE = new HashMap<>();
     private static boolean initialized = false;
 
     private CopperOxidationHandler() {}
     public static synchronized void init() {
         if (initialized) return;
+        initTables(Services.isVersionCluster("v121x"));
+        CopperWeathering.addAgeSource(block -> {
+            CommonId id = Services.PLATFORM.getBlockId(block);
+            return id != null && "buildscape".equals(id.getNamespace()) ? naturalAge(id.getPath()) : -1;
+        });
+        initialized = true;
+    }
+
+    /** Fills the stage tables; restoredFamilies adds the 1.21.1 copper families with no vanilla twin. */
+    static synchronized void initTables(boolean restoredFamilies) {
+        if (!NEXT_STAGE.isEmpty()) return;
 
         registerChain("copper_mesh", "exposed_copper_mesh", "weathered_copper_mesh", "oxidized_copper_mesh");
         registerWaxPair("copper_mesh", "waxed_copper_mesh");
@@ -91,7 +104,7 @@ public final class CopperOxidationHandler {
         registerWaxPair("weathered_slit_copper_vertical_slab", "waxed_weathered_slit_copper_vertical_slab");
         registerWaxPair("oxidized_slit_copper_vertical_slab", "waxed_oxidized_slit_copper_vertical_slab");
 
-        if (Services.isVersionCluster("v121x")) {
+        if (restoredFamilies) {
             for (String family : java.util.List.of("copper_bars", "copper_chain", "copper_lantern", "copper_chest", "copper_rod")) {
                 registerChain(family, "exposed_" + family, "weathered_" + family, "oxidized_" + family);
                 for (String prefix : java.util.List.of("", "exposed_", "weathered_", "oxidized_")) {
@@ -99,10 +112,26 @@ public final class CopperOxidationHandler {
                 }
             }
         }
-        initialized = true;
+
+        // Bit copper is a plain block: Bottle of Mist and axes step it, but it never weathers by itself.
+        for (String family : java.util.List.of("chiseled_copper", "copper_block", "copper_block_stairs",
+                "copper_block_slab", "copper_block_wall", "copper_block_vertical_slab", "cut_copper",
+                "cut_copper_stairs", "cut_copper_slab", "cut_copper_wall", "cut_copper_vertical_slab",
+                "copper_bulb", "copper_grate")) {
+            registerManualChain("bit_" + family, "bit_exposed_" + family, "bit_weathered_" + family,
+                    "bit_oxidized_" + family);
+        }
     }
 
     private static void registerChain(String b0, String b1, String b2, String b3) {
+        registerManualChain(b0, b1, b2, b3);
+        NATURAL_AGE.put(b0, 0);
+        NATURAL_AGE.put(b1, 1);
+        NATURAL_AGE.put(b2, 2);
+        NATURAL_AGE.put(b3, 3);
+    }
+
+    private static void registerManualChain(String b0, String b1, String b2, String b3) {
         NEXT_STAGE.put(b0, b1);
         NEXT_STAGE.put(b1, b2);
         NEXT_STAGE.put(b2, b3);
@@ -115,6 +144,21 @@ public final class CopperOxidationHandler {
     private static void registerWaxPair(String unwaxed, String waxed) {
         WAXED_MAP.put(unwaxed, waxed);
         UNWAXED_MAP.put(waxed, unwaxed);
+    }
+
+    /** The next weathering stage of a BuildScape copper id, or null. */
+    static String nextStage(String path) {
+        return NEXT_STAGE.get(path);
+    }
+
+    static String previousStage(String path) {
+        return PREV_STAGE.get(path);
+    }
+
+    /** Stage 0-3 of a BuildScape copper id that weathers on its own, or -1. */
+    public static int naturalAge(String path) {
+        Integer age = NATURAL_AGE.get(path);
+        return age == null ? -1 : age;
     }
 
     private static Block getModBlock(String path) {
@@ -130,9 +174,13 @@ public final class CopperOxidationHandler {
 
         if (heldItemId != null && heldItemId.equals(bottleOfMistId)) {
             BlockState nextState = getNextOxidationState(state);
-            if (nextState != null) {
+            if (nextState != null && nextState.getBlock() != block) {
                 if (!level.isClientSide()) {
                     setBlockStateOrDoor(level, pos, state, nextState.getBlock());
+                    // The mist is only used up when the block really changed stage.
+                    if (level.getBlockState(pos).getBlock() != nextState.getBlock()) {
+                        return InteractionResult.PASS;
+                    }
 
                     if (level instanceof ServerLevel serverLevel) {
                         serverLevel.sendParticles(
@@ -230,13 +278,12 @@ public final class CopperOxidationHandler {
             return;
         }
 
-        String nextPath = NEXT_STAGE.get(blockId.getPath());
-        if (nextPath != null) {
-            if (level.getRandom().nextFloat() < 0.05688889F) {
-                Block targetBlock = getModBlock(nextPath);
-                if (targetBlock != null && targetBlock != Blocks.AIR) {
-                    setBlockStateOrDoor(level, pos, state, targetBlock);
-                }
+        String path = blockId.getPath();
+        String nextPath = NEXT_STAGE.get(path);
+        if (nextPath != null && CopperWeathering.shouldAdvance(level, pos, naturalAge(path))) {
+            Block targetBlock = getModBlock(nextPath);
+            if (targetBlock != null && targetBlock != Blocks.AIR) {
+                setBlockStateOrDoor(level, pos, state, targetBlock);
             }
         }
     }
@@ -286,24 +333,9 @@ public final class CopperOxidationHandler {
             return null;
         }
 
+        // Only the stage tables name next stages; guessing from id prefixes built ids of other families.
         if (blockId != null && blockId.getNamespace().equals("buildscape")) {
-            String path = blockId.getPath();
-            String nextPath = NEXT_STAGE.get(path);
-
-            if (nextPath == null) {
-                if (path.startsWith("bit_weathered_")) {
-                    nextPath = path.replace("bit_weathered_", "weathered_");
-                } else if (path.startsWith("weathered_")) {
-                    nextPath = path.replace("weathered_", "bit_oxidized_");
-                } else if (path.startsWith("bit_exposed_")) {
-                    nextPath = path.replace("bit_exposed_", "exposed_");
-                } else if (path.startsWith("exposed_")) {
-                    nextPath = path.replace("exposed_", "bit_weathered_");
-                } else if (!path.startsWith("waxed_")) {
-                    nextPath = "bit_exposed_" + path;
-                }
-            }
-
+            String nextPath = NEXT_STAGE.get(blockId.getPath());
             if (nextPath != null) {
                 Block targetBlock = getModBlock(nextPath);
                 if (targetBlock != null && targetBlock != Blocks.AIR) {

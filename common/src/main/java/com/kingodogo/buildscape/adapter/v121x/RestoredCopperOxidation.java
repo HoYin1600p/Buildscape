@@ -24,7 +24,8 @@ public final class RestoredCopperOxidation {
         if (path.startsWith("waxed_") || path.startsWith("oxidized_")) return;
         String next = path.startsWith("weathered_") ? "oxidized_" + path.substring(10)
                 : path.startsWith("exposed_") ? "weathered_" + path.substring(8) : "exposed_" + path;
-        if (level.random.nextFloat() >= 0.05688889F) return;
+        if (!com.kingodogo.buildscape.block.CopperWeathering.shouldAdvance(level, pos,
+                com.kingodogo.buildscape.block.CopperWeathering.ageFromPath(path))) return;
         Block target = Services.PLATFORM.getBlock(new CommonId("buildscape", next));
         if (target == null || target == Blocks.AIR) return;
         BlockState replacement = copyProperties(state, target.defaultBlockState());

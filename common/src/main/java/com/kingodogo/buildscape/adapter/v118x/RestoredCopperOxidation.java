@@ -49,9 +49,11 @@ public final class RestoredCopperOxidation {
     private static final Map<Supplier<Block>, Supplier<Block>> PREV_STAGE = new HashMap<>();
     private static final Map<Supplier<Block>, Supplier<Block>> WAXED_MAP = new HashMap<>();
     private static final Map<Supplier<Block>, Supplier<Block>> UNWAXED_MAP = new HashMap<>();
+    private static Map<Block, Integer> AGES;
 
     public static synchronized void init() {
         if (!NEXT_STAGE.isEmpty()) return;
+        com.kingodogo.buildscape.block.CopperWeathering.addAgeSource(RestoredCopperOxidation::age);
 
         registerChain(block("chiseled_copper"), block("exposed_chiseled_copper"), block("weathered_chiseled_copper"), block("oxidized_chiseled_copper"));
         registerWaxPair(block("chiseled_copper"), block("waxed_chiseled_copper"));
@@ -197,9 +199,13 @@ public final class RestoredCopperOxidation {
 
         if (held.is(Services.PLATFORM.getItem(new CommonId("buildscape", "bottle_of_mist")))) {
             BlockState nextState = getNextOxidationState(state);
-            if (nextState != null) {
+            if (nextState != null && nextState.getBlock() != block) {
                 if (!level.isClientSide) {
                     setBlockStateOrDoor(level, pos, state, nextState.getBlock());
+                    // The mist is only used up when the block really changed stage.
+                    if (level.getBlockState(pos).getBlock() != nextState.getBlock()) {
+                        return InteractionResult.PASS;
+                    }
 
                     if (level instanceof ServerLevel serverLevel) {
                         serverLevel.sendParticles(
@@ -309,15 +315,35 @@ public final class RestoredCopperOxidation {
             return;
         }
         Block block = state.getBlock();
-        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : NEXT_STAGE.entrySet()) {
-            if (entry.getKey().get() == block) {
-                if (level.random.nextFloat() < 0.05688889F) {
-                    Block targetBlock = entry.getValue().get();
-                    setBlockStateOrDoor(level, pos, state, targetBlock);
-                }
-                break;
-            }
+        Block targetBlock = getMappedStage(block, NEXT_STAGE);
+        if (targetBlock != null && com.kingodogo.buildscape.block.CopperWeathering.shouldAdvance(level, pos, age(block))) {
+            setBlockStateOrDoor(level, pos, state, targetBlock);
         }
+    }
+
+    /** Stage 0-3 of a restored copper block, or -1; the weathering neighbour scan asks this often. */
+    static int age(Block block) {
+        Integer age = ages().get(block);
+        return age == null ? -1 : age;
+    }
+
+    private static synchronized Map<Block, Integer> ages() {
+        if (AGES == null) {
+            init();
+            // Built on first use in a world, once every restored block is registered.
+            Map<Block, Integer> ages = new java.util.IdentityHashMap<>();
+            for (Supplier<Block> stage : NEXT_STAGE.keySet()) {
+                if (getMappedStage(stage.get(), PREV_STAGE) == null) {
+                    Block current = stage.get();
+                    for (int age = 0; current != null && age <= 3; age++) {
+                        ages.put(current, age);
+                        current = getMappedStage(current, NEXT_STAGE);
+                    }
+                }
+            }
+            AGES = ages;
+        }
+        return AGES;
     }
 
     public static void setBlockStateOrDoor(Level level, BlockPos pos, BlockState state, Block targetBlock) {
@@ -455,39 +481,8 @@ public final class RestoredCopperOxidation {
             }
         }
 
-        CommonId rl = Services.PLATFORM.getBlockId(block);
-        if (rl != null && rl.getNamespace().equals("buildscape")) {
-            String path = rl.getPath();
-            String nextPath = null;
-
-            if (path.startsWith("bit_oxidized_")) {
-                nextPath = null;
-            } else if (path.startsWith("bit_weathered_")) {
-                nextPath = path.replace("bit_weathered_", "weathered_");
-            } else if (path.startsWith("weathered_")) {
-                nextPath = path.replace("weathered_", "bit_oxidized_");
-            } else if (path.startsWith("bit_exposed_")) {
-                nextPath = path.replace("bit_exposed_", "exposed_");
-            } else if (path.startsWith("exposed_")) {
-                nextPath = path.replace("exposed_", "bit_weathered_");
-            } else if (!path.startsWith("waxed_")) {
-                nextPath = "bit_exposed_" + path;
-            }
-
-            if (nextPath != null) {
-                Block targetBlock = Services.PLATFORM.getBlock(new CommonId("buildscape", nextPath));
-                if (targetBlock != null && targetBlock != net.minecraft.world.level.block.Blocks.AIR) {
-                    return copyStateProperties(state, targetBlock.defaultBlockState());
-                }
-            }
-        }
-
-        Optional<Block> vanillaNext = WeatheringCopper.getNext(block);
-        if (vanillaNext.isPresent()) {
-            return copyStateProperties(state, vanillaNext.get().defaultBlockState());
-        }
-
-        return null;
+        // The shared table covers the other BuildScape families, including bit copper, then vanilla copper.
+        return com.kingodogo.buildscape.block.CopperOxidationHandler.getNextOxidationState(state);
     }
 
     private static Optional<BlockState> getUnwaxedState(BlockState state) {

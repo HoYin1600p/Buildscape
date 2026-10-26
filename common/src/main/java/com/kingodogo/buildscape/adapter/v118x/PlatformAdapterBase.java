@@ -2493,6 +2493,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public void registerCommonLifecycleInteractions() {
+        // Restored copper counts as a weathering neighbour from the first random tick.
+        RestoredCopperOxidation.init();
         registerFlowerPotPlants();
         registerCompostables();
         registerCauldronInteractions();

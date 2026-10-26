@@ -22,8 +22,8 @@ public final class DispenserEffects {
                     1, (level.getRandom().nextDouble() - .5) * .2, level.getRandom().nextDouble() * .05,
                     (level.getRandom().nextDouble() - .5) * .2, 0);
         }
+        // A dispensed mist only sprays; it changes nothing, so the bottle is kept.
         level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, .1F, .1F);
-        stack.shrink(1);
         return stack;
     }
 

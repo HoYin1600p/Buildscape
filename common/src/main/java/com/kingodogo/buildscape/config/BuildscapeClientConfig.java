@@ -24,6 +24,10 @@ public class BuildscapeClientConfig {
     public static final String KEY_SIDE_PANEL_EXPANDED = "SidePanelExpanded";
     public static final String KEY_ANIMATION_SPEED = "AnimationSpeed";
     public static final String KEY_LAST_ACTIVE_TAB = "LastActiveTab";
+    public static final String KEY_MAX_CUSTOM_PRESETS = "MaxCustomPresets";
+    public static final int DEFAULT_CUSTOM_PRESETS = 4;
+    public static final int MIN_CUSTOM_PRESETS = 1;
+    public static final int MAX_CUSTOM_PRESETS = 32;
 
     private static final LinkedHashMap<String, String> DEFAULTS = new LinkedHashMap<>();
     private static volatile BuildscapeClientConfig INSTANCE;
@@ -42,6 +46,7 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_SIDE_PANEL_EXPANDED, "false");
         DEFAULTS.put(KEY_ANIMATION_SPEED, "0");
         DEFAULTS.put(KEY_LAST_ACTIVE_TAB, "0");
+        DEFAULTS.put(KEY_MAX_CUSTOM_PRESETS, String.valueOf(DEFAULT_CUSTOM_PRESETS));
     }
 
     private final Map<String, String> values;
@@ -116,6 +121,7 @@ public class BuildscapeClientConfig {
         try {
             if (file.exists()) {
                 source = ConfigLayoutIO.readText(file.toPath());
+                readOnly |= ConfigLayoutIO.protectInvalidEncoding(file.toPath());
                 values.putAll(ConfigLayoutIO.readEntries(source));
             }
         } catch (IOException e) {
@@ -134,6 +140,7 @@ public class BuildscapeClientConfig {
             try {
                 if (Files.exists(uiFile)) {
                     uiSource = ConfigLayoutIO.readText(uiFile);
+                    uiReadOnly |= ConfigLayoutIO.protectInvalidEncoding(uiFile);
                     uiValues.putAll(ConfigLayoutIO.readEntries(uiSource));
                 }
                 for (String key : UI_STATE) {
@@ -163,8 +170,11 @@ public class BuildscapeClientConfig {
                     text.append(key).append(" = ").append(entry.getValue()).append('\n');
                 }
             }
-            ConfigLayoutIO.write(getConfigFile().toPath(), text.toString(), source, true);
-            source = text.toString();
+            if (source != null && ConfigLayoutIO.readEntries(source)
+                    .equals(ConfigLayoutIO.readEntries(text.toString()))) return;
+            String output = ConfigLayoutIO.retainComments(source, text.toString(), false);
+            ConfigLayoutIO.write(getConfigFile().toPath(), output, source, true);
+            source = output;
         } catch (IOException e) {
             BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to write config", e);
         }
@@ -178,8 +188,9 @@ public class BuildscapeClientConfig {
             for (Map.Entry<String, String> entry : uiValues.entrySet()) {
                 text.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
             }
-            ConfigLayoutIO.write(configDirectory.resolve("buildscape/ui-state.cfg"), text.toString(), uiSource, false);
-            uiSource = text.toString();
+            String output = ConfigLayoutIO.retainComments(uiSource, text.toString(), false);
+            ConfigLayoutIO.write(configDirectory.resolve("buildscape/ui-state.cfg"), output, uiSource, false);
+            uiSource = output;
             return true;
         } catch (IOException e) {
             BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to save UI state; retaining the old location", e);
@@ -318,6 +329,14 @@ public class BuildscapeClientConfig {
 
     public int getLastActiveTab() {
         return getInt(KEY_LAST_ACTIVE_TAB, 0);
+    }
+
+    public int getMaxCustomPresets() {
+        return clampCustomPresets(getInt(KEY_MAX_CUSTOM_PRESETS, DEFAULT_CUSTOM_PRESETS));
+    }
+
+    public static int clampCustomPresets(int slots) {
+        return Math.max(MIN_CUSTOM_PRESETS, Math.min(MAX_CUSTOM_PRESETS, slots));
     }
 
     public void setLastActiveTab(int tab) {

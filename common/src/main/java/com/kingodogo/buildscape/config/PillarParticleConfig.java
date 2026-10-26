@@ -6,14 +6,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.platform.Services;
+import com.kingodogo.buildscape.BuildscapeCommon;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.IOException;
+import java.util.TreeSet;
+import java.util.Collection;
 import java.lang.reflect.Type;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,6 +27,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 public class PillarParticleConfig {
+
+    public static boolean isValidItemId(String item) {
+        if (item == null) return false;
+        String id = item.startsWith("#") ? item.substring(1) : item;
+        return id.matches("(?:[a-z0-9_.-]*:)?[a-z0-9/._-]+");
+    }
 
     public static final int CONFIG_PERMISSION_LEVEL = 4;
 
@@ -107,6 +115,11 @@ public class PillarParticleConfig {
     private transient JsonObject loadedPropertyValues;
     private transient String propertiesSource;
     private transient boolean corruptedItems;
+    private transient boolean itemsReadOnly;
+    private transient boolean itemsLoaded;
+    private transient boolean itemsOnDiskIs405;
+    private transient String itemsSource;
+    private transient JsonObject originalItems;
     private final transient java.nio.file.Path configDirectory;
 
     private long lastLoadedProperties = 0L;
@@ -271,18 +284,8 @@ public class PillarParticleConfig {
     }
 
     private void writeDefaultItems(File f, boolean vaultLoaded) {
-        try {
-            File parentDir = f.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-
-            try (FileWriter writer = new FileWriter(f)) {
-                DefaultPillarItems.writeGrouped(writer, vaultLoaded);
-            }
-        } catch (Exception ignored) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to write default pillar items", ignored);
-        }
+        ConfigPaths.copyTemplateIfMissing(f.toPath(), "/data/buildscape/config/"
+                + (vaultLoaded ? "vault_pillar_items.json" : "vanilla_pillar_items.json"));
     }
 
     static String[] getDefaultItemArray() {
@@ -365,7 +368,7 @@ public class PillarParticleConfig {
             return;
         }
 
-        try (FileReader r = new FileReader(file)) {
+        try (java.io.StringReader r = new java.io.StringReader(ConfigLayoutIO.readText(file.toPath()))) {
             StringBuilder content = new StringBuilder();
             int ch;
             while ((ch = r.read()) != -1) {
@@ -405,6 +408,9 @@ public class PillarParticleConfig {
                     jsonMap.put("pattern_intensity", jsonMap.get("template_intensity"));
                 }
 
+                if (jsonMap.get("particle_color") instanceof String color) {
+                    jsonMap.put("particle_color", List.of(color));
+                }
                 String updatedJson = GSON.toJson(jsonMap);
                 Type type = new TypeToken<PillarParticleConfig>() {}.getType();
                 PillarParticleConfig loaded = GSON.fromJson(updatedJson, type);
@@ -413,7 +419,8 @@ public class PillarParticleConfig {
                     this.particle_speed = loaded.particle_speed > 0 ? loaded.particle_speed : this.particle_speed;
                     this.particle_spread = loaded.particle_spread > 0 ? loaded.particle_spread : this.particle_spread;
                     this.particle_lifetime = loaded.particle_lifetime > 0 ? loaded.particle_lifetime : this.particle_lifetime;
-                    this.particle_density = loaded.particle_density > 0 ? loaded.particle_density : this.particle_density;
+                    this.particle_density = jsonMap.containsKey("particle_density")
+                            ? Math.max(0, loaded.particle_density) : this.particle_density;
                     this.use_pattern = loaded.use_pattern;
                     this.pattern = loaded.pattern != null ? loaded.pattern : "ring";
                     this.pattern_speed = loaded.pattern_speed > 0 ? loaded.pattern_speed : this.pattern_speed;
@@ -447,13 +454,15 @@ public class PillarParticleConfig {
                     }
 
                     int numColors = this.particle_color.size();
-                    this.max_particle_color = Math.max(1, Math.min(7, Math.min(loaded.max_particle_color > 0 ? loaded.max_particle_color : numColors, numColors)));
+                    int requestedColors = jsonMap.containsKey("max_particle_color") && loaded.max_particle_color > 0
+                            ? loaded.max_particle_color : numColors;
+                    this.max_particle_color = Math.max(1, Math.min(7, Math.min(requestedColors, numColors)));
                 }
             }
             originalProperties = original;
             propertiesSource = content.toString();
             loadedPropertyValues = propertyValues();
-            corruptedProperties = legacyReadOnly;
+            corruptedProperties = legacyReadOnly || ConfigLayoutIO.protectInvalidEncoding(file.toPath());
             if (legacyReadOnly) {
                 com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn(
                         "Loaded pillar properties using the legacy parser; the file is read-only and will be kept as-is");
@@ -470,63 +479,196 @@ public class PillarParticleConfig {
         loadItemsInternal(Services.PLATFORM.isModLoaded("the_vault"));
     }
 
-    void loadItemsInternal(boolean vaultLoaded) {
+    synchronized void loadItemsInternal(boolean vaultLoaded) {
         File file = getItemsFile();
+        if (!itemsLoaded) {
+            items = new HashSet<>(ConfigPaths.loadDefaultItems(vaultLoaded));
+            itemsLoaded = true;
+        }
         if (!file.exists()) {
             writeDefaultItems(file, vaultLoaded);
-            initializeDefaultItems();
-            VaultPillarItems.merge(items, vaultLoaded);
-            lastLoadedItems = file.lastModified();
-            lastFileSizeItems = file.length();
-            return;
         }
-
-        try (FileReader r = new FileReader(file)) {
-            StringBuilder content = new StringBuilder();
-            int ch;
-            while ((ch = r.read()) != -1) {
-                content.append((char) ch);
+        try {
+            String source = ConfigLayoutIO.readText(file.toPath());
+            Set<String> parsed = parseItems(source, file.toString());
+            String normalized = ConfigLayoutIO.itemsJson(source);
+            JsonObject document = GSON.fromJson(normalized, JsonObject.class);
+            itemsReadOnly = ConfigLayoutIO.protectInvalidEncoding(file.toPath());
+            try {
+                ConfigLayoutIO.readProperties(normalized);
+            } catch (Exception e) {
+                // unparsable properties text only makes the items file read-only
+                itemsReadOnly = true;
             }
-            String jsonWithoutComments = stripComments(content.toString());
-
-            Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
-            Map<String, Object> jsonMap = GSON.fromJson(jsonWithoutComments, mapType);
-
-            if (jsonMap == null || !(jsonMap.get("items") instanceof List<?>)) {
-                throw new IllegalArgumentException("Expected pillar items list");
+            // Non-string entries can be ignored in memory, but must not be lost in a rewrite.
+            for (JsonElement entry : document.getAsJsonArray("items")) {
+                if (!entry.isJsonPrimitive() || !entry.getAsJsonPrimitive().isString()) {
+                    itemsReadOnly = true;
+                }
             }
-
-            if (jsonMap != null && jsonMap.containsKey("items")) {
-                Object itemsObj = jsonMap.get("items");
-                this.items = new HashSet<>();
-                if (itemsObj instanceof List<?> itemsList) {
-                    for (Object item : itemsList) {
-                        if (item instanceof String s) {
-                            this.items.add(s);
-                        }
+            itemsReadOnly |= !ConfigLayoutIO.isWritable(file.toPath());
+            if (!itemsReadOnly) {
+                try {
+                    itemsOnDiskIs405 = isLegacyItems(document);
+                    JsonObject merged = mergeDefaultItems(document, vaultLoaded);
+                    boolean itemsChanged = !merged.get("items").equals(document.get("items"));
+                    boolean inferredProvenance = !document.has("defaults_version")
+                            && !document.has("offered_defaults");
+                    if (itemsChanged || inferredProvenance && !merged.equals(document)) {
+                        String output = ConfigLayoutIO.retainComments(source, GSON.toJson(merged), true);
+                        output = ConfigLayoutIO.retainInvalidItemTokens(source, output);
+                        ConfigLayoutIO.writeItems(file.toPath(), output, source, itemsOnDiskIs405);
+                        itemsOnDiskIs405 = false;
+                        source = output;
+                        parsed = parseItems(output, file.toString());
                     }
-                }
-
-                boolean changed = false;
-                for (String defaultItem : getDefaultItemArray()) {
-                    if (!this.items.contains(defaultItem)) {
-                        this.items.add(defaultItem);
-                        changed = true;
-                    }
-                }
-
-                changed |= VaultPillarItems.merge(items, vaultLoaded);
-                if (changed) {
-                    saveItemsToDisk();
+                    document = merged;
+                } catch (Exception e) {
+                    // merging new default items is best effort; keep the existing file
+                    BuildscapeCommon.LOGGER.warn("Unable to merge new default items; retaining the existing file", e);
                 }
             }
-
-            lastLoadedItems = file.lastModified();
-            lastFileSizeItems = file.length();
-        } catch (Exception ignored) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to load pillar items", ignored);
+            itemsSource = source;
+            originalItems = document;
+            items = new HashSet<>(parsed);
+            clearMatchCache();
+            corruptedItems = false;
+        } catch (Exception e) {
+            // the items file may be malformed in any way; keep the last good item list
             corruptedItems = true;
+            try { ConfigBackup.copyCorrupted(file.toPath()); } catch (IOException backupFailure) { BuildscapeCommon.LOGGER.warn("Unable to back up unreadable pillar items", backupFailure); }
+            BuildscapeCommon.LOGGER.error("Unable to load items config {}; keeping the last good item list", file, e);
+        } finally {
+            lastLoadedItems = file.lastModified();
+            lastFileSizeItems = file.length();
         }
+    }
+
+    static JsonObject mergeDefaultItems(JsonObject document, boolean vaultLoaded) throws IOException {
+        JsonObject defaults = ConfigPaths
+                .loadItemsTemplate(vaultLoaded ? "vault_pillar_items" : "vanilla_pillar_items");
+        int defaultsVersion = defaults.get("defaults_version").getAsInt();
+        Set<String> offered = new HashSet<>();
+        if (document.has("offered_defaults")) {
+            if (!document.get("offered_defaults").isJsonArray()) {
+                throw new IOException("Invalid offered defaults");
+            }
+            for (JsonElement entry : document.getAsJsonArray("offered_defaults")) {
+                offered.add(entry.getAsString());
+            }
+        } else if (document.has("defaults_version") && document.get("defaults_version").getAsInt() >= defaultsVersion) {
+            // Current files may have been hand-edited before offered defaults were recorded.
+            for (JsonElement entry : defaults.getAsJsonArray("items")) {
+                offered.add(entry.getAsString());
+            }
+        } else {
+            Set<String> pre405 = parseItems(ConfigPaths.loadItemsTemplate("legacy_pillar_items_pre405").toString());
+            Set<String> legacy405 = parseItems(ConfigPaths.loadItemsTemplate("legacy_pillar_items").toString());
+            boolean hadVaultItems = document.has("vault_defaults_version")
+                    && document.get("vault_defaults_version").getAsInt() >= 405;
+            boolean has405OnlyItem = false;
+            for (JsonElement entry : document.getAsJsonArray("items")) {
+                String item = entry.getAsString();
+                if (isVaultItem(item)) {
+                    hadVaultItems = true;
+                }
+                if (legacy405.contains(item) && !pre405.contains(item)) {
+                    has405OnlyItem = true;
+                }
+            }
+            // An explicit version takes precedence over guessing from the remaining items.
+            boolean had405Defaults = document.has("defaults_version")
+                    ? document.get("defaults_version").getAsInt() >= 405
+                    : has405OnlyItem;
+            // Infer removals only from defaults the old installation could have offered.
+            for (String item : had405Defaults ? legacy405 : pre405) {
+                if (!isVaultItem(item) || hadVaultItems) {
+                    offered.add(item);
+                }
+            }
+        }
+        JsonObject merged = document.deepCopy();
+        Set<String> present = new HashSet<>();
+        for (JsonElement entry : document.getAsJsonArray("items")) {
+            present.add(entry.getAsString());
+        }
+        for (JsonElement entry : defaults.getAsJsonArray("items")) {
+            String item = entry.getAsString();
+            if (!offered.contains(item) && present.add(item)) {
+                merged.getAsJsonArray("items").add(entry.deepCopy());
+            }
+            offered.add(item);
+        }
+        merged.add("offered_defaults", GSON.toJsonTree(new TreeSet<>(offered)));
+        merged.addProperty("defaults_version", defaultsVersion);
+        if (vaultLoaded) {
+            merged.addProperty("vault_defaults_version", defaultsVersion);
+        }
+        return merged;
+    }
+
+    private static boolean isVaultItem(String item) {
+        return item.startsWith("the_vault:") || item.startsWith("#the_vault:");
+    }
+
+    private static boolean isLegacyItems(JsonObject document) throws IOException {
+        if (document == null || document.has("offered_defaults")) {
+            return false;
+        }
+        if (document.has("defaults_version")) {
+            return document.get("defaults_version").getAsInt() <= 405;
+        }
+        Set<String> existing = new HashSet<>();
+        for (JsonElement entry : document.getAsJsonArray("items")) {
+            existing.add(entry.getAsString());
+        }
+        Set<String> vanilla = new HashSet<>();
+        Set<String> vault = new HashSet<>();
+        for (String template : new String[]{"legacy_pillar_items", "legacy_pillar_items_pre405"}) {
+            vanilla.clear();
+            vault.clear();
+            for (JsonElement entry : ConfigPaths.loadItemsTemplate(template).getAsJsonArray("items")) {
+                String item = entry.getAsString();
+                vault.add(item);
+                if (!isVaultItem(item)) {
+                    vanilla.add(item);
+                }
+            }
+            if (existing.equals(vanilla) || existing.equals(vault)) {
+                return true;
+            }
+        }
+        // Use a normal backup when an unversioned file's origin cannot be established.
+        return false;
+    }
+
+    static Set<String> parseItems(String content) {
+        return parseItems(content, ITEMS_FILE_NAME);
+    }
+
+    static Set<String> parseItems(String content, String source) {
+        JsonObject root;
+        try {
+            root = GSON.fromJson(ConfigLayoutIO.itemsJson(content), JsonObject.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Invalid items config " + source, e);
+        }
+        if (root == null || !root.has("items") || !root.get("items").isJsonArray()) {
+            throw new IllegalArgumentException("Expected an items array");
+        }
+        Set<String> parsed = new HashSet<>();
+        boolean skippedEntries = false;
+        for (JsonElement item : root.getAsJsonArray("items")) {
+            if (!item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) {
+                skippedEntries = true;
+                continue;
+            }
+            parsed.add(item.getAsString());
+        }
+        if (skippedEntries) {
+            BuildscapeCommon.LOGGER.warn("Skipped non-string entries in items array from {}", source);
+        }
+        return parsed;
     }
 
     private void initializeDefaultItems() {
@@ -581,40 +723,90 @@ public class PillarParticleConfig {
     public void saveItems() {
         saveItemsToDisk();
     }
-    public void saveItemsToDisk() {
+    public synchronized boolean saveItemsToDisk() {
+        if (remote) {
+            return false;
+        }
+        return saveItemsToDisk(Services.PLATFORM.isModLoaded("the_vault"));
+    }
+
+    synchronized boolean saveItemsToDisk(boolean vaultLoaded) {
+        if (remote) {
+            return false;
+        }
         clearMatchCache();
-        if (remote) return;
+        if (corruptedItems || itemsReadOnly) {
+            BuildscapeCommon.LOGGER.warn("Not saving read-only items config; unreadable/legacy file kept as-is: {}",
+                    getItemsFile());
+            return false;
+        }
         File file = getItemsFile();
         try {
-            if (corruptedItems) {
-                ConfigBackup.copyCorrupted(file.toPath());
-                corruptedItems = false;
-            }
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();
             }
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write("{\n");
-                writer.write("  // Item IDs that trigger particles when placed on pillars\n");
-                writer.write("  \"items\": [\n");
-                List<String> itemsList = new ArrayList<>(items);
-                itemsList.sort(String::compareTo);
-                for (int i = 0; i < itemsList.size(); i++) {
-                    writer.write("    " + GSON.toJson(itemsList.get(i)));
-                    if (i < itemsList.size() - 1) {
-                        writer.write(",");
-                    }
-                    writer.write("\n");
-                }
-                writer.write("  ]\n");
-                writer.write("}\n");
+            if (originalItems == null && file.exists()) {
+                itemsSource = ConfigLayoutIO.readText(file.toPath());
+                parseItems(itemsSource, file.toString());
+                originalItems = ConfigLayoutIO.readProperties(ConfigLayoutIO.itemsJson(itemsSource));
             }
+            JsonObject json = originalItems == null ? new JsonObject() : originalItems.deepCopy();
+            json.add("items", GSON.toJsonTree(itemsForSave(originalItems, items)));
+            json = mergeDefaultItems(json, vaultLoaded);
+            String output = ConfigLayoutIO.retainComments(itemsSource, GSON.toJson(json), true);
+            output = ConfigLayoutIO.retainInvalidItemTokens(itemsSource, output);
+            ConfigLayoutIO.writeItems(file.toPath(), output, itemsSource,
+                    itemsOnDiskIs405 || isLegacyItems(originalItems));
+            itemsOnDiskIs405 = false;
+            items = new HashSet<>(parseItems(output));
+            clearMatchCache();
+            itemsSource = output;
+            originalItems = json;
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
-        } catch (Exception ignored) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to save pillar items", ignored);
+            return true;
+        } catch (Exception e) {
+            // any save failure is logged and reported to the caller as false
+            BuildscapeCommon.LOGGER.error("Error saving items config", e);
+            return false;
         }
+    }
+
+    private static List<String> itemsForSave(JsonObject original, Collection<String> updated) {
+        List<String> existing = new ArrayList<>();
+        if (original != null) {
+            for (JsonElement entry : original.getAsJsonArray("items")) {
+                existing.add(entry.getAsString());
+            }
+        }
+        return orderedItemsForSave(existing, updated);
+    }
+
+    /**
+     * The list to write: entries already in the file keep their position (and any duplicates, and invalid
+     * tokens, are left as they are); removed entries disappear; entries new to the file are appended at the
+     * end, sorted among themselves so one batch of additions is written the same way every time.
+     */
+    static List<String> orderedItemsForSave(List<String> existing, Collection<String> updated) {
+        Set<String> wanted = new HashSet<>(updated);
+        List<String> values = new ArrayList<>();
+        Set<String> present = new HashSet<>();
+        for (String item : existing) {
+            present.add(item);
+            if (wanted.contains(item) || !isValidItemId(item)) {
+                values.add(item);
+            }
+        }
+        List<String> added = new ArrayList<>();
+        for (String item : wanted) {
+            if (!present.contains(item)) {
+                added.add(item);
+            }
+        }
+        added.sort(String::compareTo);
+        values.addAll(added);
+        return values;
     }
 
     public void saveProperties() {
@@ -646,7 +838,8 @@ public class PillarParticleConfig {
                     output.add(key, !changed && output.has(alias) ? output.get(alias) : entry.getValue());
                 }
             }
-            String text = groupedProperties(output);
+            if (originalProperties != null && output.equals(originalProperties)) return;
+            String text = ConfigLayoutIO.retainComments(propertiesSource, groupedProperties(output), true);
             ConfigLayoutIO.write(file.toPath(), text, propertiesSource, true);
             propertiesSource = text;
             originalProperties = output;
@@ -723,7 +916,7 @@ public class PillarParticleConfig {
     }
 
     public boolean addItem(String itemId) {
-        if (itemId == null || itemId.isEmpty()) {
+        if (!canEditItems() || !isValidItemId(itemId)) {
             return false;
         }
         if (items.add(itemId)) {
@@ -735,7 +928,7 @@ public class PillarParticleConfig {
     }
 
     public boolean removeItem(String itemId) {
-        if (itemId == null || itemId.isEmpty()) {
+        if (!canEditItems() || !isValidItemId(itemId)) {
             return false;
         }
         if (items.remove(itemId)) {
@@ -749,5 +942,31 @@ public class PillarParticleConfig {
     public static void addItemToConfig(String itemId) {
         PillarParticleConfig config = get();
         config.addItem(itemId);
+    }
+
+    public boolean canEditItems() {
+        return !corruptedItems && !itemsReadOnly;
+    }
+
+    public synchronized void editItems(Collection<String> updatedItems) {
+        if (!canEditItems()) return;
+        Set<String> replacement = new HashSet<>();
+        for (String item : items) {
+            if (!isValidItemId(item)) replacement.add(item);
+        }
+        for (String item : updatedItems) {
+            if (isValidItemId(item)) replacement.add(item);
+        }
+        items = replacement;
+        clearMatchCache();
+    }
+
+    static void backupUnreadableFile(File file) {
+        java.nio.file.Path backup = file.toPath().resolveSibling(file.getName() + ".bak");
+        try {
+            if (!java.nio.file.Files.exists(backup)) java.nio.file.Files.copy(file.toPath(), backup);
+        } catch (IOException e) {
+            BuildscapeCommon.LOGGER.warn("Unable to back up unreadable config {}", file, e);
+        }
     }
 }

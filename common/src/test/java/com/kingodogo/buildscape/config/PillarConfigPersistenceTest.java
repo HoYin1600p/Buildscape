@@ -24,6 +24,7 @@ class PillarConfigPersistenceTest {
         local.particle_speed = 0.125;
         local.saveItemsToDisk();
         local.savePropertiesToDisk();
+        Set<String> localItemsBefore = Set.copyOf(local.items);
         String itemsBefore = Files.readString(directory.resolve("pillar-items.json"));
         String propertiesBefore = Files.readString(directory.resolve("pillar-properties.json"));
 
@@ -55,7 +56,7 @@ class PillarConfigPersistenceTest {
             received.items = new HashSet<>(Set.of("minecraft:emerald"));
             received.saveItemsToDisk();
             received.savePropertiesToDisk();
-            assertEquals(Set.of("minecraft:diamond"), local.items);
+            assertEquals(localItemsBefore, local.items);
             assertEquals(0.125, local.particle_speed);
             assertEquals(itemsBefore, Files.readString(directory.resolve("pillar-items.json")));
             assertEquals(propertiesBefore, Files.readString(directory.resolve("pillar-properties.json")));
@@ -86,7 +87,7 @@ class PillarConfigPersistenceTest {
         String first = Files.readString(file);
         assertTrue(first.indexOf("#the_vault:keys") < first.indexOf("minecraft:diamond"));
         assertTrue(first.indexOf("minecraft:diamond") < first.indexOf("minecraft:zombie_head"));
-        config.items = new HashSet<>(List.of("minecraft:diamond", "minecraft:zombie_head", "#the_vault:keys"));
+        config.items = new HashSet<>(config.items);
         config.saveItemsToDisk();
         assertEquals(first, Files.readString(file));
     }
@@ -130,7 +131,7 @@ class PillarConfigPersistenceTest {
             assertEquals(1, backups.size());
             assertEquals(broken, Files.readString(backups.get(0)));
         }
-        assertNotEquals(broken, Files.readString(file));
+        assertEquals(broken, Files.readString(file));
     }
 
     @Test

@@ -46,7 +46,7 @@ class DefaultPillarItemsTest {
             Path file = folder.resolve("pillar-items.json");
             String text = Files.readString(file);
             assertTrue(text.contains("// ===== VANILLA MINECRAFT ITEMS ====="));
-            assertTrue(text.contains("// ===== BUILDSCAPEahh  ITEMS ====="));
+            assertTrue(text.contains("// ===== BUILDSCAPE ITEMS ====="));
             assertEquals(vaultLoaded, text.contains("// ===== VAULT / MODDED ITEMS ====="));
             assertTrue(text.indexOf("minecraft:elder_guardian_spawn_egg") < text.indexOf("minecraft:diamond_hoe"));
             assertTrue(text.indexOf("minecraft:netherite_sword") < text.indexOf("buildscape:ancient_ashen_scroll"));
@@ -54,7 +54,7 @@ class DefaultPillarItemsTest {
                 assertTrue(text.indexOf("minecraft:netherite_sword") < text.indexOf("the_vault:vault_crystal"));
                 assertTrue(text.indexOf("#the_vault:greed_trinket") < text.indexOf("buildscape:ancient_ashen_scroll"));
             }
-            assertEquals(vaultLoaded ? 155 : 110,
+            assertEquals(vaultLoaded ? 154 : 109,
                     JsonParser.parseString(text).getAsJsonObject().getAsJsonArray("items").size());
             config.loadItemsInternal(vaultLoaded);
             assertEquals(text, Files.readString(file));
@@ -62,20 +62,21 @@ class DefaultPillarItemsTest {
     }
 
     @Test
-    void existingFilesKeepUnknownUserEntriesAndGainDefaults() throws Exception {
+    void versionedFilesKeepUnknownUserEntriesAndRespectRemovedDefaults() throws Exception {
         for (boolean vaultLoaded : new boolean[]{false, true}) {
             Path folder = Files.createDirectories(directory.resolve(String.valueOf(vaultLoaded)));
             Path file = folder.resolve("pillar-items.json");
             Set<String> userItems = Set.of("other:custom", "#missing:tag", "buildscape:missing_item",
                     "the_vault:user_item", "odd:\"quoted", "minecraft:diamond");
-            Files.writeString(file, new com.google.gson.Gson().toJson(java.util.Map.of("items", userItems)));
+            String original = new com.google.gson.Gson().toJson(java.util.Map.of(
+                    "items", userItems, "defaults_version", 405, "vault_defaults_version", 405));
+            Files.writeString(file, original);
             PillarParticleConfig config = new PillarParticleConfig(folder);
             config.loadItemsInternal(vaultLoaded);
             Set<String> expected = new HashSet<>(userItems);
-            expected.addAll(DefaultPillarItems.items(vaultLoaded));
             assertEquals(expected, config.items);
             String saved = Files.readString(file);
-            assertTrue(saved.indexOf("#missing:tag") < saved.indexOf("minecraft:diamond"));
+            assertEquals(original, saved);
             assertFalse(saved.contains("===== VANILLA"));
             config.loadItemsInternal(vaultLoaded);
             assertEquals(expected, config.items);

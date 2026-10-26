@@ -188,6 +188,12 @@ public final class RestoredCopperOxidation {
         UNWAXED_MAP.put(waxed, unwaxed);
     }
 
+    /** The restored interaction, or the shared one when the restored table did not handle the block. */
+    static InteractionResult firstHandled(Supplier<InteractionResult> restored, Supplier<InteractionResult> shared) {
+        InteractionResult result = restored.get();
+        return result == InteractionResult.PASS ? shared.get() : result;
+    }
+
     public static InteractionResult handleRightClick(Level level, BlockPos pos, BlockState state, ItemStack held, Player player, InteractionHand hand) {
         init();
 

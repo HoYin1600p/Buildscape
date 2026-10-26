@@ -2008,7 +2008,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public net.minecraft.world.InteractionResult handleCopperRightClick(Level level, BlockPos pos, BlockState state,
             ItemStack held, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
-        return RestoredCopperOxidation.handleRightClick(level, pos, state, held, player, hand);
+        // The restored table lacks the shared families (bit copper among them); the shared handler covers those.
+        return RestoredCopperOxidation.firstHandled(
+                () -> RestoredCopperOxidation.handleRightClick(level, pos, state, held, player, hand),
+                () -> com.kingodogo.buildscape.block.CopperOxidationHandler.handleRightClick(level, pos, state, held, player, hand));
     }
 
     @Override

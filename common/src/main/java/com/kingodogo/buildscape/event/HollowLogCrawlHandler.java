@@ -25,15 +25,24 @@ public final class HollowLogCrawlHandler {
 
     public static boolean USE_FORCED_SWIM_POSE = false;
 
-    private static final Set<UUID> FORCED_PLAYERS = Collections.synchronizedSet(new HashSet<>());
-    private static final Set<UUID> CUSTOM_CRAWLING_PLAYERS = Collections.synchronizedSet(new HashSet<>());
+    // In single player the client and server player share a UUID, so each side keeps its own crawl state.
+    private static final Set<PlayerSide> FORCED_PLAYERS = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<PlayerSide> CUSTOM_CRAWLING_PLAYERS = Collections.synchronizedSet(new HashSet<>());
+
+    record PlayerSide(UUID id, boolean clientSide) {
+    }
+
+    private static PlayerSide playerSide(Player player) {
+        Level level = Services.PLATFORM.getEntityLevel(player);
+        return new PlayerSide(player.getUUID(), level != null && level.isClientSide());
+    }
 
     private static final EntityDimensions CRAWL_DIMENSIONS = EntityDimensions.scalable(0.6F, 0.6F);
     private static final float CRAWL_EYE_HEIGHT = 0.4F;
 
     private HollowLogCrawlHandler() {}
     public static boolean isPlayerCustomCrawling(Player player) {
-        return player != null && CUSTOM_CRAWLING_PLAYERS.contains(player.getUUID());
+        return player != null && CUSTOM_CRAWLING_PLAYERS.contains(playerSide(player));
     }
     public static void tickPlayer(Player player) {
         if (player == null || player.isSpectator()) return;
@@ -57,14 +66,14 @@ public final class HollowLogCrawlHandler {
         if (USE_FORCED_SWIM_POSE) {
             if (insideLog || enteringLog) {
                 player.setPose(Pose.SWIMMING);
-                FORCED_PLAYERS.add(player.getUUID());
+                FORCED_PLAYERS.add(playerSide(player));
             } else {
                 clearForcedPose(player);
             }
         } else {
             if (insideLog || enteringLog) {
-                if (!CUSTOM_CRAWLING_PLAYERS.contains(player.getUUID())) {
-                    CUSTOM_CRAWLING_PLAYERS.add(player.getUUID());
+                if (!CUSTOM_CRAWLING_PLAYERS.contains(playerSide(player))) {
+                    CUSTOM_CRAWLING_PLAYERS.add(playerSide(player));
                     player.refreshDimensions();
                 }
                 if (player.getPose() != Pose.SWIMMING) {
@@ -76,8 +85,8 @@ public final class HollowLogCrawlHandler {
         }
     }
     public static void clearCrawling(Player player) {
-        boolean ours = CUSTOM_CRAWLING_PLAYERS.remove(player.getUUID());
-        ours |= FORCED_PLAYERS.remove(player.getUUID());
+        boolean ours = CUSTOM_CRAWLING_PLAYERS.remove(playerSide(player));
+        ours |= FORCED_PLAYERS.remove(playerSide(player));
         if (!ours) return;
         player.refreshDimensions();
     }
@@ -87,8 +96,10 @@ public final class HollowLogCrawlHandler {
     }
     public static void onPlayerLoggedOut(UUID id) {
         if (id != null) {
-            FORCED_PLAYERS.remove(id);
-            CUSTOM_CRAWLING_PLAYERS.remove(id);
+            for (boolean clientSide : new boolean[]{false, true}) {
+                FORCED_PLAYERS.remove(new PlayerSide(id, clientSide));
+                CUSTOM_CRAWLING_PLAYERS.remove(new PlayerSide(id, clientSide));
+            }
         }
     }
 

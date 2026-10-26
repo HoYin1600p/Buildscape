@@ -192,6 +192,15 @@ public class HollowLogBlockEntity extends DataBlockEntity implements IDataSerial
         if (state.hasProperty(HollowLogBlock.LAVA_LOGGED) && state.getValue(HollowLogBlock.LAVA_LOGGED)) {
             if (blockEntity.lavaTicks > 0) {
                 blockEntity.lavaTicks--;
+                // The last five seconds crackle and smoke, warning that the lava is about to burn through.
+                if (blockEntity.lavaTicks > 0 && blockEntity.lavaTicks <= 100 && blockEntity.lavaTicks % 20 == 0) {
+                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRE_AMBIENT,
+                            net.minecraft.sounds.SoundSource.BLOCKS, 0.8F, 1.0F);
+                    if (level instanceof ServerLevel serverLevel) {
+                        serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.8,
+                                pos.getZ() + 0.5, 4, 0.3, 0.2, 0.3, 0.02);
+                    }
+                }
                 if (blockEntity.lavaTicks <= 0) {
                     Services.PLATFORM.playFireExtinguish(level, pos);
                     if (level instanceof ServerLevel serverLevel) {

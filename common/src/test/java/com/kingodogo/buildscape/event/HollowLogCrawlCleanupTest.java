@@ -23,26 +23,39 @@ class HollowLogCrawlCleanupTest {
     }
 
     @Test
-    void logoutClearsBothCrawlModesWithoutChangingOtherPlayers() throws Exception {
+    void logoutClearsBothCrawlModesOnBothSidesWithoutChangingOtherPlayers() throws Exception {
         UUID departing = UUID.randomUUID();
         UUID remaining = UUID.randomUUID();
         for (String mode : new String[]{"FORCED_PLAYERS", "CUSTOM_CRAWLING_PLAYERS"}) {
-            players(mode).add(departing);
-            players(mode).add(remaining);
+            for (boolean clientSide : new boolean[]{false, true}) {
+                players(mode).add(new HollowLogCrawlHandler.PlayerSide(departing, clientSide));
+                players(mode).add(new HollowLogCrawlHandler.PlayerSide(remaining, clientSide));
+            }
         }
 
         HollowLogCrawlHandler.onPlayerLoggedOut(departing);
 
         for (String mode : new String[]{"FORCED_PLAYERS", "CUSTOM_CRAWLING_PLAYERS"}) {
-            assertFalse(players(mode).contains(departing));
-            assertTrue(players(mode).contains(remaining));
+            for (boolean clientSide : new boolean[]{false, true}) {
+                assertFalse(players(mode).contains(new HollowLogCrawlHandler.PlayerSide(departing, clientSide)));
+                assertTrue(players(mode).contains(new HollowLogCrawlHandler.PlayerSide(remaining, clientSide)));
+            }
         }
     }
 
     @Test
+    void theClientAndServerCopiesOfOnePlayerAreTrackedSeparately() throws Exception {
+        UUID id = UUID.randomUUID();
+        Set<HollowLogCrawlHandler.PlayerSide> crawling = players("CUSTOM_CRAWLING_PLAYERS");
+        crawling.add(new HollowLogCrawlHandler.PlayerSide(id, true));
+        assertTrue(crawling.contains(new HollowLogCrawlHandler.PlayerSide(id, true)));
+        assertFalse(crawling.contains(new HollowLogCrawlHandler.PlayerSide(id, false)));
+    }
+
+    @Test
     void serverStopClearsBothCrawlModesBeforeTheNextSession() throws Exception {
-        players("FORCED_PLAYERS").add(UUID.randomUUID());
-        players("CUSTOM_CRAWLING_PLAYERS").add(UUID.randomUUID());
+        players("FORCED_PLAYERS").add(new HollowLogCrawlHandler.PlayerSide(UUID.randomUUID(), false));
+        players("CUSTOM_CRAWLING_PLAYERS").add(new HollowLogCrawlHandler.PlayerSide(UUID.randomUUID(), true));
 
         HollowLogCrawlHandler.onServerStopping();
 
@@ -51,9 +64,9 @@ class HollowLogCrawlCleanupTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static Set<UUID> players(String mode) throws Exception {
+    private static Set<HollowLogCrawlHandler.PlayerSide> players(String mode) throws Exception {
         var field = HollowLogCrawlHandler.class.getDeclaredField(mode);
         field.setAccessible(true);
-        return (Set<UUID>) field.get(null);
+        return (Set<HollowLogCrawlHandler.PlayerSide>) field.get(null);
     }
 }

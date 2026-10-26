@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.pipe.transport;
 
+import com.kingodogo.buildscape.block.HollowPipeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -286,6 +287,8 @@ public class HollowPipeTransportManager {
         if (neighborIsPipe || neighborIsFluid || neighborIsOpenEndpoint) {
             markDirty(level, pos);
         }
+        // Outlets stop ticking while blocked; any neighbour change may have cleared one.
+        HollowPipeBlock.scheduleOutletTick(level, pos, state);
     }
 
     public static void onBucketUsed(Level level, BlockPos pos, BlockState state) {

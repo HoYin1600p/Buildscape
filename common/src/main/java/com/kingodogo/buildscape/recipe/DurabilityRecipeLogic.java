@@ -19,8 +19,8 @@ public final class DurabilityRecipeLogic {
                 return damagedStack;
             }
 
-            int newDamage = damagedStack.getDamageValue() + damageAmount;
-            damagedStack.setDamageValue(newDamage);
+            long newDamage = (long) damagedStack.getDamageValue() + damageAmount;
+            damagedStack.setDamageValue((int) Math.min(newDamage, Integer.MAX_VALUE));
             return newDamage < damagedStack.getMaxDamage() ? damagedStack : ItemStack.EMPTY;
         }
 

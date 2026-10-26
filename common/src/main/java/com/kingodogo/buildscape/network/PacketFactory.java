@@ -42,14 +42,19 @@ public final class PacketFactory {
     }
 
     public static void sendToPlayer(ServerPlayer player, CommonPacket packet) {
-        Services.PACKET_FACTORY.sendToPlayer(player, packet);
+        for (CommonPacket part : outgoing(packet)) Services.PACKET_FACTORY.sendToPlayer(player, part);
     }
 
     public static void sendToAll(CommonPacket packet) {
-        Services.PACKET_FACTORY.sendToAll(packet);
+        for (CommonPacket part : outgoing(packet)) Services.PACKET_FACTORY.sendToAll(part);
     }
 
     public static void sendToTracking(Level level, BlockPos pos, CommonPacket packet) {
-        Services.PACKET_FACTORY.sendToTracking(level, pos, packet);
+        for (CommonPacket part : outgoing(packet)) Services.PACKET_FACTORY.sendToTracking(level, pos, part);
+    }
+
+    private static java.util.List<? extends CommonPacket> outgoing(CommonPacket packet) {
+        return packet instanceof SyncConfigPacket config ? SyncConfigChunkPacket.split(config)
+                : java.util.List.of(packet);
     }
 }

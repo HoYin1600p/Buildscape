@@ -10,10 +10,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.nio.charset.StandardCharsets;
 
 public class SyncConfigPacket implements CommonPacket {
 
-    public static final CommonId ID = new CommonId("buildscape", "sync_config");
+    public static final CommonId ID = new CommonId("buildscape", "sync_config_v2");
+    public int baseRevision;
+    public boolean itemsReadOnly;
+    public boolean propertiesReadOnly;
+    public Set<com.kingodogo.buildscape.config.ConfigSetting> uploadSettings =
+            com.kingodogo.buildscape.config.ConfigSetting.uploadable();
 
     public double particle_speed;
     public double particle_spread;
@@ -37,6 +43,9 @@ public class SyncConfigPacket implements CommonPacket {
     }
 
     public SyncConfigPacket(PillarParticleConfig config, Player player) {
+        this.baseRevision = config.revision;
+        this.itemsReadOnly = !config.canEditItems();
+        this.propertiesReadOnly = !config.canEditProperties();
         this.particle_speed = NetworkPacketLimits.clamp(config.particle_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
         this.particle_spread = NetworkPacketLimits.clamp(config.particle_spread,
@@ -44,7 +53,9 @@ public class SyncConfigPacket implements CommonPacket {
         this.particle_lifetime = clamp(config.particle_lifetime, 1, NetworkPacketLimits.MAX_PARTICLE_LIFETIME);
         this.particle_density = clamp(config.particle_density, 0, NetworkPacketLimits.MAX_PARTICLE_DENSITY);
         this.use_pattern = config.use_pattern;
-        this.pattern = config.pattern != null ? config.pattern : "ring";
+        this.pattern = config.pattern != null
+                && config.pattern.getBytes(StandardCharsets.UTF_8).length <= NetworkPacketLimits.MAX_PATTERN_LENGTH
+                ? config.pattern : "ring";
         this.pattern_speed = NetworkPacketLimits.clamp(config.pattern_speed,
                 NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
         this.pattern_spread = NetworkPacketLimits.clamp(config.pattern_spread,
@@ -58,6 +69,8 @@ public class SyncConfigPacket implements CommonPacket {
         this.items = new HashSet<>(
                 config.items != null ? config.items : new HashSet<>()
         );
+        this.items.removeIf(item -> item != null
+                && item.getBytes(StandardCharsets.UTF_8).length > NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH);
         this.edit_permission_mode = config.edit_permission_mode != null
                 ? config.edit_permission_mode : PillarParticleConfig.EditPermissionMode.STRICT;
         if (player != null) {
@@ -101,6 +114,9 @@ public class SyncConfigPacket implements CommonPacket {
                 NetworkPacketLimits.readUtf(buf, 16, "edit permission mode"));
         this.permission_level = NetworkPacketLimits.readBoundedInt(buf, -1,
                 PillarParticleConfig.CONFIG_PERMISSION_LEVEL, "permission level");
+        this.itemsReadOnly = buf.readBoolean();
+        this.propertiesReadOnly = buf.readBoolean();
+        this.baseRevision = NetworkPacketLimits.readBoundedInt(buf, 0, Integer.MAX_VALUE, "config revision");
     }
 
     public static SyncConfigPacket decode(FriendlyByteBuf buf) {
@@ -154,6 +170,9 @@ public class SyncConfigPacket implements CommonPacket {
                 edit_permission_mode != null ? edit_permission_mode.name() : PillarParticleConfig.EditPermissionMode.STRICT.name(),
                 16, "edit permission mode");
         buf.writeInt(permission_level);
+        buf.writeBoolean(itemsReadOnly);
+        buf.writeBoolean(propertiesReadOnly);
+        buf.writeInt(baseRevision);
     }
 
     @Override
@@ -178,6 +197,9 @@ public class SyncConfigPacket implements CommonPacket {
             }
             cfg.edit_permission_mode = this.edit_permission_mode != null
                     ? this.edit_permission_mode : PillarParticleConfig.EditPermissionMode.STRICT;
+            cfg.revision = this.baseRevision;
+            cfg.setServerProtection(itemsReadOnly, propertiesReadOnly);
+            cfg.establishBaseline();
             if (this.permission_level >= 0) {
                 PillarParticleConfig.setClientPermissionLevel(this.permission_level);
             }

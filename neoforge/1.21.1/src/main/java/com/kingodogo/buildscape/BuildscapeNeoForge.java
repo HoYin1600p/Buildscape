@@ -51,7 +51,7 @@ public class BuildscapeNeoForge {
 
     private void registerPayloadHandlers(net.neoforged.bus.api.IEventBus modEventBus) {
         modEventBus.addListener((net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent event) -> {
-            net.neoforged.neoforge.network.registration.PayloadRegistrar registrar = event.registrar(BuildscapeCommon.MOD_ID);
+            net.neoforged.neoforge.network.registration.PayloadRegistrar registrar = event.registrar(com.kingodogo.buildscape.network.ModPackets.PROTOCOL_NAME);
             for (com.kingodogo.buildscape.network.IPacketFactory.PacketDescriptor desc : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
                 net.minecraft.resources.ResourceLocation loc = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(desc.id().getNamespace(), desc.id().getPath());
                 net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.v121x.PacketFactory.BuildscapeCustomPayload> type =

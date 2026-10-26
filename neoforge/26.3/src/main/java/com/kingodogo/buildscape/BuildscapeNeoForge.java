@@ -80,7 +80,7 @@ public class BuildscapeNeoForge {
         BuildscapeCommon.setServerFullyInitialized(false);
     }
     private static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        var registrar = event.registrar("1");
+        var registrar = event.registrar(com.kingodogo.buildscape.network.ModPackets.PROTOCOL_NAME);
         for (var descriptor : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
             var type = new CustomPacketPayload.Type<BuildscapeCustomPayload>(Identifier.fromNamespaceAndPath(
                     descriptor.id().getNamespace(), descriptor.id().getPath()));

@@ -1,12 +1,15 @@
 package com.kingodogo.buildscape.network;
 
 public final class ModPackets {
+    public static final int PROTOCOL_VERSION = 2;
+    public static final String PROTOCOL_NAME = Integer.toString(PROTOCOL_VERSION);
 
     private ModPackets() {}
 
     public static void registerAll() {
         PacketFactory.register(ActionBarMessagePacket.ID, PacketDirection.SERVER_TO_CLIENT, ActionBarMessagePacket::decode);
         PacketFactory.register(SyncConfigPacket.ID, PacketDirection.SERVER_TO_CLIENT, SyncConfigPacket::decode);
+        PacketFactory.register(SyncConfigChunkPacket.ID, PacketDirection.SERVER_TO_CLIENT, SyncConfigChunkPacket::decode);
         PacketFactory.register(TreeChopPacket.ID, PacketDirection.CLIENT_TO_SERVER, TreeChopPacket::decode);
         PacketFactory.register(UpdatePillarDataPacket.ID, PacketDirection.CLIENT_TO_SERVER, UpdatePillarDataPacket::decode);
         PacketFactory.register(SyncPillarIdsPacket.ID, PacketDirection.SERVER_TO_CLIENT, SyncPillarIdsPacket::decode);

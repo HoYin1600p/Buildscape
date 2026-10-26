@@ -8,6 +8,8 @@ import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.BuildscapeCommon;
 import com.kingodogo.buildscape.util.CommonId;
+import com.kingodogo.buildscape.network.SyncConfigPacket;
+import com.kingodogo.buildscape.network.NetworkPacketLimits;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
@@ -16,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.TreeSet;
 import java.util.Collection;
+import java.util.Objects;
 import java.lang.reflect.Type;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,6 +38,11 @@ public class PillarParticleConfig {
     }
 
     public static final int CONFIG_PERMISSION_LEVEL = 4;
+
+    public static int resolveClientPermissionLevel(int syncedLevel, boolean levelTwo, boolean levelFour) {
+        return syncedLevel >= 0 ? Math.min(CONFIG_PERMISSION_LEVEL, syncedLevel)
+                : levelFour ? CONFIG_PERMISSION_LEVEL : levelTwo ? 2 : 0;
+    }
 
     public enum EditPermissionMode {
         STRICT,
@@ -97,6 +105,7 @@ public class PillarParticleConfig {
     }
 
     public static void clearServerConfig() {
+        com.kingodogo.buildscape.network.SyncConfigChunkPacket.clearPending();
         SERVER_CONFIG = null;
         SNAPSHOT = null;
         CLIENT_PERMISSION_LEVEL = -1;
@@ -165,7 +174,222 @@ public class PillarParticleConfig {
         this.particle_color.add("#3CDFFF");
         this.particle_color.add("#9B51E0");
         this.loadedPropertyValues = propertyValues();
+        recordSnapshot();
     }
+    public static class Snapshot {
+        public final int revision;
+        public final double particle_speed;
+        public final double particle_spread;
+        public final int particle_lifetime;
+        public final int particle_density;
+        public final boolean use_pattern;
+        public final String pattern;
+        public final double pattern_speed;
+        public final double pattern_spread;
+        public final double pattern_intensity;
+        public final List<String> particle_color;
+        public final int max_particle_color;
+        public final Set<String> items;
+        public final EditPermissionMode edit_permission_mode;
+
+        public Snapshot(int revision, PillarParticleConfig config) {
+            this.revision = revision;
+            this.particle_speed = config.particle_speed;
+            this.particle_spread = config.particle_spread;
+            this.particle_lifetime = config.particle_lifetime;
+            this.particle_density = config.particle_density;
+            this.use_pattern = config.use_pattern;
+            this.pattern = config.pattern != null ? config.pattern : "ring";
+            this.pattern_speed = config.pattern_speed;
+            this.pattern_spread = config.pattern_spread;
+            this.pattern_intensity = config.pattern_intensity;
+            this.particle_color = new ArrayList<>(config.particle_color != null ? config.particle_color : List.of());
+            this.max_particle_color = config.max_particle_color;
+            this.items = new HashSet<>(config.items != null ? config.items : Set.of());
+            this.edit_permission_mode = config.edit_permission_mode;
+        }
+    }
+
+    public int revision = 0;
+    private final transient List<Snapshot> snapshotHistory = new ArrayList<>();
+    private transient boolean initialLoadDone = false;
+    private transient boolean isApplyingUpload = false;
+
+    public synchronized void establishBaseline() {
+        snapshotHistory.clear();
+        snapshotHistory.add(new Snapshot(revision, this));
+        initialLoadDone = true;
+    }
+
+    public synchronized void onReload() {
+        this.revision++;
+        recordSnapshot();
+    }
+
+    public synchronized void recordSnapshot() {
+        if (isApplyingUpload) {
+            if (snapshotHistory.isEmpty() || !isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+                snapshotHistory.add(new Snapshot(revision, this));
+                if (snapshotHistory.size() > 50) {
+                    snapshotHistory.remove(0);
+                }
+            }
+            return;
+        }
+        if (snapshotHistory.isEmpty()) {
+            snapshotHistory.add(new Snapshot(revision, this));
+        } else if (snapshotHistory.size() == 1 && revision == 0 && !initialLoadDone) {
+            snapshotHistory.set(0, new Snapshot(revision, this));
+        } else if (!isSameState(snapshotHistory.get(snapshotHistory.size() - 1))) {
+            snapshotHistory.add(new Snapshot(revision, this));
+            if (snapshotHistory.size() > 50) {
+                snapshotHistory.remove(0);
+            }
+        }
+    }
+
+    private boolean isSameState(Snapshot s) {
+        return revision == s.revision
+                && Double.compare(particle_speed, s.particle_speed) == 0
+                && Double.compare(particle_spread, s.particle_spread) == 0
+                && particle_lifetime == s.particle_lifetime
+                && particle_density == s.particle_density
+                && use_pattern == s.use_pattern
+                && Objects.equals(pattern, s.pattern)
+                && Double.compare(pattern_speed, s.pattern_speed) == 0
+                && Double.compare(pattern_spread, s.pattern_spread) == 0
+                && Double.compare(pattern_intensity, s.pattern_intensity) == 0
+                && Objects.equals(particle_color, s.particle_color)
+                && max_particle_color == s.max_particle_color
+                && Objects.equals(items, s.items)
+                && edit_permission_mode == s.edit_permission_mode;
+    }
+
+    public synchronized Snapshot findBaseSnapshot(int baseRev) {
+        for (int i = snapshotHistory.size() - 1; i >= 0; i--) {
+            Snapshot s = snapshotHistory.get(i);
+            if (s.revision == baseRev) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public synchronized Snapshot findBaseSnapshot(int baseRev, Set<ConfigSetting> groups, Double inSpeed,
+            Integer inLifetime, Set<String> inItems) {
+        return findBaseSnapshot(baseRev);
+    }
+
+    public synchronized boolean applyUpload(PillarParticleConfig client, Set<ConfigSetting> groups) {
+        SyncConfigPacket data = new SyncConfigPacket(client);
+        data.baseRevision = client.revision;
+        boolean applied = applyUpload(data, groups);
+        if (applied) {
+            client.revision = this.revision;
+        }
+        return applied;
+    }
+
+    public synchronized boolean applyUpload(SyncConfigPacket data, Set<ConfigSetting> groups) {
+        if (groups == null || groups.isEmpty()) {
+            return true;
+        }
+        Snapshot base = findBaseSnapshot(data.baseRevision);
+        if (base == null) {
+            groups.clear();
+            return false;
+        }
+
+        isApplyingUpload = true;
+        try {
+            if (groups.contains(ConfigSetting.PARTICLES)) {
+                if (Double.compare(data.particle_speed, base.particle_speed) != 0) {
+                    this.particle_speed = data.particle_speed;
+                }
+                if (Double.compare(data.particle_spread, base.particle_spread) != 0) {
+                    this.particle_spread = data.particle_spread;
+                }
+                if (data.particle_lifetime != base.particle_lifetime) {
+                    this.particle_lifetime = data.particle_lifetime;
+                }
+                if (data.particle_density != base.particle_density) {
+                    this.particle_density = data.particle_density;
+                }
+                if (data.use_pattern != base.use_pattern) {
+                    this.use_pattern = data.use_pattern;
+                }
+                if (!Objects.equals(data.pattern, base.pattern) && data.pattern != null) {
+                    this.pattern = data.pattern;
+                }
+                if (Double.compare(data.pattern_speed, base.pattern_speed) != 0) {
+                    this.pattern_speed = data.pattern_speed;
+                }
+                if (Double.compare(data.pattern_spread, base.pattern_spread) != 0) {
+                    this.pattern_spread = data.pattern_spread;
+                }
+                if (Double.compare(data.pattern_intensity, base.pattern_intensity) != 0) {
+                    this.pattern_intensity = data.pattern_intensity;
+                }
+            }
+
+            if (groups.contains(ConfigSetting.COLORS)) {
+                if (data.max_particle_color != base.max_particle_color && data.max_particle_color > 0) {
+                    this.max_particle_color = data.max_particle_color;
+                }
+                if (data.particle_color != null) {
+                    if (data.particle_color.size() != base.particle_color.size()) {
+                        this.particle_color = new ArrayList<>(data.particle_color);
+                    } else {
+                        List<String> merged = new ArrayList<>(this.particle_color);
+                        for (int i = 0; i < data.particle_color.size(); i++) {
+                            if (!Objects.equals(data.particle_color.get(i), base.particle_color.get(i))) {
+                                while (merged.size() <= i) {
+                                    merged.add(DEFAULT_COLORS[Math.min(merged.size(), DEFAULT_COLORS.length - 1)]);
+                                }
+                                merged.set(i, data.particle_color.get(i));
+                            }
+                        }
+                        this.particle_color = merged;
+                    }
+                }
+            }
+
+            if (groups.contains(ConfigSetting.ITEMS) && data.items != null) {
+                Set<String> added = new HashSet<>();
+                for (String item : data.items) {
+                    if (!base.items.contains(item)) {
+                        added.add(item);
+                    }
+                }
+                Set<String> removed = new HashSet<>();
+                for (String item : base.items) {
+                    if (!data.items.contains(item) && isValidItemId(item)
+                            && item.length() <= NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH) {
+                        removed.add(item);
+                    }
+                }
+
+                Set<String> merged = new HashSet<>(this.items);
+                merged.addAll(added);
+                merged.removeAll(removed);
+                this.editItems(merged);
+            }
+
+            if (groups.contains(ConfigSetting.POLICY) && data.edit_permission_mode != null) {
+                if (data.edit_permission_mode != base.edit_permission_mode) {
+                    this.edit_permission_mode = data.edit_permission_mode;
+                }
+            }
+
+            this.revision++;
+            data.baseRevision = this.revision;
+            recordSnapshot();
+            return true;
+        } finally {
+            isApplyingUpload = false;
+        }
+    }
+
     public static void addConfigReloadCallback(Consumer<Boolean> callback) {
         CONFIG_RELOAD_CALLBACKS.add(callback);
     }
@@ -239,10 +463,13 @@ public class PillarParticleConfig {
 
                 if (reloadProperties) {
                     INSTANCE.loadPropertiesInternal();
-                    notifyCallbacks(false);
                 }
                 if (reloadItems) {
                     INSTANCE.loadItemsInternal();
+                }
+                if (reloadProperties || reloadItems) {
+                    INSTANCE.onReload();
+                    notifyCallbacks(false);
                 }
             }
             SNAPSHOT = INSTANCE;
@@ -348,6 +575,7 @@ public class PillarParticleConfig {
     private void loadInternal() {
         loadPropertiesInternal();
         loadItemsInternal();
+        establishBaseline();
     }
 
     private void loadPropertiesInternal() {
@@ -462,7 +690,8 @@ public class PillarParticleConfig {
             originalProperties = original;
             propertiesSource = content.toString();
             loadedPropertyValues = propertyValues();
-            corruptedProperties = legacyReadOnly || ConfigLayoutIO.protectInvalidEncoding(file.toPath());
+            corruptedProperties = legacyReadOnly || ConfigLayoutIO.protectInvalidEncoding(file.toPath())
+                    || !ConfigLayoutIO.isWritable(file.toPath());
             if (legacyReadOnly) {
                 com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn(
                         "Loaded pillar properties using the legacy parser; the file is read-only and will be kept as-is");
@@ -812,8 +1041,8 @@ public class PillarParticleConfig {
     public void saveProperties() {
         savePropertiesToDisk();
     }
-    public void savePropertiesToDisk() {
-        if (remote || corruptedProperties) return;
+    public boolean savePropertiesToDisk() {
+        if (remote || corruptedProperties) return false;
         File file = getPropertiesFile();
         try {
             if (originalProperties == null && file.exists()) {
@@ -838,7 +1067,7 @@ public class PillarParticleConfig {
                     output.add(key, !changed && output.has(alias) ? output.get(alias) : entry.getValue());
                 }
             }
-            if (originalProperties != null && output.equals(originalProperties)) return;
+            if (originalProperties != null && output.equals(originalProperties)) return true;
             String text = ConfigLayoutIO.retainComments(propertiesSource, groupedProperties(output), true);
             ConfigLayoutIO.write(file.toPath(), text, propertiesSource, true);
             propertiesSource = text;
@@ -846,8 +1075,10 @@ public class PillarParticleConfig {
             loadedPropertyValues = current;
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
+            return true;
         } catch (Exception ignored) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to save pillar properties", ignored);
+            return false;
         }
     }
 
@@ -946,6 +1177,46 @@ public class PillarParticleConfig {
 
     public boolean canEditItems() {
         return !corruptedItems && !itemsReadOnly;
+    }
+
+    public boolean canEditProperties() {
+        return !corruptedProperties;
+    }
+
+    public void setServerProtection(boolean itemsProtected, boolean propertiesProtected) {
+        itemsReadOnly = itemsProtected;
+        corruptedProperties = propertiesProtected;
+    }
+
+    public boolean canApplyUpdate() {
+        return canApplyUpdate(true, true);
+    }
+
+    public boolean canApplyUpdate(boolean updateItems, boolean updateProperties) {
+        if ((updateItems && !canEditItems()) || (updateProperties && !canEditProperties())) return false;
+        if (remote) return true;
+        try {
+            File properties = getPropertiesFile();
+            File configuredItems = getItemsFile();
+            if (updateProperties && properties.exists()) {
+                corruptedProperties |= ConfigLayoutIO.protectInvalidEncoding(properties.toPath())
+                        || !ConfigLayoutIO.isWritable(properties.toPath());
+            }
+            if (updateItems && configuredItems.exists()) {
+                itemsReadOnly |= ConfigLayoutIO.protectInvalidEncoding(configuredItems.toPath())
+                        || !ConfigLayoutIO.isWritable(configuredItems.toPath());
+            }
+            return (!updateItems || canEditItems()) && (!updateProperties || canEditProperties());
+        } catch (IOException | SecurityException e) {
+            BuildscapeCommon.LOGGER.warn("Unable to check server config protection", e);
+            return false;
+        }
+    }
+
+    public String getSaveFailureReason() {
+        return corruptedProperties || itemsReadOnly || corruptedItems
+                ? "the config file is protected because it could not be read safely"
+                : "the config file changed on disk or could not be written; check the server log";
     }
 
     public synchronized void editItems(Collection<String> updatedItems) {

@@ -1509,7 +1509,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private void persistServerConfig(PillarParticleConfig config) {
-        PacketFactory.sendToServer(new UpdateConfigPacket(config));
+        UpdateConfigPacket.send(config);
     }
 
     private boolean confirmDestructiveAction(String action) {

@@ -45,6 +45,7 @@ public final class ForgePacketFactory implements IPacketFactory {
         if (channel != null) throw new IllegalStateException("Forge channel already installed");
         types.put(ActionBarMessagePacket.ID, ActionBarMessagePacket.class);
         types.put(SyncConfigPacket.ID, SyncConfigPacket.class);
+        types.put(SyncConfigChunkPacket.ID, SyncConfigChunkPacket.class);
         types.put(TreeChopPacket.ID, TreeChopPacket.class);
         types.put(UpdatePillarDataPacket.ID, UpdatePillarDataPacket.class);
         types.put(SyncPillarIdsPacket.ID, SyncPillarIdsPacket.class);
@@ -63,7 +64,7 @@ public final class ForgePacketFactory implements IPacketFactory {
         types.put(ConfettiBurstPacket.ID, ConfettiBurstPacket.class);
         if (!types.keySet().equals(packets.keySet())) throw new IllegalStateException("Forge packet types differ from shared descriptors");
         channel = NetworkRegistry.newSimpleChannel(new ResourceLocation(BuildscapeCommon.MOD_ID, "main"),
-                () -> "1", "1"::equals, "1"::equals);
+                () -> ModPackets.PROTOCOL_NAME, ModPackets.PROTOCOL_NAME::equals, ModPackets.PROTOCOL_NAME::equals);
         int discriminator = 1;
         for (PacketDescriptor descriptor : PacketFactory.getRegisteredDescriptors()) {
             bind(discriminator++, descriptor, types.get(descriptor.id()));

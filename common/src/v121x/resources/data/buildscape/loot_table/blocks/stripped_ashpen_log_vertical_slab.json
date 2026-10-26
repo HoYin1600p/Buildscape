@@ -7,7 +7,23 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "buildscape:stripped_ashpen_log_vertical_slab"
+          "name": "buildscape:stripped_ashpen_log_vertical_slab",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:stripped_ashpen_log_vertical_slab",
+                  "properties": {
+                    "type": "double"
+                  }
+                }
+              ],
+              "count": 2,
+              "add": false
+            }
+          ]
         }
       ],
       "conditions": [

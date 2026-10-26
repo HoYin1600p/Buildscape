@@ -22,8 +22,8 @@ public class MulticolorGlowLightsBlock extends GlowLightsBlock {
         if (state == null) {
             return null;
         }
-        // Main samples the fluid one block past the destination (clicked pos shifted by the clicked face).
-        BlockPos fluidPos = context.getClickedPos().relative(context.getClickedFace());
+        // Waterlogging follows the fluid in the block being placed.
+        BlockPos fluidPos = context.getClickedPos();
         boolean water = context.getLevel().getFluidState(fluidPos).getType() == Fluids.WATER;
         return state.setValue(LIT, true).setValue(WATERLOGGED, water);
     }

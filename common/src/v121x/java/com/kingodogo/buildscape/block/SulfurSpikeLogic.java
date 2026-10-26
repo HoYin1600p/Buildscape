@@ -70,9 +70,10 @@ public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Level level = context.getLevel();
-        BlockPos clickedPos = context.getClickedPos();
+        BlockPos pos = context.getClickedPos();
         Direction clickedFace = context.getClickedFace();
-        BlockPos pos = clickedPos.relative(clickedFace);
+        // The context already names the block being placed; the clicked support is behind its face.
+        BlockPos clickedPos = pos.relative(clickedFace.getOpposite());
 
         Direction verticalDirection;
         BlockState clickedState = level.getBlockState(clickedPos);
@@ -366,6 +367,8 @@ public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
     ) {
         java.util.Set<BlockPos> breakingBlocks = new java.util.HashSet<>();
         breakingBlocks.add(pos);
+        // The block that started the break has lost its support too.
+        level.destroyBlock(pos, true);
 
         Direction tipDirection = direction == Direction.DOWN
                 ? Direction.DOWN

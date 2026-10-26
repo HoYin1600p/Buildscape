@@ -116,21 +116,17 @@ public abstract class SnowyShortGrassBlock extends BushBlock implements SinksOnF
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
-            BlockPos upperPos = abovePos.above();
-            BlockState upperState = level.getBlockState(upperPos);
-            if (upperState.isAir()) {
-                Block tallGrass = snowyTallGrassSupplier != null ? snowyTallGrassSupplier.get() : null;
-                if (tallGrass != null) {
-                    BlockState tallGrassState = tallGrass.defaultBlockState()
-                            .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
-                    if (tallGrassState.canSurvive(level, pos)) {
-                        level.setBlock(pos, tallGrassState, 3);
-                        level.setBlock(
-                                abovePos,
-                                tallGrassState.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER),
-                                3
-                        );
-                    }
+            Block tallGrass = snowyTallGrassSupplier != null ? snowyTallGrassSupplier.get() : null;
+            if (tallGrass != null) {
+                BlockState tallGrassState = tallGrass.defaultBlockState()
+                        .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
+                if (tallGrassState.canSurvive(level, pos)) {
+                    level.setBlock(pos, tallGrassState, 3);
+                    level.setBlock(
+                            abovePos,
+                            tallGrassState.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER),
+                            3
+                    );
                 }
             }
         }

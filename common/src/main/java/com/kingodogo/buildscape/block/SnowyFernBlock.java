@@ -116,21 +116,17 @@ public abstract class SnowyFernBlock extends BushBlock implements SinksOnFarmlan
         BlockPos abovePos = pos.above();
         BlockState aboveState = level.getBlockState(abovePos);
         if (aboveState.isAir()) {
-            BlockPos upperPos = abovePos.above();
-            BlockState upperState = level.getBlockState(upperPos);
-            if (upperState.isAir()) {
-                Block largeFern = snowyLargeFernSupplier != null ? snowyLargeFernSupplier.get() : null;
-                if (largeFern != null) {
-                    BlockState largeFernState = largeFern.defaultBlockState()
-                            .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
-                    if (largeFernState.canSurvive(level, pos)) {
-                        level.setBlock(pos, largeFernState, 3);
-                        level.setBlock(
-                                abovePos,
-                                largeFernState.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER),
-                                3
-                        );
-                    }
+            Block largeFern = snowyLargeFernSupplier != null ? snowyLargeFernSupplier.get() : null;
+            if (largeFern != null) {
+                BlockState largeFernState = largeFern.defaultBlockState()
+                        .setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER);
+                if (largeFernState.canSurvive(level, pos)) {
+                    level.setBlock(pos, largeFernState, 3);
+                    level.setBlock(
+                            abovePos,
+                            largeFernState.setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER),
+                            3
+                    );
                 }
             }
         }

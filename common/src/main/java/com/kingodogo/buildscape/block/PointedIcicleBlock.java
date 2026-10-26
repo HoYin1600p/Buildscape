@@ -403,6 +403,8 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
     private void breakAllConnectedBlocks(Level level, BlockPos pos, Direction direction) {
         Set<BlockPos> breakingBlocks = new HashSet<>();
         breakingBlocks.add(pos);
+        // The block that started the break has lost its support too.
+        level.destroyBlock(pos, true);
 
         Direction tipDirection = direction == Direction.DOWN ? Direction.DOWN : Direction.UP;
         BlockPos currentPos = pos.relative(tipDirection);

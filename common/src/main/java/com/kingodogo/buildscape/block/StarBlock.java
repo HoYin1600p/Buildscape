@@ -82,7 +82,8 @@ public abstract class StarBlock extends BushBlock implements SinksOnFarmland, Si
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction clickedFace = context.getClickedFace();
         BlockPos clickedPos = context.getClickedPos();
-        BlockPos placePos = clickedPos.relative(clickedFace);
+        // The context already names the block being placed, so check and sample there.
+        BlockPos placePos = clickedPos;
         Level level = context.getLevel();
 
         if (!level.getBlockState(placePos).canBeReplaced(context)) {

@@ -155,7 +155,8 @@ public class OrnamentBlock extends Block implements SimpleWaterloggedBlock, ICom
             facing = playerFacing;
         }
 
-        BlockPos placePos = clickedPos.relative(clickedFace);
+        // The context already names the block being placed, so check and sample there.
+        BlockPos placePos = clickedPos;
         BlockState placeState = level.getBlockState(placePos);
         if (!placeState.isAir() && !placeState.canBeReplaced(context) && !placeState.is(this)) return null;
         FluidState fluidState = level.getFluidState(placePos);

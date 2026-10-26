@@ -1219,6 +1219,11 @@ public class PillarParticleConfig {
                 : "the config file changed on disk or could not be written; check the server log";
     }
 
+    public synchronized void replaceItems(Collection<String> updatedItems) {
+        items = new HashSet<>(updatedItems);
+        clearMatchCache();
+    }
+
     public synchronized void editItems(Collection<String> updatedItems) {
         if (!canEditItems()) return;
         Set<String> replacement = new HashSet<>();

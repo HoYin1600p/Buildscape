@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.config.BuildscapeClientConfig;
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
@@ -711,6 +712,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private final List<GuiEventListener> widgets = new ArrayList<>();
     private final List<GuiEventListener> tabWidgets = new ArrayList<>();
     private static volatile BuildScapeConfigScreen currentInstance;
+    private final ConfigUploadBatch uploadBatch = new ConfigUploadBatch();
+    static {
+        PillarParticleConfig.addConfigReloadCallback(remote -> {
+            BuildScapeConfigScreen screen = currentInstance;
+            if (remote && screen != null) {
+                screen.uploadBatch.reapply(PillarParticleConfig.get());
+                screen.rebuildActiveItemsCache();
+                screen.itemsListDirty = true;
+                screen.tagsListDirty = true;
+            }
+        });
+    }
     private static final ConfigWarmupState CONFIG_WARMUP_STATE = new ConfigWarmupState();
 
     static final class ConfigWarmupState {
@@ -919,6 +932,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     public BuildScapeConfigScreen(Screen parent) {
         this.parent = parent;
+        uploadBatch.rebase(PillarParticleConfig.get());
         this.title = ComponentHelper.translatable("buildscape.config.title");
 
         this.openStartTime = 0L;
@@ -1241,6 +1255,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public void tick() {
+        if (uploadBatch.isDue(System.currentTimeMillis())) flushConfigUpload();
         if (availableItems.isEmpty() && itemsCached) {
             cacheAvailableItems();
             rebuildActiveItemsCache();
@@ -1450,6 +1465,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     public void startClosing(boolean toWorld) {
         if (isClosing) return;
+        flushConfigUpload();
         this.closeToWorld = toWorld;
         this.isClosing = true;
         this.isOpening = false;
@@ -1509,7 +1525,30 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private void persistServerConfig(PillarParticleConfig config) {
-        UpdateConfigPacket.send(config);
+        uploadBatch.edited(config, System.currentTimeMillis());
+    }
+
+    private void flushConfigUpload() {
+        if (!uploadBatch.hasPending()) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.getConnection() == null) return;
+        PillarParticleConfig config = PillarParticleConfig.get();
+        for (ConfigSetting setting : uploadBatch.pendingSettings()) {
+            if (!hasEditAccess(setting.scope)
+                    || (setting.itemsFile ? !config.canEditItems() : !config.canEditProperties())) {
+                uploadBatch.revert(setting, config);
+                readOnlyDeniedAt = System.currentTimeMillis();
+                readOnlyDeniedX = rawMouseX;
+                readOnlyDeniedY = rawMouseY;
+                rebuildActiveItemsCache();
+            }
+        }
+        if (!uploadBatch.hasPending()) return;
+        Set<ConfigSetting> changed = uploadBatch.pendingSettings();
+        List<UpdateConfigPacket> packets = UpdateConfigPacket.split(config, changed);
+        uploadBatch.take();
+        uploadBatch.measureFrom(config);
+        for (UpdateConfigPacket packet : packets) PacketFactory.sendToServer(packet);
     }
 
     private boolean confirmDestructiveAction(String action) {
@@ -6125,6 +6164,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public void onClose() {
+        flushConfigUpload();
         if (currentInstance == this) {
             currentInstance = null;
         }

@@ -33,6 +33,9 @@ public final class RestoredContentTypes {
                 BLOCK_ENTITIES.put("potent_sulfur", com.kingodogo.buildscape.platform.Services.PLATFORM.createBlockEntityTypeForBlocks(
                         com.kingodogo.buildscape.block.PotentSulfurBlockEntity::new,
                         blocks.get("potent_sulfur")));
+                BLOCK_ENTITIES.put("sculk_catalyst", com.kingodogo.buildscape.platform.Services.PLATFORM.createBlockEntityTypeForBlocks(
+                        com.kingodogo.buildscape.block.SculkCatalystBlockEntity::new,
+                        blocks.get("sculk_catalyst")));
             });
         }
         return java.util.Collections.unmodifiableMap(BLOCK_ENTITIES);

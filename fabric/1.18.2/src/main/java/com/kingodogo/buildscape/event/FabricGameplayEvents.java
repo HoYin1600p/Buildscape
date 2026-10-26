@@ -75,15 +75,6 @@ public final class FabricGameplayEvents {
     }
     public static void livingDeath(net.minecraft.world.entity.LivingEntity entity, net.minecraft.world.damagesource.DamageSource source) {
         ModCommonEvents.onLivingDeath(entity, source);
-        if (entity.level.isClientSide) return;
-        var origin = entity.blockPosition();
-        var catalyst = com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(
-                new com.kingodogo.buildscape.util.CommonId("buildscape", "sculk_catalyst"));
-        for (var pos : net.minecraft.core.BlockPos.betweenClosed(origin.offset(-8, -8, -8), origin.offset(8, 8, 8))) {
-            if (entity.level.getBlockState(pos).is(catalyst)) {
-                com.kingodogo.buildscape.block.SculkCatalystHandler.onMobKilledNearCatalyst(entity.level, pos, origin, entity);
-                break;
-            }
-        }
+        com.kingodogo.buildscape.block.SculkCatalystHandler.onDeath(entity, source);
     }
 }

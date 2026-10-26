@@ -10,6 +10,10 @@ import net.minecraft.world.level.block.SoundType;
 
 import com.kingodogo.buildscape.block.CustomSoundType;
 public class ModSounds {
+    // The vanilla 1.19 sculk sounds exist only for the 1.18.2 sculk backport.
+    public static final RegistrySupplier<SoundEvent> SCULK_CATALYST_BLOOM = registerV118xSound("block.sculk_catalyst.bloom");
+    public static final RegistrySupplier<SoundEvent> SCULK_SPREAD = registerV118xSound("block.sculk.spread");
+    public static final RegistrySupplier<SoundEvent> SCULK_CHARGE = registerV118xSound("block.sculk.charge");
     public static final RegistrySupplier<SoundEvent> COPPER_GRATE_BREAK = registerSound("block.copper_grate.break");
     public static final RegistrySupplier<SoundEvent> COPPER_GRATE_STEP = registerSound("block.copper_grate.step");
     public static final RegistrySupplier<SoundEvent> COPPER_GRATE_PLACE = COPPER_GRATE_STEP;
@@ -210,6 +214,10 @@ public class ModSounds {
     private static RegistrySupplier<SoundEvent> registerSound(String path) {
         String sanitized = path.replace('.', '_');
         return Services.REGISTRY.registerSound(sanitized, () -> Services.PLATFORM.createSoundEvent(new CommonId(BuildscapeCommon.MOD_ID, sanitized)));
+    }
+
+    private static RegistrySupplier<SoundEvent> registerV118xSound(String path) {
+        return Services.isVersionCluster("v118x") ? registerSound(path) : null;
     }
     public static void init() {
     }

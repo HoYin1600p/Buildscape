@@ -15,6 +15,8 @@ import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
@@ -57,6 +59,18 @@ public final class ForgeGameplayEvents {
             }
         });
         bus.addListener((LivingDeathEvent event) -> livingDeath(event));
+        // Lowest priority: catalysts only charge from deaths no other mod cancelled.
+        bus.addListener(EventPriority.LOWEST, (LivingDeathEvent event) -> {
+            if (!event.isCanceled()) {
+                com.kingodogo.buildscape.block.SculkCatalystHandler.onDeath(event.getEntityLiving(), event.getSource());
+            }
+        });
+        bus.addListener(EventPriority.LOWEST, (LivingExperienceDropEvent event) -> {
+            if (!event.isCanceled()) {
+                event.setDroppedExperience(com.kingodogo.buildscape.block.SculkCatalystHandler.experienceToDrop(
+                        event.getEntityLiving(), event.getDroppedExperience()));
+            }
+        });
         bus.addListener(LoaderStewRecipes::crafted);
         bus.addListener((LivingEntityUseItemEvent.Finish event) -> ModCommonEvents.onItemUseFinish(event.getEntityLiving(), event.getItem()));
         bus.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
@@ -139,16 +153,6 @@ public final class ForgeGameplayEvents {
 
     private static void livingDeath(LivingDeathEvent event) {
         ModCommonEvents.onLivingDeath(event.getEntityLiving(), event.getSource());
-        var entity = event.getEntityLiving();
-        if (entity.level.isClientSide) return;
-        var origin = entity.blockPosition();
-        var catalyst = Services.PLATFORM.getBlock(new com.kingodogo.buildscape.util.CommonId("buildscape", "sculk_catalyst"));
-        for (var pos : net.minecraft.core.BlockPos.betweenClosed(origin.offset(-8, -8, -8), origin.offset(8, 8, 8))) {
-            if (entity.level.getBlockState(pos).is(catalyst)) {
-                com.kingodogo.buildscape.block.SculkCatalystHandler.onMobKilledNearCatalyst(entity.level, pos, origin, entity);
-                break;
-            }
-        }
     }
 
     private static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {

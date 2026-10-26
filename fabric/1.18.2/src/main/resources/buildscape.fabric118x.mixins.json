@@ -17,6 +17,7 @@
     "ExplosionGriefingMixin",
     "ItemUseFinishMixin",
     "LivingDeathMixin",
+    "SculkExperienceDropMixin",
     "PlayerDimensionMixin",
     "PlayerSpawnMixin",
     "EntityDataMixin",

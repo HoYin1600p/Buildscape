@@ -2561,14 +2561,10 @@ public class BlockFactory implements IBlockFactory {
             case "ochre_froglight" -> BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15);
             case "pearlescent_froglight" -> BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15);
             case "verdant_froglight" -> BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15);
-            case "sculk" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
-            case "sculk_slab" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
-            case "sculk_stairs" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
-            case "sculk_wall" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
-            case "sculk_vertical_slab" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
-            case "sculk_vein" -> BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN);
-            case "sculk_catalyst" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).lightLevel(state -> 6);
-            case "sculk_shrieker" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).noOcclusion();
+            case "sculk", "sculk_slab", "sculk_stairs", "sculk_wall", "sculk_vertical_slab" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(0.2F).lightLevel(state -> 0).color(MaterialColor.COLOR_BLACK);
+            case "sculk_vein" -> BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN).lightLevel(state -> 0);
+            case "sculk_catalyst" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(3.0F, 3.0F).lightLevel(state -> 6).randomTicks();
+            case "sculk_shrieker" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).strength(3.0F, 3.0F).lightLevel(state -> 0).noOcclusion();
             case "sculk_sensor" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).lightLevel(state -> 1).noOcclusion();
             case "copper_torch" -> BlockBehaviour.Properties.copy(Blocks.TORCH).lightLevel(state -> 14);
             case "copper_wall_torch" -> BlockBehaviour.Properties.copy(Blocks.WALL_TORCH).lightLevel(state -> 14);

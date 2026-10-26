@@ -8,6 +8,22 @@
         {
           "type": "minecraft:item",
           "name": "buildscape:sculk_slab",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:sculk_slab",
+                  "properties": {
+                    "type": "double"
+                  }
+                }
+              ],
+              "count": 2,
+              "add": false
+            }
+          ],
           "conditions": [
             {
               "condition": "minecraft:match_tool",

@@ -30,6 +30,8 @@ public final class NeoForgeGameplayEvents {
     public static void register() {
         AdvancementEvents.configure(new LoaderAdvancementAccess());
         var bus = NeoForge.EVENT_BUS;
+        bus.addListener((PlayerEvent.BreakSpeed event) -> event.setNewSpeed(
+                com.kingodogo.buildscape.block.LeafMiningSpeed.adjust(event.getEntity(), event.getState(), event.getNewSpeed())));
 
         bus.addListener(LoaderWandererTrades::register);
         bus.addListener((net.neoforged.neoforge.event.entity.player.AdvancementEvent.AdvancementEarnEvent event) -> {

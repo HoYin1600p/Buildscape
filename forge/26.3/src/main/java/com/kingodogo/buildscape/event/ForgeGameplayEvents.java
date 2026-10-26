@@ -52,6 +52,8 @@ public final class ForgeGameplayEvents {
             }
         });
         RegisterCommandsEvent.BUS.addListener((RegisterCommandsEvent event) -> BuildscapeCommands.register(event.getDispatcher()));
+        PlayerEvent.BreakSpeed.BUS.addListener((PlayerEvent.BreakSpeed event) -> event.setNewSpeed(
+                com.kingodogo.buildscape.block.LeafMiningSpeed.adjust(event.getEntity(), event.getState(), event.getNewSpeed())));
         PlayerInteractEvent.RightClickBlock.BUS.addListener(ForgeGameplayEvents::rightClickBlock);
         PlayerInteractEvent.RightClickItem.BUS.addListener(ForgeGameplayEvents::rightClickItem);
         PlayerInteractEvent.EntityInteractSpecific.BUS.addListener(ForgeGameplayEvents::entityInteract);

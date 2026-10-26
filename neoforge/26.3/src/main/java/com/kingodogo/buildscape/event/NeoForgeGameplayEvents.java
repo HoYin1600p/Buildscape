@@ -30,6 +30,8 @@ public final class NeoForgeGameplayEvents {
     public static void register() {
         AdvancementEvents.configure(new LoaderAdvancementAccess());
         var bus = NeoForge.EVENT_BUS;
+        bus.addListener((PlayerEvent.BreakSpeed event) -> event.setNewSpeed(
+                com.kingodogo.buildscape.block.LeafMiningSpeed.adjust(event.getEntity(), event.getState(), event.getNewSpeed())));
         // 26.3 binds item components after mod init and again on every data reload (compostables need them).
         bus.addListener((net.neoforged.neoforge.event.server.ServerStartingEvent event) ->
                 ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) com.kingodogo.buildscape.platform.Services.PLATFORM)

@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "fabric.BlockPlacementMixin",
+    "fabric.LeafShearsSpeedMixin",
     "fabric.CraftingMixin",
     "fabric.CraftingResultPreparationMixin",
     "fabric.PlayerDimensionMixin",

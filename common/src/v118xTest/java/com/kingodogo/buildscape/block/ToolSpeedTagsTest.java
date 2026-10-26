@@ -61,6 +61,30 @@ class ToolSpeedTagsTest {
         }
     }
 
+    @Test
+    void everyLoaderGivesShearsLeafSpeed() throws Exception {
+        Path repo = common().getParent();
+        for (String module : new String[]{"forge/1.18.2", "forge/1.21.1", "forge/26.2", "forge/26.3",
+                "neoforge/1.21.1", "neoforge/26.2", "neoforge/26.3"}) {
+            String loader = module.startsWith("neoforge") ? "NeoForge" : "Forge";
+            String events = Files.readString(repo.resolve(module
+                    + "/src/main/java/com/kingodogo/buildscape/event/" + loader + "GameplayEvents.java"));
+            assertTrue(events.contains("PlayerEvent.BreakSpeed") && events.contains("LeafMiningSpeed.adjust("), module);
+        }
+        for (String module : new String[]{"fabric/1.18.2", "fabric/1.21.1", "fabric/26.2", "fabric/26.3"}) {
+            Path resources = repo.resolve(module + "/src/main/resources");
+            boolean listed = false;
+            try (var configs = Files.list(resources)) {
+                for (Path config : (Iterable<Path>) configs.filter(p -> p.toString().endsWith(".mixins.json"))::iterator) {
+                    listed |= Files.readString(config).contains("LeafShearsSpeedMixin\"");
+                }
+            }
+            assertTrue(listed, module);
+            assertTrue(Files.isRegularFile(repo.resolve(module
+                    + "/src/main/java/com/kingodogo/buildscape/mixin/fabric/LeafShearsSpeedMixin.java")), module);
+        }
+    }
+
     private static Set<String> values(String tree, String namespace, String tag) throws Exception {
         Path path = common().resolve("src").resolve(String.format(tree, namespace, tag));
         JsonArray array = JsonParser.parseString(Files.readString(path)).getAsJsonObject().getAsJsonArray("values");

@@ -59,7 +59,7 @@ public class GlowLightsBlockEntity extends DataBlockEntity implements IDataSeria
     public void readData(IBlockEntityReadData data) {
         this.dyeColors.clear();
         for (String color : data.getStringListOrEmpty("DyeColors")) {
-            if (color != null && !color.isEmpty()) {
+            if (color != null && !color.isEmpty() && this.dyeColors.size() < MAX_DYE_COLORS) {
                 this.dyeColors.add(color);
             }
         }

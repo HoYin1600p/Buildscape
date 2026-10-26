@@ -43,22 +43,29 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
     }
 
     public InteractionResult onInteract(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand) {
-        if (state.getValue(ACTIVE)) {
-            return InteractionResult.PASS;
+        boolean emptyHand = player.getItemInHand(hand).isEmpty();
+        if (!emptyHand || level.isClientSide()) {
+            return resinInteractionResult(emptyHand, 0, level.isClientSide());
         }
-        if (!level.isClientSide()) {
-            level.setBlock(pos, state.setValue(ACTIVE, true), 3);
-            spawnResinOnHeart(level, pos);
+        if (state.getValue(ACTIVE)) {
+            level.setBlock(pos, state.setValue(ACTIVE, false), 3);
+        }
+        int spawned = spawnResinOnHeart(level, pos);
+        if (spawned > 0) {
             level.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.levelEvent(2005, pos, 0);
-            level.scheduleTick(pos, this, RESIN_COOLDOWN_TICKS);
         }
-        return Services.PLATFORM.sidedSuccess(level.isClientSide());
+        return resinInteractionResult(emptyHand, spawned, false);
     }
 
-    public void spawnResinOnHeart(Level level, BlockPos pos) {
+    static InteractionResult resinInteractionResult(boolean emptyHand, int spawned, boolean clientSide) {
+        if (!emptyHand || (!clientSide && spawned == 0)) return InteractionResult.PASS;
+        return clientSide ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
+    }
+
+    public int spawnResinOnHeart(Level level, BlockPos pos) {
         Block resinClump = resinClumpSupplier != null ? resinClumpSupplier.get() : null;
-        if (resinClump == null || resinClump == Blocks.AIR) return;
+        if (resinClump == null || resinClump == Blocks.AIR) return 0;
 
         List<Direction> directions = new ArrayList<>(List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.UP, Direction.DOWN));
         Collections.shuffle(directions);
@@ -71,18 +78,18 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
             BlockState adjState = level.getBlockState(adjPos);
 
             if (adjState.is(resinClump)) {
-                if (adjState.hasProperty(faceProp) && !adjState.getValue(faceProp)) {
-                    level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
+                if (adjState.hasProperty(faceProp) && !adjState.getValue(faceProp)
+                        && level.setBlock(adjPos, adjState.setValue(faceProp, true), 3)) {
                     spawned++;
                 }
             } else if (adjState.isAir()) {
                 BlockState newState = resinClump.defaultBlockState().setValue(faceProp, true);
-                level.setBlock(adjPos, newState, 3);
-                spawned++;
+                if (level.setBlock(adjPos, newState, 3)) spawned++;
             }
 
             if (spawned >= 2) break;
         }
+        return spawned;
     }
 
     public void onScheduledTick(BlockState state, Level level, BlockPos pos) {

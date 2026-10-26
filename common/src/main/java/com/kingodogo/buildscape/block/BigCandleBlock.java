@@ -105,7 +105,14 @@ public class BigCandleBlock extends Block implements SimpleWaterloggedBlock, ICo
 
         if (heldItem.is(Items.FLINT_AND_STEEL) || heldItem.is(Items.FIRE_CHARGE)) {
             if (!currentlyLit && !isWaterlogged) {
-                level.setBlock(pos, state.setValue(LIT, true), 3);
+                if (!level.setBlock(pos, state.setValue(LIT, true), 3)) return InteractionResult.PASS;
+                if (!player.getAbilities().instabuild) {
+                    if (heldItem.is(Items.FLINT_AND_STEEL)) {
+                        Services.PLATFORM.hurtAndBreak(heldItem, 1, player, hand);
+                    } else {
+                        heldItem.shrink(1);
+                    }
+                }
                 Services.PLATFORM.playFlintAndSteelSound(level, pos);
                 return InteractionResult.SUCCESS;
             }

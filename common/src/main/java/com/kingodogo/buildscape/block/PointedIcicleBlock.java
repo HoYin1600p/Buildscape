@@ -38,6 +38,8 @@ import java.util.Random;
 import java.util.Set;
 
 public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, SimpleWaterloggedBlock {
+    private static final ThreadLocal<Boolean> CASCADE_ACTIVE = new ThreadLocal<>();
+
 
     public enum Thickness implements StringRepresentable {
         TIP_MERGE("tip_merge"),
@@ -309,43 +311,48 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
     }
 
     public void onIcicleRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!level.isClientSide() && !isMoving && !newState.is(this)) {
-            Direction direction = state.getValue(VERTICAL_DIRECTION);
-            Set<BlockPos> fallingBlocks = new HashSet<>();
-            fallingBlocks.add(pos);
+        if (!level.isClientSide() && !isMoving && !newState.is(this) && !Boolean.TRUE.equals(CASCADE_ACTIVE.get())) {
+            CASCADE_ACTIVE.set(true);
+            try {
+                Direction direction = state.getValue(VERTICAL_DIRECTION);
+                Set<BlockPos> fallingBlocks = new HashSet<>();
+                fallingBlocks.add(pos);
 
-            if (direction == Direction.DOWN) {
-                BlockPos currentPos = pos.below();
-                while (true) {
-                    if (fallingBlocks.contains(currentPos)) {
-                        break;
+                if (direction == Direction.DOWN) {
+                    BlockPos currentPos = pos.below();
+                    while (true) {
+                        if (fallingBlocks.contains(currentPos)) {
+                            break;
+                        }
+                        BlockState currentState = level.getBlockState(currentPos);
+                        if (currentState.is(this) && currentState.getValue(VERTICAL_DIRECTION) == direction) {
+                            fallingBlocks.add(currentPos);
+                            makeIcicleFall(level, currentPos, currentState);
+                            currentPos = currentPos.below();
+                        } else {
+                            break;
+                        }
                     }
-                    BlockState currentState = level.getBlockState(currentPos);
-                    if (currentState.is(this) && currentState.getValue(VERTICAL_DIRECTION) == direction) {
-                        fallingBlocks.add(currentPos);
-                        makeIcicleFall(level, currentPos, currentState);
-                        currentPos = currentPos.below();
-                    } else {
-                        break;
+                    updateRemainingStack(level, pos.above(), direction);
+                } else {
+                    BlockPos currentPos = pos.above();
+                    while (true) {
+                        if (fallingBlocks.contains(currentPos)) {
+                            break;
+                        }
+                        BlockState currentState = level.getBlockState(currentPos);
+                        if (currentState.is(this) && currentState.getValue(VERTICAL_DIRECTION) == direction) {
+                            fallingBlocks.add(currentPos);
+                            level.destroyBlock(currentPos, true);
+                            currentPos = currentPos.above();
+                        } else {
+                            break;
+                        }
                     }
+                    updateRemainingStack(level, pos.below(), direction);
                 }
-                updateRemainingStack(level, pos.above(), direction);
-            } else {
-                BlockPos currentPos = pos.above();
-                while (true) {
-                    if (fallingBlocks.contains(currentPos)) {
-                        break;
-                    }
-                    BlockState currentState = level.getBlockState(currentPos);
-                    if (currentState.is(this) && currentState.getValue(VERTICAL_DIRECTION) == direction) {
-                        fallingBlocks.add(currentPos);
-                        level.destroyBlock(currentPos, true);
-                        currentPos = currentPos.above();
-                    } else {
-                        break;
-                    }
-                }
-                updateRemainingStack(level, pos.below(), direction);
+            } finally {
+                CASCADE_ACTIVE.remove();
             }
         }
     }

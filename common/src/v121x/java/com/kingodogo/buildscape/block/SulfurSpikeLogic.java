@@ -28,6 +28,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.util.RandomSource;
 
 public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
+    private static final ThreadLocal<Boolean> CASCADE_ACTIVE = new ThreadLocal<>();
+
 
     protected SulfurSpikeLogic(BlockBehaviour.Properties properties) {
         super(properties);
@@ -227,56 +229,61 @@ public abstract class SulfurSpikeLogic extends PointedDripstoneBlock {
             BlockState newState,
             boolean isMoving
     ) {
-        if (!level.isClientSide && !isMoving && !newState.is(this)) {
-            Direction direction = state.getValue(
-                    BlockStateProperties.VERTICAL_DIRECTION
-            );
+        if (!level.isClientSide && !isMoving && !newState.is(this) && !Boolean.TRUE.equals(CASCADE_ACTIVE.get())) {
+            CASCADE_ACTIVE.set(true);
+            try {
+                Direction direction = state.getValue(
+                        BlockStateProperties.VERTICAL_DIRECTION
+                );
 
-            java.util.Set<BlockPos> fallingBlocks = new java.util.HashSet<>();
-            fallingBlocks.add(pos);
+                java.util.Set<BlockPos> fallingBlocks = new java.util.HashSet<>();
+                fallingBlocks.add(pos);
 
-            if (direction == Direction.DOWN) {
-                BlockPos currentPos = pos.below();
-                while (true) {
-                    if (fallingBlocks.contains(currentPos)) {
-                        break;
+                if (direction == Direction.DOWN) {
+                    BlockPos currentPos = pos.below();
+                    while (true) {
+                        if (fallingBlocks.contains(currentPos)) {
+                            break;
+                        }
+                        BlockState currentState = level.getBlockState(currentPos);
+                        if (
+                                currentState.is(this) &&
+                                        currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
+                                                direction
+                        ) {
+                            fallingBlocks.add(currentPos);
+                            makeSulfurSpikeFall(level, currentPos, currentState);
+                            currentPos = currentPos.below();
+                        } else {
+                            break;
+                        }
                     }
-                    BlockState currentState = level.getBlockState(currentPos);
-                    if (
-                            currentState.is(this) &&
-                                    currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                            direction
-                    ) {
-                        fallingBlocks.add(currentPos);
-                        makeSulfurSpikeFall(level, currentPos, currentState);
-                        currentPos = currentPos.below();
-                    } else {
-                        break;
+
+                    updateRemainingStack(level, pos.above(), direction);
+                } else {
+                    BlockPos currentPos = pos.above();
+                    while (true) {
+                        if (fallingBlocks.contains(currentPos)) {
+                            break;
+                        }
+                        BlockState currentState = level.getBlockState(currentPos);
+                        if (
+                                currentState.is(this) &&
+                                        currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
+                                                direction
+                        ) {
+                            fallingBlocks.add(currentPos);
+                            level.destroyBlock(currentPos, true);
+                            currentPos = currentPos.above();
+                        } else {
+                            break;
+                        }
                     }
+
+                    updateRemainingStack(level, pos.below(), direction);
                 }
-
-                updateRemainingStack(level, pos.above(), direction);
-            } else {
-                BlockPos currentPos = pos.above();
-                while (true) {
-                    if (fallingBlocks.contains(currentPos)) {
-                        break;
-                    }
-                    BlockState currentState = level.getBlockState(currentPos);
-                    if (
-                            currentState.is(this) &&
-                                    currentState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
-                                            direction
-                    ) {
-                        fallingBlocks.add(currentPos);
-                        level.destroyBlock(currentPos, true);
-                        currentPos = currentPos.above();
-                    } else {
-                        break;
-                    }
-                }
-
-                updateRemainingStack(level, pos.below(), direction);
+            } finally {
+                CASCADE_ACTIVE.remove();
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);

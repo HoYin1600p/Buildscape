@@ -2640,6 +2640,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public net.minecraft.world.phys.Vec3 getMainCameraPosition() {
+        return net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+    }
+
+    @Override
     public void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource) {
         if (bufferSource instanceof net.minecraft.client.renderer.MultiBufferSource mbs) {
             net.minecraft.client.renderer.block.BlockRenderDispatcher blockRenderer = net.minecraft.client.Minecraft.getInstance().getBlockRenderer();

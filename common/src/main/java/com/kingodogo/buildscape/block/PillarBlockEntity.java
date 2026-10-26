@@ -79,6 +79,7 @@ public class PillarBlockEntity extends DataBlockEntity {
         if (level == null || !level.isClientSide()) {
             return;
         }
+        if (!ClientParticleHelper.isWithinRange(pos)) return;
         if (!be.hasDisplayItem()) {
             return;
         }
@@ -89,13 +90,14 @@ public class PillarBlockEntity extends DataBlockEntity {
         }
 
         PillarParticleConfig cfg = PillarParticleConfig.peek();
+        if (cfg.particle_density <= 0) return;
         if (!cfg.matches(be.displayedItem)) {
             return;
         }
 
         String earlyPattern = be.getParticlePattern();
-        if (earlyPattern == null || "default".equals(earlyPattern)) {
-            earlyPattern = cfg.pattern;
+        if (earlyPattern == null || earlyPattern.isEmpty() || "default".equals(earlyPattern)) {
+            earlyPattern = cfg.pattern != null ? cfg.pattern : "ring";
         }
         if ("none".equals(earlyPattern)) {
             return;
@@ -103,15 +105,13 @@ public class PillarBlockEntity extends DataBlockEntity {
 
         be.lastParticleTick = time;
 
-        int baseCount = cfg.particle_density;
-        boolean usePattern = be.getUsePattern() != null ? be.getUsePattern() : cfg.use_pattern;
-        double intensity = be.getPatternIntensity() != null ? be.getPatternIntensity() : cfg.pattern_intensity;
-        int count = Math.max(
-                1,
-                usePattern
-                        ? (int) Math.round(baseCount * intensity)
-                        : baseCount
-        );
+        boolean usePattern = be.usePattern != null ? be.usePattern : cfg.use_pattern;
+        ParticleSettings settings = new ParticleSettings(earlyPattern, usePattern,
+                be.patternSpeed != null ? be.patternSpeed : usePattern ? cfg.pattern_speed : cfg.particle_speed,
+                be.patternSpread != null ? be.patternSpread : usePattern ? cfg.pattern_spread : cfg.particle_spread,
+                be.patternIntensity != null ? be.patternIntensity : cfg.pattern_intensity);
+        int count = particleCount(cfg.particle_density, settings.usePattern, settings.intensity);
+        if (count == 0) return;
 
         Random rand = java.util.concurrent.ThreadLocalRandom.current();
         double centerX = pos.getX() + 0.5D;
@@ -119,15 +119,28 @@ public class PillarBlockEntity extends DataBlockEntity {
         double centerY = pos.getY() + (isAshen ? 0.75D : 1.0D);
         double centerZ = pos.getZ() + 0.5D;
 
-        ClientParticleHelper.spawnParticles(level, pos, be, cfg, time, count, rand, centerX, centerY, centerZ);
+        ClientParticleHelper.spawnParticles(level, pos, be, cfg, settings, time, count, rand, centerX, centerY, centerZ);
     }
 
+    static int particleCount(int density, boolean usePattern, double intensity) {
+        if (density <= 0) return 0;
+        return (int) Math.min(64L, Math.max(0L, usePattern ? Math.round(density * intensity) : density));
+    }
+
+    private record ParticleSettings(String pattern, boolean usePattern, double speed, double spread, double intensity) {}
+
     private static class ClientParticleHelper {
+        private static boolean isWithinRange(BlockPos pos) {
+            return Services.PLATFORM.getMainCameraPosition().distanceToSqr(
+                    pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 32.0D * 32.0D;
+        }
+
         private static void spawnParticles(
                 Level level,
                 BlockPos pos,
                 PillarBlockEntity be,
                 PillarParticleConfig cfg,
+                ParticleSettings settings,
                 long time,
                 int count,
                 Random rand,
@@ -135,17 +148,13 @@ public class PillarBlockEntity extends DataBlockEntity {
                 double centerY,
                 double centerZ
         ) {
-            String pattern = be.getParticlePattern();
-            if (pattern == null || "default".equals(pattern)) {
-                pattern = cfg.pattern != null ? cfg.pattern : "ring";
-            }
-            boolean isSnowflake = "snowflake".equals(pattern);
+            boolean isSnowflake = "snowflake".equals(settings.pattern);
             ParticleOptions particleType = isSnowflake
                     ? (ModParticles.SNOWFLAKE.isPresent() ? ModParticles.SNOWFLAKE.get() : ParticleTypes.SNOWFLAKE)
                     : (ModParticles.GLOW_LIME_SPARKLE.isPresent() ? ModParticles.GLOW_LIME_SPARKLE.get() : ParticleTypes.ENCHANT);
 
             for (int i = 0; i < count; i++) {
-                ParticleSpawnData data = calculateParticleData(be, cfg, time, i, count, rand);
+                ParticleSpawnData data = calculateParticleData(settings, cfg, time, i, count, rand);
                 if (data == null) {
                     continue;
                 }
@@ -167,7 +176,7 @@ public class PillarBlockEntity extends DataBlockEntity {
         }
     }
     private static ParticleSpawnData calculateParticleData(
-            PillarBlockEntity be,
+            ParticleSettings settings,
             PillarParticleConfig cfg,
             long time,
             int i,
@@ -177,24 +186,10 @@ public class PillarBlockEntity extends DataBlockEntity {
         double sx, sy, sz, vx, vy, vz;
         float size = 1.0f;
 
-        String pillarPattern = be.getParticlePattern();
-        boolean usePattern = be.usePattern != null ? be.usePattern : cfg.use_pattern;
-
-        if (usePattern) {
-            String pattern = pillarPattern;
-            if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
-                pattern = cfg.pattern != null ? cfg.pattern : "ring";
-            }
-
-            if ("none".equals(pattern)) {
-                return null;
-            }
-
-            double patternSpeed = be.patternSpeed != null ? be.patternSpeed : cfg.pattern_speed;
-            double patternIntensity = be.patternIntensity != null ? be.patternIntensity : cfg.pattern_intensity;
-            double patternSpread = be.patternSpread != null ? be.patternSpread : cfg.pattern_spread;
-            double speed = patternSpeed * patternIntensity;
-            double spread = patternSpread;
+        if (settings.usePattern) {
+            String pattern = settings.pattern;
+            double speed = settings.speed * settings.intensity;
+            double spread = settings.spread;
 
             switch (pattern) {
                 case "beam" -> {
@@ -278,8 +273,8 @@ public class PillarBlockEntity extends DataBlockEntity {
                 }
             }
         } else {
-            double pSpeed = be.patternSpeed != null ? be.patternSpeed : cfg.particle_speed;
-            double pSpread = be.patternSpread != null ? be.patternSpread : cfg.particle_spread;
+            double pSpeed = settings.speed;
+            double pSpread = settings.spread;
             double rAngle = ((i * 2.0D * Math.PI) / count) + (time * 0.05D);
             double rRadius = pSpread * 0.8D;
             sx = Math.cos(rAngle) * rRadius;
@@ -627,7 +622,7 @@ public class PillarBlockEntity extends DataBlockEntity {
             }
 
             if (data.pattern_intensity != null
-                    && (this.patternIntensity != null && !this.patternIntensity.equals(data.pattern_intensity))) {
+                    && (this.patternIntensity == null || !this.patternIntensity.equals(data.pattern_intensity))) {
                 this.patternIntensity = data.pattern_intensity;
                 changed = true;
             } else if (data.pattern_intensity == null && this.patternIntensity != null) {

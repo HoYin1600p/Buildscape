@@ -2608,6 +2608,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override public boolean isScreenOpen() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isScreenOpen(); }
 
     @Override public net.minecraft.world.phys.Vec3 getCameraPosition(net.minecraft.client.Camera camera) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getCameraPosition(camera); }
+    @Override public net.minecraft.world.phys.Vec3 getMainCameraPosition() { return net.minecraft.client.Minecraft.getInstance().gameRenderer.mainCamera().position(); }
 
     @Override public void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderFallingIcicleBlock(level, blockState, blockPos, startPos, poseStack, bufferSource); }
 

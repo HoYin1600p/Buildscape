@@ -496,6 +496,7 @@ public interface IPlatformAdapter {
     void renderLineBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a);
     boolean isScreenOpen();
     net.minecraft.world.phys.Vec3 getCameraPosition(net.minecraft.client.Camera camera);
+    net.minecraft.world.phys.Vec3 getMainCameraPosition();
     void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource);
     int getLightColor(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos);
     boolean isMapItemWithData(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.Level level);

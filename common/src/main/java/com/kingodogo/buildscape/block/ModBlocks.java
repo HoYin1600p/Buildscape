@@ -3632,22 +3632,22 @@ public class ModBlocks {
         RED_TRAPPED_DECORATED_POT = reg("red_trapped_decorated_pot", "TrappedDecoratedPotBlock", 1.5f, 1.5f, "STONE", null, null, false, false, false, 0, null, null);
         WHITE_TRAPPED_DECORATED_POT = reg("white_trapped_decorated_pot", "TrappedDecoratedPotBlock", 1.5f, 1.5f, "STONE", null, null, false, false, false, 0, null, null);
         YELLOW_TRAPPED_DECORATED_POT = reg("yellow_trapped_decorated_pot", "TrappedDecoratedPotBlock", 1.5f, 1.5f, "STONE", null, null, false, false, false, 0, null, null);
-        BLACK_CARPET_LAYERS = reg("black_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_BLACK", false, false, true, 0, null, null);
-        BLUE_CARPET_LAYERS = reg("blue_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_BLUE", false, false, true, 0, null, null);
-        BROWN_CARPET_LAYERS = reg("brown_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_BROWN", false, false, true, 0, null, null);
-        CYAN_CARPET_LAYERS = reg("cyan_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_CYAN", false, false, true, 0, null, null);
-        GRAY_CARPET_LAYERS = reg("gray_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_GRAY", false, false, true, 0, null, null);
-        GREEN_CARPET_LAYERS = reg("green_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_GREEN", false, false, true, 0, null, null);
-        LIGHT_BLUE_CARPET_LAYERS = reg("light_blue_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_LIGHT_BLUE", false, false, true, 0, null, null);
-        LIGHT_GRAY_CARPET_LAYERS = reg("light_gray_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_LIGHT_GRAY", false, false, true, 0, null, null);
-        LIME_CARPET_LAYERS = reg("lime_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_LIGHT_GREEN", false, false, true, 0, null, null);
-        MAGENTA_CARPET_LAYERS = reg("magenta_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_MAGENTA", false, false, true, 0, null, null);
-        ORANGE_CARPET_LAYERS = reg("orange_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_ORANGE", false, false, true, 0, null, null);
-        PINK_CARPET_LAYERS = reg("pink_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_PINK", false, false, true, 0, null, null);
-        PURPLE_CARPET_LAYERS = reg("purple_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_PURPLE", false, false, true, 0, null, null);
-        RED_CARPET_LAYERS = reg("red_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_RED", false, false, true, 0, null, null);
-        WHITE_CARPET_LAYERS = reg("white_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "SNOW", false, false, true, 0, null, null);
-        YELLOW_CARPET_LAYERS = reg("yellow_carpet_layers", "WoolLayersBlock", 0.8f, 0.8f, "WOOL", "WOOL", "COLOR_YELLOW", false, false, true, 0, null, null);
+        BLACK_CARPET_LAYERS = reg("black_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_BLACK", false, false, true, 0, null, null);
+        BLUE_CARPET_LAYERS = reg("blue_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_BLUE", false, false, true, 0, null, null);
+        BROWN_CARPET_LAYERS = reg("brown_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_BROWN", false, false, true, 0, null, null);
+        CYAN_CARPET_LAYERS = reg("cyan_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_CYAN", false, false, true, 0, null, null);
+        GRAY_CARPET_LAYERS = reg("gray_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_GRAY", false, false, true, 0, null, null);
+        GREEN_CARPET_LAYERS = reg("green_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_GREEN", false, false, true, 0, null, null);
+        LIGHT_BLUE_CARPET_LAYERS = reg("light_blue_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_LIGHT_BLUE", false, false, true, 0, null, null);
+        LIGHT_GRAY_CARPET_LAYERS = reg("light_gray_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_LIGHT_GRAY", false, false, true, 0, null, null);
+        LIME_CARPET_LAYERS = reg("lime_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_LIGHT_GREEN", false, false, true, 0, null, null);
+        MAGENTA_CARPET_LAYERS = reg("magenta_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_MAGENTA", false, false, true, 0, null, null);
+        ORANGE_CARPET_LAYERS = reg("orange_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_ORANGE", false, false, true, 0, null, null);
+        PINK_CARPET_LAYERS = reg("pink_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_PINK", false, false, true, 0, null, null);
+        PURPLE_CARPET_LAYERS = reg("purple_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_PURPLE", false, false, true, 0, null, null);
+        RED_CARPET_LAYERS = reg("red_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_RED", false, false, true, 0, null, null);
+        WHITE_CARPET_LAYERS = reg("white_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "SNOW", false, false, true, 0, null, null);
+        YELLOW_CARPET_LAYERS = reg("yellow_carpet_layers", "WoolLayersBlock", 0.1f, 0.1f, "WOOL", "WOOL", "COLOR_YELLOW", false, false, true, 0, null, null);
     }
 
     private static void initPart1() {

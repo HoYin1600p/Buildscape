@@ -18,6 +18,7 @@
     "ItemUseFinishMixin",
     "LivingDeathMixin",
     "SculkExperienceDropMixin",
+    "LeafShearsSpeedMixin",
     "PlayerDimensionMixin",
     "PlayerSpawnMixin",
     "EntityDataMixin",

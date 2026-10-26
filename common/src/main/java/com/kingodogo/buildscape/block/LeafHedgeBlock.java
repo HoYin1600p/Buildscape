@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.WallBlock;
@@ -64,34 +63,6 @@ public class LeafHedgeBlock extends WallBlock {
                 Services.PLATFORM.playVegetationStepSound(level, soundPos, entity, this.getSoundType(soundState));
             }
         }
-    }
-
-    @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        float destroySpeed = state.getDestroySpeed(level, pos);
-        if (destroySpeed == -1.0F) {
-            return 0.0F;
-        }
-
-        int efficiencyLevel = Services.PLATFORM.getEfficiencyLevel(player.getMainHandItem());
-        ItemStack tool = player.getMainHandItem();
-
-        float speedMultiplier = 1.0F;
-        if (!tool.isEmpty()) {
-            speedMultiplier = tool.getDestroySpeed(state);
-        }
-
-        if (speedMultiplier > 1.0F) {
-            int efficiencyBonus = efficiencyLevel > 0
-                    ? efficiencyLevel * efficiencyLevel + 1
-                    : 0;
-            speedMultiplier += (float) efficiencyBonus;
-        }
-
-        float difficultyModifier = player.hasCorrectToolForDrops(state)
-                ? 30.0F
-                : 100.0F;
-        return speedMultiplier / destroySpeed / difficultyModifier;
     }
 
     @Override

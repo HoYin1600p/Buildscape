@@ -3,10 +3,7 @@ package com.kingodogo.buildscape.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -55,28 +52,5 @@ public class FallingSandBlock extends Block implements ICommonNeighborAware {
 
     public void onScheduledTick(BlockState state, ServerLevel level, BlockPos pos) {
         if (isFree(level, pos)) FallingBlockEntity.fall(level, pos, state);
-    }
-
-    @Override
-    public float getDestroyProgress(
-            BlockState state,
-            Player player,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        float destroySpeed = state.getDestroySpeed(level, pos);
-        if (destroySpeed == -1.0F) {
-            return 0.0F;
-        }
-
-        ItemStack tool = player.getMainHandItem();
-        float speedMultiplier = tool.isEmpty() ? 1.0F : tool.getDestroySpeed(state);
-        if (speedMultiplier > 1.0F) {
-            int efficiencyLevel = com.kingodogo.buildscape.platform.Services.PLATFORM.getEfficiencyLevel(tool);
-            speedMultiplier += efficiencyLevel > 0 ? efficiencyLevel * efficiencyLevel + 1 : 0;
-        }
-
-        float difficultyModifier = player.hasCorrectToolForDrops(state) ? 30.0F : 100.0F;
-        return speedMultiplier / destroySpeed / difficultyModifier;
     }
 }

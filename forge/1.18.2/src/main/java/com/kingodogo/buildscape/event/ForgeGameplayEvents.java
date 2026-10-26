@@ -71,6 +71,8 @@ public final class ForgeGameplayEvents {
                         event.getEntityLiving(), event.getDroppedExperience()));
             }
         });
+        bus.addListener(EventPriority.HIGHEST, (PlayerEvent.BreakSpeed event) -> event.setNewSpeed(
+                com.kingodogo.buildscape.block.LeafMiningSpeed.adjust(event.getPlayer(), event.getState(), event.getNewSpeed())));
         bus.addListener(LoaderStewRecipes::crafted);
         bus.addListener((LivingEntityUseItemEvent.Finish event) -> ModCommonEvents.onItemUseFinish(event.getEntityLiving(), event.getItem()));
         bus.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {

@@ -17,6 +17,17 @@
     "buildscape:dirt_stairs",
     "buildscape:mycelium_stairs",
     "buildscape:podzol_stairs",
-    "buildscape:snow_overlay"
+    "buildscape:snow_overlay",
+    "buildscape:dirt_slab",
+    "buildscape:dirt_vertical_slab",
+    "buildscape:mycelium_slab",
+    "buildscape:mycelium_vertical_slab",
+    "buildscape:podzol_slab",
+    "buildscape:podzol_vertical_slab",
+    "buildscape:snow_bricks_slab",
+    "buildscape:snow_bricks_vertical_slab",
+    "buildscape:snow_slab",
+    "buildscape:snow_vertical_slab",
+    "buildscape:snowy_grass_block_slab"
   ]
 }

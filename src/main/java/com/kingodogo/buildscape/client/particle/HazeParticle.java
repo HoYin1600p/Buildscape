@@ -10,6 +10,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
@@ -32,9 +33,10 @@ public class HazeParticle extends TextureSheetParticle {
     private final double originX;
     private final double originZ;
     private final float maskMin;
-    private final HazeMask mask;
-    private final float[][] clipA = new float[8][2];
-    private final float[][] clipB = new float[8][2];
+    private final HazeGeometry geometry;
+    private TextureAtlasSprite geometrySprite;
+    private int geometryCutoff = -1;
+    private HazeTextureBounds textureBounds;
 
     protected HazeParticle(ClientLevel level, double x, double y, double z,
             double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
@@ -75,8 +77,9 @@ public class HazeParticle extends TextureSheetParticle {
         int radius = Math.min((HazeMask.MAX_GRID_SIZE - 1) / 2,
                 Mth.ceil((this.baseSize * 1.2 * Math.sqrt(2.0) + 0.02) / CELL_SIZE));
         this.maskMin = -(radius + 0.5F) * CELL_SIZE;
-        this.mask = createMask(level, radius);
-        if (this.mask.rectangles().isEmpty()) {
+        HazeMask mask = createMask(level, radius);
+        this.geometry = new HazeGeometry(mask.rectangles(), this.maskMin, CELL_SIZE);
+        if (mask.rectangles().isEmpty()) {
             this.remove();
         }
 
@@ -131,6 +134,19 @@ public class HazeParticle extends TextureSheetParticle {
 
     @Override
     public void render(VertexConsumer consumer, Camera camera, float partialTick) {
+        if (this.alpha <= 0.0F) {
+            return;
+        }
+        int cutoff = HazeShaderSupport.alphaCutoff(this.alpha);
+        if (this.sprite != this.geometrySprite || cutoff != this.geometryCutoff) {
+            this.textureBounds = HazeTextureBounds.forSprite(this.sprite, cutoff);
+            this.geometry.setTextureBounds(this.textureBounds);
+            this.geometrySprite = this.sprite;
+            this.geometryCutoff = cutoff;
+        }
+        if (this.textureBounds.isEmpty()) {
+            return;
+        }
         Vec3 camPos = camera.getPosition();
         float py = (float) (Mth.lerp((double) partialTick, this.yo, this.y) - camPos.y());
         float dx = (float) (Mth.lerp((double) partialTick, this.xo, this.x) - this.originX);
@@ -140,74 +156,17 @@ public class HazeParticle extends TextureSheetParticle {
         float cos = Mth.cos(angle) * size;
         float sin = Mth.sin(angle) * size;
         int light = this.getLightColor(partialTick);
-        for (HazeMask.Rectangle rectangle : this.mask.rectangles()) {
-            // Clockwise as seen from above, preserving the original top face and texture orientation.
-            setPoint(this.clipA[0], dx - cos - sin, dz - sin + cos);
-            setPoint(this.clipA[1], dx + cos - sin, dz + sin + cos);
-            setPoint(this.clipA[2], dx + cos + sin, dz + sin - cos);
-            setPoint(this.clipA[3], dx - cos + sin, dz - sin - cos);
-            int count = clip(this.clipA, this.clipB, 4, 0, this.maskMin + rectangle.minX() * CELL_SIZE, true);
-            count = clip(this.clipB, this.clipA, count, 0, this.maskMin + rectangle.maxX() * CELL_SIZE, false);
-            count = clip(this.clipA, this.clipB, count, 1, this.maskMin + rectangle.minZ() * CELL_SIZE, true);
-            count = clip(this.clipB, this.clipA, count, 1, this.maskMin + rectangle.maxZ() * CELL_SIZE, false);
-            if (count == 4) {
-                for (int i = 0; i < 4; i++) {
-                    emitVertex(consumer, camPos, py, this.clipA[i], dx, dz, cos, sin, light);
-                }
-                for (int i = 3; i >= 0; i--) {
-                    emitVertex(consumer, camPos, py, this.clipA[i], dx, dz, cos, sin, light);
-                }
-            } else {
-                // The particle buffer uses quads; a repeated final vertex represents each triangle.
-                for (int i = 1; i + 1 < count; i++) {
-                    emitVertex(consumer, camPos, py, this.clipA[0], dx, dz, cos, sin, light);
-                    emitVertex(consumer, camPos, py, this.clipA[i], dx, dz, cos, sin, light);
-                    emitVertex(consumer, camPos, py, this.clipA[i + 1], dx, dz, cos, sin, light);
-                    emitVertex(consumer, camPos, py, this.clipA[i + 1], dx, dz, cos, sin, light);
-                    emitVertex(consumer, camPos, py, this.clipA[i + 1], dx, dz, cos, sin, light);
-                    emitVertex(consumer, camPos, py, this.clipA[i], dx, dz, cos, sin, light);
-                    emitVertex(consumer, camPos, py, this.clipA[0], dx, dz, cos, sin, light);
-                    emitVertex(consumer, camPos, py, this.clipA[0], dx, dz, cos, sin, light);
-                }
-            }
+        this.geometry.update(dx, dz, cos, sin);
+        float[] vertices = this.geometry.vertices();
+        float u0 = this.getU0();
+        float u1 = this.getU1();
+        float v0 = this.getV0();
+        float v1 = this.getV1();
+        for (int i = 0; i < this.geometry.vertexCount() * 4; i += 4) {
+            consumer.vertex(this.originX + vertices[i] - camPos.x(), py, this.originZ + vertices[i + 1] - camPos.z())
+                    .uv(Mth.lerp(vertices[i + 2], u0, u1), Mth.lerp(vertices[i + 3], v0, v1))
+                    .color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
         }
-    }
-
-    private static void setPoint(float[] point, float x, float z) {
-        point[0] = x;
-        point[1] = z;
-    }
-
-    private static int clip(float[][] input, float[][] output, int count, int axis, float edge, boolean minimum) {
-        int result = 0;
-        for (int i = 0; i < count; i++) {
-            float[] previous = input[(i + count - 1) % count];
-            float[] current = input[i];
-            boolean previousInside = minimum ? previous[axis] >= edge : previous[axis] <= edge;
-            boolean currentInside = minimum ? current[axis] >= edge : current[axis] <= edge;
-            if (previousInside != currentInside) {
-                float fraction = (edge - previous[axis]) / (current[axis] - previous[axis]);
-                setPoint(output[result], Mth.lerp(fraction, previous[0], current[0]),
-                        Mth.lerp(fraction, previous[1], current[1]));
-                output[result++][axis] = edge;
-            }
-            if (currentInside) {
-                setPoint(output[result++], current[0], current[1]);
-            }
-        }
-        return result;
-    }
-
-    private void emitVertex(VertexConsumer consumer, Vec3 camera, float py, float[] point,
-            float dx, float dz, float cos, float sin, int light) {
-        float relativeX = point[0] - dx;
-        float relativeZ = point[1] - dz;
-        float sizeSquared = cos * cos + sin * sin;
-        float u = ((relativeX * cos + relativeZ * sin) / sizeSquared + 1.0F) * 0.5F;
-        float v = (1.0F - (-relativeX * sin + relativeZ * cos) / sizeSquared) * 0.5F;
-        consumer.vertex(this.originX + point[0] - camera.x(), py, this.originZ + point[1] - camera.z())
-                .uv(Mth.lerp(u, this.getU0(), this.getU1()), Mth.lerp(v, this.getV0(), this.getV1()))
-                .color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
     }
 
     @Override

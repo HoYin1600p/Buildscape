@@ -56,6 +56,8 @@ com.kingodogo.buildscape.client.feature.muff.MuffBlockManager bus=FORGE dist=CLI
   onPlaySound(net.minecraftforge.client.event.sound.PlaySoundEvent) NORMAL
 com.kingodogo.buildscape.client.feature.pillar.ItemFrameParticleClient bus=FORGE dist=CLIENT
   onClientTick(net.minecraftforge.event.TickEvent$ClientTickEvent) NORMAL
+com.kingodogo.buildscape.client.particle.HazeShaderSupport bus=MOD dist=CLIENT
+  onShadersReload(net.minecraftforge.client.event.RegisterShadersEvent) NORMAL
 com.kingodogo.buildscape.client.particle.ModClientParticleEvents bus=MOD dist=CLIENT
   registerParticleFactories(net.minecraftforge.client.event.ParticleFactoryRegisterEvent) NORMAL
 com.kingodogo.buildscape.client.particle.ParticleCacheEvents bus=FORGE dist=CLIENT

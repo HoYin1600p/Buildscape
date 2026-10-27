@@ -1,12 +1,16 @@
 package com.kingodogo.buildscape.client.particle;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.function.BiPredicate;
 
@@ -14,6 +18,27 @@ import java.util.function.BiPredicate;
 public final class HazeMask {
 
     public static final int MAX_GRID_SIZE = 32;
+    private static final Cache<MaskKey, HazeMask> MASKS = CacheBuilder.newBuilder().maximumSize(128).build();
+    // Weak keys compare shape identity; never reuse a decomposition for a different live shape.
+    private static final Cache<VoxelShape, List<AABB>> SHAPES = CacheBuilder.newBuilder()
+            .weakKeys().maximumSize(512).build();
+
+    static void clearCaches() {
+        MASKS.invalidateAll();
+        SHAPES.invalidateAll();
+    }
+
+    static List<AABB> collisionBoxes(VoxelShape shape) {
+        List<AABB> boxes = SHAPES.getIfPresent(shape);
+        if (boxes == null) {
+            boxes = List.copyOf(shape.toAabbs());
+            SHAPES.put(shape, boxes);
+        }
+        return boxes;
+    }
+
+    private record MaskKey(int width, int height, int centreX, int centreZ, BitSet occupied) {
+    }
 
     private final int width;
     private final int height;
@@ -36,13 +61,22 @@ public final class HazeMask {
         }
 
         boolean[] occupied = new boolean[width * height];
+        BitSet occupancy = new BitSet(occupied.length);
         for (int z = 0; z < height; z++) {
             for (int x = 0; x < width; x++) {
                 int index = z * width + x;
                 occupied[index] = blocked.test(x, z);
+                if (occupied[index]) {
+                    occupancy.set(index);
+                }
             }
         }
 
+        MaskKey key = new MaskKey(width, height, centreX, centreZ, occupancy);
+        HazeMask cached = MASKS.getIfPresent(key);
+        if (cached != null) {
+            return cached;
+        }
         boolean[] visible = new boolean[occupied.length];
         int[] queue = new int[occupied.length];
         int head = 0;
@@ -99,7 +133,9 @@ public final class HazeMask {
                 }
             }
         }
-        return new HazeMask(width, height, visible);
+        HazeMask mask = new HazeMask(width, height, visible);
+        MASKS.put(key, mask);
+        return mask;
     }
 
     static boolean blocksCell(BlockGetter level, BlockPos.MutableBlockPos pos,
@@ -114,7 +150,7 @@ public final class HazeMask {
                     long key = BlockPos.asLong(bx, by, bz);
                     List<AABB> boxes = shapes.get(key);
                     if (boxes == null) {
-                        boxes = level.getBlockState(pos).getCollisionShape(level, pos).toAabbs();
+                        boxes = collisionBoxes(level.getBlockState(pos).getCollisionShape(level, pos));
                         shapes.put(key, boxes);
                     }
                     for (AABB box : boxes) {

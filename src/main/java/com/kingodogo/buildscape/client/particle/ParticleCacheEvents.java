@@ -35,6 +35,7 @@ public final class ParticleCacheEvents {
     }
 
     private static void clear() {
+        HazeMask.clearCaches();
         SmokeColorRegistry.clearColorCache();
         TintedDripParticle.clearColorCache();
         CherryParticle.clearColorCache();

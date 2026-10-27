@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class HazeTextureBoundsTest {
@@ -33,6 +35,20 @@ public class HazeTextureBoundsTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void alphaIsTheHighestAcrossFrames() {
+        int[] alpha = HazeTextureBounds.readAlpha(2, 1, new int[] {0, 1},
+                (frame, x, y) -> (frame == x ? 0xC0 : 0x10) << 24);
+        assertArrayEquals(new int[] {0xC0, 0xC0}, alpha);
+    }
+
+    @Test
+    public void imageFreedByResourceReloadIsNotRead() {
+        assertNull(HazeTextureBounds.readAlpha(4, 4, new int[] {0}, (frame, x, y) -> {
+            throw new IllegalStateException("Image is not allocated.");
+        }));
     }
 
     @Test

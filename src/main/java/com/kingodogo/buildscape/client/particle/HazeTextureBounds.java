@@ -17,7 +17,18 @@ record HazeTextureBounds(float minU, float maxU, float minV, float maxV) {
     }
 
     static HazeTextureBounds forSprite(TextureAtlasSprite sprite, int cutoff) {
-        Coverage coverage = CACHE.computeIfAbsent(sprite, Coverage::new);
+        Coverage cached = CACHE.get(sprite);
+        if (cached == null) {
+            int[] alpha = readAlpha(sprite.getWidth(), sprite.getHeight(), sprite.getUniqueFrames().toArray(),
+                    sprite::getPixelRGBA);
+            if (alpha == null) {
+                // A resource reload freed this sprite's image; the particle swaps sprites on its next tick.
+                return FULL;
+            }
+            cached = new Coverage(sprite.getWidth(), sprite.getHeight(), alpha);
+            CACHE.put(sprite, cached);
+        }
+        Coverage coverage = cached;
         if (coverage.bounds[cutoff] == null) {
             coverage.bounds[cutoff] = compute(coverage.width, coverage.height,
                     index -> coverage.alpha[index] <= cutoff);
@@ -35,17 +46,30 @@ record HazeTextureBounds(float minU, float maxU, float minV, float maxV) {
         private final int[] alpha;
         private final HazeTextureBounds[] bounds = new HazeTextureBounds[256];
 
-        private Coverage(TextureAtlasSprite sprite) {
-            this.width = sprite.getWidth();
-            this.height = sprite.getHeight();
-            this.alpha = new int[this.width * this.height];
-            for (int frame : sprite.getUniqueFrames().toArray()) {
-                for (int index = 0; index < this.alpha.length; index++) {
-                    this.alpha[index] = Math.max(this.alpha[index],
-                            sprite.getPixelRGBA(frame, index % this.width, index / this.width) >>> 24);
+        private Coverage(int width, int height, int[] alpha) {
+            this.width = width;
+            this.height = height;
+            this.alpha = alpha;
+        }
+    }
+
+    interface FramePixels {
+        int rgba(int frame, int x, int y);
+    }
+
+    /** Highest alpha of each texel across all frames, or null when the image is no longer readable. */
+    static int[] readAlpha(int width, int height, int[] frames, FramePixels pixels) {
+        int[] alpha = new int[width * height];
+        try {
+            for (int frame : frames) {
+                for (int index = 0; index < alpha.length; index++) {
+                    alpha[index] = Math.max(alpha[index], pixels.rgba(frame, index % width, index / width) >>> 24);
                 }
             }
+        } catch (IllegalStateException closedImage) {
+            return null;
         }
+        return alpha;
     }
 
     static HazeTextureBounds compute(int width, int height, IntPredicate transparent) {

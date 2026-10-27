@@ -39,14 +39,14 @@ public class HazeTextureBoundsTest {
 
     @Test
     public void alphaIsTheHighestAcrossFrames() {
-        int[] alpha = HazeTextureBounds.readAlpha(2, 1, new int[] {0, 1},
+        int[] alpha = HazeTextureBounds.readAlpha(2, 1, new int[]{0, 1},
                 (frame, x, y) -> (frame == x ? 0xC0 : 0x10) << 24);
-        assertArrayEquals(new int[] {0xC0, 0xC0}, alpha);
+        assertArrayEquals(new int[]{0xC0, 0xC0}, alpha);
     }
 
     @Test
     public void imageFreedByResourceReloadIsNotRead() {
-        assertNull(HazeTextureBounds.readAlpha(4, 4, new int[] {0}, (frame, x, y) -> {
+        assertNull(HazeTextureBounds.readAlpha(4, 4, new int[]{0}, (frame, x, y) -> {
             throw new IllegalStateException("Image is not allocated.");
         }));
     }

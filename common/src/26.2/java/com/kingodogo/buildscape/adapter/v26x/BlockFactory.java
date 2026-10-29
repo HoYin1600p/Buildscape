@@ -232,7 +232,7 @@ public class BlockFactory implements IBlockFactory {
                     return drops;
                 }
                 @Override public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-                    com.kingodogo.buildscape.adapter.v26x.client.HazeBushParticleHandler.animate(state, level, pos);
+                    com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.animate(state, level, pos);
                 }
                 @Override public MapCodec<BushBlock> codec() { return codecForDefinition(def, BushBlock.class); }
             };
@@ -258,7 +258,7 @@ public class BlockFactory implements IBlockFactory {
                     return drops;
                 }
                 @Override public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-                    com.kingodogo.buildscape.adapter.v26x.client.HazeBushParticleHandler.animate(state, level, pos);
+                    com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.animate(state, level, pos);
                 }
                 @Override public MapCodec<net.minecraft.world.level.block.FlowerPotBlock> codec() {
                     return codecForDefinition(def, net.minecraft.world.level.block.FlowerPotBlock.class);

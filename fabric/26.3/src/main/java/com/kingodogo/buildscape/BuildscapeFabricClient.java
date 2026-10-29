@@ -43,12 +43,12 @@ public class BuildscapeFabricClient implements ClientModInitializer {
         });
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();
-            com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clear();
+            com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clear();
             com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.clearInputRenderState();
         });
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((client, level) -> {
             com.kingodogo.buildscape.client.ClientEvents.onClientWorldUnload();
-            com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clear();
+            com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clear();
             com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.clearInputRenderState();
         });
         net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents.AFTER_BLOCK_OUTLINE_EXTRACTION.register(
@@ -98,7 +98,7 @@ public class BuildscapeFabricClient implements ClientModInitializer {
         com.kingodogo.buildscape.client.ClientEvents.initializeConfigCallback();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             com.kingodogo.buildscape.client.ClientEvents.onClientTick();
-            com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clientTick();
+            com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clientTick();
         });
         for (var descriptor : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
             if (descriptor.direction() != PacketDirection.SERVER_TO_CLIENT) continue;

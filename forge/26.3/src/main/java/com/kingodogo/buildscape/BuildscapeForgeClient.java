@@ -120,13 +120,13 @@ final class BuildscapeForgeClient {
     }
     private static void disconnect(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
         com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();
-        com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clear();
+        com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clear();
         com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.clearInputRenderState();
     }
     private static void unload(net.minecraftforge.event.level.LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
             com.kingodogo.buildscape.client.ClientEvents.onClientWorldUnload();
-            com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clear();
+            com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clear();
             com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.clearInputRenderState();
         }
     }
@@ -138,7 +138,7 @@ final class BuildscapeForgeClient {
     }
     private static void tick(ClientTickEvent.Post event) {
         com.kingodogo.buildscape.client.ClientEvents.onClientTick();
-        com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clientTick();
+        com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clientTick();
     }
     private static void screens() {
         GuiProvider.registerMenuScreens(new GuiProvider.Registrar() {

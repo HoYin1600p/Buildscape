@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.adapter.v263.client;
+package com.kingodogo.buildscape.client.particle;
 
 import com.kingodogo.buildscape.block.HazeBushBlock;
 import com.kingodogo.buildscape.block.PottedHazeBushBlock;

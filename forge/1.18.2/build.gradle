@@ -37,6 +37,7 @@ sourceSets.main {
     java.exclude 'com/kingodogo/buildscape/client/particle/HazeParticle.java'
     java.exclude 'com/kingodogo/buildscape/client/particle/HazeBushParticleHandler.java'
     java.exclude 'com/kingodogo/buildscape/client/FoliageColors.java'
+    java.exclude 'com/kingodogo/buildscape/client/particle/ConfettiParticle.java'
     // Neutral mixins that target 26.2-only signatures and have a 1.18.2 replacement in this module.
     java.exclude 'com/kingodogo/buildscape/mixin/FlowingFluidMixin.java'
     java.exclude 'com/kingodogo/buildscape/mixin/StonecutterMenuAccessor.java'

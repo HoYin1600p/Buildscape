@@ -139,7 +139,7 @@ final class BuildscapeNeoForgeClient {
             public <T extends ParticleOptions> void register(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> factory) {
                 // Replace the age-based confetti provider with the reference's random shapes.
                 Function<SpriteSet, ParticleProvider<T>> selected = type.equals(com.kingodogo.buildscape.particle.ModParticles.CONFETTI.get())
-                        ? com.kingodogo.buildscape.adapter.v263.client.ConfettiParticle::provider : factory;
+                        ? com.kingodogo.buildscape.client.particle.ConfettiParticle::provider : factory;
                 event.registerSpriteSet(type, selected::apply);
             }
             public <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider) {

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client;
 
 import com.google.gson.JsonParser;
-import com.kingodogo.buildscape.adapter.v26x.client.ConfettiParticle;
+import com.kingodogo.buildscape.client.particle.ConfettiParticle;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;

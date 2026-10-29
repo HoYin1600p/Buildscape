@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.adapter.v263.client;
+package com.kingodogo.buildscape.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleProvider;

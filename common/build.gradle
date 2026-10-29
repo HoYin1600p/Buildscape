@@ -21,6 +21,7 @@ sourceSets {
             exclude 'com/kingodogo/buildscape/client/particle/HazeParticle.java'
             exclude 'com/kingodogo/buildscape/client/particle/HazeBushParticleHandler.java'
             exclude 'com/kingodogo/buildscape/client/FoliageColors.java'
+            exclude 'com/kingodogo/buildscape/client/particle/ConfettiParticle.java'
         }
         // This cluster supplies a complete 1.18.2 resource tree.
         resources.srcDirs = ['src/1.18.2/resources']
@@ -32,6 +33,7 @@ sourceSets {
             exclude 'com/kingodogo/buildscape/client/particle/HazeParticle.java'
             exclude 'com/kingodogo/buildscape/client/particle/HazeBushParticleHandler.java'
             exclude 'com/kingodogo/buildscape/client/FoliageColors.java'
+            exclude 'com/kingodogo/buildscape/client/particle/ConfettiParticle.java'
         }
         // This cluster supplies a complete 1.21.1 resource tree.
         resources.srcDirs = ['src/1.21.1/resources']

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.adapter.v26x;
 
-import com.kingodogo.buildscape.adapter.v26x.client.FramebufferScissor;
+import com.kingodogo.buildscape.client.FramebufferScissor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

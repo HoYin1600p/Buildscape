@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.adapter.v26x.client;
+package com.kingodogo.buildscape.client;
 
 /** Converts the common framebuffer clip contract to the extractor's GUI coordinates. */
 public record FramebufferScissor(int left, int top, int right, int bottom) {

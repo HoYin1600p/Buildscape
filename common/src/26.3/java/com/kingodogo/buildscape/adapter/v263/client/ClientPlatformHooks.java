@@ -1,4 +1,6 @@
 package com.kingodogo.buildscape.adapter.v263.client;
+
+import com.kingodogo.buildscape.client.FramebufferScissor;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.entity.FallingIcicleEntity;
 import com.kingodogo.buildscape.entity.FestiveStockingEntity;

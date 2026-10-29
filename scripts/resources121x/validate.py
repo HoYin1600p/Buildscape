@@ -366,7 +366,7 @@ def main():
     parser.add_argument("--resources-root", dest="root_option", type=Path)
     parser.add_argument("--mc-jar", dest="jar_option", type=Path)
     args = parser.parse_args()
-    root = args.root_option or args.resources_root or c.REPO / "common/src/v121x/resources"
+    root = args.root_option or args.resources_root or c.REPO / "common/src/1.21.1/resources"
     jar = args.jar_option or args.mc_jar
     if not jar:
         parser.error("a Minecraft 1.21.1 client jar is required")

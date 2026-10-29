@@ -35,7 +35,7 @@ class CopperInteractionFallbackTest {
     @Test
     void bothLoadersRouteCopperClicksThroughTheFallback() throws Exception {
         Path adapter = Path.of(System.getProperty("buildscape.v118xMixinConfig",
-                        "src/v118x/resources/buildscape.mixins.json"))
+                        "src/1.18.2/resources/buildscape.mixins.json"))
                 .toAbsolutePath().getParent().getParent().getParent()
                 .resolve("main/java/com/kingodogo/buildscape/adapter/v118x/PlatformAdapterBase.java");
         String source = Files.readString(adapter);

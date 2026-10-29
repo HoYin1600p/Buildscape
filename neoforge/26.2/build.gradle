@@ -20,7 +20,7 @@ dependencies {
 
 tasks.named('processResources') {
     from rootProject.file('common/src/main/resources')
-    from rootProject.file('common/src/v26x/resources')
+    from rootProject.file('common/src/26.2/resources')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks.named('jar', Jar) {

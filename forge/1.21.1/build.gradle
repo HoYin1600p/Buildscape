@@ -33,7 +33,7 @@ dependencies {
 }
 
 // Package the complete v121x resource tree.
-sourceSets.main.resources.srcDir rootProject.file('common/src/v121x/resources')
+sourceSets.main.resources.srcDir rootProject.file('common/src/1.21.1/resources')
 
 tasks.named('compileJava') { dependsOn ':common:compileV121xJava' }
 

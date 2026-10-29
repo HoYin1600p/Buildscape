@@ -44,7 +44,7 @@ neoForge {
 sourceSets {
     main {
         resources {
-            srcDir rootProject.file('common/src/v121x/resources')
+            srcDir rootProject.file('common/src/1.21.1/resources')
         }
     }
 }

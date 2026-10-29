@@ -44,7 +44,7 @@ sourceSets {
     }
 
     v118xTest {
-        java.srcDirs = ['src/v118xTest/java']
+        java.srcDirs = ['src/1.18.2Test/java']
         resources.srcDirs = []
         // Unimined may add the mapped Minecraft jar directly to the compile task.
         // Use that task's final classpath, including its vanilla libraries.
@@ -55,8 +55,8 @@ sourceSets {
     }
 
     v121xTest {
-        java.srcDirs = ['src/v121xTest/java']
-        resources.srcDirs = ['src/v121xTest/resources']
+        java.srcDirs = ['src/1.21.1Test/java']
+        resources.srcDirs = ['src/1.21.1Test/resources']
         def minecraftClasspath = files(provider { tasks.named('compileV121xJava', JavaCompile).get().classpath })
         compileClasspath += sourceSets.v121x.output + minecraftClasspath
         runtimeClasspath += sourceSets.v121x.output + sourceSets.v121x.runtimeClasspath + minecraftClasspath
@@ -73,7 +73,7 @@ if (v263Enabled) {
                 exclude 'com/kingodogo/buildscape/worldgen/WorldGenTypeHelper.java'
                 // 26.3 changed Block.playerDestroy, BlockItem.updateCustomBlockEntityTag and worldgen;
                 // the v263 cluster supplies its own copies of these shared classes, so drop only the
-                // src/main/java versions (a plain exclude pattern would also drop the src/v263 copies).
+                // src/main/java versions (a plain exclude pattern would also drop the src/26.3 copies).
                 exclude { element ->
                     element.file.toURI().path.contains('/src/main/java/') &&
                             element.relativePath.pathString in [

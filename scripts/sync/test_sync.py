@@ -423,8 +423,8 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(target["loaders"], ["fabric", "neoforge"])
         self.assertEqual(target["version_cluster"], "v263")
         self.assertEqual(target["version_clusters"], ["v263"])
-        self.assertEqual(target["java_roots"], ["common/src/main/java", "common/src/v263/java"])
-        self.assertEqual(target["resource_root"], "common/src/v263/resources")
+        self.assertEqual(target["java_roots"], ["common/src/main/java", "common/src/26.3/java"])
+        self.assertEqual(target["resource_root"], "common/src/26.3/resources")
         self.assertEqual(target["state_file"], "sync/state/mc26.3.json")
         self.assertEqual(target["ledger_coverage"], ["263"])
         self.assertEqual(target["converter"]["profile"], "26.3")
@@ -456,7 +456,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(inherited["inherited_from"], "mc26.2")
         self.assertEqual(len(inherited["excluded_target_paths"]), len(approved["excluded_target_paths"]))
         self.assertEqual(len(set(inherited["excluded_target_paths"])), len(set(approved["excluded_target_paths"])))
-        old_root, new_root = "common/src/main/resources/", "common/src/v263/resources/"
+        old_root, new_root = "common/src/main/resources/", "common/src/26.3/resources/"
         resources = 0
         for old, new in zip(approved["excluded_target_paths"], inherited["excluded_target_paths"]):
             if old.startswith(old_root):
@@ -506,8 +506,8 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         retired, model, base, policy = self.policy_files()
         target = self.config["targets"][0]
         target.update(id="mc26.3", base_commit=base, version_cluster="v263", version_clusters=["v263"],
-                      java_roots=["common/src/main/java", "common/src/v263/java"],
-                      resource_root="common/src/v263/resources", ledger_coverage=["263"],
+                      java_roots=["common/src/main/java", "common/src/26.3/java"],
+                      resource_root="common/src/26.3/resources", ledger_coverage=["263"],
                       removal_policy={"file": "sync/removals26x.json", "inherits": "mc26.2",
                                       "inherited_resource_root": "common/src/main/resources"})
         self.write(self.repo, "sync/removals26x.json", json.dumps(policy))
@@ -520,10 +520,10 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
 """)
         for path in (self.repo / "common/src/main/resources").rglob("*"):
             if path.is_file():
-                self.write(self.repo, "common/src/v263/resources/"
+                self.write(self.repo, "common/src/26.3/resources/"
                            + path.relative_to(self.repo / "common/src/main/resources").as_posix(),
                            path.read_bytes())
-        self.write(self.repo, "common/src/v263/java/example/Adapter.java", "class Adapter {}\n")
+        self.write(self.repo, "common/src/26.3/java/example/Adapter.java", "class Adapter {}\n")
         commit = self.commit(self.repo, "Record removal policy and 26.3 resource root")
         self.git(self.repo, "branch", "-f", "port/test", commit)
         self.write(self.source, retired, '{"variants": {}, "changed": true}\n')
@@ -537,7 +537,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
             self.assertEqual(plan["removal_policy"][key], value)
         self.assertEqual(plan["removal_policy"]["inherited_from"], "mc26.2")
         self.assertEqual(plan["removal_policy"]["excluded_target_paths"],
-                         ["common/src/v263/resources/" + model[len("src/main/resources/"):],
+                         ["common/src/26.3/resources/" + model[len("src/main/resources/"):],
                           "common/src/main/java/example/Mapped.java"])
         self.assertEqual(plan["version_clusters"], ["v263"])
         items = {c["path"]: c for c in plan["changes"]}
@@ -547,7 +547,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         before_main = sync.files_at(self.repo, plan["target_commit"], ["common/src/main/resources"])
         sync.apply_plan(self.repo, plan, target, config, source, "sync/targets.json", self.output)
         branch = plan["apply"]["branch"]
-        v263 = "common/src/v263/resources/"
+        v263 = "common/src/26.3/resources/"
         for path in (retired, model, self.resources + "assets/buildscape/items/copper_rod.json"):
             self.assertIsNone(sync.blob(self.repo, branch, v263 + path[len("src/main/resources/"):], True), path)
         self.assertIsNotNone(sync.blob(self.repo, branch, v263 + "data/kept.json"))
@@ -572,9 +572,9 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(sync.foreign_clusters(registry, registry["targets"][0]), ["v121x", "v263"])
         self.assertEqual(sync.foreign_clusters(registry, registry["targets"][1]), ["v118x", "v121x", "v26x"])
         base = "common/src/main/java/example/Base.java"
-        v26x = "common/src/v26x/java/example/adapter/v26x/Adapter.java"
+        v26x = "common/src/26.2/java/example/adapter/v26x/Adapter.java"
         v118x = "common/src/main/java/example/adapter/v118x/Adapter.java"
-        v263 = "common/src/v263/java/example/adapter/v263/Adapter.java"
+        v263 = "common/src/26.3/java/example/adapter/v263/Adapter.java"
         for path in (base, v26x, v118x, v263):
             self.write(self.repo, path, "class X {}\n")
         commit = self.commit(self.repo, "Cluster adapters")
@@ -609,7 +609,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         root = Path(__file__).resolve().parents[2]
         with (root / "migration/ledger.csv").open(encoding="utf-8", newline="") as stream:
             rows = list(csv.DictReader(stream))
-        marked = [r for r in rows if any("/v263/" in p or "/src/v263/" in p for p in r["active_paths"].split(";"))]
+        marked = [r for r in rows if any("/v263/" in p or "/src/26.3/" in p for p in r["active_paths"].split(";"))]
         self.assertGreater(len(marked), 200)
         for row in marked:
             self.assertIn("263", row["era_coverage"].split(";"), row["reference_path"])
@@ -623,7 +623,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
     def cluster_target(self):
         target = self.config["targets"][0]
         target.update(id="mc26.2", version_cluster="v26x", version_clusters=["v26x", "v118x"],
-                      java_roots=["common/src/main/java", "common/src/v118x/java", "common/src/v26x/java"],
+                      java_roots=["common/src/main/java", "common/src/1.18.2/java", "common/src/26.2/java"],
                       ledger_coverage=["26x", "118x"], reference_snapshot="ref/forge/1.18.2")
         (self.repo / "ref/source").rename(self.repo / "ref/forge-tmp")
         (self.repo / "ref/forge").mkdir()
@@ -657,17 +657,17 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(changes[self.java + "Mapped.java"]["affected_clusters"], ["v118x", "v26x"])
         rename = changes[self.java + "Renamed.java"]
         self.assertEqual(rename["classification"], "automatic")
-        self.assertEqual(rename["destination"], "common/src/v118x/java/example/Renamed.java")
+        self.assertEqual(rename["destination"], "common/src/1.18.2/java/example/Renamed.java")
         sync.apply_plan(self.repo, plan, target, config, source, "sync/targets.json", self.output)
         branch = plan["apply"]["branch"]
         snapshot = sync.files_at(self.repo, branch, [target["reference_snapshot"]])
         actual = {p[len(target["reference_snapshot"]) + 1:]: data for p, data in snapshot.items()}
         self.assertEqual(actual, sync.files_at(self.source, head, sync.scope(self.config["source"])))
-        self.assertIsNone(sync.blob(self.repo, branch, "common/src/v118x/java/example/Rename.java", True))
-        self.assertEqual(sync.blob(self.repo, branch, "common/src/v118x/java/example/Same.java"),
+        self.assertIsNone(sync.blob(self.repo, branch, "common/src/1.18.2/java/example/Rename.java", True))
+        self.assertEqual(sync.blob(self.repo, branch, "common/src/1.18.2/java/example/Same.java"),
                          sync.blob(self.source, head, self.java + "Same.java"))
         rows = self.read_csv(branch)
-        self.assertEqual(rows[self.java + "Same.java"]["active_paths"], "common/src/v118x/java/example/Same.java")
+        self.assertEqual(rows[self.java + "Same.java"]["active_paths"], "common/src/1.18.2/java/example/Same.java")
         self.assertTrue(all("118x" in r["era_coverage"].split(";") for r in rows.values()))
 
     def test_single_identical_v118x_mixin_can_sync(self):
@@ -676,7 +676,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         old = b"class ExampleMixin {}\n"
         self.write(self.source, path, old)
         base = self.commit(self.source, "Mixin baseline")
-        dest = "common/src/v118x/java/example/ExampleMixin.java"
+        dest = "common/src/1.18.2/java/example/ExampleMixin.java"
         self.write(self.repo, dest, old)
         commit = self.commit(self.repo, "Mixin counterpart")
         self.git(self.repo, "branch", "-f", "port/test", commit)

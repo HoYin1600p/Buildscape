@@ -25,8 +25,8 @@ class PlantGenerationCoverageTest {
         Path main = Path.of(System.getProperty("buildscape.mainResources", "common/src/main/resources")).toAbsolutePath();
         Path common = main.getParent().getParent().getParent();
         Path repo = common.getParent();
-        Path resources = target.endsWith("1.21.1") ? common.resolve("src/v121x/resources") : main;
-        Path overlay = target.endsWith("26.3") ? common.resolve("src/v263/resources") : resources;
+        Path resources = target.endsWith("1.21.1") ? common.resolve("src/1.21.1/resources") : main;
+        Path overlay = target.endsWith("26.3") ? common.resolve("src/26.3/resources") : resources;
         String loader = target.substring(0, target.indexOf('/'));
         JsonObject reference;
         try (var stream = getClass().getResourceAsStream("/worldgen/plant-biomes-4.0.4.json")) {

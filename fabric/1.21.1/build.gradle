@@ -38,7 +38,7 @@ dependencies {
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
-sourceSets.main.resources.srcDir rootProject.file('common/src/v121x/resources')
+sourceSets.main.resources.srcDir rootProject.file('common/src/1.21.1/resources')
 tasks.named('compileJava') { dependsOn ':common:compileV121xJava' }
 tasks.named('processResources', ProcessResources) {
     inputs.property 'mod_version', project.version

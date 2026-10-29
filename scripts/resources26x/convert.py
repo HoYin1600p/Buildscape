@@ -8,7 +8,7 @@ The compact recipes_pack is a private Java format, not a vanilla recipe folder.
 --derive-from BASE treats the resources root as an overlay folder: BASE (the 26.2
 resources) is converted in a temporary copy and only the files that change are written,
 e.g.  convert.py --profile 26.3 --derive-from common/src/main/resources \\
-common/src/v263/resources minecraft-26.3-client.jar
+common/src/26.3/resources minecraft-26.3-client.jar
 """
 import argparse
 import copy

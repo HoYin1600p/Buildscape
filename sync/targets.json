@@ -81,8 +81,8 @@
       ],
       "java_roots": [
         "common/src/main/java",
-        "common/src/v118x/java",
-        "common/src/v26x/java"
+        "common/src/1.18.2/java",
+        "common/src/26.2/java"
       ],
       "ledger_coverage": [
         "26x",
@@ -126,7 +126,7 @@
       "reference_snapshot": "ref/forge/1.18.2",
       "mapping_file": "migration/ledger.csv",
       "java_root": "common/src/main/java",
-      "resource_root": "common/src/v263/resources",
+      "resource_root": "common/src/26.3/resources",
       "state_file": "sync/state/mc26.3.json",
       "mc_jar": "ref/artifacts/minecraft-26.3.jar",
       "removal_policy": {
@@ -179,7 +179,7 @@
       ],
       "java_roots": [
         "common/src/main/java",
-        "common/src/v263/java"
+        "common/src/26.3/java"
       ],
       "ledger_coverage": [
         "263"

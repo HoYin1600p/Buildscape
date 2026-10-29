@@ -651,7 +651,7 @@ def main():
                         help="Minecraft version profile (default: %(default)s)")
     parser.add_argument("--resources-root", type=Path, default=None,
                         help="resource layer to validate (default: common/src/main/resources, or "
-                             "common/src/v263/resources for --profile 26.3)")
+                             "common/src/26.3/resources for --profile 26.3)")
     parser.add_argument("--base-root", type=Path, default=None,
                         help="layer below --resources-root (26.3 default: common/src/main/resources, so the "
                              "26.3 overlay is validated together with the resources it patches)")
@@ -660,7 +660,7 @@ def main():
     main_resources = REPO / "common/src/main/resources"
     root, base = args.resources_root, args.base_root
     if args.profile == "26.3":
-        root = root or REPO / "common/src/v263/resources"
+        root = root or REPO / "common/src/26.3/resources"
         base = base or main_resources
     else:
         root = root or main_resources

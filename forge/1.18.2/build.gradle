@@ -31,13 +31,13 @@ def java17Launcher = javaToolchains.launcherFor {
 sourceSets.main {
     // Compile common source variant against Forge's Mojang dev jar.
     java.setSrcDirs(['src/main/java', rootProject.file('common/src/main/java'),
-                     rootProject.file('common/src/v118x/java')])
+                     rootProject.file('common/src/1.18.2/java')])
     java.exclude 'com/kingodogo/buildscape/adapter/v121x/**'
     java.exclude 'com/kingodogo/buildscape/adapter/v26x/**'
     // Neutral mixins that target 26.2-only signatures and have a 1.18.2 replacement in this module.
     java.exclude 'com/kingodogo/buildscape/mixin/FlowingFluidMixin.java'
     java.exclude 'com/kingodogo/buildscape/mixin/StonecutterMenuAccessor.java'
-    resources.setSrcDirs([rootProject.file('common/src/v118x/resources'), file('src/main/resources')])
+    resources.setSrcDirs([rootProject.file('common/src/1.18.2/resources'), file('src/main/resources')])
 }
 
 repositories {

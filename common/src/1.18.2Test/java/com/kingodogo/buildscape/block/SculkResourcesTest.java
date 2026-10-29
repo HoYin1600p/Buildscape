@@ -59,7 +59,7 @@ class SculkResourcesTest {
     }
 
     private static Path resources() {
-        return Path.of(System.getProperty("buildscape.v118xMixinConfig", "src/v118x/resources/buildscape.mixins.json"))
+        return Path.of(System.getProperty("buildscape.v118xMixinConfig", "src/1.18.2/resources/buildscape.mixins.json"))
                 .toAbsolutePath().getParent();
     }
 }

@@ -50,7 +50,7 @@ class NullEntityCollisionContextTest {
     void production1182SourcesNeverPassLiteralNullToEntityContexts() throws IOException {
         Path common = RemapSafeReflectionTest.commonRoot();
         List<String> failures = new ArrayList<>();
-        for (String root : List.of("src/main/java/com/kingodogo/buildscape/adapter/v118x", "src/v118x")) {
+        for (String root : List.of("src/main/java/com/kingodogo/buildscape/adapter/v118x", "src/1.18.2")) {
             Path directory = common.resolve(root);
             assertTrue(Files.isDirectory(directory), "Missing scan root: " + directory);
             try (var paths = Files.walk(directory)) {

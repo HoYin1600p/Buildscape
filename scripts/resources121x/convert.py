@@ -586,8 +586,8 @@ def convert(source, output, jar, manifest=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mc_jar", type=Path)
-    parser.add_argument("--source", type=Path, default=REPO / "common/src/v118x/resources")
-    parser.add_argument("--output", type=Path, default=REPO / "common/src/v121x/resources")
+    parser.add_argument("--source", type=Path, default=REPO / "common/src/1.18.2/resources")
+    parser.add_argument("--output", type=Path, default=REPO / "common/src/1.21.1/resources")
     args = parser.parse_args()
     convert(args.source, args.output, args.mc_jar)
 

@@ -136,6 +136,7 @@ public final class ForgeClientEvents {
     public static void disconnect(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         ClientEvents.onClientDisconnect();
         HazeBushParticleHandler.clear();
+        com.kingodogo.buildscape.adapter.v118x.client.HazeMask.clearCaches();
     }
 
     @SubscribeEvent
@@ -143,6 +144,7 @@ public final class ForgeClientEvents {
         if (event.getWorld().isClientSide()) {
             ClientEvents.onClientWorldUnload();
             HazeBushParticleHandler.clear();
+            com.kingodogo.buildscape.adapter.v118x.client.HazeMask.clearCaches();
         }
     }
 

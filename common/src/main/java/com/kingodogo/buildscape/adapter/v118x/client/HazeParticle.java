@@ -1,146 +1,96 @@
 package com.kingodogo.buildscape.adapter.v118x.client;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-public class HazeParticle extends TextureSheetParticle {
 
+import java.util.List;
+
+public final class HazeParticle extends TextureSheetParticle {
+    private static final float CELL_SIZE = .5F;
     private final SpriteSet sprites;
-    private final float rotSpeed;
-    private final float maxAlpha;
-    private final float baseSize;
+    private final float rotSpeed, maxAlpha, baseSize, maskMin;
+    private final double originX, originZ;
+    private final HazeGeometry geometry;
+    private TextureAtlasSprite geometrySprite;
+    private int geometryCutoff = -1;
+    private HazeTextureBounds textureBounds;
 
-    protected HazeParticle(ClientLevel level, double x, double y, double z,
-                           double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+    private HazeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z);
         this.sprites = sprites;
+        baseSize = 2 + level.random.nextFloat() * 1.5F;
+        quadSize = baseSize; lifetime = 240 + level.random.nextInt(120); gravity = 0; hasPhysics = false;
+        xd = (level.random.nextFloat() - .5) * .0003; yd = 0; zd = (level.random.nextFloat() - .5) * .0003;
+        rotSpeed = (level.random.nextFloat() - .5F) * .0006F; roll = level.random.nextFloat() * ((float) Math.PI * 2); oRoll = roll;
+        if (xSpeed > .01 || ySpeed > .01 || zSpeed > .01) {
+            float variation = (level.random.nextFloat() - .5F) * .03F;
+            setColor(Mth.clamp((float) xSpeed + variation, 0, 1), Mth.clamp((float) ySpeed + variation, 0, 1), Mth.clamp((float) zSpeed + variation, 0, 1));
+        } else { float tint = .94F + level.random.nextFloat() * .06F; setColor(tint, tint, tint); }
+        maxAlpha = .32F + level.random.nextFloat() * .12F; alpha = 0;
+        originX = x; originZ = z;
+        int radius = Math.min((HazeMask.MAX_GRID_SIZE - 1) / 2, Mth.ceil((baseSize * 1.2 * Math.sqrt(2) + .02) / CELL_SIZE));
+        maskMin = -(radius + .5F) * CELL_SIZE;
+        HazeMask mask = createMask(level, radius);
+        geometry = new HazeGeometry(mask.rectangles(), maskMin, CELL_SIZE);
+        if (mask.rectangles().isEmpty()) remove();
+        setSpriteFromAge(sprites);
+    }
 
-        this.baseSize = 2.0F + level.random.nextFloat() * 1.5F;
-        this.quadSize = this.baseSize;
-        this.lifetime = 240 + level.random.nextInt(120);
-        this.gravity = 0.0F;
-        this.hasPhysics = false;
+    private HazeMask createMask(ClientLevel level, int radius) {
+        Long2ObjectMap<List<AABB>> shapes = new Long2ObjectOpenHashMap<>();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        int gridSize = radius * 2 + 1;
+        return HazeMask.compute(gridSize, gridSize, radius, radius, (cellX, cellZ) -> {
+            double minX = originX + maskMin + cellX * CELL_SIZE, minZ = originZ + maskMin + cellZ * CELL_SIZE;
+            return HazeMask.blocksCell(level, pos, shapes, minX, minZ, minX + CELL_SIZE, minZ + CELL_SIZE, y);
+        });
+    }
 
-        this.xd = (level.random.nextFloat() - 0.5D) * 0.0003D;
-        this.yd = 0.0D;
-        this.zd = (level.random.nextFloat() - 0.5D) * 0.0003D;
+    @Override public void tick() {
+        xo = x; yo = y; zo = z;
+        if (age++ >= lifetime) { remove(); return; }
+        oRoll = roll; roll += rotSpeed; move(xd, yd, zd); xd *= .99; zd *= .99;
+        float progress = (float) age / lifetime; quadSize = baseSize * (1 + progress * .2F);
+        alpha = progress < .2F ? progress / .2F * maxAlpha : progress > .65F ? (1 - (progress - .65F) / .35F) * maxAlpha : maxAlpha;
+        setSpriteFromAge(sprites);
+    }
 
-        this.rotSpeed = (level.random.nextFloat() - 0.5F) * 0.0006F;
-        this.roll = level.random.nextFloat() * ((float) Math.PI * 2.0F);
-        this.oRoll = this.roll;
-
-        if (xSpeed > 0.01 || ySpeed > 0.01 || zSpeed > 0.01) {
-            float var = (level.random.nextFloat() - 0.5F) * 0.03F;
-            float r = Mth.clamp((float) xSpeed + var, 0.0F, 1.0F);
-            float g = Mth.clamp((float) ySpeed + var, 0.0F, 1.0F);
-            float b = Mth.clamp((float) zSpeed + var, 0.0F, 1.0F);
-            this.setColor(r, g, b);
-        } else {
-            float tint = 0.94F + level.random.nextFloat() * 0.06F;
-            this.setColor(tint, tint, tint);
+    @Override public void render(VertexConsumer consumer, Camera camera, float partialTick) {
+        if (alpha <= 0) return;
+        int cutoff = HazeRenderSupport.alphaCutoff(alpha);
+        if (sprite != geometrySprite || cutoff != geometryCutoff) {
+            textureBounds = HazeTextureBounds.forSprite(sprite, cutoff); geometry.setTextureBounds(textureBounds); geometrySprite = sprite; geometryCutoff = cutoff;
         }
-
-        this.maxAlpha = 0.32F + level.random.nextFloat() * 0.12F;
-        this.alpha = 0.0F;
-
-        this.setSpriteFromAge(sprites);
+        if (textureBounds.isEmpty()) return;
+        Vec3 cameraPosition = camera.getPosition();
+        float renderY = (float) (Mth.lerp((double) partialTick, yo, y) - cameraPosition.y());
+        float dx = (float) (Mth.lerp((double) partialTick, xo, x) - originX), dz = (float) (Mth.lerp((double) partialTick, zo, z) - originZ);
+        float size = getQuadSize(partialTick), angle = Mth.lerp(partialTick, oRoll, roll), cos = Mth.cos(angle) * size, sin = Mth.sin(angle) * size;
+        geometry.update(dx, dz, cos, sin);
+        float[] vertices = geometry.vertices(); int light = getLightColor(partialTick);
+        float u0 = getU0(), u1 = getU1(), v0 = getV0(), v1 = getV1();
+        for (int i = 0; i < geometry.vertexCount() * 4; i += 4) consumer.vertex(originX + vertices[i] - cameraPosition.x(), renderY, originZ + vertices[i + 1] - cameraPosition.z())
+                .uv(Mth.lerp(vertices[i + 2], u0, u1), Mth.lerp(vertices[i + 3], v0, v1)).color(rCol, gCol, bCol, alpha).uv2(light).endVertex();
     }
 
-    @Override
-    public void tick() {
-        this.xo = this.x;
-        this.yo = this.y;
-        this.zo = this.z;
-
-        if (this.age++ >= this.lifetime) {
-            this.remove();
-            return;
-        }
-
-        this.oRoll = this.roll;
-        this.roll += this.rotSpeed;
-
-        this.move(this.xd, this.yd, this.zd);
-
-        this.xd *= 0.99;
-        this.zd *= 0.99;
-
-        float progress = (float) this.age / (float) this.lifetime;
-        this.quadSize = this.baseSize * (1.0F + progress * 0.20F);
-
-        if (progress < 0.20F) {
-            this.alpha = (progress / 0.20F) * this.maxAlpha;
-        } else if (progress > 0.65F) {
-            this.alpha = (1.0F - (progress - 0.65F) / 0.35F) * this.maxAlpha;
-        } else {
-            this.alpha = this.maxAlpha;
-        }
-
-        this.setSpriteFromAge(this.sprites);
-    }
-
-    @Override
-    public void render(VertexConsumer consumer, Camera camera, float partialTick) {
-        Vec3 camPos = camera.getPosition();
-        float px = (float)(Mth.lerp((double)partialTick, this.xo, this.x) - camPos.x());
-        float py = (float)(Mth.lerp((double)partialTick, this.yo, this.y) - camPos.y());
-        float pz = (float)(Mth.lerp((double)partialTick, this.zo, this.z) - camPos.z());
-
-        float size = this.getQuadSize(partialTick);
-        float angle = Mth.lerp(partialTick, this.oRoll, this.roll);
-
-        float cos = Mth.cos(angle) * size;
-        float sin = Mth.sin(angle) * size;
-
-        float ux = cos;
-        float uz = sin;
-        float vx = -sin;
-        float vz = cos;
-
-        Vector3f p0 = new Vector3f(px - ux - vx, py, pz - uz - vz);
-        Vector3f p1 = new Vector3f(px + ux - vx, py, pz + uz - vz);
-        Vector3f p2 = new Vector3f(px + ux + vx, py, pz + uz + vz);
-        Vector3f p3 = new Vector3f(px - ux + vx, py, pz - uz + vz);
-
-        int light = this.getLightColor(partialTick);
-        float u0 = this.getU0();
-        float u1 = this.getU1();
-        float v0 = this.getV0();
-        float v1 = this.getV1();
-
-        // Top Face (visible looking down)
-        consumer.vertex(p3.x(), p3.y(), p3.z()).uv(u0, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p2.x(), p2.y(), p2.z()).uv(u1, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p1.x(), p1.y(), p1.z()).uv(u1, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p0.x(), p0.y(), p0.z()).uv(u0, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-
-        // Bottom Face (visible looking up)
-        consumer.vertex(p0.x(), p0.y(), p0.z()).uv(u0, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p1.x(), p1.y(), p1.z()).uv(u1, v1).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p2.x(), p2.y(), p2.z()).uv(u1, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-        consumer.vertex(p3.x(), p3.y(), p3.z()).uv(u0, v0).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
-    }
-
-    @Override
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
-    }
-    public static class Provider implements ParticleProvider<SimpleParticleType> {
+    @Override public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
+    public static final class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
-
-        public Provider(SpriteSet sprites) {
-            this.sprites = sprites;
-        }
-
-        @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level,
-                                       double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            return new HazeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
-        }
+        public Provider(SpriteSet sprites) { this.sprites = sprites; }
+        @Override public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) { return new HazeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites); }
     }
 }

@@ -33,6 +33,7 @@ public final class BuildscapeForgeClient {
 
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent event) {
+        com.kingodogo.buildscape.client.HazeShaderSupport.install();
         ModLoadingContext.get().registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class,
                 () -> new ConfigGuiHandler.ConfigGuiFactory((minecraft, parent) -> GuiProvider.createConfigScreen(parent)));
         event.enqueueWork(() -> {

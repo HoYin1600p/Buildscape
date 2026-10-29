@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.adapter.v118x.client;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import com.kingodogo.buildscape.mixin.SpriteV118xAccessor;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -15,12 +16,17 @@ record HazeTextureBounds(float minU, float maxU, float minV, float maxV) {
     static HazeTextureBounds forSprite(TextureAtlasSprite sprite, int cutoff) {
         Coverage cached = CACHE.get(sprite);
         if (cached == null) {
-            int[] alpha = readAlpha(sprite.getWidth(), sprite.getHeight(), sprite.getUniqueFrames().toArray(), sprite::getPixelRGBA);
+            var image = ((SpriteV118xAccessor) sprite).buildscape$getImages()[0];
+            int columns = image.getWidth() / sprite.getWidth();
+            int[] alpha = readAlpha(sprite.getWidth(), sprite.getHeight(), sprite.getUniqueFrames().toArray(),
+                    (frame, x, y) -> image.getPixelRGBA((frame % columns) * sprite.getWidth() + x,
+                            (frame / columns) * sprite.getHeight() + y));
             if (alpha == null) return FULL;
             cached = new Coverage(sprite.getWidth(), sprite.getHeight(), alpha);
             CACHE.put(sprite, cached);
         }
-        if (cached.bounds[cutoff] == null) cached.bounds[cutoff] = compute(cached.width, cached.height, index -> cached.alpha[index] <= cutoff);
+        Coverage coverage = cached;
+        if (coverage.bounds[cutoff] == null) coverage.bounds[cutoff] = compute(coverage.width, coverage.height, index -> coverage.alpha[index] <= cutoff);
         return cached.bounds[cutoff];
     }
 

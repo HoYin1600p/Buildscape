@@ -28,7 +28,7 @@ public class SnifferLootTableTest {
     void testV121xSnifferDiggingLootTable() throws Exception {
         String mainResourcesProp = System.getProperty("buildscape.mainResources");
         Path mainResources = mainResourcesProp != null ? Path.of(mainResourcesProp) : Path.of("common/src/main/resources").toAbsolutePath();
-        Path v121xResources = mainResources.getParent().getParent().resolve("v121x/resources");
+        Path v121xResources = mainResources.getParent().getParent().resolve("1.21.1/resources");
         Path tablePath = v121xResources.resolve("data/minecraft/loot_table/gameplay/sniffer_digging.json");
         assertTrue(Files.exists(tablePath), "sniffer_digging.json must exist in v121x resources: " + tablePath);
 

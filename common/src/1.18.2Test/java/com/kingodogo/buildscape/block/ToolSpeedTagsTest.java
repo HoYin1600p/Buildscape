@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Tool bonuses come from vanilla tool tags in every cluster, not from custom break-speed code. */
 class ToolSpeedTagsTest {
-    private static final List<String> TAG_TREES = List.of("v118x/resources/data/%s/tags/blocks/%s.json",
-            "v121x/resources/data/%s/tags/block/%s.json", "main/resources/data/%s/tags/block/%s.json");
+    private static final List<String> TAG_TREES = List.of("1.18.2/resources/data/%s/tags/blocks/%s.json",
+            "1.21.1/resources/data/%s/tags/block/%s.json", "main/resources/data/%s/tags/block/%s.json");
 
     @Test
     void shearsCutHedgesAndLeafLayersAtLeafSpeedKeepingEfficiency() {

@@ -35,7 +35,7 @@ class RemapSafeReflectionTest {
     void production1182SourcesContainNoUnapprovedReflectiveLookups() throws IOException {
         Path common = commonRoot();
         List<Path> sources = new ArrayList<>();
-        for (String root : List.of("src/main/java/com/kingodogo/buildscape/adapter/v118x", "src/1.18.2")) {
+        for (String root : List.of("src/1.18.2")) {
             Path directory = common.resolve(root);
             assertTrue(Files.isDirectory(directory), "Missing scan root: " + directory);
             try (var paths = Files.walk(directory)) {

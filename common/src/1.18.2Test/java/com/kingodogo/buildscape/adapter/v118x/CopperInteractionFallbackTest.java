@@ -37,7 +37,7 @@ class CopperInteractionFallbackTest {
         Path adapter = Path.of(System.getProperty("buildscape.v118xMixinConfig",
                         "src/1.18.2/resources/buildscape.mixins.json"))
                 .toAbsolutePath().getParent().getParent().getParent()
-                .resolve("main/java/com/kingodogo/buildscape/adapter/v118x/PlatformAdapterBase.java");
+                .resolve("1.18.2/java/com/kingodogo/buildscape/adapter/v118x/PlatformAdapterBase.java");
         String source = Files.readString(adapter);
         int method = source.indexOf("handleCopperRightClick(");
         String body = source.substring(method, source.indexOf("    @Override", method));

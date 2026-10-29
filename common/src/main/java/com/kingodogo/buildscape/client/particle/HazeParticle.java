@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.adapter.v26x.client;
+package com.kingodogo.buildscape.client.particle;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;

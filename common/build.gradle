@@ -18,6 +18,7 @@ sourceSets {
     v118x {
         java {
             srcDirs = ['src/main/java', 'src/1.18.2/java']
+            exclude 'com/kingodogo/buildscape/client/particle/HazeParticle.java'
         }
         // This cluster supplies a complete 1.18.2 resource tree.
         resources.srcDirs = ['src/1.18.2/resources']
@@ -26,6 +27,7 @@ sourceSets {
     v121x {
         java {
             srcDirs = ['src/main/java', 'src/1.21.1/java']
+            exclude 'com/kingodogo/buildscape/client/particle/HazeParticle.java'
         }
         // This cluster supplies a complete 1.21.1 resource tree.
         resources.srcDirs = ['src/1.21.1/resources']

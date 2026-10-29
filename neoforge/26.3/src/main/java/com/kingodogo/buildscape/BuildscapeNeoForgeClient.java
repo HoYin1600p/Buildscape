@@ -47,11 +47,11 @@ final class BuildscapeNeoForgeClient {
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::unload);
     }
     private static void blockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.BlockTintSources event) {
-        com.kingodogo.buildscape.adapter.v263.client.FoliageColors.register(event.getBlockColors());
+        com.kingodogo.buildscape.client.FoliageColors.register(event.getBlockColors());
     }
     private static void itemColors(net.neoforged.neoforge.client.event.ModelEvent.ModifyBakingResult event) {
         event.getBakingResult().itemStackModels().replaceAll(
-                com.kingodogo.buildscape.adapter.v263.client.FoliageColors::tintItem);
+                com.kingodogo.buildscape.client.FoliageColors::tintItem);
     }
     private static void keys(net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent event) {
         com.kingodogo.buildscape.client.ModKeyBinds.register(event::register);

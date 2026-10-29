@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.client;
 
-import com.kingodogo.buildscape.adapter.v263.client.FoliageColors;
+import com.kingodogo.buildscape.client.FoliageColors;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.client.resources.model.ModelBakery;
 import org.spongepowered.asm.mixin.Mixin;

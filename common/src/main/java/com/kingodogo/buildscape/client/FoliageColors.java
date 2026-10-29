@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.adapter.v26x.client;
+package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
 import java.lang.reflect.Field;

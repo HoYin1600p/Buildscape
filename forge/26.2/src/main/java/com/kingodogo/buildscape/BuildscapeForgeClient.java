@@ -46,7 +46,7 @@ final class BuildscapeForgeClient {
         net.minecraftforge.event.level.LevelEvent.Unload.BUS.addListener(BuildscapeForgeClient::unload);
     }
     private static void blockColors(net.minecraftforge.client.event.RegisterColorHandlersEvent.Block event) {
-        com.kingodogo.buildscape.adapter.v26x.client.FoliageColors.register(event.getBlockColors());
+        com.kingodogo.buildscape.client.FoliageColors.register(event.getBlockColors());
     }
     private static void fluidModels(net.minecraftforge.client.event.ModelEvent.BakeFluidModels event) {
         var model = com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidModel.create()
@@ -74,7 +74,7 @@ final class BuildscapeForgeClient {
     }
     private static void itemColors(net.minecraftforge.client.event.ModelEvent.ModifyBakingResult event) {
         event.getResults().itemStackModels().replaceAll(
-                com.kingodogo.buildscape.adapter.v26x.client.FoliageColors::tintItem);
+                com.kingodogo.buildscape.client.FoliageColors::tintItem);
     }
     private static void keys(net.minecraftforge.client.event.RegisterKeyMappingsEvent event) {
         com.kingodogo.buildscape.client.ModKeyBinds.register(event::register);

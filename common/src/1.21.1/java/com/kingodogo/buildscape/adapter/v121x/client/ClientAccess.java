@@ -333,6 +333,10 @@ public final class ClientAccess {
         return net.minecraft.client.Minecraft.getInstance().screen != null;
     }
 
+    public static net.minecraft.world.phys.Vec3 getMainCameraPosition() {
+        return net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+    }
+
     public static net.minecraft.world.phys.Vec3 getCameraPosition(net.minecraft.client.Camera camera) {
         return camera != null ? camera.getPosition() : net.minecraft.world.phys.Vec3.ZERO;
     }

@@ -2692,7 +2692,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public net.minecraft.world.phys.Vec3 getMainCameraPosition() {
-        return net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        return ClientAccess.getMainCameraPosition();
     }
 
     @Override

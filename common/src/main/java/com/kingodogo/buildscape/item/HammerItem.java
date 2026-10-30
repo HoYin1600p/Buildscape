@@ -36,6 +36,14 @@ public class HammerItem extends Item {
         public boolean canReplaceObsidianLevel() {
             return canReplaceObsidianLevel;
         }
+
+        public Item getHarvestToolItem() {
+            return switch (this) {
+                case IRON -> Items.IRON_PICKAXE;
+                case DIAMOND -> Items.DIAMOND_PICKAXE;
+                case NETHERITE -> Items.NETHERITE_PICKAXE;
+            };
+        }
     }
 
     private final HammerTier tier;

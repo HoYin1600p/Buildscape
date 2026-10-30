@@ -1630,6 +1630,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public Item createHammerItem(com.kingodogo.buildscape.item.HammerItem.HammerTier tier, Item.Properties properties) {
         return new com.kingodogo.buildscape.item.HammerItem(tier, properties) {
+            @Override
+            public boolean isCorrectToolForDrops(BlockState state) {
+                return tier.getHarvestToolItem().isCorrectToolForDrops(state);
+            }
+
             public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.world.item.enchantment.Enchantment enchantment) {
                 return supportsHammerEnchantment(stack, enchantment);
             }

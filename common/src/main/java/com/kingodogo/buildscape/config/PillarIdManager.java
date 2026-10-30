@@ -524,7 +524,25 @@ public class PillarIdManager {
     }
 
     public void markFrameEdit(PillarData data) {
-        if (serverAuthoritative && isFrameData(data)) data.frameEditPending = true;
+        if (!serverAuthoritative || !isFrameData(data)) return;
+        data.frameEditPending = true;
+        MinecraftServer server = getCurrentServer();
+        if (server == null) return;
+        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            if (!Objects.equals(getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
+            for (net.minecraft.world.entity.Entity entity : level.getEntities(null, new net.minecraft.world.phys.AABB(data.getBlockPos()).inflate(1.0))) {
+                net.minecraft.core.Direction facing;
+                if (entity instanceof net.minecraft.world.entity.decoration.ItemFrame frame) facing = frame.getDirection();
+                else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) facing = frame.getFrameDirection();
+                else continue;
+                if (!isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) continue;
+                applyPendingFrameEdit(data, Services.PLATFORM.getEntityData(entity), false);
+                if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
+                    frame.setParticlePattern(data.pattern == null ? "none" : data.pattern);
+                    frame.setParticleColorsRaw(String.join(";", data.dyeColors));
+                }
+            }
+        }
     }
 
     private boolean applyPendingFrameEdit(PillarData data, CompoundTag tag, boolean immediate) {

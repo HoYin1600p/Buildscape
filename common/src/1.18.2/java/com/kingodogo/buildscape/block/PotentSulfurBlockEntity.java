@@ -134,6 +134,8 @@ public class PotentSulfurBlockEntity extends DataBlockEntity {
    };
 
    public static final BlockEntityTicker<PotentSulfurBlockEntity> LAUNCH_ENTITY_TICKER = (level, pos, state, entity) -> {
+      int topY = getLiftTop(level, pos);
+      tickLivingLift(level, pos, topY);
       BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
       if (sourceBlock != null) {
          int rawWaterBlocks = sourceBlock.getY() - pos.getY() - 1;
@@ -145,6 +147,7 @@ public class PotentSulfurBlockEntity extends DataBlockEntity {
          AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double)(geyserForceHeight + 3), 0.0D).inflate(0.45D, 0.0D, 0.45D);
 
          for (Entity entityToBeLaunched : level.getEntitiesOfClass(Entity.class, aabb, EFFECT_PREDICATE)) {
+            if (entityToBeLaunched.blockPosition().getY() > topY) continue;
             Vec3 entityVelocity = entityToBeLaunched.getDeltaMovement();
             entityToBeLaunched.fallDistance = 0.0F;
 
@@ -191,6 +194,41 @@ public class PotentSulfurBlockEntity extends DataBlockEntity {
          }
       }
    };
+
+   private static int getLiftTop(Level level, BlockPos pos) {
+      BlockPos.MutableBlockPos probe = pos.mutable();
+      for (int y = pos.getY() + 1; y < pos.getY() + 24; y++) {
+         probe.setY(y);
+         BlockState state = level.getBlockState(probe);
+         if (state.getBlock() instanceof PotentSulfurBlock
+               || !isGeyserPassableBlock(state, level, probe, CollisionContext.empty())) return y - 1;
+      }
+      return pos.getY() + 23;
+   }
+
+   private static void tickLivingLift(Level level, BlockPos pos, int topY) {
+      AABB column = new AABB(pos).expandTowards(0.0D, 23.0D, 0.0D);
+      List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, column, living -> {
+         BlockPos at = living.blockPosition();
+         return at.getX() == pos.getX() && at.getZ() == pos.getZ()
+               && at.getY() >= pos.getY() && at.getY() <= topY
+               && !living.isPassenger() && !living.getType().is(NOT_AFFECTED_BY_GEYSERS)
+               && !(living instanceof Player player && player.getAbilities().flying);
+      });
+      if (entities.isEmpty()) return;
+      BlockPos.MutableBlockPos source = pos.above().mutable();
+      while (level.getFluidState(source).isSourceOfType(Fluids.WATER)) source.move(Direction.UP);
+      int waterBlocks = Math.max(1, source.getY() - pos.getY() - 1);
+      for (LivingEntity living : entities) {
+         Vec3 velocity = living.getDeltaMovement();
+         if (velocity.y < 0.3D + waterBlocks * 0.1D) {
+            living.fallDistance = 0.0F;
+            living.setDeltaMovement(velocity.add(0.0D, 0.2D, 0.0D));
+            living.hasImpulse = true;
+            if (!level.isClientSide()) living.hurtMarked = true;
+         }
+      }
+   }
 
    public PotentSulfurBlockEntity(final BlockPos worldPosition, final BlockState blockState) {
       super(com.kingodogo.buildscape.adapter.v118x.RestoredContentTypes.blockEntity("potent_sulfur"), worldPosition, blockState);

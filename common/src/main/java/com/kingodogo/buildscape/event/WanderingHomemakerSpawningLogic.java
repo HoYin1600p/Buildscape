@@ -136,7 +136,7 @@ public final class WanderingHomemakerSpawningLogic {
                 homemaker.setPos(spawnX, spawnY, spawnZ);
                 homemaker.setYRot(level.getRandom().nextFloat() * 360F);
                 boolean added = serverLevel.addFreshEntity(homemaker);
-                if (Services.isVersionCluster("v121x") && !added) return;
+                if (!added) return;
                 Services.PLATFORM.putTagUUID(data, "WanderingHomemakerUUID", homemaker.getUUID());
             }
 

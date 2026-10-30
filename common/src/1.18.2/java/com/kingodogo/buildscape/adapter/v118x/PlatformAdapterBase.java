@@ -2028,7 +2028,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public int applyBiomeToArea(ServerLevel serverLevel, BlockPos pos1, BlockPos pos2, Holder<Biome> biomeHolder, ItemStack stack) {
+    public int applyBiomeToArea(ServerLevel serverLevel, BlockPos pos1, BlockPos pos2, Holder<Biome> biomeHolder, ItemStack stack, boolean creative) {
         int minX = Math.min(pos1.getX(), pos2.getX());
         int maxX = Math.max(pos1.getX(), pos2.getX());
         int minY = Math.min(pos1.getY(), pos2.getY());
@@ -2087,7 +2087,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                 }
 
                 for (int y = minY; y <= maxY; y++) {
-                    if (stack != null && !stack.isEmpty() && stack.getDamageValue() >= stack.getMaxDamage()) {
+                    if (!creative && stack != null && !stack.isEmpty() && stack.getDamageValue() >= stack.getMaxDamage()) {
                         broken = true;
                         break;
                     }
@@ -2124,7 +2124,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
                     affectedBlocks++;
 
-                    if (stack != null && !stack.isEmpty()) {
+                    if (!creative && stack != null && !stack.isEmpty()) {
                         boolean shouldDamage = true;
                         if (unbreakingLevel > 0) {
                             shouldDamage = serverLevel.getRandom().nextInt(unbreakingLevel + 1) == 0;

@@ -181,7 +181,7 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
         ItemStack stack = context.getItemInHand();
         BlockPos clickedPos = context.getClickedPos();
 
-        if (stack.getDamageValue() >= stack.getMaxDamage()) {
+        if (!player.getAbilities().instabuild && stack.getDamageValue() >= stack.getMaxDamage()) {
             Services.PLATFORM.playDispenserFail(level, player.getX(), player.getY(), player.getZ());
             Services.PLATFORM.sendActionBarMessage(player, ComponentHelper.translatable("message.buildscape.biome_brush.broken").withStyle(ChatFormatting.RED));
             return InteractionResult.FAIL;
@@ -230,7 +230,8 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
                 return InteractionResult.FAIL;
             }
 
-            int affectedBlocks = Services.PLATFORM.applyBiomeToArea(serverLevel, pos1, pos2, biomeHolder, stack);
+            int affectedBlocks = Services.PLATFORM.applyBiomeToArea(serverLevel, pos1, pos2, biomeHolder, stack,
+                    player.getAbilities().instabuild);
 
             Services.PLATFORM.playBoneMealUse(level, player.getX(), player.getY(), player.getZ());
 

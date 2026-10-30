@@ -430,7 +430,7 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.Item createPoplarBoatItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.ItemStack removeItem(java.util.List<net.minecraft.world.item.ItemStack> items, int slot, int amount);
     net.minecraft.world.item.ItemStack takeItem(java.util.List<net.minecraft.world.item.ItemStack> items, int slot);
-    int applyBiomeToArea(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos pos1, net.minecraft.core.BlockPos pos2, net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome> biomeHolder, net.minecraft.world.item.ItemStack stack);
+    int applyBiomeToArea(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos pos1, net.minecraft.core.BlockPos pos2, net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome> biomeHolder, net.minecraft.world.item.ItemStack stack, boolean creative);
     void scanChunkForBlock(net.minecraft.server.level.ServerLevel level, net.minecraft.world.level.chunk.LevelChunk chunk, java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> predicate, java.util.function.BiConsumer<net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState> action);
     void markChunkUnsaved(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos);
     void playWoolBreak(net.minecraft.world.level.Level level, double x, double y, double z);

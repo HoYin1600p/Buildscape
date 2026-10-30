@@ -401,6 +401,9 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.Item createBuildersPouchItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createHammerItem(com.kingodogo.buildscape.item.HammerItem.HammerTier tier, net.minecraft.world.item.Item.Properties properties);
     boolean supportsHammerEnchantment(net.minecraft.world.item.ItemStack stack, Object enchantment);
+    default java.util.List<net.minecraft.world.item.ItemStack> hammerDrops(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.entity.BlockEntity entity, net.minecraft.server.level.ServerPlayer player, net.minecraft.world.item.ItemStack hammer, com.kingodogo.buildscape.item.HammerItem.HammerTier tier) {
+        return net.minecraft.world.level.block.Block.getDrops(state, level, pos, entity);
+    }
     void playNoteBlockChime(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos, float pitch);
     net.minecraft.nbt.CompoundTag getEntityData(net.minecraft.world.entity.Entity entity);
     net.minecraft.nbt.CompoundTag getBlockEntityData(net.minecraft.world.level.block.entity.BlockEntity be);

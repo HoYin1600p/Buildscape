@@ -1660,6 +1660,22 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public List<ItemStack> hammerDrops(ServerLevel level, BlockPos pos, BlockState state,
+            net.minecraft.world.level.block.entity.BlockEntity entity, net.minecraft.server.level.ServerPlayer player,
+            ItemStack hammer, com.kingodogo.buildscape.item.HammerItem.HammerTier tier) {
+        ItemStack tool = new ItemStack(tier.getHarvestToolItem());
+        net.minecraft.world.item.enchantment.EnchantmentHelper.setEnchantments(
+                net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantments(hammer), tool);
+        net.minecraft.world.level.storage.loot.LootContext.Builder context = new net.minecraft.world.level.storage.loot.LootContext.Builder(level)
+                .withRandom(level.random)
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL, tool)
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.THIS_ENTITY, player)
+                .withOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY, entity);
+        return state.getDrops(context);
+    }
+
+    @Override
     public void playNoteBlockChime(Level level, BlockPos pos, float pitch) {
         level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, pitch);
     }

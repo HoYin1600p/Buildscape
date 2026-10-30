@@ -91,16 +91,7 @@ public class RecipeCacheGenerator {
     }
 
     public static byte[] generateCache(Path sourceDirectory) throws IOException {
-        Map<String, byte[]> rawCategoryData = new LinkedHashMap<>();
-
-        for (String category : CATEGORIES) {
-            Path sourceFile = sourceDirectory.resolve(category + ".json");
-            if (Files.isRegularFile(sourceFile)) {
-                rawCategoryData.put(category, Files.readAllBytes(sourceFile));
-                com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter.validateJson(
-                        Files.readString(sourceFile, StandardCharsets.UTF_8));
-            }
-        }
+        Map<String, byte[]> rawCategoryData = readAndValidateCategories(sourceDirectory);
 
         String contentHash = computeSourceHash(CATEGORIES, rawCategoryData);
         Set<String> runtimeCategories = findRuntimeCategories(rawCategoryData);
@@ -385,6 +376,27 @@ public class RecipeCacheGenerator {
         } else {
             return "{\"item\":\"" + resolved + "\"}";
         }
+    }
+
+    /** Reads each category, validates its JSON and rejects gainful stonecutting cycles before caching. */
+    private static Map<String, byte[]> readAndValidateCategories(Path sourceDirectory) throws IOException {
+        Map<String, byte[]> rawCategoryData = new LinkedHashMap<>();
+        StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
+        for (String category : CATEGORIES) {
+            Path sourceFile = sourceDirectory.resolve(category + ".json");
+            if (!Files.isRegularFile(sourceFile)) {
+                continue;
+            }
+            byte[] content = Files.readAllBytes(sourceFile);
+            rawCategoryData.put(category, content);
+            com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter.validateJson(
+                    new String(content, StandardCharsets.UTF_8));
+            try (Reader reader = new InputStreamReader(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                cycles.addCategory(StreamingRecipeParser.parseCategory(category, reader));
+            }
+        }
+        cycles.validate();
+        return rawCategoryData;
     }
 
     private static int getStringIndex(String str, List<String> stringPool, Map<String, Integer> stringIndexMap) {

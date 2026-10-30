@@ -2485,7 +2485,7 @@ public class PillarIdManager {
             String color = frame.getColorVariant();
             if (color == null || color.isEmpty()) color = "white";
             else color = color.toLowerCase(java.util.Locale.ROOT);
-            if (net.minecraft.resources.ResourceLocation.tryParse("buildscape:" + color + "_item_frame") == null) {
+            if (CommonId.tryParse("buildscape:" + color + "_item_frame") == null) {
                 color = "white";
             }
 
@@ -2510,7 +2510,7 @@ public class PillarIdManager {
             String color = frame.getColorVariant();
             if (color == null || color.isEmpty()) color = "white";
             else color = color.toLowerCase(java.util.Locale.ROOT);
-            if (net.minecraft.resources.ResourceLocation.tryParse("buildscape:" + color + "_item_frame") == null) {
+            if (CommonId.tryParse("buildscape:" + color + "_item_frame") == null) {
                 color = "white";
             }
             String expectedType = "buildscape:" + color + "_item_frame";

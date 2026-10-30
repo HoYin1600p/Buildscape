@@ -41,9 +41,6 @@ public class BottleOfMistItem extends Item {
         if (!level.isClientSide()) {
             Services.PLATFORM.playFireExtinguish(level, player.getX(), player.getY(), player.getZ());
         }
-        if (!player.getAbilities().instabuild) {
-            stack.shrink(1);
-        }
     }
 
     public void appendBuildscapeTooltip(Consumer<Component> tooltip) {

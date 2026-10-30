@@ -9,7 +9,8 @@ import net.minecraft.world.item.ItemStack;
 public class BuildersPouchTooltipData implements TooltipComponent {
     public static final CommonId TEXTURE = new CommonId(BuildscapeCommon.MOD_ID, "textures/gui/shulker_box_tooltip.png");
 
-    public static final int COLOR_GOLD = 0xFBC02D;
+    /** Multiplied over the grey preview frame, this matches the pouch's main blue. */
+    public static final int COLOR_POUCH_BLUE = 0x0076D8;
 
     public static float[] hexToRgb(int hex) {
         float r = ((hex >> 16) & 0xFF) / 255.0f;

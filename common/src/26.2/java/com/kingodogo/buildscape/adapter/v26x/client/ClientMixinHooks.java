@@ -378,7 +378,7 @@ public final class ClientMixinHooks {
                     com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData.getHexColor(shulker.getColor()), outside, textHeight, ClientMixinHooks::extractPreviewImage);
         if (data instanceof com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData pouch)
             return new com.kingodogo.buildscape.mixinsupport.TooltipPreviewComponent(pouch.getFilterStacks(), pouch.getRealStacks(),
-                    com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.COLOR_GOLD, outside, textHeight, ClientMixinHooks::extractPreviewImage);
+                    com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.COLOR_POUCH_BLUE, outside, textHeight, ClientMixinHooks::extractPreviewImage);
         return null;
     }
 

@@ -331,7 +331,7 @@ public final class ClientMixins {
         if (pouch == null) return null;
         return new PreviewData(pouch.getFilterStacks(), pouch.getRealStacks(),
                 com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.hexToRgb(
-                        com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.COLOR_GOLD));
+                        com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.COLOR_POUCH_BLUE));
     }
 
     /** Called after the text tooltip is drawn; draws the preview outside it like the reference. */

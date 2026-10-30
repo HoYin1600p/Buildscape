@@ -513,7 +513,7 @@ public final class MixinClientHooks {
                 float[] tint = com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData.getTint(shulkerData.getColor());
                 renderTooltipBox(font, customX, customY, poseStack, itemRenderer, 400, 3, tint, shulkerData.getFilterStacks(), shulkerData.getRealStacks());
             } else {
-                float[] tint = com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.hexToRgb(com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.COLOR_GOLD);
+                float[] tint = com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.hexToRgb(com.kingodogo.buildscape.client.tooltip.BuildersPouchTooltipData.COLOR_POUCH_BLUE);
                 renderTooltipBox(font, customX, customY, poseStack, itemRenderer, 400, 1, tint, pouchData.getFilterStacks(), pouchData.getRealStacks());
             }
             poseStack.popPose();

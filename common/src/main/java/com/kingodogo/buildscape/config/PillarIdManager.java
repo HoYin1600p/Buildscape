@@ -548,6 +548,7 @@ public class PillarIdManager {
     private boolean applyPendingFrameEdit(PillarData data, CompoundTag tag, boolean immediate) {
         if (data == null || !Boolean.TRUE.equals(data.frameEditPending)) return false;
         data.frameEditPending = null;
+        saveFrameChange(immediate);
         if (immediate) return false;
         tag.putString("BuildScapeParticlePattern", data.pattern == null ? "none" : data.pattern);
         Services.PLATFORM.putTagStringList(tag, "BuildScapeParticleColors", data.dyeColors == null ? List.of() : data.dyeColors);

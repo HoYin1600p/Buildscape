@@ -101,6 +101,7 @@ public class UpdateAllPillarIdsPacket implements CommonPacket {
                     existing.dyeColors = new ArrayList<>(incoming.dyeColors);
                 }
                 existing.modifiedTime = System.currentTimeMillis();
+                manager.markFrameEdit(existing);
                 changed = true;
             }
         }

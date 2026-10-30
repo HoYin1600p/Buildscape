@@ -208,6 +208,7 @@ public class UpdatePillarDataPacket implements CommonPacket {
 
         if (changed) {
             data.modifiedTime = System.currentTimeMillis();
+            manager.markFrameEdit(data);
             manager.saveImmediate();
             updateBlockEntity(com.kingodogo.buildscape.platform.Services.PLATFORM.getServer(serverPlayer), data);
             SyncPillarIdsPacket.sendToAll(manager.getAllPillarDataForSync());

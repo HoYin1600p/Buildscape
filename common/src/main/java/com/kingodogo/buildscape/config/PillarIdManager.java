@@ -523,6 +523,19 @@ public class PillarIdManager {
                 || (data.pillarType != null && data.pillarType.endsWith("item_frame")));
     }
 
+    public void markFrameEdit(PillarData data) {
+        if (serverAuthoritative && isFrameData(data)) data.frameEditPending = true;
+    }
+
+    private boolean applyPendingFrameEdit(PillarData data, CompoundTag tag, boolean immediate) {
+        if (data == null || !Boolean.TRUE.equals(data.frameEditPending)) return false;
+        data.frameEditPending = null;
+        if (immediate) return false;
+        tag.putString("BuildScapeParticlePattern", data.pattern == null ? "none" : data.pattern);
+        Services.PLATFORM.putTagStringList(tag, "BuildScapeParticleColors", data.dyeColors == null ? List.of() : data.dyeColors);
+        return true;
+    }
+
     private static boolean isColoredFrameData(PillarData data) {
         return data.pillarType != null && data.pillarType.startsWith("buildscape:")
                 && data.pillarType.endsWith("item_frame");
@@ -2392,6 +2405,10 @@ public class PillarIdManager {
             id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
             existing = null;
         }
+        if (applyPendingFrameEdit(existing, dataTag, immediate)) {
+            pattern = existing.pattern == null ? "none" : existing.pattern;
+            colors = new ArrayList<>(existing.dyeColors);
+        }
         boolean removedDuplicates = removeOtherFrameEntries(id, dimension, pos, facing, false);
         if (existing == null) {
             PillarData data = new PillarData(id, dimension, pos);
@@ -2485,6 +2502,12 @@ public class PillarIdManager {
             id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame.asEntity());
             existing = null;
         }
+        if (applyPendingFrameEdit(existing, dataTag, immediate)) {
+            pattern = existing.pattern == null ? "none" : existing.pattern;
+            colors = new ArrayList<>(existing.dyeColors);
+            frame.setParticlePattern(pattern);
+            frame.setParticleColorsRaw(String.join(";", colors));
+        }
         boolean removedDuplicates = removeOtherFrameEntries(id, dimension, pos, facing, true);
         if (existing == null) {
             PillarData data = new PillarData(id, dimension, pos);
@@ -2577,6 +2600,7 @@ public class PillarIdManager {
     public static class PillarData {
 
         public String id;
+        public Boolean frameEditPending;
         public List<String> dyeColors = new ArrayList<>();
         public String dimension;
         public int x, y, z;

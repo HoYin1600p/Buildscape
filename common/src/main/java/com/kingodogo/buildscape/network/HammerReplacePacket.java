@@ -87,7 +87,7 @@ public class HammerReplacePacket implements CommonPacket {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         List<ItemStack> drops = Block.getDrops(targetState, level, pos, blockEntity);
 
-        level.setBlock(pos, newState, 3);
+        if (!level.setBlock(pos, newState, 3)) return;
         AdvancementMilestoneLogic.onHammerReplace(serverPlayer);
 
         if (!serverPlayer.isCreative()) {

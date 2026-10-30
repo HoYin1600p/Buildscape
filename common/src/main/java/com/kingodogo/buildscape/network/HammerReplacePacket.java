@@ -120,6 +120,8 @@ public class HammerReplacePacket implements CommonPacket {
     private static boolean isMultiBlockPart(BlockState state) {
         return state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
                 || state.hasProperty(BlockStateProperties.BED_PART)
+                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
+                || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED))
                 || state.hasProperty(BlockStateProperties.CHEST_TYPE)
                 || state.hasProperty(BlockStateProperties.DOOR_HINGE);
     }

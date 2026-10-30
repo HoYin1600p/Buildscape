@@ -76,6 +76,9 @@ public class HammerReplacePacket implements CommonPacket {
 
         HammerItem.HammerTier tier = hammer.getHammerTier();
         if (!tier.canReplaceObsidianLevel() && destroyTime >= 50.0f) return;
+        if (!Services.PLATFORM.canHammerHarvest(targetState, hammerStack, tier)) return;
+        net.minecraft.nbt.CompoundTag itemData = Services.PLATFORM.getCustomData(offhandStack, false);
+        if (itemData != null && itemData.contains("BlockEntityTag")) return;
 
         Block replacementBlock = blockItem.getBlock();
         if (targetState.getBlock() == replacementBlock) return;

@@ -1676,6 +1676,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public boolean canHammerHarvest(BlockState state, ItemStack hammer, com.kingodogo.buildscape.item.HammerItem.HammerTier tier) {
+        return !state.requiresCorrectToolForDrops() || new ItemStack(tier.getHarvestToolItem()).isCorrectToolForDrops(state);
+    }
+
+    @Override
     public void playNoteBlockChime(Level level, BlockPos pos, float pitch) {
         level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, pitch);
     }

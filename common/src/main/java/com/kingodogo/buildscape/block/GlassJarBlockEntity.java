@@ -283,9 +283,7 @@ public class GlassJarBlockEntity extends DataBlockEntity implements IDataSeriali
     }
 
     private void scheduleGlowingUpdate() {
-        if (level != null && !level.isClientSide()) {
-            level.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
-        }
+        updateGlowingState();
     }
 
     @Override

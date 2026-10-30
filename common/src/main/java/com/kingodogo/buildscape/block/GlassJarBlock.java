@@ -14,7 +14,6 @@ import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -31,8 +30,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import java.util.Random;
 
 public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, ICommonInteractable {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -78,13 +75,6 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new GlassJarBlockEntity(pos, state);
-    }
-
-    @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-        if (level.getBlockEntity(pos) instanceof GlassJarBlockEntity jar) {
-            jar.updateGlowingState();
-        }
     }
 
     @Override

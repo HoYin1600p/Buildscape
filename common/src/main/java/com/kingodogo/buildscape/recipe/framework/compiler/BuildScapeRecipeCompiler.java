@@ -36,6 +36,7 @@ public class BuildScapeRecipeCompiler {
     private final TemplateEngine templateEngine = new TemplateEngine();
     private final FamilyExpander familyExpander;
     private final RecipeValidator validator = new RecipeValidator();
+    private final RecipeIdAllocator recipeIds = new RecipeIdAllocator();
 
     public static record CompileResult(
             List<RecipeIR.CompiledRecipe> recipes,
@@ -138,12 +139,10 @@ public class BuildScapeRecipeCompiler {
             return null;
         }
 
-        String rawId = spec.id() != null ? spec.id() : generateRecipeId(spec);
-        String cleanPath = sanitizePath("autogen/" + category + "/" + rawId);
-
-        CommonId recipeId = CommonId.tryParse(BuildscapeCommon.MOD_ID + ":" + cleanPath);
+        String allocatedId = recipeIds.allocate(category, spec, aliasResolver);
+        CommonId recipeId = CommonId.tryParse(allocatedId);
         if (recipeId == null) {
-            BuildscapeCommon.LOGGER.warn("BDRE Compiler: Invalid recipe resource location path: {}", cleanPath);
+            BuildscapeCommon.LOGGER.warn("BDRE Compiler: Invalid recipe resource location path: {}", allocatedId);
             return null;
         }
 
@@ -330,20 +329,8 @@ public class BuildScapeRecipeCompiler {
         }
         return aliasResolver.resolveString(raw);
     }
-    private String generateRecipeId(RecipeIR.RecipeSpec spec) {
-        String res = (spec.result() != null && spec.result().item() != null) ? spec.result().item() : "unknown";
-        return sanitizePath(res) + "_" + Math.abs(spec.hashCode());
-    }
-
-    private String sanitizePath(String str) {
-        if (str == null) return "unknown";
-        String resolved = aliasResolver.resolveString(str);
-        return resolved.toLowerCase(Locale.ROOT)
-                .replace(":", "_")
-                .replaceAll("[^a-z0-9/._-]", "_");
-    }
-
     public void clear() {
         validator.clear();
+        recipeIds.clear();
     }
 }

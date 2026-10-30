@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.recipe.framework.validation;
 
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver;
+import com.kingodogo.buildscape.recipe.framework.compiler.ShapedRecipeSymbols;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.world.item.Item;
@@ -148,6 +149,12 @@ public class RecipeValidator {
             }
         } else if ("shaped".equalsIgnoreCase(spec.type())) {
             if (spec.pattern() == null || spec.pattern().isEmpty() || spec.keys() == null || spec.keys().isEmpty()) {
+                return false;
+            }
+            try {
+                ShapedRecipeSymbols.validate(spec);
+            } catch (IllegalArgumentException exception) {
+                BuildscapeCommon.LOGGER.warn("BDRE: Rejected shaped recipe: {}", exception.getMessage());
                 return false;
             }
             for (String ing : spec.keys().values()) {

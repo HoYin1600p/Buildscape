@@ -2223,6 +2223,7 @@ public class PillarIdManager {
             if (original != null) {
                 PillarData copy = new PillarData();
                 copy.id = original.id;
+                copy.frameEditPending = original.frameEditPending;
                 copy.dimension = original.dimension;
                 copy.x = original.x;
                 copy.y = original.y;

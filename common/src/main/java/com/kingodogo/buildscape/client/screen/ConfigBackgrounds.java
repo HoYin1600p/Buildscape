@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.config.BuildscapeClientConfig;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
 
+import java.io.DataInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -181,12 +182,28 @@ public class ConfigBackgrounds {
         }
     }
 
+    private static boolean isOversizedPng(Path filePath) {
+        try (DataInputStream header = new DataInputStream(Files.newInputStream(filePath))) {
+            if (header.readLong() != 0x89504E470D0A1A0AL || header.readInt() != 13
+                    || header.readInt() != 0x49484452) {
+                return false;
+            }
+            long width = Integer.toUnsignedLong(header.readInt());
+            long height = Integer.toUnsignedLong(header.readInt());
+            return width > 4096 || height > 4096;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
     private static void loadCustomBackgroundFile(Path filePath) {
         String fileName = filePath.getFileName().toString();
         String id = sanitizeId(fileName);
         if (id.isEmpty()) return;
 
         if (REGISTERED_BACKGROUND_IDS.contains(id)) return;
+
+        if (isOversizedPng(filePath)) return;
 
         String displayName = formatDisplayName(fileName);
         try (InputStream in = Files.newInputStream(filePath)) {

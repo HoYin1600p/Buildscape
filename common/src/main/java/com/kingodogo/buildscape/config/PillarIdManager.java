@@ -658,6 +658,15 @@ public class PillarIdManager {
         removePillars(Collections.singleton(pillarId));
     }
 
+    public void unregisterDestroyedFrame(String frameId) {
+        if (frameId == null) return;
+        PillarData removed = pillarData.remove(frameId);
+        if (removed == null) return;
+        positionIndex.values().removeIf(frameId::equals);
+        if (pillarData.isEmpty()) allowEmptySave = true;
+        saveImmediate();
+    }
+
     public void removePillarData(String pillarId) {
         removePillar(pillarId);
     }

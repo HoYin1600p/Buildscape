@@ -100,7 +100,7 @@ public final class ItemFrameParticleHandler {
                 CompoundTag data = Services.PLATFORM.getEntityData(entity);
                 String frameId = Services.PLATFORM.getTagString(data, FRAME_ID_KEY, null);
                 if (frameId != null && !frameId.isEmpty()) {
-                    PillarIdManager.get(level).removePillar(frameId);
+                    PillarIdManager.get(level).unregisterDestroyedFrame(frameId);
                     clearCaches(entity.getId());
                 }
             }

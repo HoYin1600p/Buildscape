@@ -2956,7 +2956,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             renderJarFluid(blockEntity, poseStack, mbs, light, combinedOverlay);
         } else if (!blockEntity.isEmpty()) {
             ItemStack storedItem = blockEntity.getStoredItem();
-            if (storedItem != null && !storedItem.isEmpty()) {
+            if (storedItem != null && !storedItem.isEmpty()
+                    && !(storedItem.getItem() instanceof com.kingodogo.buildscape.item.GlassJarItem)) {
                 int count = storedItem.getCount();
                 int renderCount = Math.min(32, count);
 

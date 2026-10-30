@@ -40,17 +40,7 @@ public final class FrostRoseDropHandler {
         Block frostRoseBlock = Services.PLATFORM.getBlock(new CommonId("buildscape", "frost_rose"));
         if (frostRoseBlock == null || frostRoseBlock == Blocks.AIR) return;
 
-        ItemStack frostRose = new ItemStack(frostRoseBlock);
-        ItemEntity itemEntity = new ItemEntity(
-                level,
-                deathPos.getX() + 0.5,
-                deathPos.getY() + 0.5,
-                deathPos.getZ() + 0.5,
-                frostRose
-        );
-        level.addFreshEntity(itemEntity);
-
-        TRACKED_DEATHS.add(new TrackedDeath(level.dimension(), deathPos, deathX, deathY, deathZ, 20));
+        TRACKED_DEATHS.add(new TrackedDeath(level.dimension(), deathPos, deathX, deathY, deathZ, entity, 20));
         // Fabric's AFTER_DEATH callback runs after vanilla has already created its rose.
         for (ItemEntity drop : level.getEntitiesOfClass(ItemEntity.class,
                 entity.getBoundingBox().inflate(2.0), FrostRoseDropHandler::shouldCancelItemSpawn)) {
@@ -97,6 +87,19 @@ public final class FrostRoseDropHandler {
                 continue;
             }
 
+            if (death.dropPending) {
+                if (!death.entity.isDeadOrDying()) {
+                    it.remove();
+                    continue;
+                }
+                Block frostRose = Services.PLATFORM.getBlock(new CommonId("buildscape", "frost_rose"));
+                if (frostRose != null && frostRose != Blocks.AIR) {
+                    level.addFreshEntity(new ItemEntity(level, death.pos.getX() + 0.5,
+                            death.pos.getY() + 0.5, death.pos.getZ() + 0.5, new ItemStack(frostRose)));
+                }
+                death.dropPending = false;
+            }
+
             if (level.getBlockState(death.pos).is(Blocks.WITHER_ROSE)) {
                 level.removeBlock(death.pos, false);
                 it.remove();
@@ -116,14 +119,17 @@ public final class FrostRoseDropHandler {
         final ResourceKey<Level> dimension;
         final BlockPos pos;
         final double x, y, z;
+        final LivingEntity entity;
+        boolean dropPending = true;
         int ticksRemaining;
 
-        TrackedDeath(ResourceKey<Level> dimension, BlockPos pos, double x, double y, double z, int ticks) {
+        TrackedDeath(ResourceKey<Level> dimension, BlockPos pos, double x, double y, double z, LivingEntity entity, int ticks) {
             this.dimension = dimension;
             this.pos = pos;
             this.x = x;
             this.y = y;
             this.z = z;
+            this.entity = entity;
             this.ticksRemaining = ticks;
         }
     }

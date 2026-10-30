@@ -13,6 +13,28 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public final class ForgePlatformAdapter extends PlatformAdapterBase implements com.kingodogo.buildscape.world.GameRuleAccess {
+    @Override public int beforeHammerReplacement(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos,
+            net.minecraft.world.level.block.state.BlockState replacement) {
+        net.minecraft.server.level.ServerLevel level = player.getLevel();
+        int experience = net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos);
+        if (experience < 0) return -1;
+        net.minecraftforge.common.util.BlockSnapshot snapshot = net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos);
+        net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent event = new net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent(snapshot, level.getBlockState(pos.below()), player) {
+            @Override public net.minecraft.world.level.block.state.BlockState getState() { return replacement; }
+            @Override public net.minecraft.world.level.block.state.BlockState getPlacedBlock() { return replacement; }
+        };
+        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) {
+            player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(level, pos));
+            return -1;
+        }
+        return experience;
+    }
+
+    @Override public void awardHammerExperience(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos, int experience) {
+        if (!player.isCreative() && experience > 0 && player.getLevel().getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOBLOCKDROPS)) {
+            net.minecraft.world.entity.ExperienceOrb.award(player.getLevel(), net.minecraft.world.phys.Vec3.atCenterOf(pos), experience);
+        }
+    }
     @Override public void registerMenuScreens() {
         if (!isClient()) return;
         com.kingodogo.buildscape.adapter.v118x.GuiProvider.registerMenuScreens(menuScreenRegistrar());

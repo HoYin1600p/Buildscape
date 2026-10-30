@@ -84,6 +84,9 @@ public class HammerReplacePacket implements CommonPacket {
         BlockState newState = replacementBlock.defaultBlockState();
         if (isMultiBlockPart(newState) || !newState.canSurvive(level, pos)) return;
 
+        int experience = Services.PLATFORM.beforeHammerReplacement(serverPlayer, pos, newState);
+        if (experience < 0 || level.getBlockState(pos) != targetState) return;
+
         BlockEntity blockEntity = level.getBlockEntity(pos);
         List<ItemStack> drops = Services.PLATFORM.hammerDrops(level, pos, targetState, blockEntity, serverPlayer, hammerStack, tier);
 
@@ -97,6 +100,7 @@ public class HammerReplacePacket implements CommonPacket {
         for (ItemStack drop : drops) {
             Block.popResource(level, pos, drop);
         }
+        Services.PLATFORM.awardHammerExperience(serverPlayer, pos, experience);
 
         if (!serverPlayer.isCreative()) {
             Services.PLATFORM.hurtAndBreak(hammerStack, 1, serverPlayer, InteractionHand.MAIN_HAND);

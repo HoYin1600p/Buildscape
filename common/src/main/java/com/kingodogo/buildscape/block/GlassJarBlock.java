@@ -14,6 +14,7 @@ import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -30,8 +31,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Random;
+
 public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, ICommonInteractable {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty GLOWING = BooleanProperty.create("glowing");
 
     protected static final VoxelShape SHAPE = Shapes.or(
             Block.box(4.0D, 0.0D, 4.0D, 12.0D, 12.0D, 12.0D),
@@ -40,13 +45,13 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
     );
 
     public GlassJarBlock(BlockBehaviour.Properties properties) {
-        super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false));
+        super(properties.lightLevel(state -> state.getValue(GLOWING) ? 15 : 0));
+        this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false).setValue(GLOWING, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WATERLOGGED);
+        builder.add(WATERLOGGED, GLOWING);
     }
 
     @Override
@@ -73,6 +78,13 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new GlassJarBlockEntity(pos, state);
+    }
+
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+        if (level.getBlockEntity(pos) instanceof GlassJarBlockEntity jar) {
+            jar.updateGlowingState();
+        }
     }
 
     @Override

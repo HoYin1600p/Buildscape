@@ -18,7 +18,9 @@ import com.kingodogo.buildscape.block.entity.IDataSerializable;
 import com.kingodogo.buildscape.block.entity.DataBlockEntity;
 import com.kingodogo.buildscape.platform.Services;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.Level;
 public class GlassJarBlockEntity extends DataBlockEntity implements IDataSerializable {
     public static final int MAX_LIQUID_LEVEL = 16;
     public static final int XP_BOTTLE_MAX = 3;
@@ -50,6 +52,10 @@ public class GlassJarBlockEntity extends DataBlockEntity implements IDataSeriali
     }
     public static int getLiquidCap(ItemStack stack) {
         return isXpLiquid(stack) ? XP_BOTTLE_MAX : MAX_LIQUID_LEVEL;
+    }
+    static boolean shouldGlow(ItemStack liquid, int liquidLevel) {
+        return liquidLevel > 0 && liquid != null && !liquid.isEmpty()
+                && (isXpLiquid(liquid) || liquid.is(Items.LAVA_BUCKET));
     }
     public boolean isBucketLiquid() {
         if (!hasLiquid()) return false;
@@ -260,8 +266,32 @@ public class GlassJarBlockEntity extends DataBlockEntity implements IDataSeriali
     public void sync() {
         setChanged();
         if (level != null && !level.isClientSide()) {
+            updateGlowingState();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
+    }
+
+    void updateGlowingState() {
+        if (level == null || level.isClientSide() || level.getBlockEntity(worldPosition) != this) {
+            return;
+        }
+        BlockState state = level.getBlockState(worldPosition);
+        boolean glowing = shouldGlow(storedLiquidItem, liquidLevel);
+        if (state.getBlock() instanceof GlassJarBlock && state.getValue(GlassJarBlock.GLOWING) != glowing) {
+            level.setBlock(worldPosition, state.setValue(GlassJarBlock.GLOWING, glowing), Block.UPDATE_ALL);
+        }
+    }
+
+    private void scheduleGlowingUpdate() {
+        if (level != null && !level.isClientSide()) {
+            level.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
+        }
+    }
+
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+        scheduleGlowingUpdate();
     }
 
     @Override
@@ -281,6 +311,7 @@ public class GlassJarBlockEntity extends DataBlockEntity implements IDataSeriali
             this.liquidLevel = Math.max(0, Math.min(getLiquidCap(this.storedLiquidItem), data.getIntOr("LiquidLevel", 0)));
         }
         this.wobbleStartedAtTick = data.getLongOr("WobbleStartTick", 0L);
+        scheduleGlowingUpdate();
     }
 
     @Override

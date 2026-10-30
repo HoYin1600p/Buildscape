@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.block.ExperienceFluidBlock;
+import com.kingodogo.buildscape.block.CushionBlock;
+import com.kingodogo.buildscape.block.CushionSupport;
 import com.kingodogo.buildscape.fluid.ModFluids;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
@@ -18,9 +20,25 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
+
+    @Inject(method = "getOnPos", at = @At("RETURN"), cancellable = true)
+    private void buildscape$cushionOnPos(CallbackInfoReturnable<BlockPos> callback) {
+        Entity self = (Entity) (Object) this;
+        Level level = Services.PLATFORM.getEntityLevel(self);
+        if (level == null) {
+            return;
+        }
+        BlockPos vanilla = callback.getReturnValue();
+        BlockPos fixed = CushionSupport.supportingPos(vanilla, self.getX(), self.getY(), self.getZ(),
+                pos -> level.getBlockState(pos).getBlock() instanceof CushionBlock);
+        if (!fixed.equals(vanilla)) {
+            callback.setReturnValue(fixed);
+        }
+    }
 
     @Inject(method = "move", at = @At("TAIL"))
     private void onMove(

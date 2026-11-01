@@ -19,7 +19,7 @@ dependencies {
 }
 
 // common/src/26.3/resources overlays the 26.2 resources: copy only the main files it leaves alone.
-apply from: rootProject.file('gradle/v263-resources.gradle')
+apply from: rootProject.file('gradle/26.3/resources.gradle')
 // The dev run reads the mixin config and the other overlay files from this module's own resources folder,
 // so the overlay is copied here too; the jar then drops the overlay copies carried by the common variant.
 tasks.named('processResources') {

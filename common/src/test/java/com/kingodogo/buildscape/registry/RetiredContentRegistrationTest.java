@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class RetiredContentRegistrationTest {
     private static Path repositoryRoot() {
         for (Path path = Path.of("").toAbsolutePath(); path != null; path = path.getParent()) {
-            if (Files.isRegularFile(path.resolve("sync/removals26x.json"))) return path;
+            if (Files.isRegularFile(path.resolve("sync/26.2/removals.json"))) return path;
         }
-        throw new IllegalStateException("Cannot locate sync/removals26x.json");
+        throw new IllegalStateException("Cannot locate sync/26.2/removals.json");
     }
 
     private static List<String> ids(String source, String expression) {
@@ -35,7 +35,7 @@ class RetiredContentRegistrationTest {
     @Test
     void gatedRegistrationsMatchTheRetirementManifestAndReferenceOrder() throws Exception {
         Path root = repositoryRoot();
-        var manifest = JsonParser.parseString(Files.readString(root.resolve("sync/removals26x.json")))
+        var manifest = JsonParser.parseString(Files.readString(root.resolve("sync/26.2/removals.json")))
                 .getAsJsonObject().getAsJsonArray("removed_ids");
         for (String kind : List.of("block", "item")) {
             var expected = new LinkedHashSet<String>();
@@ -50,7 +50,7 @@ class RetiredContentRegistrationTest {
             String source = Files.readString(root.resolve("common/src/main/" + sourcePath));
             String gate = kind.equals("block") ? "regV118x" : "registerV118x";
             List<String> actual = ids(source, "\\b" + gate + "\\(\\\"([^\\\"]+)\\\"");
-            assertEquals(expected, new LinkedHashSet<>(actual), kind + " registrations differ from removals26x.json");
+            assertEquals(expected, new LinkedHashSet<>(actual), kind + " registrations differ from the removal policy");
             assertEquals(expected.size(), actual.size(), kind + " registrations contain duplicates");
             assertTrue(source.contains("if (!Services.isVersionCluster(\"v118x\") && (!Services.isVersionCluster(\"v121x\")"));
             assertTrue(source.contains("ContentRemovalPolicy.removes(\"v121x\", " + (kind.equals("block") ? "id" : "name") + ")"));
@@ -89,7 +89,7 @@ class RetiredContentRegistrationTest {
         ModItems.init();
         ModEntities.init();
         Path root = repositoryRoot();
-        var manifest = JsonParser.parseString(Files.readString(root.resolve("sync/removals26x.json")))
+        var manifest = JsonParser.parseString(Files.readString(root.resolve("sync/26.2/removals.json")))
                 .getAsJsonObject().getAsJsonArray("removed_ids");
         var registered = new LinkedHashSet<String>();
         Services.REGISTERED_BLOCKS.forEach(entry -> registered.add(entry.getId().toString()));

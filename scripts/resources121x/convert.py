@@ -172,7 +172,7 @@ def unsupported_loot_functions(data):
 
 
 def removals(path=None):
-    manifest = load(Path(path) if path else REPO / "sync/removals121x.json")
+    manifest = load(Path(path) if path else REPO / "sync/1.21.1/removals.json")
     if manifest["schema_version"] != 1 or manifest["target"] != "mc1.21.1":
         raise ValueError("Expected 1.21.1 removal manifest")
     result = {}

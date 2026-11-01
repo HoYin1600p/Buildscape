@@ -64,7 +64,7 @@ class ContentRemovalPolicyTest {
 
     private static Path repositoryRoot() {
         Path root = Path.of("").toAbsolutePath();
-        while (root != null && !Files.isRegularFile(root.resolve("sync/removals121x.json"))) {
+        while (root != null && !Files.isRegularFile(root.resolve("sync/1.21.1/removals.json"))) {
             root = root.getParent();
         }
         assertNotNull(root, "Cannot find repository removal manifests");

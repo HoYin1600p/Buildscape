@@ -162,7 +162,7 @@ def metadata(path):
 
 
 # mc26.2 predates the registry key; every other target must declare removal_policy explicitly.
-LEGACY_REMOVAL_POLICIES = {"mc26.2": {"file": "sync/removals26x.json", "inherits": "mc26.2"}}
+LEGACY_REMOVAL_POLICIES = {"mc26.2": {"file": "sync/26.2/removals.json", "inherits": "mc26.2"}}
 
 
 def inherited_policy(policy, spec, target):
@@ -528,7 +528,7 @@ def update_ledger(worktree, plan, target, fields, rows, conflicts=()):
             continue
         if c["classification"] == "retired":
             row["active_paths"] = "n/a"
-            row["verification"] = "Retired by sync/removals26x.json; source " + plan["source_commit"]
+            row["verification"] = "Retired by sync/26.2/removals.json; source " + plan["source_commit"]
         elif c["classification"] == "automatic":
             row["reference_path"] = c["path"]
             if c["kind"] == "java":

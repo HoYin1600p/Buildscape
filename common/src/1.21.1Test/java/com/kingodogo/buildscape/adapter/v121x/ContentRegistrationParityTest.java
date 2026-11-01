@@ -47,7 +47,7 @@ class ContentRegistrationParityTest {
             missing.removeAll(actual);
             var extra = new TreeSet<>(actual);
             extra.removeAll(expected);
-            assertTrue(missing.isEmpty() && extra.isEmpty(), kind + " registry differs from main minus removals121x.json; missing "
+            assertTrue(missing.isEmpty() && extra.isEmpty(), kind + " registry differs from main minus the removal policy; missing "
                     + missing.size() + ": " + missing + "; unexpected " + extra.size() + ": " + extra);
         }
     }
@@ -62,7 +62,7 @@ class ContentRegistrationParityTest {
 
     private static Path repositoryRoot() {
         for (Path root = Path.of("").toAbsolutePath(); root != null; root = root.getParent()) {
-            if (Files.isRegularFile(root.resolve("sync/removals121x.json"))) return root;
+            if (Files.isRegularFile(root.resolve("sync/1.21.1/removals.json"))) return root;
         }
         throw new IllegalStateException("Cannot locate reference registration sources");
     }

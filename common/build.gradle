@@ -95,7 +95,7 @@ if (v263Enabled) {
             resources.srcDirs = ['src/26.3/resources', 'src/main/resources']
         }
     }
-    apply from: rootProject.file('gradle/v263-resources.gradle')
+    apply from: rootProject.file('gradle/26.3/resources.gradle')
     tasks.named('processV263Resources') {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         exclude v263RetiredMainResources

@@ -130,7 +130,7 @@
       "state_file": "sync/state/mc26.3.json",
       "mc_jar": "ref/artifacts/minecraft-26.3.jar",
       "removal_policy": {
-        "file": "sync/removals26x.json",
+        "file": "sync/26.2/removals.json",
         "inherits": "mc26.2",
         "inherited_resource_root": "common/src/main/resources"
       },

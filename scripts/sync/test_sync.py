@@ -290,7 +290,7 @@ if (Path.cwd() / 'fail-validation').exists():
                   "removed_ids": [{"id": "buildscape:copper_rod",
                                    "vanilla_equivalent": "minecraft:lightning_rod"}],
                   "excluded_target_paths": ["common/" + model]}
-        self.write(self.repo, "sync/removals26x.json", json.dumps(policy))
+        self.write(self.repo, "sync/26.2/removals.json", json.dumps(policy))
         self.write(self.repo, "sync/targets.json", json.dumps(self.config))
         self.write(self.repo, "tools/convert.py", (self.repo / "tools/convert.py").read_text() + """
 # A converter may synthesize modern item definitions from old item models.
@@ -432,7 +432,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertIn("26.3", target["validation"][0])
         self.assertIn("build263", target["validation"][1])
         self.assertIn("-Pbuildscape.v263=true", target["validation"][1])
-        self.assertEqual(target["removal_policy"]["file"], "sync/removals26x.json")
+        self.assertEqual(target["removal_policy"]["file"], "sync/26.2/removals.json")
         self.assertEqual(target["removal_policy"]["inherits"], "mc26.2")
         # 26.2 keeps its legacy, implicit policy and its own roots.
         old = next(t for t in config["targets"] if t["id"] == "mc26.2")
@@ -490,13 +490,13 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         retired, model, base, policy = self.policy_files()
         target = self.config["targets"][0]
         target.update(id="mc26.2", base_commit=base)
-        self.write(self.repo, "sync/removals26x.json", json.dumps(policy))
+        self.write(self.repo, "sync/26.2/removals.json", json.dumps(policy))
         self.write(self.repo, "sync/targets.json", json.dumps(self.config))
         commit = self.commit(self.repo, "Record removal policy")
         self.git(self.repo, "branch", "-f", "port/test", commit)
         self.assertEqual(sync.removal_policy(self.repo, target), policy)
         # A policy approved for another target is rejected instead of silently applied.
-        self.write(self.repo, "sync/removals26x.json", json.dumps(dict(policy, target="other")))
+        self.write(self.repo, "sync/26.2/removals.json", json.dumps(dict(policy, target="other")))
         commit = self.commit(self.repo, "Wrong policy owner")
         self.git(self.repo, "branch", "-f", "port/test", commit)
         with self.assertRaisesRegex(sync.SyncError, "Invalid mc26.2 removal policy"):
@@ -508,9 +508,9 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         target.update(id="mc26.3", base_commit=base, version_cluster="v263", version_clusters=["v263"],
                       java_roots=["common/src/main/java", "common/src/26.3/java"],
                       resource_root="common/src/26.3/resources", ledger_coverage=["263"],
-                      removal_policy={"file": "sync/removals26x.json", "inherits": "mc26.2",
+                      removal_policy={"file": "sync/26.2/removals.json", "inherits": "mc26.2",
                                       "inherited_resource_root": "common/src/main/resources"})
-        self.write(self.repo, "sync/removals26x.json", json.dumps(policy))
+        self.write(self.repo, "sync/26.2/removals.json", json.dumps(policy))
         self.write(self.repo, "sync/targets.json", json.dumps(self.config))
         self.write(self.repo, "tools/convert.py", (self.repo / "tools/convert.py").read_text() + """
 # A converter may synthesize modern item definitions from old item models.
@@ -634,7 +634,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
             self.write(self.repo, dest, (self.repo / old).read_bytes())
             (self.repo / old).unlink()
         # A removal on 26.2 must not retire a restored v118x counterpart.
-        self.write(self.repo, "sync/removals26x.json", json.dumps({"schema_version": 1, "target": "mc26.2",
+        self.write(self.repo, "sync/26.2/removals.json", json.dumps({"schema_version": 1, "target": "mc26.2",
             "removed_ids": [], "excluded_target_paths": ["common/" + self.java + "Same.java"]}))
         self.write(self.repo, "sync/targets.json", json.dumps(self.config))
         commit = self.commit(self.repo, "Cluster roots")

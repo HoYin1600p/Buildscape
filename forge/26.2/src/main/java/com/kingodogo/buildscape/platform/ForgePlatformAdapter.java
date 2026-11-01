@@ -10,6 +10,7 @@ public class ForgePlatformAdapter extends PlatformAdapterBase {
         if (experience < 0) return -1;
         net.minecraftforge.common.util.BlockSnapshot snapshot = net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos);
         net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event = new net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent(snapshot, level.getBlockState(pos.below()), player);
+        ((com.kingodogo.buildscape.mixin.forge.PlacementEventAccessor) (Object) event).buildscape$setPlacedBlock(replacement);
         if (net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent.BUS.post(event)) {
             player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(pos, level.getBlockState(pos)));
             return -1;

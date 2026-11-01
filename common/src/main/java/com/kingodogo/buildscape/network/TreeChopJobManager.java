@@ -107,7 +107,10 @@ public final class TreeChopJobManager {
                 if (i % 3 == 0) {
                     level.levelEvent(2001, pos, Block.getId(state));
                 }
-                level.destroyBlock(pos, false);
+                net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
+                if (level.destroyBlock(pos, false)) {
+                    com.kingodogo.buildscape.platform.Services.PLATFORM.afterTreeChopBlock(player, pos, state, blockEntity);
+                }
             }
 
             currentIndex = end;

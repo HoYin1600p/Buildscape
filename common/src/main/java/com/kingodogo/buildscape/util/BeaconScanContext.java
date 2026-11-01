@@ -66,18 +66,22 @@ public final class BeaconScanContext {
     }
 
     public static synchronized int confirmedHeight(Level level, BlockPos beaconPos) {
+        return confirmedHeight(level, beaconPos, null);
+    }
+
+    public static synchronized int confirmedHeight(Level level, BlockPos beaconPos, java.util.function.Predicate<BlockState> stopper) {
         long gameTime = level.getGameTime();
         Map<BlockPos, CachedHeight> heights = CLIENT_HEIGHTS.computeIfAbsent(level, ignored -> new HashMap<>());
         CachedHeight cached = heights.get(beaconPos);
         if (cached != null && cached.validUntil > gameTime) {
             return cached.height;
         }
-        int height = scanHeight(level, beaconPos);
+        int height = scanHeight(level, beaconPos, stopper);
         heights.put(beaconPos.immutable(), new CachedHeight(height, gameTime + 20L));
         return height;
     }
 
-    private static int scanHeight(Level level, BlockPos beaconPos) {
+    private static int scanHeight(Level level, BlockPos beaconPos, java.util.function.Predicate<BlockState> stopper) {
         int top = level.getHeight(Heightmap.Types.WORLD_SURFACE, beaconPos.getX(), beaconPos.getZ());
         Block tintedOrnament = Services.PLATFORM.getBlock(TINTED_ORNAMENT_ID);
         Block bigTintedOrnament = Services.PLATFORM.getBlock(BIG_TINTED_ORNAMENT_ID);
@@ -85,7 +89,8 @@ public final class BeaconScanContext {
         for (int y = beaconPos.getY() + 1; y <= top; y++) {
             scanPos.set(beaconPos.getX(), y, beaconPos.getZ());
             BlockState state = level.getBlockState(scanPos);
-            if ((tintedOrnament != null && state.is(tintedOrnament))
+            if ((stopper != null && stopper.test(state))
+                    || (tintedOrnament != null && state.is(tintedOrnament))
                     || (bigTintedOrnament != null && state.is(bigTintedOrnament))) {
                 return y - beaconPos.getY();
             }

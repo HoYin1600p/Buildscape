@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.adapter.v118x.client;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import com.kingodogo.buildscape.mixin.SpriteV118xAccessor;
+import com.kingodogo.buildscape.mixin.SpriteAccessor;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -16,7 +16,7 @@ record HazeTextureBounds(float minU, float maxU, float minV, float maxV) {
     static HazeTextureBounds forSprite(TextureAtlasSprite sprite, int cutoff) {
         Coverage cached = CACHE.get(sprite);
         if (cached == null) {
-            var image = ((SpriteV118xAccessor) sprite).buildscape$getImages()[0];
+            var image = ((SpriteAccessor) sprite).buildscape$getImages()[0];
             int columns = image.getWidth() / sprite.getWidth();
             int[] alpha = readAlpha(sprite.getWidth(), sprite.getHeight(), sprite.getUniqueFrames().toArray(),
                     (frame, x, y) -> image.getPixelRGBA((frame % columns) * sprite.getWidth() + x,

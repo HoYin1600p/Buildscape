@@ -141,7 +141,7 @@ public final class MixinClientHooks {
     }
 
     private static void addWidgetToScreen(net.minecraft.client.gui.screens.Screen screen, AbstractWidget widget) {
-        ((com.kingodogo.buildscape.mixin.ScreenV118xInvoker) screen).buildscape$addRenderableWidget(widget);
+        ((com.kingodogo.buildscape.mixin.ScreenInvoker) screen).buildscape$addRenderableWidget(widget);
     }
 
     public void addPauseScreenButton(PauseScreen screen, int width, int height, List<? extends GuiEventListener> children) {
@@ -229,7 +229,8 @@ public final class MixinClientHooks {
     }
 
     public void renderClippedBeaconBeam(BeaconBlockEntity blockEntity, float partialTicks, PoseStack poseStack, Object bufferSourceObj, int combinedLight, int combinedOverlay) {
-        int cutoff = BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos());
+        int cutoff = BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos(),
+                com.kingodogo.buildscape.util.BeaconBeamStoppers::isStopper);
         if (cutoff >= BeaconBeamScanState.UNLIMITED) return;
         MultiBufferSource bufferSource = (MultiBufferSource) bufferSourceObj;
 
@@ -281,7 +282,7 @@ public final class MixinClientHooks {
             AnvilMenu menu = screen.getMenu();
             if (menu.getCost() == 0 && menu.getSlot(2).hasItem()) {
                 Font font = Minecraft.getInstance().font;
-                int imageWidth = ((com.kingodogo.buildscape.mixin.ContainerScreenV118xAccessor) screen).buildscape$getImageWidth();
+                int imageWidth = ((com.kingodogo.buildscape.mixin.ContainerScreenAccessor) screen).buildscape$getImageWidth();
                 Component component = new TranslatableComponent("container.repair.cost", 0);
                 int k = imageWidth - 8 - font.width(component) - 2;
                 GuiComponentBridge.fill(ps, k - 2, 67, imageWidth - 8, 79, 0x4F000000);
@@ -689,7 +690,7 @@ public final class MixinClientHooks {
 
         try {
             ModelBakery bakery = (ModelBakery) bakeryObj;
-            var access = (com.kingodogo.buildscape.mixin.ModelBakeryV118xAccessor) bakery;
+            var access = (com.kingodogo.buildscape.mixin.ModelBakeryAccessor) bakery;
             Map<ResourceLocation, ?> topLevelModels = access.buildscape$getTopLevelModels();
 
             List<ResourceLocation> candidates = topLevelModels.keySet().stream()
@@ -780,9 +781,9 @@ public final class MixinClientHooks {
     public void handleFireworkStarterTick(Object starterObj) {
         if (!(starterObj instanceof net.minecraft.client.particle.Particle particle)) return;
         try {
-            var particleAccess = (com.kingodogo.buildscape.mixin.ParticleV118xAccessor) particle;
+            var particleAccess = (com.kingodogo.buildscape.mixin.ParticleAccessor) particle;
             if (particleAccess.buildscape$getAge() != 0) return;
-            if (!(starterObj instanceof com.kingodogo.buildscape.mixin.FireworkStarterV118xAccessor starter)) return;
+            if (!(starterObj instanceof com.kingodogo.buildscape.mixin.FireworkStarterAccessor starter)) return;
             net.minecraft.nbt.ListTag explosions = starter.buildscape$getExplosions();
             if (explosions == null || explosions.isEmpty()) return;
 

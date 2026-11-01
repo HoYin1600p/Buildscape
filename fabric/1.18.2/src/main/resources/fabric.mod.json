@@ -23,7 +23,7 @@
   "accessWidener": "buildscape.accesswidener",
   "mixins": [
     "buildscape.mixins.json",
-    "buildscape.fabric118x.mixins.json"
+    "buildscape.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.16.14",

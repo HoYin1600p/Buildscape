@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
-import com.kingodogo.buildscape.adapter.v118x.RegistrationOrder118x;
+import com.kingodogo.buildscape.adapter.v118x.RegistrationOrder;
 import com.kingodogo.buildscape.item.ModCreativeTabs;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
@@ -52,7 +52,7 @@ public final class ForgeRegistryAdapter extends BaseRegistryAdapter {
         bind(bus, Item.class, Registry.ITEM, () -> {
             initItems();
             // DeferredRegister preserves enqueue order; vanilla search uses Registry.ITEM order.
-            registerTo(Registry.ITEM, RegistrationOrder118x.orderedItems(modItems));
+            registerTo(Registry.ITEM, RegistrationOrder.orderedItems(modItems));
         });
         bind(bus, BlockEntityType.class, Registry.BLOCK_ENTITY_TYPE,
                 () -> { initBlockEntities(); registerTo(Registry.BLOCK_ENTITY_TYPE, modBlockEntities); });

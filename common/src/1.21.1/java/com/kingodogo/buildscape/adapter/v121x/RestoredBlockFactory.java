@@ -176,7 +176,7 @@ final class RestoredBlockFactory {
                 // The base is never registered; drop its intrusive holder so the registry freeze accepts the set.
                 // Unit tests run without mixins, so the accessor is only present in the game.
                 if ((Object) net.minecraft.core.registries.BuiltInRegistries.BLOCK
-                        instanceof com.kingodogo.buildscape.mixin.MappedRegistryV121xAccessor<?> accessor) {
+                        instanceof com.kingodogo.buildscape.mixin.MappedRegistryAccessor<?> accessor) {
                     var holders = accessor.buildscape$unregisteredIntrusiveHolders();
                     if (holders != null) holders.remove(base);
                 }

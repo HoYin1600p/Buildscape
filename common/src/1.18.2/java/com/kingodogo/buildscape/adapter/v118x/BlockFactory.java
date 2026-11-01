@@ -206,7 +206,7 @@ public class BlockFactory implements IBlockFactory {
         }
 
         private static WoodType createRegistered(String name) {
-            return com.kingodogo.buildscape.mixin.WoodTypeV118xInvoker.buildscape$register(new CustomWoodType(name));
+            return com.kingodogo.buildscape.mixin.WoodTypeInvoker.buildscape$register(new CustomWoodType(name));
         }
     }
     // Block setup initializes this factory before the client builds its sign models.
@@ -246,7 +246,7 @@ public class BlockFactory implements IBlockFactory {
                 return new com.kingodogo.buildscape.block.HazeBushBlock(color, props.noCollission().instabreak().sound(SoundType.GRASS)) {
                     @Override public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
                         super.animateTick(state, level, pos, random);
-                        HazeAnimation118x.animate(state, level, pos, random);
+                        HazeAnimation.animate(state, level, pos, random);
                     }
                     @Override public net.minecraft.world.item.BlockItem createHazeItem(net.minecraft.world.item.Item.Properties properties) {
                         return new HazeBushItem(this, properties);
@@ -268,7 +268,7 @@ public class BlockFactory implements IBlockFactory {
                 return new com.kingodogo.buildscape.block.PottedHazeBushBlock(color, plant, props) {
                     @Override public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
                         super.animateTick(state, level, pos, random);
-                        HazeAnimation118x.animate(state, level, pos, random);
+                        HazeAnimation.animate(state, level, pos, random);
                     }
                     @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
                             InteractionHand hand, BlockHitResult hit) {

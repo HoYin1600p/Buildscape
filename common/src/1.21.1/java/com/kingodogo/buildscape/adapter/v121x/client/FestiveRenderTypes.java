@@ -80,7 +80,7 @@ public final class FestiveRenderTypes extends RenderType {
     // RenderType's public constructor with the same ordered setup/clear as CompositeRenderType.
     private static RenderType createFestive(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize,
                                             boolean affectsCrumbling, boolean sortOnUpload, RenderType.CompositeState state) {
-        var states = ((com.kingodogo.buildscape.mixin.RenderCompositeStateV121xAccessor) (Object) state).buildscape$getStates();
+        var states = ((com.kingodogo.buildscape.mixin.RenderCompositeStateAccessor) (Object) state).buildscape$getStates();
         float[] previousGlintAlpha = new float[1];
         return new FestiveRenderTypes(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload,
                 () -> {

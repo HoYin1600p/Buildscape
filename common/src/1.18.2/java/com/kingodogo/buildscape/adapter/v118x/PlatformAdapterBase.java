@@ -168,7 +168,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public Item.Properties prepareItemProperties(CommonId id, Item.Properties properties) {
-        return properties.tab(CreativeTabs118x.tabFor(id));
+        return properties.tab(CreativeTabs.tabFor(id));
     }
     @Override
     public void dropPlayerItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.item.ItemStack stack, boolean randomThrow) {
@@ -946,7 +946,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public CreativeModeTab createCreativeTab(CommonId tabId, String titleKey, Supplier<ItemStack> iconSupplier, List<String> orderedItemIds, Map<String, Item> items) {
-        return CreativeTabs118x.configure(iconSupplier, orderedItemIds, items);
+        return CreativeTabs.configure(iconSupplier, orderedItemIds, items);
     }
 
     @Override
@@ -976,7 +976,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public net.minecraft.world.item.BlockItem createTrophyBlockItem(com.kingodogo.buildscape.trophy.TrophyBlock block, com.kingodogo.buildscape.trophy.TrophyDefinition definition, Item.Properties properties) {
         return new com.kingodogo.buildscape.trophy.TrophyBlockItem(block, definition,
-                properties.tab(CreativeTabs118x.tabFor(new CommonId("buildscape", definition.getId())))) {
+                properties.tab(CreativeTabs.tabFor(new CommonId("buildscape", definition.getId())))) {
             @Override
             public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
                 super.appendHoverText(stack, level, tooltip, flag);
@@ -3102,7 +3102,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     private final Map<String, double[]> v118xSpriteCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static com.mojang.blaze3d.platform.NativeImage getSpriteImage(net.minecraft.client.renderer.texture.TextureAtlasSprite sprite) {
-        var images = ((com.kingodogo.buildscape.mixin.SpriteV118xAccessor) sprite).buildscape$getImages();
+        var images = ((com.kingodogo.buildscape.mixin.SpriteAccessor) sprite).buildscape$getImages();
         return images != null && images.length > 0 ? images[0] : null;
     }
 

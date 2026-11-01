@@ -25,6 +25,11 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
     }
 
     @Override
+    public int buildscape$getPendingBeamHeight() {
+        return this.buildscape$beamScanState.pendingHeight();
+    }
+
+    @Override
     public void buildscape$beginBeamScan() {
         this.buildscape$beamScanState.beginScan();
     }

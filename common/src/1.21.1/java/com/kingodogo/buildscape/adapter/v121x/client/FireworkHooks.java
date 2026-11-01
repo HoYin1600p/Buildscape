@@ -44,7 +44,7 @@ public final class FireworkHooks {
             }
         }
         if (!customShape) return;
-        var particleAccess = (com.kingodogo.buildscape.mixin.client.ParticleV121xAccessor) starter;
+        var particleAccess = (com.kingodogo.buildscape.mixin.client.ParticleAccessor) starter;
         float yaw;
         if (fireworks.contains("ShotYaw")) {
             yaw = fireworks.getFloat("ShotYaw");
@@ -63,7 +63,7 @@ public final class FireworkHooks {
         FireworkMetadata metadata = METADATA.get(starter);
         if (metadata == null || !(starter instanceof FireworkSparkAccess sparks)
                 || !(starter instanceof FireworkStarterAccess access)) return false;
-        var particleAccess = (com.kingodogo.buildscape.mixin.client.ParticleV121xAccessor) starter;
+        var particleAccess = (com.kingodogo.buildscape.mixin.client.ParticleAccessor) starter;
         int index = access.buildscape$life() / 2;
         if (index < 0 || index >= metadata.explosions().size()) return false;
         CompoundTag tag = metadata.explosions().getCompound(index);

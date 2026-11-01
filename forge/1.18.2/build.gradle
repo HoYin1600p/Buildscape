@@ -90,7 +90,7 @@ unimined.minecraft {
     minecraftForge {
         loader '40.3.12'
         useToolchains = false
-        mixinConfig(['buildscape.mixins.json', 'buildscape.forge118x.mixins.json'])
+        mixinConfig(['buildscape.mixins.json', 'buildscape.forge.mixins.json'])
         accessTransformer devAccessTransformer
     }
     mods {
@@ -161,7 +161,7 @@ tasks.named('jar', Jar) {
             'Implementation-Version': version.toString(),
             'Implementation-Vendor': 'kingodogo',
             'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            'MixinConfigs': 'buildscape.mixins.json,buildscape.forge118x.mixins.json'
+            'MixinConfigs': 'buildscape.mixins.json,buildscape.forge.mixins.json'
         ])
     }
     exclude { it.path.startsWith('.') || it.path.contains('..') }

@@ -33,7 +33,8 @@ public class BeaconBlockEntityRendererMixin {
             int combinedOverlay,
             CallbackInfo callback
     ) {
-        int cutoff = BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos());
+        int cutoff = BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos(),
+                com.kingodogo.buildscape.util.BeaconBeamStoppers::isStopper);
         if (cutoff >= BeaconBeamScanState.UNLIMITED) {
             return;
         }

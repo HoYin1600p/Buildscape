@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
-import com.kingodogo.buildscape.mixin.LivingEntityExperienceV118xAccessor;
+import com.kingodogo.buildscape.mixin.LivingEntityExperienceAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -34,7 +34,7 @@ public final class SculkCatalystHandler {
             return;
         }
 
-        LivingEntityExperienceV118xAccessor experience = (LivingEntityExperienceV118xAccessor) entity;
+        LivingEntityExperienceAccessor experience = (LivingEntityExperienceAccessor) entity;
         Player player = experience.buildscape$getLastHurtByPlayer();
         if (player == null && source != null && source.getEntity() instanceof Player killer) {
             player = killer;

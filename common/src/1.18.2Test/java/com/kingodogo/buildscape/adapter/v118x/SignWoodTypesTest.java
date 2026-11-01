@@ -40,7 +40,7 @@ class SignWoodTypesTest {
         int invocations = 0;
         for (var instruction : register.instructions) {
             if (instruction instanceof MethodInsnNode call
-                    && call.owner.equals("com/kingodogo/buildscape/mixin/WoodTypeV118xInvoker")
+                    && call.owner.equals("com/kingodogo/buildscape/mixin/WoodTypeInvoker")
                     && call.name.equals("buildscape$register")) invocations++;
         }
         assertEquals(1, invocations, "Registration must use the remapped invoker");

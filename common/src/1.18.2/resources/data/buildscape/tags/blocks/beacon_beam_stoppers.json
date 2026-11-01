@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:tinted_glass",
+    "buildscape:tinted_glass_slab",
+    "buildscape:tinted_glass_stairs",
+    "buildscape:tinted_glass_vertical_slab",
+    "buildscape:tinted_glass_ornament",
+    "buildscape:big_tinted_glass_ornament"
+  ]
+}

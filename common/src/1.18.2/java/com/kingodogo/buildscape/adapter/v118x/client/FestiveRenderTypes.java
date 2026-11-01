@@ -16,7 +16,7 @@ public class FestiveRenderTypes extends RenderType {
                                             RenderType.CompositeState state) {
         // These glint states do not participate in outlines. Use RenderType's compiled
         // constructor and the same ordered state setup/clear as CompositeRenderType.
-        var states = ((com.kingodogo.buildscape.mixin.RenderCompositeStateV118xAccessor) (Object) state).buildscape$getStates();
+        var states = ((com.kingodogo.buildscape.mixin.RenderCompositeStateAccessor) (Object) state).buildscape$getStates();
         return new FestiveRenderTypes(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload,
                 () -> states.forEach(RenderStateShard::setupRenderState),
                 () -> states.forEach(RenderStateShard::clearRenderState));

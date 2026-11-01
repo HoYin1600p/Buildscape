@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
-import com.kingodogo.buildscape.adapter.v118x.RegistrationOrder118x;
+import com.kingodogo.buildscape.adapter.v118x.RegistrationOrder;
 import com.kingodogo.buildscape.item.ModCreativeTabs;
 import com.kingodogo.buildscape.platform.Services;
 import net.minecraft.core.Registry;
@@ -17,7 +17,7 @@ public final class FabricRegistryAdapter extends BaseRegistryAdapter {
             initBlocks();
             registerTo(Registry.BLOCK, modBlocks);
             initItems();
-            registerTo(Registry.ITEM, RegistrationOrder118x.orderedItems(modItems));
+            registerTo(Registry.ITEM, RegistrationOrder.orderedItems(modItems));
             initBlockEntities();
             registerTo(Registry.BLOCK_ENTITY_TYPE, modBlockEntities);
             initEntities();

@@ -157,11 +157,11 @@ public final class RenderFactory {
         registerRenderers(new Registrar() {
             public <T extends BlockEntity> void registerBlockEntity(BlockEntityType<T> type,
                     net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<T> provider) {
-                com.kingodogo.buildscape.mixin.BlockEntityRenderersV118xInvoker.buildscape$register(type, provider);
+                com.kingodogo.buildscape.mixin.BlockEntityRenderersInvoker.buildscape$register(type, provider);
             }
             public <T extends Entity> void registerEntity(EntityType<T> type,
                     net.minecraft.client.renderer.entity.EntityRendererProvider<T> provider) {
-                com.kingodogo.buildscape.mixin.EntityRenderersV118xInvoker.buildscape$register(type, provider);
+                com.kingodogo.buildscape.mixin.EntityRenderersInvoker.buildscape$register(type, provider);
             }
         });
     }

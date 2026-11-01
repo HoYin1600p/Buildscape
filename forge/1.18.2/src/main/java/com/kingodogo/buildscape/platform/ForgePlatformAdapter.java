@@ -13,6 +13,14 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public final class ForgePlatformAdapter extends PlatformAdapterBase implements com.kingodogo.buildscape.world.GameRuleAccess {
+    @Override public boolean canRotateBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = player.getLevel();
+        boolean canceled = net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,
+                net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos), net.minecraft.core.Direction.UP);
+        if (canceled) player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(level, pos));
+        return !canceled;
+    }
+
     @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
         return net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(player.getLevel(),
                 player.gameMode.getGameModeForPlayer(), player, pos) >= 0;

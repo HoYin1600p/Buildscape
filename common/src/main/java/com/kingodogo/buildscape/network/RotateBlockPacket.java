@@ -94,10 +94,16 @@ public class RotateBlockPacket implements CommonPacket {
         BlockState newState = calculateRotatedState(state, direction, serverPlayer.getDirection());
 
         if (!newState.equals(state)) {
-            level.setBlock(pos, newState, 3);
-            level.updateNeighborsAt(pos, state.getBlock());
-            level.updateNeighborsAt(pos, newState.getBlock());
-            level.updateNeighbourForOutputSignal(pos, newState.getBlock());
+            if (!com.kingodogo.buildscape.platform.Services.PLATFORM.canRotateBlock(serverPlayer, pos)) return;
+            if (state.getBlock() instanceof com.kingodogo.buildscape.block.HollowPipeBlock pipe
+                    && newState.hasProperty(BlockStateProperties.AXIS)) {
+                pipe.setAxisAndRefresh(level, pos, state, newState.getValue(BlockStateProperties.AXIS));
+            } else {
+                if (!level.setBlock(pos, newState, 3)) return;
+                level.updateNeighborsAt(pos, state.getBlock());
+                level.updateNeighborsAt(pos, newState.getBlock());
+                level.updateNeighbourForOutputSignal(pos, newState.getBlock());
+            }
 
             level.playSound(null, pos, SoundEvents.ITEM_FRAME_ROTATE_ITEM, SoundSource.BLOCKS, 1.0f, 1.2f);
             level.sendParticles(
@@ -110,6 +116,12 @@ public class RotateBlockPacket implements CommonPacket {
 
     @SuppressWarnings("unchecked")
     private static BlockState calculateRotatedState(BlockState state, ArrowDirection arrowDir, Direction playerFacing) {
+        if (state.hasProperty(BlockStateProperties.BED_PART)
+                || state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
+                || state.getBlock() instanceof net.minecraft.world.level.block.piston.PistonHeadBlock
+                || (state.hasProperty(BlockStateProperties.EXTENDED) && state.getValue(BlockStateProperties.EXTENDED))) {
+            return state;
+        }
         BlockState newState = state;
 
         if (arrowDir == ArrowDirection.UP || arrowDir == ArrowDirection.DOWN) {

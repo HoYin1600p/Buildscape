@@ -115,7 +115,11 @@ public final class WorldGenFactory {
                                     List<BlockPos> logs, List<BlockPos> leaves) {
             for (BlockPos pos : leaves) if (random.nextFloat() < probability) {
                 BlockPos below = pos.below();
-                if (level.isStateAtPosition(below, BlockState::isAir)) setter.accept(below, Blocks.VINE.defaultBlockState());
+                BlockState vine = Blocks.VINE.defaultBlockState().setValue(net.minecraft.world.level.block.VineBlock.UP, true);
+                if (level.isStateAtPosition(below, BlockState::isAir)
+                        && level instanceof net.minecraft.world.level.LevelReader reader && vine.canSurvive(reader, below)) {
+                    setter.accept(below, vine);
+                }
             }
         }
     }
@@ -143,8 +147,8 @@ public final class WorldGenFactory {
         for (int x = -10; x <= 10; x++) for (int z = -10; z <= 10; z++) for (int y = -5; y <= 5; y++) {
             BlockPos pos = base.offset(x, y, z);
             if (!checked.add(pos)) continue;
-            boolean root = level.isStateAtPosition(pos, state -> state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_roots").getBlock())
-                    || state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:muddy_mangrove_roots").getBlock()));
+            boolean root = level.isStateAtPosition(pos, state -> state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get().getBlock())
+                    || state.is(com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get().getBlock()));
             BlockPos above = pos.above();
             if (root && random.nextFloat() < probability && level.isStateAtPosition(above, BlockState::isAir))
                 setter.accept(above, com.kingodogo.buildscape.block.ModBlocks.MOSS_OVERLAY.get().defaultBlockState());
@@ -172,13 +176,15 @@ public final class WorldGenFactory {
         @Override public void place(net.minecraft.world.level.LevelSimulatedReader level,
                                     java.util.function.BiConsumer<BlockPos, BlockState> setter, Random random,
                                     List<BlockPos> logs, List<BlockPos> leaves) {
-            placePropagules(level, setter, random, logs, leaves, requiredEmptyBlocks);
+            placePropagules(level, setter, random, logs, leaves, requiredEmptyBlocks,
+                    probability, exclusionRadiusXZ, exclusionRadiusY);
         }
     }
 
     private static void placePropagules(net.minecraft.world.level.LevelSimulatedReader level,
                                         java.util.function.BiConsumer<BlockPos, BlockState> setter, Random random,
-                                        List<BlockPos> logs, List<BlockPos> leaves, int requiredEmptyBlocks) {
+                                        List<BlockPos> logs, List<BlockPos> leaves, int requiredEmptyBlocks,
+                                        float probability, IntProvider radiusXZ, IntProvider radiusY) {
         com.kingodogo.buildscape.worldgen.MangrovePropaguleLogic.place(logs, leaves, requiredEmptyBlocks,
                 pos -> level.isStateAtPosition(pos, state -> state.getBlock() instanceof net.minecraft.world.level.block.LeavesBlock),
                 pos -> level.isStateAtPosition(pos, state -> state.isAir() || state.is(Blocks.WATER)),
@@ -186,7 +192,8 @@ public final class WorldGenFactory {
                 Blocks.AIR.defaultBlockState(), random::nextInt,
                 age -> com.kingodogo.buildscape.block.BlockDefinition.vanilla("buildscape:mangrove_propagule").defaultBlockState()
                         .setValue(com.kingodogo.buildscape.block.MangrovePropaguleBlock.AGE, age)
-                        .setValue(com.kingodogo.buildscape.block.MangrovePropaguleBlock.HANGING, true));
+                        .setValue(com.kingodogo.buildscape.block.MangrovePropaguleBlock.HANGING, true),
+                probability, random::nextFloat, () -> radiusXZ.sample(random), () -> radiusY.sample(random));
     }
 
     public static final class MangroveRootDecorator extends TreeDecorator {
@@ -207,23 +214,25 @@ public final class WorldGenFactory {
             this.randomSkewChance = randomSkewChance; this.trunkOffsetY = trunkOffsetY;
         }
         @Override protected TreeDecoratorType<?> type() { return mangroveRootType; }
+        int sampleTrunkOffset(Random random) { return trunkOffsetY.sample(random); }
         @Override public void place(net.minecraft.world.level.LevelSimulatedReader level,
                                     java.util.function.BiConsumer<BlockPos, BlockState> setter, Random random,
                                     List<BlockPos> logs, List<BlockPos> leaves) {
             com.kingodogo.buildscape.worldgen.MangroveRootLogic.place(logs, randomSkewChance,
+                    maxRootWidth.sample(random), maxRootLength.sample(random),
                     pos -> level.isStateAtPosition(pos, state -> {
                         boolean terrain = state.is(Blocks.DIRT) || state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.STONE)
                                 || state.is(Blocks.SAND) || state.is(Blocks.GRAVEL) || state.is(Blocks.CLAY);
                         boolean tree = state.is(net.minecraft.tags.BlockTags.LOGS)
-                                || state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_roots").getBlock())
-                                || state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:muddy_mangrove_roots").getBlock());
+                                || state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get().getBlock())
+                                || state.is(com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get().getBlock());
                         return terrain && !tree && state.getMaterial().isSolid() && !state.getMaterial().isReplaceable();
                     }),
                     pos -> level.isStateAtPosition(pos, state -> !state.is(net.minecraft.tags.BlockTags.LOGS)
-                            && (state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_roots").getBlock())
-                            || state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:muddy_mangrove_roots").getBlock())
+                            && (state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get().getBlock())
+                            || state.is(com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get().getBlock())
                             || state.isAir() || state.is(Blocks.WATER))), setter,
-                    () -> com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_roots").defaultBlockState()
+                    () -> com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get().defaultBlockState()
                             .setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, Direction.Axis.Y),
                     random::nextInt, random::nextFloat);
         }
@@ -352,7 +361,14 @@ public final class WorldGenFactory {
                 net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration config
         ) {
             List<FoliagePlacer.FoliageAttachment> attachments = new ArrayList<>();
-            int elevationShift = 2 + random.nextInt(3);
+            int elevationShift = -1;
+            for (TreeDecorator decorator : config.decorators) {
+                if (decorator instanceof MangroveRootDecorator roots) {
+                    elevationShift = roots.sampleTrunkOffset(random);
+                    break;
+                }
+            }
+            if (elevationShift < 0) elevationShift = 2 + random.nextInt(3);
             int extraHeight = random.nextInt(4);
             int branchSteps = this.extraBranchSteps.sample(random);
             int branchLength = this.extraBranchLength.sample(random);

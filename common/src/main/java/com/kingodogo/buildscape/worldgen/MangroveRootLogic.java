@@ -19,11 +19,20 @@ public final class MangroveRootLogic {
                              Predicate<BlockPos> isTerrain, Predicate<BlockPos> canPlace,
                              BiConsumer<BlockPos, BlockState> setter, Supplier<BlockState> rootState,
                              IntUnaryOperator nextInt, java.util.function.DoubleSupplier nextFloat) {
+        place(logs, randomSkewChance, 0, 0, isTerrain, canPlace, setter, rootState, nextInt, nextFloat);
+    }
+
+    public static void place(List<BlockPos> logs, float randomSkewChance, int maxWidth, int maxLength,
+                             Predicate<BlockPos> isTerrain, Predicate<BlockPos> canPlace,
+                             BiConsumer<BlockPos, BlockState> setter, Supplier<BlockState> rootState,
+                             IntUnaryOperator nextInt, java.util.function.DoubleSupplier nextFloat) {
         if (logs.isEmpty()) return;
         BlockPos base = logs.stream().min(Comparator.comparingInt(BlockPos::getY)).orElse(logs.get(0));
         int ground = findGroundLevel(base, isTerrain);
         for (Direction direction : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
-            int horizontalDistance = 2 + nextInt.applyAsInt(4);
+            boolean bounded = maxWidth > 0 && maxLength > 0;
+            int horizontalDistance = bounded ? 1 + nextInt.applyAsInt(Math.min(maxWidth, maxLength))
+                    : 2 + nextInt.applyAsInt(4);
             List<BlockPos> horizontal = new ArrayList<>(horizontalDistance);
             for (int i = 1; i <= horizontalDistance; i++) {
                 BlockPos root = new BlockPos(base.getX() + direction.getStepX() * i, base.getY(),
@@ -32,11 +41,14 @@ public final class MangroveRootLogic {
                 placeRoot(root, canPlace, setter, rootState);
             }
             BlockPos last = horizontal.get(horizontal.size() - 1);
-            for (int y = 1; y <= last.getY() - ground; y++) placeRoot(last.below(y), canPlace, setter, rootState);
+            int depth = last.getY() - ground;
+            if (bounded) depth = Math.min(depth, maxLength - horizontalDistance);
+            for (int y = 1; y <= depth; y++) placeRoot(last.below(y), canPlace, setter, rootState);
             if (horizontal.size() >= 2 && nextFloat.getAsDouble() < randomSkewChance) {
                 BlockPos secondLast = horizontal.get(horizontal.size() - 2);
-                int depth = Math.min(2 + nextInt.applyAsInt(2), secondLast.getY() - ground);
-                for (int y = 1; y <= depth; y++) placeRoot(secondLast.below(y), canPlace, setter, rootState);
+                int secondDepth = Math.min(2 + nextInt.applyAsInt(2), secondLast.getY() - ground);
+                if (bounded) secondDepth = Math.min(secondDepth, maxLength - (horizontalDistance - 1));
+                for (int y = 1; y <= secondDepth; y++) placeRoot(secondLast.below(y), canPlace, setter, rootState);
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin.forge262;
+package com.kingodogo.buildscape.mixin.forge;
 
 import com.kingodogo.buildscape.platform.ForgeBlockEntityData;
 import net.minecraft.nbt.CompoundTag;

@@ -53,7 +53,7 @@ public final class LoaderWandererTrades {
             }
             // Forge exposes no pool-extension event or setter.
             // Only the holder list changes; count, duplicate policy, and random sequence remain intact.
-            ((com.kingodogo.buildscape.mixin.forge263.TradeSetAccessor) (Object) set).buildscape$setTrades(HolderSet.direct(trades));
+            ((com.kingodogo.buildscape.mixin.forge.TradeSetAccessor) (Object) set).buildscape$setTrades(HolderSet.direct(trades));
             EXTENDED.add(set);
         } catch (RuntimeException exception) {
             BuildscapeCommon.LOGGER.error("Failed to extend wandering trader offers", exception);

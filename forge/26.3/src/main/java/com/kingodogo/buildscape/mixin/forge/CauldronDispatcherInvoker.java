@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin.forge262;
+package com.kingodogo.buildscape.mixin.forge;
 
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.world.item.Item;

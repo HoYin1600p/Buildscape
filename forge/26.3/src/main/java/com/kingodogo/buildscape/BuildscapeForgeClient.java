@@ -23,7 +23,7 @@ final class BuildscapeForgeClient {
         net.minecraftforge.common.MinecraftForge.registerConfigScreen(
                 com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks::createConfigScreen);
         com.kingodogo.buildscape.adapter.v263.client.SpecialItemRenderers.register(
-                com.kingodogo.buildscape.mixin.forge263.SpecialModelRenderersAccessor.buildscape$getMapper()::put);
+                com.kingodogo.buildscape.mixin.forge.SpecialModelRenderersAccessor.buildscape$getMapper()::put);
         net.minecraftforge.client.event.RegisterKeyMappingsEvent.BUS.addListener(BuildscapeForgeClient::keys);
         FMLClientSetupEvent.getBus(group).addListener(BuildscapeForgeClient::setup);
         RegisterParticleProvidersEvent.BUS.addListener(BuildscapeForgeClient::particles);

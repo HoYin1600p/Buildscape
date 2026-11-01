@@ -26,5 +26,5 @@ description = '''Welcome to Buildscape the ultimate expansion for builders, arch
 config = "buildscape.mixins.json"
 
 [[mixins]]
-config = "buildscape.neoforge263.mixins.json"
+config = "buildscape.neoforge.mixins.json"
 

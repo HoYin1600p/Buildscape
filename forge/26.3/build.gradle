@@ -26,7 +26,7 @@ unimined.minecraft {
     defaultRemapJar = false
     minecraftForge {
         loader '66.0.11'
-        mixinConfig(['buildscape.mixins.json', 'buildscape.forge263.mixins.json'])
+        mixinConfig(['buildscape.mixins.json', 'buildscape.forge.mixins.json'])
     }
 }
 
@@ -73,7 +73,7 @@ tasks.named('jar', Jar) {
         exclude v263ReplacedByOverlay
     }
     duplicatesStrategy = DuplicatesStrategy.FAIL
-    manifest { attributes 'MixinConfigs': 'buildscape.mixins.json,buildscape.forge263.mixins.json' }
+    manifest { attributes 'MixinConfigs': 'buildscape.mixins.json,buildscape.forge.mixins.json' }
 }
 tasks.withType(JavaCompile).configureEach {
     options.release.set(25)

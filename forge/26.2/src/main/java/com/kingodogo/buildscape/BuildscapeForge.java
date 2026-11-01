@@ -43,7 +43,7 @@ public final class BuildscapeForge {
         LoaderDispenserSetup.register();
         ((com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase) Services.PLATFORM)
                 .registerExperienceCauldronInteractions(
-                        ((com.kingodogo.buildscape.mixin.forge262.CauldronDispatcherInvoker) (Object)
+                        ((com.kingodogo.buildscape.mixin.forge.CauldronDispatcherInvoker) (Object)
                                 net.minecraft.core.cauldron.CauldronInteractions.EMPTY)::buildscape$put);
     }
     private static void addReloadListeners(AddReloadListenerEvent event) {

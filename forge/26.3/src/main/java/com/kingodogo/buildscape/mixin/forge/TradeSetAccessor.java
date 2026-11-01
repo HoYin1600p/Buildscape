@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin.forge263;
+package com.kingodogo.buildscape.mixin.forge;
 
 import net.minecraft.core.HolderSet;
 import net.minecraft.world.item.trading.TradeSet;

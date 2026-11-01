@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin.forge262;
+package com.kingodogo.buildscape.mixin.forge;
 
 import com.kingodogo.buildscape.adapter.v26x.client.ClientWorldHooks;
 import com.mojang.blaze3d.vertex.PoseStack;

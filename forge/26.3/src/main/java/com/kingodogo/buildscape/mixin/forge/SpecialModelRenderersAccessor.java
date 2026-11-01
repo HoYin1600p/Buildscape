@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin.forge263;
+package com.kingodogo.buildscape.mixin.forge;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;

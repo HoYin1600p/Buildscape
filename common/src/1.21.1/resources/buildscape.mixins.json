@@ -38,6 +38,7 @@
     "LiquidBlockMixin",
     "LightningBoltMixin",
     "LivingEntityMixin",
+    "HollowLogPlayerPoseMixin",
     "MinecraftServerMixin",
     "PoiTypeAccessor",
     "RecipeManagerAccessor",

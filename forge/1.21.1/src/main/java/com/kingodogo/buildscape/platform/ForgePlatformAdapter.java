@@ -12,6 +12,19 @@ import net.minecraft.world.level.levelgen.feature.foliageplacers.*;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.*;
 
 public final class ForgePlatformAdapter extends PlatformAdapterBase implements com.kingodogo.buildscape.world.GameRuleAccess {
+    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        return net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos) >= 0;
+    }
+
+    @Override public boolean canRotateBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        boolean canceled = net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,
+                net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos), net.minecraft.core.Direction.UP);
+        if (canceled) player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(level, pos));
+        return !canceled;
+    }
+
     @Override public String getPlatformName() { return "Forge 1.21.1"; }
     @Override public boolean isModLoaded(String id) { return net.minecraftforge.fml.ModList.get().isLoaded(id); }
     @Override public boolean isClient() { return net.minecraftforge.fml.loading.FMLEnvironment.dist.isClient(); }

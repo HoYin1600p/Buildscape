@@ -16,6 +16,24 @@ import net.minecraft.world.level.levelgen.feature.foliageplacers.*;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.*;
 
 public final class FabricPlatformAdapter extends PlatformAdapterBase implements com.kingodogo.buildscape.world.GameRuleAccess {
+    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos);
+        net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
+        boolean allowed = net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.invoker()
+                .beforeBlockBreak(level, player, pos, state, blockEntity);
+        if (!allowed) net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.CANCELED.invoker()
+                .onBlockBreakCanceled(level, player, pos, state, blockEntity);
+        return allowed;
+    }
+
+    @Override public void afterTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos,
+            net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.entity.BlockEntity blockEntity) {
+        net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.AFTER.invoker()
+                .afterBlockBreak((net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player), player, pos, state, blockEntity);
+    }
+
+
     @Override
     public net.minecraft.world.item.BlockItem createDoublePlantBlockItem(net.minecraft.world.level.block.Block block,
                                                                        net.minecraft.world.item.Item.Properties properties) {

@@ -12,6 +12,21 @@ import net.minecraft.world.level.levelgen.feature.foliageplacers.*;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.*;
 
 public final class NeoForgePlatformAdapter extends PlatformAdapterBase implements com.kingodogo.buildscape.world.GameRuleAccess {
+    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        return !net.neoforged.neoforge.common.CommonHooks.fireBlockBreak(level,
+                player.gameMode.getGameModeForPlayer(), player, pos, level.getBlockState(pos)).isCanceled();
+    }
+
+    @Override public boolean canRotateBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        boolean canceled = net.neoforged.neoforge.event.EventHooks.onBlockPlace(player,
+                net.neoforged.neoforge.common.util.BlockSnapshot.create(level.dimension(), level, pos), net.minecraft.core.Direction.UP);
+        if (canceled) player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(pos, level.getBlockState(pos)));
+        return !canceled;
+    }
+
+
     @Override public String getPlatformName() { return "NeoForge 1.21.1"; }
     @Override public boolean isModLoaded(String id) { return net.neoforged.fml.ModList.get().isLoaded(id); }
     @Override public boolean isClient() { return net.neoforged.fml.loading.FMLEnvironment.dist.isClient(); }

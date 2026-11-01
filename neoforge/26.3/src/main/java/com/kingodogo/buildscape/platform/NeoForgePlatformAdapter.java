@@ -3,6 +3,21 @@ package com.kingodogo.buildscape.platform;
 import com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase;
 
 public class NeoForgePlatformAdapter extends PlatformAdapterBase {
+    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        return !net.neoforged.neoforge.common.CommonHooks.fireBlockBreak(level,
+                player.gameMode.getGameModeForPlayer(), player, pos, level.getBlockState(pos)).isCanceled();
+    }
+
+    @Override public boolean canRotateBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        boolean canceled = net.neoforged.neoforge.event.EventHooks.onBlockPlace(player,
+                net.neoforged.neoforge.common.util.BlockSnapshot.create(level.dimension(), level, pos), net.minecraft.core.Direction.UP);
+        if (canceled) player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(pos, level.getBlockState(pos)));
+        return !canceled;
+    }
+
+
     @Override
     public <V> void register(net.minecraft.core.Registry<V> registry,
                              com.kingodogo.buildscape.util.CommonId id, V value) {

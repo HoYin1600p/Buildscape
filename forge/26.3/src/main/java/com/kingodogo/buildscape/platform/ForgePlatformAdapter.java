@@ -3,6 +3,20 @@ package com.kingodogo.buildscape.platform;
 import com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase;
 
 public class ForgePlatformAdapter extends PlatformAdapterBase {
+    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        return net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos) >= 0;
+    }
+
+    @Override public boolean canRotateBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        boolean canceled = net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,
+                net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos), net.minecraft.core.Direction.UP);
+        if (canceled) player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(pos, level.getBlockState(pos)));
+        return !canceled;
+    }
+
+
     @Override
     public <V> void register(net.minecraft.core.Registry<V> registry,
                              com.kingodogo.buildscape.util.CommonId id, V value) {

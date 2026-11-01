@@ -91,7 +91,7 @@ public class RotateBlockPacket implements CommonPacket {
         BlockState state = level.getBlockState(pos);
         if (state.isAir()) return;
 
-        BlockState newState = calculateRotatedState(state, direction, playerFacing);
+        BlockState newState = calculateRotatedState(state, direction, serverPlayer.getDirection());
 
         if (!newState.equals(state)) {
             level.setBlock(pos, newState, 3);

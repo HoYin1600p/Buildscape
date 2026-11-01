@@ -536,23 +536,38 @@ public class PillarIdManager {
                 else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) facing = frame.getFrameDirection();
                 else continue;
                 if (!isSameFrameLocation(data, data.dimension, entity.blockPosition(), facing)) continue;
-                applyPendingFrameEdit(data, Services.PLATFORM.getEntityData(entity), false);
+                CompoundTag tag = Services.PLATFORM.getEntityData(entity);
+                String storedId = Services.PLATFORM.getTagString(tag, "BuildScapeFrameId", "");
+                if (storedId != null && !storedId.isEmpty() && !storedId.equals(data.id)) continue;
+                applyPendingFrameEdit(data, tag, false);
                 if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
-                    frame.setParticlePattern(data.pattern == null ? "none" : data.pattern);
-                    frame.setParticleColorsRaw(String.join(";", data.dyeColors));
+                    frame.setParticlePattern(framePattern(data.pattern));
+                    frame.setParticleColorsRaw(String.join(";", frameColors(data.dyeColors)));
                 }
+                return;
             }
         }
     }
 
     private boolean applyPendingFrameEdit(PillarData data, CompoundTag tag, boolean immediate) {
         if (data == null || !Boolean.TRUE.equals(data.frameEditPending)) return false;
+        if (!immediate) {
+            tag.putString("BuildScapeParticlePattern", framePattern(data.pattern));
+            Services.PLATFORM.putTagStringList(tag, "BuildScapeParticleColors", frameColors(data.dyeColors));
+            if (tag.contains("PATTERN")) tag.putString("PATTERN", framePattern(data.pattern));
+            if (tag.contains("COLORS")) Services.PLATFORM.putTagStringList(tag, "COLORS", frameColors(data.dyeColors));
+        }
         data.frameEditPending = null;
         saveFrameChange(immediate);
-        if (immediate) return false;
-        tag.putString("BuildScapeParticlePattern", data.pattern == null ? "none" : data.pattern);
-        Services.PLATFORM.putTagStringList(tag, "BuildScapeParticleColors", data.dyeColors == null ? List.of() : data.dyeColors);
-        return true;
+        return !immediate;
+    }
+
+    private static String framePattern(String pattern) {
+        return pattern == null || pattern.isEmpty() ? "none" : pattern;
+    }
+
+    private static List<String> frameColors(List<String> colors) {
+        return colors == null ? List.of() : colors;
     }
 
     private static boolean isColoredFrameData(PillarData data) {
@@ -1051,7 +1066,8 @@ public class PillarIdManager {
                                     needsMigration = true;
                                 }
 
-                                if (existing != null && existing.hasColors() && existing.dyeColors != null) {
+                                if (!Boolean.TRUE.equals(data.frameEditPending)
+                                        && existing != null && existing.hasColors() && existing.dyeColors != null) {
                                     data.dyeColors = new ArrayList<>(existing.dyeColors);
                                 }
                             }
@@ -1154,6 +1170,10 @@ public class PillarIdManager {
                 }
 
                 hasLoaded = true;
+
+                for (PillarData data : new ArrayList<>(pillarData.values())) {
+                    if (data != null && Boolean.TRUE.equals(data.frameEditPending)) markFrameEdit(data);
+                }
 
                 if (duplicateFrames > 0) requestSave();
                 updateCachedWorldDir();
@@ -2426,8 +2446,8 @@ public class PillarIdManager {
             existing = null;
         }
         if (applyPendingFrameEdit(existing, dataTag, immediate)) {
-            pattern = existing.pattern == null ? "none" : existing.pattern;
-            colors = new ArrayList<>(existing.dyeColors);
+            pattern = framePattern(existing.pattern);
+            colors = new ArrayList<>(frameColors(existing.dyeColors));
         }
         boolean removedDuplicates = removeOtherFrameEntries(id, dimension, pos, facing, false);
         if (existing == null) {
@@ -2523,8 +2543,8 @@ public class PillarIdManager {
             existing = null;
         }
         if (applyPendingFrameEdit(existing, dataTag, immediate)) {
-            pattern = existing.pattern == null ? "none" : existing.pattern;
-            colors = new ArrayList<>(existing.dyeColors);
+            pattern = framePattern(existing.pattern);
+            colors = new ArrayList<>(frameColors(existing.dyeColors));
             frame.setParticlePattern(pattern);
             frame.setParticleColorsRaw(String.join(";", colors));
         }

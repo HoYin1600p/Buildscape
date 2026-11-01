@@ -11,7 +11,11 @@
         }
       ],
       "condition": {
-        "type": "minecraft:survives_explosion"
+        "type": "minecraft:all_of",
+        "terms": [
+          "minecraft:tool/can_silk_touch",
+          { "type": "minecraft:survives_explosion" }
+        ]
       }
     }
   ]

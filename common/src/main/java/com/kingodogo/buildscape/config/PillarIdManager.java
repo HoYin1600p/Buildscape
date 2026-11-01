@@ -922,11 +922,6 @@ public class PillarIdManager {
                 return;
             }
 
-            File file = getDataFile();
-            if (hasLoaded && pillarData.isEmpty() && file.exists()) {
-                hasLoaded = false;
-            }
-
             if (hasLoaded || loadInProgress) {
                 return;
             }
@@ -1094,19 +1089,12 @@ public class PillarIdManager {
                                 originalFileColors = new ArrayList<>(data.dyeColors);
                             }
 
-                            PillarData existing = existingData.get(id);
-
                             if (originalFileColors != null && !originalFileColors.isEmpty()) {
                                 data.dyeColors = originalFileColors;
                             } else {
                                 if (data.dyeColors == null) {
                                     data.dyeColors = new ArrayList<>();
                                     needsMigration = true;
-                                }
-
-                                if (!Boolean.TRUE.equals(data.frameEditPending)
-                                        && existing != null && existing.hasColors() && existing.dyeColors != null) {
-                                    data.dyeColors = new ArrayList<>(existing.dyeColors);
                                 }
                             }
 
@@ -1254,7 +1242,7 @@ public class PillarIdManager {
             if (file.exists() && file.length() > 0) {
                 try {
                     loadedData = loadFromFile(file);
-                    if (loadedData != null && !loadedData.isEmpty()) {
+                    if (loadedData != null) {
                         sourceFile = file;
                     }
                 } catch (Exception e) {
@@ -1262,34 +1250,14 @@ public class PillarIdManager {
                 }
             }
 
-            boolean mainFileHasColors = false;
-            if (loadedData != null) {
-                for (PillarData data : loadedData.values()) {
-                    if (data != null && data.hasColors()) {
-                        mainFileHasColors = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!mainFileHasColors) {
+            if (loadedData == null) {
                 File backupFile = getBackupDataFile();
                 if (backupFile.exists() && backupFile.length() > 0) {
                     try {
                         Map<String, PillarData> backupData = loadFromFile(backupFile);
                         if (backupData != null && !backupData.isEmpty()) {
-                            boolean backupHasColors = false;
-                            for (PillarData data : backupData.values()) {
-                                if (data != null && data.hasColors()) {
-                                    backupHasColors = true;
-                                    break;
-                                }
-                            }
-
-                            if (backupHasColors) {
-                                loadedData = backupData;
-                                sourceFile = backupFile;
-                            }
+                            loadedData = backupData;
+                            sourceFile = backupFile;
                         }
                     } catch (Exception e) {
                         com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error loading backup file: " + e.getMessage(), e);
@@ -1297,7 +1265,18 @@ public class PillarIdManager {
                 }
             }
 
-            if (loadedData == null || loadedData.isEmpty()) {
+            if (loadedData != null && loadedData.isEmpty()) {
+                pillarData.clear();
+                positionIndex.clear();
+                fileWasDeleted = false;
+                hadColorsOnLoad = false;
+                lastLoadedTime = sourceFile.lastModified();
+                lastFileSize = sourceFile.length();
+                hasLoaded = true;
+                refreshSyncSnapshot();
+                return;
+            }
+            if (loadedData == null) {
                 fileWasDeleted = true;
                 pillarData.clear();
                 lastLoadedTime = 0L;

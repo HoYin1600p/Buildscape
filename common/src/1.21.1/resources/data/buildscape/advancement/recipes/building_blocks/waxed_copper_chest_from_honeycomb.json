@@ -16,7 +16,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "buildscape:autogen/crafting/buildscape_waxed_copper_chest_461658902"
+        "recipe": "buildscape:autogen/crafting/waxed_copper_chest"
       }
     }
   },
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "buildscape:autogen/crafting/buildscape_waxed_copper_chest_461658902"
+      "buildscape:autogen/crafting/waxed_copper_chest"
     ]
   }
 }

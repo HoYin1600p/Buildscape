@@ -6,6 +6,15 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "modifier": [
+            { "type": "minecraft:set_count", "count": 0 },
+            { "type": "minecraft:set_count", "count": 1, "add": true, "condition": { "type": "minecraft:match_block", "blocks": "buildscape:multicolor_glow_lights", "state": { "north": "true" } } },
+            { "type": "minecraft:set_count", "count": 1, "add": true, "condition": { "type": "minecraft:match_block", "blocks": "buildscape:multicolor_glow_lights", "state": { "east": "true" } } },
+            { "type": "minecraft:set_count", "count": 1, "add": true, "condition": { "type": "minecraft:match_block", "blocks": "buildscape:multicolor_glow_lights", "state": { "south": "true" } } },
+            { "type": "minecraft:set_count", "count": 1, "add": true, "condition": { "type": "minecraft:match_block", "blocks": "buildscape:multicolor_glow_lights", "state": { "west": "true" } } },
+            { "type": "minecraft:set_count", "count": 1, "add": true, "condition": { "type": "minecraft:match_block", "blocks": "buildscape:multicolor_glow_lights", "state": { "up": "true" } } },
+            { "type": "minecraft:set_count", "count": 1, "add": true, "condition": { "type": "minecraft:match_block", "blocks": "buildscape:multicolor_glow_lights", "state": { "down": "true" } } }
+          ],
           "name": "buildscape:multicolor_glow_lights"
         }
       ],

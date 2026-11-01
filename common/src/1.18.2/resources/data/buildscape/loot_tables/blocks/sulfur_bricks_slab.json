@@ -15,11 +15,7 @@
                   "block": "buildscape:sulfur_bricks_slab"
                 }
               ],
-              "count": {
-                "min": 1,
-                "type": "minecraft:uniform",
-                "max": 2
-              }
+              "count": 2
             }
           ],
           "name": "buildscape:sulfur_bricks_slab",

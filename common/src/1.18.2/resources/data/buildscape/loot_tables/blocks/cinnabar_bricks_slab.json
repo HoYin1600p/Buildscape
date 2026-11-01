@@ -15,11 +15,7 @@
                   "block": "buildscape:cinnabar_bricks_slab"
                 }
               ],
-              "count": {
-                "min": 1,
-                "type": "minecraft:uniform",
-                "max": 2
-              }
+              "count": 2
             }
           ],
           "name": "buildscape:cinnabar_bricks_slab",

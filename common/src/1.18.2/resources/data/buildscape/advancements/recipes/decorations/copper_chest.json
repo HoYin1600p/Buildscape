@@ -16,7 +16,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "buildscape:copper_chest"
+        "recipe": "buildscape:autogen/crafting/copper_chest"
       }
     }
   },
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "buildscape:copper_chest"
+      "buildscape:autogen/crafting/copper_chest"
     ]
   }
 }

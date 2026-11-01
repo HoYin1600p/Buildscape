@@ -21,6 +21,7 @@
     "CoralBlockMixin",
     "EntityAccessor",
     "EntityMixin",
+    "FarmlandHydrationMixin",
     "FeatureMixin",
     "FenceBlockMixin",
     "FireworkRocketEntityMixin",

@@ -15,6 +15,12 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 
 public final class FabricPlatformAdapter extends PlatformAdapterBase implements GameRuleAccess {
+    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = player.getLevel();
+        return net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.invoker()
+                .beforeBlockBreak(level, player, pos, level.getBlockState(pos), level.getBlockEntity(pos));
+    }
+
     @Override
     public net.minecraft.world.item.BlockItem createDoublePlantBlockItem(net.minecraft.world.level.block.Block block,
                                                                        net.minecraft.world.item.Item.Properties properties) {

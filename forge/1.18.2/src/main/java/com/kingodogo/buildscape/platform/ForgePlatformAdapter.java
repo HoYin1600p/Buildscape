@@ -13,6 +13,11 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public final class ForgePlatformAdapter extends PlatformAdapterBase implements com.kingodogo.buildscape.world.GameRuleAccess {
+    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        return net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(player.getLevel(),
+                player.gameMode.getGameModeForPlayer(), player, pos) >= 0;
+    }
+
     @Override public int beforeHammerReplacement(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos,
             net.minecraft.world.level.block.state.BlockState replacement) {
         net.minecraft.server.level.ServerLevel level = player.getLevel();

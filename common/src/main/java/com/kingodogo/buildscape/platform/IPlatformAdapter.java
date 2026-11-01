@@ -402,6 +402,7 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.Item createHammerItem(com.kingodogo.buildscape.item.HammerItem.HammerTier tier, net.minecraft.world.item.Item.Properties properties);
     boolean supportsHammerEnchantment(net.minecraft.world.item.ItemStack stack, Object enchantment);
     default boolean canHammerHarvest(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.item.ItemStack hammer, com.kingodogo.buildscape.item.HammerItem.HammerTier tier) { return true; }
+    default boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) { return true; }
     default int beforeHammerReplacement(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState replacement) { return 0; }
     default void awardHammerExperience(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos, int experience) { }
     default java.util.List<net.minecraft.world.item.ItemStack> hammerDrops(net.minecraft.server.level.ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.block.entity.BlockEntity entity, net.minecraft.server.level.ServerPlayer player, net.minecraft.world.item.ItemStack hammer, com.kingodogo.buildscape.item.HammerItem.HammerTier tier) {

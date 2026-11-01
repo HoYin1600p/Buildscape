@@ -93,11 +93,15 @@ public final class TreeChopJobManager {
             for (int i = currentIndex; i < end; i++) {
                 BlockPos pos = blocks.get(i);
                 if (!level.isLoaded(pos)
+                        || !level.mayInteract(player, pos)
                         || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
                     continue;
                 }
                 BlockState state = level.getBlockState(pos);
                 if (state.getBlock() != targetBlock) {
+                    continue;
+                }
+                if (!com.kingodogo.buildscape.platform.Services.PLATFORM.canTreeChopBlock(player, pos)) {
                     continue;
                 }
                 if (i % 3 == 0) {

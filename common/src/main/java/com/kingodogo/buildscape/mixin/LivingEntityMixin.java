@@ -7,15 +7,16 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
+    @Unique private static final CommonId buildscape$mobChains = new CommonId("buildscape", "mob_chains");
 
     @Inject(method = "onClimbable", at = @At("RETURN"), cancellable = true)
     private void onOnClimbable(CallbackInfoReturnable<Boolean> cir) {
@@ -32,7 +33,7 @@ public abstract class LivingEntityMixin {
                 BlockState state = level.getBlockState(pos);
                 Block block = state.getBlock();
 
-                if (block instanceof ChainBlock || isBuildscapeChain(block)) {
+                if (isBuildscapeChain(block)) {
                     cir.setReturnValue(false);
                 }
             }
@@ -41,8 +42,7 @@ public abstract class LivingEntityMixin {
 
     private static boolean isBuildscapeChain(Block block) {
         if (block == null) return false;
-        CommonId key = Services.PLATFORM.getBlockId(block);
-        return key != null && "buildscape".equals(key.getNamespace()) && key.getPath().contains("chain");
+        return Services.PLATFORM.isBlockInTag(block, buildscape$mobChains);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))

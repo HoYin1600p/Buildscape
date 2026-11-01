@@ -8,8 +8,8 @@ import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.config.PresetsConfig;
 import com.kingodogo.buildscape.network.PacketFactory;
 import com.kingodogo.buildscape.network.RemovePillarPacket;
+import com.kingodogo.buildscape.network.ResetPillarsPacket;
 import com.kingodogo.buildscape.network.RequestPillarIdsPacket;
-import com.kingodogo.buildscape.network.UpdateAllPillarIdsPacket;
 import com.kingodogo.buildscape.network.UpdateConfigPacket;
 import com.kingodogo.buildscape.network.UpdateGameRulePacket;
 import com.kingodogo.buildscape.network.UpdatePillarDataPacket;
@@ -406,6 +406,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private static final List<String> STATIC_ALL_REGISTERED_TAGS = new ArrayList<>();
     private static final Map<String, Integer> STATIC_TAG_ITEM_COUNTS = new HashMap<>();
     private static volatile boolean tagsCached = false;
+    private static java.lang.ref.WeakReference<net.minecraft.world.level.Level> cachedTagLevel = new java.lang.ref.WeakReference<>(null);
 
     // Cooldown on disk synchronization for pillar markers
     private static long lastPillarsSyncTime = 0L;
@@ -1217,6 +1218,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     @Override
     public void init(Minecraft mc, int width, int height, Consumer<AbstractWidget> addWidget, Consumer<GuiEventListener> removeWidget) {
+        if (cachedTagLevel.get() != mc.level) {
+            cachedTagLevel = new java.lang.ref.WeakReference<>(mc.level);
+            synchronized (STATIC_ALL_REGISTERED_TAGS) {
+                tagsCached = false;
+                STATIC_ALL_REGISTERED_TAGS.clear();
+                STATIC_TAG_ITEM_COUNTS.clear();
+            }
+            allRegisteredTags.clear();
+            tagItemCounts.clear();
+            refreshTagNamespaces();
+            tagsListDirty = true;
+            inventoryTagsDirty = true;
+        }
         currentInstance = this;
         this.openStartTime = 0L;
         this.isOpening = true;
@@ -4893,7 +4907,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 PillarIdManager.clearPillarOverrides(PillarIdManager.getClient().getPillarData(id));
             }
             PillarIdManager.getClient().saveAllPillars();
-            PacketFactory.sendToServer(new UpdateAllPillarIdsPacket(PillarIdManager.getClient().copyDataSnapshot()));
+            List<String> batch = new ArrayList<>();
+            int bytes = Integer.BYTES;
+            for (String id : selectedPillarIds) {
+                int size = id.getBytes(java.nio.charset.StandardCharsets.UTF_8).length + 5;
+                if (!batch.isEmpty() && (bytes + size > 24_000 || batch.size() >= 1024)) {
+                    PacketFactory.sendToServer(new ResetPillarsPacket(batch));
+                    batch.clear();
+                    bytes = Integer.BYTES;
+                }
+                batch.add(id);
+                bytes += size;
+            }
+            if (!batch.isEmpty()) PacketFactory.sendToServer(new ResetPillarsPacket(batch));
             return true;
         }
 

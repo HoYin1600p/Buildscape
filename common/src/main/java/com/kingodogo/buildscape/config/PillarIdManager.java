@@ -763,6 +763,44 @@ public class PillarIdManager {
         data.maxParticleColor = null;
     }
 
+    public boolean resetPillars(Collection<String> ids) {
+        if (ids == null) return false;
+        boolean changed = false;
+        for (String id : ids) {
+            PillarData data = id == null ? null : pillarData.get(id);
+            if (data == null) continue;
+            clearPillarOverrides(data);
+            data.modifiedTime = System.currentTimeMillis();
+            if (serverAuthoritative) {
+                if (isFrameData(data)) {
+                    markFrameEdit(data);
+                } else {
+                    data.pillarResetPending = true;
+                    applyPendingPillarReset(data);
+                }
+            }
+            changed = true;
+        }
+        return changed;
+    }
+
+    private void applyPendingPillarReset(PillarData data) {
+        if (!Boolean.TRUE.equals(data.pillarResetPending)) return;
+        MinecraftServer server = getCurrentServer();
+        if (server == null) return;
+        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+            if (!Objects.equals(getDimensionKey(level), data.dimension) || !level.hasChunkAt(data.getBlockPos())) continue;
+            if (!(level.getBlockEntity(data.getBlockPos()) instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillar)) return;
+            BlockPos pos = pillar.findStackBottom();
+            for (int i = 0; i < 256 && level.getBlockState(pos).getBlock() instanceof com.kingodogo.buildscape.block.PillarBlock; i++, pos = pos.above()) {
+                if (level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.PillarBlockEntity part) part.resetParticleSettings();
+            }
+            data.pillarResetPending = null;
+            requestSave();
+            return;
+        }
+    }
+
     public boolean removePillars(Collection<String> pillarIds) {
         if (pillarIds == null || pillarIds.isEmpty()) {
             return false;
@@ -2245,6 +2283,7 @@ public class PillarIdManager {
                 PillarData copy = new PillarData();
                 copy.id = original.id;
                 copy.frameEditPending = original.frameEditPending;
+                copy.pillarResetPending = original.pillarResetPending;
                 copy.dimension = original.dimension;
                 copy.x = original.x;
                 copy.y = original.y;
@@ -2392,6 +2431,10 @@ public class PillarIdManager {
             requestSave();
         } else {
             positionIndex.put(posKey, id);
+
+            if (Boolean.TRUE.equals(existing.pillarResetPending)) {
+                applyPendingPillarReset(existing);
+            }
 
             if (syncPatternSettingsFromNBT(pillar, existing)) {
                 requestSave();
@@ -2641,6 +2684,7 @@ public class PillarIdManager {
 
         public String id;
         public Boolean frameEditPending;
+        public Boolean pillarResetPending;
         public List<String> dyeColors = new ArrayList<>();
         public String dimension;
         public int x, y, z;

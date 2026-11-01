@@ -481,9 +481,13 @@ public class PillarBlockEntity extends DataBlockEntity {
     }
 
     public void resetToDefaultAppearance() {
+        resetParticleSettings();
+        this.pillarId = null;
+    }
+
+    public void resetParticleSettings() {
         this.particleColors = null;
         this.colorsInitialized = false;
-        this.pillarId = null;
         this.particlePattern = null;
         this.patternSpeed = null;
         this.patternSpread = null;

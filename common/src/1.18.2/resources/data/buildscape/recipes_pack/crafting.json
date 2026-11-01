@@ -1436,6 +1436,7 @@
     ["BS:magenta_wool_stairs",["C  ","CC ","CCC"],[["C","MC:magenta_wool"]],4],
     ["BS:magenta_wool_wall",["   ","BBB","BBB"],[["B","MC:magenta_wool"]],6],
     ["BS:mangrove_boat",["# #","###"],[["#","BS:mangrove_planks"]],1],
+    ["BS:poplar_boat",["# #","###"],[["#","BS:poplar_planks"]],1],
     ["BS:mangrove_ladder",["S S","SPS","S S"],[["S","MC:stick"],["P","BS:mangrove_planks"]],3],
     ["BS:mangrove_leaf_hedge",["   ","BBB","BBB"],[["B","BS:mangrove_leaves"]],6],
     ["BS:mangrove_leaf_layers",["###"],[["#","BS:mangrove_leaves"]],8],

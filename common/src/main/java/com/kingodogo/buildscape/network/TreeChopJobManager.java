@@ -101,7 +101,7 @@ public final class TreeChopJobManager {
                 if (state.getBlock() != targetBlock) {
                     continue;
                 }
-                if (!com.kingodogo.buildscape.platform.Services.PLATFORM.canTreeChopBlock(player, pos)) {
+                if (!com.kingodogo.buildscape.platform.Services.PLATFORM.canPlayerBreakBlock(player, pos)) {
                     continue;
                 }
                 if (i % 3 == 0) {
@@ -109,7 +109,7 @@ public final class TreeChopJobManager {
                 }
                 net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
                 if (level.destroyBlock(pos, false)) {
-                    com.kingodogo.buildscape.platform.Services.PLATFORM.afterTreeChopBlock(player, pos, state, blockEntity);
+                    com.kingodogo.buildscape.platform.Services.PLATFORM.afterPlayerBlockBreak(player, pos, state, blockEntity);
                 }
             }
 

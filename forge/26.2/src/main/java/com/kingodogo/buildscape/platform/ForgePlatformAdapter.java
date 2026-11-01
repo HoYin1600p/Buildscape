@@ -3,11 +3,29 @@ package com.kingodogo.buildscape.platform;
 import com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase;
 
 public class ForgePlatformAdapter extends PlatformAdapterBase {
-    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+    @Override public int beforeHammerReplacement(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos,
+            net.minecraft.world.level.block.state.BlockState replacement) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        int experience = net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos);
+        if (experience < 0) return -1;
+        net.minecraftforge.common.util.BlockSnapshot snapshot = net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos);
+        net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event = new net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent(snapshot, level.getBlockState(pos.below()), player);
+        if (net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent.BUS.post(event)) {
+            player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(pos, level.getBlockState(pos)));
+            return -1;
+        }
+        return experience;
+    }
+    @Override public void awardHammerExperience(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos, int experience) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        if (!player.isCreative() && experience > 0 && level.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.BLOCK_DROPS)) {
+            net.minecraft.world.entity.ExperienceOrb.award(level, net.minecraft.world.phys.Vec3.atCenterOf(pos), experience);
+        }
+    }
+    @Override public boolean canPlayerBreakBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
         net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
         return net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos) >= 0;
     }
-
     @Override public boolean canRotateBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
         net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
         boolean canceled = net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,

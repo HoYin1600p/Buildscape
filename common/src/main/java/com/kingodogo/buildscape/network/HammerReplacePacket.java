@@ -94,6 +94,8 @@ public class HammerReplacePacket implements CommonPacket {
         List<ItemStack> drops = Services.PLATFORM.hammerDrops(level, pos, targetState, blockEntity, serverPlayer, hammerStack, tier);
 
         if (!level.setBlock(pos, newState, 3)) return;
+        Services.PLATFORM.afterPlayerBlockBreak(serverPlayer, pos, targetState, blockEntity);
+        Services.PLATFORM.afterHammerReplacement(serverPlayer, pos, targetState, hammerStack, tier);
         AdvancementMilestoneLogic.onHammerReplace(serverPlayer);
 
         if (!serverPlayer.isCreative()) {

@@ -1624,6 +1624,23 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     @Override
+    public java.util.List<net.minecraft.world.item.ItemStack> hammerDrops(net.minecraft.server.level.ServerLevel level,
+            net.minecraft.core.BlockPos pos, net.minecraft.world.level.block.state.BlockState state,
+            net.minecraft.world.level.block.entity.BlockEntity entity, net.minecraft.server.level.ServerPlayer player,
+            net.minecraft.world.item.ItemStack hammer, com.kingodogo.buildscape.item.HammerItem.HammerTier tier) {
+        net.minecraft.world.item.ItemStack tool = new net.minecraft.world.item.ItemStack(tier.getHarvestToolItem());
+        tool.set(net.minecraft.core.component.DataComponents.ENCHANTMENTS, hammer.getEnchantments());
+        return net.minecraft.world.level.block.Block.getDrops(state, level, pos, entity, player, tool);
+    }
+
+    @Override
+    public boolean canHammerHarvest(net.minecraft.world.level.block.state.BlockState state,
+            net.minecraft.world.item.ItemStack hammer, com.kingodogo.buildscape.item.HammerItem.HammerTier tier) {
+        return !state.requiresCorrectToolForDrops()
+                || new net.minecraft.world.item.ItemStack(tier.getHarvestToolItem()).isCorrectToolForDrops(state);
+    }
+
+    @Override
     public Item createHammerItem(com.kingodogo.buildscape.item.HammerItem.HammerTier tier, Item.Properties properties) {
         return new com.kingodogo.buildscape.item.HammerItem(tier, properties) {
             public boolean supportsEnchantment(ItemStack stack, net.minecraft.core.Holder<net.minecraft.world.item.enchantment.Enchantment> enchantment) {

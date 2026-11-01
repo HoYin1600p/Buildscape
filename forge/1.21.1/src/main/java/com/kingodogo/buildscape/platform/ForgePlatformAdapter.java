@@ -12,7 +12,31 @@ import net.minecraft.world.level.levelgen.feature.foliageplacers.*;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.*;
 
 public final class ForgePlatformAdapter extends PlatformAdapterBase implements com.kingodogo.buildscape.world.GameRuleAccess {
-    @Override public boolean canTreeChopBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
+    @Override public int beforeHammerReplacement(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos,
+            net.minecraft.world.level.block.state.BlockState replacement) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        int experience = net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos);
+        if (experience < 0) return -1;
+        net.minecraftforge.common.util.BlockSnapshot snapshot = net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos);
+        net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event = new net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent(snapshot, level.getBlockState(pos.below()), player) {
+            @Override public net.minecraft.world.level.block.state.BlockState getState() { return replacement; }
+            @Override public net.minecraft.world.level.block.state.BlockState getPlacedBlock() { return replacement; }
+        };
+        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) {
+            player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(pos, level.getBlockState(pos)));
+            return -1;
+        }
+        return experience;
+    }
+
+    @Override public void awardHammerExperience(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos, int experience) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
+        if (!player.isCreative() && experience > 0 && level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOBLOCKDROPS)) {
+            net.minecraft.world.entity.ExperienceOrb.award(level, net.minecraft.world.phys.Vec3.atCenterOf(pos), experience);
+        }
+    }
+
+    @Override public boolean canPlayerBreakBlock(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos) {
         net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) Services.PLATFORM.getEntityLevel(player);
         return net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos) >= 0;
     }

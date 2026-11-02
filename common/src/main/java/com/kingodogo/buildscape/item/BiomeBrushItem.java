@@ -296,5 +296,6 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
         tooltip.accept(ComponentHelper.translatable("tooltip.buildscape.biome_brush.desc1").withStyle(ChatFormatting.GRAY));
         tooltip.accept(ComponentHelper.translatable("tooltip.buildscape.biome_brush.desc2").withStyle(ChatFormatting.GRAY));
         tooltip.accept(ComponentHelper.translatable("tooltip.buildscape.biome_brush.desc3").withStyle(ChatFormatting.AQUA));
+        tooltip.accept(ComponentHelper.translatable("tooltip.buildscape.biome_brush.desc4").withStyle(ChatFormatting.GRAY));
     }
 }

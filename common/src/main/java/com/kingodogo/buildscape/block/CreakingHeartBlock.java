@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.function.Supplier;
 public class CreakingHeartBlock extends RotatedPillarBlock {
     public static final BooleanProperty ACTIVE = ModBlockProperties.ACTIVE;
-    public static final int RESIN_COOLDOWN_TICKS = 1200;
 
     private final Supplier<Block> resinClumpSupplier;
 

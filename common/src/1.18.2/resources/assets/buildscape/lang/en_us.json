@@ -33,6 +33,7 @@
   "tooltip.buildscape.biome_brush.desc1": "Right-click block to capture its biome or set Position 1.",
   "tooltip.buildscape.biome_brush.desc2": "Left-click block to set Position 2.",
   "tooltip.buildscape.biome_brush.desc3": "Sneak + Right-click to apply the captured biome to the selection.",
+  "tooltip.buildscape.biome_brush.desc4": "Sneak + Left-click to clear the captured biome.",
   "message.buildscape.biome_brush.captured": "Biome captured: %s",
   "message.buildscape.biome_brush.pos1": "Position 1 set: %s, %s, %s",
   "message.buildscape.biome_brush.pos2": "Position 2 set: %s, %s, %s",

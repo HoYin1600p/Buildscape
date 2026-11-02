@@ -345,6 +345,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     @SuppressWarnings("unchecked")
     public boolean getGameRuleBoolean(net.minecraft.world.level.Level level, Object ruleKey, boolean fallback) {
+        if (level != null && level.isClientSide()) return fallback;
         if (level != null && ruleKey instanceof net.minecraft.world.level.GameRules.Key<?> key) {
             return level.getGameRules().getBoolean((net.minecraft.world.level.GameRules.Key<net.minecraft.world.level.GameRules.BooleanValue>) key);
         }

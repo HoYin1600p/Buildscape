@@ -43,6 +43,16 @@ subprojects {
         }
         if (path != ':common') {
             base.archivesName = "buildscape-${parent.name}-${name}"
+            if (path in [':forge:1.18.2', ':fabric:1.18.2', ':forge:1.21.1', ':fabric:1.21.1', ':neoforge:1.21.1']) {
+                // The older version trees are complete snapshots; only opt in shared resources
+                // that are known to be compatible until those snapshots are fully reduced to overlays.
+                tasks.named('processResources', ProcessResources) {
+                    from(rootProject.file('common/src/main/resources')) {
+                        include 'assets/buildscape/textures/client/ui/**'
+                        include 'data/buildscape/config/default_pillar_properties.json'
+                    }
+                }
+            }
             // These loaders already expand metadata in their module build scripts.
             if (!(path in [':forge:1.18.2', ':fabric:1.18.2', ':fabric:1.21.1', ':neoforge:1.21.1', ':forge:1.21.1'])) {
                 tasks.named('processResources', ProcessResources) {

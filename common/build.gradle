@@ -263,12 +263,20 @@ def v26xClusterResources = tasks.register('v26xClusterResources', Sync) {
 def v118xClusterResourcesDir = layout.buildDirectory.dir('resources/v118xCluster')
 def v118xClusterResources = tasks.register('v118xClusterResources', Sync) {
     from 'src/1.18.2/resources'
+    from('src/main/resources') {
+        include 'assets/buildscape/textures/client/ui/**'
+        include 'data/buildscape/config/default_pillar_properties.json'
+    }
     into v118xClusterResourcesDir
 }
 
 def v121xClusterResourcesDir = layout.buildDirectory.dir('resources/v121xCluster')
 def v121xClusterResources = tasks.register('v121xClusterResources', Sync) {
     from 'src/1.21.1/resources'
+    from('src/main/resources') {
+        include 'assets/buildscape/textures/client/ui/**'
+        include 'data/buildscape/config/default_pillar_properties.json'
+    }
     into v121xClusterResourcesDir
 }
 

@@ -494,6 +494,8 @@ public class PillarParticleConfig {
     }
 
     private void writeDefaultProperties(File f) {
+        if (ConfigPaths.copyTemplateIfMissing(f.toPath(), "/data/buildscape/config/default_pillar_properties.json")
+                || f.exists()) return;
         try {
             File parentDir = f.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
@@ -584,6 +586,8 @@ public class PillarParticleConfig {
         File file = getPropertiesFile();
         if (!file.exists()) {
             writeDefaultProperties(file);
+        }
+        if (!file.exists()) {
             this.particle_color.clear();
             this.particle_color.add("#FFB81C");
             this.particle_color.add("#FFFFFF");
@@ -593,12 +597,7 @@ public class PillarParticleConfig {
             this.particle_color.add("#3CDFFF");
             this.max_particle_color = 3;
             loadedPropertyValues = propertyValues();
-            try {
-                corruptedProperties = propertiesSource == null || !ConfigLayoutIO.isWritable(file.toPath());
-            } catch (IOException e) {
-                corruptedProperties = true;
-                BuildscapeCommon.LOGGER.warn("Unable to check default pillar properties", e);
-            }
+            corruptedProperties = true;
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
             return;

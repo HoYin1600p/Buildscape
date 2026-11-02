@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.config.PillarIdManager;
-import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.network.FriendlyByteBuf;
@@ -39,8 +38,7 @@ public final class ResetPillarsPacket implements CommonPacket {
     }
 
     @Override public void handle(Player player) {
-        if (!(player instanceof ServerPlayer serverPlayer) || !PillarParticleConfig.canPlayerEdit(serverPlayer,
-                PillarParticleConfig.getServerConfig().edit_permission_mode, PillarParticleConfig.EditScope.GENERAL)) return;
+        if (!(player instanceof ServerPlayer serverPlayer) || !EditGuard.requirePillarEdit(serverPlayer)) return;
         PillarIdManager manager = PillarIdManager.get();
         if (manager.resetPillars(ids)) {
             manager.saveImmediate();

@@ -869,6 +869,7 @@ public class PillarIdManager {
         }
 
         boolean changed = false;
+        Set<String> removedIds = new HashSet<>();
         for (String pillarId : pillarIds) {
             if (pillarId == null) {
                 continue;
@@ -877,7 +878,7 @@ public class PillarIdManager {
             if (data == null) {
                 continue;
             }
-            positionIndex.values().removeIf(pillarId::equals);
+            removedIds.add(pillarId);
             if (serverAuthoritative) {
                 if (isFrameData(data)) {
                     data.removed = true;
@@ -893,6 +894,7 @@ public class PillarIdManager {
         }
 
         if (changed) {
+            positionIndex.values().removeIf(removedIds::contains);
             pruneRemovedFrames();
             if (pillarData.isEmpty()) {
                 allowEmptySave = true;

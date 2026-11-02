@@ -1580,7 +1580,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private boolean requireConfigModificationAccess() {
         String tabId = selectedTabIndex >= 0 && selectedTabIndex < navItems.size() ? navItems.get(selectedTabIndex).id : "";
-        PillarParticleConfig.EditScope scope = "items".equals(tabId) || sidePanelType == SidePanelType.PRESETS
+        PillarParticleConfig.EditScope scope = "items".equals(tabId) || "pillars".equals(tabId)
+                || sidePanelType == SidePanelType.PRESETS
                 ? PillarParticleConfig.EditScope.LIMITED : PillarParticleConfig.EditScope.GENERAL;
         return requireConfigModificationAccess(scope);
     }
@@ -4849,6 +4850,25 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return handlePillarTableClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH);
     }
 
+    private static List<List<String>> pillarIdBatches(Collection<String> ids) {
+        List<List<String>> batches = new ArrayList<>();
+        List<String> batch = new ArrayList<>();
+        int bytes = Integer.BYTES;
+        for (String id : ids) {
+            if (id == null) continue;
+            int size = id.getBytes(java.nio.charset.StandardCharsets.UTF_8).length + 5;
+            if (!batch.isEmpty() && (bytes + size > 24_000 || batch.size() >= 1024)) {
+                batches.add(batch);
+                batch = new ArrayList<>();
+                bytes = Integer.BYTES;
+            }
+            batch.add(id);
+            bytes += size;
+        }
+        if (!batch.isEmpty()) batches.add(batch);
+        return batches;
+    }
+
     private boolean handlePillarTableClick(double mouseX, double mouseY, int button, int x, int y, int w, int h, int catHeaderH) {
         List<PillarIdManager.PillarData> pillarList = new ArrayList<>(PillarIdManager.getClient().copyDataSnapshot().values());
         pillarList.sort(Comparator.comparing(p -> p.id != null ? p.id : ""));
@@ -4876,10 +4896,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (!selectedPillarIds.isEmpty() && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             if (!confirmDestructiveAction("remove:selected")) return true;
-            for (String id : new ArrayList<>(selectedPillarIds)) {
-                PillarIdManager.getClient().removePillarData(id);
-                PacketFactory.sendToServer(new RemovePillarPacket(id));
-            }
+            List<String> ids = new ArrayList<>(selectedPillarIds);
+            PillarIdManager.getClient().removePillars(ids);
+            for (List<String> batch : pillarIdBatches(ids)) PacketFactory.sendToServer(new RemovePillarPacket(batch));
             selectedPillarIds.clear();
             return true;
         }
@@ -4890,12 +4909,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (!pillarList.isEmpty() && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             if (!confirmDestructiveAction("remove:all")) return true;
+            List<String> ids = new ArrayList<>();
             for (PillarIdManager.PillarData data : pillarList) {
                 if (data.id != null) {
-                    PillarIdManager.getClient().removePillarData(data.id);
-                    PacketFactory.sendToServer(new RemovePillarPacket(data.id));
+                    ids.add(data.id);
                 }
             }
+            PillarIdManager.getClient().removePillars(ids);
+            for (List<String> batch : pillarIdBatches(ids)) PacketFactory.sendToServer(new RemovePillarPacket(batch));
             selectedPillarIds.clear();
             return true;
         }
@@ -4908,19 +4929,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 PillarIdManager.clearPillarOverrides(PillarIdManager.getClient().getPillarData(id));
             }
             PillarIdManager.getClient().saveAllPillars();
-            List<String> batch = new ArrayList<>();
-            int bytes = Integer.BYTES;
-            for (String id : selectedPillarIds) {
-                int size = id.getBytes(java.nio.charset.StandardCharsets.UTF_8).length + 5;
-                if (!batch.isEmpty() && (bytes + size > 24_000 || batch.size() >= 1024)) {
-                    PacketFactory.sendToServer(new ResetPillarsPacket(batch));
-                    batch.clear();
-                    bytes = Integer.BYTES;
-                }
-                batch.add(id);
-                bytes += size;
-            }
-            if (!batch.isEmpty()) PacketFactory.sendToServer(new ResetPillarsPacket(batch));
+            for (List<String> batch : pillarIdBatches(selectedPillarIds)) PacketFactory.sendToServer(new ResetPillarsPacket(batch));
             return true;
         }
 
@@ -5542,7 +5551,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Row 1: Custom Pattern Toggle
         if (checkSideRowToggleClick(mouseX, mouseY, rowX, curY, rowW, rowH)) {
-            if (!requireConfigModificationAccess()) return true;
+            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             boolean cur = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
             data.use_pattern = !cur;
             PillarIdManager.getClient().updatePillarData(data);
@@ -5553,7 +5562,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Row 2: Pattern Cycle
         if (checkSideRowCycleClick(mouseX, mouseY, rowX, curY, rowW, rowH)) {
-            if (!requireConfigModificationAccess()) return true;
+            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
             int idx = 0;
             for (int i = 0; i < PARTICLE_PATTERNS.length; i++) {
@@ -5572,7 +5581,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 3: Speed Counter
         int speedStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
         if (speedStep != 0) {
-            if (!requireConfigModificationAccess()) return true;
+            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
             data.pattern_speed = adjustConfigValue(cur, speedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
             PillarIdManager.getClient().updatePillarData(data);
@@ -5584,7 +5593,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 4: Spread Counter
         int spreadStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
         if (spreadStep != 0) {
-            if (!requireConfigModificationAccess()) return true;
+            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
             data.pattern_spread = adjustConfigValue(cur, spreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
             PillarIdManager.getClient().updatePillarData(data);
@@ -5596,7 +5605,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 5: Intensity Counter
         int intStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
         if (intStep != 0) {
-            if (!requireConfigModificationAccess()) return true;
+            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
             data.pattern_intensity = adjustConfigValue(cur, intStep, 0.1D, Services.PLATFORM.hasControlDown(), 0.1D, 5.0D, 1);
             PillarIdManager.getClient().updatePillarData(data);
@@ -5619,14 +5628,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int stepW = 13;
         if (mouseY >= counterY && mouseY <= counterY + counterH) {
             if (mouseX >= counterX && mouseX <= counterX + stepW) {
-                if (!requireConfigModificationAccess()) return true;
+                if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
                 data.max_particle_color = Math.max(1, maxColors - 1);
                 if (data.dyeColors == null) data.dyeColors = new ArrayList<>(colors);
                 PillarIdManager.getClient().updatePillarData(data);
                 PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
                 return true;
             } else if (mouseX >= counterX + counterW - stepW && mouseX <= counterX + counterW) {
-                if (!requireConfigModificationAccess()) return true;
+                if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
                 data.max_particle_color = Math.min(5, maxColors + 1);
                 if (data.dyeColors == null) data.dyeColors = new ArrayList<>(colors);
                 PillarIdManager.getClient().updatePillarData(data);
@@ -5664,7 +5673,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 7: Save Button
         int btnH = 16;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
-            if (!requireConfigModificationAccess()) return true;
+            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             PillarIdManager.getClient().saveAllPillars();
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5754,7 +5763,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnW = w - pad * 2;
         int btnH = 16;
         if (mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH) {
-            if (!requireConfigModificationAccess()) return true;
+            if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
             int r = (currentColorInt >> 16) & 0xFF;
             int g = (currentColorInt >> 8) & 0xFF;

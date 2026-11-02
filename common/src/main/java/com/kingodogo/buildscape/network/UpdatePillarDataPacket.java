@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.PillarIdManager;
-import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -157,8 +156,7 @@ public class UpdatePillarDataPacket implements CommonPacket {
 
     @Override
     public void handle(Player player) {
-        if (!(player instanceof ServerPlayer serverPlayer) || !PillarParticleConfig.canPlayerEdit(serverPlayer,
-                PillarParticleConfig.getServerConfig().edit_permission_mode, PillarParticleConfig.EditScope.GENERAL)) return;
+        if (!(player instanceof ServerPlayer serverPlayer) || !EditGuard.requirePillarEdit(serverPlayer)) return;
 
         PillarIdManager manager = PillarIdManager.get();
         PillarIdManager.PillarData data = manager.getPillarData(pillarId);

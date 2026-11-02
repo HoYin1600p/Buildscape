@@ -85,6 +85,7 @@ public interface IPlatformAdapter {
     /** Game directory supplied by the loader, independent of the process working directory. */
     java.nio.file.Path getGameDir();
     String getPlatformName();
+    String getModVersion();
     boolean isModLoaded(String modId);
     boolean isClient();
     boolean hasCurrentUser();

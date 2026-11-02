@@ -48,6 +48,9 @@ public class FabricPlatformAdapter extends PlatformAdapterBase {
     }
 
     @Override
+    public String getModVersion() { return net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer("buildscape").map(mod -> mod.getMetadata().getVersion().getFriendlyString()).orElse(""); }
+
+    @Override
     public String getPlatformName() {
         return "Fabric 26.3";
     }

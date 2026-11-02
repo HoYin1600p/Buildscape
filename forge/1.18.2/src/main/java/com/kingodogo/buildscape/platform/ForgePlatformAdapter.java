@@ -82,6 +82,7 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
         return net.minecraftforge.common.extensions.IForgeMenuType.create((id, inventory, buffer) -> factory.create(id, inventory));
     }
 
+    @Override public String getModVersion() { return net.minecraftforge.fml.ModList.get().getModContainerById("buildscape").map(mod -> mod.getModInfo().getVersion().toString()).orElse(""); }
     @Override public String getPlatformName() { return "Forge 1.18.2"; }
     @Override public boolean isModLoaded(String modId) { return ModList.get().isLoaded(modId); }
     @Override public boolean isClient() { return FMLEnvironment.dist.isClient(); }

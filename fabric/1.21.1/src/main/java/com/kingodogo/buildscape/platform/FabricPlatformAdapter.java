@@ -63,6 +63,7 @@ public final class FabricPlatformAdapter extends PlatformAdapterBase implements 
         };
     }
 
+    @Override public String getModVersion() { return net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer("buildscape").map(mod -> mod.getMetadata().getVersion().getFriendlyString()).orElse(""); }
     @Override public String getPlatformName() { return "Fabric 1.21.1"; }
     @Override public boolean isModLoaded(String id) { return FabricLoader.getInstance().isModLoaded(id); }
     @Override public boolean isClient() { return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT; }

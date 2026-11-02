@@ -54,6 +54,9 @@ public class NeoForgePlatformAdapter extends PlatformAdapterBase {
     }
 
     @Override
+    public String getModVersion() { return net.neoforged.fml.ModList.get().getModContainerById("buildscape").map(mod -> mod.getModInfo().getVersion().toString()).orElse(""); }
+
+    @Override
     public String getPlatformName() {
         return "NeoForge 26.3";
     }

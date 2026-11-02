@@ -198,6 +198,7 @@ public final class FabricPlatformAdapter extends PlatformAdapterBase implements 
                     (net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?>)value);
         });
     }
+    @Override public String getModVersion() { return net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer("buildscape").map(mod -> mod.getMetadata().getVersion().getFriendlyString()).orElse(""); }
     @Override public String getPlatformName() { return "Fabric 1.18.2"; }
     @Override public boolean isModLoaded(String modId) { return FabricLoader.getInstance().isModLoaded(modId); }
     @Override public boolean isClient() { return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT; }

@@ -47,6 +47,9 @@ public class ForgePlatformAdapter extends PlatformAdapterBase {
     }
 
     @Override
+    public String getModVersion() { return net.minecraftforge.fml.ModList.getModContainerById("buildscape").map(mod -> mod.getModInfo().getVersion().toString()).orElse(""); }
+
+    @Override
     public String getPlatformName() {
         return "Forge 26.3";
     }

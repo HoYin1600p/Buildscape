@@ -49,6 +49,7 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
         return !canceled;
     }
 
+    @Override public String getModVersion() { return net.minecraftforge.fml.ModList.get().getModContainerById("buildscape").map(mod -> mod.getModInfo().getVersion().toString()).orElse(""); }
     @Override public String getPlatformName() { return "Forge 1.21.1"; }
     @Override public boolean isModLoaded(String id) { return net.minecraftforge.fml.ModList.get().isLoaded(id); }
     @Override public boolean isClient() { return net.minecraftforge.fml.loading.FMLEnvironment.dist.isClient(); }

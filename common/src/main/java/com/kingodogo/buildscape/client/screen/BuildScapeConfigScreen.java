@@ -47,6 +47,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return UI_ICONS.computeIfAbsent(name, key -> new CommonId("buildscape", "textures/client/ui/" + key + ".png"));
     }
 
+    private static String modVersionTag() {
+        String version = Services.PLATFORM.getModVersion();
+        return version == null || version.isBlank() ? "" : "v" + version;
+    }
+
+    private static int themeToggleX(Font font, int headerX, int headerWidth) {
+        return headerX + headerWidth - font.width(modVersionTag()) - 28 - 54;
+    }
+
     private static int firstVisibleRow(int viewportY, int startY, int step) {
         return Math.max(0, Math.floorDiv(viewportY - startY, step) - 1);
     }
@@ -1840,9 +1849,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         // 4. Header Bar Contents
-        int themeToggleX = headerX + headerW - 14 - 5 - 44 - 8;
-        drawText(poseStackOrGraphics, font, trimTextToWidth(font, "⚙ Buildscape Configuration",
+        int themeToggleX = themeToggleX(font, headerX, headerW);
+        drawText(poseStackOrGraphics, font, trimTextToWidth(font, Services.PLATFORM.getPlatformName(),
                 Math.max(0, themeToggleX - headerX - 14), false), headerX + 8, headerY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        String versionTag = modVersionTag();
+        drawText(poseStackOrGraphics, font, versionTag, headerX + headerW - font.width(versionTag) - 28,
+                headerY + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
         renderHeaderThemeToggle(poseStackOrGraphics, themeToggleX, headerY + 4, effMouseX, effMouseY, alpha);
 
         drawTopCrestBadge(poseStackOrGraphics, font, frameX, frameY, frameW, alpha);
@@ -4368,7 +4380,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             return true;
         }
 
-        int themeToggleX = headerX + headerW - closeBtnSize - 5 - 44 - 8;
+        int themeToggleX = themeToggleX(Minecraft.getInstance().font, headerX, headerW);
         int themeToggleY = headerY + 4;
         if (mouseX >= themeToggleX && mouseX <= themeToggleX + 44 && mouseY >= themeToggleY && mouseY <= themeToggleY + 16) {
             applyTheme(currentTheme.isLight() ? ConfigThemes.getDarkVariant(currentTheme) : ConfigThemes.getLightVariant(currentTheme));

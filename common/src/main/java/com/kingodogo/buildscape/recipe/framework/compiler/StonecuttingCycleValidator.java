@@ -22,6 +22,12 @@ public final class StonecuttingCycleValidator {
 
     private record SearchNode(String item, boolean gain) {}
 
+    public void removeRecipe(String id) {
+        if (!registeredIds.remove(id)) return;
+        outgoing.values().forEach(edges -> edges.removeIf(edge -> edge.recipeId().equals(id)));
+        outgoing.values().removeIf(List::isEmpty);
+    }
+
     /** Adds one compiled recipe if it cannot create a gainful cycle with accepted recipes. */
     public void addRecipeChecked(String id, List<String> inputs, String output, int count) {
         if (count < 1 || registeredIds.contains(id)) return;

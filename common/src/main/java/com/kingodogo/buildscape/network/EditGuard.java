@@ -22,6 +22,7 @@ public final class EditGuard {
         Services.PLATFORM.sendActionBarMessage(player,
                 ComponentHelper.literal("BuildScape: This setting is locked by the server edit policy.").withStyle(ChatFormatting.RED));
         try {
+            PacketFactory.sendToPlayer(player, new EditRefusedPacket(setting));
             PacketFactory.sendToPlayer(player, new SyncConfigPacket(config, player));
             if (setting == ConfigSetting.PILLAR_EDIT) {
                 PillarIdManager manager = PillarIdManager.get();

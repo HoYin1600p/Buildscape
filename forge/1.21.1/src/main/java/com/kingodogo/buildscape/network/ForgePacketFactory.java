@@ -62,6 +62,7 @@ public final class ForgePacketFactory implements IPacketFactory {
         types.put(SyncSignFramePacket.ID, SyncSignFramePacket.class);
         types.put(ConfettiBurstPacket.ID, ConfettiBurstPacket.class);
         types.put(ResetPillarsPacket.ID, ResetPillarsPacket.class);
+        types.put(EditRefusedPacket.ID, EditRefusedPacket.class);
         if (!types.keySet().equals(packets.keySet())) throw new IllegalStateException("Forge packet types differ from shared descriptors");
         channel = ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "main"))
                 .networkProtocolVersion(ModPackets.PROTOCOL_VERSION).simpleChannel();

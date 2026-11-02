@@ -714,6 +714,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private final List<GuiEventListener> tabWidgets = new ArrayList<>();
     private static volatile BuildScapeConfigScreen currentInstance;
     private final ConfigUploadBatch uploadBatch = new ConfigUploadBatch();
+    public static void onServerRefusal(ConfigSetting setting) {
+        BuildScapeConfigScreen screen = currentInstance;
+        if (screen == null) return;
+        screen.uploadBatch.refuse(setting, PillarParticleConfig.get());
+        screen.rebuildActiveItemsCache();
+        screen.itemsListDirty = true;
+        screen.readOnlyDeniedAt = System.currentTimeMillis();
+        screen.readOnlyDeniedX = screen.rawMouseX;
+        screen.readOnlyDeniedY = screen.rawMouseY;
+    }
     static {
         PillarParticleConfig.addConfigReloadCallback(remote -> {
             BuildScapeConfigScreen screen = currentInstance;

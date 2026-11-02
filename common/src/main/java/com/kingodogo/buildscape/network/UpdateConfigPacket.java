@@ -203,6 +203,7 @@ public class UpdateConfigPacket implements CommonPacket {
 
     private static void refuse(ServerPlayer player, String reason, PillarParticleConfig config) {
         Services.PLATFORM.sendActionBarMessage(player, ComponentHelper.literal(reason));
+        PacketFactory.sendToPlayer(player, new EditRefusedPacket(null));
         PacketFactory.sendToPlayer(player, new SyncConfigPacket(config, player));
     }
 

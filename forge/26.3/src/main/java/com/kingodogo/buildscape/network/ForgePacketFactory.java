@@ -52,7 +52,6 @@ public final class ForgePacketFactory implements IPacketFactory {
         types.put(RequestPillarIdsPacket.ID, RequestPillarIdsPacket.class);
         types.put(UpdateConfigPacket.ID, UpdateConfigPacket.class);
         types.put(RemovePillarPacket.ID, RemovePillarPacket.class);
-        types.put(UpdateAllPillarIdsPacket.ID, UpdateAllPillarIdsPacket.class);
         types.put(SyncGameRulesPacket.ID, SyncGameRulesPacket.class);
         types.put(UpdateGameRulePacket.ID, UpdateGameRulePacket.class);
         types.put(SyncHomemakerCooldownPacket.ID, SyncHomemakerCooldownPacket.class);

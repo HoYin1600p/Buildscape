@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
 public final class ModPackets {
-    public static final int PROTOCOL_VERSION = 3;
+    public static final int PROTOCOL_VERSION = 4;
     public static final String PROTOCOL_NAME = Integer.toString(PROTOCOL_VERSION);
 
     private ModPackets() {}
@@ -16,7 +16,6 @@ public final class ModPackets {
         PacketFactory.register(RequestPillarIdsPacket.ID, PacketDirection.CLIENT_TO_SERVER, RequestPillarIdsPacket::decode);
         PacketFactory.register(UpdateConfigPacket.ID, PacketDirection.CLIENT_TO_SERVER, UpdateConfigPacket::decode);
         PacketFactory.register(RemovePillarPacket.ID, PacketDirection.CLIENT_TO_SERVER, RemovePillarPacket::decode);
-        PacketFactory.register(UpdateAllPillarIdsPacket.ID, PacketDirection.CLIENT_TO_SERVER, UpdateAllPillarIdsPacket::decode);
         PacketFactory.register(SyncGameRulesPacket.ID, PacketDirection.SERVER_TO_CLIENT, SyncGameRulesPacket::decode);
         PacketFactory.register(UpdateGameRulePacket.ID, PacketDirection.CLIENT_TO_SERVER, UpdateGameRulePacket::decode);
         PacketFactory.register(SyncHomemakerCooldownPacket.ID, PacketDirection.SERVER_TO_CLIENT, SyncHomemakerCooldownPacket::decode);

@@ -139,6 +139,7 @@ public class ClientEvents {
     }
 
     public static void onClientTick() {
+        com.kingodogo.buildscape.network.SyncPillarIdsPacket.expireClientState();
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null && !com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.isItemsCached()) {
             com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.warmupAsync();

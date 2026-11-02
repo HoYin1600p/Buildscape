@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildscapeCommon;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.recipe.framework.cache.BinaryRecipeCache;
 import com.kingodogo.buildscape.recipe.framework.compiler.BuildScapeRecipeCompiler;
+import com.kingodogo.buildscape.recipe.framework.compiler.StonecuttingCycleValidator;
 import com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjector;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
@@ -191,7 +192,7 @@ public class BuildScapeRecipeLoader {
                 RecipePackFormatter.validateJson(new String(bytes, StandardCharsets.UTF_8));
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
-                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack);
+                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack, false);
                 compiledByCategory.put(category, result.recipes());
                 compiler.clear();
             } catch (Exception e) {
@@ -209,8 +210,8 @@ public class BuildScapeRecipeLoader {
             }
         }
 
-        recipes = RecipeValidator.filterCompiled(recipes);
-        cacheableSourceRecipes = RecipeValidator.filterCompiled(cacheableSourceRecipes);
+        recipes = filterStonecuttingCycles(RecipeValidator.filterCompiled(recipes));
+        cacheableSourceRecipes = filterStonecuttingCycles(RecipeValidator.filterCompiled(cacheableSourceRecipes));
         if (!cacheableSourceRecipes.isEmpty()) {
             BinaryRecipeCache.saveCache(contentHash, cacheableSourceRecipes);
         }
@@ -244,7 +245,7 @@ public class BuildScapeRecipeLoader {
                 RecipePackFormatter.validateJson(new String(categoryData, StandardCharsets.UTF_8));
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
-                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack);
+                BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack, false);
                 for (RecipeIR.CompiledRecipe recipe : result.recipes()) {
                     if (addUnique(recipesById, recipe)) added++;
                 }
@@ -256,7 +257,50 @@ public class BuildScapeRecipeLoader {
         if (added > 0) {
             BuildscapeCommon.LOGGER.info("BDRE Loader: Added {} runtime-only recipes after cache load.", added);
         }
-        return RecipeValidator.filterCompiled(new ArrayList<>(recipesById.values()));
+        return runtimeCategories.isEmpty() ? RecipeValidator.filterCompiled(new ArrayList<>(recipesById.values()))
+                : filterStonecuttingCycles(RecipeValidator.filterCompiled(new ArrayList<>(recipesById.values())));
+    }
+
+    private static List<RecipeIR.CompiledRecipe> filterStonecuttingCycles(List<RecipeIR.CompiledRecipe> recipes) {
+        StonecuttingCycleValidator cycles = new StonecuttingCycleValidator();
+        List<RecipeIR.CompiledRecipe> accepted = new ArrayList<>(recipes.size());
+        for (RecipeIR.CompiledRecipe recipe : recipes) {
+            if ("stonecutting".equals(recipe.type())) {
+                List<String> inputs = new ArrayList<>();
+                collectStonecuttingInputs(recipe.input(), inputs);
+                try {
+                    cycles.addRecipeChecked(recipe.id(), inputs, recipe.resultItem(), recipe.resultCount());
+                } catch (IllegalArgumentException exception) {
+                    BuildscapeCommon.LOGGER.warn("BDRE Loader: Rejected recipe [{}]: {}", recipe.id(), exception.getMessage());
+                    continue;
+                }
+            }
+            accepted.add(recipe);
+        }
+        return accepted;
+    }
+
+    private static void collectStonecuttingInputs(String input, List<String> result) {
+        if (input == null || input.isEmpty()) return;
+        input = input.trim();
+        if (input.startsWith("{") || input.startsWith("[")) {
+            collectStonecuttingInputs(com.google.gson.JsonParser.parseString(input), result);
+        } else {
+            result.add(input);
+        }
+    }
+
+    private static void collectStonecuttingInputs(com.google.gson.JsonElement input, List<String> result) {
+        // Tags remain separate graph nodes because their members depend on the active datapack.
+        if (input.isJsonArray()) {
+            for (com.google.gson.JsonElement alternative : input.getAsJsonArray()) collectStonecuttingInputs(alternative, result);
+        } else if (input.isJsonObject()) {
+            var object = input.getAsJsonObject();
+            if (object.has("item")) result.add(object.get("item").getAsString());
+            if (object.has("tag")) result.add("#" + object.get("tag").getAsString());
+        } else if (input.isJsonPrimitive() && input.getAsJsonPrimitive().isString()) {
+            result.add(input.getAsString());
+        }
     }
 
     private static boolean addUnique(Map<String, RecipeIR.CompiledRecipe> recipes, RecipeIR.CompiledRecipe recipe) {

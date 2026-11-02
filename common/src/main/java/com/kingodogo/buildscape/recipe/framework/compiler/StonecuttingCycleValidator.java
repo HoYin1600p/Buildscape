@@ -20,6 +20,33 @@ public final class StonecuttingCycleValidator {
     private record Edge(String input, String output, int count, String recipeId) {
     }
 
+    private record SearchNode(String item, boolean gain) {}
+
+    /** Adds one compiled recipe if it cannot create a gainful cycle with accepted recipes. */
+    public void addRecipeChecked(String id, List<String> inputs, String output, int count) {
+        if (count < 1 || registeredIds.contains(id)) return;
+        Set<String> targets = new HashSet<>(inputs);
+        SearchNode start = new SearchNode(output, count > 1);
+        Set<SearchNode> visited = new HashSet<>();
+        ArrayDeque<SearchNode> queue = new ArrayDeque<>();
+        visited.add(start);
+        queue.add(start);
+        while (!queue.isEmpty()) {
+            SearchNode node = queue.remove();
+            if (node.gain() && targets.contains(node.item())) {
+                throw new IllegalArgumentException("Stonecutting cycle with net item gain involving " + id);
+            }
+            for (Edge edge : outgoing.getOrDefault(node.item(), List.of())) {
+                SearchNode next = new SearchNode(edge.output(), node.gain() || edge.count() > 1);
+                if (visited.add(next)) queue.add(next);
+            }
+        }
+        registeredIds.add(id);
+        for (String input : inputs) {
+            outgoing.computeIfAbsent(input, key -> new ArrayList<>()).add(new Edge(input, output, count, id));
+        }
+    }
+
     public void addCategory(RecipeIR.CategoryPack pack) {
         AliasResolver aliases = new AliasResolver();
         aliases.registerAliases(pack.aliases());

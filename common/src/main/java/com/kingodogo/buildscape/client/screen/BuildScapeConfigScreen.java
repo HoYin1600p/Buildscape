@@ -4924,7 +4924,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
             case "links" -> {
                 for (ConfigLink link : CONFIG_LINKS) {
-                    if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 72)) {
+                    if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH,
+                            getConfigRowButtonWidth(Minecraft.getInstance().font, "Open ↗"))) {
                         try {
                             Services.PLATFORM.openUri(new URI(link.url()));
                         } catch (Exception error) {

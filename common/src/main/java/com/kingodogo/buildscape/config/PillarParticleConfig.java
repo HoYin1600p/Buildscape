@@ -500,7 +500,9 @@ public class PillarParticleConfig {
                 parentDir.mkdirs();
             }
 
-            JsonObject defaults = new PillarParticleConfig(configDirectory).propertyValues();
+            PillarParticleConfig defaultConfig = new PillarParticleConfig(configDirectory);
+            defaultConfig.particle_color.remove("#9B51E0");
+            JsonObject defaults = defaultConfig.propertyValues();
             String text = groupedProperties(defaults);
             ConfigLayoutIO.write(f.toPath(), text, null, true);
             propertiesSource = text;
@@ -589,8 +591,13 @@ public class PillarParticleConfig {
             this.particle_color.add("#E8FEFD");
             this.particle_color.add("#FF5C00");
             this.particle_color.add("#3CDFFF");
-            this.particle_color.add("#9B51E0");
             this.max_particle_color = 3;
+            try {
+                corruptedProperties = propertiesSource == null || !ConfigLayoutIO.isWritable(file.toPath());
+            } catch (IOException e) {
+                corruptedProperties = true;
+                BuildscapeCommon.LOGGER.warn("Unable to check default pillar properties", e);
+            }
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
             return;

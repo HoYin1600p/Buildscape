@@ -55,7 +55,9 @@ public class GlassJarBlockEntity extends DataBlockEntity implements IDataSeriali
     }
     static boolean shouldGlow(ItemStack liquid, int liquidLevel) {
         return liquidLevel > 0 && liquid != null && !liquid.isEmpty()
-                && (isXpLiquid(liquid) || liquid.is(Items.LAVA_BUCKET));
+                && (isXpLiquid(liquid) || liquid.is(Items.LAVA_BUCKET)
+                || liquid.getItem() instanceof BucketItem
+                && Services.PLATFORM.getBucketFluid(liquid.getItem()) == net.minecraft.world.level.material.Fluids.LAVA);
     }
     public boolean isBucketLiquid() {
         if (!hasLiquid()) return false;

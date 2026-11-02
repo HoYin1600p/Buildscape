@@ -41,6 +41,7 @@ import java.util.function.Consumer;
 public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private static final Map<String, CommonId> UI_ICONS = new HashMap<>();
+    private static final java.util.regex.Pattern SEARCH_WHITESPACE = java.util.regex.Pattern.compile("\\s+");
 
     private static CommonId uiIcon(String name) {
         return UI_ICONS.computeIfAbsent(name, key -> new CommonId("buildscape", "textures/client/ui/" + key + ".png"));
@@ -838,8 +839,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private static String normalizeSearchText(String value) {
-        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT)
-                .replace('_', ' ').replace('-', ' ').replaceAll("\\s+", " ");
+        return value == null ? "" : SEARCH_WHITESPACE.matcher(value.trim().toLowerCase(Locale.ROOT)
+                .replace('_', ' ').replace('-', ' ')).replaceAll(" ");
     }
 
     static List<Double> resetSearchScrollOffsets(double scrollOffset, double targetScrollOffset) {
@@ -1135,13 +1136,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         String selectedNamespace = itemSearchNamespaceIndex >= 0 && itemSearchNamespaceIndex < availableModNamespaces.size()
                 ? availableModNamespaces.get(itemSearchNamespaceIndex) : null;
+        String query = normalizeSearchText(itemSearchFilter);
         cachedFilteredItems.removeIf(item -> {
             CommonId id = Services.PLATFORM.getItemId(item);
             if (id == null || selectedNamespace != null && !selectedNamespace.equalsIgnoreCase(id.getNamespace())) {
                 return true;
             }
+            if (query.isEmpty() || normalizeSearchText(id.toString()).contains(query)) return false;
             String displayName = itemStackCache.computeIfAbsent(item, ItemStack::new).getHoverName().getString();
-            return !matchesConfigSearch(id.toString(), displayName, itemSearchFilter);
+            return !normalizeSearchText(displayName).contains(query);
         });
     }
 
@@ -4540,7 +4543,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                             cachedActiveItems.add(item);
                                         }
                                         persistServerConfig(cfg);
-                                        if (itemFilterMode == 3) {
+                                        if (itemFilterMode == 2) {
                                             itemsListDirty = true;
                                         }
                                     }
@@ -4573,6 +4576,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                     cachedActiveTags.add(tagId);
                                 }
                                 persistServerConfig(cfg);
+                                if (tagFilterMode == 2) tagsListDirty = true;
                                 return true;
                             }
                         }

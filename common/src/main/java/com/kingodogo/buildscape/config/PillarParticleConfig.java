@@ -592,6 +592,7 @@ public class PillarParticleConfig {
             this.particle_color.add("#FF5C00");
             this.particle_color.add("#3CDFFF");
             this.max_particle_color = 3;
+            loadedPropertyValues = propertyValues();
             try {
                 corruptedProperties = propertiesSource == null || !ConfigLayoutIO.isWritable(file.toPath());
             } catch (IOException e) {

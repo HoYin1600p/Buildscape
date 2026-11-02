@@ -359,6 +359,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override public void beginGuiOverlayRender() { com.mojang.blaze3d.systems.RenderSystem.disableDepthTest(); com.mojang.blaze3d.systems.RenderSystem.enableBlend(); com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc(); }
     @Override public void endGuiOverlayRender() { com.mojang.blaze3d.systems.RenderSystem.disableBlend(); com.mojang.blaze3d.systems.RenderSystem.enableDepthTest(); }
     @Override public void resetShaderColor() { com.mojang.blaze3d.systems.RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F); }
+    @Override public void renderScreen(net.minecraft.client.gui.screens.Screen screen, Object graphics, int mouseX, int mouseY, float partialTick) {
+        if (graphics instanceof com.mojang.blaze3d.vertex.PoseStack pose) screen.render(pose, mouseX, mouseY, partialTick);
+    }
     @Override public void renderPillarMarkers(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera) { }
     @Override public float getWalkDistance(net.minecraft.world.entity.player.Player player) { return player.walkDist; }
     @Override public boolean isWalkAnimationMoving(net.minecraft.world.entity.player.Player player) { return player.walkDist > player.walkDistO; }

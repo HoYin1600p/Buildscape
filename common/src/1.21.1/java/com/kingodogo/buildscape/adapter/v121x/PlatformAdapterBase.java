@@ -352,6 +352,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public void resetShaderColor() {
         ClientAccess.resetShaderColor();
     }
+
+    @Override public void renderScreen(net.minecraft.client.gui.screens.Screen screen, Object graphics, int mouseX, int mouseY, float partialTick) {
+        ClientAccess.renderScreen(screen, graphics, mouseX, mouseY, partialTick);
+    }
     @Override
     public void renderPillarMarkers(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera) {
     }

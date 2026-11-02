@@ -327,6 +327,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override public void beginGuiOverlayRender() { com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.beginGuiOverlayRender(); }
     @Override public void endGuiOverlayRender() { com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.endGuiOverlayRender(); }
     @Override public void resetShaderColor() { com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.resetShaderColor(); }
+    @Override public void renderScreen(net.minecraft.client.gui.screens.Screen screen, Object graphics, int mouseX, int mouseY, float partialTick) {
+        com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.renderScreen(screen, graphics, mouseX, mouseY, partialTick);
+    }
     @Override public void renderPillarMarkers(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera) { com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.renderPillarMarkers(poseStack, camera); }
     @Override public float getWalkDistance(net.minecraft.world.entity.player.Player player) { return player.walkAnimation.position(); }
     @Override public boolean isWalkAnimationMoving(net.minecraft.world.entity.player.Player player) { return player.walkAnimation.isMoving(); }

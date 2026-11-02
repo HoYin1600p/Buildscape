@@ -106,6 +106,7 @@ public interface IPlatformAdapter {
     Iterable<net.minecraft.world.item.ItemStack> getInventoryItems(net.minecraft.world.entity.player.Inventory inventory);
     boolean hasPlayerPermissions(net.minecraft.world.entity.player.Player player, int level);
     void openScreen(net.minecraft.client.gui.screens.Screen screen);
+    void renderScreen(net.minecraft.client.gui.screens.Screen screen, Object graphics, int mouseX, int mouseY, float partialTick);
     void openUri(java.net.URI uri);
     void setNativeImagePixel(com.mojang.blaze3d.platform.NativeImage image, int x, int y, int abgr);
     void beginGuiOverlayRender();

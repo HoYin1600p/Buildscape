@@ -221,6 +221,10 @@ public final class ClientAccess {
         } finally { gui.setColor(1, 1, 1, 1); }
     }
 
+    public static void renderScreen(net.minecraft.client.gui.screens.Screen screen, Object context, int mouseX, int mouseY, float partialTick) {
+        if (graphics(context) instanceof net.minecraft.client.gui.GuiGraphics gui) screen.render(gui, mouseX, mouseY, partialTick);
+    }
+
     public static void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
         if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
             gg.renderComponentTooltip(font, components, mouseX, mouseY);

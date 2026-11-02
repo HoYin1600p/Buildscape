@@ -310,6 +310,10 @@ public final class ClientPlatformHooks {
                 width, height, textureWidth, textureHeight, textureWidth, textureHeight, ClientGuiHooks.color(color));
     }
 
+    public static void renderScreen(net.minecraft.client.gui.screens.Screen screen, Object graphics, int mouseX, int mouseY, float partialTick) {
+        if (graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) screen.extractRenderState(extractor, mouseX, mouseY, partialTick);
+    }
+
     public static void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
         if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor
                 && components != null && !components.isEmpty()) {

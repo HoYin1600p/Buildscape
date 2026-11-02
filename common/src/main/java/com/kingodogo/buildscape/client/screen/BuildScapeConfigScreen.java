@@ -57,6 +57,39 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private final Map<String, Boolean> toggleLastState = new HashMap<>();
     private final Map<String, Long> toggleChangedAt = new HashMap<>();
+    private float themeTogglePosition = -1;
+    private float themeToggleFrom;
+    private long themeToggleChangedAt;
+    private String lastToggleTheme;
+
+    private void renderHeaderThemeToggle(Object graphics, int x, int y, int mouseX, int mouseY, float alpha) {
+        float target = currentTheme.isLight() ? 1 : 0;
+        if (themeTogglePosition < 0) {
+            themeTogglePosition = target;
+            lastToggleTheme = currentTheme.id;
+        } else if (!currentTheme.id.equals(lastToggleTheme)) {
+            lastToggleTheme = currentTheme.id;
+            themeToggleFrom = themeTogglePosition;
+            themeToggleChangedAt = System.currentTimeMillis();
+        }
+        float progress = Math.min(1, (System.currentTimeMillis() - themeToggleChangedAt)
+                / (float) Math.max(1, (int) (220 * getAnimSpeedMultiplier())));
+        themeTogglePosition = themeToggleFrom + (target - themeToggleFrom) * easeOutCubic(progress);
+        boolean hover = mouseX >= x && mouseX <= x + 44 && mouseY >= y && mouseY <= y + 16;
+        drawBeveledButton(graphics, x, y, 44, 16, COLOR_SLOT_BG, hover, false, alpha);
+        int knobX = x + 2 + Math.round(themeTogglePosition * 28);
+        drawBeveledButton(graphics, knobX, y + 2, 12, 12, hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hover, false, alpha);
+        Services.PLATFORM.blitTinted(graphics, uiIcon("icon_moon"), x + 3, y + 3, 10, 10, 16, 16,
+                applyAlpha(COLOR_TEXT_WHITE, alpha * (themeTogglePosition > 0.5f ? 0.45f : 1)));
+        Services.PLATFORM.blitTinted(graphics, uiIcon("icon_sun"), x + 31, y + 3, 10, 10, 16, 16,
+                applyAlpha(COLOR_TEXT_WHITE, alpha * (themeTogglePosition < 0.5f ? 0.45f : 1)));
+        if (hover) {
+            deferredTooltip = Collections.singletonList(ComponentHelper.literal(currentTheme.isLight()
+                    ? "Switch to dark mode" : "Switch to light mode"));
+            deferredTooltipX = rawMouseX + 12;
+            deferredTooltipY = rawMouseY;
+        }
+    }
 
     private void renderToggle(Object graphics, String key, int x, int y, boolean value, boolean hover, float alpha) {
         Boolean previous = toggleLastState.put(key, value);
@@ -1806,8 +1839,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             drawPresetsSideTab(poseStackOrGraphics, font, frameRight, frameY + 36, effMouseX, effMouseY, alpha);
         }
 
-        // 4. Header Bar Contents (Title, version tag, Crest Badge, Close button)
-        drawText(poseStackOrGraphics, font, "⚙ Buildscape Configuration", headerX + 8, headerY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        // 4. Header Bar Contents
+        int themeToggleX = headerX + headerW - 14 - 5 - 44 - 8;
+        drawText(poseStackOrGraphics, font, trimTextToWidth(font, "⚙ Buildscape Configuration",
+                Math.max(0, themeToggleX - headerX - 14), false), headerX + 8, headerY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        renderHeaderThemeToggle(poseStackOrGraphics, themeToggleX, headerY + 4, effMouseX, effMouseY, alpha);
 
         drawTopCrestBadge(poseStackOrGraphics, font, frameX, frameY, frameW, alpha);
 
@@ -4329,6 +4365,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int closeBtnY = headerY + 5;
         if (mouseX >= closeBtnX && mouseX <= closeBtnX + closeBtnSize && mouseY >= closeBtnY && mouseY <= closeBtnY + closeBtnSize) {
             startClosing();
+            return true;
+        }
+
+        int themeToggleX = headerX + headerW - closeBtnSize - 5 - 44 - 8;
+        int themeToggleY = headerY + 4;
+        if (mouseX >= themeToggleX && mouseX <= themeToggleX + 44 && mouseY >= themeToggleY && mouseY <= themeToggleY + 16) {
+            applyTheme(currentTheme.isLight() ? ConfigThemes.getDarkVariant(currentTheme) : ConfigThemes.getLightVariant(currentTheme));
             return true;
         }
 

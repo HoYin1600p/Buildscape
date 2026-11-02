@@ -620,5 +620,8 @@ public interface IPlatformAdapter {
     default net.minecraft.client.gui.screens.Screen createConfigScreen(net.minecraft.client.gui.screens.Screen parent) { return null; }
     default net.minecraft.client.gui.screens.Screen wrapScreen(net.minecraft.network.chat.Component title, net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.IScreenDelegate delegate) { return null; }
     void renderGuiItem(Object poseStackOrGraphics, net.minecraft.world.item.ItemStack stack, int x, int y);
+    default void renderScaledGuiItem(Object graphics, net.minecraft.world.item.ItemStack stack, int x, int y, float scale) {
+        renderGuiItem(graphics, stack, x, y);
+    }
     void renderGuiItemDecorations(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.world.item.ItemStack stack, int x, int y);
 }

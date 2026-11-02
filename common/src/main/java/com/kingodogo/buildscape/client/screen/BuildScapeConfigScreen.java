@@ -1282,9 +1282,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             inventoryTagsDirty = true;
         }
         currentInstance = this;
-        this.openStartTime = 0L;
-        this.isOpening = true;
-        this.openProgress = 0.0f;
+        if (this.isOpening || this.openProgress < 0.99f) {
+            this.openStartTime = 0L;
+            this.isOpening = true;
+            this.openProgress = 0.0f;
+        }
 
         this.width = width;
         this.height = height;
@@ -1485,7 +1487,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 openProgress = 1.0f;
                 isOpening = false;
             } else {
-                openProgress = easeOutSine(elapsed);
+                openProgress = easeOutCubic(elapsed);
             }
         }
 
@@ -1793,10 +1795,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // 4. Header Bar Contents (Title, version tag, Crest Badge, Close button)
         drawText(poseStackOrGraphics, font, "⚙ Buildscape Configuration", headerX + 8, headerY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
-
-        String versionTag = "v4.0.3 · NeoForge 26.2";
-        int tagW = font.width(versionTag);
-        drawText(poseStackOrGraphics, font, versionTag, headerX + headerW - tagW - 28, headerY + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
         drawTopCrestBadge(poseStackOrGraphics, font, frameX, frameY, frameW, alpha);
 
@@ -2265,7 +2263,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     }
 
                     ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
-                    Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, slotX + 2, slotY + 2);
+                    Services.PLATFORM.renderScaledGuiItem(poseStackOrGraphics, stack, slotX + 2, slotY + 2, getGuiUiScale());
 
                     if (hover) {
                         hoveredStack = stack;
@@ -2612,10 +2610,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 if (!pillarTypeStack.isEmpty() || !dispStack.isEmpty()) {
                     if (!pillarTypeStack.isEmpty()) {
-                        Services.PLATFORM.renderGuiItem(poseStackOrGraphics, pillarTypeStack, iconStartX, iconY);
+                        Services.PLATFORM.renderScaledGuiItem(poseStackOrGraphics, pillarTypeStack, iconStartX, iconY, getGuiUiScale());
                     }
                     if (!dispStack.isEmpty()) {
-                        Services.PLATFORM.renderGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY);
+                        Services.PLATFORM.renderScaledGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY, getGuiUiScale());
                     }
                 } else {
                     drawCenteredText(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
@@ -4263,7 +4261,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     // Mouse and keyboard event handling.
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (isClosing) return true;
+        if (isClosing || (isOpening && openProgress < 0.2f)) return true;
 
         float uiScale = getGuiUiScale();
         if (Math.abs(uiScale - 1.0f) > 0.001f) {

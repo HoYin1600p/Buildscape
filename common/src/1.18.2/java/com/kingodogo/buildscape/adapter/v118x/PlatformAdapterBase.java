@@ -4382,6 +4382,24 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void renderScaledGuiItem(Object graphics, net.minecraft.world.item.ItemStack stack, int x, int y, float scale) {
+        if (Math.abs(scale - 1.0f) < 0.001f) {
+            renderGuiItem(graphics, stack, x, y);
+            return;
+        }
+        com.mojang.blaze3d.vertex.PoseStack modelView = com.mojang.blaze3d.systems.RenderSystem.getModelViewStack();
+        modelView.pushPose();
+        modelView.scale(scale, scale, 1.0f);
+        com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();
+        try {
+            renderGuiItem(graphics, stack, x, y);
+        } finally {
+            modelView.popPose();
+            com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();
+        }
+    }
+
+    @Override
     public void renderGuiItemDecorations(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.world.item.ItemStack stack, int x, int y) {
         com.kingodogo.buildscape.adapter.v118x.GuiProvider.renderGuiItemDecorations(poseStackOrGraphics, font, stack, x, y);
     }

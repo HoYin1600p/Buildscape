@@ -1,9 +1,10 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.config.ConfigSetting;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class UpdateGameRulePacket implements CommonPacket {
@@ -45,9 +46,8 @@ public class UpdateGameRulePacket implements CommonPacket {
 
     @Override
     public void handle(Player player) {
-        if (!PillarParticleConfig.canPlayerEdit(player, PillarParticleConfig.getServerConfig().edit_permission_mode,
-                PillarParticleConfig.EditScope.GENERAL)) return;
-        Services.PLATFORM.updateGameRule(player, this.ruleName, this.value);
+        if (!(player instanceof ServerPlayer serverPlayer) || !EditGuard.require(serverPlayer, ConfigSetting.WORLD_RULES)) return;
+        Services.PLATFORM.updateGameRule(serverPlayer, this.ruleName, this.value);
     }
 
     public String getRuleName() {

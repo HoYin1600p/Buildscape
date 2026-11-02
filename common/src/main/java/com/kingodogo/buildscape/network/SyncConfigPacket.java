@@ -69,8 +69,8 @@ public class SyncConfigPacket implements CommonPacket {
         this.items = new HashSet<>(
                 config.items != null ? config.items : new HashSet<>()
         );
-        this.items.removeIf(item -> item != null
-                && item.getBytes(StandardCharsets.UTF_8).length > NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH);
+        this.items.removeIf(item -> item == null
+                || item.getBytes(StandardCharsets.UTF_8).length > NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH);
         this.edit_permission_mode = config.edit_permission_mode != null
                 ? config.edit_permission_mode : PillarParticleConfig.EditPermissionMode.STRICT;
         if (player != null) {

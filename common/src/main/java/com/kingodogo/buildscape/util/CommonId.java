@@ -3,6 +3,8 @@ package com.kingodogo.buildscape.util;
 import java.util.Objects;
 public final class CommonId implements Comparable<CommonId> {
     public static final String DEFAULT_NAMESPACE = "minecraft";
+    private static final java.util.regex.Pattern NAMESPACE = java.util.regex.Pattern.compile("[a-z0-9_.-]+");
+    private static final java.util.regex.Pattern PATH = java.util.regex.Pattern.compile("[a-z0-9/._-]+");
     private final String namespace;
     private final String path;
 
@@ -28,12 +30,13 @@ public final class CommonId implements Comparable<CommonId> {
 
     public static CommonId tryParse(String location) {
         if (location == null || location.isEmpty()) return null;
-        try {
-            return parse(location);
-        } catch (Exception e) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to parse resource identifier", e);
-            return null;
-        }
+        int separator = location.indexOf(':');
+        if (separator != location.lastIndexOf(':')) return null;
+        String namespace = separator < 0 ? DEFAULT_NAMESPACE : location.substring(0, separator);
+        String path = separator < 0 ? location : location.substring(separator + 1);
+        if (path.isEmpty() || (!namespace.isEmpty() && !NAMESPACE.matcher(namespace).matches())
+                || !PATH.matcher(path).matches()) return null;
+        return new CommonId(namespace, path);
     }
 
     public String getNamespace() {

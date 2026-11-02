@@ -993,6 +993,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         cachedActiveTags.clear();
         PillarParticleConfig cfg = PillarParticleConfig.get();
         for (String s : cfg.items) {
+            if (s == null) continue;
             if (s.startsWith("#")) {
                 cachedActiveTags.add(s);
             } else {

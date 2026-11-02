@@ -44,7 +44,6 @@ public final class RestoredCopperOxidation {
         return () -> Services.PLATFORM.getBlock(new CommonId("buildscape", path));
     }
 
-    // TODO S7a: route copper and eyeblossom interactions here for v118x.
     private static final Map<Supplier<Block>, Supplier<Block>> NEXT_STAGE = new HashMap<>();
     private static final Map<Supplier<Block>, Supplier<Block>> PREV_STAGE = new HashMap<>();
     private static final Map<Supplier<Block>, Supplier<Block>> WAXED_MAP = new HashMap<>();

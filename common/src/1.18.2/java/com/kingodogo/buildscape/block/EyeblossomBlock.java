@@ -78,7 +78,6 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
             return;
         }
 
-        // TODO S6b: register both eyeblossom variants before transitions are enabled.
         BlockState replacement = Services.PLATFORM.getBlock(new CommonId("buildscape",
                 night ? "open_eyeblossom" : "closed_eyeblossom"))
                 .defaultBlockState()

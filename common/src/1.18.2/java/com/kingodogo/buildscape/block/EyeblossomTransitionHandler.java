@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 public final class EyeblossomTransitionHandler {
-    // TODO S7a: wire these callbacks to Forge END level tick and server chunk/level lifecycle events.
     private static final Map<ServerLevel, Tracker> TRACKERS = new IdentityHashMap<>();
 
     private EyeblossomTransitionHandler() {

@@ -44,7 +44,6 @@ public class DryGrassBlock extends BushBlock implements BonemealableBlock {
 
     @Override
     public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {
-        // TODO S6b: register tall_dry_grass before this bonemeal path is used.
         level.setBlock(pos, Services.PLATFORM.getBlock(new CommonId("buildscape", "tall_dry_grass")).defaultBlockState(), 3);
     }
 }

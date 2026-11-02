@@ -629,6 +629,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override public void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, float u, float v, int width, int height, int sheetW, int sheetH) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.blit(poseStackOrGraphics, texture, x, y, u, v, width, height, sheetW, sheetH); }
 
     @Override public void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.blit(poseStackOrGraphics, texture, x, y, width, height, u, v, uWidth, vHeight, sheetW, sheetH); }
+    @Override public void blitTinted(Object graphics, CommonId texture, int x, int y, int width, int height, int textureWidth, int textureHeight, int color) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.blitTinted(graphics, texture, x, y, width, height, textureWidth, textureHeight, color); }
 
     @Override public void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderComponentTooltip(poseStackOrGraphics, font, components, mouseX, mouseY); }
 

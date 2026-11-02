@@ -302,6 +302,14 @@ public final class ClientPlatformHooks {
         }
     }
 
+    public static void blitTinted(Object graphics, CommonId texture, int x, int y, int width, int height,
+                                  int textureWidth, int textureHeight, int color) {
+        if (texture == null || !(graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor)) return;
+        net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath());
+        extractor.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, id, x, y, 0, 0,
+                width, height, textureWidth, textureHeight, textureWidth, textureHeight, ClientGuiHooks.color(color));
+    }
+
     public static void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
         if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor
                 && components != null && !components.isEmpty()) {

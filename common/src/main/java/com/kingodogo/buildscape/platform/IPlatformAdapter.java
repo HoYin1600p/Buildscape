@@ -189,6 +189,8 @@ public interface IPlatformAdapter {
     void bindTexture(CommonId id);
     void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, float u, float v, int width, int height, int sheetW, int sheetH);
     void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH);
+    void blitTinted(Object graphics, CommonId texture, int x, int y, int width, int height,
+                    int textureWidth, int textureHeight, int color);
     void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY);
     java.util.List<net.minecraft.network.chat.Component> getTooltipFromItem(net.minecraft.world.item.ItemStack stack);
     com.mojang.blaze3d.vertex.PoseStack toPoseStack(Object poseStackOrGraphics);

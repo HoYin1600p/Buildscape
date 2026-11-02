@@ -692,6 +692,22 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void blitTinted(Object graphics, CommonId texture, int x, int y, int width, int height,
+                           int textureWidth, int textureHeight, int color) {
+        if (!(graphics instanceof com.mojang.blaze3d.vertex.PoseStack pose) || texture == null) return;
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
+        com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
+        com.mojang.blaze3d.systems.RenderSystem.setShaderColor(((color >> 16) & 255) / 255f,
+                ((color >> 8) & 255) / 255f, (color & 255) / 255f, ((color >>> 24) & 255) / 255f);
+        try {
+            bindTexture(texture);
+            net.minecraft.client.gui.GuiComponent.blit(pose, x, y, width, height, 0, 0,
+                    textureWidth, textureHeight, textureWidth, textureHeight);
+        } finally { resetShaderColor(); }
+    }
+
+    @Override
     public void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
         if (poseStackOrGraphics instanceof com.mojang.blaze3d.vertex.PoseStack ps) {
             net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();

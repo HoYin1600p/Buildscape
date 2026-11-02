@@ -696,6 +696,12 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void blitTinted(Object graphics, CommonId texture, int x, int y, int width, int height,
+                           int textureWidth, int textureHeight, int color) {
+        ClientAccess.blitTinted(graphics, texture, x, y, width, height, textureWidth, textureHeight, color);
+    }
+
+    @Override
     public void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
         ClientAccess.renderComponentTooltip(poseStackOrGraphics, font, components, mouseX, mouseY);
     }

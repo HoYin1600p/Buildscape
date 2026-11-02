@@ -210,6 +210,17 @@ public final class ClientAccess {
         }
     }
 
+    public static void blitTinted(Object context, CommonId texture, int x, int y, int width, int height,
+                                  int textureWidth, int textureHeight, int color) {
+        if (texture == null || !(graphics(context) instanceof net.minecraft.client.gui.GuiGraphics gui)) return;
+        gui.setColor(((color >> 16) & 255) / 255f, ((color >> 8) & 255) / 255f,
+                (color & 255) / 255f, ((color >>> 24) & 255) / 255f);
+        try {
+            gui.blit(ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), texture.getPath()),
+                    x, y, width, height, 0, 0, textureWidth, textureHeight, textureWidth, textureHeight);
+        } finally { gui.setColor(1, 1, 1, 1); }
+    }
+
     public static void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
         if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
             gg.renderComponentTooltip(font, components, mouseX, mouseY);

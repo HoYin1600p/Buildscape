@@ -40,6 +40,35 @@ import java.util.function.Consumer;
 // Unified Single-Panel Buildscape Configuration Screen.
 public class BuildScapeConfigScreen implements IScreenDelegate {
 
+    private static CommonId uiIcon(String name) {
+        return new CommonId("buildscape", "textures/client/ui/" + name + ".png");
+    }
+
+    private final Map<String, Boolean> toggleLastState = new HashMap<>();
+    private final Map<String, Long> toggleChangedAt = new HashMap<>();
+
+    private void renderToggle(Object graphics, String key, int x, int y, boolean value, boolean hover, float alpha) {
+        Boolean previous = toggleLastState.put(key, value);
+        long now = System.currentTimeMillis();
+        if (previous != null && previous != value) toggleChangedAt.put(key, now);
+        float progress = value ? 1 : 0;
+        Long started = toggleChangedAt.get(key);
+        if (started != null) {
+            float t = Math.min(1, (now - started) / (float) Math.max(1, (int) (180 * getAnimSpeedMultiplier())));
+            float eased = easeOutCubic(t);
+            progress = value ? eased : 1 - eased;
+            if (t >= 1) toggleChangedAt.remove(key);
+        }
+        int accent = hover ? COLOR_ACCENT_GLOW : COLOR_ACCENT;
+        for (int state = 0; state < 2; state++) {
+            float opacity = alpha * (state == 0 ? 1 - progress : progress);
+            if (opacity <= 0) continue;
+            String name = state == 0 ? "toggle_off" : "toggle_on";
+            Services.PLATFORM.blitTinted(graphics, uiIcon(name + "_tint"), x, y, 26, 15, 24, 13, applyAlpha(accent, opacity));
+            Services.PLATFORM.blitTinted(graphics, uiIcon(name), x, y, 26, 15, 24, 13, applyAlpha(0xFFFFFFFF, opacity));
+        }
+    }
+
     record ConfigLink(String title, String description, String url) {}
 
     record PresetSideTabGeometry(int x, int y, int width, int height, int centerX, int centerY) {}
@@ -1874,19 +1903,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             float dist = Math.abs(tabY - currentIndicatorY) / (float) (tabH + tabGap);
             float selectWeight = Math.max(0.0f, 1.0f - dist * 1.5f);
 
-            int iconCollapsedX = tabX + (tabW / 2) - (font.width(item.icon) / 2);
-            int iconExpandedX = tabX + 6;
+            int iconCollapsedX = tabX + (tabW - 16) / 2;
+            int iconExpandedX = tabX + 5;
             int iconX = (int) Math.round(iconCollapsedX + (iconExpandedX - iconCollapsedX) * navAnimProgress);
 
             int baseIconCol = hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED;
             int iconCol = lerpColor(baseIconCol, COLOR_TEXT_WHITE, selectWeight);
-            drawText(poseStackOrGraphics, font, item.icon, iconX, tabY + 9, applyAlpha(iconCol, alpha));
+            Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon("nav_" + item.id), iconX,
+                    tabY + (tabH - 16) / 2, 16, 16, 16, 16, applyAlpha(iconCol, alpha));
 
             if (navAnimProgress > 0.15f) {
                 float textAlpha = alpha * Math.min(1.0f, (navAnimProgress - 0.15f) / 0.85f);
                 int baseTextCol = hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED;
                 int textCol = lerpColor(baseTextCol, COLOR_TEXT_WHITE, selectWeight);
-                drawText(poseStackOrGraphics, font, item.title, tabX + 20, tabY + 9, applyAlpha(textCol, textAlpha));
+                drawText(poseStackOrGraphics, font, item.title, tabX + 25, tabY + 9, applyAlpha(textCol, textAlpha));
             } else if (hover) {
                 hoveredTooltip = item.title;
             }
@@ -1943,8 +1973,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         float tabAlpha = alpha * Math.min(1.0f, 0.65f + 0.35f * transProgress);
 
         int catHeaderH = 22;
-        drawText(poseStackOrGraphics, font, current.icon + "  " + current.title.toUpperCase(), x + 8, y + 6, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
-        drawText(poseStackOrGraphics, font, current.subtitle, x + 8 + font.width(current.icon + "  " + current.title.toUpperCase()) + 10, y + 7, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
+        Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon("nav_" + current.id), x + 8, y + 3,
+                16, 16, 16, 16, applyAlpha(COLOR_ACCENT, tabAlpha));
+        String title = current.title.toUpperCase(Locale.ROOT);
+        drawText(poseStackOrGraphics, font, title, x + 29, y + 6, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
+        drawText(poseStackOrGraphics, font, current.subtitle, x + 39 + font.width(title), y + 7, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
         PillarParticleConfig.EditScope tabScope = "items".equals(current.id)
                 ? PillarParticleConfig.EditScope.LIMITED : PillarParticleConfig.EditScope.GENERAL;
         boolean restricted = ("items".equals(current.id) || "particles".equals(current.id)
@@ -2049,15 +2082,21 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         boolean isSub0 = (itemsSubTab == 0);
         boolean hoverSub0 = mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
         drawBeveledButton(poseStackOrGraphics, sub0X, subY, subBtnW, subBtnH, isSub0 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub0, isSub0, alpha);
-        String sub0Label = "▦ Display Items (" + cachedActiveItems.size() + ")";
-        drawCenteredText(poseStackOrGraphics, font, sub0Label, sub0X + subBtnW / 2, subY + 3, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+        String sub0Label = "Display Items (" + cachedActiveItems.size() + ")";
+        int sub0Start = sub0X + (subBtnW - font.width(sub0Label) - 16) / 2;
+        Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon("subtab_items"), sub0Start, subY + 1,
+                12, 12, 16, 16, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+        drawText(poseStackOrGraphics, font, sub0Label, sub0Start + 16, subY + 3, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
 
         int sub1X = sub0X + subBtnW + 4;
         boolean isSub1 = (itemsSubTab == 1);
         boolean hoverSub1 = mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
         drawBeveledButton(poseStackOrGraphics, sub1X, subY, subBtnW, subBtnH, isSub1 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub1, isSub1, alpha);
-        String sub1Label = "🏷 Display Tags (" + cachedActiveTags.size() + ")";
-        drawCenteredText(poseStackOrGraphics, font, sub1Label, sub1X + subBtnW / 2, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+        String sub1Label = "Display Tags (" + cachedActiveTags.size() + ")";
+        int sub1Start = sub1X + (subBtnW - font.width(sub1Label) - 16) / 2;
+        Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon("subtab_tags"), sub1Start, subY + 1,
+                12, 12, 16, 16, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+        drawText(poseStackOrGraphics, font, sub1Label, sub1Start + 16, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
 
         curY += row1H + 2;
 
@@ -3500,13 +3539,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnY = y + (h - btnH) / 2;
         boolean hover = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
 
-        if (val) {
-            drawBeveledGreenButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hover, alpha);
-        } else {
-            drawBeveledRedButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hover, alpha);
-        }
-        int textCol = val ? (hover ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT) : (hover ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT);
-        drawCenteredText(poseStackOrGraphics, font, val ? "ON" : "OFF", btnX + btnW / 2, btnY + 4, applyAlpha(textCol, alpha));
+        renderToggle(poseStackOrGraphics, "side:" + label, btnX + btnW - 26, btnY, val, hover, alpha);
     }
 
     private void renderSideRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
@@ -3922,13 +3955,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnY = y + (h - btnH) / 2;
 
         boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
-        if (value) {
-            drawBeveledGreenButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn, alpha);
-        } else {
-            drawBeveledRedButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn, alpha);
-        }
-        int textCol = value ? (hoverBtn ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT) : (hoverBtn ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT);
-        drawCenteredText(poseStackOrGraphics, font, value ? "ON" : "OFF", btnX + btnW / 2, btnY + 4, applyAlpha(textCol, alpha));
+        renderToggle(poseStackOrGraphics, "main:" + label, btnX + btnW - 26, btnY, value, hoverBtn, alpha);
     }
 
     private void renderConfigRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String currentVal, int mouseX, int mouseY, float alpha) {

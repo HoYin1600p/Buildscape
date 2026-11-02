@@ -44,6 +44,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return new CommonId("buildscape", "textures/client/ui/" + name + ".png");
     }
 
+    private static int firstVisibleRow(int viewportY, int startY, int step) {
+        return Math.max(0, Math.floorDiv(viewportY - startY, step) - 1);
+    }
+
+    private static int endVisibleRow(int viewportY, int viewportHeight, int startY, int step, int count) {
+        return Math.min(count, Math.max(0, Math.floorDiv(viewportY + viewportHeight - startY, step) + 1));
+    }
+
     private final Map<String, Boolean> toggleLastState = new HashMap<>();
     private final Map<String, Long> toggleChangedAt = new HashMap<>();
 
@@ -2276,7 +2284,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
             enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
 
-            for (int ti = 0; ti < tagsToDisplay.size(); ti++) {
+            int firstTag = firstVisibleRow(viewportY, startY, tagRowH + tagRowGap);
+            int lastTag = endVisibleRow(viewportY, viewportH, startY, tagRowH + tagRowGap, tagsToDisplay.size());
+            for (int ti = firstTag; ti < lastTag; ti++) {
                 String tagId = tagsToDisplay.get(ti);
                 int rowY = startY + ti * (tagRowH + tagRowGap);
                 if (rowY + tagRowH < viewportY || rowY > viewportY + viewportH) continue;
@@ -2547,7 +2557,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             drawCenteredText(poseStackOrGraphics, font, "No placed pillars found in world.", colX + availW / 2, emptyY + 8, applyAlpha(COLOR_TEXT_SILVER, alpha));
             drawCenteredText(poseStackOrGraphics, font, "Place and customize pillar columns to synchronize their IDs.", colX + availW / 2, emptyY + 20, applyAlpha(COLOR_TEXT_MUTED, alpha));
         } else {
-            for (int r = 0; r < pillarList.size(); r++) {
+            int firstRow = firstVisibleRow(viewportY, startY, rowH + rowGap);
+            int endRow = endVisibleRow(viewportY, viewportH, startY, rowH + rowGap, pillarList.size());
+            for (int r = firstRow; r < endRow; r++) {
                 PillarIdManager.PillarData data = pillarList.get(r);
                 int rowY = startY + r * (rowH + rowGap);
                 if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;
@@ -4522,7 +4534,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         int rowW = availGridW;
                         int rowX = contentX + 6;
 
-                        for (int ti = 0; ti < tagsToDisplay.size(); ti++) {
+                        int firstTag = firstVisibleRow(viewportY, startY, tagRowH + tagRowGap);
+                        int lastTag = endVisibleRow(viewportY, viewportH, startY, tagRowH + tagRowGap, tagsToDisplay.size());
+                        for (int ti = firstTag; ti < lastTag; ti++) {
                             int rowY = startY + ti * (tagRowH + tagRowGap);
                             if (rowY + tagRowH < viewportY || rowY > viewportY + viewportH) continue;
 
@@ -5016,7 +5030,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int rowGap = 2;
         int startY = viewportY + 2 - (int) scrollOffset;
 
-        for (int r = 0; r < pillarList.size(); r++) {
+        int firstRow = firstVisibleRow(viewportY, startY, rowH + rowGap);
+        int endRow = endVisibleRow(viewportY, viewportH, startY, rowH + rowGap, pillarList.size());
+        for (int r = firstRow; r < endRow; r++) {
             PillarIdManager.PillarData data = pillarList.get(r);
             int rowY = startY + r * (rowH + rowGap);
             if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;

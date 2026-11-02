@@ -69,7 +69,9 @@ public final class GlassJarRenderer implements BlockEntityRenderer<GlassJarBlock
         }
         state.food.clear();
         ItemStack stored = entity.getStoredItem();
-        state.count = entity.hasLiquid() ? 0 : Math.min(32, entity.getItemCount());
+        state.count = entity.hasLiquid() || stored.isEmpty()
+                || stored.getItem() instanceof com.kingodogo.buildscape.item.GlassJarItem
+                ? 0 : Math.min(32, entity.getItemCount());
         if (state.count > 0) {
             client.getItemModelResolver().updateForTopItem(state.food, stored, ItemDisplayContext.FIXED,
                     entity.getLevel(), null, 0);

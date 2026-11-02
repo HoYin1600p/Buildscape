@@ -25,7 +25,7 @@ public final class LogStrippingLogic {
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
         CommonId blockId = Services.PLATFORM.getBlockId(block);
-        if (blockId == null) return InteractionResult.PASS;
+        if (blockId == null || !"buildscape".equals(blockId.getNamespace())) return InteractionResult.PASS;
 
         String path = blockId.getPath();
         String strippedPath = null;

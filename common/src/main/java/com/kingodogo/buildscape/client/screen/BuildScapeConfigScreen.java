@@ -40,8 +40,10 @@ import java.util.function.Consumer;
 // Unified Single-Panel Buildscape Configuration Screen.
 public class BuildScapeConfigScreen implements IScreenDelegate {
 
+    private static final Map<String, CommonId> UI_ICONS = new HashMap<>();
+
     private static CommonId uiIcon(String name) {
-        return new CommonId("buildscape", "textures/client/ui/" + name + ".png");
+        return UI_ICONS.computeIfAbsent(name, key -> new CommonId("buildscape", "textures/client/ui/" + key + ".png"));
     }
 
     private static int firstVisibleRow(int viewportY, int startY, int step) {
@@ -2067,9 +2069,23 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private void renderLinksRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap,
                                  int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         int curY = startY;
-        for (ConfigLink link : CONFIG_LINKS) {
-            renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH,
-                    link.title(), link.description(), "Open ↗", mouseX, mouseY, alpha);
+        String[] icons = {"link_website", "link_bugs", "link_kofi", "link_curseforge", "link_modrinth"};
+        for (int i = 0; i < CONFIG_LINKS.size(); i++) {
+            ConfigLink link = CONFIG_LINKS.get(i);
+            if (curY >= clipY && curY + h <= clipY + clipH) {
+                renderRowCardBase(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "", "", mouseX, mouseY, alpha);
+                Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon(icons[i]), x + 6, curY + (h - 16) / 2,
+                        16, 16, 16, 16, applyAlpha(COLOR_ACCENT, alpha));
+                int btnW = getConfigRowButtonWidth(font, "Open ↗");
+                int btnX = x + w - btnW - 8;
+                int btnY = curY + (h - 14) / 2;
+                int textWidth = Math.max(0, btnX - x - 33);
+                drawText(poseStackOrGraphics, font, trimTextToWidth(font, link.title(), textWidth, false), x + 27, curY + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
+                drawText(poseStackOrGraphics, font, trimTextToWidth(font, link.description(), textWidth, false), x + 27, curY + 15, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                boolean hover = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + 14;
+                drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, 14, hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hover, false, alpha);
+                drawCenteredText(poseStackOrGraphics, font, "Open ↗", btnX + btnW / 2, btnY + 3, applyAlpha(hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+            }
             curY += h + gap;
         }
     }
@@ -3127,7 +3143,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             float titleAlpha = (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching)
                     ? alpha * (0.25f + 0.75f * switchProgress) : alpha;
 
-            drawText(poseStackOrGraphics, font, titleText, sHeadX + 6 + titleOffsetX, sHeadY + 7, applyAlpha(COLOR_TEXT_WHITE, titleAlpha));
+            String panelIcon = sidePanelType == SidePanelType.PILLAR_DETAIL ? "panel_pillar"
+                    : sidePanelType == SidePanelType.COLOR_PICKER ? "panel_color" : null;
+            int titleX = sHeadX + 6 + titleOffsetX;
+            if (panelIcon != null) {
+                Services.PLATFORM.blitTinted(poseStackOrGraphics, uiIcon(panelIcon), titleX, sHeadY + 4,
+                        14, 14, 16, 16, applyAlpha(COLOR_ACCENT, titleAlpha));
+                titleX += 19;
+            }
+            drawText(poseStackOrGraphics, font, titleText, titleX, sHeadY + 7, applyAlpha(COLOR_TEXT_WHITE, titleAlpha));
 
             if (sidePanelType == SidePanelType.PILLAR_DETAIL && isPillarSwitching) {
                 float glowAlpha = (1.0f - switchProgress) * 0.45f * alpha;

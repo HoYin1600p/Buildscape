@@ -1027,6 +1027,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         this.parent = parent;
         uploadBatch.rebase(PillarParticleConfig.get());
         this.title = ComponentHelper.translatable("buildscape.config.title");
+        PresetsConfig presets = PresetsConfig.get();
+        this.selectedPresetIndex = Math.max(0, presets.getPresetKeys().indexOf(presets.getLastAppliedPreset()));
 
         this.openStartTime = 0L;
         try {
@@ -5611,7 +5613,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 String key = keys.get(selectedPresetIndex);
                 PillarParticleConfig cfg = PillarParticleConfig.get();
                 String currentName = presets.get(selectedPresetIndex).name;
-                presetsCfg.savePreset(key, currentName, new HashSet<>(cfg.items));
+                if (!presetsCfg.savePreset(key, currentName, new HashSet<>(cfg.items))) {
+                    showPresetEditFailure(presetsCfg);
+                    return true;
+                }
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
             }
@@ -5622,7 +5627,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int deleteY = manageY + btnH + 4;
             if (mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= deleteY && mouseY <= deleteY + btnH) {
                 if (!requireConfigModificationAccess()) return true;
-                presetsCfg.deletePreset(currentKey);
+                if (!presetsCfg.deletePreset(currentKey)) {
+                    showPresetEditFailure(presetsCfg);
+                    return true;
+                }
                 selectedPresetIndex = 0;
                 presetsCfg.applyPreset("default");
                 persistServerConfig(PillarParticleConfig.get());
@@ -5671,13 +5679,30 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         PresetsConfig presetsCfg = PresetsConfig.get();
         PillarParticleConfig cfg = PillarParticleConfig.get();
         String newKey = presetsCfg.generatePresetKey();
-        presetsCfg.savePreset(newKey, normalizePresetName(presetNameInput), new HashSet<>(cfg.items));
-        selectedPresetIndex = presetsCfg.getPresets().size() - 1;
+        if (!presetsCfg.savePreset(newKey, normalizePresetName(presetNameInput), new HashSet<>(cfg.items))) {
+            showPresetEditFailure(presetsCfg);
+            return;
+        }
+        selectedPresetIndex = Math.max(0, presetsCfg.getPresetKeys().indexOf(newKey));
         presetNameInput = "";
         presetNameFocused = false;
         presetNameSelected = false;
         rebuildActiveItemsCache();
         itemsListDirty = true;
+    }
+
+    private void showPresetEditFailure(PresetsConfig presets) {
+        String message = switch (presets.getLastEditFailure()) {
+            case "limit" -> "No custom preset slots are available.";
+            case "unreadable" -> "Preset settings are read-only.";
+            default -> "Could not save the preset.";
+        };
+        readOnlyDeniedAt = System.currentTimeMillis();
+        readOnlyDeniedX = rawMouseX;
+        readOnlyDeniedY = rawMouseY;
+        deferredTooltip = Collections.singletonList(ComponentHelper.literal(message));
+        deferredTooltipX = rawMouseX + 12;
+        deferredTooltipY = rawMouseY;
     }
 
     private boolean handleSidePanelPillarClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {

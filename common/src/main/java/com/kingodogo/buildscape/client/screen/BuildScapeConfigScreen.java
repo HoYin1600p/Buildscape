@@ -938,6 +938,25 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return Arrays.asList(searchWidth, namespaceWidth, safeGap);
     }
 
+    private final ParticleRange.Migration rangeMigration = new ParticleRange.Migration();
+
+    private Double stepRangeValue(ParticleRange range, String scope, double value, int direction) {
+        switch (rangeMigration.click(range, scope, value, System.currentTimeMillis())) {
+            case WARN -> {
+                readOnlyDeniedAt = System.currentTimeMillis();
+                readOnlyDeniedX = rawMouseX;
+                readOnlyDeniedY = rawMouseY;
+                deferredTooltip = Collections.singletonList(ComponentHelper.literal(range.warning(value)));
+                deferredTooltipX = rawMouseX + 12;
+                deferredTooltipY = rawMouseY;
+                return null;
+            }
+            case COMMIT -> { return range.nearestInRange(value); }
+            default -> { return adjustConfigValue(value, direction, range.step,
+                    range.decimals > 0 && Services.PLATFORM.hasControlDown(), range.min, range.max, range.decimals); }
+        }
+    }
+
     static double adjustConfigValue(double value, int direction, double fineStep, boolean accelerated,
                                     double minimum, double maximum, int decimalPlaces) {
         double step = fineStep * (accelerated ? 10.0D : 1.0D);
@@ -2447,23 +2466,23 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         curY += h + gap;
 
         // 3. Pattern Speed
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Animation rotation and movement speed", String.format("%.2f", cfg.pattern_speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED.formatValue(cfg.pattern_speed), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 4. Pattern Spread
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Particle spread radius", String.format("%.2f", cfg.pattern_spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD.formatValue(cfg.pattern_spread), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 5. Pattern Intensity
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Particle spawn rate and density multiplier", String.format("%.1fx", cfg.pattern_intensity), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY.formatValue(cfg.pattern_intensity), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 6. Basic Particle Speed
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Base vertical speed of particles", String.format("%.2f", cfg.particle_speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Base vertical speed of particles", ParticleRange.PARTICLE_SPEED.formatValue(cfg.particle_speed), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 7. Basic Particle Spread
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Base spread distance of particles", String.format("%.2f", cfg.particle_spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Base spread distance of particles", ParticleRange.PARTICLE_SPREAD.formatValue(cfg.particle_spread), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 8. Particle Lifetime
@@ -2824,17 +2843,17 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Row 3: Pattern Speed Counter (fallback to global pattern_speed)
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Animation rotation and movement speed", String.format("%.2f", speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED.formatValue(speed), mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 4: Pattern Spread Counter (fallback to global pattern_spread)
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Particle spread radius", String.format("%.2f", spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD.formatValue(spread), mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 5: Pattern Intensity Counter (fallback to global pattern_intensity)
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Particle spawn rate and density multiplier", String.format("%.1fx", intensity), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY.formatValue(intensity), mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 6: Per-Pillar Color Palette (fallback to global particle_color & max_particle_color)
@@ -3484,17 +3503,17 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Row 3: Speed Counter
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Speed", String.format("%.2f", speed), mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Speed", ParticleRange.PATTERN_SPEED.formatValue(speed), mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 4: Spread Counter
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Spread", String.format("%.2f", spread), mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Spread", ParticleRange.PATTERN_SPREAD.formatValue(spread), mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 5: Intensity Counter
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Intensity", String.format("%.1fx", intensity), mouseX, mouseY, contentAlpha);
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Intensity", ParticleRange.PATTERN_INTENSITY.formatValue(intensity), mouseX, mouseY, contentAlpha);
         curY += rowH + rowGap;
 
         // Row 6: Per-Pillar Colors Palette
@@ -4703,7 +4722,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int pSpeedStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pSpeedStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
-                    cfg.pattern_speed = adjustConfigValue(cfg.pattern_speed, pSpeedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+                    Double next = stepRangeValue(ParticleRange.PATTERN_SPEED, "global", cfg.pattern_speed, pSpeedStep);
+                    if (next == null) return true;
+                    cfg.pattern_speed = next;
                     persistServerConfig(cfg);
                     return true;
                 }
@@ -4713,7 +4734,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int pSpreadStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pSpreadStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
-                    cfg.pattern_spread = adjustConfigValue(cfg.pattern_spread, pSpreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+                    Double next = stepRangeValue(ParticleRange.PATTERN_SPREAD, "global", cfg.pattern_spread, pSpreadStep);
+                    if (next == null) return true;
+                    cfg.pattern_spread = next;
                     persistServerConfig(cfg);
                     return true;
                 }
@@ -4723,7 +4746,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int pIntStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pIntStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
-                    cfg.pattern_intensity = adjustConfigValue(cfg.pattern_intensity, pIntStep, 0.1D, Services.PLATFORM.hasControlDown(), 0.1D, 5.0D, 1);
+                    Double next = stepRangeValue(ParticleRange.PATTERN_INTENSITY, "global", cfg.pattern_intensity, pIntStep);
+                    if (next == null) return true;
+                    cfg.pattern_intensity = next;
                     persistServerConfig(cfg);
                     return true;
                 }
@@ -4733,7 +4758,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int speedStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (speedStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
-                    cfg.particle_speed = adjustConfigValue(cfg.particle_speed, speedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+                    Double next = stepRangeValue(ParticleRange.PARTICLE_SPEED, "global", cfg.particle_speed, speedStep);
+                    if (next == null) return true;
+                    cfg.particle_speed = next;
                     persistServerConfig(cfg);
                     return true;
                 }
@@ -4743,7 +4770,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int spreadStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (spreadStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
-                    cfg.particle_spread = adjustConfigValue(cfg.particle_spread, spreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+                    Double next = stepRangeValue(ParticleRange.PARTICLE_SPREAD, "global", cfg.particle_spread, spreadStep);
+                    if (next == null) return true;
+                    cfg.particle_spread = next;
                     persistServerConfig(cfg);
                     return true;
                 }
@@ -4753,7 +4782,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int lifeStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (lifeStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
-                    cfg.particle_lifetime = Math.max(5, Math.min(120, cfg.particle_lifetime + lifeStep * 5));
+                    Double next = stepRangeValue(ParticleRange.PARTICLE_LIFETIME, "global", cfg.particle_lifetime, lifeStep);
+                    if (next == null) return true;
+                    cfg.particle_lifetime = next.intValue();
                     persistServerConfig(cfg);
                     return true;
                 }
@@ -4763,7 +4794,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int denStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (denStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
-                    cfg.particle_density = Math.max(1, Math.min(16, cfg.particle_density + denStep));
+                    Double next = stepRangeValue(ParticleRange.PARTICLE_DENSITY, "global", cfg.particle_density, denStep);
+                    if (next == null) return true;
+                    cfg.particle_density = next.intValue();
                     persistServerConfig(cfg);
                     return true;
                 }
@@ -5283,7 +5316,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int speedStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (speedStep != 0) {
             double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-            data.pattern_speed = adjustConfigValue(cur, speedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+            Double next = stepRangeValue(ParticleRange.PATTERN_SPEED, data.id, cur, speedStep);
+            if (next == null) return true;
+            data.pattern_speed = next;
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5294,7 +5329,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int spreadStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (spreadStep != 0) {
             double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-            data.pattern_spread = adjustConfigValue(cur, spreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+            Double next = stepRangeValue(ParticleRange.PATTERN_SPREAD, data.id, cur, spreadStep);
+            if (next == null) return true;
+            data.pattern_spread = next;
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5305,7 +5342,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int intStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
         if (intStep != 0) {
             double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-            data.pattern_intensity = adjustConfigValue(cur, intStep, 0.1D, Services.PLATFORM.hasControlDown(), 0.1D, 5.0D, 1);
+            Double next = stepRangeValue(ParticleRange.PATTERN_INTENSITY, data.id, cur, intStep);
+            if (next == null) return true;
+            data.pattern_intensity = next;
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5768,7 +5807,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (speedStep != 0) {
             if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-            data.pattern_speed = adjustConfigValue(cur, speedStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+            Double next = stepRangeValue(ParticleRange.PATTERN_SPEED, data.id, cur, speedStep);
+            if (next == null) return true;
+            data.pattern_speed = next;
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5780,7 +5821,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (spreadStep != 0) {
             if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-            data.pattern_spread = adjustConfigValue(cur, spreadStep, 0.01D, Services.PLATFORM.hasControlDown(), 0.01D, 0.50D, 2);
+            Double next = stepRangeValue(ParticleRange.PATTERN_SPREAD, data.id, cur, spreadStep);
+            if (next == null) return true;
+            data.pattern_spread = next;
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;
@@ -5792,7 +5835,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (intStep != 0) {
             if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
             double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-            data.pattern_intensity = adjustConfigValue(cur, intStep, 0.1D, Services.PLATFORM.hasControlDown(), 0.1D, 5.0D, 1);
+            Double next = stepRangeValue(ParticleRange.PATTERN_INTENSITY, data.id, cur, intStep);
+            if (next == null) return true;
+            data.pattern_intensity = next;
             PillarIdManager.getClient().updatePillarData(data);
             PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
             return true;

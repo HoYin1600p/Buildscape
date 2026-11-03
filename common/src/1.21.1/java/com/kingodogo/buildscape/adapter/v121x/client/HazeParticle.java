@@ -1,19 +1,26 @@
 package com.kingodogo.buildscape.adapter.v121x.client;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import org.joml.Vector3f;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import java.util.List;
 public class HazeParticle extends TextureSheetParticle {
 
+    private static final float CELL_SIZE = 0.5F;
     private final SpriteSet sprites;
     private final float rotSpeed;
     private final float maxAlpha;
     private final float baseSize;
+    private final double originX, originZ;
+    private final HazeGeometry geometry;
 
     protected HazeParticle(ClientLevel level, double x, double y, double z,
                            double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
@@ -47,6 +54,23 @@ public class HazeParticle extends TextureSheetParticle {
 
         this.maxAlpha = 0.32F + level.random.nextFloat() * 0.12F;
         this.alpha = 0.0F;
+
+        this.originX = x;
+        this.originZ = z;
+        int radius = Math.min((HazeMask.MAX_GRID_SIZE - 1) / 2,
+                Mth.ceil((baseSize * 1.2 * Math.sqrt(2) + 0.02) / CELL_SIZE));
+        float maskMin = -(radius + 0.5F) * CELL_SIZE;
+        Long2ObjectMap<List<AABB>> shapes = new Long2ObjectOpenHashMap<>();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        int gridSize = radius * 2 + 1;
+        HazeMask mask = HazeMask.compute(gridSize, gridSize, radius, radius, (cellX, cellZ) -> {
+            double minX = originX + maskMin + cellX * CELL_SIZE;
+            double minZ = originZ + maskMin + cellZ * CELL_SIZE;
+            return HazeMask.blocksCell(level, pos, shapes, minX, minZ,
+                    minX + CELL_SIZE, minZ + CELL_SIZE, y);
+        });
+        this.geometry = new HazeGeometry(mask.rectangles(), maskMin, CELL_SIZE);
+        if (mask.rectangles().isEmpty()) remove();
 
         this.setSpriteFromAge(sprites);
     }
@@ -86,44 +110,22 @@ public class HazeParticle extends TextureSheetParticle {
 
     @Override
     public void render(VertexConsumer consumer, Camera camera, float partialTick) {
-        Vec3 camPos = camera.getPosition();
-        float px = (float)(Mth.lerp((double)partialTick, this.xo, this.x) - camPos.x());
-        float py = (float)(Mth.lerp((double)partialTick, this.yo, this.y) - camPos.y());
-        float pz = (float)(Mth.lerp((double)partialTick, this.zo, this.z) - camPos.z());
-
-        float size = this.getQuadSize(partialTick);
-        float angle = Mth.lerp(partialTick, this.oRoll, this.roll);
-
-        float cos = Mth.cos(angle) * size;
-        float sin = Mth.sin(angle) * size;
-
-        float ux = cos;
-        float uz = sin;
-        float vx = -sin;
-        float vz = cos;
-
-        Vector3f p0 = new Vector3f(px - ux - vx, py, pz - uz - vz);
-        Vector3f p1 = new Vector3f(px + ux - vx, py, pz + uz - vz);
-        Vector3f p2 = new Vector3f(px + ux + vx, py, pz + uz + vz);
-        Vector3f p3 = new Vector3f(px - ux + vx, py, pz - uz + vz);
-
-        int light = this.getLightColor(partialTick);
-        float u0 = this.getU0();
-        float u1 = this.getU1();
-        float v0 = this.getV0();
-        float v1 = this.getV1();
-
-        // Top Face (visible looking down)
-        consumer.addVertex(p3.x(), p3.y(), p3.z()).setUv(u0, v0).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
-        consumer.addVertex(p2.x(), p2.y(), p2.z()).setUv(u1, v0).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
-        consumer.addVertex(p1.x(), p1.y(), p1.z()).setUv(u1, v1).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
-        consumer.addVertex(p0.x(), p0.y(), p0.z()).setUv(u0, v1).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
-
-        // Bottom Face (visible looking up)
-        consumer.addVertex(p0.x(), p0.y(), p0.z()).setUv(u0, v1).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
-        consumer.addVertex(p1.x(), p1.y(), p1.z()).setUv(u1, v1).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
-        consumer.addVertex(p2.x(), p2.y(), p2.z()).setUv(u1, v0).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
-        consumer.addVertex(p3.x(), p3.y(), p3.z()).setUv(u0, v0).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
+        if (alpha <= 0) return;
+        Vec3 cameraPosition = camera.getPosition();
+        float renderY = (float) (Mth.lerp((double) partialTick, yo, y) - cameraPosition.y());
+        float dx = (float) (Mth.lerp((double) partialTick, xo, x) - originX);
+        float dz = (float) (Mth.lerp((double) partialTick, zo, z) - originZ);
+        float size = getQuadSize(partialTick), angle = Mth.lerp(partialTick, oRoll, roll);
+        geometry.update(dx, dz, Mth.cos(angle) * size, Mth.sin(angle) * size);
+        float[] vertices = geometry.vertices();
+        int light = getLightColor(partialTick);
+        float u0 = getU0(), u1 = getU1(), v0 = getV0(), v1 = getV1();
+        for (int i = 0; i < geometry.vertexCount() * 4; i += 4) {
+            consumer.addVertex((float) (originX + vertices[i] - cameraPosition.x()), renderY,
+                    (float) (originZ + vertices[i + 1] - cameraPosition.z()))
+                    .setUv(Mth.lerp(vertices[i + 2], u0, u1), Mth.lerp(vertices[i + 3], v0, v1))
+                    .setColor(rCol, gCol, bCol, alpha).setLight(light);
+        }
     }
 
     @Override

@@ -57,14 +57,6 @@ public class BiomeTintDataTest {
     }
 
     @Test
-    public void vaultDimensionsAreExcludedFromTints() {
-        assertTrue(BiomeTintData.isExcludedDimension(new ResourceLocation("the_vault", "vault")));
-        assertTrue(BiomeTintData.isExcludedDimension(new ResourceLocation("the_vault", "arena")));
-        assertFalse(BiomeTintData.isExcludedDimension(new ResourceLocation("minecraft", "overworld")));
-        assertFalse(BiomeTintData.isExcludedDimension(new ResourceLocation("minecraft", "the_vault")));
-    }
-
-    @Test
     public void existingWorldWithoutTintDataIsEmptyAndInvalidEntriesAreSkipped() {
         assertTrue(BiomeTintData.load(new CompoundTag()).getChunk(new ChunkPos(0, 0)).isEmpty());
         CompoundTag root = new CompoundTag();

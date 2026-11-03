@@ -3403,7 +3403,6 @@ message.buildscape.biome_brush.broken
 message.buildscape.biome_brush.cannot_apply
 message.buildscape.biome_brush.captured
 message.buildscape.biome_brush.cleared
-message.buildscape.biome_brush.excluded_dimension
 message.buildscape.biome_brush.invalid_biome
 message.buildscape.biome_brush.pos1
 message.buildscape.biome_brush.pos2

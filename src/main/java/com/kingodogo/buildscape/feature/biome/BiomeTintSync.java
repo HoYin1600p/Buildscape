@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.feature.biome;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.network.ModMessages;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.event.world.ChunkWatchEvent;
@@ -19,22 +18,15 @@ public class BiomeTintSync {
     @SubscribeEvent
     public static void onWatch(ChunkWatchEvent.Watch event) {
         ServerLevel level = event.getWorld();
-        ResourceLocation dimension = level.dimension().location();
-        if (BiomeTintData.isExcludedDimension(dimension)) {
-            return;
-        }
         BiomeTintData data = BiomeTintData.get(level);
         if (!data.hasChunk(event.getPos())) {
             return;
         }
         ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(event::getPlayer),
-                new SyncBiomeTintPacket(dimension, event.getPos(), data.getChunk(event.getPos())));
+                new SyncBiomeTintPacket(level.dimension().location(), event.getPos(), data.getChunk(event.getPos())));
     }
 
     public static void sync(ServerLevel level, ChunkPos chunk) {
-        if (BiomeTintData.isExcludedDimension(level.dimension().location())) {
-            return;
-        }
         SyncBiomeTintPacket packet = packet(level, chunk);
         level.getChunkSource().chunkMap.getPlayers(chunk, false)
                 .forEach(player -> ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet));

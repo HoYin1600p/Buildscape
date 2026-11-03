@@ -33,8 +33,7 @@ public class ClientBiomeTints {
     public static void apply(SyncBiomeTintPacket packet) {
         Minecraft minecraft = Minecraft.getInstance();
         ClientLevel level = minecraft.level;
-        if (level == null || !level.dimension().location().equals(packet.dimension)
-                || BiomeTintData.isExcludedDimension(packet.dimension)) {
+        if (level == null || !level.dimension().location().equals(packet.dimension)) {
             return;
         }
         State previous = state;

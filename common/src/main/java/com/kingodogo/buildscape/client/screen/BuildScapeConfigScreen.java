@@ -1666,6 +1666,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return normalized.substring(0, Math.min(32, normalized.length()));
     }
 
+    private static void setPaletteColor(List<String> colors, int index, String value) {
+        while (colors.size() <= index) {
+            colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
+        }
+        colors.set(index, value);
+    }
+
     static int moveSelection(int current, int direction, int count) {
         if (count <= 0) return 0;
         return Math.floorMod(current + direction, count);
@@ -2885,7 +2892,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         rY += rowH + rowGap;
 
         // Row 6: Per-Pillar Color Palette (fallback to global particle_color & max_particle_color)
-        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : new ArrayList<>(globalCfg.particle_color);
+        List<String> colors = new ArrayList<>((data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : globalCfg.particle_color);
         while (colors.size() < 5) {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
@@ -3548,7 +3555,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         curY += rowH + rowGap;
 
         // Row 6: Per-Pillar Colors Palette
-        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : new ArrayList<>(globalCfg.particle_color);
+        List<String> colors = new ArrayList<>((data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : globalCfg.particle_color);
         while (colors.size() < 5) {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
@@ -4835,10 +4842,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 // 10. Swatch Clicks -> Opens Draggable Color Picker Modal!
                 if (curY >= clipY && curY + h <= clipY + clipH) {
-                    while (cfg.particle_color.size() < 7) {
-                        cfg.particle_color.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(cfg.particle_color.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
-                    }
-
                     int counterW = 86;
                     int counterH = 16;
                     int counterX = x + w - counterW - 8;
@@ -4872,7 +4875,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                             editingColorIndex = i;
                             isEditingPillarColor = false;
                             editingPillarId = null;
-                            String hex = cfg.particle_color.get(i).replace("#", "");
+                            String color = i < cfg.particle_color.size() ? cfg.particle_color.get(i)
+                                    : PillarParticleConfig.DEFAULT_COLORS[Math.min(i, PillarParticleConfig.DEFAULT_COLORS.length - 1)];
+                            String hex = color == null ? "" : color.replace("#", "");
                             try {
                                 int rgb = Integer.parseInt(hex, 16);
                                 float[] hsb = new float[3];
@@ -5383,7 +5388,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         rY += rowH + rowGap;
 
         // Row 6: Per-Pillar Color Palette
-        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : new ArrayList<>(globalCfg.particle_color);
+        List<String> colors = new ArrayList<>((data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : globalCfg.particle_color);
         while (colors.size() < 5) {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
@@ -5526,21 +5531,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     if (data.dyeColors == null) {
                         data.dyeColors = new ArrayList<>(PillarParticleConfig.get().particle_color);
                     }
-                    if (editingColorIndex < data.dyeColors.size()) {
-                        data.dyeColors.set(editingColorIndex, hexString);
-                    } else {
-                        data.dyeColors.add(hexString);
-                    }
+                    setPaletteColor(data.dyeColors, editingColorIndex, hexString);
                     PillarIdManager.getClient().updatePillarData(data);
                     PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
                 }
             } else {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
-                if (editingColorIndex < cfg.particle_color.size()) {
-                    cfg.particle_color.set(editingColorIndex, hexString);
-                } else {
-                    cfg.particle_color.add(hexString);
-                }
+                setPaletteColor(cfg.particle_color, editingColorIndex, hexString);
                 persistServerConfig(cfg);
             }
 
@@ -5879,7 +5876,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         curY += rowH + rowGap;
 
         // Row 6: Palette & Swatches
-        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : new ArrayList<>(globalCfg.particle_color);
+        List<String> colors = new ArrayList<>((data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : globalCfg.particle_color);
         while (colors.size() < 5) {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
@@ -6040,21 +6037,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     if (data.dyeColors == null) {
                         data.dyeColors = new ArrayList<>(PillarParticleConfig.get().particle_color);
                     }
-                    if (editingColorIndex < data.dyeColors.size()) {
-                        data.dyeColors.set(editingColorIndex, hexString);
-                    } else {
-                        data.dyeColors.add(hexString);
-                    }
+                    setPaletteColor(data.dyeColors, editingColorIndex, hexString);
                     PillarIdManager.getClient().updatePillarData(data);
                     PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
                 }
             } else {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
-                if (editingColorIndex < cfg.particle_color.size()) {
-                    cfg.particle_color.set(editingColorIndex, hexString);
-                } else {
-                    cfg.particle_color.add(hexString);
-                }
+                setPaletteColor(cfg.particle_color, editingColorIndex, hexString);
                 persistServerConfig(cfg);
             }
 

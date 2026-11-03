@@ -120,25 +120,21 @@ public final class WanderingHomemakerSpawningLogic {
                 }
             }
 
-            String entityName = spawnFestive ? "festive_wandering_homemaker" : "wandering_homemaker";
             double angle = level.getRandom().nextDouble() * 2.0D * Math.PI;
             double distance = 2.0D + level.getRandom().nextDouble() * 1.0D;
             double spawnX = pos.getX() + 0.5D + Math.cos(angle) * distance;
             double spawnY = pos.getY();
             double spawnZ = pos.getZ() + 0.5D + Math.sin(angle) * distance;
 
+            Entity homemaker = Services.PLATFORM.createWanderingHomemakerEntity(serverLevel, spawnFestive);
+            if (homemaker == null) return;
+            homemaker.setPos(spawnX, spawnY, spawnZ);
+            homemaker.setYRot(level.getRandom().nextFloat() * 360F);
+            if (!serverLevel.addFreshEntity(homemaker)) return;
+            Services.PLATFORM.putTagUUID(data, "WanderingHomemakerUUID", homemaker.getUUID());
+
             BlockPos spawnPos = new BlockPos((int) spawnX, (int) spawnY, (int) spawnZ);
             Services.PLATFORM.playEvokerPrepareSummon(serverLevel, spawnPos);
-
-            Entity homemaker = Services.PLATFORM.createWanderingHomemakerEntity(serverLevel, spawnFestive);
-            if (Services.isVersionCluster("v121x") && homemaker == null) return;
-            if (homemaker != null) {
-                homemaker.setPos(spawnX, spawnY, spawnZ);
-                homemaker.setYRot(level.getRandom().nextFloat() * 360F);
-                boolean added = serverLevel.addFreshEntity(homemaker);
-                if (!added) return;
-                Services.PLATFORM.putTagUUID(data, "WanderingHomemakerUUID", homemaker.getUUID());
-            }
 
             for (int i = 0; i < 20; i++) {
                 double px = spawnX + (level.getRandom().nextDouble() - 0.5D) * 1.5D;

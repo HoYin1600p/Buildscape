@@ -961,6 +961,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
+    private void offerRangeTooltip(ParticleRange range, double value, int x, int y, int width, int height,
+            int mouseX, int mouseY) {
+        if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height) {
+            deferredTooltip = Collections.singletonList(ComponentHelper.literal(range.tooltip(value)));
+            deferredTooltipX = rawMouseX + 12;
+            deferredTooltipY = rawMouseY;
+        }
+    }
+
     static double adjustConfigValue(double value, int direction, double fineStep, boolean accelerated,
                                     double minimum, double maximum, int decimalPlaces) {
         double step = fineStep * (accelerated ? 10.0D : 1.0D);
@@ -2474,30 +2483,37 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // 3. Pattern Speed
         renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED.formatValue(cfg.pattern_speed), mouseX, mouseY, alpha);
+        if (curY >= clipY && curY + h <= clipY + clipH) offerRangeTooltip(ParticleRange.PATTERN_SPEED, cfg.pattern_speed, x + w - 94, curY + (h - 16) / 2, 86, 16, mouseX, mouseY);
         curY += h + gap;
 
         // 4. Pattern Spread
         renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD.formatValue(cfg.pattern_spread), mouseX, mouseY, alpha);
+        if (curY >= clipY && curY + h <= clipY + clipH) offerRangeTooltip(ParticleRange.PATTERN_SPREAD, cfg.pattern_spread, x + w - 94, curY + (h - 16) / 2, 86, 16, mouseX, mouseY);
         curY += h + gap;
 
         // 5. Pattern Intensity
         renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY.formatValue(cfg.pattern_intensity), mouseX, mouseY, alpha);
+        if (curY >= clipY && curY + h <= clipY + clipH) offerRangeTooltip(ParticleRange.PATTERN_INTENSITY, cfg.pattern_intensity, x + w - 94, curY + (h - 16) / 2, 86, 16, mouseX, mouseY);
         curY += h + gap;
 
         // 6. Basic Particle Speed
         renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Base vertical speed of particles", ParticleRange.PARTICLE_SPEED.formatValue(cfg.particle_speed), mouseX, mouseY, alpha);
+        if (curY >= clipY && curY + h <= clipY + clipH) offerRangeTooltip(ParticleRange.PARTICLE_SPEED, cfg.particle_speed, x + w - 94, curY + (h - 16) / 2, 86, 16, mouseX, mouseY);
         curY += h + gap;
 
         // 7. Basic Particle Spread
         renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Base spread distance of particles", ParticleRange.PARTICLE_SPREAD.formatValue(cfg.particle_spread), mouseX, mouseY, alpha);
+        if (curY >= clipY && curY + h <= clipY + clipH) offerRangeTooltip(ParticleRange.PARTICLE_SPREAD, cfg.particle_spread, x + w - 94, curY + (h - 16) / 2, 86, 16, mouseX, mouseY);
         curY += h + gap;
 
         // 8. Particle Lifetime
         renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Lifetime", "Particle duration in ticks before fading", cfg.particle_lifetime + " ticks", mouseX, mouseY, alpha);
+        if (curY >= clipY && curY + h <= clipY + clipH) offerRangeTooltip(ParticleRange.PARTICLE_LIFETIME, cfg.particle_lifetime, x + w - 94, curY + (h - 16) / 2, 86, 16, mouseX, mouseY);
         curY += h + gap;
 
         // 9. Particle Density
         renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Density", "Particle count emitted per pillar", cfg.particle_density + "x", mouseX, mouseY, alpha);
+        if (curY >= clipY && curY + h <= clipY + clipH) offerRangeTooltip(ParticleRange.PARTICLE_DENSITY, cfg.particle_density, x + w - 94, curY + (h - 16) / 2, 86, 16, mouseX, mouseY);
         curY += h + gap;
 
         // 10. Swatches & Active Colors
@@ -2851,16 +2867,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 3: Pattern Speed Counter (fallback to global pattern_speed)
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
         renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Animation rotation and movement speed", ParticleRange.PATTERN_SPEED.formatValue(speed), mouseX, mouseY, alpha);
+        if (rY >= viewportY && rY + rowH <= viewportY + viewportH) offerRangeTooltip(ParticleRange.PATTERN_SPEED, speed, rowX + rowW - 94, rY + (rowH - 16) / 2, 86, 16, mouseX, mouseY);
         rY += rowH + rowGap;
 
         // Row 4: Pattern Spread Counter (fallback to global pattern_spread)
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
         renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Particle spread radius", ParticleRange.PATTERN_SPREAD.formatValue(spread), mouseX, mouseY, alpha);
+        if (rY >= viewportY && rY + rowH <= viewportY + viewportH) offerRangeTooltip(ParticleRange.PATTERN_SPREAD, spread, rowX + rowW - 94, rY + (rowH - 16) / 2, 86, 16, mouseX, mouseY);
         rY += rowH + rowGap;
 
         // Row 5: Pattern Intensity Counter (fallback to global pattern_intensity)
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
         renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Particle spawn rate and density multiplier", ParticleRange.PATTERN_INTENSITY.formatValue(intensity), mouseX, mouseY, alpha);
+        if (rY >= viewportY && rY + rowH <= viewportY + viewportH) offerRangeTooltip(ParticleRange.PATTERN_INTENSITY, intensity, rowX + rowW - 94, rY + (rowH - 16) / 2, 86, 16, mouseX, mouseY);
         rY += rowH + rowGap;
 
         // Row 6: Per-Pillar Color Palette (fallback to global particle_color & max_particle_color)
@@ -3511,16 +3530,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Row 3: Speed Counter
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
         renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Speed", ParticleRange.PATTERN_SPEED.formatValue(speed), mouseX, mouseY, contentAlpha);
+        offerRangeTooltip(ParticleRange.PATTERN_SPEED, speed, rowX + rowW - 78, curY + (rowH - 15) / 2, 74, 15, mouseX, mouseY);
         curY += rowH + rowGap;
 
         // Row 4: Spread Counter
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
         renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Spread", ParticleRange.PATTERN_SPREAD.formatValue(spread), mouseX, mouseY, contentAlpha);
+        offerRangeTooltip(ParticleRange.PATTERN_SPREAD, spread, rowX + rowW - 78, curY + (rowH - 15) / 2, 74, 15, mouseX, mouseY);
         curY += rowH + rowGap;
 
         // Row 5: Intensity Counter
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
         renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Intensity", ParticleRange.PATTERN_INTENSITY.formatValue(intensity), mouseX, mouseY, contentAlpha);
+        offerRangeTooltip(ParticleRange.PATTERN_INTENSITY, intensity, rowX + rowW - 78, curY + (rowH - 15) / 2, 74, 15, mouseX, mouseY);
         curY += rowH + rowGap;
 
         // Row 6: Per-Pillar Colors Palette

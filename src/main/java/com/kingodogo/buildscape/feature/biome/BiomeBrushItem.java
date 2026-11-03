@@ -243,6 +243,10 @@ public class BiomeBrushItem extends Item {
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
+        if (BiomeTintData.isExcludedDimension(level.dimension().location())) {
+            return failWith(player, new TranslatableComponent("message.buildscape.biome_brush.excluded_dimension")
+                    .withStyle(ChatFormatting.RED));
+        }
 
         String biomeStr = getCapturedBiome(stack);
         BlockPos pos1 = getPos1(stack);

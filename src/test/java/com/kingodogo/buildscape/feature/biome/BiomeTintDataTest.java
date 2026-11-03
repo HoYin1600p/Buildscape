@@ -47,6 +47,24 @@ public class BiomeTintDataTest {
     }
 
     @Test
+    public void onlyPaintedChunksHaveTintData() {
+        BiomeTintData data = new BiomeTintData();
+        assertFalse(data.hasChunk(new ChunkPos(0, 0)));
+        data.putColumn(-1, -17, SWAMP);
+        assertTrue(data.hasChunk(new ChunkPos(-1, -2)));
+        assertFalse(data.hasChunk(new ChunkPos(0, 0)));
+        assertTrue(BiomeTintData.load(data.save(new CompoundTag())).hasChunk(new ChunkPos(-1, -2)));
+    }
+
+    @Test
+    public void vaultDimensionsAreExcludedFromTints() {
+        assertTrue(BiomeTintData.isExcludedDimension(new ResourceLocation("the_vault", "vault")));
+        assertTrue(BiomeTintData.isExcludedDimension(new ResourceLocation("the_vault", "arena")));
+        assertFalse(BiomeTintData.isExcludedDimension(new ResourceLocation("minecraft", "overworld")));
+        assertFalse(BiomeTintData.isExcludedDimension(new ResourceLocation("minecraft", "the_vault")));
+    }
+
+    @Test
     public void existingWorldWithoutTintDataIsEmptyAndInvalidEntriesAreSkipped() {
         assertTrue(BiomeTintData.load(new CompoundTag()).getChunk(new ChunkPos(0, 0)).isEmpty());
         CompoundTag root = new CompoundTag();

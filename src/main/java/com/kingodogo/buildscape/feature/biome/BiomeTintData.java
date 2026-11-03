@@ -11,7 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BiomeTintData extends SavedData {
+    /** Vault Hunters dimensions are generated per run and never painted, so tints skip them entirely. */
+    private static final String VAULT_NAMESPACE = "the_vault";
+
     private final Map<Long, Map<Integer, ResourceLocation>> chunks = new HashMap<>();
+
+    public static boolean isExcludedDimension(ResourceLocation dimension) {
+        return VAULT_NAMESPACE.equals(dimension.getNamespace());
+    }
 
     public static BiomeTintData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(BiomeTintData::load, BiomeTintData::new,
@@ -30,6 +37,14 @@ public class BiomeTintData extends SavedData {
         }
         setDirty();
         return true;
+    }
+
+    /**
+     * BiomeTintSync skips watched chunks without data, so anything that ever removes tints must still sync
+     * the chunk to its watchers.
+     */
+    public boolean hasChunk(ChunkPos chunk) {
+        return chunks.containsKey(chunk.toLong());
     }
 
     public Map<Integer, ResourceLocation> getChunk(ChunkPos chunk) {

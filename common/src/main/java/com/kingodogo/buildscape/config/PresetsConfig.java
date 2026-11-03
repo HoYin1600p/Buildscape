@@ -358,7 +358,7 @@ public class PresetsConfig {
     }
 
     public boolean canApplyPreset(String key) {
-        return presets.containsKey(key) && !fileUnreadable && PillarParticleConfig.get().canEditItems();
+        return presets.containsKey(key) && !fileUnreadable && PillarParticleConfig.get().canApplyUpdate(true, false);
     }
 
     public String getLastEditFailure() {
@@ -420,7 +420,7 @@ public class PresetsConfig {
         Preset preset = presets.get(key);
         if (preset != null) {
             PillarParticleConfig config = PillarParticleConfig.get();
-            if (fileUnreadable || !config.canEditItems()) {
+            if (fileUnreadable || !config.canApplyUpdate(true, false)) {
                 lastEditFailure = "unreadable";
                 BuildscapeCommon.LOGGER.warn("Not applying a preset while its config files are read-only");
                 return;

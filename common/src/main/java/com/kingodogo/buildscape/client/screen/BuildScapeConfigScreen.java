@@ -547,6 +547,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private int rawMouseX = 0;
     private int rawMouseY = 0;
     private long readOnlyDeniedAt = -1L;
+    private String feedbackMessage;
+    private long feedbackUntil;
     private int readOnlyDeniedX = 0;
     private int readOnlyDeniedY = 0;
 
@@ -805,6 +807,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         screen.readOnlyDeniedAt = System.currentTimeMillis();
         screen.readOnlyDeniedX = screen.rawMouseX;
         screen.readOnlyDeniedY = screen.rawMouseY;
+        screen.showFeedback("The server refused this configuration change.", 4000L);
     }
     static {
         PillarParticleConfig.addConfigReloadCallback(remote -> {
@@ -946,12 +949,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 readOnlyDeniedAt = System.currentTimeMillis();
                 readOnlyDeniedX = rawMouseX;
                 readOnlyDeniedY = rawMouseY;
-                deferredTooltip = Collections.singletonList(ComponentHelper.literal(range.warning(value)));
-                deferredTooltipX = rawMouseX + 12;
-                deferredTooltipY = rawMouseY;
+                showFeedback(range.warning(value), ParticleRange.MIGRATION_WINDOW_MS);
                 return null;
             }
-            case COMMIT -> { return range.nearestInRange(value); }
+            case COMMIT -> {
+                showFeedback(range.migrated(value), 2000L);
+                return range.nearestInRange(value);
+            }
             default -> { return adjustConfigValue(value, direction, range.step,
                     range.decimals > 0 && Services.PLATFORM.hasControlDown(), range.min, range.max, range.decimals); }
         }
@@ -1672,6 +1676,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 readOnlyDeniedAt = System.currentTimeMillis();
                 readOnlyDeniedX = rawMouseX;
                 readOnlyDeniedY = rawMouseY;
+                showFeedback("This setting is locked or its config file is read-only.", 4000L);
                 rebuildActiveItemsCache();
             }
         }
@@ -1713,9 +1718,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         String message = scope == PillarParticleConfig.EditScope.POLICY
                 ? "Permission level 4 is required to change the edit policy."
                 : "This setting is locked by the server edit policy.";
-        deferredTooltip = Collections.singletonList(ComponentHelper.literal(message));
-        deferredTooltipX = rawMouseX + 12;
-        deferredTooltipY = rawMouseY;
+        showFeedback(message, 4000L);
         return false;
     }
 
@@ -1917,7 +1920,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         // Render deferred tooltip in unscaled screen coordinates
-        if (deferredTooltip != null && !deferredTooltip.isEmpty()) {
+        if (feedbackMessage != null && System.currentTimeMillis() <= feedbackUntil) {
+            Services.PLATFORM.renderComponentTooltip(poseStackOrGraphics, font,
+                    Collections.singletonList(ComponentHelper.literal(feedbackMessage)),
+                    readOnlyDeniedX + 12, readOnlyDeniedY);
+        } else if (deferredTooltip != null && !deferredTooltip.isEmpty()) {
             Services.PLATFORM.renderComponentTooltip(poseStackOrGraphics, font, deferredTooltip, deferredTooltipX, deferredTooltipY);
         }
     }
@@ -5742,9 +5749,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         readOnlyDeniedAt = System.currentTimeMillis();
         readOnlyDeniedX = rawMouseX;
         readOnlyDeniedY = rawMouseY;
-        deferredTooltip = Collections.singletonList(ComponentHelper.literal(message));
-        deferredTooltipX = rawMouseX + 12;
-        deferredTooltipY = rawMouseY;
+        showFeedback(message, 4000L);
     }
 
     private boolean requirePresetApplyAccess(PresetsConfig presets, String key) {
@@ -5752,11 +5757,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         readOnlyDeniedAt = System.currentTimeMillis();
         readOnlyDeniedX = rawMouseX;
         readOnlyDeniedY = rawMouseY;
-        deferredTooltip = Collections.singletonList(ComponentHelper.literal(
-                "This preset cannot be applied while its settings are unavailable or read-only."));
-        deferredTooltipX = rawMouseX + 12;
-        deferredTooltipY = rawMouseY;
+        showFeedback("This preset cannot be applied while its settings are unavailable or read-only.", 4000L);
         return false;
+    }
+
+    private void showFeedback(String message, long durationMillis) {
+        feedbackMessage = message;
+        feedbackUntil = System.currentTimeMillis() + durationMillis;
     }
 
     private boolean handleSidePanelPillarClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {

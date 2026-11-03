@@ -5595,6 +5595,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= applyY && mouseY <= applyY + btnH) {
             if (!requireConfigModificationAccess()) return true;
             if (!keys.isEmpty() && selectedPresetIndex < keys.size()) {
+                if (!requirePresetApplyAccess(presetsCfg, keys.get(selectedPresetIndex))) return true;
                 presetsCfg.applyPreset(keys.get(selectedPresetIndex));
                 persistServerConfig(PillarParticleConfig.get());
                 rebuildActiveItemsCache();
@@ -5627,6 +5628,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int deleteY = manageY + btnH + 4;
             if (mouseX >= selectorX && mouseX <= selectorX + selectorW && mouseY >= deleteY && mouseY <= deleteY + btnH) {
                 if (!requireConfigModificationAccess()) return true;
+                if (!requirePresetApplyAccess(presetsCfg, "default")) return true;
                 if (!presetsCfg.deletePreset(currentKey)) {
                     showPresetEditFailure(presetsCfg);
                     return true;
@@ -5664,6 +5666,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         curY += 61 + resetGap;
         if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
             if (!requireConfigModificationAccess()) return true;
+            if (!requirePresetApplyAccess(presetsCfg, "default")) return true;
             presetsCfg.applyPreset("default");
             persistServerConfig(PillarParticleConfig.get());
             selectedPresetIndex = 0;
@@ -5703,6 +5706,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         deferredTooltip = Collections.singletonList(ComponentHelper.literal(message));
         deferredTooltipX = rawMouseX + 12;
         deferredTooltipY = rawMouseY;
+    }
+
+    private boolean requirePresetApplyAccess(PresetsConfig presets, String key) {
+        if (presets.canApplyPreset(key)) return true;
+        readOnlyDeniedAt = System.currentTimeMillis();
+        readOnlyDeniedX = rawMouseX;
+        readOnlyDeniedY = rawMouseY;
+        deferredTooltip = Collections.singletonList(ComponentHelper.literal(
+                "This preset cannot be applied while its settings are unavailable or read-only."));
+        deferredTooltipX = rawMouseX + 12;
+        deferredTooltipY = rawMouseY;
+        return false;
     }
 
     private boolean handleSidePanelPillarClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {

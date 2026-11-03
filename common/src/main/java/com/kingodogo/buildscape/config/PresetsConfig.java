@@ -357,6 +357,10 @@ public class PresetsConfig {
         return preset == null && preservedPresets.containsKey(key) ? new Preset(key, Set.of()) : preset;
     }
 
+    public boolean canApplyPreset(String key) {
+        return presets.containsKey(key) && !fileUnreadable && PillarParticleConfig.get().canEditItems();
+    }
+
     public String getLastEditFailure() {
         return lastEditFailure;
     }

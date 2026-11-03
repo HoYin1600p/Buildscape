@@ -15,6 +15,7 @@ final class HazeGeometry {
     private int vertexCount;
     private boolean valid;
     private float cachedX, cachedZ, cachedCos, cachedSin;
+    private HazeTextureBounds textureBounds = HazeTextureBounds.FULL;
 
     HazeGeometry(List<HazeMask.Rectangle> rectangles, float maskMin, float cellSize) {
         bounds = new float[rectangles.size() * 4];
@@ -27,13 +28,15 @@ final class HazeGeometry {
         }
     }
 
+    void setTextureBounds(HazeTextureBounds bounds) { if (!bounds.equals(textureBounds)) { textureBounds = bounds; valid = false; } }
     int vertexCount() { return vertexCount; }
     float[] vertices() { return vertices; }
 
     void update(float dx, float dz, float cos, float sin) {
         if (valid && dx == cachedX && dz == cachedZ && cos == cachedCos && sin == cachedSin) return;
         cachedX = dx; cachedZ = dz; cachedCos = cos; cachedSin = sin; valid = true; vertexCount = 0;
-        float left = -1, right = 1, top = 1, bottom = -1;
+        float left = textureBounds.minU() * 2 - 1, right = textureBounds.maxU() * 2 - 1;
+        float top = 1 - textureBounds.minV() * 2, bottom = 1 - textureBounds.maxV() * 2;
         float x0 = dx + cos * left - sin * top, z0 = dz + sin * left + cos * top;
         float x1 = dx + cos * right - sin * top, z1 = dz + sin * right + cos * top;
         float x2 = dx + cos * right - sin * bottom, z2 = dz + sin * right + cos * bottom;

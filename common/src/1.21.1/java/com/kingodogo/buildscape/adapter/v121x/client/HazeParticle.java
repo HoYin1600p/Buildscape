@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -21,6 +22,8 @@ public class HazeParticle extends TextureSheetParticle {
     private final float baseSize;
     private final double originX, originZ;
     private final HazeGeometry geometry;
+    private TextureAtlasSprite geometrySprite;
+    private HazeTextureBounds textureBounds;
 
     protected HazeParticle(ClientLevel level, double x, double y, double z,
                            double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
@@ -111,6 +114,12 @@ public class HazeParticle extends TextureSheetParticle {
     @Override
     public void render(VertexConsumer consumer, Camera camera, float partialTick) {
         if (alpha <= 0) return;
+        if (sprite != geometrySprite) {
+            textureBounds = HazeTextureBounds.forSprite(sprite);
+            geometry.setTextureBounds(textureBounds);
+            geometrySprite = sprite;
+        }
+        if (textureBounds.isEmpty()) return;
         Vec3 cameraPosition = camera.getPosition();
         float renderY = (float) (Mth.lerp((double) partialTick, yo, y) - cameraPosition.y());
         float dx = (float) (Mth.lerp((double) partialTick, xo, x) - originX);

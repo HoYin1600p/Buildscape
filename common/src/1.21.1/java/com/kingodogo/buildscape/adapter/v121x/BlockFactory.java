@@ -547,6 +547,7 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isGlassJar()) {
             return new GlassJarBlock(props) {
+                @Override protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { onScheduledTick(level, pos); }
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
                     if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));

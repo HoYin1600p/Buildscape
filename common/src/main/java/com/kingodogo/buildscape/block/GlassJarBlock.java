@@ -77,6 +77,12 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
         return new GlassJarBlockEntity(pos, state);
     }
 
+    public void onScheduledTick(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof GlassJarBlockEntity jar) {
+            jar.updateGlowingState();
+        }
+    }
+
     @Override
     public InteractionResult onInteract(Level level, BlockPos pos, BlockState state, Player player, InteractionHand hand, BlockHitResult hit) {
         return handleJarInteraction(player.getItemInHand(hand), state, level, pos, player, hand, hit);

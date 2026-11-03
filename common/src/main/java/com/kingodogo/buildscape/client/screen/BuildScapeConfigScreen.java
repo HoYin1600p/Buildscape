@@ -1060,7 +1060,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         uploadBatch.rebase(PillarParticleConfig.get());
         this.title = ComponentHelper.translatable("buildscape.config.title");
         PresetsConfig presets = PresetsConfig.get();
-        this.selectedPresetIndex = Math.max(0, presets.getPresetKeys().indexOf(presets.getLastAppliedPreset()));
+        String lastPreset = BuildscapeClientConfig.get().getLastPreset();
+        if (lastPreset == null || lastPreset.isBlank()) lastPreset = presets.getLastAppliedPreset();
+        this.selectedPresetIndex = Math.max(0, presets.getPresetKeys().indexOf(lastPreset));
 
         this.openStartTime = 0L;
         try {
@@ -5665,6 +5667,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             if (!keys.isEmpty() && selectedPresetIndex < keys.size()) {
                 if (!requirePresetApplyAccess(presetsCfg, keys.get(selectedPresetIndex))) return true;
                 presetsCfg.applyPreset(keys.get(selectedPresetIndex));
+                BuildscapeClientConfig.get().setLastPreset(keys.get(selectedPresetIndex));
                 persistServerConfig(PillarParticleConfig.get());
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
@@ -5703,6 +5706,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
                 selectedPresetIndex = 0;
                 presetsCfg.applyPreset("default");
+                BuildscapeClientConfig.get().setLastPreset("default");
                 persistServerConfig(PillarParticleConfig.get());
                 rebuildActiveItemsCache();
                 itemsListDirty = true;
@@ -5736,6 +5740,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             if (!requireConfigModificationAccess()) return true;
             if (!requirePresetApplyAccess(presetsCfg, "default")) return true;
             presetsCfg.applyPreset("default");
+            BuildscapeClientConfig.get().setLastPreset("default");
             persistServerConfig(PillarParticleConfig.get());
             selectedPresetIndex = 0;
             rebuildActiveItemsCache();

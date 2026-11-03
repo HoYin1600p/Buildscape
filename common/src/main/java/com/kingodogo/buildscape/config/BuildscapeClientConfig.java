@@ -24,6 +24,7 @@ public class BuildscapeClientConfig {
     public static final String KEY_SIDE_PANEL_EXPANDED = "SidePanelExpanded";
     public static final String KEY_ANIMATION_SPEED = "AnimationSpeed";
     public static final String KEY_LAST_ACTIVE_TAB = "LastActiveTab";
+    public static final String KEY_LAST_PRESET = "LastPreset";
     public static final String KEY_MAX_CUSTOM_PRESETS = "MaxCustomPresets";
     public static final int DEFAULT_CUSTOM_PRESETS = 4;
     public static final int MIN_CUSTOM_PRESETS = 1;
@@ -46,6 +47,7 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_SIDE_PANEL_EXPANDED, "false");
         DEFAULTS.put(KEY_ANIMATION_SPEED, "0");
         DEFAULTS.put(KEY_LAST_ACTIVE_TAB, "0");
+        DEFAULTS.put(KEY_LAST_PRESET, "");
         DEFAULTS.put(KEY_MAX_CUSTOM_PRESETS, String.valueOf(DEFAULT_CUSTOM_PRESETS));
     }
 
@@ -57,7 +59,7 @@ public class BuildscapeClientConfig {
     private boolean uiReadOnly;
     private String source;
     private String uiSource;
-    private static final Set<String> UI_STATE = Set.of(KEY_LAST_ACTIVE_TAB, KEY_SIDE_PANEL_EXPANDED);
+    private static final Set<String> UI_STATE = Set.of(KEY_LAST_ACTIVE_TAB, KEY_SIDE_PANEL_EXPANDED, KEY_LAST_PRESET);
 
     private BuildscapeClientConfig() {
         this(ConfigPaths.root());
@@ -218,7 +220,7 @@ public class BuildscapeClientConfig {
             case KEY_PARALLEL_MODEL_LOADING, KEY_CACHE_MODEL_MATERIALS,
                     KEY_PARALLEL_MODEL_BAKING, KEY_PARALLEL_BLOCK_STATE_CACHE -> "Performance";
             case KEY_HIDE_CONFIG_BUTTON, KEY_UI_THEME, KEY_UI_BACKGROUND, KEY_ANIMATION_SPEED,
-                    KEY_LAST_ACTIVE_TAB, KEY_SIDE_PANEL_EXPANDED -> "Interface";
+                    KEY_LAST_ACTIVE_TAB, KEY_SIDE_PANEL_EXPANDED, KEY_LAST_PRESET -> "Interface";
             default -> "Other";
         };
     }
@@ -237,6 +239,7 @@ public class BuildscapeClientConfig {
             case KEY_UI_BACKGROUND -> "Background for the configuration screen.";
             case KEY_ANIMATION_SPEED -> "Screen animation speed: 0 smooth, 1 snappy, 2 instant.";
             case KEY_LAST_ACTIVE_TAB -> "Last selected configuration tab (client screen state).";
+            case KEY_LAST_PRESET -> "Last preset explicitly applied from the configuration screen.";
             case KEY_SIDE_PANEL_EXPANDED -> "Whether the presets side panel is expanded (client screen state).";
             default -> "Unrecognized setting retained with its original value.";
         };
@@ -329,6 +332,17 @@ public class BuildscapeClientConfig {
 
     public int getLastActiveTab() {
         return getInt(KEY_LAST_ACTIVE_TAB, 0);
+    }
+
+    public String getLastPreset() {
+        return values.getOrDefault(KEY_LAST_PRESET, "");
+    }
+
+    public void setLastPreset(String key) {
+        String normalized = key == null || key.isBlank() ? "default" : key;
+        if (normalized.equals(getLastPreset())) return;
+        values.put(KEY_LAST_PRESET, normalized);
+        saveState();
     }
 
     public int getMaxCustomPresets() {

@@ -1740,6 +1740,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return false;
     }
 
+    private boolean requireConfigFilesEditable(boolean items, boolean properties) {
+        if (PillarParticleConfig.get().canApplyUpdate(items, properties)) return true;
+        readOnlyDeniedAt = System.currentTimeMillis();
+        readOnlyDeniedX = rawMouseX;
+        readOnlyDeniedY = rawMouseY;
+        showFeedback("The configuration file is unavailable or read-only.", 4000L);
+        return false;
+    }
+
     private UUID getPlayerUuid() {
         Minecraft mc = Minecraft.getInstance();
         return mc.player != null ? mc.player.getUUID() : null;
@@ -4655,6 +4664,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                 int slotY = viewportY + 2 - (int) scrollOffset + row * step;
                                 if (mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize) {
                                     if (!requireConfigModificationAccess()) return true;
+                                    if (!requireConfigFilesEditable(true, false)) return true;
                                     Item item = itemsToDisplay.get(index);
                                     CommonId cid = Services.PLATFORM.getItemId(item);
                                     if (cid != null) {
@@ -4691,6 +4701,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                             if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= rowY && mouseY <= rowY + tagRowH) {
                                 if (!requireConfigModificationAccess()) return true;
+                                if (!requireConfigFilesEditable(true, false)) return true;
                                 String tagId = tagsToDisplay.get(ti);
                                 if (cfg.items.contains(tagId)) {
                                     cfg.items.remove(tagId);
@@ -4733,6 +4744,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 1. Mode Toggle
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     cfg.use_pattern = !cfg.use_pattern;
                     persistServerConfig(cfg);
                     return true;
@@ -4743,6 +4755,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int patStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (patStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     int pIndex = 0;
                     for (int i = 0; i < GLOBAL_PARTICLE_PATTERNS.length; i++) {
                         if (GLOBAL_PARTICLE_PATTERNS[i].equalsIgnoreCase(cfg.pattern)) {
@@ -4760,6 +4773,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int pSpeedStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pSpeedStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     Double next = stepRangeValue(ParticleRange.PATTERN_SPEED, "global", cfg.pattern_speed, pSpeedStep);
                     if (next == null) return true;
                     cfg.pattern_speed = next;
@@ -4772,6 +4786,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int pSpreadStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pSpreadStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     Double next = stepRangeValue(ParticleRange.PATTERN_SPREAD, "global", cfg.pattern_spread, pSpreadStep);
                     if (next == null) return true;
                     cfg.pattern_spread = next;
@@ -4784,6 +4799,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int pIntStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (pIntStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     Double next = stepRangeValue(ParticleRange.PATTERN_INTENSITY, "global", cfg.pattern_intensity, pIntStep);
                     if (next == null) return true;
                     cfg.pattern_intensity = next;
@@ -4796,6 +4812,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int speedStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (speedStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     Double next = stepRangeValue(ParticleRange.PARTICLE_SPEED, "global", cfg.particle_speed, speedStep);
                     if (next == null) return true;
                     cfg.particle_speed = next;
@@ -4808,6 +4825,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int spreadStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (spreadStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     Double next = stepRangeValue(ParticleRange.PARTICLE_SPREAD, "global", cfg.particle_spread, spreadStep);
                     if (next == null) return true;
                     cfg.particle_spread = next;
@@ -4820,6 +4838,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int lifeStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (lifeStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     Double next = stepRangeValue(ParticleRange.PARTICLE_LIFETIME, "global", cfg.particle_lifetime, lifeStep);
                     if (next == null) return true;
                     cfg.particle_lifetime = next.intValue();
@@ -4832,6 +4851,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int denStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (denStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     Double next = stepRangeValue(ParticleRange.PARTICLE_DENSITY, "global", cfg.particle_density, denStep);
                     if (next == null) return true;
                     cfg.particle_density = next.intValue();
@@ -4851,11 +4871,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     if (mouseY >= counterY && mouseY <= counterY + counterH) {
                         if (mouseX >= counterX && mouseX <= counterX + stepBtnW) {
                             if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                            if (!requireConfigFilesEditable(false, true)) return true;
                             cfg.max_particle_color = Math.max(1, cfg.max_particle_color - 1);
                             persistServerConfig(cfg);
                             return true;
                         } else if (mouseX >= counterX + counterW - stepBtnW && mouseX <= counterX + counterW) {
                             if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                            if (!requireConfigFilesEditable(false, true)) return true;
                             cfg.max_particle_color = Math.min(7, cfg.max_particle_color + 1);
                             persistServerConfig(cfg);
                             return true;
@@ -4872,6 +4894,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         int swX = swatchStartX + i * (swatchSize + swatchGap);
                         if (mouseX >= swX && mouseX <= swX + swatchSize && mouseY >= swatchY && mouseY <= swatchY + swatchSize) {
                             if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                            if (!requireConfigFilesEditable(false, true)) return true;
                             editingColorIndex = i;
                             isEditingPillarColor = false;
                             editingPillarId = null;
@@ -4897,6 +4920,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH,
                         getConfigRowButtonWidth(Minecraft.getInstance().font, "↻ Reset Properties"))) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.GENERAL)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     resetParticleProperties(cfg);
                     persistServerConfig(cfg);
                     return true;
@@ -4906,6 +4930,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH,
                         getConfigRowButtonWidth(Minecraft.getInstance().font, "↻ Reset Colors"))) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.LIMITED)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     resetParticleColors(cfg);
                     persistServerConfig(cfg);
                     return true;
@@ -5045,6 +5070,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int permissionStep = checkCycleClick(mouseX, mouseY, x, curY, w, systemRowH, clipY, clipH);
                 if (permissionStep != 0) {
                     if (!requireConfigModificationAccess(PillarParticleConfig.EditScope.POLICY)) return true;
+                    if (!requireConfigFilesEditable(false, true)) return true;
                     PillarParticleConfig cfg = PillarParticleConfig.get();
                     PillarParticleConfig.EditPermissionMode[] modes = PillarParticleConfig.EditPermissionMode.values();
                     int next = Math.floorMod(cfg.edit_permission_mode.ordinal() + permissionStep, modes.length);
@@ -5537,6 +5563,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
             } else {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
+                if (!requireConfigFilesEditable(false, true)) return true;
                 setPaletteColor(cfg.particle_color, editingColorIndex, hexString);
                 persistServerConfig(cfg);
             }
@@ -6043,6 +6070,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
             } else {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
+                if (!requireConfigFilesEditable(false, true)) return true;
                 setPaletteColor(cfg.particle_color, editingColorIndex, hexString);
                 persistServerConfig(cfg);
             }

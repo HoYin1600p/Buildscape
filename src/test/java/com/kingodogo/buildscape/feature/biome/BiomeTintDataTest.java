@@ -47,6 +47,16 @@ public class BiomeTintDataTest {
     }
 
     @Test
+    public void onlyPaintedChunksHaveTintData() {
+        BiomeTintData data = new BiomeTintData();
+        assertFalse(data.hasChunk(new ChunkPos(0, 0)));
+        data.putColumn(-1, -17, SWAMP);
+        assertTrue(data.hasChunk(new ChunkPos(-1, -2)));
+        assertFalse(data.hasChunk(new ChunkPos(0, 0)));
+        assertTrue(BiomeTintData.load(data.save(new CompoundTag())).hasChunk(new ChunkPos(-1, -2)));
+    }
+
+    @Test
     public void existingWorldWithoutTintDataIsEmptyAndInvalidEntriesAreSkipped() {
         assertTrue(BiomeTintData.load(new CompoundTag()).getChunk(new ChunkPos(0, 0)).isEmpty());
         CompoundTag root = new CompoundTag();

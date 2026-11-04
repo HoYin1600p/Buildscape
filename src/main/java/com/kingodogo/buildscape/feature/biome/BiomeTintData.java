@@ -32,6 +32,14 @@ public class BiomeTintData extends SavedData {
         return true;
     }
 
+    /**
+     * BiomeTintSync skips watched chunks without data, so anything that ever removes tints must still sync
+     * the chunk to its watchers.
+     */
+    public boolean hasChunk(ChunkPos chunk) {
+        return chunks.containsKey(chunk.toLong());
+    }
+
     public Map<Integer, ResourceLocation> getChunk(ChunkPos chunk) {
         return Map.copyOf(chunks.getOrDefault(chunk.toLong(), Map.of()));
     }

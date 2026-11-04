@@ -11,10 +11,19 @@ import net.minecraftforge.network.PacketDistributor;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID)
 public class BiomeTintSync {
+    /**
+     * Sends a newly watched chunk's tints, but only when it has any. Tints are never removed and the client
+     * drops a chunk's tints when it unloads, so an unpainted chunk needs no packet.
+     */
     @SubscribeEvent
     public static void onWatch(ChunkWatchEvent.Watch event) {
         ServerLevel level = event.getWorld();
-        ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(event::getPlayer), packet(level, event.getPos()));
+        BiomeTintData data = BiomeTintData.get(level);
+        if (!data.hasChunk(event.getPos())) {
+            return;
+        }
+        ModMessages.INSTANCE.send(PacketDistributor.PLAYER.with(event::getPlayer),
+                new SyncBiomeTintPacket(level.dimension().location(), event.getPos(), data.getChunk(event.getPos())));
     }
 
     public static void sync(ServerLevel level, ChunkPos chunk) {

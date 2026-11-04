@@ -49,8 +49,8 @@ jobs:
           echo "Base Mod Version: $MOD_VER"
           echo "Minecraft Version: $MC_VER"
 
-          # Check if branch contains 'main' (e.g. main, dev/main-1.18.2, main/1.18.2-4.1.0)
-          if [[ "$REF_NAME" == *"main"* ]]; then
+          # Release branches and existing main branches produce production builds.
+          if [[ "$REF_NAME" == release/* || "$REF_NAME" == *"main"* ]]; then
             echo "Release branch detected."
             IS_RELEASE="true"
             IS_PRERELEASE="false"

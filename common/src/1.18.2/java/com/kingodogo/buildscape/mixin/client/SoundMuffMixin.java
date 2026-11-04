@@ -16,7 +16,7 @@ public abstract class SoundMuffMixin {
     @Inject(method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V",
             at = @At("HEAD"), cancellable = true, require = 0)
     private void buildscape$mute(SoundInstance sound, CallbackInfo ci) {
-        if (sound != null && MuffBlockManager.shouldMute(Minecraft.getInstance().level,
+        if (sound != null && !sound.isRelative() && MuffBlockManager.shouldMute(Minecraft.getInstance().level,
                 sound.getSource(), sound.getX(), sound.getY(), sound.getZ())) {
             ci.cancel();
         }

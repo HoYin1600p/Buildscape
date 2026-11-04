@@ -16,7 +16,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public class SignFrameInteractionHandler {
 
     public static InteractionResult handleRightClick(Player player, Level level, InteractionHand hand, BlockPos pos) {
-        if (player == null || level == null || pos == null) return InteractionResult.PASS;
+        if (player == null || level == null || pos == null || !player.mayBuild() || !level.mayInteract(player, pos)) {
+            return InteractionResult.PASS;
+        }
         BlockState state = level.getBlockState(pos);
         BlockEntity be = level.getBlockEntity(pos);
 

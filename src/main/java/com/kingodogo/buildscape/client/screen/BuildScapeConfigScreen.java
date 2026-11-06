@@ -2067,8 +2067,8 @@ public class BuildScapeConfigScreen extends Screen {
         }
         alpha = Math.max(0.01f, Math.min(1.0f, alpha));
 
-        // Render parent behind the config screen so transitions and backdrop are seamless
-        renderParentBackground(poseStack, -999, -999, partialTick);
+        // The pause screen is the return target, not this screen's backdrop. Rendering it here
+        // leaks its controls through the config screen's translucent overlay.
 
         this.rawMouseX = mouseX;
         this.rawMouseY = mouseY;

@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/mossy_carpet_side",
+  "parent": "buildscape:block/mossy_carpet_side",
   "textures": {
     "side": "buildscape:block/pale_moss_carpet_side_tall"
   }

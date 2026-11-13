@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase;
-import com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload;
+import com.kingodogo.buildscape.adapter.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.PacketFactory.BuildscapeCustomPayload;
 import com.kingodogo.buildscape.network.PacketDirection;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader;
@@ -71,12 +71,12 @@ public class BuildscapeNeoForge {
                         BuildScapeRecipeLoader.forReload(event.getServerResources().getRecipeManager())));
     }
     private static void serverStarted(ServerStartedEvent event) {
-        com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(event.getServer());
+        com.kingodogo.buildscape.adapter.PacketFactory.setServer(event.getServer());
         BuildscapeCommon.setServerFullyInitialized(true);
     }
     private static void serverStopped(ServerStoppedEvent event) {
         BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);
-        com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(null);
+        com.kingodogo.buildscape.adapter.PacketFactory.setServer(null);
         BuildscapeCommon.setServerFullyInitialized(false);
     }
     private static void registerPayloads(RegisterPayloadHandlersEvent event) {

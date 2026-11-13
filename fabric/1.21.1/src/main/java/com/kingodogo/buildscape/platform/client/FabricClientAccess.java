@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.platform.client;
 
-import com.kingodogo.buildscape.adapter.v121x.client.GuiProvider;
-import com.kingodogo.buildscape.adapter.v121x.client.ParticleFactory;
-import com.kingodogo.buildscape.adapter.v121x.client.RenderFactory;
+import com.kingodogo.buildscape.adapter.client.GuiProvider;
+import com.kingodogo.buildscape.adapter.client.ParticleFactory;
+import com.kingodogo.buildscape.adapter.client.RenderFactory;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.adapter.v121x.client.FestiveRenderTypes;
+import com.kingodogo.buildscape.adapter.client.FestiveRenderTypes;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import java.util.SequencedMap;
 import net.minecraft.client.renderer.RenderBuffers;

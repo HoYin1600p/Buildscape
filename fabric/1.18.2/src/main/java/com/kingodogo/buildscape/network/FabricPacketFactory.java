@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import io.netty.buffer.Unpooled;
 
 /** Descriptor decoding and thread dispatch remain in the shared v118x factory. */
-public final class FabricPacketFactory extends com.kingodogo.buildscape.adapter.v118x.PacketFactory {
+public final class FabricPacketFactory extends com.kingodogo.buildscape.adapter.PacketFactory {
     @Override public void handleServerbound(com.kingodogo.buildscape.util.CommonId id, byte[] data, ServerPlayer player) {
         var buffer = new FriendlyByteBuf(Unpooled.wrappedBuffer(data));
         try { handleServerbound(id, buffer, player); }

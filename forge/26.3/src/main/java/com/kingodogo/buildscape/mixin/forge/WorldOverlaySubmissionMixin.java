@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.forge;
 
-import com.kingodogo.buildscape.adapter.v263.client.ClientWorldHooks;
+import com.kingodogo.buildscape.adapter.client.ClientWorldHooks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;

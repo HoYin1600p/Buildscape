@@ -2,7 +2,7 @@ package com.kingodogo.buildscape;
 
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.network.FabricPacketFactory;
-import com.kingodogo.buildscape.adapter.v118x.PacketFactory;
+import com.kingodogo.buildscape.adapter.PacketFactory;
 import com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;

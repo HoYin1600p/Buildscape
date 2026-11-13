@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.kingodogo.buildscape.TestBootstrap;
-import com.kingodogo.buildscape.adapter.v26x.BlockFactory;
+import com.kingodogo.buildscape.adapter.BlockFactory;
 import com.kingodogo.buildscape.block.BlockDefinition;
 import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.platform.Services;

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.adapter.v118x.client.CustomGeometryAccess;
+import com.kingodogo.buildscape.adapter.client.CustomGeometryAccess;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import org.spongepowered.asm.mixin.Mixin;
 

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.adapter.v118x.client.FestiveRenderTypes;
+import com.kingodogo.buildscape.adapter.client.FestiveRenderTypes;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import java.util.SortedMap;
 import net.minecraft.client.renderer.RenderBuffers;

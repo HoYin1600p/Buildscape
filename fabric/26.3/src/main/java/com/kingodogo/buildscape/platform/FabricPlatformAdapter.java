@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.platform;
 
-import com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.PlatformAdapterBase;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.mixin.forge121;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
-import com.kingodogo.buildscape.adapter.v121x.client.BlockEntityItemRenderer;
+import com.kingodogo.buildscape.adapter.client.BlockEntityItemRenderer;
 import com.kingodogo.buildscape.item.GlassJarItem;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;

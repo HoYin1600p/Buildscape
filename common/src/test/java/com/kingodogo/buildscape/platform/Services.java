@@ -32,11 +32,11 @@ public class Services {
             Services.class.getClassLoader(), new Class<?>[]{IPlatformAdapter.class}, (proxy, method, args) -> {
                 // Item properties get their registry id (and so their description key) exactly as the 26.x adapter does it.
                 if (method.getName().equals("prepareItemProperties")) {
-                    return com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase.itemProperties(
+                    return com.kingodogo.buildscape.adapter.PlatformAdapterBase.itemProperties(
                             (com.kingodogo.buildscape.util.CommonId) args[0], (net.minecraft.world.item.Item.Properties) args[1]);
                 }
                 if (method.getName().equals("prepareBlockItemProperties")) {
-                    return com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase.itemProperties(
+                    return com.kingodogo.buildscape.adapter.PlatformAdapterBase.itemProperties(
                             (com.kingodogo.buildscape.util.CommonId) args[0], (net.minecraft.world.item.Item.Properties) args[1])
                             .useBlockDescriptionPrefix();
                 }

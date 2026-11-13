@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.client;
 
-import com.kingodogo.buildscape.adapter.v121x.client.FireworkStarterAccess;
+import com.kingodogo.buildscape.adapter.client.FireworkStarterAccess;
 import com.kingodogo.buildscape.mixinsupport.FireworkContext;
 import com.kingodogo.buildscape.mixinsupport.FireworkSparkAccess;
 import com.kingodogo.buildscape.mixinsupport.MixinFactory;

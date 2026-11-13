@@ -16,7 +16,7 @@ public class MangroveBoatEntity extends Boat {
 
     public MangroveBoatEntity(Level level, double x, double y, double z) {
         this(
-                com.kingodogo.buildscape.adapter.v118x.RestoredContentTypes.<MangroveBoatEntity>entity("mangrove_boat"),
+                com.kingodogo.buildscape.adapter.RestoredContentTypes.<MangroveBoatEntity>entity("mangrove_boat"),
                 level
         );
         this.setPos(x, y, z);

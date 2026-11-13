@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.platform;
 
-import com.kingodogo.buildscape.adapter.v118x.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.PlatformAdapterBase;
 import com.kingodogo.buildscape.registry.ForgeRegistryAdapter;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.core.Registry;
@@ -50,15 +50,15 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
     }
     @Override public void registerMenuScreens() {
         if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v118x.GuiProvider.registerMenuScreens(menuScreenRegistrar());
+        com.kingodogo.buildscape.adapter.GuiProvider.registerMenuScreens(menuScreenRegistrar());
         registerRenderers();
     }
 
-    public static com.kingodogo.buildscape.adapter.v118x.GuiProvider.Registrar menuScreenRegistrar() {
-        return new com.kingodogo.buildscape.adapter.v118x.GuiProvider.Registrar() {
+    public static com.kingodogo.buildscape.adapter.GuiProvider.Registrar menuScreenRegistrar() {
+        return new com.kingodogo.buildscape.adapter.GuiProvider.Registrar() {
             public <M extends net.minecraft.world.inventory.AbstractContainerMenu> void register(
                     net.minecraft.world.inventory.MenuType<M> type,
-                    com.kingodogo.buildscape.adapter.v118x.GuiProvider.ScreenFactory<M> factory) {
+                    com.kingodogo.buildscape.adapter.GuiProvider.ScreenFactory<M> factory) {
                 net.minecraft.client.gui.screens.MenuScreens
                         .<M, net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<M>>register(
                                 type, (menu, inventory, title) -> factory.create(menu, inventory, title));
@@ -67,7 +67,7 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
     }
     @Override public void registerParticleProviders() {
         if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v118x.ParticleFactory.registerProviders(new com.kingodogo.buildscape.adapter.v118x.ParticleFactory.Registrar() {
+        com.kingodogo.buildscape.adapter.ParticleFactory.registerProviders(new com.kingodogo.buildscape.adapter.ParticleFactory.Registrar() {
             public <T extends net.minecraft.core.particles.ParticleOptions> void register(net.minecraft.core.particles.ParticleType<T> type,
                     java.util.function.Function<net.minecraft.client.particle.SpriteSet, net.minecraft.client.particle.ParticleProvider<T>> factory) {
                 net.minecraft.client.Minecraft.getInstance().particleEngine.register(type, sprites -> factory.apply(sprites));
@@ -95,15 +95,15 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
 
     /** Forge 1.18.2 patches RecipeSerializer to extend IForgeRegistryEntry; wrap vanilla-compiled serializers. */
     @Override public <T extends net.minecraft.world.item.crafting.Recipe<?>> net.minecraft.world.item.crafting.RecipeSerializer<T>
-    createRecipeSerializer(com.kingodogo.buildscape.adapter.v118x.RecipeFactory.SerializerLogic<T> delegate) {
+    createRecipeSerializer(com.kingodogo.buildscape.adapter.RecipeFactory.SerializerLogic<T> delegate) {
         return new ForgeRecipeSerializer<>(delegate);
     }
 
     private static final class ForgeRecipeSerializer<T extends net.minecraft.world.item.crafting.Recipe<?>>
             extends net.minecraftforge.registries.ForgeRegistryEntry<net.minecraft.world.item.crafting.RecipeSerializer<?>>
             implements net.minecraft.world.item.crafting.RecipeSerializer<T> {
-        private final com.kingodogo.buildscape.adapter.v118x.RecipeFactory.SerializerLogic<T> delegate;
-        ForgeRecipeSerializer(com.kingodogo.buildscape.adapter.v118x.RecipeFactory.SerializerLogic<T> delegate) { this.delegate = delegate; }
+        private final com.kingodogo.buildscape.adapter.RecipeFactory.SerializerLogic<T> delegate;
+        ForgeRecipeSerializer(com.kingodogo.buildscape.adapter.RecipeFactory.SerializerLogic<T> delegate) { this.delegate = delegate; }
         @Override public T fromJson(ResourceLocation id, com.google.gson.JsonObject json) { return delegate.fromJson(id, json); }
         @Override public T fromNetwork(ResourceLocation id, net.minecraft.network.FriendlyByteBuf buffer) { return delegate.fromNetwork(id, buffer); }
         @Override public void toNetwork(net.minecraft.network.FriendlyByteBuf buffer, T recipe) { delegate.toNetwork(buffer, recipe); }
@@ -189,7 +189,7 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
 
     @Override protected void registerCauldronInteractions() {
         super.registerCauldronInteractions();
-        var interactions = com.kingodogo.buildscape.adapter.v118x.ExperienceCauldronInteractions.INTERACTIONS;
+        var interactions = com.kingodogo.buildscape.adapter.ExperienceCauldronInteractions.INTERACTIONS;
         var cauldron = getBlock(new CommonId("buildscape", "experience_cauldron"));
         var xpBucket = getItem(new CommonId("buildscape", "experience_bucket"));
         interactions.put(net.minecraft.world.item.Items.BUCKET, (state, level, pos, player, hand, stack) -> {

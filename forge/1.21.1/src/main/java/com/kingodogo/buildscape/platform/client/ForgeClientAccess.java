@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.platform.client;
 
-import com.kingodogo.buildscape.adapter.v121x.client.GuiProvider;
-import com.kingodogo.buildscape.adapter.v121x.client.ParticleFactory;
+import com.kingodogo.buildscape.adapter.client.GuiProvider;
+import com.kingodogo.buildscape.adapter.client.ParticleFactory;
 import com.kingodogo.buildscape.platform.Services;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.screens.MenuScreens;

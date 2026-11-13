@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.kingodogo.buildscape.TestBootstrap;
-import com.kingodogo.buildscape.adapter.v26x.BlockFactory;
+import com.kingodogo.buildscape.adapter.BlockFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

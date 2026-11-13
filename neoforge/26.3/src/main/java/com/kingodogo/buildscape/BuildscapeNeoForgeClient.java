@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v263.GuiProvider;
-import com.kingodogo.buildscape.adapter.v263.ParticleFactory;
-import com.kingodogo.buildscape.adapter.v263.RenderFactory;
+import com.kingodogo.buildscape.adapter.GuiProvider;
+import com.kingodogo.buildscape.adapter.ParticleFactory;
+import com.kingodogo.buildscape.adapter.RenderFactory;
 import com.kingodogo.buildscape.menu.ModMenuTypes;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
@@ -22,7 +22,7 @@ final class BuildscapeNeoForgeClient {
     static void register(IEventBus bus) {
         net.neoforged.fml.ModLoadingContext.get().registerExtensionPoint(
                 net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
-                () -> (container, parent) -> com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.createConfigScreen(parent));
+                () -> (container, parent) -> com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.createConfigScreen(parent));
         bus.addListener(BuildscapeNeoForgeClient::keys);
         bus.addListener(BuildscapeNeoForgeClient::fluidModels);
         bus.addListener(BuildscapeNeoForgeClient::fluidExtensions);
@@ -63,7 +63,7 @@ final class BuildscapeNeoForgeClient {
         if (event.getButton() == 1 && event.getAction() == 1) com.kingodogo.buildscape.client.ClientEvents.onRightClick();
     }
     private static void scroll(net.neoforged.neoforge.client.event.InputEvent.MouseScrollingEvent event) {
-        if (!com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.isScreenOpen()
+        if (!com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.isScreenOpen()
                 && com.kingodogo.buildscape.client.ZoomHandler.isZooming()) {
             com.kingodogo.buildscape.client.ZoomHandler.handleScroll(event.getScrollDeltaY());
             event.setCanceled(true);
@@ -72,14 +72,14 @@ final class BuildscapeNeoForgeClient {
     private static void interaction(net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered event) {
         var mc = net.minecraft.client.Minecraft.getInstance();
         if (event.isAttack()) com.kingodogo.buildscape.client.BiomeBrushClientHandler.onAttack(mc.player, mc.hitResult);
-        if (event.isAttack() && !com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.isScreenOpen()
+        if (event.isAttack() && !com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.isScreenOpen()
                 && com.kingodogo.buildscape.client.TreeChopHandler.shouldCancelLeftClick(mc.player, mc.hitResult)) {
             event.setCanceled(true);
             event.setSwingHand(true);
         }
     }
     private static void highlight(net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent event) {
-        if (com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.extractBlockHighlight(
+        if (com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.extractBlockHighlight(
                 event.getCamera(), event.getHitResult(), event.getLevelRenderState())) event.setCanceled(true);
     }
     private static void fov(net.neoforged.neoforge.client.event.ViewportEvent.ComputeFov event) {
@@ -93,34 +93,34 @@ final class BuildscapeNeoForgeClient {
     private static void disconnect(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
         com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();
         com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clear();
-        com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.clearInputRenderState();
+        com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.clearInputRenderState();
     }
     private static void unload(net.neoforged.neoforge.event.level.LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
             com.kingodogo.buildscape.client.ClientEvents.onClientWorldUnload();
             com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clear();
-            com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.clearInputRenderState();
+            com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.clearInputRenderState();
         }
     }
     private static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(com.kingodogo.buildscape.client.ClientEvents::initializeConfigCallback);
     }
     private static void fluidModels(net.neoforged.neoforge.client.event.RegisterFluidModelsEvent event) {
-        event.register(com.kingodogo.buildscape.adapter.v263.client.ExperienceFluidModel.create(),
-                com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluids.still(),
-                com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluids.flowing());
+        event.register(com.kingodogo.buildscape.adapter.client.ExperienceFluidModel.create(),
+                com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.still(),
+                com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.flowing());
     }
     private static void fluidExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
         event.registerFluidType(new net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions() {
             @Override public void modifyFogColor(net.minecraft.client.Camera camera, float partialTick,
                     net.minecraft.client.multiplayer.ClientLevel level, int renderDistance, float darken,
                     org.joml.Vector4f color) {
-                com.kingodogo.buildscape.adapter.v263.client.ExperienceFluidFog.color(color);
+                com.kingodogo.buildscape.adapter.client.ExperienceFluidFog.color(color);
             }
             @Override public void modifyFogRender(net.minecraft.client.Camera camera,
                     net.minecraft.client.renderer.fog.environment.FogEnvironment environment,
                     float renderDistance, float partialTick, net.minecraft.client.renderer.fog.FogData fog) {
-                com.kingodogo.buildscape.adapter.v263.client.ExperienceFluidFog.distances(fog);
+                com.kingodogo.buildscape.adapter.client.ExperienceFluidFog.distances(fog);
             }
         }, com.kingodogo.buildscape.fluid.NeoForgeExperienceFluids.type());
     }
@@ -152,17 +152,17 @@ final class BuildscapeNeoForgeClient {
         RenderFactory.registerBlockEntityRenderers(event::registerBlockEntityRenderer);
     }
     private static void specialModels(net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent event) {
-        com.kingodogo.buildscape.adapter.v263.client.SpecialItemRenderers.register(event::register);
+        com.kingodogo.buildscape.adapter.client.SpecialItemRenderers.register(event::register);
     }
     private static void guiLayers(net.neoforged.neoforge.client.event.RegisterGuiLayersEvent event) {
         event.registerAboveAll(net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", "overlay"),
-                (graphics, delta) -> com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.renderClientOverlay(
+                (graphics, delta) -> com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.renderClientOverlay(
                         graphics, graphics.guiWidth(), graphics.guiHeight()));
     }
     private static void worldOverlays(net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent event) {
-        com.kingodogo.buildscape.adapter.v263.client.ClientWorldHooks.collectWorldOverlays(
+        com.kingodogo.buildscape.adapter.client.ClientWorldHooks.collectWorldOverlays(
                 event.getPoseStack(), event.getSubmitNodeCollector(), event.getLevelRenderState());
-        com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.collectBlockHighlight(
+        com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.collectBlockHighlight(
                 event.getPoseStack(), event.getSubmitNodeCollector(), event.getLevelRenderState());
     }
 }

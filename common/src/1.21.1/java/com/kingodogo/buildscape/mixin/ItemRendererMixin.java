@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.adapter.v121x.client.FestiveRenderTypes;
-import com.kingodogo.buildscape.adapter.v121x.client.FestiveStackBufferSource;
+import com.kingodogo.buildscape.adapter.client.FestiveRenderTypes;
+import com.kingodogo.buildscape.adapter.client.FestiveStackBufferSource;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;

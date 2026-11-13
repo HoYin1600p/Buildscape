@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.TestBootstrap;
-import com.kingodogo.buildscape.adapter.v26x.ValueInputData;
-import com.kingodogo.buildscape.adapter.v26x.ValueOutputData;
+import com.kingodogo.buildscape.adapter.ValueInputData;
+import com.kingodogo.buildscape.adapter.ValueOutputData;
 import com.kingodogo.buildscape.util.ColorGradientSolver;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;

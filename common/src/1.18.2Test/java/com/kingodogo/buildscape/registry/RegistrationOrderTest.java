@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.registry;
 
-import com.kingodogo.buildscape.adapter.v118x.RegistrationOrder;
+import com.kingodogo.buildscape.adapter.RegistrationOrder;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

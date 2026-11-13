@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.platform;
 
-import com.kingodogo.buildscape.adapter.v118x.PlatformAdapterBase;
-import com.kingodogo.buildscape.adapter.v118x.PacketFactory;
+import com.kingodogo.buildscape.adapter.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.PacketFactory;
 import com.kingodogo.buildscape.util.CommonId;
 import com.kingodogo.buildscape.world.GameRuleAccess;
 import com.kingodogo.buildscape.world.ModGameRules;
@@ -63,15 +63,15 @@ public final class FabricPlatformAdapter extends PlatformAdapterBase implements 
 
     @Override public void registerMenuScreens() {
         if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v118x.GuiProvider.registerMenuScreens(menuScreenRegistrar());
+        com.kingodogo.buildscape.adapter.GuiProvider.registerMenuScreens(menuScreenRegistrar());
         registerRenderers();
     }
 
-    public static com.kingodogo.buildscape.adapter.v118x.GuiProvider.Registrar menuScreenRegistrar() {
-        return new com.kingodogo.buildscape.adapter.v118x.GuiProvider.Registrar() {
+    public static com.kingodogo.buildscape.adapter.GuiProvider.Registrar menuScreenRegistrar() {
+        return new com.kingodogo.buildscape.adapter.GuiProvider.Registrar() {
             public <M extends net.minecraft.world.inventory.AbstractContainerMenu> void register(
                     net.minecraft.world.inventory.MenuType<M> type,
-                    com.kingodogo.buildscape.adapter.v118x.GuiProvider.ScreenFactory<M> factory) {
+                    com.kingodogo.buildscape.adapter.GuiProvider.ScreenFactory<M> factory) {
                 net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry
                         .<M, net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<M>>register(
                                 type, (menu, inventory, title) -> factory.create(menu, inventory, title));
@@ -80,7 +80,7 @@ public final class FabricPlatformAdapter extends PlatformAdapterBase implements 
     }
     @Override public void registerParticleProviders() {
         if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v118x.ParticleFactory.registerProviders(new com.kingodogo.buildscape.adapter.v118x.ParticleFactory.Registrar() {
+        com.kingodogo.buildscape.adapter.ParticleFactory.registerProviders(new com.kingodogo.buildscape.adapter.ParticleFactory.Registrar() {
             public <T extends net.minecraft.core.particles.ParticleOptions> void register(net.minecraft.core.particles.ParticleType<T> type,
                     java.util.function.Function<net.minecraft.client.particle.SpriteSet, net.minecraft.client.particle.ParticleProvider<T>> factory) {
                 net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry.getInstance().register(type, sprites -> factory.apply(sprites));
@@ -116,7 +116,7 @@ public final class FabricPlatformAdapter extends PlatformAdapterBase implements 
 
     @Override public <T extends net.minecraft.world.item.crafting.Recipe<?>>
     net.minecraft.world.item.crafting.RecipeSerializer<T> createRecipeSerializer(
-            com.kingodogo.buildscape.adapter.v118x.RecipeFactory.SerializerLogic<T> delegate) {
+            com.kingodogo.buildscape.adapter.RecipeFactory.SerializerLogic<T> delegate) {
         return new net.minecraft.world.item.crafting.RecipeSerializer<T>() {
             @Override public T fromJson(ResourceLocation id, com.google.gson.JsonObject json) {
                 return delegate.fromJson(id, json);
@@ -249,7 +249,7 @@ public final class FabricPlatformAdapter extends PlatformAdapterBase implements 
     }
     @Override protected void registerCauldronInteractions() {
         super.registerCauldronInteractions();
-        var interactions = com.kingodogo.buildscape.adapter.v118x.ExperienceCauldronInteractions.INTERACTIONS;
+        var interactions = com.kingodogo.buildscape.adapter.ExperienceCauldronInteractions.INTERACTIONS;
         var cauldron = getBlock(new CommonId("buildscape", "experience_cauldron"));
         var xpBucket = getItem(new CommonId("buildscape", "experience_bucket"));
         interactions.put(net.minecraft.world.item.Items.BUCKET, (state, level, pos, player, hand, stack) -> {

@@ -19,15 +19,15 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public final class BuildscapeForge {
     public BuildscapeForge(FMLJavaModLoadingContext context) {
         var modBus = context.getModEventBus();
-        com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.installFactories(
-                () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Source() {
+        com.kingodogo.buildscape.adapter.ExperienceFluids.installFactories(
+                () -> new com.kingodogo.buildscape.adapter.ExperienceFluids.Source() {
                     @Override public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
                             net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) { return false; }
                     @Override public net.minecraftforge.fluids.FluidType getFluidType() {
                         return net.minecraftforge.common.ForgeMod.WATER_TYPE.get();
                     }
                 },
-                () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Flowing() {
+                () -> new com.kingodogo.buildscape.adapter.ExperienceFluids.Flowing() {
                     @Override public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
                             net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) { return false; }
                     @Override public net.minecraftforge.fluids.FluidType getFluidType() {
@@ -67,13 +67,13 @@ public final class BuildscapeForge {
     }
 
     private static void serverStarted(ServerStartedEvent event) {
-        com.kingodogo.buildscape.adapter.v121x.PacketFactory.setServer(event.getServer());
+        com.kingodogo.buildscape.adapter.PacketFactory.setServer(event.getServer());
         BuildscapeCommon.setServerFullyInitialized(true);
     }
 
     private static void serverStopped(ServerStoppedEvent event) {
         BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);
-        com.kingodogo.buildscape.adapter.v121x.PacketFactory.setServer(null);
+        com.kingodogo.buildscape.adapter.PacketFactory.setServer(null);
         BuildscapeCommon.setServerFullyInitialized(false);
     }
 }

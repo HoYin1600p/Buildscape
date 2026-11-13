@@ -38,7 +38,7 @@ public class CopperChestBlock extends ChestBlock implements ICopperChestBlock {
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!isWaxed) {
-            com.kingodogo.buildscape.adapter.v121x.RestoredCopperOxidation.tryOxidize(level, pos, state);
+            com.kingodogo.buildscape.adapter.RestoredCopperOxidation.tryOxidize(level, pos, state);
         }
     }
 

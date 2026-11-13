@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.client;
 
-import com.kingodogo.buildscape.adapter.v263.client.ExperienceFluidFog;
+import com.kingodogo.buildscape.adapter.client.ExperienceFluidFog;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;

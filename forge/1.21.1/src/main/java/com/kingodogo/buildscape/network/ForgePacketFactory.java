@@ -83,7 +83,7 @@ public final class ForgePacketFactory implements IPacketFactory {
                     if (descriptor.direction() == PacketDirection.CLIENT_TO_SERVER) {
                         if (context.getSender() != null) packet.handle(context.getSender());
                     } else if (FMLEnvironment.dist == Dist.CLIENT) {
-                        com.kingodogo.buildscape.adapter.v121x.client.ClientPackets.handleOnClientThread(packet, null);
+                        com.kingodogo.buildscape.adapter.client.ClientPackets.handleOnClientThread(packet, null);
                     }
                 }).add();
     }
@@ -113,7 +113,7 @@ public final class ForgePacketFactory implements IPacketFactory {
     @Override public void handleClientbound(CommonId id, FriendlyByteBuf buffer, Player player) {
         requireDirection(id, PacketDirection.SERVER_TO_CLIENT);
         CommonPacket packet = decode(id, buffer);
-        if (FMLEnvironment.dist == Dist.CLIENT) com.kingodogo.buildscape.adapter.v121x.client.ClientPackets.handleOnClientThread(packet, player);
+        if (FMLEnvironment.dist == Dist.CLIENT) com.kingodogo.buildscape.adapter.client.ClientPackets.handleOnClientThread(packet, player);
     }
     @Override public void handleServerbound(CommonId id, byte[] data, ServerPlayer player) {
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.wrappedBuffer(data));

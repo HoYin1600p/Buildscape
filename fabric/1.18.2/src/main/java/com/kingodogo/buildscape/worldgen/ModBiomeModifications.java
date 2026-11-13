@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.worldgen;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
-import com.kingodogo.buildscape.adapter.v118x.PlantPlacements;
+import com.kingodogo.buildscape.adapter.PlantPlacements;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;

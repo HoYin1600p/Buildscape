@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
-import com.kingodogo.buildscape.adapter.v118x.client.HazeBushParticleHandler;
+import com.kingodogo.buildscape.adapter.client.HazeBushParticleHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.api.distmarker.Dist;
@@ -136,7 +136,7 @@ public final class ForgeClientEvents {
     public static void disconnect(ClientPlayerNetworkEvent.LoggedOutEvent event) {
         ClientEvents.onClientDisconnect();
         HazeBushParticleHandler.clear();
-        com.kingodogo.buildscape.adapter.v118x.client.HazeMask.clearCaches();
+        com.kingodogo.buildscape.adapter.client.HazeMask.clearCaches();
     }
 
     @SubscribeEvent
@@ -144,7 +144,7 @@ public final class ForgeClientEvents {
         if (event.getWorld().isClientSide()) {
             ClientEvents.onClientWorldUnload();
             HazeBushParticleHandler.clear();
-            com.kingodogo.buildscape.adapter.v118x.client.HazeMask.clearCaches();
+            com.kingodogo.buildscape.adapter.client.HazeMask.clearCaches();
         }
     }
 

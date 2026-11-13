@@ -22,8 +22,8 @@ public final class LoaderWorldGen {
     }
     public static void register(FabricRegistryAdapter registry) {
         // 1.18.2 keeps its own mangrove trees (26.2 uses vanilla's), shaped by the v118x adapter.
-        queue(registry, "mangrove", () -> com.kingodogo.buildscape.adapter.v118x.WorldGenFactory.createMangroveTreeFeature(false));
-        queue(registry, "tall_mangrove", () -> com.kingodogo.buildscape.adapter.v118x.WorldGenFactory.createMangroveTreeFeature(true));
+        queue(registry, "mangrove", () -> com.kingodogo.buildscape.adapter.WorldGenFactory.createMangroveTreeFeature(false));
+        queue(registry, "tall_mangrove", () -> com.kingodogo.buildscape.adapter.WorldGenFactory.createMangroveTreeFeature(true));
         queue(registry, "poplar", ModConfiguredFeatures.POPLAR_TREE::get);
         queue(registry, "pale_oak", ModConfiguredFeatures.PALE_OAK_TREE::get);
         queue(registry, "cherry", ModConfiguredFeatures.CHERRY_TREE::get);

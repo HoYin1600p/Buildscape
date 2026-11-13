@@ -23,7 +23,7 @@ public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
 
     public NeoForgeRegistryAdapter() {
         super(BuildscapeCommon.MOD_ID);
-        com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.setFactory(
+        com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.setFactory(
                 com.kingodogo.buildscape.fluid.NeoForgeExperienceFluids::createPair);
     }
 
@@ -53,7 +53,7 @@ public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
                         Identifier.fromNamespaceAndPath(namespace, "experience"),
                         com.kingodogo.buildscape.fluid.NeoForgeExperienceFluids::type);
             } else if (key.equals(Registries.FLUID)) {
-                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.register();
+                com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.register();
             } else if (key.equals(Registries.BLOCK)) {
                 initBlocks();
                 registerTo(BuiltInRegistries.BLOCK, modBlocks);
@@ -98,13 +98,13 @@ public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
                 }
             }
             if (key.equals(Registries.BLOCK)) {
-                com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
+                com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
                         BuiltInRegistries.BLOCK::addAlias);
             } else if (key.equals(Registries.ITEM)) {
-                com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ITEM,
+                com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.ITEM,
                         BuiltInRegistries.ITEM::addAlias);
             } else if (key.equals(Registries.ENTITY_TYPE)) {
-                com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
+                com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
                         BuiltInRegistries.ENTITY_TYPE::addAlias);
             }
             completed.add(key);

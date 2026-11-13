@@ -48,9 +48,9 @@ public class ForgeRegistryAdapter extends BaseRegistryAdapter {
             var key = event.getRegistryKey();
             if (key.equals(Registries.FLUID)) {
                 Services.PLATFORM.register(BuiltInRegistries.FLUID, new CommonId(namespace, "experience_still"),
-                        com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.still());
+                        com.kingodogo.buildscape.adapter.ExperienceFluids.still());
                 Services.PLATFORM.register(BuiltInRegistries.FLUID, new CommonId(namespace, "experience_flowing"),
-                        com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.flowing());
+                        com.kingodogo.buildscape.adapter.ExperienceFluids.flowing());
             } else if (key.equals(Registries.BLOCK)) {
                 initBlocks();
                 registerTo(BuiltInRegistries.BLOCK, modBlocks);
@@ -95,13 +95,13 @@ public class ForgeRegistryAdapter extends BaseRegistryAdapter {
                 }
             }
             if (key.equals(Registries.BLOCK)) {
-                com.kingodogo.buildscape.adapter.v121x.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
+                com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
                         ((net.minecraftforge.registries.ForgeRegistry<?>) event.getForgeRegistry())::addAlias);
             } else if (key.equals(Registries.ITEM)) {
-                com.kingodogo.buildscape.adapter.v121x.RemovedIdAliases.register(BuiltInRegistries.ITEM,
+                com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.ITEM,
                         ((net.minecraftforge.registries.ForgeRegistry<?>) event.getForgeRegistry())::addAlias);
             } else if (key.equals(Registries.ENTITY_TYPE)) {
-                com.kingodogo.buildscape.adapter.v121x.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
+                com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
                         ((net.minecraftforge.registries.ForgeRegistry<?>) event.getForgeRegistry())::addAlias);
             }
             completed.add(key);

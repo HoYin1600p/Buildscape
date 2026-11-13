@@ -6,6 +6,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CopperChestBlockEntity extends ChestBlockEntity {
     public CopperChestBlockEntity(BlockPos pos, BlockState state) {
-        super(com.kingodogo.buildscape.adapter.v118x.RestoredContentTypes.blockEntity("copper_chest"), pos, state);
+        super(com.kingodogo.buildscape.adapter.RestoredContentTypes.blockEntity("copper_chest"), pos, state);
     }
 }

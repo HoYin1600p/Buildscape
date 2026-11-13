@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v118x.GuiProvider;
-import com.kingodogo.buildscape.adapter.v118x.ParticleFactory;
-import com.kingodogo.buildscape.adapter.v118x.RenderFactory;
+import com.kingodogo.buildscape.adapter.GuiProvider;
+import com.kingodogo.buildscape.adapter.ParticleFactory;
+import com.kingodogo.buildscape.adapter.RenderFactory;
 import com.kingodogo.buildscape.client.ClientEvents;
 import com.kingodogo.buildscape.platform.Services;
 import net.minecraft.client.Minecraft;
@@ -41,16 +41,16 @@ public final class BuildscapeForgeClient {
             ClientEvents.initializeConfigCallback();
             net.minecraftforge.client.MinecraftForgeClient.registerTooltipComponentFactory(
                     com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData.class,
-                    com.kingodogo.buildscape.adapter.v118x.client.ShulkerTooltipComponent::new);
+                    com.kingodogo.buildscape.adapter.client.ShulkerTooltipComponent::new);
             GuiProvider.registerMenuScreens(com.kingodogo.buildscape.platform.ForgePlatformAdapter.menuScreenRegistrar());
-            com.kingodogo.buildscape.adapter.v118x.client.FoliageColors.register(
+            com.kingodogo.buildscape.adapter.client.FoliageColors.register(
                     Minecraft.getInstance().getBlockColors(), Minecraft.getInstance().getItemColors());
             ItemBlockRenderTypes.setRenderLayer(com.kingodogo.buildscape.fluid.ForgeExperienceFluids.EXPERIENCE_STILL.get(), net.minecraft.client.renderer.RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(com.kingodogo.buildscape.fluid.ForgeExperienceFluids.EXPERIENCE_FLOWING.get(), net.minecraft.client.renderer.RenderType.translucent());
             for (var block : ForgeRegistries.BLOCKS.getValues()) {
                 var id = ForgeRegistries.BLOCKS.getKey(block);
                 if (id != null && BuildscapeCommon.MOD_ID.equals(id.getNamespace())) {
-                    var layer = com.kingodogo.buildscape.adapter.v118x.client.BuildscapeRenderLayers.getRenderType(id.getPath());
+                    var layer = com.kingodogo.buildscape.adapter.client.BuildscapeRenderLayers.getRenderType(id.getPath());
                     if (layer != null) ItemBlockRenderTypes.setRenderLayer(block, layer);
                 }
             }
@@ -100,7 +100,7 @@ public final class BuildscapeForgeClient {
         event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener)
                 manager -> {
                     com.kingodogo.buildscape.client.workbench.ClientBlockColorCatalog.invalidate();
-                    com.kingodogo.buildscape.adapter.v118x.client.DryFoliageColor.init();
+                    com.kingodogo.buildscape.adapter.client.DryFoliageColor.init();
                 });
     }
 

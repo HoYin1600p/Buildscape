@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.adapter.v121x.CopperRodPoi;
+import com.kingodogo.buildscape.adapter.CopperRodPoi;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

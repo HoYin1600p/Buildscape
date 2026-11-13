@@ -5,15 +5,15 @@ import net.neoforged.fml.common.Mod;
 @Mod("buildscape")
 public class BuildscapeNeoForge {
     public BuildscapeNeoForge(net.neoforged.bus.api.IEventBus modEventBus) {
-        com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.installFactories(
-                () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Source() {
+        com.kingodogo.buildscape.adapter.ExperienceFluids.installFactories(
+                () -> new com.kingodogo.buildscape.adapter.ExperienceFluids.Source() {
                     @Override public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
                             net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) { return false; }
                     @Override public net.neoforged.neoforge.fluids.FluidType getFluidType() {
                         return net.neoforged.neoforge.common.NeoForgeMod.WATER_TYPE.value();
                     }
                 },
-                () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Flowing() {
+                () -> new com.kingodogo.buildscape.adapter.ExperienceFluids.Flowing() {
                     @Override public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
                             net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) { return false; }
                     @Override public net.neoforged.neoforge.fluids.FluidType getFluidType() {
@@ -29,7 +29,7 @@ public class BuildscapeNeoForge {
         modEventBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event) ->
                 com.kingodogo.buildscape.platform.Services.PLATFORM.registerEntityAttributes(event::put));
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStartedEvent event) -> {
-            com.kingodogo.buildscape.adapter.v121x.PacketFactory.setServer(event.getServer());
+            com.kingodogo.buildscape.adapter.PacketFactory.setServer(event.getServer());
             BuildscapeCommon.setServerFullyInitialized(true);
         });
         com.kingodogo.buildscape.event.NeoForgeGameplayEvents.register();
@@ -44,7 +44,7 @@ public class BuildscapeNeoForge {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent event) -> {
             com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE
                     .setCurrentRecipeManager(null);
-            com.kingodogo.buildscape.adapter.v121x.PacketFactory.setServer(null);
+            com.kingodogo.buildscape.adapter.PacketFactory.setServer(null);
             BuildscapeCommon.setServerFullyInitialized(false);
         });
     }
@@ -54,10 +54,10 @@ public class BuildscapeNeoForge {
             net.neoforged.neoforge.network.registration.PayloadRegistrar registrar = event.registrar(com.kingodogo.buildscape.network.ModPackets.PROTOCOL_NAME);
             for (com.kingodogo.buildscape.network.IPacketFactory.PacketDescriptor desc : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
                 net.minecraft.resources.ResourceLocation loc = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(desc.id().getNamespace(), desc.id().getPath());
-                net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.v121x.PacketFactory.BuildscapeCustomPayload> type =
+                net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.PacketFactory.BuildscapeCustomPayload> type =
                         new net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<>(loc);
-                net.minecraft.network.codec.StreamCodec<net.minecraft.network.FriendlyByteBuf, com.kingodogo.buildscape.adapter.v121x.PacketFactory.BuildscapeCustomPayload> codec =
-                        com.kingodogo.buildscape.adapter.v121x.PacketFactory.BuildscapeCustomPayload.codec(type);
+                net.minecraft.network.codec.StreamCodec<net.minecraft.network.FriendlyByteBuf, com.kingodogo.buildscape.adapter.PacketFactory.BuildscapeCustomPayload> codec =
+                        com.kingodogo.buildscape.adapter.PacketFactory.BuildscapeCustomPayload.codec(type);
 
                 if (desc.direction() == com.kingodogo.buildscape.network.PacketDirection.CLIENT_TO_SERVER) {
                     registrar.playToServer(type, codec, (payload, context) -> {

@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
-import com.kingodogo.buildscape.adapter.v118x.client.FestiveRenderTypes;
-import com.kingodogo.buildscape.adapter.v118x.client.TransparentMultiBufferSource;
+import com.kingodogo.buildscape.adapter.client.FestiveRenderTypes;
+import com.kingodogo.buildscape.adapter.client.TransparentMultiBufferSource;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;

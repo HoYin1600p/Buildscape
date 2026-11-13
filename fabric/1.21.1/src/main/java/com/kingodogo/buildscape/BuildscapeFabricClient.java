@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v121x.PacketFactory.BuildscapeCustomPayload;
+import com.kingodogo.buildscape.adapter.PacketFactory.BuildscapeCustomPayload;
 import com.kingodogo.buildscape.network.PacketDirection;
-import com.kingodogo.buildscape.adapter.v121x.client.*;
+import com.kingodogo.buildscape.adapter.client.*;
 import com.kingodogo.buildscape.client.ClientEvents;
 import com.kingodogo.buildscape.platform.Services;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -56,8 +56,8 @@ public final class BuildscapeFabricClient implements ClientModInitializer {
             var layer = BuildscapeRenderLayers.getRenderType(id.getPath());
             if (layer != null) BlockRenderLayerMap.INSTANCE.putBlock(block, layer);
         }
-        var still = com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.still();
-        var flowing = com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.flowing();
+        var still = com.kingodogo.buildscape.adapter.ExperienceFluids.still();
+        var flowing = com.kingodogo.buildscape.adapter.ExperienceFluids.flowing();
         BlockRenderLayerMap.INSTANCE.putFluids(net.minecraft.client.renderer.RenderType.translucent(), still, flowing);
         FluidRenderHandlerRegistry.INSTANCE.register(still, flowing, new SimpleFluidRenderHandler(
                 ResourceLocation.withDefaultNamespace("block/water_still"),

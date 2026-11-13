@@ -13,6 +13,6 @@ public class MangroveSignBlockEntity extends SignBlockEntity {
 
     @Override
     public BlockEntityType<?> getType() {
-        return com.kingodogo.buildscape.adapter.v118x.RestoredContentTypes.blockEntity("mangrove_sign_block_entity");
+        return com.kingodogo.buildscape.adapter.RestoredContentTypes.blockEntity("mangrove_sign_block_entity");
     }
 }

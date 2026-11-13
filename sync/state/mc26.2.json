@@ -25,7 +25,7 @@
         "common/src/main/java/com/kingodogo/buildscape/command/BuildscapeCommands.java",
         "common/src/main/java/com/kingodogo/buildscape/command/FireworkTestCommand.java",
         "common/src/main/java/com/kingodogo/buildscape/mixin/MinecraftServerMixin.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/PlatformAdapterBase.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/PlatformAdapterBase.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -43,7 +43,7 @@
       "path": "src/main/java/com/kingodogo/buildscape/block/CactusFlowerBlock.java",
       "target_paths": [
         "common/src/main/java/com/kingodogo/buildscape/block/BlockDefinition.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/BlockFactory.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/BlockFactory.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -108,7 +108,7 @@
       "old_path": "src/main/java/com/kingodogo/buildscape/block/FireflyBushBlock.java",
       "path": "src/main/java/com/kingodogo/buildscape/block/FireflyBushBlock.java",
       "target_paths": [
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/BlockFactory.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/BlockFactory.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -126,7 +126,7 @@
       "path": "src/main/java/com/kingodogo/buildscape/block/GoldenDandelionBlock.java",
       "target_paths": [
         "common/src/main/java/com/kingodogo/buildscape/block/BlockDefinition.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/BlockFactory.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/BlockFactory.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -157,7 +157,7 @@
       "path": "src/main/java/com/kingodogo/buildscape/block/HollowLogBlock.java",
       "target_paths": [
         "common/src/main/java/com/kingodogo/buildscape/block/HollowLogBlock.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/BlockFactory.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/BlockFactory.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -209,7 +209,7 @@
       "target_paths": [
         "common/src/main/java/com/kingodogo/buildscape/block/ModBushBlock.java",
         "common/src/main/java/com/kingodogo/buildscape/platform/IPlatformAdapter.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/BlockFactory.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/BlockFactory.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -228,7 +228,7 @@
       "target_paths": [
         "common/src/main/java/com/kingodogo/buildscape/block/PointedIcicleBlock.java",
         "common/src/main/java/com/kingodogo/buildscape/block/BlockDefinition.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/BlockFactory.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/BlockFactory.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -290,7 +290,7 @@
       "target_paths": [
         "common/src/main/java/com/kingodogo/buildscape/entity/WanderingHomemakerEntity.java",
         "common/src/main/java/com/kingodogo/buildscape/entity/WanderingHomemakerTrades.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/PlatformAdapterBase.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/PlatformAdapterBase.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -323,7 +323,7 @@
         "common/src/main/java/com/kingodogo/buildscape/item/ModCreativeTabs.java",
         "common/src/main/resources/data/buildscape/creative_tab_order.txt",
         "common/src/main/java/com/kingodogo/buildscape/platform/IPlatformAdapter.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/PlatformAdapterBase.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/PlatformAdapterBase.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -399,7 +399,7 @@
       "path": "src/main/java/com/kingodogo/buildscape/particle/ModParticles.java",
       "target_paths": [
         "common/src/main/java/com/kingodogo/buildscape/particle/ModParticles.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/GeyserParticleTypes.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/GeyserParticleTypes.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",
@@ -542,7 +542,7 @@
       "target_paths": [
         "common/src/main/java/com/kingodogo/buildscape/util/ColorGradientSolver.java",
         "common/src/main/java/com/kingodogo/buildscape/platform/IPlatformAdapter.java",
-        "common/src/main/java/com/kingodogo/buildscape/adapter/v26x/PlatformAdapterBase.java"
+        "common/src/main/java/com/kingodogo/buildscape/adapter/PlatformAdapterBase.java"
       ],
       "classification": "port-candidate",
       "reason": "Mapped Java needs porting",

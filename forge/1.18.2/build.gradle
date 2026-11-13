@@ -32,8 +32,6 @@ sourceSets.main {
     // Compile common source variant against Forge's Mojang dev jar.
     java.setSrcDirs(['src/main/java', rootProject.file('common/src/main/java'),
                      rootProject.file('common/src/1.18.2/java')])
-    java.exclude 'com/kingodogo/buildscape/adapter/v121x/**'
-    java.exclude 'com/kingodogo/buildscape/adapter/v26x/**'
     java.exclude 'com/kingodogo/buildscape/client/particle/HazeParticle.java'
     java.exclude 'com/kingodogo/buildscape/client/particle/HazeBushParticleHandler.java'
     java.exclude 'com/kingodogo/buildscape/client/FoliageColors.java'

@@ -18,6 +18,6 @@ public class WeatheringLanternBlock extends LanternBlock {
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        com.kingodogo.buildscape.adapter.v121x.RestoredCopperOxidation.tryOxidize(level, pos, state);
+        com.kingodogo.buildscape.adapter.RestoredCopperOxidation.tryOxidize(level, pos, state);
     }
 }

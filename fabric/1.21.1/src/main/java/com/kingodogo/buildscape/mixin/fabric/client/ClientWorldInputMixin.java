@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.fabric.client;
 
-import com.kingodogo.buildscape.adapter.v121x.client.HazeBushParticleHandler;
+import com.kingodogo.buildscape.adapter.client.HazeBushParticleHandler;
 import com.kingodogo.buildscape.client.BiomeBrushClientHandler;
 import com.kingodogo.buildscape.client.ClientEvents;
 import com.kingodogo.buildscape.client.TreeChopHandler;

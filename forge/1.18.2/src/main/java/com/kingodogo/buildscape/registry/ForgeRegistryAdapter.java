@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
-import com.kingodogo.buildscape.adapter.v118x.RegistrationOrder;
+import com.kingodogo.buildscape.adapter.RegistrationOrder;
 import com.kingodogo.buildscape.item.ModCreativeTabs;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;

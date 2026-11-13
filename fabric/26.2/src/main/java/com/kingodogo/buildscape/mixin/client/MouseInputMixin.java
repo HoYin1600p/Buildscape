@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.client;
 
-import com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks;
+import com.kingodogo.buildscape.adapter.client.ClientPlatformHooks;
 import com.kingodogo.buildscape.client.ClientEvents;
 import com.kingodogo.buildscape.client.ZoomHandler;
 import net.minecraft.client.Minecraft;

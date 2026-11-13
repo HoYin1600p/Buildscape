@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.TestBootstrap;
-import com.kingodogo.buildscape.adapter.v26x.AtlasIds;
-import com.kingodogo.buildscape.adapter.v26x.BlockFactory;
-import com.kingodogo.buildscape.adapter.v26x.ValueInputData;
+import com.kingodogo.buildscape.adapter.AtlasIds;
+import com.kingodogo.buildscape.adapter.BlockFactory;
+import com.kingodogo.buildscape.adapter.ValueInputData;
 import com.kingodogo.buildscape.event.HollowLogCrawlHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

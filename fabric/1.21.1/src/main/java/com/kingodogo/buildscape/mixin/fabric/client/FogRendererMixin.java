@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin.fabric.client;
 
-import com.kingodogo.buildscape.adapter.v121x.ExperienceFluids;
+import com.kingodogo.buildscape.adapter.ExperienceFluids;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;

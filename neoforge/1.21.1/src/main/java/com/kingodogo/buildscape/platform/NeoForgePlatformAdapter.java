@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.platform;
 
-import com.kingodogo.buildscape.adapter.v121x.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.PlatformAdapterBase;
 import com.kingodogo.buildscape.registry.NeoForgeRegistryAdapter;
 import com.kingodogo.buildscape.util.CommonId;
 import com.mojang.serialization.MapCodec;
@@ -109,7 +109,7 @@ public final class NeoForgePlatformAdapter extends PlatformAdapterBase implement
         }
     }
     @Override public void registerRenderers() {
-        if (isClient()) com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.registerRenderers();
+        if (isClient()) com.kingodogo.buildscape.adapter.client.RenderFactory.registerRenderers();
     }
     @Override public net.minecraft.world.level.Level currentServerRuleLevel() {
         var server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();

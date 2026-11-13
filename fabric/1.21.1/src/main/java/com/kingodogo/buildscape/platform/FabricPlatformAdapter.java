@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.platform;
 
-import com.kingodogo.buildscape.adapter.v121x.PlatformAdapterBase;
-import com.kingodogo.buildscape.adapter.v121x.PacketFactory;
+import com.kingodogo.buildscape.adapter.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.PacketFactory;
 import com.kingodogo.buildscape.mixin.fabric.RegistryStateAccessor;
 import com.kingodogo.buildscape.util.CommonId;
 import com.mojang.serialization.MapCodec;

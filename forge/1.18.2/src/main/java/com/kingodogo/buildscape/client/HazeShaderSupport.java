@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.client;
 
 import com.google.common.hash.Hashing;
 import com.kingodogo.buildscape.BuildscapeCommon;
-import com.kingodogo.buildscape.adapter.v118x.client.HazeRenderSupport;
+import com.kingodogo.buildscape.adapter.client.HazeRenderSupport;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;

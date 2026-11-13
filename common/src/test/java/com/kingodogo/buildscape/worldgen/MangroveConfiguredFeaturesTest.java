@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.worldgen;
 
 import com.google.gson.*;
 import com.kingodogo.buildscape.TestBootstrap;
-import com.kingodogo.buildscape.adapter.v26x.WorldGenFactory;
+import com.kingodogo.buildscape.adapter.WorldGenFactory;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;

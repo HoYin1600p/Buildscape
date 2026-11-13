@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase;
-import com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload;
+import com.kingodogo.buildscape.adapter.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.PacketFactory.BuildscapeCustomPayload;
 import com.kingodogo.buildscape.network.PacketDirection;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader;
@@ -46,7 +46,7 @@ public class BuildscapeFabric implements ModInitializer {
             ServerLifecycleEvents.SERVER_STARTING.register(server -> {
                 ((PlatformAdapterBase) Services.PLATFORM).registerDeferredServerData(server);
                 useRecipeManager(server, server.getRecipeManager());
-                com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(server);
+                com.kingodogo.buildscape.adapter.PacketFactory.setServer(server);
             });
             ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> {
                 if (!success) return;
@@ -55,7 +55,7 @@ public class BuildscapeFabric implements ModInitializer {
             });
             ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
                 BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);
-                com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(null);
+                com.kingodogo.buildscape.adapter.PacketFactory.setServer(null);
                 BuildscapeCommon.setServerFullyInitialized(false);
             });
             ServerLifecycleEvents.SERVER_STARTED.register(server -> BuildscapeCommon.setServerFullyInitialized(true));

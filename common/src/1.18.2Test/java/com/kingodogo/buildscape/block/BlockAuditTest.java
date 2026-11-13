@@ -19,10 +19,10 @@ class BlockAuditTest {
     private static final List<String> LOOT_TREES = List.of("src/1.18.2/resources/data/buildscape/loot_tables/blocks",
             "src/1.21.1/resources/data/buildscape/loot_table/blocks", "src/main/resources/data/buildscape/loot_table/blocks");
     private static final List<String> FACTORIES = List.of(
-            "src/1.18.2/java/com/kingodogo/buildscape/adapter/v118x/BlockFactory.java",
-            "src/1.21.1/java/com/kingodogo/buildscape/adapter/v121x/BlockFactory.java",
-            "src/26.2/java/com/kingodogo/buildscape/adapter/v26x/BlockFactory.java",
-            "src/26.3/java/com/kingodogo/buildscape/adapter/v263/BlockFactory.java");
+            "src/1.18.2/java/com/kingodogo/buildscape/adapter/BlockFactory.java",
+            "src/1.21.1/java/com/kingodogo/buildscape/adapter/BlockFactory.java",
+            "src/26.2/java/com/kingodogo/buildscape/adapter/BlockFactory.java",
+            "src/26.3/java/com/kingodogo/buildscape/adapter/BlockFactory.java");
 
     @Test
     void everySlabLootTableDropsTwoForADoubleSlab() throws Exception {

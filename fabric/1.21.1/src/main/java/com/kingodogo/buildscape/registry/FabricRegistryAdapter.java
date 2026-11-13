@@ -17,9 +17,9 @@ public class FabricRegistryAdapter extends BaseRegistryAdapter {
         if (initialized) return;
         Services.PLATFORM.wrapRegistryAction(() -> {
             Services.PLATFORM.register(BuiltInRegistries.FLUID, new CommonId(namespace, "experience_still"),
-                    com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.still());
+                    com.kingodogo.buildscape.adapter.ExperienceFluids.still());
             Services.PLATFORM.register(BuiltInRegistries.FLUID, new CommonId(namespace, "experience_flowing"),
-                    com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.flowing());
+                    com.kingodogo.buildscape.adapter.ExperienceFluids.flowing());
             initBlocks();
             registerTo(BuiltInRegistries.BLOCK, modBlocks);
             initItems();

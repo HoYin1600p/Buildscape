@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.adapter.v121x.client.FestiveStackBufferSource;
+import com.kingodogo.buildscape.adapter.client.FestiveStackBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ThrownTridentRenderer;
 import net.minecraft.world.entity.projectile.ThrownTrident;

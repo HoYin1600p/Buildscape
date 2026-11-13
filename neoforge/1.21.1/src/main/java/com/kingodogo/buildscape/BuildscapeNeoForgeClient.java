@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v121x.client.GuiProvider;
-import com.kingodogo.buildscape.adapter.v121x.client.ParticleFactory;
+import com.kingodogo.buildscape.adapter.client.GuiProvider;
+import com.kingodogo.buildscape.adapter.client.ParticleFactory;
 import com.kingodogo.buildscape.platform.Services;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -16,15 +16,15 @@ public final class BuildscapeNeoForgeClient {
     private BuildscapeNeoForgeClient() {}
 
     public static void register(IEventBus bus) {
-        com.kingodogo.buildscape.adapter.v121x.client.ClientMixins.installWidgetRegistrar(
+        com.kingodogo.buildscape.adapter.client.ClientMixins.installWidgetRegistrar(
                 (screen, widget) -> pendingWidgets.computeIfAbsent(screen, key -> new java.util.ArrayList<>()).add(widget));
-        com.kingodogo.buildscape.adapter.v121x.client.DryFoliageColor.installHumidityAccess(
+        com.kingodogo.buildscape.adapter.client.DryFoliageColor.installHumidityAccess(
                 biome -> biome.getModifiedClimateSettings().downfall());
         bus.addListener((net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent event) ->
                 com.kingodogo.buildscape.client.ModKeyBinds.register(event::register));
         bus.addListener((net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent event) ->
                 event.register(com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData.class,
-                        com.kingodogo.buildscape.adapter.v121x.client.ShulkerTooltipComponent::new));
+                        com.kingodogo.buildscape.adapter.client.ShulkerTooltipComponent::new));
         bus.addListener((net.neoforged.neoforge.client.event.ModelEvent.ModifyBakingResult event) ->
                 event.getModels().replaceAll((id, model) -> {
                     String path = id.id().getPath();
@@ -33,13 +33,13 @@ public final class BuildscapeNeoForgeClient {
                     return model;
                 }));
         bus.addListener((net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Block event) ->
-                com.kingodogo.buildscape.adapter.v121x.client.FoliageColors.registerBlocks(event.getBlockColors()));
+                com.kingodogo.buildscape.adapter.client.FoliageColors.registerBlocks(event.getBlockColors()));
         bus.addListener((net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Item event) ->
-                com.kingodogo.buildscape.adapter.v121x.client.FoliageColors.registerItems(event.getItemColors()));
+                com.kingodogo.buildscape.adapter.client.FoliageColors.registerItems(event.getItemColors()));
         bus.addListener((net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers event) ->
                 Services.PLATFORM.wrapRegistryAction(() ->
-                    com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.withRegistrar(
-                        new com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.Registrar() {
+                    com.kingodogo.buildscape.adapter.client.RenderFactory.withRegistrar(
+                        new com.kingodogo.buildscape.adapter.client.RenderFactory.Registrar() {
                             public <T extends net.minecraft.world.level.block.entity.BlockEntity> void registerBlockEntity(
                                     net.minecraft.world.level.block.entity.BlockEntityType<T> type,
                                     net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<T> provider) {
@@ -53,8 +53,8 @@ public final class BuildscapeNeoForgeClient {
                         }, Services.PLATFORM::registerRenderers)));
         bus.addListener(BuildscapeNeoForgeClient::registerPoplarBoatRenderer);
         bus.addListener((net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) -> {
-            var chestRenderer = new com.kingodogo.buildscape.adapter.v121x.client.BlockEntityItemRenderer(true);
-            var jarRenderer = new com.kingodogo.buildscape.adapter.v121x.client.BlockEntityItemRenderer(false);
+            var chestRenderer = new com.kingodogo.buildscape.adapter.client.BlockEntityItemRenderer(true);
+            var jarRenderer = new com.kingodogo.buildscape.adapter.client.BlockEntityItemRenderer(false);
             for (var item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
                 // On 1.21.1 the copper chests are plain block items, so they are recognised by registry id.
                 var key = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item);
@@ -75,7 +75,7 @@ public final class BuildscapeNeoForgeClient {
         bus.addListener((net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent event) ->
                 event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager -> {
                     com.kingodogo.buildscape.client.workbench.ClientBlockColorCatalog.invalidate();
-                    com.kingodogo.buildscape.adapter.v121x.client.DryFoliageColor.init();
+                    com.kingodogo.buildscape.adapter.client.DryFoliageColor.init();
                 }));
         bus.addListener((RegisterMenuScreensEvent event) -> {
             menuEvent = event;
@@ -95,14 +95,14 @@ public final class BuildscapeNeoForgeClient {
                 event.enqueueWork(() -> {
                     com.kingodogo.buildscape.client.ClientEvents.initializeConfigCallback();
                     net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
-                            com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.still(), net.minecraft.client.renderer.RenderType.translucent());
+                            com.kingodogo.buildscape.adapter.ExperienceFluids.still(), net.minecraft.client.renderer.RenderType.translucent());
                     net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
-                            com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.flowing(), net.minecraft.client.renderer.RenderType.translucent());
+                            com.kingodogo.buildscape.adapter.ExperienceFluids.flowing(), net.minecraft.client.renderer.RenderType.translucent());
                     for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
                         var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
                         if (!BuildscapeCommon.MOD_ID.equals(id.getNamespace())) continue;
                         // main's full 1.18.2 list: 1.21.1 keeps content 26.2 retired (eyeblossoms, 1.21.5 plants, ...).
-                        var renderType = com.kingodogo.buildscape.adapter.v121x.client.BuildscapeRenderLayers.getRenderType(id.getPath());
+                        var renderType = com.kingodogo.buildscape.adapter.client.BuildscapeRenderLayers.getRenderType(id.getPath());
                         if (renderType != null) net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(block, renderType); // null = solid
                     }
                 }));
@@ -122,7 +122,7 @@ public final class BuildscapeNeoForgeClient {
         });
         gameBus.addListener((net.neoforged.neoforge.client.event.ViewportEvent.ComputeFogColor event) -> {
             var mc = net.minecraft.client.Minecraft.getInstance();
-            if (mc.level != null && com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.still().isSame(
+            if (mc.level != null && com.kingodogo.buildscape.adapter.ExperienceFluids.still().isSame(
                     mc.level.getFluidState(event.getCamera().getBlockPosition()).getType())) {
                 event.setRed(0.3F);
                 event.setGreen(0.9F);
@@ -131,7 +131,7 @@ public final class BuildscapeNeoForgeClient {
         });
         gameBus.addListener((net.neoforged.neoforge.client.event.ViewportEvent.RenderFog event) -> {
             var mc = net.minecraft.client.Minecraft.getInstance();
-            if (mc.level != null && com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.still().isSame(
+            if (mc.level != null && com.kingodogo.buildscape.adapter.ExperienceFluids.still().isSame(
                     mc.level.getFluidState(event.getCamera().getBlockPosition()).getType())) {
                 event.setNearPlaneDistance(0.5F);
                 event.setFarPlaneDistance(12.0F);
@@ -152,7 +152,7 @@ public final class BuildscapeNeoForgeClient {
         });
         gameBus.addListener((net.neoforged.neoforge.client.event.RenderGuiEvent.Post event) -> {
             var graphics = event.getGuiGraphics();
-            com.kingodogo.buildscape.adapter.v121x.client.ClientAccess.withGuiGraphics(graphics, () -> {
+            com.kingodogo.buildscape.adapter.client.ClientAccess.withGuiGraphics(graphics, () -> {
                 com.kingodogo.buildscape.client.ClientEvents.renderOverlay(graphics.pose(), graphics.guiWidth(), graphics.guiHeight());
                 com.kingodogo.buildscape.client.PillarOverlayHandler.renderOverlay(graphics.pose());
                 var mc = net.minecraft.client.Minecraft.getInstance();
@@ -163,8 +163,8 @@ public final class BuildscapeNeoForgeClient {
         });
         gameBus.addListener((net.neoforged.neoforge.client.event.ClientTickEvent.Post event) -> {
             com.kingodogo.buildscape.client.ClientEvents.onClientTick();
-            com.kingodogo.buildscape.adapter.v121x.client.HazeBushParticleHandler.clientTick();
-            com.kingodogo.buildscape.adapter.v121x.client.GeyserParticleHandler.onClientTick();
+            com.kingodogo.buildscape.adapter.client.HazeBushParticleHandler.clientTick();
+            com.kingodogo.buildscape.adapter.client.GeyserParticleHandler.onClientTick();
         });
         gameBus.addListener((net.neoforged.neoforge.client.event.InputEvent.Key event) ->
                 com.kingodogo.buildscape.client.ClientEvents.onKeyInput(event.getKey(), event.getAction()));
@@ -194,21 +194,21 @@ public final class BuildscapeNeoForgeClient {
         });
         gameBus.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) -> {
             com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();
-            com.kingodogo.buildscape.adapter.v121x.client.HazeBushParticleHandler.clear();
+            com.kingodogo.buildscape.adapter.client.HazeBushParticleHandler.clear();
         });
         gameBus.addListener((net.neoforged.neoforge.event.level.LevelEvent.Unload event) -> {
             if (event.getLevel().isClientSide()) {
                 com.kingodogo.buildscape.client.ClientEvents.onClientWorldUnload();
-                com.kingodogo.buildscape.adapter.v121x.client.HazeBushParticleHandler.clear();
+                com.kingodogo.buildscape.adapter.client.HazeBushParticleHandler.clear();
             }
         });
         gameBus.addListener((net.neoforged.neoforge.event.level.ChunkEvent.Load event) -> {
             if (event.getLevel().isClientSide() && event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk)
-                com.kingodogo.buildscape.adapter.v121x.client.HazeBushParticleHandler.onChunkLoad(chunk);
+                com.kingodogo.buildscape.adapter.client.HazeBushParticleHandler.onChunkLoad(chunk);
         });
         gameBus.addListener((net.neoforged.neoforge.event.level.ChunkEvent.Unload event) -> {
             if (event.getLevel().isClientSide() && event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk)
-                com.kingodogo.buildscape.adapter.v121x.client.HazeBushParticleHandler.onChunkUnload(chunk);
+                com.kingodogo.buildscape.adapter.client.HazeBushParticleHandler.onChunkUnload(chunk);
         });
     }
 

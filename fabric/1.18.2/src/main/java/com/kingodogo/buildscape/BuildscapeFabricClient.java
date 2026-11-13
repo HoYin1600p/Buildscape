@@ -1,14 +1,14 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v118x.GuiProvider;
-import com.kingodogo.buildscape.adapter.v118x.ParticleFactory;
-import com.kingodogo.buildscape.adapter.v118x.RenderFactory;
-import com.kingodogo.buildscape.adapter.v118x.client.BuildscapeRenderLayers;
-import com.kingodogo.buildscape.adapter.v118x.client.DryFoliageColor;
-import com.kingodogo.buildscape.adapter.v118x.client.FoliageColors;
-import com.kingodogo.buildscape.adapter.v118x.client.HazeBushParticleHandler;
-import com.kingodogo.buildscape.adapter.v118x.client.MixinClientHooks;
-import com.kingodogo.buildscape.adapter.v118x.client.ShulkerTooltipComponent;
+import com.kingodogo.buildscape.adapter.GuiProvider;
+import com.kingodogo.buildscape.adapter.ParticleFactory;
+import com.kingodogo.buildscape.adapter.RenderFactory;
+import com.kingodogo.buildscape.adapter.client.BuildscapeRenderLayers;
+import com.kingodogo.buildscape.adapter.client.DryFoliageColor;
+import com.kingodogo.buildscape.adapter.client.FoliageColors;
+import com.kingodogo.buildscape.adapter.client.HazeBushParticleHandler;
+import com.kingodogo.buildscape.adapter.client.MixinClientHooks;
+import com.kingodogo.buildscape.adapter.client.ShulkerTooltipComponent;
 import com.kingodogo.buildscape.client.ClientEvents;
 import com.kingodogo.buildscape.client.CopperChestClientEvents;
 import com.kingodogo.buildscape.client.GeyserParticleHandler;

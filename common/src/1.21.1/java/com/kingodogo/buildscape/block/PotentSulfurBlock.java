@@ -177,6 +177,6 @@ public class PotentSulfurBlock extends BaseEntityBlock {
          default:
             ticker = null;
       }
-      return createTickerHelper(type, com.kingodogo.buildscape.adapter.v121x.RestoredContentTypes.<PotentSulfurBlockEntity>blockEntity("potent_sulfur"), ticker);
+      return createTickerHelper(type, com.kingodogo.buildscape.adapter.RestoredContentTypes.<PotentSulfurBlockEntity>blockEntity("potent_sulfur"), ticker);
    }
 }

@@ -18,6 +18,6 @@ public class WeatheringClimbableChainBlock extends ClimbableChainBlock {
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-        com.kingodogo.buildscape.adapter.v118x.RestoredCopperOxidation.tryOxidize(level, pos, state);
+        com.kingodogo.buildscape.adapter.RestoredCopperOxidation.tryOxidize(level, pos, state);
     }
 }

@@ -18,13 +18,13 @@ public final class LoaderWorldGen {
     }
     private static void queue(ForgeRegistryAdapter registry, String path, Supplier<?> factory) {
         if (!IDS.add(path)) throw new IllegalStateException("Duplicate configured feature: " + path);
-        Supplier<ConfiguredFeature<?, ?>> feature = () -> com.kingodogo.buildscape.adapter.v118x.WorldGenFactory.configuredFeature(factory.get());
+        Supplier<ConfiguredFeature<?, ?>> feature = () -> com.kingodogo.buildscape.adapter.WorldGenFactory.configuredFeature(factory.get());
         registry.queue(BuiltinRegistries.CONFIGURED_FEATURE, path, feature);
     }
     public static void register(ForgeRegistryAdapter registry) {
         // 1.18.2 keeps its own mangrove trees (26.2 uses vanilla's), shaped by the v118x adapter.
-        queue(registry, "mangrove", () -> com.kingodogo.buildscape.adapter.v118x.WorldGenFactory.createMangroveTreeFeature(false));
-        queue(registry, "tall_mangrove", () -> com.kingodogo.buildscape.adapter.v118x.WorldGenFactory.createMangroveTreeFeature(true));
+        queue(registry, "mangrove", () -> com.kingodogo.buildscape.adapter.WorldGenFactory.createMangroveTreeFeature(false));
+        queue(registry, "tall_mangrove", () -> com.kingodogo.buildscape.adapter.WorldGenFactory.createMangroveTreeFeature(true));
         queue(registry, "poplar", ModConfiguredFeatures.POPLAR_TREE::get);
         queue(registry, "pale_oak", ModConfiguredFeatures.PALE_OAK_TREE::get);
         queue(registry, "cherry", ModConfiguredFeatures.CHERRY_TREE::get);

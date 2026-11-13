@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v121x.PacketFactory;
-import com.kingodogo.buildscape.adapter.v121x.PacketFactory.BuildscapeCustomPayload;
+import com.kingodogo.buildscape.adapter.PacketFactory;
+import com.kingodogo.buildscape.adapter.PacketFactory.BuildscapeCustomPayload;
 import com.kingodogo.buildscape.network.PacketDirection;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader;

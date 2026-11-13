@@ -12,17 +12,17 @@ public class FabricRegistryAdapter extends BaseRegistryAdapter {
     @Override
     public synchronized void init() {
         if (isInitialized()) return;
-        com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.register();
+        com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.register();
         super.init();
         registerTo(BuiltInRegistries.BLOCK, modBlocks);
         registerTo(BuiltInRegistries.ITEM, modItems);
-        com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
+        com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
                 ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.BLOCK)::addAlias);
-        com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ITEM,
+        com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.ITEM,
                 ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.ITEM)::addAlias);
         registerTo(BuiltInRegistries.BLOCK_ENTITY_TYPE, modBlockEntities);
         registerTo(BuiltInRegistries.ENTITY_TYPE, modEntities);
-        com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
+        com.kingodogo.buildscape.adapter.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
                 ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.ENTITY_TYPE)::addAlias);
         registerTo(BuiltInRegistries.SOUND_EVENT, modSounds);
         registerTo(BuiltInRegistries.RECIPE_SERIALIZER, (java.util.Map) modRecipeSerializers);

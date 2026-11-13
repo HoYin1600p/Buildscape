@@ -67,7 +67,7 @@ public class CopperRodHandler {
         }
 
         BlockState baseState = level.getBlockState(basePos);
-        if (!com.kingodogo.buildscape.adapter.v118x.RestoredCopperOxidation.isWeatheringCopper(baseState.getBlock())) {
+        if (!com.kingodogo.buildscape.adapter.RestoredCopperOxidation.isWeatheringCopper(baseState.getBlock())) {
             return;
         }
         if (baseState.getBlock() instanceof WeatheringCopper) {
@@ -90,14 +90,14 @@ public class CopperRodHandler {
         if (block == Services.PLATFORM.getBlock(new CommonId("buildscape", "exposed_copper_rod"))
                 || block == Services.PLATFORM.getBlock(new CommonId("buildscape", "weathered_copper_rod"))
                 || block == Services.PLATFORM.getBlock(new CommonId("buildscape", "oxidized_copper_rod"))) {
-            com.kingodogo.buildscape.adapter.v118x.RestoredCopperOxidation.setBlockStateOrDoor(level, pos, state, cleanRod);
+            com.kingodogo.buildscape.adapter.RestoredCopperOxidation.setBlockStateOrDoor(level, pos, state, cleanRod);
         }
     }
 
     private static void deoxidizeBuildscapeCopperFirst(Level level, BlockPos pos, BlockState state) {
-        Block firstStage = com.kingodogo.buildscape.adapter.v118x.RestoredCopperOxidation.getFirstStage(state.getBlock());
+        Block firstStage = com.kingodogo.buildscape.adapter.RestoredCopperOxidation.getFirstStage(state.getBlock());
         if (firstStage != null) {
-            com.kingodogo.buildscape.adapter.v118x.RestoredCopperOxidation.setBlockStateOrDoor(level, pos, state, firstStage);
+            com.kingodogo.buildscape.adapter.RestoredCopperOxidation.setBlockStateOrDoor(level, pos, state, firstStage);
         }
     }
 
@@ -115,15 +115,15 @@ public class CopperRodHandler {
     private static Optional<BlockPos> randomStepCleanCopper(Level level, BlockPos pos) {
         for (BlockPos testPos : BlockPos.randomInCube(level.random, 10, pos, 1)) {
             BlockState testState = level.getBlockState(testPos);
-            if (!com.kingodogo.buildscape.adapter.v118x.RestoredCopperOxidation.isWeatheringCopper(testState.getBlock())) {
+            if (!com.kingodogo.buildscape.adapter.RestoredCopperOxidation.isWeatheringCopper(testState.getBlock())) {
                 continue;
             }
             if (testState.getBlock() instanceof WeatheringCopper) {
                 WeatheringCopper.getPrevious(testState).ifPresent(s -> level.setBlockAndUpdate(testPos, s));
             } else {
-                Block prev = com.kingodogo.buildscape.adapter.v118x.RestoredCopperOxidation.getPrevStage(testState.getBlock());
+                Block prev = com.kingodogo.buildscape.adapter.RestoredCopperOxidation.getPrevStage(testState.getBlock());
                 if (prev != null) {
-                    com.kingodogo.buildscape.adapter.v118x.RestoredCopperOxidation.setBlockStateOrDoor(level, testPos, testState, prev);
+                    com.kingodogo.buildscape.adapter.RestoredCopperOxidation.setBlockStateOrDoor(level, testPos, testState, prev);
                 }
             }
             level.levelEvent(3002, testPos, -1);

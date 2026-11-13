@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.worldgen;
 
-import com.kingodogo.buildscape.adapter.v118x.PlantPlacements;
+import com.kingodogo.buildscape.adapter.PlantPlacements;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraftforge.event.world.BiomeLoadingEvent;

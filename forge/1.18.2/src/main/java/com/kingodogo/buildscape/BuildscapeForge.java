@@ -20,7 +20,7 @@ public final class BuildscapeForge {
     public BuildscapeForge() {
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ((ForgeRegistryAdapter) Services.REGISTRY).attach(modBus);
-        com.kingodogo.buildscape.adapter.v118x.BlockFactory.installExperienceFluidFactory(
+        com.kingodogo.buildscape.adapter.BlockFactory.installExperienceFluidFactory(
                 com.kingodogo.buildscape.fluid.ForgeExperienceFluidBlock::new);
         Services.PLATFORM.wrapRegistryAction(BuildscapeCommon::prepareRegistration);
         ((ForgePacketFactory) Services.PACKET_FACTORY).installChannel();
@@ -74,12 +74,12 @@ public final class BuildscapeForge {
                 BuildScapeRecipeLoader.forReload(event.getServerResources().getRecipeManager())));
     }
     private static void serverStarted(ServerStartedEvent event) {
-        com.kingodogo.buildscape.adapter.v118x.PacketFactory.setServer(event.getServer());
+        com.kingodogo.buildscape.adapter.PacketFactory.setServer(event.getServer());
         BuildscapeCommon.setServerFullyInitialized(true);
     }
     private static void serverStopped(ServerStoppedEvent event) {
         BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);
-        com.kingodogo.buildscape.adapter.v118x.PacketFactory.setServer(null);
+        com.kingodogo.buildscape.adapter.PacketFactory.setServer(null);
         BuildscapeCommon.setServerFullyInitialized(false);
     }
 }

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.adapter.v26x.client.ClientWorldHooks;
+import com.kingodogo.buildscape.adapter.client.ClientWorldHooks;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.state.level.LevelRenderState;

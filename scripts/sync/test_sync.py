@@ -572,9 +572,9 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(sync.foreign_clusters(registry, registry["targets"][0]), ["v121x", "v263"])
         self.assertEqual(sync.foreign_clusters(registry, registry["targets"][1]), ["v118x", "v121x", "v26x"])
         base = "common/src/main/java/example/Base.java"
-        v26x = "common/src/26.2/java/example/adapter/v26x/Adapter.java"
-        v118x = "common/src/main/java/example/adapter/v118x/Adapter.java"
-        v263 = "common/src/26.3/java/example/adapter/v263/Adapter.java"
+        v26x = "common/src/26.2/java/example/adapter/Adapter.java"
+        v118x = "common/src/main/java/example/adapter/Adapter.java"
+        v263 = "common/src/26.3/java/example/adapter/Adapter.java"
         for path in (base, v26x, v118x, v263):
             self.write(self.repo, path, "class X {}\n")
         commit = self.commit(self.repo, "Cluster adapters")

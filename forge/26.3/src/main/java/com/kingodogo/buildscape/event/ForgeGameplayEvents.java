@@ -32,14 +32,14 @@ public final class ForgeGameplayEvents {
 
 
         net.minecraftforge.event.server.ServerStartingEvent.BUS.addListener((net.minecraftforge.event.server.ServerStartingEvent event) -> {
-            ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) Services.PLATFORM)
+            ((com.kingodogo.buildscape.adapter.PlatformAdapterBase) Services.PLATFORM)
                     .registerDeferredServerData(event.getServer());
             LoaderWandererTrades.register(event.getServer());
         });
         net.minecraftforge.event.OnDatapackSyncEvent.BUS.addListener((net.minecraftforge.event.OnDatapackSyncEvent event) -> {
             // A null player means a data reload rather than a player joining.
             if (event.getPlayer() == null) {
-                ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) Services.PLATFORM)
+                ((com.kingodogo.buildscape.adapter.PlatformAdapterBase) Services.PLATFORM)
                         .registerDeferredServerData(event.getPlayerList().getServer());
             }
             LoaderWandererTrades.register(event.getPlayerList().getServer());

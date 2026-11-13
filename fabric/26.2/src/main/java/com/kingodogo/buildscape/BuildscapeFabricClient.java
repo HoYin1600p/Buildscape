@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v26x.GuiProvider;
-import com.kingodogo.buildscape.adapter.v26x.ParticleFactory;
-import com.kingodogo.buildscape.adapter.v26x.RenderFactory;
-import com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload;
+import com.kingodogo.buildscape.adapter.GuiProvider;
+import com.kingodogo.buildscape.adapter.ParticleFactory;
+import com.kingodogo.buildscape.adapter.RenderFactory;
+import com.kingodogo.buildscape.adapter.PacketFactory.BuildscapeCustomPayload;
 import com.kingodogo.buildscape.menu.ModMenuTypes;
 import com.kingodogo.buildscape.network.PacketDirection;
 import net.fabricmc.api.ClientModInitializer;
@@ -43,28 +43,28 @@ public class BuildscapeFabricClient implements ClientModInitializer {
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();
             com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clear();
-            com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.clearInputRenderState();
+            com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.clearInputRenderState();
         });
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((client, level) -> {
             com.kingodogo.buildscape.client.ClientEvents.onClientWorldUnload();
             com.kingodogo.buildscape.client.particle.HazeBushParticleHandler.clear();
-            com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.clearInputRenderState();
+            com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.clearInputRenderState();
         });
         net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents.AFTER_BLOCK_OUTLINE_EXTRACTION.register(
                 (context, target) -> {
-                    if (com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.extractBlockHighlight(
+                    if (com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.extractBlockHighlight(
                             context.camera(), target, context.levelState())) {
                         context.levelState().blockOutlineRenderState = null;
                     }
                 });
         net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents.COLLECT_SUBMITS.register(context ->
-                com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.collectBlockHighlight(
+                com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.collectBlockHighlight(
                         context.poseStack(), context.submitNodeCollector(), context.levelState()));
         net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderingRegistry.register(
-                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.still(),
-                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.flowing(),
-                com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidModel.create());
-        com.kingodogo.buildscape.adapter.v26x.client.SpecialItemRenderers.registerFabric();
+                com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.still(),
+                com.kingodogo.buildscape.adapter.fluid.ExperienceFluids.flowing(),
+                com.kingodogo.buildscape.adapter.client.ExperienceFluidModel.create());
+        com.kingodogo.buildscape.adapter.client.SpecialItemRenderers.registerFabric();
         GuiProvider.registerMenuScreens(new GuiProvider.Registrar() {
             public void registerWorkbench() {
                 MenuScreens.register(ModMenuTypes.BUILDERS_WORKBENCH_MENU, GuiProvider::createWorkbenchScreen);
@@ -89,10 +89,10 @@ public class BuildscapeFabricClient implements ClientModInitializer {
         RenderFactory.registerBlockEntityRenderers(net.minecraft.client.renderer.blockentity.BlockEntityRenderers::register);
         net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry.addLast(
                 Identifier.fromNamespaceAndPath("buildscape", "overlay"), (graphics, delta) ->
-                        com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderClientOverlay(
+                        com.kingodogo.buildscape.adapter.client.ClientPlatformHooks.renderClientOverlay(
                                 graphics, graphics.guiWidth(), graphics.guiHeight()));
         net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents.COLLECT_SUBMITS.register(context ->
-                com.kingodogo.buildscape.adapter.v26x.client.ClientWorldHooks.collectWorldOverlays(
+                com.kingodogo.buildscape.adapter.client.ClientWorldHooks.collectWorldOverlays(
                         context.poseStack(), context.submitNodeCollector(), context.levelState()));
         com.kingodogo.buildscape.client.ClientEvents.initializeConfigCallback();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

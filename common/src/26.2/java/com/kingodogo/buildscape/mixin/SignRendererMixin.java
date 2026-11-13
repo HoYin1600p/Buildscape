@@ -19,7 +19,7 @@ public class SignRendererMixin {
             at = @At("RETURN"), require = 0)
     private void buildscape$extractFrame(SignBlockEntity entity, @Coerce Object state, float partialTick,
             @Coerce Object camera, @Coerce Object breaking, CallbackInfo ci) {
-        com.kingodogo.buildscape.adapter.v26x.client.ClientSignFrames.extract(entity, state, partialTick);
+        com.kingodogo.buildscape.adapter.client.ClientSignFrames.extract(entity, state, partialTick);
     }
 
     @Dynamic
@@ -27,7 +27,7 @@ public class SignRendererMixin {
             at = @At("TAIL"), require = 0)
     private void buildscape$submitFrame(@Coerce Object state, PoseStack pose, @Coerce Object collector,
             @Coerce Object camera, CallbackInfo ci) {
-        com.kingodogo.buildscape.adapter.v26x.client.ClientSignFrames.submit(state, pose, collector, camera);
+        com.kingodogo.buildscape.adapter.client.ClientSignFrames.submit(state, pose, collector, camera);
     }
 
     @Dynamic

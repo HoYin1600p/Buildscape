@@ -2,7 +2,7 @@ package com.kingodogo.buildscape;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kingodogo.buildscape.adapter.v26x.BlockFactory;
+import com.kingodogo.buildscape.adapter.BlockFactory;
 import com.kingodogo.buildscape.block.BlockDefinition;
 import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.entity.EntityDefinition;

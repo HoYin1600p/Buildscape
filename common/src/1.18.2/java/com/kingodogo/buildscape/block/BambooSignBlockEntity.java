@@ -13,6 +13,6 @@ public class BambooSignBlockEntity extends SignBlockEntity {
 
     @Override
     public BlockEntityType<?> getType() {
-        return com.kingodogo.buildscape.adapter.v118x.RestoredContentTypes.blockEntity("bamboo_sign_block_entity");
+        return com.kingodogo.buildscape.adapter.RestoredContentTypes.blockEntity("bamboo_sign_block_entity");
     }
 }

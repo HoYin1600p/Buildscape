@@ -34,12 +34,12 @@ public final class NeoForgeGameplayEvents {
                 com.kingodogo.buildscape.block.LeafMiningSpeed.adjust(event.getEntity(), event.getState(), event.getNewSpeed())));
         // 26.3 binds item components after mod init and again on every data reload (compostables need them).
         bus.addListener((net.neoforged.neoforge.event.server.ServerStartingEvent event) ->
-                ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) com.kingodogo.buildscape.platform.Services.PLATFORM)
+                ((com.kingodogo.buildscape.adapter.PlatformAdapterBase) com.kingodogo.buildscape.platform.Services.PLATFORM)
                         .registerDeferredServerData(event.getServer()));
         bus.addListener((net.neoforged.neoforge.event.OnDatapackSyncEvent event) -> {
             // A null player means a /reload, not a player joining.
             if (event.getPlayer() == null) {
-                ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) com.kingodogo.buildscape.platform.Services.PLATFORM)
+                ((com.kingodogo.buildscape.adapter.PlatformAdapterBase) com.kingodogo.buildscape.platform.Services.PLATFORM)
                         .registerDeferredServerData(event.getPlayerList().getServer());
             }
         });

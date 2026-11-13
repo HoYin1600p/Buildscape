@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.platform;
 
-import com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.PlatformAdapterBase;
 
 public class NeoForgePlatformAdapter extends PlatformAdapterBase {
     @Override public int beforeHammerReplacement(net.minecraft.server.level.ServerPlayer player, net.minecraft.core.BlockPos pos,

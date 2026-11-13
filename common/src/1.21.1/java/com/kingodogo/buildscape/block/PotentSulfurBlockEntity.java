@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.block;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
-import com.kingodogo.buildscape.adapter.v121x.EntitylessClipContext;
+import com.kingodogo.buildscape.adapter.EntitylessClipContext;
 import com.kingodogo.buildscape.block.entity.DataBlockEntity;
 import com.kingodogo.buildscape.block.entity.IBlockEntityReadData;
 import com.kingodogo.buildscape.block.entity.IBlockEntityWriteData;
@@ -193,7 +193,7 @@ public class PotentSulfurBlockEntity extends DataBlockEntity {
    };
 
    public PotentSulfurBlockEntity(final BlockPos worldPosition, final BlockState blockState) {
-      super(com.kingodogo.buildscape.adapter.v121x.RestoredContentTypes.blockEntity("potent_sulfur"), worldPosition, blockState);
+      super(com.kingodogo.buildscape.adapter.RestoredContentTypes.blockEntity("potent_sulfur"), worldPosition, blockState);
    }
 
    @Override

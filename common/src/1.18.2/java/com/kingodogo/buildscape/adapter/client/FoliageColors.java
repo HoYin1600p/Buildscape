@@ -407,9 +407,7 @@ public final class FoliageColors {
                             .getBlock();
 
                     int color = -1;
-                    if (block == block("leaf_litter")) {
-                        color = DryFoliageColor.getDefaultColor();
-                    } else if (block == block("bush")
+                    if (block == block("bush")
                             || block == block("oak_leaf_hedge")
                             || block == block("oak_leaf_layers")) {
                         color = vanillaItemColors.getColor(

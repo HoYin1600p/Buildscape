@@ -95,8 +95,13 @@ public final class AdvancementEvents {
     public static void checkFullCubeAdvancement(ServerPlayer player) {
         if (player == null || access == null || access.isDone(player, "a_full_buildscape_cube")) return;
         for (String criterion : access.remainingCriteria(player, "a_full_buildscape_cube")) {
+            if (!isAdvancementPath(criterion)) continue;
             if (access.isDone(player, criterion)) access.awardCriterion(player, "a_full_buildscape_cube", criterion);
         }
+    }
+
+    static boolean isAdvancementPath(String criterion) {
+        return criterion != null && CommonId.tryParse("buildscape:" + criterion) != null;
     }
 
     public static void onPillarItemInserted(ServerPlayer player) {

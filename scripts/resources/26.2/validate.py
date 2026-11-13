@@ -15,6 +15,14 @@ import zipfile
 from convert import FOLDERS, TAG_FOLDERS, PACK, SPECIAL_ITEMS
 
 
+def normalize_config_json(text):
+    """Apply the config loader's comment and trailing-comma handling."""
+    strings = r'("(?:\\.|[^"\\])*")'
+    text = re.sub(strings + r'|//[^\r\n]*|/\*[\s\S]*?\*/',
+                  lambda match: match.group(1) or "", text)
+    return re.sub(strings + r'|,\s*(?=[}\]])', lambda match: match.group(1) or "", text)
+
+
 def _profile_support():
     """The version profiles live in this folder's convert.py. Load that file by path:
     The 1.21.1 converter loads this module while its own convert.py is the `convert` module."""
@@ -160,7 +168,10 @@ class Validator:
         for path, p in self.files.items():
             if p.suffix == ".json" or p.name == "pack.mcmeta" or p.name.endswith(".png.mcmeta"):
                 try:
-                    self.json[path] = json.loads(p.read_bytes().decode("utf-8-sig"))
+                    content = p.read_bytes().decode("utf-8-sig")
+                    if path.startswith("data/buildscape/config/"):
+                        content = normalize_config_json(content)
+                    self.json[path] = json.loads(content)
                 except (ValueError, UnicodeError) as e:
                     self.error(path, "JSON parse error: " + str(e))
             parts = path.split("/")
@@ -427,9 +438,9 @@ class Validator:
         if path in self.json:
             d, base = self.json[path], self.get_vanilla(path)
             if (d.get("type") != base.get("type") or d.get("result", {}).get("id") != base.get("result", {}).get("id")
-                    or d.get("result", {}).get("count") != 8 or d.get("pattern") != ["#"]
+                    or d.get("result", {}).get("count") != 2 or d.get("pattern") != ["#"]
                     or d.get("key") != base.get("key")):
-                self.error(path, "snow override must preserve its one-block/eight-layer recipe and vanilla ingredient/type/output id")
+                self.error(path, "snow override must preserve its one-block/two-layer recipe and vanilla ingredient/type/output id")
         path = "data/minecraft/loot_table/blocks/composter.json"
         if path in self.json:
             d, base = self.json[path], self.get_vanilla(path)

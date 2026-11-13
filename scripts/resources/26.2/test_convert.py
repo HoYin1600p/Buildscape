@@ -9,6 +9,12 @@ import convert as c
 
 
 class ConversionTests(unittest.TestCase):
+    def test_config_normalization_preserves_strings(self):
+        import validate
+        text = '{"url":"https://example.test/a/*b*/,}", // note\n "value": [2,] /* note */,}'
+        self.assertEqual(json.loads(validate.normalize_config_json(text)),
+                         {"url": "https://example.test/a/*b*/,}", "value": [2]})
+
     def test_folders_in_every_namespace(self):
         for namespace in ("minecraft", "buildscape", "other"):
             for old, new in c.FOLDERS.items():

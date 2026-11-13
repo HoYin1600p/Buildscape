@@ -43,6 +43,7 @@ public final class ForgePacketFactory implements IPacketFactory {
 
     public void installChannel() {
         if (channel != null) throw new IllegalStateException("Forge channel already installed");
+        types.put(SyncBiomeTintPacket.ID, SyncBiomeTintPacket.class);
         types.put(ActionBarMessagePacket.ID, ActionBarMessagePacket.class);
         types.put(SyncConfigPacket.ID, SyncConfigPacket.class);
         types.put(SyncConfigChunkPacket.ID, SyncConfigChunkPacket.class);

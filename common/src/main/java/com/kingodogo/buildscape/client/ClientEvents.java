@@ -219,6 +219,7 @@ public class ClientEvents {
     }
 
     public static void onClientWorldUnload() {
+        com.kingodogo.buildscape.client.biome.ClientBiomeTints.clear();
         ZoomHandler.reset();
         TreeChopHandler.reset();
         ModKeyBinds.CINEMATIC_ZOOM.setDown(false);

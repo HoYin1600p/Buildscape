@@ -1352,6 +1352,11 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isBigBook()) {
             return new BigBookBlock(props) {
+                @Override
+                protected net.minecraft.world.phys.shapes.VoxelShape getOcclusionShape(BlockState state) {
+                    return net.minecraft.world.phys.shapes.Shapes.empty();
+                }
+
             };
         } else if (def.isBigCandle()) {
             props.lightLevel(state -> state.getValue(BigCandleBlock.LIT) ? BigCandleBlock.LIGHT_LEVEL : 0);

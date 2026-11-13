@@ -110,6 +110,10 @@ class BlockPropertiesParityTest {
             try {
                 var block = Services.PARITY_BLOCKS.get(id.substring(id.indexOf(':') + 1));
                 BlockState state = block.defaultBlockState();
+                if (block instanceof com.kingodogo.buildscape.block.BigBookBlock) {
+                    assertTrue(state.getOcclusionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).isEmpty(), id);
+                    assertEquals(1.0F, state.getShadeBrightness(EmptyBlockGetter.INSTANCE, BlockPos.ZERO), id);
+                }
                 if (id.equals("buildscape:sculk_slab") || id.equals("buildscape:sculk_stairs")
                         || id.equals("buildscape:sculk_wall") || id.equals("buildscape:sculk_vertical_slab")) {
                     assertEquals(net.minecraft.world.level.material.MapColor.COLOR_BLACK,

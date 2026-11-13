@@ -1430,6 +1430,11 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isBigBook()) {
             return new BigBookBlock(props) {
                 @Override
+                protected net.minecraft.world.phys.shapes.VoxelShape getOcclusionShape(BlockState state) {
+                    return net.minecraft.world.phys.shapes.Shapes.empty();
+                }
+
+                @Override
                 public MapCodec<? extends HorizontalDirectionalBlock> codec() {
                     return codecForDefinition(def, HorizontalDirectionalBlock.class);
                 }

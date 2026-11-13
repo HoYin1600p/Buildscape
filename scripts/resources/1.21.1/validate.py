@@ -178,7 +178,10 @@ class Validator(shared.Validator):
         for path, file in self.files.items():
             if file.suffix == ".json" or file.name.endswith(".mcmeta"):
                 try:
-                    self.json[path] = json.loads(file.read_bytes().decode("utf-8-sig"))
+                    content = file.read_bytes().decode("utf-8-sig")
+                    if path.startswith("data/buildscape/config/"):
+                        content = shared.normalize_config_json(content)
+                    self.json[path] = json.loads(content)
                 except (ValueError, UnicodeError) as error:
                     self.error(path, "JSON parse error: " + str(error))
             parts = path.split("/")

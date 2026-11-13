@@ -41,23 +41,23 @@
       "state_file": "sync/state/mc26.2.json",
       "mc_jar": "ref/artifacts/minecraft-26.2.jar",
       "converter": {
-        "path": "scripts/resources26x/convert.py",
+        "path": "scripts/resources/26.2/convert.py",
         "command": [
           "{python}",
           "-B",
-          "{repo}/scripts/resources26x/convert.py",
+          "{repo}/scripts/resources/26.2/convert.py",
           "{resources}",
           "{mc_jar}"
         ]
       },
       "validator": {
-        "path": "scripts/resources26x/check.py"
+        "path": "scripts/resources/26.2/check.py"
       },
       "validation": [
         [
           "{python}",
           "-B",
-          "{repo}/scripts/resources26x/check.py",
+          "{repo}/scripts/resources/26.2/check.py",
           "--resources-root",
           "{resources}",
           "--mc-jar",
@@ -85,8 +85,8 @@
         "common/src/26.2/java"
       ],
       "ledger_coverage": [
-        "26x",
-        "118x"
+        "26.2",
+        "1.18.2"
       ],
       "gated_validation": [
         {
@@ -135,12 +135,12 @@
         "inherited_resource_root": "common/src/main/resources"
       },
       "converter": {
-        "path": "scripts/resources26x/convert.py",
+        "path": "scripts/resources/26.2/convert.py",
         "profile": "26.3",
         "command": [
           "{python}",
           "-B",
-          "{repo}/scripts/resources26x/convert.py",
+          "{repo}/scripts/resources/26.2/convert.py",
           "--profile",
           "26.3",
           "{resources}",
@@ -148,14 +148,14 @@
         ]
       },
       "validator": {
-        "path": "scripts/resources26x/check.py",
+        "path": "scripts/resources/26.2/check.py",
         "profile": "26.3"
       },
       "validation": [
         [
           "{python}",
           "-B",
-          "{repo}/scripts/resources26x/check.py",
+          "{repo}/scripts/resources/26.2/check.py",
           "--profile",
           "26.3",
           "--resources-root",

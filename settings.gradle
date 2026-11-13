@@ -122,7 +122,7 @@ if (activeTarget == 'neoforge:26.2') {
     }
 
     // 1.18.2 targets
-    if (isEnabled('buildscape.fabric118x')) {
+    if (isEnabled('buildscape.fabric1182')) {
         include ':fabric:1.18.2'
         project(':fabric:1.18.2').projectDir = file('fabric/1.18.2')
     }

@@ -36,7 +36,7 @@ class BlockPropertiesParityTest {
                 differences.put("buildscape:" + id + " sound." + event, "minecraft:block.nether_wood." + event);
             }
         }
-        // On 1.21.1 Buildscape's stripped_bamboo_block is replaced by vanilla's (removals121x), and the stairs copy
+        // On 1.21.1 Buildscape's stripped_bamboo_block is replaced by vanilla's (1.21.1 removals), and the stairs copy
         // their base's blast resistance, so they follow vanilla's 3.0 instead of main's custom block's 2.0.
         differences.put("buildscape:stripped_bamboo_block_stairs explosionResistance", "3.0");
         // Release 4.1 adds a glowing state to every jar on both versions.

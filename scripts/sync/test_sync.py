@@ -439,13 +439,13 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertNotIn("removal_policy", old)
         self.assertEqual(old["resource_root"], "common/src/main/resources")
         self.assertEqual(old["version_clusters"], ["minecraft262", "minecraft1182"])
-        self.assertEqual(old["ledger_coverage"], ["26x", "118x"])
+        self.assertEqual(old["ledger_coverage"], ["26.2", "1.18.2"])
         state = json.loads((root / target["state_file"]).read_text())
         self.assertEqual(state, {"schema_version": 1, "pending": []})
         # Only active targets are synchronized by default.
         self.assertEqual([t["id"] for t in config["targets"] if t["status"] == "active"], ["mc26.2"])
 
-    def test_mc263_inherits_exactly_the_approved_26x_removals(self):
+    def test_mc263_inherits_exactly_the_approved_removals(self):
         root = Path(__file__).resolve().parents[2]
         config = json.loads((root / "sync/targets.json").read_text())
         target = next(t for t in config["targets"] if t["id"] == "mc26.3")
@@ -626,7 +626,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         target = self.config["targets"][0]
         target.update(id="mc26.2", version_cluster="minecraft262", version_clusters=["minecraft262", "minecraft1182"],
                       java_roots=["common/src/main/java", "common/src/1.18.2/java", "common/src/26.2/java"],
-                      ledger_coverage=["26x", "118x"], reference_snapshot="ref/forge/1.18.2")
+                      ledger_coverage=["26.2", "1.18.2"], reference_snapshot="ref/forge/1.18.2")
         (self.repo / "ref/source").rename(self.repo / "ref/forge-tmp")
         (self.repo / "ref/forge").mkdir()
         (self.repo / "ref/forge-tmp").rename(self.repo / "ref/forge/1.18.2")
@@ -672,7 +672,7 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
                          sync.blob(self.source, head, self.java + "Same.java"))
         rows = self.read_csv(branch)
         self.assertEqual(rows[self.java + "Same.java"]["active_paths"], "common/src/1.18.2/java/example/Same.java")
-        self.assertTrue(all("118x" in r["era_coverage"].split(";") for r in rows.values()))
+        self.assertTrue(all("1.18.2" in r["era_coverage"].split(";") for r in rows.values()))
 
     def test_single_identical_minecraft1182_mixin_can_sync(self):
         target = self.cluster_target()

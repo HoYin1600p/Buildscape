@@ -39,7 +39,7 @@ class ContentRemovalPolicyTest {
     }
 
     @Test
-    void replacementAliasesCoverExactlyThe121xVanillaReplacements() {
+    void replacementAliasesCoverExactlyTheVanillaReplacements() {
         var expected = new ArrayList<>(ContentRemovalPolicy.MINECRAFT_1211.stream()
                 .filter(removal -> removal.vanillaEquivalent() != null)
                 .map(removal -> new VanillaReplacementAliases.Alias(

@@ -26,13 +26,13 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
 
     private boolean standaloneLaunchFasterPresent;
     private boolean isPost118;
-    private boolean is26x;
+    private boolean usesModernIdentifiers;
 
     @Override
     public void onLoad(String mixinPackage) {
         standaloneLaunchFasterPresent = classExists("com.ruben.launchfaster.Launchfaster");
         isPost118 = classExists("net.minecraft.world.flag.FeatureFlagSet");
-        is26x = classExists("net.minecraft.resources.Identifier");
+        usesModernIdentifiers = classExists("net.minecraft.resources.Identifier");
     }
 
     @Override
@@ -44,25 +44,25 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.endsWith(".BuildscapeForgeRegistryMixin")
                 && !classExists("net.minecraftforge.registries.ForgeRegistry")) return false;
-        if (mixinClassName.endsWith(".BlockEntityMigrationMixin")) return is26x;
+        if (mixinClassName.endsWith(".BlockEntityMigrationMixin")) return usesModernIdentifiers;
         if (mixinClassName.startsWith("com.kingodogo.buildscape.mixin.client.")) return isPost118 || mixinClassName.endsWith(".SoundMuffMixin");
-        if (is26x && (mixinClassName.endsWith(".ScreenMixin") || mixinClassName.endsWith(".RenderBuffersMixin")
+        if (usesModernIdentifiers && (mixinClassName.endsWith(".ScreenMixin") || mixinClassName.endsWith(".RenderBuffersMixin")
                 || mixinClassName.endsWith(".AdvancementWidgetMixin") || mixinClassName.endsWith(".GeneralStatisticsListMixin")
                 || mixinClassName.endsWith(".GeneralStatisticsListEntryMixin"))) return true;
-        if (mixinClassName.endsWith(".WorldOverlayExtractionMixin")) return is26x;
+        if (mixinClassName.endsWith(".WorldOverlayExtractionMixin")) return usesModernIdentifiers;
         if (mixinClassName.endsWith(".EmbeddiumPipeSpillMixin")) {
             // No Sodium for 26.2 is cached; the legacy renderer API is incompatible.
-            if (is26x) return false;
+            if (usesModernIdentifiers) return false;
             return classExists("me.jellysquid.mods.sodium.client.render.chunk.compile.buffers.ChunkModelBuilder");
         }
         if (standaloneLaunchFasterPresent && OVERLAPPING_CACHE_MIXINS.contains(mixinClassName)) {
             return false;
         }
-        if (is26x && mixinClassName.endsWith(".CreativeModeTabMixin")) return true;
+        if (usesModernIdentifiers && mixinClassName.endsWith(".CreativeModeTabMixin")) return true;
         if (isPost118 && OBSOLETE_118_MIXINS.contains(mixinClassName)) {
             return false;
         }
-        if (is26x && mixinClassName.endsWith(".LiquidBlockRendererMixin")) {
+        if (usesModernIdentifiers && mixinClassName.endsWith(".LiquidBlockRendererMixin")) {
             return true;
         }
         return true;

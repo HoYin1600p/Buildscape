@@ -23,7 +23,7 @@ class PillarToolDisplayTest {
         assertEquals(PillarItemDisplay.Mode.DEFAULT, PillarItemDisplay.parse("stuck", true));
     }
 
-    @Test void removedToolSubclassesHaveEquivalent26xClassification() {
+    @Test void removedToolSubclassesHaveEquivalentClassification() {
         for (var item : new net.minecraft.world.item.Item[] {
                 Items.DIAMOND_SWORD, Items.TRIDENT, Items.DIAMOND_SHOVEL}) {
             var stack = new ItemStack(item);

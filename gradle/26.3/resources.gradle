@@ -1,6 +1,6 @@
 // Minecraft 26.3 resources: common/src/26.3/resources is a layer over common/src/main/resources.
 // It holds only what differs from the 26.2 resources (regenerate it with
-// scripts/resources26x/convert.py --profile 26.3 --derive-from, see that script).
+// scripts/resources/26.2/convert.py --profile 26.3 --derive-from, see that script).
 //
 // A main file must not be copied next to the overlay file that replaces it (the loader
 // modules fail on duplicate paths), nor may a folder 26.3 renamed survive from main.

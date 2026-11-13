@@ -50,7 +50,7 @@ class BlockFactoryCodecTest {
     }
 
     @Test
-    void restored26xPotsAreRegisteredWithVanillaPlants() {
+    void restoredPotsAreRegisteredWithVanillaPlants() {
         ModBlocks.init();
         var plants = java.util.Map.of(
                 "potted_bush", Blocks.BUSH,

@@ -25,7 +25,7 @@ class ContentRegistrationParityTest {
     }
 
     @Test
-    void actualRegistrationQueuesEqualMainMinusExactly121xRemovals() throws Exception {
+    void actualRegistrationQueuesEqualMainMinusExpectedRemovals() throws Exception {
         ModBlocks.init();
         ModItems.init();
         Trophies.init();

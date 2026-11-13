@@ -83,7 +83,7 @@ class RetiredContentRegistrationTest {
     }
 
     @Test
-    void retiredIdsAreAbsentFromThe26xRegistrationQueues() throws Exception {
+    void retiredIdsAreAbsentFromRegistrationQueues() throws Exception {
         assertFalse(Services.isVersionCluster("minecraft1182"));
         ModBlocks.init();
         ModItems.init();

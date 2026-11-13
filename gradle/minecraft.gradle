@@ -63,7 +63,7 @@ def registerOfficialClient = { String mcVersion, String clientSha1, String taskN
     }
 }
 
-registerOfficialClient('26.2', '2dc72797acbc1b63fc16a11c4ac393605f453754', 'downloadMinecraft26x', 'minecraft262CompileOnly')
+registerOfficialClient('26.2', '2dc72797acbc1b63fc16a11c4ac393605f453754', 'downloadMinecraft262', 'minecraft262CompileOnly')
 if (providers.gradleProperty('buildscape.minecraft263').getOrElse('false') == 'true' ||
         rootProject.findProject(':fabric:26.3') != null ||
         rootProject.findProject(':neoforge:26.3') != null ||

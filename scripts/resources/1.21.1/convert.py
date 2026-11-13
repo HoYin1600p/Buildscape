@@ -1,6 +1,6 @@
 """Generate 1.21.1 resources from the frozen 1.18.2 tree, without editing it.
 
-Usage: python -B scripts/resources121x/convert.py MINECRAFT_CLIENT_JAR
+Usage: python -B scripts/resources/1.21.1/convert.py MINECRAFT_CLIENT_JAR
 Optional --source and --output select fixture trees. Unsupported loader data
 and stale binary recipe caches are dropped with a report on stdout.
 """
@@ -13,12 +13,12 @@ import sys
 import zipfile
 
 sys.dont_write_bytecode = True
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 
 
 def shared_module(name):
     spec = importlib.util.spec_from_file_location(
-        "resources26x_" + name, REPO / "scripts/resources26x" / (name + ".py"))
+        "resource_profiles_" + name, REPO / "scripts/resources/26.2" / (name + ".py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module

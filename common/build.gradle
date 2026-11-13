@@ -128,7 +128,7 @@ def minecraft1182Active = rootProject.findProject(':forge:1.18.2') != null ||
         rootProject.findProject(':fabric:1.18.2') != null ||
         providers.gradleProperty('buildscape.minecraft1182').getOrElse('false') == 'true' ||
         gradle.startParameter.projectProperties.get('buildscape.minecraft1182') == 'true' ||
-        gradle.startParameter.taskNames.any { it.contains('118x') }
+        gradle.startParameter.taskNames.any { it.toLowerCase().contains('minecraft1182') }
 
 if (minecraft1182Active) {
     unimined.minecraft(sourceSets.minecraft1182) {
@@ -144,7 +144,7 @@ def minecraft1211Active = rootProject.findProject(':neoforge:1.21.1') != null ||
         rootProject.findProject(':forge:1.21.1') != null ||
         providers.gradleProperty('buildscape.minecraft1211').getOrElse('false') == 'true' ||
         gradle.startParameter.projectProperties.get('buildscape.minecraft1211') == 'true' ||
-        gradle.startParameter.taskNames.any { it.contains('121x') }
+        gradle.startParameter.taskNames.any { it.toLowerCase().contains('minecraft1211') }
 
 if (minecraft1211Active) {
     unimined.minecraft(sourceSets.minecraft1211) {

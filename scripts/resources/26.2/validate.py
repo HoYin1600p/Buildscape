@@ -17,8 +17,8 @@ from convert import FOLDERS, TAG_FOLDERS, PACK, SPECIAL_ITEMS
 
 def _profile_support():
     """The version profiles live in this folder's convert.py. Load that file by path:
-    resources121x loads this module while its own convert.py is the `convert` module."""
-    spec = importlib.util.spec_from_file_location("resources26x_profiles", Path(__file__).with_name("convert.py"))
+    The 1.21.1 converter loads this module while its own convert.py is the `convert` module."""
+    spec = importlib.util.spec_from_file_location("resource_profiles", Path(__file__).with_name("convert.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -31,7 +31,7 @@ FEATURE_FILE, LEGACY_CONDITION_TYPES_263, PROVIDER_TYPES_263 = (
 
 ID = re.compile(r"^[a-z0-9_.-]+:[a-z0-9/._-]+$")
 BUILTINS = {"minecraft:builtin/generated"}
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 # Folders 26.3 renamed; a copy left in an older layer is superseded, not an error.
 RETIRED_DIRS_263 = re.compile(r"data/[^/]+/(?:worldgen/configured_feature/|tags/worldgen/configured_feature/)")
 

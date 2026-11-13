@@ -158,7 +158,7 @@ class ConversionTests(unittest.TestCase):
             with self.subTest(tag=tag), self.assertRaises(ValueError):
                 c.loot({"functions": [{"function": "minecraft:set_nbt", "tag": tag}]})
 
-    def test_every_source_loot_table_converts_to_known_121x_functions(self):
+    def test_every_source_loot_table_converts_to_known_functions(self):
         root = c.REPO / "common/src/1.18.2/resources/data"
         tables = list(root.rglob("loot_tables/**/*.json"))
         self.assertTrue(tables)

@@ -455,8 +455,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isGrassSlab()) {
             props.randomTicks();
             Supplier<Block> dirtSlabSupplier = resolveBlockSupplier("dirt_slab");
-            class V118xGrassSlabBlock extends GrassSlabBlock implements BonemealableBlock {
-                public V118xGrassSlabBlock(BlockBehaviour.Properties properties) {
+            class NativeGrassSlabBlock extends GrassSlabBlock implements BonemealableBlock {
+                public NativeGrassSlabBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -566,7 +566,7 @@ public class BlockFactory implements IBlockFactory {
                     }
                 }
             }
-            return new V118xGrassSlabBlock(props);
+            return new NativeGrassSlabBlock(props);
         } else if (def.isHayBaleSlab()) {
             return new HayBaleSlabBlock(props) {
                 @Override
@@ -773,8 +773,8 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isMangroveLeaves()) {
-            class V118xMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
-                public V118xMangroveLeavesBlock(BlockBehaviour.Properties properties) {
+            class NativeMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
+                public NativeMangroveLeavesBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                     BlockState base = this.stateDefinition.any();
                     if (base.hasProperty(BlockStateProperties.WATERLOGGED)) {
@@ -795,13 +795,13 @@ public class BlockFactory implements IBlockFactory {
                     MangroveLeavesBlock.growPropagule(level, pos);
                 }
             }
-            return new V118xMangroveLeavesBlock(props);
+            return new NativeMangroveLeavesBlock(props);
         } else if (def.isMangrovePropagule()) {
             Supplier<Block> propaguleLeaves = resolveBlockSupplier("mangrove_leaves");
             Supplier<Block> propaguleMud = resolveBlockSupplier("mud");
             Supplier<Block> propaguleMuddyRoots = resolveBlockSupplier("muddy_mangrove_roots");
-            class V118xMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
-                public V118xMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
+            class NativeMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
+                public NativeMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
                 private boolean isLeavesAbove(BlockState aboveState) {
@@ -938,7 +938,7 @@ public class BlockFactory implements IBlockFactory {
                     return state.isFaceSturdy(level, pos, Direction.UP) && state.getMaterial().isSolid() && !state.getMaterial().isReplaceable();
                 }
             }
-            return new V118xMangrovePropaguleBlock(props);
+            return new NativeMangrovePropaguleBlock(props);
         } else if (def.isMangroveRoots()) {
             return new MangroveRootsBlock(props) {
                 {
@@ -983,8 +983,8 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isColoredMossLayers()) {
             Supplier<Block> fullBlock = resolveBlockSupplier(def.getId().replace("_layers", "_block"));
-            class V118xColoredMossLayersBlock extends ColoredMossLayersBlock {
-                public V118xColoredMossLayersBlock(BlockBehaviour.Properties properties) {
+            class NativeColoredMossLayersBlock extends ColoredMossLayersBlock {
+                public NativeColoredMossLayersBlock(BlockBehaviour.Properties properties) {
                     super(properties, fullBlock);
                 }
 
@@ -1005,7 +1005,7 @@ public class BlockFactory implements IBlockFactory {
                     return isCommonPathfindable(state, type);
                 }
             }
-            return new V118xColoredMossLayersBlock(props) {
+            return new NativeColoredMossLayersBlock(props) {
                 // Reference: drops one layer item per layer, ignoring the loot table (which gives a single item).
                 @Override
                 public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
@@ -1013,8 +1013,8 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isMossLayers()) {
-            class V118xMossLayersBlock extends MossLayersBlock {
-                public V118xMossLayersBlock(BlockBehaviour.Properties properties) {
+            class NativeMossLayersBlock extends MossLayersBlock {
+                public NativeMossLayersBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1035,7 +1035,7 @@ public class BlockFactory implements IBlockFactory {
                     return isCommonPathfindable(state, type);
                 }
             }
-            return new V118xMossLayersBlock(props) {
+            return new NativeMossLayersBlock(props) {
                 // Reference: drops one layer item per layer, ignoring the loot table (which gives a single item).
                 @Override
                 public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
@@ -1696,8 +1696,8 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isHangingMoss()) {
             props.randomTicks();
-            class V118xHangingMossBlock extends HangingMossBlock implements BonemealableBlock {
-                public V118xHangingMossBlock(BlockBehaviour.Properties properties) {
+            class NativeHangingMossBlock extends HangingMossBlock implements BonemealableBlock {
+                public NativeHangingMossBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1784,11 +1784,11 @@ public class BlockFactory implements IBlockFactory {
                     }
                 }
             }
-            return new V118xHangingMossBlock(props);
+            return new NativeHangingMossBlock(props);
         } else if (def.isClover()) {
             props.sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
-            class V118xCloverBlock extends CloverBlock implements BonemealableBlock {
-                public V118xCloverBlock(BlockBehaviour.Properties properties) {
+            class NativeCloverBlock extends CloverBlock implements BonemealableBlock {
+                public NativeCloverBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1824,11 +1824,11 @@ public class BlockFactory implements IBlockFactory {
                     growClover(level, pos, state);
                 }
             }
-            return new V118xCloverBlock(props);
+            return new NativeCloverBlock(props);
         } else if (def.isPetal() || def.isLeafLitter()) {
             props.sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
-            class V118xPetalBlock extends PetalBlock implements BonemealableBlock {
-                public V118xPetalBlock(BlockBehaviour.Properties properties) {
+            class NativePetalBlock extends PetalBlock implements BonemealableBlock {
+                public NativePetalBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1864,11 +1864,11 @@ public class BlockFactory implements IBlockFactory {
                     growPetal(level, pos, state);
                 }
             }
-            return new V118xPetalBlock(props);
+            return new NativePetalBlock(props);
         } else if (def.isWildflowers()) {
             props.sound(SoundType.GRASS).noCollission();
-            class V118xWildflowersBlock extends WildflowersBlock implements BonemealableBlock {
-                public V118xWildflowersBlock(BlockBehaviour.Properties properties) {
+            class NativeWildflowersBlock extends WildflowersBlock implements BonemealableBlock {
+                public NativeWildflowersBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1897,14 +1897,14 @@ public class BlockFactory implements IBlockFactory {
                     return getReferenceDrops(state);
                 }
             }
-            return new V118xWildflowersBlock(props);
+            return new NativeWildflowersBlock(props);
         } else if (def.isColoredMoss()) {
             Supplier<Block> carpet = resolveBlockSupplier(def.getId().replace("_block", "_carpet"));
             Supplier<Block> overlay = resolveBlockSupplier(def.getId().replace("_block", "_overlay"));
             Supplier<Block> layers = resolveBlockSupplier(def.getId().replace("_block", "_layers"));
             Supplier<Block> sapling = resolveBlockSupplier(def.getParentBlockId());
-            class V118xColoredMossBlock extends ColoredMossBlock implements BonemealableBlock {
-                public V118xColoredMossBlock(BlockBehaviour.Properties properties) {
+            class NativeColoredMossBlock extends ColoredMossBlock implements BonemealableBlock {
+                public NativeColoredMossBlock(BlockBehaviour.Properties properties) {
                     super(properties, carpet, overlay, layers, sapling, null);
                 }
 
@@ -1929,11 +1929,11 @@ public class BlockFactory implements IBlockFactory {
                     growMoss(level, pos, state, random::nextInt);
                 }
             }
-            return new V118xColoredMossBlock(props);
+            return new NativeColoredMossBlock(props);
         } else if (def.isColoredSporeBlossom()) {
             int colorRGB = getSporeBlossomColor(def.getId());
-            class V118xColoredSporeBlossomBlock extends ColoredSporeBlossomBlock {
-                public V118xColoredSporeBlossomBlock(BlockBehaviour.Properties properties) {
+            class NativeColoredSporeBlossomBlock extends ColoredSporeBlossomBlock {
+                public NativeColoredSporeBlossomBlock(BlockBehaviour.Properties properties) {
                     super(properties, colorRGB);
                 }
 
@@ -1942,11 +1942,11 @@ public class BlockFactory implements IBlockFactory {
                     onAnimateTick(state, level, pos, random::nextDouble, random::nextInt);
                 }
             }
-            return new V118xColoredSporeBlossomBlock(props);
+            return new NativeColoredSporeBlossomBlock(props);
         } else if (def.isCreakingHeart()) {
             Supplier<Block> resinClumpSupplier = resolveBlockSupplier("resin_clump");
-            class V118xCreakingHeartBlock extends CreakingHeartBlock {
-                public V118xCreakingHeartBlock(BlockBehaviour.Properties properties) {
+            class NativeCreakingHeartBlock extends CreakingHeartBlock {
+                public NativeCreakingHeartBlock(BlockBehaviour.Properties properties) {
                     super(properties, resinClumpSupplier);
                 }
 
@@ -1960,10 +1960,10 @@ public class BlockFactory implements IBlockFactory {
                     onScheduledTick(state, level, pos);
                 }
             }
-            return new V118xCreakingHeartBlock(props);
+            return new NativeCreakingHeartBlock(props);
         } else if (def.isMonetFlower()) {
-            class V118xMonetFlowerBlock extends MonetFlowerBlock implements BonemealableBlock {
-                public V118xMonetFlowerBlock(BlockBehaviour.Properties properties) {
+            class NativeMonetFlowerBlock extends MonetFlowerBlock implements BonemealableBlock {
+                public NativeMonetFlowerBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
                 @Override
@@ -1984,7 +1984,7 @@ public class BlockFactory implements IBlockFactory {
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
             }
-            return new V118xMonetFlowerBlock(props);
+            return new NativeMonetFlowerBlock(props);
         } else if (def.isSnowyBush()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
             return new SnowyBushBlock(props, snowBricks) {
@@ -2001,8 +2001,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isSnowyFern()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
             Supplier<Block> snowyLargeFern = resolveBlockSupplier("snowy_large_fern");
-            class V118xSnowyFernBlock extends SnowyFernBlock implements BonemealableBlock {
-                public V118xSnowyFernBlock(BlockBehaviour.Properties properties) {
+            class NativeSnowyFernBlock extends SnowyFernBlock implements BonemealableBlock {
+                public NativeSnowyFernBlock(BlockBehaviour.Properties properties) {
                     super(properties, snowBricks, snowyLargeFern);
                 }
                 @Override
@@ -2027,12 +2027,12 @@ public class BlockFactory implements IBlockFactory {
                     return getReferenceDrops(builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL));
                 }
             }
-            return new V118xSnowyFernBlock(props);
+            return new NativeSnowyFernBlock(props);
         } else if (def.isSnowyShortGrass()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
             Supplier<Block> snowyTallGrass = resolveBlockSupplier("snowy_tall_grass");
-            class V118xSnowyShortGrassBlock extends SnowyShortGrassBlock implements BonemealableBlock {
-                public V118xSnowyShortGrassBlock(BlockBehaviour.Properties properties) {
+            class NativeSnowyShortGrassBlock extends SnowyShortGrassBlock implements BonemealableBlock {
+                public NativeSnowyShortGrassBlock(BlockBehaviour.Properties properties) {
                     super(properties, snowBricks, snowyTallGrass);
                 }
                 @Override
@@ -2057,7 +2057,7 @@ public class BlockFactory implements IBlockFactory {
                     return getReferenceDrops(builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL));
                 }
             }
-            return new V118xSnowyShortGrassBlock(props);
+            return new NativeSnowyShortGrassBlock(props);
         } else if (def.isSnowyLargeFern()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
             return new SnowyLargeFernBlock(props, snowBricks) {
@@ -2094,8 +2094,8 @@ public class BlockFactory implements IBlockFactory {
             Supplier<Block> snowyFern = resolveBlockSupplier("snowy_fern");
             Supplier<Block> snowyTallGrass = resolveBlockSupplier("snowy_tall_grass");
             Supplier<Block> snowyLargeFern = resolveBlockSupplier("snowy_large_fern");
-            class V118xSnowyGrassBlock extends SnowyGrassBlock implements BonemealableBlock {
-                public V118xSnowyGrassBlock(BlockBehaviour.Properties properties) {
+            class NativeSnowyGrassBlock extends SnowyGrassBlock implements BonemealableBlock {
+                public NativeSnowyGrassBlock(BlockBehaviour.Properties properties) {
                     super(properties, snowyShortGrass, snowyBush, snowyFern, snowyTallGrass, snowyLargeFern);
                 }
 
@@ -2170,7 +2170,7 @@ public class BlockFactory implements IBlockFactory {
                     return getReferenceDrops(builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL));
                 }
             }
-            return new V118xSnowyGrassBlock(props);
+            return new NativeSnowyGrassBlock(props);
         } else if (def.isExperienceFluid()) {
             Supplier<FlowingFluid> fluidSupplier = () -> resolveFlowingFluid(def.getParentBlockId());
             if (experienceFluidFactory != null) return experienceFluidFactory.apply(fluidSupplier, props);

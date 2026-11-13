@@ -365,8 +365,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isGrassSlab()) {
             props.randomTicks();
             Supplier<Block> dirtSlabSupplier = resolveBlockSupplier("dirt_slab");
-            class V26xGrassSlabBlock extends GrassSlabBlock implements BonemealableBlock {
-                public V26xGrassSlabBlock(BlockBehaviour.Properties properties) {
+            class NativeGrassSlabBlock extends GrassSlabBlock implements BonemealableBlock {
+                public NativeGrassSlabBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -472,7 +472,7 @@ public class BlockFactory implements IBlockFactory {
                     }
                 }
             }
-            return new V26xGrassSlabBlock(props);
+            return new NativeGrassSlabBlock(props);
         } else if (def.isHayBaleSlab()) {
             return new HayBaleSlabBlock(props) {
                 @Override
@@ -719,8 +719,8 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isMangroveLeaves()) {
-            class V26xMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
-                public V26xMangroveLeavesBlock(BlockBehaviour.Properties properties) {
+            class NativeMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
+                public NativeMangroveLeavesBlock(BlockBehaviour.Properties properties) {
                     super(0.01f, properties);
                 }
                 @Override
@@ -744,10 +744,10 @@ public class BlockFactory implements IBlockFactory {
                     // The 1.18.2 reference leaves do not emit falling-leaf particles.
                 }
             }
-            return new V26xMangroveLeavesBlock(props);
+            return new NativeMangroveLeavesBlock(props);
         } else if (def.isMangrovePropagule()) {
-            class V26xMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
-                public V26xMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
+            class NativeMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
+                public NativeMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
                     super(properties.noCollision().instabreak().sound(SoundType.GRASS).randomTicks());
                 }
                 @Override
@@ -777,7 +777,7 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BushBlock.class);
                 }
             }
-            return new V26xMangrovePropaguleBlock(props);
+            return new NativeMangrovePropaguleBlock(props);
         } else if (def.isMangroveRoots()) {
             return new MangroveRootsBlock(props) {
                 @Override
@@ -832,8 +832,8 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isColoredMossLayers()) {
             Supplier<Block> fullBlock = resolveBlockSupplier(def.getId().replace("_layers", "_block"));
-            class V26xColoredMossLayersBlock extends ColoredMossLayersBlock {
-                public V26xColoredMossLayersBlock(BlockBehaviour.Properties properties) {
+            class NativeColoredMossLayersBlock extends ColoredMossLayersBlock {
+                public NativeColoredMossLayersBlock(BlockBehaviour.Properties properties) {
                     super(properties, fullBlock);
                 }
 
@@ -854,10 +854,10 @@ public class BlockFactory implements IBlockFactory {
                     return isCommonPathfindable(state, type);
                 }
             }
-            return new V26xColoredMossLayersBlock(props);
+            return new NativeColoredMossLayersBlock(props);
         } else if (def.isMossLayers()) {
-            class V26xMossLayersBlock extends MossLayersBlock {
-                public V26xMossLayersBlock(BlockBehaviour.Properties properties) {
+            class NativeMossLayersBlock extends MossLayersBlock {
+                public NativeMossLayersBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -878,7 +878,7 @@ public class BlockFactory implements IBlockFactory {
                     return isCommonPathfindable(state, type);
                 }
             }
-            return new V26xMossLayersBlock(props);
+            return new NativeMossLayersBlock(props);
         } else if (def.isWoolLayers()) {
             String color = def.getId().replace("_carpet_layers", "").replace("_layered_wool_layers", "");
             Supplier<Item> carpetSupplier = resolveItemSupplier(color + "_carpet_layers");
@@ -915,8 +915,8 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isLeafLitter()) {
-            class V26xLeafLitterBlock extends LeafLitterBlock implements BonemealableBlock {
-                public V26xLeafLitterBlock(BlockBehaviour.Properties properties) {
+            class NativeLeafLitterBlock extends LeafLitterBlock implements BonemealableBlock {
+                public NativeLeafLitterBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -952,7 +952,7 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BushBlock.class);
                 }
             }
-            return new V26xLeafLitterBlock(props);
+            return new NativeLeafLitterBlock(props);
         } else if (def.isLayer()) {
             return new ModLayerBlock(props);
         } else if (def.isAshenKingPillar()) {
@@ -1679,8 +1679,8 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isHangingMoss()) {
             props.randomTicks();
-            class V26xHangingMossBlock extends HangingMossBlock implements BonemealableBlock {
-                public V26xHangingMossBlock(BlockBehaviour.Properties properties) {
+            class NativeHangingMossBlock extends HangingMossBlock implements BonemealableBlock {
+                public NativeHangingMossBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1768,11 +1768,11 @@ public class BlockFactory implements IBlockFactory {
                     }
                 }
             }
-            return new V26xHangingMossBlock(props);
+            return new NativeHangingMossBlock(props);
         } else if (def.isClover()) {
             props.instabreak().sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
-            class V26xCloverBlock extends CloverBlock implements BonemealableBlock {
-                public V26xCloverBlock(BlockBehaviour.Properties properties) {
+            class NativeCloverBlock extends CloverBlock implements BonemealableBlock {
+                public NativeCloverBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1813,11 +1813,11 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BushBlock.class);
                 }
             }
-            return new V26xCloverBlock(props);
+            return new NativeCloverBlock(props);
         } else if (def.isPetal()) {
             props.instabreak().sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
-            class V26xPetalBlock extends PetalBlock implements BonemealableBlock {
-                public V26xPetalBlock(BlockBehaviour.Properties properties) {
+            class NativePetalBlock extends PetalBlock implements BonemealableBlock {
+                public NativePetalBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1858,11 +1858,11 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BushBlock.class);
                 }
             }
-            return new V26xPetalBlock(props);
+            return new NativePetalBlock(props);
         } else if (def.isWildflowers()) {
             props.sound(SoundType.GRASS).noCollision();
-            class V26xWildflowersBlock extends WildflowersBlock implements BonemealableBlock {
-                public V26xWildflowersBlock(BlockBehaviour.Properties properties) {
+            class NativeWildflowersBlock extends WildflowersBlock implements BonemealableBlock {
+                public NativeWildflowersBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
 
@@ -1901,14 +1901,14 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BushBlock.class);
                 }
             }
-            return new V26xWildflowersBlock(props);
+            return new NativeWildflowersBlock(props);
         } else if (def.isColoredMoss()) {
             Supplier<Block> carpet = resolveBlockSupplier(def.getId().replace("_block", "_carpet"));
             Supplier<Block> overlay = resolveBlockSupplier(def.getId().replace("_block", "_overlay"));
             Supplier<Block> layers = resolveBlockSupplier(def.getId().replace("_block", "_layers"));
             Supplier<Block> sapling = resolveBlockSupplier(def.getParentBlockId());
-            class V26xColoredMossBlock extends ColoredMossBlock implements BonemealableBlock {
-                public V26xColoredMossBlock(BlockBehaviour.Properties properties) {
+            class NativeColoredMossBlock extends ColoredMossBlock implements BonemealableBlock {
+                public NativeColoredMossBlock(BlockBehaviour.Properties properties) {
                     super(properties, carpet, overlay, layers, sapling, null);
                 }
 
@@ -1938,11 +1938,11 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, Block.class);
                 }
             }
-            return new V26xColoredMossBlock(props);
+            return new NativeColoredMossBlock(props);
         } else if (def.isColoredSporeBlossom()) {
             int colorRGB = getSporeBlossomColor(def.getId());
-            class V26xColoredSporeBlossomBlock extends ColoredSporeBlossomBlock {
-                public V26xColoredSporeBlossomBlock(BlockBehaviour.Properties properties) {
+            class NativeColoredSporeBlossomBlock extends ColoredSporeBlossomBlock {
+                public NativeColoredSporeBlossomBlock(BlockBehaviour.Properties properties) {
                     super(properties, colorRGB);
                 }
 
@@ -1956,11 +1956,11 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, SporeBlossomBlock.class);
                 }
             }
-            return new V26xColoredSporeBlossomBlock(props);
+            return new NativeColoredSporeBlossomBlock(props);
         } else if (def.isCreakingHeart()) {
             Supplier<Block> resinClumpSupplier = resolveBlockSupplier("resin_clump");
-            class V26xCreakingHeartBlock extends CreakingHeartBlock {
-                public V26xCreakingHeartBlock(BlockBehaviour.Properties properties) {
+            class NativeCreakingHeartBlock extends CreakingHeartBlock {
+                public NativeCreakingHeartBlock(BlockBehaviour.Properties properties) {
                     super(properties, resinClumpSupplier);
                 }
 
@@ -1986,10 +1986,10 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, RotatedPillarBlock.class);
                 }
             }
-            return new V26xCreakingHeartBlock(props);
+            return new NativeCreakingHeartBlock(props);
         } else if (def.isMonetFlower()) {
-            class V26xMonetFlowerBlock extends MonetFlowerBlock implements BonemealableBlock {
-                public V26xMonetFlowerBlock(BlockBehaviour.Properties properties) {
+            class NativeMonetFlowerBlock extends MonetFlowerBlock implements BonemealableBlock {
+                public NativeMonetFlowerBlock(BlockBehaviour.Properties properties) {
                     super(properties);
                 }
                 @Override
@@ -2014,7 +2014,7 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BushBlock.class);
                 }
             }
-            return new V26xMonetFlowerBlock(props);
+            return new NativeMonetFlowerBlock(props);
         } else if (def.isSnowyBush()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
             return new SnowyBushBlock(props, snowBricks) {
@@ -2036,8 +2036,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isSnowyFern()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
             Supplier<Block> snowyLargeFern = resolveBlockSupplier("snowy_large_fern");
-            class V26xSnowyFernBlock extends SnowyFernBlock implements BonemealableBlock {
-                public V26xSnowyFernBlock(BlockBehaviour.Properties properties) {
+            class NativeSnowyFernBlock extends SnowyFernBlock implements BonemealableBlock {
+                public NativeSnowyFernBlock(BlockBehaviour.Properties properties) {
                     super(properties, snowBricks, snowyLargeFern);
                 }
                 @Override
@@ -2067,12 +2067,12 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BushBlock.class);
                 }
             }
-            return new V26xSnowyFernBlock(props);
+            return new NativeSnowyFernBlock(props);
         } else if (def.isSnowyShortGrass()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
             Supplier<Block> snowyTallGrass = resolveBlockSupplier("snowy_tall_grass");
-            class V26xSnowyShortGrassBlock extends SnowyShortGrassBlock implements BonemealableBlock {
-                public V26xSnowyShortGrassBlock(BlockBehaviour.Properties properties) {
+            class NativeSnowyShortGrassBlock extends SnowyShortGrassBlock implements BonemealableBlock {
+                public NativeSnowyShortGrassBlock(BlockBehaviour.Properties properties) {
                     super(properties, snowBricks, snowyTallGrass);
                 }
                 @Override
@@ -2104,7 +2104,7 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BushBlock.class);
                 }
             }
-            return new V26xSnowyShortGrassBlock(props);
+            return new NativeSnowyShortGrassBlock(props);
         } else if (def.isSnowyLargeFern()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
             return new SnowyLargeFernBlock(props, snowBricks) {
@@ -2151,8 +2151,8 @@ public class BlockFactory implements IBlockFactory {
             Supplier<Block> snowyFern = resolveBlockSupplier("snowy_fern");
             Supplier<Block> snowyTallGrass = resolveBlockSupplier("snowy_tall_grass");
             Supplier<Block> snowyLargeFern = resolveBlockSupplier("snowy_large_fern");
-            class V26xSnowyGrassBlock extends SnowyGrassBlock implements BonemealableBlock {
-                public V26xSnowyGrassBlock(BlockBehaviour.Properties properties) {
+            class NativeSnowyGrassBlock extends SnowyGrassBlock implements BonemealableBlock {
+                public NativeSnowyGrassBlock(BlockBehaviour.Properties properties) {
                     super(properties, snowyShortGrass, snowyBush, snowyFern, snowyTallGrass, snowyLargeFern);
                 }
 
@@ -2230,7 +2230,7 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, Block.class);
                 }
             }
-            return new V26xSnowyGrassBlock(props);
+            return new NativeSnowyGrassBlock(props);
         } else if (def.isExperienceFluid()) {
             return new ExperienceFluidBlock(com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids::still,
                     props.noLootTable().replaceable().noOcclusion()) {

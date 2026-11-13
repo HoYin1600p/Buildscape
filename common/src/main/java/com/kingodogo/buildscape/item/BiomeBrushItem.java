@@ -225,7 +225,7 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
                 Services.PLATFORM.sendActionBarMessage(player, ComponentHelper.translatable("message.buildscape.biome_brush.wrong_dimension").withStyle(ChatFormatting.RED));
                 return InteractionResult.FAIL;
             }
-            if (maxX - minX + 1 > MAX_HORIZONTAL_SIZE || maxZ - minZ + 1 > MAX_HORIZONTAL_SIZE) {
+            if ((long) maxX - minX + 1 > MAX_HORIZONTAL_SIZE || (long) maxZ - minZ + 1 > MAX_HORIZONTAL_SIZE) {
                 Services.PLATFORM.sendActionBarMessage(player, ComponentHelper.translatable("message.buildscape.biome_brush.too_large", MAX_HORIZONTAL_SIZE).withStyle(ChatFormatting.RED));
                 return InteractionResult.FAIL;
             }

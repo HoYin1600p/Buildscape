@@ -321,29 +321,8 @@ public final class FoliageColors {
                     net.minecraft.world.level.block.entity.BlockEntity be = reader
                             .getBlockEntity(pos);
                     if (be instanceof com.kingodogo.buildscape.block.GlowLightsBlockEntity glowBE) {
-                        java.util.List<String> dyeColors = glowBE
-                                .getDyeColors();
-                        if (dyeColors != null && !dyeColors.isEmpty()) {
-                            int hash = pos.hashCode()
-                                    ^ state.hashCode();
-                            int colorIndex = Math.floorMod(hash, dyeColors.size());
-                            String colorCode = dyeColors
-                                    .get(colorIndex);
-
-                            try {
-                                if (colorCode != null
-                                        && colorCode.startsWith(
-                                        "#")
-                                        && colorCode.length() == 7) {
-                                    int color = Integer
-                                            .parseInt(colorCode
-                                                            .substring(1),
-                                                    16);
-                                    return color | 0xFF000000;
-                                }
-                            } catch (NumberFormatException e) {
-                            }
-                        }
+                        return com.kingodogo.buildscape.client.GlowLightTint.color(
+                                pos.hashCode() ^ state.hashCode(), glowBE.getDyeColors());
                     }
                 }
 

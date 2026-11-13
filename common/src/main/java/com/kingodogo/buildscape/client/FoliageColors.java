@@ -20,6 +20,14 @@ public final class FoliageColors {
     private FoliageColors() {}
 
     private static BlockTintSource source(String path) {
+        if (path.equals("glow_lights")) return new BlockTintSource() {
+            public int color(BlockState state) { return -1; }
+            public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+                if (level == null || pos == null
+                        || !(level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.GlowLightsBlockEntity lights)) return -1;
+                return GlowLightTint.color(pos.hashCode() ^ state.hashCode(), lights.getDyeColors());
+            }
+        };
         if (path.equals("cascade_block") || path.equals("cascade_block_no_mist")) return new BlockTintSource() {
             public int color(BlockState state) { return 0xFF3F76E4; }
             public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
@@ -84,6 +92,7 @@ public final class FoliageColors {
     /** Model-bake callbacks supply item colours without changing packaged JSON resources. */
     public static ItemModel tintItem(Identifier id, ItemModel original) {
         if (!id.getNamespace().equals("buildscape")) return original;
+        if (id.getPath().equals("glow_lights")) return original;
         BlockTintSource tint = source(id.getPath());
         if (tint == null) return original;
         return (state, stack, resolver, display, level, owner, seed) -> {

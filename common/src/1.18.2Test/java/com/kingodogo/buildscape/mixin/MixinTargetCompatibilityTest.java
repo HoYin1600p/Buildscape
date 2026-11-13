@@ -44,7 +44,8 @@ class MixinTargetCompatibilityTest {
     // Forge classes are absent from this Minecraft-only bytecode classpath; Embeddium is optional.
     private static final Set<String> EXPECTED_MISSING_CLASSES = Set.of(
             "com/kingodogo/buildscape/mixin/BuildscapeForgeRegistryMixin -> net.minecraftforge.registries.ForgeRegistry",
-            "com/kingodogo/buildscape/mixin/EmbeddiumPipeSpillMixin -> me.jellysquid.mods.sodium.client.render.pipeline.FluidRenderer"
+            "com/kingodogo/buildscape/mixin/EmbeddiumPipeSpillMixin -> me.jellysquid.mods.sodium.client.render.pipeline.FluidRenderer",
+            "com/kingodogo/buildscape/mixin/EmbeddiumBiomeColorMixin -> me.jellysquid.mods.sodium.client.world.biome.BiomeColorCache"
     );
     // Only these selectors may miss: 26.2's parallel-model lifecycle and the production SRG alias
     // alongside ItemStack's Mojang-named getMaxStackSize. Invalid callbacks/@At sites still fail.

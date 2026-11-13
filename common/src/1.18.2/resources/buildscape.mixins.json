@@ -53,6 +53,10 @@
                    "ServerRecipeBookMixin"
                ],
     "client":  [
+                   "BiomeColorsMixin",
+                   "EmbeddiumBiomeColorMixin",
+                   "BiomeTintPacketMixin",
+                   "BiomeTintChunkUnloadMixin",
                    "AbstractContainerScreenMixin",
                    "AdvancementWidgetMixin",
                    "AnvilScreenMixin",

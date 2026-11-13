@@ -16,24 +16,32 @@ record HazeTextureBounds(float minU, float maxU, float minV, float maxV) {
         if (cached != null) return cached;
         var contents = sprite.contents();
         int width = contents.width(), height = contents.height();
+        HazeTextureBounds bounds = scan(width, height, contents.getUniqueFrames().toIntArray(), contents::isTransparent);
+        if (bounds == null) return FULL;
+        CACHE.put(sprite, bounds);
+        return bounds;
+    }
+
+    @FunctionalInterface
+    interface PixelTransparency { boolean isTransparent(int frame, int x, int y); }
+
+    static HazeTextureBounds scan(int width, int height, int[] frames, PixelTransparency pixels) {
         int minX = width, minY = height, maxX = -1, maxY = -1;
         try {
-            for (int frame : contents.getUniqueFrames().toIntArray()) {
+            for (int frame : frames) {
                 for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) {
-                    if (!contents.isTransparent(frame, x, y)) {
+                    if (!pixels.isTransparent(frame, x, y)) {
                         minX = Math.min(minX, x); minY = Math.min(minY, y);
                         maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
                     }
                 }
             }
         } catch (IllegalStateException closedImage) {
-            return FULL;
+            return null;
         }
-        HazeTextureBounds bounds = maxX < 0 ? EMPTY : new HazeTextureBounds(
+        return maxX < 0 ? EMPTY : new HazeTextureBounds(
                 Math.max(0, minX - 1) / (float) width, Math.min(width, maxX + 2) / (float) width,
                 Math.max(0, minY - 1) / (float) height, Math.min(height, maxY + 2) / (float) height);
-        CACHE.put(sprite, bounds);
-        return bounds;
     }
 
     boolean isEmpty() { return minU == maxU || minV == maxV; }

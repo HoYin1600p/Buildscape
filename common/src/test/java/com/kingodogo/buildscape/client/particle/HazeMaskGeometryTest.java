@@ -6,6 +6,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HazeMaskGeometryTest {
     @Test
+    void textureScanIncludesAllFramesAndToleratesAClosedImage() {
+        var bounds = HazeTextureBounds.scan(8, 8, new int[]{0, 1},
+                (frame, x, y) -> !(frame == 1 && x == 3 && y == 4));
+        assertEquals(new HazeTextureBounds(0.25F, 0.625F, 0.375F, 0.75F), bounds);
+        assertNull(HazeTextureBounds.scan(8, 8, new int[]{0}, (frame, x, y) -> {
+            throw new IllegalStateException("closed image");
+        }));
+    }
+    @Test
     void wallsBlockVisibilityAndIdenticalLayoutsReuseTheMask() {
         HazeMask.clearCaches();
         HazeMask wall = HazeMask.compute(7, 7, 3, 3, (x, z) -> x == 5);

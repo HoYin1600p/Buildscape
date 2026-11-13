@@ -46,8 +46,7 @@ public class TreeChopHandler {
             cachedLevel = mc.level;
         }
 
-        if (Services.PLATFORM.isScreenOpen() || !player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
-                || !CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
+        if (Services.PLATFORM.isScreenOpen() || mcPlayerNotEligible(player) || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()) {
             resetTarget(mc, player);
             return;
         }
@@ -96,8 +95,7 @@ public class TreeChopHandler {
     }
 
     public static boolean shouldCancelHighlight(Player player, HitResult hit) {
-        if (player == null || !player.isCreative() || !player.isShiftKeyDown()) return false;
-        if (!CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) return false;
+        if (player == null || mcPlayerNotEligible(player)) return false;
         if (hit == null || hit.getType() != HitResult.Type.BLOCK) return false;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return false;
@@ -153,7 +151,7 @@ public class TreeChopHandler {
     }
 
     private static boolean mcPlayerNotEligible(Player player) {
-        return !player.isCreative() || !player.isShiftKeyDown() ||
+        return !player.isCreative() || !Services.PLATFORM.hasPermission(player, 2) || !player.mayBuild() || !player.isShiftKeyDown() ||
                 !CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID());
     }
 
@@ -162,8 +160,7 @@ public class TreeChopHandler {
     }
 
     public static String getOverlayText(Player player, HitResult hit) {
-        if (player == null || !player.isCreative() || !player.isShiftKeyDown()) return null;
-        if (!CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) return null;
+        if (player == null || mcPlayerNotEligible(player)) return null;
         if (hit == null || hit.getType() != HitResult.Type.BLOCK) return null;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return null;

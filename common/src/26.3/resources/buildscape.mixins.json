@@ -38,6 +38,7 @@
     "LivingEntityMixin",
     "HollowLogPlayerPoseMixin",
     "MinecraftServerMixin",
+    "SavedDataStorageMixin",
     "ShulkerGhostFilterMixin",
     "ShulkerBoxBlockMixin",
     "ShulkerBoxMenuMixin",

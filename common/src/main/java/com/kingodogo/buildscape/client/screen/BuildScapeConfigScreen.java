@@ -1807,16 +1807,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     // Main screen rendering.
     @Override
     public void render(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
-        if (parent != null && !closeToWorld) {
-            Services.PLATFORM.pushGuiPose(poseStackOrGraphics);
-            try {
-                Services.PLATFORM.renderScreen(parent, poseStackOrGraphics, -999, -999, partialTick);
-            } catch (RuntimeException e) {
-                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.debug("Unable to render the parent screen", e);
-            } finally {
-                Services.PLATFORM.popGuiPose(poseStackOrGraphics);
-            }
-        }
+        // The parent screen is the return target, not this screen's backdrop. Rendering it here
+        // leaks pause-screen controls through the config screen's translucent overlay.
         float alpha = updateAnimations();
         if (alpha <= 0.001f) return;
 

@@ -25,7 +25,7 @@ public final class HazeBushParticleHandler {
     private static final int RANGE = 32;
     private HazeBushParticleHandler() {}
 
-    public static void clear() { POSITIONS.clear(); trackedLevel = null; scanTicks = 0; }
+    public static void clear() { POSITIONS.clear(); trackedLevel = null; scanTicks = 0; HazeMask.clearCaches(); }
 
     private static boolean isBush(BlockState state) {
         return state.getBlock() instanceof HazeBushBlock || state.getBlock() instanceof PottedHazeBushBlock;

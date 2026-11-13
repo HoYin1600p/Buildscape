@@ -53,6 +53,7 @@
     "SulfurCubePassengerDamageMixin"
   ],
   "client": [
+    "HazeParticleRenderStateMixin",
     "BiomeColorsMixin",
     "BiomeTintPacketMixin",
     "BiomeTintChunkUnloadMixin",

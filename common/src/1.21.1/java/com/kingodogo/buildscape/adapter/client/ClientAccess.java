@@ -115,6 +115,10 @@ public final class ClientAccess {
     public static CommonId registerExternalTexture(String name, java.io.InputStream stream) {
         try {
             com.mojang.blaze3d.platform.NativeImage image = com.mojang.blaze3d.platform.NativeImage.read(stream);
+            if (com.kingodogo.buildscape.client.screen.BackgroundImageLimits.oversized(image.getWidth(), image.getHeight())) {
+                image.close();
+                return null;
+            }
             net.minecraft.client.renderer.texture.DynamicTexture texture = new net.minecraft.client.renderer.texture.DynamicTexture(image);
             texture.upload();
             return registerDynamicTexture(name, texture);

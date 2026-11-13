@@ -163,6 +163,21 @@ public final class ClientPlatformHooks {
         return CommonId.of(id.getNamespace(), id.getPath());
     }
 
+    public static CommonId registerExternalTexture(String name, java.io.InputStream stream) {
+        try {
+            com.mojang.blaze3d.platform.NativeImage image = com.mojang.blaze3d.platform.NativeImage.read(stream);
+            if (com.kingodogo.buildscape.client.screen.BackgroundImageLimits.oversized(image.getWidth(), image.getHeight())) {
+                image.close();
+                return null;
+            }
+            var texture = new net.minecraft.client.renderer.texture.DynamicTexture(() -> name, image);
+            texture.upload();
+            return registerDynamicTexture(name, texture);
+        } catch (Throwable error) {
+            return null;
+        }
+    }
+
     public static net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) {
         return new net.minecraft.client.renderer.texture.DynamicTexture(name, width, height, clear);
     }

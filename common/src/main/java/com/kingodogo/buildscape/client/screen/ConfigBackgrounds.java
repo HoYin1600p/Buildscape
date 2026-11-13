@@ -190,7 +190,7 @@ public class ConfigBackgrounds {
             }
             long width = Integer.toUnsignedLong(header.readInt());
             long height = Integer.toUnsignedLong(header.readInt());
-            return width > 4096 || height > 4096;
+            return BackgroundImageLimits.oversized(width, height);
         } catch (Exception ignored) {
             return false;
         }

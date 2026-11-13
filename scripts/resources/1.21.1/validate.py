@@ -18,6 +18,15 @@ objects, strings, namespaced, asset_path = (
     shared.objects, shared.strings, shared.namespaced, shared.asset_path)
 
 
+def invalid_legacy_references(path, data, removed, files):
+    checked = data
+    if ("/worldgen/placed_feature/" in path and isinstance(data, dict)
+            and isinstance(data.get("feature"), str)
+            and c.data_path("worldgen/configured_feature", data["feature"]) in files):
+        checked = {key: value for key, value in data.items() if key != "feature"}
+    return [value for value in strings(checked) if value in removed or value.startswith("#forge:")]
+
+
 class Validator(shared.Validator):
     @staticmethod
     def number(value):
@@ -154,6 +163,9 @@ class Validator(shared.Validator):
                         self.error(path, event + ": unknown subtitle " + repr(subtitle))
 
     def registry_id(self, kind, value):
+        if kind == "recipe" and isinstance(value, str):
+            if c.data_path(kind, value) in getattr(self, "generated_recipes", set()):
+                return True
         if kind == "item":
             if not isinstance(value, str) or not shared.ID.fullmatch(value):
                 return False
@@ -293,22 +305,26 @@ class Validator(shared.Validator):
         if self.get_vanilla("version.json").get("id") != "1.21.1":
             return ["--mc-jar: expected Minecraft 1.21.1 client jar"]
         self.parse()
+        self.generated_recipes = c.generated_recipe_paths({Path(path): data for path, data in self.json.items()})
         if self.json.get("pack.mcmeta") != c.PACK:
             self.error("pack.mcmeta", "expected resource 34 / data 48 supported range")
         self.models()
         self.sounds()
         removed = c.removals()
-        files = {Path(path) for path in self.files} | {Path(path) for path in self.jar_files}
+        files = {Path(path) for path in self.files} | {Path(path) for path in self.jar_files} | self.generated_recipes
         for path, data in self.json.items():
             if path.startswith("data/"):
                 for kind, value in c.missing_data_references(Path(path), data, files):
                     self.error(path, "missing " + kind + " dependency " + value)
-                reason = c.unsupported_loader_data(data)
+                allowed_type = None
+                for loader in ("forge", "neoforge"):
+                    if path.startswith("data/buildscape/" + loader + "/biome_modifier/"):
+                        allowed_type = loader + ":add_features"
+                reason = c.unsupported_loader_data(data, allowed_type)
                 if reason:
                     self.error(path, reason)
-                for value in strings(data):
-                    if value in removed or value.startswith("#forge:"):
-                        self.error(path, "retired or legacy reference " + value)
+                for value in invalid_legacy_references(path, data, removed, files):
+                    self.error(path, "retired or legacy reference " + value)
                 if "/tags/" in path:
                     parts = path.split("/")
                     kind = "/".join(parts[3:5]) if parts[3] == "worldgen" else parts[3]

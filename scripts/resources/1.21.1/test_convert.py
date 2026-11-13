@@ -13,6 +13,36 @@ import validate as v
 
 
 class ConversionTests(unittest.TestCase):
+    def test_compact_recipe_unlocks_require_a_backing_recipe(self):
+        generated = {
+            Path("data/buildscape/recipes_pack/crafting.json"): {
+                "aliases": {"BS": "buildscape:"},
+                "crafting_shaped": [["BS:copper_chest", ["#"], [["#", "minecraft:chest"]], 1]],
+            },
+            Path("data/buildscape/advancement/keep.json"): {
+                "rewards": {"recipes": ["buildscape:autogen/crafting/copper_chest"]}},
+            Path("data/buildscape/advancement/drop.json"): {
+                "rewards": {"recipes": ["buildscape:autogen/crafting/missing"]}},
+        }
+        c.prune_dependencies(generated, [])
+        self.assertIn(Path("data/buildscape/advancement/keep.json"), generated)
+        self.assertNotIn(Path("data/buildscape/advancement/drop.json"), generated)
+
+    def test_loader_codec_exception_does_not_allow_nested_codecs(self):
+        self.assertIsNone(c.unsupported_loader_data({"type": "forge:add_features"}, "forge:add_features"))
+        self.assertIsNotNone(c.unsupported_loader_data({"type": "neoforge:add_features"}, "forge:add_features"))
+        self.assertIsNotNone(c.unsupported_loader_data({"type": "forge:add_features",
+                                                       "nested": {"type": "forge:unsupported"}},
+                                                      "forge:add_features"))
+
+    def test_configured_feature_id_does_not_hide_retired_block_references(self):
+        path = "data/buildscape/worldgen/placed_feature/test.json"
+        data = {"feature": "buildscape:mangrove_propagule",
+                "placement": [{"block": "buildscape:mangrove_propagule"}]}
+        files = {Path("data/buildscape/worldgen/configured_feature/mangrove_propagule.json")}
+        self.assertEqual(v.invalid_legacy_references(path, data, {"buildscape:mangrove_propagule"}, files),
+                         ["buildscape:mangrove_propagule"])
+
     def test_model_migration_preserves_face_data_and_nonzero_rotations(self):
         original = {"elements": [
             {"rotation": {"x": 0, "y": 0, "z": 0, "origin": [14, 13, 14]},

@@ -9,6 +9,7 @@ import copy
 import importlib.util
 import json
 from pathlib import Path
+import re
 import sys
 import zipfile
 
@@ -310,13 +311,15 @@ def objects(value):
             yield from objects(child)
 
 
-def unsupported_loader_data(data):
+def unsupported_loader_data(data, allowed_root_type=None):
     for obj in objects(data):
         if "forge:conditions" in obj or "neoforge:conditions" in obj:
             return "legacy Forge conditions"
         for key in ("type", "condition", "function"):
             value = obj.get(key, "")
             if isinstance(value, str) and value.startswith(("forge:", "neoforge:")):
+                if obj is data and key == "type" and value == allowed_root_type:
+                    continue
                 return "loader-specific codec " + value
     return None
 
@@ -421,17 +424,47 @@ def missing_data_references(rel, data, files):
             and data_path(kind, value) not in files]
 
 
+def generated_recipe_paths(generated):
+    """Paths for compact recipes assigned IDs by RecipeIdAllocator at runtime."""
+    paths = set()
+    for path, pack in generated.items():
+        if path.parts[:3] != ("data", "buildscape", "recipes_pack") or not isinstance(pack, dict):
+            continue
+        aliases = pack.get("aliases", {})
+        if not isinstance(aliases, dict):
+            continue
+        for section in ("crafting_shaped", "shaped", "crafting_shapeless", "shapeless",
+                        "crafting_shaped_durability", "shaped_durability",
+                        "crafting_shapeless_durability", "shapeless_durability"):
+            rows = pack.get(section, [])
+            if not isinstance(rows, list):
+                continue
+            for row in rows:
+                minimum = 3 if "shaped" in section and "shapeless" not in section else 2
+                if (not isinstance(row, list) or len(row) < minimum or not isinstance(row[0], str)
+                        or not isinstance(row[1], list)):
+                    continue
+                prefix, separator, name = row[0].partition(":")
+                if not separator:
+                    name = prefix
+                elif isinstance(aliases.get(prefix), str):
+                    name = (aliases[prefix] + name).partition(":")[2]
+                name = re.sub(r"[^a-z0-9/._-]", "_", name.lower())
+                paths.add(Path("data/buildscape/recipe/autogen") / path.stem / (name + ".json"))
+    return paths
+
+
 def prune_dependencies(generated, report):
     """Remove orphan unlocks and worldgen chains after loader/removal filtering.
 
-    Compact packs are runtime recipes, not vanilla recipe resources. They cannot
-    satisfy a vanilla advancement reward. Keep their recipes and drop the unlock
-    with a report instead. Repeat to handle parents and nested worldgen tags.
+    Compact packs create runtime recipes. Include their IDs when deciding whether
+    an advancement reward exists. Repeat for parents and nested worldgen tags.
     """
     while True:
         changed = False
+        available = set(generated) | generated_recipe_paths(generated)
         for rel, data in list(generated.items()):
-            missing = missing_data_references(rel, data, generated)
+            missing = missing_data_references(rel, data, available)
             if not missing:
                 continue
             if rel.parts[2:4] == ("tags", "worldgen"):

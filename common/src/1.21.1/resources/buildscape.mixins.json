@@ -55,6 +55,9 @@
     "WallBlockMixin"
   ],
   "client": [
+    "BiomeColorsMixin",
+    "BiomeTintPacketMixin",
+    "BiomeTintChunkUnloadMixin",
     "LiquidBlockRendererMixin",
     "AbstractContainerScreenMixin",
     "AdvancementWidgetMixin",

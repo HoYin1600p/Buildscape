@@ -53,6 +53,9 @@
     "SulfurCubePassengerDamageMixin"
   ],
   "client": [
+    "BiomeColorsMixin",
+    "BiomeTintPacketMixin",
+    "BiomeTintChunkUnloadMixin",
     "LiquidBlockRendererMixin",
     "client.SoundMuffMixin",
     "client.AdvancementsScreenMixin",

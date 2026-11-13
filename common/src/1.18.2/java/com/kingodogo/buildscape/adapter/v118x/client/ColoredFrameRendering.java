@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.adapter.v118x.client;
 
-import com.kingodogo.buildscape.BuildscapeCommon;
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
@@ -13,14 +12,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class ColoredFrameRendering {
 
-    private static final CommonId DEFAULT_TEXTURE =
-            CommonId.of(BuildscapeCommon.MOD_ID, "textures/entity/white_item_frame.png");
-
     public static CommonId getTextureForColor(String color) {
-        if (color == null || color.isEmpty()) {
-            return DEFAULT_TEXTURE;
-        }
-        return CommonId.of(BuildscapeCommon.MOD_ID, "textures/entity/" + color + "_item_frame.png");
+        return com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer.getTextureForColor(color);
     }
 
     public static <T extends Entity & ColoredItemFrameEntity> Vec3 getRenderOffset(T entity, float partialTicks) {

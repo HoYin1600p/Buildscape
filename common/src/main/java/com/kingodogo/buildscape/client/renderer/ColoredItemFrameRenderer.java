@@ -17,10 +17,16 @@ public class ColoredItemFrameRenderer {
             CommonId.of(BuildscapeCommon.MOD_ID, "textures/entity/white_item_frame.png");
 
     public static CommonId getTextureForColor(String color) {
-        if (color == null || color.isEmpty()) {
-            return DEFAULT_TEXTURE;
+        String safeColor = safeColor(color);
+        return safeColor.equals("white") ? DEFAULT_TEXTURE
+                : CommonId.of(BuildscapeCommon.MOD_ID, "textures/entity/" + safeColor + "_item_frame.png");
+    }
+
+    public static String safeColor(String color) {
+        for (net.minecraft.world.item.DyeColor dye : net.minecraft.world.item.DyeColor.values()) {
+            if (dye.getName().equals(color)) return color;
         }
-        return CommonId.of(BuildscapeCommon.MOD_ID, "textures/entity/" + color + "_item_frame.png");
+        return "white";
     }
 
     public static <T extends Entity & ColoredItemFrameEntity> Vec3 getRenderOffset(T entity, float partialTicks) {

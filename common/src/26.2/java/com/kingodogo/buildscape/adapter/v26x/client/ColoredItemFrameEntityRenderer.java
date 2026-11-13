@@ -38,7 +38,7 @@ public final class ColoredItemFrameEntityRenderer extends ItemFrameRenderer<Plat
 
     public static Identifier textureFor(String color) {
         return Identifier.fromNamespaceAndPath("buildscape", "textures/entity/"
-                + (color == null || color.isEmpty() ? "white" : color) + "_item_frame.png");
+                + com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer.safeColor(color) + "_item_frame.png");
     }
 
     @Override public Vec3 getRenderOffset(ItemFrameRenderState state) {
